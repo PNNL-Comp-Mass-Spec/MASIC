@@ -1,0 +1,587 @@
+MASIC Change Log
+
+Vesrion 2.6.5074; November 22, 2013
+	- Changed several ByRef parameters to ByVal parameters in MASICPeakFinder
+	- Fixed bug in LookupDatasetNumber
+
+Vesrion 2.6.5072; November 20, 2013
+	- Factored out the auto-generated control code from frmMain.vb into frmMain.Designer.vb
+
+Version 2.6.5071; November 19, 2013
+	- Updated the OGlcNac reporter ion to include 204.087 m/z (plus also 300.13 and 503.21 m/z)
+
+Version 2.6.5069; November 17, 2013
+	- Added new reporter ion mode: Mode 11 (enum type OGlcNAc)
+
+Version 2.6.5044; October 23, 2013
+	- Code cleanup
+
+Version 2.6.5021; September 30, 2013
+	- Added new reporter ion mode: Mode 10 (enum type TMTTenMZ)
+
+Version 2.6.4934; July 5, 2013
+	- Now creating temporary Spectrum cache files in the user's temp directory
+
+Version 2.6.4890; May 22, 2013
+	- New version of MSDataFileReader.dll that supports mzXML v3.x files with zlib compressed data
+
+Version 2.6.4874; May 6, 2013
+	- Added setting ReporterIonITraq4PlexCorrectionFactorType, which dictates the correction factors to use for 4-plex iTRAQ
+		- Options are ABSciex or BroadInstitute
+
+Version 2.6.4798; February 19, 2013
+	- Now saving the MASIC settings file in the user's AppData folder (e.g. C:\Users\username\AppData\Roaming\MASIC)
+
+Version 2.6.4797; February 18, 2013
+	- Added support for MZToleranceDaList in the parameter file
+	- Now splitting the Custom SIC list file either on a tab or on a comma, but never on a space
+		- Allows for comments with commas and spaces in them if using a tab delimited between columns
+	- Improved error checking when parsing values from a Custom SIC list file
+
+Version 2.6.4757; January 9, 2013
+	- New version of ThermoRawFileReader.dll
+		- Supports scan filter text "Full msx ms2"
+	- New version of PRISM.dll
+
+Version 2.6.4731; December 14, 2012
+	- Added new reporter ion mode: Mode 9 (enum type LycAcetFragment)
+
+Version 2.6.4518; May 15, 2012
+	- Now using ThermoRawFileReader.dll
+
+Version 2.6.4499; April 26, 2012
+	- New version of clsFinniganDataFileFunctions
+
+Version 2.6.4462; March 20, 2012
+	- Updated to .NET Framework 4.0
+	- Switched from xrawfile2.dll to MSFileReader.XRawfile2.dll
+		- New version supports Xcalibur v2.2
+	- New version of MSDataFileReader.dll
+
+Version 2.5.4324; November 3, 2011
+	- Added new reporter ion mode: Mode 8 (enum type HemeCFragment)
+		- Searches for 616.1767 m/z and 617.1845 m/z
+
+Version 2.5.4302; October 20, 2011
+	- Fixed bug that incorrectly interpreted the scan tolerance for custom SIC values when using an absolute scan number
+
+Version 2.5.4282; September 22, 2011
+	- New version of SavGolCS.dll that no longer uses MathNet.Iridium.dll
+
+Version 2.5.4281; September 21, 2011
+	- Switched from .Now to .UtcNow
+	- Updated to Visual Studio 2010
+	- New version of DataFilter.dll that uses SavGolCS.dll and MathNet.Iridium.dll instead of SAVGOL.dll and icr2ls32.dll
+
+Version 2.5.4049; February 1, 2011
+	- Added option ConsolidateConstantExtendedHeaderValues
+
+Version 2.5.4023; January 6, 2011
+	- Added support for CRM ms3 scans (" NSI CRM ms3 ") in scan headers
+
+Version 2.5.3972; November 16, 2010
+	- Fixed bug that caused MASIC to sometimes not find Reporter Ion masses when using narrow reporter ion tolerances, e.g. less than 0.02 Da
+		- Resulted because the CompressSpectraData function was compressing ion data 
+		  to a resolution of 0.2 Da (BinningOptions.BinSize / SICOptions.CompressToleranceDivisorForDa; typically 1 / 5 = 0.2)
+		- As an example, if an ion at 115.0866 m/z has a higher abundance than the iTRAQ ion at 115.1071 m/z, 
+		  then CompressSpectraData() would only keep the 115.0866 m/z ion, and that ion wouldn't be matched
+		  when searching for 115.1083 +/- 0.015 Da
+
+Version 2.5.3957; November 1, 2010
+	- Updated reporter ion Mode 7 (enum type PCGalnaz) to include 204.087 m/z
+		- Searches for 204.0871934 m/z, 300.130787 m/z, and 503.2101566 m/z
+
+Version 2.5.3947; October 22, 2010
+	- Fixed bug in MASIC Browser
+
+Version 2.5.3923; September 28, 2010
+	- New version of MSDataFileReader.dll
+	- Added support for reading SRM and MRM info from mzXML files
+		- Thermo files should be processed using ReadW so that they have the filterLine XML attribute in the scan element
+			- For example: "+ c NSI SRM ms2 398.560@cid13.00 [491.269-491.271, 769.369-769.371]"
+		- For Non-thermo files, looking for attribute scanType in the scan element
+		- Currently only supports MRM scans where msLevel is 2 or higher
+	- Now skipping call to DiscardDataBelowNoiseThreshold when processing MRM spectra
+	- Now filtering on Dataset name when looking up the dataset name in DMS
+		- The filter will only be added if the Sql Query (defined by DatasetInfoQuerySql) starts with "SELECT DATASET"
+
+Version 2.5.3912; September 17, 2010
+	- Added new reporter ion mode: Mode 7 (enum type PCGalnaz)
+		- Searches for 300.13 m/z and 503.21 m/z
+
+Version 2.5.3841; July 8, 2010
+	- Minor code update to clsProcessFilesBaseClass.vb
+
+Version 2.5.3827; April 30, 2010
+	- Fixed bug that was creating a Log file when MASIC.exe is run from the command line, even if /L was not specified
+
+Version 2.5.3772; April 30, 2010
+	- Added ability to customize the divisors used to determine m/z resolution when compressing mass spectra
+	- By default, when loading MS spectra, MASIC combines data points that have m/z values within the SIC Tolerance divided by 5
+		- Thus, if the SIC tolerance is 0.4 Da, then data closer than 0.08 m/z units is combined into one data point
+		- When compressing, keeps the m/z value and intensity value of the most intense data point in a region (in other words, it doesn't sum the data in a region; it takes the maximum)
+		- You can customize this value using CompressToleranceDivisorForDa or CompressToleranceDivisorForPPM in the XML settings file
+		- CompressToleranceDivisorForDa is usedif the SICTolerance is Dalton based; for ppm-based tolerances, CompressToleranceDivisorForPPM is used
+	- When loading MS/MS spectra, MASIC combines data points that have m/z values with the BinSize defined for binning, divided by 5
+		- The default value for BinSize is 1, so data points closer than 1 / 5 = 0.2 m/z units are combined
+		- Again, when compressing, MASIC keeps the m/z value and intensity value of the most intense data point in the tolerance region
+		- MASIC only uses MS/MS spectra for finding similar MS/MS spectra (for finding related parent ions)
+			- This is why the bin size and m/z resolution values for compression are higher for MS/MS spectra than for MS spectra
+
+Version 2.5.3758; April 16, 2010
+	- Added new Reporter Ion mode: Mode 6 (enum type ITraqEightMZLowRes)
+		- This mode uses the 9x9 matrix for correcting 8-plex iTraq intensities
+			- This matrix accounts for immonium loss from phenylalanine, which appears at 120.08 and 121.08 m/z
+		- This mode is appropriate when collecting low resolution MS/MS spectra (resolution of ~8000 or lower)
+		- When using this mode, the reporter ion "m/z Tolerance Half Width" value should be set to 0.1 Da or larger
+	- For high resolution MS/MS spectra, use Reporter Ion Mode 5 (enum type ITraqEightMZHighRes)
+		- This mode uses the 8x8 matrix for correcting 8-plex iTraq Intensities
+			- This matrix does not consider immonium loss from phenylalanine, since on high resolution instruments, 
+			  the 121.08 peak from phenylalanine and the 121.12 m/z can be baseline resolved
+		- When using this mode, the reporter ion "m/z Tolerance Half Width" value should be set to 0.03 Da or smaller
+	- The GUI will warn you if you're using High Res MS/MS 8-plex iTraq but the tolerance is greater than 0.03 Da.
+	  Similarly, it will warn you if you're using Low Res MS/MS 8-plex iTraq but the tolerance is less than 0.1 Da.
+	
+
+Version 2.5.3757; April 15, 2010
+	- Updated the coefficients used to build the 8-plex iTraq matrix to account for immonium loss from phenylalanine
+		- Results in a 9x9 matrix instead of an 8x8 matrix
+		- For more info, see page 664 in Vaudel, M., Sickmann, A., and L. Martens. "Peptide and protein quantification: A map of the minefield", Proteomics 2010, 10, 650-670.
+
+Version 2.5.3756; April 14, 2010
+	- Added option to correct the iTraq reporter ion intensities based on the theoretical overlap in isotopic distribution peaks
+		- Abundance correction is enabled by default (override using setting "ReporterIonApplyAbundanceCorrection")
+		- To see the extent of the change in intensity set "ReporterIonSaveUncorrectedIntensities" to True
+
+Version 2.5.3700; February 17, 2010
+	- Switched to using a StringBuilder object when writing out the Mass and Intensity lists to the _SICs.xml file
+
+Version 2.5.3686; February 3, 2010
+	- Added support for Dependent MS2 zoom scans (" d Z ms2 ") in scan headers
+	- Fixed bug that was writing 0 to the bpi m/z column in the ScanStats.txt file for MS/MS spectra
+
+Version 2.5.3684; February 1, 2010
+	- Now creating a _DatasetInfo.xml file for each dataset
+		- Contains stats on the number of scans, acquisition start/end times, etc.
+
+Version 2.5.3682; January 30, 2010
+	- Updated to limit the maximum number of ions retained for each mass spectrum to be 50,000 ions
+		- If more than 50,000 ions are present, then sorts the data by descending intensity and keeps the top 50,000 points
+	- Added support for files with Zoom scans
+		- Simply skipping Zoom scans when creating SICs
+
+Version 2.5.3667; January 15, 2010
+	- Fixed bug that caused ReporterIon intensities to be zero
+		- Resulted because the MS/MS spectra are filtered to only retain data about a S/N floor
+		- When the ReporterIon peaks were below this S/N level, they were being filteredout
+		- The fix was to update the DiscardDataBelowNoiseThreshold function to allow for keeping all data within a certain m/z range, which is set to the region in which we need to search for reporter ions
+
+Version 2.5.3643; December 22, 2009
+	- Updated the iTRAQ masses to more precise values: 114.1112, 115.1083, 116.1116, 117.1150 m/z
+	- Added new Reporter Ion mode: iTraq 8-plex
+		- Reporter ions are at 113.107873, 114.111228, 115.108263, 116.111618, 117.114973, 118.112008, 119.115363, and 121.122072 m/z
+		- Specify iTraq 8 using <item key="ReporterIonMassMode" value="5" />
+
+Version 2.5.3586; October 26, 2009
+	- Now using a class instead of a structure to store mass spectra ions and intensities
+
+Version 2.5.3575; October 15, 2009
+	- Added support for 'Q3MS' MRM scan header
+
+Version 2.5.3520; August 21, 2009
+	- Added two new Reporter Ion modes: TMT 2 and TMT 6
+		- Reporter ions are at 126.1283, 127.1316, 128.135, 129.1383, 130.1417, and 131.1387 m/z
+		- TMT 2 searches for just the first two m/z values, while TMT 6 searches for all 6 values
+		- Specify TMT 2 using <item key="ReporterIonMassMode" value="3" />
+		- Specify TMT 6 using <item key="ReporterIonMassMode" value="4" />
+
+Version 2.5.3512; August 13, 2009
+	- Added support for specifying the log file name using /L:LogFileName.txt
+	- Removed support for ILogger class from PRISM.Dll 
+	- Removed Trace Log support, and switched to instead use clsProcessFilesBaseClass for logging
+
+Version 2.5.3490; July 22, 2009
+	- Added support for "Full cnl " MRM scan header
+
+Version 2.5.3474; July 6, 2009
+	- Added parameter ParentIonDecoyMassDa
+		- When non-zero, this value is added to all parent ion m/z values read from Thermo .Raw files.
+
+Version 2.5.3463; June 26, 2009
+	- Updated clsFinniganDataFileFunctions.vb to use member variables mLoadMSMethodInfo and mLoadMSTuneInfo to determine whether or not the method and/or tune info should be loaded
+		- This change was needed becauase on several older LTQ-FT datasets, XRAWFILE2Lib.XRawfile was throwing an exception on the call to mXRawFile.GetTuneData: 
+		  Attempted to read or write protected memory. This is often an indication that other memory is corrupt.
+
+Version 2.5.3463; June 25, 2009
+	- Added exception handling around:
+		mXRawFile.GetTuneData()
+		mXRawFile.GetTrailerExtraForScanNum()
+		mXRawFile.GetStatusLogForScanNum()
+	- Now logging errors to the log file defined in clsProcessFileBaseClass (which is used if /L is specified at the command line)
+
+Version 2.5.3327; February 9, 2009
+	- Updated MASIC processing class to catch errors if the Memory->'Available MBytes' performance monitor class is not available
+
+Version 2.5.3324; February 6, 2009
+	- Added support for scan header "Full pr " (product mass scan) and scan header " d Z ms "
+
+Version 2.5.3318; January 31, 2009
+	- Added command line switch /SF which allows for customizing the MASIC Status file name
+		- Default name is MasicStatus.xml
+		- To change to CustomStatus.xml use /SF:CustomStatus.xml
+	- Now appending a random number to the spectrum cache ($SpecCache) filename
+
+Version 2.5.3267; December 11, 2008
+	- Updated clsFinniganDataFileFunctions.vb to allow for the Scan Filter Text to be blank
+		- This is rarely the case, but can happen if the file is corrupted
+		- MS/MS scans will be assumed to be cid spectra and will have a parent ion m/z of 0
+
+Version 2.5.3224; October 29, 2008
+	- Fixed bug in ExtractSICDetailsFromFullSIC that prematurely stopped creating the SIC for Custom m/z values if the Custom m/z scan center was 0 (meaning search all) and/or the Custom m/z scan tolerance was 0 (meaning search all)
+
+Version 2.5.3198; October 3, 2008
+	- Fixed bug that always had CacheSpectraToRetainInMemory in clsSpectraCache set to 500, even if a different value was specified in a parameter file
+	- Reduced COMPRESS_TOLERANCE_DIVISOR to 3 when using ppm-basd tolerances (otherwise, is set to 5)
+	- Now updating the status file when creating the _Scans.txt file
+
+Version 2.5.3159; August 25, 2008
+	- Added Reporter Ion mode ITRAQ-ETD
+		- Reporter ions are at 101.107, 102.104, and 104.1107 m/z
+
+Version 2.5.3156; August 22, 2008
+	- Added option to limit which Status Log entries are saved to the _ScanStatsEx.txt file
+		- Specify in the Parameter file using StatusLogKeyNameFilterList
+
+Version 2.5.3101; June 28, 2008
+	- Added option to created selected ion chromatograms using ppm-based tolerances (useful for high resolution instruments)
+
+Version 2.5.3050; May 8, 2008
+	- Fixed rounding bug during creation of the _MRMCrosstab.txt file
+
+Version 2.5.3036; April 24, 2008
+	- Now including ScanTime in the _MRMCrosstab.txt file 
+
+Version 2.5.3033; April 21, 2008
+	- Expanded the Custom SIC Value search options to allow for specifying scan time values (i.e. acquisition time, aka elution time)
+		- Three available modes: absolute scan number, relative scan number (0 to 1), or acquisition time
+		- The ScanType parameter of section CustomSICValues now supports three values: Absolute, Relative, or AcquisitionTime
+	- If using a tab-delimited file (specified with CustomMZFile in a parameter file), you can now optionally use column headers ScanTime and TimeTolerance instead of ScanCenter and ScanTolerance
+		- When ScanCenter and ScanTolerance are present, then will assume the Custom SIC scan type is "Absolute" (unless an alternate "ScanType" setting is defined in section CustomSICValues of the MASIC parameter file)
+		- When ScanTime and TimeTolerance are present, the Custom SIC scan type mode will be auto-set to "AcquisitionTime" (ignoring the setting for "ScanType" in section CustomSICValues of the MASIC parameter file)
+	- Now examining the Custom SIC values for inconsistencies with the Custom SIC scan type mode
+		- If all of the values are between 0 and 1 but the ScanType is "Absolute", then it will be auto-set to "Relative"
+		- If all of the values are greater than 1 but the ScanType is "Relative", then it will be auto-set to "Absolute"
+	- Updated MASIC Browser to display a green dot at the scan(s) for which the given m/z value was chosen for fragmentation
+	- Fixed bug that caused a program error if the GetTuneData XDK function returned invalid tune data (e.g. parameter names but no values)
+
+Version 2.5.3028; April 16, 2008
+	- Updated project to Visual Studio 2008 (using .NET 2.0)
+	- Added support for creating selected ion chromatograms for MRM data files
+		- If processing an MRM data file, then also saves two additional files
+		- The _MRMSettings.txt file lists the MRM parent m/z, daughter m/z transitions that were monitored
+		- The _MRMCrosstab.txt file contains a crosstab view of the intensity values detected for each parent to daughter transition
+
+Version 2.4.2991; March 10, 2008
+	- Updated version of MSDataFileReader.dll
+		- Now supports mzXML v3.x
+
+Version 2.4.2974; February 22, 2008
+	- Updated the _ReporterIons.txt file to include the ReporterIonIntensityMax column, plus intensity ratio columns
+	- Added option ReporterIonSaveObservedMasses
+
+Version 2.4.2973; February 21, 2008
+	- Added the ability to look for Reporter Ion m/z values in each fragmentation spectrum
+		- iTraq analyses have reporter ions at 114.1, 115.1, 116.1, and 117.1 m/z
+	- When Generate Reporter Ion Stats is enabled, then MASIC looks for these m/z values in each fragmentation scan, then writes out the abundance values and m/z values of the matching ions to the _ReporterIons.txt file
+		- Note that the Maximum Intensity within the search window is reported, not a sum of intensities
+		- For example, if two ions are found within 114.1 +/- 0.25 Da, then the intensity reported for the 114 ion is the larger of the two matched ions
+
+Version 2.4.2959; February 7, 2008
+	- Changed the precision of the variables used to track mass and m/z values from single precision to double precision to enable search tolerances below ~3 ppm
+
+Version 2.4.2910; December 20, 2007
+	- Added support for scan header "NSI Z ms"
+
+Version 2.4.2904; December 14, 2007
+	- Now writing the collision mode and scan filter text to the Extended Scan Stats file
+		- Collision mode is determined by the text visible after the @ sign, for example "cid" in "ITMS + c NSI d Full ms2 756.98@cid35.00 [195.00-2000.00]"
+	- Added option in the GUI to enable writing the status log values (temperature, pressure, voltage, etc.) to the Extended Scan Stats File
+	- Added support for "+ p Z ms" and "+ p ms2" scan headers
+
+Version 2.4.2872; November 12, 2007
+	- Expanded the Custom SIC Value search options
+		- Can now read search values from a tab-delimited text file
+		- Now supports custom search tolerance values for each m/z
+		- Now supports custom scan tolerance values for each m/z (will always include the given number of scans, at a minimum, surrounding the central scan number specified)
+	- Updated the MASIC parameter file format to allow for specifying the tab-delimited text file to load Custom SIC values from
+		- Use parameter CustomMZFile in section CustomSICValues
+
+Version 2.4.2854; October 25, 2007
+	- Added option "Include scan times in SIC stats file"
+	- Added option to save the MS Method(s) data and Tune data to disk for Thermo Finnigan .Raw files
+	- Updated to new version of SharedVBNetRoutines.dll
+	- Now allowing user to use the syntax "MASIC InputFile.raw" in addition to "MASIC /I:InputFile.Raw"
+
+Version 2.4.2742; July 5, 2007
+	- Now creating two Decon2LS compatible _scans.csv files (one for MS1 data and one for MS2 data)
+	- Now only creating one Icr2LS compatible .tic file
+	- Renamed SkipSICProcessing to SkipSICAndRawDataProcessing in the XML Settings file
+	- Updated to set ExportRawDataOnly to False if SkipSICAndRawDataProcessing is True
+	- Fixed bug that failed to write scan acquisition time values to the _scans.csv file when exporting raw data
+	- Altered the column order and column names in the _scans.csv file to match the current Decon2LS file format
+
+Version 2.4.2692; May 16, 2007
+	- Added limited support for TSQ data files (scan types 'Q1MS' and 'SRM ms2')
+
+Version 2.4.2608; February 21, 2007
+	- Fixed bug that caused the program to periodically lock up during SIC creation for custom m/z values
+
+Version 2.4.2359; December 14, 2006
+	- Added option to look through the m/z values in the parent ion spectrum data to find the closest match to the parent ion m/z value reported for the given fragmentation spectrum (within SICTolerance/5 m/z)
+		- Necessary since Xcalibur only reports parent ion m/z values to 2 decimal places
+		- Updates the reported parent ion m/z value to the one found in the parent ion spectrum
+	- New version of MSDataFileReader.dll (now tracks parent ion m/z using double precision numbers)
+
+Version 2.4.2486; October 19, 2006
+	- Updated to report the final parent ion m/z listed for ms3, ms4, etc. spectra
+		- For example, "+ c d Full ms3 1312.95@45.00 873.85@45.00 [ 350.00-2000.00]" will now report a parent ion of 873.85 m/z instead of 1312.95 m/z
+
+Version 2.4.2476; October 12, 2006
+	- Added support for scan type " Full ms10 ", " Full ms11 ", etc. in Finnigan .Raw files (i.e. MS Levels > 9)
+		- Example "ITMS + c NSI d Full ms10 421.76@35.00"
+
+Version 2.4.2459; September 26, 2006
+	- Updated the ScanStats file to include columns IonCount and IonCountRaw
+
+Version 2.4.2418; August 15, 2006
+	- Fixed an indexing bug in clsMASIC->ProcessMZList that occurred with datasets containing SIM scans
+
+Version 2.4.2326; May 15, 2006
+	- Updated to a new version of MSDataFileReader.dll
+
+Version 2.4.2285; April 4, 2006
+	- Now using MSDataFileReader.dll to read .MGF, mzXML, and mzData files
+		- Support for mzData files is new to MASIC
+		- Fixes bug that was present in the MZXmlDataFileReader.dll file that reported an incorrect .IonCount value
+
+Version 2.4.2277; March 27, 2006
+	- Removed the maximum window size constraint from both MASIC and MASIC browser
+
+Version 2.4.2274; March 24, 2006
+	- Increased maximum allowable window height from 560 pixels to 1000 pixels
+	- Decreased minimum allowable window width from 660 to 450 pixels
+	- Changed default SICNoiseThresholdMode to TrimmedMedianByAbundance (was DualTrimmedMeanByAbundance)
+		- In actuality, this parameter doesn't really matter due to the changes made in version 2.3.2132 (MASIC now uses function ComputeDualTrimmedNoiseLevelTTest to compute the SIC noise thresholds in segments for each m/z chunk)
+	- Added check for invalid .IonCount value returned by MZXmlDataFileReader.dll for scans with MSLevel > 1
+		- Affects version 1.0.1908 of MZXmlDataFileReader.dll; will be fixed in a future version
+
+Version 2.4.2259; March 9, 2006
+	- Updated "Reset to Defaults" to clear the "Sql Server Connection String" and "Dataset Info Query Sql" textboxes on the advanced tab
+		- Use the "Set to PNNL Server" button to set the defaults for those textboxes
+	- Now continuing with analysis if the dataset number lookup fails
+		- Updated the error message shown to instruct the user how to avoid the error in the future
+
+Version 2.4.2239; February 17, 2006
+	- Implemented saving of raw data as DeconTools compatible CSV files (_Isos.csv and _Scans.csv)
+
+Version 2.4.2199; January 8, 2006
+	- Added more detailed error handling when looking up the dataset number from the database for the given datafile
+
+Version 2.4.2189; December 29, 2005
+	- Updated the copyright notice
+
+Version 2.4.2180; December 20, 2005
+	- Updated MASIC Browser to use the XmlTextReader class to read XML files
+
+Version 2.4.2136; November 6, 2005
+	- Updated statistical momements calculations to use the smoothed, contiguous data centered around the peak maximum
+		- Using baseline-adjusted, smoothed data with intensities >= 10% of the maximum baseline-adjusted intensity in the peak, stopping as soon as a value is found < 10% of the maximum
+		- If less than 5 data points have a baseline-adjusted intensity >= 10% of the maximum, or if less than 5 data points have positive baseline-adjusted intensities, then the 5 data points centered around the maximum are used and the non-baseline adjusted smoothed intensities are used
+		- Fixed bug in statistical momements calculations that computed incorrect center of mass and peak skew values since raw scan numbers were used while we should have been using scan numbers offset to start at 0
+	- Added computation of the Kolmogorov-Smirnov Statistic (aka KS Statistic)
+		- The KS Statistic is a measure of how much a peak deviates from an ideal Gaussian peak
+		- The KS Statistic is saved in the XML file and in the SICStats file
+	- The XML file and the SICStats file now list the number of points used to compute the statistical moments (and KS Statistic)
+	- The XML file and the SICStats file now list the Statistical Moments based area
+	- Updated peak area computation to optionally prepend and append the peak data with a value >= 5% of the maximum intensity in the peak
+		- Previously, we were optionally prepending an intensity value of 0
+		- Additionally, now using a scan delta equivalent to the average scan delta across the peak when prepending or appending an intensity value; previously we were always using a scan delta of 1
+
+Version 2.3.2134; November 4, 2005
+	- Added option to replace SIC values of 0 with the minimum positive intensity observed in the mass spectrum corresponding to the given SIC data point
+		- This option is enabled by default
+		- If this option is not used, then values of 0 are replaced with the minimum positive intensity observed in the given SIC
+	- Fixed bug in baseline noise computation algorithm that incorrectly computed the weighted average noise level between adjacent noise level segments
+
+Version 2.3.2132; November 2, 2005
+	- Split out the SIC peak finding functions into MASICPeakFinder.dll
+		- This allows MASIC Browser to use the same code base for peak finding
+	- Altered the method used to compute signal to noise ratio (S/N) in SICs
+		- Previously, was using a trimmed median of the bottom 75% of the data in the SIC to determine the baseline noise level
+		- Now, grouping the parent ions by m/z in chunks of SIC Search Mass Tolerance / 2
+		- For a group of ions with similar m/z, a SIC is created throughout the entire data file, using the median m/z of the members of each group
+		- The noise level is computed for this data by:
+			- Replacing intensity values of 0 in the orignal data with the minimum positive value in the SIC data
+			- Computing the average
+			- Determining the standard deviation (StDev)
+			- Discarding the data above or below 5 StDev units from the average
+			- Recomputing the average; this value is used as the baseline noise value
+			- The standard deviation of the data and the number of points used is also tracked
+		- Since the baseline level can increase over the length of the separation, the full SIC is divided into 3 segments and the baseline noise level computed for each segment
+			- A T-test is used to compare the Mean and StDev values of each segment of noise
+			- If the segments are not signficantly different (90% confidence interval) then they are combined into one segment and the Mean and StDev are re-calculated
+			- When assigning the baseline noise level to a given peak in a SIC, the peak location is compared to the start and end point of each segment to see which segment it overlaps with
+			- For peaks that reside between the midpoint of one segment and the midpoint of an adjacent segment, the noise values are averaged between the two segments using a weighted average, weighting on distance from the midpoint of each segment
+	- Altered the method used to create the SICs since we're now examining the parent ions in order of increasing m/z and since we're now creating a SIC across all scans for each m/z
+		- After computing the noise level for a given m/z chunk, we look for the largest (most intense) peak in the SIC
+		- For all parent ions with an observed scan number within the boundaries of the largest peak, assign identical peak and SIC stats to each parent ion
+		- For the remaining parent ions whose observed scan number did not fall within the largest peak:
+			- Process the SIC data to extract out the data in the region of each parent ion (centering around the scan the parent ion was observed in)
+			- Look for peaks in the extracted data and use the stats for the largest peak that contains the parent ion's scan
+	- Altered the method used to compute full width at half max (FWHM) to now use baseline-adjusted intensity values
+		- Previously when using non-baseline adjusted values would often overestimate the FWHM value for long peaks barely over the baseline
+		- If the maximum intensity of the peak is below the baseline, then non baseline-adjusted values are used
+		- If the points at the start of the peak are both above 50% of the peak maximum, then the FWHM point chosen is the point halfway between the first point in the peak and the point of the peak maximum
+		- If the points at the end of the peak are both above 50% of the peak maximum, then the FWHM point chosen is the point halfway between the last point in the peak and the point of the peak maximum
+	- Now reporting the peak intensity as the maximum value in the raw SIC data, not the maximum value of the smoothed data
+	- Updated the default Butterworth Sampling Frequency to be 0.25 (was 0.15)
+	- Now computing statistical moments values: 
+		- The zeroth moment is area (was already being computed); area is computed using unsmoothed data; non-baseline corrected area is reported in the SICStats file but baseline corrected area is used for the following statisical moments calculations
+		- The first moment is peak center of mass
+		- The second moment is peak variance
+		- The third moment is determined, then used to compute peak skew
+		- The raw (unsmoothed) SIC data is used for the statistical moments calculations, though the data is baseline corrected (i.e. the the intensity used is the raw intensity minus the baseline intensity)
+	- Now reporting the parent ion intensity in the _SICStats file
+		- This is the intensity in the SIC data in the scan just before the fragmentation scan
+		- If the fragmentation scan occurs more than 1 scan after a MS1 scan (i.e. other fragmentation scans occur between the MS1 scan and the MS2 scan), then the SIC value to report is interpolated between the MS1 scans bracketing the MS2 scan
+	- Updated the SICStats file and the XML results file to include all of the new statistics being tracked (ParentIonIntensity, Baseline Noise stats, Statistical Moments stats)
+	- Extended the spectrum similarity testing to also look for similar spectra 0.333, -0.333, 0.666, and -0.666 m/z units apart if the SIC Search Mass Tolerance is less than 0.25 Da and the similar ion m/z half width is less than 0.15 m/z units
+	- Switched to using Prism.Dll for additional functions
+	- Updated to new version of SharedVBNetRoutines.dll
+
+Version 2.2.2104.26240; October 5, 2005
+	- Updated the copyright notice and updated to new version of SharedVBNetRoutines.dll
+
+Version 2.2.2056.33084; August 18, 2005
+	- Updated to new version of SharedVBNetRoutines.dll
+
+Version 2.2.2020.26124; August 2, 2005
+	- Updated to use SharedVBNetRoutines.dll and to use a new version of DataFilter.dll
+
+Version 2.2.1975.32433; May 16, 2005
+	- Added option "Export Raw Data Only (No SICs)" which greatly speeds up the time required to create a .PEK file from a LC-MS/MS data file
+
+Version 2.2.1915.19244; March 30, 2005
+	- Replaced parameter SimilarIonScanToleranceHalfWidth with parameter SimilarIonToleranceHalfWidthMinutes
+		- When checking for similar parent ions, they must be within SimilarIonMZToleranceHalfWidth m/z units of each other and within SimilarIonToleranceHalfWidthMinutes minutes of each other
+		- If they are within the m/z and time constraints, then their spectra are compared using a Pearson correlation
+		- If their similarity is above SpectrumSimilarityMinimum, then the data for the higher intensity parent ion is used
+
+Version 2.2.1913.29445; March 28, 2005
+	- Improved the spectral data compression option to consolidate blocks of data points that all have intensity values of 0 into just two data points (the first and last m/z value in the block)
+		- This situation is common with LTQ-FT data files
+
+Version 2.2.1907.23068; March 22, 2005
+	- Reworked the spectrum caching mechanism to use a circular array to store the active spectra
+		- Removes the need of the VB.NET garbage collector to clear data for cached spectra, which slowed down the processing, especially on a single CPU machine
+	- Now using a single, large binary page file to cache the spectra rather than a separate file for each spectrum
+	- For Finnigan .Raw files, now utilizing the spectra data cached in the binary page file rather than re-loading with Xcaliber
+	- Consolidated some of the processing routines that occur when a spectrum is loaded
+		- e.g. compute noise level and discard low intensity data
+	- Added new option to compress spectra (enabled by default)
+		- Consolidates ions that are extremely close in m/z values, keeping the m/z and intensity of the data point with the largest intensity value
+		- The data resolution is equal to SICToleranceDa / 5 for MS spectra and to the similarity Binning BinSize / 5 for MS/MS spectra
+	- Now using an updated mzXML data file reader (minor bug fixes)
+
+Version 2.1.1874.35607; February 17, 2005
+	- Updated for use with the new MsMsDataFileReader.dll and FilterMsMsSpectra.dll classes, which now use string arrays instead of ArrayList objects for passing data; this has no effect on results
+
+Version 2.1.1853.33051; January 27, 2005
+	- Fixed bug with memory allocation errors for .MGF/.CDF files
+
+Version 2.1.1852.30576; January 26, 2005
+	- Reworked additional memory reserving operations, this time in the CreateParentIonSICs and FindPeaks sections
+
+Version 2.1.1851.29367; January 25, 2005
+	- Reworked sum of the memory reserving operations during the FindSimilarParentIons step to optimize memory usage
+	- Added SkipOutOfMemoryErrors option as an attempt to deal with an error from a huge LTQ .Raw file
+
+Version 2.1.1849.39800; January 23, 2005
+	- Fixed bug involving .MGF files that caused MASIC to discard fragmentation scans that were not in ascending order
+
+Version 2.1.1844.36664; January 18, 2005
+	- Added support for scan type " Full ms2 ", " Full ms3 ", " Full ms4", " Full ms5", etc. in Finnigan .Raw files
+		- Previously had support for ms2 and ms3
+		- Revamped function to use a regular expression and thus match ms2 through ms9
+
+Version 2.1.1824.23640; December 29, 2004
+	- Now checking for .MGF files with duplicate fragmentation scan numbers
+		- Duplicates will occur if the Agilent Chemstation software allowed a fragmentation scan to be present as both a single scan and combined with other scans
+		- If duplicates are found, only the first occurrence is used
+
+Version 2.1.1824.21116; December 29, 2004
+	- Now checking for .MGF files with scan number indexing errors, resulting in conflicting scan numbers between survey scans and fragmentation scans
+		- This error is present with .MGF files created by an older version of Agilent Chemstation
+
+Version 2.1.1815.31911; December 20, 2004
+	- Added support for scan type " p ms " in Finnigan .Raw files
+
+Version 2.1.1814.37663; December 19, 2004
+	- Added support for scan type " Full ms3 " in Finnigan .Raw files
+	- Now listing ScanType = 1 for MS spectra, 2 for MS/MS, and 3 for MS/MS/MS in the ScanStats file.
+
+Version 2.1.1814.30146; December 19, 2004
+	- Added support for scan type " c ms " in Finnigan .Raw files, typically used with analyses that only consist of MS1 spectra
+
+Version 2.1.1813.39804; December 18, 2004
+	- Updated program to work with Selected Ion Monitoring (SIM) MS data
+		- When SIM MS data is present, then creates the SIC using only the survey scans from the same SIM mass range
+
+Version 2.0.1813.28386; December 18, 2004
+	- Updated program to validate the ScanFilter text for .Raw files to assure that the given scan is really a MS or a MS/MS scan
+		- Necessary since XRaw sometimes returns a .EventNumber value greater than 1 even though the scan really is a MS scan
+
+Version 2.0.1809.31782; December 14, 2004
+	- First version officially used with DMS
+
+
+v2.0.1722; November 7, 2004
+	- Updated the Least Squares Fitting algorithm to use purely .NET code, and no longer use the Eols.dll
+	- Updated the peak finding for SICs to take into account the SICNoiseThresholdLevel value to reduce the occurrence of peaks including a large number of noise points
+	- Added option to store the SIC intensity lists and mass lists in the XML file using base-64 encoding
+		- Didn't see any reduction in file size, so this feature is currently disabled in the code
+	- Added progress bar when managing the spectra cache to cache spectra
+
+v2.0; November 5, 2004
+	- Implemented use of SICNoiseThresholdModes TrimmedMeanByAbundance and TrimmedMeanByCount to determine noise levels in spectra
+	- Added spectrum caching mechanism that monitors memory usage and dynamically caches and loads spectra as needed to keep free memory below threshold
+	- Added support for reading mzXML files
+	- Added support for utilizing the Xcalibur XRawFile class to read LCQ, LTQ, and LTQ-FT data
+		- This reading mode is much faster than when using icr2ls32.dll
+	- Extended support for exporting raw data to .PEK files
+		- Can filter by Minimum Signal to Noise ratio, Maximum Ion Count per Scan, or Minimum intensity
+		- Can renumber the spectra to not have any gaps; useful if exporting survey scans only
+	- Added ability to contact DMS to determine the Dataset_ID for a given input file, removing the need to use the Dataset Lookup file
+
+v1.5; October 24, 2004
+	- Added Graphical User Interface (GUI)
+	- Updated clsMASIC to include several new options:
+		- ExportRawDataFileFormat, ExportRawDataRenumberScans
+		- SICNoiseThresholdMode, SICNoiseThresholdIntensity, SICNoiseMinimumSignalToNoiseRatio
+		- MassSpectraNoiseThresholdMode, MassSpectraNoiseThresholdIntensity, MassSpectraNoiseMinimumSignalToNoiseRatio
+	- Updated clsSearchRange to match the version used in the Protein Digestion Simulator program
+
+v1.4; April 28, 2004
+	- Updated clsLCQDataFileFunctions to support the LTQ file format (new icr2ls32.dll from Gordon Anderson)
+
+v1.3; December 9, 2003
+	- Initial implementation finalized
+
+v1.2; November 1, 2003
+	- Savitzky Golay filter added
+
+v1.1; October 24, 2003
+	- Correlation class added; used to find similar spectra by comparing the observed ions in the fragmentation spectra
+
+v1.0; October 11, 2003
+	- Started writing MASIC

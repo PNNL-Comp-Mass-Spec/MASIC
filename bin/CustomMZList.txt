@@ -1,0 +1,20 @@
+MZ	MZToleranceDa	ScanCenter	ScanTolerance	Comment
+500	1	300	10	Test1
+505	2	600	50	Test2
+506	2	650	30	Test2.2
+715	0.2	700	25	Test11
+725	0.3	900	40	Test12
+515	0.2	700	25	Test3
+620	0.1	900	20	Test7
+629.9	0.3	450	10	Test8
+630	0.3	450	10	Test8.1
+630.12	0.3	450	10	Test8.2
+525	0.3	900	40	Test4
+550	0.2	300	20	Test5
+580	0.2	800	40	Test6
+700	1	300	10	Test9
+705	2	600	50	Test10
+750	0.2	300	20	Test13
+780	0.2	800	40	Test14
+
+
