@@ -1,10 +1,16 @@
 MASIC Change Log
 
-Vesrion 2.6.5074; November 22, 2013
+Version 2.6.5228; April 25, 2014
+	- Fix log naming bug in clsProcessFilesOrFoldersBase
+
+Version 2.6.5206; April 3, 2014
+	- New version of MSDataFileReader.dll that reports the Activation Method (CID, ETD, or HCD) for .mzXML files created with MSConvert
+
+Version 2.6.5074; November 22, 2013
 	- Changed several ByRef parameters to ByVal parameters in MASICPeakFinder
 	- Fixed bug in LookupDatasetNumber
 
-Vesrion 2.6.5072; November 20, 2013
+Version 2.6.5072; November 20, 2013
 	- Factored out the auto-generated control code from frmMain.vb into frmMain.Designer.vb
 
 Version 2.6.5071; November 19, 2013

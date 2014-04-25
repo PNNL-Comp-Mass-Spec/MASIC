@@ -38,7 +38,7 @@ Public Class clsMASIC
 	Inherits clsProcessFilesBaseClass
 
 	Public Sub New()
-		MyBase.mFileDate = "November 22, 2013"
+		MyBase.mFileDate = "April 3, 2014"
 		InitializeVariables()
 	End Sub
 
@@ -5572,7 +5572,7 @@ Public Class clsMASIC
 
 								' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
 								.ScanHeaderText = String.Empty
-								.ScanTypeName = "MS"
+								.ScanTypeName = "MS"				' This may get updated via the call to UpdateMSXmlScanType()
 
 								.BasePeakIonMZ = objSpectrumInfo.BasePeakMZ
 								.BasePeakIonIntensity = objSpectrumInfo.BasePeakIntensity
@@ -5642,7 +5642,7 @@ Public Class clsMASIC
 
 								' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
 								.ScanHeaderText = String.Empty
-								.ScanTypeName = "MSn"
+								.ScanTypeName = "MSn"				' This may get updated via the call to UpdateMSXmlScanType()
 
 								.BasePeakIonMZ = objSpectrumInfo.BasePeakMZ
 								.BasePeakIonIntensity = objSpectrumInfo.BasePeakIntensity
@@ -5818,7 +5818,6 @@ Public Class clsMASIC
 	  ByRef objMZXmlSpectrumInfo As MSDataFileReader.clsSpectrumInfoMzXML)
 
 		Dim intMSLevelFromFilter As Integer
-		Dim blnValidScan As Boolean
 
 		With udtScanInfo
 			If blnIsMzXML Then
@@ -5832,7 +5831,7 @@ Public Class clsMASIC
 					.ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(.ScanHeaderText)
 
 					' Now populate .SIMScan, .MRMScanType and .ZoomScan
-					blnValidScan = XRawFileIO.ValidateMSScan(.ScanHeaderText, intMSLevelFromFilter, .SIMScan, .MRMScanType, .ZoomScan)
+					Dim blnValidScan = XRawFileIO.ValidateMSScan(.ScanHeaderText, intMSLevelFromFilter, .SIMScan, .MRMScanType, .ZoomScan)
 
 				Else
 					.ScanHeaderText = String.Empty
@@ -5841,7 +5840,7 @@ Public Class clsMASIC
 					If String.IsNullOrEmpty(.ScanTypeName) Then
 						.ScanTypeName = strDefaultScanType
 					Else
-						' Possibly udpate .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromFinniganScanFilterText()
+						' Possibly update .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromFinniganScanFilterText()
 						Select Case .ScanTypeName.ToLower
 							Case MSDataFileReader.clsSpectrumInfoMzXML.ScanTypeNames.Full.ToLower
 								If intMSLevel <= 1 Then
@@ -5863,6 +5862,18 @@ Public Class clsMASIC
 							Case Else
 								' Leave .ScanTypeName unchanged
 						End Select
+					End If
+
+					If Not String.IsNullOrWhiteSpace(objMZXmlSpectrumInfo.ActivationMethod) Then
+						' Update ScanTypeName to include the activation method, 
+						' For example, to be CID-MSn instead of simply MSn
+						.ScanTypeName = objMZXmlSpectrumInfo.ActivationMethod & "-" & .ScanTypeName
+
+						If .ScanTypeName = "HCD-MSn" Then
+							' HCD spectra are always high res; auto-update things
+							.ScanTypeName = "HCD-HMSn"
+						End If
+
 					End If
 				End If
 

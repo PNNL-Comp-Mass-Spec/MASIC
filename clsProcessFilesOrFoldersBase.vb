@@ -393,7 +393,7 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
 					mLogFilePath &= "_log"
 
 					If mLogFileUsesDateStamp Then
-						mLogFilePath &= "_log_" & DateTime.Now.ToString("yyyy-MM-dd") & ".txt"
+						mLogFilePath &= "_" & DateTime.Now.ToString("yyyy-MM-dd") & ".txt"
 					Else
 						mLogFilePath &= ".txt"
 					End If
