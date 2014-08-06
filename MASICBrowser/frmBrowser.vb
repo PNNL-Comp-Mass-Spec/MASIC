@@ -30,7 +30,7 @@ Imports PNNLOmics.Utilities
 Public Class frmBrowser
 	Inherits System.Windows.Forms.Form
 
-	Private Const PROGRAM_DATE As String = "March 20, 2012"
+	Private Const PROGRAM_DATE As String = "August 5, 2014"
 
 #Region "Windows Form Designer generated code"
 
@@ -2351,7 +2351,7 @@ Public Class frmBrowser
 			If mParentIonPointerArrayCount > 0 Then
 				For intIndex = 0 To mParentIonPointerArrayCount - 1
 					With mParentIonStats(mParentIonPointerArray(intIndex))
-						strParentIonDesc = "Scan " & .FragScanObserved.ToString & "  (" & Math.Round(.MZ, 2).ToString & " m/z)"
+						strParentIonDesc = "Scan " & .FragScanObserved.ToString & "  (" & Math.Round(.MZ, 4).ToString & " m/z)"
 						lstParentIonData.Items.Add(strParentIonDesc)
 					End With
 				Next

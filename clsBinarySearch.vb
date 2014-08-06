@@ -22,7 +22,7 @@ Public Class clsBinarySearch
     Public Shared Function BinarySearchFindNearest(ByRef intArrayToSearch() As Integer, ByVal intItemToSearchFor As Integer, ByVal intDataCount As Integer, Optional ByVal eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through intArrayToSearch() for intItemToSearchFor, returning
         '  the index of the item if found
-        ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
+		' If not found, returns the index of the closest match, based on eMissingDataMode
         ' Assumes intArrayToSearch() is already sorted
 
         Dim intIndexFirst As Integer, intIndexLast As Integer

@@ -1795,6 +1795,8 @@ Public Class frmMain
 
 				' Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
 				.ReporterIonToleranceDaDefault = SharedVBNetRoutines.VBNetRoutines.ParseTextboxValueDbl(txtReporterIonMZToleranceDa, "", blnError, clsMASIC.REPORTER_ION_TOLERANCE_DA_DEFAULT, False)
+				.SetReporterIonMassMode(.ReporterIonMassMode, .ReporterIonToleranceDaDefault)
+
 				.ReporterIonApplyAbundanceCorrection = chkReporterIonApplyAbundanceCorrection.Checked
 
 				.ReporterIonSaveObservedMasses = chkReporterIonSaveObservedMasses.Checked

@@ -1,0 +1,78 @@
+MASIC Browser Change Log
+
+Version 1.0.5330; August 5, 2014
+	- Now displaying m/z values with 4 digits of precision in the Parent Ion SIC list
+
+Version 1.0.4615; August 20, 2012
+	- New version of ProgressFormNET.dll
+
+Version 1.0.4462; March 20, 2012
+	- New version of CWSpectrumDLLNET.dll
+
+Version 1.0.4282; September 22, 2011
+	- New version of SavGolCS.dll that no longer uses MathNet.Iridium.dll
+
+Version 1.0.4281; September 21, 2011
+	- Switched from .Now to .UtcNow
+	- Updated to Visual Studio 2010
+
+Version 1.0.3947; October 22, 2010
+	- Now limiting the length of the error string that is generated when loading data
+
+Version 1.0.3841; July 8, 2010
+	- New version of CWSpectrumDLLNET.dll (built against .NET 2.0 instead of .NET 1.1)
+
+Version 1.0.3463; June 25, 2009
+	- Now displaying the comment associated with Custom SIC peaks when they are selected in the Parent Ion SIC list
+
+Version 1.0.3224; October 29, 2008
+	- Fixed bug that aborted reading MS/MS search results when two parent ions had the same fragmentation scan number (which is normally the case with custom m/z values)
+
+Version 1.0.3033; April 21, 2008
+	- Updated project to Visual Studio 2008 (using .NET 2.0)
+	- Updated to display a green dot at the scan(s) for which the given m/z value was chosen for fragmentation
+		- This will always include the fragmentation scan for the given parent ion, but will also include any other nearby parent ions that had a similar m/z value (within 200% of the SimilarIonMZToleranceHalfWidth value defined in the .input Xml file)
+
+Version 1.0.2277; March 27, 2006
+	- Removed the maximum window size constraint
+
+Verison 1.0.2215; January 24, 2006
+	- Updated to new version of CWSpectrumDLLNET.dll
+		- Supports defining the plot window's caption via code
+
+Version 1.0.2189; December 29, 2005
+	- Updated the copyright notice
+
+Version 1.0.2180; December 20, 2005
+	- Updated the XML document reader to use System.Xml.XmlTextReader rather than System.Xml.XmlDocument
+		- Drastically reduces the memory overhead required when reading XML data files since the XmlTextReader is a lightweight, forward-only reader
+
+Version 1.0.2134; November 4, 2005
+	- Added ability to recompute the peak statistics using routines in MASICPeakFinder.dll
+		- Now displaying additional peak and noise level statistics
+	- Added several new sorting options
+	- Updated the "Jump to Scan" feature to always jump to the closest match, regardless of the sort order
+	- Added ability to load Sequest results files (first hits or synopsis)
+	- Switched to using Prism.Dll and to new version of SharedVBNetRoutines.dll
+
+Version 1.0.2104; October 5, 2005
+	- Updated to new version of CWSpectrumDLLNET.dll
+	- Updated the copyright and open source statements
+
+Version 1.0.2019; July 12, 2005
+	- Updated to use SharedVBNetRoutines.dll
+
+Version 1.0.1897; March 12, 2005
+	- Updated the copyright statements
+
+Version 1.0.1798; December 3, 2004
+	- Updated to optionally display the smoothed data on the SIC
+
+Version 1.0.1784; November 19, 2004
+	- Now plotting smoothed data and added ability to resmooth loaded data
+
+Version 1.0.1451; December 22, 2003
+	- Added additional sorting options and added option to fix the graph X and Y zoom range
+
+Version 1.0.1392; October 24, 2003
+	 - Initial release

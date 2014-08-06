@@ -33,12 +33,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_15DD392E0D114BFFBF415E05AB7A040D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_303BB900208BA7A0A8D49A6A4353D2F6"
         "OwnerKey" = "8:_5DF3A51F24BB478A8CC74C74740C31F5"
         "MsmSig" = "8:_UNDEFINED"
@@ -57,6 +51,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3E75C27A009D49B3AB190AA488A6D5B4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4038EB81986FA784FD045C5801F2127D"
         "OwnerKey" = "8:_5DF3A51F24BB478A8CC74C74740C31F5"
         "MsmSig" = "8:_UNDEFINED"
@@ -65,6 +65,12 @@
         {
         "MsmKey" = "8:_4038EB81986FA784FD045C5801F2127D"
         "OwnerKey" = "8:_7D00477429FF4CF196E5B9C1AF6A7A91"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4056E34533B654133CB954A793BF10F4"
+        "OwnerKey" = "8:_A131D2A5FD5619A056492D2A1562FC81"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -135,12 +141,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_831C4780FD26428BADDD45B36428E1D5"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_84D587D5E627B07CE1FA09983E04B228"
         "OwnerKey" = "8:_7D00477429FF4CF196E5B9C1AF6A7A91"
         "MsmSig" = "8:_UNDEFINED"
@@ -201,12 +201,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A1B85E371DE8A6B9EBEF60C7BEDF8786"
-        "OwnerKey" = "8:_A131D2A5FD5619A056492D2A1562FC81"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_A1DE9C5C0755BAC782B1627C88136C68"
         "OwnerKey" = "8:_7D00477429FF4CF196E5B9C1AF6A7A91"
         "MsmSig" = "8:_UNDEFINED"
@@ -220,12 +214,6 @@
         "Entry"
         {
         "MsmKey" = "8:_A1FBF1B1AE664F3D834E4A0EB0CA2E20"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A3BDF5ED5D95409782062E0B30747F68"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -309,7 +297,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_EE0A48622BAF4D83AD04DA4FC7FCC02F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_FE630D3EE565401398668EA6E027F05F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FEACA3CCC54C4B19BAD1317DDBDB75EF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -582,26 +582,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_15DD392E0D114BFFBF415E05AB7A040D"
-            {
-            "SourcePath" = "8:..\\bin\\RevisionHistory.txt"
-            "TargetName" = "8:RevisionHistory.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_303BB900208BA7A0A8D49A6A4353D2F6"
             {
             "AssemblyRegister" = "3:1"
@@ -633,11 +613,31 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3E75C27A009D49B3AB190AA488A6D5B4"
+            {
+            "SourcePath" = "8:..\\Readme.txt"
+            "TargetName" = "8:Readme.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4038EB81986FA784FD045C5801F2127D"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:MASICPeakFinder, Version=1.1.5074.27973, Culture=neutral, processorArchitecture=x86"
+            "AssemblyAsmDisplayName" = "8:MASICPeakFinder, Version=1.1.5330.32415, Culture=neutral, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
                     "_4038EB81986FA784FD045C5801F2127D"
@@ -664,11 +664,31 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4056E34533B654133CB954A793BF10F4"
+            {
+            "SourcePath" = "8:cwui.ocx"
+            "TargetName" = "8:cwui.ocx"
+            "Tag" = "8:"
+            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:4"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4C38846032E63C41891D1A87D253F519"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5003.27413, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5142.35689, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_4C38846032E63C41891D1A87D253F519"
@@ -699,7 +719,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5003.27413, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5142.35689, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_6317BCAC06EDCF6E319A368111962CF4"
@@ -850,26 +870,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_831C4780FD26428BADDD45B36428E1D5"
-            {
-            "SourcePath" = "8:..\\MASICBrowser\\bin\\RevisionHistory.txt"
-            "TargetName" = "8:RevisionHistory_MASICBrowser.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_84D587D5E627B07CE1FA09983E04B228"
             {
             "AssemblyRegister" = "3:1"
@@ -925,7 +925,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:MSDataFileReader, Version=1.3.4890.35456, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:MSDataFileReader, Version=1.3.5206.32780, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_89621E8AC80F3863671C8B01DF1E787E"
@@ -1054,26 +1054,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A1B85E371DE8A6B9EBEF60C7BEDF8786"
-            {
-            "SourcePath" = "8:cwui.ocx"
-            "TargetName" = "8:cwui.ocx"
-            "Tag" = "8:"
-            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:4"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A1DE9C5C0755BAC782B1627C88136C68"
             {
             "AssemblyRegister" = "3:1"
@@ -1109,26 +1089,6 @@
             {
             "SourcePath" = "8:..\\bin\\CustomMZList_AcqTime.txt"
             "TargetName" = "8:CustomMZList_AcqTime.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A3BDF5ED5D95409782062E0B30747F68"
-            {
-            "SourcePath" = "8:..\\bin\\Readme.txt"
-            "TargetName" = "8:Readme.txt"
             "Tag" = "8:"
             "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
             "Condition" = "8:"
@@ -1351,10 +1311,50 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE0A48622BAF4D83AD04DA4FC7FCC02F"
+            {
+            "SourcePath" = "8:..\\MASICBrowser\\RevisionHistory.txt"
+            "TargetName" = "8:RevisionHistory_MASICBrowser.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FE630D3EE565401398668EA6E027F05F"
             {
             "SourcePath" = "8:..\\bin\\CustomMZList.txt"
             "TargetName" = "8:CustomMZList.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FEACA3CCC54C4B19BAD1317DDBDB75EF"
+            {
+            "SourcePath" = "8:..\\RevisionHistory.txt"
+            "TargetName" = "8:RevisionHistory.txt"
             "Tag" = "8:"
             "Folder" = "8:_CB5E782170B740B8BF9F35A4429C5B1F"
             "Condition" = "8:"
@@ -1438,15 +1438,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:MASIC"
-        "ProductCode" = "8:{8156FADA-0E79-4CC3-A66A-2C398BDFBB32}"
-        "PackageCode" = "8:{0D14D5BC-AC6A-421D-B763-319F9EA9ECE3}"
+        "ProductCode" = "8:{C4B8A70A-5B51-44DC-B1DF-61B95303037B}"
+        "PackageCode" = "8:{CE52CB34-91C2-49F5-B93A-C8C2E23B2443}"
         "UpgradeCode" = "8:{CF333D4E-5556-4B3B-A005-FDBF66C41824}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.6.9"
+        "ProductVersion" = "8:2.6.10"
         "Manufacturer" = "8:PNNL"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

@@ -1,5 +1,13 @@
 MASIC Change Log
 
+Version 2.6.5330; August 5, 2014
+	- Updated metadata tracking for custom SICs to utilize the MS2 scan closest to the central scan or central time defined for each custom m/z
+		- Previously, all custom SICs were mapped to the first MS2 scan in the dataset
+
+Version 2.6.5323; July 29, 2014
+	- Now checking for data that needs to be sorted by m/z
+	- Fixed bug in CompressSpectraData where the zero-intensity data points with no zero-intensity neighbors were not being properly handled
+
 Version 2.6.5228; April 25, 2014
 	- Fix log naming bug in clsProcessFilesOrFoldersBase
 

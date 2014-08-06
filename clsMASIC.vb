@@ -38,7 +38,7 @@ Public Class clsMASIC
 	Inherits clsProcessFilesBaseClass
 
 	Public Sub New()
-		MyBase.mFileDate = "April 3, 2014"
+		MyBase.mFileDate = "August 5, 2014"
 		InitializeVariables()
 	End Sub
 
@@ -288,7 +288,7 @@ Public Class clsMASIC
 		Public OptimalPeakApexScanNumber As Integer			' Scan number of the peak apex for this parent ion; originally the scan number of the first fragmentation spectrum; later updated to the scan number of the SIC data Peak apex; possibly updated later in FindSimilarParentIons()
 		Public PeakApexOverrideParentIonIndex As Integer	' If OptimalPeakApexScanNumber is inherited from another parent ion, then this is set to that parent ion's index; otherwise, this is -1
 		Public FragScanIndexCount As Integer				' Number of fragmentation scans attributable to this parent ion; normally just 1; for custom SIC values, there are no associated fragmentation scans, but we still set this value to 1
-		Public FragScanIndices() As Integer					' Pointers to entries in .FragScans(); this pointer is unused for custom SIC values
+		Public FragScanIndices() As Integer					' Pointers to entries in .FragScans(); for custom SIC values, points to the next MS2 scan that occurs after the ScanCenter search value
 		Public SICStats As udtSICStatsType
 		Public CustomSICPeak As Boolean						' True if this is a custom SIC-based parent ion
 		Public CustomSICPeakComment As String				' Only applies to custom SIC-based parent ions
@@ -430,7 +430,7 @@ Public Class clsMASIC
 
 	Protected Structure udtCustomMZSearchListType
 		Public ScanToleranceType As eCustomSICScanTypeConstants
-		Public ScanOrAcqTimeTolerance As Single							' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanType = .Relative or ScanType = .AcquisitionTime; set to 0 to search the entire file for the given mass
+		Public ScanOrAcqTimeTolerance As Single							' This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime; set to 0 to search the entire file for the given mass
 		Public CustomMZSearchValues() As udtCustomMZSearchSpecType
 		Public LimitSearchToCustomMZList As Boolean						' When True, then will only search for the m/z values listed in the custom m/z list
 		Public RawTextMZList As String
@@ -1580,6 +1580,7 @@ Public Class clsMASIC
 					With udtScanList
 						With .ParentIons(.ParentIonInfoCount)
 							.MZ = mCustomSICList.CustomMZSearchValues(intIndex).MZ
+
 							If mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeCenter < Single.Epsilon Then
 								' Set the SurveyScanIndex to the center of the analysis
 								.SurveyScanIndex = FindNearestSurveyScanIndex(udtScanList, 0.5, eCustomSICScanTypeConstants.Relative)
@@ -1587,8 +1588,23 @@ Public Class clsMASIC
 								.SurveyScanIndex = FindNearestSurveyScanIndex(udtScanList, mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeCenter, mCustomSICList.ScanToleranceType)
 							End If
 
+							' Find the next MS2 scan that occurs after the survey scan (parent scan)
+							Dim surveyScanNumberAbsolute = udtScanList.SurveyScans(.SurveyScanIndex).ScanNumber + 1
+							Dim fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanNumList, surveyScanNumberAbsolute, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+							While fragScanIndexMatch < udtScanList.MasterScanOrderCount AndAlso udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.SurveyScan
+								fragScanIndexMatch += 1
+							End While
+
+							' This is a custom SIC-based parent ion
+							' Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
+							' This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
 							ReDim .FragScanIndices(0)
-							.FragScanIndices(0) = 0		' This is a custom SIC-based parent ion, so it doesn't have a fragmentation scan; we'll record a 0 here
+							If udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.FragScan Then
+								.FragScanIndices(0) = udtScanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer								
+							Else
+								.FragScanIndices(0) = 0
+							End If
+
 							.FragScanIndexCount = 1
 							.CustomSICPeak = True
 							.CustomSICPeakComment = mCustomSICList.CustomMZSearchValues(intIndex).Comment
@@ -2581,6 +2597,12 @@ Public Class clsMASIC
 							.IonsIntensity(intTargetIndex) = .IonsIntensity(intIndex + intCountCombined)
 
 							intIndex += intCountCombined
+						Else
+							' Keep this data point since a single zero
+							If intTargetIndex <> intIndex Then
+								.IonsMZ(intTargetIndex) = .IonsMZ(intIndex)
+								.IonsIntensity(intTargetIndex) = .IonsIntensity(intIndex)
+							End If
 						End If
 					Else
 						' Note: intTargetIndex will be the same as intIndex until the first time that data is combined (intCountCombined > 0)
@@ -2935,7 +2957,7 @@ Public Class clsMASIC
 				blnIncludeParentIon = False
 			Else
 				If mCustomSICList.LimitSearchToCustomMZList Then
-					' Always include CustomSICPeak entrys
+					' Always include CustomSICPeak entries
 					blnIncludeParentIon = udtScanList.ParentIons(intParentIonIndex).CustomSICPeak
 				Else
 					' Use blnProcessingSIMScans and .SIMScan to decide whether or not to include the entry
@@ -8692,6 +8714,7 @@ Public Class clsMASIC
 		Try
 
 			' Load the ions for this scan
+		
 			strLastKnownLocation = "objXcaliburAccessor.GetScanData for scan " & intScanNumber
 			objMSSpectrum.IonCount = objXcaliburAccessor.GetScanData(intScanNumber, objMSSpectrum.IonsMZ, dblIntensityList, udtScanHeaderInfo)
 			With udtScanInfo
@@ -8707,6 +8730,24 @@ Public Class clsMASIC
 						Debug.WriteLine("LoadSpectraForFinniganDataFile: Survey Scan found where IonCount <> dblMZList.Length -- Scan " & intScanNumber, "LoadSpectraForFinniganDataFile")
 					End If
 				End If
+
+				Dim sortRequired As Boolean = False
+
+				For intIndex = 1 To objMSSpectrum.IonCount - 1					
+					' Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z, 
+					' we have observed a few cases in certain scans of certain datasets that points with 
+					' similar m/z values are swapped and ths slightly out of order
+					' The following if statement checks for this
+					If (objMSSpectrum.IonsMZ(intIndex) < objMSSpectrum.IonsMZ(intIndex - 1)) Then
+						sortRequired = True
+						Exit For
+					End If
+				Next intIndex
+
+				If sortRequired Then
+					Array.Sort(objMSSpectrum.IonsMZ, dblIntensityList)
+				End If
+
 			Else
 				objMSSpectrum.IonCount = 0
 			End If
@@ -9929,8 +9970,8 @@ Public Class clsMASIC
 									intFullSICScanIndices(intMZIndexWork, intDataIndex) = intSurveyScanIndex
 									sngFullSICIntensities(intMZIndexWork, intDataIndex) = sngIonSum
 
-									If sngIonSum <= 0 AndAlso mSICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
-										sngFullSICIntensities(intMZIndexWork, intDataIndex) = udtScanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
+									If sngIonSum < Single.Epsilon AndAlso mSICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
+										sngFullSICIntensities(intMZIndexWork, intDataIndex) = udtScanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity									
 									End If
 
 									dblFullSICMasses(intMZIndexWork, intDataIndex) = dblClosestMZ
@@ -10015,32 +10056,32 @@ Public Class clsMASIC
 								End If
 
 								blnStorePeakInParentIon = False
-								If Not udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then
-									' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
-									With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
-										If .SurveyScanIndex >= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseLeft) AndAlso _
-										   .SurveyScanIndex <= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseRight) Then
+								If udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
 
-											blnStorePeakInParentIon = True
-										End If
-									End With
+								' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
+								With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+									If .SurveyScanIndex >= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseLeft) AndAlso _
+									   .SurveyScanIndex <= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseRight) Then
 
-
-									If blnStorePeakInParentIon Then
-										blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
-
-										' Possibly save the stats for this SIC to the SICData file
-										SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
-
-										' Save the stats for this SIC to the XML file
-										SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
-
-										blnParentIonUpdated(intParentIonIndexPointer) = True
-										intParentIonsProcessed += 1
-
+										blnStorePeakInParentIon = True
 									End If
+								End With
+
+
+								If blnStorePeakInParentIon Then
+									blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
+
+									' Possibly save the stats for this SIC to the SICData file
+									SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
+
+									' Save the stats for this SIC to the XML file
+									SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
+
+									blnParentIonUpdated(intParentIonIndexPointer) = True
+									intParentIonsProcessed += 1
 
 								End If
+
 
 							Next intParentIonIndexPointer
 						End If
