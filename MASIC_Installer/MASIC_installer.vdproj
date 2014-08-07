@@ -637,7 +637,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:MASICPeakFinder, Version=1.1.5330.32415, Culture=neutral, processorArchitecture=x86"
+            "AssemblyAsmDisplayName" = "8:MASICPeakFinder, Version=1.1.5331.19844, Culture=neutral, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
                     "_4038EB81986FA784FD045C5801F2127D"
@@ -1438,15 +1438,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:MASIC"
-        "ProductCode" = "8:{C4B8A70A-5B51-44DC-B1DF-61B95303037B}"
-        "PackageCode" = "8:{CE52CB34-91C2-49F5-B93A-C8C2E23B2443}"
+        "ProductCode" = "8:{C8F69355-BE21-4B5F-9FE5-BAC59EA3B3AC}"
+        "PackageCode" = "8:{DA4F22DD-586E-495F-A60F-8DEFBFA3282F}"
         "UpgradeCode" = "8:{CF333D4E-5556-4B3B-A005-FDBF66C41824}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.6.10"
+        "ProductVersion" = "8:2.6.11"
         "Manufacturer" = "8:PNNL"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

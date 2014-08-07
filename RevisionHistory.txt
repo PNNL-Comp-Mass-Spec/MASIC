@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.6.5331; August 6, 2014
+	- Fixed bug in CompressSpectraData when checking for reporter ion m/z values, which should not be merged with neighboring data within the search resolution
+	- Changed default value for SpectrumSimilarityMinimum from 0.7 to 0.8
+
 Version 2.6.5330; August 5, 2014
 	- Updated metadata tracking for custom SICs to utilize the MS2 scan closest to the central scan or central time defined for each custom m/z
 		- Previously, all custom SICs were mapped to the first MS2 scan in the dataset

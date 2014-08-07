@@ -370,8 +370,10 @@ Friend Class clsCorrelation
                     Return RS
                 Case cmCorrelationMethodConstants.Kendall
                     CorrelKendall(sngDataList1, sngDataList2, KendallsTau, Z, ProbOfSignificance)
-                    Return KendallsTau
-            End Select
+					Return KendallsTau
+				Case Else
+					Return -1
+			End Select
 
         Catch ex As Exception
             Debug.Assert(False, "Error in clsCorrelation->Correlate: " & ex.Message)
