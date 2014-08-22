@@ -12,10 +12,22 @@ in an XML file that can be read using the accompanying graphical results
 browser.  The browser provides a fast, graphical method for browsing the SICs 
 identified by MASIC, allowing the user to sort and filter the SIC list as desired.
 
+The application note describing MASIC is Monroe ME et. al.
+Comput Biol Chem. 2008 Jun;32(3):215-217.  More info at
+http://www.ncbi.nlm.nih.gov/pubmed/?term=18440872
+
+
 == Installation ==
 Double click the MASIC_installer.msi file to install.  The program
 shortcut can be found at Start Menu -> Programs -> PAST Toolkit -> MASIC
 The MASIC browser shortcut can be found at PAST Toolkit -> MASIC Browser
+
+In order to process Thermo .Raw files, you may need to install Thermo's 
+MSFileReader from http://sjsupport.thermofinnigan.com/public/detail.asp?id=703  
+When installing enable both features:
+* MSFileReader for 64 bit
+* MSFileReader for 32 bit
+
 
 == Custom SIC Values ==
 You can optionally define custom values to instruct MASIC to create SICs of
@@ -72,17 +84,22 @@ then the values in those columns will be treated as AcquisitionTime values,
 regardless of the global custom SIC Tolerance Type setting defined in the GUI
 or in the XML parameter file.
 
+
 == Reporter Ions ==
 Enable the "Generate Reporter Ion Stats" option to instruct MASIC to look 
 for standard reporter ion masses and to save their observed intensities in
 file _ReporterIons.txt.  Supported reporter ion modes are:
-	Mode 1: iTraq ions 114.1112, 115.1083, 116.1116, and 117.115 m/z
-	Mode 2: ITraq ETD: 101.107, 102.104, and 104.1107 m/z
-	Mode 3: TMT 2: 126.1283 and 127.1316
-	Mode 4: TMT 6: 126.1283, 127.1316, 128.135, 129.1383, 130.1417, and 131.1387
-	Mode 5: ITraq 8 (high res): 113.107873, 114.111228, 115.108263, 116.111618, 117.114973, 118.112008, 119.115363, and 121.122072
-	Mode 6: ITraq 8 (low res): same ions as Mode 5, but corrects for contamination from the immonium ion at 120.08131
-	Mode 7: PCGalnaz: 300.13 and 503.21 m/z
+	Mode 1, iTraq ions 114.1112, 115.1083, 116.1116, and 117.115 m/z
+	Mode 2, ITraq ETD: 101.107, 102.104, and 104.1107 m/z
+	Mode 3, TMT 2: 126.1283 and 127.1316
+	Mode 4, TMT 6: 126.1283, 127.1316, 128.135, 129.1383, 130.1417, and 131.1387
+	Mode 5, ITraq 8 (high res): 113.107873, 114.111228, 115.108263, 116.111618, 117.114973, 118.112008, 119.115363, and 121.122072
+	Mode 6, ITraq 8 (low res): same ions as Mode 5, but corrects for contamination from the immonium ion at 120.08131
+	Mode 7, PCGalnaz: 300.13 and 503.21 m/z
+	Mode 8, HemeCFragment: 616.1767 and 617.1845
+	Mode 9, LycAcetFragment: 126.09134 and 127.094695   
+	Mode 10, OGlcNAc: 204.0872, 300.13079, and 503.21017 
+
 
 == MRM Data ==
 When processing Thermo-Finnigan MRM data files, a file named _MRMSettings.txt 
@@ -96,6 +113,7 @@ that presents the data in a crosstab format (aka PivotTable).  Here, each
 column in the crosstab corresponds to the intensity values over time for a 
 given parent m/z to daughter m/z transition being monitored.
 
+
 == IonCountRaw vs. IonCount ==
 In the ScanStats file, IonCountRaw is the number MASIC m/z values present in 
 each spectrum.  IonCount is the number of points that MASIC keeps in memory and 
@@ -105,6 +123,7 @@ within ~0.05 m/z (thus, combine 1000.05 and 1000.052 as simply 1000.051).
 Additionally, for scans with a lot of low quality, low intensity data, MASIC 
 discards the low intensity data.  The IonCount value would let you see which 
 scans MASIC is discarding some data, for whatever reason.
+
 
 -------------------------------------------------------------------------------
 Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
