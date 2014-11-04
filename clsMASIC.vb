@@ -38,7 +38,7 @@ Public Class clsMASIC
 	Inherits clsProcessFilesBaseClass
 
 	Public Sub New()
-		MyBase.mFileDate = "August 6, 2014"
+        MyBase.mFileDate = "November 4, 2014"
 		InitializeVariables()
 	End Sub
 
@@ -1576,7 +1576,7 @@ Public Class clsMASIC
 
 				For intIndex = 0 To mCustomSICList.CustomMZSearchValues.Length - 1
 
-					' Add a new parent ion entry to .ParentIons() for this custom MZ value
+                    ' Add a new parent ion entry to .ParentIons() for this custom MZ value
 					With udtScanList
 						With .ParentIons(.ParentIonInfoCount)
 							.MZ = mCustomSICList.CustomMZSearchValues(intIndex).MZ
@@ -1595,38 +1595,47 @@ Public Class clsMASIC
 								fragScanIndexMatch += 1
 							End While
 
-							' This is a custom SIC-based parent ion
-							' Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
-							' This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
-							ReDim .FragScanIndices(0)
-							If udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.FragScan Then
-								.FragScanIndices(0) = udtScanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer								
-							Else
-								.FragScanIndices(0) = 0
-							End If
+                            If fragScanIndexMatch = udtScanList.MasterScanOrderCount Then
+                                ' Did not find the next frag scan; find the previous frag scan
+                                fragScanIndexMatch -= 1
+                                While fragScanIndexMatch > 0 AndAlso udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.SurveyScan
+                                    fragScanIndexMatch -= 1
+                                End While
+                                If fragScanIndexMatch < 0 Then fragScanIndexMatch = 0
+                            End If
 
-							.FragScanIndexCount = 1
-							.CustomSICPeak = True
-							.CustomSICPeakComment = mCustomSICList.CustomMZSearchValues(intIndex).Comment
-							.CustomSICPeakMZToleranceDa = mCustomSICList.CustomMZSearchValues(intIndex).MZToleranceDa
-							.CustomSICPeakScanOrAcqTimeTolerance = mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeTolerance
+                            ' This is a custom SIC-based parent ion
+                            ' Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
+                            ' This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
+                            ReDim .FragScanIndices(0)
+                            If udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.FragScan Then
+                                .FragScanIndices(0) = udtScanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer
+                            Else
+                                .FragScanIndices(0) = 0
+                            End If
 
-							If .CustomSICPeakMZToleranceDa < Double.Epsilon Then
-								If blnSICToleranceIsPPM Then
-									.CustomSICPeakMZToleranceDa = PPMToMass(dblDefaultSICTolerance, .MZ)
-								Else
-									.CustomSICPeakMZToleranceDa = dblDefaultSICTolerance
-								End If
-							End If
+                            .FragScanIndexCount = 1
+                            .CustomSICPeak = True
+                            .CustomSICPeakComment = mCustomSICList.CustomMZSearchValues(intIndex).Comment
+                            .CustomSICPeakMZToleranceDa = mCustomSICList.CustomMZSearchValues(intIndex).MZToleranceDa
+                            .CustomSICPeakScanOrAcqTimeTolerance = mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeTolerance
 
-							If .CustomSICPeakScanOrAcqTimeTolerance < Single.Epsilon Then
-								.CustomSICPeakScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
-							Else
-								sngScanOrAcqTimeSumForAveraging += .CustomSICPeakScanOrAcqTimeTolerance
-								intScanOrAcqTimeSumCount += 1
-							End If
+                            If .CustomSICPeakMZToleranceDa < Double.Epsilon Then
+                                If blnSICToleranceIsPPM Then
+                                    .CustomSICPeakMZToleranceDa = PPMToMass(dblDefaultSICTolerance, .MZ)
+                                Else
+                                    .CustomSICPeakMZToleranceDa = dblDefaultSICTolerance
+                                End If
+                            End If
 
-						End With
+                            If .CustomSICPeakScanOrAcqTimeTolerance < Single.Epsilon Then
+                                .CustomSICPeakScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
+                            Else
+                                sngScanOrAcqTimeSumForAveraging += .CustomSICPeakScanOrAcqTimeTolerance
+                                intScanOrAcqTimeSumCount += 1
+                            End If
+
+                        End With
 
 						.ParentIons(.ParentIonInfoCount).OptimalPeakApexScanNumber = .SurveyScans(.ParentIons(.ParentIonInfoCount).SurveyScanIndex).ScanNumber
 						.ParentIons(.ParentIonInfoCount).PeakApexOverrideParentIonIndex = -1

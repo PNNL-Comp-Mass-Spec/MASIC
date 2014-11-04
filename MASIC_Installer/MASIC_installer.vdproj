@@ -637,7 +637,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:MASICPeakFinder, Version=1.1.5331.19844, Culture=neutral, processorArchitecture=x86"
+            "AssemblyAsmDisplayName" = "8:MASICPeakFinder, Version=1.1.5421.20203, Culture=neutral, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
                     "_4038EB81986FA784FD045C5801F2127D"
@@ -688,7 +688,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5142.35689, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5402.26958, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_4C38846032E63C41891D1A87D253F519"
@@ -719,7 +719,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5142.35689, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:PRISM, Version=2.2.5402.26958, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_6317BCAC06EDCF6E319A368111962CF4"
@@ -781,7 +781,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:ThermoRawFileReaderDLL, Version=1.1.5049.29983, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:ThermoRawFileReaderDLL, Version=1.1.5415.32440, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_70C57550E07823249C36CBA3F50618D9"
@@ -1140,7 +1140,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:MatrixDecompositionUtility, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86"
+            "AssemblyAsmDisplayName" = "8:MatrixDecompositionUtility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_B3C45F049BA4F77B4A1FD1654BFEDE5D"

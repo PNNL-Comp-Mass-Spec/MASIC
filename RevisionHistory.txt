@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.6.5421; November 4, 2014
+	- Fix logic in AddCustomSICValues that finds the nearest MS2 spectrum for a given custom m/z value
+
 Version 2.6.5331; August 6, 2014
 	- Fixed bug in CompressSpectraData when checking for reporter ion m/z values, which should not be merged with neighboring data within the search resolution
 	- Changed default value for SpectrumSimilarityMinimum from 0.7 to 0.8
