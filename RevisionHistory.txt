@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.6.5500; January 22, 2015
+	- New version of ThermoRawFileReaderDLL that handles exceptions thrown by corrupt spectra
+
 Version 2.6.5421; November 4, 2014
 	- Fix logic in AddCustomSICValues that finds the nearest MS2 spectrum for a given custom m/z value
 

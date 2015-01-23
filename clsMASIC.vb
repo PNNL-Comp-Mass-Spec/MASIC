@@ -8776,11 +8776,15 @@ Public Class clsMASIC
 			' Load the ions for this scan
 		
 			strLastKnownLocation = "objXcaliburAccessor.GetScanData for scan " & intScanNumber
-			objMSSpectrum.IonCount = objXcaliburAccessor.GetScanData(intScanNumber, objMSSpectrum.IonsMZ, dblIntensityList, udtScanHeaderInfo)
-			With udtScanInfo
-				.IonCount = objMSSpectrum.IonCount
-				.IonCountRaw = .IonCount
-			End With
+
+            ' Start a new thread to load the data, in case MSFileReader encounters a corrupt scan
+
+            objMSSpectrum.IonCount = objXcaliburAccessor.GetScanData(intScanNumber, objMSSpectrum.IonsMZ, dblIntensityList, udtScanHeaderInfo)
+
+            With udtScanInfo
+                .IonCount = objMSSpectrum.IonCount
+                .IonCountRaw = .IonCount
+            End With
 
 			If objMSSpectrum.IonCount > 0 Then
 				If objMSSpectrum.IonCount <> objMSSpectrum.IonsMZ.Length Then
