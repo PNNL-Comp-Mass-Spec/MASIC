@@ -81,6 +81,25 @@ ThermoRawFileReaderDLL
 	<param name="blnCentroid">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired); note that the mass calibration of centroided data may be off by several hundred ppm</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@)">
+	<summary>
+ Obtain the mass and intensity for the specified scan
+ </summary>
+	<param name="scanNumber"></param>
+	<param name="mzList"></param>
+	<param name="intensityList"></param>
+	<returns>The number of data points, or -1 if an error</returns>
+	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,System.Int32)">
+	<summary>
+ Obtain the mass and intensity for the specified scan
+ </summary>
+	<param name="scanNumber"></param>
+	<param name="mzList"></param>
+	<param name="intensityList"></param>
+	<param name="maxNumberOfPeaks">Set to 0 (or negative) to return all of the data</param>
+	<returns>The number of data points, or -1 if an error</returns>
+	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,System.Int32,System.Boolean)">
 	<summary>
  Obtain the mass and intensity for the specified scan
