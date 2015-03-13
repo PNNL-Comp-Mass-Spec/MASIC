@@ -41,7 +41,7 @@ ThermoRawFileReaderDLL
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMZList"></param>
 	<param name="dblIntensityList"></param>
 	<param name="udtScanHeaderInfo">Unused; parameter retained for compatibility reasons</param>
@@ -51,7 +51,7 @@ ThermoRawFileReaderDLL
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMZList"></param>
 	<param name="dblIntensityList"></param>
 	<param name="udtScanHeaderInfo">Unused; parameter retained for compatibility reasons</param>
@@ -62,7 +62,7 @@ ThermoRawFileReaderDLL
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMZList"></param>
 	<param name="dblIntensityList"></param>
 	<param name="udtScanHeaderInfo">Unused; parameter retained for compatibility reasons</param>
@@ -73,7 +73,7 @@ ThermoRawFileReaderDLL
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMZList"></param>
 	<param name="dblIntensityList"></param>
 	<param name="udtScanHeaderInfo">Unused; parameter retained for compatibility reasons</param>
@@ -104,50 +104,47 @@ ThermoRawFileReaderDLL
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMZList"></param>
 	<param name="dblIntensityList"></param>
 	<param name="intMaxNumberOfPeaks">Set to 0 (or negative) to return all of the data</param>
 	<param name="blnCentroid">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired); note that the mass calibration of centroided data may be off by several hundred ppm</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData2D(System.Int32,System.Double[0:,0:]@)">
+	<summary>
+ Obtain the mass and intensity for the specified scan
+ </summary>
+	<param name="scan"></param>
+	<param name="dblMassIntensityPairs">2D array where the first dimension is 0 for mass or 1 for intensity while the second dimension is the data point index</param>
+	<returns>The number of data points, or -1 if an error</returns>
+	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData2D(System.Int32,System.Double[0:,0:]@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtScanHeaderInfoType@,System.Int32)">
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMassIntensityPairs">2D array where the first dimension is 0 for mass or 1 for intensity while the second dimension is the data point index</param>
 	<param name="udtScanHeaderInfo">Unused; parameter retained for compatibility reasons</param>
-	<param name="intMaxNumberOfPeaks"></param>
-	<returns>The number of data points, or -1 if an error</returns>
-	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
-</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData2D(System.Int32,System.Double[0:,0:]@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtScanHeaderInfoType@,System.Int32,System.Boolean)">
-	<summary>
- Obtain the mass and intensity for the specified scan
- </summary>
-	<param name="Scan"></param>
-	<param name="dblMassIntensityPairs">2D array where the first dimension is 0 for mass or 1 for intensity while the second dimension is the data point index</param>
-	<param name="udtScanHeaderInfo">Unused; parameter retained for compatibility reasons</param>
-	<param name="intMaxNumberOfPeaks"></param>
-	<param name="blnCentroid">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired); note that the mass calibration of centroided data may be off by several hundred ppm</param>
+	<param name="intMaxNumberOfPeaks">Maximum number of data points; 0 to return all data</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData2D(System.Int32,System.Double[0:,0:]@,System.Int32)">
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMassIntensityPairs">2D array where the first dimension is 0 for mass or 1 for intensity while the second dimension is the data point index</param>
-	<param name="intMaxNumberOfPeaks"></param>
+	<param name="intMaxNumberOfPeaks">Maximum number of data points; 0 to return all data</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData2D(System.Int32,System.Double[0:,0:]@,System.Int32,System.Boolean)">
 	<summary>
  Obtain the mass and intensity for the specified scan
  </summary>
-	<param name="Scan"></param>
+	<param name="scan"></param>
 	<param name="dblMassIntensityPairs">2D array where the first dimension is 0 for mass or 1 for intensity while the second dimension is the data point index</param>
-	<param name="intMaxNumberOfPeaks"></param>
+	<param name="intMaxNumberOfPeaks">Maximum number of data points; 0 to return all data</param>
 	<param name="blnCentroid">True to centroid the data, false to return as-is (either profile or centroid, depending on how the data was acquired); note that the mass calibration of centroided data may be off by several hundred ppm</param>
 	<returns>The number of data points, or -1 if an error</returns>
 	<remarks>If intMaxNumberOfPeaks is 0 (or negative), then returns all data; set intMaxNumberOfPeaks to &gt; 0 to limit the number of data points returned</remarks>

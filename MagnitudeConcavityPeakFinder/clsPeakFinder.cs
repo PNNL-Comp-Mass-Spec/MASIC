@@ -87,22 +87,23 @@ namespace MagnitudeConcavityPeakFinder
             bool useValleysForPeakWidth = true,
             bool movePeakLocationToMaxIntensity = true)
         {
-            // Finds peaks in the parallel arrays xValsZeroBased[) and yValsZeroBased[)
+            // Finds peaks in the parallel arrays xValsZeroBased[] and yValsZeroBased[]
             // intensityThreshold is the minimum absolute intensity allowable for a peak
             // peakDetectIntensityThresholdPercentageOfMaximum allows one to specify a minimum intensity as a percentage of the maximum peak intensity
             // Note that the maximum value of intensityThreshold vs. MaxValue * peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
             // For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
-            //   then if the maximum of yValsZeroBased[) is 50, then the minimum intensity of identified peaks is 10, and not 2.5
-            //   However, if the maximum of yValsZeroBased[) is 500, then the minimum intensity of identified peaks is 50, and not 10
+            //   then if the maximum of yValsZeroBased[] is 50, then the minimum intensity of identified peaks is 10, and not 2.5
+            //   However, if the maximum of yValsZeroBased[] is 500, then the minimum intensity of identified peaks is 50, and not 10
 
-            // Returns the locations of the peaks in peakLocations() -- indices of the peak apexes in the source arrays
-            // Returns the left edges of the peaks (in points, not actual units) in peakEdgesLeft[)       -- These values could be negative if blnUseValleysForPeakWidth = False
-            // Returns the right edges of the peaks in peakEdgesRight[)                                   -- These values could be larger than sourceDataCount-1 if blnUseValleysForPeakWidth = False
-            // Returns the areas of the peaks in peakAreas()
+            // Returns the peaks in List<clsPeak>
+            // Each peak has these values:
+            //   LocationIndex  is the index of the peak apex in the source arrays
+            //   LeftEdge       is the left edge of the peak (in points, not actual units); this value could be negative if blnUseValleysForPeakWidth = False
+            //   RightEdge      is the right edge of the peak (in points, not actual units); this value could be larger than sourceDataCount-1 if blnUseValleysForPeakWidth = False
+            //   Area
+            //   IsValid
 
-            // Note: Compute peak width using: peakWidthPoints = poeakEdgesRight[intPeakLocationsCount] - peakEdgesLeft[intPeakLocationsCount] + 1
-
-            // The function returns the number of peaks found; if none are found, returns 0
+            // Note: Compute peak width using: peakWidthPoints = peakEdgesRight[intPeakLocationsCount] - peakEdgesLeft[intPeakLocationsCount] + 1
 
             // Uses the Magnitude-Concavity method, wherein a second order
             //   polynomial is fit to the points within the window, giving a_2*x^2 + a_1*x + a_0

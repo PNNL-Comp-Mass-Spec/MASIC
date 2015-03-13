@@ -95,6 +95,7 @@ namespace MagnitudeConcavityPeakFinder
             public bool SelectedIonMonitoringDataIsPresent;
 
             // When True, then the calling function is testing the smallest possible peak width
+            [Obsolete("This does not appear to be used")]
             public bool TestingMinimumPeakWidth;
 
             /// When True, then a valid peak is one that contains udtPeakData.OriginalPeakLocationIndex, and will return only that peak
@@ -102,7 +103,7 @@ namespace MagnitudeConcavityPeakFinder
             public bool ReturnClosestPeak;
         }
 
-        protected struct udtSICPotentialAreaStatsType
+        public struct udtSICPotentialAreaStatsType
         {
             public double MinimumPotentialPeakArea;
             public int PeakCountBasisForMinimumPotentialArea;
@@ -311,7 +312,7 @@ namespace MagnitudeConcavityPeakFinder
         /// <remarks>
         /// The summed intensity is not used if the number of points greater than or equal to
         ///  .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width</remarks>
-        protected udtSICPotentialAreaStatsType FindMinimumPotentialPeakArea(
+        public udtSICPotentialAreaStatsType FindMinimumPotentialPeakArea(
             List<KeyValuePair<int, double>> xyData,
             udtSICPeakFinderOptionsType udtSICPeakFinderOptions)
         {

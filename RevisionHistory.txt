@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.6.5549; March 12, 2015
+	- Increased default cache settings to a maximum of 5000 spectra and 3 GB of memory
+	- Now compiling as AnyCPU by default
+
 Version 2.6.5500; January 22, 2015
 	- New version of ThermoRawFileReaderDLL that handles exceptions thrown by corrupt spectra
 
