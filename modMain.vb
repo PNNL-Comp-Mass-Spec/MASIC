@@ -26,7 +26,7 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "March 12, 2015"
+    Public Const PROGRAM_DATE As String = "March 24, 2015"
 
 	Private mInputFilePath As String
 	Private mOutputFolderPath As String				' Optional

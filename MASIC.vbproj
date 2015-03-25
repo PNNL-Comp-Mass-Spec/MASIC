@@ -175,18 +175,12 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="clsBase64EncodeDecode.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="clsBinarySearch.vb" />
     <Compile Include="clsCorrelation.vb">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsFilterDataArrayMaxCount.vb" />
     <Compile Include="clsITraqIntensityCorrection.vb" />
-    <Compile Include="clsLCQDataFileFunctions.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="clsMASIC.vb">
       <SubType>Code</SubType>
     </Compile>

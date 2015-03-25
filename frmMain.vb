@@ -73,9 +73,7 @@ Public Class frmMain
 	Private mXmlSettingsFilePath As String
 	Private mPreferredInputFileExtension As String
 
-	Private mUseFinniganXRawAccessorFunctions As Boolean
-
-	Private mCacheOptions As clsSpectraCache.udtSpectrumCacheOptionsType
+    Private mCacheOptions As clsSpectraCache.udtSpectrumCacheOptionsType
 
 	Private mSuppressNoParentIonsError As Boolean
 	Private mCompressMSSpectraData As Boolean
@@ -1101,8 +1099,7 @@ Public Class frmMain
 		Try
 			With objMasic
 				' Import Options
-				mUseFinniganXRawAccessorFunctions = .UseFinniganXRawAccessorFunctions
-				txtParentIonDecoyMassDa.Text = .ParentIonDecoyMassDa.ToString
+                txtParentIonDecoyMassDa.Text = .ParentIonDecoyMassDa.ToString
 
 				' Masic Export Options
 				chkIncludeHeaders.Checked = .IncludeHeadersInExportFile
@@ -1622,7 +1619,6 @@ Public Class frmMain
 		Try
 			With objMasic
 				' Import options
-				.UseFinniganXRawAccessorFunctions = mUseFinniganXRawAccessorFunctions
 
 				.ParentIonDecoyMassDa = SharedVBNetRoutines.VBNetRoutines.ParseTextboxValueDbl(txtParentIonDecoyMassDa, lblParentIonDecoyMassDa.Text & " must be a value", blnError)
 				If blnError Then Exit Try
