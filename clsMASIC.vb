@@ -5143,12 +5143,16 @@ Public Class clsMASIC
 				intScanStart = mXcaliburAccessor.FileInfo.ScanStart
 				intScanEnd = mXcaliburAccessor.FileInfo.ScanEnd
 
-				With udtSICOptions
-					If .ScanRangeStart >= 0 AndAlso .ScanRangeEnd > .ScanRangeStart Then
-						intScanStart = Math.Max(intScanStart, .ScanRangeStart)
-						intScanEnd = Math.Min(intScanEnd, .ScanRangeEnd)
-					End If
-				End With
+                With udtSICOptions
+                    If .ScanRangeStart > 0 And .ScanRangeEnd = 0 Then
+                        .ScanRangeEnd = Integer.MaxValue
+                    End If
+
+                    If .ScanRangeStart >= 0 AndAlso .ScanRangeEnd > .ScanRangeStart Then
+                        intScanStart = Math.Max(intScanStart, .ScanRangeStart)
+                        intScanEnd = Math.Min(intScanEnd, .ScanRangeEnd)
+                    End If
+                End With
 
 				UpdateOverallProgress("Reading Xcalibur data with " & strIOMode & " (" & intScanCount.ToString & " scans)" & ControlChars.NewLine & IO.Path.GetFileName(strFilePath))
 				LogMessage("Reading Xcalibur data with " & strIOMode & "; Total scan count: " & intScanCount.ToString)
