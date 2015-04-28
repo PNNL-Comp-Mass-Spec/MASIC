@@ -10489,11 +10489,12 @@ Public Class clsMASIC
 
 			strInputFileName = IO.Path.GetFileName(strInputFilePathFull)
 
-			' First, write a true TIC file (in ICR-2LS format)
-			strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
-			LogMessage("Saving ICR Tools TIC to " & IO.Path.GetFileName(strOutputFilePath))
+            ' Disabled in April 2015 since not used
+            '' First, write a true TIC file (in ICR-2LS format)
+            'strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
+            'LogMessage("Saving ICR Tools TIC to " & IO.Path.GetFileName(strOutputFilePath))
 
-			SaveICRToolsChromatogramByScan(udtScanList.SurveyScans, udtScanList.SurveyScanCount, strOutputFilePath, False, True, strInputFilePathFull)
+            'SaveICRToolsChromatogramByScan(udtScanList.SurveyScans, udtScanList.SurveyScanCount, strOutputFilePath, False, True, strInputFilePathFull)
 
 			intStepsCompleted += 1
 			SetSubtaskProcessingStepPct(CShort(intStepsCompleted / intBPIStepCount * 100))
@@ -10580,112 +10581,113 @@ Public Class clsMASIC
 
 	End Sub
 
-	Private Sub SaveICRToolsChromatogramByScan(ByRef udtScans() As udtScanInfoType, ByVal intScanCount As Integer, ByVal strOutputFilePath As String, ByVal blnSaveElutionTimeInsteadOfScan As Boolean, ByVal blnSaveTICInsteadOfBPI As Boolean, ByVal strInputFilePathFull As String)
+    <Obsolete("No longer used")>
+       Private Sub SaveICRToolsChromatogramByScan(ByRef udtScans() As udtScanInfoType, ByVal intScanCount As Integer, ByVal strOutputFilePath As String, ByVal blnSaveElutionTimeInsteadOfScan As Boolean, ByVal blnSaveTICInsteadOfBPI As Boolean, ByVal strInputFilePathFull As String)
 
-		Dim srOutFile As IO.StreamWriter
-		Dim fsBinaryOutStream As IO.FileStream
-		Dim srBinaryOut As IO.BinaryWriter
+        Dim srOutFile As IO.StreamWriter
+        Dim fsBinaryOutStream As IO.FileStream
+        Dim srBinaryOut As IO.BinaryWriter
 
-		Dim intBufferLength As Integer
-		Dim intScanIndex As Integer
+        Dim intBufferLength As Integer
+        Dim intScanIndex As Integer
 
-		srOutFile = New IO.StreamWriter(strOutputFilePath)
+        srOutFile = New IO.StreamWriter(strOutputFilePath)
 
-		' Write the Header text
-		srOutFile.WriteLine("ICR-2LS Data File (GA Anderson & JE Bruce); output from MASIC by Matthew E Monroe")
-		srOutFile.WriteLine("Version " & MyBase.FileVersion & "; " & MyBase.mFileDate)
-		srOutFile.WriteLine("FileName:")
-		If blnSaveTICInsteadOfBPI Then
-			srOutFile.WriteLine("title:" & IO.Path.GetFileName(strInputFilePathFull) & " TIC")
-			srOutFile.WriteLine("Ytitle:Amplitude (TIC)")
-		Else
-			srOutFile.WriteLine("title:" & IO.Path.GetFileName(strInputFilePathFull) & " BPI")
-			srOutFile.WriteLine("Ytitle:Amplitude (BPI)")
-		End If
+        ' Write the Header text
+        srOutFile.WriteLine("ICR-2LS Data File (GA Anderson & JE Bruce); output from MASIC by Matthew E Monroe")
+        srOutFile.WriteLine("Version " & MyBase.FileVersion & "; " & MyBase.mFileDate)
+        srOutFile.WriteLine("FileName:")
+        If blnSaveTICInsteadOfBPI Then
+            srOutFile.WriteLine("title:" & IO.Path.GetFileName(strInputFilePathFull) & " TIC")
+            srOutFile.WriteLine("Ytitle:Amplitude (TIC)")
+        Else
+            srOutFile.WriteLine("title:" & IO.Path.GetFileName(strInputFilePathFull) & " BPI")
+            srOutFile.WriteLine("Ytitle:Amplitude (BPI)")
+        End If
 
-		If blnSaveElutionTimeInsteadOfScan Then
-			srOutFile.WriteLine("Xtitle:Time (Minutes)")
-		Else
-			srOutFile.WriteLine("Xtitle:Scan #")
-		End If
+        If blnSaveElutionTimeInsteadOfScan Then
+            srOutFile.WriteLine("Xtitle:Time (Minutes)")
+        Else
+            srOutFile.WriteLine("Xtitle:Scan #")
+        End If
 
-		srOutFile.WriteLine("Comment:")
-		srOutFile.WriteLine("LCQfilename: " & strInputFilePathFull)
-		srOutFile.WriteLine()
-		srOutFile.WriteLine("CommentEnd")
-		srOutFile.WriteLine("FileType: 5 ")
-		srOutFile.WriteLine(" ValidTypes:1=Time,2=Freq,3=Mass;4=TimeSeriesWithCalibrationFn;5=XYPairs")
-		srOutFile.WriteLine("DataType: 3 ")
-		srOutFile.WriteLine(" ValidTypes:1=Integer,no header,2=Floats,Sun Extrel,3=Floats with header,4=Excite waveform")
-		srOutFile.WriteLine("Appodization: 0")
-		srOutFile.WriteLine(" ValidFunctions:0=Square,1=Parzen,2=Hanning,3=Welch")
-		srOutFile.WriteLine("ZeroFills: 0 ")
+        srOutFile.WriteLine("Comment:")
+        srOutFile.WriteLine("LCQfilename: " & strInputFilePathFull)
+        srOutFile.WriteLine()
+        srOutFile.WriteLine("CommentEnd")
+        srOutFile.WriteLine("FileType: 5 ")
+        srOutFile.WriteLine(" ValidTypes:1=Time,2=Freq,3=Mass;4=TimeSeriesWithCalibrationFn;5=XYPairs")
+        srOutFile.WriteLine("DataType: 3 ")
+        srOutFile.WriteLine(" ValidTypes:1=Integer,no header,2=Floats,Sun Extrel,3=Floats with header,4=Excite waveform")
+        srOutFile.WriteLine("Appodization: 0")
+        srOutFile.WriteLine(" ValidFunctions:0=Square,1=Parzen,2=Hanning,3=Welch")
+        srOutFile.WriteLine("ZeroFills: 0 ")
 
-		' Since we're using XY pairs, the buffer length needs to be two times intScanCount
-		intBufferLength = intScanCount * 2
-		If intBufferLength < 1 Then intBufferLength = 1
+        ' Since we're using XY pairs, the buffer length needs to be two times intScanCount
+        intBufferLength = intScanCount * 2
+        If intBufferLength < 1 Then intBufferLength = 1
 
-		srOutFile.WriteLine("NumberOfSamples: " & intBufferLength.ToString & " ")
-		srOutFile.WriteLine("SampleRate: 1 ")
-		srOutFile.WriteLine("LowMassFreq: 0 ")
-		srOutFile.WriteLine("FreqShift: 0 ")
-		srOutFile.WriteLine("NumberSegments: 0 ")
-		srOutFile.WriteLine("MaxPoint: 0 ")
-		srOutFile.WriteLine("CalType: 0 ")
-		srOutFile.WriteLine("CalA: 108205311.2284 ")
-		srOutFile.WriteLine("CalB:-1767155067.018 ")
-		srOutFile.WriteLine("CalC: 29669467490280 ")
-		srOutFile.WriteLine("Intensity: 0 ")
-		srOutFile.WriteLine("CurrentXmin: 0 ")
-		If intScanCount > 0 Then
-			If blnSaveElutionTimeInsteadOfScan Then
-				srOutFile.WriteLine("CurrentXmax: " & udtScans(intScanCount - 1).ScanTime.ToString & " ")
-			Else
-				srOutFile.WriteLine("CurrentXmax: " & udtScans(intScanCount - 1).ScanNumber.ToString & " ")
-			End If
-		Else
-			srOutFile.WriteLine("CurrentXmax: 0")
-		End If
+        srOutFile.WriteLine("NumberOfSamples: " & intBufferLength.ToString & " ")
+        srOutFile.WriteLine("SampleRate: 1 ")
+        srOutFile.WriteLine("LowMassFreq: 0 ")
+        srOutFile.WriteLine("FreqShift: 0 ")
+        srOutFile.WriteLine("NumberSegments: 0 ")
+        srOutFile.WriteLine("MaxPoint: 0 ")
+        srOutFile.WriteLine("CalType: 0 ")
+        srOutFile.WriteLine("CalA: 108205311.2284 ")
+        srOutFile.WriteLine("CalB:-1767155067.018 ")
+        srOutFile.WriteLine("CalC: 29669467490280 ")
+        srOutFile.WriteLine("Intensity: 0 ")
+        srOutFile.WriteLine("CurrentXmin: 0 ")
+        If intScanCount > 0 Then
+            If blnSaveElutionTimeInsteadOfScan Then
+                srOutFile.WriteLine("CurrentXmax: " & udtScans(intScanCount - 1).ScanTime.ToString & " ")
+            Else
+                srOutFile.WriteLine("CurrentXmax: " & udtScans(intScanCount - 1).ScanNumber.ToString & " ")
+            End If
+        Else
+            srOutFile.WriteLine("CurrentXmax: 0")
+        End If
 
-		srOutFile.WriteLine("Tags:")
-		srOutFile.WriteLine("TagsEnd")
-		srOutFile.WriteLine("End")
+        srOutFile.WriteLine("Tags:")
+        srOutFile.WriteLine("TagsEnd")
+        srOutFile.WriteLine("End")
 
-		srOutFile.Close()
+        srOutFile.Close()
 
-		' Wait 500 msec, then re-open the file using Binary IO
-		Threading.Thread.Sleep(500)
+        ' Wait 500 msec, then re-open the file using Binary IO
+        Threading.Thread.Sleep(500)
 
-		fsBinaryOutStream = New IO.FileStream(strOutputFilePath, IO.FileMode.Append)
-		srBinaryOut = New IO.BinaryWriter(fsBinaryOutStream)
+        fsBinaryOutStream = New IO.FileStream(strOutputFilePath, IO.FileMode.Append)
+        srBinaryOut = New IO.BinaryWriter(fsBinaryOutStream)
 
 
-		' Write an Escape character (Byte 1B)
-		srBinaryOut.Write(CByte(27))
+        ' Write an Escape character (Byte 1B)
+        srBinaryOut.Write(CByte(27))
 
-		For intScanIndex = 0 To intScanCount - 1
-			With udtScans(intScanIndex)
-				' Note: Using CSng to assure that we write out single precision numbers
-				' .TotalIonIntensity and .BasePeakIonIntensity are actually already singles
+        For intScanIndex = 0 To intScanCount - 1
+            With udtScans(intScanIndex)
+                ' Note: Using CSng to assure that we write out single precision numbers
+                ' .TotalIonIntensity and .BasePeakIonIntensity are actually already singles
 
-				If blnSaveElutionTimeInsteadOfScan Then
-					srBinaryOut.Write(CSng(.ScanTime))
-				Else
-					srBinaryOut.Write(CSng(.ScanNumber))
-				End If
+                If blnSaveElutionTimeInsteadOfScan Then
+                    srBinaryOut.Write(CSng(.ScanTime))
+                Else
+                    srBinaryOut.Write(CSng(.ScanNumber))
+                End If
 
-				If blnSaveTICInsteadOfBPI Then
-					srBinaryOut.Write(CSng(.TotalIonIntensity))
-				Else
-					srBinaryOut.Write(CSng(.BasePeakIonIntensity))
-				End If
+                If blnSaveTICInsteadOfBPI Then
+                    srBinaryOut.Write(CSng(.TotalIonIntensity))
+                Else
+                    srBinaryOut.Write(CSng(.BasePeakIonIntensity))
+                End If
 
-			End With
-		Next intScanIndex
+            End With
+        Next intScanIndex
 
-		srBinaryOut.Close()
+        srBinaryOut.Close()
 
-	End Sub
+    End Sub
 
 	Private Function SaveSICDataToText(ByRef udtSICOptions As udtSICOptionsType, ByRef udtScanList As udtScanListType, ByVal intParentIonIndex As Integer, ByRef udtSICDetails As udtSICStatsDetailsType, ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
 
