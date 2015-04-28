@@ -39,7 +39,7 @@ Public Class clsMASIC
 	Inherits clsProcessFilesBaseClass
 
 	Public Sub New()
-        MyBase.mFileDate = "November 4, 2014"
+        MyBase.mFileDate = "April 28, 2015"
 		InitializeVariables()
 	End Sub
 
@@ -2902,26 +2902,6 @@ Public Class clsMASIC
 		Return strOutputFilePath
 
 	End Function
-
-	Private Sub ConstructBlankRawTextLists(ByRef udtCustomSICList As udtCustomMZSearchListType)
-		Dim intIndex As Integer
-
-		With udtCustomSICList
-			.RawTextMZToleranceDaList = String.Empty
-			.RawTextScanOrAcqTimeToleranceList = String.Empty
-
-			For intIndex = 0 To .CustomMZSearchValues.Length - 1
-				If intIndex = 0 Then
-					.RawTextMZToleranceDaList = "0"
-					.RawTextScanOrAcqTimeToleranceList = udtCustomSICList.ScanOrAcqTimeTolerance.ToString
-				Else
-					.RawTextMZToleranceDaList &= ",0"
-					.RawTextScanOrAcqTimeToleranceList &= ","c & udtCustomSICList.ScanOrAcqTimeTolerance.ToString
-				End If
-			Next intIndex
-
-		End With
-	End Sub
 
 	Private Function ConstructSRMMapKey(ByVal udtSRMListEntry As udtSRMListType) As String
 		Return ConstructSRMMapKey(udtSRMListEntry.ParentIonMZ, udtSRMListEntry.CentralMass)
@@ -8711,79 +8691,76 @@ Public Class clsMASIC
 
         If lstMZs.Count > 0 Then
 
-            With mCustomSICList
+            mCustomSICList.RawTextMZList = strMZList
+            mCustomSICList.RawTextMZToleranceDaList = strMZToleranceDaList
+            mCustomSICList.RawTextScanOrAcqTimeCenterList = strScanCenterList
+            mCustomSICList.RawTextScanOrAcqTimeToleranceList = strScanToleranceList
 
-                .RawTextMZList = strMZList
-                .RawTextScanOrAcqTimeCenterList = strScanCenterList
-                .RawTextScanOrAcqTimeToleranceList = strScanToleranceList
+            ReDim mCustomSICList.CustomMZSearchValues(lstMZs.Count - 1)
 
-                ' The following are populated below
-                .RawTextMZToleranceDaList = String.Empty
-                .RawTextScanOrAcqTimeToleranceList = String.Empty
+            intCustomMZCount = 0
+            For intIndex = 0 To lstMZs.Count - 1
 
-                ReDim .CustomMZSearchValues(lstMZs.Count - 1)
+                If IsNumber(lstMZs.Item(intIndex)) Then
+                    Dim udtCustomSearchInfo As New udtCustomMZSearchSpecType
 
-                intCustomMZCount = 0
-                For intIndex As Integer = 0 To lstMZs.Count - 1
+                    udtCustomSearchInfo.MZ = CDbl(lstMZs.Item(intIndex))
+                    udtCustomSearchInfo.MZToleranceDa = 0
+                    udtCustomSearchInfo.ScanOrAcqTimeCenter = 0         ' Set to 0 to indicate that the entire file should be searched
+                    udtCustomSearchInfo.ScanOrAcqTimeTolerance = 0
 
-                    If IsNumber(lstMZs.Item(intIndex)) Then
-                        With .CustomMZSearchValues(intCustomMZCount)
-                            .MZ = CDbl(lstMZs.Item(intIndex))
-                            .MZToleranceDa = 0
-                            .ScanOrAcqTimeCenter = 0         ' Set to 0 to indicate that the entire file should be searched
-                            .ScanOrAcqTimeTolerance = 0
-
-                            If lstScanCenters.Count > intIndex Then
-                                If IsNumber(lstScanCenters.Item(intIndex)) Then
-                                    If mCustomSICList.ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-                                        .ScanOrAcqTimeCenter = CInt(lstScanCenters.Item(intIndex))
-                                    Else
-                                        ' Includes .Relative and .AcquisitionTime
-                                        .ScanOrAcqTimeCenter = CSng(lstScanCenters.Item(intIndex))
-                                    End If
-                                End If
-                            End If
-
-                            If lstScanTolerances.Count > intIndex Then
-                                If IsNumber(lstScanTolerances.Item(intIndex)) Then
-                                    If mCustomSICList.ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-                                        .ScanOrAcqTimeTolerance = CInt(lstScanTolerances.Item(intIndex))
-                                    Else
-                                        ' Includes .Relative and .AcquisitionTime
-                                        .ScanOrAcqTimeTolerance = CSng(lstScanTolerances.Item(intIndex))
-                                    End If
-                                End If
-                            End If
-
-                            If lstMZToleranceDa.Count > intIndex Then
-                                If IsNumber(lstMZToleranceDa.Item(intIndex)) Then
-                                    .MZToleranceDa = CDbl(lstMZToleranceDa.Item(intIndex))
-                                End If
-                            End If
-
-                            If lstScanComments.Count > intIndex Then
-                                .Comment = lstScanComments.Item(intIndex)
+                    If lstScanCenters.Count > intIndex Then
+                        If IsNumber(lstScanCenters.Item(intIndex)) Then
+                            If mCustomSICList.ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
+                                udtCustomSearchInfo.ScanOrAcqTimeCenter = CInt(lstScanCenters.Item(intIndex))
                             Else
-                                .Comment = String.Empty
+                                ' Includes .Relative and .AcquisitionTime
+                                udtCustomSearchInfo.ScanOrAcqTimeCenter = CSng(lstScanCenters.Item(intIndex))
                             End If
-
-                        End With
-
-                        intCustomMZCount += 1
+                        End If
                     End If
 
-                Next
+                    If lstScanTolerances.Count > intIndex Then
+                        If IsNumber(lstScanTolerances.Item(intIndex)) Then
+                            If mCustomSICList.ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
+                                udtCustomSearchInfo.ScanOrAcqTimeTolerance = CInt(lstScanTolerances.Item(intIndex))
+                            Else
+                                ' Includes .Relative and .AcquisitionTime
+                                udtCustomSearchInfo.ScanOrAcqTimeTolerance = CSng(lstScanTolerances.Item(intIndex))
+                            End If
+                        End If
+                    End If
 
-                If intCustomMZCount < .CustomMZSearchValues.Length Then
-                    ReDim Preserve .CustomMZSearchValues(intCustomMZCount - 1)
+                    If lstMZToleranceDa.Count > intIndex Then
+                        If IsNumber(lstMZToleranceDa.Item(intIndex)) Then
+                            udtCustomSearchInfo.MZToleranceDa = CDbl(lstMZToleranceDa.Item(intIndex))
+                        End If
+                    End If
+
+                    If lstScanComments.Count > intIndex Then
+                        udtCustomSearchInfo.Comment = lstScanComments.Item(intIndex)
+                    Else
+                        udtCustomSearchInfo.Comment = String.Empty
+                    End If
+
+                    mCustomSICList.CustomMZSearchValues(intCustomMZCount) = udtCustomSearchInfo
+
+                    intCustomMZCount += 1
                 End If
 
-            End With
+            Next
+
+            If intCustomMZCount < mCustomSICList.CustomMZSearchValues.Length Then
+                ReDim Preserve mCustomSICList.CustomMZSearchValues(intCustomMZCount - 1)
+            End If
+
         Else
             ReDim mCustomSICList.CustomMZSearchValues(-1)
+            mCustomSICList.RawTextMZList = String.Empty
+            mCustomSICList.RawTextMZToleranceDaList = String.Empty
+            mCustomSICList.RawTextScanOrAcqTimeCenterList = String.Empty
+            mCustomSICList.RawTextScanOrAcqTimeToleranceList = String.Empty
         End If
-
-        ConstructBlankRawTextLists(mCustomSICList)
 
         Return blnSuccess
 

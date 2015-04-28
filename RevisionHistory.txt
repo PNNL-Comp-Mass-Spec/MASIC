@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.6.5596; April 28, 2015
+	- Fix storing of custom m/z search mass tolerance values in the XML file
+
 Version 2.6.5595; April 27, 2015
 	- No longer creating an ICR-2LS compatible .tic file
 	- Fix bugs saving/loading custom search tolerances for custom m/z values
