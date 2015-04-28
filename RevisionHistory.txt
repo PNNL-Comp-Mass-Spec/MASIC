@@ -2,6 +2,7 @@ MASIC Change Log
 
 Version 2.6.5595; April 27, 2015
 	- No longer creating an ICR-2LS compatible .tic file
+	- Fix bugs saving/loading custom search tolerances for custom m/z values
 
 Version 2.6.5549; March 12, 2015
 	- Increased default cache settings to a maximum of 5000 spectra and 3 GB of memory

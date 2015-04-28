@@ -256,7 +256,7 @@ Public Module modMain
 					If .RetrieveValueForParameter("P", strValue) Then mParameterFilePath = strValue
 					If .RetrieveValueForParameter("D", strValue) Then
 						If Not IsNumeric(strValue) AndAlso Not strValue Is Nothing Then
-							' Assume the user specified a dataset number lookup file (comma or tab delimeted file specifying the dataset number for each input file)
+                            ' Assume the user specified a dataset number lookup file (comma or tab delimited file specifying the dataset number for each input file)
 							mDatasetLookupFilePath = strValue
 							mDatasetNumber = 0
 						Else
