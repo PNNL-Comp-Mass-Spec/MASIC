@@ -54,7 +54,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\x86\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>MASIC.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
@@ -82,7 +82,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\AnyCPU\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>MASIC.xml</DocumentationFile>
     <Optimize>true</Optimize>
