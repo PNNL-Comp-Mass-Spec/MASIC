@@ -26,7 +26,7 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "April 28, 2015"
+    Public Const PROGRAM_DATE As String = "July 20, 2015"
 
 	Private mInputFilePath As String
 	Private mOutputFolderPath As String				' Optional
@@ -153,7 +153,7 @@ Public Module modMain
 				ShowProgramHelp()
 				intReturnCode = -1
 			Else
-				mMASIC = New MASIC.clsMASIC
+                mMASIC = New MASIC.clsMASIC()
 
 				mMASIC.DatasetLookupFilePath = mDatasetLookupFilePath
 				mMASIC.DatasetNumber = mDatasetNumber
@@ -336,9 +336,12 @@ Public Module modMain
 	Public Sub ShowGUI()
 		Dim objFormMain As frmMain
 
+        System.Windows.Forms.Application.EnableVisualStyles()
+        System.Windows.Forms.Application.DoEvents()
+    
 		objFormMain = New frmMain
 
-		' The following call is needed because the .ShowDialog() call is inexplicably increasing the size of the form
+    ' The following call is needed because the .ShowDialog() call is inexplicably increasing the size of the form
 		objFormMain.SetHeightAdjustForce(objFormMain.Height)
 
 		objFormMain.ShowDialog()
@@ -347,63 +350,63 @@ Public Module modMain
 
 	End Sub
 
-	Private Sub ShowProgramHelp()
+    Private Sub ShowProgramHelp()
 
-		Try
+        Try
 
-			Console.WriteLine("This program will read a Finnigan LCQ .RAW file or Agilent LC/MSD .CDF/.MGF file combo and create a selected ion chromatogram (SIC) for each parent ion.")
-			Console.WriteLine()
+            Console.WriteLine("This program will read a Finnigan LCQ .RAW file or Agilent LC/MSD .CDF/.MGF file combo and create a selected ion chromatogram (SIC) for each parent ion.")
+            Console.WriteLine()
 
-			Console.WriteLine("Program syntax:" & System.Environment.NewLine & IO.Path.GetFileName(clsProcessFilesBaseClass.GetAppPath()))
-			Console.WriteLine(" /I:InputFilePath.raw [/O:OutputFolderPath]")
-			Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath] ")
-			Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputFolderPath] [/R]")
-			Console.WriteLine(" [/L:[LogFilePath]] [/LogFolder:LogFolderPath] [/SF:StatusFileName] [/Q]")
-			Console.WriteLine()
+            Console.WriteLine("Program syntax:" & System.Environment.NewLine & IO.Path.GetFileName(clsProcessFilesBaseClass.GetAppPath()))
+            Console.WriteLine(" /I:InputFilePath.raw [/O:OutputFolderPath]")
+            Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath] ")
+            Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputFolderPath] [/R]")
+            Console.WriteLine(" [/L:[LogFilePath]] [/LogFolder:LogFolderPath] [/SF:StatusFileName] [/Q]")
+            Console.WriteLine()
 
-			Console.WriteLine("The input file path can contain the wildcard character *")
-			Console.WriteLine("The output folder name is optional.  If omitted, the output files will be created in the same folder as the input file.  If included, then a subfolder is created with the name OutputFolderName.")
-			Console.WriteLine("The param file switch is optional.  If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used.")
-			Console.WriteLine()
-			Console.WriteLine("The /D switch can be used to specify the dataset number of the input file; if omitted, 0 will be used")
-			Console.WriteLine("Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S)")
-			Console.WriteLine()
-			Console.WriteLine("Use /S to process all valid files in the input folder and subfolders. Include a number after /S (like /S:2) to limit the level of subfolders to examine.")
-			Console.WriteLine("When using /S, you can redirect the output of the results using /A.")
-			Console.WriteLine("When using /S, you can use /R to re-create the input folder hierarchy in the alternate output folder (if defined).")
-			Console.WriteLine()
-			Console.WriteLine("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file.")
-			Console.WriteLine("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASIC.DEFAULT_MASIC_STATUS_FILE_NAME & ").")
-			Console.WriteLine("The optional /Q switch will suppress all error messages.")
-			Console.WriteLine()
+            Console.WriteLine("The input file path can contain the wildcard character *")
+            Console.WriteLine("The output folder name is optional.  If omitted, the output files will be created in the same folder as the input file.  If included, then a subfolder is created with the name OutputFolderName.")
+            Console.WriteLine("The param file switch is optional.  If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used.")
+            Console.WriteLine()
+            Console.WriteLine("The /D switch can be used to specify the dataset number of the input file; if omitted, 0 will be used")
+            Console.WriteLine("Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S)")
+            Console.WriteLine()
+            Console.WriteLine("Use /S to process all valid files in the input folder and subfolders. Include a number after /S (like /S:2) to limit the level of subfolders to examine.")
+            Console.WriteLine("When using /S, you can redirect the output of the results using /A.")
+            Console.WriteLine("When using /S, you can use /R to re-create the input folder hierarchy in the alternate output folder (if defined).")
+            Console.WriteLine()
+            Console.WriteLine("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file.")
+            Console.WriteLine("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASIC.DEFAULT_MASIC_STATUS_FILE_NAME & ").")
+            Console.WriteLine("The optional /Q switch will suppress all error messages.")
+            Console.WriteLine()
 
-			Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003")
-			Console.WriteLine("Version: " & GetAppVersion())
+            Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003")
+            Console.WriteLine("Version: " & GetAppVersion())
 
-			Console.WriteLine()
+            Console.WriteLine()
 
-			Console.WriteLine("E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com")
-			Console.WriteLine("Website: http://omics.pnl.gov/ or http://panomics.pnnl.gov/")
-			Console.WriteLine()
+            Console.WriteLine("E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com")
+            Console.WriteLine("Website: http://omics.pnl.gov/ or http://panomics.pnnl.gov/")
+            Console.WriteLine()
 
-			' Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
-			System.Threading.Thread.Sleep(750)
+            ' Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
+            System.Threading.Thread.Sleep(750)
 
-		Catch ex As Exception
-			ShowErrorMessage("Error displaying the program syntax: " & ex.Message)
-		End Try
+        Catch ex As Exception
+            ShowErrorMessage("Error displaying the program syntax: " & ex.Message)
+        End Try
 
-	End Sub
+    End Sub
 
-	Private Sub WriteToErrorStream(strErrorMessage As String)
-		Try
-			Using swErrorStream As System.IO.StreamWriter = New System.IO.StreamWriter(Console.OpenStandardError())
-				swErrorStream.WriteLine(strErrorMessage)
-			End Using
-		Catch ex As Exception
-			' Ignore errors here
-		End Try
-	End Sub
+    Private Sub WriteToErrorStream(strErrorMessage As String)
+        Try
+            Using swErrorStream As System.IO.StreamWriter = New System.IO.StreamWriter(Console.OpenStandardError())
+                swErrorStream.WriteLine(strErrorMessage)
+            End Using
+        Catch ex As Exception
+            ' Ignore errors here
+        End Try
+    End Sub
 
     Private Sub mMASIC_ProgressChanged(ByVal taskDescription As String, ByVal percentComplete As Single) Handles mMASIC.ProgressChanged
         Const PERCENT_REPORT_INTERVAL As Integer = 25

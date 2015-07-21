@@ -30,12 +30,15 @@ Imports PNNLOmics.Utilities
 Public Class frmBrowser
 	Inherits System.Windows.Forms.Form
 
-	Private Const PROGRAM_DATE As String = "August 5, 2014"
+    Private Const PROGRAM_DATE As String = "July 20, 2015"
 
 #Region "Windows Form Designer generated code"
 
 	Public Sub New()
 		MyBase.New()
+
+        System.Windows.Forms.Application.EnableVisualStyles()
+        System.Windows.Forms.Application.DoEvents()
 
 		'This call is required by the Windows Form Designer.
 		InitializeComponent()

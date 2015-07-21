@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.6.5679; July 20, 2015
+	- Enabled visual styles to give rounded buttons and text boxes in the main window
+
 Version 2.6.5596; April 28, 2015
 	- Fix storing of custom m/z search mass tolerance values in the XML file
 

@@ -118,9 +118,16 @@ ThermoRawFileReaderDLL
 	<value></value>
 	<returns></returns>
 	<remarks></remarks>
+</member><member name="P:ThermoRawFileReaderDLL.clsScanInfo.ActivationType">
+	<summary>
+ Activation type (aka activation method) as reported by the reader
+ </summary>
+	<value></value>
+	<returns></returns>
+	<remarks></remarks>
 </member><member name="P:ThermoRawFileReaderDLL.clsScanInfo.CollisionMode">
 	<summary>
- Collision mode
+ Collision mode, determined from the filter string
  </summary>
 	<value></value>
 	<returns></returns>
@@ -211,6 +218,15 @@ ThermoRawFileReaderDLL
 	<param name="logNames"></param>
 	<param name="logValues"></param>
 	<remarks></remarks>
+</member><member name="M:ThermoRawFileReaderDLL.clsScanInfo.TryGetScanEvent(System.String,System.String@,System.Boolean)">
+	<summary>
+ Get the event value associated with the given scan event name
+ </summary>
+	<param name="eventName">Event name to find</param>
+	<param name="eventValue">Event value</param>
+	<param name="partialMatchToStart">Set to true to match the start of an event name, and not require a full match</param>
+	<returns>True if found a match for the event name, otherwise false</returns>
+	<remarks>Event names nearly always end in a colon, e.g. "Monoisotopic M/Z:" or "Charge State:"</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.ExtractParentIonMZFromFilterText(System.String,System.Double@,System.Int32@,System.String@)">
 	<summary>
  Parse out the parent ion and collision energy from strFilterText
