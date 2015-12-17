@@ -1,5 +1,10 @@
 MASIC Change Log
 
+Version 2.6.5829; December 17, 2015
+	- Fixed bug tracking data used to create files _ScanStatsEx.txt and _ScanStatsConstant.txt
+	- Updated defaults to use a parent ion tolerance of 10 ppm instead of 0.6 Da
+	- Replaced hashtables with Dictionaries
+
 Version 2.6.5679; July 20, 2015
 	- Enabled visual styles to give rounded buttons and text boxes in the main window
 

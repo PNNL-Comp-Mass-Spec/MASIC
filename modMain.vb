@@ -26,7 +26,7 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "July 20, 2015"
+    Public Const PROGRAM_DATE As String = "December 17, 2015"
 
 	Private mInputFilePath As String
 	Private mOutputFolderPath As String				' Optional
@@ -271,7 +271,7 @@ Public Module modMain
 						End If
 					End If
 					If .RetrieveValueForParameter("A", strValue) Then mOutputFolderAlternatePath = strValue
-					If .RetrieveValueForParameter("R", strValue) Then mRecreateFolderHierarchyInAlternatePath = True
+                    If .IsParameterPresent("R") Then mRecreateFolderHierarchyInAlternatePath = True
 
 					If .RetrieveValueForParameter("L", strValue) Then
 						mLogMessagesToFile = True
@@ -288,7 +288,7 @@ Public Module modMain
 							mLogFolderPath = strValue
 						End If
 					End If
-					If .RetrieveValueForParameter("Q", strValue) Then mQuietMode = True
+                    If .IsParameterPresent("Q") Then mQuietMode = True
 				End With
 
 				Return True
