@@ -40,7 +40,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "December 17, 2015"
+        MyBase.mFileDate = "December 31, 2015"
         InitializeVariables()
     End Sub
 
@@ -9682,8 +9682,6 @@ Public Class clsMASIC
                           udtSICOptions, udtBinningOptions, mStatusMessage,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 
-                        Console.WriteLine("Debug check; udtScanList.SurveyScans(0).ExtendedHeaderInfo.Count = " & udtScanList.SurveyScans(0).ExtendedHeaderInfo.Count)
-
 					Case MZ_XML_FILE_EXTENSION1.ToUpper, MZ_XML_FILE_EXTENSION2.ToUpper
 						' Open the .mzXML file and obtain the scan information
                         blnSuccess = ExtractScanInfoFromMZXMLDataFile(
@@ -9724,22 +9722,20 @@ Public Class clsMASIC
 			' Record that the file is finished loading
 			mProcessingStats.FileLoadEndTime = DateTime.UtcNow
 
-            Console.WriteLine("Debug check; udtScanList.SurveyScans(0).ExtendedHeaderInfo.Count = " & udtScanList.SurveyScans(0).ExtendedHeaderInfo.Count)
-
-			If Not blnSuccess Then
-				If mStatusMessage Is Nothing OrElse mStatusMessage.Length = 0 Then
-					mStatusMessage = "Unable to parse file; unknown error"
-				Else
-					mStatusMessage = "Unable to parse file: " & mStatusMessage
-				End If
-				If MyBase.ShowMessages Then
-					Windows.Forms.MessageBox.Show(mStatusMessage, "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Exclamation)
-					LogMessage(mStatusMessage, eMessageTypeConstants.ErrorMsg)
-				Else
-					MyBase.ShowErrorMessage(mStatusMessage)
-				End If
-				Exit Try
-			End If
+            If Not blnSuccess Then
+                If mStatusMessage Is Nothing OrElse mStatusMessage.Length = 0 Then
+                    mStatusMessage = "Unable to parse file; unknown error"
+                Else
+                    mStatusMessage = "Unable to parse file: " & mStatusMessage
+                End If
+                If MyBase.ShowMessages Then
+                    Windows.Forms.MessageBox.Show(mStatusMessage, "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Exclamation)
+                    LogMessage(mStatusMessage, eMessageTypeConstants.ErrorMsg)
+                Else
+                    MyBase.ShowErrorMessage(mStatusMessage)
+                End If
+                Exit Try
+            End If
 
 			Try
 				' Make sure the arrays in udtScanList range from 0 to the Count-1
@@ -9893,25 +9889,23 @@ Public Class clsMASIC
 
 				End If
 
-                Console.WriteLine("Debug check; udtScanList.SurveyScans(0).ExtendedHeaderInfo.Count = " & udtScanList.SurveyScans(0).ExtendedHeaderInfo.Count)
+                If mWriteExtendedStats AndAlso Not mExportRawDataOnly Then
+                    '---------------------------------------------------------
+                    ' Save Extended Scan Stats Files
+                    '---------------------------------------------------------
 
-				If mWriteExtendedStats AndAlso Not mExportRawDataOnly Then
-					'---------------------------------------------------------
-					' Save Extended Scan Stats Files
-					'---------------------------------------------------------
+                    UpdateProcessingStep(eProcessingStepConstants.SaveExtendedScanStatsFiles)
+                    SetSubtaskProcessingStepPct(0)
+                    UpdatePeakMemoryUsage()
 
-					UpdateProcessingStep(eProcessingStepConstants.SaveExtendedScanStatsFiles)
-					SetSubtaskProcessingStepPct(0)
-					UpdatePeakMemoryUsage()
+                    LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
+                    blnSuccess = SaveExtendedScanStatsFiles(udtScanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile)
 
-					LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
-					blnSuccess = SaveExtendedScanStatsFiles(udtScanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile)
-
-					If Not blnSuccess Then
-						SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
-						Exit Try
-					End If
-				End If
+                    If Not blnSuccess Then
+                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
+                        Exit Try
+                    End If
+                End If
 
 
 				'---------------------------------------------------------

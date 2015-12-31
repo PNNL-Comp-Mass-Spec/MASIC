@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.6.5843; December 31, 2015
+	- Removed Console.Writeline debug statements (resulted in exceptions for datasets that only have MS2 spectra)
+
 Version 2.6.5829; December 17, 2015
 	- Fixed bug tracking data used to create files _ScanStatsEx.txt and _ScanStatsConstant.txt
 	- Updated defaults to use a parent ion tolerance of 10 ppm instead of 0.6 Da
