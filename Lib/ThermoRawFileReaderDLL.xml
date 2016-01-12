@@ -131,7 +131,7 @@ ThermoRawFileReaderDLL
  </summary>
 	<value></value>
 	<returns></returns>
-	<remarks></remarks>
+	<remarks>Typically CID, ETD, HCD, EThcD, or ETciD</remarks>
 </member><member name="P:ThermoRawFileReaderDLL.clsScanInfo.IonMode">
 	<summary>
  Ionization polarity
