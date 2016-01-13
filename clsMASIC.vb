@@ -40,7 +40,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "December 31, 2015"
+        MyBase.mFileDate = "January 12, 2016"
         InitializeVariables()
     End Sub
 
@@ -11151,101 +11151,101 @@ Public Class clsMASIC
 								objXMLOut.WriteElementString("PeakScanMaxIntensity", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
 							End If
 
-							objXMLOut.WriteElementString("PeakIntensity", MathUtilities.ValueToString(.MaxIntensityValue, 5))
-							objXMLOut.WriteElementString("PeakSignalToNoiseRatio", MathUtilities.ValueToString(.SignalToNoiseRatio, 4))
-							objXMLOut.WriteElementString("FWHMInScans", .FWHMScanWidth.ToString)
-							objXMLOut.WriteElementString("PeakArea", MathUtilities.ValueToString(.Area, 5))
-							objXMLOut.WriteElementString("ShoulderCount", .ShoulderCount.ToString)
+                            objXMLOut.WriteElementString("PeakIntensity", StringUtilities.ValueToString(.MaxIntensityValue, 5))
+                            objXMLOut.WriteElementString("PeakSignalToNoiseRatio", StringUtilities.ValueToString(.SignalToNoiseRatio, 4))
+                            objXMLOut.WriteElementString("FWHMInScans", .FWHMScanWidth.ToString)
+                            objXMLOut.WriteElementString("PeakArea", StringUtilities.ValueToString(.Area, 5))
+                            objXMLOut.WriteElementString("ShoulderCount", .ShoulderCount.ToString)
 
-							objXMLOut.WriteElementString("ParentIonIntensity", MathUtilities.ValueToString(.ParentIonIntensity, 5))
+                            objXMLOut.WriteElementString("ParentIonIntensity", StringUtilities.ValueToString(.ParentIonIntensity, 5))
 
-							With .BaselineNoiseStats
-								objXMLOut.WriteElementString("PeakBaselineNoiseLevel", MathUtilities.ValueToString(.NoiseLevel, 5))
-								objXMLOut.WriteElementString("PeakBaselineNoiseStDev", MathUtilities.ValueToString(.NoiseStDev, 3))
-								objXMLOut.WriteElementString("PeakBaselinePointsUsed", .PointsUsed.ToString)
-								objXMLOut.WriteElementString("NoiseThresholdModeUsed", CInt(.NoiseThresholdModeUsed).ToString)
-							End With
+                            With .BaselineNoiseStats
+                                objXMLOut.WriteElementString("PeakBaselineNoiseLevel", StringUtilities.ValueToString(.NoiseLevel, 5))
+                                objXMLOut.WriteElementString("PeakBaselineNoiseStDev", StringUtilities.ValueToString(.NoiseStDev, 3))
+                                objXMLOut.WriteElementString("PeakBaselinePointsUsed", .PointsUsed.ToString)
+                                objXMLOut.WriteElementString("NoiseThresholdModeUsed", CInt(.NoiseThresholdModeUsed).ToString)
+                            End With
 
-							With .StatisticalMoments
-								objXMLOut.WriteElementString("StatMomentsArea", MathUtilities.ValueToString(.Area, 5))
-								objXMLOut.WriteElementString("CenterOfMassScan", .CenterOfMassScan.ToString)
-								objXMLOut.WriteElementString("PeakStDev", MathUtilities.ValueToString(.StDev, 3))
-								objXMLOut.WriteElementString("PeakSkew", MathUtilities.ValueToString(.Skew, 4))
-								objXMLOut.WriteElementString("PeakKSStat", MathUtilities.ValueToString(.KSStat, 4))
-								objXMLOut.WriteElementString("StatMomentsDataCountUsed", .DataCountUsed.ToString)
-							End With
+                            With .StatisticalMoments
+                                objXMLOut.WriteElementString("StatMomentsArea", StringUtilities.ValueToString(.Area, 5))
+                                objXMLOut.WriteElementString("CenterOfMassScan", .CenterOfMassScan.ToString)
+                                objXMLOut.WriteElementString("PeakStDev", StringUtilities.ValueToString(.StDev, 3))
+                                objXMLOut.WriteElementString("PeakSkew", StringUtilities.ValueToString(.Skew, 4))
+                                objXMLOut.WriteElementString("PeakKSStat", StringUtilities.ValueToString(.KSStat, 4))
+                                objXMLOut.WriteElementString("StatMomentsDataCountUsed", .DataCountUsed.ToString)
+                            End With
 
-						End With
+                        End With
 
-						If udtSICDetails.SICScanType = eScanTypeConstants.FragScan Then
-							objXMLOut.WriteElementString("SICScanStart", udtScanList.FragScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
-						Else
-							objXMLOut.WriteElementString("SICScanStart", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
-						End If
+                        If udtSICDetails.SICScanType = eScanTypeConstants.FragScan Then
+                            objXMLOut.WriteElementString("SICScanStart", udtScanList.FragScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
+                        Else
+                            objXMLOut.WriteElementString("SICScanStart", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
+                        End If
 
-						If mUseBase64DataEncoding Then
-							' Save scan interval list as base-64 encoded strings
-							strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICScanIntervals"
-							SaveDataToXMLEncodeArray(objXMLOut, "SICScanIntervals", SICDataScanIntervals)
-						Else
-							' Save scan interval list as long list of numbers
-							' There are no tab delimiters, since we require that all 
-							'  of the SICDataScanInterval values be <= 61
-							'   If the interval is <=9, then the interval is stored as a number
-							'   For intervals between 10 and 35, uses letters A to Z
-							'   For intervals between 36 and 61, uses letters A to Z
+                        If mUseBase64DataEncoding Then
+                            ' Save scan interval list as base-64 encoded strings
+                            strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICScanIntervals"
+                            SaveDataToXMLEncodeArray(objXMLOut, "SICScanIntervals", SICDataScanIntervals)
+                        Else
+                            ' Save scan interval list as long list of numbers
+                            ' There are no tab delimiters, since we require that all 
+                            '  of the SICDataScanInterval values be <= 61
+                            '   If the interval is <=9, then the interval is stored as a number
+                            '   For intervals between 10 and 35, uses letters A to Z
+                            '   For intervals between 36 and 61, uses letters A to Z
 
-							strLastGoodLoc = "Populate strScanIntervalList"
-							strScanIntervalList = String.Empty
-							If Not SICDataScanIntervals Is Nothing Then
-								For intScanIntervalIndex = 0 To udtSICDetails.SICDataCount - 1
-									If SICDataScanIntervals(intScanIntervalIndex) <= 9 Then
-										strScanIntervalList &= SICDataScanIntervals(intScanIntervalIndex)
-									ElseIf SICDataScanIntervals(intScanIntervalIndex) <= 35 Then
-										strScanIntervalList &= Chr(SICDataScanIntervals(intScanIntervalIndex) + 55)		' 55 = -10 + 65
-									ElseIf SICDataScanIntervals(intScanIntervalIndex) <= 61 Then
-										strScanIntervalList &= Chr(SICDataScanIntervals(intScanIntervalIndex) + 61)		' 61 = -36 + 97
-									Else
-										strScanIntervalList &= "z"
-									End If
-								Next intScanIntervalIndex
-							End If
-							objXMLOut.WriteElementString("SICScanIntervals", strScanIntervalList)
-						End If
+                            strLastGoodLoc = "Populate strScanIntervalList"
+                            strScanIntervalList = String.Empty
+                            If Not SICDataScanIntervals Is Nothing Then
+                                For intScanIntervalIndex = 0 To udtSICDetails.SICDataCount - 1
+                                    If SICDataScanIntervals(intScanIntervalIndex) <= 9 Then
+                                        strScanIntervalList &= SICDataScanIntervals(intScanIntervalIndex)
+                                    ElseIf SICDataScanIntervals(intScanIntervalIndex) <= 35 Then
+                                        strScanIntervalList &= Chr(SICDataScanIntervals(intScanIntervalIndex) + 55)     ' 55 = -10 + 65
+                                    ElseIf SICDataScanIntervals(intScanIntervalIndex) <= 61 Then
+                                        strScanIntervalList &= Chr(SICDataScanIntervals(intScanIntervalIndex) + 61)     ' 61 = -36 + 97
+                                    Else
+                                        strScanIntervalList &= "z"
+                                    End If
+                                Next intScanIntervalIndex
+                            End If
+                            objXMLOut.WriteElementString("SICScanIntervals", strScanIntervalList)
+                        End If
 
-						strLastGoodLoc = "Write SICPeakIndexStart"
-						objXMLOut.WriteElementString("SICPeakIndexStart", .Peak.IndexBaseLeft.ToString)
-						objXMLOut.WriteElementString("SICPeakIndexEnd", .Peak.IndexBaseRight.ToString)
-						objXMLOut.WriteElementString("SICDataCount", udtSICDetails.SICDataCount.ToString)
+                        strLastGoodLoc = "Write SICPeakIndexStart"
+                        objXMLOut.WriteElementString("SICPeakIndexStart", .Peak.IndexBaseLeft.ToString)
+                        objXMLOut.WriteElementString("SICPeakIndexEnd", .Peak.IndexBaseRight.ToString)
+                        objXMLOut.WriteElementString("SICDataCount", udtSICDetails.SICDataCount.ToString)
 
-						If SaveSmoothedData Then
-							objXMLOut.WriteElementString("SICSmoothedYDataIndexStart", udtSmoothedYDataSubset.DataStartIndex.ToString)
-						End If
+                        If SaveSmoothedData Then
+                            objXMLOut.WriteElementString("SICSmoothedYDataIndexStart", udtSmoothedYDataSubset.DataStartIndex.ToString)
+                        End If
 
-						If mUseBase64DataEncoding Then
-							Dim DataArray() As Single
-							ReDim DataArray(udtSICDetails.SICDataCount - 1)
+                        If mUseBase64DataEncoding Then
+                            Dim DataArray() As Single
+                            ReDim DataArray(udtSICDetails.SICDataCount - 1)
 
-							' Save intensity and mass data lists as base-64 encoded strings
-							' Note that these field names are purposely different than the DataList names used below for comma separated lists
-							strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
-							Array.Copy(udtSICDetails.SICData, DataArray, udtSICDetails.SICDataCount)
-							SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", DataArray)
+                            ' Save intensity and mass data lists as base-64 encoded strings
+                            ' Note that these field names are purposely different than the DataList names used below for comma separated lists
+                            strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
+                            Array.Copy(udtSICDetails.SICData, DataArray, udtSICDetails.SICDataCount)
+                            SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", DataArray)
 
-							strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
-							For intSICDataIndex = 0 To udtSICDetails.SICDataCount - 1
-								DataArray(intSICDataIndex) = CSng(udtSICDetails.SICMasses(intSICDataIndex))
-							Next intSICDataIndex
-							SaveDataToXMLEncodeArray(objXMLOut, "SICMassData", DataArray)
+                            strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
+                            For intSICDataIndex = 0 To udtSICDetails.SICDataCount - 1
+                                DataArray(intSICDataIndex) = CSng(udtSICDetails.SICMasses(intSICDataIndex))
+                            Next intSICDataIndex
+                            SaveDataToXMLEncodeArray(objXMLOut, "SICMassData", DataArray)
 
-							If SaveSmoothedData Then
-								' Need to copy the data into an array with the correct number of elements
-								ReDim DataArray(udtSmoothedYDataSubset.DataCount - 1)
-								Array.Copy(udtSmoothedYDataSubset.Data, DataArray, udtSmoothedYDataSubset.DataCount)
+                            If SaveSmoothedData Then
+                                ' Need to copy the data into an array with the correct number of elements
+                                ReDim DataArray(udtSmoothedYDataSubset.DataCount - 1)
+                                Array.Copy(udtSmoothedYDataSubset.Data, DataArray, udtSmoothedYDataSubset.DataCount)
 
-								SaveDataToXMLEncodeArray(objXMLOut, "SICSmoothedYData", DataArray)
-							End If
-						Else
+                                SaveDataToXMLEncodeArray(objXMLOut, "SICSmoothedYData", DataArray)
+                            End If
+                        Else
                             ' Save intensity and mass data lists as tab-delimited text list
 
                             blnIntensityDataListWritten = False
@@ -11930,24 +11930,24 @@ Public Class clsMASIC
                                         sbOutLine.Append(udtScanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
                                     End If
                                     With .Peak
-                                        sbOutLine.Append(MathUtilities.ValueToString(.MaxIntensityValue, 5) & cColDelimiter)           ' Peak Intensity
-                                        sbOutLine.Append(MathUtilities.ValueToString(.SignalToNoiseRatio, 4) & cColDelimiter)          ' Peak signal to noise ratio
-                                        sbOutLine.Append(.FWHMScanWidth.ToString & cColDelimiter)                       ' Full width at half max (in scans)
-                                        sbOutLine.Append(MathUtilities.ValueToString(.Area, 5) & cColDelimiter)                    ' Peak area
+                                        sbOutLine.Append(StringUtilities.ValueToString(.MaxIntensityValue, 5) & cColDelimiter)           ' Peak Intensity
+                                        sbOutLine.Append(StringUtilities.ValueToString(.SignalToNoiseRatio, 4) & cColDelimiter)          ' Peak signal to noise ratio
+                                        sbOutLine.Append(.FWHMScanWidth.ToString & cColDelimiter)                                       ' Full width at half max (in scans)
+                                        sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)                       ' Peak area
 
-                                        sbOutLine.Append(MathUtilities.ValueToString(.ParentIonIntensity, 5) & cColDelimiter)          ' Intensity of the parent ion (just before the fragmentation scan)
+                                        sbOutLine.Append(StringUtilities.ValueToString(.ParentIonIntensity, 5) & cColDelimiter)          ' Intensity of the parent ion (just before the fragmentation scan)
                                         With .BaselineNoiseStats
-                                            sbOutLine.Append(MathUtilities.ValueToString(.NoiseLevel, 5) & cColDelimiter)
-                                            sbOutLine.Append(MathUtilities.ValueToString(.NoiseStDev, 3) & cColDelimiter)
+                                            sbOutLine.Append(StringUtilities.ValueToString(.NoiseLevel, 5) & cColDelimiter)
+                                            sbOutLine.Append(StringUtilities.ValueToString(.NoiseStDev, 3) & cColDelimiter)
                                             sbOutLine.Append(.PointsUsed.ToString & cColDelimiter)
                                         End With
 
                                         With .StatisticalMoments
-                                            sbOutLine.Append(MathUtilities.ValueToString(.Area, 5) & cColDelimiter)
+                                            sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)
                                             sbOutLine.Append(.CenterOfMassScan.ToString & cColDelimiter)
-                                            sbOutLine.Append(MathUtilities.ValueToString(.StDev, 3) & cColDelimiter)
-                                            sbOutLine.Append(MathUtilities.ValueToString(.Skew, 4) & cColDelimiter)
-                                            sbOutLine.Append(MathUtilities.ValueToString(.KSStat, 4) & cColDelimiter)
+                                            sbOutLine.Append(StringUtilities.ValueToString(.StDev, 3) & cColDelimiter)
+                                            sbOutLine.Append(StringUtilities.ValueToString(.Skew, 4) & cColDelimiter)
+                                            sbOutLine.Append(StringUtilities.ValueToString(.KSStat, 4) & cColDelimiter)
                                             sbOutLine.Append(.DataCountUsed.ToString)
                                         End With
 
@@ -12293,12 +12293,12 @@ Public Class clsMASIC
         objScanStatsEntry.ScanFilterText = udtCurrentScan.ScanHeaderText
 
         objScanStatsEntry.ElutionTime = udtCurrentScan.ScanTime.ToString("0.0000")
-        objScanStatsEntry.TotalIonIntensity = MathUtilities.ValueToString(udtCurrentScan.TotalIonIntensity, 5)
-        objScanStatsEntry.BasePeakIntensity = MathUtilities.ValueToString(udtCurrentScan.BasePeakIonIntensity, 5)
+        objScanStatsEntry.TotalIonIntensity = StringUtilities.ValueToString(udtCurrentScan.TotalIonIntensity, 5)
+        objScanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(udtCurrentScan.BasePeakIonIntensity, 5)
         objScanStatsEntry.BasePeakMZ = Math.Round(udtCurrentScan.BasePeakIonMZ, 4).ToString
 
         ' Base peak signal to noise ratio
-        objScanStatsEntry.BasePeakSignalToNoiseRatio = MathUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(udtCurrentScan.BasePeakIonIntensity, udtCurrentScan.BaselineNoiseStats.NoiseLevel), 4)
+        objScanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(udtCurrentScan.BasePeakIonIntensity, udtCurrentScan.BaselineNoiseStats.NoiseLevel), 4)
 
         objScanStatsEntry.IonCount = udtCurrentScan.IonCount
         objScanStatsEntry.IonCountRaw = udtCurrentScan.IonCountRaw
@@ -12322,570 +12322,570 @@ Public Class clsMASIC
 
     End Sub
 
-	''' <summary>
-	''' Converts a scan number of acquisition time to an actual scan number
-	''' </summary>
-	''' <param name="udtScanList"></param>
-	''' <param name="sngScanOrAcqTime">Value to convert</param>
-	''' <param name="eScanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
-	''' <param name="blnConvertingRangeOrTolerance">True when converting a range</param>
-	''' <returns></returns>
-	''' <remarks></remarks>
-	Private Function ScanOrAcqTimeToAbsolute(
+    ''' <summary>
+    ''' Converts a scan number of acquisition time to an actual scan number
+    ''' </summary>
+    ''' <param name="udtScanList"></param>
+    ''' <param name="sngScanOrAcqTime">Value to convert</param>
+    ''' <param name="eScanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
+    ''' <param name="blnConvertingRangeOrTolerance">True when converting a range</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function ScanOrAcqTimeToAbsolute(
       ByRef udtScanList As udtScanListType,
       sngScanOrAcqTime As Single,
       eScanType As eCustomSICScanTypeConstants,
       blnConvertingRangeOrTolerance As Boolean) As Integer
 
 
-		Dim intTotalScanRange As Integer
-		Dim intAbsoluteScanNumber As Integer
-		Dim intMasterScanIndex As Integer
+        Dim intTotalScanRange As Integer
+        Dim intAbsoluteScanNumber As Integer
+        Dim intMasterScanIndex As Integer
 
-		Dim sngTotalRunTime As Single
-		Dim sngRelativeTime As Single
+        Dim sngTotalRunTime As Single
+        Dim sngRelativeTime As Single
 
-		Try
-			Select Case eScanType
-				Case eCustomSICScanTypeConstants.Absolute
-					' sngScanOrAcqTime is an absolute scan number (or range of scan numbers)
-					' No conversion needed; simply return the value
-					intAbsoluteScanNumber = CInt(sngScanOrAcqTime)
+        Try
+            Select Case eScanType
+                Case eCustomSICScanTypeConstants.Absolute
+                    ' sngScanOrAcqTime is an absolute scan number (or range of scan numbers)
+                    ' No conversion needed; simply return the value
+                    intAbsoluteScanNumber = CInt(sngScanOrAcqTime)
 
-				Case eCustomSICScanTypeConstants.Relative
-					' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
+                Case eCustomSICScanTypeConstants.Relative
+                    ' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
-					' Use the total range of scan numbers
-					With udtScanList
-						If .MasterScanOrderCount > 0 Then
-							intTotalScanRange = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
+                    ' Use the total range of scan numbers
+                    With udtScanList
+                        If .MasterScanOrderCount > 0 Then
+                            intTotalScanRange = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
 
-							intAbsoluteScanNumber = CInt(sngScanOrAcqTime * intTotalScanRange + .MasterScanNumList(0))
-						Else
-							intAbsoluteScanNumber = 0
-						End If
-					End With
+                            intAbsoluteScanNumber = CInt(sngScanOrAcqTime * intTotalScanRange + .MasterScanNumList(0))
+                        Else
+                            intAbsoluteScanNumber = 0
+                        End If
+                    End With
 
-				Case eCustomSICScanTypeConstants.AcquisitionTime
-					' sngScanOrAcqTime is an elution time value
-					' If blnConvertingRangeOrTolerance = False, then look for the scan that is nearest to sngScanOrAcqTime
-					' If blnConvertingRangeOrTolerance = True, then Convert sngScanOrAcqTime to a relative scan range and then
-					'   call this function again with that relative time
+                Case eCustomSICScanTypeConstants.AcquisitionTime
+                    ' sngScanOrAcqTime is an elution time value
+                    ' If blnConvertingRangeOrTolerance = False, then look for the scan that is nearest to sngScanOrAcqTime
+                    ' If blnConvertingRangeOrTolerance = True, then Convert sngScanOrAcqTime to a relative scan range and then
+                    '   call this function again with that relative time
 
-					If blnConvertingRangeOrTolerance Then
-						With udtScanList
-							sngTotalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
-							If sngTotalRunTime < 0.1 Then
-								sngTotalRunTime = 1
-							End If
+                    If blnConvertingRangeOrTolerance Then
+                        With udtScanList
+                            sngTotalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
+                            If sngTotalRunTime < 0.1 Then
+                                sngTotalRunTime = 1
+                            End If
 
-							sngRelativeTime = sngScanOrAcqTime / sngTotalRunTime
-						End With
+                            sngRelativeTime = sngScanOrAcqTime / sngTotalRunTime
+                        End With
 
-						intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
-					Else
-						intMasterScanIndex = FindNearestScanNumIndex(udtScanList, sngScanOrAcqTime, eScanType)
-						If intMasterScanIndex >= 0 AndAlso udtScanList.MasterScanOrderCount > 0 Then
-							intAbsoluteScanNumber = udtScanList.MasterScanNumList(intMasterScanIndex)
-						End If
-					End If
-
-
-				Case Else
-					' Unknown type; assume absolute scan number
-					intAbsoluteScanNumber = CInt(sngScanOrAcqTime)
-			End Select
+                        intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+                    Else
+                        intMasterScanIndex = FindNearestScanNumIndex(udtScanList, sngScanOrAcqTime, eScanType)
+                        If intMasterScanIndex >= 0 AndAlso udtScanList.MasterScanOrderCount > 0 Then
+                            intAbsoluteScanNumber = udtScanList.MasterScanNumList(intMasterScanIndex)
+                        End If
+                    End If
 
 
-		Catch ex As Exception
-			LogErrors("ScanOrAcqTimeToAbsolute", "Error in clsMasic->ScanOrAcqTimeToAbsolute ", ex, True, False)
-			intAbsoluteScanNumber = 0
-		End Try
+                Case Else
+                    ' Unknown type; assume absolute scan number
+                    intAbsoluteScanNumber = CInt(sngScanOrAcqTime)
+            End Select
 
-		Return intAbsoluteScanNumber
 
-	End Function
+        Catch ex As Exception
+            LogErrors("ScanOrAcqTimeToAbsolute", "Error in clsMasic->ScanOrAcqTimeToAbsolute ", ex, True, False)
+            intAbsoluteScanNumber = 0
+        End Try
 
-	Private Function ScanOrAcqTimeToScanTime(
+        Return intAbsoluteScanNumber
+
+    End Function
+
+    Private Function ScanOrAcqTimeToScanTime(
       ByRef udtScanList As udtScanListType,
       sngScanOrAcqTime As Single,
       eScanType As eCustomSICScanTypeConstants,
       blnConvertingRangeOrTolerance As Boolean) As Single
 
 
-		Dim intMasterScanIndex As Integer
+        Dim intMasterScanIndex As Integer
 
-		Dim sngTotalRunTime As Single
-		Dim sngRelativeTime As Single
+        Dim sngTotalRunTime As Single
+        Dim sngRelativeTime As Single
 
-		Dim sngComputedScanTime As Single
+        Dim sngComputedScanTime As Single
 
-		Try
-			Select Case eScanType
-				Case eCustomSICScanTypeConstants.Absolute
-					' sngScanOrAcqTime is an absolute scan number (or range of scan numbers)
+        Try
+            Select Case eScanType
+                Case eCustomSICScanTypeConstants.Absolute
+                    ' sngScanOrAcqTime is an absolute scan number (or range of scan numbers)
 
-					' If blnConvertingRangeOrTolerance = False, then look for the scan that is nearest to sngScanOrAcqTime
-					' If blnConvertingRangeOrTolerance = True, then Convert sngScanOrAcqTime to a relative scan range and then
-					'   call this function again with that relative time
+                    ' If blnConvertingRangeOrTolerance = False, then look for the scan that is nearest to sngScanOrAcqTime
+                    ' If blnConvertingRangeOrTolerance = True, then Convert sngScanOrAcqTime to a relative scan range and then
+                    '   call this function again with that relative time
 
-					If blnConvertingRangeOrTolerance Then
-						With udtScanList
-							Dim intTotalScans As Integer
-							intTotalScans = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
-							If intTotalScans < 1 Then
-								intTotalScans = 1
-							End If
+                    If blnConvertingRangeOrTolerance Then
+                        With udtScanList
+                            Dim intTotalScans As Integer
+                            intTotalScans = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
+                            If intTotalScans < 1 Then
+                                intTotalScans = 1
+                            End If
 
-							sngRelativeTime = sngScanOrAcqTime / intTotalScans
-						End With
+                            sngRelativeTime = sngScanOrAcqTime / intTotalScans
+                        End With
 
-						sngComputedScanTime = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
-					Else
-						intMasterScanIndex = FindNearestScanNumIndex(udtScanList, sngScanOrAcqTime, eScanType)
-						If intMasterScanIndex >= 0 AndAlso udtScanList.MasterScanOrderCount > 0 Then
-							sngComputedScanTime = udtScanList.MasterScanTimeList(intMasterScanIndex)
-						End If
-					End If
+                        sngComputedScanTime = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+                    Else
+                        intMasterScanIndex = FindNearestScanNumIndex(udtScanList, sngScanOrAcqTime, eScanType)
+                        If intMasterScanIndex >= 0 AndAlso udtScanList.MasterScanOrderCount > 0 Then
+                            sngComputedScanTime = udtScanList.MasterScanTimeList(intMasterScanIndex)
+                        End If
+                    End If
 
-				Case eCustomSICScanTypeConstants.Relative
-					' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
+                Case eCustomSICScanTypeConstants.Relative
+                    ' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
-					' Use the total range of scan times
-					With udtScanList
-						If .MasterScanOrderCount > 0 Then
-							sngTotalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
+                    ' Use the total range of scan times
+                    With udtScanList
+                        If .MasterScanOrderCount > 0 Then
+                            sngTotalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
 
-							sngComputedScanTime = CSng(sngScanOrAcqTime * sngTotalRunTime + .MasterScanTimeList(0))
-						Else
-							sngComputedScanTime = 0
-						End If
-					End With
+                            sngComputedScanTime = CSng(sngScanOrAcqTime * sngTotalRunTime + .MasterScanTimeList(0))
+                        Else
+                            sngComputedScanTime = 0
+                        End If
+                    End With
 
-				Case eCustomSICScanTypeConstants.AcquisitionTime
-					' sngScanOrAcqTime is an elution time value (or elution time range)
-					' No conversion needed; simply return the value
-					sngComputedScanTime = sngScanOrAcqTime
+                Case eCustomSICScanTypeConstants.AcquisitionTime
+                    ' sngScanOrAcqTime is an elution time value (or elution time range)
+                    ' No conversion needed; simply return the value
+                    sngComputedScanTime = sngScanOrAcqTime
 
-				Case Else
-					' Unknown type; assume already a scan time
-					sngComputedScanTime = sngScanOrAcqTime
-			End Select
+                Case Else
+                    ' Unknown type; assume already a scan time
+                    sngComputedScanTime = sngScanOrAcqTime
+            End Select
 
 
-		Catch ex As Exception
-			LogErrors("ScanOrAcqTimeToAbsolute", "Error in clsMasic->ScanOrAcqTimeToScanTime ", ex, True, False)
-			sngComputedScanTime = 0
-		End Try
+        Catch ex As Exception
+            LogErrors("ScanOrAcqTimeToAbsolute", "Error in clsMasic->ScanOrAcqTimeToScanTime ", ex, True, False)
+            sngComputedScanTime = 0
+        End Try
 
-		Return sngComputedScanTime
+        Return sngComputedScanTime
 
-	End Function
+    End Function
 
-	Protected Function ScanNumberToIndex(
+    Protected Function ScanNumberToIndex(
       ByRef udtScanList As udtScanListType,
       intScanNumber As Integer,
       ByRef eScanType As eScanTypeConstants) As Integer
 
-		' Looks for intScanNumber in udtScanList and returns the index containing the scan number
-		' Returns -1 if no match
+        ' Looks for intScanNumber in udtScanList and returns the index containing the scan number
+        ' Returns -1 if no match
 
-		Dim intIndex As Integer
-		Dim intScanIndexMatch As Integer
-		Static objScanInfoComparer As clsScanInfoScanNumComparer
+        Dim intIndex As Integer
+        Dim intScanIndexMatch As Integer
+        Static objScanInfoComparer As clsScanInfoScanNumComparer
 
-		If objScanInfoComparer Is Nothing Then
-			objScanInfoComparer = New clsScanInfoScanNumComparer
-		End If
+        If objScanInfoComparer Is Nothing Then
+            objScanInfoComparer = New clsScanInfoScanNumComparer
+        End If
 
-		intScanIndexMatch = -1
-		eScanType = eScanTypeConstants.SurveyScan
+        intScanIndexMatch = -1
+        eScanType = eScanTypeConstants.SurveyScan
 
-		intScanIndexMatch = Array.BinarySearch(udtScanList.SurveyScans, 0, udtScanList.SurveyScanCount, intScanNumber, objScanInfoComparer)
-		If intScanIndexMatch >= 0 Then
-			eScanType = eScanTypeConstants.SurveyScan
-		Else
-			intScanIndexMatch = Array.BinarySearch(udtScanList.FragScans, 0, udtScanList.FragScanCount, intScanNumber, objScanInfoComparer)
-			If intScanIndexMatch >= 0 Then
-				eScanType = eScanTypeConstants.FragScan
-			Else
-				' Match still not found; brute force search udtScanList.SurveyScans for intScanNumber
-				For intIndex = 0 To udtScanList.SurveyScanCount - 1
-					If udtScanList.SurveyScans(intIndex).ScanNumber = intScanNumber Then
-						intScanIndexMatch = intIndex
-						eScanType = eScanTypeConstants.SurveyScan
-						Exit For
-					End If
-				Next intIndex
+        intScanIndexMatch = Array.BinarySearch(udtScanList.SurveyScans, 0, udtScanList.SurveyScanCount, intScanNumber, objScanInfoComparer)
+        If intScanIndexMatch >= 0 Then
+            eScanType = eScanTypeConstants.SurveyScan
+        Else
+            intScanIndexMatch = Array.BinarySearch(udtScanList.FragScans, 0, udtScanList.FragScanCount, intScanNumber, objScanInfoComparer)
+            If intScanIndexMatch >= 0 Then
+                eScanType = eScanTypeConstants.FragScan
+            Else
+                ' Match still not found; brute force search udtScanList.SurveyScans for intScanNumber
+                For intIndex = 0 To udtScanList.SurveyScanCount - 1
+                    If udtScanList.SurveyScans(intIndex).ScanNumber = intScanNumber Then
+                        intScanIndexMatch = intIndex
+                        eScanType = eScanTypeConstants.SurveyScan
+                        Exit For
+                    End If
+                Next intIndex
 
-				If intScanIndexMatch < 0 Then
-					' Still no match; brute force search & udtScanList.FragScans for intScanNumber
-					For intIndex = 0 To udtScanList.FragScanCount - 1
-						If udtScanList.FragScans(intIndex).ScanNumber = intScanNumber Then
-							intScanIndexMatch = intIndex
-							eScanType = eScanTypeConstants.FragScan
-							Exit For
-						End If
-					Next intIndex
-				End If
-			End If
-		End If
+                If intScanIndexMatch < 0 Then
+                    ' Still no match; brute force search & udtScanList.FragScans for intScanNumber
+                    For intIndex = 0 To udtScanList.FragScanCount - 1
+                        If udtScanList.FragScans(intIndex).ScanNumber = intScanNumber Then
+                            intScanIndexMatch = intIndex
+                            eScanType = eScanTypeConstants.FragScan
+                            Exit For
+                        End If
+                    Next intIndex
+                End If
+            End If
+        End If
 
-		Return intScanIndexMatch
+        Return intScanIndexMatch
 
-	End Function
+    End Function
 
-	Protected Function ScanNumberToScanTime(
+    Protected Function ScanNumberToScanTime(
       ByRef udtScanList As udtScanListType,
       intScanNumber As Integer) As Single
 
-		Dim intScanIndexMatch As Integer
-		Dim eScanTypeMatch As eScanTypeConstants
+        Dim intScanIndexMatch As Integer
+        Dim eScanTypeMatch As eScanTypeConstants
 
-		Dim sngScantime As Single
+        Dim sngScantime As Single
 
-		sngScantime = 0
+        sngScantime = 0
 
-		intScanIndexMatch = ScanNumberToIndex(udtScanList, intScanNumber, eScanTypeMatch)
-		If intScanIndexMatch >= 0 Then
-			Select Case eScanTypeMatch
-				Case eScanTypeConstants.SurveyScan
-					sngScantime = udtScanList.SurveyScans(intScanIndexMatch).ScanTime
-				Case eScanTypeConstants.FragScan
-					sngScantime = udtScanList.FragScans(intScanIndexMatch).ScanTime
-				Case Else
-					' Unknown scan type
-			End Select
-		End If
+        intScanIndexMatch = ScanNumberToIndex(udtScanList, intScanNumber, eScanTypeMatch)
+        If intScanIndexMatch >= 0 Then
+            Select Case eScanTypeMatch
+                Case eScanTypeConstants.SurveyScan
+                    sngScantime = udtScanList.SurveyScans(intScanIndexMatch).ScanTime
+                Case eScanTypeConstants.FragScan
+                    sngScantime = udtScanList.FragScans(intScanIndexMatch).ScanTime
+                Case Else
+                    ' Unknown scan type
+            End Select
+        End If
 
-		Return sngScantime
+        Return sngScantime
 
-	End Function
+    End Function
 
-	Public Function SetCustomSICListValues(
+    Public Function SetCustomSICListValues(
       eScanType As eCustomSICScanTypeConstants,
       dblMZToleranceDa As Double,
       sngScanOrAcqTimeTolerance As Single,
-      dblMZList() As Double, 
-      dblMZToleranceList() As Double, 
-      sngScanOrAcqTimeCenterList() As Single, 
-      sngScanOrAcqTimeToleranceList() As Single, 
+      dblMZList() As Double,
+      dblMZToleranceList() As Double,
+      sngScanOrAcqTimeCenterList() As Single,
+      sngScanOrAcqTimeToleranceList() As Single,
       strScanComments() As String) As Boolean
 
-		' Returns True if sucess
+        ' Returns True if sucess
 
-		Dim intIndex As Integer
+        Dim intIndex As Integer
 
-		If dblMZToleranceList.Length > 0 AndAlso dblMZToleranceList.Length <> dblMZList.Length Then
-			' Invalid Custom SIC comment list; number of entries doesn't match
-			Return False
-		ElseIf sngScanOrAcqTimeCenterList.Length > 0 AndAlso sngScanOrAcqTimeCenterList.Length <> dblMZList.Length Then
-			' Invalid Custom SIC scan center list; number of entries doesn't match
-			Return False
-		ElseIf sngScanOrAcqTimeToleranceList.Length > 0 AndAlso sngScanOrAcqTimeToleranceList.Length <> dblMZList.Length Then
-			' Invalid Custom SIC scan center list; number of entries doesn't match
-			Return False
-		ElseIf strScanComments.Length > 0 AndAlso strScanComments.Length <> dblMZList.Length Then
-			' Invalid Custom SIC comment list; number of entries doesn't match
-			Return False
-		End If
+        If dblMZToleranceList.Length > 0 AndAlso dblMZToleranceList.Length <> dblMZList.Length Then
+            ' Invalid Custom SIC comment list; number of entries doesn't match
+            Return False
+        ElseIf sngScanOrAcqTimeCenterList.Length > 0 AndAlso sngScanOrAcqTimeCenterList.Length <> dblMZList.Length Then
+            ' Invalid Custom SIC scan center list; number of entries doesn't match
+            Return False
+        ElseIf sngScanOrAcqTimeToleranceList.Length > 0 AndAlso sngScanOrAcqTimeToleranceList.Length <> dblMZList.Length Then
+            ' Invalid Custom SIC scan center list; number of entries doesn't match
+            Return False
+        ElseIf strScanComments.Length > 0 AndAlso strScanComments.Length <> dblMZList.Length Then
+            ' Invalid Custom SIC comment list; number of entries doesn't match
+            Return False
+        End If
 
 
-		With mCustomSICList
-			.ScanToleranceType = eScanType
-			.ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance		' This value is used if sngScanOrAcqTimeToleranceList is blank or for any entries in sngScanOrAcqTimeToleranceList() that are zero
+        With mCustomSICList
+            .ScanToleranceType = eScanType
+            .ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance     ' This value is used if sngScanOrAcqTimeToleranceList is blank or for any entries in sngScanOrAcqTimeToleranceList() that are zero
 
-			If dblMZList.Length > 0 Then
-				.RawTextMZList = String.Empty
-				.RawTextMZToleranceDaList = String.Empty
-				.RawTextScanOrAcqTimeCenterList = String.Empty
-				.RawTextScanOrAcqTimeToleranceList = String.Empty
+            If dblMZList.Length > 0 Then
+                .RawTextMZList = String.Empty
+                .RawTextMZToleranceDaList = String.Empty
+                .RawTextScanOrAcqTimeCenterList = String.Empty
+                .RawTextScanOrAcqTimeToleranceList = String.Empty
 
-				ReDim .CustomMZSearchValues(dblMZList.Length - 1)
+                ReDim .CustomMZSearchValues(dblMZList.Length - 1)
 
-				For intIndex = 0 To dblMZList.Length - 1
+                For intIndex = 0 To dblMZList.Length - 1
 
-					With .CustomMZSearchValues(intIndex)
-						.MZ = dblMZList(intIndex)
+                    With .CustomMZSearchValues(intIndex)
+                        .MZ = dblMZList(intIndex)
 
-						If dblMZToleranceList.Length > intIndex AndAlso dblMZToleranceList(intIndex) > 0 Then
-							.MZToleranceDa = dblMZToleranceList(intIndex)
-						Else
-							.MZToleranceDa = dblMZToleranceDa
-						End If
+                        If dblMZToleranceList.Length > intIndex AndAlso dblMZToleranceList(intIndex) > 0 Then
+                            .MZToleranceDa = dblMZToleranceList(intIndex)
+                        Else
+                            .MZToleranceDa = dblMZToleranceDa
+                        End If
 
-						If sngScanOrAcqTimeCenterList.Length > intIndex Then
-							.ScanOrAcqTimeCenter = sngScanOrAcqTimeCenterList(intIndex)
-						Else
-							.ScanOrAcqTimeCenter = 0		 ' Set to 0 to indicate that the entire file should be searched
-						End If
+                        If sngScanOrAcqTimeCenterList.Length > intIndex Then
+                            .ScanOrAcqTimeCenter = sngScanOrAcqTimeCenterList(intIndex)
+                        Else
+                            .ScanOrAcqTimeCenter = 0         ' Set to 0 to indicate that the entire file should be searched
+                        End If
 
-						If sngScanOrAcqTimeToleranceList.Length > intIndex AndAlso sngScanOrAcqTimeToleranceList(intIndex) > 0 Then
-							.ScanOrAcqTimeTolerance = sngScanOrAcqTimeToleranceList(intIndex)
-						Else
-							.ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance
-						End If
+                        If sngScanOrAcqTimeToleranceList.Length > intIndex AndAlso sngScanOrAcqTimeToleranceList(intIndex) > 0 Then
+                            .ScanOrAcqTimeTolerance = sngScanOrAcqTimeToleranceList(intIndex)
+                        Else
+                            .ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance
+                        End If
 
-						If strScanComments.Length > 0 AndAlso strScanComments.Length > intIndex Then
-							.Comment = strScanComments(intIndex)
-						Else
-							.Comment = String.Empty
-						End If
+                        If strScanComments.Length > 0 AndAlso strScanComments.Length > intIndex Then
+                            .Comment = strScanComments(intIndex)
+                        Else
+                            .Comment = String.Empty
+                        End If
 
-						If intIndex = 0 Then
-							mCustomSICList.RawTextMZList = .MZ.ToString
-							mCustomSICList.RawTextMZToleranceDaList = .MZToleranceDa.ToString
-							mCustomSICList.RawTextScanOrAcqTimeCenterList = .ScanOrAcqTimeCenter.ToString
-							mCustomSICList.RawTextScanOrAcqTimeToleranceList = .ScanOrAcqTimeTolerance.ToString
-						Else
-							mCustomSICList.RawTextMZList &= ","c & .MZ.ToString
-							mCustomSICList.RawTextMZToleranceDaList &= ","c & .MZToleranceDa.ToString
-							mCustomSICList.RawTextScanOrAcqTimeCenterList &= ","c & .ScanOrAcqTimeCenter.ToString
-							mCustomSICList.RawTextScanOrAcqTimeToleranceList &= ","c & .ScanOrAcqTimeTolerance.ToString
-						End If
+                        If intIndex = 0 Then
+                            mCustomSICList.RawTextMZList = .MZ.ToString
+                            mCustomSICList.RawTextMZToleranceDaList = .MZToleranceDa.ToString
+                            mCustomSICList.RawTextScanOrAcqTimeCenterList = .ScanOrAcqTimeCenter.ToString
+                            mCustomSICList.RawTextScanOrAcqTimeToleranceList = .ScanOrAcqTimeTolerance.ToString
+                        Else
+                            mCustomSICList.RawTextMZList &= ","c & .MZ.ToString
+                            mCustomSICList.RawTextMZToleranceDaList &= ","c & .MZToleranceDa.ToString
+                            mCustomSICList.RawTextScanOrAcqTimeCenterList &= ","c & .ScanOrAcqTimeCenter.ToString
+                            mCustomSICList.RawTextScanOrAcqTimeToleranceList &= ","c & .ScanOrAcqTimeTolerance.ToString
+                        End If
 
-					End With
+                    End With
 
-				Next intIndex
+                Next intIndex
 
-				ValidateCustomSICList()
-			Else
-				ReDim .CustomMZSearchValues(-1)
-			End If
-		End With
+                ValidateCustomSICList()
+            Else
+                ReDim .CustomMZSearchValues(-1)
+            End If
+        End With
 
-		Return True
+        Return True
 
-	End Function
+    End Function
 
-	Public Sub SetReporterIons(dblReporterIonMZList() As Double)
-		SetReporterIons(dblReporterIonMZList, REPORTER_ION_TOLERANCE_DA_DEFAULT)
-	End Sub
+    Public Sub SetReporterIons(dblReporterIonMZList() As Double)
+        SetReporterIons(dblReporterIonMZList, REPORTER_ION_TOLERANCE_DA_DEFAULT)
+    End Sub
 
-	Public Sub SetReporterIons(dblReporterIonMZList() As Double, dblMZToleranceDa As Double)
-		SetReporterIons(dblReporterIonMZList, dblMZToleranceDa, True)
-	End Sub
+    Public Sub SetReporterIons(dblReporterIonMZList() As Double, dblMZToleranceDa As Double)
+        SetReporterIons(dblReporterIonMZList, dblMZToleranceDa, True)
+    End Sub
 
-	Public Sub SetReporterIons(udtReporterIonInfo() As udtReporterIonInfoType)
-		SetReporterIons(udtReporterIonInfo, True)
-	End Sub
+    Public Sub SetReporterIons(udtReporterIonInfo() As udtReporterIonInfoType)
+        SetReporterIons(udtReporterIonInfo, True)
+    End Sub
 
-	Protected Sub SetReporterIons(
+    Protected Sub SetReporterIons(
       udtReporterIonInfo() As udtReporterIonInfoType,
       blnCustomReporterIons As Boolean)
 
-		Dim intIndex As Integer
+        Dim intIndex As Integer
 
-		If udtReporterIonInfo Is Nothing OrElse udtReporterIonInfo.Length = 0 Then
-			mReporterIonCount = 0
-			ReDim mReporterIonInfo(0)
-		Else
-			mReporterIonCount = udtReporterIonInfo.Length
-			ReDim mReporterIonInfo(mReporterIonCount - 1)
+        If udtReporterIonInfo Is Nothing OrElse udtReporterIonInfo.Length = 0 Then
+            mReporterIonCount = 0
+            ReDim mReporterIonInfo(0)
+        Else
+            mReporterIonCount = udtReporterIonInfo.Length
+            ReDim mReporterIonInfo(mReporterIonCount - 1)
 
-			Array.Copy(udtReporterIonInfo, mReporterIonInfo, udtReporterIonInfo.Length)
+            Array.Copy(udtReporterIonInfo, mReporterIonInfo, udtReporterIonInfo.Length)
 
-			For intIndex = 0 To mReporterIonCount - 1
-				If mReporterIonInfo(intIndex).MZToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM Then
-					mReporterIonInfo(intIndex).MZToleranceDa = REPORTER_ION_TOLERANCE_DA_MINIMUM
-				End If
-			Next
+            For intIndex = 0 To mReporterIonCount - 1
+                If mReporterIonInfo(intIndex).MZToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM Then
+                    mReporterIonInfo(intIndex).MZToleranceDa = REPORTER_ION_TOLERANCE_DA_MINIMUM
+                End If
+            Next
 
-		End If
+        End If
 
-		If blnCustomReporterIons Then
-			mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
-		End If
+        If blnCustomReporterIons Then
+            mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
+        End If
 
-	End Sub
+    End Sub
 
-	Protected Sub SetReporterIons(
+    Protected Sub SetReporterIons(
       dblReporterIonMZList() As Double,
       dblMZToleranceDa As Double, blnCustomReporterIons As Boolean)
 
-		' dblMZToleranceDa is the search tolerance (half width)
-		Dim intIndex As Integer
+        ' dblMZToleranceDa is the search tolerance (half width)
+        Dim intIndex As Integer
 
-		If dblMZToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM Then
-			dblMZToleranceDa = REPORTER_ION_TOLERANCE_DA_MINIMUM
-		End If
+        If dblMZToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM Then
+            dblMZToleranceDa = REPORTER_ION_TOLERANCE_DA_MINIMUM
+        End If
 
-		If dblReporterIonMZList Is Nothing OrElse dblReporterIonMZList.Length = 0 Then
-			mReporterIonCount = 0
-			ReDim mReporterIonInfo(0)
-			mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
-		Else
-			mReporterIonCount = dblReporterIonMZList.Length
-			ReDim mReporterIonInfo(mReporterIonCount - 1)
+        If dblReporterIonMZList Is Nothing OrElse dblReporterIonMZList.Length = 0 Then
+            mReporterIonCount = 0
+            ReDim mReporterIonInfo(0)
+            mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
+        Else
+            mReporterIonCount = dblReporterIonMZList.Length
+            ReDim mReporterIonInfo(mReporterIonCount - 1)
 
-			For intIndex = 0 To mReporterIonCount - 1
-				mReporterIonInfo(intIndex).MZ = dblReporterIonMZList(intIndex)
-				mReporterIonInfo(intIndex).MZToleranceDa = dblMZToleranceDa
-			Next
-		End If
+            For intIndex = 0 To mReporterIonCount - 1
+                mReporterIonInfo(intIndex).MZ = dblReporterIonMZList(intIndex)
+                mReporterIonInfo(intIndex).MZToleranceDa = dblMZToleranceDa
+            Next
+        End If
 
-		If blnCustomReporterIons Then
-			mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
-		End If
-	End Sub
+        If blnCustomReporterIons Then
+            mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
+        End If
+    End Sub
 
-	Public Sub SetReporterIonMassMode(eReporterIonMassMode As eReporterIonMassModeConstants)
-		If eReporterIonMassMode = eReporterIonMassModeConstants.ITraqEightMZHighRes Then
-			SetReporterIonMassMode(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES)
-		Else
-			SetReporterIonMassMode(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
-		End If
-	End Sub
+    Public Sub SetReporterIonMassMode(eReporterIonMassMode As eReporterIonMassModeConstants)
+        If eReporterIonMassMode = eReporterIonMassModeConstants.ITraqEightMZHighRes Then
+            SetReporterIonMassMode(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES)
+        Else
+            SetReporterIonMassMode(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
+        End If
+    End Sub
 
-	Public Sub SetReporterIonMassMode(
+    Public Sub SetReporterIonMassMode(
       eReporterIonMassMode As eReporterIonMassModeConstants,
       dblMZToleranceDa As Double)
 
-		' Note: If eReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone then nothing is changed
+        ' Note: If eReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone then nothing is changed
 
-		Dim udtReporterIonInfo() As udtReporterIonInfoType
+        Dim udtReporterIonInfo() As udtReporterIonInfoType
 
-		If eReporterIonMassMode <> eReporterIonMassModeConstants.CustomOrNone Then
-			Me.ReporterIonToleranceDaDefault = dblMZToleranceDa
+        If eReporterIonMassMode <> eReporterIonMassModeConstants.CustomOrNone Then
+            Me.ReporterIonToleranceDaDefault = dblMZToleranceDa
 
-			udtReporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, dblMZToleranceDa)
+            udtReporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, dblMZToleranceDa)
 
-			SetReporterIons(udtReporterIonInfo, False)
-			mReporterIonMassMode = eReporterIonMassMode
-		End If
+            SetReporterIons(udtReporterIonInfo, False)
+            mReporterIonMassMode = eReporterIonMassMode
+        End If
 
-	End Sub
+    End Sub
 
-	Private Sub SetDefaultPeakLocValues(ByRef udtScanList As udtScanListType)
+    Private Sub SetDefaultPeakLocValues(ByRef udtScanList As udtScanListType)
 
-		Dim intParentIonIndex As Integer
-		Dim intScanIndexObserved As Integer
+        Dim intParentIonIndex As Integer
+        Dim intScanIndexObserved As Integer
 
-		Try
-			For intParentIonIndex = 0 To udtScanList.ParentIonInfoCount - 1
-				With udtScanList.ParentIons(intParentIonIndex)
-					intScanIndexObserved = .SurveyScanIndex
+        Try
+            For intParentIonIndex = 0 To udtScanList.ParentIonInfoCount - 1
+                With udtScanList.ParentIons(intParentIonIndex)
+                    intScanIndexObserved = .SurveyScanIndex
 
-					With .SICStats
-						.ScanTypeForPeakIndices = eScanTypeConstants.SurveyScan
-						.PeakScanIndexStart = intScanIndexObserved
-						.PeakScanIndexEnd = intScanIndexObserved
-						.PeakScanIndexMax = intScanIndexObserved
-					End With
-				End With
-			Next intParentIonIndex
-		Catch ex As Exception
-			LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex, True, False)
-		End Try
+                    With .SICStats
+                        .ScanTypeForPeakIndices = eScanTypeConstants.SurveyScan
+                        .PeakScanIndexStart = intScanIndexObserved
+                        .PeakScanIndexEnd = intScanIndexObserved
+                        .PeakScanIndexMax = intScanIndexObserved
+                    End With
+                End With
+            Next intParentIonIndex
+        Catch ex As Exception
+            LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex, True, False)
+        End Try
 
-	End Sub
+    End Sub
 
-	Private Sub SetLocalErrorCode(eNewErrorCode As eMasicErrorCodes)
-		SetLocalErrorCode(eNewErrorCode, False)
-	End Sub
+    Private Sub SetLocalErrorCode(eNewErrorCode As eMasicErrorCodes)
+        SetLocalErrorCode(eNewErrorCode, False)
+    End Sub
 
-	Private Sub SetLocalErrorCode(
+    Private Sub SetLocalErrorCode(
       eNewErrorCode As eMasicErrorCodes,
       blnLeaveExistingErrorCodeUnchanged As Boolean)
 
 
-		If blnLeaveExistingErrorCodeUnchanged AndAlso mLocalErrorCode <> eMasicErrorCodes.NoError Then
-			' An error code is already defined; do not change it
-		Else
-			mLocalErrorCode = eNewErrorCode
+        If blnLeaveExistingErrorCodeUnchanged AndAlso mLocalErrorCode <> eMasicErrorCodes.NoError Then
+            ' An error code is already defined; do not change it
+        Else
+            mLocalErrorCode = eNewErrorCode
 
-			If eNewErrorCode = eMasicErrorCodes.NoError Then
-				If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError Then
-					MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError)
-				End If
-			Else
-				MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError)
-			End If
-		End If
+            If eNewErrorCode = eMasicErrorCodes.NoError Then
+                If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError Then
+                    MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError)
+                End If
+            Else
+                MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError)
+            End If
+        End If
 
-	End Sub
+    End Sub
 
-	Private Sub SetSubtaskProcessingStepPct(NewStepPct As Short)
-		SetSubtaskProcessingStepPct(NewStepPct, False)
-	End Sub
+    Private Sub SetSubtaskProcessingStepPct(NewStepPct As Short)
+        SetSubtaskProcessingStepPct(NewStepPct, False)
+    End Sub
 
-	Private Sub SetSubtaskProcessingStepPct(NewStepPct As Short, blnForceUpdate As Boolean)
+    Private Sub SetSubtaskProcessingStepPct(NewStepPct As Short, blnForceUpdate As Boolean)
         Const MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250
 
-		Dim blnRaiseEvent As Boolean
-		Static LastFileWriteTime As DateTime = DateTime.UtcNow
+        Dim blnRaiseEvent As Boolean
+        Static LastFileWriteTime As DateTime = DateTime.UtcNow
 
-		If NewStepPct = 0 Then
-			mAbortProcessing = False
-			RaiseEvent ProgressResetKeypressAbort()
-			blnRaiseEvent = True
-		End If
+        If NewStepPct = 0 Then
+            mAbortProcessing = False
+            RaiseEvent ProgressResetKeypressAbort()
+            blnRaiseEvent = True
+        End If
 
-		If NewStepPct <> mSubtaskProcessingStepPct Then
-			blnRaiseEvent = True
-			mSubtaskProcessingStepPct = NewStepPct
-		End If
+        If NewStepPct <> mSubtaskProcessingStepPct Then
+            blnRaiseEvent = True
+            mSubtaskProcessingStepPct = NewStepPct
+        End If
 
-		If blnForceUpdate OrElse blnRaiseEvent OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS Then
-			LastFileWriteTime = DateTime.UtcNow
+        If blnForceUpdate OrElse blnRaiseEvent OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS Then
+            LastFileWriteTime = DateTime.UtcNow
 
-			UpdateOverallProgress()
-			UpdateStatusFile()
-			RaiseEvent ProgressSubtaskChanged()
-		End If
-	End Sub
+            UpdateOverallProgress()
+            UpdateStatusFile()
+            RaiseEvent ProgressSubtaskChanged()
+        End If
+    End Sub
 
-	Private Sub SetSubtaskProcessingStepPct(NewStepPct As Short, strSubtaskDescription As String)
-		mSubtaskDescription = strSubtaskDescription
-		SetSubtaskProcessingStepPct(NewStepPct, True)
-	End Sub
+    Private Sub SetSubtaskProcessingStepPct(NewStepPct As Short, strSubtaskDescription As String)
+        mSubtaskDescription = strSubtaskDescription
+        SetSubtaskProcessingStepPct(NewStepPct, True)
+    End Sub
 
-	Public Sub SetStatusLogKeyNameFilterList(ByRef strMatchSpecList As String, chDelimiter As Char)
-		Dim strItems() As String
-		Dim intIndex As Integer
-		Dim intTargetIndex As Integer
+    Public Sub SetStatusLogKeyNameFilterList(ByRef strMatchSpecList As String, chDelimiter As Char)
+        Dim strItems() As String
+        Dim intIndex As Integer
+        Dim intTargetIndex As Integer
 
-		Try
-			' Split on the user-specified delimiter, plus also CR and LF
-			strItems = strMatchSpecList.Split(New Char() {chDelimiter, ControlChars.Cr, ControlChars.Lf})
+        Try
+            ' Split on the user-specified delimiter, plus also CR and LF
+            strItems = strMatchSpecList.Split(New Char() {chDelimiter, ControlChars.Cr, ControlChars.Lf})
 
-			If strItems.Length > 0 Then
+            If strItems.Length > 0 Then
 
-				' Make sure no blank entries are present in strItems
-				intTargetIndex = 0
-				For intIndex = 0 To strItems.Length - 1
-					strItems(intIndex) = strItems(intIndex).Trim
-					If strItems(intIndex).Length > 0 Then
-						If intTargetIndex <> intIndex Then
-							strItems(intTargetIndex) = String.Copy(strItems(intIndex))
-						End If
-						intTargetIndex += 1
-					End If
-				Next intIndex
+                ' Make sure no blank entries are present in strItems
+                intTargetIndex = 0
+                For intIndex = 0 To strItems.Length - 1
+                    strItems(intIndex) = strItems(intIndex).Trim
+                    If strItems(intIndex).Length > 0 Then
+                        If intTargetIndex <> intIndex Then
+                            strItems(intTargetIndex) = String.Copy(strItems(intIndex))
+                        End If
+                        intTargetIndex += 1
+                    End If
+                Next intIndex
 
-				If intTargetIndex < strItems.Length Then
-					ReDim Preserve strItems(intTargetIndex - 1)
-				End If
+                If intTargetIndex < strItems.Length Then
+                    ReDim Preserve strItems(intTargetIndex - 1)
+                End If
 
-				SetStatusLogKeyNameFilterList(strItems)
-			End If
-		Catch ex As Exception
-			' Error parsing strMatchSpecList
-			' Ignore errors here
-		End Try
-	End Sub
+                SetStatusLogKeyNameFilterList(strItems)
+            End If
+        Catch ex As Exception
+            ' Error parsing strMatchSpecList
+            ' Ignore errors here
+        End Try
+    End Sub
 
-	Public Sub SetStatusLogKeyNameFilterList(ByRef strMatchSpecList() As String)
-		Try
-			If Not strMatchSpecList Is Nothing Then
-				ReDim mStatusLogKeyNameFilterList(strMatchSpecList.Length - 1)
-				Array.Copy(strMatchSpecList, mStatusLogKeyNameFilterList, strMatchSpecList.Length)
-				Array.Sort(mStatusLogKeyNameFilterList)
-			End If
-		Catch ex As Exception
-			' Ignore errors here
-		End Try
-	End Sub
+    Public Sub SetStatusLogKeyNameFilterList(ByRef strMatchSpecList() As String)
+        Try
+            If Not strMatchSpecList Is Nothing Then
+                ReDim mStatusLogKeyNameFilterList(strMatchSpecList.Length - 1)
+                Array.Copy(strMatchSpecList, mStatusLogKeyNameFilterList, strMatchSpecList.Length)
+                Array.Sort(mStatusLogKeyNameFilterList)
+            End If
+        Catch ex As Exception
+            ' Ignore errors here
+        End Try
+    End Sub
 
     Private Sub StoreExtendedHeaderInfo(
       ByRef htExtendedHeaderInfo As Dictionary(Of Integer, String),
@@ -13031,7 +13031,7 @@ Public Class clsMASIC
 
     End Sub
 
-	Private Function StorePeakInParentIon(
+    Private Function StorePeakInParentIon(
       ByRef udtScanList As udtScanListType,
       intParentIonIndex As Integer,
       ByRef udtSICDetails As udtSICStatsDetailsType,
@@ -13040,142 +13040,142 @@ Public Class clsMASIC
       blnPeakIsValid As Boolean) As Boolean
 
 
-		Dim intDataIndex As Integer
-		Dim intScanIndexObserved As Integer
-		Dim intFragScanNumber As Integer
+        Dim intDataIndex As Integer
+        Dim intScanIndexObserved As Integer
+        Dim intFragScanNumber As Integer
 
-		Dim blnProcessingMRMPeak As Boolean
-		Dim blnSuccess As Boolean
+        Dim blnProcessingMRMPeak As Boolean
+        Dim blnSuccess As Boolean
 
-		Try
+        Try
 
-			With udtScanList
-				If udtSICDetails.SICData Is Nothing OrElse udtSICDetails.SICDataCount = 0 Then
-					' Either .SICData is nothing or no SIC data exists
-					' Cannot find peaks for this parent ion
-					With .ParentIons(intParentIonIndex).SICStats
-						With .Peak
-							.IndexObserved = 0
-							.IndexBaseLeft = .IndexObserved
-							.IndexBaseRight = .IndexObserved
-							.IndexMax = .IndexObserved
-						End With
-					End With
-				Else
-					With .ParentIons(intParentIonIndex)
-						intScanIndexObserved = .SurveyScanIndex
-						If intScanIndexObserved < 0 Then intScanIndexObserved = 0
+            With udtScanList
+                If udtSICDetails.SICData Is Nothing OrElse udtSICDetails.SICDataCount = 0 Then
+                    ' Either .SICData is nothing or no SIC data exists
+                    ' Cannot find peaks for this parent ion
+                    With .ParentIons(intParentIonIndex).SICStats
+                        With .Peak
+                            .IndexObserved = 0
+                            .IndexBaseLeft = .IndexObserved
+                            .IndexBaseRight = .IndexObserved
+                            .IndexMax = .IndexObserved
+                        End With
+                    End With
+                Else
+                    With .ParentIons(intParentIonIndex)
+                        intScanIndexObserved = .SurveyScanIndex
+                        If intScanIndexObserved < 0 Then intScanIndexObserved = 0
 
-						If .MRMDaughterMZ > 0 Then
-							blnProcessingMRMPeak = True
-						Else
-							blnProcessingMRMPeak = False
-						End If
+                        If .MRMDaughterMZ > 0 Then
+                            blnProcessingMRMPeak = True
+                        Else
+                            blnProcessingMRMPeak = False
+                        End If
 
-						With .SICStats
+                        With .SICStats
 
-							.SICPotentialAreaStatsForPeak = udtSICPotentialAreaStatsForPeak
-							.Peak = udtSICPeak
+                            .SICPotentialAreaStatsForPeak = udtSICPotentialAreaStatsForPeak
+                            .Peak = udtSICPeak
 
-							.ScanTypeForPeakIndices = udtSICDetails.SICScanType
-							If blnProcessingMRMPeak Then
-								If .ScanTypeForPeakIndices <> eScanTypeConstants.FragScan Then
-									' ScanType is not FragScan; this is unexpected
-									LogErrors("StorePeakInParentIon", "Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", Nothing, True, True, eMasicErrorCodes.FindSICPeaksError)
-									.ScanTypeForPeakIndices = eScanTypeConstants.FragScan
-								End If
-							End If
+                            .ScanTypeForPeakIndices = udtSICDetails.SICScanType
+                            If blnProcessingMRMPeak Then
+                                If .ScanTypeForPeakIndices <> eScanTypeConstants.FragScan Then
+                                    ' ScanType is not FragScan; this is unexpected
+                                    LogErrors("StorePeakInParentIon", "Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", Nothing, True, True, eMasicErrorCodes.FindSICPeaksError)
+                                    .ScanTypeForPeakIndices = eScanTypeConstants.FragScan
+                                End If
+                            End If
 
-							If blnProcessingMRMPeak Then
-								.Peak.IndexObserved = 0
-							Else
-								' Record the index (of data in .SICData) that the parent ion mass was first observed
-								' This is not necessarily the same as udtSICPeak.IndexObserved, so we need to search for it here
+                            If blnProcessingMRMPeak Then
+                                .Peak.IndexObserved = 0
+                            Else
+                                ' Record the index (of data in .SICData) that the parent ion mass was first observed
+                                ' This is not necessarily the same as udtSICPeak.IndexObserved, so we need to search for it here
 
-								' Search for intScanIndexObserved in udtSICDetails.SICScanIndices()
-								.Peak.IndexObserved = -1
-								For intDataIndex = 0 To udtSICDetails.SICDataCount - 1
-									If udtSICDetails.SICScanIndices(intDataIndex) = intScanIndexObserved Then
-										.Peak.IndexObserved = intDataIndex
-										Exit For
-									End If
-								Next intDataIndex
+                                ' Search for intScanIndexObserved in udtSICDetails.SICScanIndices()
+                                .Peak.IndexObserved = -1
+                                For intDataIndex = 0 To udtSICDetails.SICDataCount - 1
+                                    If udtSICDetails.SICScanIndices(intDataIndex) = intScanIndexObserved Then
+                                        .Peak.IndexObserved = intDataIndex
+                                        Exit For
+                                    End If
+                                Next intDataIndex
 
-								If .Peak.IndexObserved = -1 Then
-									' Match wasn't found; this is unexpected
-									LogErrors("StorePeakInParentIon", "Programming error: survey scan index not found in udtSICDetails.SICScanIndices", Nothing, True, True, eMasicErrorCodes.FindSICPeaksError)
-									.Peak.IndexObserved = 0
-								End If
-							End If
+                                If .Peak.IndexObserved = -1 Then
+                                    ' Match wasn't found; this is unexpected
+                                    LogErrors("StorePeakInParentIon", "Programming error: survey scan index not found in udtSICDetails.SICScanIndices", Nothing, True, True, eMasicErrorCodes.FindSICPeaksError)
+                                    .Peak.IndexObserved = 0
+                                End If
+                            End If
 
-							If udtScanList.FragScanCount > 0 AndAlso udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0) < udtScanList.FragScanCount Then
-								' Record the fragmentation scan number
-								intFragScanNumber = udtScanList.FragScans(udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
-							Else
-								' Use the parent scan number as the fragmentation scan number
-								' This is OK based on how mMASICPeakFinder.ComputeParentIonIntensity() uses intFragScanNumber
-								intFragScanNumber = udtScanList.SurveyScans(udtScanList.ParentIons(intParentIonIndex).SurveyScanIndex).ScanNumber
-							End If
+                            If udtScanList.FragScanCount > 0 AndAlso udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0) < udtScanList.FragScanCount Then
+                                ' Record the fragmentation scan number
+                                intFragScanNumber = udtScanList.FragScans(udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
+                            Else
+                                ' Use the parent scan number as the fragmentation scan number
+                                ' This is OK based on how mMASICPeakFinder.ComputeParentIonIntensity() uses intFragScanNumber
+                                intFragScanNumber = udtScanList.SurveyScans(udtScanList.ParentIons(intParentIonIndex).SurveyScanIndex).ScanNumber
+                            End If
 
-							If blnProcessingMRMPeak Then
-								udtSICPeak.ParentIonIntensity = 0
-							Else
-								' Determine the value for .ParentIonIntensity
-								blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(udtSICDetails.SICDataCount, udtSICDetails.SICScanNumbers, udtSICDetails.SICData, .Peak, intFragScanNumber)
-							End If
+                            If blnProcessingMRMPeak Then
+                                udtSICPeak.ParentIonIntensity = 0
+                            Else
+                                ' Determine the value for .ParentIonIntensity
+                                blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(udtSICDetails.SICDataCount, udtSICDetails.SICScanNumbers, udtSICDetails.SICData, .Peak, intFragScanNumber)
+                            End If
 
-							If blnPeakIsValid Then
-								' Record the survey scan indices of the peak max, start, and end
-								' Note that .ScanTypeForPeakIndices was set earlier in this function
-								.PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
-								.PeakScanIndexStart = udtSICDetails.SICScanIndices(.Peak.IndexBaseLeft)
-								.PeakScanIndexEnd = udtSICDetails.SICScanIndices(.Peak.IndexBaseRight)
-							Else
-								' No peak found
-								.PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
-								.PeakScanIndexStart = .PeakScanIndexMax
-								.PeakScanIndexEnd = .PeakScanIndexMax
+                            If blnPeakIsValid Then
+                                ' Record the survey scan indices of the peak max, start, and end
+                                ' Note that .ScanTypeForPeakIndices was set earlier in this function
+                                .PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
+                                .PeakScanIndexStart = udtSICDetails.SICScanIndices(.Peak.IndexBaseLeft)
+                                .PeakScanIndexEnd = udtSICDetails.SICScanIndices(.Peak.IndexBaseRight)
+                            Else
+                                ' No peak found
+                                .PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
+                                .PeakScanIndexStart = .PeakScanIndexMax
+                                .PeakScanIndexEnd = .PeakScanIndexMax
 
-								With .Peak
-									.MaxIntensityValue = udtSICDetails.SICData(.IndexMax)
-									.IndexBaseLeft = .IndexMax
-									.IndexBaseRight = .IndexMax
-									.FWHMScanWidth = 1
-									' Assign the intensity of the peak at the observed maximum to the area
-									.Area = .MaxIntensityValue
+                                With .Peak
+                                    .MaxIntensityValue = udtSICDetails.SICData(.IndexMax)
+                                    .IndexBaseLeft = .IndexMax
+                                    .IndexBaseRight = .IndexMax
+                                    .FWHMScanWidth = 1
+                                    ' Assign the intensity of the peak at the observed maximum to the area
+                                    .Area = .MaxIntensityValue
 
-									.SignalToNoiseRatio = MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
-								End With
-							End If
-						End With
-					End With
+                                    .SignalToNoiseRatio = MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
+                                End With
+                            End If
+                        End With
+                    End With
 
-					' Update .OptimalPeakApexScanNumber
-					' Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
-					With .ParentIons(intParentIonIndex)
-						If blnProcessingMRMPeak Then
-							.OptimalPeakApexScanNumber = udtScanList.FragScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
-						Else
-							.OptimalPeakApexScanNumber = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
-						End If
-					End With
+                    ' Update .OptimalPeakApexScanNumber
+                    ' Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
+                    With .ParentIons(intParentIonIndex)
+                        If blnProcessingMRMPeak Then
+                            .OptimalPeakApexScanNumber = udtScanList.FragScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+                        Else
+                            .OptimalPeakApexScanNumber = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+                        End If
+                    End With
 
-				End If
+                End If
 
-			End With
+            End With
 
-			blnSuccess = True
+            blnSuccess = True
 
-		Catch ex As Exception
+        Catch ex As Exception
 
-			LogErrors("StorePeakInParentIon", "Error finding SIC peaks and their areas", ex, True, False, eMasicErrorCodes.FindSICPeaksError)
-			blnSuccess = False
+            LogErrors("StorePeakInParentIon", "Error finding SIC peaks and their areas", ex, True, False, eMasicErrorCodes.FindSICPeaksError)
+            blnSuccess = False
 
-		End Try
+        End Try
 
-		Return blnSuccess
+        Return blnSuccess
 
-	End Function
+    End Function
 
     Private Function AggregateIonsInRange(
       objSpectraCache As clsSpectraCache,
@@ -13269,163 +13269,163 @@ Public Class clsMASIC
 
     End Function
 
-	Private Function SumIonsFindValueInRange(
+    Private Function SumIonsFindValueInRange(
       ByRef DataDouble() As Double,
-      intDataCount As Integer, 
-      dblSearchValue As Double, 
-      dblToleranceHalfWidth As Double, 
-      Optional ByRef intMatchIndexStart As Integer = 0, 
+      intDataCount As Integer,
+      dblSearchValue As Double,
+      dblToleranceHalfWidth As Double,
+      Optional ByRef intMatchIndexStart As Integer = 0,
       Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
 
-		' Searches DataDouble for dblSearchValue with a tolerance of +/-dblToleranceHalfWidth
-		' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
-		' Otherwise, returns false
+        ' Searches DataDouble for dblSearchValue with a tolerance of +/-dblToleranceHalfWidth
+        ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
+        ' Otherwise, returns false
 
-		Dim blnMatchFound As Boolean
+        Dim blnMatchFound As Boolean
 
-		intMatchIndexStart = 0
-		intMatchIndexEnd = intDataCount - 1
+        intMatchIndexStart = 0
+        intMatchIndexEnd = intDataCount - 1
 
-		If intDataCount = 0 Then
-			intMatchIndexEnd = -1
-		ElseIf intDataCount = 1 Then
-			If Math.Abs(dblSearchValue - DataDouble(0)) > dblToleranceHalfWidth Then
-				' Only one data point, and it is not within tolerance
-				intMatchIndexEnd = -1
-			End If
-		Else
-			SumIonsBinarySearchRangeDbl(DataDouble, dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
-		End If
+        If intDataCount = 0 Then
+            intMatchIndexEnd = -1
+        ElseIf intDataCount = 1 Then
+            If Math.Abs(dblSearchValue - DataDouble(0)) > dblToleranceHalfWidth Then
+                ' Only one data point, and it is not within tolerance
+                intMatchIndexEnd = -1
+            End If
+        Else
+            SumIonsBinarySearchRangeDbl(DataDouble, dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+        End If
 
-		If intMatchIndexStart > intMatchIndexEnd Then
-			intMatchIndexStart = -1
-			intMatchIndexEnd = -1
-			blnMatchFound = False
-		Else
-			blnMatchFound = True
-		End If
+        If intMatchIndexStart > intMatchIndexEnd Then
+            intMatchIndexStart = -1
+            intMatchIndexEnd = -1
+            blnMatchFound = False
+        Else
+            blnMatchFound = True
+        End If
 
-		Return blnMatchFound
-	End Function
+        Return blnMatchFound
+    End Function
 
-	Private Sub SumIonsBinarySearchRangeDbl(
-	  ByRef DataDouble() As Double, 
-	  dblSearchValue As Double, 
-	  dblToleranceHalfWidth As Double, 
-	  ByRef intMatchIndexStart As Integer, 
-	  ByRef intMatchIndexEnd As Integer)
-	  
-		' Recursive search function
+    Private Sub SumIonsBinarySearchRangeDbl(
+      ByRef DataDouble() As Double,
+      dblSearchValue As Double,
+      dblToleranceHalfWidth As Double,
+      ByRef intMatchIndexStart As Integer,
+      ByRef intMatchIndexEnd As Integer)
 
-		Dim intIndexMidpoint As Integer
-		Dim blnLeftDone As Boolean
-		Dim blnRightDone As Boolean
-		Dim intLeftIndex As Integer
-		Dim intRightIndex As Integer
+        ' Recursive search function
 
-		intIndexMidpoint = (intMatchIndexStart + intMatchIndexEnd) \ 2
-		If intIndexMidpoint = intMatchIndexStart Then
-			' Min and Max are next to each other
-			If Math.Abs(dblSearchValue - DataDouble(intMatchIndexStart)) > dblToleranceHalfWidth Then intMatchIndexStart = intMatchIndexEnd
-			If Math.Abs(dblSearchValue - DataDouble(intMatchIndexEnd)) > dblToleranceHalfWidth Then intMatchIndexEnd = intIndexMidpoint
-			Exit Sub
-		End If
+        Dim intIndexMidpoint As Integer
+        Dim blnLeftDone As Boolean
+        Dim blnRightDone As Boolean
+        Dim intLeftIndex As Integer
+        Dim intRightIndex As Integer
 
-		If DataDouble(intIndexMidpoint) > dblSearchValue + dblToleranceHalfWidth Then
-			' Out of range on the right
-			intMatchIndexEnd = intIndexMidpoint
-			SumIonsBinarySearchRangeDbl(DataDouble, dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
-		ElseIf DataDouble(intIndexMidpoint) < dblSearchValue - dblToleranceHalfWidth Then
-			' Out of range on the left
-			intMatchIndexStart = intIndexMidpoint
-			SumIonsBinarySearchRangeDbl(DataDouble, dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
-		Else
-			' Inside range; figure out the borders
-			intLeftIndex = intIndexMidpoint
-			Do
-				intLeftIndex = intLeftIndex - 1
-				If intLeftIndex < intMatchIndexStart Then
-					blnLeftDone = True
-				Else
-					If Math.Abs(dblSearchValue - DataDouble(intLeftIndex)) > dblToleranceHalfWidth Then blnLeftDone = True
-				End If
-			Loop While Not blnLeftDone
-			intRightIndex = intIndexMidpoint
+        intIndexMidpoint = (intMatchIndexStart + intMatchIndexEnd) \ 2
+        If intIndexMidpoint = intMatchIndexStart Then
+            ' Min and Max are next to each other
+            If Math.Abs(dblSearchValue - DataDouble(intMatchIndexStart)) > dblToleranceHalfWidth Then intMatchIndexStart = intMatchIndexEnd
+            If Math.Abs(dblSearchValue - DataDouble(intMatchIndexEnd)) > dblToleranceHalfWidth Then intMatchIndexEnd = intIndexMidpoint
+            Exit Sub
+        End If
 
-			Do
-				intRightIndex = intRightIndex + 1
-				If intRightIndex > intMatchIndexEnd Then
-					blnRightDone = True
-				Else
-					If Math.Abs(dblSearchValue - DataDouble(intRightIndex)) > dblToleranceHalfWidth Then blnRightDone = True
-				End If
-			Loop While Not blnRightDone
+        If DataDouble(intIndexMidpoint) > dblSearchValue + dblToleranceHalfWidth Then
+            ' Out of range on the right
+            intMatchIndexEnd = intIndexMidpoint
+            SumIonsBinarySearchRangeDbl(DataDouble, dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+        ElseIf DataDouble(intIndexMidpoint) < dblSearchValue - dblToleranceHalfWidth Then
+            ' Out of range on the left
+            intMatchIndexStart = intIndexMidpoint
+            SumIonsBinarySearchRangeDbl(DataDouble, dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+        Else
+            ' Inside range; figure out the borders
+            intLeftIndex = intIndexMidpoint
+            Do
+                intLeftIndex = intLeftIndex - 1
+                If intLeftIndex < intMatchIndexStart Then
+                    blnLeftDone = True
+                Else
+                    If Math.Abs(dblSearchValue - DataDouble(intLeftIndex)) > dblToleranceHalfWidth Then blnLeftDone = True
+                End If
+            Loop While Not blnLeftDone
+            intRightIndex = intIndexMidpoint
 
-			intMatchIndexStart = intLeftIndex + 1
-			intMatchIndexEnd = intRightIndex - 1
-		End If
+            Do
+                intRightIndex = intRightIndex + 1
+                If intRightIndex > intMatchIndexEnd Then
+                    blnRightDone = True
+                Else
+                    If Math.Abs(dblSearchValue - DataDouble(intRightIndex)) > dblToleranceHalfWidth Then blnRightDone = True
+                End If
+            Loop While Not blnRightDone
 
-	End Sub
+            intMatchIndexStart = intLeftIndex + 1
+            intMatchIndexEnd = intRightIndex - 1
+        End If
 
-	Private Sub TestScanConversions(ByRef udtScanList As udtScanListType)
+    End Sub
 
-		Dim intScanNumber As Integer
-		Dim sngRelativeTime As Single
-		Dim sngScanTime As Single
+    Private Sub TestScanConversions(ByRef udtScanList As udtScanListType)
 
-		Dim sngResult As Single
+        Dim intScanNumber As Integer
+        Dim sngRelativeTime As Single
+        Dim sngScanTime As Single
 
-		Try
-			' Convert absolute values
-			intScanNumber = 500			' Scan 500
-			sngRelativeTime = 0.5		' Relative scan 0.5
-			sngScanTime = 30			' The scan at 30 minutes
+        Dim sngResult As Single
 
-			' Find the scan number corresponding to each of these values
-			sngResult = ScanOrAcqTimeToAbsolute(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
-			sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
-			sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
+        Try
+            ' Convert absolute values
+            intScanNumber = 500         ' Scan 500
+            sngRelativeTime = 0.5       ' Relative scan 0.5
+            sngScanTime = 30            ' The scan at 30 minutes
 
-
-			' Convert ranges
-			intScanNumber = 50			' 50 scans wide
-			sngRelativeTime = 0.1		' 10% of the run
-			sngScanTime = 5				' 5 minutes
-
-			' Convert each of these ranges to a scan time range in minutes
-			sngResult = ScanOrAcqTimeToAbsolute(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
-			sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
-			sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
+            ' Find the scan number corresponding to each of these values
+            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
+            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
+            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
 
 
+            ' Convert ranges
+            intScanNumber = 50          ' 50 scans wide
+            sngRelativeTime = 0.1       ' 10% of the run
+            sngScanTime = 5             ' 5 minutes
 
-			' Convert absolute values
-			intScanNumber = 500			' Scan 500
-			sngRelativeTime = 0.5		' Relative scan 0.5
-			sngScanTime = 30			' The scan at 30 minutes
-
-			' Find the scan number corresponding to each of these values
-			sngResult = ScanOrAcqTimeToScanTime(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
-			sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
-			sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
-
-
-			' Convert ranges
-			intScanNumber = 50			' 50 scans wide
-			sngRelativeTime = 0.1		' 10% of the run
-			sngScanTime = 5				' 5 minutes
-
-			' Convert each of these ranges to a scan time range in minutes
-			sngResult = ScanOrAcqTimeToScanTime(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
-			sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
-			sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
+            ' Convert each of these ranges to a scan time range in minutes
+            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
+            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
 
 
-		Catch ex As Exception
-			Console.WriteLine("Error caught: " & ex.Message)
-		End Try
 
-	End Sub
+            ' Convert absolute values
+            intScanNumber = 500         ' Scan 500
+            sngRelativeTime = 0.5       ' Relative scan 0.5
+            sngScanTime = 30            ' The scan at 30 minutes
+
+            ' Find the scan number corresponding to each of these values
+            sngResult = ScanOrAcqTimeToScanTime(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
+            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
+            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
+
+
+            ' Convert ranges
+            intScanNumber = 50          ' 50 scans wide
+            sngRelativeTime = 0.1       ' 10% of the run
+            sngScanTime = 5             ' 5 minutes
+
+            ' Convert each of these ranges to a scan time range in minutes
+            sngResult = ScanOrAcqTimeToScanTime(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
+            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
+
+
+        Catch ex As Exception
+            Console.WriteLine("Error caught: " & ex.Message)
+        End Try
+
+    End Sub
 
     Private Function TryGetExtendedHeaderInfoValue(keyName As String, <Out()> ByRef headerIndex As Integer) As Boolean
 
@@ -13521,36 +13521,36 @@ Public Class clsMASIC
 
     End Function
 
-	Private Sub UpdateMZIntensityFilterIgnoreRange()
-		' Look at the m/z values in mReporterIonInfo to determine the minimum and maximum m/z values
-		' Update mMZIntensityFilterIgnoreRangeStart and mMZIntensityFilterIgnoreRangeEnd to be
-		'  2x .MZToleranceDa away from the minimum and maximum
+    Private Sub UpdateMZIntensityFilterIgnoreRange()
+        ' Look at the m/z values in mReporterIonInfo to determine the minimum and maximum m/z values
+        ' Update mMZIntensityFilterIgnoreRangeStart and mMZIntensityFilterIgnoreRangeEnd to be
+        '  2x .MZToleranceDa away from the minimum and maximum
 
-		Dim intIndex As Integer
-		Dim dblValue As Double
+        Dim intIndex As Integer
+        Dim dblValue As Double
 
-		If mReporterIonStatsEnabled AndAlso mReporterIonCount > 0 Then
-			mMZIntensityFilterIgnoreRangeStart = mReporterIonInfo(0).MZ - mReporterIonInfo(0).MZToleranceDa * 2
-			mMZIntensityFilterIgnoreRangeEnd = mReporterIonInfo(0).MZ + mReporterIonInfo(0).MZToleranceDa * 2
+        If mReporterIonStatsEnabled AndAlso mReporterIonCount > 0 Then
+            mMZIntensityFilterIgnoreRangeStart = mReporterIonInfo(0).MZ - mReporterIonInfo(0).MZToleranceDa * 2
+            mMZIntensityFilterIgnoreRangeEnd = mReporterIonInfo(0).MZ + mReporterIonInfo(0).MZToleranceDa * 2
 
-			For intIndex = 1 To mReporterIonCount - 1
-				dblValue = mReporterIonInfo(intIndex).MZ - mReporterIonInfo(intIndex).MZToleranceDa * 2
-				If dblValue < mMZIntensityFilterIgnoreRangeStart Then mMZIntensityFilterIgnoreRangeStart = dblValue
+            For intIndex = 1 To mReporterIonCount - 1
+                dblValue = mReporterIonInfo(intIndex).MZ - mReporterIonInfo(intIndex).MZToleranceDa * 2
+                If dblValue < mMZIntensityFilterIgnoreRangeStart Then mMZIntensityFilterIgnoreRangeStart = dblValue
 
-				dblValue = mReporterIonInfo(intIndex).MZ + mReporterIonInfo(intIndex).MZToleranceDa * 2
-				If dblValue > mMZIntensityFilterIgnoreRangeEnd Then mMZIntensityFilterIgnoreRangeEnd = dblValue
+                dblValue = mReporterIonInfo(intIndex).MZ + mReporterIonInfo(intIndex).MZToleranceDa * 2
+                If dblValue > mMZIntensityFilterIgnoreRangeEnd Then mMZIntensityFilterIgnoreRangeEnd = dblValue
 
-			Next intIndex
-		Else
-			mMZIntensityFilterIgnoreRangeStart = 0
-			mMZIntensityFilterIgnoreRangeEnd = 0
-		End If
+            Next intIndex
+        Else
+            mMZIntensityFilterIgnoreRangeStart = 0
+            mMZIntensityFilterIgnoreRangeEnd = 0
+        End If
 
-	End Sub
+    End Sub
 
-	Private Sub UpdateOverallProgress()
-		UpdateOverallProgress(MyBase.mProgressStepDescription)
-	End Sub
+    Private Sub UpdateOverallProgress()
+        UpdateOverallProgress(MyBase.mProgressStepDescription)
+    End Sub
 
     Private Sub UpdateOverallProgress(objSpectraCache As clsSpectraCache)
         UpdateOverallProgress()
@@ -13558,143 +13558,143 @@ Public Class clsMASIC
         mProcessingStats.UnCacheEventCount = objSpectraCache.UnCacheEventCount
     End Sub
 
-	Private Sub UpdateOverallProgress(strProgressStepDescription As String)
+    Private Sub UpdateOverallProgress(strProgressStepDescription As String)
 
-		' Update the processing progress, storing the value in mProgressPercentComplete
+        ' Update the processing progress, storing the value in mProgressPercentComplete
 
-		'NewTask = 0
-		'ReadDataFile = 1
-		'SaveBPI = 2
-		'CreateSICsAndFindPeaks = 3
-		'FindSimilarParentIons = 4
-		'SaveExtendedScanStatsFiles = 5
-		'SaveSICStatsFlatFile = 6
-		'CloseOpenFileHandles = 7
-		'UpdateXMLFileWithNewOptimalPeakApexValues = 8
-		'Cancelled = 99
-		'Complete = 100
+        'NewTask = 0
+        'ReadDataFile = 1
+        'SaveBPI = 2
+        'CreateSICsAndFindPeaks = 3
+        'FindSimilarParentIons = 4
+        'SaveExtendedScanStatsFiles = 5
+        'SaveSICStatsFlatFile = 6
+        'CloseOpenFileHandles = 7
+        'UpdateXMLFileWithNewOptimalPeakApexValues = 8
+        'Cancelled = 99
+        'Complete = 100
 
-		Dim sngWeightingFactors() As Single
+        Dim sngWeightingFactors() As Single
 
-		If mSkipMSMSProcessing Then
-			' Step                              0   1     2     3  4   5      6      7      8     
-			sngWeightingFactors = New Single() {0, 0.97, 0.002, 0, 0, 0.001, 0.025, 0.001, 0.001}			 ' The sum of these factors should be 1.00
-		Else
-			' Step                              0   1      2      3     4     5      6      7      8     
-			sngWeightingFactors = New Single() {0, 0.194, 0.003, 0.65, 0.09, 0.001, 0.006, 0.001, 0.055}	 ' The sum of these factors should be 1.00
-		End If
+        If mSkipMSMSProcessing Then
+            ' Step                              0   1     2     3  4   5      6      7      8     
+            sngWeightingFactors = New Single() {0, 0.97, 0.002, 0, 0, 0.001, 0.025, 0.001, 0.001}            ' The sum of these factors should be 1.00
+        Else
+            ' Step                              0   1      2      3     4     5      6      7      8     
+            sngWeightingFactors = New Single() {0, 0.194, 0.003, 0.65, 0.09, 0.001, 0.006, 0.001, 0.055}     ' The sum of these factors should be 1.00
+        End If
 
-		Dim intCurrentStep, intIndex As Integer
-		Dim sngOverallPctCompleted As Single
+        Dim intCurrentStep, intIndex As Integer
+        Dim sngOverallPctCompleted As Single
 
-		Try
-			intCurrentStep = mProcessingStep
-			If intCurrentStep >= sngWeightingFactors.Length Then intCurrentStep = sngWeightingFactors.Length - 1
+        Try
+            intCurrentStep = mProcessingStep
+            If intCurrentStep >= sngWeightingFactors.Length Then intCurrentStep = sngWeightingFactors.Length - 1
 
-			sngOverallPctCompleted = 0
-			For intIndex = 0 To intCurrentStep - 1
-				sngOverallPctCompleted += sngWeightingFactors(intIndex) * 100
-			Next intIndex
+            sngOverallPctCompleted = 0
+            For intIndex = 0 To intCurrentStep - 1
+                sngOverallPctCompleted += sngWeightingFactors(intIndex) * 100
+            Next intIndex
 
-			sngOverallPctCompleted += sngWeightingFactors(intCurrentStep) * mSubtaskProcessingStepPct
+            sngOverallPctCompleted += sngWeightingFactors(intCurrentStep) * mSubtaskProcessingStepPct
 
-			mProgressPercentComplete = sngOverallPctCompleted
+            mProgressPercentComplete = sngOverallPctCompleted
 
-		Catch ex As Exception
-			Debug.Assert(False, "Bug in UpdateOverallProgress")
-		End Try
+        Catch ex As Exception
+            Debug.Assert(False, "Bug in UpdateOverallProgress")
+        End Try
 
-		MyBase.UpdateProgress(strProgressStepDescription, mProgressPercentComplete)
-	End Sub
+        MyBase.UpdateProgress(strProgressStepDescription, mProgressPercentComplete)
+    End Sub
 
-	Private Sub UpdatePeakMemoryUsage()
+    Private Sub UpdatePeakMemoryUsage()
 
-		Dim sngMemoryUsageMB As Single
+        Dim sngMemoryUsageMB As Single
 
-		sngMemoryUsageMB = GetProcessMemoryUsageMB()
-		If sngMemoryUsageMB > mProcessingStats.PeakMemoryUsageMB Then
-			mProcessingStats.PeakMemoryUsageMB = sngMemoryUsageMB
-		End If
+        sngMemoryUsageMB = GetProcessMemoryUsageMB()
+        If sngMemoryUsageMB > mProcessingStats.PeakMemoryUsageMB Then
+            mProcessingStats.PeakMemoryUsageMB = sngMemoryUsageMB
+        End If
 
-	End Sub
+    End Sub
 
-	Private Sub UpdateProcessingStep(eNewProcessingStep As eProcessingStepConstants, Optional blnForceStatusFileUpdate As Boolean = False)
+    Private Sub UpdateProcessingStep(eNewProcessingStep As eProcessingStepConstants, Optional blnForceStatusFileUpdate As Boolean = False)
 
-		mProcessingStep = eNewProcessingStep
-		UpdateStatusFile(blnForceStatusFileUpdate)
+        mProcessingStep = eNewProcessingStep
+        UpdateStatusFile(blnForceStatusFileUpdate)
 
-	End Sub
+    End Sub
 
-	Private Sub UpdateStatusFile(Optional blnForceUpdate As Boolean = False)
+    Private Sub UpdateStatusFile(Optional blnForceUpdate As Boolean = False)
 
-		Dim strPath As String
-		Dim strTempPath As String
-		Dim objXMLOut As Xml.XmlTextWriter
+        Dim strPath As String
+        Dim strTempPath As String
+        Dim objXMLOut As Xml.XmlTextWriter
 
-		Static LastFileWriteTime As DateTime = DateTime.UtcNow
+        Static LastFileWriteTime As DateTime = DateTime.UtcNow
 
-		If blnForceUpdate OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS Then
-			LastFileWriteTime = DateTime.UtcNow
+        If blnForceUpdate OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS Then
+            LastFileWriteTime = DateTime.UtcNow
 
-			Try
-				strTempPath = IO.Path.Combine(GetAppFolderPath(), "Temp_" & mMASICStatusFilename)
-				strPath = IO.Path.Combine(GetAppFolderPath(), mMASICStatusFilename)
+            Try
+                strTempPath = IO.Path.Combine(GetAppFolderPath(), "Temp_" & mMASICStatusFilename)
+                strPath = IO.Path.Combine(GetAppFolderPath(), mMASICStatusFilename)
 
-				objXMLOut = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
-				objXMLOut.Formatting = Xml.Formatting.Indented
-				objXMLOut.Indentation = 2
+                objXMLOut = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
+                objXMLOut.Formatting = Xml.Formatting.Indented
+                objXMLOut.Indentation = 2
 
-				objXMLOut.WriteStartDocument(True)
-				objXMLOut.WriteComment("MASIC processing status")
+                objXMLOut.WriteStartDocument(True)
+                objXMLOut.WriteComment("MASIC processing status")
 
-				'Write the beginning of the "Root" element.
-				objXMLOut.WriteStartElement("Root")
+                'Write the beginning of the "Root" element.
+                objXMLOut.WriteStartElement("Root")
 
-				objXMLOut.WriteStartElement("General")
-				objXMLOut.WriteElementString("LastUpdate", DateTime.Now.ToString)
-				objXMLOut.WriteElementString("ProcessingStep", mProcessingStep.ToString)
-				objXMLOut.WriteElementString("Progress", Math.Round(mProgressPercentComplete, 2).ToString)
-				objXMLOut.WriteElementString("Error", GetErrorMessage())
-				objXMLOut.WriteEndElement()
+                objXMLOut.WriteStartElement("General")
+                objXMLOut.WriteElementString("LastUpdate", DateTime.Now.ToString)
+                objXMLOut.WriteElementString("ProcessingStep", mProcessingStep.ToString)
+                objXMLOut.WriteElementString("Progress", Math.Round(mProgressPercentComplete, 2).ToString)
+                objXMLOut.WriteElementString("Error", GetErrorMessage())
+                objXMLOut.WriteEndElement()
 
-				objXMLOut.WriteStartElement("Statistics")
-				objXMLOut.WriteElementString("FreeMemoryMB", Math.Round(GetFreeMemoryMB, 1).ToString)
-				objXMLOut.WriteElementString("MemoryUsageMB", Math.Round(GetProcessMemoryUsageMB, 1).ToString)
-				objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(mProcessingStats.PeakMemoryUsageMB, 1).ToString)
+                objXMLOut.WriteStartElement("Statistics")
+                objXMLOut.WriteElementString("FreeMemoryMB", Math.Round(GetFreeMemoryMB, 1).ToString)
+                objXMLOut.WriteElementString("MemoryUsageMB", Math.Round(GetProcessMemoryUsageMB, 1).ToString)
+                objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(mProcessingStats.PeakMemoryUsageMB, 1).ToString)
 
-				With mProcessingStats
-					objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString)
-					objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString)
-				End With
+                With mProcessingStats
+                    objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString)
+                    objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString)
+                End With
 
-				objXMLOut.WriteElementString("ProcessingTimeSec", Math.Round(GetTotalProcessingTimeSec(), 2).ToString)
-				objXMLOut.WriteEndElement()
+                objXMLOut.WriteElementString("ProcessingTimeSec", Math.Round(GetTotalProcessingTimeSec(), 2).ToString)
+                objXMLOut.WriteEndElement()
 
-				objXMLOut.WriteEndElement()	 'End the "Root" element.
-				objXMLOut.WriteEndDocument() 'End the document
+                objXMLOut.WriteEndElement()  'End the "Root" element.
+                objXMLOut.WriteEndDocument() 'End the document
 
-				objXMLOut.Close()
+                objXMLOut.Close()
 
-				GC.Collect()
-				GC.WaitForPendingFinalizers()
-				Application.DoEvents()
+                GC.Collect()
+                GC.WaitForPendingFinalizers()
+                Application.DoEvents()
 
-				'Copy the temporary file to the real one
-				IO.File.Copy(strTempPath, strPath, True)
-				IO.File.Delete(strTempPath)
+                'Copy the temporary file to the real one
+                IO.File.Copy(strTempPath, strPath, True)
+                IO.File.Delete(strTempPath)
 
-			Catch ex As Exception
-				' Ignore any errors
-			End Try
+            Catch ex As Exception
+                ' Ignore any errors
+            End Try
 
-		End If
+        End If
 
-	End Sub
+    End Sub
 
-	Private Sub ValidateCustomSICList()
-		Dim intIndex As Integer
-		Dim intCountBetweenZeroAndOne As Integer
-		Dim intCountOverOne As Integer
+    Private Sub ValidateCustomSICList()
+        Dim intIndex As Integer
+        Dim intCountBetweenZeroAndOne As Integer
+        Dim intCountOverOne As Integer
 
         If Not mCustomSICList.CustomMZSearchValues Is Nothing AndAlso
            mCustomSICList.CustomMZSearchValues.Length > 0 Then
@@ -13729,117 +13729,118 @@ Public Class clsMASIC
             End If
         End If
 
-	End Sub
-	Private Sub ValidateMasterScanOrderSorting(ByRef udtScanList As udtScanListType)
-		' Validate that .MasterScanOrder() really is sorted by scan number
-		' Cannot use an IComparer because .MasterScanOrder points into other arrays
+    End Sub
+    Private Sub ValidateMasterScanOrderSorting(ByRef udtScanList As udtScanListType)
+        ' Validate that .MasterScanOrder() really is sorted by scan number
+        ' Cannot use an IComparer because .MasterScanOrder points into other arrays
 
-		Dim intMasterScanOrderIndices() As Integer
-		Dim udtMasterScanOrderListCopy() As udtScanOrderPointerType
-		Dim sngMasterScanTimeListCopy() As Single
+        Dim intMasterScanOrderIndices() As Integer
+        Dim udtMasterScanOrderListCopy() As udtScanOrderPointerType
+        Dim sngMasterScanTimeListCopy() As Single
 
-		Dim intIndex As Integer
+        Dim intIndex As Integer
 
-		Dim blnListWasSorted As Boolean
+        Dim blnListWasSorted As Boolean
 
-		With udtScanList
+        With udtScanList
 
-			ReDim intMasterScanOrderIndices(.MasterScanOrderCount - 1)
+            ReDim intMasterScanOrderIndices(.MasterScanOrderCount - 1)
 
-			For intIndex = 0 To .MasterScanOrderCount - 1
-				intMasterScanOrderIndices(intIndex) = intIndex
-			Next intIndex
+            For intIndex = 0 To .MasterScanOrderCount - 1
+                intMasterScanOrderIndices(intIndex) = intIndex
+            Next intIndex
 
-			' Sort .MasterScanNumList ascending, sorting the scan order indices array in parallel
-			Array.Sort(.MasterScanNumList, intMasterScanOrderIndices)
+            ' Sort .MasterScanNumList ascending, sorting the scan order indices array in parallel
+            Array.Sort(.MasterScanNumList, intMasterScanOrderIndices)
 
-			' Check whether we need to re-populate the lists
-			blnListWasSorted = False
-			For intIndex = 1 To .MasterScanOrderCount - 1
-				If intMasterScanOrderIndices(intIndex) < intMasterScanOrderIndices(intIndex - 1) Then
-					blnListWasSorted = True
-				End If
-			Next intIndex
+            ' Check whether we need to re-populate the lists
+            blnListWasSorted = False
+            For intIndex = 1 To .MasterScanOrderCount - 1
+                If intMasterScanOrderIndices(intIndex) < intMasterScanOrderIndices(intIndex - 1) Then
+                    blnListWasSorted = True
+                End If
+            Next intIndex
 
-			If blnListWasSorted Then
-				' Reorder .MasterScanOrder
-				ReDim udtMasterScanOrderListCopy(.MasterScanOrder.Length - 1)
-				ReDim sngMasterScanTimeListCopy(.MasterScanOrder.Length - 1)
+            If blnListWasSorted Then
+                ' Reorder .MasterScanOrder
+                ReDim udtMasterScanOrderListCopy(.MasterScanOrder.Length - 1)
+                ReDim sngMasterScanTimeListCopy(.MasterScanOrder.Length - 1)
 
-				Array.Copy(.MasterScanOrder, udtMasterScanOrderListCopy, .MasterScanOrderCount)
-				Array.Copy(.MasterScanTimeList, sngMasterScanTimeListCopy, .MasterScanOrderCount)
+                Array.Copy(.MasterScanOrder, udtMasterScanOrderListCopy, .MasterScanOrderCount)
+                Array.Copy(.MasterScanTimeList, sngMasterScanTimeListCopy, .MasterScanOrderCount)
 
-				For intIndex = 0 To .MasterScanOrderCount - 1
-					.MasterScanOrder(intIndex) = udtMasterScanOrderListCopy(intMasterScanOrderIndices(intIndex))
-					.MasterScanTimeList(intIndex) = sngMasterScanTimeListCopy(intMasterScanOrderIndices(intIndex))
-				Next intIndex
-			End If
+                For intIndex = 0 To .MasterScanOrderCount - 1
+                    .MasterScanOrder(intIndex) = udtMasterScanOrderListCopy(intMasterScanOrderIndices(intIndex))
+                    .MasterScanTimeList(intIndex) = sngMasterScanTimeListCopy(intMasterScanOrderIndices(intIndex))
+                Next intIndex
+            End If
 
 
-		End With
-	End Sub
+        End With
+    End Sub
 
-	Private Sub ValidateSICOptions(ByRef udtSICOptions As udtSICOptionsType)
+    Private Sub ValidateSICOptions(ByRef udtSICOptions As udtSICOptionsType)
 
-		If udtSICOptions.CompressToleranceDivisorForDa < 1 Then
-			udtSICOptions.CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA
-		End If
+        If udtSICOptions.CompressToleranceDivisorForDa < 1 Then
+            udtSICOptions.CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA
+        End If
 
-		If udtSICOptions.CompressToleranceDivisorForPPM < 1 Then
-			udtSICOptions.CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM
-		End If
+        If udtSICOptions.CompressToleranceDivisorForPPM < 1 Then
+            udtSICOptions.CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM
+        End If
 
-	End Sub
+    End Sub
 
-	Private Function ValidateXRawAccessor() As Boolean
+    Private Function ValidateXRawAccessor() As Boolean
 
-		Static blnValidated As Boolean
-		Static blnValidationSaved As Boolean
+        Static blnValidated As Boolean
+        Static blnValidationSaved As Boolean
 
-		If blnValidated Then
-			Return blnValidationSaved
-		End If
+        If blnValidated Then
+            Return blnValidationSaved
+        End If
 
-		Try
-			Dim objXRawAccess As New XRawFileIO
+        Try
+            Dim objXRawAccess As New XRawFileIO
 
-			blnValidationSaved = objXRawAccess.CheckFunctionality()
-		Catch ex As Exception
-			blnValidationSaved = False
-		End Try
+            blnValidationSaved = objXRawAccess.CheckFunctionality()
+        Catch ex As Exception
+            blnValidationSaved = False
+        End Try
 
-		Return blnValidationSaved
+        Return blnValidationSaved
 
-	End Function
+    End Function
 
-	''Public Sub TestValueToString()
+    Public Sub TestValueToString()
 
-	''    Const intDigitsOfPrecision As Integer = 5
+        Const intDigitsOfPrecision As Integer = 5
 
-	''    Console.WriteLine( MathUtilities.ValueToString(1.2301, 3, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(1.2, 3, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(1.003, 3, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(999.995, 9, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(999.995, 8, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(999.995, 7, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(999.995, 6, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(999.995, 5, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(999.995, 4, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(1000.995, 3, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(1000.995, 2, 100000))
-	''    Console.WriteLine( MathUtilities.ValueToString(1.003, 5))
+        Console.WriteLine(StringUtilities.ValueToString(1.2301, 3, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(1.2, 3, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(1.003, 3, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(999.995, 9, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(999.995, 8, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(999.995, 7, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(999.995, 6, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(999.995, 5, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(999.995, 4, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(1000.995, 3, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(1000.995, 2, 100000))
+        Console.WriteLine(StringUtilities.ValueToString(1.003, 5))
 
-	''    Console.WriteLine( MathUtilities.ValueToString(1.23123, intDigitsOfPrecision))
-	''    Console.WriteLine( MathUtilities.ValueToString(12.3123, intDigitsOfPrecision))
-	''    Console.WriteLine( MathUtilities.ValueToString(123.123, intDigitsOfPrecision))
-	''    'Console.WriteLine( MathUtilities.ValueToString(1231.23, intDigitsOfPrecision))
-	''    'Console.WriteLine( MathUtilities.ValueToString(12312.3, intDigitsOfPrecision))
-	''    'Console.WriteLine( MathUtilities.ValueToString(123123, intDigitsOfPrecision))
-	''    'Console.WriteLine( MathUtilities.ValueToString(1231234, intDigitsOfPrecision))
-	''    'Console.WriteLine( MathUtilities.ValueToString(12312345, intDigitsOfPrecision))
-	''    'Console.WriteLine( MathUtilities.ValueToString(123123456, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(1.23123, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(12.3123, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(123.123, intDigitsOfPrecision))
 
-	''End Sub
+        Console.WriteLine(StringUtilities.ValueToString(1231.23, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(12312.3, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(123123, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(1231234, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(12312345, intDigitsOfPrecision))
+        Console.WriteLine(StringUtilities.ValueToString(123123456, intDigitsOfPrecision))
+
+    End Sub
 
 	Private Sub WriteDecon2LSIsosFileHeaders(srOutFile As IO.StreamWriter)
 		srOutFile.WriteLine("scan_num,charge,abundance,mz,fit,average_mw,monoisotopic_mw,mostabundant_mw,fwhm,signal_noise,mono_abundance,mono_plus2_abundance")

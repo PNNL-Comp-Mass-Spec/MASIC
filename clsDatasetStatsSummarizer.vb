@@ -618,14 +618,14 @@ Namespace DSSummarizer
                 objDSInfo.WriteEndElement()       ' AcquisitionInfo
 
                 objDSInfo.WriteStartElement("TICInfo")
-                objDSInfo.WriteElementString("TIC_Max_MS", MathUtilities.ValueToString(objSummaryStats.MSStats.TICMax, 5))
-                objDSInfo.WriteElementString("TIC_Max_MSn", MathUtilities.ValueToString(objSummaryStats.MSnStats.TICMax, 5))
-                objDSInfo.WriteElementString("BPI_Max_MS", MathUtilities.ValueToString(objSummaryStats.MSStats.BPIMax, 5))
-                objDSInfo.WriteElementString("BPI_Max_MSn", MathUtilities.ValueToString(objSummaryStats.MSnStats.BPIMax, 5))
-                objDSInfo.WriteElementString("TIC_Median_MS", MathUtilities.ValueToString(objSummaryStats.MSStats.TICMedian, 5))
-                objDSInfo.WriteElementString("TIC_Median_MSn", MathUtilities.ValueToString(objSummaryStats.MSnStats.TICMedian, 5))
-                objDSInfo.WriteElementString("BPI_Median_MS", MathUtilities.ValueToString(objSummaryStats.MSStats.BPIMedian, 5))
-                objDSInfo.WriteElementString("BPI_Median_MSn", MathUtilities.ValueToString(objSummaryStats.MSnStats.BPIMedian, 5))
+                objDSInfo.WriteElementString("TIC_Max_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.TICMax, 5))
+                objDSInfo.WriteElementString("TIC_Max_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.TICMax, 5))
+                objDSInfo.WriteElementString("BPI_Max_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.BPIMax, 5))
+                objDSInfo.WriteElementString("BPI_Max_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.BPIMax, 5))
+                objDSInfo.WriteElementString("TIC_Median_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.TICMedian, 5))
+                objDSInfo.WriteElementString("TIC_Median_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.TICMedian, 5))
+                objDSInfo.WriteElementString("BPI_Median_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.BPIMedian, 5))
+                objDSInfo.WriteElementString("BPI_Median_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.BPIMedian, 5))
                 objDSInfo.WriteEndElement()       ' TICInfo
 
                 ' Only write the SampleInfo block if udtSampleInfo contains entries

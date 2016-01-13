@@ -26,329 +26,361 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "December 31, 2015"
+    Public Const PROGRAM_DATE As String = "January 12, 2016"
 
-	Private mInputFilePath As String
-	Private mOutputFolderPath As String				' Optional
-	Private mParameterFilePath As String			' Optional
-	Private mOutputFolderAlternatePath As String				' Optional
-	Private mRecreateFolderHierarchyInAlternatePath As Boolean	' Optional
+    Private mInputFilePath As String
+    Private mOutputFolderPath As String             ' Optional
+    Private mParameterFilePath As String            ' Optional
+    Private mOutputFolderAlternatePath As String                ' Optional
+    Private mRecreateFolderHierarchyInAlternatePath As Boolean  ' Optional
 
-	Private mDatasetLookupFilePath As String		' Optional
-	Private mDatasetNumber As Integer
+    Private mDatasetLookupFilePath As String        ' Optional
+    Private mDatasetNumber As Integer
 
-	Private mRecurseFolders As Boolean
-	Private mRecurseFoldersMaxLevels As Integer
+    Private mRecurseFolders As Boolean
+    Private mRecurseFoldersMaxLevels As Integer
 
-	Private mLogMessagesToFile As Boolean
-	Private mLogFilePath As String = String.Empty
-	Private mLogFolderPath As String = String.Empty
+    Private mLogMessagesToFile As Boolean
+    Private mLogFilePath As String = String.Empty
+    Private mLogFolderPath As String = String.Empty
 
-	Private mMASICStatusFilename As String = String.Empty
-	Private mQuietMode As Boolean
+    Private mMASICStatusFilename As String = String.Empty
+    Private mQuietMode As Boolean
 
-	Private WithEvents mMASIC As MASIC.clsMASIC
-	Private mProgressForm As ProgressFormNET.frmProgress
+    Private mTestMode As Boolean
 
-	Private mLastProgressReportTime As System.DateTime
-	Private mLastProgressReportValue As Integer
+    Private WithEvents mMASIC As MASIC.clsMASIC
+    Private mProgressForm As ProgressFormNET.frmProgress
 
-
-	Private Structure udtScanInfoTestType
-		Public ScanNumber As Integer						' Ranges from 1 to the number of scans in the datafile
-		Public RetTime As Single							' Retention (elution) Time (in minutes)
-		Public BasePeakIonMZ As Double						' mz of the most intense ion in this scan
-		Public BasePeakIonIntensity As Single				' intensity of the most intense ion in this scan
-		Public TotalIonIntensity As Single					' intensity of all of the ions for this scan
-		Public ParentIonInfoIndex As Integer				' Pointer to an entry in the ParentIons() array; -1 if undefined
-		Public FragScanNumber As Integer					' Usually 1, 2, or 3
-
-		Public ExtendedHeaderInfo As Hashtable				' Hash keys are ID values pointing to mExtendedHeaderInfo (where the name is defined); hash values are the string or numeric values for the settings
-		Public CacheState As Integer
-		Public CacheRequestState As Integer
-
-		Public IonCount As Integer
-		Public IonsMZ() As Double							' 0-based array, ranging from 0 to IonCount-1
-		Public IonsIntensity() As Single					' 0-based array, ranging from 0 to IonCount-1
-
-		Public NoiseThresholdIntensity As Single			' Intensity level of the noise
-
-	End Structure
-
-	Private Function GetMemoryUsage() As Single
-
-		Dim sngMemoryUsageMB As Single
-
-		' Obtain a handle to the current process
-		Dim objProcess As System.Diagnostics.Process
-		objProcess = System.Diagnostics.Process.GetCurrentProcess()
-
-		' The WorkingSet is the total physical memory usage 
-		sngMemoryUsageMB = CSng(objProcess.WorkingSet64() / 1024 / 1024)
-		Return sngMemoryUsageMB
-
-	End Function
-
-	''Private Sub InitializeTraceLogFile(ByVal strUserDefinedLogFilePath As String)
-	''    Dim strTraceFilePath As String
-
-	''    Static blnTraceFileEnabled As Boolean
-
-	''    If Not blnTraceFileEnabled Then
-	''        Try
-	''            If strUserDefinedLogFilePath Is Nothing Then strUserDefinedLogFilePath = String.Empty
-
-	''            If strUserDefinedLogFilePath.Length = 0 Then
-	''                strTraceFilePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
-	''                strTraceFilePath = System.IO.Path.Combine(strTraceFilePath, "MASIC_Log_" & System.DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss") & ".txt")
-	''            Else
-	''                strTraceFilePath = String.Copy(strUserDefinedLogFilePath)
-	''            End If
-
-	''            Trace.Listeners.Add(New TextWriterTraceListener(strTraceFilePath))
-	''            Trace.AutoFlush = True
-
-	''            blnTraceFileEnabled = True
-	''        Catch ex As Exception
-	''            If strUserDefinedLogFilePath.Length > 0 Then
-	''                ' Error using the user-defined path
-	''                ' Call this function using a blank string so that a default file is created
-	''                InitializeTraceLogFile(String.Empty)
-	''            End If
-
-	''        End Try
-
-	''    End If
-
-	''End Sub
-
-	Public Function Main() As Integer
-		' Returns 0 if no error, error code if an error
-
-		Dim intReturnCode As Integer
-		Dim objParseCommandLine As New clsParseCommandLine
-		Dim blnProceed As Boolean
-
-		intReturnCode = 0
-		mInputFilePath = String.Empty
-		mOutputFolderPath = String.Empty
-		mParameterFilePath = String.Empty
-
-		mRecurseFolders = False
-		mRecurseFoldersMaxLevels = 0
-
-		mQuietMode = False
-		mLogMessagesToFile = False
-		mLogFilePath = String.Empty
-
-		Try
-			blnProceed = False
-			If objParseCommandLine.ParseCommandLine Then
-				If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then blnProceed = True
-			End If
-
-			If (objParseCommandLine.ParameterCount + objParseCommandLine.NonSwitchParameterCount = 0) And Not objParseCommandLine.NeedToShowHelp Then
-				ShowGUI()
-			ElseIf Not blnProceed OrElse objParseCommandLine.NeedToShowHelp OrElse mInputFilePath.Length = 0 Then
-				ShowProgramHelp()
-				intReturnCode = -1
-			Else
-                mMASIC = New MASIC.clsMASIC()
-
-				mMASIC.DatasetLookupFilePath = mDatasetLookupFilePath
-				mMASIC.DatasetNumber = mDatasetNumber
-
-				If Not mMASICStatusFilename Is Nothing AndAlso mMASICStatusFilename.Length > 0 Then
-					mMASIC.MASICStatusFilename = mMASICStatusFilename
-				End If
-
-				mMASIC.ShowMessages = Not mQuietMode
-				mMASIC.LogMessagesToFile = mLogMessagesToFile
-				mMASIC.LogFilePath = mLogFilePath
-				mMASIC.LogFolderPath = mLogFolderPath
-
-				If mMASIC.ShowMessages Then
-					mProgressForm = New ProgressFormNET.frmProgress
-
-					mProgressForm.InitializeProgressForm("Parsing " & System.IO.Path.GetFileName(mInputFilePath), 0, 100, False, True)
-					mProgressForm.InitializeSubtask("", 0, 100, False)
-					mProgressForm.ResetKeyPressAbortProcess()
-					mProgressForm.Show()
-					Application.DoEvents()
-
-				End If
-
-				If mRecurseFolders Then
-					If mMASIC.ProcessFilesAndRecurseFolders(mInputFilePath, mOutputFolderPath, mOutputFolderAlternatePath, mRecreateFolderHierarchyInAlternatePath, mParameterFilePath, mRecurseFoldersMaxLevels) Then
-						intReturnCode = 0
-					Else
-						intReturnCode = mMASIC.ErrorCode
-					End If
-				Else
-					If mMASIC.ProcessFilesWildcard(mInputFilePath, mOutputFolderPath, mParameterFilePath) Then
-						intReturnCode = 0
-					Else
-						intReturnCode = mMASIC.ErrorCode
-						If intReturnCode <> 0 AndAlso Not mQuietMode Then
-							Console.WriteLine("Error while processing: " & mMASIC.GetErrorMessage())
-						End If
-					End If
-				End If
-			End If
-
-		Catch ex As Exception
-			ShowErrorMessage("Error occurred in modMain->Main: " & System.Environment.NewLine & ex.Message)
-			intReturnCode = -1
-		Finally
-			If Not mProgressForm Is Nothing Then
-				mProgressForm.HideForm()
-				mProgressForm = Nothing
-			End If
-		End Try
-
-		''Trace.Close()
-
-		Return intReturnCode
-
-	End Function
-
-	Private Sub DisplayProgressPercent(ByVal intPercentComplete As Integer, ByVal blnAddCarriageReturn As Boolean)
-		If blnAddCarriageReturn Then
-			Console.WriteLine()
-		End If
-		If intPercentComplete > 100 Then intPercentComplete = 100
-		Console.Write("Processing: " & intPercentComplete.ToString() & "% ")
-		If blnAddCarriageReturn Then
-			Console.WriteLine()
-		End If
-	End Sub
-
-	Private Function GetAppVersion() As String
-		Return clsProcessFilesBaseClass.GetAppVersion(PROGRAM_DATE)
-	End Function
+    Private mLastProgressReportTime As System.DateTime
+    Private mLastProgressReportValue As Integer
 
 
-	Private Function SetOptionsUsingCommandLineParameters(ByVal objParseCommandLine As clsParseCommandLine) As Boolean
-		' Returns True if no problems; otherwise, returns false
+    Private Structure udtScanInfoTestType
+        Public ScanNumber As Integer                        ' Ranges from 1 to the number of scans in the datafile
+        Public RetTime As Single                            ' Retention (elution) Time (in minutes)
+        Public BasePeakIonMZ As Double                      ' mz of the most intense ion in this scan
+        Public BasePeakIonIntensity As Single               ' intensity of the most intense ion in this scan
+        Public TotalIonIntensity As Single                  ' intensity of all of the ions for this scan
+        Public ParentIonInfoIndex As Integer                ' Pointer to an entry in the ParentIons() array; -1 if undefined
+        Public FragScanNumber As Integer                    ' Usually 1, 2, or 3
 
-		Dim strValue As String = String.Empty
-		Dim lstValidParameters As Generic.List(Of String) = New Generic.List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "LogFolder", "Q"}
-		Dim intValue As Integer
+        Public ExtendedHeaderInfo As Hashtable              ' Hash keys are ID values pointing to mExtendedHeaderInfo (where the name is defined); hash values are the string or numeric values for the settings
+        Public CacheState As Integer
+        Public CacheRequestState As Integer
 
-		Try
-			' Make sure no invalid parameters are present
-			If objParseCommandLine.InvalidParametersPresent(lstValidParameters) Then
-				ShowErrorMessage("Invalid commmand line parameters",
-				  (From item In objParseCommandLine.InvalidParameters(lstValidParameters) Select "/" + item).ToList())
-				Return False
-			Else
+        Public IonCount As Integer
+        Public IonsMZ() As Double                           ' 0-based array, ranging from 0 to IonCount-1
+        Public IonsIntensity() As Single                    ' 0-based array, ranging from 0 to IonCount-1
 
-				' Query objParseCommandLine to see if various parameters are present
-				With objParseCommandLine
-					If .RetrieveValueForParameter("I", strValue) Then
-						mInputFilePath = strValue
-					ElseIf .NonSwitchParameterCount > 0 Then
-						' Treat the first non-switch parameter as the input file
-						mInputFilePath = .RetrieveNonSwitchParameter(0)
-					End If
+        Public NoiseThresholdIntensity As Single            ' Intensity level of the noise
 
-					If .RetrieveValueForParameter("O", strValue) Then mOutputFolderPath = strValue
-					If .RetrieveValueForParameter("P", strValue) Then mParameterFilePath = strValue
-					If .RetrieveValueForParameter("D", strValue) Then
-						If Not IsNumeric(strValue) AndAlso Not strValue Is Nothing Then
+    End Structure
+
+    Private Function GetMemoryUsage() As Single
+
+        Dim sngMemoryUsageMB As Single
+
+        ' Obtain a handle to the current process
+        Dim objProcess As System.Diagnostics.Process
+        objProcess = System.Diagnostics.Process.GetCurrentProcess()
+
+        ' The WorkingSet is the total physical memory usage 
+        sngMemoryUsageMB = CSng(objProcess.WorkingSet64() / 1024 / 1024)
+        Return sngMemoryUsageMB
+
+    End Function
+
+    ''Private Sub InitializeTraceLogFile(ByVal strUserDefinedLogFilePath As String)
+    ''    Dim strTraceFilePath As String
+
+    ''    Static blnTraceFileEnabled As Boolean
+
+    ''    If Not blnTraceFileEnabled Then
+    ''        Try
+    ''            If strUserDefinedLogFilePath Is Nothing Then strUserDefinedLogFilePath = String.Empty
+
+    ''            If strUserDefinedLogFilePath.Length = 0 Then
+    ''                strTraceFilePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
+    ''                strTraceFilePath = System.IO.Path.Combine(strTraceFilePath, "MASIC_Log_" & System.DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss") & ".txt")
+    ''            Else
+    ''                strTraceFilePath = String.Copy(strUserDefinedLogFilePath)
+    ''            End If
+
+    ''            Trace.Listeners.Add(New TextWriterTraceListener(strTraceFilePath))
+    ''            Trace.AutoFlush = True
+
+    ''            blnTraceFileEnabled = True
+    ''        Catch ex As Exception
+    ''            If strUserDefinedLogFilePath.Length > 0 Then
+    ''                ' Error using the user-defined path
+    ''                ' Call this function using a blank string so that a default file is created
+    ''                InitializeTraceLogFile(String.Empty)
+    ''            End If
+
+    ''        End Try
+
+    ''    End If
+
+    ''End Sub
+
+    Public Function Main() As Integer
+        ' Returns 0 if no error, error code if an error
+
+        Dim objParseCommandLine As New clsParseCommandLine
+        Dim blnProceed As Boolean
+
+        mInputFilePath = String.Empty
+        mOutputFolderPath = String.Empty
+        mParameterFilePath = String.Empty
+
+        mRecurseFolders = False
+        mRecurseFoldersMaxLevels = 0
+
+        mQuietMode = False
+        mTestMode = False
+        mLogMessagesToFile = False
+        mLogFilePath = String.Empty
+
+        Try
+            blnProceed = False
+            If objParseCommandLine.ParseCommandLine Then
+                If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then blnProceed = True
+            End If
+
+            If (objParseCommandLine.ParameterCount + objParseCommandLine.NonSwitchParameterCount = 0) And Not objParseCommandLine.NeedToShowHelp Then
+                ShowGUI()
+                Return 0
+            End If
+
+            If mTestMode Then
+                RunTests()
+                Return 0
+            End If
+
+            If Not blnProceed OrElse objParseCommandLine.NeedToShowHelp OrElse mInputFilePath.Length = 0 Then
+                ShowProgramHelp()
+                Return -1
+            End If
+
+            mMASIC = New clsMASIC()
+
+            mMASIC.DatasetLookupFilePath = mDatasetLookupFilePath
+            mMASIC.DatasetNumber = mDatasetNumber
+
+            If Not mMASICStatusFilename Is Nothing AndAlso mMASICStatusFilename.Length > 0 Then
+                mMASIC.MASICStatusFilename = mMASICStatusFilename
+            End If
+
+            mMASIC.ShowMessages = Not mQuietMode
+            mMASIC.LogMessagesToFile = mLogMessagesToFile
+            mMASIC.LogFilePath = mLogFilePath
+            mMASIC.LogFolderPath = mLogFolderPath
+
+            If mMASIC.ShowMessages Then
+                mProgressForm = New ProgressFormNET.frmProgress
+
+                mProgressForm.InitializeProgressForm("Parsing " & System.IO.Path.GetFileName(mInputFilePath), 0, 100, False, True)
+                mProgressForm.InitializeSubtask("", 0, 100, False)
+                mProgressForm.ResetKeyPressAbortProcess()
+                mProgressForm.Show()
+                Application.DoEvents()
+
+            End If
+
+            Dim intReturnCode As Integer = 0
+
+            If mRecurseFolders Then
+                If mMASIC.ProcessFilesAndRecurseFolders(mInputFilePath, mOutputFolderPath, mOutputFolderAlternatePath, mRecreateFolderHierarchyInAlternatePath, mParameterFilePath, mRecurseFoldersMaxLevels) Then
+                    intReturnCode = 0
+                Else
+                    intReturnCode = mMASIC.ErrorCode
+                End If
+            Else
+                If mMASIC.ProcessFilesWildcard(mInputFilePath, mOutputFolderPath, mParameterFilePath) Then
+                    intReturnCode = 0
+                Else
+                    intReturnCode = mMASIC.ErrorCode
+                    If intReturnCode <> 0 AndAlso Not mQuietMode Then
+                        Console.WriteLine("Error while processing: " & mMASIC.GetErrorMessage())
+                    End If
+                End If
+            End If
+
+            Return 0
+
+        Catch ex As Exception
+            ShowErrorMessage("Error occurred in modMain->Main: " & System.Environment.NewLine & ex.Message)
+            Return -1
+        Finally
+            If Not mProgressForm Is Nothing Then
+                mProgressForm.HideForm()
+                mProgressForm = Nothing
+            End If
+        End Try
+
+        ''Trace.Close()
+
+
+    End Function
+
+    Private Sub RunTests()
+        Try
+            Dim oMASIC = New clsMASIC()
+
+            oMASIC.TestValueToString()
+
+            Console.WriteLine()
+
+        Catch ex As Exception
+            ShowErrorMessage("Error occurred in modMain->RunTests: " & System.Environment.NewLine & ex.Message)
+        End Try
+
+    End Sub
+
+    Private Sub DisplayProgressPercent(ByVal intPercentComplete As Integer, ByVal blnAddCarriageReturn As Boolean)
+        If blnAddCarriageReturn Then
+            Console.WriteLine()
+        End If
+        If intPercentComplete > 100 Then intPercentComplete = 100
+        Console.Write("Processing: " & intPercentComplete.ToString() & "% ")
+        If blnAddCarriageReturn Then
+            Console.WriteLine()
+        End If
+    End Sub
+
+    Private Function GetAppVersion() As String
+        Return clsProcessFilesBaseClass.GetAppVersion(PROGRAM_DATE)
+    End Function
+
+
+    Private Function SetOptionsUsingCommandLineParameters(ByVal objParseCommandLine As clsParseCommandLine) As Boolean
+        ' Returns True if no problems; otherwise, returns false
+
+        Dim strValue As String = String.Empty
+        Dim lstValidParameters = New Generic.List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "Test", "LogFolder", "Q"}
+        Dim intValue As Integer
+
+        Try
+            ' Make sure no invalid parameters are present
+            If objParseCommandLine.InvalidParametersPresent(lstValidParameters) Then
+                ShowErrorMessage("Invalid commmand line parameters",
+                  (From item In objParseCommandLine.InvalidParameters(lstValidParameters) Select "/" + item).ToList())
+                Return False
+            Else
+
+                ' Query objParseCommandLine to see if various parameters are present
+                With objParseCommandLine
+                    If .RetrieveValueForParameter("I", strValue) Then
+                        mInputFilePath = strValue
+                    ElseIf .NonSwitchParameterCount > 0 Then
+                        ' Treat the first non-switch parameter as the input file
+                        mInputFilePath = .RetrieveNonSwitchParameter(0)
+                    End If
+
+                    If .RetrieveValueForParameter("O", strValue) Then mOutputFolderPath = strValue
+                    If .RetrieveValueForParameter("P", strValue) Then mParameterFilePath = strValue
+                    If .RetrieveValueForParameter("D", strValue) Then
+                        If Not IsNumeric(strValue) AndAlso Not strValue Is Nothing Then
                             ' Assume the user specified a dataset number lookup file (comma or tab delimited file specifying the dataset number for each input file)
-							mDatasetLookupFilePath = strValue
-							mDatasetNumber = 0
-						Else
-							mDatasetNumber = CInt(strValue)
-						End If
-					End If
+                            mDatasetLookupFilePath = strValue
+                            mDatasetNumber = 0
+                        Else
+                            mDatasetNumber = CInt(strValue)
+                        End If
+                    End If
 
-					If .RetrieveValueForParameter("S", strValue) Then
-						mRecurseFolders = True
-						If Integer.TryParse(strValue, intValue) Then
-							mRecurseFoldersMaxLevels = intValue
-						End If
-					End If
-					If .RetrieveValueForParameter("A", strValue) Then mOutputFolderAlternatePath = strValue
+                    If .RetrieveValueForParameter("S", strValue) Then
+                        mRecurseFolders = True
+                        If Integer.TryParse(strValue, intValue) Then
+                            mRecurseFoldersMaxLevels = intValue
+                        End If
+                    End If
+                    If .RetrieveValueForParameter("A", strValue) Then mOutputFolderAlternatePath = strValue
                     If .IsParameterPresent("R") Then mRecreateFolderHierarchyInAlternatePath = True
 
-					If .RetrieveValueForParameter("L", strValue) Then
-						mLogMessagesToFile = True
-						If Not String.IsNullOrEmpty(strValue) Then
-							mLogFilePath = strValue.Trim(""""c)
-						End If
-					End If
+                    If .RetrieveValueForParameter("L", strValue) Then
+                        mLogMessagesToFile = True
+                        If Not String.IsNullOrEmpty(strValue) Then
+                            mLogFilePath = strValue.Trim(""""c)
+                        End If
+                    End If
 
-					If .RetrieveValueForParameter("SF", strValue) Then mMASICStatusFilename = strValue
+                    If .RetrieveValueForParameter("SF", strValue) Then
+                        mMASICStatusFilename = strValue
+                    End If
 
-					If .RetrieveValueForParameter("LogFolder", strValue) Then
-						mLogMessagesToFile = True
-						If Not String.IsNullOrEmpty(strValue) Then
-							mLogFolderPath = strValue
-						End If
-					End If
+                    If .IsParameterPresent("Test") Then
+                        mTestMode = True
+                    End If
+
+                    If .RetrieveValueForParameter("LogFolder", strValue) Then
+                        mLogMessagesToFile = True
+                        If Not String.IsNullOrEmpty(strValue) Then
+                            mLogFolderPath = strValue
+                        End If
+                    End If
                     If .IsParameterPresent("Q") Then mQuietMode = True
-				End With
+                End With
 
-				Return True
-			End If
+                Return True
+            End If
 
-		Catch ex As Exception
-			ShowErrorMessage("Error parsing the command line parameters: " & System.Environment.NewLine & ex.Message)
-		End Try
+        Catch ex As Exception
+            ShowErrorMessage("Error parsing the command line parameters: " & System.Environment.NewLine & ex.Message)
+        End Try
 
-		Return False
+        Return False
 
-	End Function
+    End Function
 
-	Private Sub ShowErrorMessage(ByVal strMessage As String)
-		Dim strSeparator As String = "------------------------------------------------------------------------------"
+    Private Sub ShowErrorMessage(ByVal strMessage As String)
+        Dim strSeparator As String = "------------------------------------------------------------------------------"
 
-		Console.WriteLine()
-		Console.WriteLine(strSeparator)
-		Console.WriteLine(strMessage)
-		Console.WriteLine(strSeparator)
-		Console.WriteLine()
+        Console.WriteLine()
+        Console.WriteLine(strSeparator)
+        Console.WriteLine(strMessage)
+        Console.WriteLine(strSeparator)
+        Console.WriteLine()
 
-		WriteToErrorStream(strMessage)
-	End Sub
+        WriteToErrorStream(strMessage)
+    End Sub
 
-	Private Sub ShowErrorMessage(ByVal strTitle As String, ByVal items As List(Of String))
-		Dim strSeparator As String = "------------------------------------------------------------------------------"
-		Dim strMessage As String
+    Private Sub ShowErrorMessage(ByVal strTitle As String, ByVal items As List(Of String))
+        Dim strSeparator As String = "------------------------------------------------------------------------------"
+        Dim strMessage As String
 
-		Console.WriteLine()
-		Console.WriteLine(strSeparator)
-		Console.WriteLine(strTitle)
-		strMessage = strTitle & ":"
+        Console.WriteLine()
+        Console.WriteLine(strSeparator)
+        Console.WriteLine(strTitle)
+        strMessage = strTitle & ":"
 
-		For Each item As String In items
-			Console.WriteLine("   " + item)
-			strMessage &= " " & item
-		Next
-		Console.WriteLine(strSeparator)
-		Console.WriteLine()
+        For Each item As String In items
+            Console.WriteLine("   " + item)
+            strMessage &= " " & item
+        Next
+        Console.WriteLine(strSeparator)
+        Console.WriteLine()
 
-		WriteToErrorStream(strMessage)
-	End Sub
+        WriteToErrorStream(strMessage)
+    End Sub
 
-	Public Sub ShowGUI()
-		Dim objFormMain As frmMain
+    Public Sub ShowGUI()
+        Dim objFormMain As frmMain
 
         System.Windows.Forms.Application.EnableVisualStyles()
         System.Windows.Forms.Application.DoEvents()
-    
-		objFormMain = New frmMain
 
-    ' The following call is needed because the .ShowDialog() call is inexplicably increasing the size of the form
-		objFormMain.SetHeightAdjustForce(objFormMain.Height)
+        objFormMain = New frmMain
 
-		objFormMain.ShowDialog()
+        ' The following call is needed because the .ShowDialog() call is inexplicably increasing the size of the form
+        objFormMain.SetHeightAdjustForce(objFormMain.Height)
 
-		objFormMain = Nothing
+        objFormMain.ShowDialog()
 
-	End Sub
+        objFormMain = Nothing
+
+    End Sub
 
     Private Sub ShowProgramHelp()
 
