@@ -545,7 +545,7 @@ Public Class frmMain
 
             If strFilePath.Length > 0 Then
                 Try
-                    .InitialDirectory = IO.Directory.GetParent(strFilePath).ToString
+                    .InitialDirectory = Directory.GetParent(strFilePath).ToString
                 Catch
                     .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
                 End Try
@@ -553,8 +553,8 @@ Public Class frmMain
                 .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
             End If
 
-            If IO.File.Exists(strFilePath) Then
-                .FileName = IO.Path.GetFileName(strFilePath)
+            If File.Exists(strFilePath) Then
+                .FileName = Path.GetFileName(strFilePath)
             End If
 
             .Title = "Specify file to load options from"
@@ -597,7 +597,7 @@ Public Class frmMain
                 Try
                     txtDatasetLookupFilePath.Text = .GetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
                     Try
-                        If Not IO.File.Exists(txtDatasetLookupFilePath.Text) Then
+                        If Not File.Exists(txtDatasetLookupFilePath.Text) Then
                             txtDatasetLookupFilePath.Text = String.Empty
                         End If
                     Catch ex As Exception
@@ -622,7 +622,7 @@ Public Class frmMain
                     mPreferredInputFileExtension = .GetParam(XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
 
                 Catch ex As Exception
-                    Windows.Forms.MessageBox.Show("Invalid parameter in settings file: " & IO.Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    Windows.Forms.MessageBox.Show("Invalid parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End Try
             End With
 
@@ -668,7 +668,7 @@ Public Class frmMain
 
             If strFilePath.Length > 0 Then
                 Try
-                    .InitialDirectory = IO.Directory.GetParent(strFilePath).ToString
+                    .InitialDirectory = Directory.GetParent(strFilePath).ToString
                 Catch
                     .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
                 End Try
@@ -676,8 +676,8 @@ Public Class frmMain
                 .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
             End If
 
-            If IO.File.Exists(strFilePath) Then
-                .FileName = IO.Path.GetFileName(strFilePath)
+            If File.Exists(strFilePath) Then
+                .FileName = Path.GetFileName(strFilePath)
             End If
 
             .Title = "Specify file to save options to"
@@ -718,7 +718,7 @@ Public Class frmMain
                 Try
                     If Not blnSaveWindowDimensionsOnly Then
                         Try
-                            If IO.File.Exists(txtDatasetLookupFilePath.Text) Then
+                            If File.Exists(txtDatasetLookupFilePath.Text) Then
                                 .SetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
                             End If
                         Catch ex As Exception
@@ -735,7 +735,7 @@ Public Class frmMain
                     .SetParam(XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
 
                 Catch ex As Exception
-                    Windows.Forms.MessageBox.Show("Error storing parameter in settings file: " & IO.Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    Windows.Forms.MessageBox.Show("Error storing parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End Try
 
                 .SaveSettings()
@@ -1096,7 +1096,7 @@ Public Class frmMain
 
         ' File Paths and Import Options
         Try
-            If txtOutputFolderPath.TextLength = 0 OrElse Not IO.Directory.Exists(txtOutputFolderPath.Text) Then
+            If txtOutputFolderPath.TextLength = 0 OrElse Not Directory.Exists(txtOutputFolderPath.Text) Then
                 txtOutputFolderPath.Text = clsProcessFilesBaseClass.GetAppFolderPath()
             End If
         Catch ex As Exception
@@ -1146,7 +1146,7 @@ Public Class frmMain
                 txtDatasetInfoQuerySQL.Text = .DatasetInfoQuerySql
 
                 Try
-                    If IO.File.Exists(.DatasetLookupFilePath) Then
+                    If File.Exists(.DatasetLookupFilePath) Then
                         txtDatasetLookupFilePath.Text = .DatasetLookupFilePath
                     Else
                         txtDatasetLookupFilePath.Text = String.Empty
@@ -1303,7 +1303,7 @@ Public Class frmMain
 
             If txtDatasetLookupFilePath.TextLength > 0 Then
                 Try
-                    .InitialDirectory = IO.Directory.GetParent(txtDatasetLookupFilePath.Text).ToString
+                    .InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString
                 Catch
                     .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
                 End Try
@@ -1342,7 +1342,7 @@ Public Class frmMain
             strExtension = ".txt"
 
             If txtCustomSICFileName.TextLength > 0 Then
-                strExtension = IO.Path.GetExtension(txtCustomSICFileName.Text)
+                strExtension = Path.GetExtension(txtCustomSICFileName.Text)
             End If
 
             Select Case strExtension.ToLower
@@ -1356,7 +1356,7 @@ Public Class frmMain
 
             If txtCustomSICFileName.TextLength > 0 Then
                 Try
-                    .InitialDirectory = IO.Directory.GetParent(txtCustomSICFileName.Text).ToString
+                    .InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString
                 Catch
                     .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
                 End Try
@@ -1400,7 +1400,7 @@ Public Class frmMain
             strExtension = String.Copy(mPreferredInputFileExtension)
 
             If txtInputFilePath.TextLength > 0 Then
-                strExtension = IO.Path.GetExtension(txtInputFilePath.Text)
+                strExtension = Path.GetExtension(txtInputFilePath.Text)
             End If
 
             Select Case strExtension.ToLower
@@ -1422,7 +1422,7 @@ Public Class frmMain
 
             If txtInputFilePath.TextLength > 0 Then
                 Try
-                    .InitialDirectory = IO.Directory.GetParent(txtInputFilePath.Text).ToString
+                    .InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString
                 Catch
                     .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
                 End Try
@@ -1435,7 +1435,7 @@ Public Class frmMain
             .ShowDialog()
             If .FileName.Length > 0 Then
                 txtInputFilePath.Text = .FileName
-                mPreferredInputFileExtension = IO.Path.GetExtension(.FileName)
+                mPreferredInputFileExtension = Path.GetExtension(.FileName)
             End If
         End With
 
@@ -1677,7 +1677,7 @@ Public Class frmMain
                 End If
 
                 Try
-                    If IO.File.Exists(txtDatasetLookupFilePath.Text) Then
+                    If File.Exists(txtDatasetLookupFilePath.Text) Then
                         .DatasetLookupFilePath = txtDatasetLookupFilePath.Text
                     Else
                         .DatasetLookupFilePath = String.Empty

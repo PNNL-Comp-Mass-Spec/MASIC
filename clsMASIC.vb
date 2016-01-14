@@ -40,7 +40,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "January 12, 2016"
+        MyBase.mFileDate = "January 13, 2016"
         InitializeVariables()
     End Sub
 
@@ -461,8 +461,8 @@ Public Class clsMASIC
     End Structure
 
     Protected Structure udtOutputFileHandlesType
-        Public ScanStats As IO.StreamWriter
-        Public SICDataFile As IO.StreamWriter
+        Public ScanStats As StreamWriter
+        Public SICDataFile As StreamWriter
         Public XMLFileForSICs As Xml.XmlTextWriter
         Public MSMethodFilePathBase As String
         Public MSTuneFilePathBase As String
@@ -2040,7 +2040,7 @@ Public Class clsMASIC
             strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.XMLFile)
 
             ' See if the file exists
-            If IO.File.Exists(strFilePathToCheck) Then
+            If File.Exists(strFilePathToCheck) Then
 
                 If mFastExistingXMLFileTest Then
                     ' XML File found; do not check the settings or version to see if they match the current ones
@@ -2095,10 +2095,10 @@ Public Class clsMASIC
                     If udtSICOptionsCompare.DatasetNumber <> udtSICOptions.DatasetNumber Then Exit Try
 
                     ' Check the filename in strSourceFilePathCheck
-                    If IO.Path.GetFileName(strSourceFilePathCheck) <> IO.Path.GetFileName(strInputFilePathFull) Then Exit Try
+                    If Path.GetFileName(strSourceFilePathCheck) <> Path.GetFileName(strInputFilePathFull) Then Exit Try
 
                     ' Check if the source file stats match
-                    Dim ioFileInfo As New IO.FileInfo(strInputFilePathFull)
+                    Dim ioFileInfo As New FileInfo(strInputFilePathFull)
                     dtSourceFileDateTime = ioFileInfo.LastWriteTime()
                     If strSourceFileDateTimeCheck <> (dtSourceFileDateTime.ToShortDateString & " " & dtSourceFileDateTime.ToShortTimeString) Then Exit Try
                     If lngSourceFileSizeBytes <> ioFileInfo.Length Then Exit Try
@@ -2300,13 +2300,13 @@ Public Class clsMASIC
                         blnValidExistingResultsFound = False
 
                         strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsFlatFile)
-                        If Not IO.File.Exists(strFilePathToCheck) Then Exit Try
+                        If Not File.Exists(strFilePathToCheck) Then Exit Try
 
                         strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.SICStatsFlatFile)
-                        If Not IO.File.Exists(strFilePathToCheck) Then Exit Try
+                        If Not File.Exists(strFilePathToCheck) Then Exit Try
 
                         strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.BPIFile)
-                        If Not IO.File.Exists(strFilePathToCheck) Then Exit Try
+                        If Not File.Exists(strFilePathToCheck) Then Exit Try
 
                         blnValidExistingResultsFound = True
                     End If
@@ -2898,7 +2898,7 @@ Public Class clsMASIC
 
         Dim strOutputFilePath As String
 
-        strOutputFilePath = IO.Path.Combine(strOutputFolderPath, IO.Path.GetFileNameWithoutExtension(strInputFileName))
+        strOutputFilePath = Path.Combine(strOutputFolderPath, Path.GetFileNameWithoutExtension(strInputFileName))
         Select Case eFileType
             Case eOutputFileTypeConstants.XMLFile
                 strOutputFilePath &= "_SICs.xml"
@@ -2931,7 +2931,7 @@ Public Class clsMASIC
             Case eOutputFileTypeConstants.PEKFile
                 strOutputFilePath &= ".pek"
             Case eOutputFileTypeConstants.HeaderGlossary
-                strOutputFilePath = IO.Path.Combine(strOutputFolderPath, "Header_Glossary_Readme.txt")
+                strOutputFilePath = Path.Combine(strOutputFolderPath, "Header_Glossary_Readme.txt")
             Case eOutputFileTypeConstants.DeconToolsIsosFile
                 strOutputFilePath &= "_isos.csv"
             Case eOutputFileTypeConstants.DeconToolsScansFile
@@ -2985,7 +2985,7 @@ Public Class clsMASIC
         udtSampleInfo.Clear()
 
         Try
-            strDatasetName = IO.Path.GetFileNameWithoutExtension(strInputFileName)
+            strDatasetName = Path.GetFileNameWithoutExtension(strInputFileName)
             strDatasetInfoFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DatasetInfoFile)
 
             objDatasetStatsSummarizer = New DSSummarizer.clsDatasetStatsSummarizer
@@ -4018,7 +4018,7 @@ Public Class clsMASIC
         ' When this is true, then will write a text file of the mass spectrum before before and after it is filtered
         ' Used for debugging
         Dim blnWriteDebugData As Boolean
-        Dim srOutFile As IO.StreamWriter = Nothing
+        Dim srOutFile As StreamWriter = Nothing
 
         Try
 
@@ -4032,7 +4032,7 @@ Public Class clsMASIC
 
                     blnWriteDebugData = False
                     If blnWriteDebugData Then
-                        srOutFile = New IO.StreamWriter(New IO.FileStream(IO.Path.Combine(mOutputFolderPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString & "_BeforeFilter.txt"), IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Read))
+                        srOutFile = New StreamWriter(New FileStream(Path.Combine(mOutputFolderPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString & "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
                         srOutFile.WriteLine("m/z" & ControlChars.Tab & "Intensity")
                     End If
 
@@ -4080,7 +4080,7 @@ Public Class clsMASIC
                 End If
 
                 If blnWriteDebugData Then
-                    srOutFile = New IO.StreamWriter(New IO.FileStream(IO.Path.Combine(mOutputFolderPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString & "_PostFilter.txt"), IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Read))
+                    srOutFile = New StreamWriter(New FileStream(Path.Combine(mOutputFolderPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString & "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
                     srOutFile.WriteLine("m/z" & ControlChars.Tab & "Intensity")
 
                     ' Store the intensity values in objFilterDataArray
@@ -4148,8 +4148,8 @@ Public Class clsMASIC
 
         Const cColDelimiter As Char = ControlChars.Tab
 
-        Dim srDataOutfile As IO.StreamWriter = Nothing
-        Dim srCrosstabOutfile As IO.StreamWriter = Nothing
+        Dim srDataOutfile As StreamWriter = Nothing
+        Dim srCrosstabOutfile As StreamWriter = Nothing
 
         Dim intScanFirst As Integer
         Dim sngScanTimeFirst As Single
@@ -4192,7 +4192,7 @@ Public Class clsMASIC
 
             ' Write out the MRM Settings
             strMRMSettingsFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MRMSettingsFile)
-            Using srSettingsOutFile = New IO.StreamWriter(strMRMSettingsFilePath)
+            Using srSettingsOutFile = New StreamWriter(strMRMSettingsFilePath)
 
                 srSettingsOutFile.WriteLine(GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.MRMSettingsFile))
 
@@ -4224,7 +4224,7 @@ Public Class clsMASIC
                     If Me.WriteMRMDataList Then
                         ' Write out the raw MRM Data
                         strDataFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MRMDatafile)
-                        srDataOutfile = New IO.StreamWriter(strDataFilePath)
+                        srDataOutfile = New StreamWriter(strDataFilePath)
 
                         ' Write the file headers
                         srDataOutfile.WriteLine(GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.MRMDatafile))
@@ -4234,7 +4234,7 @@ Public Class clsMASIC
                     If Me.WriteMRMIntensityCrosstab Then
                         ' Write out the raw MRM Data
                         strCrosstabFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MRMCrosstabFile)
-                        srCrosstabOutfile = New IO.StreamWriter(strCrosstabFilePath)
+                        srCrosstabOutfile = New StreamWriter(strCrosstabFilePath)
 
                         ' Initialize the crosstab header variable using the data in udtSRMList()
                         strCrosstabHeaders = "Scan_First" & cColDelimiter & "ScanTime"
@@ -4359,7 +4359,7 @@ Public Class clsMASIC
     End Function
 
     Private Sub ExportMRMDataWriteLine(
-      srCrosstabOutfile As IO.StreamWriter,
+      srCrosstabOutfile As StreamWriter,
       intScanFirst As Integer,
       sngScanTimeFirst As Single,
       sngCrosstabColumnValue() As Single,
@@ -4407,8 +4407,8 @@ Public Class clsMASIC
         Dim strOutputFilePath As String = "??"
         Dim strOutputFilePath2 As String
 
-        Dim srDataOutfile As IO.StreamWriter
-        Dim srScanInfoOutFile As IO.StreamWriter = Nothing
+        Dim srDataOutfile As StreamWriter
+        Dim srScanInfoOutFile As StreamWriter = Nothing
 
         Dim intMasterOrderIndex As Integer
         Dim intScanPointer As Integer
@@ -4425,13 +4425,13 @@ Public Class clsMASIC
             Select Case udtRawDataExportOptions.FileFormat
                 Case eExportRawDataFileFormatConstants.PEKFile
                     strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.PEKFile)
-                    srDataOutfile = New IO.StreamWriter(strOutputFilePath)
+                    srDataOutfile = New StreamWriter(strOutputFilePath)
                 Case eExportRawDataFileFormatConstants.CSVFile
                     strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsIsosFile)
                     strOutputFilePath2 = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsScansFile)
 
-                    srDataOutfile = New IO.StreamWriter(strOutputFilePath)
-                    srScanInfoOutFile = New IO.StreamWriter(strOutputFilePath2)
+                    srDataOutfile = New StreamWriter(strOutputFilePath)
+                    srScanInfoOutFile = New StreamWriter(strOutputFilePath2)
 
                     ' Write the file headers
                     WriteDecon2LSIsosFileHeaders(srDataOutfile)
@@ -4671,7 +4671,7 @@ Public Class clsMASIC
         ' strFilePath can contain the path to the MGF or to the CDF file; the extension will be removed in order to determine the base file name,
         '  then the two files will be looked for separately
 
-        Dim ioFileInfo As IO.FileInfo
+        Dim ioFileInfo As FileInfo
         Dim strMGFInputFilePathFull As String
         Dim strCDFInputFilePathFull As String
 
@@ -4712,15 +4712,15 @@ Public Class clsMASIC
             Console.Write("Reading CDF/MGF data files ")
             LogMessage("Reading CDF/MGF data files")
 
-            SetSubtaskProcessingStepPct(0, "Opening data file: " & ControlChars.NewLine & IO.Path.GetFileName(strFilePath))
+            SetSubtaskProcessingStepPct(0, "Opening data file: " & ControlChars.NewLine & Path.GetFileName(strFilePath))
 
             ' Obtain the full path to the file
-            ioFileInfo = New IO.FileInfo(strFilePath)
+            ioFileInfo = New FileInfo(strFilePath)
             strMGFInputFilePathFull = ioFileInfo.FullName
 
             ' Make sure the extension for strMGFInputFilePathFull is .MGF
-            strMGFInputFilePathFull = IO.Path.ChangeExtension(strMGFInputFilePathFull, AGILENT_MSMS_FILE_EXTENSION)
-            strCDFInputFilePathFull = IO.Path.ChangeExtension(strMGFInputFilePathFull, AGILENT_MS_FILE_EXTENSION)
+            strMGFInputFilePathFull = Path.ChangeExtension(strMGFInputFilePathFull, AGILENT_MSMS_FILE_EXTENSION)
+            strCDFInputFilePathFull = Path.ChangeExtension(strMGFInputFilePathFull, AGILENT_MS_FILE_EXTENSION)
 
             blnSuccess = UpdateDatasetFileStats(mDatasetFileInfo, ioFileInfo, intDatasetID)
             mDatasetFileInfo.ScanCount = 0
@@ -4755,7 +4755,7 @@ Public Class clsMASIC
                 InitializeScanList(udtScanList, intMsScanCount, 0)
                 intLastSurveyScanIndex = -1
 
-                UpdateOverallProgress("Reading CDF/MGF data (" & intMsScanCount.ToString & " scans)" & ControlChars.NewLine & IO.Path.GetFileName(strFilePath))
+                UpdateOverallProgress("Reading CDF/MGF data (" & intMsScanCount.ToString & " scans)" & ControlChars.NewLine & Path.GetFileName(strFilePath))
                 LogMessage("Reading CDF/MGF data; Total MS scan count: " & intMsScanCount.ToString)
 
                 ' Read all of the Survey scans from the CDF file
@@ -5158,7 +5158,7 @@ Public Class clsMASIC
         ' Returns True if Success, False if failure
         ' Note: This function assumes strFilePath exists
 
-        Dim ioFileInfo As IO.FileInfo
+        Dim ioFileInfo As FileInfo
         Dim strInputFileFullPath As String
 
         Dim intScanCount As Integer
@@ -5184,10 +5184,10 @@ Public Class clsMASIC
             Console.Write("Reading Xcalibur data file ")
             LogMessage("Reading Xcalibur data file")
 
-            SetSubtaskProcessingStepPct(0, "Opening data file:" & ControlChars.NewLine & IO.Path.GetFileName(strFilePath))
+            SetSubtaskProcessingStepPct(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(strFilePath))
 
             ' Obtain the full path to the file
-            ioFileInfo = New IO.FileInfo(strFilePath)
+            ioFileInfo = New FileInfo(strFilePath)
             strInputFileFullPath = ioFileInfo.FullName
 
             mXcaliburAccessor.LoadMSMethodInfo = mWriteMSMethodFile
@@ -5235,7 +5235,7 @@ Public Class clsMASIC
                     End If
                 End With
 
-                UpdateOverallProgress("Reading Xcalibur data with " & strIOMode & " (" & intScanCount.ToString & " scans)" & ControlChars.NewLine & IO.Path.GetFileName(strFilePath))
+                UpdateOverallProgress("Reading Xcalibur data with " & strIOMode & " (" & intScanCount.ToString & " scans)" & ControlChars.NewLine & Path.GetFileName(strFilePath))
                 LogMessage("Reading Xcalibur data with " & strIOMode & "; Total scan count: " & intScanCount.ToString)
                 dtLastLogTime = DateTime.UtcNow
 
@@ -5639,7 +5639,7 @@ Public Class clsMASIC
         ' Returns True if Success, False if failure
         ' Note: This function assumes strFilePath exists
 
-        Dim ioFileInfo As IO.FileInfo
+        Dim ioFileInfo As FileInfo
         Dim strInputFileFullPath As String
 
         Dim intLastSurveyScanIndex As Integer
@@ -5665,10 +5665,10 @@ Public Class clsMASIC
             Console.Write("Reading MSXml data file ")
             LogMessage("Reading MSXml data file")
 
-            SetSubtaskProcessingStepPct(0, "Opening data file:" & ControlChars.NewLine & IO.Path.GetFileName(strFilePath))
+            SetSubtaskProcessingStepPct(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(strFilePath))
 
             ' Obtain the full path to the file
-            ioFileInfo = New IO.FileInfo(strFilePath)
+            ioFileInfo = New FileInfo(strFilePath)
             strInputFileFullPath = ioFileInfo.FullName
 
             blnSuccess = UpdateDatasetFileStats(mDatasetFileInfo, ioFileInfo, intDatasetID)
@@ -5692,7 +5692,7 @@ Public Class clsMASIC
             udtScanList.SIMDataPresent = False
             udtScanList.MRMDataPresent = False
 
-            UpdateOverallProgress("Reading XML data" & ControlChars.NewLine & IO.Path.GetFileName(strFilePath))
+            UpdateOverallProgress("Reading XML data" & ControlChars.NewLine & Path.GetFileName(strFilePath))
             LogMessage("Reading XML data from " & strFilePath)
 
             Do
@@ -6558,7 +6558,7 @@ Public Class clsMASIC
 
         Dim strOutputFilePath As String = "??"
 
-        Dim srOutFile As IO.StreamWriter
+        Dim srOutFile As StreamWriter
 
         Dim intMasterOrderIndex As Integer
         Dim intScanPointer As Integer
@@ -6591,7 +6591,7 @@ Public Class clsMASIC
             Array.Sort(udtReporterIonInfo, New clsReportIonInfoComparer)
 
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ReporterIonsFile)
-            srOutFile = New IO.StreamWriter(strOutputFilePath)
+            srOutFile = New StreamWriter(strOutputFilePath)
 
             ' Write the file headers
             Dim reporterIonMZsUnique = New SortedSet(Of String)
@@ -6721,7 +6721,7 @@ Public Class clsMASIC
       ByRef udtScanList As udtScanListType,
       objSpectraCache As clsSpectraCache,
       ByRef udtScan As udtScanInfoType,
-      ByRef srOutFile As IO.StreamWriter,
+      ByRef srOutFile As StreamWriter,
       ByRef udtReporterIonInfo() As udtReporterIonInfoType,
       cColDelimiter As Char,
       blnSaveUncorrectedIntensities As Boolean)
@@ -7921,7 +7921,7 @@ Public Class clsMASIC
 			If mWriteDetailedSICDataFile Then
 				strOutputFilePath = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.SICDataFile)
 
-				udtOutputFileHandles.SICDataFile = New IO.StreamWriter(New IO.FileStream(strOutputFilePath, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Read))
+				udtOutputFileHandles.SICDataFile = New StreamWriter(New FileStream(strOutputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
 
 				' Write the header line
                 udtOutputFileHandles.SICDataFile.WriteLine("Dataset" & ControlChars.Tab &
@@ -8318,10 +8318,10 @@ Public Class clsMASIC
 			End If
 
 
-			If Not IO.File.Exists(strParameterFilePath) Then
+			If Not File.Exists(strParameterFilePath) Then
 				' See if strParameterFilePath points to a file in the same directory as the application
-				strParameterFilePath = IO.Path.Combine(GetAppFolderPath(), IO.Path.GetFileName(strParameterFilePath))
-				If Not IO.File.Exists(strParameterFilePath) Then
+				strParameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
+				If Not File.Exists(strParameterFilePath) Then
 					LogErrors("LoadParameterFileSettings", "Parameter file not found: " & strParameterFilePath, Nothing, True, False)
 					MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.ParameterFileNotFound)
 					Return False
@@ -8621,7 +8621,7 @@ Public Class clsMASIC
 			' eColumnMapping will be initialized when the headers are read
 			ReDim eColumnMapping(-1)
 
-			If Not IO.File.Exists(strCustomSICValuesFileName) Then
+			If Not File.Exists(strCustomSICValuesFileName) Then
 				' Custom SIC file not found
 
 				strErrorMessage = "Custom MZ List file not found: " & strCustomSICValuesFileName
@@ -8638,7 +8638,7 @@ Public Class clsMASIC
 				Exit Try
 			End If
 
-            Using srInFile = New IO.StreamReader(New IO.FileStream(strCustomSICValuesFileName, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read))
+            Using srInFile = New StreamReader(New FileStream(strCustomSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
 
                 intLinesRead = 0
                 Do While Not srInFile.EndOfStream
@@ -9132,7 +9132,7 @@ Public Class clsMASIC
 		Dim objRow As DataRow
 
 		' Initialize intNewDatasetNumber and strFileNameCompare
-		strFileNameCompare = IO.Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper
+		strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper
 		intNewDatasetNumber = intDefaultDatasetNumber
 
 		strAvoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and 'Dataset Info Query SQL' entries on the Advanced tab."
@@ -9225,7 +9225,7 @@ Public Class clsMASIC
             Dim strDelimList = New Char() {" "c, ","c, ControlChars.Tab}
 
 			Try
-                Using srInFile = New IO.StreamReader(strDatasetLookupFilePath)
+                Using srInFile = New StreamReader(strDatasetLookupFilePath)
                     Do While Not srInFile.EndOfStream
                         strLineIn = srInFile.ReadLine
                         If strLineIn Is Nothing Then Continue Do
@@ -9343,7 +9343,7 @@ Public Class clsMASIC
 
 			' Scan Stats file
 			strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsFlatFile)
-			.ScanStats = New IO.StreamWriter(strOutputFilePath, False)
+			.ScanStats = New StreamWriter(strOutputFilePath, False)
 			If blnWriteHeaders Then .ScanStats.WriteLine(GetHeadersForOutputFile(Nothing, eOutputFileTypeConstants.ScanStatsFlatFile))
 
 			.MSMethodFilePathBase = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MSMethodFile)
@@ -9465,7 +9465,7 @@ Public Class clsMASIC
         Dim udtMRMSettings() As udtMRMScanInfoType = Nothing
 		Dim udtSRMList() As udtSRMListType = Nothing
 
-		Dim ioFileInfo As IO.FileInfo
+		Dim ioFileInfo As FileInfo
 
 		Dim blnSuccess, blnDoNotProcess As Boolean
 		Dim blnKeepRawMSSpectra As Boolean
@@ -9534,7 +9534,7 @@ Public Class clsMASIC
 			End If
 
 
-			mStatusMessage = "Parsing " & IO.Path.GetFileName(strInputFilePath)
+			mStatusMessage = "Parsing " & Path.GetFileName(strInputFilePath)
 			Console.WriteLine()
 			ShowMessage(mStatusMessage)
 
@@ -9569,7 +9569,7 @@ Public Class clsMASIC
 				'---------------------------------------------------------
 
 				' Obtain the full path to the input file
-				ioFileInfo = New IO.FileInfo(strInputFilePath)
+				ioFileInfo = New FileInfo(strInputFilePath)
 				strInputFilePathFull = ioFileInfo.FullName
 
 				LogMessage("Checking for existing results in the output path: " & strOutputFolderPath)
@@ -9604,9 +9604,9 @@ Public Class clsMASIC
 				LogMessage("Checking for write permission in the output path: " & strOutputFolderPath)
 
 				Dim strOutputFileTestPath As String
-				strOutputFileTestPath = IO.Path.Combine(strOutputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
+				strOutputFileTestPath = Path.Combine(strOutputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
 
-				Dim fsOutFileTest As New IO.StreamWriter(strOutputFileTestPath, False)
+				Dim fsOutFileTest As New StreamWriter(strOutputFileTestPath, False)
 
 				fsOutFileTest.WriteLine("Test")
 				fsOutFileTest.Flush()
@@ -9648,7 +9648,7 @@ Public Class clsMASIC
 				'---------------------------------------------------------
 				' Define strInputFileName (which is referenced several times below)
 				'---------------------------------------------------------
-				strInputFileName = IO.Path.GetFileName(strInputFilePathFull)
+				strInputFileName = Path.GetFileName(strInputFilePathFull)
 
 				'---------------------------------------------------------
 				' Create the _ScanStats.txt file
@@ -9672,7 +9672,7 @@ Public Class clsMASIC
 
 				ValidateSICOptions(udtSICOptions)
 
-				Select Case IO.Path.GetExtension(strInputFilePath).ToUpper
+				Select Case Path.GetExtension(strInputFilePath).ToUpper
 					Case FINNIGAN_RAW_FILE_EXTENSION.ToUpper
 						' Open the .Raw file and obtain the scan information
 
@@ -9706,7 +9706,7 @@ Public Class clsMASIC
                           udtSICOptions, udtBinningOptions, mStatusMessage,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 					Case Else
-						mStatusMessage = "Unknown file extension: " & IO.Path.GetExtension(strInputFilePathFull)
+						mStatusMessage = "Unknown file extension: " & Path.GetExtension(strInputFilePathFull)
 						SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension)
 						blnSuccess = False
 				End Select
@@ -10775,12 +10775,12 @@ Public Class clsMASIC
             SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk")
             intStepsCompleted = 0
 
-            strInputFileName = IO.Path.GetFileName(strInputFilePathFull)
+            strInputFileName = Path.GetFileName(strInputFilePathFull)
 
             ' Disabled in April 2015 since not used
             '' First, write a true TIC file (in ICR-2LS format)
             'strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
-            'LogMessage("Saving ICR Tools TIC to " & IO.Path.GetFileName(strOutputFilePath))
+            'LogMessage("Saving ICR Tools TIC to " & Path.GetFileName(strOutputFilePath))
 
             'SaveICRToolsChromatogramByScan(udtScanList.SurveyScans, udtScanList.SurveyScanCount, strOutputFilePath, False, True, strInputFilePathFull)
 
@@ -10790,7 +10790,7 @@ Public Class clsMASIC
 
             ' Second, write an MS-based _scans.csv file (readable with Decon2LS)
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSChromatogramFile)
-            LogMessage("Saving Decon2LS MS Chromatogram File to " & IO.Path.GetFileName(strOutputFilePath))
+            LogMessage("Saving Decon2LS MS Chromatogram File to " & Path.GetFileName(strOutputFilePath))
 
             SaveDecon2LSChromatogram(udtScanList.SurveyScans, udtScanList.SurveyScanCount, objSpectraCache, strOutputFilePath)
 
@@ -10800,7 +10800,7 @@ Public Class clsMASIC
 
             ' Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile)
-            LogMessage("Saving Decon2LS MSMS Chromatogram File to " & IO.Path.GetFileName(strOutputFilePath))
+            LogMessage("Saving Decon2LS MSMS Chromatogram File to " & Path.GetFileName(strOutputFilePath))
 
             SaveDecon2LSChromatogram(udtScanList.FragScans, udtScanList.FragScanCount, objSpectraCache, strOutputFilePath)
 
@@ -10822,10 +10822,10 @@ Public Class clsMASIC
 	  blnSaveTIC As Boolean, 
 	  cColDelimiter As Char)
 
-		Dim srOutFile As IO.StreamWriter
+		Dim srOutFile As StreamWriter
 		Dim intScanIndex As Integer
 
-		srOutFile = New IO.StreamWriter(strOutputFilePath)
+		srOutFile = New StreamWriter(strOutputFilePath)
 
 		If blnSaveTIC Then
 			srOutFile.WriteLine("Time" & cColDelimiter & "TotalIonIntensity")
@@ -10857,10 +10857,10 @@ Public Class clsMASIC
       objSpectraCache As clsSpectraCache,
       strOutputFilePath As String)
 
-        Dim srScanInfoOutfile As IO.StreamWriter
+        Dim srScanInfoOutfile As StreamWriter
         Dim intScanIndex As Integer
 
-        srScanInfoOutfile = New IO.StreamWriter(strOutputFilePath)
+        srScanInfoOutfile = New StreamWriter(strOutputFilePath)
 
         ' Write the file headers
         WriteDecon2LSScanFileHeaders(srScanInfoOutfile)
@@ -10888,24 +10888,24 @@ Public Class clsMASIC
       blnSaveTICInsteadOfBPI As Boolean, 
       strInputFilePathFull As String)
 
-        Dim srOutFile As IO.StreamWriter
-        Dim fsBinaryOutStream As IO.FileStream
-        Dim srBinaryOut As IO.BinaryWriter
+        Dim srOutFile As StreamWriter
+        Dim fsBinaryOutStream As FileStream
+        Dim srBinaryOut As BinaryWriter
 
         Dim intBufferLength As Integer
         Dim intScanIndex As Integer
 
-        srOutFile = New IO.StreamWriter(strOutputFilePath)
+        srOutFile = New StreamWriter(strOutputFilePath)
 
         ' Write the Header text
         srOutFile.WriteLine("ICR-2LS Data File (GA Anderson & JE Bruce); output from MASIC by Matthew E Monroe")
         srOutFile.WriteLine("Version " & MyBase.FileVersion & "; " & MyBase.mFileDate)
         srOutFile.WriteLine("FileName:")
         If blnSaveTICInsteadOfBPI Then
-            srOutFile.WriteLine("title:" & IO.Path.GetFileName(strInputFilePathFull) & " TIC")
+            srOutFile.WriteLine("title:" & Path.GetFileName(strInputFilePathFull) & " TIC")
             srOutFile.WriteLine("Ytitle:Amplitude (TIC)")
         Else
-            srOutFile.WriteLine("title:" & IO.Path.GetFileName(strInputFilePathFull) & " BPI")
+            srOutFile.WriteLine("title:" & Path.GetFileName(strInputFilePathFull) & " BPI")
             srOutFile.WriteLine("Ytitle:Amplitude (BPI)")
         End If
 
@@ -10962,8 +10962,8 @@ Public Class clsMASIC
         ' Wait 500 msec, then re-open the file using Binary IO
         Threading.Thread.Sleep(500)
 
-        fsBinaryOutStream = New IO.FileStream(strOutputFilePath, IO.FileMode.Append)
-        srBinaryOut = New IO.BinaryWriter(fsBinaryOutStream)
+        fsBinaryOutStream = New FileStream(strOutputFilePath, FileMode.Append)
+        srBinaryOut = New BinaryWriter(fsBinaryOutStream)
 
 
         ' Write an Escape character (Byte 1B)
@@ -11404,7 +11404,7 @@ Public Class clsMASIC
             strExtendedConstantHeaderOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile)
             strExtendedNonConstantHeaderOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
 
-            LogMessage("Saving extended scan stats flat file to disk: " & IO.Path.GetFileName(strExtendedNonConstantHeaderOutputFilePath))
+            LogMessage("Saving extended scan stats flat file to disk: " & Path.GetFileName(strExtendedNonConstantHeaderOutputFilePath))
 
             If mExtendedHeaderInfo.Count = 0 Then
                 ' No extended stats to write; exit the function
@@ -11417,12 +11417,12 @@ Public Class clsMASIC
             If strConstantExtendedHeaderValues Is Nothing Then strConstantExtendedHeaderValues = String.Empty
 
             ' Write the constant extended stats values to a text file
-            Using srOutFile = New IO.StreamWriter(strExtendedConstantHeaderOutputFilePath, False)
+            Using srOutFile = New StreamWriter(strExtendedConstantHeaderOutputFilePath, False)
                 srOutFile.WriteLine(strConstantExtendedHeaderValues)
             End Using
 
             ' Now open another output file for the non-constant extended stats
-            Using srOutFile = New IO.StreamWriter(strExtendedNonConstantHeaderOutputFilePath, False)
+            Using srOutFile = New StreamWriter(strExtendedNonConstantHeaderOutputFilePath, False)
 
                 If blnIncludeHeaders Then
                     Dim strOutLine = ConstructExtendedStatsHeaders(cColDelimiter)
@@ -11459,16 +11459,16 @@ Public Class clsMASIC
       strOutputFolderPath As String) As Boolean
 
 
-        Dim srOutFile As IO.StreamWriter
+        Dim srOutFile As StreamWriter
 
         Dim strHeaders As String
         Dim strOutputFilePath As String = "?undefinedfile?"
 
         Try
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.HeaderGlossary)
-            LogMessage("Saving Header Glossary to " & IO.Path.GetFileName(strOutputFilePath))
+            LogMessage("Saving Header Glossary to " & Path.GetFileName(strOutputFilePath))
 
-            srOutFile = New IO.StreamWriter(strOutputFilePath, False)
+            srOutFile = New StreamWriter(strOutputFilePath, False)
 
             ' ScanStats
             srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) & ":")
@@ -11507,7 +11507,7 @@ Public Class clsMASIC
         Dim strOutputFilePath As String = "?undefinedfile?"
         Dim strMethodNum As String
 
-        Dim srOutfile As IO.StreamWriter
+        Dim srOutfile As StreamWriter
 
         Try
             intInstMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Length
@@ -11525,7 +11525,7 @@ Public Class clsMASIC
                 End If
                 strOutputFilePath = udtOutputFileHandles.MSMethodFilePathBase & strMethodNum & ".txt"
 
-                srOutfile = New IO.StreamWriter(strOutputFilePath, False)
+                srOutfile = New StreamWriter(strOutputFilePath, False)
 
                 With objXcaliburAccessor.FileInfo
                     srOutfile.WriteLine("Instrument model: " & .InstModel)
@@ -11561,7 +11561,7 @@ Public Class clsMASIC
         Dim strOutputFilePath As String = "?undefinedfile?"
         Dim strTuneInfoNum As String
 
-        Dim srOutfile As IO.StreamWriter
+        Dim srOutfile As StreamWriter
 
         Try
             intTuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Length
@@ -11579,7 +11579,7 @@ Public Class clsMASIC
                 End If
                 strOutputFilePath = udtOutputFileHandles.MSTuneFilePathBase & strTuneInfoNum & ".txt"
 
-                srOutfile = New IO.StreamWriter(strOutputFilePath, False)
+                srOutfile = New StreamWriter(strOutputFilePath, False)
 
                 srOutfile.WriteLine("Category" & cColDelimiter & "Name" & cColDelimiter & "Value")
 
@@ -11860,9 +11860,9 @@ Public Class clsMASIC
             SetSubtaskProcessingStepPct(0, "Saving SIC data to flat file")
 
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.SICStatsFlatFile)
-            LogMessage("Saving SIC flat file to disk: " & IO.Path.GetFileName(strOutputFilePath))
+            LogMessage("Saving SIC flat file to disk: " & Path.GetFileName(strOutputFilePath))
 
-            Using srOutfile = New IO.StreamWriter(strOutputFilePath, False)
+            Using srOutfile = New StreamWriter(strOutputFilePath, False)
 
                 ' Write the SIC stats to the output file
                 ' The file is tab delimited
@@ -11991,8 +11991,8 @@ Public Class clsMASIC
     End Function
 
     Private Sub SaveRawDatatoDiskWork(
-      ByRef srDataOutFile As IO.StreamWriter,
-      ByRef srScanInfoOutfile As IO.StreamWriter,
+      ByRef srDataOutFile As StreamWriter,
+      ByRef srScanInfoOutfile As StreamWriter,
       ByRef udtScan As udtScanInfoType,
       objSpectraCache As clsSpectraCache,
       strInputFileName As String,
@@ -12012,8 +12012,8 @@ Public Class clsMASIC
     End Sub
 
     Private Sub SaveCSVFilesToDiskWork(
-      ByRef srDataOutFile As IO.StreamWriter,
-      ByRef srScanInfoOutfile As IO.StreamWriter,
+      ByRef srDataOutFile As StreamWriter,
+      ByRef srScanInfoOutfile As StreamWriter,
       ByRef udtScan As udtScanInfoType,
       objSpectraCache As clsSpectraCache,
       blnFragmentationScan As Boolean,
@@ -12152,7 +12152,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub SavePEKFileToDiskWork(
-      ByRef srOutFile As IO.StreamWriter,
+      ByRef srOutFile As StreamWriter,
       ByRef udtScan As udtScanInfoType,
       objSpectraCache As clsSpectraCache,
       strInputFileName As String,
@@ -12264,7 +12264,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub SaveScanStatEntry(
-      swOutFile As IO.StreamWriter,
+      swOutFile As StreamWriter,
       eScanType As eScanTypeConstants,
       ByRef udtCurrentScan As udtScanInfoType,
       intDatasetNumber As Integer)
@@ -13443,7 +13443,7 @@ Public Class clsMASIC
 
     Private Function UpdateDatasetFileStats(
       ByRef udtDatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType,
-      ByRef ioFileInfo As IO.FileInfo,
+      ByRef ioFileInfo As FileInfo,
       intDatasetID As Integer) As Boolean
 
         Try
@@ -13458,7 +13458,7 @@ Public Class clsMASIC
                 .AcqTimeEnd = .FileSystemModificationTime
 
                 .DatasetID = intDatasetID
-                .DatasetName = IO.Path.GetFileNameWithoutExtension(ioFileInfo.Name)
+                .DatasetName = Path.GetFileNameWithoutExtension(ioFileInfo.Name)
                 .FileExtension = ioFileInfo.Extension
                 .FileSizeBytes = ioFileInfo.Length
 
@@ -13475,7 +13475,7 @@ Public Class clsMASIC
 
     Private Function UpdateDatasetFileStats(
       ByRef udtDatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType,
-      ByRef ioFileInfo As IO.FileInfo,
+      ByRef ioFileInfo As FileInfo,
       intDatasetID As Integer,
       ByRef objXcaliburAccessor As FinniganFileReaderBaseClass) As Boolean
 
@@ -13637,8 +13637,8 @@ Public Class clsMASIC
             LastFileWriteTime = DateTime.UtcNow
 
             Try
-                strTempPath = IO.Path.Combine(GetAppFolderPath(), "Temp_" & mMASICStatusFilename)
-                strPath = IO.Path.Combine(GetAppFolderPath(), mMASICStatusFilename)
+                strTempPath = Path.Combine(GetAppFolderPath(), "Temp_" & mMASICStatusFilename)
+                strPath = Path.Combine(GetAppFolderPath(), mMASICStatusFilename)
 
                 objXMLOut = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
                 objXMLOut.Formatting = Xml.Formatting.Indented
@@ -13680,8 +13680,8 @@ Public Class clsMASIC
                 Application.DoEvents()
 
                 'Copy the temporary file to the real one
-                IO.File.Copy(strTempPath, strPath, True)
-                IO.File.Delete(strTempPath)
+                File.Copy(strTempPath, strPath, True)
+                File.Delete(strTempPath)
 
             Catch ex As Exception
                 ' Ignore any errors
@@ -13842,12 +13842,12 @@ Public Class clsMASIC
 
     End Sub
 
-	Private Sub WriteDecon2LSIsosFileHeaders(srOutFile As IO.StreamWriter)
+	Private Sub WriteDecon2LSIsosFileHeaders(srOutFile As StreamWriter)
 		srOutFile.WriteLine("scan_num,charge,abundance,mz,fit,average_mw,monoisotopic_mw,mostabundant_mw,fwhm,signal_noise,mono_abundance,mono_plus2_abundance")
 	End Sub
 
 	Private Sub WriteDecon2LSIsosFileEntry(
-	  ByRef srIsosOutFile As IO.StreamWriter, 
+	  ByRef srIsosOutFile As StreamWriter, 
 	  intScanNumber As Integer, 
 	  intCharge As Integer, 
 	  sngIntensity As Single, 
@@ -13880,7 +13880,7 @@ Public Class clsMASIC
 
 	End Sub
 
-	Private Sub WriteDecon2LSScanFileHeaders(srOutFile As IO.StreamWriter)
+	Private Sub WriteDecon2LSScanFileHeaders(srOutFile As StreamWriter)
 		srOutFile.WriteLine("scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped")
 
 		' Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
@@ -13888,7 +13888,7 @@ Public Class clsMASIC
 	End Sub
 
     Private Sub WriteDecon2LSScanFileEntry(
-      ByRef srScanInfoOutFile As IO.StreamWriter,
+      ByRef srScanInfoOutFile As StreamWriter,
       ByRef udtScan As udtScanInfoType,
       objSpectraCache As clsSpectraCache)
 
@@ -13924,7 +13924,7 @@ Public Class clsMASIC
     End Sub
 
 	Private Sub WriteDecon2LSScanFileEntry(
-	  ByRef srScanInfoOutFile As IO.StreamWriter, 
+	  ByRef srScanInfoOutFile As StreamWriter, 
 	  udtScan As udtScanInfoType, 
 	  intScanNumber As Integer, 
 	  intMSLevel As Integer, 
@@ -14003,7 +14003,7 @@ Public Class clsMASIC
 
         Dim strXMLOutputFilePath As String = String.Empty
 
-        Dim ioFileInfo As IO.FileInfo
+        Dim ioFileInfo As FileInfo
 
         Dim LastModTime As Date
         Dim strLastModTime As String
@@ -14031,7 +14031,7 @@ Public Class clsMASIC
             objXMLOut.WriteElementString("SourceFilePath", strInputFilePathFull)
 
             Try
-                ioFileInfo = New IO.FileInfo(strInputFilePathFull)
+                ioFileInfo = New FileInfo(strInputFilePathFull)
                 LastModTime = ioFileInfo.LastWriteTime()
                 strLastModTime = LastModTime.ToShortDateString & " " & LastModTime.ToShortTimeString
                 strFileSizeBytes = ioFileInfo.Length.ToString
@@ -14199,19 +14199,19 @@ Public Class clsMASIC
 
 		strXMLReadFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.XMLFile)
 
-		strXMLOutputFilePath = IO.Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
+		strXMLOutputFilePath = Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
 
 		Try
 			' Wait 2 seconds before reopening the file, to make sure the handle is closed
 			Threading.Thread.Sleep(2000)
 
-			If Not IO.File.Exists(strXMLReadFilePath) Then
+			If Not File.Exists(strXMLReadFilePath) Then
 				' XML file not found, exit the function
 				Return True
 			End If
 
-            Using srInFile = New IO.StreamReader(strXMLReadFilePath),
-                  srOutFile = New IO.StreamWriter(strXMLOutputFilePath, False)
+            Using srInFile = New StreamReader(strXMLReadFilePath),
+                  srOutFile = New StreamWriter(strXMLOutputFilePath, False)
 
                 SetSubtaskProcessingStepPct(0, "Updating XML file with optimal peak apex values")
 
@@ -14273,13 +14273,13 @@ Public Class clsMASIC
                 ' Wait 2 seconds, then delete the original file and rename the temp one to the original one
                 Threading.Thread.Sleep(2000)
 
-                If IO.File.Exists(strXMLOutputFilePath) Then
-                    If IO.File.Exists(strXMLReadFilePath) Then
-                        IO.File.Delete(strXMLReadFilePath)
+                If File.Exists(strXMLOutputFilePath) Then
+                    If File.Exists(strXMLReadFilePath) Then
+                        File.Delete(strXMLReadFilePath)
                         Threading.Thread.Sleep(500)
                     End If
 
-                    IO.File.Move(strXMLOutputFilePath, strXMLReadFilePath)
+                    File.Move(strXMLOutputFilePath, strXMLReadFilePath)
                 End If
 
             Catch ex As Exception
@@ -14300,7 +14300,7 @@ Public Class clsMASIC
 	End Function
 
 	Private Sub XmlOutputFileReplaceSetting(
-	  srOutFile As IO.StreamWriter, 
+	  srOutFile As StreamWriter, 
 	  strLineIn As String, 
 	  strXMLElementName As String, 
 	  intNewValueToSave As Integer)

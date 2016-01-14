@@ -391,7 +391,7 @@ Public Class clsBinarySearch
 
         Dim eMissingDataMode As eMissingDataModeConstants
 
-        Dim srOutFile As System.IO.StreamWriter
+        Dim srOutFile As StreamWriter
         Dim strLineOut As String
 
         Try
@@ -406,7 +406,7 @@ Public Class clsBinarySearch
             Array.Sort(intDataList)
 
             ' Write the data to disk
-            srOutFile = New System.IO.StreamWriter("BinarySearch_Test_Int.txt", False)
+            srOutFile = New StreamWriter("BinarySearch_Test_Int.txt", False)
 
             srOutFile.WriteLine("Data_Index" & ControlChars.Tab & "Data_Value")
             For intIndex = 0 To intDataList.Length - 1
@@ -494,7 +494,7 @@ Public Class clsBinarySearch
 
         Dim eMissingDataMode As eMissingDataModeConstants
 
-        Dim srOutFile As System.IO.StreamWriter
+        Dim srOutFile As StreamWriter
         Dim strLineOut As String
 
         Try
@@ -509,7 +509,7 @@ Public Class clsBinarySearch
             Array.Sort(dblDataList)
 
             ' Write the data to disk
-            srOutFile = New System.IO.StreamWriter("BinarySearch_Test_Double.txt", False)
+            srOutFile = New StreamWriter("BinarySearch_Test_Double.txt", False)
 
             srOutFile.WriteLine("Data_Index" & ControlChars.Tab & "Data_Value")
             For intIndex = 0 To dblDataList.Length - 1

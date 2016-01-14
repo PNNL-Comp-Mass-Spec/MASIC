@@ -16,7 +16,6 @@ Option Strict On
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
 
-Imports System.IO
 Imports System.Text
 Imports System.Xml
 Imports PNNLOmics.Utilities
@@ -131,7 +130,7 @@ Namespace DSSummarizer
 #End Region
 
         Public Sub New()
-            mFileDate = "January 11, 2016"
+            mFileDate = "January 13, 2016"
             InitializeLocalVariables()
         End Sub
 
@@ -181,16 +180,16 @@ Namespace DSSummarizer
             Dim strScanTypeKey As String
 
             Dim dblTICListMS() As Double
-            Dim intTICListMSCount As Integer = 0
+            Dim intTICListMSCount = 0
 
             Dim dblTICListMSn() As Double
-            Dim intTICListMSnCount As Integer = 0
+            Dim intTICListMSnCount = 0
 
             Dim dblBPIListMS() As Double
-            Dim intBPIListMSCount As Integer = 0
+            Dim intBPIListMSCount = 0
 
             Dim dblBPIListMSn() As Double
-            Dim intBPIListMSnCount As Integer = 0
+            Dim intBPIListMSnCount = 0
 
             Try
 
@@ -440,7 +439,7 @@ Namespace DSSummarizer
          ByRef objScanStats As List(Of clsScanStatsEntry),
          ByRef udtDatasetFileInfo As udtDatasetFileInfoType) As String
 
-            Dim udtSampleInfo As udtSampleInfoType = New udtSampleInfoType
+            Dim udtSampleInfo = New udtSampleInfoType()
             udtSampleInfo.Clear()
 
             Return CreateDatasetInfoXML(strDatasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo)
@@ -473,7 +472,7 @@ Namespace DSSummarizer
             Dim strScanType As String
             Dim strScanFilterText As String
 
-            Dim includeCentroidStats As Boolean = False
+            Dim includeCentroidStats = False
 
             Try
 
@@ -515,8 +514,8 @@ Namespace DSSummarizer
                 ' We could cache the text using a StringBuilder, like this:
                 '
                 ' Dim sbDatasetInfo As New System.StringBuilder
-                ' Dim objStringWriter As System.IO.StringWriter
-                ' objStringWriter = New System.IO.StringWriter(sbDatasetInfo)
+                ' Dim objStringWriter As = StringWriter
+                ' objStringWriter = New StringWriter(sbDatasetInfo)
                 ' objDSInfo = New System.Xml.XmlTextWriter(objStringWriter)
                 ' objDSInfo.Formatting = System.Xml.Formatting.Indented
                 ' objDSInfo.Indentation = 2
@@ -642,7 +641,6 @@ Namespace DSSummarizer
                 objDSInfo.WriteEndDocument() 'End the document
 
                 objDSInfo.Close()
-                objDSInfo = Nothing
 
                 ' Now Rewind the memory stream and output as a string
                 objMemStream.Position = 0
@@ -772,8 +770,8 @@ Namespace DSSummarizer
         Private Sub InitializeLocalVariables()
             mErrorMessage = String.Empty
 
-            mMedianUtils = New SpectraTypeClassifier.clsMedianUtilities()
-            mSpectraTypeClassifier = New SpectraTypeClassifier.clsSpectrumTypeClassifier
+            mMedianUtils = New clsMedianUtilities()
+            mSpectraTypeClassifier = New clsSpectrumTypeClassifier
 
             ClearCachedData()
         End Sub

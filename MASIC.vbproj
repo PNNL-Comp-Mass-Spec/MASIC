@@ -125,9 +125,9 @@
       <Name>ProgressFormNET</Name>
       <HintPath>lib\ProgressFormNET.dll</HintPath>
     </Reference>
-    <Reference Include="SharedVBNetRoutines">
-      <Name>SharedVBNetRoutines</Name>
-      <HintPath>lib\SharedVBNetRoutines.dll</HintPath>
+    <Reference Include="SharedVBNetRoutines, Version=1.0.4818.24389, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\SharedVBNetRoutines.dll</HintPath>
     </Reference>
     <Reference Include="SpectraTypeClassifier">
       <HintPath>Lib\SpectraTypeClassifier.dll</HintPath>
@@ -158,7 +158,8 @@
       <Name>MatrixDecompositionUtility</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="ThermoRawFileReaderDLL">
+    <Reference Include="ThermoRawFileReaderDLL, Version=1.1.5856.32868, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\ThermoRawFileReaderDLL.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -170,6 +171,7 @@
     <Import Include="System.Collections.Generic" />
     <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
+    <Import Include="System.IO" />
     <Import Include="System.Linq" />
     <Import Include="System.Windows.Forms" />
   </ItemGroup>

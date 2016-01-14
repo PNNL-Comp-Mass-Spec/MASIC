@@ -82,8 +82,8 @@ Public Class clsSpectraCache
 
     Private mCacheOptions As udtSpectrumCacheOptionsType
 
-    Private mPageFileReader As IO.BinaryReader
-    Private mPageFileWriter As IO.BinaryWriter
+    Private mPageFileReader As BinaryReader
+    Private mPageFileWriter As BinaryWriter
 
     Private mFolderPathValidated As Boolean
     Private mCacheFileNameBase As String                    ' Base filename for this instance of clsMasic, includes a timestamp to allow multiple instances to write to the same cache folder
@@ -347,7 +347,7 @@ Public Class clsSpectraCache
 
         strFileName = mCacheFileNameBase & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & ".bin"
 
-        Return IO.Path.Combine(mCacheOptions.FolderPath, strFileName)
+        Return Path.Combine(mCacheOptions.FolderPath, strFileName)
 
     End Function
 
@@ -362,8 +362,8 @@ Public Class clsSpectraCache
 
         Dim strFiles() As String
 
-        Dim objFolder As IO.DirectoryInfo
-        Dim objFile As IO.FileInfo
+        Dim objFolder As DirectoryInfo
+        Dim objFile As FileInfo
 
         dtFileDateTolerance = DateTime.UtcNow.Subtract(New TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0))
 
@@ -378,10 +378,10 @@ Public Class clsSpectraCache
             End If
 
             strFilePathMatch = strFilePathMatch.Substring(0, intCharIndex)
-            strFiles = IO.Directory.GetFiles(mCacheOptions.FolderPath, IO.Path.GetFileName(strFilePathMatch) & "*")
+            strFiles = Directory.GetFiles(mCacheOptions.FolderPath, Path.GetFileName(strFilePathMatch) & "*")
 
             For intIndex = 0 To strFiles.Length - 1
-                IO.File.Delete(strFiles(intIndex))
+                File.Delete(strFiles(intIndex))
             Next intIndex
 
         Catch ex As Exception
@@ -393,7 +393,7 @@ Public Class clsSpectraCache
         Try
             strFilePathMatch = SPECTRUM_CACHE_FILE_PREFIX & "*" & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & "*"
 
-            objFolder = New IO.DirectoryInfo(IO.Path.GetDirectoryName(IO.Path.GetFullPath(ConstructCachedSpectrumPath())))
+            objFolder = New DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())))
 
             If Not objFolder Is Nothing Then
                 For Each objFile In objFolder.GetFiles(strFilePathMatch)
@@ -539,7 +539,7 @@ Public Class clsSpectraCache
     Public Shared Sub ResetCacheOptions(ByRef udtCacheOptions As udtSpectrumCacheOptionsType)
         With udtCacheOptions
             .DiskCachingAlwaysDisabled = False
-            .FolderPath = IO.Path.GetTempPath()
+            .FolderPath = Path.GetTempPath()
             .SpectraToRetainInMemory = 5000
             .MinimumFreeMemoryMB = 250
             .MaximumMemoryUsageMB = 3000             ' Spectrum caching to disk will be enabled if the memory usage rises over this value
@@ -576,7 +576,7 @@ Public Class clsSpectraCache
                 mPageFileWriter.Flush()
 
                 ' Read the spectrum from the page file
-                mPageFileReader.BaseStream.Seek(lngByteOffset, IO.SeekOrigin.Begin)
+                mPageFileReader.BaseStream.Seek(lngByteOffset, SeekOrigin.Begin)
 
                 intScanNumberInCacheFile = mPageFileReader.ReadInt32()
                 intIonCount = mPageFileReader.ReadInt32()
@@ -653,20 +653,20 @@ Public Class clsSpectraCache
 
         If String.IsNullOrWhiteSpace(mCacheOptions.FolderPath) Then
             ' Need to define the spectrum caching folder path
-            mCacheOptions.FolderPath = IO.Path.GetTempPath()
+            mCacheOptions.FolderPath = Path.GetTempPath()
             mFolderPathValidated = False
         End If
 
         If Not mFolderPathValidated Then
             Try
-                If Not IO.Path.IsPathRooted(mCacheOptions.FolderPath) Then
-                    mCacheOptions.FolderPath = IO.Path.Combine(IO.Path.GetTempPath(), mCacheOptions.FolderPath)
+                If Not Path.IsPathRooted(mCacheOptions.FolderPath) Then
+                    mCacheOptions.FolderPath = Path.Combine(Path.GetTempPath(), mCacheOptions.FolderPath)
                 End If
 
-                If Not IO.Directory.Exists(mCacheOptions.FolderPath) Then
-                    IO.Directory.CreateDirectory(mCacheOptions.FolderPath)
+                If Not Directory.Exists(mCacheOptions.FolderPath) Then
+                    Directory.CreateDirectory(mCacheOptions.FolderPath)
 
-                    If Not IO.Directory.Exists(mCacheOptions.FolderPath) Then
+                    If Not Directory.Exists(mCacheOptions.FolderPath) Then
                         LogErrors("ValidateCachedSpectrumFolder", "Error creating spectrum cache folder: " & mCacheOptions.FolderPath, Nothing, True, False)
                         Return False
                     End If
@@ -714,16 +714,16 @@ Public Class clsSpectraCache
         If mPageFileReader Is Nothing Then
             If blnCreateIfUninitialized Then
                 Dim strCacheFilePath As String
-                Dim fsWrite As IO.FileStream
-                Dim fsRead As IO.FileStream
+                Dim fsWrite As FileStream
+                Dim fsRead As FileStream
 
                 Try
                     ' Construct the page file path
                     strCacheFilePath = ConstructCachedSpectrumPath()
 
                     ' Initialize the binary writer and create the file
-                    fsWrite = New IO.FileStream(strCacheFilePath, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Read)
-                    mPageFileWriter = New IO.BinaryWriter(fsWrite)
+                    fsWrite = New FileStream(strCacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)
+                    mPageFileWriter = New BinaryWriter(fsWrite)
 
                     ' Write a header line
                     mPageFileWriter.Write("MASIC Spectrum Cache Page File.  Created " & DateTime.Now.ToLongDateString() & " " & DateTime.Now.ToLongTimeString())
@@ -736,8 +736,8 @@ Public Class clsSpectraCache
                     mPageFileWriter.Flush()
 
                     ' Initialize the binary reader
-                    fsRead = New IO.FileStream(strCacheFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.ReadWrite)
-                    mPageFileReader = New IO.BinaryReader(fsRead)
+                    fsRead = New FileStream(strCacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                    mPageFileReader = New BinaryReader(fsRead)
 
                     blnValid = True
                 Catch ex As Exception

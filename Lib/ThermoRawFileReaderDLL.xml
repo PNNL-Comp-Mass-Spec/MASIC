@@ -265,7 +265,7 @@ ThermoRawFileReaderDLL
 	<remarks></remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.ValidateMSScan(System.String,System.Int32@,System.Boolean@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.MRMScanTypeConstants@,System.Boolean@)">
 	<summary>
- Examines strFilterText to validate that it is a supported scan type
+ Examines strFilterText to validate that it is a supported MS1 scan type (MS, SIM, or MRMQMS, or SRM scan)
  </summary>
 	<param name="strFilterText"></param>
 	<param name="intMSLevel"></param>
@@ -273,7 +273,7 @@ ThermoRawFileReaderDLL
 	<param name="eMRMScanType"></param>
 	<param name="blnZoomScan"></param>
 	<returns>True if strFilterText contains a known MS scan type</returns>
-	<remarks></remarks>
+	<remarks>Returns false for MSn scans (like ms2 or ms3)</remarks>
 </member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.GetScanData(System.Int32,System.Double[]@,System.Double[]@,ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtScanHeaderInfoType@)">
 	<summary>
  Obtain the mass and intensity list for the specified scan

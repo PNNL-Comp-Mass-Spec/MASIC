@@ -26,7 +26,7 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "January 12, 2016"
+    Public Const PROGRAM_DATE As String = "January 13, 2016"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -49,34 +49,12 @@ Public Module modMain
 
     Private mTestMode As Boolean
 
-    Private WithEvents mMASIC As MASIC.clsMASIC
+    Private WithEvents mMASIC As clsMASIC
     Private mProgressForm As ProgressFormNET.frmProgress
 
-    Private mLastProgressReportTime As System.DateTime
+    Private mLastProgressReportTime As DateTime
     Private mLastProgressReportValue As Integer
-
-
-    Private Structure udtScanInfoTestType
-        Public ScanNumber As Integer                        ' Ranges from 1 to the number of scans in the datafile
-        Public RetTime As Single                            ' Retention (elution) Time (in minutes)
-        Public BasePeakIonMZ As Double                      ' mz of the most intense ion in this scan
-        Public BasePeakIonIntensity As Single               ' intensity of the most intense ion in this scan
-        Public TotalIonIntensity As Single                  ' intensity of all of the ions for this scan
-        Public ParentIonInfoIndex As Integer                ' Pointer to an entry in the ParentIons() array; -1 if undefined
-        Public FragScanNumber As Integer                    ' Usually 1, 2, or 3
-
-        Public ExtendedHeaderInfo As Hashtable              ' Hash keys are ID values pointing to mExtendedHeaderInfo (where the name is defined); hash values are the string or numeric values for the settings
-        Public CacheState As Integer
-        Public CacheRequestState As Integer
-
-        Public IonCount As Integer
-        Public IonsMZ() As Double                           ' 0-based array, ranging from 0 to IonCount-1
-        Public IonsIntensity() As Single                    ' 0-based array, ranging from 0 to IonCount-1
-
-        Public NoiseThresholdIntensity As Single            ' Intensity level of the noise
-
-    End Structure
-
+    
     Private Function GetMemoryUsage() As Single
 
         Dim sngMemoryUsageMB As Single
@@ -101,8 +79,8 @@ Public Module modMain
     ''            If strUserDefinedLogFilePath Is Nothing Then strUserDefinedLogFilePath = String.Empty
 
     ''            If strUserDefinedLogFilePath.Length = 0 Then
-    ''                strTraceFilePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
-    ''                strTraceFilePath = System.IO.Path.Combine(strTraceFilePath, "MASIC_Log_" & System.DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss") & ".txt")
+    ''                strTraceFilePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
+    ''                strTraceFilePath = Path.Combine(strTraceFilePath, "MASIC_Log_" & System.DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss") & ".txt")
     ''            Else
     ''                strTraceFilePath = String.Copy(strUserDefinedLogFilePath)
     ''            End If
@@ -180,7 +158,7 @@ Public Module modMain
             If mMASIC.ShowMessages Then
                 mProgressForm = New ProgressFormNET.frmProgress
 
-                mProgressForm.InitializeProgressForm("Parsing " & System.IO.Path.GetFileName(mInputFilePath), 0, 100, False, True)
+                mProgressForm.InitializeProgressForm("Parsing " & Path.GetFileName(mInputFilePath), 0, 100, False, True)
                 mProgressForm.InitializeSubtask("", 0, 100, False)
                 mProgressForm.ResetKeyPressAbortProcess()
                 mProgressForm.Show()
@@ -188,7 +166,7 @@ Public Module modMain
 
             End If
 
-            Dim intReturnCode As Integer = 0
+            Dim intReturnCode As Integer
 
             If mRecurseFolders Then
                 If mMASIC.ProcessFilesAndRecurseFolders(mInputFilePath, mOutputFolderPath, mOutputFolderAlternatePath, mRecreateFolderHierarchyInAlternatePath, mParameterFilePath, mRecurseFoldersMaxLevels) Then
@@ -210,7 +188,7 @@ Public Module modMain
             Return 0
 
         Catch ex As Exception
-            ShowErrorMessage("Error occurred in modMain->Main: " & System.Environment.NewLine & ex.Message)
+            ShowErrorMessage("Error occurred in modMain->Main: " & Environment.NewLine & ex.Message)
             Return -1
         Finally
             If Not mProgressForm Is Nothing Then
@@ -233,7 +211,7 @@ Public Module modMain
             Console.WriteLine()
 
         Catch ex As Exception
-            ShowErrorMessage("Error occurred in modMain->RunTests: " & System.Environment.NewLine & ex.Message)
+            ShowErrorMessage("Error occurred in modMain->RunTests: " & Environment.NewLine & ex.Message)
         End Try
 
     End Sub
@@ -258,7 +236,7 @@ Public Module modMain
         ' Returns True if no problems; otherwise, returns false
 
         Dim strValue As String = String.Empty
-        Dim lstValidParameters = New Generic.List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "Test", "LogFolder", "Q"}
+        Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "Test", "LogFolder", "Q"}
         Dim intValue As Integer
 
         Try
@@ -327,7 +305,7 @@ Public Module modMain
             End If
 
         Catch ex As Exception
-            ShowErrorMessage("Error parsing the command line parameters: " & System.Environment.NewLine & ex.Message)
+            ShowErrorMessage("Error parsing the command line parameters: " & Environment.NewLine & ex.Message)
         End Try
 
         Return False
@@ -335,7 +313,7 @@ Public Module modMain
     End Function
 
     Private Sub ShowErrorMessage(ByVal strMessage As String)
-        Dim strSeparator As String = "------------------------------------------------------------------------------"
+        Dim strSeparator = "------------------------------------------------------------------------------"
 
         Console.WriteLine()
         Console.WriteLine(strSeparator)
@@ -347,7 +325,7 @@ Public Module modMain
     End Sub
 
     Private Sub ShowErrorMessage(ByVal strTitle As String, ByVal items As List(Of String))
-        Dim strSeparator As String = "------------------------------------------------------------------------------"
+        Dim strSeparator = "------------------------------------------------------------------------------"
         Dim strMessage As String
 
         Console.WriteLine()
@@ -378,8 +356,6 @@ Public Module modMain
 
         objFormMain.ShowDialog()
 
-        objFormMain = Nothing
-
     End Sub
 
     Private Sub ShowProgramHelp()
@@ -389,7 +365,7 @@ Public Module modMain
             Console.WriteLine("This program will read a Finnigan LCQ .RAW file or Agilent LC/MSD .CDF/.MGF file combo and create a selected ion chromatogram (SIC) for each parent ion.")
             Console.WriteLine()
 
-            Console.WriteLine("Program syntax:" & System.Environment.NewLine & IO.Path.GetFileName(clsProcessFilesBaseClass.GetAppPath()))
+            Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(clsProcessFilesBaseClass.GetAppPath()))
             Console.WriteLine(" /I:InputFilePath.raw [/O:OutputFolderPath]")
             Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath] ")
             Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputFolderPath] [/R]")
@@ -422,7 +398,7 @@ Public Module modMain
             Console.WriteLine()
 
             ' Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
-            System.Threading.Thread.Sleep(750)
+            Threading.Thread.Sleep(750)
 
         Catch ex As Exception
             ShowErrorMessage("Error displaying the program syntax: " & ex.Message)
@@ -432,7 +408,7 @@ Public Module modMain
 
     Private Sub WriteToErrorStream(strErrorMessage As String)
         Try
-            Using swErrorStream As System.IO.StreamWriter = New System.IO.StreamWriter(Console.OpenStandardError())
+            Using swErrorStream = New StreamWriter(Console.OpenStandardError())
                 swErrorStream.WriteLine(strErrorMessage)
             End Using
         Catch ex As Exception
@@ -441,8 +417,8 @@ Public Module modMain
     End Sub
 
     Private Sub mMASIC_ProgressChanged(ByVal taskDescription As String, ByVal percentComplete As Single) Handles mMASIC.ProgressChanged
-        Const PERCENT_REPORT_INTERVAL As Integer = 25
-        Const PROGRESS_DOT_INTERVAL_MSEC As Integer = 250
+        Const PERCENT_REPORT_INTERVAL = 25
+        Const PROGRESS_DOT_INTERVAL_MSEC = 250
 
         If Not mProgressForm Is Nothing Then
             mProgressForm.UpdateCurrentTask(mMASIC.ProgressStepDescription)
