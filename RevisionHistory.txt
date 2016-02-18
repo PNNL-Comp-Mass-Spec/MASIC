@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.6.5891; February 17, 2016
+	- Added reporter ion mode FrackingAmine20160217
+		- Looks for 170.09 m/z, 172.08 m/z, and 252.07 m/z
+
 Version 2.6.5856; January 13, 2016
 	- Updated ThermoRawFileReader with improved scan filter handling
 	- Imported namespace System.IO

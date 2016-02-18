@@ -40,7 +40,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "January 13, 2016"
+        MyBase.mFileDate = "February 17, 2016"
         InitializeVariables()
     End Sub
 
@@ -205,6 +205,7 @@ Public Class clsMASIC
         LycAcetFragment = 9
         TMTTenMZ = 10               ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
         OGlcNAc = 11
+        FrackingAmine20160217 = 12
     End Enum
 
 #End Region
@@ -4498,7 +4499,7 @@ Public Class clsMASIC
         Return blnSuccess
     End Function
 
-    Private Function ExtractConstantExtendedHeaderValues(      
+    Private Function ExtractConstantExtendedHeaderValues(
       ByRef intNonConstantHeaderIDs() As Integer,
       ByRef udtSurveyScans() As udtScanInfoType,
       ByRef udtFragScans() As udtScanInfoType,
@@ -6055,11 +6056,11 @@ Public Class clsMASIC
     End Sub
 
     Private Function FindBasePeakIon(
-      ByRef dblMZList() As Double, 
-      ByRef sngIonIntensity() As Single, 
+      ByRef dblMZList() As Double,
+      ByRef sngIonIntensity() As Single,
       intIonCount As Integer,
       ByRef sngBasePeakIonIntensity As Single,
-      ByRef dblMZMin As Double, 
+      ByRef dblMZMin As Double,
       ByRef dblMZMax As Double) As Double
 
         ' Finds the base peak ion
@@ -6215,338 +6216,338 @@ Public Class clsMASIC
 
     End Function
 
-	Private Function FindMaxValueInMZRange(
-	  ByRef dblMZList() As Double, 
-	  ByRef sngIntensityList() As Single, 
-	  intIonCount As Integer, 
-	  dblMZStart As Double, 
-	  dblMZEnd As Double, 
-	  ByRef dblBestMatchMZ As Double, 
-	  ByRef sngMatchIntensity As Single) As Boolean
-	  
-		' Searches dblMZList for the maximum value between dblMZStart and dblMZEnd
-		' If a match is found, then updates dblBestMatchMZ to the m/z of the match, updates sngMatchIntensity to its intensity,
-		'  and returns True
-		'
-		' Note that this function performs a linear search of .IonsMZ; it is therefore good for spectra with < 10 data points
-		'  and bad for spectra with > 10 data points
-		' As an alternative to this function, use AggregateIonsInRange
+    Private Function FindMaxValueInMZRange(
+      ByRef dblMZList() As Double,
+      ByRef sngIntensityList() As Single,
+      intIonCount As Integer,
+      dblMZStart As Double,
+      dblMZEnd As Double,
+      ByRef dblBestMatchMZ As Double,
+      ByRef sngMatchIntensity As Single) As Boolean
 
-		Dim intDataIndex As Integer
-		Dim intClosestMatchIndex As Integer
-		Dim sngHighestIntensity As Single
+        ' Searches dblMZList for the maximum value between dblMZStart and dblMZEnd
+        ' If a match is found, then updates dblBestMatchMZ to the m/z of the match, updates sngMatchIntensity to its intensity,
+        '  and returns True
+        '
+        ' Note that this function performs a linear search of .IonsMZ; it is therefore good for spectra with < 10 data points
+        '  and bad for spectra with > 10 data points
+        ' As an alternative to this function, use AggregateIonsInRange
 
-		Try
-			intClosestMatchIndex = -1
-			sngHighestIntensity = 0
+        Dim intDataIndex As Integer
+        Dim intClosestMatchIndex As Integer
+        Dim sngHighestIntensity As Single
 
-			For intDataIndex = 0 To intIonCount - 1
-				If dblMZList(intDataIndex) >= dblMZStart AndAlso dblMZList(intDataIndex) <= dblMZEnd Then
-					If intClosestMatchIndex < 0 Then
-						intClosestMatchIndex = intDataIndex
-						sngHighestIntensity = sngIntensityList(intDataIndex)
-					ElseIf sngIntensityList(intDataIndex) > sngHighestIntensity Then
-						intClosestMatchIndex = intDataIndex
-						sngHighestIntensity = sngIntensityList(intDataIndex)
-					End If
-				End If
-			Next intDataIndex
+        Try
+            intClosestMatchIndex = -1
+            sngHighestIntensity = 0
 
-		Catch ex As Exception
-			LogErrors("FindClosestMZ", "Error in FindMaxValueInMZRange", ex, True, False)
-			intClosestMatchIndex = -1
-		End Try
+            For intDataIndex = 0 To intIonCount - 1
+                If dblMZList(intDataIndex) >= dblMZStart AndAlso dblMZList(intDataIndex) <= dblMZEnd Then
+                    If intClosestMatchIndex < 0 Then
+                        intClosestMatchIndex = intDataIndex
+                        sngHighestIntensity = sngIntensityList(intDataIndex)
+                    ElseIf sngIntensityList(intDataIndex) > sngHighestIntensity Then
+                        intClosestMatchIndex = intDataIndex
+                        sngHighestIntensity = sngIntensityList(intDataIndex)
+                    End If
+                End If
+            Next intDataIndex
 
-		If intClosestMatchIndex >= 0 Then
-			dblBestMatchMZ = dblMZList(intClosestMatchIndex)
-			sngMatchIntensity = sngHighestIntensity
-			Return True
-		Else
-			dblBestMatchMZ = 0
-			sngMatchIntensity = 0
-			Return False
-		End If
+        Catch ex As Exception
+            LogErrors("FindClosestMZ", "Error in FindMaxValueInMZRange", ex, True, False)
+            intClosestMatchIndex = -1
+        End Try
 
-	End Function
+        If intClosestMatchIndex >= 0 Then
+            dblBestMatchMZ = dblMZList(intClosestMatchIndex)
+            sngMatchIntensity = sngHighestIntensity
+            Return True
+        Else
+            dblBestMatchMZ = 0
+            sngMatchIntensity = 0
+            Return False
+        End If
 
-	Private Function FindNearestSurveyScanIndex(
-	  ByRef udtScanList As udtScanListType, 
-	  sngScanOrAcqTime As Single, 
-	  eScanType As eCustomSICScanTypeConstants) As Integer
-	  
-		' Finds the index of the survey scan closest to sngScanOrAcqTime
-		' Note that sngScanOrAcqTime can be absolute, relative, or AcquisitionTime; eScanType specifies which it is
+    End Function
 
-		Dim intIndex As Integer
-		Dim intScanNumberToFind As Integer
-		Dim intSurveyScanIndexMatch As Integer
+    Private Function FindNearestSurveyScanIndex(
+      ByRef udtScanList As udtScanListType,
+      sngScanOrAcqTime As Single,
+      eScanType As eCustomSICScanTypeConstants) As Integer
+
+        ' Finds the index of the survey scan closest to sngScanOrAcqTime
+        ' Note that sngScanOrAcqTime can be absolute, relative, or AcquisitionTime; eScanType specifies which it is
+
+        Dim intIndex As Integer
+        Dim intScanNumberToFind As Integer
+        Dim intSurveyScanIndexMatch As Integer
 
 
-		Try
-			intSurveyScanIndexMatch = -1
-			intScanNumberToFind = ScanOrAcqTimeToAbsolute(udtScanList, sngScanOrAcqTime, eScanType, False)
-			For intIndex = 0 To udtScanList.SurveyScanCount - 1
-				If udtScanList.SurveyScans(intIndex).ScanNumber >= intScanNumberToFind Then
-					intSurveyScanIndexMatch = intIndex
-					If udtScanList.SurveyScans(intIndex).ScanNumber <> intScanNumberToFind AndAlso intIndex < udtScanList.SurveyScanCount - 1 Then
-						' Didn't find an exact match; determine which survey scan is closer
+        Try
+            intSurveyScanIndexMatch = -1
+            intScanNumberToFind = ScanOrAcqTimeToAbsolute(udtScanList, sngScanOrAcqTime, eScanType, False)
+            For intIndex = 0 To udtScanList.SurveyScanCount - 1
+                If udtScanList.SurveyScans(intIndex).ScanNumber >= intScanNumberToFind Then
+                    intSurveyScanIndexMatch = intIndex
+                    If udtScanList.SurveyScans(intIndex).ScanNumber <> intScanNumberToFind AndAlso intIndex < udtScanList.SurveyScanCount - 1 Then
+                        ' Didn't find an exact match; determine which survey scan is closer
                         If Math.Abs(udtScanList.SurveyScans(intIndex + 1).ScanNumber - intScanNumberToFind) <
                            Math.Abs(udtScanList.SurveyScans(intIndex).ScanNumber - intScanNumberToFind) Then
                             intSurveyScanIndexMatch += 1
                         End If
-					End If
-					Exit For
-				End If
-			Next intIndex
+                    End If
+                    Exit For
+                End If
+            Next intIndex
 
-			If intSurveyScanIndexMatch < 0 Then
-				' Match not found; return either the first or the last survey scan
-				If udtScanList.SurveyScanCount > 0 Then
-					intSurveyScanIndexMatch = udtScanList.SurveyScanCount - 1
-				Else
-					intSurveyScanIndexMatch = 0
-				End If
-			End If
-		Catch ex As Exception
-			LogErrors("FindNearestSurveyScanIndex", "Error in FindNearestSurveyScanIndex", ex, True, False)
-			intSurveyScanIndexMatch = 0
-		End Try
+            If intSurveyScanIndexMatch < 0 Then
+                ' Match not found; return either the first or the last survey scan
+                If udtScanList.SurveyScanCount > 0 Then
+                    intSurveyScanIndexMatch = udtScanList.SurveyScanCount - 1
+                Else
+                    intSurveyScanIndexMatch = 0
+                End If
+            End If
+        Catch ex As Exception
+            LogErrors("FindNearestSurveyScanIndex", "Error in FindNearestSurveyScanIndex", ex, True, False)
+            intSurveyScanIndexMatch = 0
+        End Try
 
-		Return intSurveyScanIndexMatch
+        Return intSurveyScanIndexMatch
 
-	End Function
+    End Function
 
-	''' <summary>
-	''' Returns the index of the scan closest to sngScanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
-	''' </summary>
-	''' <param name="udtScanList"></param>
-	''' <param name="sngScanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
-	''' <param name="eScanType">Specifies what type of value value sngScanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
-	''' <returns></returns>
-	''' <remarks></remarks>
-	Private Function FindNearestScanNumIndex(
-	  ByRef udtScanList As udtScanListType, 
-	  sngScanOrAcqTime As Single, 
-	  eScanType As eCustomSICScanTypeConstants) As Integer
-	  
-		Dim intAbsoluteScanNumber As Integer
-		Dim intScanIndexMatch As Integer
+    ''' <summary>
+    ''' Returns the index of the scan closest to sngScanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
+    ''' </summary>
+    ''' <param name="udtScanList"></param>
+    ''' <param name="sngScanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
+    ''' <param name="eScanType">Specifies what type of value value sngScanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function FindNearestScanNumIndex(
+      ByRef udtScanList As udtScanListType,
+      sngScanOrAcqTime As Single,
+      eScanType As eCustomSICScanTypeConstants) As Integer
 
-		Try
-			If eScanType = eCustomSICScanTypeConstants.Absolute Or eScanType = eCustomSICScanTypeConstants.Relative Then
-				intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(udtScanList, sngScanOrAcqTime, eScanType, False)
-				intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanNumList, intAbsoluteScanNumber, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
-			Else
-				' eScanType = eCustomSICScanTypeConstants.AcquisitionTime
-				' Find the closest match in udtScanList.MasterScanTimeList
-				intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanTimeList, sngScanOrAcqTime, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
-			End If
+        Dim intAbsoluteScanNumber As Integer
+        Dim intScanIndexMatch As Integer
 
-		Catch ex As Exception
-			LogErrors("FindNearestScanNumIndex", "Error in FindNearestScanNumIndex", ex, True, False)
-			intScanIndexMatch = 0
-		End Try
+        Try
+            If eScanType = eCustomSICScanTypeConstants.Absolute Or eScanType = eCustomSICScanTypeConstants.Relative Then
+                intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(udtScanList, sngScanOrAcqTime, eScanType, False)
+                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanNumList, intAbsoluteScanNumber, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+            Else
+                ' eScanType = eCustomSICScanTypeConstants.AcquisitionTime
+                ' Find the closest match in udtScanList.MasterScanTimeList
+                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanTimeList, sngScanOrAcqTime, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+            End If
 
-		Return intScanIndexMatch
-	End Function
+        Catch ex As Exception
+            LogErrors("FindNearestScanNumIndex", "Error in FindNearestScanNumIndex", ex, True, False)
+            intScanIndexMatch = 0
+        End Try
 
-	''Private Sub FindMinimumPotentialPeakAreaInRegion(ByRef udtScanList As udtScanListType, intParentIonIndexStart As Integer, intParentIonIndexEnd As Integer, ByRef udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType)
-	''    ' This function finds the minimum potential peak area in the parent ions between
-	''    '  intParentIonIndexStart and intParentIonIndexEnd
-	''    ' However, the summed intensity is not used if the number of points >= .SICNoiseThresholdIntensity is less than MASICPeakFinder.clsMASICPeakFinder.MINIMUM_PEAK_WIDTH
+        Return intScanIndexMatch
+    End Function
 
-	''    Dim intParentIonIndex As Integer
-	''    Dim intIndex As Integer
+    ''Private Sub FindMinimumPotentialPeakAreaInRegion(ByRef udtScanList As udtScanListType, intParentIonIndexStart As Integer, intParentIonIndexEnd As Integer, ByRef udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType)
+    ''    ' This function finds the minimum potential peak area in the parent ions between
+    ''    '  intParentIonIndexStart and intParentIonIndexEnd
+    ''    ' However, the summed intensity is not used if the number of points >= .SICNoiseThresholdIntensity is less than MASICPeakFinder.clsMASICPeakFinder.MINIMUM_PEAK_WIDTH
 
-	''    With udtSICPotentialAreaStatsForRegion
-	''        .MinimumPotentialPeakArea = Double.MaxValue
-	''        .PeakCountBasisForMinimumPotentialArea = 0
-	''    End With
+    ''    Dim intParentIonIndex As Integer
+    ''    Dim intIndex As Integer
 
-	''    For intParentIonIndex = intParentIonIndexStart To intParentIonIndexEnd
-	''        With udtScanList.ParentIons(intParentIonIndex).SICStats.SICPotentialAreaStatsForPeak
+    ''    With udtSICPotentialAreaStatsForRegion
+    ''        .MinimumPotentialPeakArea = Double.MaxValue
+    ''        .PeakCountBasisForMinimumPotentialArea = 0
+    ''    End With
 
-	''            If .MinimumPotentialPeakArea > 0 AndAlso .PeakCountBasisForMinimumPotentialArea >= MASICPeakFinder.clsMASICPeakFinder.MINIMUM_PEAK_WIDTH Then
-	''                If .PeakCountBasisForMinimumPotentialArea > udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
-	''                    ' The non valid peak count value is larger than the one associated with the current
-	''                    '  minimum potential peak area; update the minimum peak area to dblPotentialPeakArea
-	''                    udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
-	''                    udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
-	''                Else
+    ''    For intParentIonIndex = intParentIonIndexStart To intParentIonIndexEnd
+    ''        With udtScanList.ParentIons(intParentIonIndex).SICStats.SICPotentialAreaStatsForPeak
+
+    ''            If .MinimumPotentialPeakArea > 0 AndAlso .PeakCountBasisForMinimumPotentialArea >= MASICPeakFinder.clsMASICPeakFinder.MINIMUM_PEAK_WIDTH Then
+    ''                If .PeakCountBasisForMinimumPotentialArea > udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
+    ''                    ' The non valid peak count value is larger than the one associated with the current
+    ''                    '  minimum potential peak area; update the minimum peak area to dblPotentialPeakArea
+    ''                    udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
+    ''                    udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
+    ''                Else
     ''                    If .MinimumPotentialPeakArea < udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea AndAlso
-	''                       .PeakCountBasisForMinimumPotentialArea >= udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
-	''                        udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
-	''                        udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
-	''                    End If
-	''                End If
-	''            End If
+    ''                       .PeakCountBasisForMinimumPotentialArea >= udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
+    ''                        udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
+    ''                        udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
+    ''                    End If
+    ''                End If
+    ''            End If
 
-	''        End With
-	''    Next intParentIonIndex
+    ''        End With
+    ''    Next intParentIonIndex
 
-	''    If udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = Double.MaxValue Then
-	''        udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = 1
-	''    End If
+    ''    If udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = Double.MaxValue Then
+    ''        udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = 1
+    ''    End If
 
-	''End Sub
+    ''End Sub
 
-	''Private Function FindSICPeakAndAreaForParentIon(ByRef udtScanList As udtScanListType, intParentIonIndex As Integer, ByRef udtSICDetails As udtSICStatsDetailsType, ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType, udtSICOptions As udtSICOptionsType) As Boolean
+    ''Private Function FindSICPeakAndAreaForParentIon(ByRef udtScanList As udtScanListType, intParentIonIndex As Integer, ByRef udtSICDetails As udtSICStatsDetailsType, ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType, udtSICOptions As udtSICOptionsType) As Boolean
 
-	''    Const RECOMPUTE_NOISE_LEVEL As Boolean = True
+    ''    Const RECOMPUTE_NOISE_LEVEL As Boolean = True
 
-	''    Dim intSurveyScanIndex As Integer
-	''    Dim intDataIndex As Integer
-	''    Dim intIndexPointer As Integer
-	''    Dim intParentIonIndexStart As Integer
+    ''    Dim intSurveyScanIndex As Integer
+    ''    Dim intDataIndex As Integer
+    ''    Dim intIndexPointer As Integer
+    ''    Dim intParentIonIndexStart As Integer
 
-	''    Dim intScanIndexObserved As Integer
-	''    Dim intScanDelta As Integer
+    ''    Dim intScanIndexObserved As Integer
+    ''    Dim intScanDelta As Integer
 
-	''    Dim intFragScanNumber As Integer
+    ''    Dim intFragScanNumber As Integer
 
-	''    Dim intAreaDataCount As Integer
-	''    Dim intAreaDataBaseIndex As Integer
+    ''    Dim intAreaDataCount As Integer
+    ''    Dim intAreaDataBaseIndex As Integer
 
-	''    Dim sngFWHMScanStart, sngFWHMScanEnd As Single
+    ''    Dim sngFWHMScanStart, sngFWHMScanEnd As Single
 
-	''    Dim udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-	''    Dim sngMaxIntensityValueRawData As Single
+    ''    Dim udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+    ''    Dim sngMaxIntensityValueRawData As Single
 
-	''    Dim intSICScanNumbers() As Integer
-	''    Dim sngSICIntensities() As Single
+    ''    Dim intSICScanNumbers() As Integer
+    ''    Dim sngSICIntensities() As Single
 
-	''    Dim blnCustomSICPeak As Boolean
-	''    Dim blnSuccess As Boolean
+    ''    Dim blnCustomSICPeak As Boolean
+    ''    Dim blnSuccess As Boolean
 
-	''    Try
+    ''    Try
 
-	''        ' Determine the minimum potential peak area in the last 500 scans
-	''        intParentIonIndexStart = intParentIonIndex - 500
-	''        If intParentIonIndexStart < 0 Then intParentIonIndexStart = 0
-	''        FindMinimumPotentialPeakAreaInRegion(udtScanList, intParentIonIndexStart, intParentIonIndex, udtSICPotentialAreaStatsForRegion)
+    ''        ' Determine the minimum potential peak area in the last 500 scans
+    ''        intParentIonIndexStart = intParentIonIndex - 500
+    ''        If intParentIonIndexStart < 0 Then intParentIonIndexStart = 0
+    ''        FindMinimumPotentialPeakAreaInRegion(udtScanList, intParentIonIndexStart, intParentIonIndex, udtSICPotentialAreaStatsForRegion)
 
-	''        With udtScanList
-	''            With .ParentIons(intParentIonIndex)
-	''                intScanIndexObserved = .SurveyScanIndex
-	''                If intScanIndexObserved < 0 Then intScanIndexObserved = 0
-	''                blnCustomSICPeak = .CustomSICPeak
-	''            End With
+    ''        With udtScanList
+    ''            With .ParentIons(intParentIonIndex)
+    ''                intScanIndexObserved = .SurveyScanIndex
+    ''                If intScanIndexObserved < 0 Then intScanIndexObserved = 0
+    ''                blnCustomSICPeak = .CustomSICPeak
+    ''            End With
 
-	''            If udtSICDetails.SICData Is Nothing OrElse udtSICDetails.SICDataCount = 0 Then
-	''                ' Either .SICData is nothing or no SIC data exists
-	''                ' Cannot find peaks for this parent ion
-	''                With .ParentIons(intParentIonIndex).SICStats
-	''                    With .Peak
-	''                        .IndexObserved = 0
-	''                        .IndexBaseLeft = .IndexObserved
-	''                        .IndexBaseRight = .IndexObserved
-	''                        .IndexMax = .IndexObserved
-	''                    End With
-	''                End With
-	''            Else
-	''                With .ParentIons(intParentIonIndex).SICStats
-	''                    ' Record the index (of data in .SICData) that the parent ion mass was first observed
+    ''            If udtSICDetails.SICData Is Nothing OrElse udtSICDetails.SICDataCount = 0 Then
+    ''                ' Either .SICData is nothing or no SIC data exists
+    ''                ' Cannot find peaks for this parent ion
+    ''                With .ParentIons(intParentIonIndex).SICStats
+    ''                    With .Peak
+    ''                        .IndexObserved = 0
+    ''                        .IndexBaseLeft = .IndexObserved
+    ''                        .IndexBaseRight = .IndexObserved
+    ''                        .IndexMax = .IndexObserved
+    ''                    End With
+    ''                End With
+    ''            Else
+    ''                With .ParentIons(intParentIonIndex).SICStats
+    ''                    ' Record the index (of data in .SICData) that the parent ion mass was first observed
 
-	''                    .Peak.ScanTypeForPeakIndices = eScanTypeConstants.SurveyScan
+    ''                    .Peak.ScanTypeForPeakIndices = eScanTypeConstants.SurveyScan
 
-	''                    ' Search for intScanIndexObserved in udtSICDetails.SICScanIndices()
-	''                    .Peak.IndexObserved = -1
-	''                    For intSurveyScanIndex = 0 To udtSICDetails.SICDataCount - 1
-	''                        If udtSICDetails.SICScanIndices(intSurveyScanIndex) = intScanIndexObserved Then
-	''                            .Peak.IndexObserved = intSurveyScanIndex
-	''                            Exit For
-	''                        End If
-	''                    Next intSurveyScanIndex
+    ''                    ' Search for intScanIndexObserved in udtSICDetails.SICScanIndices()
+    ''                    .Peak.IndexObserved = -1
+    ''                    For intSurveyScanIndex = 0 To udtSICDetails.SICDataCount - 1
+    ''                        If udtSICDetails.SICScanIndices(intSurveyScanIndex) = intScanIndexObserved Then
+    ''                            .Peak.IndexObserved = intSurveyScanIndex
+    ''                            Exit For
+    ''                        End If
+    ''                    Next intSurveyScanIndex
 
-	''                    If .Peak.IndexObserved = -1 Then
-	''                        ' Match wasn't found; this is unexpected
-	''                        LogErrors("FindSICPeakAndAreaForParentIon", "Programming error: survey scan index not found", Nothing, True, True, True, eMasicErrorCodes.FindSICPeaksError)
-	''                        .Peak.IndexObserved = 0
-	''                    End If
+    ''                    If .Peak.IndexObserved = -1 Then
+    ''                        ' Match wasn't found; this is unexpected
+    ''                        LogErrors("FindSICPeakAndAreaForParentIon", "Programming error: survey scan index not found", Nothing, True, True, True, eMasicErrorCodes.FindSICPeaksError)
+    ''                        .Peak.IndexObserved = 0
+    ''                    End If
 
-	''                    ' Populate intSICScanNumbers() with the scan numbers that the SICData corresponds to
-	''                    ' At the same time, populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
+    ''                    ' Populate intSICScanNumbers() with the scan numbers that the SICData corresponds to
+    ''                    ' At the same time, populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
 
-	''                    If udtSICDetails.SICDataCount > udtSICDetails.SICDataScanIntervals.Length Then
-	''                        ReDim udtSICDetails.SICDataScanIntervals(udtSICDetails.SICDataCount - 1)
-	''                    End If
+    ''                    If udtSICDetails.SICDataCount > udtSICDetails.SICDataScanIntervals.Length Then
+    ''                        ReDim udtSICDetails.SICDataScanIntervals(udtSICDetails.SICDataCount - 1)
+    ''                    End If
 
-	''                    ReDim intSICScanNumbers(udtSICDetails.SICDataCount - 1)
-	''                    For intSurveyScanIndex = 0 To udtSICDetails.SICDataCount - 1
-	''                        intSICScanNumbers(intSurveyScanIndex) = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(intSurveyScanIndex)).ScanNumber
-	''                        If intSurveyScanIndex > 0 Then
-	''                            intScanDelta = intSICScanNumbers(intSurveyScanIndex) - intSICScanNumbers(intSurveyScanIndex - 1)
-	''                            udtSICDetails.SICDataScanIntervals(intSurveyScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))        ' Make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
-	''                        End If
-	''                    Next intSurveyScanIndex
+    ''                    ReDim intSICScanNumbers(udtSICDetails.SICDataCount - 1)
+    ''                    For intSurveyScanIndex = 0 To udtSICDetails.SICDataCount - 1
+    ''                        intSICScanNumbers(intSurveyScanIndex) = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(intSurveyScanIndex)).ScanNumber
+    ''                        If intSurveyScanIndex > 0 Then
+    ''                            intScanDelta = intSICScanNumbers(intSurveyScanIndex) - intSICScanNumbers(intSurveyScanIndex - 1)
+    ''                            udtSICDetails.SICDataScanIntervals(intSurveyScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))        ' Make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
+    ''                        End If
+    ''                    Next intSurveyScanIndex
 
-	''                    ' Record the fragmentation scan number
-	''                    intFragScanNumber = udtScanList.FragScans(udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
+    ''                    ' Record the fragmentation scan number
+    ''                    intFragScanNumber = udtScanList.FragScans(udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
 
-	''                    ' Determine the value for .ParentIonIntensity
-	''                    blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(udtSICDetails.SICDataCount, intSICScanNumbers, udtSICDetails.SICData, .Peak, intFragScanNumber)
+    ''                    ' Determine the value for .ParentIonIntensity
+    ''                    blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(udtSICDetails.SICDataCount, intSICScanNumbers, udtSICDetails.SICData, .Peak, intFragScanNumber)
 
     ''                    blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(udtSICDetails.SICDataCount, intSICScanNumbers, udtSICDetails.SICData, .SICPotentialAreaStatsForPeak, .Peak,
     ''                                                                     udtSmoothedYDataSubset, udtSICOptions.SICPeakFinderOptions,
     ''                                                                     udtSICPotentialAreaStatsForRegion,
-	''                                                                     Not blnCustomSICPeak, udtScanList.SIMDataPresent, RECOMPUTE_NOISE_LEVEL)
+    ''                                                                     Not blnCustomSICPeak, udtScanList.SIMDataPresent, RECOMPUTE_NOISE_LEVEL)
 
-	''                    If blnSuccess Then
-	''                        ' Record the survey scan indices of the peak max, start, and end
-	''                        ' Note that .ScanTypeForPeakIndices was set earlier in this function
-	''                        .PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
-	''                        .PeakScanIndexStart = udtSICDetails.SICScanIndices(.Peak.IndexBaseLeft)
-	''                        .PeakScanIndexEnd = udtSICDetails.SICScanIndices(.Peak.IndexBaseRight)
-	''                    Else
-	''                        ' No peak found
-	''                        .PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
-	''                        .PeakScanIndexStart = .PeakScanIndexMax
-	''                        .PeakScanIndexEnd = .PeakScanIndexMax
+    ''                    If blnSuccess Then
+    ''                        ' Record the survey scan indices of the peak max, start, and end
+    ''                        ' Note that .ScanTypeForPeakIndices was set earlier in this function
+    ''                        .PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
+    ''                        .PeakScanIndexStart = udtSICDetails.SICScanIndices(.Peak.IndexBaseLeft)
+    ''                        .PeakScanIndexEnd = udtSICDetails.SICScanIndices(.Peak.IndexBaseRight)
+    ''                    Else
+    ''                        ' No peak found
+    ''                        .PeakScanIndexMax = udtSICDetails.SICScanIndices(.Peak.IndexMax)
+    ''                        .PeakScanIndexStart = .PeakScanIndexMax
+    ''                        .PeakScanIndexEnd = .PeakScanIndexMax
 
-	''                        With .Peak
-	''                            .MaxIntensityValue = udtSICDetails.SICData(.IndexMax)
-	''                            .IndexBaseLeft = .IndexMax
-	''                            .IndexBaseRight = .IndexMax
-	''                            .FWHMScanWidth = 1
-	''                            ' Assign the intensity of the peak at the observed maximum to the area
-	''                            .Area = .MaxIntensityValue
+    ''                        With .Peak
+    ''                            .MaxIntensityValue = udtSICDetails.SICData(.IndexMax)
+    ''                            .IndexBaseLeft = .IndexMax
+    ''                            .IndexBaseRight = .IndexMax
+    ''                            .FWHMScanWidth = 1
+    ''                            ' Assign the intensity of the peak at the observed maximum to the area
+    ''                            .Area = .MaxIntensityValue
 
-	''                            .SignalToNoiseRatio = mMASICPeakFinder.ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
-	''                        End With
-	''                    End If
-	''                End With
+    ''                            .SignalToNoiseRatio = mMASICPeakFinder.ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
+    ''                        End With
+    ''                    End If
+    ''                End With
 
-	''                ' Update .OptimalPeakApexScanNumber
-	''                ' Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
-	''                With .ParentIons(intParentIonIndex)
-	''                    .OptimalPeakApexScanNumber = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
-	''                End With
+    ''                ' Update .OptimalPeakApexScanNumber
+    ''                ' Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
+    ''                With .ParentIons(intParentIonIndex)
+    ''                    .OptimalPeakApexScanNumber = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+    ''                End With
 
-	''            End If
+    ''            End If
 
-	''        End With
+    ''        End With
 
-	''        blnSuccess = True
+    ''        blnSuccess = True
 
-	''    Catch ex As Exception
-	''        LogErrors("FindSICPeakAndAreaForParentIon", "Error finding SIC peaks and their areas", ex, True, False, True, eMasicErrorCodes.FindSICPeaksError)
-	''        blnSuccess = False
-	''    End Try
+    ''    Catch ex As Exception
+    ''        LogErrors("FindSICPeakAndAreaForParentIon", "Error finding SIC peaks and their areas", ex, True, False, True, eMasicErrorCodes.FindSICPeaksError)
+    ''        blnSuccess = False
+    ''    End Try
 
-	''    Return blnSuccess
+    ''    Return blnSuccess
 
-	''End Function
+    ''End Function
 
-	''' <summary>
-	''' Looks for the reporter ion peaks using FindReporterIonsWork
-	''' </summary>
-	''' <param name="udtSICOptions"></param>
-	''' <param name="udtScanList"></param>
-	''' <param name="objSpectraCache"></param>
-	''' <param name="strInputFileName"></param>
-	''' <param name="strOutputFolderPath"></param>
-	''' <returns></returns>
-	''' <remarks></remarks>
+    ''' <summary>
+    ''' Looks for the reporter ion peaks using FindReporterIonsWork
+    ''' </summary>
+    ''' <param name="udtSICOptions"></param>
+    ''' <param name="udtScanList"></param>
+    ''' <param name="objSpectraCache"></param>
+    ''' <param name="strInputFileName"></param>
+    ''' <param name="strOutputFolderPath"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Private Function FindReporterIons(
       ByRef udtSICOptions As udtSICOptionsType,
       ByRef udtScanList As udtScanListType,
@@ -6703,19 +6704,19 @@ Public Class clsMASIC
 
     End Function
 
-	''' <summary>
-	''' Looks for the reporter ion m/z values, +/- a tolerance
-	''' Calls AggregateIonsInRange with blnReturnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
-	''' </summary>
-	''' <param name="udtSICOptions"></param>
-	''' <param name="udtScanList"></param>
-	''' <param name="objSpectraCache"></param>
-	''' <param name="udtScan"></param>
-	''' <param name="srOutFile"></param>
-	''' <param name="udtReporterIonInfo"></param>
-	''' <param name="cColDelimiter"></param>
-	''' <param name="blnSaveUncorrectedIntensities"></param>
-	''' <remarks></remarks>
+    ''' <summary>
+    ''' Looks for the reporter ion m/z values, +/- a tolerance
+    ''' Calls AggregateIonsInRange with blnReturnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
+    ''' </summary>
+    ''' <param name="udtSICOptions"></param>
+    ''' <param name="udtScanList"></param>
+    ''' <param name="objSpectraCache"></param>
+    ''' <param name="udtScan"></param>
+    ''' <param name="srOutFile"></param>
+    ''' <param name="udtReporterIonInfo"></param>
+    ''' <param name="cColDelimiter"></param>
+    ''' <param name="blnSaveUncorrectedIntensities"></param>
+    ''' <remarks></remarks>
     Private Sub FindReporterIonsWork(
       ByRef udtSICOptions As udtSICOptionsType,
       ByRef udtScanList As udtScanListType,
@@ -7239,43 +7240,43 @@ Public Class clsMASIC
 
     End Sub
 
-	Private Function GenerateMRMInfoHash(udtMRMScanInfo As udtMRMScanInfoType) As String
-		Dim strHash As String
-		Dim intIndex As Integer
+    Private Function GenerateMRMInfoHash(udtMRMScanInfo As udtMRMScanInfoType) As String
+        Dim strHash As String
+        Dim intIndex As Integer
 
-		With udtMRMScanInfo
-			strHash = .ParentIonMZ & "_" & .MRMMassCount
+        With udtMRMScanInfo
+            strHash = .ParentIonMZ & "_" & .MRMMassCount
 
-			For intIndex = 0 To .MRMMassCount - 1
+            For intIndex = 0 To .MRMMassCount - 1
                 strHash &= "_" &
                   .MRMMassList(intIndex).CentralMass.ToString("0.000") & "_" &
                   .MRMMassList(intIndex).StartMass.ToString("0.000") & "_" &
                   .MRMMassList(intIndex).EndMass.ToString("0.000")
 
-			Next intIndex
-		End With
+            Next intIndex
+        End With
 
-		Return strHash
+        Return strHash
 
-	End Function
+    End Function
 
-	Public Overrides Function GetDefaultExtensionsToParse() As String()
-		Dim strExtensionsToParse(5) As String
+    Public Overrides Function GetDefaultExtensionsToParse() As String()
+        Dim strExtensionsToParse(5) As String
 
-		strExtensionsToParse(0) = FINNIGAN_RAW_FILE_EXTENSION
-		strExtensionsToParse(1) = MZ_XML_FILE_EXTENSION1
-		strExtensionsToParse(2) = MZ_XML_FILE_EXTENSION2
-		strExtensionsToParse(3) = MZ_DATA_FILE_EXTENSION1
-		strExtensionsToParse(4) = MZ_DATA_FILE_EXTENSION2
-		strExtensionsToParse(5) = AGILENT_MSMS_FILE_EXTENSION
+        strExtensionsToParse(0) = FINNIGAN_RAW_FILE_EXTENSION
+        strExtensionsToParse(1) = MZ_XML_FILE_EXTENSION1
+        strExtensionsToParse(2) = MZ_XML_FILE_EXTENSION2
+        strExtensionsToParse(3) = MZ_DATA_FILE_EXTENSION1
+        strExtensionsToParse(4) = MZ_DATA_FILE_EXTENSION2
+        strExtensionsToParse(5) = AGILENT_MSMS_FILE_EXTENSION
 
-		Return strExtensionsToParse
-	End Function
+        Return strExtensionsToParse
+    End Function
 
-	Public Overrides Function GetErrorMessage() As String
-		' Returns String.Empty if no error
+    Public Overrides Function GetErrorMessage() As String
+        ' Returns String.Empty if no error
 
-		Dim strErrorMessage As String
+        Dim strErrorMessage As String
 
         If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError OrElse
            MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError Then
@@ -7330,34 +7331,34 @@ Public Class clsMASIC
             strErrorMessage = MyBase.GetBaseClassErrorMessage()
         End If
 
-		Return strErrorMessage
+        Return strErrorMessage
 
-	End Function
+    End Function
 
-	Private Function GetFilePathPrefixChar() As String
-		If Me.ShowMessages Then
-			Return ControlChars.NewLine
-		Else
-			Return ": "
-		End If
-	End Function
+    Private Function GetFilePathPrefixChar() As String
+        If Me.ShowMessages Then
+            Return ControlChars.NewLine
+        Else
+            Return ": "
+        End If
+    End Function
 
-	Private Function GetFreeMemoryMB() As Single
-		' Returns the amount of free memory, in MB
+    Private Function GetFreeMemoryMB() As Single
+        ' Returns the amount of free memory, in MB
 
-		If mFreeMemoryPerformanceCounter Is Nothing Then
-			Return 0
-		Else
-			Return mFreeMemoryPerformanceCounter.NextValue()
-		End If
+        If mFreeMemoryPerformanceCounter Is Nothing Then
+            Return 0
+        Else
+            Return mFreeMemoryPerformanceCounter.NextValue()
+        End If
 
-	End Function
+    End Function
 
-	Public Shared Function GetCustomMZFileColumnHeaders(
-	  Optional cColDelimiter As String = ", ", 
-	  Optional blnIncludeAndBeforeLastItem As Boolean = True) As String
-	  
-		Dim strHeaders As String
+    Public Shared Function GetCustomMZFileColumnHeaders(
+      Optional cColDelimiter As String = ", ",
+      Optional blnIncludeAndBeforeLastItem As Boolean = True) As String
+
+        Dim strHeaders As String
 
         strHeaders = CUSTOM_SIC_COLUMN_MZ & cColDelimiter &
          CUSTOM_SIC_COLUMN_MZ_TOLERANCE & cColDelimiter &
@@ -7366,32 +7367,32 @@ Public Class clsMASIC
          CUSTOM_SIC_COLUMN_SCAN_TIME & cColDelimiter &
          CUSTOM_SIC_COLUMN_TIME_TOLERANCE & cColDelimiter
 
-		If blnIncludeAndBeforeLastItem Then
-			strHeaders &= " and "
-		End If
+        If blnIncludeAndBeforeLastItem Then
+            strHeaders &= " and "
+        End If
 
-		strHeaders &= CUSTOM_SIC_COLUMN_COMMENT
+        strHeaders &= CUSTOM_SIC_COLUMN_COMMENT
 
-		Return strHeaders
+        Return strHeaders
 
-	End Function
+    End Function
 
-	Private Function GetHeadersForOutputFile(ByRef udtScanList As udtScanListType, eOutputFileType As eOutputFileTypeConstants) As String
-		Return GetHeadersForOutputFile(udtScanList, eOutputFileType, ControlChars.Tab)
-	End Function
+    Private Function GetHeadersForOutputFile(ByRef udtScanList As udtScanListType, eOutputFileType As eOutputFileTypeConstants) As String
+        Return GetHeadersForOutputFile(udtScanList, eOutputFileType, ControlChars.Tab)
+    End Function
 
-	Private Function GetHeadersForOutputFile(ByRef udtScanList As udtScanListType, eOutputFileType As eOutputFileTypeConstants, cColDelimiter As Char) As String
-		Dim strHeaders As String
+    Private Function GetHeadersForOutputFile(ByRef udtScanList As udtScanListType, eOutputFileType As eOutputFileTypeConstants, cColDelimiter As Char) As String
+        Dim strHeaders As String
         Dim intNonConstantHeaderIDs() As Integer = Nothing
-        
-		Select Case eOutputFileType
-			Case eOutputFileTypeConstants.ScanStatsFlatFile
+
+        Select Case eOutputFileType
+            Case eOutputFileTypeConstants.ScanStatsFlatFile
                 strHeaders = "Dataset" & cColDelimiter & "ScanNumber" & cColDelimiter & "ScanTime" & cColDelimiter &
                    "ScanType" & cColDelimiter & "TotalIonIntensity" & cColDelimiter & "BasePeakIntensity" & cColDelimiter &
                    "BasePeakMZ" & cColDelimiter & "BasePeakSignalToNoiseRatio" & cColDelimiter &
                    "IonCount" & cColDelimiter & "IonCountRaw" & cColDelimiter & "ScanTypeName"
 
-			Case eOutputFileTypeConstants.ScanStatsExtendedFlatFile
+            Case eOutputFileTypeConstants.ScanStatsExtendedFlatFile
 
                 If Not mExtendedHeaderInfo Is Nothing Then
 
@@ -7404,311 +7405,320 @@ Public Class clsMASIC
                     strHeaders = String.Empty
                 End If
 
-			Case eOutputFileTypeConstants.SICStatsFlatFile
+            Case eOutputFileTypeConstants.SICStatsFlatFile
                 strHeaders = "Dataset" & cColDelimiter & "ParentIonIndex" & cColDelimiter & "MZ" & cColDelimiter & "SurveyScanNumber" & cColDelimiter & "FragScanNumber" & cColDelimiter & "OptimalPeakApexScanNumber" & cColDelimiter & "PeakApexOverrideParentIonIndex" & cColDelimiter &
                    "CustomSICPeak" & cColDelimiter & "PeakScanStart" & cColDelimiter & "PeakScanEnd" & cColDelimiter & "PeakScanMaxIntensity" & cColDelimiter &
                    "PeakMaxIntensity" & cColDelimiter & "PeakSignalToNoiseRatio" & cColDelimiter & "FWHMInScans" & cColDelimiter & "PeakArea" & cColDelimiter & "ParentIonIntensity" & cColDelimiter &
                    "PeakBaselineNoiseLevel" & cColDelimiter & "PeakBaselineNoiseStDev" & cColDelimiter & "PeakBaselinePointsUsed" & cColDelimiter &
                    "StatMomentsArea" & cColDelimiter & "CenterOfMassScan" & cColDelimiter & "PeakStDev" & cColDelimiter & "PeakSkew" & cColDelimiter & "PeakKSStat" & cColDelimiter & "StatMomentsDataCountUsed"
 
-				If mIncludeScanTimesInSICStatsFile Then
-					strHeaders &= cColDelimiter & "SurveyScanTime" & cColDelimiter & "FragScanTime" & cColDelimiter & "OptimalPeakApexScanTime"
-				End If
+                If mIncludeScanTimesInSICStatsFile Then
+                    strHeaders &= cColDelimiter & "SurveyScanTime" & cColDelimiter & "FragScanTime" & cColDelimiter & "OptimalPeakApexScanTime"
+                End If
 
-			Case eOutputFileTypeConstants.MRMSettingsFile
-				strHeaders = "Parent_Index" & cColDelimiter & "Parent_MZ" & cColDelimiter & "Daughter_MZ" & cColDelimiter & "MZ_Start" & cColDelimiter & "MZ_End" & cColDelimiter & "Scan_Count"
+            Case eOutputFileTypeConstants.MRMSettingsFile
+                strHeaders = "Parent_Index" & cColDelimiter & "Parent_MZ" & cColDelimiter & "Daughter_MZ" & cColDelimiter & "MZ_Start" & cColDelimiter & "MZ_End" & cColDelimiter & "Scan_Count"
 
-			Case eOutputFileTypeConstants.MRMDatafile
-				strHeaders = "Scan" & cColDelimiter & "MRM_Parent_MZ" & cColDelimiter & "MRM_Daughter_MZ" & cColDelimiter & "MRM_Daughter_Intensity"
+            Case eOutputFileTypeConstants.MRMDatafile
+                strHeaders = "Scan" & cColDelimiter & "MRM_Parent_MZ" & cColDelimiter & "MRM_Daughter_MZ" & cColDelimiter & "MRM_Daughter_Intensity"
 
-			Case Else
-				strHeaders = "Unknown header column names"
-		End Select
+            Case Else
+                strHeaders = "Unknown header column names"
+        End Select
 
-		Return strHeaders
-	End Function
+        Return strHeaders
+    End Function
 
-	Private Function GetNextSurveyScanIndex(ByRef SurveyScans() As udtScanInfoType, intSurveyScanIndex As Integer) As Integer
-		' Returns the next adjacent survey scan index
-		' If the given survey scan is not a SIM scan, then simply returns the next index
-		' If the given survey scan is a SIM scan, then returns the next survey scan with the same .SIMIndex
-		' If no appropriate next survey scan index is found, then returns intSurveyScanIndex instead
+    Private Function GetNextSurveyScanIndex(ByRef SurveyScans() As udtScanInfoType, intSurveyScanIndex As Integer) As Integer
+        ' Returns the next adjacent survey scan index
+        ' If the given survey scan is not a SIM scan, then simply returns the next index
+        ' If the given survey scan is a SIM scan, then returns the next survey scan with the same .SIMIndex
+        ' If no appropriate next survey scan index is found, then returns intSurveyScanIndex instead
 
-		Dim intNextSurveyScanIndex As Integer
-		Dim intSIMIndex As Integer
+        Dim intNextSurveyScanIndex As Integer
+        Dim intSIMIndex As Integer
 
-		Try
-			If intSurveyScanIndex < SurveyScans.Length - 1 AndAlso intSurveyScanIndex >= 0 Then
-				If SurveyScans(intSurveyScanIndex).SIMScan Then
-					intSIMIndex = SurveyScans(intSurveyScanIndex).SIMIndex
+        Try
+            If intSurveyScanIndex < SurveyScans.Length - 1 AndAlso intSurveyScanIndex >= 0 Then
+                If SurveyScans(intSurveyScanIndex).SIMScan Then
+                    intSIMIndex = SurveyScans(intSurveyScanIndex).SIMIndex
 
-					intNextSurveyScanIndex = intSurveyScanIndex + 1
-					Do While intNextSurveyScanIndex < SurveyScans.Length
-						If SurveyScans(intNextSurveyScanIndex).SIMIndex = intSIMIndex Then
-							Exit Do
-						Else
-							intNextSurveyScanIndex += 1
-						End If
-					Loop
+                    intNextSurveyScanIndex = intSurveyScanIndex + 1
+                    Do While intNextSurveyScanIndex < SurveyScans.Length
+                        If SurveyScans(intNextSurveyScanIndex).SIMIndex = intSIMIndex Then
+                            Exit Do
+                        Else
+                            intNextSurveyScanIndex += 1
+                        End If
+                    Loop
 
-					If intNextSurveyScanIndex = SurveyScans.Length Then
-						' Match was not found
-						intNextSurveyScanIndex = intSurveyScanIndex
-					End If
+                    If intNextSurveyScanIndex = SurveyScans.Length Then
+                        ' Match was not found
+                        intNextSurveyScanIndex = intSurveyScanIndex
+                    End If
 
-					Return intNextSurveyScanIndex
-				Else
-					' Not a SIM Scan
-					Return intSurveyScanIndex + 1
-				End If
-			Else
-				' intSurveyScanIndex is the final survey scan or is less than 0
-				Return intSurveyScanIndex
-			End If
-		Catch ex As Exception
-			' Error occurred; simply return intSurveyScanIndex
-			Return intSurveyScanIndex
-		End Try
+                    Return intNextSurveyScanIndex
+                Else
+                    ' Not a SIM Scan
+                    Return intSurveyScanIndex + 1
+                End If
+            Else
+                ' intSurveyScanIndex is the final survey scan or is less than 0
+                Return intSurveyScanIndex
+            End If
+        Catch ex As Exception
+            ' Error occurred; simply return intSurveyScanIndex
+            Return intSurveyScanIndex
+        End Try
 
-	End Function
+    End Function
 
-	Private Function GetPreviousSurveyScanIndex(ByRef SurveyScans() As udtScanInfoType, intSurveyScanIndex As Integer) As Integer
-		' Returns the previous adjacent survey scan index
-		' If the given survey scan is not a SIM scan, then simply returns the previous index
-		' If the given survey scan is a SIM scan, then returns the previous survey scan with the same .SIMIndex
-		' If no appropriate next survey scan index is found, then returns intSurveyScanIndex instead
+    Private Function GetPreviousSurveyScanIndex(ByRef SurveyScans() As udtScanInfoType, intSurveyScanIndex As Integer) As Integer
+        ' Returns the previous adjacent survey scan index
+        ' If the given survey scan is not a SIM scan, then simply returns the previous index
+        ' If the given survey scan is a SIM scan, then returns the previous survey scan with the same .SIMIndex
+        ' If no appropriate next survey scan index is found, then returns intSurveyScanIndex instead
 
-		Dim intPreviousSurveyScanIndex As Integer
-		Dim intSIMIndex As Integer
+        Dim intPreviousSurveyScanIndex As Integer
+        Dim intSIMIndex As Integer
 
-		Try
-			If intSurveyScanIndex > 0 AndAlso intSurveyScanIndex < SurveyScans.Length Then
-				If SurveyScans(intSurveyScanIndex).SIMScan Then
-					intSIMIndex = SurveyScans(intSurveyScanIndex).SIMIndex
+        Try
+            If intSurveyScanIndex > 0 AndAlso intSurveyScanIndex < SurveyScans.Length Then
+                If SurveyScans(intSurveyScanIndex).SIMScan Then
+                    intSIMIndex = SurveyScans(intSurveyScanIndex).SIMIndex
 
-					intPreviousSurveyScanIndex = intSurveyScanIndex - 1
-					Do While intPreviousSurveyScanIndex >= 0
-						If SurveyScans(intPreviousSurveyScanIndex).SIMIndex = intSIMIndex Then
-							Exit Do
-						Else
-							intPreviousSurveyScanIndex -= 1
-						End If
-					Loop
+                    intPreviousSurveyScanIndex = intSurveyScanIndex - 1
+                    Do While intPreviousSurveyScanIndex >= 0
+                        If SurveyScans(intPreviousSurveyScanIndex).SIMIndex = intSIMIndex Then
+                            Exit Do
+                        Else
+                            intPreviousSurveyScanIndex -= 1
+                        End If
+                    Loop
 
-					If intPreviousSurveyScanIndex < 0 Then
-						' Match was not found
-						intPreviousSurveyScanIndex = intSurveyScanIndex
-					End If
+                    If intPreviousSurveyScanIndex < 0 Then
+                        ' Match was not found
+                        intPreviousSurveyScanIndex = intSurveyScanIndex
+                    End If
 
-					Return intPreviousSurveyScanIndex
-				Else
-					' Not a SIM Scan
-					Return intSurveyScanIndex - 1
-				End If
-			Else
-				' intSurveyScanIndex is the first survey scan or is less than 0
-				Return intSurveyScanIndex
-			End If
-		Catch ex As Exception
-			' Error occurred; simply return intSurveyScanIndex
-			Return intSurveyScanIndex
-		End Try
+                    Return intPreviousSurveyScanIndex
+                Else
+                    ' Not a SIM Scan
+                    Return intSurveyScanIndex - 1
+                End If
+            Else
+                ' intSurveyScanIndex is the first survey scan or is less than 0
+                Return intSurveyScanIndex
+            End If
+        Catch ex As Exception
+            ' Error occurred; simply return intSurveyScanIndex
+            Return intSurveyScanIndex
+        End Try
 
-	End Function
+    End Function
 
-	Private Function GetProcessMemoryUsageMB() As Single
+    Private Function GetProcessMemoryUsageMB() As Single
 
-		' Obtain a handle to the current process
-		Dim objProcess As Diagnostics.Process
-		objProcess = Diagnostics.Process.GetCurrentProcess()
+        ' Obtain a handle to the current process
+        Dim objProcess As Diagnostics.Process
+        objProcess = Diagnostics.Process.GetCurrentProcess()
 
-		' The WorkingSet is the total physical memory usage 
-		Return CSng(objProcess.WorkingSet64 / 1024 / 1024)
+        ' The WorkingSet is the total physical memory usage 
+        Return CSng(objProcess.WorkingSet64 / 1024 / 1024)
 
-	End Function
+    End Function
 
-	Public Shared Function GetDefaultReporterIons(eReporterIonMassMode As eReporterIonMassModeConstants) As udtReporterIonInfoType()
-		If eReporterIonMassMode = eReporterIonMassModeConstants.ITraqEightMZHighRes Then
-			Return GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES)
-		Else
-			Return GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
-		End If
-	End Function
+    Public Shared Function GetDefaultReporterIons(eReporterIonMassMode As eReporterIonMassModeConstants) As udtReporterIonInfoType()
+        If eReporterIonMassMode = eReporterIonMassModeConstants.ITraqEightMZHighRes Then
+            Return GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES)
+        Else
+            Return GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT)
+        End If
+    End Function
 
-	Public Shared Function GetDefaultReporterIons(
-	  eReporterIonMassMode As eReporterIonMassModeConstants, 
-	  dblMZToleranceDa As Double) As udtReporterIonInfoType()
-	  
-		Dim intIndex As Integer
-		Dim udtReporterIonInfo() As udtReporterIonInfoType
+    Public Shared Function GetDefaultReporterIons(
+      eReporterIonMassMode As eReporterIonMassModeConstants,
+      dblMZToleranceDa As Double) As udtReporterIonInfoType()
 
-		Select Case eReporterIonMassMode
-			Case eReporterIonMassModeConstants.ITraqFourMZ
-				' ITRAQ
-				ReDim udtReporterIonInfo(3)
-				udtReporterIonInfo(0).MZ = 114.1112
-				udtReporterIonInfo(1).MZ = 115.1083
-				udtReporterIonInfo(2).MZ = 116.1116
-				udtReporterIonInfo(3).MZ = 117.115
+        Dim intIndex As Integer
+        Dim udtReporterIonInfo() As udtReporterIonInfoType
 
-			Case eReporterIonMassModeConstants.ITraqETDThreeMZ
-				' ITRAQ ETD tags
-				ReDim udtReporterIonInfo(2)
-				udtReporterIonInfo(0).MZ = 101.107
-				udtReporterIonInfo(1).MZ = 102.104
-				udtReporterIonInfo(2).MZ = 104.1107
+        Select Case eReporterIonMassMode
+            Case eReporterIonMassModeConstants.ITraqFourMZ
+                ' ITRAQ
+                ReDim udtReporterIonInfo(3)
+                udtReporterIonInfo(0).MZ = 114.1112
+                udtReporterIonInfo(1).MZ = 115.1083
+                udtReporterIonInfo(2).MZ = 116.1116
+                udtReporterIonInfo(3).MZ = 117.115
 
-			Case eReporterIonMassModeConstants.TMTTwoMZ
-				' TMT duplex Isobaric tags (from Thermo)
-				ReDim udtReporterIonInfo(1)
-				udtReporterIonInfo(0).MZ = 126.1283
-				udtReporterIonInfo(1).MZ = 127.1316
+            Case eReporterIonMassModeConstants.ITraqETDThreeMZ
+                ' ITRAQ ETD tags
+                ReDim udtReporterIonInfo(2)
+                udtReporterIonInfo(0).MZ = 101.107
+                udtReporterIonInfo(1).MZ = 102.104
+                udtReporterIonInfo(2).MZ = 104.1107
 
-			Case eReporterIonMassModeConstants.TMTSixMZ
-				' TMT sixplex Isobaric tags (from Thermo)
-				' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
-				ReDim udtReporterIonInfo(5)					' Old values:
-				udtReporterIonInfo(0).MZ = 126.127725		' 126.1283
-				udtReporterIonInfo(1).MZ = 127.12476	   ' 127.1316
-				udtReporterIonInfo(2).MZ = 128.134433		' 128.135
-				udtReporterIonInfo(3).MZ = 129.131468		' 129.1383
-				udtReporterIonInfo(4).MZ = 130.141141		' 130.1417
-				udtReporterIonInfo(5).MZ = 131.138176		' 131.1387
+            Case eReporterIonMassModeConstants.TMTTwoMZ
+                ' TMT duplex Isobaric tags (from Thermo)
+                ReDim udtReporterIonInfo(1)
+                udtReporterIonInfo(0).MZ = 126.1283
+                udtReporterIonInfo(1).MZ = 127.1316
 
-			Case eReporterIonMassModeConstants.TMTTenMZ
-				' TMT 10-plex Isobaric tags (from Thermo)
-				' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
-				' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-				ReDim udtReporterIonInfo(9)
-				udtReporterIonInfo(0).MZ = 126.127725	 ' 126.127725	
-				udtReporterIonInfo(1).MZ = 127.12476	 ' 127.12476
-				udtReporterIonInfo(2).MZ = 127.131079	 ' 127.131079
-				udtReporterIonInfo(3).MZ = 128.128114	 ' 128.128114
-				udtReporterIonInfo(4).MZ = 128.134433	 ' 128.134433
-				udtReporterIonInfo(5).MZ = 129.131468	 ' 129.131468
-				udtReporterIonInfo(6).MZ = 129.137787	 ' 129.137787
-				udtReporterIonInfo(7).MZ = 130.134822	 ' 130.134822
-				udtReporterIonInfo(8).MZ = 130.141141	 ' 130.141141
-				udtReporterIonInfo(9).MZ = 131.138176	 ' 131.138176
+            Case eReporterIonMassModeConstants.TMTSixMZ
+                ' TMT sixplex Isobaric tags (from Thermo)
+                ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
+                ReDim udtReporterIonInfo(5)                 ' Old values:
+                udtReporterIonInfo(0).MZ = 126.127725       ' 126.1283
+                udtReporterIonInfo(1).MZ = 127.12476       ' 127.1316
+                udtReporterIonInfo(2).MZ = 128.134433       ' 128.135
+                udtReporterIonInfo(3).MZ = 129.131468       ' 129.1383
+                udtReporterIonInfo(4).MZ = 130.141141       ' 130.1417
+                udtReporterIonInfo(5).MZ = 131.138176       ' 131.1387
 
-			Case eReporterIonMassModeConstants.ITraqEightMZHighRes
+            Case eReporterIonMassModeConstants.TMTTenMZ
+                ' TMT 10-plex Isobaric tags (from Thermo)
+                ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
+                ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
+                ReDim udtReporterIonInfo(9)
+                udtReporterIonInfo(0).MZ = 126.127725    ' 126.127725	
+                udtReporterIonInfo(1).MZ = 127.12476     ' 127.12476
+                udtReporterIonInfo(2).MZ = 127.131079    ' 127.131079
+                udtReporterIonInfo(3).MZ = 128.128114    ' 128.128114
+                udtReporterIonInfo(4).MZ = 128.134433    ' 128.134433
+                udtReporterIonInfo(5).MZ = 129.131468    ' 129.131468
+                udtReporterIonInfo(6).MZ = 129.137787    ' 129.137787
+                udtReporterIonInfo(7).MZ = 130.134822    ' 130.134822
+                udtReporterIonInfo(8).MZ = 130.141141    ' 130.141141
+                udtReporterIonInfo(9).MZ = 131.138176    ' 131.138176
 
-				' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS
-				ReDim udtReporterIonInfo(7)
-				udtReporterIonInfo(0).MZ = 113.107873
-				udtReporterIonInfo(1).MZ = 114.111228
-				udtReporterIonInfo(2).MZ = 115.108263
-				udtReporterIonInfo(3).MZ = 116.111618
-				udtReporterIonInfo(4).MZ = 117.114973
-				udtReporterIonInfo(5).MZ = 118.112008
-				udtReporterIonInfo(6).MZ = 119.115363
-				udtReporterIonInfo(7).MZ = 121.122072
+            Case eReporterIonMassModeConstants.ITraqEightMZHighRes
+
+                ' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS
+                ReDim udtReporterIonInfo(7)
+                udtReporterIonInfo(0).MZ = 113.107873
+                udtReporterIonInfo(1).MZ = 114.111228
+                udtReporterIonInfo(2).MZ = 115.108263
+                udtReporterIonInfo(3).MZ = 116.111618
+                udtReporterIonInfo(4).MZ = 117.114973
+                udtReporterIonInfo(5).MZ = 118.112008
+                udtReporterIonInfo(6).MZ = 119.115363
+                udtReporterIonInfo(7).MZ = 121.122072
 
 
-			Case eReporterIonMassModeConstants.ITraqEightMZLowRes
+            Case eReporterIonMassModeConstants.ITraqEightMZLowRes
 
-				' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS
-				ReDim udtReporterIonInfo(8)
-				udtReporterIonInfo(0).MZ = 113.107873
-				udtReporterIonInfo(1).MZ = 114.111228
-				udtReporterIonInfo(2).MZ = 115.108263
-				udtReporterIonInfo(3).MZ = 116.111618
-				udtReporterIonInfo(4).MZ = 117.114973
-				udtReporterIonInfo(5).MZ = 118.112008
-				udtReporterIonInfo(6).MZ = 119.115363
+                ' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS
+                ReDim udtReporterIonInfo(8)
+                udtReporterIonInfo(0).MZ = 113.107873
+                udtReporterIonInfo(1).MZ = 114.111228
+                udtReporterIonInfo(2).MZ = 115.108263
+                udtReporterIonInfo(3).MZ = 116.111618
+                udtReporterIonInfo(4).MZ = 117.114973
+                udtReporterIonInfo(5).MZ = 118.112008
+                udtReporterIonInfo(6).MZ = 119.115363
 
-				udtReporterIonInfo(7).MZ = 120.08131   ' This corresponds to immonium ion loss from Phenylalanine (147.06841 - 26.9871 since Immonium is CO minus H)
-				udtReporterIonInfo(7).ContaminantIon = True
+                udtReporterIonInfo(7).MZ = 120.08131   ' This corresponds to immonium ion loss from Phenylalanine (147.06841 - 26.9871 since Immonium is CO minus H)
+                udtReporterIonInfo(7).ContaminantIon = True
 
-				udtReporterIonInfo(8).MZ = 121.122072
+                udtReporterIonInfo(8).MZ = 121.122072
 
-			Case eReporterIonMassModeConstants.PCGalnaz
+            Case eReporterIonMassModeConstants.PCGalnaz
 
-				' Custom reporter ions for Josh Alfaro
-				ReDim udtReporterIonInfo(2)
-				udtReporterIonInfo(0).MZ = 204.0871934		' C8H14NO5
-				udtReporterIonInfo(1).MZ = 300.130787		' C11H18N5O5
-				udtReporterIonInfo(2).MZ = 503.2101566		' C19H31N6O10
+                ' Custom reporter ions for Josh Alfaro
+                ReDim udtReporterIonInfo(2)
+                udtReporterIonInfo(0).MZ = 204.0871934      ' C8H14NO5
+                udtReporterIonInfo(1).MZ = 300.130787       ' C11H18N5O5
+                udtReporterIonInfo(2).MZ = 503.2101566      ' C19H31N6O10
 
-			Case eReporterIonMassModeConstants.HemeCFragment
+            Case eReporterIonMassModeConstants.HemeCFragment
 
-				' Custom reporter ions for Eric Merkley
-				ReDim udtReporterIonInfo(1)
-				udtReporterIonInfo(0).MZ = 616.1767
-				udtReporterIonInfo(1).MZ = 617.1845
+                ' Custom reporter ions for Eric Merkley
+                ReDim udtReporterIonInfo(1)
+                udtReporterIonInfo(0).MZ = 616.1767
+                udtReporterIonInfo(1).MZ = 617.1845
 
-			Case eReporterIonMassModeConstants.LycAcetFragment
+            Case eReporterIonMassModeConstants.LycAcetFragment
 
-				' Custom reporter ions for Ernesto Nakayasu
-				ReDim udtReporterIonInfo(1)
-				udtReporterIonInfo(0).MZ = 126.09134
-				udtReporterIonInfo(1).MZ = 127.094695
+                ' Custom reporter ions for Ernesto Nakayasu
+                ReDim udtReporterIonInfo(1)
+                udtReporterIonInfo(0).MZ = 126.09134
+                udtReporterIonInfo(1).MZ = 127.094695
 
-			Case eReporterIonMassModeConstants.OGlcNAc
-				' O-GlcNAc
-				ReDim udtReporterIonInfo(2)
-				udtReporterIonInfo(0).MZ = 204.0872
-				udtReporterIonInfo(1).MZ = 300.13079
-				udtReporterIonInfo(2).MZ = 503.21017
+            Case eReporterIonMassModeConstants.OGlcNAc
+                ' O-GlcNAc
+                ReDim udtReporterIonInfo(2)
+                udtReporterIonInfo(0).MZ = 204.0872
+                udtReporterIonInfo(1).MZ = 300.13079
+                udtReporterIonInfo(2).MZ = 503.21017
 
-			Case Else
-				' Includes eReporterIonMassModeConstants.CustomOrNone
-				ReDim udtReporterIonInfo(-1)
-		End Select
+            Case eReporterIonMassModeConstants.FrackingAmine20160217
+                ' Product ions associated with FrackingFluid_amine_1_02172016
+                ReDim udtReporterIonInfo(2)
+                udtReporterIonInfo(0).MZ = 170.09
+                udtReporterIonInfo(1).MZ = 172.08
+                udtReporterIonInfo(2).MZ = 252.07
 
-		For intIndex = 0 To udtReporterIonInfo.Length - 1
-			udtReporterIonInfo(intIndex).MZToleranceDa = dblMZToleranceDa
-		Next intIndex
+            Case Else
+                ' Includes eReporterIonMassModeConstants.CustomOrNone
+                ReDim udtReporterIonInfo(-1)
+        End Select
 
-		Return udtReporterIonInfo
+        For intIndex = 0 To udtReporterIonInfo.Length - 1
+            udtReporterIonInfo(intIndex).MZToleranceDa = dblMZToleranceDa
+        Next intIndex
 
-	End Function
+        Return udtReporterIonInfo
 
-	Public Function GetReporterIons() As udtReporterIonInfoType()
-		Dim udtReporterIonInfo() As udtReporterIonInfoType
+    End Function
 
-		If mReporterIonCount <= 0 Then
-			ReDim udtReporterIonInfo(-1)
-		Else
-			ReDim udtReporterIonInfo(mReporterIonCount - 1)
-			Array.Copy(mReporterIonInfo, udtReporterIonInfo, mReporterIonCount)
-		End If
+    Public Function GetReporterIons() As udtReporterIonInfoType()
+        Dim udtReporterIonInfo() As udtReporterIonInfoType
 
-		Return udtReporterIonInfo
-	End Function
+        If mReporterIonCount <= 0 Then
+            ReDim udtReporterIonInfo(-1)
+        Else
+            ReDim udtReporterIonInfo(mReporterIonCount - 1)
+            Array.Copy(mReporterIonInfo, udtReporterIonInfo, mReporterIonCount)
+        End If
 
-	Public Shared Function GetReporterIonModeDescription(eReporterIonMode As eReporterIonMassModeConstants) As String
+        Return udtReporterIonInfo
+    End Function
 
-		Select Case eReporterIonMode
-			Case eReporterIonMassModeConstants.CustomOrNone
-				Return "Custom/None"
-			Case eReporterIonMassModeConstants.ITraqFourMZ
-				Return "4-plex iTraq"
-			Case eReporterIonMassModeConstants.ITraqETDThreeMZ
-				Return "3-plex ETD iTraq"
-			Case eReporterIonMassModeConstants.TMTTwoMZ
-				Return "2-plex TMT"
-			Case eReporterIonMassModeConstants.TMTSixMZ
-				Return "6-plex TMT"
-			Case eReporterIonMassModeConstants.TMTTenMZ
-				Return "10-plex TMT"
-			Case eReporterIonMassModeConstants.ITraqEightMZHighRes
-				Return "8-plex iTraq (High Res MS/MS)"
-			Case eReporterIonMassModeConstants.ITraqEightMZLowRes
-				Return "8-plex iTraq (Low Res MS/MS)"
-			Case eReporterIonMassModeConstants.PCGalnaz
-				Return "PCGalnaz (300.13 m/z and 503.21 m/z)"
-			Case eReporterIonMassModeConstants.HemeCFragment
-				Return "Heme C (616.18 m/z and 616.19 m/z)"
-			Case eReporterIonMassModeConstants.LycAcetFragment
-				Return "Lys Acet (126.091 m/z and 127.095 m/z)"
-			Case eReporterIonMassModeConstants.OGlcNAc
-				Return "O-GlcNAc (204.087, 300.13, and 503.21 m/z)"
-			Case Else
-				Return "Unknown mode"
-		End Select
+    Public Shared Function GetReporterIonModeDescription(eReporterIonMode As eReporterIonMassModeConstants) As String
 
-	End Function
+        Select Case eReporterIonMode
+            Case eReporterIonMassModeConstants.CustomOrNone
+                Return "Custom/None"
+            Case eReporterIonMassModeConstants.ITraqFourMZ
+                Return "4-plex iTraq"
+            Case eReporterIonMassModeConstants.ITraqETDThreeMZ
+                Return "3-plex ETD iTraq"
+            Case eReporterIonMassModeConstants.TMTTwoMZ
+                Return "2-plex TMT"
+            Case eReporterIonMassModeConstants.TMTSixMZ
+                Return "6-plex TMT"
+            Case eReporterIonMassModeConstants.TMTTenMZ
+                Return "10-plex TMT"
+            Case eReporterIonMassModeConstants.ITraqEightMZHighRes
+                Return "8-plex iTraq (High Res MS/MS)"
+            Case eReporterIonMassModeConstants.ITraqEightMZLowRes
+                Return "8-plex iTraq (Low Res MS/MS)"
+            Case eReporterIonMassModeConstants.PCGalnaz
+                Return "PCGalnaz (300.13 m/z and 503.21 m/z)"
+            Case eReporterIonMassModeConstants.HemeCFragment
+                Return "Heme C (616.18 m/z and 616.19 m/z)"
+            Case eReporterIonMassModeConstants.LycAcetFragment
+                Return "Lys Acet (126.091 m/z and 127.095 m/z)"
+            Case eReporterIonMassModeConstants.OGlcNAc
+                Return "O-GlcNAc (204.087, 300.13, and 503.21 m/z)"
+            Case eReporterIonMassModeConstants.FrackingAmine20160217
+                Return "Fracking Amine 20160217 (170.09, 172.08, and 252.07 m/z)"
+            Case Else
+                Return "Unknown mode"
+        End Select
+
+    End Function
 
 	Protected Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double) As Double
 		Return GetParentIonToleranceDa(udtSICOptions, dblParentIonMZ, udtSICOptions.SICTolerance)
