@@ -2,7 +2,7 @@ MASIC Change Log
 
 Version 2.6.5893; February 19, 2016
 	- Update the masses for  reporter ion mode FrackingAmine20160217
-		- Now: 170.09 m/z, 172.08 m/z, and 252.07 m/z
+		- Now: 157.089, 170.097, and 234.059 m/z
 
 Version 2.6.5891; February 17, 2016
 	- Added reporter ion mode FrackingAmine20160217
