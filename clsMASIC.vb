@@ -40,7 +40,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "February 17, 2016"
+        MyBase.mFileDate = "February 19, 2016"
         InitializeVariables()
     End Sub
 
@@ -7655,9 +7655,9 @@ Public Class clsMASIC
             Case eReporterIonMassModeConstants.FrackingAmine20160217
                 ' Product ions associated with FrackingFluid_amine_1_02172016
                 ReDim udtReporterIonInfo(2)
-                udtReporterIonInfo(0).MZ = 170.09
-                udtReporterIonInfo(1).MZ = 172.08
-                udtReporterIonInfo(2).MZ = 252.07
+                udtReporterIonInfo(0).MZ = 157.089
+                udtReporterIonInfo(1).MZ = 170.097
+                udtReporterIonInfo(2).MZ = 234.059
 
             Case Else
                 ' Includes eReporterIonMassModeConstants.CustomOrNone
@@ -7713,7 +7713,7 @@ Public Class clsMASIC
             Case eReporterIonMassModeConstants.OGlcNAc
                 Return "O-GlcNAc (204.087, 300.13, and 503.21 m/z)"
             Case eReporterIonMassModeConstants.FrackingAmine20160217
-                Return "Fracking Amine 20160217 (170.09, 172.08, and 252.07 m/z)"
+                Return "Fracking Amine 20160217 (157.089, 170.097, and 234.059 m/z)"
             Case Else
                 Return "Unknown mode"
         End Select

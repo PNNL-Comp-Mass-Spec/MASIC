@@ -995,7 +995,7 @@ Public Class frmMain
                 .Insert(eReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095")
                 .Insert(eReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131")
                 .Insert(eReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21")
-                .Insert(eReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 170.09, 172.08, and 252.07")
+                .Insert(eReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059")
             End With
             .SelectedIndex = eReporterIonMassModeConstants.CustomOrNone
         End With
