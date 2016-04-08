@@ -1,5 +1,11 @@
 MASIC Change Log
 
+Version 2.6.5941; April 7, 2016
+	- Added three new reporter ion modes
+		- FSFACustomCarbonyl:    171.104, 236.074, 157.088 m/z
+		- FSFACustomCarboxylic:  171.104, 234.058, 336.174 m/z
+		- FSFACustomHydroxyl:    151.063 and 166.087 m/z
+
 Version 2.6.5893; February 19, 2016
 	- Update the masses for  reporter ion mode FrackingAmine20160217
 		- Now: 157.089, 170.097, and 234.059 m/z

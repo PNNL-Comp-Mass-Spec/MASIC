@@ -416,6 +416,16 @@ ThermoRawFileReaderDLL
  Constructor
  </summary>
 	<remarks></remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.#ctor(System.String)">
+	<summary>
+ Constructor
+ </summary>
+	<remarks></remarks>
+</member><member name="M:ThermoRawFileReaderDLL.FinniganFileIO.XRawFileIO.Dispose">
+	<summary>
+ Dispose the reader
+ </summary>
+	<remarks></remarks>
 </member>
 </members>
 </doc>

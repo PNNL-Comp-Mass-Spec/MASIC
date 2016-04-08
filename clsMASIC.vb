@@ -40,7 +40,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "February 19, 2016"
+        MyBase.mFileDate = "April 7, 2016"
         InitializeVariables()
     End Sub
 
@@ -206,6 +206,9 @@ Public Class clsMASIC
         TMTTenMZ = 10               ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da
         OGlcNAc = 11
         FrackingAmine20160217 = 12
+        FSFACustomCarbonyl = 13
+        FSFACustomCarboxylic = 14
+        FSFACustomHydroxyl = 15
     End Enum
 
 #End Region
@@ -7659,6 +7662,26 @@ Public Class clsMASIC
                 udtReporterIonInfo(1).MZ = 170.097
                 udtReporterIonInfo(2).MZ = 234.059
 
+            Case eReporterIonMassModeConstants.FSFACustomCarbonyl
+                ' Custom product ions from Chengdong Xu
+                ReDim udtReporterIonInfo(2)
+                udtReporterIonInfo(0).MZ = 171.104
+                udtReporterIonInfo(1).MZ = 236.074
+                udtReporterIonInfo(2).MZ = 257.088
+
+            Case eReporterIonMassModeConstants.FSFACustomCarboxylic
+                ' Custom product ions from Chengdong Xu
+                ReDim udtReporterIonInfo(2)
+                udtReporterIonInfo(0).MZ = 171.104
+                udtReporterIonInfo(1).MZ = 234.058
+                udtReporterIonInfo(2).MZ = 336.174
+
+            Case eReporterIonMassModeConstants.FSFACustomHydroxyl
+                ' Custom product ions from Chengdong Xu
+                ReDim udtReporterIonInfo(1)
+                udtReporterIonInfo(0).MZ = 151.063
+                udtReporterIonInfo(1).MZ = 166.087
+
             Case Else
                 ' Includes eReporterIonMassModeConstants.CustomOrNone
                 ReDim udtReporterIonInfo(-1)
@@ -7714,6 +7737,12 @@ Public Class clsMASIC
                 Return "O-GlcNAc (204.087, 300.13, and 503.21 m/z)"
             Case eReporterIonMassModeConstants.FrackingAmine20160217
                 Return "Fracking Amine 20160217 (157.089, 170.097, and 234.059 m/z)"
+            Case eReporterIonMassModeConstants.FSFACustomCarbonyl
+                Return "FSFA Custom Carbonyl (171.104, 236.074, 157.088 m/z)"
+            Case eReporterIonMassModeConstants.FSFACustomCarboxylic
+                Return "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)"
+            Case eReporterIonMassModeConstants.FSFACustomHydroxyl
+                Return "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)"
             Case Else
                 Return "Unknown mode"
         End Select
