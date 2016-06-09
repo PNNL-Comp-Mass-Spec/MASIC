@@ -31,8 +31,7 @@ Option Strict On
 ' SOFTWARE.  This notice including this sentence must appear on any copies of 
 ' this computer software.
 
-Imports ThermoRawFileReaderDLL
-Imports ThermoRawFileReaderDLL.FinniganFileIO
+Imports ThermoRawFileReader
 Imports PNNLOmics.Utilities
 Imports System.Runtime.InteropServices
 
@@ -307,7 +306,7 @@ Public Class clsMASIC
     Protected Structure udtMRMScanInfoType
         Public ParentIonMZ As Double
         Public MRMMassCount As Integer                      ' List of mass ranges monitored by the first quadrupole
-        Public MRMMassList() As FinniganFileReaderBaseClass.udtMRMMassRangeType     ' Daughter m/z values monitored for this parent m/z
+        Public MRMMassList As List(Of udtMRMMassRangeType)  ' Daughter m/z values monitored for this parent m/z
         Public ScanCount As Integer                         ' Number of spectra that used these MRM search values
         Public ParentIonInfoIndex As Integer
     End Structure
@@ -331,7 +330,7 @@ Public Class clsMASIC
 
         Public ZoomScan As Boolean                          ' True if the scan is a Zoom scan
         Public SIMScan As Boolean                           ' True if the scan was a SIM scan
-        Public MRMScanType As FinniganFileReaderBaseClass.MRMScanTypeConstants
+        Public MRMScanType As MRMScanTypeConstants
         Public SIMIndex As Integer                          ' For SIM scans, allows one to quickly find all of the SIM scans with the same mass range, since they'll all have the same SIMIndex
         Public LowMass As Double                            ' Useful for SIMScans to find similar SIM scans
         Public HighMass As Double                           ' Useful for SIMScans to find similar SIM scans
@@ -592,7 +591,7 @@ Public Class clsMASIC
     Private mScanStats As List(Of DSSummarizer.clsScanStatsEntry)
     Private mDatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType
 
-    Protected WithEvents mXcaliburAccessor As FinniganFileReaderBaseClass
+    Protected WithEvents mXcaliburAccessor As XRawFileIO
 
     ' Note: Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
     ' Use ProgressSubtaskChanged when updating the sub task progress
@@ -1715,7 +1714,7 @@ Public Class clsMASIC
 
             .ZoomScan = False
             .SIMScan = False
-            .MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM
+            .MRMScanType = MRMScanTypeConstants.NotMRM
 
             .LowMass = 0
             .HighMass = 0
@@ -3853,7 +3852,7 @@ Public Class clsMASIC
 
             ' Construct a list of the MRM search values used
             For intScanIndex = 0 To udtScanList.FragScanCount - 1
-                If udtScanList.FragScans(intScanIndex).MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.SRM Then
+                If udtScanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
                     blnMRMDataPresent = True
 
                     With udtScanList.FragScans(intScanIndex)
@@ -4102,19 +4101,19 @@ Public Class clsMASIC
     End Sub
 
     Private Sub DuplicateMRMInfo(
-      ByRef udtSource As FinniganFileReaderBaseClass.udtMRMInfoType,
+      ByRef udtSource As MRMInfo,
       dblParentIonMZ As Double,
       ByRef udtTarget As udtMRMScanInfoType)
 
         With udtSource
             udtTarget.ParentIonMZ = dblParentIonMZ
-            udtTarget.MRMMassCount = .MRMMassCount
+            udtTarget.MRMMassCount = .MRMMassList.Count
 
             If .MRMMassList Is Nothing Then
-                ReDim udtTarget.MRMMassList(-1)
+                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)()
             Else
-                ReDim udtTarget.MRMMassList(.MRMMassList.Length - 1)
-                Array.Copy(.MRMMassList, udtTarget.MRMMassList, .MRMMassList.Length)
+                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)(.MRMMassList.Count)
+                udtTarget.MRMMassList.AddRange(.MRMMassList)
             End If
 
             udtTarget.ScanCount = 0
@@ -4128,10 +4127,10 @@ Public Class clsMASIC
             udtTarget.MRMMassCount = .MRMMassCount
 
             If .MRMMassList Is Nothing Then
-                ReDim udtTarget.MRMMassList(-1)
+                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)()
             Else
-                ReDim udtTarget.MRMMassList(.MRMMassList.Length - 1)
-                Array.Copy(.MRMMassList, udtTarget.MRMMassList, .MRMMassList.Length)
+                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)(.MRMMassList.Count)
+                udtTarget.MRMMassList.AddRange(.MRMMassList)
             End If
 
             udtTarget.ScanCount = udtSource.ScanCount
@@ -4256,7 +4255,7 @@ Public Class clsMASIC
                     ReDim blnCrosstabColumnFlag(udtSRMList.Length - 1)
 
                     For intScanIndex = 0 To udtScanList.FragScanCount - 1
-                        If udtScanList.FragScans(intScanIndex).MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.SRM Then
+                        If udtScanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
                             With udtScanList.FragScans(intScanIndex)
 
                                 If intScanFirst = Integer.MinValue Then
@@ -4471,7 +4470,7 @@ Public Class clsMASIC
                     SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, udtScanList.SurveyScans(intScanPointer), objSpectraCache, strInputFileName, False, intSpectrumExportCount, udtRawDataExportOptions)
                 Else
                     If udtRawDataExportOptions.IncludeMSMS OrElse
-                      Not udtScanList.FragScans(intScanPointer).MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+                      Not udtScanList.FragScans(intScanPointer).MRMScanType = MRMScanTypeConstants.NotMRM Then
                         ' Either we're writing out MS/MS data or this is an MRM scan
                         SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, udtScanList.FragScans(intScanPointer), objSpectraCache, strInputFileName, True, intSpectrumExportCount, udtRawDataExportOptions)
                     End If
@@ -5385,7 +5384,7 @@ Public Class clsMASIC
             .SIMScan = scanInfo.SIMScan
             .MRMScanType = scanInfo.MRMScanType
 
-            If Not .MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+            If Not .MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is an MRM scan
                 udtScanList.MRMDataPresent = True
             End If
@@ -5507,7 +5506,7 @@ Public Class clsMASIC
             .MRMScanType = scanInfo.MRMScanType
         End With
 
-        If Not udtScanList.FragScans(udtScanList.FragScanCount).MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+        If Not udtScanList.FragScans(udtScanList.FragScanCount).MRMScanType = MRMScanTypeConstants.NotMRM Then
             ' This is an MRM scan
             udtScanList.MRMDataPresent = True
 
@@ -5566,7 +5565,7 @@ Public Class clsMASIC
 
         End With
 
-        If scanInfo.MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+        If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
             ' This is not an MRM scan
             AddUpdateParentIons(udtScanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, udtScanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
         Else
@@ -5651,7 +5650,7 @@ Public Class clsMASIC
         Dim intLastNonZoomSurveyScanIndex As Integer
         Dim intWarnCount As Integer = 0
 
-        Dim eMRMScanType As FinniganFileReaderBaseClass.MRMScanTypeConstants
+        Dim eMRMScanType As MRMScanTypeConstants
 
         Dim objSpectrumInfo As MSDataFileReader.clsSpectrumInfo = Nothing
         Dim objMZXmlSpectrumInfo As MSDataFileReader.clsSpectrumInfoMzXML = Nothing
@@ -5754,7 +5753,7 @@ Public Class clsMASIC
                                 ' If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
                                 .ZoomScan = False
                                 .SIMScan = False
-                                .MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM
+                                .MRMScanType = MRMScanTypeConstants.NotMRM
 
                                 .LowMass = objSpectrumInfo.mzRangeStart
                                 .HighMass = objSpectrumInfo.mzRangeEnd
@@ -5827,7 +5826,7 @@ Public Class clsMASIC
                                 ' If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
                                 .ZoomScan = False
                                 .SIMScan = False
-                                .MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM
+                                .MRMScanType = MRMScanTypeConstants.NotMRM
 
                                 .MRMScanInfo.MRMMassCount = 0
 
@@ -5836,17 +5835,16 @@ Public Class clsMASIC
                             UpdateMSXmlScanType(udtScanList.FragScans(udtScanList.FragScanCount), objSpectrumInfo.MSLevel, "MSn", blnIsMzXML, objMZXmlSpectrumInfo)
 
                             eMRMScanType = udtScanList.FragScans(udtScanList.FragScanCount).MRMScanType
-                            If Not eMRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+                            If Not eMRMScanType = MRMScanTypeConstants.NotMRM Then
                                 ' This is an MRM scan
                                 udtScanList.MRMDataPresent = True
 
-                                Dim udtScanHeaderInfo As FinniganFileReaderBaseClass.udtScanHeaderInfoType
+                                Dim scanInfo = New clsScanInfo(objSpectrumInfo.SpectrumID)
 
-                                With udtScanHeaderInfo
+                                With scanInfo
                                     .FilterText = udtScanList.FragScans(udtScanList.FragScanCount).ScanHeaderText
                                     .MRMScanType = eMRMScanType
-                                    .MRMInfo = New ThermoRawFileReaderDLL.FinniganFileIO.FinniganFileReaderBaseClass.udtMRMInfoType
-                                    XRawFileIO.InitializeMRMInfo(.MRMInfo, 1)
+                                    .MRMInfo = New MRMInfo
 
                                     If Not String.IsNullOrEmpty(.FilterText) Then
                                         ' Parse out the MRM_QMS or SRM information for this scan
@@ -5866,17 +5864,19 @@ Public Class clsMASIC
                                             End If
                                         End If
 
-                                        With .MRMInfo.MRMMassList(0)
+                                        Dim mRMMassRange As udtMRMMassRangeType
+                                        mRMMassRange = New udtMRMMassRangeType()
+                                        With mRMMassRange
                                             .StartMass = objSpectrumInfo.mzRangeStart
                                             .EndMass = objSpectrumInfo.mzRangeEnd
                                             .CentralMass = Math.Round(.StartMass + (.EndMass - .StartMass) / 2, 6)
                                         End With
-                                        .MRMInfo.MRMMassCount += 1
+                                        .MRMInfo.MRMMassList.Add(mRMMassRange)
 
                                     End If
                                 End With
 
-                                DuplicateMRMInfo(udtScanHeaderInfo.MRMInfo, objSpectrumInfo.ParentIonMZ, udtScanList.FragScans(udtScanList.FragScanCount).MRMScanInfo)
+                                DuplicateMRMInfo(scanInfo.MRMInfo, objSpectrumInfo.ParentIonMZ, udtScanList.FragScans(udtScanList.FragScanCount).MRMScanInfo)
 
 
                                 If udtScanList.SurveyScanCount = 0 Then
@@ -5912,7 +5912,7 @@ Public Class clsMASIC
 
                             End With
 
-                            If eMRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+                            If eMRMScanType = MRMScanTypeConstants.NotMRM Then
                                 ' This is not an MRM scan
                                 AddUpdateParentIons(udtScanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ, udtScanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
                             Else
@@ -6025,11 +6025,11 @@ Public Class clsMASIC
 
                             Case MSDataFileReader.clsSpectrumInfoMzXML.ScanTypeNames.MRM.ToLower
                                 .ScanTypeName = "MRM"
-                                .MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.SRM
+                                .MRMScanType = MRMScanTypeConstants.SRM
 
                             Case MSDataFileReader.clsSpectrumInfoMzXML.ScanTypeNames.SRM.ToLower
                                 .ScanTypeName = "CID-SRM"
-                                .MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.SRM
+                                .MRMScanType = MRMScanTypeConstants.SRM
                             Case Else
                                 ' Leave .ScanTypeName unchanged
                         End Select
@@ -8996,7 +8996,7 @@ Public Class clsMASIC
     End Function
 
     Private Function LoadSpectraForFinniganDataFile(
-      objXcaliburAccessor As FinniganFileReaderBaseClass,
+      objXcaliburAccessor As XRawFileIO,
       objSpectraCache As clsSpectraCache,
       intScanNumber As Integer,
       ByRef udtScanInfo As udtScanInfoType,
@@ -9090,7 +9090,7 @@ Public Class clsMASIC
                 End With
 
 
-                If udtScanInfo.MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+                If udtScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                     blnDiscardLowIntensityDataWork = blnDiscardLowIntensityData
                     blnCompressSpectraDataWork = blnCompressSpectraData
                 Else
@@ -9440,7 +9440,7 @@ Public Class clsMASIC
             If blnKeepRawSpectrum Then
 
                 ' Do not discard low intensity data for MRM scans
-                If udtScanInfo.MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.NotMRM Then
+                If udtScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                     If blnDiscardLowIntensityData Then
                         ' Discard data below the noise level or below the minimum S/N level
                         ' If we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
@@ -10650,7 +10650,7 @@ Public Class clsMASIC
 
                     ' Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
                     For intScanIndex = 0 To udtScanList.FragScanCount - 1
-                        If udtScanList.FragScans(intScanIndex).MRMScanType = FinniganFileReaderBaseClass.MRMScanTypeConstants.SRM Then
+                        If udtScanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
                             With udtScanList.FragScans(intScanIndex)
 
                                 blnUseScan = False
@@ -11538,7 +11538,7 @@ Public Class clsMASIC
     End Function
 
     Private Function SaveMSMethodFile(
-      ByRef objXcaliburAccessor As FinniganFileReaderBaseClass,
+      ByRef objXcaliburAccessor As XRawFileIO,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
 
         Dim intInstMethodCount As Integer
@@ -11549,7 +11549,7 @@ Public Class clsMASIC
         Dim srOutfile As StreamWriter
 
         Try
-            intInstMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Length
+            intInstMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count
         Catch ex As Exception
             LogErrors("SaveMSMethodFile", "Error looking up InstMethod length in objXcaliburAccessor.FileInfo", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
             Return False
@@ -11557,7 +11557,7 @@ Public Class clsMASIC
 
         Try
             For intIndex = 0 To intInstMethodCount - 1
-                If intIndex = 0 And objXcaliburAccessor.FileInfo.InstMethods.Length = 1 Then
+                If intIndex = 0 And objXcaliburAccessor.FileInfo.InstMethods.Count = 1 Then
                     strMethodNum = String.Empty
                 Else
                     strMethodNum = (intIndex + 1).ToString.Trim
@@ -11589,21 +11589,20 @@ Public Class clsMASIC
     End Function
 
     Private Function SaveMSTuneFile(
-      ByRef objXcaliburAccessor As FinniganFileReaderBaseClass,
+      ByRef objXcaliburAccessor As XRawFileIO,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
 
         Const cColDelimiter As Char = ControlChars.Tab
 
         Dim intTuneMethodCount As Integer
         Dim intIndex As Integer
-        Dim intTuneSettingIndex As Integer
         Dim strOutputFilePath As String = "?undefinedfile?"
         Dim strTuneInfoNum As String
 
         Dim srOutfile As StreamWriter
 
         Try
-            intTuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Length
+            intTuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count
         Catch ex As Exception
             LogErrors("SaveMSMethodFile", "Error looking up TuneMethods length in objXcaliburAccessor.FileInfo", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
             Return False
@@ -11611,7 +11610,7 @@ Public Class clsMASIC
 
         Try
             For intIndex = 0 To intTuneMethodCount - 1
-                If intIndex = 0 And objXcaliburAccessor.FileInfo.TuneMethods.Length = 1 Then
+                If intIndex = 0 And objXcaliburAccessor.FileInfo.TuneMethods.Count = 1 Then
                     strTuneInfoNum = String.Empty
                 Else
                     strTuneInfoNum = (intIndex + 1).ToString.Trim
@@ -11623,8 +11622,8 @@ Public Class clsMASIC
                 srOutfile.WriteLine("Category" & cColDelimiter & "Name" & cColDelimiter & "Value")
 
                 With objXcaliburAccessor.FileInfo.TuneMethods(intIndex)
-                    For intTuneSettingIndex = 0 To .Count - 1
-                        srOutfile.WriteLine(.SettingCategory(intTuneSettingIndex) & cColDelimiter & .SettingName(intTuneSettingIndex) & cColDelimiter & .SettingValue(intTuneSettingIndex))
+                    For Each setting As udtTuneMethodSetting In .Settings
+                        srOutfile.WriteLine(setting.Category & cColDelimiter & setting.Name & cColDelimiter & setting.Value)
                     Next
                     srOutfile.WriteLine()
                 End With
@@ -13516,9 +13515,9 @@ Public Class clsMASIC
       ByRef udtDatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType,
       ByRef ioFileInfo As FileInfo,
       intDatasetID As Integer,
-      ByRef objXcaliburAccessor As FinniganFileReaderBaseClass) As Boolean
+      ByRef objXcaliburAccessor As XRawFileIO) As Boolean
 
-        Dim udtScanHeaderInfo = New FinniganFileReaderBaseClass.udtScanHeaderInfoType
+        Dim scanInfo = New clsScanInfo(0)
 
         Dim intScanEnd As Integer
         Dim blnSuccess As Boolean
@@ -13540,10 +13539,10 @@ Public Class clsMASIC
             Try
                 ' Look up the end scan time then compute .AcqTimeEnd
                 intScanEnd = objXcaliburAccessor.FileInfo.ScanEnd
-                objXcaliburAccessor.GetScanInfo(intScanEnd, udtScanHeaderInfo)
+                objXcaliburAccessor.GetScanInfo(intScanEnd, scanInfo)
 
                 With udtDatasetFileInfo
-                    .AcqTimeEnd = .AcqTimeStart.AddMinutes(udtScanHeaderInfo.RetentionTime)
+                    .AcqTimeEnd = .AcqTimeStart.AddMinutes(scanInfo.RetentionTime)
                     .ScanCount = objXcaliburAccessor.GetNumScans()
                 End With
 
