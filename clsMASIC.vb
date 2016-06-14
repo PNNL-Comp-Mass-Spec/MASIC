@@ -39,7 +39,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "April 7, 2016"
+        MyBase.mFileDate = "June 13, 2016"
         InitializeVariables()
     End Sub
 

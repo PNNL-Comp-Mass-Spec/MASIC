@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.6.6008; June 13, 2016
+	-  Replace VB.NET ThermoRawFileReader with C# ThermoRawFileReader
+
 Version 2.6.5941; April 7, 2016
 	- Added three new reporter ion modes
 		- FSFACustomCarbonyl:    171.104, 236.074, 157.088 m/z
