@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.6.6033; July 8, 2016
+	- Updated MSDataFileReader.dll, PRISM.dll, and SpectraTypeClassifier.dll
+	- Updated to .NET 4.5.1
+
 Version 2.6.6008; June 13, 2016
 	-  Replace VB.NET ThermoRawFileReader with C# ThermoRawFileReader
 

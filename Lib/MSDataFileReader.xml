@@ -6,6 +6,203 @@ MSDataFileReader
 </name>
 </assembly>
 <members>
-
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.DecodeNumericArray(System.String,System.Byte[]@)">
+ <summary>
+ Extracts an array of Bytes from a base-64 encoded string
+ </summary>
+ <param name="strBase64EncodedText"></param>
+ <param name="dataArray"></param>
+ <returns></returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.DecodeNumericArray(System.String,System.Int16[]@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Extracts an array of 16-bit integers from a base-64 encoded string
+ </summary>
+ <param name="strBase64EncodedText"></param>
+ <param name="dataArray"></param>
+ <param name="zLibCompressed"></param>
+ <param name="eEndianMode"></param>
+ <returns></returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.DecodeNumericArray(System.String,System.Int32[]@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Extracts an array of 32-bit integers from a base-64 encoded string
+ </summary>
+ <param name="strBase64EncodedText"></param>
+ <param name="dataArray"></param>
+ <param name="zLibCompressed"></param>
+ <param name="eEndianMode"></param>
+ <returns></returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.DecodeNumericArray(System.String,System.Single[]@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Extracts an array of Singles from a base-64 encoded string
+ </summary>
+ <param name="strBase64EncodedText"></param>
+ <param name="dataArray"></param>
+ <param name="zLibCompressed"></param>
+ <param name="eEndianMode"></param>
+ <returns></returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.DecodeNumericArray(System.String,System.Double[]@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Extracts an array of Doubles from a base-64 encoded string
+ </summary>
+ <param name="strBase64EncodedText"></param>
+ <param name="dataArray"></param>
+ <param name="zLibCompressed"></param>
+ <param name="eEndianMode"></param>
+ <returns></returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(System.Byte[],System.Int32@,System.String@,System.Boolean)">
+ <summary>
+ Converts an array of Bytes to a base-64 encoded string
+ </summary>
+ <param name="dataArray"></param>
+ <param name="intPrecisionBitsReturn">Output: Bits of precision</param>
+ <param name="strDataTypeNameReturn">Output: Datatype name</param>
+ <param name="removeTrailingPaddingChars"></param>
+ <returns>Base-64 encoded string</returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(System.Int16[],System.Int32@,System.String@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Converts an array of 16-bit integers to a base-64 encoded string
+ </summary>
+ <param name="dataArray"></param>
+ <param name="intPrecisionBitsReturn">Output: Bits of precision</param>
+ <param name="strDataTypeNameReturn">Output: Datatype name</param>
+ <param name="removeTrailingPaddingChars"></param>
+ <param name="eEndianMode"></param>
+ <returns>Base-64 encoded string</returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(System.Int32[],System.Int32@,System.String@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Converts an array of 32-bit integers to a base-64 encoded string
+ </summary>
+ <param name="dataArray"></param>
+ <param name="intPrecisionBitsReturn">Output: Bits of precision</param>
+ <param name="strDataTypeNameReturn">Output: Datatype name</param>
+ <param name="removeTrailingPaddingChars"></param>
+ <param name="eEndianMode"></param>
+ <returns>Base-64 encoded string</returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(System.Single[],System.Int32@,System.String@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Converts an array of singles (floats) to a base-64 encoded string
+ </summary>
+ <param name="dataArray"></param>
+ <param name="intPrecisionBitsReturn">Output: Bits of precision</param>
+ <param name="strDataTypeNameReturn">Output: Datatype name</param>
+ <param name="removeTrailingPaddingChars"></param>
+ <param name="eEndianMode"></param>
+ <returns>Base-64 encoded string</returns>
+</member>
+<member name="M:MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(System.Double[],System.Int32@,System.String@,System.Boolean,MSDataFileReader.clsBase64EncodeDecode.eEndianTypeConstants)">
+ <summary>
+ Converts an array of doubles to a base-64 encoded string
+ </summary>
+ <param name="dataArray"></param>
+ <param name="intPrecisionBitsReturn">Output: Bits of precision</param>
+ <param name="strDataTypeNameReturn">Output: Datatype name</param>
+ <param name="removeTrailingPaddingChars"></param>
+ <param name="eEndianMode"></param>
+ <returns>Base-64 encoded string</returns>
+</member>
+<member name="M:MSDataFileReader.clsMSDataFileAccessorBaseClass.ExtractTextBetweenOffsets(System.String,System.Int64,System.Int64)">
+ <summary>
+ Extracts the text between lngStartByteOffset and lngEndByteOffset in strFilePath and returns it
+ </summary>
+ <param name="strFilePath"></param>
+ <param name="lngStartByteOffset"></param>
+ <param name="lngEndByteOffset"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:MSDataFileReader.clsMSDataFileAccessorBaseClass.ExtractTextFromFile(System.String,System.Int64,System.Int64,System.String@,System.Int32,System.Single,System.Single)">
+ <summary>
+ Extract the text between lngStartByteOffset and lngEndByteOffset in strFilePath, then append it to
+ mXmlFileHeader, add the closing element tags, and return ByRef in strExtractedText
+ </summary>
+ <param name="strFilePath"></param>
+ <param name="lngStartByteOffset"></param>
+ <param name="lngEndByteOffset"></param>
+ <param name="strExtractedText"></param>
+ <param name="intScanCountTotal"></param>
+ <param name="sngStartTimeMinutesAllScans"></param>
+ <param name="sngEndTimeMinutesAllScans"></param>
+ <returns></returns>
+ <remarks>Note that sngStartTimeMinutesAllScans and sngEndTimeMinutesAllScans are really only appropriate for mzXML files</remarks>
+</member>
+<member name="M:MSDataFileReader.clsMSDataFileAccessorBaseClass.OpenTextStream(System.String)">
+ <summary>
+ This reading mode is not appropriate for the MS Data File Accessor
+ </summary>
+ <param name="strTextStream"></param>
+ <returns>Always returns false</returns>
+ <remarks></remarks>
+</member>
+<member name="P:MSDataFileReader.clsMSDataFileReaderBaseClass.AutoShrinkDataLists">
+ <summary>
+  When mAutoShrinkDataLists is True, clsSpectrumInfo.MZList().Length and clsSpectrumInfo.IntensityList().Length will equal DataCount; 
+  When mAutoShrinkDataLists is False, the memory will not be freed when DataCount shrinks or clsSpectrumInfo.Clear() is called
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>
+ Setting mAutoShrinkDataLists to False helps reduce slow, increased memory usage due to inefficient garbage collection
+ (this is not much of an issue in 2016, and thus this parameter defaults to True)
+ </remarks>
+</member>
+<member name="M:MSDataFileReader.clsMSDataFileReaderBaseClass.ConvoluteMass(System.Double,System.Int32,System.Int32,System.Double)">
+ <summary>
+ Converts dblMassMZ to the MZ that would appear at the given intDesiredCharge
+ </summary>
+ <param name="dblMassMZ"></param>
+ <param name="intCurrentCharge"></param>
+ <param name="intDesiredCharge"></param>
+ <param name="dblChargeCarrierMass"></param>
+ <returns></returns>
+ <remarks>To return the neutral mass, set intDesiredCharge to 0</remarks>
+</member>
+<member name="M:MSDataFileReader.clsMSDataFileReaderBaseClass.OpenFileInit(System.String)">
+ <summary>
+ Validates that strInputFilePath exists
+ </summary>
+ <param name="strInputFilePath"></param>
+ <returns>True if the file exists, otherwise false</returns>
+ <remarks>Updates mFilePath if the file is valid</remarks>
+</member>
+<member name="M:MSDataFileReader.clsMSTextFileReaderBaseClass.CleanupComment(System.String,System.Char,System.Boolean)">
+ <summary>
+ Remove any instance of strCommentChar from the beginning and end of strCommentIn
+ </summary>
+ <param name="strCommentIn"></param>
+ <param name="strCommentChar"></param>
+ <param name="blnRemoveQuoteMarks">When True, also look for double quotation marks at the beginning and end</param>
+ <returns></returns>
+</member>
+<member name="M:MSDataFileReader.clsMzDataFileReader.SetXMLReaderForSpectrum(System.Xml.XmlReader)">
+ <summary>
+ Updates the current XMLReader object with a new reader positioned at the XML for a new mass spectrum
+ </summary>
+ <param name="newReader"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:MSDataFileReader.clsMzXMLFileReader.SetXMLReaderForSpectrum(System.Xml.XmlReader)">
+ <summary>
+ Updates the current XMLReader object with a new reader positioned at the XML for a new mass spectrum
+ </summary>
+ <param name="newReader"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="T:MSDataFileReader.clsSpectrumInfoMzXML.PairOrderTypes">
+ <summary>
+ Tracks pairOrder for mzXML v1.x and v2.x
+ Tracks contentType for mzXML 3.x files
+ </summary>
+ <remarks></remarks>
+</member>
 </members>
 </doc>
