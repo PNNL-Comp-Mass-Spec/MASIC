@@ -7528,8 +7528,7 @@ Public Class clsMASIC
     Private Function GetProcessMemoryUsageMB() As Single
 
         ' Obtain a handle to the current process
-        Dim objProcess As Diagnostics.Process
-        objProcess = Diagnostics.Process.GetCurrentProcess()
+        Dim objProcess = Diagnostics.Process.GetCurrentProcess()
 
         ' The WorkingSet is the total physical memory usage 
         Return CSng(objProcess.WorkingSet64 / 1024 / 1024)
@@ -8633,7 +8632,7 @@ Public Class clsMASIC
         Dim strLineIn As String
         Dim strSplitLine() As String
 
-        Dim strDelimList() As Char = New Char() {ControlChars.Tab}
+        Dim strDelimList = New Char() {ControlChars.Tab}
 
         Dim strErrorMessage As String
 
@@ -8896,7 +8895,7 @@ Public Class clsMASIC
       strScanCommentList As String,
       strParameterFilePath As String) As Boolean
 
-        Dim strDelimList() As Char = New Char() {","c, ControlChars.Tab}
+        Dim strDelimList = New Char() {","c, ControlChars.Tab}
 
         Dim intCustomMZCount As Integer
 
@@ -9022,7 +9021,7 @@ Public Class clsMASIC
         Dim blnDiscardLowIntensityDataWork As Boolean
         Dim blnCompressSpectraDataWork As Boolean
 
-        Dim strLastKnownLocation As String = "Start"
+        Dim strLastKnownLocation = "Start"
 
         Try
 
@@ -9048,7 +9047,7 @@ Public Class clsMASIC
                     End If
                 End If
 
-                Dim sortRequired As Boolean = False
+                Dim sortRequired = False
 
                 For intIndex = 1 To objMSSpectrum.IonCount - 1
                     ' Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z, 
@@ -9190,7 +9189,7 @@ Public Class clsMASIC
 
                 Dim intTextCol As Integer = -1
                 Dim intDatasetIDCol As Integer = -1
-                Dim blnQueryingSingleDataset As Boolean = False
+                Dim blnQueryingSingleDataset = False
 
                 Dim strQuery = String.Copy(mDatasetInfoQuerySql)
                 If strQuery.ToUpper.StartsWith("SELECT DATASET") Then
@@ -9364,7 +9363,7 @@ Public Class clsMASIC
       dblMRMDaughterMZ2 As Double) As Boolean
 
 
-        Const COMPARISON_TOLERANCE As Double = 0.01
+        Const COMPARISON_TOLERANCE = 0.01
 
         If Math.Abs(dblParentIonMZ1 - dblParentIonMZ2) <= COMPARISON_TOLERANCE AndAlso
            Math.Abs(dblMRMDaughterMZ1 - dblMRMDaughterMZ2) <= COMPARISON_TOLERANCE Then
@@ -9433,7 +9432,7 @@ Public Class clsMASIC
         Static intSpectraFoundExceedingMaxIonCount As Integer = 0
         Static intMaxIonCountReported As Integer = 0
 
-        Dim strLastKnownLocation As String = "Start"
+        Dim strLastKnownLocation = "Start"
 
         Try
             blnSuccess = False
@@ -9516,7 +9515,7 @@ Public Class clsMASIC
 
         Dim strInputFilePathFull As String = String.Empty
         Dim strInputFileName As String = String.Empty
-        Dim udtOutputFileHandles As udtOutputFileHandlesType = New udtOutputFileHandlesType
+        Dim udtOutputFileHandles = New udtOutputFileHandlesType
         Dim intSimilarParentIonUpdateCount As Integer
 
         If blnResetErrorCode Then
@@ -10119,8 +10118,8 @@ Public Class clsMASIC
 
         ' Step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
         ' Note that udtMZBinList() and intParentIonIndices() are parallel arrays, with udtMZBinList() sorted on ascending m/z
-        Const MAX_RAW_DATA_MEMORY_USAGE_MB As Integer = 50
-        Const DATA_COUNT_MEMORY_RESERVE As Integer = 200
+        Const MAX_RAW_DATA_MEMORY_USAGE_MB = 50
+        Const DATA_COUNT_MEMORY_RESERVE = 200
 
         Dim intMZIndex As Integer
         Dim intMZIndexWork As Integer
@@ -10170,7 +10169,7 @@ Public Class clsMASIC
         Dim blnLargestPeakFound As Boolean
         Dim blnSuccess As Boolean
 
-        Const DebugParentIonIndexToFind As Integer = 3139
+        Const DebugParentIonIndexToFind = 3139
         Const DebugMZToFind As Single = 488.47
 
         Try
@@ -11069,7 +11068,7 @@ Public Class clsMASIC
                         ' Nothing to write
                         udtOutputFileHandles.SICDataFile.WriteLine(strPrefix & "0" & ControlChars.Tab & "0" & ControlChars.Tab & "0")
                     Else
-                        For intScanIndex As Integer = 0 To .SICDataCount - 1
+                        For intScanIndex = 0 To .SICDataCount - 1
                             udtOutputFileHandles.SICDataFile.WriteLine(strPrefix & .SICScanNumbers(intScanIndex) & ControlChars.Tab & .SICMasses(intScanIndex) & ControlChars.Tab & .SICData(intScanIndex))
                         Next intScanIndex
                     End If
@@ -11111,7 +11110,7 @@ Public Class clsMASIC
         Dim intSICDataIndex As Integer
         Dim intIndex As Integer
 
-        Dim strLastGoodLoc As String = "Start"
+        Dim strLastGoodLoc = "Start"
         Dim blnIntensityDataListWritten As Boolean
         Dim blnMassDataList As Boolean
 
@@ -11506,7 +11505,7 @@ Public Class clsMASIC
         Dim srOutFile As StreamWriter
 
         Dim strHeaders As String
-        Dim strOutputFilePath As String = "?undefinedfile?"
+        Dim strOutputFilePath = "?undefinedfile?"
 
         Try
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.HeaderGlossary)
@@ -11548,7 +11547,7 @@ Public Class clsMASIC
 
         Dim intInstMethodCount As Integer
         Dim intIndex As Integer
-        Dim strOutputFilePath As String = "?undefinedfile?"
+        Dim strOutputFilePath = "?undefinedfile?"
         Dim strMethodNum As String
 
         Dim srOutfile As StreamWriter
@@ -11601,7 +11600,7 @@ Public Class clsMASIC
 
         Dim intTuneMethodCount As Integer
         Dim intIndex As Integer
-        Dim strOutputFilePath As String = "?undefinedfile?"
+        Dim strOutputFilePath = "?undefinedfile?"
         Dim strTuneInfoNum As String
 
         Dim srOutfile As StreamWriter
@@ -13857,7 +13856,7 @@ Public Class clsMASIC
 
     Public Sub TestValueToString()
 
-        Const intDigitsOfPrecision As Integer = 5
+        Const intDigitsOfPrecision = 5
 
         Console.WriteLine(StringUtilities.ValueToString(1.2301, 3, 100000))
         Console.WriteLine(StringUtilities.ValueToString(1.2, 3, 100000))
