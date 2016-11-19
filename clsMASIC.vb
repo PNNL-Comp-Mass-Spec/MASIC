@@ -9167,8 +9167,6 @@ Public Class clsMASIC
         Dim strAvoidErrorMessage As String
 
         Dim blnDatasetFoundInDB As Boolean
-        Dim objDBTools As PRISM.DataBase.clsDBTools
-        Dim objDBLogger As PRISM.Logging.ILogger = Nothing
 
         Dim intRowCount As Integer
         Dim dsDatasetInfo As DataSet = Nothing
@@ -9185,7 +9183,7 @@ Public Class clsMASIC
         If Not mDatabaseConnectionString Is Nothing AndAlso mDatabaseConnectionString.Length > 0 Then
             ' Attempt to lookup the dataset number in the database
             Try
-                objDBTools = New PRISM.DataBase.clsDBTools(objDBLogger, mDatabaseConnectionString)
+                Dim objDBTools = New PRISM.DataBase.clsDBTools(mDatabaseConnectionString)
 
                 Dim intTextCol As Integer = -1
                 Dim intDatasetIDCol As Integer = -1
