@@ -370,10 +370,10 @@ Friend Class clsCorrelation
                     Return RS
                 Case cmCorrelationMethodConstants.Kendall
                     CorrelKendall(sngDataList1, sngDataList2, KendallsTau, Z, ProbOfSignificance)
-					Return KendallsTau
-				Case Else
-					Return -1
-			End Select
+                    Return KendallsTau
+                Case Else
+                    Return -1
+            End Select
 
         Catch ex As Exception
             Debug.Assert(False, "Error in clsCorrelation->Correlate: " & ex.Message)
@@ -639,8 +639,8 @@ Friend Class clsCorrelation
 
     Private Function GammLn(ByVal xx As Double) As Double
         Dim x, y, tmp, ser As Double
-        Static cof() As Double = New Double() {76.180091729471457, -86.505320329416776, _
-                                               24.014098240830911, -1.231739572450155, _
+        Static cof() As Double = New Double() {76.180091729471457, -86.505320329416776,
+                                               24.014098240830911, -1.231739572450155,
                                                0.001208650973866179, -0.000005395239384953}
         Dim j As Integer
 

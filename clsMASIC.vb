@@ -7754,220 +7754,220 @@ Public Class clsMASIC
 
     End Function
 
-	Protected Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double) As Double
-		Return GetParentIonToleranceDa(udtSICOptions, dblParentIonMZ, udtSICOptions.SICTolerance)
-	End Function
+    Protected Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double) As Double
+        Return GetParentIonToleranceDa(udtSICOptions, dblParentIonMZ, udtSICOptions.SICTolerance)
+    End Function
 
-	Protected Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double, dblParentIonTolerance As Double) As Double
-		If udtSICOptions.SICToleranceIsPPM Then
-			Return PPMToMass(dblParentIonTolerance, dblParentIonMZ)
-		Else
-			Return dblParentIonTolerance
-		End If
-	End Function
+    Protected Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double, dblParentIonTolerance As Double) As Double
+        If udtSICOptions.SICToleranceIsPPM Then
+            Return PPMToMass(dblParentIonTolerance, dblParentIonMZ)
+        Else
+            Return dblParentIonTolerance
+        End If
+    End Function
 
-	Private Function GetScanByMasterScanIndex(ByRef udtScanList As udtScanListType, intMasterScanIndex As Integer) As udtScanInfoType
-		Dim udtCurrentScan As udtScanInfoType
+    Private Function GetScanByMasterScanIndex(ByRef udtScanList As udtScanListType, intMasterScanIndex As Integer) As udtScanInfoType
+        Dim udtCurrentScan As udtScanInfoType
 
-		udtCurrentScan = New udtScanInfoType
-		If Not udtScanList.MasterScanOrder Is Nothing Then
-			If intMasterScanIndex < 0 Then
-				intMasterScanIndex = 0
-			ElseIf intMasterScanIndex >= udtScanList.MasterScanOrderCount Then
-				intMasterScanIndex = udtScanList.MasterScanOrderCount - 1
-			End If
+        udtCurrentScan = New udtScanInfoType
+        If Not udtScanList.MasterScanOrder Is Nothing Then
+            If intMasterScanIndex < 0 Then
+                intMasterScanIndex = 0
+            ElseIf intMasterScanIndex >= udtScanList.MasterScanOrderCount Then
+                intMasterScanIndex = udtScanList.MasterScanOrderCount - 1
+            End If
 
-			Select Case udtScanList.MasterScanOrder(intMasterScanIndex).ScanType
-				Case eScanTypeConstants.SurveyScan
-					' Survey scan
-					udtCurrentScan = udtScanList.SurveyScans(udtScanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
-				Case eScanTypeConstants.FragScan
-					' Frag Scan
-					udtCurrentScan = udtScanList.FragScans(udtScanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
-				Case Else
-					' Unkown scan type
-			End Select
-		End If
+            Select Case udtScanList.MasterScanOrder(intMasterScanIndex).ScanType
+                Case eScanTypeConstants.SurveyScan
+                    ' Survey scan
+                    udtCurrentScan = udtScanList.SurveyScans(udtScanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                Case eScanTypeConstants.FragScan
+                    ' Frag Scan
+                    udtCurrentScan = udtScanList.FragScans(udtScanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                Case Else
+                    ' Unkown scan type
+            End Select
+        End If
 
-		Return udtCurrentScan
+        Return udtCurrentScan
 
-	End Function
+    End Function
 
-	Private Function GetScanToleranceTypeFromText(strScanType As String) As eCustomSICScanTypeConstants
-		Dim strScanTypeLowerCase As String
+    Private Function GetScanToleranceTypeFromText(strScanType As String) As eCustomSICScanTypeConstants
+        Dim strScanTypeLowerCase As String
 
-		If strScanType Is Nothing Then strScanType = String.Empty
-		strScanTypeLowerCase = strScanType.ToLower.Trim
+        If strScanType Is Nothing Then strScanType = String.Empty
+        strScanTypeLowerCase = strScanType.ToLower.Trim
 
-		If strScanTypeLowerCase = CUSTOM_SIC_TYPE_RELATIVE.ToLower Then
-			Return eCustomSICScanTypeConstants.Relative
-		ElseIf strScanTypeLowerCase = CUSTOM_SIC_TYPE_ACQUISITION_TIME.ToLower Then
-			Return eCustomSICScanTypeConstants.AcquisitionTime
-		Else
-			' Assume absolute
-			Return eCustomSICScanTypeConstants.Absolute
-		End If
+        If strScanTypeLowerCase = CUSTOM_SIC_TYPE_RELATIVE.ToLower Then
+            Return eCustomSICScanTypeConstants.Relative
+        ElseIf strScanTypeLowerCase = CUSTOM_SIC_TYPE_ACQUISITION_TIME.ToLower Then
+            Return eCustomSICScanTypeConstants.AcquisitionTime
+        Else
+            ' Assume absolute
+            Return eCustomSICScanTypeConstants.Absolute
+        End If
 
-	End Function
+    End Function
 
-	Private Function GetScanTypeName(eScanType As eScanTypeConstants) As String
-		Select Case eScanType
-			Case eScanTypeConstants.SurveyScan
-				Return "survey scan"
-			Case eScanTypeConstants.FragScan
-				Return "frag scan"
-			Case Else
-				Return "unknown scan type"
-		End Select
-	End Function
+    Private Function GetScanTypeName(eScanType As eScanTypeConstants) As String
+        Select Case eScanType
+            Case eScanTypeConstants.SurveyScan
+                Return "survey scan"
+            Case eScanTypeConstants.FragScan
+                Return "frag scan"
+            Case Else
+                Return "unknown scan type"
+        End Select
+    End Function
 
-	Public Function GetStatusLogKeyNameFilterList() As String()
-		If mStatusLogKeyNameFilterList Is Nothing Then
-			ReDim mStatusLogKeyNameFilterList(-1)
-		End If
+    Public Function GetStatusLogKeyNameFilterList() As String()
+        If mStatusLogKeyNameFilterList Is Nothing Then
+            ReDim mStatusLogKeyNameFilterList(-1)
+        End If
 
-		Return mStatusLogKeyNameFilterList
-	End Function
+        Return mStatusLogKeyNameFilterList
+    End Function
 
-	''' <summary>
-	''' Returns the contents of mStatusLogKeyNameFilterList
-	''' </summary>
-	''' <param name="blnCommaSeparatedList">When true, then returns a comma separated list; when false, returns separates items with CrLf</param>
-	''' <returns></returns>
-	''' <remarks></remarks>
-	Public Function GetStatusLogKeyNameFilterListAsText(blnCommaSeparatedList As Boolean) As String
-		If mStatusLogKeyNameFilterList Is Nothing Then
-			ReDim mStatusLogKeyNameFilterList(-1)
-		End If
+    ''' <summary>
+    ''' Returns the contents of mStatusLogKeyNameFilterList
+    ''' </summary>
+    ''' <param name="blnCommaSeparatedList">When true, then returns a comma separated list; when false, returns separates items with CrLf</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function GetStatusLogKeyNameFilterListAsText(blnCommaSeparatedList As Boolean) As String
+        If mStatusLogKeyNameFilterList Is Nothing Then
+            ReDim mStatusLogKeyNameFilterList(-1)
+        End If
 
-		Dim intIndex As Integer
-		Dim strList As String
-		strList = String.Empty
+        Dim intIndex As Integer
+        Dim strList As String
+        strList = String.Empty
 
-		For intIndex = 0 To mStatusLogKeyNameFilterList.Length - 1
-			If intIndex > 0 Then
-				If blnCommaSeparatedList Then
-					strList &= ", "
-				Else
-					strList &= ControlChars.NewLine
-				End If
-			End If
-			strList &= mStatusLogKeyNameFilterList(intIndex)
-		Next
+        For intIndex = 0 To mStatusLogKeyNameFilterList.Length - 1
+            If intIndex > 0 Then
+                If blnCommaSeparatedList Then
+                    strList &= ", "
+                Else
+                    strList &= ControlChars.NewLine
+                End If
+            End If
+            strList &= mStatusLogKeyNameFilterList(intIndex)
+        Next
 
-		Return strList
-	End Function
+        Return strList
+    End Function
 
-	Private Function GetTotalProcessingTimeSec() As Single
+    Private Function GetTotalProcessingTimeSec() As Single
 
-		Dim objProcess As Diagnostics.Process
-		objProcess = Diagnostics.Process.GetCurrentProcess()
+        Dim objProcess As Diagnostics.Process
+        objProcess = Diagnostics.Process.GetCurrentProcess()
 
-		Return CSng(objProcess.TotalProcessorTime().TotalSeconds)
+        Return CSng(objProcess.TotalProcessorTime().TotalSeconds)
 
-	End Function
+    End Function
 
-	Private Sub InitializeScanList(
-	  ByRef udtScanList As udtScanListType, 
-	  intSurveyScanCountToAllocate As Integer, 
-	  intFragScanCountToAllocate As Integer)
+    Private Sub InitializeScanList(
+      ByRef udtScanList As udtScanListType,
+      intSurveyScanCountToAllocate As Integer,
+      intFragScanCountToAllocate As Integer)
 
-		Dim intMasterScanOrderCountToAllocate As Integer
-		Dim intIndex As Integer
+        Dim intMasterScanOrderCountToAllocate As Integer
+        Dim intIndex As Integer
 
-		If intSurveyScanCountToAllocate < 1 Then intSurveyScanCountToAllocate = 1
-		If intFragScanCountToAllocate < 1 Then intFragScanCountToAllocate = 1
+        If intSurveyScanCountToAllocate < 1 Then intSurveyScanCountToAllocate = 1
+        If intFragScanCountToAllocate < 1 Then intFragScanCountToAllocate = 1
 
-		intMasterScanOrderCountToAllocate = intSurveyScanCountToAllocate + intFragScanCountToAllocate
+        intMasterScanOrderCountToAllocate = intSurveyScanCountToAllocate + intFragScanCountToAllocate
 
-		With udtScanList
-			.SurveyScanCount = 0
-			ReDim .SurveyScans(intSurveyScanCountToAllocate - 1)
+        With udtScanList
+            .SurveyScanCount = 0
+            ReDim .SurveyScans(intSurveyScanCountToAllocate - 1)
 
-			.FragScanCount = 0
-			ReDim .FragScans(intFragScanCountToAllocate - 1)
+            .FragScanCount = 0
+            ReDim .FragScans(intFragScanCountToAllocate - 1)
 
-			.MasterScanOrderCount = 0
-			ReDim .MasterScanOrder(intMasterScanOrderCountToAllocate - 1)
-			ReDim .MasterScanNumList(intMasterScanOrderCountToAllocate - 1)
-			ReDim .MasterScanTimeList(intMasterScanOrderCountToAllocate - 1)
+            .MasterScanOrderCount = 0
+            ReDim .MasterScanOrder(intMasterScanOrderCountToAllocate - 1)
+            ReDim .MasterScanNumList(intMasterScanOrderCountToAllocate - 1)
+            ReDim .MasterScanTimeList(intMasterScanOrderCountToAllocate - 1)
 
-			InitializeSingleScan(.SurveyScans(0))
-			InitializeSingleScan(.FragScans(0))
+            InitializeSingleScan(.SurveyScans(0))
+            InitializeSingleScan(.FragScans(0))
 
-			.ParentIonInfoCount = 0
-			ReDim .ParentIons(intFragScanCountToAllocate - 1)
-			For intIndex = 0 To intFragScanCountToAllocate - 1
-				ReDim .ParentIons(intIndex).FragScanIndices(0)
-			Next intIndex
+            .ParentIonInfoCount = 0
+            ReDim .ParentIons(intFragScanCountToAllocate - 1)
+            For intIndex = 0 To intFragScanCountToAllocate - 1
+                ReDim .ParentIons(intIndex).FragScanIndices(0)
+            Next intIndex
 
-		End With
-	End Sub
+        End With
+    End Sub
 
-	''Private Sub ExpandScanList(ByRef udtScanList As udtScanListType, sngSurveyScanExpansionFactor As Single, sngFragScanExpansionFactor As Integer)
-	''    ' Set sngSurveyScanExpansionFactor to 2 to double the amount of memory reserved for survey scans
-	''    ' Set sngFragScanExpansionFactor to 2 to double the amount of memory reserved for fragmentation scans
+    ''Private Sub ExpandScanList(ByRef udtScanList As udtScanListType, sngSurveyScanExpansionFactor As Single, sngFragScanExpansionFactor As Integer)
+    ''    ' Set sngSurveyScanExpansionFactor to 2 to double the amount of memory reserved for survey scans
+    ''    ' Set sngFragScanExpansionFactor to 2 to double the amount of memory reserved for fragmentation scans
 
-	''    ' If sngSurveyScanExpansionFactor is <= 1 then the memory reserved will not be changed
-	''    ' If sngFragScanExpansionFactor is <= 1 then the memory reserved will not be changed
+    ''    ' If sngSurveyScanExpansionFactor is <= 1 then the memory reserved will not be changed
+    ''    ' If sngFragScanExpansionFactor is <= 1 then the memory reserved will not be changed
 
-	''    Dim intNewSurveyScanCount As Integer
-	''    Dim intNewFragScanCount As Integer
-	''    Dim intNewMasterScanOrderCount As Integer
+    ''    Dim intNewSurveyScanCount As Integer
+    ''    Dim intNewFragScanCount As Integer
+    ''    Dim intNewMasterScanOrderCount As Integer
 
-	''    Dim intIndex As Integer
+    ''    Dim intIndex As Integer
 
-	''    Dim blnUpdateMasterScanOrder As Boolean
+    ''    Dim blnUpdateMasterScanOrder As Boolean
 
-	''    If sngSurveyScanExpansionFactor < 1 Then sngSurveyScanExpansionFactor = 1
-	''    If sngFragScanExpansionFactor < 1 Then sngFragScanExpansionFactor = 1
+    ''    If sngSurveyScanExpansionFactor < 1 Then sngSurveyScanExpansionFactor = 1
+    ''    If sngFragScanExpansionFactor < 1 Then sngFragScanExpansionFactor = 1
 
-	''    With udtScanList
-	''        If sngSurveyScanExpansionFactor > 1 Then
-	''            intNewSurveyScanCount = CInt(.SurveyScans.Length * sngSurveyScanExpansionFactor)
-	''            ReDim Preserve .SurveyScans(intNewSurveyScanCount - 1)
-	''            blnUpdateMasterScanOrder = True
-	''        End If
+    ''    With udtScanList
+    ''        If sngSurveyScanExpansionFactor > 1 Then
+    ''            intNewSurveyScanCount = CInt(.SurveyScans.Length * sngSurveyScanExpansionFactor)
+    ''            ReDim Preserve .SurveyScans(intNewSurveyScanCount - 1)
+    ''            blnUpdateMasterScanOrder = True
+    ''        End If
 
-	''        If sngFragScanExpansionFactor > 1 Then
-	''            intNewFragScanCount = CInt(.FragScans.Length * sngFragScanExpansionFactor)
-	''            ReDim Preserve .FragScans(intNewFragScanCount - 1)
-	''            blnUpdateMasterScanOrder = True
+    ''        If sngFragScanExpansionFactor > 1 Then
+    ''            intNewFragScanCount = CInt(.FragScans.Length * sngFragScanExpansionFactor)
+    ''            ReDim Preserve .FragScans(intNewFragScanCount - 1)
+    ''            blnUpdateMasterScanOrder = True
 
-	''            ReDim Preserve .ParentIons(intNewFragScanCount - 1)
-	''            For intIndex = .ParentIonInfoCount To intNewFragScanCount - 1
-	''                ReDim .ParentIons(intIndex).FragScanIndices(0)
-	''            Next intIndex
-	''        End If
+    ''            ReDim Preserve .ParentIons(intNewFragScanCount - 1)
+    ''            For intIndex = .ParentIonInfoCount To intNewFragScanCount - 1
+    ''                ReDim .ParentIons(intIndex).FragScanIndices(0)
+    ''            Next intIndex
+    ''        End If
 
-	''        If blnUpdateMasterScanOrder Then
-	''            intNewMasterScanOrderCount = .SurveyScans.Length + .FragScans.Length
-	''            If intNewMasterScanOrderCount < .MasterScanOrderCount Then
-	''                ' This shouldn't normally happen
-	''                intNewMasterScanOrderCount = .MasterScanOrderCount
-	''            End If
+    ''        If blnUpdateMasterScanOrder Then
+    ''            intNewMasterScanOrderCount = .SurveyScans.Length + .FragScans.Length
+    ''            If intNewMasterScanOrderCount < .MasterScanOrderCount Then
+    ''                ' This shouldn't normally happen
+    ''                intNewMasterScanOrderCount = .MasterScanOrderCount
+    ''            End If
 
-	''            ReDim Preserve .MasterScanOrder(intNewMasterScanOrderCount - 1)
-	''        End If
+    ''            ReDim Preserve .MasterScanOrder(intNewMasterScanOrderCount - 1)
+    ''        End If
 
-	''    End With
-	''End Sub
+    ''    End With
+    ''End Sub
 
-	Private Function InitializeSICDetailsTextFile(
-	  strInputFilePathFull As String, 
-	  strOutputFolderPath As String, 
-	  ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
-	  
-		Dim strOutputFilePath As String = String.Empty
+    Private Function InitializeSICDetailsTextFile(
+      strInputFilePathFull As String,
+      strOutputFolderPath As String,
+      ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
 
-		Try
+        Dim strOutputFilePath As String = String.Empty
 
-			If mWriteDetailedSICDataFile Then
-				strOutputFilePath = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.SICDataFile)
+        Try
 
-				udtOutputFileHandles.SICDataFile = New StreamWriter(New FileStream(strOutputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            If mWriteDetailedSICDataFile Then
+                strOutputFilePath = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.SICDataFile)
 
-				' Write the header line
+                udtOutputFileHandles.SICDataFile = New StreamWriter(New FileStream(strOutputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+
+                ' Write the header line
                 udtOutputFileHandles.SICDataFile.WriteLine("Dataset" & ControlChars.Tab &
                  "ParentIonIndex" & ControlChars.Tab &
                  "FragScanIndex" & ControlChars.Tab &
@@ -7975,712 +7975,712 @@ Public Class clsMASIC
                  "Scan" & ControlChars.Tab &
                  "MZ" & ControlChars.Tab &
                  "Intensity")
-			End If
+            End If
 
-		Catch ex As Exception
-			LogErrors("InitializeSICDetailsTextFile", "Error initializing the XML output file" & GetFilePathPrefixChar() & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
-			Return False
-		End Try
+        Catch ex As Exception
+            LogErrors("InitializeSICDetailsTextFile", "Error initializing the XML output file" & GetFilePathPrefixChar() & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+            Return False
+        End Try
 
-		Return True
+        Return True
 
-	End Function
+    End Function
 
-	Private Sub InitializeSingleScan(ByRef udtScan As udtScanInfoType)
-		With udtScan
-			.FragScanInfo.ParentIonInfoIndex = -1			 ' -1 means undefined; only used for fragmentation scans
-			.IonCount = 0
-			.IonCountRaw = 0
-		End With
-	End Sub
+    Private Sub InitializeSingleScan(ByRef udtScan As udtScanInfoType)
+        With udtScan
+            .FragScanInfo.ParentIonInfoIndex = -1            ' -1 means undefined; only used for fragmentation scans
+            .IonCount = 0
+            .IonCountRaw = 0
+        End With
+    End Sub
 
-	Private Sub InitializeUniqueMZListMatchIndices(
-	  ByRef udtUniqueMZList() As udtUniqueMZListType, 
-	  intStartIndex As Integer, 
-	  intEndIndex As Integer)
-	  
-		Dim intIndex As Integer
+    Private Sub InitializeUniqueMZListMatchIndices(
+      ByRef udtUniqueMZList() As udtUniqueMZListType,
+      intStartIndex As Integer,
+      intEndIndex As Integer)
 
-		For intIndex = intStartIndex To intEndIndex
-			ReDim udtUniqueMZList(intIndex).MatchIndices(0)
-			udtUniqueMZList(intIndex).MatchCount = 0
-		Next intIndex
+        Dim intIndex As Integer
 
-	End Sub
+        For intIndex = intStartIndex To intEndIndex
+            ReDim udtUniqueMZList(intIndex).MatchIndices(0)
+            udtUniqueMZList(intIndex).MatchCount = 0
+        Next intIndex
 
-	Private Sub InitializeVariables()
-		mLocalErrorCode = eMasicErrorCodes.NoError
-		mStatusMessage = String.Empty
+    End Sub
 
-		mDatasetLookupFilePath = String.Empty
-		mDatabaseConnectionString = String.Empty
-		mDatasetInfoQuerySql = String.Empty
+    Private Sub InitializeVariables()
+        mLocalErrorCode = eMasicErrorCodes.NoError
+        mStatusMessage = String.Empty
 
-		mIncludeHeadersInExportFile = True
-		mIncludeScanTimesInSICStatsFile = False
-		mFastExistingXMLFileTest = False
+        mDatasetLookupFilePath = String.Empty
+        mDatabaseConnectionString = String.Empty
+        mDatasetInfoQuerySql = String.Empty
 
-		mSkipMSMSProcessing = False
-		mSkipSICAndRawDataProcessing = False
-		mExportRawDataOnly = False
+        mIncludeHeadersInExportFile = True
+        mIncludeScanTimesInSICStatsFile = False
+        mFastExistingXMLFileTest = False
 
-		mSuppressNoParentIonsError = False
+        mSkipMSMSProcessing = False
+        mSkipSICAndRawDataProcessing = False
+        mExportRawDataOnly = False
 
-		mWriteMSMethodFile = True
-		mWriteMSTuneFile = False
+        mSuppressNoParentIonsError = False
 
-		mWriteDetailedSICDataFile = False
-		mWriteExtendedStats = True
-		mWriteExtendedStatsIncludeScanFilterText = True
+        mWriteMSMethodFile = True
+        mWriteMSTuneFile = False
+
+        mWriteDetailedSICDataFile = False
+        mWriteExtendedStats = True
+        mWriteExtendedStatsIncludeScanFilterText = True
         mWriteExtendedStatsStatusLog = True
-		mConsolidateConstantExtendedHeaderValues = True
+        mConsolidateConstantExtendedHeaderValues = True
 
-		ReDim mStatusLogKeyNameFilterList(-1)
+        ReDim mStatusLogKeyNameFilterList(-1)
         SetStatusLogKeyNameFilterList("Source", ","c)
 
-		mWriteMRMDataList = False
-		mWriteMRMIntensityCrosstab = True
+        mWriteMRMDataList = False
+        mWriteMRMIntensityCrosstab = True
 
-		With mRawDataExportOptions
-			.ExportEnabled = False
+        With mRawDataExportOptions
+            .ExportEnabled = False
 
-			.FileFormat = eExportRawDataFileFormatConstants.CSVFile
-			.IncludeMSMS = False
-			.RenumberScans = False
+            .FileFormat = eExportRawDataFileFormatConstants.CSVFile
+            .IncludeMSMS = False
+            .RenumberScans = False
 
-			.MinimumSignalToNoiseRatio = 1
-			.MaxIonCountPerScan = 200
-			.IntensityMinimum = 0
-		End With
+            .MinimumSignalToNoiseRatio = 1
+            .MaxIonCountPerScan = 200
+            .IntensityMinimum = 0
+        End With
 
-		mCDFTimeInSeconds = True
+        mCDFTimeInSeconds = True
         mParentIonDecoyMassDa = 0
 
-		mUseBase64DataEncoding = False						' Enabling this gives files of nearly equivalent size, but with the data arrays base-64 encoded; thus, no advantage
+        mUseBase64DataEncoding = False                      ' Enabling this gives files of nearly equivalent size, but with the data arrays base-64 encoded; thus, no advantage
 
-		Try
-			mFreeMemoryPerformanceCounter = New Diagnostics.PerformanceCounter("Memory", "Available MBytes")
-			mFreeMemoryPerformanceCounter.ReadOnly = True
-		Catch ex As Exception
-			LogErrors("InitializeVariables", "Error instantiating the Memory->'Available MBytes' performance counter", ex, False, False, eMasicErrorCodes.NoError)
-		End Try
+        Try
+            mFreeMemoryPerformanceCounter = New Diagnostics.PerformanceCounter("Memory", "Available MBytes")
+            mFreeMemoryPerformanceCounter.ReadOnly = True
+        Catch ex As Exception
+            LogErrors("InitializeVariables", "Error instantiating the Memory->'Available MBytes' performance counter", ex, False, False, eMasicErrorCodes.NoError)
+        End Try
 
-		mMASICPeakFinder = New MASICPeakFinder.clsMASICPeakFinder
+        mMASICPeakFinder = New MASICPeakFinder.clsMASICPeakFinder
 
-		InitializeSICOptions(mSICOptions)
-		InitializeBinningOptions(mBinningOptions)
+        InitializeSICOptions(mSICOptions)
+        InitializeBinningOptions(mBinningOptions)
 
-		InitializeMemoryManagementOptions(mProcessingStats)
-		clsSpectraCache.ResetCacheOptions(mCacheOptions)
+        InitializeMemoryManagementOptions(mProcessingStats)
+        clsSpectraCache.ResetCacheOptions(mCacheOptions)
 
-		InitializeCustomMZList(mCustomSICList)
+        InitializeCustomMZList(mCustomSICList)
 
-		InitializeReporterIonInfo()
-	End Sub
+        InitializeReporterIonInfo()
+    End Sub
 
-	Private Sub InitializeBinningOptions(ByRef udtBinningOptions As clsCorrelation.udtBinningOptionsType)
-		clsCorrelation.InitializeBinningOptions(udtBinningOptions)
-	End Sub
+    Private Sub InitializeBinningOptions(ByRef udtBinningOptions As clsCorrelation.udtBinningOptionsType)
+        clsCorrelation.InitializeBinningOptions(udtBinningOptions)
+    End Sub
 
-	Private Sub InitializeCustomMZList(ByRef udtCustomMZList As udtCustomMZSearchListType)
-		InitializeCustomMZList(udtCustomMZList, True)
-	End Sub
+    Private Sub InitializeCustomMZList(ByRef udtCustomMZList As udtCustomMZSearchListType)
+        InitializeCustomMZList(udtCustomMZList, True)
+    End Sub
 
-	Private Sub InitializeCustomMZList(ByRef udtCustomMZList As udtCustomMZSearchListType, blnResetTolerances As Boolean)
-		With udtCustomMZList
-			If blnResetTolerances Then
-				.ScanToleranceType = eCustomSICScanTypeConstants.Absolute
-				.ScanOrAcqTimeTolerance = 1000
-			End If
+    Private Sub InitializeCustomMZList(ByRef udtCustomMZList As udtCustomMZSearchListType, blnResetTolerances As Boolean)
+        With udtCustomMZList
+            If blnResetTolerances Then
+                .ScanToleranceType = eCustomSICScanTypeConstants.Absolute
+                .ScanOrAcqTimeTolerance = 1000
+            End If
 
-			ReDim .CustomMZSearchValues(-1)
-			.RawTextMZList = String.Empty
-			.RawTextMZToleranceDaList = String.Empty
-			.RawTextScanOrAcqTimeCenterList = String.Empty
-			.RawTextScanOrAcqTimeToleranceList = String.Empty
-		End With
-	End Sub
+            ReDim .CustomMZSearchValues(-1)
+            .RawTextMZList = String.Empty
+            .RawTextMZToleranceDaList = String.Empty
+            .RawTextScanOrAcqTimeCenterList = String.Empty
+            .RawTextScanOrAcqTimeToleranceList = String.Empty
+        End With
+    End Sub
 
-	Private Sub InitializeReporterIonInfo()
-		mReporterIonCount = 0
-		ReDim mReporterIonInfo(0)
+    Private Sub InitializeReporterIonInfo()
+        mReporterIonCount = 0
+        ReDim mReporterIonInfo(0)
 
-		SetReporterIonMassMode(eReporterIonMassModeConstants.CustomOrNone)
+        SetReporterIonMassMode(eReporterIonMassModeConstants.CustomOrNone)
 
-		Me.ReporterIonToleranceDaDefault = REPORTER_ION_TOLERANCE_DA_DEFAULT
-		Me.ReporterIonApplyAbundanceCorrection = True
-		Me.ReporterIonITraq4PlexCorrectionFactorType = clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex
+        Me.ReporterIonToleranceDaDefault = REPORTER_ION_TOLERANCE_DA_DEFAULT
+        Me.ReporterIonApplyAbundanceCorrection = True
+        Me.ReporterIonITraq4PlexCorrectionFactorType = clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex
 
-		Me.ReporterIonSaveObservedMasses = False
-		Me.ReporterIonSaveUncorrectedIntensities = False
+        Me.ReporterIonSaveObservedMasses = False
+        Me.ReporterIonSaveUncorrectedIntensities = False
 
-	End Sub
+    End Sub
 
-	Private Sub InitializeSICOptions(ByRef udtSICOptions As udtSICOptionsType)
-		With udtSICOptions
+    Private Sub InitializeSICOptions(ByRef udtSICOptions As udtSICOptionsType)
+        With udtSICOptions
             .SICTolerance = 10
             .SICToleranceIsPPM = True
 
-			.RefineReportedParentIonMZ = False			' Typically only useful when using a small value for .SICTolerance
+            .RefineReportedParentIonMZ = False          ' Typically only useful when using a small value for .SICTolerance
 
-			.ScanRangeStart = 0
-			.ScanRangeEnd = 0
-			.RTRangeStart = 0
-			.RTRangeEnd = 0
+            .ScanRangeStart = 0
+            .ScanRangeEnd = 0
+            .RTRangeStart = 0
+            .RTRangeEnd = 0
 
-			.CompressMSSpectraData = True
-			.CompressMSMSSpectraData = True
+            .CompressMSSpectraData = True
+            .CompressMSMSSpectraData = True
 
-			.CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA
-			.CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM
+            .CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA
+            .CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM
 
-			.MaxSICPeakWidthMinutesBackward = 5
-			.MaxSICPeakWidthMinutesForward = 5
+            .MaxSICPeakWidthMinutesBackward = 5
+            .MaxSICPeakWidthMinutesForward = 5
 
-			.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = True
+            .ReplaceSICZeroesWithMinimumPositiveValueFromMSData = True
 
-			.SICPeakFinderOptions = MASICPeakFinder.clsMASICPeakFinder.GetDefaultSICPeakFinderOptions
+            .SICPeakFinderOptions = MASICPeakFinder.clsMASICPeakFinder.GetDefaultSICPeakFinderOptions
 
-			.SaveSmoothedData = False
+            .SaveSmoothedData = False
 
-			' Note: When using narrow SIC tolerances, be sure to SimilarIonMZToleranceHalfWidth to a smaller value
-			' However, with very small values, the SpectraCache file will be much larger
-			' The default for SimilarIonMZToleranceHalfWidth is 0.1
-			' Consider using 0.05 when using ppm-based SIC tolerances
+            ' Note: When using narrow SIC tolerances, be sure to SimilarIonMZToleranceHalfWidth to a smaller value
+            ' However, with very small values, the SpectraCache file will be much larger
+            ' The default for SimilarIonMZToleranceHalfWidth is 0.1
+            ' Consider using 0.05 when using ppm-based SIC tolerances
             .SimilarIonMZToleranceHalfWidth = 0.05
 
-			' .SimilarIonScanToleranceHalfWidth = 100
-			.SimilarIonToleranceHalfWidthMinutes = 5
-			.SpectrumSimilarityMinimum = 0.8
-		End With
-	End Sub
+            ' .SimilarIonScanToleranceHalfWidth = 100
+            .SimilarIonToleranceHalfWidthMinutes = 5
+            .SpectrumSimilarityMinimum = 0.8
+        End With
+    End Sub
 
-	Private Sub InitializeMemoryManagementOptions(ByRef udtMemoryOptions As udtProcessingStatsType)
+    Private Sub InitializeMemoryManagementOptions(ByRef udtMemoryOptions As udtProcessingStatsType)
 
-		With udtMemoryOptions
-			.PeakMemoryUsageMB = GetProcessMemoryUsageMB()
-			.TotalProcessingTimeAtStart = GetTotalProcessingTimeSec()
-			.CacheEventCount = 0
-			.UnCacheEventCount = 0
+        With udtMemoryOptions
+            .PeakMemoryUsageMB = GetProcessMemoryUsageMB()
+            .TotalProcessingTimeAtStart = GetTotalProcessingTimeSec()
+            .CacheEventCount = 0
+            .UnCacheEventCount = 0
 
-			.FileLoadStartTime = DateTime.UtcNow
-			.FileLoadEndTime = .FileLoadStartTime
+            .FileLoadStartTime = DateTime.UtcNow
+            .FileLoadEndTime = .FileLoadStartTime
 
-			.ProcessingStartTime = .FileLoadStartTime
-			.ProcessingEndTime = .FileLoadStartTime
+            .ProcessingStartTime = .FileLoadStartTime
+            .ProcessingEndTime = .FileLoadStartTime
 
-			.MemoryUsageMBAtStart = .PeakMemoryUsageMB
-			.MemoryUsageMBDuringLoad = .PeakMemoryUsageMB
-			.MemoryUsageMBAtEnd = .PeakMemoryUsageMB
-		End With
+            .MemoryUsageMBAtStart = .PeakMemoryUsageMB
+            .MemoryUsageMBDuringLoad = .PeakMemoryUsageMB
+            .MemoryUsageMBAtEnd = .PeakMemoryUsageMB
+        End With
 
-	End Sub
+    End Sub
 
-	Private Function InterpolateRTandFragScanNumber(
-	  ByRef udtSurveyScans() As udtScanInfoType, 
-	  intSurveyScanCount As Integer, 
-	  intLastSurveyScanIndex As Integer, 
-	  intFragScanNumber As Integer, 
-	  ByRef intFragScanIteration As Integer) As Single
-	  
-		' Examine the scan numbers in udtSurveyScans, starting at intLastSurveyScanIndex, to find the survey scans on either side of intFragScanNumber
-		' Interpolate the retention time that corresponds to intFragScanNumber
-		' Determine intFragScanNumber, which is generally 1, 2, or 3, indicating if this is the 1st, 2nd, or 3rd MS/MS scan after the survey scan
+    Private Function InterpolateRTandFragScanNumber(
+      ByRef udtSurveyScans() As udtScanInfoType,
+      intSurveyScanCount As Integer,
+      intLastSurveyScanIndex As Integer,
+      intFragScanNumber As Integer,
+      ByRef intFragScanIteration As Integer) As Single
 
-		Dim sngRT As Single
-		Dim sngPrevScanRT As Single
-		Dim sngNextScanRT As Single
-		Dim intScanDiff As Integer
+        ' Examine the scan numbers in udtSurveyScans, starting at intLastSurveyScanIndex, to find the survey scans on either side of intFragScanNumber
+        ' Interpolate the retention time that corresponds to intFragScanNumber
+        ' Determine intFragScanNumber, which is generally 1, 2, or 3, indicating if this is the 1st, 2nd, or 3rd MS/MS scan after the survey scan
 
-		Try
-			intFragScanIteration = 1
+        Dim sngRT As Single
+        Dim sngPrevScanRT As Single
+        Dim sngNextScanRT As Single
+        Dim intScanDiff As Integer
 
-			' Decrement intLastSurveyScanIndex if the corresponding SurveyScan's scan number is larger than intFragScanNumber
-			Do While intLastSurveyScanIndex > 0 AndAlso udtSurveyScans(intLastSurveyScanIndex).ScanNumber > intFragScanNumber
-				' This code will generally not be reached, provided the calling function passed the correct intLastSurveyScanIndex value to this function
-				intLastSurveyScanIndex -= 1
-			Loop
+        Try
+            intFragScanIteration = 1
 
-			' Increment intLastSurveyScanIndex if the next SurveyScan's scan number is smaller than intFragScanNumber
-			Do While intLastSurveyScanIndex < intSurveyScanCount - 1 AndAlso udtSurveyScans(intLastSurveyScanIndex + 1).ScanNumber < intFragScanNumber
-				' This code will generally not be reached, provided the calling function passed the correct intLastSurveyScanIndex value to this function
-				intLastSurveyScanIndex += 1
-			Loop
+            ' Decrement intLastSurveyScanIndex if the corresponding SurveyScan's scan number is larger than intFragScanNumber
+            Do While intLastSurveyScanIndex > 0 AndAlso udtSurveyScans(intLastSurveyScanIndex).ScanNumber > intFragScanNumber
+                ' This code will generally not be reached, provided the calling function passed the correct intLastSurveyScanIndex value to this function
+                intLastSurveyScanIndex -= 1
+            Loop
 
-			If intLastSurveyScanIndex >= intSurveyScanCount - 1 Then
-				' Cannot easily interpolate since FragScanNumber is greater than the last survey scan number
-				If intSurveyScanCount > 0 Then
-					If intSurveyScanCount >= 2 Then
-						' Use the scan numbers of the last 2 survey scans to extrapolate the scan number for this fragmentation scan
+            ' Increment intLastSurveyScanIndex if the next SurveyScan's scan number is smaller than intFragScanNumber
+            Do While intLastSurveyScanIndex < intSurveyScanCount - 1 AndAlso udtSurveyScans(intLastSurveyScanIndex + 1).ScanNumber < intFragScanNumber
+                ' This code will generally not be reached, provided the calling function passed the correct intLastSurveyScanIndex value to this function
+                intLastSurveyScanIndex += 1
+            Loop
 
-						intLastSurveyScanIndex = intSurveyScanCount - 1
-						With udtSurveyScans(intLastSurveyScanIndex)
-							intScanDiff = .ScanNumber - udtSurveyScans(intLastSurveyScanIndex - 1).ScanNumber
-							sngPrevScanRT = udtSurveyScans(intLastSurveyScanIndex - 1).ScanTime
+            If intLastSurveyScanIndex >= intSurveyScanCount - 1 Then
+                ' Cannot easily interpolate since FragScanNumber is greater than the last survey scan number
+                If intSurveyScanCount > 0 Then
+                    If intSurveyScanCount >= 2 Then
+                        ' Use the scan numbers of the last 2 survey scans to extrapolate the scan number for this fragmentation scan
 
-							' Compute intFragScanIteration
-							intFragScanIteration = intFragScanNumber - .ScanNumber
+                        intLastSurveyScanIndex = intSurveyScanCount - 1
+                        With udtSurveyScans(intLastSurveyScanIndex)
+                            intScanDiff = .ScanNumber - udtSurveyScans(intLastSurveyScanIndex - 1).ScanNumber
+                            sngPrevScanRT = udtSurveyScans(intLastSurveyScanIndex - 1).ScanTime
 
-							If intScanDiff > 0 AndAlso intFragScanIteration > 0 Then
-								sngRT = CSng(.ScanTime + (intFragScanIteration / intScanDiff * (.ScanTime - sngPrevScanRT)))
-							Else
-								' Adjacent survey scans have the same scan number
-								' This shouldn't happen
-								sngRT = udtSurveyScans(intLastSurveyScanIndex).ScanTime
-							End If
+                            ' Compute intFragScanIteration
+                            intFragScanIteration = intFragScanNumber - .ScanNumber
 
-							If intFragScanIteration < 1 Then intFragScanIteration = 1
+                            If intScanDiff > 0 AndAlso intFragScanIteration > 0 Then
+                                sngRT = CSng(.ScanTime + (intFragScanIteration / intScanDiff * (.ScanTime - sngPrevScanRT)))
+                            Else
+                                ' Adjacent survey scans have the same scan number
+                                ' This shouldn't happen
+                                sngRT = udtSurveyScans(intLastSurveyScanIndex).ScanTime
+                            End If
 
-						End With
-					Else
-						' Use the scan time of the highest survey scan in memory
-						sngRT = udtSurveyScans(intSurveyScanCount - 1).ScanTime
-					End If
-				Else
-					sngRT = 0
-				End If
-			Else
-				' Interpolate retention time
-				With udtSurveyScans(intLastSurveyScanIndex)
-					intScanDiff = udtSurveyScans(intLastSurveyScanIndex + 1).ScanNumber - .ScanNumber
-					sngNextScanRT = udtSurveyScans(intLastSurveyScanIndex + 1).ScanTime
+                            If intFragScanIteration < 1 Then intFragScanIteration = 1
 
-					' Compute intFragScanIteration
-					intFragScanIteration = intFragScanNumber - .ScanNumber
+                        End With
+                    Else
+                        ' Use the scan time of the highest survey scan in memory
+                        sngRT = udtSurveyScans(intSurveyScanCount - 1).ScanTime
+                    End If
+                Else
+                    sngRT = 0
+                End If
+            Else
+                ' Interpolate retention time
+                With udtSurveyScans(intLastSurveyScanIndex)
+                    intScanDiff = udtSurveyScans(intLastSurveyScanIndex + 1).ScanNumber - .ScanNumber
+                    sngNextScanRT = udtSurveyScans(intLastSurveyScanIndex + 1).ScanTime
 
-					If intScanDiff > 0 AndAlso intFragScanIteration > 0 Then
-						sngRT = CSng(.ScanTime + (intFragScanIteration / intScanDiff * (sngNextScanRT - .ScanTime)))
-					Else
-						' Adjacent survey scans have the same scan number
-						' This shouldn't happen
-						sngRT = .ScanTime
-					End If
+                    ' Compute intFragScanIteration
+                    intFragScanIteration = intFragScanNumber - .ScanNumber
 
-					If intFragScanIteration < 1 Then intFragScanIteration = 1
+                    If intScanDiff > 0 AndAlso intFragScanIteration > 0 Then
+                        sngRT = CSng(.ScanTime + (intFragScanIteration / intScanDiff * (sngNextScanRT - .ScanTime)))
+                    Else
+                        ' Adjacent survey scans have the same scan number
+                        ' This shouldn't happen
+                        sngRT = .ScanTime
+                    End If
 
-				End With
+                    If intFragScanIteration < 1 Then intFragScanIteration = 1
 
-			End If
+                End With
 
-		Catch ex As Exception
-			' Ignore any errors that occur in this function
-			LogErrors("InterpolateRTandFragScanNumber", "Error in InterpolateRTandFragScanNumber", ex, True, False)
-		End Try
+            End If
 
-		Return sngRT
+        Catch ex As Exception
+            ' Ignore any errors that occur in this function
+            LogErrors("InterpolateRTandFragScanNumber", "Error in InterpolateRTandFragScanNumber", ex, True, False)
+        End Try
 
-	End Function
+        Return sngRT
 
-	Private Function InterpolateX(
+    End Function
+
+    Private Function InterpolateX(
       ByRef sngInterpolatedXValue As Single,
-      X1 As Integer, 
-      X2 As Integer, 
-      Y1 As Single, 
-      Y2 As Single, 
+      X1 As Integer,
+      X2 As Integer,
+      Y1 As Single,
+      Y2 As Single,
       sngTargetY As Single) As Boolean
 
-		' Checks if Y1 or Y2 is less than sngTargetY
-		' If it is, then determines the X value that corresponds to sngTargetY by interpolating the line between (X1, Y1) and (X2, Y2)
-		'
-		' Returns True if a match is found; otherwise, returns false
+        ' Checks if Y1 or Y2 is less than sngTargetY
+        ' If it is, then determines the X value that corresponds to sngTargetY by interpolating the line between (X1, Y1) and (X2, Y2)
+        '
+        ' Returns True if a match is found; otherwise, returns false
 
-		Dim sngDeltaY As Single
-		Dim sngFraction As Single
-		Dim intDeltaX As Integer
-		Dim sngTargetX As Single
+        Dim sngDeltaY As Single
+        Dim sngFraction As Single
+        Dim intDeltaX As Integer
+        Dim sngTargetX As Single
 
-		If Y1 < sngTargetY OrElse Y2 < sngTargetY Then
-			If Y1 < sngTargetY AndAlso Y2 < sngTargetY Then
-				' Both of the Y values are less than sngTargetY
-				' We cannot interpolate
-				Debug.Assert(False, "This code should normally not be reached (clsMasic->InterpolateX)")
-				Return False
-			Else
-				sngDeltaY = Y2 - Y1									' Yes, this is y-two minus y-one
-				sngFraction = (sngTargetY - Y1) / sngDeltaY
-				intDeltaX = X2 - X1									' Yes, this is x-two minus x-one
+        If Y1 < sngTargetY OrElse Y2 < sngTargetY Then
+            If Y1 < sngTargetY AndAlso Y2 < sngTargetY Then
+                ' Both of the Y values are less than sngTargetY
+                ' We cannot interpolate
+                Debug.Assert(False, "This code should normally not be reached (clsMasic->InterpolateX)")
+                Return False
+            Else
+                sngDeltaY = Y2 - Y1                                 ' Yes, this is y-two minus y-one
+                sngFraction = (sngTargetY - Y1) / sngDeltaY
+                intDeltaX = X2 - X1                                 ' Yes, this is x-two minus x-one
 
-				sngTargetX = sngFraction * intDeltaX + X1
+                sngTargetX = sngFraction * intDeltaX + X1
 
-				If Math.Abs(sngTargetX - X1) >= 0 AndAlso Math.Abs(sngTargetX - X2) >= 0 Then
-					sngInterpolatedXValue = sngTargetX
-					Return True
-				Else
-					Debug.Assert(False, "TargetX is not between X1 and X2; this shouldn't happen (clsMasic->InterpolateX)")
-					Return False
-				End If
+                If Math.Abs(sngTargetX - X1) >= 0 AndAlso Math.Abs(sngTargetX - X2) >= 0 Then
+                    sngInterpolatedXValue = sngTargetX
+                    Return True
+                Else
+                    Debug.Assert(False, "TargetX is not between X1 and X2; this shouldn't happen (clsMasic->InterpolateX)")
+                    Return False
+                End If
 
-			End If
-		Else
-			Return False
-		End If
+            End If
+        Else
+            Return False
+        End If
 
-	End Function
+    End Function
 
-	Protected Function IsNumber(strValue As String) As Boolean
-		Try
-			Return Double.TryParse(strValue, 0)
-		Catch ex As Exception
-			Return False
-		End Try
-	End Function
+    Protected Function IsNumber(strValue As String) As Boolean
+        Try
+            Return Double.TryParse(strValue, 0)
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
 
-	Public Function LoadParameterFileSettings(strParameterFilePath As String) As Boolean
+    Public Function LoadParameterFileSettings(strParameterFilePath As String) As Boolean
 
-		Dim objSettingsFile As New XmlSettingsFileAccessor
+        Dim objSettingsFile As New XmlSettingsFileAccessor
 
-		Dim strMZList As String
-		Dim strMZToleranceDaList As String
+        Dim strMZList As String
+        Dim strMZToleranceDaList As String
 
         Dim strScanCenterList As String
         Dim strScanToleranceList As String
 
-		Dim strScanCommentList As String
-		Dim strScanTolerance As String
-		Dim strScanType As String
-		Dim strFilterList As String
+        Dim strScanCommentList As String
+        Dim strScanTolerance As String
+        Dim strScanType As String
+        Dim strFilterList As String
 
-		Dim eReporterIonMassMode As eReporterIonMassModeConstants
-		Dim eReporterIonITraq4PlexCorrectionFactorType As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
+        Dim eReporterIonMassMode As eReporterIonMassModeConstants
+        Dim eReporterIonITraq4PlexCorrectionFactorType As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
 
-		Dim dblSICTolerance As Double
-		Dim blnSICToleranceIsPPM As Boolean
+        Dim dblSICTolerance As Double
+        Dim blnSICToleranceIsPPM As Boolean
 
-		Dim strErrorMessage As String
-		Dim blnNotPresent As Boolean
+        Dim strErrorMessage As String
+        Dim blnNotPresent As Boolean
 
-		Dim blnSuccess As Boolean
+        Dim blnSuccess As Boolean
 
-		Try
+        Try
 
-			If strParameterFilePath Is Nothing OrElse strParameterFilePath.Length = 0 Then
-				' No parameter file specified; nothing to load
-				LogMessage("Parameter file not specified -- will use default settings")
-				Return True
-			Else
-				LogMessage("Loading parameter file: " & strParameterFilePath)
-			End If
+            If strParameterFilePath Is Nothing OrElse strParameterFilePath.Length = 0 Then
+                ' No parameter file specified; nothing to load
+                LogMessage("Parameter file not specified -- will use default settings")
+                Return True
+            Else
+                LogMessage("Loading parameter file: " & strParameterFilePath)
+            End If
 
 
-			If Not File.Exists(strParameterFilePath) Then
-				' See if strParameterFilePath points to a file in the same directory as the application
-				strParameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
-				If Not File.Exists(strParameterFilePath) Then
-					LogErrors("LoadParameterFileSettings", "Parameter file not found: " & strParameterFilePath, Nothing, True, False)
-					MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.ParameterFileNotFound)
-					Return False
-				End If
-			End If
+            If Not File.Exists(strParameterFilePath) Then
+                ' See if strParameterFilePath points to a file in the same directory as the application
+                strParameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
+                If Not File.Exists(strParameterFilePath) Then
+                    LogErrors("LoadParameterFileSettings", "Parameter file not found: " & strParameterFilePath, Nothing, True, False)
+                    MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.ParameterFileNotFound)
+                    Return False
+                End If
+            End If
 
-			' Pass False to .LoadSettings() here to turn off case sensitive matching
-			If objSettingsFile.LoadSettings(strParameterFilePath, False) Then
-				With objSettingsFile
+            ' Pass False to .LoadSettings() here to turn off case sensitive matching
+            If objSettingsFile.LoadSettings(strParameterFilePath, False) Then
+                With objSettingsFile
 
-					If Not .SectionPresent(XML_SECTION_DATABASE_SETTINGS) Then
-						' Database settings section not found; that's ok
-					Else
-						Me.DatabaseConnectionString = .GetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString", Me.DatabaseConnectionString)
-						Me.DatasetInfoQuerySql = .GetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql", Me.DatasetInfoQuerySql)
-					End If
+                    If Not .SectionPresent(XML_SECTION_DATABASE_SETTINGS) Then
+                        ' Database settings section not found; that's ok
+                    Else
+                        Me.DatabaseConnectionString = .GetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString", Me.DatabaseConnectionString)
+                        Me.DatasetInfoQuerySql = .GetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql", Me.DatasetInfoQuerySql)
+                    End If
 
-					If Not .SectionPresent(XML_SECTION_IMPORT_OPTIONS) Then
-						' Import options section not found; that's ok
-					Else
-						Me.CDFTimeInSeconds = .GetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", Me.CDFTimeInSeconds)
+                    If Not .SectionPresent(XML_SECTION_IMPORT_OPTIONS) Then
+                        ' Import options section not found; that's ok
+                    Else
+                        Me.CDFTimeInSeconds = .GetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", Me.CDFTimeInSeconds)
                         Me.ParentIonDecoyMassDa = .GetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", Me.ParentIonDecoyMassDa)
-					End If
+                    End If
 
-					' Masic Export Options
-					If Not .SectionPresent(XML_SECTION_EXPORT_OPTIONS) Then
-						' Export options section not found; that's ok
-					Else
-						Me.IncludeHeadersInExportFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", Me.IncludeHeadersInExportFile)
-						Me.IncludeScanTimesInSICStatsFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", Me.IncludeScanTimesInSICStatsFile)
-						Me.SkipMSMSProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", Me.SkipMSMSProcessing)
+                    ' Masic Export Options
+                    If Not .SectionPresent(XML_SECTION_EXPORT_OPTIONS) Then
+                        ' Export options section not found; that's ok
+                    Else
+                        Me.IncludeHeadersInExportFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", Me.IncludeHeadersInExportFile)
+                        Me.IncludeScanTimesInSICStatsFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", Me.IncludeScanTimesInSICStatsFile)
+                        Me.SkipMSMSProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", Me.SkipMSMSProcessing)
 
-						' Check for both "SkipSICProcessing" and "SkipSICAndRawDataProcessing" in the XML file
-						' If either is true, then mExportRawDataOnly will be auto-set to false in function ProcessFiles
-						Me.SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICProcessing", Me.SkipSICAndRawDataProcessing)
-						Me.SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICAndRawDataProcessing", Me.SkipSICAndRawDataProcessing)
+                        ' Check for both "SkipSICProcessing" and "SkipSICAndRawDataProcessing" in the XML file
+                        ' If either is true, then mExportRawDataOnly will be auto-set to false in function ProcessFiles
+                        Me.SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICProcessing", Me.SkipSICAndRawDataProcessing)
+                        Me.SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICAndRawDataProcessing", Me.SkipSICAndRawDataProcessing)
 
-						Me.ExportRawDataOnly = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", Me.ExportRawDataOnly)
+                        Me.ExportRawDataOnly = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", Me.ExportRawDataOnly)
 
-						Me.SuppressNoParentIonsError = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError", Me.SuppressNoParentIonsError)
+                        Me.SuppressNoParentIonsError = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError", Me.SuppressNoParentIonsError)
 
-						Me.WriteDetailedSICDataFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile", Me.WriteDetailedSICDataFile)
-						Me.WriteMSMethodFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", Me.WriteMSMethodFile)
-						Me.WriteMSTuneFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", Me.WriteMSTuneFile)
+                        Me.WriteDetailedSICDataFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile", Me.WriteDetailedSICDataFile)
+                        Me.WriteMSMethodFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", Me.WriteMSMethodFile)
+                        Me.WriteMSTuneFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", Me.WriteMSTuneFile)
 
-						Me.WriteExtendedStats = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats", Me.WriteExtendedStats)
-						Me.WriteExtendedStatsIncludeScanFilterText = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsIncludeScanFilterText", Me.WriteExtendedStatsIncludeScanFilterText)
-						Me.WriteExtendedStatsStatusLog = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsStatusLog", Me.WriteExtendedStatsStatusLog)
-						strFilterList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", String.Empty)
-						If Not strFilterList Is Nothing AndAlso strFilterList.Length > 0 Then
-							SetStatusLogKeyNameFilterList(strFilterList, ","c)
-						End If
+                        Me.WriteExtendedStats = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats", Me.WriteExtendedStats)
+                        Me.WriteExtendedStatsIncludeScanFilterText = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsIncludeScanFilterText", Me.WriteExtendedStatsIncludeScanFilterText)
+                        Me.WriteExtendedStatsStatusLog = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsStatusLog", Me.WriteExtendedStatsStatusLog)
+                        strFilterList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", String.Empty)
+                        If Not strFilterList Is Nothing AndAlso strFilterList.Length > 0 Then
+                            SetStatusLogKeyNameFilterList(strFilterList, ","c)
+                        End If
 
-						Me.ConsolidateConstantExtendedHeaderValues = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ConsolidateConstantExtendedHeaderValues", Me.ConsolidateConstantExtendedHeaderValues)
+                        Me.ConsolidateConstantExtendedHeaderValues = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ConsolidateConstantExtendedHeaderValues", Me.ConsolidateConstantExtendedHeaderValues)
 
-						Me.WriteMRMDataList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", Me.WriteMRMDataList)
-						Me.WriteMRMIntensityCrosstab = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab", Me.WriteMRMIntensityCrosstab)
+                        Me.WriteMRMDataList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", Me.WriteMRMDataList)
+                        Me.WriteMRMIntensityCrosstab = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab", Me.WriteMRMIntensityCrosstab)
 
-						Me.FastExistingXMLFileTest = .GetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", Me.FastExistingXMLFileTest)
+                        Me.FastExistingXMLFileTest = .GetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", Me.FastExistingXMLFileTest)
 
-						Me.ReporterIonStatsEnabled = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", Me.ReporterIonStatsEnabled)
-						eReporterIonMassMode = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", CInt(Me.ReporterIonMassMode)), eReporterIonMassModeConstants)
-						Me.ReporterIonToleranceDaDefault = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", Me.ReporterIonToleranceDaDefault)
-						Me.ReporterIonApplyAbundanceCorrection = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", Me.ReporterIonApplyAbundanceCorrection)
+                        Me.ReporterIonStatsEnabled = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", Me.ReporterIonStatsEnabled)
+                        eReporterIonMassMode = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", CInt(Me.ReporterIonMassMode)), eReporterIonMassModeConstants)
+                        Me.ReporterIonToleranceDaDefault = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", Me.ReporterIonToleranceDaDefault)
+                        Me.ReporterIonApplyAbundanceCorrection = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", Me.ReporterIonApplyAbundanceCorrection)
 
-						eReporterIonITraq4PlexCorrectionFactorType = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", CInt(Me.ReporterIonITraq4PlexCorrectionFactorType)), clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)
-						Me.ReporterIonITraq4PlexCorrectionFactorType = eReporterIonITraq4PlexCorrectionFactorType
+                        eReporterIonITraq4PlexCorrectionFactorType = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", CInt(Me.ReporterIonITraq4PlexCorrectionFactorType)), clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)
+                        Me.ReporterIonITraq4PlexCorrectionFactorType = eReporterIonITraq4PlexCorrectionFactorType
 
-						Me.ReporterIonSaveObservedMasses = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", Me.ReporterIonSaveObservedMasses)
-						Me.ReporterIonSaveUncorrectedIntensities = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", Me.ReporterIonSaveUncorrectedIntensities)
+                        Me.ReporterIonSaveObservedMasses = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", Me.ReporterIonSaveObservedMasses)
+                        Me.ReporterIonSaveUncorrectedIntensities = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", Me.ReporterIonSaveUncorrectedIntensities)
 
-						SetReporterIonMassMode(eReporterIonMassMode, Me.ReporterIonToleranceDaDefault)
+                        SetReporterIonMassMode(eReporterIonMassMode, Me.ReporterIonToleranceDaDefault)
 
-						' Raw data export options
-						Me.ExportRawSpectraData = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", Me.ExportRawSpectraData)
-						Me.ExportRawDataFileFormat = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", CInt(Me.ExportRawDataFileFormat)), eExportRawDataFileFormatConstants)
+                        ' Raw data export options
+                        Me.ExportRawSpectraData = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", Me.ExportRawSpectraData)
+                        Me.ExportRawDataFileFormat = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", CInt(Me.ExportRawDataFileFormat)), eExportRawDataFileFormatConstants)
 
-						Me.ExportRawDataIncludeMSMS = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", Me.ExportRawDataIncludeMSMS)
-						Me.ExportRawDataRenumberScans = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", Me.ExportRawDataRenumberScans)
+                        Me.ExportRawDataIncludeMSMS = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", Me.ExportRawDataIncludeMSMS)
+                        Me.ExportRawDataRenumberScans = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", Me.ExportRawDataRenumberScans)
 
-						Me.ExportRawDataMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", Me.ExportRawDataMinimumSignalToNoiseRatio)
-						Me.ExportRawDataMaxIonCountPerScan = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", Me.ExportRawDataMaxIonCountPerScan)
-						Me.ExportRawDataIntensityMinimum = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", Me.ExportRawDataIntensityMinimum)
-					End If
+                        Me.ExportRawDataMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", Me.ExportRawDataMinimumSignalToNoiseRatio)
+                        Me.ExportRawDataMaxIonCountPerScan = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", Me.ExportRawDataMaxIonCountPerScan)
+                        Me.ExportRawDataIntensityMinimum = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", Me.ExportRawDataIntensityMinimum)
+                    End If
 
-					If Not .SectionPresent(XML_SECTION_SIC_OPTIONS) Then
-						strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS & ControlChars.Quote & "> was not found in the parameter file: " & strParameterFilePath
-						If MyBase.ShowMessages Then
-							Windows.Forms.MessageBox.Show(strErrorMessage, "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-							LogMessage(strErrorMessage, eMessageTypeConstants.ErrorMsg)
-						Else
-							ShowErrorMessage(strErrorMessage)
-						End If
-						MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
-						Return False
-					Else
-						' SIC Options
-						' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
+                    If Not .SectionPresent(XML_SECTION_SIC_OPTIONS) Then
+                        strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS & ControlChars.Quote & "> was not found in the parameter file: " & strParameterFilePath
+                        If MyBase.ShowMessages Then
+                            Windows.Forms.MessageBox.Show(strErrorMessage, "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                            LogMessage(strErrorMessage, eMessageTypeConstants.ErrorMsg)
+                        Else
+                            ShowErrorMessage(strErrorMessage)
+                        End If
+                        MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
+                        Return False
+                    Else
+                        ' SIC Options
+                        ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
 
-						' Preferentially use "SICTolerance", if it is present
-						dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", GetSICTolerance(), blnNotPresent)
+                        ' Preferentially use "SICTolerance", if it is present
+                        dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", GetSICTolerance(), blnNotPresent)
 
-						If blnNotPresent Then
-							' Check for "SICToleranceDa", which is a legacy setting
-							dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", Me.SICToleranceDa, blnNotPresent)
+                        If blnNotPresent Then
+                            ' Check for "SICToleranceDa", which is a legacy setting
+                            dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", Me.SICToleranceDa, blnNotPresent)
 
-							If Not blnNotPresent Then
-								SetSICTolerance(dblSICTolerance, False)
-							End If
-						Else
-							blnSICToleranceIsPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", False)
+                            If Not blnNotPresent Then
+                                SetSICTolerance(dblSICTolerance, False)
+                            End If
+                        Else
+                            blnSICToleranceIsPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", False)
 
-							SetSICTolerance(dblSICTolerance, blnSICToleranceIsPPM)
-						End If
+                            SetSICTolerance(dblSICTolerance, blnSICToleranceIsPPM)
+                        End If
 
-						Me.RefineReportedParentIonMZ = .GetParam(XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", Me.RefineReportedParentIonMZ)
-						Me.ScanRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart", Me.ScanRangeStart)
-						Me.ScanRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeEnd", Me.ScanRangeEnd)
-						Me.RTRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeStart", Me.RTRangeStart)
-						Me.RTRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeEnd", Me.RTRangeEnd)
+                        Me.RefineReportedParentIonMZ = .GetParam(XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", Me.RefineReportedParentIonMZ)
+                        Me.ScanRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart", Me.ScanRangeStart)
+                        Me.ScanRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeEnd", Me.ScanRangeEnd)
+                        Me.RTRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeStart", Me.RTRangeStart)
+                        Me.RTRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeEnd", Me.RTRangeEnd)
 
-						Me.CompressMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData", Me.CompressMSSpectraData)
-						Me.CompressMSMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSMSSpectraData", Me.CompressMSMSSpectraData)
+                        Me.CompressMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData", Me.CompressMSSpectraData)
+                        Me.CompressMSMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSMSSpectraData", Me.CompressMSMSSpectraData)
 
-						Me.CompressToleranceDivisorForDa = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForDa", Me.CompressToleranceDivisorForDa)
-						Me.CompressToleranceDivisorForPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForPPM", Me.CompressToleranceDivisorForPPM)
+                        Me.CompressToleranceDivisorForDa = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForDa", Me.CompressToleranceDivisorForDa)
+                        Me.CompressToleranceDivisorForPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForPPM", Me.CompressToleranceDivisorForPPM)
 
-						Me.MaxSICPeakWidthMinutesBackward = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesBackward", Me.MaxSICPeakWidthMinutesBackward)
-						Me.MaxSICPeakWidthMinutesForward = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesForward", Me.MaxSICPeakWidthMinutesForward)
-						Me.IntensityThresholdFractionMax = .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", Me.IntensityThresholdFractionMax)
-						Me.IntensityThresholdAbsoluteMinimum = .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", Me.IntensityThresholdAbsoluteMinimum)
+                        Me.MaxSICPeakWidthMinutesBackward = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesBackward", Me.MaxSICPeakWidthMinutesBackward)
+                        Me.MaxSICPeakWidthMinutesForward = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesForward", Me.MaxSICPeakWidthMinutesForward)
+                        Me.IntensityThresholdFractionMax = .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", Me.IntensityThresholdFractionMax)
+                        Me.IntensityThresholdAbsoluteMinimum = .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", Me.IntensityThresholdAbsoluteMinimum)
 
-						' Peak Finding Options
-						Me.SICNoiseThresholdMode = CType(.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", CInt(Me.SICNoiseThresholdMode)), MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
-						Me.SICNoiseThresholdIntensity = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", Me.SICNoiseThresholdIntensity)
-						Me.SICNoiseFractionLowIntensityDataToAverage = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", Me.SICNoiseFractionLowIntensityDataToAverage)
-						Me.SICNoiseMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseMinimumSignalToNoiseRatio", Me.SICNoiseMinimumSignalToNoiseRatio)
+                        ' Peak Finding Options
+                        Me.SICNoiseThresholdMode = CType(.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", CInt(Me.SICNoiseThresholdMode)), MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
+                        Me.SICNoiseThresholdIntensity = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", Me.SICNoiseThresholdIntensity)
+                        Me.SICNoiseFractionLowIntensityDataToAverage = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", Me.SICNoiseFractionLowIntensityDataToAverage)
+                        Me.SICNoiseMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseMinimumSignalToNoiseRatio", Me.SICNoiseMinimumSignalToNoiseRatio)
 
-						Me.MaxDistanceScansNoOverlap = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap", Me.MaxDistanceScansNoOverlap)
-						Me.MaxAllowedUpwardSpikeFractionMax = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", Me.MaxAllowedUpwardSpikeFractionMax)
-						Me.InitialPeakWidthScansScaler = .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler", Me.InitialPeakWidthScansScaler)
-						Me.InitialPeakWidthScansMaximum = .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum", Me.InitialPeakWidthScansMaximum)
+                        Me.MaxDistanceScansNoOverlap = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap", Me.MaxDistanceScansNoOverlap)
+                        Me.MaxAllowedUpwardSpikeFractionMax = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", Me.MaxAllowedUpwardSpikeFractionMax)
+                        Me.InitialPeakWidthScansScaler = .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler", Me.InitialPeakWidthScansScaler)
+                        Me.InitialPeakWidthScansMaximum = .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum", Me.InitialPeakWidthScansMaximum)
 
-						Me.FindPeaksOnSmoothedData = .GetParam(XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData", Me.FindPeaksOnSmoothedData)
-						Me.SmoothDataRegardlessOfMinimumPeakWidth = .GetParam(XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth", Me.SmoothDataRegardlessOfMinimumPeakWidth)
-						Me.UseButterworthSmooth = .GetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth", Me.UseButterworthSmooth)
-						Me.ButterworthSamplingFrequency = .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", Me.ButterworthSamplingFrequency)
-						Me.ButterworthSamplingFrequencyDoubledForSIMData = .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData", Me.ButterworthSamplingFrequencyDoubledForSIMData)
+                        Me.FindPeaksOnSmoothedData = .GetParam(XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData", Me.FindPeaksOnSmoothedData)
+                        Me.SmoothDataRegardlessOfMinimumPeakWidth = .GetParam(XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth", Me.SmoothDataRegardlessOfMinimumPeakWidth)
+                        Me.UseButterworthSmooth = .GetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth", Me.UseButterworthSmooth)
+                        Me.ButterworthSamplingFrequency = .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", Me.ButterworthSamplingFrequency)
+                        Me.ButterworthSamplingFrequencyDoubledForSIMData = .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData", Me.ButterworthSamplingFrequencyDoubledForSIMData)
 
-						Me.UseSavitzkyGolaySmooth = .GetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth", Me.UseSavitzkyGolaySmooth)
-						Me.SavitzkyGolayFilterOrder = .GetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder", Me.SavitzkyGolayFilterOrder)
-						Me.SaveSmoothedData = .GetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", Me.SaveSmoothedData)
+                        Me.UseSavitzkyGolaySmooth = .GetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth", Me.UseSavitzkyGolaySmooth)
+                        Me.SavitzkyGolayFilterOrder = .GetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder", Me.SavitzkyGolayFilterOrder)
+                        Me.SaveSmoothedData = .GetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", Me.SaveSmoothedData)
 
-						Me.MassSpectraNoiseThresholdMode = CType(.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", CInt(Me.MassSpectraNoiseThresholdMode)), MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
-						Me.MassSpectraNoiseThresholdIntensity = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", Me.MassSpectraNoiseThresholdIntensity)
-						Me.MassSpectraNoiseFractionLowIntensityDataToAverage = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", Me.MassSpectraNoiseFractionLowIntensityDataToAverage)
-						Me.MassSpectraNoiseMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio ", Me.MassSpectraNoiseMinimumSignalToNoiseRatio)
+                        Me.MassSpectraNoiseThresholdMode = CType(.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", CInt(Me.MassSpectraNoiseThresholdMode)), MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
+                        Me.MassSpectraNoiseThresholdIntensity = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", Me.MassSpectraNoiseThresholdIntensity)
+                        Me.MassSpectraNoiseFractionLowIntensityDataToAverage = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", Me.MassSpectraNoiseFractionLowIntensityDataToAverage)
+                        Me.MassSpectraNoiseMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio ", Me.MassSpectraNoiseMinimumSignalToNoiseRatio)
 
-						Me.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = .GetParam(XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData", Me.ReplaceSICZeroesWithMinimumPositiveValueFromMSData)
+                        Me.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = .GetParam(XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData", Me.ReplaceSICZeroesWithMinimumPositiveValueFromMSData)
 
-						' Similarity Options
-						Me.SimilarIonMZToleranceHalfWidth = .GetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonMZToleranceHalfWidth", Me.SimilarIonMZToleranceHalfWidth)
-						Me.SimilarIonToleranceHalfWidthMinutes = .GetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonToleranceHalfWidthMinutes", Me.SimilarIonToleranceHalfWidthMinutes)
-						Me.SpectrumSimilarityMinimum = .GetParam(XML_SECTION_SIC_OPTIONS, "SpectrumSimilarityMinimum", Me.SpectrumSimilarityMinimum)
+                        ' Similarity Options
+                        Me.SimilarIonMZToleranceHalfWidth = .GetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonMZToleranceHalfWidth", Me.SimilarIonMZToleranceHalfWidth)
+                        Me.SimilarIonToleranceHalfWidthMinutes = .GetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonToleranceHalfWidthMinutes", Me.SimilarIonToleranceHalfWidthMinutes)
+                        Me.SpectrumSimilarityMinimum = .GetParam(XML_SECTION_SIC_OPTIONS, "SpectrumSimilarityMinimum", Me.SpectrumSimilarityMinimum)
 
-					End If
+                    End If
 
-					' Binning Options
-					If Not .SectionPresent(XML_SECTION_BINNING_OPTIONS) Then
-						strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_BINNING_OPTIONS & ControlChars.Quote & "> was not found in the parameter file: " & strParameterFilePath
-						If MyBase.ShowMessages Then
-							Windows.Forms.MessageBox.Show(strErrorMessage, "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-							LogMessage(strErrorMessage, eMessageTypeConstants.ErrorMsg)
-						Else
-							ShowErrorMessage(strErrorMessage)
-						End If
+                    ' Binning Options
+                    If Not .SectionPresent(XML_SECTION_BINNING_OPTIONS) Then
+                        strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_BINNING_OPTIONS & ControlChars.Quote & "> was not found in the parameter file: " & strParameterFilePath
+                        If MyBase.ShowMessages Then
+                            Windows.Forms.MessageBox.Show(strErrorMessage, "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                            LogMessage(strErrorMessage, eMessageTypeConstants.ErrorMsg)
+                        Else
+                            ShowErrorMessage(strErrorMessage)
+                        End If
 
-						MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
-						Return False
-					Else
-						Me.BinStartX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX", Me.BinStartX)
-						Me.BinEndX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinEndX", Me.BinEndX)
-						Me.BinSize = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinSize", Me.BinSize)
-						Me.MaximumBinCount = .GetParam(XML_SECTION_BINNING_OPTIONS, "MaximumBinCount", Me.MaximumBinCount)
+                        MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
+                        Return False
+                    Else
+                        Me.BinStartX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX", Me.BinStartX)
+                        Me.BinEndX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinEndX", Me.BinEndX)
+                        Me.BinSize = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinSize", Me.BinSize)
+                        Me.MaximumBinCount = .GetParam(XML_SECTION_BINNING_OPTIONS, "MaximumBinCount", Me.MaximumBinCount)
 
-						Me.BinnedDataIntensityPrecisionPercent = .GetParam(XML_SECTION_BINNING_OPTIONS, "IntensityPrecisionPercent", Me.BinnedDataIntensityPrecisionPercent)
-						Me.NormalizeBinnedData = .GetParam(XML_SECTION_BINNING_OPTIONS, "Normalize", Me.NormalizeBinnedData)
-						Me.SumAllIntensitiesForBin = .GetParam(XML_SECTION_BINNING_OPTIONS, "SumAllIntensitiesForBin", Me.SumAllIntensitiesForBin)
-					End If
+                        Me.BinnedDataIntensityPrecisionPercent = .GetParam(XML_SECTION_BINNING_OPTIONS, "IntensityPrecisionPercent", Me.BinnedDataIntensityPrecisionPercent)
+                        Me.NormalizeBinnedData = .GetParam(XML_SECTION_BINNING_OPTIONS, "Normalize", Me.NormalizeBinnedData)
+                        Me.SumAllIntensitiesForBin = .GetParam(XML_SECTION_BINNING_OPTIONS, "SumAllIntensitiesForBin", Me.SumAllIntensitiesForBin)
+                    End If
 
-					' Memory management options
-					Me.DiskCachingAlwaysDisabled = .GetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", Me.DiskCachingAlwaysDisabled)
-					Me.CacheFolderPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", Me.CacheFolderPath)
+                    ' Memory management options
+                    Me.DiskCachingAlwaysDisabled = .GetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", Me.DiskCachingAlwaysDisabled)
+                    Me.CacheFolderPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", Me.CacheFolderPath)
 
-					Me.CacheSpectraToRetainInMemory = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", Me.CacheSpectraToRetainInMemory)
-					Me.CacheMinimumFreeMemoryMB = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMinimumFreeMemoryMB", Me.CacheMinimumFreeMemoryMB)
-					Me.CacheMaximumMemoryUsageMB = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMaximumMemoryUsageMB", Me.CacheMaximumMemoryUsageMB)
+                    Me.CacheSpectraToRetainInMemory = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", Me.CacheSpectraToRetainInMemory)
+                    Me.CacheMinimumFreeMemoryMB = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMinimumFreeMemoryMB", Me.CacheMinimumFreeMemoryMB)
+                    Me.CacheMaximumMemoryUsageMB = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMaximumMemoryUsageMB", Me.CacheMaximumMemoryUsageMB)
 
-				End With
+                End With
 
-				If Not objSettingsFile.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES) Then
-					' Custom SIC values section not found; that's ok
-				Else
-					Me.LimitSearchToCustomMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "LimitSearchToCustomMZList", Me.LimitSearchToCustomMZList)
+                If Not objSettingsFile.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES) Then
+                    ' Custom SIC values section not found; that's ok
+                Else
+                    Me.LimitSearchToCustomMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "LimitSearchToCustomMZList", Me.LimitSearchToCustomMZList)
 
-					strScanType = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", String.Empty)
-					strScanTolerance = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", String.Empty)
+                    strScanType = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", String.Empty)
+                    strScanTolerance = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", String.Empty)
 
-					With mCustomSICList
-						.ScanToleranceType = GetScanToleranceTypeFromText(strScanType)
+                    With mCustomSICList
+                        .ScanToleranceType = GetScanToleranceTypeFromText(strScanType)
 
-						If strScanTolerance.Length > 0 AndAlso IsNumber(strScanTolerance) Then
-							If .ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-								.ScanOrAcqTimeTolerance = CInt(strScanTolerance)
-							Else
-								' Includes .Relative and .AcquisitionTime
-								.ScanOrAcqTimeTolerance = CSng(strScanTolerance)
-							End If
-						Else
-							.ScanOrAcqTimeTolerance = 0
-						End If
-					End With
+                        If strScanTolerance.Length > 0 AndAlso IsNumber(strScanTolerance) Then
+                            If .ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
+                                .ScanOrAcqTimeTolerance = CInt(strScanTolerance)
+                            Else
+                                ' Includes .Relative and .AcquisitionTime
+                                .ScanOrAcqTimeTolerance = CSng(strScanTolerance)
+                            End If
+                        Else
+                            .ScanOrAcqTimeTolerance = 0
+                        End If
+                    End With
 
-					Me.CustomSICListFileName = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", String.Empty)
+                    Me.CustomSICListFileName = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", String.Empty)
 
-					If Me.CustomSICListFileName.Length > 0 Then
-						' Clear mCustomSICList; we'll read the data from the file when ProcessFile is called()
+                    If Me.CustomSICListFileName.Length > 0 Then
+                        ' Clear mCustomSICList; we'll read the data from the file when ProcessFile is called()
 
-						InitializeCustomMZList(mCustomSICList, False)
+                        InitializeCustomMZList(mCustomSICList, False)
 
-						blnSuccess = True
-					Else
-						strMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Empty)
-						strMZToleranceDaList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", String.Empty)
+                        blnSuccess = True
+                    Else
+                        strMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Empty)
+                        strMZToleranceDaList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", String.Empty)
 
                         strScanCenterList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", String.Empty)
                         strScanToleranceList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", String.Empty)
 
-						strScanCommentList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
+                        strScanCommentList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
 
                         blnSuccess = ParseCustomSICList(strMZList, strMZToleranceDaList, strScanCenterList, strScanToleranceList, strScanCommentList, strParameterFilePath)
-					End If
+                    End If
 
-					If Not blnSuccess Then
-						Return False
-					End If
+                    If Not blnSuccess Then
+                        Return False
+                    End If
 
-				End If
-			Else
-				LogErrors("LoadParameterFileSettings", "Error calling objSettingsFile.LoadSettings for " & strParameterFilePath, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
-				Return False
-			End If
+                End If
+            Else
+                LogErrors("LoadParameterFileSettings", "Error calling objSettingsFile.LoadSettings for " & strParameterFilePath, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
+                Return False
+            End If
 
-		Catch ex As Exception
-			LogErrors("LoadParameterFileSettings", "Error in LoadParameterFileSettings", ex, True, False, eMasicErrorCodes.InputFileDataReadError)
-			Return False
-		End Try
+        Catch ex As Exception
+            LogErrors("LoadParameterFileSettings", "Error in LoadParameterFileSettings", ex, True, False, eMasicErrorCodes.InputFileDataReadError)
+            Return False
+        End Try
 
-		Return True
+        Return True
 
-	End Function
+    End Function
 
-	Protected Function LoadCustomSICListFromFile(strCustomSICValuesFileName As String) As Boolean
+    Protected Function LoadCustomSICListFromFile(strCustomSICValuesFileName As String) As Boolean
 
-		Dim strLineIn As String
-		Dim strSplitLine() As String
+        Dim strLineIn As String
+        Dim strSplitLine() As String
 
-		Dim strDelimList() As Char = New Char() {ControlChars.Tab}
+        Dim strDelimList() As Char = New Char() {ControlChars.Tab}
 
-		Dim strErrorMessage As String
+        Dim strErrorMessage As String
 
-		Dim blnSuccess As Boolean
-		Dim blnMZHeaderFound As Boolean
+        Dim blnSuccess As Boolean
+        Dim blnMZHeaderFound As Boolean
 
-		Dim blnScanTimeHeaderFound As Boolean
-		Dim blnTimeToleranceHeaderFound As Boolean
-		Dim blnForceAcquisitionTimeMode As Boolean
+        Dim blnScanTimeHeaderFound As Boolean
+        Dim blnTimeToleranceHeaderFound As Boolean
+        Dim blnForceAcquisitionTimeMode As Boolean
 
-		Dim intLinesRead As Integer
-		Dim intColIndex As Integer
+        Dim intLinesRead As Integer
+        Dim intColIndex As Integer
 
-		Dim eColumnMapping() As Integer
-		Dim intCustomMZCount As Integer
+        Dim eColumnMapping() As Integer
+        Dim intCustomMZCount As Integer
 
-		Try
-			blnSuccess = True
-			blnMZHeaderFound = False
-			blnScanTimeHeaderFound = False
-			blnTimeToleranceHeaderFound = False
+        Try
+            blnSuccess = True
+            blnMZHeaderFound = False
+            blnScanTimeHeaderFound = False
+            blnTimeToleranceHeaderFound = False
 
-			InitializeCustomMZList(mCustomSICList, False)
+            InitializeCustomMZList(mCustomSICList, False)
 
-			' Initially reserve space for 10 custom m/z values
-			ReDim Preserve mCustomSICList.CustomMZSearchValues(9)
-			intCustomMZCount = 0
+            ' Initially reserve space for 10 custom m/z values
+            ReDim Preserve mCustomSICList.CustomMZSearchValues(9)
+            intCustomMZCount = 0
 
-			' eColumnMapping will be initialized when the headers are read
-			ReDim eColumnMapping(-1)
+            ' eColumnMapping will be initialized when the headers are read
+            ReDim eColumnMapping(-1)
 
-			If Not File.Exists(strCustomSICValuesFileName) Then
-				' Custom SIC file not found
+            If Not File.Exists(strCustomSICValuesFileName) Then
+                ' Custom SIC file not found
 
-				strErrorMessage = "Custom MZ List file not found: " & strCustomSICValuesFileName
-				If MyBase.ShowMessages Then
-					Windows.Forms.MessageBox.Show(strErrorMessage, "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-					LogMessage(strErrorMessage, eMessageTypeConstants.ErrorMsg)
-				Else
-					ShowErrorMessage(strErrorMessage)
-				End If
+                strErrorMessage = "Custom MZ List file not found: " & strCustomSICValuesFileName
+                If MyBase.ShowMessages Then
+                    Windows.Forms.MessageBox.Show(strErrorMessage, "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    LogMessage(strErrorMessage, eMessageTypeConstants.ErrorMsg)
+                Else
+                    ShowErrorMessage(strErrorMessage)
+                End If
 
-				SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues)
+                SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues)
 
-				blnSuccess = False
-				Exit Try
-			End If
+                blnSuccess = False
+                Exit Try
+            End If
 
             Using srInFile = New StreamReader(New FileStream(strCustomSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
 
@@ -8862,31 +8862,31 @@ Public Class clsMASIC
 
             End Using
 
-		Catch ex As Exception
-			LogErrors("LoadCustomSICListFromFile", "Error in LoadCustomSICListFromFile", ex, True, True, eMasicErrorCodes.InvalidCustomSICValues)
-			blnSuccess = False
-		End Try
+        Catch ex As Exception
+            LogErrors("LoadCustomSICListFromFile", "Error in LoadCustomSICListFromFile", ex, True, True, eMasicErrorCodes.InvalidCustomSICValues)
+            blnSuccess = False
+        End Try
 
-		Try
-			If blnSuccess Then
-				' Shrink the custom mz search values array
-				ReDim Preserve mCustomSICList.CustomMZSearchValues(intCustomMZCount - 1)
+        Try
+            If blnSuccess Then
+                ' Shrink the custom mz search values array
+                ReDim Preserve mCustomSICList.CustomMZSearchValues(intCustomMZCount - 1)
 
-				If Not blnForceAcquisitionTimeMode Then
-					ValidateCustomSICList()
-				End If
-			Else
-				' Clear the custom mz search values array
-				ReDim mCustomSICList.CustomMZSearchValues(-1)
-			End If
+                If Not blnForceAcquisitionTimeMode Then
+                    ValidateCustomSICList()
+                End If
+            Else
+                ' Clear the custom mz search values array
+                ReDim mCustomSICList.CustomMZSearchValues(-1)
+            End If
 
-		Catch ex As Exception
-			' Ignore errors here
-		End Try
+        Catch ex As Exception
+            ' Ignore errors here
+        End Try
 
-		Return blnSuccess
+        Return blnSuccess
 
-	End Function
+    End Function
 
     Protected Function ParseCustomSICList(
       strMZList As String,
@@ -9118,157 +9118,157 @@ Public Class clsMASIC
 
     End Function
 
-	Private Sub LogErrors(
-	  strSource As String, 
-	  strMessage As String, 
-	  ex As Exception, 
-	  Optional blnAllowInformUser As Boolean = True, 
-	  Optional blnAllowThrowingException As Boolean = True, 
-	  Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
-	  
-		Dim strMessageWithoutCRLF As String
+    Private Sub LogErrors(
+      strSource As String,
+      strMessage As String,
+      ex As Exception,
+      Optional blnAllowInformUser As Boolean = True,
+      Optional blnAllowThrowingException As Boolean = True,
+      Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
 
-		mStatusMessage = String.Copy(strMessage)
+        Dim strMessageWithoutCRLF As String
 
-		strMessageWithoutCRLF = mStatusMessage.Replace(ControlChars.NewLine, "; ")
+        mStatusMessage = String.Copy(strMessage)
 
-		If ex Is Nothing Then
-			ex = New Exception("Error")
-		Else
-			If Not ex.Message Is Nothing AndAlso ex.Message.Length > 0 Then
-				strMessageWithoutCRLF &= "; " & ex.Message
-			End If
-		End If
+        strMessageWithoutCRLF = mStatusMessage.Replace(ControlChars.NewLine, "; ")
 
-		' Show the message and log to the clsProcessFilesBaseClass logger
-		ShowErrorMessage(strSource & ": " & strMessageWithoutCRLF, True)
+        If ex Is Nothing Then
+            ex = New Exception("Error")
+        Else
+            If Not ex.Message Is Nothing AndAlso ex.Message.Length > 0 Then
+                strMessageWithoutCRLF &= "; " & ex.Message
+            End If
+        End If
 
-		If Not eNewErrorCode = eMasicErrorCodes.NoError Then
-			SetLocalErrorCode(eNewErrorCode, True)
-		End If
+        ' Show the message and log to the clsProcessFilesBaseClass logger
+        ShowErrorMessage(strSource & ": " & strMessageWithoutCRLF, True)
 
-		If MyBase.ShowMessages AndAlso blnAllowInformUser Then
-			Windows.Forms.MessageBox.Show(mStatusMessage & ControlChars.NewLine & ex.Message, "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Exclamation)
-		ElseIf blnAllowThrowingException Then
-			Throw New Exception(mStatusMessage, ex)
-		End If
-	End Sub
+        If Not eNewErrorCode = eMasicErrorCodes.NoError Then
+            SetLocalErrorCode(eNewErrorCode, True)
+        End If
 
-	Private Function LookupDatasetNumber(
+        If MyBase.ShowMessages AndAlso blnAllowInformUser Then
+            Windows.Forms.MessageBox.Show(mStatusMessage & ControlChars.NewLine & ex.Message, "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Exclamation)
+        ElseIf blnAllowThrowingException Then
+            Throw New Exception(mStatusMessage, ex)
+        End If
+    End Sub
+
+    Private Function LookupDatasetNumber(
       strInputFilePath As String,
       strDatasetLookupFilePath As String,
       intDefaultDatasetNumber As Integer) As Integer
 
-		' First tries to poll the database for the dataset number
-		' If this doesn't work, then looks for the dataset name in mDatasetLookupFilePath
+        ' First tries to poll the database for the dataset number
+        ' If this doesn't work, then looks for the dataset name in mDatasetLookupFilePath
 
-		Dim strFileNameCompare As String
-		Dim intNewDatasetNumber As Integer
+        Dim strFileNameCompare As String
+        Dim intNewDatasetNumber As Integer
 
-		Dim strAvoidErrorMessage As String
+        Dim strAvoidErrorMessage As String
 
-		Dim blnDatasetFoundInDB As Boolean
-		Dim objDBTools As PRISM.DataBase.clsDBTools
-		Dim objDBLogger As PRISM.Logging.ILogger = Nothing
+        Dim blnDatasetFoundInDB As Boolean
+        Dim objDBTools As PRISM.DataBase.clsDBTools
+        Dim objDBLogger As PRISM.Logging.ILogger = Nothing
 
-		Dim intRowCount As Integer
-		Dim dsDatasetInfo As DataSet = Nothing
-		Dim objRow As DataRow
+        Dim intRowCount As Integer
+        Dim dsDatasetInfo As DataSet = Nothing
+        Dim objRow As DataRow
 
-		' Initialize intNewDatasetNumber and strFileNameCompare
-		strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper
-		intNewDatasetNumber = intDefaultDatasetNumber
+        ' Initialize intNewDatasetNumber and strFileNameCompare
+        strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper
+        intNewDatasetNumber = intDefaultDatasetNumber
 
-		strAvoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and 'Dataset Info Query SQL' entries on the Advanced tab."
+        strAvoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and 'Dataset Info Query SQL' entries on the Advanced tab."
 
-		blnDatasetFoundInDB = False
+        blnDatasetFoundInDB = False
 
-		If Not mDatabaseConnectionString Is Nothing AndAlso mDatabaseConnectionString.Length > 0 Then
-			' Attempt to lookup the dataset number in the database
-			Try
-				objDBTools = New PRISM.DataBase.clsDBTools(objDBLogger, mDatabaseConnectionString)
+        If Not mDatabaseConnectionString Is Nothing AndAlso mDatabaseConnectionString.Length > 0 Then
+            ' Attempt to lookup the dataset number in the database
+            Try
+                objDBTools = New PRISM.DataBase.clsDBTools(objDBLogger, mDatabaseConnectionString)
 
-				Dim intTextCol As Integer = -1
-				Dim intDatasetIDCol As Integer = -1
-				Dim blnQueryingSingleDataset As Boolean = False
+                Dim intTextCol As Integer = -1
+                Dim intDatasetIDCol As Integer = -1
+                Dim blnQueryingSingleDataset As Boolean = False
 
-				Dim strQuery = String.Copy(mDatasetInfoQuerySql)
-				If strQuery.ToUpper.StartsWith("SELECT DATASET") Then
-					' Add a where clause to the query
-					strQuery &= " WHERE Dataset = '" & strFileNameCompare & "'"
-					blnQueryingSingleDataset = True
-				End If
+                Dim strQuery = String.Copy(mDatasetInfoQuerySql)
+                If strQuery.ToUpper.StartsWith("SELECT DATASET") Then
+                    ' Add a where clause to the query
+                    strQuery &= " WHERE Dataset = '" & strFileNameCompare & "'"
+                    blnQueryingSingleDataset = True
+                End If
 
-				If objDBTools.GetDiscDataSet(strQuery, dsDatasetInfo, intRowCount) Then
-					If intRowCount > 0 Then
-						With dsDatasetInfo.Tables(0)
-							If .Columns(0).DataType Is Type.GetType("System.String") Then
-								' First column is text; make sure the second is a number
-								If Not .Columns(1).DataType Is Type.GetType("System.String") Then
-									intTextCol = 0
-									intDatasetIDCol = 1
-								End If
-							Else
-								' First column is not text; make sure the second is text
-								If .Columns(1).DataType Is Type.GetType("System.String") Then
-									intTextCol = 1
-									intDatasetIDCol = 0
-								End If
-							End If
-						End With
+                If objDBTools.GetDiscDataSet(strQuery, dsDatasetInfo, intRowCount) Then
+                    If intRowCount > 0 Then
+                        With dsDatasetInfo.Tables(0)
+                            If .Columns(0).DataType Is Type.GetType("System.String") Then
+                                ' First column is text; make sure the second is a number
+                                If Not .Columns(1).DataType Is Type.GetType("System.String") Then
+                                    intTextCol = 0
+                                    intDatasetIDCol = 1
+                                End If
+                            Else
+                                ' First column is not text; make sure the second is text
+                                If .Columns(1).DataType Is Type.GetType("System.String") Then
+                                    intTextCol = 1
+                                    intDatasetIDCol = 0
+                                End If
+                            End If
+                        End With
 
-						If intTextCol >= 0 Then
-							' Find the row in the datatable that matches strFileNameCompare
-							For Each objRow In dsDatasetInfo.Tables(0).Rows
-								If CStr(objRow.Item(intTextCol)).ToUpper = strFileNameCompare Then
-									' Match found
-									Try
-										intNewDatasetNumber = CInt(objRow.Item(intDatasetIDCol))
-										blnDatasetFoundInDB = True
-									Catch ex As Exception
-										Try
-											LogErrors("LookupDatasetNumber", "Error converting '" & objRow.Item(intDatasetIDCol).ToString & "' to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
-										Catch ex2 As Exception
-											LogErrors("LookupDatasetNumber", "Error converting column " & intDatasetIDCol.ToString & " from the dataset report to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
-										End Try
-										blnDatasetFoundInDB = False
-									End Try
-									Exit For
-								End If
-							Next objRow
-						End If
+                        If intTextCol >= 0 Then
+                            ' Find the row in the datatable that matches strFileNameCompare
+                            For Each objRow In dsDatasetInfo.Tables(0).Rows
+                                If CStr(objRow.Item(intTextCol)).ToUpper = strFileNameCompare Then
+                                    ' Match found
+                                    Try
+                                        intNewDatasetNumber = CInt(objRow.Item(intDatasetIDCol))
+                                        blnDatasetFoundInDB = True
+                                    Catch ex As Exception
+                                        Try
+                                            LogErrors("LookupDatasetNumber", "Error converting '" & objRow.Item(intDatasetIDCol).ToString & "' to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                        Catch ex2 As Exception
+                                            LogErrors("LookupDatasetNumber", "Error converting column " & intDatasetIDCol.ToString & " from the dataset report to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                        End Try
+                                        blnDatasetFoundInDB = False
+                                    End Try
+                                    Exit For
+                                End If
+                            Next objRow
+                        End If
 
-						If Not blnDatasetFoundInDB AndAlso blnQueryingSingleDataset Then
-							Try
-								Integer.TryParse(dsDatasetInfo.Tables(0).Rows(0).Item(1).ToString(), intNewDatasetNumber)
-								blnDatasetFoundInDB = True
-							Catch ex As Exception
-								' Ignore errors here
-							End Try
+                        If Not blnDatasetFoundInDB AndAlso blnQueryingSingleDataset Then
+                            Try
+                                Integer.TryParse(dsDatasetInfo.Tables(0).Rows(0).Item(1).ToString(), intNewDatasetNumber)
+                                blnDatasetFoundInDB = True
+                            Catch ex As Exception
+                                ' Ignore errors here
+                            End Try
 
-						End If
-					End If
-				End If
+                        End If
+                    End If
+                End If
 
-			Catch ex2 As NullReferenceException
-				LogErrors("LookupDatasetNumber", "Error connecting to database: " & mDatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, Nothing, True, False, eMasicErrorCodes.InvalidDatasetNumber)
-				blnDatasetFoundInDB = False
-			Catch ex As Exception
-				LogErrors("LookupDatasetNumber", "Error connecting to database: " & mDatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
-				blnDatasetFoundInDB = False
-			End Try
-		End If
+            Catch ex2 As NullReferenceException
+                LogErrors("LookupDatasetNumber", "Error connecting to database: " & mDatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, Nothing, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                blnDatasetFoundInDB = False
+            Catch ex As Exception
+                LogErrors("LookupDatasetNumber", "Error connecting to database: " & mDatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                blnDatasetFoundInDB = False
+            End Try
+        End If
 
-		If Not blnDatasetFoundInDB AndAlso Not String.IsNullOrWhiteSpace(strDatasetLookupFilePath) Then
+        If Not blnDatasetFoundInDB AndAlso Not String.IsNullOrWhiteSpace(strDatasetLookupFilePath) Then
 
-			' Lookup the dataset number in the dataset lookup file
+            ' Lookup the dataset number in the dataset lookup file
 
-			Dim strLineIn As String
-			Dim strSplitLine() As String
+            Dim strLineIn As String
+            Dim strSplitLine() As String
 
             Dim strDelimList = New Char() {" "c, ","c, ControlChars.Tab}
 
-			Try
+            Try
                 Using srInFile = New StreamReader(strDatasetLookupFilePath)
                     Do While Not srInFile.EndOfStream
                         strLineIn = srInFile.ReadLine
@@ -9292,79 +9292,79 @@ Public Class clsMASIC
                     Loop
                 End Using
 
-			Catch ex As Exception
-				SetLocalErrorCode(eMasicErrorCodes.InvalidDatasetLookupFilePath)
-			End Try
+            Catch ex As Exception
+                SetLocalErrorCode(eMasicErrorCodes.InvalidDatasetLookupFilePath)
+            End Try
 
-		End If
+        End If
 
-		Return intNewDatasetNumber
+        Return intNewDatasetNumber
 
-	End Function
+    End Function
 
-	Private Function LookupRTByScanNumber(
+    Private Function LookupRTByScanNumber(
       ByRef udtScanList() As udtScanInfoType,
-      intScanListCount As Integer, 
-      intScanListArray() As Integer, 
+      intScanListCount As Integer,
+      intScanListArray() As Integer,
       intScanNumberToFind As Integer) As Single
 
-		' intScanListArray() must be populated with the scan numbers in udtScanList() before calling this function
+        ' intScanListArray() must be populated with the scan numbers in udtScanList() before calling this function
 
-		Dim intScanIndex As Integer
-		Dim intMatchIndex As Integer
+        Dim intScanIndex As Integer
+        Dim intMatchIndex As Integer
 
-		Try
-			intMatchIndex = Array.IndexOf(intScanListArray, intScanNumberToFind)
+        Try
+            intMatchIndex = Array.IndexOf(intScanListArray, intScanNumberToFind)
 
-			If intMatchIndex < 0 Then
-				' Need to find the closest scan with this scan number
-				intMatchIndex = 0
-				For intScanIndex = 0 To intScanListCount - 1
-					If udtScanList(intScanIndex).ScanNumber <= intScanNumberToFind Then intMatchIndex = intScanIndex
-				Next intScanIndex
-			End If
+            If intMatchIndex < 0 Then
+                ' Need to find the closest scan with this scan number
+                intMatchIndex = 0
+                For intScanIndex = 0 To intScanListCount - 1
+                    If udtScanList(intScanIndex).ScanNumber <= intScanNumberToFind Then intMatchIndex = intScanIndex
+                Next intScanIndex
+            End If
 
-			Return udtScanList(intMatchIndex).ScanTime
-		Catch ex As Exception
-			' Ignore any errors that occur in this function
-			LogErrors("LookupRTByScanNumber", "Error in LookupRTByScanNumber", ex, True, False)
-			Return 0
-		End Try
+            Return udtScanList(intMatchIndex).ScanTime
+        Catch ex As Exception
+            ' Ignore any errors that occur in this function
+            LogErrors("LookupRTByScanNumber", "Error in LookupRTByScanNumber", ex, True, False)
+            Return 0
+        End Try
 
-	End Function
+    End Function
 
-	Private Function MRMParentDaughterMatch(
+    Private Function MRMParentDaughterMatch(
       ByRef udtSRMListEntry As udtSRMListType,
       ByRef udtMRMSettingEntry As udtMRMScanInfoType,
       intMRMMassIndex As Integer) As Boolean
 
         Return MRMParentDaughterMatch(
-          udtSRMListEntry.ParentIonMZ, 
+          udtSRMListEntry.ParentIonMZ,
           udtSRMListEntry.CentralMass,
-          udtMRMSettingEntry.ParentIonMZ, 
+          udtMRMSettingEntry.ParentIonMZ,
           udtMRMSettingEntry.MRMMassList(intMRMMassIndex).CentralMass)
-	End Function
+    End Function
 
-	Private Function MRMParentDaughterMatch(
+    Private Function MRMParentDaughterMatch(
       ByRef udtSRMListEntry As udtSRMListType,
       dblParentIonMZ As Double,
       dblMRMDaughterMZ As Double) As Boolean
 
         Return MRMParentDaughterMatch(
-          udtSRMListEntry.ParentIonMZ, 
+          udtSRMListEntry.ParentIonMZ,
           udtSRMListEntry.CentralMass,
-          dblParentIonMZ, 
+          dblParentIonMZ,
           dblMRMDaughterMZ)
-	End Function
+    End Function
 
-	Private Function MRMParentDaughterMatch(
+    Private Function MRMParentDaughterMatch(
       dblParentIonMZ1 As Double,
       dblMRMDaughterMZ1 As Double,
       dblParentIonMZ2 As Double,
       dblMRMDaughterMZ2 As Double) As Boolean
 
 
-		Const COMPARISON_TOLERANCE As Double = 0.01
+        Const COMPARISON_TOLERANCE As Double = 0.01
 
         If Math.Abs(dblParentIonMZ1 - dblParentIonMZ2) <= COMPARISON_TOLERANCE AndAlso
            Math.Abs(dblMRMDaughterMZ1 - dblMRMDaughterMZ2) <= COMPARISON_TOLERANCE Then
@@ -9373,47 +9373,47 @@ Public Class clsMASIC
             Return False
         End If
 
-	End Function
+    End Function
 
-	Private Sub OpenOutputFileHandles(
-	  strInputFileName As String, 
-	  strOutputFolderPath As String, 
-	  ByRef udtOutputFileHandles As udtOutputFileHandlesType, 
-	  blnWriteHeaders As Boolean)
+    Private Sub OpenOutputFileHandles(
+      strInputFileName As String,
+      strOutputFolderPath As String,
+      ByRef udtOutputFileHandles As udtOutputFileHandlesType,
+      blnWriteHeaders As Boolean)
 
-		Dim strOutputFilePath As String
+        Dim strOutputFilePath As String
 
-		With udtOutputFileHandles
+        With udtOutputFileHandles
 
-			' Scan Stats file
-			strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsFlatFile)
-			.ScanStats = New StreamWriter(strOutputFilePath, False)
-			If blnWriteHeaders Then .ScanStats.WriteLine(GetHeadersForOutputFile(Nothing, eOutputFileTypeConstants.ScanStatsFlatFile))
+            ' Scan Stats file
+            strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsFlatFile)
+            .ScanStats = New StreamWriter(strOutputFilePath, False)
+            If blnWriteHeaders Then .ScanStats.WriteLine(GetHeadersForOutputFile(Nothing, eOutputFileTypeConstants.ScanStatsFlatFile))
 
-			.MSMethodFilePathBase = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MSMethodFile)
-			.MSTuneFilePathBase = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MSTuneFile)
-		End With
+            .MSMethodFilePathBase = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MSMethodFile)
+            .MSTuneFilePathBase = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MSTuneFile)
+        End With
 
-	End Sub
+    End Sub
 
-	Private Sub PopulateScanListPointerArray(
-	  ByRef udtSurveyScans() As udtScanInfoType, 
-	  intSurveyScanCount As Integer, 
-	  ByRef intScanListArray() As Integer)
+    Private Sub PopulateScanListPointerArray(
+      ByRef udtSurveyScans() As udtScanInfoType,
+      intSurveyScanCount As Integer,
+      ByRef intScanListArray() As Integer)
 
-		Dim intIndex As Integer
+        Dim intIndex As Integer
 
-		If intSurveyScanCount > 0 Then
-			ReDim intScanListArray(intSurveyScanCount - 1)
+        If intSurveyScanCount > 0 Then
+            ReDim intScanListArray(intSurveyScanCount - 1)
 
-			For intIndex = 0 To intSurveyScanCount - 1
-				intScanListArray(intIndex) = udtSurveyScans(intIndex).ScanNumber
-			Next intIndex
-		Else
-			ReDim intScanListArray(0)
-		End If
+            For intIndex = 0 To intSurveyScanCount - 1
+                intScanListArray(intIndex) = udtSurveyScans(intIndex).ScanNumber
+            Next intIndex
+        Else
+            ReDim intScanListArray(0)
+        End If
 
-	End Sub
+    End Sub
 
     Private Function ProcessAndStoreSpectrum(
       ByRef udtScanInfo As udtScanInfoType,
@@ -9494,231 +9494,231 @@ Public Class clsMASIC
 
     End Function
 
-	' Main processing function
-	Public Overloads Overrides Function ProcessFile(
+    ' Main processing function
+    Public Overloads Overrides Function ProcessFile(
       strInputFilePath As String,
       strOutputFolderPath As String,
       strParameterFilePath As String,
       blnResetErrorCode As Boolean) As Boolean
 
 
-		Dim udtSICOptions As udtSICOptionsType
-		Dim udtBinningOptions As clsCorrelation.udtBinningOptionsType
+        Dim udtSICOptions As udtSICOptionsType
+        Dim udtBinningOptions As clsCorrelation.udtBinningOptionsType
 
         Dim udtScanList = New udtScanListType
         Dim udtMRMSettings() As udtMRMScanInfoType = Nothing
-		Dim udtSRMList() As udtSRMListType = Nothing
+        Dim udtSRMList() As udtSRMListType = Nothing
 
-		Dim ioFileInfo As FileInfo
+        Dim ioFileInfo As FileInfo
 
-		Dim blnSuccess, blnDoNotProcess As Boolean
-		Dim blnKeepRawMSSpectra As Boolean
+        Dim blnSuccess, blnDoNotProcess As Boolean
+        Dim blnKeepRawMSSpectra As Boolean
 
-		Dim strInputFilePathFull As String = String.Empty
-		Dim strInputFileName As String = String.Empty
-		Dim udtOutputFileHandles As udtOutputFileHandlesType = New udtOutputFileHandlesType
-		Dim intSimilarParentIonUpdateCount As Integer
+        Dim strInputFilePathFull As String = String.Empty
+        Dim strInputFileName As String = String.Empty
+        Dim udtOutputFileHandles As udtOutputFileHandlesType = New udtOutputFileHandlesType
+        Dim intSimilarParentIonUpdateCount As Integer
 
-		If blnResetErrorCode Then
-			SetLocalErrorCode(eMasicErrorCodes.NoError)
-		End If
+        If blnResetErrorCode Then
+            SetLocalErrorCode(eMasicErrorCodes.NoError)
+        End If
 
-		mSubtaskProcessingStepPct = 0
-		UpdateProcessingStep(eProcessingStepConstants.NewTask, True)
-		MyBase.ResetProgress("Starting calculations")
+        mSubtaskProcessingStepPct = 0
+        UpdateProcessingStep(eProcessingStepConstants.NewTask, True)
+        MyBase.ResetProgress("Starting calculations")
 
-		mStatusMessage = String.Empty
+        mStatusMessage = String.Empty
 
-		mScanStats = New List(Of DSSummarizer.clsScanStatsEntry)
+        mScanStats = New List(Of DSSummarizer.clsScanStatsEntry)
 
         mExtendedHeaderInfo = New List(Of KeyValuePair(Of String, Integer))
 
-		UpdateStatusFile(True)
+        UpdateStatusFile(True)
 
-		If Not LoadParameterFileSettings(strParameterFilePath) Then
-			mStatusMessage = "Parameter file load error: " & strParameterFilePath
-			If MyBase.ShowMessages Then
-				Windows.Forms.MessageBox.Show(mStatusMessage, "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Exclamation)
-			End If
+        If Not LoadParameterFileSettings(strParameterFilePath) Then
+            mStatusMessage = "Parameter file load error: " & strParameterFilePath
+            If MyBase.ShowMessages Then
+                Windows.Forms.MessageBox.Show(mStatusMessage, "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Exclamation)
+            End If
 
-			MyBase.ShowErrorMessage(mStatusMessage)
+            MyBase.ShowErrorMessage(mStatusMessage)
 
-			If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError Then
-				MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
-			End If
-			UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
+            If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError Then
+                MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
+            End If
+            UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
 
-			LogMessage("Processing ended in error")
-			Return False
-		End If
+            LogMessage("Processing ended in error")
+            Return False
+        End If
 
-		' Copy these to avoid issues with users making changes to mSICOptions in the middle of processing
-		udtSICOptions = mSICOptions
-		udtBinningOptions = mBinningOptions
+        ' Copy these to avoid issues with users making changes to mSICOptions in the middle of processing
+        udtSICOptions = mSICOptions
+        udtBinningOptions = mBinningOptions
 
-		Try
-			' If a Custom SICList file is defined, then load the custom SIC values now
-			If Me.CustomSICListFileName.Length > 0 Then
-				LogMessage("ProcessFile: Reading custom SIC values file: " & Me.CustomSICListFileName)
-				blnSuccess = LoadCustomSICListFromFile(Me.CustomSICListFileName)
-				If Not blnSuccess Then
-					If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.UnspecifiedError)
-					Exit Try
-				End If
-			End If
+        Try
+            ' If a Custom SICList file is defined, then load the custom SIC values now
+            If Me.CustomSICListFileName.Length > 0 Then
+                LogMessage("ProcessFile: Reading custom SIC values file: " & Me.CustomSICListFileName)
+                blnSuccess = LoadCustomSICListFromFile(Me.CustomSICListFileName)
+                If Not blnSuccess Then
+                    If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.UnspecifiedError)
+                    Exit Try
+                End If
+            End If
 
-			UpdateMZIntensityFilterIgnoreRange()
+            UpdateMZIntensityFilterIgnoreRange()
 
-			LogMessage("Source data file: " & strInputFilePath)
+            LogMessage("Source data file: " & strInputFilePath)
 
-			If strInputFilePath Is Nothing OrElse strInputFilePath.Length = 0 Then
-				ShowErrorMessage("Input file name is empty")
-				MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidInputFilePath)
-				Exit Try
-			End If
+            If strInputFilePath Is Nothing OrElse strInputFilePath.Length = 0 Then
+                ShowErrorMessage("Input file name is empty")
+                MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidInputFilePath)
+                Exit Try
+            End If
 
 
-			mStatusMessage = "Parsing " & Path.GetFileName(strInputFilePath)
-			Console.WriteLine()
-			ShowMessage(mStatusMessage)
+            mStatusMessage = "Parsing " & Path.GetFileName(strInputFilePath)
+            Console.WriteLine()
+            ShowMessage(mStatusMessage)
 
-			blnSuccess = CleanupFilePaths(strInputFilePath, strOutputFolderPath)
+            blnSuccess = CleanupFilePaths(strInputFilePath, strOutputFolderPath)
 
-			If blnSuccess Then
-				udtSICOptions.DatasetNumber = LookupDatasetNumber(strInputFilePath, mDatasetLookupFilePath, udtSICOptions.DatasetNumber)
-				mSICOptions.DatasetNumber = udtSICOptions.DatasetNumber
+            If blnSuccess Then
+                udtSICOptions.DatasetNumber = LookupDatasetNumber(strInputFilePath, mDatasetLookupFilePath, udtSICOptions.DatasetNumber)
+                mSICOptions.DatasetNumber = udtSICOptions.DatasetNumber
 
-				If Me.LocalErrorCode <> eMasicErrorCodes.NoError Then
-					If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetNumber OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
-						' Ignore this error
-						Me.SetLocalErrorCode(eMasicErrorCodes.NoError)
-						blnSuccess = True
-					Else
-						blnSuccess = False
-					End If
-				End If
-			End If
+                If Me.LocalErrorCode <> eMasicErrorCodes.NoError Then
+                    If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetNumber OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
+                        ' Ignore this error
+                        Me.SetLocalErrorCode(eMasicErrorCodes.NoError)
+                        blnSuccess = True
+                    Else
+                        blnSuccess = False
+                    End If
+                End If
+            End If
 
-			If Not blnSuccess Then
-				If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.FilePathError)
-				Exit Try
-			End If
+            If Not blnSuccess Then
+                If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.FilePathError)
+                Exit Try
+            End If
 
-			Try
-				'---------------------------------------------------------
-				' See if an output XML file already exists
-				' If it does, open it and read the parameters used
-				' If they match the current analysis parameters, and if the input file specs match the input file, then
-				'  do not reprocess
-				'---------------------------------------------------------
+            Try
+                '---------------------------------------------------------
+                ' See if an output XML file already exists
+                ' If it does, open it and read the parameters used
+                ' If they match the current analysis parameters, and if the input file specs match the input file, then
+                '  do not reprocess
+                '---------------------------------------------------------
 
-				' Obtain the full path to the input file
-				ioFileInfo = New FileInfo(strInputFilePath)
-				strInputFilePathFull = ioFileInfo.FullName
+                ' Obtain the full path to the input file
+                ioFileInfo = New FileInfo(strInputFilePath)
+                strInputFilePathFull = ioFileInfo.FullName
 
-				LogMessage("Checking for existing results in the output path: " & strOutputFolderPath)
+                LogMessage("Checking for existing results in the output path: " & strOutputFolderPath)
 
-				blnDoNotProcess = CheckForExistingResults(strInputFilePathFull, strOutputFolderPath, udtSICOptions, udtBinningOptions)
+                blnDoNotProcess = CheckForExistingResults(strInputFilePathFull, strOutputFolderPath, udtSICOptions, udtBinningOptions)
 
-				If blnDoNotProcess Then
-					LogMessage("Existing results found; data will not be reprocessed")
-				End If
+                If blnDoNotProcess Then
+                    LogMessage("Existing results found; data will not be reprocessed")
+                End If
 
-			Catch ex As Exception
-				blnSuccess = False
-				LogErrors("ProcessFile", "Error checking for existing results file", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
-			End Try
+            Catch ex As Exception
+                blnSuccess = False
+                LogErrors("ProcessFile", "Error checking for existing results file", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+            End Try
 
-			If blnDoNotProcess Then
-				blnSuccess = True
-				Exit Try
-			End If
+            If blnDoNotProcess Then
+                blnSuccess = True
+                Exit Try
+            End If
 
-			Try
-				'---------------------------------------------------------
-				' Verify that we have write access to the output folder
-				'---------------------------------------------------------
+            Try
+                '---------------------------------------------------------
+                ' Verify that we have write access to the output folder
+                '---------------------------------------------------------
 
-				' The following should work for testing access permissions, but it doesn't
-				'Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, strOutputFolderPath)
-				'' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
-				'objFilePermissionTest.Demand()
-				'objFilePermissionTest.Assert()
+                ' The following should work for testing access permissions, but it doesn't
+                'Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, strOutputFolderPath)
+                '' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
+                'objFilePermissionTest.Demand()
+                'objFilePermissionTest.Assert()
 
-				LogMessage("Checking for write permission in the output path: " & strOutputFolderPath)
+                LogMessage("Checking for write permission in the output path: " & strOutputFolderPath)
 
-				Dim strOutputFileTestPath As String
-				strOutputFileTestPath = Path.Combine(strOutputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
+                Dim strOutputFileTestPath As String
+                strOutputFileTestPath = Path.Combine(strOutputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
 
-				Dim fsOutFileTest As New StreamWriter(strOutputFileTestPath, False)
+                Dim fsOutFileTest As New StreamWriter(strOutputFileTestPath, False)
 
-				fsOutFileTest.WriteLine("Test")
-				fsOutFileTest.Flush()
-				fsOutFileTest.Close()
+                fsOutFileTest.WriteLine("Test")
+                fsOutFileTest.Flush()
+                fsOutFileTest.Close()
 
-				' Wait 250 msec, then delete the file
-				Threading.Thread.Sleep(250)
-				IO.File.Delete(strOutputFileTestPath)
+                ' Wait 250 msec, then delete the file
+                Threading.Thread.Sleep(250)
+                IO.File.Delete(strOutputFileTestPath)
 
-			Catch ex As Exception
-				blnSuccess = False
-				LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & strOutputFolderPath, ex, True, False, eMasicErrorCodes.FileIOPermissionsError)
-			End Try
+            Catch ex As Exception
+                blnSuccess = False
+                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & strOutputFolderPath, ex, True, False, eMasicErrorCodes.FileIOPermissionsError)
+            End Try
 
-			If Not blnSuccess Then
-				SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError)
-				Exit Try
-			End If
+            If Not blnSuccess Then
+                SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError)
+                Exit Try
+            End If
 
-			'---------------------------------------------------------
-			' Reset the processing stats
-			'---------------------------------------------------------
+            '---------------------------------------------------------
+            ' Reset the processing stats
+            '---------------------------------------------------------
 
-			InitializeMemoryManagementOptions(mProcessingStats)
+            InitializeMemoryManagementOptions(mProcessingStats)
 
             Dim objSpectraCache = New clsSpectraCache
-			With objSpectraCache
-				.ShowMessages = MyBase.ShowMessages
-				.DiskCachingAlwaysDisabled = Me.DiskCachingAlwaysDisabled
-				.CacheFolderPath = Me.CacheFolderPath
-				.CacheSpectraToRetainInMemory = Me.CacheSpectraToRetainInMemory
-				.CacheMinimumFreeMemoryMB = Me.CacheMinimumFreeMemoryMB
-				.CacheMaximumMemoryUsageMB = Me.CacheMaximumMemoryUsageMB
+            With objSpectraCache
+                .ShowMessages = MyBase.ShowMessages
+                .DiskCachingAlwaysDisabled = Me.DiskCachingAlwaysDisabled
+                .CacheFolderPath = Me.CacheFolderPath
+                .CacheSpectraToRetainInMemory = Me.CacheSpectraToRetainInMemory
+                .CacheMinimumFreeMemoryMB = Me.CacheMinimumFreeMemoryMB
+                .CacheMaximumMemoryUsageMB = Me.CacheMaximumMemoryUsageMB
 
-				.InitializeSpectraPool()
-			End With
+                .InitializeSpectraPool()
+            End With
 
-			Try
-				'---------------------------------------------------------
-				' Define strInputFileName (which is referenced several times below)
-				'---------------------------------------------------------
-				strInputFileName = Path.GetFileName(strInputFilePathFull)
+            Try
+                '---------------------------------------------------------
+                ' Define strInputFileName (which is referenced several times below)
+                '---------------------------------------------------------
+                strInputFileName = Path.GetFileName(strInputFilePathFull)
 
-				'---------------------------------------------------------
-				' Create the _ScanStats.txt file
-				'---------------------------------------------------------
-				OpenOutputFileHandles(strInputFileName, strOutputFolderPath, udtOutputFileHandles, mIncludeHeadersInExportFile)
+                '---------------------------------------------------------
+                ' Create the _ScanStats.txt file
+                '---------------------------------------------------------
+                OpenOutputFileHandles(strInputFileName, strOutputFolderPath, udtOutputFileHandles, mIncludeHeadersInExportFile)
 
-				'---------------------------------------------------------
-				' Read the mass spectra from the input data file
-				'---------------------------------------------------------
+                '---------------------------------------------------------
+                ' Read the mass spectra from the input data file
+                '---------------------------------------------------------
 
-				UpdateProcessingStep(eProcessingStepConstants.ReadDataFile)
-				SetSubtaskProcessingStepPct(0)
-				UpdatePeakMemoryUsage()
-				mStatusMessage = String.Empty
+                UpdateProcessingStep(eProcessingStepConstants.ReadDataFile)
+                SetSubtaskProcessingStepPct(0)
+                UpdatePeakMemoryUsage()
+                mStatusMessage = String.Empty
 
-				If mSkipSICAndRawDataProcessing Then
-					mExportRawDataOnly = False
-				End If
+                If mSkipSICAndRawDataProcessing Then
+                    mExportRawDataOnly = False
+                End If
 
-				blnKeepRawMSSpectra = Not mSkipSICAndRawDataProcessing OrElse mExportRawDataOnly
+                blnKeepRawMSSpectra = Not mSkipSICAndRawDataProcessing OrElse mExportRawDataOnly
 
-				ValidateSICOptions(udtSICOptions)
+                ValidateSICOptions(udtSICOptions)
 
-				Select Case Path.GetExtension(strInputFilePath).ToUpper
-					Case FINNIGAN_RAW_FILE_EXTENSION.ToUpper
-						' Open the .Raw file and obtain the scan information
+                Select Case Path.GetExtension(strInputFilePath).ToUpper
+                    Case FINNIGAN_RAW_FILE_EXTENSION.ToUpper
+                        ' Open the .Raw file and obtain the scan information
 
                         blnSuccess = ExtractScanInfoFromXcaliburDataFile(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
@@ -9726,45 +9726,45 @@ Public Class clsMASIC
                           udtSICOptions, udtBinningOptions, mStatusMessage,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 
-					Case MZ_XML_FILE_EXTENSION1.ToUpper, MZ_XML_FILE_EXTENSION2.ToUpper
-						' Open the .mzXML file and obtain the scan information
+                    Case MZ_XML_FILE_EXTENSION1.ToUpper, MZ_XML_FILE_EXTENSION2.ToUpper
+                        ' Open the .mzXML file and obtain the scan information
                         blnSuccess = ExtractScanInfoFromMZXMLDataFile(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
                           udtScanList, objSpectraCache, udtOutputFileHandles,
                           udtSICOptions, udtBinningOptions,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 
-					Case MZ_DATA_FILE_EXTENSION1.ToUpper, MZ_DATA_FILE_EXTENSION2.ToUpper
-						' Open the .mzXML file and obtain the scan information
+                    Case MZ_DATA_FILE_EXTENSION1.ToUpper, MZ_DATA_FILE_EXTENSION2.ToUpper
+                        ' Open the .mzXML file and obtain the scan information
                         blnSuccess = ExtractScanInfoFromMZDataFile(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
                           udtScanList, objSpectraCache, udtOutputFileHandles,
                           udtSICOptions, udtBinningOptions,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 
-					Case AGILENT_MSMS_FILE_EXTENSION.ToUpper, AGILENT_MS_FILE_EXTENSION.ToUpper
-						' Open the .MGF and .CDF files to obtain the scan information
+                    Case AGILENT_MSMS_FILE_EXTENSION.ToUpper, AGILENT_MS_FILE_EXTENSION.ToUpper
+                        ' Open the .MGF and .CDF files to obtain the scan information
                         blnSuccess = ExtractScanInfoFromMGFandCDF(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
                           udtScanList, objSpectraCache, udtOutputFileHandles,
                           udtSICOptions, udtBinningOptions, mStatusMessage,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
-					Case Else
-						mStatusMessage = "Unknown file extension: " & Path.GetExtension(strInputFilePathFull)
-						SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension)
-						blnSuccess = False
-				End Select
+                    Case Else
+                        mStatusMessage = "Unknown file extension: " & Path.GetExtension(strInputFilePathFull)
+                        SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension)
+                        blnSuccess = False
+                End Select
 
-				If Not blnSuccess Then
-					SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, True)
-				End If
-			Catch ex As Exception
-				blnSuccess = False
-				LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, True, True, eMasicErrorCodes.InputFileDataReadError)
-			End Try
+                If Not blnSuccess Then
+                    SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, True)
+                End If
+            Catch ex As Exception
+                blnSuccess = False
+                LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+            End Try
 
-			' Record that the file is finished loading
-			mProcessingStats.FileLoadEndTime = DateTime.UtcNow
+            ' Record that the file is finished loading
+            mProcessingStats.FileLoadEndTime = DateTime.UtcNow
 
             If Not blnSuccess Then
                 If mStatusMessage Is Nothing OrElse mStatusMessage.Length = 0 Then
@@ -9781,157 +9781,157 @@ Public Class clsMASIC
                 Exit Try
             End If
 
-			Try
-				' Make sure the arrays in udtScanList range from 0 to the Count-1
-				With udtScanList
-					If .SurveyScanCount <> .SurveyScans.Length Then ReDim Preserve .SurveyScans(.SurveyScanCount - 1)
-					If .FragScanCount <> .FragScans.Length Then ReDim Preserve .FragScans(.FragScanCount - 1)
-					If .MasterScanOrderCount <> .MasterScanOrder.Length Then
-						ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
-						ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
-						ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
-					End If
+            Try
+                ' Make sure the arrays in udtScanList range from 0 to the Count-1
+                With udtScanList
+                    If .SurveyScanCount <> .SurveyScans.Length Then ReDim Preserve .SurveyScans(.SurveyScanCount - 1)
+                    If .FragScanCount <> .FragScans.Length Then ReDim Preserve .FragScans(.FragScanCount - 1)
+                    If .MasterScanOrderCount <> .MasterScanOrder.Length Then
+                        ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
+                        ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
+                        ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
+                    End If
 
-					If .ParentIonInfoCount <> .ParentIons.Length Then ReDim Preserve .ParentIons(.ParentIonInfoCount - 1)
-				End With
-			Catch ex As Exception
-				blnSuccess = False
-				LogErrors("ProcessFile", "Error resizing the arrays in udtScanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
-				Exit Try
-			End Try
+                    If .ParentIonInfoCount <> .ParentIons.Length Then ReDim Preserve .ParentIons(.ParentIonInfoCount - 1)
+                End With
+            Catch ex As Exception
+                blnSuccess = False
+                LogErrors("ProcessFile", "Error resizing the arrays in udtScanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+                Exit Try
+            End Try
 
-			Try
-				'---------------------------------------------------------
-				' Save the BPIs and TICs
-				'---------------------------------------------------------
+            Try
+                '---------------------------------------------------------
+                ' Save the BPIs and TICs
+                '---------------------------------------------------------
 
-				UpdateProcessingStep(eProcessingStepConstants.SaveBPI)
-				UpdateOverallProgress("Processing Data for " & strInputFileName)
-				SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk")
-				UpdatePeakMemoryUsage()
+                UpdateProcessingStep(eProcessingStepConstants.SaveBPI)
+                UpdateOverallProgress("Processing Data for " & strInputFileName)
+                SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk")
+                UpdatePeakMemoryUsage()
 
-				If mSkipSICAndRawDataProcessing OrElse Not mExportRawDataOnly Then
-					LogMessage("ProcessFile: Call SaveBPIs")
-					SaveBPIs(udtScanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
-				End If
+                If mSkipSICAndRawDataProcessing OrElse Not mExportRawDataOnly Then
+                    LogMessage("ProcessFile: Call SaveBPIs")
+                    SaveBPIs(udtScanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
+                End If
 
-				'---------------------------------------------------------
-				' Close the ScanStats file handle
-				'---------------------------------------------------------
-				Try
-					LogMessage("ProcessFile: Close udtOutputFileHandles.ScanStats")
+                '---------------------------------------------------------
+                ' Close the ScanStats file handle
+                '---------------------------------------------------------
+                Try
+                    LogMessage("ProcessFile: Close udtOutputFileHandles.ScanStats")
 
-					If Not udtOutputFileHandles.ScanStats Is Nothing Then
-						udtOutputFileHandles.ScanStats.Close()
-					End If
+                    If Not udtOutputFileHandles.ScanStats Is Nothing Then
+                        udtOutputFileHandles.ScanStats.Close()
+                    End If
 
-				Catch ex As Exception
-					' Ignore errors here
-				End Try
+                Catch ex As Exception
+                    ' Ignore errors here
+                End Try
 
-				'---------------------------------------------------------
-				' Create the DatasetInfo XML file
-				'---------------------------------------------------------
+                '---------------------------------------------------------
+                ' Create the DatasetInfo XML file
+                '---------------------------------------------------------
 
-				LogMessage("ProcessFile: Create DatasetInfo File")
-				CreateDatasetInfoFile(strInputFileName, strOutputFolderPath)
+                LogMessage("ProcessFile: Create DatasetInfo File")
+                CreateDatasetInfoFile(strInputFileName, strOutputFolderPath)
 
-				If mSkipSICAndRawDataProcessing Then
-					LogMessage("ProcessFile: Skipping SIC Processing")
+                If mSkipSICAndRawDataProcessing Then
+                    LogMessage("ProcessFile: Skipping SIC Processing")
 
-					SetDefaultPeakLocValues(udtScanList)
-				Else
+                    SetDefaultPeakLocValues(udtScanList)
+                Else
 
-					'---------------------------------------------------------
-					' Optionally, export the raw mass spectra data
-					'---------------------------------------------------------
-					If mRawDataExportOptions.ExportEnabled Then
-						ExportRawDataToDisk(udtScanList, objSpectraCache, strInputFileName, strOutputFolderPath)
-					End If
+                    '---------------------------------------------------------
+                    ' Optionally, export the raw mass spectra data
+                    '---------------------------------------------------------
+                    If mRawDataExportOptions.ExportEnabled Then
+                        ExportRawDataToDisk(udtScanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                    End If
 
-					If mReporterIonStatsEnabled Then
-						' Look for Reporter Ions in the Fragmentation spectra
-						FindReporterIons(udtSICOptions, udtScanList, objSpectraCache, strInputFileName, strOutputFolderPath)
-					End If
+                    If mReporterIonStatsEnabled Then
+                        ' Look for Reporter Ions in the Fragmentation spectra
+                        FindReporterIons(udtSICOptions, udtScanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                    End If
 
-					'---------------------------------------------------------
-					' If MRM data is present, then save the MRM values to disk
-					'---------------------------------------------------------
-					If udtScanList.MRMDataPresent Then
-						blnSuccess = DetermineMRMSettings(udtScanList, udtMRMSettings, udtSRMList)
+                    '---------------------------------------------------------
+                    ' If MRM data is present, then save the MRM values to disk
+                    '---------------------------------------------------------
+                    If udtScanList.MRMDataPresent Then
+                        blnSuccess = DetermineMRMSettings(udtScanList, udtMRMSettings, udtSRMList)
 
-						If blnSuccess Then
-							ExportMRMDataToDisk(udtScanList, objSpectraCache, udtMRMSettings, udtSRMList, strInputFileName, strOutputFolderPath)
-						End If
-					End If
-
-
-					If Not mExportRawDataOnly Then
-
-						'---------------------------------------------------------
-						' Add the custom SIC values to udtScanList
-						'---------------------------------------------------------
-						AddCustomSICValues(udtScanList, udtSICOptions.SICTolerance, udtSICOptions.SICToleranceIsPPM, mCustomSICList.ScanOrAcqTimeTolerance)
+                        If blnSuccess Then
+                            ExportMRMDataToDisk(udtScanList, objSpectraCache, udtMRMSettings, udtSRMList, strInputFileName, strOutputFolderPath)
+                        End If
+                    End If
 
 
-						'---------------------------------------------------------
-						' Possibly create the Tab-separated values SIC details output file
-						'---------------------------------------------------------
-						blnSuccess = InitializeSICDetailsTextFile(strInputFilePathFull, strOutputFolderPath, udtOutputFileHandles)
-						If Not blnSuccess Then
-							SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
-							Exit Try
-						End If
+                    If Not mExportRawDataOnly Then
 
-						'---------------------------------------------------------
-						' Create the XML output file
-						'---------------------------------------------------------
-						blnSuccess = XMLOutputFileInitialize(strInputFilePathFull, strOutputFolderPath, udtOutputFileHandles, udtScanList, objSpectraCache, udtSICOptions, udtBinningOptions)
-						If Not blnSuccess Then
-							SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
-							Exit Try
-						End If
-
-						'---------------------------------------------------------
-						' Create the SICs
-						' For each one, find the peaks and make an entry to the XML output file
-						'---------------------------------------------------------
-
-						UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks)
-						SetSubtaskProcessingStepPct(0)
-						UpdatePeakMemoryUsage()
-
-						LogMessage("ProcessFile: Call CreateParentIonSICs")
-						blnSuccess = CreateParentIonSICs(udtScanList, objSpectraCache, udtSICOptions, udtOutputFileHandles)
-
-						If Not blnSuccess Then
-							SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
-							Exit Try
-						End If
-
-					End If
+                        '---------------------------------------------------------
+                        ' Add the custom SIC values to udtScanList
+                        '---------------------------------------------------------
+                        AddCustomSICValues(udtScanList, udtSICOptions.SICTolerance, udtSICOptions.SICToleranceIsPPM, mCustomSICList.ScanOrAcqTimeTolerance)
 
 
-					If Not (mSkipMSMSProcessing OrElse mExportRawDataOnly) Then
+                        '---------------------------------------------------------
+                        ' Possibly create the Tab-separated values SIC details output file
+                        '---------------------------------------------------------
+                        blnSuccess = InitializeSICDetailsTextFile(strInputFilePathFull, strOutputFolderPath, udtOutputFileHandles)
+                        If Not blnSuccess Then
+                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
+                            Exit Try
+                        End If
 
-						'---------------------------------------------------------
-						' Find Similar Parent Ions
-						'---------------------------------------------------------
+                        '---------------------------------------------------------
+                        ' Create the XML output file
+                        '---------------------------------------------------------
+                        blnSuccess = XMLOutputFileInitialize(strInputFilePathFull, strOutputFolderPath, udtOutputFileHandles, udtScanList, objSpectraCache, udtSICOptions, udtBinningOptions)
+                        If Not blnSuccess Then
+                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
+                            Exit Try
+                        End If
 
-						UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons)
-						SetSubtaskProcessingStepPct(0)
-						UpdatePeakMemoryUsage()
+                        '---------------------------------------------------------
+                        ' Create the SICs
+                        ' For each one, find the peaks and make an entry to the XML output file
+                        '---------------------------------------------------------
 
-						LogMessage("ProcessFile: Call FindSimilarParentIons")
-						blnSuccess = FindSimilarParentIons(udtScanList, objSpectraCache, udtSICOptions, udtBinningOptions, intSimilarParentIonUpdateCount)
+                        UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks)
+                        SetSubtaskProcessingStepPct(0)
+                        UpdatePeakMemoryUsage()
 
-						If Not blnSuccess Then
-							SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
-							Exit Try
-						End If
-					End If
+                        LogMessage("ProcessFile: Call CreateParentIonSICs")
+                        blnSuccess = CreateParentIonSICs(udtScanList, objSpectraCache, udtSICOptions, udtOutputFileHandles)
 
-				End If
+                        If Not blnSuccess Then
+                            SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
+                            Exit Try
+                        End If
+
+                    End If
+
+
+                    If Not (mSkipMSMSProcessing OrElse mExportRawDataOnly) Then
+
+                        '---------------------------------------------------------
+                        ' Find Similar Parent Ions
+                        '---------------------------------------------------------
+
+                        UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons)
+                        SetSubtaskProcessingStepPct(0)
+                        UpdatePeakMemoryUsage()
+
+                        LogMessage("ProcessFile: Call FindSimilarParentIons")
+                        blnSuccess = FindSimilarParentIons(udtScanList, objSpectraCache, udtSICOptions, udtBinningOptions, intSimilarParentIonUpdateCount)
+
+                        If Not blnSuccess Then
+                            SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
+                            Exit Try
+                        End If
+                    End If
+
+                End If
 
                 If mWriteExtendedStats AndAlso Not mExportRawDataOnly Then
                     '---------------------------------------------------------
@@ -9952,313 +9952,313 @@ Public Class clsMASIC
                 End If
 
 
-				'---------------------------------------------------------
-				' Save SIC Stats Flat File
-				'---------------------------------------------------------
+                '---------------------------------------------------------
+                ' Save SIC Stats Flat File
+                '---------------------------------------------------------
 
-				UpdateProcessingStep(eProcessingStepConstants.SaveSICStatsFlatFile)
-				SetSubtaskProcessingStepPct(0)
-				UpdatePeakMemoryUsage()
+                UpdateProcessingStep(eProcessingStepConstants.SaveSICStatsFlatFile)
+                SetSubtaskProcessingStepPct(0)
+                UpdatePeakMemoryUsage()
 
-				If Not mExportRawDataOnly Then
-					LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
-					blnSuccess = SaveSICStatsFlatFile(udtScanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile, mIncludeScanTimesInSICStatsFile)
+                If Not mExportRawDataOnly Then
+                    LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
+                    blnSuccess = SaveSICStatsFlatFile(udtScanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile, mIncludeScanTimesInSICStatsFile)
 
-					If Not blnSuccess Then
-						SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
-						Exit Try
-					End If
-				End If
-
-
-				UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles)
-				SetSubtaskProcessingStepPct(0)
-				UpdatePeakMemoryUsage()
-
-				If Not (mSkipSICAndRawDataProcessing OrElse mExportRawDataOnly) Then
-
-					'---------------------------------------------------------
-					' Write processing stats to the XML output file
-					'---------------------------------------------------------
-
-					LogMessage("ProcessFile: Call FinalizeXMLFile")
-					blnSuccess = XMLOutputFileFinalize(udtOutputFileHandles, udtScanList, objSpectraCache)
-
-				End If
-
-				'---------------------------------------------------------
-				' Close any open output files
-				'---------------------------------------------------------
-				CloseOutputFileHandles(udtOutputFileHandles)
-
-				'---------------------------------------------------------
-				' Save a text file containing the headers used in the text files
-				'---------------------------------------------------------
-				If Not mIncludeHeadersInExportFile Then
-					LogMessage("ProcessFile: Call SaveHeaderGlossary")
-					SaveHeaderGlossary(udtScanList, strInputFileName, strOutputFolderPath)
-				End If
-
-				If Not (mSkipSICAndRawDataProcessing OrElse mExportRawDataOnly) AndAlso intSimilarParentIonUpdateCount > 0 Then
-					'---------------------------------------------------------
-					' Reopen the XML file and update the entries for those ions in udtScanList that had their
-					' Optimal peak apex scan numbers updated
-					'---------------------------------------------------------
-
-					UpdateProcessingStep(eProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues)
-					SetSubtaskProcessingStepPct(0)
-					UpdatePeakMemoryUsage()
-
-					LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries")
-					XmlOutputFileUpdateEntries(udtScanList, strInputFileName, strOutputFolderPath)
-				End If
-
-			Catch ex As Exception
-				blnSuccess = False
-				LogErrors("ProcessFile", "Error creating or writing to the output file in folder" & GetFilePathPrefixChar() & strOutputFolderPath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
-			End Try
+                    If Not blnSuccess Then
+                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
+                        Exit Try
+                    End If
+                End If
 
 
+                UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles)
+                SetSubtaskProcessingStepPct(0)
+                UpdatePeakMemoryUsage()
 
-		Catch ex As Exception
-			blnSuccess = False
-			LogErrors("ProcessFile", "Error in ProcessFile", ex, True, False, eMasicErrorCodes.UnspecifiedError)
-		Finally
+                If Not (mSkipSICAndRawDataProcessing OrElse mExportRawDataOnly) Then
 
-			' Record the final processing stats (before the output file handles are closed)
-			With mProcessingStats
-				.ProcessingEndTime = DateTime.UtcNow
-				.MemoryUsageMBAtEnd = GetProcessMemoryUsageMB()
-			End With
+                    '---------------------------------------------------------
+                    ' Write processing stats to the XML output file
+                    '---------------------------------------------------------
 
-			'---------------------------------------------------------
-			' Make sure the output file handles are closed
-			'---------------------------------------------------------
+                    LogMessage("ProcessFile: Call FinalizeXMLFile")
+                    blnSuccess = XMLOutputFileFinalize(udtOutputFileHandles, udtScanList, objSpectraCache)
 
-			CloseOutputFileHandles(udtOutputFileHandles)
+                End If
 
-			If mAbortProcessing AndAlso MyBase.ShowMessages Then
-				Windows.Forms.MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information)
-			End If
-		End Try
+                '---------------------------------------------------------
+                ' Close any open output files
+                '---------------------------------------------------------
+                CloseOutputFileHandles(udtOutputFileHandles)
 
-		Try
-			'---------------------------------------------------------
-			' Cleanup after processing or error
-			'---------------------------------------------------------
+                '---------------------------------------------------------
+                ' Save a text file containing the headers used in the text files
+                '---------------------------------------------------------
+                If Not mIncludeHeadersInExportFile Then
+                    LogMessage("ProcessFile: Call SaveHeaderGlossary")
+                    SaveHeaderGlossary(udtScanList, strInputFileName, strOutputFolderPath)
+                End If
 
-			LogMessage("ProcessFile: Processing nearly complete")
+                If Not (mSkipSICAndRawDataProcessing OrElse mExportRawDataOnly) AndAlso intSimilarParentIonUpdateCount > 0 Then
+                    '---------------------------------------------------------
+                    ' Reopen the XML file and update the entries for those ions in udtScanList that had their
+                    ' Optimal peak apex scan numbers updated
+                    '---------------------------------------------------------
 
-			Console.WriteLine()
-			If blnDoNotProcess Then
-				mStatusMessage = "Existing valid results were found; processing was not repeated."
-				ShowMessage(mStatusMessage)
-			ElseIf blnSuccess Then
-				mStatusMessage = "Processing complete.  Results can be found in folder: " & strOutputFolderPath
-				ShowMessage(mStatusMessage)
-			Else
-				If Me.LocalErrorCode = eMasicErrorCodes.NoError Then
-					mStatusMessage = "Error Code " & MyBase.ErrorCode & ": " & Me.GetErrorMessage()
-					ShowErrorMessage(mStatusMessage)
-				Else
-					mStatusMessage = "Error Code " & Me.LocalErrorCode & ": " & Me.GetErrorMessage()
-					ShowErrorMessage(mStatusMessage)
-				End If
-			End If
+                    UpdateProcessingStep(eProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues)
+                    SetSubtaskProcessingStepPct(0)
+                    UpdatePeakMemoryUsage()
 
-			With mProcessingStats
-				LogMessage("ProcessingStats: Memory Usage At Start (MB) = " & .MemoryUsageMBAtStart.ToString)
-				LogMessage("ProcessingStats: Peak memory usage (MB) = " & .PeakMemoryUsageMB.ToString)
+                    LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries")
+                    XmlOutputFileUpdateEntries(udtScanList, strInputFileName, strOutputFolderPath)
+                End If
 
-				LogMessage("ProcessingStats: File Load Time (seconds) = " & .FileLoadEndTime.Subtract(.FileLoadStartTime).TotalSeconds.ToString)
-				LogMessage("ProcessingStats: Memory Usage During Load (MB) = " & .MemoryUsageMBDuringLoad.ToString)
+            Catch ex As Exception
+                blnSuccess = False
+                LogErrors("ProcessFile", "Error creating or writing to the output file in folder" & GetFilePathPrefixChar() & strOutputFolderPath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+            End Try
 
-				LogMessage("ProcessingStats: Processing Time (seconds) = " & .ProcessingEndTime.Subtract(.ProcessingStartTime).TotalSeconds.ToString)
-				LogMessage("ProcessingStats: Memory Usage At End (MB) = " & .MemoryUsageMBAtEnd.ToString)
 
-				LogMessage("ProcessingStats: Cache Event Count = " & .CacheEventCount.ToString)
-				LogMessage("ProcessingStats: UncCache Event Count = " & .UnCacheEventCount.ToString)
-			End With
 
-			If blnSuccess Then
-				LogMessage("Processing complete")
-			Else
-				LogMessage("Processing ended in error")
-			End If
+        Catch ex As Exception
+            blnSuccess = False
+            LogErrors("ProcessFile", "Error in ProcessFile", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+        Finally
 
-		Catch ex As Exception
-			blnSuccess = False
-			LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, True, False, eMasicErrorCodes.UnspecifiedError)
-		End Try
+            ' Record the final processing stats (before the output file handles are closed)
+            With mProcessingStats
+                .ProcessingEndTime = DateTime.UtcNow
+                .MemoryUsageMBAtEnd = GetProcessMemoryUsageMB()
+            End With
 
-		If blnSuccess Then
-			udtSICOptions.DatasetNumber += 1
-		End If
+            '---------------------------------------------------------
+            ' Make sure the output file handles are closed
+            '---------------------------------------------------------
 
-		If blnSuccess Then
-			UpdateProcessingStep(eProcessingStepConstants.Complete, True)
-		Else
-			UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
-		End If
+            CloseOutputFileHandles(udtOutputFileHandles)
 
-		Return blnSuccess
+            If mAbortProcessing AndAlso MyBase.ShowMessages Then
+                Windows.Forms.MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+        End Try
 
-	End Function
+        Try
+            '---------------------------------------------------------
+            ' Cleanup after processing or error
+            '---------------------------------------------------------
 
-	Private Function ProcessMZList(
+            LogMessage("ProcessFile: Processing nearly complete")
+
+            Console.WriteLine()
+            If blnDoNotProcess Then
+                mStatusMessage = "Existing valid results were found; processing was not repeated."
+                ShowMessage(mStatusMessage)
+            ElseIf blnSuccess Then
+                mStatusMessage = "Processing complete.  Results can be found in folder: " & strOutputFolderPath
+                ShowMessage(mStatusMessage)
+            Else
+                If Me.LocalErrorCode = eMasicErrorCodes.NoError Then
+                    mStatusMessage = "Error Code " & MyBase.ErrorCode & ": " & Me.GetErrorMessage()
+                    ShowErrorMessage(mStatusMessage)
+                Else
+                    mStatusMessage = "Error Code " & Me.LocalErrorCode & ": " & Me.GetErrorMessage()
+                    ShowErrorMessage(mStatusMessage)
+                End If
+            End If
+
+            With mProcessingStats
+                LogMessage("ProcessingStats: Memory Usage At Start (MB) = " & .MemoryUsageMBAtStart.ToString)
+                LogMessage("ProcessingStats: Peak memory usage (MB) = " & .PeakMemoryUsageMB.ToString)
+
+                LogMessage("ProcessingStats: File Load Time (seconds) = " & .FileLoadEndTime.Subtract(.FileLoadStartTime).TotalSeconds.ToString)
+                LogMessage("ProcessingStats: Memory Usage During Load (MB) = " & .MemoryUsageMBDuringLoad.ToString)
+
+                LogMessage("ProcessingStats: Processing Time (seconds) = " & .ProcessingEndTime.Subtract(.ProcessingStartTime).TotalSeconds.ToString)
+                LogMessage("ProcessingStats: Memory Usage At End (MB) = " & .MemoryUsageMBAtEnd.ToString)
+
+                LogMessage("ProcessingStats: Cache Event Count = " & .CacheEventCount.ToString)
+                LogMessage("ProcessingStats: UncCache Event Count = " & .UnCacheEventCount.ToString)
+            End With
+
+            If blnSuccess Then
+                LogMessage("Processing complete")
+            Else
+                LogMessage("Processing ended in error")
+            End If
+
+        Catch ex As Exception
+            blnSuccess = False
+            LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+        End Try
+
+        If blnSuccess Then
+            udtSICOptions.DatasetNumber += 1
+        End If
+
+        If blnSuccess Then
+            UpdateProcessingStep(eProcessingStepConstants.Complete, True)
+        Else
+            UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
+        End If
+
+        Return blnSuccess
+
+    End Function
+
+    Private Function ProcessMZList(
       ByRef udtScanList As udtScanListType,
       ByRef objSpectraCache As clsSpectraCache,
       udtSICOptions As udtSICOptionsType,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
-      ByRef udtMZBinList() As udtMZBinListType, 
-      ByRef intParentIonIndices() As Integer, 
-      blnProcessSIMScans As Boolean, 
-      intSIMIndex As Integer, 
+      ByRef udtMZBinList() As udtMZBinListType,
+      ByRef intParentIonIndices() As Integer,
+      blnProcessSIMScans As Boolean,
+      intSIMIndex As Integer,
       ByRef intParentIonsProcessed As Integer) As Boolean
 
 
-		' Step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
-		' Note that udtMZBinList() and intParentIonIndices() are parallel arrays, with udtMZBinList() sorted on ascending m/z
-		Const MAX_RAW_DATA_MEMORY_USAGE_MB As Integer = 50
-		Const DATA_COUNT_MEMORY_RESERVE As Integer = 200
+        ' Step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
+        ' Note that udtMZBinList() and intParentIonIndices() are parallel arrays, with udtMZBinList() sorted on ascending m/z
+        Const MAX_RAW_DATA_MEMORY_USAGE_MB As Integer = 50
+        Const DATA_COUNT_MEMORY_RESERVE As Integer = 200
 
-		Dim intMZIndex As Integer
-		Dim intMZIndexWork As Integer
-		Dim intMaxMZCountInChunk As Integer
+        Dim intMZIndex As Integer
+        Dim intMZIndexWork As Integer
+        Dim intMaxMZCountInChunk As Integer
 
-		Dim intSurveyScanIndex As Integer
-		Dim intParentIonIndexPointer As Integer
-		Dim intDataIndex As Integer
-		Dim intScanIndexObservedInFullSIC As Integer
+        Dim intSurveyScanIndex As Integer
+        Dim intParentIonIndexPointer As Integer
+        Dim intDataIndex As Integer
+        Dim intScanIndexObservedInFullSIC As Integer
 
-		Dim intPoolIndex As Integer
+        Dim intPoolIndex As Integer
 
-		Dim sngIonSum As Single
-		Dim dblClosestMZ As Double
-		Dim intIonMatchCount As Integer
+        Dim sngIonSum As Single
+        Dim dblClosestMZ As Double
+        Dim intIonMatchCount As Integer
 
-		Dim dblMZToleranceDa As Double
+        Dim dblMZToleranceDa As Double
 
-		' Ranges from 0 to intMZSearchChunkCount-1
-		Dim intMZSearchChunkCount As Integer
-		Dim udtMZSearchChunk() As udtMZSearchInfoType
+        ' Ranges from 0 to intMZSearchChunkCount-1
+        Dim intMZSearchChunkCount As Integer
+        Dim udtMZSearchChunk() As udtMZSearchInfoType
 
-		' The following are 2D arrays, ranging from 0 to intMZSearchChunkCount-1 in the first dimension and 0 to .SurveyScanCount - 1 in the second dimension
-		' I could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
-		Dim intFullSICScanIndices(,) As Integer		' Pointer into .SurveyScans
-		Dim sngFullSICIntensities(,) As Single
-		Dim dblFullSICMasses(,) As Double
-		Dim intFullSICDataCount() As Integer		' Count of the number of valid entries in the second dimension of the above 3 arrays
+        ' The following are 2D arrays, ranging from 0 to intMZSearchChunkCount-1 in the first dimension and 0 to .SurveyScanCount - 1 in the second dimension
+        ' I could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
+        Dim intFullSICScanIndices(,) As Integer     ' Pointer into .SurveyScans
+        Dim sngFullSICIntensities(,) As Single
+        Dim dblFullSICMasses(,) As Double
+        Dim intFullSICDataCount() As Integer        ' Count of the number of valid entries in the second dimension of the above 3 arrays
 
-		' The following is a 1D array, containing the SIC intensities for a single m/z group
-		Dim sngFullSICIntensities1D() As Single
+        ' The following is a 1D array, containing the SIC intensities for a single m/z group
+        Dim sngFullSICIntensities1D() As Single
 
-		Dim udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
-		Dim udtSICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-		Dim udtSICPotentialAreaStatsInFullSIC As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+        Dim udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
+        Dim udtSICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+        Dim udtSICPotentialAreaStatsInFullSIC As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
 
-		' Note: The arrays in this variable contain valid data from index 0 to .SICDataCount-1
-		'       Do not assume that the amount of usable data is from index 0 to .SICData.Length -1, since these arrays are increased in length when needed, but never decreased in length (to reduce the number of times ReDim is called)
-		Dim udtSICDetails As udtSICStatsDetailsType
-		Dim udtSmoothedYData As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-		Dim udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
+        ' Note: The arrays in this variable contain valid data from index 0 to .SICDataCount-1
+        '       Do not assume that the amount of usable data is from index 0 to .SICData.Length -1, since these arrays are increased in length when needed, but never decreased in length (to reduce the number of times ReDim is called)
+        Dim udtSICDetails As udtSICStatsDetailsType
+        Dim udtSmoothedYData As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
+        Dim udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
 
-		Dim blnParentIonUpdated() As Boolean
+        Dim blnParentIonUpdated() As Boolean
 
-		Dim blnUseScan As Boolean
-		Dim blnStorePeakInParentIon As Boolean
-		Dim blnLargestPeakFound As Boolean
-		Dim blnSuccess As Boolean
+        Dim blnUseScan As Boolean
+        Dim blnStorePeakInParentIon As Boolean
+        Dim blnLargestPeakFound As Boolean
+        Dim blnSuccess As Boolean
 
-		Const DebugParentIonIndexToFind As Integer = 3139
-		Const DebugMZToFind As Single = 488.47
+        Const DebugParentIonIndexToFind As Integer = 3139
+        Const DebugMZToFind As Single = 488.47
 
-		Try
-			' Determine the maximum number of m/z values to process simultaneously
-			' Limit the total memory usage to ~50 MB
-			' Each m/z value will require 12 bytes per scan
+        Try
+            ' Determine the maximum number of m/z values to process simultaneously
+            ' Limit the total memory usage to ~50 MB
+            ' Each m/z value will require 12 bytes per scan
 
-			If udtScanList.SurveyScanCount > 0 Then
-				intMaxMZCountInChunk = CInt((MAX_RAW_DATA_MEMORY_USAGE_MB * 1024 * 1024) / (udtScanList.SurveyScanCount * 12))
-			Else
-				intMaxMZCountInChunk = 1
-			End If
+            If udtScanList.SurveyScanCount > 0 Then
+                intMaxMZCountInChunk = CInt((MAX_RAW_DATA_MEMORY_USAGE_MB * 1024 * 1024) / (udtScanList.SurveyScanCount * 12))
+            Else
+                intMaxMZCountInChunk = 1
+            End If
 
-			If intMaxMZCountInChunk > udtMZBinList.Length Then
-				intMaxMZCountInChunk = udtMZBinList.Length
-			End If
-			If intMaxMZCountInChunk < 1 Then intMaxMZCountInChunk = 1
+            If intMaxMZCountInChunk > udtMZBinList.Length Then
+                intMaxMZCountInChunk = udtMZBinList.Length
+            End If
+            If intMaxMZCountInChunk < 1 Then intMaxMZCountInChunk = 1
 
-			' Reserve room in dblSearchMZs
-			ReDim udtMZSearchChunk(intMaxMZCountInChunk - 1)
+            ' Reserve room in dblSearchMZs
+            ReDim udtMZSearchChunk(intMaxMZCountInChunk - 1)
 
-			' Reserve room in intFullSICScanIndices for at most intMaxMZCountInChunk values and .SurveyScanCount scans
-			ReDim intFullSICDataCount(intMaxMZCountInChunk - 1)
-			ReDim intFullSICScanIndices(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
-			ReDim sngFullSICIntensities(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
-			ReDim dblFullSICMasses(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
+            ' Reserve room in intFullSICScanIndices for at most intMaxMZCountInChunk values and .SurveyScanCount scans
+            ReDim intFullSICDataCount(intMaxMZCountInChunk - 1)
+            ReDim intFullSICScanIndices(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
+            ReDim sngFullSICIntensities(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
+            ReDim dblFullSICMasses(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
 
-			ReDim sngFullSICIntensities1D(udtScanList.SurveyScanCount - 1)
+            ReDim sngFullSICIntensities1D(udtScanList.SurveyScanCount - 1)
 
-			' Pre-reserve space in the arrays in udtSICDetails
-			With udtSICDetails
-				.SICDataCount = 0
-				.SICScanType = eScanTypeConstants.SurveyScan
+            ' Pre-reserve space in the arrays in udtSICDetails
+            With udtSICDetails
+                .SICDataCount = 0
+                .SICScanType = eScanTypeConstants.SurveyScan
 
-				ReDim .SICScanIndices(DATA_COUNT_MEMORY_RESERVE)
-				ReDim .SICScanNumbers(DATA_COUNT_MEMORY_RESERVE)
-				ReDim .SICData(DATA_COUNT_MEMORY_RESERVE)
-				ReDim .SICMasses(DATA_COUNT_MEMORY_RESERVE)
+                ReDim .SICScanIndices(DATA_COUNT_MEMORY_RESERVE)
+                ReDim .SICScanNumbers(DATA_COUNT_MEMORY_RESERVE)
+                ReDim .SICData(DATA_COUNT_MEMORY_RESERVE)
+                ReDim .SICMasses(DATA_COUNT_MEMORY_RESERVE)
 
-			End With
+            End With
 
-			' Reserve room in udtSmoothedYData and udtSmoothedYDataSubset
-			With udtSmoothedYData
-				.DataCount = 0
-				ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
-			End With
+            ' Reserve room in udtSmoothedYData and udtSmoothedYDataSubset
+            With udtSmoothedYData
+                .DataCount = 0
+                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
+            End With
 
-			With udtSmoothedYDataSubset
-				.DataCount = 0
-				ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
-			End With
+            With udtSmoothedYDataSubset
+                .DataCount = 0
+                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
+            End With
 
-			' Reserve room in blnParentIonUpdated
-			ReDim blnParentIonUpdated(intParentIonIndices.Length - 1)
+            ' Reserve room in blnParentIonUpdated
+            ReDim blnParentIonUpdated(intParentIonIndices.Length - 1)
 
-		Catch ex As Exception
-			LogErrors("ProcessMZList", "Error reserving memory for the m/z chunks", ex, True, True, eMasicErrorCodes.CreateSICsError)
-			Return False
-		End Try
+        Catch ex As Exception
+            LogErrors("ProcessMZList", "Error reserving memory for the m/z chunks", ex, True, True, eMasicErrorCodes.CreateSICsError)
+            Return False
+        End Try
 
-		Try
+        Try
 
-			' Uncomment the following to debug ScanOrAcqTimeToAbsolute and ScanOrAcqTimeToScanTime
-			'TestScanConversions(udtScanList)
+            ' Uncomment the following to debug ScanOrAcqTimeToAbsolute and ScanOrAcqTimeToScanTime
+            'TestScanConversions(udtScanList)
 
-			intMZSearchChunkCount = 0
-			intMZIndex = 0
-			Do While intMZIndex < udtMZBinList.Length
+            intMZSearchChunkCount = 0
+            intMZIndex = 0
+            Do While intMZIndex < udtMZBinList.Length
 
-				'---------------------------------------------------------
-				' Find the next group of m/z values to use, starting with intMZIndex
-				'---------------------------------------------------------
-				With udtMZSearchChunk(intMZSearchChunkCount)
-					' Initially set the MZIndexStart to intMZIndex
-					.MZIndexStart = intMZIndex
+                '---------------------------------------------------------
+                ' Find the next group of m/z values to use, starting with intMZIndex
+                '---------------------------------------------------------
+                With udtMZSearchChunk(intMZSearchChunkCount)
+                    ' Initially set the MZIndexStart to intMZIndex
+                    .MZIndexStart = intMZIndex
 
 
-					' Look for adjacent m/z values within udtMZBinList(.MZIndexStart).MZToleranceDa / 2 
-					'  of the m/z value that starts this group
-					' Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
-					.MZTolerance = udtMZBinList(.MZIndexStart).MZTolerance
-					.MZToleranceIsPPM = udtMZBinList(.MZIndexStart).MZToleranceIsPPM
+                    ' Look for adjacent m/z values within udtMZBinList(.MZIndexStart).MZToleranceDa / 2 
+                    '  of the m/z value that starts this group
+                    ' Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
+                    .MZTolerance = udtMZBinList(.MZIndexStart).MZTolerance
+                    .MZToleranceIsPPM = udtMZBinList(.MZIndexStart).MZToleranceIsPPM
 
-					If .MZToleranceIsPPM Then
-						dblMZToleranceDa = PPMToMass(.MZTolerance, udtMZBinList(.MZIndexStart).MZ)
-					Else
-						dblMZToleranceDa = .MZTolerance
-					End If
+                    If .MZToleranceIsPPM Then
+                        dblMZToleranceDa = PPMToMass(.MZTolerance, udtMZBinList(.MZIndexStart).MZ)
+                    Else
+                        dblMZToleranceDa = .MZTolerance
+                    End If
 
                     Do While intMZIndex < udtMZBinList.Length - 2 AndAlso
                      Math.Abs(udtMZBinList(intMZIndex + 1).MZTolerance - .MZTolerance) < Double.Epsilon AndAlso
@@ -10266,154 +10266,154 @@ Public Class clsMASIC
                      udtMZBinList(intMZIndex + 1).MZ - udtMZBinList(.MZIndexStart).MZ <= dblMZToleranceDa / 2
                         intMZIndex += 1
                     Loop
-					.MZIndexEnd = intMZIndex
+                    .MZIndexEnd = intMZIndex
 
-					If .MZIndexEnd = .MZIndexStart Then
-						.MZIndexMidpoint = .MZIndexEnd
-						.SearchMZ = udtMZBinList(.MZIndexStart).MZ
-					Else
-						' Determine the median m/z of the members in the m/z group
-						If (.MZIndexEnd - .MZIndexStart) Mod 2 = 0 Then
-							' Odd number of points; use the m/z value of the midpoint
-							.MZIndexMidpoint = .MZIndexStart + CInt((.MZIndexEnd - .MZIndexStart) / 2)
-							.SearchMZ = udtMZBinList(.MZIndexMidpoint).MZ
-						Else
-							' Even number of points; average the values on either side of (.mzIndexEnd - .mzIndexStart / 2)
-							.MZIndexMidpoint = .MZIndexStart + CInt(Math.Floor((.MZIndexEnd - .MZIndexStart) / 2))
-							.SearchMZ = (udtMZBinList(.MZIndexMidpoint).MZ + udtMZBinList(.MZIndexMidpoint + 1).MZ) / 2
-						End If
-					End If
+                    If .MZIndexEnd = .MZIndexStart Then
+                        .MZIndexMidpoint = .MZIndexEnd
+                        .SearchMZ = udtMZBinList(.MZIndexStart).MZ
+                    Else
+                        ' Determine the median m/z of the members in the m/z group
+                        If (.MZIndexEnd - .MZIndexStart) Mod 2 = 0 Then
+                            ' Odd number of points; use the m/z value of the midpoint
+                            .MZIndexMidpoint = .MZIndexStart + CInt((.MZIndexEnd - .MZIndexStart) / 2)
+                            .SearchMZ = udtMZBinList(.MZIndexMidpoint).MZ
+                        Else
+                            ' Even number of points; average the values on either side of (.mzIndexEnd - .mzIndexStart / 2)
+                            .MZIndexMidpoint = .MZIndexStart + CInt(Math.Floor((.MZIndexEnd - .MZIndexStart) / 2))
+                            .SearchMZ = (udtMZBinList(.MZIndexMidpoint).MZ + udtMZBinList(.MZIndexMidpoint + 1).MZ) / 2
+                        End If
+                    End If
 
-				End With
-				intMZSearchChunkCount += 1
+                End With
+                intMZSearchChunkCount += 1
 
-				If intMZSearchChunkCount >= intMaxMZCountInChunk OrElse intMZIndex = udtMZBinList.Length - 1 Then
-					'---------------------------------------------------------
-					' Reached intMaxMZCountInChunk m/z value
-					' Process all of the m/z values in udtMZSearchChunk
-					'---------------------------------------------------------
+                If intMZSearchChunkCount >= intMaxMZCountInChunk OrElse intMZIndex = udtMZBinList.Length - 1 Then
+                    '---------------------------------------------------------
+                    ' Reached intMaxMZCountInChunk m/z value
+                    ' Process all of the m/z values in udtMZSearchChunk
+                    '---------------------------------------------------------
 
-					' Initialize .MaximumIntensity and .ScanIndexMax
-					' Additionally, reset intFullSICDataCount() and, for safety, set intFullSICScanIndices() to -1
-					For intMZIndexWork = 0 To intMZSearchChunkCount - 1
-						With udtMZSearchChunk(intMZIndexWork)
-							.MaximumIntensity = 0
-							.ScanIndexMax = 0
-						End With
+                    ' Initialize .MaximumIntensity and .ScanIndexMax
+                    ' Additionally, reset intFullSICDataCount() and, for safety, set intFullSICScanIndices() to -1
+                    For intMZIndexWork = 0 To intMZSearchChunkCount - 1
+                        With udtMZSearchChunk(intMZIndexWork)
+                            .MaximumIntensity = 0
+                            .ScanIndexMax = 0
+                        End With
 
-						intFullSICDataCount(intMZIndexWork) = 0
-						For intSurveyScanIndex = 0 To udtScanList.SurveyScanCount - 1
-							intFullSICScanIndices(intMZIndexWork, intSurveyScanIndex) = -1
-						Next intSurveyScanIndex
-					Next intMZIndexWork
+                        intFullSICDataCount(intMZIndexWork) = 0
+                        For intSurveyScanIndex = 0 To udtScanList.SurveyScanCount - 1
+                            intFullSICScanIndices(intMZIndexWork, intSurveyScanIndex) = -1
+                        Next intSurveyScanIndex
+                    Next intMZIndexWork
 
-					'---------------------------------------------------------
-					' Step through udtScanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
-					' We're stepping scan by scan since the process of loading a scan from disk is slower than the process of searching for each m/z in the scan
-					'---------------------------------------------------------
-					For intSurveyScanIndex = 0 To udtScanList.SurveyScanCount - 1
-						If blnProcessSIMScans Then
+                    '---------------------------------------------------------
+                    ' Step through udtScanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
+                    ' We're stepping scan by scan since the process of loading a scan from disk is slower than the process of searching for each m/z in the scan
+                    '---------------------------------------------------------
+                    For intSurveyScanIndex = 0 To udtScanList.SurveyScanCount - 1
+                        If blnProcessSIMScans Then
                             If udtScanList.SurveyScans(intSurveyScanIndex).SIMScan AndAlso
                                udtScanList.SurveyScans(intSurveyScanIndex).SIMIndex = intSIMIndex Then
                                 blnUseScan = True
                             Else
                                 blnUseScan = False
                             End If
-						Else
-							blnUseScan = Not udtScanList.SurveyScans(intSurveyScanIndex).SIMScan
+                        Else
+                            blnUseScan = Not udtScanList.SurveyScans(intSurveyScanIndex).SIMScan
 
-							If udtScanList.SurveyScans(intSurveyScanIndex).ZoomScan Then
-								blnUseScan = False
-							End If
-						End If
+                            If udtScanList.SurveyScans(intSurveyScanIndex).ZoomScan Then
+                                blnUseScan = False
+                            End If
+                        End If
 
-						If blnUseScan Then
-							If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
-								SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
-								Return False
-							End If
+                        If blnUseScan Then
+                            If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
+                                SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
+                                Return False
+                            End If
 
-							For intMZIndexWork = 0 To intMZSearchChunkCount - 1
-								With udtMZSearchChunk(intMZIndexWork)
-									If .MZToleranceIsPPM Then
-										dblMZToleranceDa = PPMToMass(.MZTolerance, .SearchMZ)
-									Else
-										dblMZToleranceDa = .MZTolerance
-									End If
+                            For intMZIndexWork = 0 To intMZSearchChunkCount - 1
+                                With udtMZSearchChunk(intMZIndexWork)
+                                    If .MZToleranceIsPPM Then
+                                        dblMZToleranceDa = PPMToMass(.MZTolerance, .SearchMZ)
+                                    Else
+                                        dblMZToleranceDa = .MZTolerance
+                                    End If
 
-									sngIonSum = AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex), .SearchMZ, dblMZToleranceDa, intIonMatchCount, dblClosestMZ, False)
+                                    sngIonSum = AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex), .SearchMZ, dblMZToleranceDa, intIonMatchCount, dblClosestMZ, False)
 
-									intDataIndex = intFullSICDataCount(intMZIndexWork)
-									intFullSICScanIndices(intMZIndexWork, intDataIndex) = intSurveyScanIndex
-									sngFullSICIntensities(intMZIndexWork, intDataIndex) = sngIonSum
+                                    intDataIndex = intFullSICDataCount(intMZIndexWork)
+                                    intFullSICScanIndices(intMZIndexWork, intDataIndex) = intSurveyScanIndex
+                                    sngFullSICIntensities(intMZIndexWork, intDataIndex) = sngIonSum
 
-									If sngIonSum < Single.Epsilon AndAlso mSICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
-										sngFullSICIntensities(intMZIndexWork, intDataIndex) = udtScanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity									
-									End If
+                                    If sngIonSum < Single.Epsilon AndAlso mSICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
+                                        sngFullSICIntensities(intMZIndexWork, intDataIndex) = udtScanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
+                                    End If
 
-									dblFullSICMasses(intMZIndexWork, intDataIndex) = dblClosestMZ
-									If sngIonSum > .MaximumIntensity Then
-										.MaximumIntensity = sngIonSum
-										.ScanIndexMax = intDataIndex
-									End If
+                                    dblFullSICMasses(intMZIndexWork, intDataIndex) = dblClosestMZ
+                                    If sngIonSum > .MaximumIntensity Then
+                                        .MaximumIntensity = sngIonSum
+                                        .ScanIndexMax = intDataIndex
+                                    End If
 
-									intFullSICDataCount(intMZIndexWork) += 1
-								End With
-							Next intMZIndexWork
-						End If
+                                    intFullSICDataCount(intMZIndexWork) += 1
+                                End With
+                            Next intMZIndexWork
+                        End If
 
-						If intSurveyScanIndex Mod 100 = 0 Then
-							SetSubtaskProcessingStepPct(CShort(Me.SubtaskProgressPercentComplete), "Loading raw SIC data: " & intSurveyScanIndex.ToString & " / " & udtScanList.SurveyScanCount.ToString)
-							If mAbortProcessing Then
-								udtScanList.ProcessingIncomplete = True
-								Exit Do
-							End If
-						End If
-					Next intSurveyScanIndex
+                        If intSurveyScanIndex Mod 100 = 0 Then
+                            SetSubtaskProcessingStepPct(CShort(Me.SubtaskProgressPercentComplete), "Loading raw SIC data: " & intSurveyScanIndex.ToString & " / " & udtScanList.SurveyScanCount.ToString)
+                            If mAbortProcessing Then
+                                udtScanList.ProcessingIncomplete = True
+                                Exit Do
+                            End If
+                        End If
+                    Next intSurveyScanIndex
 
-					SetSubtaskProcessingStepPct(CShort(Me.SubtaskProgressPercentComplete), "Creating SIC's for the parent ions")
-					If mAbortProcessing Then
-						udtScanList.ProcessingIncomplete = True
-						Exit Do
-					End If
+                    SetSubtaskProcessingStepPct(CShort(Me.SubtaskProgressPercentComplete), "Creating SIC's for the parent ions")
+                    If mAbortProcessing Then
+                        udtScanList.ProcessingIncomplete = True
+                        Exit Do
+                    End If
 
-					'---------------------------------------------------------
-					' Compute the noise level in sngFullSICIntensities() for each m/z in udtMZSearchChunk
-					' Also, find the peaks for each m/z in udtMZSearchChunk and retain the largest peak found
-					'---------------------------------------------------------
-					For intMZIndexWork = 0 To intMZSearchChunkCount - 1
+                    '---------------------------------------------------------
+                    ' Compute the noise level in sngFullSICIntensities() for each m/z in udtMZSearchChunk
+                    ' Also, find the peaks for each m/z in udtMZSearchChunk and retain the largest peak found
+                    '---------------------------------------------------------
+                    For intMZIndexWork = 0 To intMZSearchChunkCount - 1
 
-						' Use this for debugging
-						If Math.Abs(udtMZSearchChunk(intMZIndexWork).SearchMZ - DebugMZToFind) < 0.1 Then
-							intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart
-						End If
+                        ' Use this for debugging
+                        If Math.Abs(udtMZSearchChunk(intMZIndexWork).SearchMZ - DebugMZToFind) < 0.1 Then
+                            intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart
+                        End If
 
-						' Copy the data for this m/z into sngFullSICIntensities1D()
-						For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
-							sngFullSICIntensities1D(intDataIndex) = sngFullSICIntensities(intMZIndexWork, intDataIndex)
-						Next intDataIndex
+                        ' Copy the data for this m/z into sngFullSICIntensities1D()
+                        For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
+                            sngFullSICIntensities1D(intDataIndex) = sngFullSICIntensities(intMZIndexWork, intDataIndex)
+                        Next intDataIndex
 
-						' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
-						blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1, udtSICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, udtMZSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
+                        ' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
+                        blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1, udtSICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, udtMZSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
 
-						If Not blnSuccess Then
-							SetLocalErrorCode(eMasicErrorCodes.FindSICPeaksError, True)
-							Exit Try
-						End If
+                        If Not blnSuccess Then
+                            SetLocalErrorCode(eMasicErrorCodes.FindSICPeaksError, True)
+                            Exit Try
+                        End If
 
-						' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
-						mMASICPeakFinder.FindPotentialPeakArea(intFullSICDataCount(intMZIndexWork), sngFullSICIntensities1D, udtSICPotentialAreaStatsInFullSIC, udtSICOptions.SICPeakFinderOptions)
+                        ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
+                        mMASICPeakFinder.FindPotentialPeakArea(intFullSICDataCount(intMZIndexWork), sngFullSICIntensities1D, udtSICPotentialAreaStatsInFullSIC, udtSICOptions.SICPeakFinderOptions)
 
-						' Clear udtSICPotentialAreaStatsForPeak
-						udtSICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+                        ' Clear udtSICPotentialAreaStatsForPeak
+                        udtSICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
 
-						intScanIndexObservedInFullSIC = udtMZSearchChunk(intMZIndexWork).ScanIndexMax
+                        intScanIndexObservedInFullSIC = udtMZSearchChunk(intMZIndexWork).ScanIndexMax
 
-						' Populate udtSICDetails using the data centered around the highest intensity in intFullSICIntensities
-						' Note that this function will update udtSICPeak.IndexObserved
-						blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, udtScanList, intScanIndexObservedInFullSIC, udtSICDetails, udtSICPeak, udtSICOptions, False, 0)
+                        ' Populate udtSICDetails using the data centered around the highest intensity in intFullSICIntensities
+                        ' Note that this function will update udtSICPeak.IndexObserved
+                        blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, udtScanList, intScanIndexObservedInFullSIC, udtSICDetails, udtSICPeak, udtSICOptions, False, 0)
 
-						' Find the largest peak in the SIC for this m/z
+                        ' Find the largest peak in the SIC for this m/z
                         blnLargestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
                            udtSICDetails.SICDataCount, udtSICDetails.SICScanNumbers, udtSICDetails.SICData,
                            udtSICPotentialAreaStatsForPeak, udtSICPeak,
@@ -10421,82 +10421,82 @@ Public Class clsMASIC
                            udtSICPotentialAreaStatsInFullSIC,
                            True, udtScanList.SIMDataPresent, False)
 
-						If blnLargestPeakFound Then
-							'--------------------------------------------------------
-							' Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
-							' If it is, then assign the stats of the largest peak to the given parent ion
-							'--------------------------------------------------------
-							For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
-								' Use this for debugging
-								If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
-									intScanIndexObservedInFullSIC = -1
-								End If
+                        If blnLargestPeakFound Then
+                            '--------------------------------------------------------
+                            ' Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
+                            ' If it is, then assign the stats of the largest peak to the given parent ion
+                            '--------------------------------------------------------
+                            For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
+                                ' Use this for debugging
+                                If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
+                                    intScanIndexObservedInFullSIC = -1
+                                End If
 
-								blnStorePeakInParentIon = False
-								If udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
+                                blnStorePeakInParentIon = False
+                                If udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
 
-								' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
-								With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+                                ' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
+                                With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
                                     If .SurveyScanIndex >= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseLeft) AndAlso
                                        .SurveyScanIndex <= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseRight) Then
 
                                         blnStorePeakInParentIon = True
                                     End If
-								End With
+                                End With
 
 
-								If blnStorePeakInParentIon Then
-									blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
+                                If blnStorePeakInParentIon Then
+                                    blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
 
-									' Possibly save the stats for this SIC to the SICData file
-									SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
+                                    ' Possibly save the stats for this SIC to the SICData file
+                                    SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
 
-									' Save the stats for this SIC to the XML file
-									SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
+                                    ' Save the stats for this SIC to the XML file
+                                    SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
 
-									blnParentIonUpdated(intParentIonIndexPointer) = True
-									intParentIonsProcessed += 1
+                                    blnParentIonUpdated(intParentIonIndexPointer) = True
+                                    intParentIonsProcessed += 1
 
-								End If
+                                End If
 
 
-							Next intParentIonIndexPointer
-						End If
+                            Next intParentIonIndexPointer
+                        End If
 
-						'--------------------------------------------------------
-						' Now step through the parent ions and process those that were not updated using udtSICPeak
-						' For each, search for the closest peak in sngSICIntensity
-						'--------------------------------------------------------
-						For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
+                        '--------------------------------------------------------
+                        ' Now step through the parent ions and process those that were not updated using udtSICPeak
+                        ' For each, search for the closest peak in sngSICIntensity
+                        '--------------------------------------------------------
+                        For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
 
-							If Not blnParentIonUpdated(intParentIonIndexPointer) Then
-								If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
-									intScanIndexObservedInFullSIC = -1
-								End If
+                            If Not blnParentIonUpdated(intParentIonIndexPointer) Then
+                                If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
+                                    intScanIndexObservedInFullSIC = -1
+                                End If
 
-								With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
-									' Clear udtSICPotentialAreaStatsForPeak
-									.SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+                                With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+                                    ' Clear udtSICPotentialAreaStatsForPeak
+                                    .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
 
-									' Record the index in the Full SIC that the parent ion mass was first observed
-									' Search for .SurveyScanIndex in intFullSICScanIndices
-									intScanIndexObservedInFullSIC = -1
-									For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
-										If intFullSICScanIndices(intMZIndexWork, intDataIndex) >= .SurveyScanIndex Then
-											intScanIndexObservedInFullSIC = intDataIndex
-											Exit For
-										End If
-									Next intDataIndex
+                                    ' Record the index in the Full SIC that the parent ion mass was first observed
+                                    ' Search for .SurveyScanIndex in intFullSICScanIndices
+                                    intScanIndexObservedInFullSIC = -1
+                                    For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
+                                        If intFullSICScanIndices(intMZIndexWork, intDataIndex) >= .SurveyScanIndex Then
+                                            intScanIndexObservedInFullSIC = intDataIndex
+                                            Exit For
+                                        End If
+                                    Next intDataIndex
 
-									If intScanIndexObservedInFullSIC = -1 Then
-										' Match wasn't found; this is unexpected
-										LogErrors("ProcessMZList", "Programming error: survey scan index not found in intFullSICScanIndices()", Nothing, True, True, eMasicErrorCodes.FindSICPeaksError)
-										intScanIndexObservedInFullSIC = 0
-									End If
+                                    If intScanIndexObservedInFullSIC = -1 Then
+                                        ' Match wasn't found; this is unexpected
+                                        LogErrors("ProcessMZList", "Programming error: survey scan index not found in intFullSICScanIndices()", Nothing, True, True, eMasicErrorCodes.FindSICPeaksError)
+                                        intScanIndexObservedInFullSIC = 0
+                                    End If
 
-									' Populate udtSICDetails using the data centered around intScanIndexObservedInFullSIC
-									' Note that this function will update udtSICPeak.IndexObserved
-									blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, udtScanList, intScanIndexObservedInFullSIC, udtSICDetails, .SICStats.Peak, udtSICOptions, .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
+                                    ' Populate udtSICDetails using the data centered around intScanIndexObservedInFullSIC
+                                    ' Note that this function will update udtSICPeak.IndexObserved
+                                    blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, udtScanList, intScanIndexObservedInFullSIC, udtSICDetails, .SICStats.Peak, udtSICOptions, .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
 
                                     blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(
                                      udtSICDetails.SICDataCount, udtSICDetails.SICScanNumbers, udtSICDetails.SICData,
@@ -10506,75 +10506,75 @@ Public Class clsMASIC
                                      Not .CustomSICPeak, udtScanList.SIMDataPresent, False)
 
 
-									blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
-								End With
+                                    blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
+                                End With
 
-								' Possibly save the stats for this SIC to the SICData file
-								SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
+                                ' Possibly save the stats for this SIC to the SICData file
+                                SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
 
-								' Save the stats for this SIC to the XML file
-								SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
+                                ' Save the stats for this SIC to the XML file
+                                SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
 
-								blnParentIonUpdated(intParentIonIndexPointer) = True
-								intParentIonsProcessed += 1
+                                blnParentIonUpdated(intParentIonIndexPointer) = True
+                                intParentIonsProcessed += 1
 
-							End If
-						Next intParentIonIndexPointer
-
-
-						'---------------------------------------------------------
-						' Update progress
-						'---------------------------------------------------------
-						Try
-
-							If udtScanList.ParentIonInfoCount > 1 Then
-								SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (udtScanList.ParentIonInfoCount - 1) * 100))
-							Else
-								SetSubtaskProcessingStepPct(0)
-							End If
-
-							UpdateOverallProgress(objSpectraCache)
-							If mAbortProcessing Then
-								udtScanList.ProcessingIncomplete = True
-								Exit For
-							End If
-
-							If intParentIonsProcessed Mod 100 = 0 Then
-								If DateTime.UtcNow.Subtract(mLastParentIonProcessingLogTime).TotalSeconds >= 10 OrElse intParentIonsProcessed Mod 500 = 0 Then
-									LogMessage("Parent Ions Processed: " & intParentIonsProcessed.ToString)
-									Console.Write(".")
-									mLastParentIonProcessingLogTime = DateTime.UtcNow
-								End If
-							End If
-
-						Catch ex As Exception
-							LogErrors("ProcessMZList", "Error updating progress", ex, True, True, eMasicErrorCodes.CreateSICsError)
-						End Try
-
-					Next intMZIndexWork
-
-					' Reset intMZSearchChunkCount to 0
-					intMZSearchChunkCount = 0
-				End If
-
-				If mAbortProcessing Then
-					udtScanList.ProcessingIncomplete = True
-					Exit Do
-				End If
-
-				intMZIndex += 1
-			Loop
-
-			blnSuccess = True
-		Catch ex As Exception
-			LogErrors("ProcessMZList", "Error processing the m/z chunks to create the SIC data", ex, True, True, eMasicErrorCodes.CreateSICsError)
-			blnSuccess = False
-		End Try
+                            End If
+                        Next intParentIonIndexPointer
 
 
-		Return blnSuccess
+                        '---------------------------------------------------------
+                        ' Update progress
+                        '---------------------------------------------------------
+                        Try
 
-	End Function
+                            If udtScanList.ParentIonInfoCount > 1 Then
+                                SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (udtScanList.ParentIonInfoCount - 1) * 100))
+                            Else
+                                SetSubtaskProcessingStepPct(0)
+                            End If
+
+                            UpdateOverallProgress(objSpectraCache)
+                            If mAbortProcessing Then
+                                udtScanList.ProcessingIncomplete = True
+                                Exit For
+                            End If
+
+                            If intParentIonsProcessed Mod 100 = 0 Then
+                                If DateTime.UtcNow.Subtract(mLastParentIonProcessingLogTime).TotalSeconds >= 10 OrElse intParentIonsProcessed Mod 500 = 0 Then
+                                    LogMessage("Parent Ions Processed: " & intParentIonsProcessed.ToString)
+                                    Console.Write(".")
+                                    mLastParentIonProcessingLogTime = DateTime.UtcNow
+                                End If
+                            End If
+
+                        Catch ex As Exception
+                            LogErrors("ProcessMZList", "Error updating progress", ex, True, True, eMasicErrorCodes.CreateSICsError)
+                        End Try
+
+                    Next intMZIndexWork
+
+                    ' Reset intMZSearchChunkCount to 0
+                    intMZSearchChunkCount = 0
+                End If
+
+                If mAbortProcessing Then
+                    udtScanList.ProcessingIncomplete = True
+                    Exit Do
+                End If
+
+                intMZIndex += 1
+            Loop
+
+            blnSuccess = True
+        Catch ex As Exception
+            LogErrors("ProcessMZList", "Error processing the m/z chunks to create the SIC data", ex, True, True, eMasicErrorCodes.CreateSICsError)
+            blnSuccess = False
+        End Try
+
+
+        Return blnSuccess
+
+    End Function
 
     Private Function ProcessMRMList(
       ByRef udtScanList As udtScanListType,
@@ -10859,41 +10859,41 @@ Public Class clsMASIC
         Return blnSuccess
     End Function
 
-	Private Sub SaveBPIWork(
-	  ByRef udtScans() As udtScanInfoType, 
-	  intScanCount As Integer, 
-	  strOutputFilePath As String, 
-	  blnSaveTIC As Boolean, 
-	  cColDelimiter As Char)
+    Private Sub SaveBPIWork(
+      ByRef udtScans() As udtScanInfoType,
+      intScanCount As Integer,
+      strOutputFilePath As String,
+      blnSaveTIC As Boolean,
+      cColDelimiter As Char)
 
-		Dim srOutFile As StreamWriter
-		Dim intScanIndex As Integer
+        Dim srOutFile As StreamWriter
+        Dim intScanIndex As Integer
 
-		srOutFile = New StreamWriter(strOutputFilePath)
+        srOutFile = New StreamWriter(strOutputFilePath)
 
-		If blnSaveTIC Then
-			srOutFile.WriteLine("Time" & cColDelimiter & "TotalIonIntensity")
-		Else
-			srOutFile.WriteLine("Time" & cColDelimiter & "BasePeakIntensity" & cColDelimiter & "m/z")
-		End If
+        If blnSaveTIC Then
+            srOutFile.WriteLine("Time" & cColDelimiter & "TotalIonIntensity")
+        Else
+            srOutFile.WriteLine("Time" & cColDelimiter & "BasePeakIntensity" & cColDelimiter & "m/z")
+        End If
 
-		For intScanIndex = 0 To intScanCount - 1
-			With udtScans(intScanIndex)
-				If blnSaveTIC Then
+        For intScanIndex = 0 To intScanCount - 1
+            With udtScans(intScanIndex)
+                If blnSaveTIC Then
                     srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString & cColDelimiter &
                       Math.Round(.TotalIonIntensity, 2).ToString)
-				Else
+                Else
                     srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString & cColDelimiter &
                       Math.Round(.BasePeakIonIntensity, 2).ToString & cColDelimiter &
                       Math.Round(.BasePeakIonMZ, 4).ToString)
-				End If
+                End If
 
-			End With
-		Next intScanIndex
+            End With
+        Next intScanIndex
 
-		srOutFile.Close()
+        srOutFile.Close()
 
-	End Sub
+    End Sub
 
     Private Sub SaveDecon2LSChromatogram(
       ByRef udtScans() As udtScanInfoType,
@@ -10925,11 +10925,11 @@ Public Class clsMASIC
 
     <Obsolete("No longer used")>
     Private Sub SaveICRToolsChromatogramByScan(
-      ByRef udtScans() As udtScanInfoType, 
-      intScanCount As Integer, 
-      strOutputFilePath As String, 
-      blnSaveElutionTimeInsteadOfScan As Boolean, 
-      blnSaveTICInsteadOfBPI As Boolean, 
+      ByRef udtScans() As udtScanInfoType,
+      intScanCount As Integer,
+      strOutputFilePath As String,
+      blnSaveElutionTimeInsteadOfScan As Boolean,
+      blnSaveTICInsteadOfBPI As Boolean,
       strInputFilePathFull As String)
 
         Dim srOutFile As StreamWriter
@@ -11037,7 +11037,7 @@ Public Class clsMASIC
 
     End Sub
 
-	Private Function SaveSICDataToText(
+    Private Function SaveSICDataToText(
       ByRef udtSICOptions As udtSICOptionsType,
       ByRef udtScanList As udtScanListType,
       intParentIonIndex As Integer,
@@ -11045,49 +11045,49 @@ Public Class clsMASIC
       ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
 
 
-		Dim intFragScanIndex As Integer
-		Dim strPrefix As String
+        Dim intFragScanIndex As Integer
+        Dim strPrefix As String
 
-		Try
+        Try
 
-			If udtOutputFileHandles.SICDataFile Is Nothing Then
-				Return True
-			End If
+            If udtOutputFileHandles.SICDataFile Is Nothing Then
+                Return True
+            End If
 
-			' Write the detailed SIC values for the given parent ion to the text file
+            ' Write the detailed SIC values for the given parent ion to the text file
 
-			For intFragScanIndex = 0 To udtScanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+            For intFragScanIndex = 0 To udtScanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
 
-				' "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
+                ' "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
                 strPrefix = udtSICOptions.DatasetNumber.ToString & ControlChars.Tab &
                    intParentIonIndex.ToString & ControlChars.Tab &
                    intFragScanIndex.ToString & ControlChars.Tab &
                    Math.Round(udtScanList.ParentIons(intParentIonIndex).MZ, 4).ToString & ControlChars.Tab
 
-				With udtSICDetails
-					If .SICDataCount = 0 Then
-						' Nothing to write
-						udtOutputFileHandles.SICDataFile.WriteLine(strPrefix & "0" & ControlChars.Tab & "0" & ControlChars.Tab & "0")
-					Else
-						For intScanIndex As Integer = 0 To .SICDataCount - 1
-							udtOutputFileHandles.SICDataFile.WriteLine(strPrefix & .SICScanNumbers(intScanIndex) & ControlChars.Tab & .SICMasses(intScanIndex) & ControlChars.Tab & .SICData(intScanIndex))
-						Next intScanIndex
-					End If
-				End With
+                With udtSICDetails
+                    If .SICDataCount = 0 Then
+                        ' Nothing to write
+                        udtOutputFileHandles.SICDataFile.WriteLine(strPrefix & "0" & ControlChars.Tab & "0" & ControlChars.Tab & "0")
+                    Else
+                        For intScanIndex As Integer = 0 To .SICDataCount - 1
+                            udtOutputFileHandles.SICDataFile.WriteLine(strPrefix & .SICScanNumbers(intScanIndex) & ControlChars.Tab & .SICMasses(intScanIndex) & ControlChars.Tab & .SICData(intScanIndex))
+                        Next intScanIndex
+                    End If
+                End With
 
-			Next intFragScanIndex
+            Next intFragScanIndex
 
-		Catch ex As Exception
-			LogErrors("SaveSICDataToText", "Error writing to detailed SIC data text file", ex, True, False, eMasicErrorCodes.OutputFileWriteError)
-			Return False
-		End Try
+        Catch ex As Exception
+            LogErrors("SaveSICDataToText", "Error writing to detailed SIC data text file", ex, True, False, eMasicErrorCodes.OutputFileWriteError)
+            Return False
+        End Try
 
-		Return True
+        Return True
 
 
-	End Function
+    End Function
 
-	Private Function SaveDataToXML(
+    Private Function SaveDataToXML(
       ByRef udtScanList As udtScanListType,
       intParentIonIndex As Integer,
       ByRef udtSICDetails As udtSICStatsDetailsType,
@@ -11095,105 +11095,105 @@ Public Class clsMASIC
       ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
 
 
-		Dim SICDataScanIntervals() As Byte				 ' Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
+        Dim SICDataScanIntervals() As Byte               ' Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
 
-		Dim intScanIndex As Integer
-		Dim intScanDelta As Integer
+        Dim intScanIndex As Integer
+        Dim intScanDelta As Integer
 
-		Dim strScanIntervalList As String
-		Dim sbIntensityDataList As Text.StringBuilder
-		Dim sbMassDataList As Text.StringBuilder
-		Dim sbPeakYDataSmoothed As Text.StringBuilder
+        Dim strScanIntervalList As String
+        Dim sbIntensityDataList As Text.StringBuilder
+        Dim sbMassDataList As Text.StringBuilder
+        Dim sbPeakYDataSmoothed As Text.StringBuilder
 
-		Dim intFragScanIndex As Integer
-		Dim intScanIntervalIndex As Integer
+        Dim intFragScanIndex As Integer
+        Dim intScanIntervalIndex As Integer
 
-		Dim intSICDataIndex As Integer
-		Dim intIndex As Integer
+        Dim intSICDataIndex As Integer
+        Dim intIndex As Integer
 
-		Dim strLastGoodLoc As String = "Start"
-		Dim blnIntensityDataListWritten As Boolean
-		Dim blnMassDataList As Boolean
+        Dim strLastGoodLoc As String = "Start"
+        Dim blnIntensityDataListWritten As Boolean
+        Dim blnMassDataList As Boolean
 
-		Dim objXMLOut As Xml.XmlTextWriter
+        Dim objXMLOut As Xml.XmlTextWriter
 
-		Try
-			' Populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
-			With udtSICDetails
-				If .SICDataCount = 0 Then
-					ReDim SICDataScanIntervals(0)
-				Else
-					ReDim SICDataScanIntervals(.SICDataCount - 1)
-					For intScanIndex = 1 To .SICDataCount - 1
-						intScanDelta = .SICScanNumbers(intScanIndex) - .SICScanNumbers(intScanIndex - 1)
-						' When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
-						' However, for MRM data, field size can be much larger
-						SICDataScanIntervals(intScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))
-					Next intScanIndex
-				End If
-			End With
+        Try
+            ' Populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
+            With udtSICDetails
+                If .SICDataCount = 0 Then
+                    ReDim SICDataScanIntervals(0)
+                Else
+                    ReDim SICDataScanIntervals(.SICDataCount - 1)
+                    For intScanIndex = 1 To .SICDataCount - 1
+                        intScanDelta = .SICScanNumbers(intScanIndex) - .SICScanNumbers(intScanIndex - 1)
+                        ' When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
+                        ' However, for MRM data, field size can be much larger
+                        SICDataScanIntervals(intScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))
+                    Next intScanIndex
+                End If
+            End With
 
-			objXMLOut = udtOutputFileHandles.XMLFileForSICs
-			If objXMLOut Is Nothing Then Return False
+            objXMLOut = udtOutputFileHandles.XMLFileForSICs
+            If objXMLOut Is Nothing Then Return False
 
-			' Initialize the StringBuilder objects
-			sbIntensityDataList = New Text.StringBuilder
-			sbMassDataList = New Text.StringBuilder
-			sbPeakYDataSmoothed = New Text.StringBuilder
+            ' Initialize the StringBuilder objects
+            sbIntensityDataList = New Text.StringBuilder
+            sbMassDataList = New Text.StringBuilder
+            sbPeakYDataSmoothed = New Text.StringBuilder
 
-			' Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
-			For intFragScanIndex = 0 To udtScanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
-				strLastGoodLoc = "intFragScanIndex=" & intFragScanIndex.ToString
+            ' Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
+            For intFragScanIndex = 0 To udtScanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+                strLastGoodLoc = "intFragScanIndex=" & intFragScanIndex.ToString
 
-				objXMLOut.WriteStartElement("ParentIon")
-				objXMLOut.WriteAttributeString("Index", intParentIonIndex.ToString)				' Parent ion Index
-				objXMLOut.WriteAttributeString("FragScanIndex", intFragScanIndex.ToString)		' Frag Scan Index
+                objXMLOut.WriteStartElement("ParentIon")
+                objXMLOut.WriteAttributeString("Index", intParentIonIndex.ToString)             ' Parent ion Index
+                objXMLOut.WriteAttributeString("FragScanIndex", intFragScanIndex.ToString)      ' Frag Scan Index
 
-				strLastGoodLoc = "With udtScanList.ParentIons(intParentIonIndex)"
-				With udtScanList.ParentIons(intParentIonIndex)
-					objXMLOut.WriteElementString("MZ", Math.Round(.MZ, 4).ToString)
+                strLastGoodLoc = "With udtScanList.ParentIons(intParentIonIndex)"
+                With udtScanList.ParentIons(intParentIonIndex)
+                    objXMLOut.WriteElementString("MZ", Math.Round(.MZ, 4).ToString)
 
-					If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < udtScanList.SurveyScans.Length Then
-						objXMLOut.WriteElementString("SurveyScanNumber", udtScanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString)
-					Else
-						objXMLOut.WriteElementString("SurveyScanNumber", "-1")
-					End If
+                    If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < udtScanList.SurveyScans.Length Then
+                        objXMLOut.WriteElementString("SurveyScanNumber", udtScanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString)
+                    Else
+                        objXMLOut.WriteElementString("SurveyScanNumber", "-1")
+                    End If
 
-					strLastGoodLoc = "Write FragScanNumber"
-					If intFragScanIndex < udtScanList.FragScanCount Then
-						objXMLOut.WriteElementString("FragScanNumber", udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString)
-						objXMLOut.WriteElementString("FragScanTime", udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime.ToString)
-					Else
-						' Fragmentation scan does not exist
-						objXMLOut.WriteElementString("FragScanNumber", "0")
-						objXMLOut.WriteElementString("FragScanTime", "0")
-					End If
+                    strLastGoodLoc = "Write FragScanNumber"
+                    If intFragScanIndex < udtScanList.FragScanCount Then
+                        objXMLOut.WriteElementString("FragScanNumber", udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString)
+                        objXMLOut.WriteElementString("FragScanTime", udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime.ToString)
+                    Else
+                        ' Fragmentation scan does not exist
+                        objXMLOut.WriteElementString("FragScanNumber", "0")
+                        objXMLOut.WriteElementString("FragScanTime", "0")
+                    End If
 
-					objXMLOut.WriteElementString("OptimalPeakApexScanNumber", .OptimalPeakApexScanNumber.ToString)
-					objXMLOut.WriteElementString("PeakApexOverrideParentIonIndex", .PeakApexOverrideParentIonIndex.ToString)
-					objXMLOut.WriteElementString("CustomSICPeak", .CustomSICPeak.ToString)
+                    objXMLOut.WriteElementString("OptimalPeakApexScanNumber", .OptimalPeakApexScanNumber.ToString)
+                    objXMLOut.WriteElementString("PeakApexOverrideParentIonIndex", .PeakApexOverrideParentIonIndex.ToString)
+                    objXMLOut.WriteElementString("CustomSICPeak", .CustomSICPeak.ToString)
 
-					If .CustomSICPeak Then
-						objXMLOut.WriteElementString("CustomSICPeakComment", .CustomSICPeakComment)
-						objXMLOut.WriteElementString("CustomSICPeakMZToleranceDa", .CustomSICPeakMZToleranceDa.ToString)
-						objXMLOut.WriteElementString("CustomSICPeakScanTolerance", .CustomSICPeakScanOrAcqTimeTolerance.ToString)
-						objXMLOut.WriteElementString("CustomSICPeakScanToleranceType", mCustomSICList.ScanToleranceType.ToString)
-					End If
+                    If .CustomSICPeak Then
+                        objXMLOut.WriteElementString("CustomSICPeakComment", .CustomSICPeakComment)
+                        objXMLOut.WriteElementString("CustomSICPeakMZToleranceDa", .CustomSICPeakMZToleranceDa.ToString)
+                        objXMLOut.WriteElementString("CustomSICPeakScanTolerance", .CustomSICPeakScanOrAcqTimeTolerance.ToString)
+                        objXMLOut.WriteElementString("CustomSICPeakScanToleranceType", mCustomSICList.ScanToleranceType.ToString)
+                    End If
 
-					strLastGoodLoc = "With .SICStats"
-					With .SICStats
-						With .Peak
-							If udtSICDetails.SICScanType = eScanTypeConstants.FragScan Then
-								objXMLOut.WriteElementString("SICScanType", "FragScan")
-								objXMLOut.WriteElementString("PeakScanStart", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
-								objXMLOut.WriteElementString("PeakScanEnd", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
-								objXMLOut.WriteElementString("PeakScanMaxIntensity", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
-							Else
-								objXMLOut.WriteElementString("SICScanType", "SurveyScan")
-								objXMLOut.WriteElementString("PeakScanStart", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
-								objXMLOut.WriteElementString("PeakScanEnd", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
-								objXMLOut.WriteElementString("PeakScanMaxIntensity", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
-							End If
+                    strLastGoodLoc = "With .SICStats"
+                    With .SICStats
+                        With .Peak
+                            If udtSICDetails.SICScanType = eScanTypeConstants.FragScan Then
+                                objXMLOut.WriteElementString("SICScanType", "FragScan")
+                                objXMLOut.WriteElementString("PeakScanStart", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanEnd", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanMaxIntensity", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
+                            Else
+                                objXMLOut.WriteElementString("SICScanType", "SurveyScan")
+                                objXMLOut.WriteElementString("PeakScanStart", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanEnd", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanMaxIntensity", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
+                            End If
 
                             objXMLOut.WriteElementString("PeakIntensity", StringUtilities.ValueToString(.MaxIntensityValue, 5))
                             objXMLOut.WriteElementString("PeakSignalToNoiseRatio", StringUtilities.ValueToString(.SignalToNoiseRatio, 4))
@@ -13885,26 +13885,26 @@ Public Class clsMASIC
 
     End Sub
 
-	Private Sub WriteDecon2LSIsosFileHeaders(srOutFile As StreamWriter)
-		srOutFile.WriteLine("scan_num,charge,abundance,mz,fit,average_mw,monoisotopic_mw,mostabundant_mw,fwhm,signal_noise,mono_abundance,mono_plus2_abundance")
-	End Sub
+    Private Sub WriteDecon2LSIsosFileHeaders(srOutFile As StreamWriter)
+        srOutFile.WriteLine("scan_num,charge,abundance,mz,fit,average_mw,monoisotopic_mw,mostabundant_mw,fwhm,signal_noise,mono_abundance,mono_plus2_abundance")
+    End Sub
 
-	Private Sub WriteDecon2LSIsosFileEntry(
-	  ByRef srIsosOutFile As StreamWriter, 
-	  intScanNumber As Integer, 
-	  intCharge As Integer, 
-	  sngIntensity As Single, 
-	  dblIonMZ As Double, 
-	  sngFit As Single, 
-	  dblAverageMass As Double, 
-	  dblMonoisotopicMass As Double, 
-	  dblMostAbundanctMass As Double, 
-	  sngFWHM As Single, 
-	  sngSignalToNoise As Single, 
-	  sngMonoisotopicAbu As Single, 
-	  sngMonoPlus2Abu As Single)
+    Private Sub WriteDecon2LSIsosFileEntry(
+      ByRef srIsosOutFile As StreamWriter,
+      intScanNumber As Integer,
+      intCharge As Integer,
+      sngIntensity As Single,
+      dblIonMZ As Double,
+      sngFit As Single,
+      dblAverageMass As Double,
+      dblMonoisotopicMass As Double,
+      dblMostAbundanctMass As Double,
+      sngFWHM As Single,
+      sngSignalToNoise As Single,
+      sngMonoisotopicAbu As Single,
+      sngMonoPlus2Abu As Single)
 
-		Dim strLineOut As String
+        Dim strLineOut As String
 
         strLineOut = intScanNumber & "," &
          intCharge & "," &
@@ -13919,16 +13919,16 @@ Public Class clsMASIC
          sngMonoisotopicAbu & "," &
          sngMonoPlus2Abu
 
-		srIsosOutFile.WriteLine(strLineOut)
+        srIsosOutFile.WriteLine(strLineOut)
 
-	End Sub
+    End Sub
 
-	Private Sub WriteDecon2LSScanFileHeaders(srOutFile As StreamWriter)
-		srOutFile.WriteLine("scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped")
+    Private Sub WriteDecon2LSScanFileHeaders(srOutFile As StreamWriter)
+        srOutFile.WriteLine("scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped")
 
-		' Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
+        ' Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
 
-	End Sub
+    End Sub
 
     Private Sub WriteDecon2LSScanFileEntry(
       ByRef srScanInfoOutFile As StreamWriter,
@@ -13966,17 +13966,17 @@ Public Class clsMASIC
 
     End Sub
 
-	Private Sub WriteDecon2LSScanFileEntry(
-	  ByRef srScanInfoOutFile As StreamWriter, 
-	  udtScan As udtScanInfoType, 
-	  intScanNumber As Integer, 
-	  intMSLevel As Integer, 
-	  intNumPeaks As Integer, 
-	  intNumIsotopicSignatures As Integer)
+    Private Sub WriteDecon2LSScanFileEntry(
+      ByRef srScanInfoOutFile As StreamWriter,
+      udtScan As udtScanInfoType,
+      intScanNumber As Integer,
+      intMSLevel As Integer,
+      intNumPeaks As Integer,
+      intNumIsotopicSignatures As Integer)
 
-		Dim strLineOut As String
+        Dim strLineOut As String
 
-		With udtScan
+        With udtScan
             strLineOut = intScanNumber.ToString & "," &
              .ScanTime.ToString("0.0000") & "," &
              intMSLevel & "," &
@@ -13985,11 +13985,11 @@ Public Class clsMASIC
              .TotalIonIntensity.ToString & "," &
              intNumPeaks & "," &
              intNumIsotopicSignatures
-		End With
+        End With
 
-		srScanInfoOutFile.WriteLine(strLineOut)
+        srScanInfoOutFile.WriteLine(strLineOut)
 
-	End Sub
+    End Sub
 
 
     Private Function XMLOutputFileFinalize(
@@ -14217,7 +14217,7 @@ Public Class clsMASIC
 
     End Function
 
-	Private Function XmlOutputFileUpdateEntries(
+    Private Function XmlOutputFileUpdateEntries(
       ByRef udtScanList As udtScanListType,
       strInputFileName As String,
       strOutputFolderPath As String) As Boolean
@@ -14229,29 +14229,29 @@ Public Class clsMASIC
         Const OPTIMAL_PEAK_APEX_TAG_NAME = "OptimalPeakApexScanNumber"
         Const PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME = "PeakApexOverrideParentIonIndex"
 
-		Dim strXMLReadFilePath As String
-		Dim strXMLOutputFilePath As String
+        Dim strXMLReadFilePath As String
+        Dim strXMLOutputFilePath As String
 
-		Dim strLineIn As String
-		Dim strLineInTrimmedAndLower As String
-		Dim strWork As String
+        Dim strLineIn As String
+        Dim strLineInTrimmedAndLower As String
+        Dim strWork As String
 
-		Dim intCharIndex As Integer
-		Dim intParentIonIndex As Integer
-		Dim intParentIonsProcessed As Integer
+        Dim intCharIndex As Integer
+        Dim intParentIonIndex As Integer
+        Dim intParentIonsProcessed As Integer
 
-		strXMLReadFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.XMLFile)
+        strXMLReadFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.XMLFile)
 
-		strXMLOutputFilePath = Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
+        strXMLOutputFilePath = Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
 
-		Try
-			' Wait 2 seconds before reopening the file, to make sure the handle is closed
-			Threading.Thread.Sleep(2000)
+        Try
+            ' Wait 2 seconds before reopening the file, to make sure the handle is closed
+            Threading.Thread.Sleep(2000)
 
-			If Not File.Exists(strXMLReadFilePath) Then
-				' XML file not found, exit the function
-				Return True
-			End If
+            If Not File.Exists(strXMLReadFilePath) Then
+                ' XML file not found, exit the function
+                Return True
+            End If
 
             Using srInFile = New StreamReader(strXMLReadFilePath),
                   srOutFile = New StreamWriter(strXMLOutputFilePath, False)
@@ -14338,136 +14338,136 @@ Public Class clsMASIC
             Return False
         End Try
 
-		Return True
+        Return True
 
-	End Function
+    End Function
 
-	Private Sub XmlOutputFileReplaceSetting(
-	  srOutFile As StreamWriter, 
-	  strLineIn As String, 
-	  strXMLElementName As String, 
-	  intNewValueToSave As Integer)
-	  
-		' strXMLElementName should be the properly capitalized element name and should not start with "<"
+    Private Sub XmlOutputFileReplaceSetting(
+      srOutFile As StreamWriter,
+      strLineIn As String,
+      strXMLElementName As String,
+      intNewValueToSave As Integer)
 
-		Dim strWork As String
-		Dim intCharIndex As Integer
-		Dim intCurrentValue As Integer
+        ' strXMLElementName should be the properly capitalized element name and should not start with "<"
 
-		' Need to add two since strXMLElementName doesn't include "<" at the beginning
-		strWork = strLineIn.Trim.ToLower.Substring(strXMLElementName.Length + 2)
+        Dim strWork As String
+        Dim intCharIndex As Integer
+        Dim intCurrentValue As Integer
 
-		' Look for the "<" after the number
-		intCharIndex = strWork.IndexOf("<", StringComparison.Ordinal)
-		If intCharIndex > 0 Then
-			' Isolate the number
-			strWork = strWork.Substring(0, intCharIndex)
-			If IsNumber(strWork) Then
-				intCurrentValue = CInt(strWork)
+        ' Need to add two since strXMLElementName doesn't include "<" at the beginning
+        strWork = strLineIn.Trim.ToLower.Substring(strXMLElementName.Length + 2)
 
-				If intNewValueToSave <> intCurrentValue Then
-					strLineIn = "  <" & strXMLElementName & ">"
-					strLineIn &= intNewValueToSave.ToString
-					strLineIn &= "</" & strXMLElementName & ">"
+        ' Look for the "<" after the number
+        intCharIndex = strWork.IndexOf("<", StringComparison.Ordinal)
+        If intCharIndex > 0 Then
+            ' Isolate the number
+            strWork = strWork.Substring(0, intCharIndex)
+            If IsNumber(strWork) Then
+                intCurrentValue = CInt(strWork)
 
-				End If
-			End If
-		End If
+                If intNewValueToSave <> intCurrentValue Then
+                    strLineIn = "  <" & strXMLElementName & ">"
+                    strLineIn &= intNewValueToSave.ToString
+                    strLineIn &= "</" & strXMLElementName & ">"
 
-		srOutFile.WriteLine(strLineIn)
+                End If
+            End If
+        End If
 
-	End Sub
+        srOutFile.WriteLine(strLineIn)
 
-	Protected Overrides Sub Finalize()
-		If Not mFreeMemoryPerformanceCounter Is Nothing Then
-			mFreeMemoryPerformanceCounter.Close()
-			mFreeMemoryPerformanceCounter = Nothing
-		End If
+    End Sub
 
-		MyBase.Finalize()
-	End Sub
+    Protected Overrides Sub Finalize()
+        If Not mFreeMemoryPerformanceCounter Is Nothing Then
+            mFreeMemoryPerformanceCounter.Close()
+            mFreeMemoryPerformanceCounter = Nothing
+        End If
+
+        MyBase.Finalize()
+    End Sub
 
 #Region "PPMToMassConversion"
-	Public Shared Function MassToPPM(dblMassToConvert As Double, dblCurrentMZ As Double) As Double
-		' Converts dblMassToConvert to ppm, based on the value of dblCurrentMZ
+    Public Shared Function MassToPPM(dblMassToConvert As Double, dblCurrentMZ As Double) As Double
+        ' Converts dblMassToConvert to ppm, based on the value of dblCurrentMZ
 
-		Return dblMassToConvert * 1000000.0 / dblCurrentMZ
-	End Function
+        Return dblMassToConvert * 1000000.0 / dblCurrentMZ
+    End Function
 
-	Public Shared Function PPMToMass(dblPPMToConvert As Double, dblCurrentMZ As Double) As Double
-		' Converts dblPPMToConvert to a mass value, which is dependent on dblCurrentMZ
+    Public Shared Function PPMToMass(dblPPMToConvert As Double, dblCurrentMZ As Double) As Double
+        ' Converts dblPPMToConvert to a mass value, which is dependent on dblCurrentMZ
 
-		Return dblPPMToConvert / 1000000.0 * dblCurrentMZ
-	End Function
+        Return dblPPMToConvert / 1000000.0 * dblCurrentMZ
+    End Function
 #End Region
 
-	Protected Class clsScanInfoScanNumComparer
-		Implements IComparer
+    Protected Class clsScanInfoScanNumComparer
+        Implements IComparer
 
-		Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
-			Dim udtScanInfo As udtScanInfoType
-			Dim intScanNumber As Integer
+        Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
+            Dim udtScanInfo As udtScanInfoType
+            Dim intScanNumber As Integer
 
-			udtScanInfo = DirectCast(x, udtScanInfoType)
-			intScanNumber = DirectCast(y, Integer)
+            udtScanInfo = DirectCast(x, udtScanInfoType)
+            intScanNumber = DirectCast(y, Integer)
 
-			If udtScanInfo.ScanNumber > intScanNumber Then
-				Return 1
-			ElseIf udtScanInfo.ScanNumber < intScanNumber Then
-				Return -1
-			Else
-				Return 0
-			End If
-		End Function
-	End Class
+            If udtScanInfo.ScanNumber > intScanNumber Then
+                Return 1
+            ElseIf udtScanInfo.ScanNumber < intScanNumber Then
+                Return -1
+            Else
+                Return 0
+            End If
+        End Function
+    End Class
 
-	Protected Class clsMZBinListComparer
-		Implements IComparer
+    Protected Class clsMZBinListComparer
+        Implements IComparer
 
-		Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
-			Dim udtMZBinListA As udtMZBinListType
-			Dim udtMZBinListB As udtMZBinListType
+        Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
+            Dim udtMZBinListA As udtMZBinListType
+            Dim udtMZBinListB As udtMZBinListType
 
-			udtMZBinListA = DirectCast(x, udtMZBinListType)
-			udtMZBinListB = DirectCast(y, udtMZBinListType)
+            udtMZBinListA = DirectCast(x, udtMZBinListType)
+            udtMZBinListB = DirectCast(y, udtMZBinListType)
 
-			If udtMZBinListA.MZ > udtMZBinListB.MZ Then
-				Return 1
-			ElseIf udtMZBinListA.MZ < udtMZBinListB.MZ Then
-				Return -1
-			Else
-				Return 0
-			End If
-		End Function
-	End Class
+            If udtMZBinListA.MZ > udtMZBinListB.MZ Then
+                Return 1
+            ElseIf udtMZBinListA.MZ < udtMZBinListB.MZ Then
+                Return -1
+            Else
+                Return 0
+            End If
+        End Function
+    End Class
 
-	Protected Class clsReportIonInfoComparer
-		Implements IComparer
+    Protected Class clsReportIonInfoComparer
+        Implements IComparer
 
-		Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
-			Dim udtIonInfoA As udtReporterIonInfoType
-			Dim udtIonInfoB As udtReporterIonInfoType
+        Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
+            Dim udtIonInfoA As udtReporterIonInfoType
+            Dim udtIonInfoB As udtReporterIonInfoType
 
-			udtIonInfoA = DirectCast(x, udtReporterIonInfoType)
-			udtIonInfoB = DirectCast(y, udtReporterIonInfoType)
+            udtIonInfoA = DirectCast(x, udtReporterIonInfoType)
+            udtIonInfoB = DirectCast(y, udtReporterIonInfoType)
 
-			If udtIonInfoA.MZ > udtIonInfoB.MZ Then
-				Return 1
-			ElseIf udtIonInfoA.MZ < udtIonInfoB.MZ Then
-				Return -1
-			Else
-				Return 0
-			End If
-		End Function
-	End Class
+            If udtIonInfoA.MZ > udtIonInfoB.MZ Then
+                Return 1
+            ElseIf udtIonInfoA.MZ < udtIonInfoB.MZ Then
+                Return -1
+            Else
+                Return 0
+            End If
+        End Function
+    End Class
 
-	Private Sub mXcaliburAccessor_ReportError(strMessage As String) Handles mXcaliburAccessor.ReportError
-		Console.WriteLine(strMessage)
-		LogErrors("XcaliburAccessor", strMessage, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
-	End Sub
+    Private Sub mXcaliburAccessor_ReportError(strMessage As String) Handles mXcaliburAccessor.ReportError
+        Console.WriteLine(strMessage)
+        LogErrors("XcaliburAccessor", strMessage, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
+    End Sub
 
-	Private Sub mXcaliburAccessor_ReportWarning(strMessage As String) Handles mXcaliburAccessor.ReportWarning
-		Console.WriteLine(strMessage)
-		LogErrors("XcaliburAccessor", strMessage, Nothing, False, False, eMasicErrorCodes.InputFileDataReadError)
-	End Sub
+    Private Sub mXcaliburAccessor_ReportWarning(strMessage As String) Handles mXcaliburAccessor.ReportWarning
+        Console.WriteLine(strMessage)
+        LogErrors("XcaliburAccessor", strMessage, Nothing, False, False, eMasicErrorCodes.InputFileDataReadError)
+    End Sub
 End Class
