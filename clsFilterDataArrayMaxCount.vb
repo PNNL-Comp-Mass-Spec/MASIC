@@ -142,7 +142,7 @@ Public Class clsFilterDataArrayMaxCount
 
     Private Sub FilterDataByMaxDataCountToKeep()
 
-        Const HISTOGRAM_BIN_COUNT As Integer = 5000
+        Const HISTOGRAM_BIN_COUNT = 5000
 
         Dim intIndex As Integer
         Dim intPointTotal As Integer

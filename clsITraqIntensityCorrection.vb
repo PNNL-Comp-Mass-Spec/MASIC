@@ -102,15 +102,15 @@ Public Class clsITraqIntensityCorrection
 		Dim intDataCount As Integer = sngReporterIonIntensites.Count - 1
 
 		ReDim dblOriginalIntensities(intDataCount)
-		For intIndex As Integer = 0 To intDataCount
-			dblOriginalIntensities(intIndex) = sngReporterIonIntensites(intIndex)
-		Next
+        For intIndex = 0 To intDataCount
+            dblOriginalIntensities(intIndex) = sngReporterIonIntensites(intIndex)
+        Next
 
-		If ApplyCorrection(dblOriginalIntensities) Then
-			For intIndex As Integer = 0 To intDataCount
-				sngReporterIonIntensites(intIndex) = CSng(dblOriginalIntensities(intIndex))
-			Next
-			Return True
+        If ApplyCorrection(dblOriginalIntensities) Then
+            For intIndex = 0 To intDataCount
+                sngReporterIonIntensites(intIndex) = CSng(dblOriginalIntensities(intIndex))
+            Next
+            Return True
 		Else
 			Return False
 		End If

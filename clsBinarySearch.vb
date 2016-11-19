@@ -375,7 +375,7 @@ Public Class clsBinarySearch
     End Function
 
     Public Sub TestSearchFunctionsInt()
-        Const DATA_MODE_COUNT As Integer = 3
+        Const DATA_MODE_COUNT = 3
 
         Dim intDataList() As Integer
         Dim intSearchResults(,) As Integer
@@ -478,7 +478,7 @@ Public Class clsBinarySearch
     End Sub
 
     Public Sub TestSearchFunctionsDbl()
-        Const DATA_MODE_COUNT As Integer = 3
+        Const DATA_MODE_COUNT = 3
 
         Dim dblDataList() As Double
         Dim dblSearchResults(,) As Double

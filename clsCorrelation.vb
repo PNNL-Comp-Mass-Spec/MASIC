@@ -131,9 +131,9 @@ Friend Class clsCorrelation
 
     Private Function BetaCF(ByVal a As Double, ByVal b As Double, ByVal x As Double) As Double
 
-        Dim MAXIT As Integer = 100
-        Dim EPS As Double = 0.0000003
-        Dim FPMIN As Double = 1.0E-30
+        Dim MAXIT = 100
+        Dim EPS = 0.0000003
+        Dim FPMIN = 1.0E-30
 
         Dim m, m2 As Integer
         Dim aa, c, d, del, h, qab, qam, qap As Double
@@ -391,7 +391,7 @@ Friend Class clsCorrelation
         ' Note: We're passing the Data Lists ByRef for performance reasons; they are not modified by this function
 
         '  TINY is used to "regularize" the unusual case of complete correlation
-        Dim TINY As Double = 1.0E-20
+        Dim TINY = 1.0E-20
 
         ' Given two arrays x[1..n] and y[1..n], this routine computes their correlation coeffcient
         ' r (returned as r), the signicance level at which the null hypothesis of zero correlation is
@@ -401,11 +401,11 @@ Friend Class clsCorrelation
         Dim n As Integer
         Dim j As Integer
         Dim yt, xt, t, df As Double
-        Dim syy As Double = 0.0
-        Dim sxy As Double = 0.0
-        Dim sxx As Double = 0.0
-        Dim ay As Double = 0.0
-        Dim ax As Double = 0.0
+        Dim syy = 0.0
+        Dim sxy = 0.0
+        Dim sxx = 0.0
+        Dim ay = 0.0
+        Dim ax = 0.0
 
         RValue = 0
         ProbOfSignificance = 0
@@ -465,7 +465,7 @@ Friend Class clsCorrelation
         Dim n2 As Long = 0
         Dim n1 As Long = 0
         Dim k, j As Integer
-        Dim intIS As Integer = 0
+        Dim intIS = 0
 
         Dim svar, aa, a2, a1 As Double
 
@@ -625,8 +625,8 @@ Friend Class clsCorrelation
         z = Math.Abs(x)
         t = 1.0 / (1.0 + 0.5 * z)
 
-        ans = t * Math.Exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + _
-                             t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + _
+        ans = t * Math.Exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
+                             t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
                              t * (-0.82215223 + t * 0.17087277)))))))))
 
         If x >= 0.0 Then

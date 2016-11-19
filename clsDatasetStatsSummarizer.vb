@@ -303,7 +303,7 @@ Namespace DSSummarizer
         Protected Function ComputeMedian(ByRef dblList() As Double, intItemCount As Integer) As Double
 
             Dim lstData = New List(Of Double)(intItemCount)
-            For i As Integer = 0 To intItemCount - 1
+            For i = 0 To intItemCount - 1
                 lstData.Add(dblList(i))
             Next
 

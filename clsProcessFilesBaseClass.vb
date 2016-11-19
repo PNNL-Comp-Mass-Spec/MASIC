@@ -419,7 +419,7 @@ Public MustInherit Class clsProcessFilesBaseClass
                 intFileProcessFailCount = 0
 
                 ' Call RecurseFoldersWork
-                Const intRecursionLevel As Integer = 1
+                Const intRecursionLevel = 1
                 blnSuccess = RecurseFoldersWork(strInputFolderPath, strInputFilePathOrFolder, strOutputFolderName, _
                   strParameterFilePath, strOutputFolderAlternatePath, _
                   blnRecreateFolderHierarchyInAlternatePath, strExtensionsToParse, _

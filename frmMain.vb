@@ -827,8 +827,8 @@ Public Class frmMain
 
         Dim intLineIndex As Integer
 
-        Dim LineDelimiters() As Char = New Char() {ControlChars.Cr, ControlChars.Lf}
-        Dim ColumnDelimiters() As Char = New Char() {ControlChars.Tab, ","c}
+        Dim LineDelimiters = New Char() {ControlChars.Cr, ControlChars.Lf}
+        Dim ColumnDelimiters = New Char() {ControlChars.Tab, ","c}
 
         Dim dblMZToleranceDa As Double
         Dim sngScanOrAcqTimeTolerance As Single

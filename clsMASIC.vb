@@ -1579,7 +1579,7 @@ Public Class clsMASIC
 
         Dim intIndex As Integer
 
-        Dim intScanOrAcqTimeSumCount As Integer = 0
+        Dim intScanOrAcqTimeSumCount = 0
         Dim sngScanOrAcqTimeSumForAveraging As Single = 0
 
         Try
@@ -1685,7 +1685,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function AddFakeSurveyScan(ByRef udtScanList As udtScanListType) As Integer
-        Const intScanNumber As Integer = 0
+        Const intScanNumber = 0
         Const sngScanTime As Single = 0
 
         Return AddFakeSurveyScan(udtScanList, intScanNumber, sngScanTime)
@@ -1834,8 +1834,8 @@ Public Class clsMASIC
       objSpectraCache As clsSpectraCache,
       udtSICOptions As udtSICOptionsType)
 
-        Const MINIMUM_TOLERANCE_PPM As Double = 0.01
-        Const MINIMUM_TOLERANCE_DA As Double = 0.0001
+        Const MINIMUM_TOLERANCE_PPM = 0.01
+        Const MINIMUM_TOLERANCE_DA = 0.0001
 
         ' Checks to see if the parent ion specified by intSurveyScanIndex and dblParentIonMZ exists in .ParentIons()
         ' If dblMRMDaughterMZ is > 0, then also considers that value when determining uniqueness
@@ -2532,7 +2532,7 @@ Public Class clsMASIC
             Dim objCorrelate As New clsCorrelation
             objCorrelate.SetBinningOptions(udtBinningOptions)
 
-            Const eCorrelationMethod As clsCorrelation.cmCorrelationMethodConstants = clsCorrelation.cmCorrelationMethodConstants.Pearson
+            Const eCorrelationMethod = clsCorrelation.cmCorrelationMethodConstants.Pearson
 
             ' Bin the data in the first spectrum
             blnSuccess = CompareSpectraBinData(objCorrelate, udtFragSpectrum1, udtBinnedSpectrum1)
@@ -2570,7 +2570,7 @@ Public Class clsMASIC
 
 
         ' Make a copy of the data, excluding any Reporter Ion data
-        Dim filteredDataCount As Integer = 0
+        Dim filteredDataCount = 0
         ReDim sngXData(udtFragSpectrum.IonCount - 1)
         ReDim sngYData(udtFragSpectrum.IonCount - 1)
 
@@ -3200,17 +3200,22 @@ Public Class clsMASIC
       blnCustomSICPeak As Boolean,
       sngCustomSICPeakScanOrAcqTimeTolerance As Single) As Boolean
 
-        Const MINIMUM_NOISE_SCANS_TO_INCLUDE As Integer = 10             ' Minimum number of scans to extend left or right of the scan that meets the minimum intensity threshold requirement
+        ' Minimum number of scans to extend left or right of the scan that meets the minimum intensity threshold requirement
+        Const MINIMUM_NOISE_SCANS_TO_INCLUDE = 10
 
         Dim sngCustomSICScanToleranceMinutesHalfWidth As Single
 
-        Dim intScanIndexStart As Integer, intScanIndexEnd As Integer    ' Pointers to entries in intFullSICScanIndices() and sngFullSICIntensities()
+        ' Pointers to entries in intFullSICScanIndices() and sngFullSICIntensities()
+        Dim intScanIndexStart As Integer, intScanIndexEnd As Integer
 
         Dim intScanIndexMax As Integer
         Dim intScanIndex As Integer
 
-        Dim intScanIndexBelowThresholdLeft As Integer                   ' The index of the first scan found to be below threshold (on the left)
-        Dim intScanIndexBelowThresholdRight As Integer                  ' The index of the first scan found to be below threshold (on the right)
+        ' The index of the first scan found to be below threshold (on the left)
+        Dim intScanIndexBelowThresholdLeft As Integer
+
+        ' The index of the first scan found to be below threshold (on the right)
+        Dim intScanIndexBelowThresholdRight As Integer
 
         Dim sngMaximumIntensity As Single
 
@@ -4407,7 +4412,7 @@ Public Class clsMASIC
       strInputFileName As String,
       strOutputFolderPath As String) As Boolean
 
-        Dim strOutputFilePath As String = "??"
+        Dim strOutputFilePath = "??"
         Dim strOutputFilePath2 As String
 
         Dim srDataOutfile As StreamWriter
@@ -5648,7 +5653,7 @@ Public Class clsMASIC
         Dim intLastSurveyScanIndex As Integer
         Dim intLastSurveyScanIndexInMasterSeqOrder As Integer
         Dim intLastNonZoomSurveyScanIndex As Integer
-        Dim intWarnCount As Integer = 0
+        Dim intWarnCount = 0
 
         Dim eMRMScanType As MRMScanTypeConstants
 
@@ -6560,7 +6565,7 @@ Public Class clsMASIC
 
         Const cColDelimiter As Char = ControlChars.Tab
 
-        Dim strOutputFilePath As String = "??"
+        Dim strOutputFilePath = "??"
 
         Dim srOutFile As StreamWriter
 
@@ -6730,7 +6735,7 @@ Public Class clsMASIC
       cColDelimiter As Char,
       blnSaveUncorrectedIntensities As Boolean)
 
-        Const USE_MAX_ABUNDANCE_IN_WINDOW As Boolean = True
+        Const USE_MAX_ABUNDANCE_IN_WINDOW = True
 
         Static objITraqIntensityCorrector As New clsITraqIntensityCorrection(eReporterIonMassModeConstants.ITraqEightMZHighRes, clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
 
