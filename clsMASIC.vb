@@ -34,6 +34,7 @@ Option Strict On
 Imports ThermoRawFileReader
 Imports PNNLOmics.Utilities
 Imports System.Runtime.InteropServices
+Imports PNNLOmics.Data
 
 Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
@@ -151,11 +152,6 @@ Public Class clsMASIC
         UnspecifiedError = -1
     End Enum
 
-    Protected Enum eScanTypeConstants
-        SurveyScan = 0
-        FragScan = 1
-    End Enum
-
     Protected Enum eOutputFileTypeConstants
         XMLFile = 0
         ScanStatsFlatFile = 1
@@ -251,21 +247,10 @@ Public Class clsMASIC
         Public SpectrumSimilarityMinimum As Single              ' 0.8
     End Structure
 
-    Protected Structure udtSICStatsType
-        Public Peak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
-
-        Public ScanTypeForPeakIndices As eScanTypeConstants
-        Public PeakScanIndexStart As Integer              ' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-        Public PeakScanIndexEnd As Integer                ' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-        Public PeakScanIndexMax As Integer                ' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-
-        Public SICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-    End Structure
-
     Protected Structure udtSICStatsDetailsType
         Public SICDataCount As Integer
 
-        Public SICScanType As eScanTypeConstants            ' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
+        Public SICScanType As clsScanList.eScanTypeConstants            ' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
         Public SICScanIndices() As Integer                  ' This array is necessary since SIMScan data uses non-adjacent survey scans
 
         Public SICScanNumbers() As Integer                  ' Populated as a convenience since necessary to pass to various functions
@@ -287,94 +272,6 @@ Public Class clsMASIC
 
     End Structure
 
-    Protected Structure udtParentIonInfoType
-        Public MZ As Double                                 ' m/z value
-        Public SurveyScanIndex As Integer                   ' Survey scan that this parent ion was observed in; Pointer to entry in .SurveyScans(); For custom SIC values, this is the closest survey scan to .ScanCenter
-        Public OptimalPeakApexScanNumber As Integer         ' Scan number of the peak apex for this parent ion; originally the scan number of the first fragmentation spectrum; later updated to the scan number of the SIC data Peak apex; possibly updated later in FindSimilarParentIons()
-        Public PeakApexOverrideParentIonIndex As Integer    ' If OptimalPeakApexScanNumber is inherited from another parent ion, then this is set to that parent ion's index; otherwise, this is -1
-        Public FragScanIndexCount As Integer                ' Number of fragmentation scans attributable to this parent ion; normally just 1; for custom SIC values, there are no associated fragmentation scans, but we still set this value to 1
-        Public FragScanIndices() As Integer                 ' Pointers to entries in .FragScans(); for custom SIC values, points to the next MS2 scan that occurs after the ScanCenter search value
-        Public SICStats As udtSICStatsType
-        Public CustomSICPeak As Boolean                     ' True if this is a custom SIC-based parent ion
-        Public CustomSICPeakComment As String               ' Only applies to custom SIC-based parent ions
-        Public CustomSICPeakMZToleranceDa As Double         ' Only applies to custom SIC-based parent ions
-        Public CustomSICPeakScanOrAcqTimeTolerance As Single         ' Only applies to custom SIC-based parent ions
-        Public MRMDaughterMZ As Double                      ' Only applicable to MRM scans
-        Public MRMToleranceHalfWidth As Double              ' Only applicable to MRM scans
-    End Structure
-
-    Protected Structure udtMRMScanInfoType
-        Public ParentIonMZ As Double
-        Public MRMMassCount As Integer                      ' List of mass ranges monitored by the first quadrupole
-        Public MRMMassList As List(Of udtMRMMassRangeType)  ' Daughter m/z values monitored for this parent m/z
-        Public ScanCount As Integer                         ' Number of spectra that used these MRM search values
-        Public ParentIonInfoIndex As Integer
-    End Structure
-
-    Protected Structure FragScanInfoType
-        Public ParentIonInfoIndex As Integer                ' Pointer to an entry in the ParentIons() array; -1 if undefined
-        Public FragScanNumber As Integer                    ' Usually 1, 2, or 3
-        Public MSLevel As Integer                           ' 2 for MS/MS, 3 for MS/MS/MS
-        Public CollisionMode As String
-    End Structure
-
-    Protected Structure udtScanInfoType
-        Public ScanNumber As Integer                        ' Ranges from 1 to the number of scans in the datafile
-        Public ScanTime As Single                           ' Retention (elution) Time (in minutes)
-        Public ScanHeaderText As String                     ' String description of the scan mode for the given scan; only used for Finnigan .Raw files; typical values are: FTMS + p NSI Full ms, ITMS + c ESI Full ms, ITMS + p ESI d Z ms, ITMS + c NSI d Full ms2, ITMS + c NSI d Full ms2, ITMS + c NSI d Full ms2, FTMS + c NSI d Full ms2, ITMS + c NSI d Full ms3
-        Public ScanTypeName As String                       ' Typical values: MS, HMS, Zoom, CID-MSn, or PQD-MSn
-        Public BasePeakIonMZ As Double                      ' mz of the most intense ion in this scan
-        Public BasePeakIonIntensity As Single               ' intensity of the most intense ion in this scan
-        Public TotalIonIntensity As Single                  ' intensity of all of the ions for this scan
-        Public MinimumPositiveIntensity As Single           ' minimum intensity > 0 in this scan
-
-        Public ZoomScan As Boolean                          ' True if the scan is a Zoom scan
-        Public SIMScan As Boolean                           ' True if the scan was a SIM scan
-        Public MRMScanType As MRMScanTypeConstants
-        Public SIMIndex As Integer                          ' For SIM scans, allows one to quickly find all of the SIM scans with the same mass range, since they'll all have the same SIMIndex
-        Public LowMass As Double                            ' Useful for SIMScans to find similar SIM scans
-        Public HighMass As Double                           ' Useful for SIMScans to find similar SIM scans
-
-        Public FragScanInfo As FragScanInfoType             ' Information specific to fragmentation scans
-        Public MRMScanInfo As udtMRMScanInfoType            ' Information specific to MRM/SRM scans
-
-        ' Keys are ID values pointing to mExtendedHeaderInfo (where the name is defined); values are the string or numeric values for the settings
-        Public ExtendedHeaderInfo As Dictionary(Of Integer, String)
-
-        ' Note: the mass spectral data for this scan is tracked by a clsSpectraCache object
-        Public IonCount As Integer
-        Public IonCountRaw As Integer
-
-        Public BaselineNoiseStats As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseStatsType            ' Intensity level of the noise in the MS data for this scan
-
-    End Structure
-
-    Protected Structure udtScanOrderPointerType
-        Public ScanType As eScanTypeConstants
-        Public ScanIndexPointer As Integer                  ' Pointer to entry into udtScanList.SurveyScans() or udtScanList.FragScans()
-    End Structure
-
-    ' Note: We're keeping the Survey Scans separate from the Fragmentation Scans to make the creation of the
-    '         survey scan based SIC's easier (and faster)
-    '       The MasterScanOrder array allows us to step through the data scan-by-scan, using both SurveyScans and FragScans
-    Protected Structure udtScanListType
-        Public SurveyScanCount As Integer
-        Public SurveyScans() As udtScanInfoType                 ' 0-based array, holding survey scans, the order is the same as in the original data file, and thus is by increasing scan number
-        Public FragScanCount As Integer
-        Public FragScans() As udtScanInfoType                   ' 0-based array, holding fragmentation scans, the order is the same as in the original data file, and thus is by increasing scan number
-
-        Public MasterScanOrderCount As Integer
-        Public MasterScanOrder() As udtScanOrderPointerType     ' 0-based array, holding pointers to either the SurveyScans() or FragScans() arrays, in order of scan number
-        Public MasterScanNumList() As Integer                   ' 0-based array; parallel to MasterScanOrder
-        Public MasterScanTimeList() As Single                   ' 0-based array; parallel to MasterScanOrder
-
-        Public ParentIonInfoCount As Integer
-        Public ParentIons() As udtParentIonInfoType             ' 0-based array, ranging from 0 to ParentIonInfoCount-1
-        Public ProcessingIncomplete As Boolean                  ' Set to true if the user cancels any of the processing steps
-        Public SIMDataPresent As Boolean
-        Public MRMDataPresent As Boolean
-    End Structure
-
     Protected Structure udtBinnedDataType
         Public BinnedDataStartX As Single
         Public BinSize As Single
@@ -393,29 +290,6 @@ Public Class clsMASIC
         Public ParentIonIndexMaxPeakArea As Integer     ' Pointer to an entry in .ParentIons()
         Public MatchCount As Integer
         Public MatchIndices() As Integer            ' Pointer to an entry in .ParentIons()
-    End Structure
-
-    Protected Structure udtFindPeaksDataType
-
-        Public OriginalPeakLocationIndex As Integer
-
-        Public SourceDataCount As Integer
-        Public XData() As Double
-        Public YData() As Double
-        Public SmoothedYData() As Double
-
-        Public PeakCount As Integer
-        Public PeakLocs() As Integer
-        Public PeakEdgesLeft() As Integer
-        Public PeakEdgesRight() As Integer
-        Public PeakAreas() As Double
-        Public PeakIsValid() As Boolean
-
-        Public PeakWidthPointsMinimum As Integer
-        Public MaxAllowedUpwardSpikeFractionMax As Single
-        Public BestPeakIndex As Integer
-        Public BestPeakArea As Single
-
     End Structure
 
     Protected Structure udtFindSimilarIonsDataType
@@ -1572,7 +1446,7 @@ Public Class clsMASIC
 #End Region
 
     Private Sub AddCustomSICValues(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       dblDefaultSICTolerance As Double,
       blnSICToleranceIsPPM As Boolean,
       sngDefaultScanOrAcqTimeTolerance As Single)
@@ -1584,90 +1458,89 @@ Public Class clsMASIC
 
         Try
             If mCustomSICList.CustomMZSearchValues.Length > 0 Then
-                ReDim Preserve udtScanList.ParentIons(udtScanList.ParentIonInfoCount + mCustomSICList.CustomMZSearchValues.Length - 1)
+                ReDim Preserve scanList.ParentIons(scanList.ParentIonInfoCount + mCustomSICList.CustomMZSearchValues.Length - 1)
 
                 For intIndex = 0 To mCustomSICList.CustomMZSearchValues.Length - 1
 
                     ' Add a new parent ion entry to .ParentIons() for this custom MZ value
-                    With udtScanList
-                        With .ParentIons(.ParentIonInfoCount)
-                            .MZ = mCustomSICList.CustomMZSearchValues(intIndex).MZ
+                    Dim currentParentIon = scanList.ParentIons(scanList.ParentIonInfoCount)
+                    currentParentIon.MZ = mCustomSICList.CustomMZSearchValues(intIndex).MZ
 
-                            If mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeCenter < Single.Epsilon Then
-                                ' Set the SurveyScanIndex to the center of the analysis
-                                .SurveyScanIndex = FindNearestSurveyScanIndex(udtScanList, 0.5, eCustomSICScanTypeConstants.Relative)
-                            Else
-                                .SurveyScanIndex = FindNearestSurveyScanIndex(udtScanList, mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeCenter, mCustomSICList.ScanToleranceType)
-                            End If
+                    If mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeCenter < Single.Epsilon Then
+                        ' Set the SurveyScanIndex to the center of the analysis
+                        currentParentIon.SurveyScanIndex = FindNearestSurveyScanIndex(scanList, 0.5, eCustomSICScanTypeConstants.Relative)
+                    Else
+                        currentParentIon.SurveyScanIndex = FindNearestSurveyScanIndex(scanList, mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeCenter, mCustomSICList.ScanToleranceType)
+                    End If
 
-                            ' Find the next MS2 scan that occurs after the survey scan (parent scan)
-                            Dim surveyScanNumberAbsolute = 0
-                            If .SurveyScanIndex < udtScanList.SurveyScanCount Then
-                                surveyScanNumberAbsolute = udtScanList.SurveyScans(.SurveyScanIndex).ScanNumber + 1
-                            End If
+                    ' Find the next MS2 scan that occurs after the survey scan (parent scan)
+                    Dim surveyScanNumberAbsolute = 0
+                    If currentParentIon.SurveyScanIndex < scanList.SurveyScanCount Then
+                        surveyScanNumberAbsolute = scanList.SurveyScans(currentParentIon.SurveyScanIndex).ScanNumber + 1
+                    End If
 
-                            If udtScanList.MasterScanOrderCount = 0 Then
-                                ReDim .FragScanIndices(0)
-                                .FragScanIndices(0) = 0
-                            Else
-                                Dim fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanNumList, surveyScanNumberAbsolute, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+                    If scanList.MasterScanOrderCount = 0 Then
+                        ReDim currentParentIon.FragScanIndices(0)
+                        currentParentIon.FragScanIndices(0) = 0
+                    Else
+                        Dim fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
 
-                                While fragScanIndexMatch < udtScanList.MasterScanOrderCount AndAlso udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.SurveyScan
-                                    fragScanIndexMatch += 1
-                                End While
+                        While fragScanIndexMatch < scanList.MasterScanOrderCount AndAlso scanList.MasterScanOrder(fragScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.SurveyScan
+                            fragScanIndexMatch += 1
+                        End While
 
-                                If fragScanIndexMatch = udtScanList.MasterScanOrderCount Then
-                                    ' Did not find the next frag scan; find the previous frag scan
-                                    fragScanIndexMatch -= 1
-                                    While fragScanIndexMatch > 0 AndAlso udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.SurveyScan
-                                        fragScanIndexMatch -= 1
-                                    End While
-                                    If fragScanIndexMatch < 0 Then fragScanIndexMatch = 0
-                                End If
-
-                                ' This is a custom SIC-based parent ion
-                                ' Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
-                                ' This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
-                                ReDim .FragScanIndices(0)
-                                If udtScanList.MasterScanOrder(fragScanIndexMatch).ScanType = eScanTypeConstants.FragScan Then
-                                    .FragScanIndices(0) = udtScanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer
-                                Else
-                                    .FragScanIndices(0) = 0
-                                End If
-                            End If
-
-                            .FragScanIndexCount = 1
-                            .CustomSICPeak = True
-                            .CustomSICPeakComment = mCustomSICList.CustomMZSearchValues(intIndex).Comment
-                            .CustomSICPeakMZToleranceDa = mCustomSICList.CustomMZSearchValues(intIndex).MZToleranceDa
-                            .CustomSICPeakScanOrAcqTimeTolerance = mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeTolerance
-
-                            If .CustomSICPeakMZToleranceDa < Double.Epsilon Then
-                                If blnSICToleranceIsPPM Then
-                                    .CustomSICPeakMZToleranceDa = PPMToMass(dblDefaultSICTolerance, .MZ)
-                                Else
-                                    .CustomSICPeakMZToleranceDa = dblDefaultSICTolerance
-                                End If
-                            End If
-
-                            If .CustomSICPeakScanOrAcqTimeTolerance < Single.Epsilon Then
-                                .CustomSICPeakScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
-                            Else
-                                sngScanOrAcqTimeSumForAveraging += .CustomSICPeakScanOrAcqTimeTolerance
-                                intScanOrAcqTimeSumCount += 1
-                            End If
-
-                        End With
-
-                        If .ParentIons(.ParentIonInfoCount).SurveyScanIndex < .SurveyScans.Count Then
-                            .ParentIons(.ParentIonInfoCount).OptimalPeakApexScanNumber = .SurveyScans(.ParentIons(.ParentIonInfoCount).SurveyScanIndex).ScanNumber
-                        Else
-                            .ParentIons(.ParentIonInfoCount).OptimalPeakApexScanNumber = 1
+                        If fragScanIndexMatch = scanList.MasterScanOrderCount Then
+                            ' Did not find the next frag scan; find the previous frag scan
+                            fragScanIndexMatch -= 1
+                            While fragScanIndexMatch > 0 AndAlso scanList.MasterScanOrder(fragScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.SurveyScan
+                                fragScanIndexMatch -= 1
+                            End While
+                            If fragScanIndexMatch < 0 Then fragScanIndexMatch = 0
                         End If
 
-                        .ParentIons(.ParentIonInfoCount).PeakApexOverrideParentIonIndex = -1
-                        .ParentIonInfoCount += 1
-                    End With
+                        ' This is a custom SIC-based parent ion
+                        ' Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
+                        ' This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
+                        ReDim currentParentIon.FragScanIndices(0)
+                        If scanList.MasterScanOrder(fragScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.FragScan Then
+                            currentParentIon.FragScanIndices(0) = scanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer
+                        Else
+                            currentParentIon.FragScanIndices(0) = 0
+                        End If
+                    End If
+
+                    currentParentIon.FragScanIndexCount = 1
+                    currentParentIon.CustomSICPeak = True
+                    currentParentIon.CustomSICPeakComment = mCustomSICList.CustomMZSearchValues(intIndex).Comment
+                    currentParentIon.CustomSICPeakMZToleranceDa = mCustomSICList.CustomMZSearchValues(intIndex).MZToleranceDa
+                    currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = mCustomSICList.CustomMZSearchValues(intIndex).ScanOrAcqTimeTolerance
+
+                    If currentParentIon.CustomSICPeakMZToleranceDa < Double.Epsilon Then
+                        If blnSICToleranceIsPPM Then
+                            currentParentIon.CustomSICPeakMZToleranceDa = PPMToMass(dblDefaultSICTolerance, currentParentIon.MZ)
+                        Else
+                            currentParentIon.CustomSICPeakMZToleranceDa = dblDefaultSICTolerance
+                        End If
+                    End If
+
+                    If currentParentIon.CustomSICPeakScanOrAcqTimeTolerance < Single.Epsilon Then
+                        currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
+                    Else
+                        sngScanOrAcqTimeSumForAveraging += currentParentIon.CustomSICPeakScanOrAcqTimeTolerance
+                        intScanOrAcqTimeSumCount += 1
+                    End If
+
+
+                    If scanList.ParentIons(scanList.ParentIonInfoCount).SurveyScanIndex < scanList.SurveyScans.Count Then
+                        scanList.ParentIons(scanList.ParentIonInfoCount).OptimalPeakApexScanNumber =
+                            scanList.SurveyScans(scanList.ParentIons(scanList.ParentIonInfoCount).SurveyScanIndex).ScanNumber
+                    Else
+                        scanList.ParentIons(scanList.ParentIonInfoCount).OptimalPeakApexScanNumber = 1
+                    End If
+
+                    scanList.ParentIons(scanList.ParentIonInfoCount).PeakApexOverrideParentIonIndex = -1
+                    scanList.ParentIonInfoCount += 1
+
 
                 Next intIndex
 
@@ -1684,70 +1557,69 @@ Public Class clsMASIC
 
     End Sub
 
-    Private Function AddFakeSurveyScan(ByRef udtScanList As udtScanListType) As Integer
+    Private Function AddFakeSurveyScan(scanList As clsScanList) As Integer
         Const intScanNumber = 0
         Const sngScanTime As Single = 0
 
-        Return AddFakeSurveyScan(udtScanList, intScanNumber, sngScanTime)
+        Return AddFakeSurveyScan(scanList, intScanNumber, sngScanTime)
     End Function
 
     Private Function AddFakeSurveyScan(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intScanNumber As Integer,
       sngScanTime As Single) As Integer
 
         ' Adds a "fake" survey scan with the given scan number and scan time
-        ' Returns the index in udtScanList.SurveyScans() at which the new scan was added
+        ' Returns the index in scanList.SurveyScans() at which the new scan was added
 
         Dim intSurveyScanIndex As Integer
 
-        With udtScanList.SurveyScans(udtScanList.SurveyScanCount)
-            .ScanNumber = intScanNumber
-            .ScanTime = sngScanTime
-            .ScanHeaderText = "Full ms"
-            .ScanTypeName = "MS"
+        Dim surveyScan = scanList.SurveyScans(scanList.SurveyScanCount)
+        surveyScan.ScanNumber = intScanNumber
+        surveyScan.ScanTime = sngScanTime
+        surveyScan.ScanHeaderText = "Full ms"
+        surveyScan.ScanTypeName = "MS"
 
-            .BasePeakIonMZ = 0
-            .BasePeakIonIntensity = 0
-            .FragScanInfo.ParentIonInfoIndex = -1                        ' Survey scans typically lead to multiple parent ions; we do not record them here
-            .TotalIonIntensity = 0
+        surveyScan.BasePeakIonMZ = 0
+        surveyScan.BasePeakIonIntensity = 0
+        surveyScan.FragScanInfo.ParentIonInfoIndex = -1                        ' Survey scans typically lead to multiple parent ions; we do not record them here
+        surveyScan.TotalIonIntensity = 0
 
-            .ZoomScan = False
-            .SIMScan = False
-            .MRMScanType = MRMScanTypeConstants.NotMRM
+        surveyScan.ZoomScan = False
+        surveyScan.SIMScan = False
+        surveyScan.MRMScanType = MRMScanTypeConstants.NotMRM
 
-            .LowMass = 0
-            .HighMass = 0
+        surveyScan.LowMass = 0
+        surveyScan.HighMass = 0
 
-            ' Store the collision mode and possibly the scan filter text
-            .FragScanInfo.CollisionMode = String.Empty
-        End With
+        ' Store the collision mode and possibly the scan filter text
+        surveyScan.FragScanInfo.CollisionMode = String.Empty
 
-        intSurveyScanIndex = udtScanList.SurveyScanCount
-        udtScanList.SurveyScanCount += 1
+        intSurveyScanIndex = scanList.SurveyScanCount
+        scanList.SurveyScanCount += 1
 
-        AddMasterScanEntry(udtScanList, eScanTypeConstants.SurveyScan, intSurveyScanIndex)
+        AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.SurveyScan, intSurveyScanIndex)
 
         Return intSurveyScanIndex
     End Function
 
-    Private Sub AddMasterScanEntry(ByRef udtScanList As udtScanListType, eScanType As eScanTypeConstants, intScanIndex As Integer)
-        ' Adds a new entry to .MasterScanOrder using an existing entry in udtScanList.SurveyScans() or udtScanList.FragScans()
+    Private Sub AddMasterScanEntry(scanList As clsScanList, eScanType As clsScanList.eScanTypeConstants, intScanIndex As Integer)
+        ' Adds a new entry to .MasterScanOrder using an existing entry in scanList.SurveyScans() or scanList.FragScans()
 
-        If eScanType = eScanTypeConstants.SurveyScan Then
-            If udtScanList.SurveyScanCount > 0 AndAlso intScanIndex < udtScanList.SurveyScanCount Then
-                AddMasterScanEntry(udtScanList, eScanType, intScanIndex, udtScanList.SurveyScans(intScanIndex).ScanNumber, udtScanList.SurveyScans(intScanIndex).ScanTime)
+        If eScanType = clsScanList.eScanTypeConstants.SurveyScan Then
+            If scanList.SurveyScanCount > 0 AndAlso intScanIndex < scanList.SurveyScanCount Then
+                AddMasterScanEntry(scanList, eScanType, intScanIndex, scanList.SurveyScans(intScanIndex).ScanNumber, scanList.SurveyScans(intScanIndex).ScanTime)
             Else
                 ' This code shouldn't normally be reached
-                AddMasterScanEntry(udtScanList, eScanType, intScanIndex, 0, 0)
+                AddMasterScanEntry(scanList, eScanType, intScanIndex, 0, 0)
             End If
 
-        ElseIf eScanType = eScanTypeConstants.FragScan Then
-            If udtScanList.FragScanCount > 0 AndAlso intScanIndex < udtScanList.FragScanCount Then
-                AddMasterScanEntry(udtScanList, eScanType, intScanIndex, udtScanList.FragScans(intScanIndex).ScanNumber, udtScanList.FragScans(intScanIndex).ScanTime)
+        ElseIf eScanType = clsScanList.eScanTypeConstants.FragScan Then
+            If scanList.FragScanCount > 0 AndAlso intScanIndex < scanList.FragScanCount Then
+                AddMasterScanEntry(scanList, eScanType, intScanIndex, scanList.FragScans(intScanIndex).ScanNumber, scanList.FragScans(intScanIndex).ScanTime)
             Else
                 ' This code shouldn't normally be reached
-                AddMasterScanEntry(udtScanList, eScanType, intScanIndex, 0, 0)
+                AddMasterScanEntry(scanList, eScanType, intScanIndex, 0, 0)
             End If
 
         Else
@@ -1758,52 +1630,50 @@ Public Class clsMASIC
     End Sub
 
     Private Sub AddMasterScanEntry(
-       ByRef udtScanList As udtScanListType,
-       eScanType As eScanTypeConstants,
+       scanList As clsScanList,
+       eScanType As clsScanList.eScanTypeConstants,
        intScanIndex As Integer,
        intScanNumber As Integer,
        sngScanTime As Single)
 
-        With udtScanList
-            If .MasterScanOrder Is Nothing Then
-                ReDim .MasterScanOrder(99)
-                ReDim .MasterScanNumList(99)
-                ReDim .MasterScanTimeList(99)
-            ElseIf .MasterScanOrderCount >= .MasterScanOrder.Length Then
-                ReDim Preserve .MasterScanOrder(.MasterScanOrderCount + 100)
-                ReDim Preserve .MasterScanNumList(.MasterScanOrder.Length - 1)
-                ReDim Preserve .MasterScanTimeList(.MasterScanOrder.Length - 1)
-            End If
+        Dim initialScanCount = scanList.MasterScanOrderCount
 
-            With .MasterScanOrder(.MasterScanOrderCount)
-                .ScanType = eScanType
-                .ScanIndexPointer = intScanIndex
-            End With
+        If scanList.MasterScanOrder Is Nothing Then
+            ReDim scanList.MasterScanOrder(99)
+            ReDim scanList.MasterScanNumList(99)
+            ReDim scanList.MasterScanTimeList(99)
+        ElseIf initialScanCount >= scanList.MasterScanOrder.Length Then
+            ReDim Preserve scanList.MasterScanOrder(initialScanCount + 100)
+            ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrder.Length - 1)
+            ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrder.Length - 1)
+        End If
 
-            .MasterScanNumList(.MasterScanOrderCount) = intScanNumber
-            .MasterScanTimeList(.MasterScanOrderCount) = sngScanTime
+        scanList.MasterScanOrder(initialScanCount).ScanType = eScanType
+        scanList.MasterScanOrder(initialScanCount).ScanIndexPointer = intScanIndex
 
-            .MasterScanOrderCount += 1
-        End With
+        scanList.MasterScanNumList(initialScanCount) = intScanNumber
+        scanList.MasterScanTimeList(initialScanCount) = sngScanTime
+
+        scanList.MasterScanOrderCount += 1
 
     End Sub
 
     Private Sub AddUpdateParentIons(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intSurveyScanIndex As Integer,
       dblParentIonMZ As Double,
       intFragScanIndex As Integer,
       objSpectraCache As clsSpectraCache,
       udtSICOptions As udtSICOptionsType)
 
-        AddUpdateParentIons(udtScanList, intSurveyScanIndex, dblParentIonMZ, 0, 0, intFragScanIndex, objSpectraCache, udtSICOptions)
+        AddUpdateParentIons(scanList, intSurveyScanIndex, dblParentIonMZ, 0, 0, intFragScanIndex, objSpectraCache, udtSICOptions)
     End Sub
 
     Private Sub AddUpdateParentIons(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intSurveyScanIndex As Integer,
       dblParentIonMZ As Double,
-      ByRef udtMRMInfo As udtMRMScanInfoType,
+      mrmInfo As clsMRMScanInfo,
       objSpectraCache As clsSpectraCache,
       ByRef udtSICOptions As udtSICOptionsType)
 
@@ -1812,20 +1682,20 @@ Public Class clsMASIC
         Dim dblMRMToleranceHalfWidth As Double
 
 
-        For intMRMIndex = 0 To udtMRMInfo.MRMMassCount - 1
-            dblMRMDaughterMZ = udtMRMInfo.MRMMassList(intMRMIndex).CentralMass
-            dblMRMToleranceHalfWidth = Math.Round((udtMRMInfo.MRMMassList(intMRMIndex).EndMass - udtMRMInfo.MRMMassList(intMRMIndex).StartMass) / 2, 6)
+        For intMRMIndex = 0 To mrmInfo.MRMMassCount - 1
+            dblMRMDaughterMZ = mrmInfo.MRMMassList(intMRMIndex).CentralMass
+            dblMRMToleranceHalfWidth = Math.Round((mrmInfo.MRMMassList(intMRMIndex).EndMass - mrmInfo.MRMMassList(intMRMIndex).StartMass) / 2, 6)
             If dblMRMToleranceHalfWidth < 0.001 Then
                 dblMRMToleranceHalfWidth = 0.001
             End If
 
-            AddUpdateParentIons(udtScanList, intSurveyScanIndex, dblParentIonMZ, dblMRMDaughterMZ, dblMRMToleranceHalfWidth, udtScanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
+            AddUpdateParentIons(scanList, intSurveyScanIndex, dblParentIonMZ, dblMRMDaughterMZ, dblMRMToleranceHalfWidth, scanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
         Next intMRMIndex
 
     End Sub
 
     Private Sub AddUpdateParentIons(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intSurveyScanIndex As Integer,
       dblParentIonMZ As Double,
       dblMRMDaughterMZ As Double,
@@ -1842,7 +1712,7 @@ Public Class clsMASIC
         ' 
         ' If the parent ion entry already exists, then adds an entry to .FragScanIndices()
         ' If it does not exist, then adds a new entry to .ParentIons()
-        ' Note that typically intFragScanIndex will equal udtScanList.FragScanCount - 1
+        ' Note that typically intFragScanIndex will equal scanList.FragScanCount - 1
 
         ' If intSurveyScanIndex < 0 then the first scan(s) in the file occurred before we encountered a survey scan
         ' In this case, we cannot properly associate the fragmentation scan with a survey scan
@@ -1885,11 +1755,11 @@ Public Class clsMASIC
 
             dblParentIonToleranceDa = GetParentIonToleranceDa(udtSICOptions, dblParentIonMZ, dblParentIonTolerance)
 
-            For intParentIonIndex = udtScanList.ParentIonInfoCount - 1 To 0 Step -1
-                If udtScanList.ParentIons(intParentIonIndex).SurveyScanIndex >= intSurveyScanIndex Then
-                    If Math.Abs(udtScanList.ParentIons(intParentIonIndex).MZ - dblParentIonMZ) <= dblParentIonToleranceDa Then
+            For intParentIonIndex = scanList.ParentIonInfoCount - 1 To 0 Step -1
+                If scanList.ParentIons(intParentIonIndex).SurveyScanIndex >= intSurveyScanIndex Then
+                    If Math.Abs(scanList.ParentIons(intParentIonIndex).MZ - dblParentIonMZ) <= dblParentIonToleranceDa Then
                         If dblMRMDaughterMZ < Double.Epsilon OrElse
-                          Math.Abs(udtScanList.ParentIons(intParentIonIndex).MRMDaughterMZ - dblMRMDaughterMZ) <= dblParentIonToleranceDa Then
+                          Math.Abs(scanList.ParentIons(intParentIonIndex).MRMDaughterMZ - dblMRMDaughterMZ) <= dblParentIonToleranceDa Then
                             blnMatchFound = True
                             Exit For
                         End If
@@ -1905,7 +1775,7 @@ Public Class clsMASIC
             ' Add a new parent ion entry to .ParentIons(), but only if intSurveyScanIndex >= 0
 
             If intSurveyScanIndex >= 0 Then
-                With udtScanList
+                With scanList
                     If .ParentIonInfoCount >= .ParentIons.Length Then
                         ReDim Preserve .ParentIons(.ParentIonInfoCount + 100)
                         For intIndex = .ParentIonInfoCount To .ParentIons.Length - 1
@@ -1945,7 +1815,7 @@ Public Class clsMASIC
             ' However, do not add a new entry if this is an MRM scan
 
             If dblMRMDaughterMZ < Double.Epsilon Then
-                With udtScanList
+                With scanList
                     With .ParentIons(intParentIonIndex)
                         ReDim Preserve .FragScanIndices(.FragScanIndexCount)
                         .FragScanIndices(.FragScanIndexCount) = intFragScanIndex
@@ -1959,12 +1829,12 @@ Public Class clsMASIC
     End Sub
 
     Private Sub AppendParentIonToUniqueMZEntry(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intParentIonIndex As Integer,
       ByRef udtMZListEntry As udtUniqueMZListType,
       dblSearchMZOffset As Double)
 
-        With udtScanList.ParentIons(intParentIonIndex)
+        With scanList.ParentIons(intParentIonIndex)
             If udtMZListEntry.MatchCount = 0 Then
                 udtMZListEntry.MZAvg = .MZ - dblSearchMZOffset
                 udtMZListEntry.MatchCount = 1
@@ -1983,12 +1853,12 @@ Public Class clsMASIC
             With .SICStats
                 If .Peak.MaxIntensityValue > udtMZListEntry.MaxIntensity OrElse udtMZListEntry.MatchCount = 1 Then
                     udtMZListEntry.MaxIntensity = .Peak.MaxIntensityValue
-                    If .ScanTypeForPeakIndices = eScanTypeConstants.FragScan Then
-                        udtMZListEntry.ScanNumberMaxIntensity = udtScanList.FragScans(.PeakScanIndexMax).ScanNumber
-                        udtMZListEntry.ScanTimeMaxIntensity = udtScanList.FragScans(.PeakScanIndexMax).ScanTime
+                    If .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
+                        udtMZListEntry.ScanNumberMaxIntensity = scanList.FragScans(.PeakScanIndexMax).ScanNumber
+                        udtMZListEntry.ScanTimeMaxIntensity = scanList.FragScans(.PeakScanIndexMax).ScanTime
                     Else
-                        udtMZListEntry.ScanNumberMaxIntensity = udtScanList.SurveyScans(.PeakScanIndexMax).ScanNumber
-                        udtMZListEntry.ScanTimeMaxIntensity = udtScanList.SurveyScans(.PeakScanIndexMax).ScanTime
+                        udtMZListEntry.ScanNumberMaxIntensity = scanList.SurveyScans(.PeakScanIndexMax).ScanNumber
+                        udtMZListEntry.ScanTimeMaxIntensity = scanList.SurveyScans(.PeakScanIndexMax).ScanTime
                     End If
                     udtMZListEntry.ParentIonIndexMaxIntensity = intParentIonIndex
                 End If
@@ -2439,7 +2309,7 @@ Public Class clsMASIC
     End Function
 
     Private Function CompareFragSpectraForParentIons(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       intParentIonIndex1 As Integer,
       intParentIonIndex2 As Integer,
@@ -2457,37 +2327,37 @@ Public Class clsMASIC
         Dim sngSimilarityScore, sngHighestSimilarityScore As Single
 
         Try
-            If udtScanList.ParentIons(intParentIonIndex1).CustomSICPeak OrElse udtScanList.ParentIons(intParentIonIndex2).CustomSICPeak Then
+            If scanList.ParentIons(intParentIonIndex1).CustomSICPeak OrElse scanList.ParentIons(intParentIonIndex2).CustomSICPeak Then
                 ' Custom SIC values do not have fragmentation spectra; nothing to compare
                 sngHighestSimilarityScore = 0
-            ElseIf udtScanList.ParentIons(intParentIonIndex1).MRMDaughterMZ > 0 OrElse udtScanList.ParentIons(intParentIonIndex2).MRMDaughterMZ > 0 Then
+            ElseIf scanList.ParentIons(intParentIonIndex1).MRMDaughterMZ > 0 OrElse scanList.ParentIons(intParentIonIndex2).MRMDaughterMZ > 0 Then
                 ' MRM Spectra should not be compared
                 sngHighestSimilarityScore = 0
             Else
                 sngHighestSimilarityScore = 0
-                For intFragIndex1 = 0 To udtScanList.ParentIons(intParentIonIndex1).FragScanIndexCount - 1
-                    intFragSpectrumIndex1 = udtScanList.ParentIons(intParentIonIndex1).FragScanIndices(intFragIndex1)
+                For intFragIndex1 = 0 To scanList.ParentIons(intParentIonIndex1).FragScanIndexCount - 1
+                    intFragSpectrumIndex1 = scanList.ParentIons(intParentIonIndex1).FragScanIndices(intFragIndex1)
 
-                    If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.FragScans(intFragSpectrumIndex1).ScanNumber, intPoolIndex1) Then
+                    If Not objSpectraCache.ValidateSpectrumInPool(scanList.FragScans(intFragSpectrumIndex1).ScanNumber, intPoolIndex1) Then
                         SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                         Return -1
                     End If
 
                     If Not DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD Then
-                        DiscardDataBelowNoiseThreshold(objSpectraCache.SpectraPool(intPoolIndex1), udtScanList.FragScans(intFragSpectrumIndex1).BaselineNoiseStats.NoiseLevel, 0, 0, udtNoiseThresholdOptions)
+                        DiscardDataBelowNoiseThreshold(objSpectraCache.SpectraPool(intPoolIndex1), scanList.FragScans(intFragSpectrumIndex1).BaselineNoiseStats.NoiseLevel, 0, 0, udtNoiseThresholdOptions)
                     End If
 
-                    For intFragIndex2 = 0 To udtScanList.ParentIons(intParentIonIndex2).FragScanIndexCount - 1
+                    For intFragIndex2 = 0 To scanList.ParentIons(intParentIonIndex2).FragScanIndexCount - 1
 
-                        intFragSpectrumIndex2 = udtScanList.ParentIons(intParentIonIndex2).FragScanIndices(intFragIndex2)
+                        intFragSpectrumIndex2 = scanList.ParentIons(intParentIonIndex2).FragScanIndices(intFragIndex2)
 
-                        If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.FragScans(intFragSpectrumIndex2).ScanNumber, intPoolIndex2) Then
+                        If Not objSpectraCache.ValidateSpectrumInPool(scanList.FragScans(intFragSpectrumIndex2).ScanNumber, intPoolIndex2) Then
                             SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                             Return -1
                         End If
 
                         If Not DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD Then
-                            DiscardDataBelowNoiseThreshold(objSpectraCache.SpectraPool(intPoolIndex2), udtScanList.FragScans(intFragSpectrumIndex2).BaselineNoiseStats.NoiseLevel, 0, 0, udtNoiseThresholdOptions)
+                            DiscardDataBelowNoiseThreshold(objSpectraCache.SpectraPool(intPoolIndex2), scanList.FragScans(intFragSpectrumIndex2).BaselineNoiseStats.NoiseLevel, 0, 0, udtNoiseThresholdOptions)
                         End If
 
                         sngSimilarityScore = CompareSpectra(objSpectraCache.SpectraPool(intPoolIndex1), objSpectraCache.SpectraPool(intPoolIndex2), udtBinningOptions)
@@ -2604,22 +2474,22 @@ Public Class clsMASIC
     End Function
 
     Private Sub ComputeNoiseLevelForMassSpectrum(
-      ByRef udtScanInfo As udtScanInfoType,
+      scanInfo As clsScanInfo,
       objMSSpectrum As clsMSSpectrum,
       udtNoiseThresholdOptions As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseOptionsType)
 
         Const IGNORE_NON_POSITIVE_DATA = True
 
-        MASICPeakFinder.clsMASICPeakFinder.InitializeBaselineNoiseStats(udtScanInfo.BaselineNoiseStats, 0, udtNoiseThresholdOptions.BaselineNoiseMode)
+        MASICPeakFinder.clsMASICPeakFinder.InitializeBaselineNoiseStats(scanInfo.BaselineNoiseStats, 0, udtNoiseThresholdOptions.BaselineNoiseMode)
 
         If udtNoiseThresholdOptions.BaselineNoiseMode = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold Then
-            With udtScanInfo.BaselineNoiseStats
+            With scanInfo.BaselineNoiseStats
                 .NoiseLevel = udtNoiseThresholdOptions.BaselineNoiseLevelAbsolute
                 .PointsUsed = 1
             End With
         Else
             If objMSSpectrum.IonCount > 0 Then
-                mMASICPeakFinder.ComputeTrimmedNoiseLevel(objMSSpectrum.IonsIntensity, 0, objMSSpectrum.IonCount - 1, udtNoiseThresholdOptions, IGNORE_NON_POSITIVE_DATA, udtScanInfo.BaselineNoiseStats)
+                mMASICPeakFinder.ComputeTrimmedNoiseLevel(objMSSpectrum.IonsIntensity, 0, objMSSpectrum.IonCount - 1, udtNoiseThresholdOptions, IGNORE_NON_POSITIVE_DATA, scanInfo.BaselineNoiseStats)
             End If
         End If
 
@@ -3012,7 +2882,7 @@ Public Class clsMASIC
 
     Private Function CreateMZLookupList(
       ByRef udtSICOptions As udtSICOptionsType,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       ByRef udtMZBinList() As udtMZBinListType,
       ByRef intParentIonIndices() As Integer,
       blnProcessSIMScans As Boolean,
@@ -3024,20 +2894,20 @@ Public Class clsMASIC
         Dim blnIncludeParentIon As Boolean
 
         intMZListCount = 0
-        ReDim udtMZBinList(udtScanList.ParentIonInfoCount - 1)
-        ReDim intParentIonIndices(udtScanList.ParentIonInfoCount - 1)
+        ReDim udtMZBinList(scanList.ParentIonInfoCount - 1)
+        ReDim intParentIonIndices(scanList.ParentIonInfoCount - 1)
 
-        For intParentIonIndex = 0 To udtScanList.ParentIonInfoCount - 1
+        For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
 
-            If udtScanList.ParentIons(intParentIonIndex).MRMDaughterMZ > 0 Then
+            If scanList.ParentIons(intParentIonIndex).MRMDaughterMZ > 0 Then
                 blnIncludeParentIon = False
             Else
                 If mCustomSICList.LimitSearchToCustomMZList Then
                     ' Always include CustomSICPeak entries
-                    blnIncludeParentIon = udtScanList.ParentIons(intParentIonIndex).CustomSICPeak
+                    blnIncludeParentIon = scanList.ParentIons(intParentIonIndex).CustomSICPeak
                 Else
                     ' Use blnProcessingSIMScans and .SIMScan to decide whether or not to include the entry
-                    With udtScanList.SurveyScans(udtScanList.ParentIons(intParentIonIndex).SurveyScanIndex)
+                    With scanList.SurveyScans(scanList.ParentIons(intParentIonIndex).SurveyScanIndex)
                         If blnProcessSIMScans Then
                             If .SIMScan Then
                                 If .SIMIndex = intSIMIndex Then
@@ -3056,9 +2926,9 @@ Public Class clsMASIC
             End If
 
             If blnIncludeParentIon Then
-                udtMZBinList(intMZListCount).MZ = udtScanList.ParentIons(intParentIonIndex).MZ
-                If udtScanList.ParentIons(intParentIonIndex).CustomSICPeak Then
-                    udtMZBinList(intMZListCount).MZTolerance = udtScanList.ParentIons(intParentIonIndex).CustomSICPeakMZToleranceDa
+                udtMZBinList(intMZListCount).MZ = scanList.ParentIons(intParentIonIndex).MZ
+                If scanList.ParentIons(intParentIonIndex).CustomSICPeak Then
+                    udtMZBinList(intMZListCount).MZTolerance = scanList.ParentIons(intParentIonIndex).CustomSICPeakMZToleranceDa
                     udtMZBinList(intMZListCount).MZToleranceIsPPM = False
                 Else
                     udtMZBinList(intMZListCount).MZTolerance = udtSICOptions.SICTolerance
@@ -3070,7 +2940,7 @@ Public Class clsMASIC
         Next intParentIonIndex
 
         If intMZListCount > 0 Then
-            If intMZListCount < udtScanList.ParentIonInfoCount Then
+            If intMZListCount < scanList.ParentIonInfoCount Then
                 ReDim Preserve udtMZBinList(intMZListCount - 1)
                 ReDim Preserve intParentIonIndices(intMZListCount - 1)
             End If
@@ -3085,7 +2955,7 @@ Public Class clsMASIC
     End Function
 
     Private Function CreateParentIonSICs(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtSICOptions As udtSICOptionsType,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
@@ -3094,7 +2964,7 @@ Public Class clsMASIC
         Dim intParentIonIndex As Integer
         Dim intParentIonsProcessed As Integer
 
-        If udtScanList.ParentIonInfoCount <= 0 Then
+        If scanList.ParentIonInfoCount <= 0 Then
             ' No parent ions
             If mSuppressNoParentIonsError Then
                 Return True
@@ -3102,7 +2972,7 @@ Public Class clsMASIC
                 SetLocalErrorCode(eMasicErrorCodes.NoParentIonsFoundInInputFile)
                 Return False
             End If
-        ElseIf udtScanList.SurveyScanCount <= 0 Then
+        ElseIf scanList.SurveyScanCount <= 0 Then
             ' No survey scans
             If mSuppressNoParentIonsError Then
                 Return True
@@ -3120,7 +2990,7 @@ Public Class clsMASIC
             Console.Write("Creating SIC's for parent ions ")
             LogMessage("Creating SIC's for parent ions")
 
-            ' Create an array of m/z values in udtScanList.ParentIons, then sort by m/z
+            ' Create an array of m/z values in scanList.ParentIons, then sort by m/z
             ' Next, step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
 
             Dim udtMZBinList() As udtMZBinListType = Nothing
@@ -3131,16 +3001,16 @@ Public Class clsMASIC
 
             ' First process the non SIM, non MRM scans
             ' If this file only has MRM scans, then CreateMZLookupList will return False
-            If CreateMZLookupList(udtSICOptions, udtScanList, udtMZBinList, intParentIonIndices, False, 0) Then
-                blnSuccess = ProcessMZList(udtScanList, objSpectraCache, udtSICOptions, udtOutputFileHandles, udtMZBinList, intParentIonIndices, False, 0, intParentIonsProcessed)
+            If CreateMZLookupList(udtSICOptions, scanList, udtMZBinList, intParentIonIndices, False, 0) Then
+                blnSuccess = ProcessMZList(scanList, objSpectraCache, udtSICOptions, udtOutputFileHandles, udtMZBinList, intParentIonIndices, False, 0, intParentIonsProcessed)
             End If
 
             If blnSuccess And Not mCustomSICList.LimitSearchToCustomMZList Then
                 ' Now process the SIM scans (if any)
                 ' First, see if any SIMScans are present and determine the maximum SIM Index
                 intSIMIndexMax = -1
-                For intParentIonIndex = 0 To udtScanList.ParentIonInfoCount - 1
-                    With udtScanList.SurveyScans(udtScanList.ParentIons(intParentIonIndex).SurveyScanIndex)
+                For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+                    With scanList.SurveyScans(scanList.ParentIons(intParentIonIndex).SurveyScanIndex)
                         If .SIMScan Then
                             If .SIMIndex > intSIMIndexMax Then
                                 intSIMIndexMax = .SIMIndex
@@ -3151,15 +3021,15 @@ Public Class clsMASIC
 
                 ' Now process each SIM Scan type
                 For intSIMIndex = 0 To intSIMIndexMax
-                    If CreateMZLookupList(udtSICOptions, udtScanList, udtMZBinList, intParentIonIndices, True, intSIMIndex) Then
-                        blnSuccess = ProcessMZList(udtScanList, objSpectraCache, udtSICOptions, udtOutputFileHandles, udtMZBinList, intParentIonIndices, True, intSIMIndex, intParentIonsProcessed)
+                    If CreateMZLookupList(udtSICOptions, scanList, udtMZBinList, intParentIonIndices, True, intSIMIndex) Then
+                        blnSuccess = ProcessMZList(scanList, objSpectraCache, udtSICOptions, udtOutputFileHandles, udtMZBinList, intParentIonIndices, True, intSIMIndex, intParentIonsProcessed)
                     End If
                 Next intSIMIndex
             End If
 
             ' Lastly, process the MRM scans (if any)
-            If udtScanList.MRMDataPresent Then
-                blnSuccess = ProcessMRMList(udtScanList, objSpectraCache, udtSICOptions, udtOutputFileHandles, intParentIonsProcessed)
+            If scanList.MRMDataPresent Then
+                blnSuccess = ProcessMRMList(scanList, objSpectraCache, udtSICOptions, udtOutputFileHandles, intParentIonsProcessed)
             End If
 
             Console.WriteLine()
@@ -3192,7 +3062,7 @@ Public Class clsMASIC
       ByRef intFullSICScanIndices(,) As Integer,
       ByRef sngFullSICIntensities(,) As Single,
       ByRef dblFullSICMasses(,) As Double,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intScanIndexObservedInFullSIC As Integer,
       ByRef udtSICDetails As udtSICStatsDetailsType,
       ByRef udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType,
@@ -3250,7 +3120,7 @@ Public Class clsMASIC
                 If sngCustomSICPeakScanOrAcqTimeTolerance < Single.Epsilon Then
                     ' Use the entire SIC
                     ' Specify this by setting sngCustomSICScanToleranceMinutesHalfWidth to the maximum scan time in .MasterScanTimeList()
-                    With udtScanList
+                    With scanList
                         If .MasterScanOrderCount > 0 Then
                             sngCustomSICScanToleranceMinutesHalfWidth = .MasterScanTimeList(.MasterScanOrderCount - 1)
                         Else
@@ -3263,7 +3133,7 @@ Public Class clsMASIC
                         sngCustomSICPeakScanOrAcqTimeTolerance = 10
                     End If
 
-                    sngCustomSICScanToleranceMinutesHalfWidth = ScanOrAcqTimeToScanTime(udtScanList, sngCustomSICPeakScanOrAcqTimeTolerance / 2, .ScanToleranceType, True)
+                    sngCustomSICScanToleranceMinutesHalfWidth = ScanOrAcqTimeToScanTime(scanList, sngCustomSICPeakScanOrAcqTimeTolerance / 2, .ScanToleranceType, True)
                 End If
 
                 If blnCustomSICPeak Then
@@ -3336,8 +3206,8 @@ Public Class clsMASIC
                             intScanIndexBelowThresholdLeft = -1
                         End If
 
-                        sngPeakWidthMinutesBackward = udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime -
-                           udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexStart)).ScanTime
+                        sngPeakWidthMinutesBackward = scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime -
+                           scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexStart)).ScanTime
 
                         If blnLeftDone Then
                             ' Require a minimum distance of InitialPeakWidthScansMaximum data points to the left of intScanIndexObservedInFullSIC and to the left of intScanIndexMax
@@ -3364,8 +3234,8 @@ Public Class clsMASIC
                             End If
                         End If
 
-                        sngPeakWidthMinutesBackward = udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime -
-                           udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexStart)).ScanTime
+                        sngPeakWidthMinutesBackward = scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime -
+                           scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexStart)).ScanTime
 
                         If sngPeakWidthMinutesBackward >= sngMaxSICPeakWidthMinutesBackward Then
                             blnLeftDone = True
@@ -3396,8 +3266,8 @@ Public Class clsMASIC
                             intScanIndexBelowThresholdRight = -1
                         End If
 
-                        sngPeakWidthMinutesForward = udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexEnd)).ScanTime -
-                          udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime
+                        sngPeakWidthMinutesForward = scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexEnd)).ScanTime -
+                          scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime
 
                         If blnRightDone Then
                             ' Require a minimum distance of InitialPeakWidthScansMaximum data points to the right of intScanIndexObservedInFullSIC and to the Rigth of intScanIndexMax
@@ -3424,8 +3294,8 @@ Public Class clsMASIC
                             End If
                         End If
 
-                        sngPeakWidthMinutesForward = udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexEnd)).ScanTime -
-                          udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime
+                        sngPeakWidthMinutesForward = scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexEnd)).ScanTime -
+                          scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime
 
                         If sngPeakWidthMinutesForward >= sngMaxSICPeakWidthMinutesForward Then
                             blnRightDone = True
@@ -3457,7 +3327,7 @@ Public Class clsMASIC
 
             With udtSICDetails
                 .SICDataCount = intScanIndexEnd - intScanIndexStart + 1
-                .SICScanType = eScanTypeConstants.SurveyScan
+                .SICScanType = clsScanList.eScanTypeConstants.SurveyScan
 
                 If .SICDataCount > .SICScanIndices.Length Then
                     ReDim .SICScanIndices(udtSICDetails.SICDataCount - 1)
@@ -3471,7 +3341,7 @@ Public Class clsMASIC
                 For intScanIndex = intScanIndexStart To intScanIndexEnd
                     If intFullSICScanIndices(intMZIndexWork, intScanIndex) >= 0 Then
                         .SICScanIndices(.SICDataCount) = intFullSICScanIndices(intMZIndexWork, intScanIndex)
-                        .SICScanNumbers(.SICDataCount) = udtScanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndex)).ScanNumber
+                        .SICScanNumbers(.SICDataCount) = scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndex)).ScanNumber
                         .SICData(.SICDataCount) = sngFullSICIntensities(intMZIndexWork, intScanIndex)
                         .SICMasses(.SICDataCount) = dblFullSICMasses(intMZIndexWork, intScanIndex)
 
@@ -3493,7 +3363,7 @@ Public Class clsMASIC
 
     End Function
 
-    ''Private Function CreateParentIonSICsWork(ByRef udtScanList As udtScanListType, objSpectraCache As clsSpectraCache, intParentIonIndex As Integer, ByRef udtSICDetails As udtSICStatsDetailsType, udtSICOptions As udtSICOptionsType) As Boolean
+    ''Private Function CreateParentIonSICsWork(scanList As clsScanList, objSpectraCache As clsSpectraCache, intParentIonIndex As Integer, ByRef udtSICDetails As udtSICStatsDetailsType, udtSICOptions As udtSICOptionsType) As Boolean
 
     ''    Const MINIMUM_NOISE_SCANS_TO_INCLUDE As Integer = 5             ' Minimum number of scans to extend left or right of the scan that meets the minimum intensity threshold requirement
 
@@ -3537,32 +3407,32 @@ Public Class clsMASIC
     ''        With mCustomSICList
     ''            If .ScanTolerance <= 0 Then
     ''                ' Create the SIC over the entire run
-    ''                intCustomSICScanToleranceHalfWidth = ScanOrAcqTimeToAbsolute(udtScanList, 1, eCustomSICScanTypeConstants.Relative, True)
+    ''                intCustomSICScanToleranceHalfWidth = ScanOrAcqTimeToAbsolute(scanList, 1, eCustomSICScanTypeConstants.Relative, True)
     ''            Else
-    ''                intCustomSICScanToleranceHalfWidth = ScanOrAcqTimeToAbsolute(udtScanList, .ScanTolerance / 2, .ScanToleranceType, True)
+    ''                intCustomSICScanToleranceHalfWidth = ScanOrAcqTimeToAbsolute(scanList, .ScanTolerance / 2, .ScanToleranceType, True)
     ''            End If
     ''        End With
 
     ''        ' Initially create a SIC using just 3 survey scans, centered around .SurveyScanIndex
-    ''        With udtScanList.ParentIons(intParentIonIndex)
+    ''        With scanList.ParentIons(intParentIonIndex)
     ''            dblSearchMZ = .MZ
-    ''            blnSIMScan = udtScanList.SurveyScans(.SurveyScanIndex).SIMScan
-    ''            intSIMIndex = udtScanList.SurveyScans(.SurveyScanIndex).SIMIndex
+    ''            blnSIMScan = scanList.SurveyScans(.SurveyScanIndex).SIMScan
+    ''            intSIMIndex = scanList.SurveyScans(.SurveyScanIndex).SIMIndex
 
     ''            If .SurveyScanIndex > 0 Then
-    ''                intScanIndexStart = GetPreviousSurveyScanIndex(udtScanList.SurveyScans, .SurveyScanIndex)
-    ''                intScanIndexEnd = GetNextSurveyScanIndex(udtScanList.SurveyScans, .SurveyScanIndex)
+    ''                intScanIndexStart = GetPreviousSurveyScanIndex(scanList.SurveyScans, .SurveyScanIndex)
+    ''                intScanIndexEnd = GetNextSurveyScanIndex(scanList.SurveyScans, .SurveyScanIndex)
     ''                intScanIndexObserved = .SurveyScanIndex
     ''            Else
     ''                intScanIndexStart = 0
-    ''                intScanIndexEnd = GetNextSurveyScanIndex(udtScanList.SurveyScans, 0)
+    ''                intScanIndexEnd = GetNextSurveyScanIndex(scanList.SurveyScans, 0)
     ''                intScanIndexObserved = 0
     ''            End If
 
     ''            blnCustomSICPeak = .CustomSICPeak
     ''        End With
 
-    ''        If intScanIndexEnd >= udtScanList.SurveyScanCount Then intScanIndexEnd = udtScanList.SurveyScanCount - 1
+    ''        If intScanIndexEnd >= scanList.SurveyScanCount Then intScanIndexEnd = scanList.SurveyScanCount - 1
     ''    Catch ex As Exception
     ''        LogErrors("CreateParentIonSICsWork", "Error initializing SIC start/end indices", ex, True, True, True, eMasicErrorCodes.CreateSICsError)
     ''    End Try
@@ -3571,12 +3441,12 @@ Public Class clsMASIC
 
     ''        Try
     ''            ' Reserve room in intSICScanIndices for at most .SurveyScanCount items
-    ''            ReDim intSICScanIndices(udtScanList.SurveyScanCount - 1)
-    ''            ReDim sngSICIntensities(udtScanList.SurveyScanCount - 1)
-    ''            ReDim sngSICMasses(udtScanList.SurveyScanCount - 1)
+    ''            ReDim intSICScanIndices(scanList.SurveyScanCount - 1)
+    ''            ReDim sngSICIntensities(scanList.SurveyScanCount - 1)
+    ''            ReDim sngSICMasses(scanList.SurveyScanCount - 1)
 
     ''            ' Initialize the entries in intSICScanIndices to -1; when we actually use an entry, we'll store the actual scan index
-    ''            For intSurveyScanIndex = 0 To udtScanList.SurveyScanCount - 1
+    ''            For intSurveyScanIndex = 0 To scanList.SurveyScanCount - 1
     ''                intSICScanIndices(intSurveyScanIndex) = -1
     ''            Next intSurveyScanIndex
 
@@ -3591,8 +3461,8 @@ Public Class clsMASIC
     ''            intScanIndexMax = -1
     ''            For intSurveyScanIndex = intScanIndexStart To intScanIndexEnd
     ''                If blnSIMScan Then
-    ''                    If udtScanList.SurveyScans(intSurveyScanIndex).SIMScan AndAlso
-    ''                       udtScanList.SurveyScans(intSurveyScanIndex).SIMIndex = intSIMIndex Then
+    ''                    If scanList.SurveyScans(intSurveyScanIndex).SIMScan AndAlso
+    ''                       scanList.SurveyScans(intSurveyScanIndex).SIMIndex = intSIMIndex Then
     ''                        blnUseScan = True
     ''                    Else
     ''                        blnUseScan = False
@@ -3602,7 +3472,7 @@ Public Class clsMASIC
     ''                End If
 
     ''                If blnUseScan Then
-    ''                    If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
+    ''                    If Not objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
     ''                        SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
     ''                        Return False
     ''                    End If
@@ -3630,7 +3500,7 @@ Public Class clsMASIC
     ''        intScanIndexBelowThresholdRight = -1
     ''        intSpectrumProcessCount = 3
 
-    ''        With udtScanList
+    ''        With scanList
     ''            Do While (intScanIndexStart > 0 AndAlso Not blnLeftDone) OrElse (intScanIndexEnd < .SurveyScanCount - 1 AndAlso Not blnRightDone)
     ''                Try
     ''                    ' Extend the SIC to the left until the threshold is reached
@@ -3670,7 +3540,7 @@ Public Class clsMASIC
 
     ''                                intSpectrumProcessCount += 1
 
-    ''                                If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.SurveyScans(intScanIndexStart).ScanNumber, intPoolIndex) Then
+    ''                                If Not objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intScanIndexStart).ScanNumber, intPoolIndex) Then
     ''                                    SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
     ''                                    Return False
     ''                                End If
@@ -3735,7 +3605,7 @@ Public Class clsMASIC
 
     ''                                intSpectrumProcessCount += 1
 
-    ''                                If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.SurveyScans(intScanIndexEnd).ScanNumber, intPoolIndex) Then
+    ''                                If Not objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intScanIndexEnd).ScanNumber, intPoolIndex) Then
     ''                                    SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
     ''                                    Return False
     ''                                End If
@@ -3767,7 +3637,7 @@ Public Class clsMASIC
     ''        End With
 
     ''        If intScanIndexStart < 0 Then intScanIndexStart = 0
-    ''        If intScanIndexEnd >= udtScanList.SurveyScanCount Then intScanIndexEnd = udtScanList.SurveyScanCount - 1
+    ''        If intScanIndexEnd >= scanList.SurveyScanCount Then intScanIndexEnd = scanList.SurveyScanCount - 1
 
     ''        Try
     ''            ' Copy the scan index values from intSICScanIndices to .SICScanIndices()
@@ -3820,26 +3690,24 @@ Public Class clsMASIC
     ''End Function
 
     Private Function DetermineMRMSettings(
-      udtScanList As udtScanListType,
-      ByRef udtMRMSettings() As udtMRMScanInfoType,
-      ByRef udtSRMList() As udtSRMListType) As Boolean
+      scanList As clsScanList,
+      <Out()> ByRef mrmSettings As List(Of clsMRMScanInfo),
+      <Out()> ByRef srmList As List(Of udtSRMListType)) As Boolean
 
         ' Returns true if this dataset has MRM data and if it is parsed successfully
         ' Returns false if the dataset does not have MRM data, or if an error occurs
 
-        Dim intMRMSettingsCount As Integer
-        Dim intSRMListCount As Integer
-
         Dim strMRMInfoHash As String
 
         Dim intScanIndex As Integer
-        Dim intMRMInfoIndex As Integer
         Dim intMRMMassIndex As Integer
-        Dim intSRMIndex As Integer
 
         Dim blnMRMDataPresent As Boolean
         Dim blnMatchFound As Boolean
         Dim blnSuccess As Boolean
+
+        mrmSettings = New List(Of clsMRMScanInfo)
+        srmList = New List(Of udtSRMListType)
 
         Try
             blnMRMDataPresent = False
@@ -3847,65 +3715,55 @@ Public Class clsMASIC
             SetSubtaskProcessingStepPct(0, "Determining MRM settings")
 
             ' Initialize the tracking arrays
-            intMRMSettingsCount = 0
-            ReDim udtMRMSettings(9)
-
-            Dim mrmHashToIndexMap = New Dictionary(Of String, Integer)
-
-            intSRMListCount = 0
-            ReDim udtSRMList(9)
+            Dim mrmHashToIndexMap = New Dictionary(Of String, clsMRMScanInfo)
 
             ' Construct a list of the MRM search values used
-            For intScanIndex = 0 To udtScanList.FragScanCount - 1
-                If udtScanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
+            For intScanIndex = 0 To scanList.FragScanCount - 1
+                If scanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
                     blnMRMDataPresent = True
 
-                    With udtScanList.FragScans(intScanIndex)
-                        ' See if this MRM spec is already in udtMRMScanInfoType
+                    With scanList.FragScans(intScanIndex)
+                        ' See if this MRM spec is already in mrmSettings
 
                         strMRMInfoHash = GenerateMRMInfoHash(.MRMScanInfo)
 
-                        If Not mrmHashToIndexMap.TryGetValue(strMRMInfoHash, intMRMInfoIndex) Then
+                        Dim mrmInfoForHash As clsMRMScanInfo = Nothing
+                        If Not mrmHashToIndexMap.TryGetValue(strMRMInfoHash, mrmInfoForHash) Then
 
-                            If intMRMSettingsCount >= udtMRMSettings.Length Then
-                                ReDim Preserve udtMRMSettings(udtMRMSettings.Length * 2 - 1)
-                            End If
+                            mrmInfoForHash = DuplicateMRMInfo(.MRMScanInfo)
 
-                            DuplicateMRMInfo(.MRMScanInfo, udtMRMSettings(intMRMSettingsCount))
-                            udtMRMSettings(intMRMSettingsCount).ScanCount = 1
-                            udtMRMSettings(intMRMSettingsCount).ParentIonInfoIndex = .FragScanInfo.ParentIonInfoIndex
+                            mrmInfoForHash.ScanCount = 1
+                            mrmInfoForHash.ParentIonInfoIndex = .FragScanInfo.ParentIonInfoIndex
 
-                            mrmHashToIndexMap.Add(strMRMInfoHash, intMRMSettingsCount)
+                            mrmSettings.Add(mrmInfoForHash)
+                            mrmHashToIndexMap.Add(strMRMInfoHash, mrmInfoForHash)
 
-                            intMRMSettingsCount += 1
 
-                            ' Append the new entries to udtSRMList
-                            intMRMInfoIndex = intMRMSettingsCount - 1
+                            ' Append the new entries to srmList
 
-                            For intMRMMassIndex = 0 To udtMRMSettings(intMRMInfoIndex).MRMMassCount - 1
-                                ' Add this new transition to udtSRMList() only if not already present
+                            For intMRMMassIndex = 0 To mrmInfoForHash.MRMMassCount - 1
+
+                                ' Add this new transition to srmList() only if not already present
                                 blnMatchFound = False
-                                For intSRMIndex = 0 To intSRMListCount - 1
-                                    If MRMParentDaughterMatch(udtSRMList(intSRMIndex), udtMRMSettings(intMRMInfoIndex), intMRMMassIndex) Then
+                                For Each srmItem In srmList
+                                    If MRMParentDaughterMatch(srmItem, mrmInfoForHash, intMRMMassIndex) Then
                                         blnMatchFound = True
                                         Exit For
                                     End If
-                                Next intSRMIndex
+                                Next
 
                                 If Not blnMatchFound Then
                                     ' Entry is not yet present; add it
-                                    If intSRMListCount >= udtSRMList.Length Then
-                                        ReDim Preserve udtSRMList(udtSRMList.Length * 2 - 1)
-                                    End If
 
-                                    udtSRMList(intSRMListCount).ParentIonMZ = udtMRMSettings(intMRMInfoIndex).ParentIonMZ
-                                    udtSRMList(intSRMListCount).CentralMass = udtMRMSettings(intMRMInfoIndex).MRMMassList(intMRMMassIndex).CentralMass
+                                    Dim newSRMItem = New udtSRMListType
+                                    newSRMItem.ParentIonMZ = mrmInfoForHash.ParentIonMZ
+                                    newSRMItem.CentralMass = mrmInfoForHash.MRMMassList(intMRMMassIndex).CentralMass
 
-                                    intSRMListCount += 1
+                                    srmList.Add(newSRMItem)
                                 End If
                             Next intMRMMassIndex
                         Else
-                            udtMRMSettings(intMRMInfoIndex).ScanCount += 1
+                            mrmInfoForHash.ScanCount += 1
                         End If
 
                     End With
@@ -3913,14 +3771,8 @@ Public Class clsMASIC
             Next intScanIndex
 
             If blnMRMDataPresent Then
-                ' Shrink the MRM arrays to match the number of items in each
-                ReDim Preserve udtMRMSettings(intMRMSettingsCount - 1)
-                ReDim Preserve udtSRMList(intSRMListCount - 1)
-
                 blnSuccess = True
             Else
-                ReDim udtMRMSettings(0)
-                ReDim udtSRMList(0)
                 blnSuccess = False
             End If
 
@@ -4105,49 +3957,57 @@ Public Class clsMASIC
 
     End Sub
 
-    Private Sub DuplicateMRMInfo(
-      ByRef udtSource As MRMInfo,
-      dblParentIonMZ As Double,
-      ByRef udtTarget As udtMRMScanInfoType)
+    Private Function DuplicateMRMInfo(
+      oSource As ThermoRawFileReader.MRMInfo,
+      dblParentIonMZ As Double) As clsMRMScanInfo
 
-        With udtSource
-            udtTarget.ParentIonMZ = dblParentIonMZ
-            udtTarget.MRMMassCount = .MRMMassList.Count
+        Dim oTarget = New clsMRMScanInfo()
 
-            If .MRMMassList Is Nothing Then
-                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)()
-            Else
-                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)(.MRMMassList.Count)
-                udtTarget.MRMMassList.AddRange(.MRMMassList)
-            End If
-
-            udtTarget.ScanCount = 0
-            udtTarget.ParentIonInfoIndex = -1
-        End With
-    End Sub
-
-    Private Sub DuplicateMRMInfo(ByRef udtSource As udtMRMScanInfoType, ByRef udtTarget As udtMRMScanInfoType)
-        With udtSource
-            udtTarget.ParentIonMZ = .ParentIonMZ
-            udtTarget.MRMMassCount = .MRMMassCount
+        With oSource
+            oTarget.ParentIonMZ = dblParentIonMZ
+            oTarget.MRMMassCount = .MRMMassList.Count
 
             If .MRMMassList Is Nothing Then
-                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)()
+                oTarget.MRMMassList = New List(Of udtMRMMassRangeType)
             Else
-                udtTarget.MRMMassList = New List(Of udtMRMMassRangeType)(.MRMMassList.Count)
-                udtTarget.MRMMassList.AddRange(.MRMMassList)
+                oTarget.MRMMassList = New List(Of udtMRMMassRangeType)(.MRMMassList.Count)
+                oTarget.MRMMassList.AddRange(.MRMMassList)
             End If
 
-            udtTarget.ScanCount = udtSource.ScanCount
-            udtTarget.ParentIonInfoIndex = udtSource.ParentIonInfoIndex
+            oTarget.ScanCount = 0
+            oTarget.ParentIonInfoIndex = -1
         End With
-    End Sub
+
+        Return oTarget
+    End Function
+
+    Private Function DuplicateMRMInfo(oSource As clsMRMScanInfo) As clsMRMScanInfo
+        Dim oTarget = New clsMRMScanInfo()
+
+        With oSource
+            oTarget.ParentIonMZ = .ParentIonMZ
+            oTarget.MRMMassCount = .MRMMassCount
+
+            If .MRMMassList Is Nothing Then
+                oTarget.MRMMassList = New List(Of udtMRMMassRangeType)
+            Else
+                oTarget.MRMMassList = New List(Of udtMRMMassRangeType)(.MRMMassList.Count)
+                oTarget.MRMMassList.AddRange(.MRMMassList)
+            End If
+        End With
+
+        oTarget.ScanCount = oSource.ScanCount
+        oTarget.ParentIonInfoIndex = oSource.ParentIonInfoIndex
+
+        Return oTarget
+
+    End Function
 
     Private Function ExportMRMDataToDisk(
-      udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
-      ByRef udtMRMSettings() As udtMRMScanInfoType,
-      ByRef udtSRMList() As udtSRMListType,
+      mrmSettings As List(Of clsMRMScanInfo),
+      srmList As List(Of udtSRMListType),
       strInputFileName As String,
       strOutputFolderPath As String) As Boolean
 
@@ -4191,7 +4051,7 @@ Public Class clsMASIC
 
         Try
             ' Only write this data if 1 or more fragmentation spectra are of type SRM
-            If udtMRMSettings Is Nothing OrElse udtMRMSettings.Length = 0 Then
+            If mrmSettings Is Nothing OrElse mrmSettings.Count = 0 Then
                 blnSuccess = True
                 Exit Try
             End If
@@ -4202,10 +4062,10 @@ Public Class clsMASIC
             strMRMSettingsFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MRMSettingsFile)
             Using srSettingsOutFile = New StreamWriter(strMRMSettingsFilePath)
 
-                srSettingsOutFile.WriteLine(GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.MRMSettingsFile))
+                srSettingsOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.MRMSettingsFile))
 
-                For intMRMInfoIndex = 0 To udtMRMSettings.Length - 1
-                    With udtMRMSettings(intMRMInfoIndex)
+                For intMRMInfoIndex = 0 To mrmSettings.Count - 1
+                    With mrmSettings(intMRMInfoIndex)
                         For intMRMMassIndex = 0 To .MRMMassCount - 1
                             strOutLine = intMRMInfoIndex & cColDelimiter &
                              .ParentIonMZ.ToString("0.000") & cColDelimiter &
@@ -4225,8 +4085,8 @@ Public Class clsMASIC
 
                     ' Populate srmKeyToIndexMap
                     Dim srmKeyToIndexMap = New Dictionary(Of String, Integer)
-                    For intSRMIndex = 0 To udtSRMList.Length - 1
-                        srmKeyToIndexMap.Add(ConstructSRMMapKey(udtSRMList(intSRMIndex)), intSRMIndex)
+                    For intSRMIndex = 0 To srmList.Count - 1
+                        srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList(intSRMIndex)), intSRMIndex)
                     Next intSRMIndex
 
                     If Me.WriteMRMDataList Then
@@ -4235,7 +4095,7 @@ Public Class clsMASIC
                         srDataOutfile = New StreamWriter(strDataFilePath)
 
                         ' Write the file headers
-                        srDataOutfile.WriteLine(GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.MRMDatafile))
+                        srDataOutfile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.MRMDatafile))
                     End If
 
 
@@ -4247,8 +4107,8 @@ Public Class clsMASIC
                         ' Initialize the crosstab header variable using the data in udtSRMList()
                         strCrosstabHeaders = "Scan_First" & cColDelimiter & "ScanTime"
 
-                        For intSRMIndex = 0 To udtSRMList.Length - 1
-                            strCrosstabHeaders &= cColDelimiter & ConstructSRMMapKey(udtSRMList(intSRMIndex))
+                        For intSRMIndex = 0 To srmList.Count - 1
+                            strCrosstabHeaders &= cColDelimiter & ConstructSRMMapKey(srmList(intSRMIndex))
                         Next intSRMIndex
 
                         srCrosstabOutfile.WriteLine(strCrosstabHeaders)
@@ -4256,12 +4116,12 @@ Public Class clsMASIC
 
                     intScanFirst = Integer.MinValue
                     intSRMIndexLast = 0
-                    ReDim sngCrosstabColumnValue(udtSRMList.Length - 1)
-                    ReDim blnCrosstabColumnFlag(udtSRMList.Length - 1)
+                    ReDim sngCrosstabColumnValue(srmList.Count - 1)
+                    ReDim blnCrosstabColumnFlag(srmList.Count - 1)
 
-                    For intScanIndex = 0 To udtScanList.FragScanCount - 1
-                        If udtScanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
-                            With udtScanList.FragScans(intScanIndex)
+                    For intScanIndex = 0 To scanList.FragScanCount - 1
+                        If scanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
+                            With scanList.FragScans(intScanIndex)
 
                                 If intScanFirst = Integer.MinValue Then
                                     intScanFirst = .ScanNumber
@@ -4283,7 +4143,7 @@ Public Class clsMASIC
                                         dblMRMToleranceHalfWidth = 0.001
                                     End If
 
-                                    blnMatchFound = FindMaxValueInMZRange(objSpectraCache, udtScanList.FragScans, intScanIndex, dblMZStart - dblMRMToleranceHalfWidth, dblMZEnd + dblMRMToleranceHalfWidth, dblClosestMZ, sngMatchIntensity)
+                                    blnMatchFound = FindMaxValueInMZRange(objSpectraCache, scanList.FragScans, intScanIndex, dblMZStart - dblMRMToleranceHalfWidth, dblMZEnd + dblMRMToleranceHalfWidth, dblClosestMZ, sngMatchIntensity)
 
                                     If Me.WriteMRMDataList Then
                                         If blnMatchFound Then
@@ -4306,7 +4166,7 @@ Public Class clsMASIC
                                         If srmKeyToIndexMap.TryGetValue(strSRMMapKey, intSRMIndex) Then
 
                                             If blnCrosstabColumnFlag(intSRMIndex) OrElse
-                                               (intSRMIndex = 0 And intSRMIndexLast = udtSRMList.Length - 1) Then
+                                               (intSRMIndex = 0 And intSRMIndexLast = srmList.Count - 1) Then
                                                 ' Either the column is already populated, or the SRMIndex has cycled back to zero; write out the current crosstab line and reset the crosstab column arrays
                                                 ExportMRMDataWriteLine(srCrosstabOutfile, intScanFirst, sngScanTimeFirst, sngCrosstabColumnValue, blnCrosstabColumnFlag, cColDelimiter, True)
 
@@ -4407,7 +4267,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function ExportRawDataToDisk(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       strInputFileName As String,
       strOutputFolderPath As String) As Boolean
@@ -4469,20 +4329,20 @@ Public Class clsMASIC
 
             SetSubtaskProcessingStepPct(0, "Exporting raw data")
 
-            For intMasterOrderIndex = 0 To udtScanList.MasterScanOrderCount - 1
-                intScanPointer = udtScanList.MasterScanOrder(intMasterOrderIndex).ScanIndexPointer
-                If udtScanList.MasterScanOrder(intMasterOrderIndex).ScanType = eScanTypeConstants.SurveyScan Then
-                    SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, udtScanList.SurveyScans(intScanPointer), objSpectraCache, strInputFileName, False, intSpectrumExportCount, udtRawDataExportOptions)
+            For intMasterOrderIndex = 0 To scanList.MasterScanOrderCount - 1
+                intScanPointer = scanList.MasterScanOrder(intMasterOrderIndex).ScanIndexPointer
+                If scanList.MasterScanOrder(intMasterOrderIndex).ScanType = clsScanList.eScanTypeConstants.SurveyScan Then
+                    SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, scanList.SurveyScans(intScanPointer), objSpectraCache, strInputFileName, False, intSpectrumExportCount, udtRawDataExportOptions)
                 Else
                     If udtRawDataExportOptions.IncludeMSMS OrElse
-                      Not udtScanList.FragScans(intScanPointer).MRMScanType = MRMScanTypeConstants.NotMRM Then
+                      Not scanList.FragScans(intScanPointer).MRMScanType = MRMScanTypeConstants.NotMRM Then
                         ' Either we're writing out MS/MS data or this is an MRM scan
-                        SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, udtScanList.FragScans(intScanPointer), objSpectraCache, strInputFileName, True, intSpectrumExportCount, udtRawDataExportOptions)
+                        SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, scanList.FragScans(intScanPointer), objSpectraCache, strInputFileName, True, intSpectrumExportCount, udtRawDataExportOptions)
                     End If
                 End If
 
-                If udtScanList.MasterScanOrderCount > 1 Then
-                    SetSubtaskProcessingStepPct(CShort(intMasterOrderIndex / (udtScanList.MasterScanOrderCount - 1) * 100))
+                If scanList.MasterScanOrderCount > 1 Then
+                    SetSubtaskProcessingStepPct(CShort(intMasterOrderIndex / (scanList.MasterScanOrderCount - 1) * 100))
                 Else
                     SetSubtaskProcessingStepPct(0)
                 End If
@@ -4508,8 +4368,8 @@ Public Class clsMASIC
 
     Private Function ExtractConstantExtendedHeaderValues(
       ByRef intNonConstantHeaderIDs() As Integer,
-      ByRef udtSurveyScans() As udtScanInfoType,
-      ByRef udtFragScans() As udtScanInfoType,
+      ByRef udtSurveyScans() As clsScanInfo,
+      ByRef udtFragScans() As clsScanInfo,
       cColDelimiter As Char) As String
 
         ' Looks through udtSurveyScans and udtFragScans for ExtendedHeaderInfo values that are constant across all scans
@@ -4662,7 +4522,7 @@ Public Class clsMASIC
     Private Function ExtractScanInfoFromMGFandCDF(
       strFilePath As String,
       intDatasetID As Integer,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
       ByRef udtSICOptions As udtSICOptionsType,
@@ -4694,9 +4554,9 @@ Public Class clsMASIC
         Dim intIonIndex As Integer
         Dim intFragScanIteration As Integer
 
-        Dim eScanType As eScanTypeConstants
+        Dim eScanType As clsScanList.eScanTypeConstants
         Dim intScanIndex As Integer
-        Dim udtCurrentScan As udtScanInfoType
+        Dim udtCurrentScan As clsScanInfo
 
         Dim dblScanTotalIntensity, dblScanTime, dblMassMin, dblMassMax As Double
 
@@ -4760,7 +4620,7 @@ Public Class clsMASIC
             Else
 
                 ' Reserve memory for all of the the Survey Scan data
-                InitializeScanList(udtScanList, intMsScanCount, 0)
+                InitializeScanList(scanList, intMsScanCount, 0)
                 intLastSurveyScanIndex = -1
 
                 UpdateOverallProgress("Reading CDF/MGF data (" & intMsScanCount.ToString & " scans)" & ControlChars.NewLine & Path.GetFileName(strFilePath))
@@ -4781,7 +4641,7 @@ Public Class clsMASIC
 
                         If CheckScanInRange(intScanNumber, dblScanTime, udtSICOptions) Then
 
-                            With udtScanList
+                            With scanList
                                 If .SurveyScanCount + 1 >= .SurveyScans.Length Then
                                     ' This shouldn't really ever be reached, so we'll redim exactly to .SurveyScanCount
                                     ReDim Preserve .SurveyScans(.SurveyScanCount)
@@ -4883,7 +4743,7 @@ Public Class clsMASIC
 
                     UpdateOverallProgress(objSpectraCache)
                     If mAbortProcessing Then
-                        udtScanList.ProcessingIncomplete = True
+                        scanList.ProcessingIncomplete = True
                         Exit For
                     End If
 
@@ -4902,8 +4762,8 @@ Public Class clsMASIC
                 ' We loaded all of the survey scan data above
                 ' We can now initialize .MasterScanOrder()
                 intLastSurveyScanIndex = 0
-                udtScanList.MasterScanOrderCount = 0
-                AddMasterScanEntry(udtScanList, eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
+                scanList.MasterScanOrderCount = 0
+                AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
 
                 Dim surveyScansRecorded = New SortedSet(Of Integer)
                 surveyScansRecorded.Add(intLastSurveyScanIndex)
@@ -4918,14 +4778,14 @@ Public Class clsMASIC
 
                         mDatasetFileInfo.ScanCount += 1
 
-                        If objSpectrumInfo.ScanNumber < udtScanList.SurveyScans(intLastSurveyScanIndex).ScanNumber Then
+                        If objSpectrumInfo.ScanNumber < scanList.SurveyScans(intLastSurveyScanIndex).ScanNumber Then
                             ' The scan number for the current MS/MS spectrum is less than the last survey scan index scan number
                             ' This can happen, due to oddities with combining scans when creating the .MGF file
                             ' Need to decrement intLastSurveyScanIndex until we find the appropriate survey scan
                             Do
                                 intLastSurveyScanIndex -= 1
                                 If intLastSurveyScanIndex = 0 Then Exit Do
-                            Loop While objSpectrumInfo.ScanNumber < udtScanList.SurveyScans(intLastSurveyScanIndex).ScanNumber
+                            Loop While objSpectrumInfo.ScanNumber < scanList.SurveyScans(intLastSurveyScanIndex).ScanNumber
 
                         End If
 
@@ -4935,23 +4795,23 @@ Public Class clsMASIC
                             '  an older version of Agilent Chemstation.  These files typically have lines like ###MSMS: #13-29 instead of ###MSMS: #13/29/
                             ' If this indexing error is found, then we'll set intScanNumberCorrection = 1 and apply it to all subsequent MS/MS scans;
                             '  we'll also need to correct prior MS/MS scans
-                            For intSurveyScanIndex = intLastSurveyScanIndex To udtScanList.SurveyScanCount - 1
-                                If udtScanList.SurveyScans(intSurveyScanIndex).ScanNumber = objSpectrumInfo.ScanNumber Then
+                            For intSurveyScanIndex = intLastSurveyScanIndex To scanList.SurveyScanCount - 1
+                                If scanList.SurveyScans(intSurveyScanIndex).ScanNumber = objSpectrumInfo.ScanNumber Then
                                     ' Conflicting scan numbers were found
                                     intScanNumberCorrection = 1
 
                                     ' Need to update prior MS/MS scans
-                                    For intScanIndex = 0 To udtScanList.FragScanCount - 1
+                                    For intScanIndex = 0 To scanList.FragScanCount - 1
 
-                                        With udtScanList.FragScans(intScanIndex)
+                                        With scanList.FragScans(intScanIndex)
                                             .ScanNumber += intScanNumberCorrection
-                                            dblScanTime = InterpolateRTandFragScanNumber(udtScanList.SurveyScans, udtScanList.SurveyScanCount, 0, .ScanNumber, .FragScanInfo.FragScanNumber)
+                                            dblScanTime = InterpolateRTandFragScanNumber(scanList.SurveyScans, scanList.SurveyScanCount, 0, .ScanNumber, .FragScanInfo.FragScanNumber)
                                             .ScanTime = CSng(dblScanTime)
                                         End With
 
                                     Next intScanIndex
                                     Exit For
-                                ElseIf udtScanList.SurveyScans(intSurveyScanIndex).ScanNumber > objSpectrumInfo.ScanNumber Then
+                                ElseIf scanList.SurveyScans(intSurveyScanIndex).ScanNumber > objSpectrumInfo.ScanNumber Then
                                     Exit For
                                 End If
                             Next intSurveyScanIndex
@@ -4962,13 +4822,13 @@ Public Class clsMASIC
                             objSpectrumInfo.ScanNumberEnd += intScanNumberCorrection
                         End If
 
-                        dblScanTime = InterpolateRTandFragScanNumber(udtScanList.SurveyScans, udtScanList.SurveyScanCount, intLastSurveyScanIndex, objSpectrumInfo.ScanNumber, intFragScanIteration)
+                        dblScanTime = InterpolateRTandFragScanNumber(scanList.SurveyScans, scanList.SurveyScanCount, intLastSurveyScanIndex, objSpectrumInfo.ScanNumber, intFragScanIteration)
 
-                        ' Make sure this fragmentation scan isn't present yet in udtScanList.FragScans
+                        ' Make sure this fragmentation scan isn't present yet in scanList.FragScans
                         ' This can occur in Agilent .MGF files if the scan is listed both singly and grouped with other MS/MS scans
                         blnValidFragScan = True
-                        For intScanIndex = 0 To udtScanList.FragScanCount - 1
-                            If udtScanList.FragScans(intScanIndex).ScanNumber = objSpectrumInfo.ScanNumber Then
+                        For intScanIndex = 0 To scanList.FragScanCount - 1
+                            If scanList.FragScans(intScanIndex).ScanNumber = objSpectrumInfo.ScanNumber Then
                                 ' Duplicate found
                                 blnValidFragScan = False
                                 Exit For
@@ -4976,7 +4836,7 @@ Public Class clsMASIC
                         Next intScanIndex
 
                         If blnValidFragScan AndAlso CheckScanInRange(objSpectrumInfo.ScanNumber, dblScanTime, udtSICOptions) Then
-                            With udtScanList
+                            With scanList
 
                                 ' See if intLastSurveyScanIndex needs to be updated
                                 ' At the same time, populate .MasterScanOrder
@@ -4989,11 +4849,11 @@ Public Class clsMASIC
                                     If Not surveyScansRecorded.Contains(intLastSurveyScanIndex) Then
                                         surveyScansRecorded.Add(intLastSurveyScanIndex)
 
-                                        AddMasterScanEntry(udtScanList, eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
+                                        AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
                                     End If
                                 Loop
 
-                                AddMasterScanEntry(udtScanList, eScanTypeConstants.FragScan, .FragScanCount, objSpectrumInfo.ScanNumber, CSng(dblScanTime))
+                                AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.FragScan, .FragScanCount, objSpectrumInfo.ScanNumber, CSng(dblScanTime))
 
                                 If .FragScanCount + 1 >= .FragScans.Length Then
                                     ReDim Preserve .FragScans(.FragScanCount + 100)
@@ -5064,7 +4924,7 @@ Public Class clsMASIC
 
                             End With
 
-                            AddUpdateParentIons(udtScanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ, udtScanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
+                            AddUpdateParentIons(scanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ, scanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
                         End If
 
                         ' Note: We need to take intMsScanCount * 2, in addition to adding intMsScanCount to intLastSurveyScanIndex, since we have to read two different files
@@ -5076,12 +4936,12 @@ Public Class clsMASIC
 
                         UpdateOverallProgress(objSpectraCache)
                         If mAbortProcessing Then
-                            udtScanList.ProcessingIncomplete = True
+                            scanList.ProcessingIncomplete = True
                             Exit Do
                         End If
 
-                        If udtScanList.FragScanCount Mod 100 = 0 Then
-                            LogMessage("Reading MSMS scan index: " & udtScanList.FragScanCount.ToString)
+                        If scanList.FragScanCount Mod 100 = 0 Then
+                            LogMessage("Reading MSMS scan index: " & scanList.FragScanCount.ToString)
                             Console.Write(".")
                         End If
 
@@ -5094,7 +4954,7 @@ Public Class clsMASIC
                 objMGFReader.CloseFile()
 
                 ' Check for any other survey scans that need to be added to be added to MasterScanOrder
-                With udtScanList
+                With scanList
                     ' See if intLastSurveyScanIndex needs to be updated
                     ' At the same time, populate .MasterScanOrder
                     Do While intLastSurveyScanIndex < .SurveyScanCount - 1
@@ -5107,14 +4967,14 @@ Public Class clsMASIC
                             If Not surveyScansRecorded.Contains(intLastSurveyScanIndex) Then
                                 surveyScansRecorded.Add(intLastSurveyScanIndex)
 
-                                AddMasterScanEntry(udtScanList, eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
+                                AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
                             End If
                         End If
                     Loop
                 End With
 
-                ' Shrink the memory usage of the udtScanList arrays
-                With udtScanList
+                ' Shrink the memory usage of the scanList arrays
+                With scanList
                     ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
                     ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
                     ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
@@ -5124,18 +4984,18 @@ Public Class clsMASIC
                 End With
 
                 ' Make sure that MasterScanOrder really is sorted by scan number
-                ValidateMasterScanOrderSorting(udtScanList)
+                ValidateMasterScanOrderSorting(scanList)
 
                 ' Now that all of the data has been read, write out to the scan stats file, in order of scan number
-                For intScanIndex = 0 To udtScanList.MasterScanOrderCount - 1
+                For intScanIndex = 0 To scanList.MasterScanOrderCount - 1
 
-                    eScanType = udtScanList.MasterScanOrder(intScanIndex).ScanType
-                    If eScanType = eScanTypeConstants.SurveyScan Then
+                    eScanType = scanList.MasterScanOrder(intScanIndex).ScanType
+                    If eScanType = clsScanList.eScanTypeConstants.SurveyScan Then
                         ' Survey scan
-                        udtCurrentScan = udtScanList.SurveyScans(udtScanList.MasterScanOrder(intScanIndex).ScanIndexPointer)
+                        udtCurrentScan = scanList.SurveyScans(scanList.MasterScanOrder(intScanIndex).ScanIndexPointer)
                     Else
                         ' Frag Scan
-                        udtCurrentScan = udtScanList.FragScans(udtScanList.MasterScanOrder(intScanIndex).ScanIndexPointer)
+                        udtCurrentScan = scanList.FragScans(scanList.MasterScanOrder(intScanIndex).ScanIndexPointer)
                     End If
 
                     SaveScanStatEntry(udtOutputFileHandles.ScanStats, eScanType, udtCurrentScan, udtSICOptions.DatasetNumber)
@@ -5155,7 +5015,7 @@ Public Class clsMASIC
     Private Function ExtractScanInfoFromXcaliburDataFile(
       strFilePath As String,
       intDatasetID As Integer,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
       ByRef udtSICOptions As udtSICOptionsType,
@@ -5249,16 +5109,16 @@ Public Class clsMASIC
 
                 ' Pre-reserve memory for the maximum number of scans that might be loaded
                 ' Re-dimming after loading each scan is extremly slow and uses additional memory
-                InitializeScanList(udtScanList, intScanEnd - intScanStart + 1, intScanEnd - intScanStart + 1)
+                InitializeScanList(scanList, intScanEnd - intScanStart + 1, intScanEnd - intScanStart + 1)
                 intLastNonZoomSurveyScanIndex = -1
 
                 Dim htSIMScanMapping = New Dictionary(Of String, Integer)
-                udtScanList.SIMDataPresent = False
-                udtScanList.MRMDataPresent = False
+                scanList.SIMDataPresent = False
+                scanList.MRMDataPresent = False
 
                 For intScanNumber = intScanStart To intScanEnd
 
-                    Dim scanInfo As clsScanInfo = Nothing
+                    Dim scanInfo As ThermoRawFileReader.clsScanInfo = Nothing
 
                     blnSuccess = mXcaliburAccessor.GetScanInfo(intScanNumber, scanInfo)
 
@@ -5279,7 +5139,7 @@ Public Class clsMASIC
                         If scanInfo.MSLevel <= 1 Then
                             ' Survey Scan
                             blnSuccess = ExtractXcaliburSurveyScan(
-                               udtScanList, objSpectraCache, udtOutputFileHandles, udtSICOptions,
+                               scanList, objSpectraCache, udtOutputFileHandles, udtSICOptions,
                                blnKeepRawSpectra, scanInfo, htSIMScanMapping,
                                intLastNonZoomSurveyScanIndex, intScanNumber)
 
@@ -5287,7 +5147,7 @@ Public Class clsMASIC
 
                             ' Fragmentation Scan
                             blnSuccess = ExtractXcaliburFragmentationScan(
-                               udtScanList, objSpectraCache, udtOutputFileHandles, udtSICOptions, udtBinningOptions,
+                               scanList, objSpectraCache, udtOutputFileHandles, udtSICOptions, udtBinningOptions,
                                blnKeepRawSpectra, blnKeepMSMSSpectra, scanInfo,
                                intLastNonZoomSurveyScanIndex, intScanNumber)
 
@@ -5305,7 +5165,7 @@ Public Class clsMASIC
 
                     UpdateOverallProgress(objSpectraCache)
                     If mAbortProcessing Then
-                        udtScanList.ProcessingIncomplete = True
+                        scanList.ProcessingIncomplete = True
                         Exit For
                     End If
 
@@ -5325,8 +5185,8 @@ Public Class clsMASIC
                 Next intScanNumber
                 Console.WriteLine()
 
-                ' Shrink the memory usage of the udtScanList arrays
-                With udtScanList
+                ' Shrink the memory usage of the scanList arrays
+                With scanList
                     ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
                     ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
                     ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
@@ -5353,23 +5213,23 @@ Public Class clsMASIC
     End Function
 
     Protected Function ExtractXcaliburSurveyScan(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtOutputFileHandles As udtOutputFileHandlesType,
       udtSICOptions As udtSICOptionsType,
       blnKeepRawSpectra As Boolean,
-      ByRef scanInfo As clsScanInfo,
+      scanInfo As ThermoRawFileReader.clsScanInfo,
       htSIMScanMapping As Dictionary(Of String, Integer),
       ByRef intLastNonZoomSurveyScanIndex As Integer,
       intScanNumber As Integer) As Boolean
 
-        If udtScanList.SurveyScanCount + 1 >= udtScanList.SurveyScans.Length Then
+        If scanList.SurveyScanCount + 1 >= scanList.SurveyScans.Length Then
             ' This shouldn't normally happen, as the call to InitializeScanList() should have reserved sufficient memory
             ' Still, if we do reach this code, we'll increase the amount reserved to 25% more than .SurveyScanCount
-            ReDim Preserve udtScanList.SurveyScans(CInt(udtScanList.SurveyScanCount * 1.25))
+            ReDim Preserve scanList.SurveyScans(CInt(scanList.SurveyScanCount * 1.25))
         End If
 
-        With udtScanList.SurveyScans(udtScanList.SurveyScanCount)
+        With scanList.SurveyScans(scanList.SurveyScanCount)
             .ScanNumber = intScanNumber
             .ScanTime = CSng(scanInfo.RetentionTime)
 
@@ -5391,14 +5251,14 @@ Public Class clsMASIC
 
             If Not .MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is an MRM scan
-                udtScanList.MRMDataPresent = True
+                scanList.MRMDataPresent = True
             End If
 
             .LowMass = scanInfo.LowMass
             .HighMass = scanInfo.HighMass
 
             If .SIMScan Then
-                udtScanList.SIMDataPresent = True
+                scanList.SIMDataPresent = True
                 Dim strSIMKey = .LowMass & "_" & .HighMass
                 Dim simIndex As Integer
 
@@ -5426,13 +5286,13 @@ Public Class clsMASIC
             End If
         End With
 
-        With udtScanList
-            If Not udtScanList.SurveyScans(udtScanList.SurveyScanCount).ZoomScan Then
+        With scanList
+            If Not scanList.SurveyScans(scanList.SurveyScanCount).ZoomScan Then
                 intLastNonZoomSurveyScanIndex = .SurveyScanCount
             End If
             .SurveyScanCount += 1
 
-            AddMasterScanEntry(udtScanList, eScanTypeConstants.SurveyScan, .SurveyScanCount - 1)
+            AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.SurveyScan, .SurveyScanCount - 1)
 
             Dim dblMSDataResolution As Double
 
@@ -5452,7 +5312,7 @@ Public Class clsMASIC
             Dim blnSuccess = LoadSpectraForFinniganDataFile(mXcaliburAccessor, objSpectraCache, intScanNumber, .SurveyScans(.SurveyScanCount - 1), udtSICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, udtSICOptions.CompressMSSpectraData, dblMSDataResolution, blnKeepRawSpectra)
             If Not blnSuccess Then Return False
 
-            SaveScanStatEntry(udtOutputFileHandles.ScanStats, eScanTypeConstants.SurveyScan, .SurveyScans(.SurveyScanCount - 1), udtSICOptions.DatasetNumber)
+            SaveScanStatEntry(udtOutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, .SurveyScans(.SurveyScanCount - 1), udtSICOptions.DatasetNumber)
 
         End With
 
@@ -5461,24 +5321,24 @@ Public Class clsMASIC
     End Function
 
     Private Function ExtractXcaliburFragmentationScan(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtOutputFileHandles As udtOutputFileHandlesType,
       udtSICOptions As udtSICOptionsType,
       udtBinningOptions As clsCorrelation.udtBinningOptionsType,
       blnKeepRawSpectra As Boolean,
       blnKeepMSMSSpectra As Boolean,
-      ByRef scanInfo As clsScanInfo,
+      scanInfo As ThermoRawFileReader.clsScanInfo,
       ByRef intLastNonZoomSurveyScanIndex As Integer,
       intScanNumber As Integer) As Boolean
 
-        If udtScanList.FragScanCount + 1 >= udtScanList.FragScans.Length Then
+        If scanList.FragScanCount + 1 >= scanList.FragScans.Length Then
             ' This shouldn't normally happen, as the call to InitializeScanList() should have reserved sufficient memory
             ' Still, if we do reach this code, we'll increase the amount reserved to 25% more than .FragScanCount
-            ReDim Preserve udtScanList.FragScans(CInt(udtScanList.FragScanCount * 1.25))
+            ReDim Preserve scanList.FragScans(CInt(scanList.FragScanCount * 1.25))
         End If
 
-        With udtScanList.FragScans(udtScanList.FragScanCount)
+        With scanList.FragScans(scanList.FragScanCount)
             .ScanNumber = intScanNumber
             .ScanTime = CSng(scanInfo.RetentionTime)
 
@@ -5491,10 +5351,10 @@ Public Class clsMASIC
             .FragScanInfo.FragScanNumber = scanInfo.EventNumber - 1                                      ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
 
             ' The .EventNumber value is sometimes wrong; need to check for this
-            If udtScanList.FragScanCount > 0 Then
-                If udtScanList.FragScans(udtScanList.FragScanCount - 1).ScanNumber = .ScanNumber - 1 Then
-                    If .FragScanInfo.FragScanNumber <= udtScanList.FragScans(udtScanList.FragScanCount - 1).FragScanInfo.FragScanNumber Then
-                        .FragScanInfo.FragScanNumber = udtScanList.FragScans(udtScanList.FragScanCount - 1).FragScanInfo.FragScanNumber + 1
+            If scanList.FragScanCount > 0 Then
+                If scanList.FragScans(scanList.FragScanCount - 1).ScanNumber = .ScanNumber - 1 Then
+                    If .FragScanInfo.FragScanNumber <= scanList.FragScans(scanList.FragScanCount - 1).FragScanInfo.FragScanNumber Then
+                        .FragScanInfo.FragScanNumber = scanList.FragScans(scanList.FragScanCount - 1).FragScanInfo.FragScanNumber + 1
                     End If
                 End If
             End If
@@ -5511,21 +5371,21 @@ Public Class clsMASIC
             .MRMScanType = scanInfo.MRMScanType
         End With
 
-        If Not udtScanList.FragScans(udtScanList.FragScanCount).MRMScanType = MRMScanTypeConstants.NotMRM Then
+        If Not scanList.FragScans(scanList.FragScanCount).MRMScanType = MRMScanTypeConstants.NotMRM Then
             ' This is an MRM scan
-            udtScanList.MRMDataPresent = True
+            scanList.MRMDataPresent = True
 
-            DuplicateMRMInfo(scanInfo.MRMInfo, scanInfo.ParentIonMZ, udtScanList.FragScans(udtScanList.FragScanCount).MRMScanInfo)
+            scanList.FragScans(scanList.FragScanCount).MRMScanInfo = DuplicateMRMInfo(scanInfo.MRMInfo, scanInfo.ParentIonMZ)
 
-            If udtScanList.SurveyScanCount = 0 Then
+            If scanList.SurveyScanCount = 0 Then
                 ' Need to add a "fake" survey scan that we can map this parent ion to
-                intLastNonZoomSurveyScanIndex = AddFakeSurveyScan(udtScanList)
+                intLastNonZoomSurveyScanIndex = AddFakeSurveyScan(scanList)
             End If
         Else
-            udtScanList.FragScans(udtScanList.FragScanCount).MRMScanInfo.MRMMassCount = 0
+            scanList.FragScans(scanList.FragScanCount).MRMScanInfo.MRMMassCount = 0
         End If
 
-        With udtScanList.FragScans(udtScanList.FragScanCount)
+        With scanList.FragScans(scanList.FragScanCount)
             .LowMass = scanInfo.LowMass
             .HighMass = scanInfo.HighMass
 
@@ -5545,10 +5405,10 @@ Public Class clsMASIC
             End If
         End With
 
-        With udtScanList
+        With scanList
             .FragScanCount += 1
 
-            AddMasterScanEntry(udtScanList, eScanTypeConstants.FragScan, .FragScanCount - 1)
+            AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.FragScan, .FragScanCount - 1)
 
             ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             Dim dblMSDataResolution = udtBinningOptions.BinSize / udtSICOptions.CompressToleranceDivisorForDa
@@ -5566,16 +5426,16 @@ Public Class clsMASIC
 
             If Not blnSuccess Then Return False
 
-            SaveScanStatEntry(udtOutputFileHandles.ScanStats, eScanTypeConstants.FragScan, .FragScans(.FragScanCount - 1), udtSICOptions.DatasetNumber)
+            SaveScanStatEntry(udtOutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, .FragScans(.FragScanCount - 1), udtSICOptions.DatasetNumber)
 
         End With
 
         If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
             ' This is not an MRM scan
-            AddUpdateParentIons(udtScanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, udtScanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
+            AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, scanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
         Else
             ' This is an MRM scan
-            AddUpdateParentIons(udtScanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, udtScanList.FragScans(udtScanList.FragScanCount - 1).MRMScanInfo, objSpectraCache, udtSICOptions)
+            AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, scanList.FragScans(scanList.FragScanCount - 1).MRMScanInfo, objSpectraCache, udtSICOptions)
         End If
 
         Return True
@@ -5586,7 +5446,7 @@ Public Class clsMASIC
     Private Function ExtractScanInfoFromMZXMLDataFile(
       strFilePath As String,
       intDatasetID As Integer,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
       ByRef udtSICOptions As udtSICOptionsType,
@@ -5598,7 +5458,7 @@ Public Class clsMASIC
 
         Try
             objXMLReader = New MSDataFileReader.clsMzXMLFileReader
-            Return ExtractScanInfoFromMSXMLDataFile(strFilePath, intDatasetID, objXMLReader, udtScanList, objSpectraCache, udtOutputFileHandles, udtSICOptions, udtBinningOptions, mStatusMessage, blnKeepRawSpectra, blnKeepMSMSSpectra)
+            Return ExtractScanInfoFromMSXMLDataFile(strFilePath, intDatasetID, objXMLReader, scanList, objSpectraCache, udtOutputFileHandles, udtSICOptions, udtBinningOptions, mStatusMessage, blnKeepRawSpectra, blnKeepMSMSSpectra)
 
         Catch ex As Exception
             LogErrors("ExtractScanInfoFromMZXMLDataFile", "Error in ExtractScanInfoFromMZXMLDataFile", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
@@ -5610,7 +5470,7 @@ Public Class clsMASIC
     Private Function ExtractScanInfoFromMZDataFile(
       strFilePath As String,
       intDatasetID As Integer,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
       ByRef udtSICOptions As udtSICOptionsType,
@@ -5622,7 +5482,7 @@ Public Class clsMASIC
 
         Try
             objXMLReader = New MSDataFileReader.clsMzDataFileReader
-            Return ExtractScanInfoFromMSXMLDataFile(strFilePath, intDatasetID, objXMLReader, udtScanList, objSpectraCache, udtOutputFileHandles, udtSICOptions, udtBinningOptions, mStatusMessage, blnKeepRawSpectra, blnKeepMSMSSpectra)
+            Return ExtractScanInfoFromMSXMLDataFile(strFilePath, intDatasetID, objXMLReader, scanList, objSpectraCache, udtOutputFileHandles, udtSICOptions, udtBinningOptions, mStatusMessage, blnKeepRawSpectra, blnKeepMSMSSpectra)
 
         Catch ex As Exception
             LogErrors("ExtractScanInfoFromMZDataFile", "Error in ExtractScanInfoFromMZDataFile", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
@@ -5635,7 +5495,7 @@ Public Class clsMASIC
       strFilePath As String,
       intDatasetID As Integer,
       ByRef objXMLReader As MSDataFileReader.clsMSDataFileReaderBaseClass,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
       ByRef udtSICOptions As udtSICOptionsType,
@@ -5692,13 +5552,13 @@ Public Class clsMASIC
             ' We won't know the total scan count until we have read all the data
             ' Thus, initially reserve space for 1000 scans
 
-            InitializeScanList(udtScanList, 1000, 1000)
+            InitializeScanList(scanList, 1000, 1000)
             intLastSurveyScanIndex = -1
             intLastSurveyScanIndexInMasterSeqOrder = -1
             intLastNonZoomSurveyScanIndex = -1
 
-            udtScanList.SIMDataPresent = False
-            udtScanList.MRMDataPresent = False
+            scanList.SIMDataPresent = False
+            scanList.MRMDataPresent = False
 
             UpdateOverallProgress("Reading XML data" & ControlChars.NewLine & Path.GetFileName(strFilePath))
             LogMessage("Reading XML data from " & strFilePath)
@@ -5733,12 +5593,12 @@ Public Class clsMASIC
                         ' If yes, determine the scan number of the survey scan
                         If objSpectrumInfo.MSLevel <= 1 Then
                             ' Survey Scan
-                            If udtScanList.SurveyScanCount + 1 >= udtScanList.SurveyScans.Length Then
+                            If scanList.SurveyScanCount + 1 >= scanList.SurveyScans.Length Then
                                 ' Double the space reserved for .SurveyScans
-                                ReDim Preserve udtScanList.SurveyScans(udtScanList.SurveyScans.Length * 2 - 1)
+                                ReDim Preserve scanList.SurveyScans(scanList.SurveyScans.Length * 2 - 1)
                             End If
 
-                            With udtScanList.SurveyScans(udtScanList.SurveyScanCount)
+                            With scanList.SurveyScans(scanList.SurveyScanCount)
                                 .ScanNumber = objSpectrumInfo.ScanNumber
                                 .ScanTime = objSpectrumInfo.RetentionTimeMin
 
@@ -5765,13 +5625,13 @@ Public Class clsMASIC
 
                             End With
 
-                            UpdateMSXmlScanType(udtScanList.SurveyScans(udtScanList.SurveyScanCount), objSpectrumInfo.MSLevel, "MS", blnIsMzXML, objMZXmlSpectrumInfo)
+                            UpdateMSXmlScanType(scanList.SurveyScans(scanList.SurveyScanCount), objSpectrumInfo.MSLevel, "MS", blnIsMzXML, objMZXmlSpectrumInfo)
 
-                            With udtScanList
+                            With scanList
                                 intLastSurveyScanIndex = .SurveyScanCount
                                 .SurveyScanCount += 1
 
-                                AddMasterScanEntry(udtScanList, eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
+                                AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
                                 intLastSurveyScanIndexInMasterSeqOrder = .MasterScanOrderCount - 1
 
                                 If udtSICOptions.SICToleranceIsPPM Then
@@ -5798,18 +5658,18 @@ Public Class clsMASIC
                                  udtSICOptions.SimilarIonMZToleranceHalfWidth / udtSICOptions.CompressToleranceDivisorForDa,
                                  blnKeepRawSpectra)
 
-                                SaveScanStatEntry(udtOutputFileHandles.ScanStats, eScanTypeConstants.SurveyScan, .SurveyScans(.SurveyScanCount - 1), udtSICOptions.DatasetNumber)
+                                SaveScanStatEntry(udtOutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, .SurveyScans(.SurveyScanCount - 1), udtSICOptions.DatasetNumber)
 
                             End With
                         Else
                             ' Fragmentation Scan
 
-                            If udtScanList.FragScanCount + 1 >= udtScanList.FragScans.Length Then
+                            If scanList.FragScanCount + 1 >= scanList.FragScans.Length Then
                                 ' Double the space reserved for .FragScans
-                                ReDim Preserve udtScanList.FragScans(udtScanList.FragScans.Length * 2 - 1)
+                                ReDim Preserve scanList.FragScans(scanList.FragScans.Length * 2 - 1)
                             End If
 
-                            With udtScanList.FragScans(udtScanList.FragScanCount)
+                            With scanList.FragScans(scanList.FragScanCount)
                                 .ScanNumber = objSpectrumInfo.ScanNumber
                                 .ScanTime = objSpectrumInfo.RetentionTimeMin
 
@@ -5820,7 +5680,7 @@ Public Class clsMASIC
                                 .BasePeakIonMZ = objSpectrumInfo.BasePeakMZ
                                 .BasePeakIonIntensity = objSpectrumInfo.BasePeakIntensity
 
-                                .FragScanInfo.FragScanNumber = (udtScanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder      ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
+                                .FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder      ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
                                 .FragScanInfo.MSLevel = objSpectrumInfo.MSLevel
 
                                 .TotalIonIntensity = CSng(Math.Min(objSpectrumInfo.TotalIonCurrent, Single.MaxValue))
@@ -5837,19 +5697,19 @@ Public Class clsMASIC
 
                             End With
 
-                            UpdateMSXmlScanType(udtScanList.FragScans(udtScanList.FragScanCount), objSpectrumInfo.MSLevel, "MSn", blnIsMzXML, objMZXmlSpectrumInfo)
+                            UpdateMSXmlScanType(scanList.FragScans(scanList.FragScanCount), objSpectrumInfo.MSLevel, "MSn", blnIsMzXML, objMZXmlSpectrumInfo)
 
-                            eMRMScanType = udtScanList.FragScans(udtScanList.FragScanCount).MRMScanType
+                            eMRMScanType = scanList.FragScans(scanList.FragScanCount).MRMScanType
                             If Not eMRMScanType = MRMScanTypeConstants.NotMRM Then
                                 ' This is an MRM scan
-                                udtScanList.MRMDataPresent = True
+                                scanList.MRMDataPresent = True
 
-                                Dim scanInfo = New clsScanInfo(objSpectrumInfo.SpectrumID)
+                                Dim scanInfo = New ThermoRawFileReader.clsScanInfo(objSpectrumInfo.SpectrumID)
 
                                 With scanInfo
-                                    .FilterText = udtScanList.FragScans(udtScanList.FragScanCount).ScanHeaderText
+                                    .FilterText = scanList.FragScans(scanList.FragScanCount).ScanHeaderText
                                     .MRMScanType = eMRMScanType
-                                    .MRMInfo = New MRMInfo
+                                    .MRMInfo = New MRMInfo()
 
                                     If Not String.IsNullOrEmpty(.FilterText) Then
                                         ' Parse out the MRM_QMS or SRM information for this scan
@@ -5881,26 +5741,26 @@ Public Class clsMASIC
                                     End If
                                 End With
 
-                                DuplicateMRMInfo(scanInfo.MRMInfo, objSpectrumInfo.ParentIonMZ, udtScanList.FragScans(udtScanList.FragScanCount).MRMScanInfo)
+                                scanList.FragScans(scanList.FragScanCount).MRMScanInfo = DuplicateMRMInfo(scanInfo.MRMInfo, objSpectrumInfo.ParentIonMZ)
 
 
-                                If udtScanList.SurveyScanCount = 0 Then
+                                If scanList.SurveyScanCount = 0 Then
                                     ' Need to add a "fake" survey scan that we can map this parent ion to
-                                    intLastNonZoomSurveyScanIndex = AddFakeSurveyScan(udtScanList)
+                                    intLastNonZoomSurveyScanIndex = AddFakeSurveyScan(scanList)
                                 End If
                             Else
-                                udtScanList.FragScans(udtScanList.FragScanCount).MRMScanInfo.MRMMassCount = 0
+                                scanList.FragScans(scanList.FragScanCount).MRMScanInfo.MRMMassCount = 0
                             End If
 
-                            With udtScanList.FragScans(udtScanList.FragScanCount)
+                            With scanList.FragScans(scanList.FragScanCount)
                                 .LowMass = objSpectrumInfo.mzRangeStart
                                 .HighMass = objSpectrumInfo.mzRangeEnd
                             End With
 
-                            With udtScanList
+                            With scanList
                                 .FragScanCount += 1
 
-                                AddMasterScanEntry(udtScanList, eScanTypeConstants.FragScan, .FragScanCount - 1)
+                                AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.FragScan, .FragScanCount - 1)
 
                                 ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
                                 StoreMzXmlSpectrum(
@@ -5913,16 +5773,16 @@ Public Class clsMASIC
                                  udtBinningOptions.BinSize / udtSICOptions.CompressToleranceDivisorForDa,
                                  blnKeepRawSpectra And blnKeepMSMSSpectra)
 
-                                SaveScanStatEntry(udtOutputFileHandles.ScanStats, eScanTypeConstants.FragScan, .FragScans(.FragScanCount - 1), udtSICOptions.DatasetNumber)
+                                SaveScanStatEntry(udtOutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, .FragScans(.FragScanCount - 1), udtSICOptions.DatasetNumber)
 
                             End With
 
                             If eMRMScanType = MRMScanTypeConstants.NotMRM Then
                                 ' This is not an MRM scan
-                                AddUpdateParentIons(udtScanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ, udtScanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
+                                AddUpdateParentIons(scanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ, scanList.FragScanCount - 1, objSpectraCache, udtSICOptions)
                             Else
                                 ' This is an MRM scan
-                                AddUpdateParentIons(udtScanList, intLastNonZoomSurveyScanIndex, objSpectrumInfo.ParentIonMZ, udtScanList.FragScans(udtScanList.FragScanCount - 1).MRMScanInfo, objSpectraCache, udtSICOptions)
+                                AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, objSpectrumInfo.ParentIonMZ, scanList.FragScans(scanList.FragScanCount - 1).MRMScanInfo, objSpectraCache, udtSICOptions)
                             End If
 
                         End If
@@ -5933,20 +5793,20 @@ Public Class clsMASIC
 
                     UpdateOverallProgress(objSpectraCache)
                     If mAbortProcessing Then
-                        udtScanList.ProcessingIncomplete = True
+                        scanList.ProcessingIncomplete = True
                         Exit Do
                     End If
 
-                    If (udtScanList.MasterScanOrderCount - 1) Mod 100 = 0 Then
-                        LogMessage("Reading scan index: " & (udtScanList.MasterScanOrderCount - 1).ToString)
+                    If (scanList.MasterScanOrderCount - 1) Mod 100 = 0 Then
+                        LogMessage("Reading scan index: " & (scanList.MasterScanOrderCount - 1).ToString)
                         Console.Write(".")
                     End If
 
                 End If
             Loop While blnScanFound
 
-            ' Shrink the memory usage of the udtScanList arrays
-            With udtScanList
+            ' Shrink the memory usage of the scanList arrays
+            With scanList
                 ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
                 ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
                 ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
@@ -5955,7 +5815,7 @@ Public Class clsMASIC
                 ReDim Preserve .FragScans(.FragScanCount - 1)
             End With
 
-            If udtScanList.MasterScanOrderCount <= 0 Then
+            If scanList.MasterScanOrderCount <= 0 Then
                 ' No scans found
                 strStatusMessage = "No scans found in the input file: " & strFilePath
                 SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
@@ -5987,7 +5847,7 @@ Public Class clsMASIC
     End Function
 
     Private Sub UpdateMSXmlScanType(
-      ByRef udtScanInfo As udtScanInfoType,
+      scanInfo As clsScanInfo,
       intMSLevel As Integer,
       strDefaultScanType As String,
       blnIsMzXML As Boolean,
@@ -5995,7 +5855,7 @@ Public Class clsMASIC
 
         Dim intMSLevelFromFilter As Integer
 
-        With udtScanInfo
+        With scanInfo
             If blnIsMzXML Then
                 ' Store the filter line text in .ScanHeaderText
                 ' Only Thermo files processed with ReadW will have a FilterLine
@@ -6109,7 +5969,7 @@ Public Class clsMASIC
 
     Private Function FindClosestMZ(
       objSpectraCache As clsSpectraCache,
-      ByRef udtScanInfo() As udtScanInfoType,
+      scanList() As clsScanInfo,
       intSpectrumIndex As Integer,
       dblSearchMZ As Double,
       dblToleranceMZ As Double,
@@ -6121,11 +5981,11 @@ Public Class clsMASIC
         dblBestMatchMZ = 0
 
         Try
-            If udtScanInfo(intSpectrumIndex).IonCount = 0 And udtScanInfo(intSpectrumIndex).IonCountRaw = 0 Then
+            If scanList(intSpectrumIndex).IonCount = 0 And scanList(intSpectrumIndex).IonCountRaw = 0 Then
                 ' No data in this spectrum
                 blnSuccess = False
             Else
-                If Not objSpectraCache.ValidateSpectrumInPool(udtScanInfo(intSpectrumIndex).ScanNumber, intPoolIndex) Then
+                If Not objSpectraCache.ValidateSpectrumInPool(scanList(intSpectrumIndex).ScanNumber, intPoolIndex) Then
                     SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                     blnSuccess = False
                 Else
@@ -6188,14 +6048,14 @@ Public Class clsMASIC
 
     Private Function FindMaxValueInMZRange(
       objSpectraCache As clsSpectraCache,
-      ByRef udtScanInfo() As udtScanInfoType,
+      scanList() As clsScanInfo,
       intSpectrumIndex As Integer,
       dblMZStart As Double,
       dblMZEnd As Double,
       ByRef dblBestMatchMZ As Double,
       ByRef sngMatchIntensity As Single) As Boolean
 
-        ' Searches udtScanInfo(intSpectrumIndex).IonsMZ for the maximum value between dblMZStart and dblMZEnd
+        ' Searches scanList(intSpectrumIndex).IonsMZ for the maximum value between dblMZStart and dblMZEnd
         ' If a match is found, then updates dblBestMatchMZ to the m/z of the match, updates sngMatchIntensity to its intensity,
         '  and returns True
         '
@@ -6207,7 +6067,7 @@ Public Class clsMASIC
         Dim blnSuccess As Boolean
 
         Try
-            If Not objSpectraCache.ValidateSpectrumInPool(udtScanInfo(intSpectrumIndex).ScanNumber, intPoolIndex) Then
+            If Not objSpectraCache.ValidateSpectrumInPool(scanList(intSpectrumIndex).ScanNumber, intPoolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                 blnSuccess = False
             Else
@@ -6279,7 +6139,7 @@ Public Class clsMASIC
     End Function
 
     Private Function FindNearestSurveyScanIndex(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       sngScanOrAcqTime As Single,
       eScanType As eCustomSICScanTypeConstants) As Integer
 
@@ -6293,14 +6153,14 @@ Public Class clsMASIC
 
         Try
             intSurveyScanIndexMatch = -1
-            intScanNumberToFind = ScanOrAcqTimeToAbsolute(udtScanList, sngScanOrAcqTime, eScanType, False)
-            For intIndex = 0 To udtScanList.SurveyScanCount - 1
-                If udtScanList.SurveyScans(intIndex).ScanNumber >= intScanNumberToFind Then
+            intScanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, sngScanOrAcqTime, eScanType, False)
+            For intIndex = 0 To scanList.SurveyScanCount - 1
+                If scanList.SurveyScans(intIndex).ScanNumber >= intScanNumberToFind Then
                     intSurveyScanIndexMatch = intIndex
-                    If udtScanList.SurveyScans(intIndex).ScanNumber <> intScanNumberToFind AndAlso intIndex < udtScanList.SurveyScanCount - 1 Then
+                    If scanList.SurveyScans(intIndex).ScanNumber <> intScanNumberToFind AndAlso intIndex < scanList.SurveyScanCount - 1 Then
                         ' Didn't find an exact match; determine which survey scan is closer
-                        If Math.Abs(udtScanList.SurveyScans(intIndex + 1).ScanNumber - intScanNumberToFind) <
-                           Math.Abs(udtScanList.SurveyScans(intIndex).ScanNumber - intScanNumberToFind) Then
+                        If Math.Abs(scanList.SurveyScans(intIndex + 1).ScanNumber - intScanNumberToFind) <
+                           Math.Abs(scanList.SurveyScans(intIndex).ScanNumber - intScanNumberToFind) Then
                             intSurveyScanIndexMatch += 1
                         End If
                     End If
@@ -6310,8 +6170,8 @@ Public Class clsMASIC
 
             If intSurveyScanIndexMatch < 0 Then
                 ' Match not found; return either the first or the last survey scan
-                If udtScanList.SurveyScanCount > 0 Then
-                    intSurveyScanIndexMatch = udtScanList.SurveyScanCount - 1
+                If scanList.SurveyScanCount > 0 Then
+                    intSurveyScanIndexMatch = scanList.SurveyScanCount - 1
                 Else
                     intSurveyScanIndexMatch = 0
                 End If
@@ -6328,13 +6188,13 @@ Public Class clsMASIC
     ''' <summary>
     ''' Returns the index of the scan closest to sngScanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
     ''' </summary>
-    ''' <param name="udtScanList"></param>
+    ''' <param name="scanList"></param>
     ''' <param name="sngScanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
     ''' <param name="eScanType">Specifies what type of value value sngScanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Private Function FindNearestScanNumIndex(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       sngScanOrAcqTime As Single,
       eScanType As eCustomSICScanTypeConstants) As Integer
 
@@ -6343,12 +6203,12 @@ Public Class clsMASIC
 
         Try
             If eScanType = eCustomSICScanTypeConstants.Absolute Or eScanType = eCustomSICScanTypeConstants.Relative Then
-                intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(udtScanList, sngScanOrAcqTime, eScanType, False)
-                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanNumList, intAbsoluteScanNumber, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+                intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, sngScanOrAcqTime, eScanType, False)
+                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, intAbsoluteScanNumber, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
             Else
                 ' eScanType = eCustomSICScanTypeConstants.AcquisitionTime
-                ' Find the closest match in udtScanList.MasterScanTimeList
-                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(udtScanList.MasterScanTimeList, sngScanOrAcqTime, udtScanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+                ' Find the closest match in scanList.MasterScanTimeList
+                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanTimeList, sngScanOrAcqTime, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
             End If
 
         Catch ex As Exception
@@ -6359,7 +6219,7 @@ Public Class clsMASIC
         Return intScanIndexMatch
     End Function
 
-    ''Private Sub FindMinimumPotentialPeakAreaInRegion(ByRef udtScanList As udtScanListType, intParentIonIndexStart As Integer, intParentIonIndexEnd As Integer, ByRef udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType)
+    ''Private Sub FindMinimumPotentialPeakAreaInRegion(scanList As clsScanList, intParentIonIndexStart As Integer, intParentIonIndexEnd As Integer, ByRef udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType)
     ''    ' This function finds the minimum potential peak area in the parent ions between
     ''    '  intParentIonIndexStart and intParentIonIndexEnd
     ''    ' However, the summed intensity is not used if the number of points >= .SICNoiseThresholdIntensity is less than MASICPeakFinder.clsMASICPeakFinder.MINIMUM_PEAK_WIDTH
@@ -6373,7 +6233,7 @@ Public Class clsMASIC
     ''    End With
 
     ''    For intParentIonIndex = intParentIonIndexStart To intParentIonIndexEnd
-    ''        With udtScanList.ParentIons(intParentIonIndex).SICStats.SICPotentialAreaStatsForPeak
+    ''        With scanList.ParentIons(intParentIonIndex).SICStats.SICPotentialAreaStatsForPeak
 
     ''            If .MinimumPotentialPeakArea > 0 AndAlso .PeakCountBasisForMinimumPotentialArea >= MASICPeakFinder.clsMASICPeakFinder.MINIMUM_PEAK_WIDTH Then
     ''                If .PeakCountBasisForMinimumPotentialArea > udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
@@ -6399,7 +6259,7 @@ Public Class clsMASIC
 
     ''End Sub
 
-    ''Private Function FindSICPeakAndAreaForParentIon(ByRef udtScanList As udtScanListType, intParentIonIndex As Integer, ByRef udtSICDetails As udtSICStatsDetailsType, ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType, udtSICOptions As udtSICOptionsType) As Boolean
+    ''Private Function FindSICPeakAndAreaForParentIon(scanList As clsScanList, intParentIonIndex As Integer, ByRef udtSICDetails As udtSICStatsDetailsType, ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType, udtSICOptions As udtSICOptionsType) As Boolean
 
     ''    Const RECOMPUTE_NOISE_LEVEL As Boolean = True
 
@@ -6432,9 +6292,9 @@ Public Class clsMASIC
     ''        ' Determine the minimum potential peak area in the last 500 scans
     ''        intParentIonIndexStart = intParentIonIndex - 500
     ''        If intParentIonIndexStart < 0 Then intParentIonIndexStart = 0
-    ''        FindMinimumPotentialPeakAreaInRegion(udtScanList, intParentIonIndexStart, intParentIonIndex, udtSICPotentialAreaStatsForRegion)
+    ''        FindMinimumPotentialPeakAreaInRegion(scanList, intParentIonIndexStart, intParentIonIndex, udtSICPotentialAreaStatsForRegion)
 
-    ''        With udtScanList
+    ''        With scanList
     ''            With .ParentIons(intParentIonIndex)
     ''                intScanIndexObserved = .SurveyScanIndex
     ''                If intScanIndexObserved < 0 Then intScanIndexObserved = 0
@@ -6482,7 +6342,7 @@ Public Class clsMASIC
 
     ''                    ReDim intSICScanNumbers(udtSICDetails.SICDataCount - 1)
     ''                    For intSurveyScanIndex = 0 To udtSICDetails.SICDataCount - 1
-    ''                        intSICScanNumbers(intSurveyScanIndex) = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(intSurveyScanIndex)).ScanNumber
+    ''                        intSICScanNumbers(intSurveyScanIndex) = scanList.SurveyScans(udtSICDetails.SICScanIndices(intSurveyScanIndex)).ScanNumber
     ''                        If intSurveyScanIndex > 0 Then
     ''                            intScanDelta = intSICScanNumbers(intSurveyScanIndex) - intSICScanNumbers(intSurveyScanIndex - 1)
     ''                            udtSICDetails.SICDataScanIntervals(intSurveyScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))        ' Make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
@@ -6490,7 +6350,7 @@ Public Class clsMASIC
     ''                    Next intSurveyScanIndex
 
     ''                    ' Record the fragmentation scan number
-    ''                    intFragScanNumber = udtScanList.FragScans(udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
+    ''                    intFragScanNumber = scanList.FragScans(scanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
 
     ''                    ' Determine the value for .ParentIonIntensity
     ''                    blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(udtSICDetails.SICDataCount, intSICScanNumbers, udtSICDetails.SICData, .Peak, intFragScanNumber)
@@ -6498,7 +6358,7 @@ Public Class clsMASIC
     ''                    blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(udtSICDetails.SICDataCount, intSICScanNumbers, udtSICDetails.SICData, .SICPotentialAreaStatsForPeak, .Peak,
     ''                                                                     udtSmoothedYDataSubset, udtSICOptions.SICPeakFinderOptions,
     ''                                                                     udtSICPotentialAreaStatsForRegion,
-    ''                                                                     Not blnCustomSICPeak, udtScanList.SIMDataPresent, RECOMPUTE_NOISE_LEVEL)
+    ''                                                                     Not blnCustomSICPeak, scanList.SIMDataPresent, RECOMPUTE_NOISE_LEVEL)
 
     ''                    If blnSuccess Then
     ''                        ' Record the survey scan indices of the peak max, start, and end
@@ -6528,7 +6388,7 @@ Public Class clsMASIC
     ''                ' Update .OptimalPeakApexScanNumber
     ''                ' Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
     ''                With .ParentIons(intParentIonIndex)
-    ''                    .OptimalPeakApexScanNumber = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+    ''                    .OptimalPeakApexScanNumber = scanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
     ''                End With
 
     ''            End If
@@ -6550,7 +6410,7 @@ Public Class clsMASIC
     ''' Looks for the reporter ion peaks using FindReporterIonsWork
     ''' </summary>
     ''' <param name="udtSICOptions"></param>
-    ''' <param name="udtScanList"></param>
+    ''' <param name="scanList"></param>
     ''' <param name="objSpectraCache"></param>
     ''' <param name="strInputFileName"></param>
     ''' <param name="strOutputFolderPath"></param>
@@ -6558,7 +6418,7 @@ Public Class clsMASIC
     ''' <remarks></remarks>
     Private Function FindReporterIons(
       ByRef udtSICOptions As udtSICOptionsType,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       strInputFileName As String,
       strOutputFolderPath As String) As Boolean
@@ -6668,17 +6528,17 @@ Public Class clsMASIC
 
             SetSubtaskProcessingStepPct(0, "Searching for reporter ions")
 
-            For intMasterOrderIndex = 0 To udtScanList.MasterScanOrderCount - 1
-                intScanPointer = udtScanList.MasterScanOrder(intMasterOrderIndex).ScanIndexPointer
-                If udtScanList.MasterScanOrder(intMasterOrderIndex).ScanType = eScanTypeConstants.SurveyScan Then
+            For intMasterOrderIndex = 0 To scanList.MasterScanOrderCount - 1
+                intScanPointer = scanList.MasterScanOrder(intMasterOrderIndex).ScanIndexPointer
+                If scanList.MasterScanOrder(intMasterOrderIndex).ScanType = clsScanList.eScanTypeConstants.SurveyScan Then
                     ' Skip Survey Scans
                 Else
 
                     FindReporterIonsWork(
                        udtSICOptions,
-                       udtScanList,
+                       scanList,
                        objSpectraCache,
-                       udtScanList.FragScans(intScanPointer),
+                       scanList.FragScans(intScanPointer),
                        srOutFile,
                        udtReporterIonInfo,
                        cColDelimiter,
@@ -6686,8 +6546,8 @@ Public Class clsMASIC
 
                 End If
 
-                If udtScanList.MasterScanOrderCount > 1 Then
-                    SetSubtaskProcessingStepPct(CShort(intMasterOrderIndex / (udtScanList.MasterScanOrderCount - 1) * 100))
+                If scanList.MasterScanOrderCount > 1 Then
+                    SetSubtaskProcessingStepPct(CShort(intMasterOrderIndex / (scanList.MasterScanOrderCount - 1) * 100))
                 Else
                     SetSubtaskProcessingStepPct(0)
                 End If
@@ -6717,9 +6577,9 @@ Public Class clsMASIC
     ''' Calls AggregateIonsInRange with blnReturnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
     ''' </summary>
     ''' <param name="udtSICOptions"></param>
-    ''' <param name="udtScanList"></param>
+    ''' <param name="scanList"></param>
     ''' <param name="objSpectraCache"></param>
-    ''' <param name="udtScan"></param>
+    ''' <param name="currentScan"></param>
     ''' <param name="srOutFile"></param>
     ''' <param name="udtReporterIonInfo"></param>
     ''' <param name="cColDelimiter"></param>
@@ -6727,9 +6587,9 @@ Public Class clsMASIC
     ''' <remarks></remarks>
     Private Sub FindReporterIonsWork(
       ByRef udtSICOptions As udtSICOptionsType,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
-      ByRef udtScan As udtScanInfoType,
+      currentScan As clsScanInfo,
       ByRef srOutFile As StreamWriter,
       ByRef udtReporterIonInfo() As udtReporterIonInfoType,
       cColDelimiter As Char,
@@ -6766,13 +6626,13 @@ Public Class clsMASIC
         ' Using Absolute Value of percent change to avoid averaging both negative and positive values
         Dim sngWeightedAvgPctIntensityCorrection As Single
 
-        If udtScan.FragScanInfo.ParentIonInfoIndex >= 0 AndAlso udtScan.FragScanInfo.ParentIonInfoIndex < udtScanList.ParentIons.Count Then
-            dblParentIonMZ = udtScanList.ParentIons(udtScan.FragScanInfo.ParentIonInfoIndex).MZ
+        If currentScan.FragScanInfo.ParentIonInfoIndex >= 0 AndAlso currentScan.FragScanInfo.ParentIonInfoIndex < scanList.ParentIons.Count Then
+            dblParentIonMZ = scanList.ParentIons(currentScan.FragScanInfo.ParentIonInfoIndex).MZ
         Else
             dblParentIonMZ = 0
         End If
 
-        If Not objSpectraCache.ValidateSpectrumInPool(udtScan.ScanNumber, intPoolIndex) Then
+        If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
             SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
             Exit Sub
         End If
@@ -6784,11 +6644,11 @@ Public Class clsMASIC
 
         ' Initialize the output variables
         strOutLine = udtSICOptions.DatasetNumber.ToString & cColDelimiter &
-         udtScan.ScanNumber.ToString & cColDelimiter &
-         udtScan.FragScanInfo.CollisionMode & cColDelimiter &
+         currentScan.ScanNumber.ToString & cColDelimiter &
+         currentScan.FragScanInfo.CollisionMode & cColDelimiter &
          Math.Round(dblParentIonMZ, 2).ToString & cColDelimiter &
-         Math.Round(udtScan.BasePeakIonIntensity, 2).ToString & cColDelimiter &
-         Math.Round(udtScan.BasePeakIonMZ, 4).ToString
+         Math.Round(currentScan.BasePeakIonIntensity, 2).ToString & cColDelimiter &
+         Math.Round(currentScan.BasePeakIonMZ, 4).ToString
 
         strReporterIntensityList = String.Empty
         strObsMZList = String.Empty
@@ -6923,7 +6783,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function FindSimilarParentIons(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtSICOptions As udtSICOptionsType,
       udtBinningOptions As clsCorrelation.udtBinningOptionsType,
@@ -6960,7 +6820,7 @@ Public Class clsMASIC
         Try
             intIonUpdateCount = 0
 
-            If udtScanList.ParentIonInfoCount <= 0 Then
+            If scanList.ParentIonInfoCount <= 0 Then
                 If mSuppressNoParentIonsError Then
                     Return True
                 Else
@@ -6972,7 +6832,7 @@ Public Class clsMASIC
             LogMessage("Finding similar parent ions")
             SetSubtaskProcessingStepPct(0, "Finding similar parent ions")
 
-            With udtScanList
+            With scanList
                 ' Populate udtFindSimilarIonsData.MZPointerArray and dblMZList, plus intIntensityPointerArray and sngIntensityList()
                 ReDim udtFindSimilarIonsData.MZPointerArray(.ParentIonInfoCount - 1)
                 ReDim udtFindSimilarIonsData.IonUsed(.ParentIonInfoCount - 1)
@@ -7015,7 +6875,7 @@ Public Class clsMASIC
                 If mSuppressNoParentIonsError Then
                     Return True
                 Else
-                    If udtScanList.MRMDataPresent Then
+                    If scanList.MRMDataPresent Then
                         Return True
                     Else
                         Return False
@@ -7079,7 +6939,7 @@ Public Class clsMASIC
                             InitializeUniqueMZListMatchIndices(udtFindSimilarIonsData.UniqueMZList, .UniqueMZListCount, .UniqueMZList.Length - 1)
 
                         End If
-                        AppendParentIonToUniqueMZEntry(udtScanList, intOriginalIndex, .UniqueMZList(.UniqueMZListCount), 0)
+                        AppendParentIonToUniqueMZEntry(scanList, intOriginalIndex, .UniqueMZList(.UniqueMZListCount), 0)
                         .UniqueMZListCount += 1
 
                         .IonUsed(intOriginalIndex) = True
@@ -7095,24 +6955,24 @@ Public Class clsMASIC
                         End With
 
                         If dblCurrentMZ > 0 Then
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
 
                             ' Look for similar 1+ spaced m/z values
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 1, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -1, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 1, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -1, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
 
                             ' Look for similar 2+ spaced m/z values
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.5, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.5, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.5, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.5, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
 
                             Dim parentIonToleranceDa = GetParentIonToleranceDa(udtSICOptions, dblCurrentMZ)
 
                             If parentIonToleranceDa <= 0.25 AndAlso udtSICOptions.SimilarIonMZToleranceHalfWidth <= 0.15 Then
                                 ' Also look for similar 3+ spaced m/z values
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.666, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.333, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.333, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.666, intOriginalIndex, udtScanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.666, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.333, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.333, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
+                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.666, intOriginalIndex, scanList, udtFindSimilarIonsData, udtSICOptions, udtBinningOptions, objSearchRange)
                             End If
 
                         End If
@@ -7131,7 +6991,7 @@ Public Class clsMASIC
 
                 UpdateOverallProgress(objSpectraCache)
                 If mAbortProcessing Then
-                    udtScanList.ProcessingIncomplete = True
+                    scanList.ProcessingIncomplete = True
                     Exit Do
                 End If
 
@@ -7161,11 +7021,11 @@ Public Class clsMASIC
                     For intMatchIndex = 0 To .MatchCount - 1
                         intParentIonIndex = .MatchIndices(intMatchIndex)
 
-                        If udtScanList.ParentIons(intParentIonIndex).MZ > 0 Then
-                            If udtScanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber <> .ScanNumberMaxIntensity Then
+                        If scanList.ParentIons(intParentIonIndex).MZ > 0 Then
+                            If scanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber <> .ScanNumberMaxIntensity Then
                                 intIonUpdateCount += 1
-                                udtScanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber = .ScanNumberMaxIntensity
-                                udtScanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex = .ParentIonIndexMaxIntensity
+                                scanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber = .ScanNumberMaxIntensity
+                                scanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex = .ParentIonIndexMaxIntensity
                             End If
                         End If
                     Next intMatchIndex
@@ -7187,7 +7047,7 @@ Public Class clsMASIC
       dblSearchMZ As Double,
       dblSearchMZOffset As Double,
       intOriginalIndex As Integer,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       ByRef udtFindSimilarIonsData As udtFindSimilarIonsDataType,
       udtSICOptions As udtSICOptionsType,
       udtBinningOptions As clsCorrelation.udtBinningOptionsType,
@@ -7206,36 +7066,36 @@ Public Class clsMASIC
                 intMatchOriginalIndex = udtFindSimilarIonsData.MZPointerArray(intMatchIndex)
 
                 If Not udtFindSimilarIonsData.IonUsed(intMatchOriginalIndex) Then
-                    With udtScanList.ParentIons(intMatchOriginalIndex)
+                    With scanList.ParentIons(intMatchOriginalIndex)
 
-                        If .SICStats.ScanTypeForPeakIndices = eScanTypeConstants.FragScan Then
-                            If udtScanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
+                        If .SICStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
+                            If scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
                               udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
                                 ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                                sngTimeDiff = CSng(Math.Abs(udtScanList.FragScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
+                                sngTimeDiff = CSng(Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
                             Else
-                                sngTimeDiff = Math.Abs(udtScanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
+                                sngTimeDiff = Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
                             End If
                         Else
-                            If udtScanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
+                            If scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
                               udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
                                 ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                                sngTimeDiff = CSng(Math.Abs(udtScanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
+                                sngTimeDiff = CSng(Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
                             Else
-                                sngTimeDiff = Math.Abs(udtScanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
+                                sngTimeDiff = Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
                             End If
                         End If
 
                         If sngTimeDiff <= udtSICOptions.SimilarIonToleranceHalfWidthMinutes Then
                             ' Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
 
-                            Dim similarityScore = CompareFragSpectraForParentIons(udtScanList, objSpectraCache, intOriginalIndex, intMatchOriginalIndex, udtBinningOptions, udtSICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions)
+                            Dim similarityScore = CompareFragSpectraForParentIons(scanList, objSpectraCache, intOriginalIndex, intMatchOriginalIndex, udtBinningOptions, udtSICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions)
 
                             If similarityScore > udtSICOptions.SpectrumSimilarityMinimum Then
                                 ' Yes, the spectra are similar
                                 ' Add this parent ion to udtUniqueMZList(intUniqueMZListCount - 1)
                                 With udtFindSimilarIonsData
-                                    AppendParentIonToUniqueMZEntry(udtScanList, intMatchOriginalIndex, .UniqueMZList(.UniqueMZListCount - 1), dblSearchMZOffset)
+                                    AppendParentIonToUniqueMZEntry(scanList, intMatchOriginalIndex, .UniqueMZList(.UniqueMZListCount - 1), dblSearchMZOffset)
                                 End With
                                 udtFindSimilarIonsData.IonUsed(intMatchOriginalIndex) = True
                                 udtFindSimilarIonsData.IonInUseCount += 1
@@ -7248,11 +7108,11 @@ Public Class clsMASIC
 
     End Sub
 
-    Private Function GenerateMRMInfoHash(udtMRMScanInfo As udtMRMScanInfoType) As String
+    Private Function GenerateMRMInfoHash(mrmScanInfo As clsMRMScanInfo) As String
         Dim strHash As String
         Dim intIndex As Integer
 
-        With udtMRMScanInfo
+        With mrmScanInfo
             strHash = .ParentIonMZ & "_" & .MRMMassCount
 
             For intIndex = 0 To .MRMMassCount - 1
@@ -7385,11 +7245,11 @@ Public Class clsMASIC
 
     End Function
 
-    Private Function GetHeadersForOutputFile(ByRef udtScanList As udtScanListType, eOutputFileType As eOutputFileTypeConstants) As String
-        Return GetHeadersForOutputFile(udtScanList, eOutputFileType, ControlChars.Tab)
+    Private Function GetHeadersForOutputFile(scanList As clsScanList, eOutputFileType As eOutputFileTypeConstants) As String
+        Return GetHeadersForOutputFile(scanList, eOutputFileType, ControlChars.Tab)
     End Function
 
-    Private Function GetHeadersForOutputFile(ByRef udtScanList As udtScanListType, eOutputFileType As eOutputFileTypeConstants, cColDelimiter As Char) As String
+    Private Function GetHeadersForOutputFile(scanList As clsScanList, eOutputFileType As eOutputFileTypeConstants, cColDelimiter As Char) As String
         Dim strHeaders As String
         Dim intNonConstantHeaderIDs() As Integer = Nothing
 
@@ -7406,7 +7266,7 @@ Public Class clsMASIC
 
                     ' Lookup extended stats values that are constants for all scans
                     ' The following will also remove the constant header values from htExtendedHeaderInfo
-                    ExtractConstantExtendedHeaderValues(intNonConstantHeaderIDs, udtScanList.SurveyScans, udtScanList.FragScans, cColDelimiter)
+                    ExtractConstantExtendedHeaderValues(intNonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter)
 
                     strHeaders = ConstructExtendedStatsHeaders(cColDelimiter)
                 Else
@@ -7437,7 +7297,7 @@ Public Class clsMASIC
         Return strHeaders
     End Function
 
-    Private Function GetNextSurveyScanIndex(ByRef SurveyScans() As udtScanInfoType, intSurveyScanIndex As Integer) As Integer
+    Private Function GetNextSurveyScanIndex(ByRef SurveyScans() As clsScanInfo, intSurveyScanIndex As Integer) As Integer
         ' Returns the next adjacent survey scan index
         ' If the given survey scan is not a SIM scan, then simply returns the next index
         ' If the given survey scan is a SIM scan, then returns the next survey scan with the same .SIMIndex
@@ -7481,7 +7341,7 @@ Public Class clsMASIC
 
     End Function
 
-    Private Function GetPreviousSurveyScanIndex(ByRef SurveyScans() As udtScanInfoType, intSurveyScanIndex As Integer) As Integer
+    Private Function GetPreviousSurveyScanIndex(ByRef SurveyScans() As clsScanInfo, intSurveyScanIndex As Integer) As Integer
         ' Returns the previous adjacent survey scan index
         ' If the given survey scan is not a SIM scan, then simply returns the previous index
         ' If the given survey scan is a SIM scan, then returns the previous survey scan with the same .SIMIndex
@@ -7765,24 +7625,24 @@ Public Class clsMASIC
         End If
     End Function
 
-    Private Function GetScanByMasterScanIndex(ByRef udtScanList As udtScanListType, intMasterScanIndex As Integer) As udtScanInfoType
-        Dim udtCurrentScan As udtScanInfoType
+    Private Function GetScanByMasterScanIndex(scanList As clsScanList, intMasterScanIndex As Integer) As clsScanInfo
+        Dim udtCurrentScan As clsScanInfo
 
-        udtCurrentScan = New udtScanInfoType
-        If Not udtScanList.MasterScanOrder Is Nothing Then
+        udtCurrentScan = New clsScanInfo
+        If Not scanList.MasterScanOrder Is Nothing Then
             If intMasterScanIndex < 0 Then
                 intMasterScanIndex = 0
-            ElseIf intMasterScanIndex >= udtScanList.MasterScanOrderCount Then
-                intMasterScanIndex = udtScanList.MasterScanOrderCount - 1
+            ElseIf intMasterScanIndex >= scanList.MasterScanOrderCount Then
+                intMasterScanIndex = scanList.MasterScanOrderCount - 1
             End If
 
-            Select Case udtScanList.MasterScanOrder(intMasterScanIndex).ScanType
-                Case eScanTypeConstants.SurveyScan
+            Select Case scanList.MasterScanOrder(intMasterScanIndex).ScanType
+                Case clsScanList.eScanTypeConstants.SurveyScan
                     ' Survey scan
-                    udtCurrentScan = udtScanList.SurveyScans(udtScanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
-                Case eScanTypeConstants.FragScan
+                    udtCurrentScan = scanList.SurveyScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                Case clsScanList.eScanTypeConstants.FragScan
                     ' Frag Scan
-                    udtCurrentScan = udtScanList.FragScans(udtScanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                    udtCurrentScan = scanList.FragScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
                 Case Else
                     ' Unkown scan type
             End Select
@@ -7809,11 +7669,11 @@ Public Class clsMASIC
 
     End Function
 
-    Private Function GetScanTypeName(eScanType As eScanTypeConstants) As String
+    Private Function GetScanTypeName(eScanType As clsScanList.eScanTypeConstants) As String
         Select Case eScanType
-            Case eScanTypeConstants.SurveyScan
+            Case clsScanList.eScanTypeConstants.SurveyScan
                 Return "survey scan"
-            Case eScanTypeConstants.FragScan
+            Case clsScanList.eScanTypeConstants.FragScan
                 Return "frag scan"
             Case Else
                 Return "unknown scan type"
@@ -7867,7 +7727,7 @@ Public Class clsMASIC
     End Function
 
     Private Sub InitializeScanList(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intSurveyScanCountToAllocate As Integer,
       intFragScanCountToAllocate As Integer)
 
@@ -7879,31 +7739,29 @@ Public Class clsMASIC
 
         intMasterScanOrderCountToAllocate = intSurveyScanCountToAllocate + intFragScanCountToAllocate
 
-        With udtScanList
-            .SurveyScanCount = 0
-            ReDim .SurveyScans(intSurveyScanCountToAllocate - 1)
+        scanList.SurveyScanCount = 0
+        ReDim scanList.SurveyScans(intSurveyScanCountToAllocate - 1)
 
-            .FragScanCount = 0
-            ReDim .FragScans(intFragScanCountToAllocate - 1)
+        scanList.FragScanCount = 0
+        ReDim scanList.FragScans(intFragScanCountToAllocate - 1)
 
-            .MasterScanOrderCount = 0
-            ReDim .MasterScanOrder(intMasterScanOrderCountToAllocate - 1)
-            ReDim .MasterScanNumList(intMasterScanOrderCountToAllocate - 1)
-            ReDim .MasterScanTimeList(intMasterScanOrderCountToAllocate - 1)
+        scanList.MasterScanOrderCount = 0
+        ReDim scanList.MasterScanOrder(intMasterScanOrderCountToAllocate - 1)
+        ReDim scanList.MasterScanNumList(intMasterScanOrderCountToAllocate - 1)
+        ReDim scanList.MasterScanTimeList(intMasterScanOrderCountToAllocate - 1)
 
-            InitializeSingleScan(.SurveyScans(0))
-            InitializeSingleScan(.FragScans(0))
+        InitializeSingleScan(scanList.SurveyScans(0))
+        InitializeSingleScan(scanList.FragScans(0))
 
-            .ParentIonInfoCount = 0
-            ReDim .ParentIons(intFragScanCountToAllocate - 1)
-            For intIndex = 0 To intFragScanCountToAllocate - 1
-                ReDim .ParentIons(intIndex).FragScanIndices(0)
-            Next intIndex
+        scanList.ParentIonInfoCount = 0
+        ReDim scanList.ParentIons(intFragScanCountToAllocate - 1)
+        For intIndex = 0 To intFragScanCountToAllocate - 1
+            ReDim scanList.ParentIons(intIndex).FragScanIndices(0)
+        Next intIndex
 
-        End With
     End Sub
 
-    ''Private Sub ExpandScanList(ByRef udtScanList As udtScanListType, sngSurveyScanExpansionFactor As Single, sngFragScanExpansionFactor As Integer)
+    ''Private Sub ExpandScanList(scanList As clsScanList, sngSurveyScanExpansionFactor As Single, sngFragScanExpansionFactor As Integer)
     ''    ' Set sngSurveyScanExpansionFactor to 2 to double the amount of memory reserved for survey scans
     ''    ' Set sngFragScanExpansionFactor to 2 to double the amount of memory reserved for fragmentation scans
 
@@ -7921,7 +7779,7 @@ Public Class clsMASIC
     ''    If sngSurveyScanExpansionFactor < 1 Then sngSurveyScanExpansionFactor = 1
     ''    If sngFragScanExpansionFactor < 1 Then sngFragScanExpansionFactor = 1
 
-    ''    With udtScanList
+    ''    With scanList
     ''        If sngSurveyScanExpansionFactor > 1 Then
     ''            intNewSurveyScanCount = CInt(.SurveyScans.Length * sngSurveyScanExpansionFactor)
     ''            ReDim Preserve .SurveyScans(intNewSurveyScanCount - 1)
@@ -7985,12 +7843,10 @@ Public Class clsMASIC
 
     End Function
 
-    Private Sub InitializeSingleScan(ByRef udtScan As udtScanInfoType)
-        With udtScan
-            .FragScanInfo.ParentIonInfoIndex = -1            ' -1 means undefined; only used for fragmentation scans
-            .IonCount = 0
-            .IonCountRaw = 0
-        End With
+    Private Sub InitializeSingleScan(currentScan As clsScanInfo)
+        currentScan.FragScanInfo.ParentIonInfoIndex = -1            ' -1 means undefined; only used for fragmentation scans
+        currentScan.IonCount = 0
+        currentScan.IonCountRaw = 0
     End Sub
 
     Private Sub InitializeUniqueMZListMatchIndices(
@@ -8176,7 +8032,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function InterpolateRTandFragScanNumber(
-      ByRef udtSurveyScans() As udtScanInfoType,
+      ByRef udtSurveyScans() As clsScanInfo,
       intSurveyScanCount As Integer,
       intLastSurveyScanIndex As Integer,
       intFragScanNumber As Integer,
@@ -9003,7 +8859,7 @@ Public Class clsMASIC
       objXcaliburAccessor As XRawFileIO,
       objSpectraCache As clsSpectraCache,
       intScanNumber As Integer,
-      ByRef udtScanInfo As udtScanInfoType,
+      scanInfo As clsScanInfo,
       ByRef udtNoiseThresholdOptions As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseOptionsType,
       blnDiscardLowIntensityData As Boolean,
       blnCompressSpectraData As Boolean,
@@ -9033,10 +8889,8 @@ Public Class clsMASIC
 
             objMSSpectrum.IonCount = objXcaliburAccessor.GetScanData(intScanNumber, objMSSpectrum.IonsMZ, dblIntensityList)
 
-            With udtScanInfo
-                .IonCount = objMSSpectrum.IonCount
-                .IonCountRaw = .IonCount
-            End With
+            scanInfo.IonCount = objMSSpectrum.IonCount
+            scanInfo.IonCountRaw = scanInfo.IonCount
 
             If objMSSpectrum.IonCount > 0 Then
                 If objMSSpectrum.IonCount <> objMSSpectrum.IonsMZ.Length Then
@@ -9084,17 +8938,14 @@ Public Class clsMASIC
 
             ' Determine the minimum positive intensity in this scan
             strLastKnownLocation = "Call mMASICPeakFinder.FindMinimumPositiveValue"
-            udtScanInfo.MinimumPositiveIntensity = mMASICPeakFinder.FindMinimumPositiveValue(objMSSpectrum.IonCount, objMSSpectrum.IonsIntensity, 0)
+            scanInfo.MinimumPositiveIntensity = mMASICPeakFinder.FindMinimumPositiveValue(objMSSpectrum.IonCount, objMSSpectrum.IonsIntensity, 0)
 
             If objMSSpectrum.IonCount > 0 Then
-                With udtScanInfo
-                    If .TotalIonIntensity < Single.Epsilon Then
-                        .TotalIonIntensity = CSng(Math.Min(dblTIC, Single.MaxValue))
-                    End If
-                End With
+                If scanInfo.TotalIonIntensity < Single.Epsilon Then
+                    scanInfo.TotalIonIntensity = CSng(Math.Min(dblTIC, Single.MaxValue))
+                End If
 
-
-                If udtScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
+                If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                     blnDiscardLowIntensityDataWork = blnDiscardLowIntensityData
                     blnCompressSpectraDataWork = blnCompressSpectraData
                 Else
@@ -9103,9 +8954,9 @@ Public Class clsMASIC
                 End If
 
                 strLastKnownLocation = "Call ProcessAndStoreSpectrum"
-                ProcessAndStoreSpectrum(udtScanInfo, objSpectraCache, objMSSpectrum, udtNoiseThresholdOptions, blnDiscardLowIntensityDataWork, blnCompressSpectraDataWork, dblMSDataResolution, blnKeepRawSpectrum)
+                ProcessAndStoreSpectrum(scanInfo, objSpectraCache, objMSSpectrum, udtNoiseThresholdOptions, blnDiscardLowIntensityDataWork, blnCompressSpectraDataWork, dblMSDataResolution, blnKeepRawSpectrum)
             Else
-                udtScanInfo.TotalIonIntensity = 0
+                scanInfo.TotalIonIntensity = 0
             End If
 
         Catch ex As Exception
@@ -9300,12 +9151,12 @@ Public Class clsMASIC
     End Function
 
     Private Function LookupRTByScanNumber(
-      ByRef udtScanList() As udtScanInfoType,
+      scanList() As clsScanInfo,
       intScanListCount As Integer,
       intScanListArray() As Integer,
       intScanNumberToFind As Integer) As Single
 
-        ' intScanListArray() must be populated with the scan numbers in udtScanList() before calling this function
+        ' intScanListArray() must be populated with the scan numbers in scanList() before calling this function
 
         Dim intScanIndex As Integer
         Dim intMatchIndex As Integer
@@ -9317,11 +9168,11 @@ Public Class clsMASIC
                 ' Need to find the closest scan with this scan number
                 intMatchIndex = 0
                 For intScanIndex = 0 To intScanListCount - 1
-                    If udtScanList(intScanIndex).ScanNumber <= intScanNumberToFind Then intMatchIndex = intScanIndex
+                    If scanList(intScanIndex).ScanNumber <= intScanNumberToFind Then intMatchIndex = intScanIndex
                 Next intScanIndex
             End If
 
-            Return udtScanList(intMatchIndex).ScanTime
+            Return scanList(intMatchIndex).ScanTime
         Catch ex As Exception
             ' Ignore any errors that occur in this function
             LogErrors("LookupRTByScanNumber", "Error in LookupRTByScanNumber", ex, True, False)
@@ -9332,14 +9183,14 @@ Public Class clsMASIC
 
     Private Function MRMParentDaughterMatch(
       ByRef udtSRMListEntry As udtSRMListType,
-      ByRef udtMRMSettingEntry As udtMRMScanInfoType,
+      mrmSettingsEntry As clsMRMScanInfo,
       intMRMMassIndex As Integer) As Boolean
 
         Return MRMParentDaughterMatch(
           udtSRMListEntry.ParentIonMZ,
           udtSRMListEntry.CentralMass,
-          udtMRMSettingEntry.ParentIonMZ,
-          udtMRMSettingEntry.MRMMassList(intMRMMassIndex).CentralMass)
+          mrmSettingsEntry.ParentIonMZ,
+          mrmSettingsEntry.MRMMassList(intMRMMassIndex).CentralMass)
     End Function
 
     Private Function MRMParentDaughterMatch(
@@ -9394,7 +9245,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub PopulateScanListPointerArray(
-      ByRef udtSurveyScans() As udtScanInfoType,
+      ByRef udtSurveyScans() As clsScanInfo,
       intSurveyScanCount As Integer,
       ByRef intScanListArray() As Integer)
 
@@ -9413,7 +9264,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function ProcessAndStoreSpectrum(
-      ByRef udtScanInfo As udtScanInfoType,
+      scanInfo As clsScanInfo,
       ByRef objSpectraCache As clsSpectraCache,
       objMSSpectrum As clsMSSpectrum,
       ByRef udtNoiseThresholdOptions As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseOptionsType,
@@ -9437,18 +9288,18 @@ Public Class clsMASIC
 
             ' Determine the noise threshold intensity for this spectrum
             strLastKnownLocation = "Call ComputeNoiseLevelForMassSpectrum"
-            ComputeNoiseLevelForMassSpectrum(udtScanInfo, objMSSpectrum, udtNoiseThresholdOptions)
+            ComputeNoiseLevelForMassSpectrum(scanInfo, objMSSpectrum, udtNoiseThresholdOptions)
 
             If blnKeepRawSpectrum Then
 
                 ' Do not discard low intensity data for MRM scans
-                If udtScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
+                If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                     If blnDiscardLowIntensityData Then
                         ' Discard data below the noise level or below the minimum S/N level
                         ' If we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
                         strLastKnownLocation = "Call DiscardDataBelowNoiseThreshold"
-                        DiscardDataBelowNoiseThreshold(objMSSpectrum, udtScanInfo.BaselineNoiseStats.NoiseLevel, mMZIntensityFilterIgnoreRangeStart, mMZIntensityFilterIgnoreRangeEnd, udtNoiseThresholdOptions)
-                        udtScanInfo.IonCount = objMSSpectrum.IonCount
+                        DiscardDataBelowNoiseThreshold(objMSSpectrum, scanInfo.BaselineNoiseStats.NoiseLevel, mMZIntensityFilterIgnoreRangeStart, mMZIntensityFilterIgnoreRangeEnd, udtNoiseThresholdOptions)
+                        scanInfo.IonCount = objMSSpectrum.IonCount
                     End If
                 End If
 
@@ -9468,17 +9319,17 @@ Public Class clsMASIC
                     ' In addition, display a new message every time a new max value is encountered
                     If intSpectraFoundExceedingMaxIonCount <= 10 OrElse objMSSpectrum.IonCount > intMaxIonCountReported Then
                         Console.WriteLine()
-                        Console.WriteLine("Note: Scan " & udtScanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; will only retain " & intMaxAllowableIonCount & " (trimmed " & intSpectraFoundExceedingMaxIonCount.ToString & " spectra)")
+                        Console.WriteLine("Note: Scan " & scanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; will only retain " & intMaxAllowableIonCount & " (trimmed " & intSpectraFoundExceedingMaxIonCount.ToString & " spectra)")
 
                         intMaxIonCountReported = objMSSpectrum.IonCount
                     End If
 
                     DiscardDataToLimitIonCount(objMSSpectrum, mMZIntensityFilterIgnoreRangeStart, mMZIntensityFilterIgnoreRangeEnd, intMaxAllowableIonCount)
-                    udtScanInfo.IonCount = objMSSpectrum.IonCount
+                    scanInfo.IonCount = objMSSpectrum.IonCount
                 End If
 
                 strLastKnownLocation = "Call AddSpectrumToPool"
-                blnSuccess = objSpectraCache.AddSpectrumToPool(objMSSpectrum, udtScanInfo.ScanNumber, 0)
+                blnSuccess = objSpectraCache.AddSpectrumToPool(objMSSpectrum, scanInfo.ScanNumber, 0)
             Else
                 blnSuccess = True
             End If
@@ -9502,9 +9353,7 @@ Public Class clsMASIC
         Dim udtSICOptions As udtSICOptionsType
         Dim udtBinningOptions As clsCorrelation.udtBinningOptionsType
 
-        Dim udtScanList = New udtScanListType
-        Dim udtMRMSettings() As udtMRMScanInfoType = Nothing
-        Dim udtSRMList() As udtSRMListType = Nothing
+        Dim scanList = New clsScanList()
 
         Dim ioFileInfo As FileInfo
 
@@ -9719,7 +9568,7 @@ Public Class clsMASIC
 
                         blnSuccess = ExtractScanInfoFromXcaliburDataFile(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
-                          udtScanList, objSpectraCache, udtOutputFileHandles,
+                          scanList, objSpectraCache, udtOutputFileHandles,
                           udtSICOptions, udtBinningOptions, mStatusMessage,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 
@@ -9727,7 +9576,7 @@ Public Class clsMASIC
                         ' Open the .mzXML file and obtain the scan information
                         blnSuccess = ExtractScanInfoFromMZXMLDataFile(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
-                          udtScanList, objSpectraCache, udtOutputFileHandles,
+                          scanList, objSpectraCache, udtOutputFileHandles,
                           udtSICOptions, udtBinningOptions,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 
@@ -9735,7 +9584,7 @@ Public Class clsMASIC
                         ' Open the .mzXML file and obtain the scan information
                         blnSuccess = ExtractScanInfoFromMZDataFile(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
-                          udtScanList, objSpectraCache, udtOutputFileHandles,
+                          scanList, objSpectraCache, udtOutputFileHandles,
                           udtSICOptions, udtBinningOptions,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
 
@@ -9743,7 +9592,7 @@ Public Class clsMASIC
                         ' Open the .MGF and .CDF files to obtain the scan information
                         blnSuccess = ExtractScanInfoFromMGFandCDF(
                           strInputFilePathFull, udtSICOptions.DatasetNumber,
-                          udtScanList, objSpectraCache, udtOutputFileHandles,
+                          scanList, objSpectraCache, udtOutputFileHandles,
                           udtSICOptions, udtBinningOptions, mStatusMessage,
                           blnKeepRawMSSpectra, Not mSkipMSMSProcessing)
                     Case Else
@@ -9779,8 +9628,8 @@ Public Class clsMASIC
             End If
 
             Try
-                ' Make sure the arrays in udtScanList range from 0 to the Count-1
-                With udtScanList
+                ' Make sure the arrays in scanList range from 0 to the Count-1
+                With scanList
                     If .SurveyScanCount <> .SurveyScans.Length Then ReDim Preserve .SurveyScans(.SurveyScanCount - 1)
                     If .FragScanCount <> .FragScans.Length Then ReDim Preserve .FragScans(.FragScanCount - 1)
                     If .MasterScanOrderCount <> .MasterScanOrder.Length Then
@@ -9793,7 +9642,7 @@ Public Class clsMASIC
                 End With
             Catch ex As Exception
                 blnSuccess = False
-                LogErrors("ProcessFile", "Error resizing the arrays in udtScanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+                LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
                 Exit Try
             End Try
 
@@ -9809,7 +9658,7 @@ Public Class clsMASIC
 
                 If mSkipSICAndRawDataProcessing OrElse Not mExportRawDataOnly Then
                     LogMessage("ProcessFile: Call SaveBPIs")
-                    SaveBPIs(udtScanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
+                    SaveBPIs(scanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
                 End If
 
                 '---------------------------------------------------------
@@ -9836,29 +9685,33 @@ Public Class clsMASIC
                 If mSkipSICAndRawDataProcessing Then
                     LogMessage("ProcessFile: Skipping SIC Processing")
 
-                    SetDefaultPeakLocValues(udtScanList)
+                    SetDefaultPeakLocValues(scanList)
                 Else
 
                     '---------------------------------------------------------
                     ' Optionally, export the raw mass spectra data
                     '---------------------------------------------------------
                     If mRawDataExportOptions.ExportEnabled Then
-                        ExportRawDataToDisk(udtScanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                        ExportRawDataToDisk(scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
                     End If
 
                     If mReporterIonStatsEnabled Then
                         ' Look for Reporter Ions in the Fragmentation spectra
-                        FindReporterIons(udtSICOptions, udtScanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                        FindReporterIons(udtSICOptions, scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
                     End If
 
                     '---------------------------------------------------------
                     ' If MRM data is present, then save the MRM values to disk
                     '---------------------------------------------------------
-                    If udtScanList.MRMDataPresent Then
-                        blnSuccess = DetermineMRMSettings(udtScanList, udtMRMSettings, udtSRMList)
+                    If scanList.MRMDataPresent Then
+
+                        Dim mrmSettings As List(Of clsMRMScanInfo) = Nothing
+                        Dim srmList As List(Of udtSRMListType) = Nothing
+
+                        blnSuccess = DetermineMRMSettings(scanList, mrmSettings, srmList)
 
                         If blnSuccess Then
-                            ExportMRMDataToDisk(udtScanList, objSpectraCache, udtMRMSettings, udtSRMList, strInputFileName, strOutputFolderPath)
+                            ExportMRMDataToDisk(scanList, objSpectraCache, mrmSettings, srmList, strInputFileName, strOutputFolderPath)
                         End If
                     End If
 
@@ -9866,9 +9719,9 @@ Public Class clsMASIC
                     If Not mExportRawDataOnly Then
 
                         '---------------------------------------------------------
-                        ' Add the custom SIC values to udtScanList
+                        ' Add the custom SIC values to scanList
                         '---------------------------------------------------------
-                        AddCustomSICValues(udtScanList, udtSICOptions.SICTolerance, udtSICOptions.SICToleranceIsPPM, mCustomSICList.ScanOrAcqTimeTolerance)
+                        AddCustomSICValues(scanList, udtSICOptions.SICTolerance, udtSICOptions.SICToleranceIsPPM, mCustomSICList.ScanOrAcqTimeTolerance)
 
 
                         '---------------------------------------------------------
@@ -9883,7 +9736,7 @@ Public Class clsMASIC
                         '---------------------------------------------------------
                         ' Create the XML output file
                         '---------------------------------------------------------
-                        blnSuccess = XMLOutputFileInitialize(strInputFilePathFull, strOutputFolderPath, udtOutputFileHandles, udtScanList, objSpectraCache, udtSICOptions, udtBinningOptions)
+                        blnSuccess = XMLOutputFileInitialize(strInputFilePathFull, strOutputFolderPath, udtOutputFileHandles, scanList, objSpectraCache, udtSICOptions, udtBinningOptions)
                         If Not blnSuccess Then
                             SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
                             Exit Try
@@ -9899,7 +9752,7 @@ Public Class clsMASIC
                         UpdatePeakMemoryUsage()
 
                         LogMessage("ProcessFile: Call CreateParentIonSICs")
-                        blnSuccess = CreateParentIonSICs(udtScanList, objSpectraCache, udtSICOptions, udtOutputFileHandles)
+                        blnSuccess = CreateParentIonSICs(scanList, objSpectraCache, udtSICOptions, udtOutputFileHandles)
 
                         If Not blnSuccess Then
                             SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
@@ -9920,7 +9773,7 @@ Public Class clsMASIC
                         UpdatePeakMemoryUsage()
 
                         LogMessage("ProcessFile: Call FindSimilarParentIons")
-                        blnSuccess = FindSimilarParentIons(udtScanList, objSpectraCache, udtSICOptions, udtBinningOptions, intSimilarParentIonUpdateCount)
+                        blnSuccess = FindSimilarParentIons(scanList, objSpectraCache, udtSICOptions, udtBinningOptions, intSimilarParentIonUpdateCount)
 
                         If Not blnSuccess Then
                             SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
@@ -9940,7 +9793,7 @@ Public Class clsMASIC
                     UpdatePeakMemoryUsage()
 
                     LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
-                    blnSuccess = SaveExtendedScanStatsFiles(udtScanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile)
+                    blnSuccess = SaveExtendedScanStatsFiles(scanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile)
 
                     If Not blnSuccess Then
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
@@ -9959,7 +9812,7 @@ Public Class clsMASIC
 
                 If Not mExportRawDataOnly Then
                     LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
-                    blnSuccess = SaveSICStatsFlatFile(udtScanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile, mIncludeScanTimesInSICStatsFile)
+                    blnSuccess = SaveSICStatsFlatFile(scanList, strInputFileName, strOutputFolderPath, udtSICOptions, mIncludeHeadersInExportFile, mIncludeScanTimesInSICStatsFile)
 
                     If Not blnSuccess Then
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
@@ -9979,7 +9832,7 @@ Public Class clsMASIC
                     '---------------------------------------------------------
 
                     LogMessage("ProcessFile: Call FinalizeXMLFile")
-                    blnSuccess = XMLOutputFileFinalize(udtOutputFileHandles, udtScanList, objSpectraCache)
+                    blnSuccess = XMLOutputFileFinalize(udtOutputFileHandles, scanList, objSpectraCache)
 
                 End If
 
@@ -9993,12 +9846,12 @@ Public Class clsMASIC
                 '---------------------------------------------------------
                 If Not mIncludeHeadersInExportFile Then
                     LogMessage("ProcessFile: Call SaveHeaderGlossary")
-                    SaveHeaderGlossary(udtScanList, strInputFileName, strOutputFolderPath)
+                    SaveHeaderGlossary(scanList, strInputFileName, strOutputFolderPath)
                 End If
 
                 If Not (mSkipSICAndRawDataProcessing OrElse mExportRawDataOnly) AndAlso intSimilarParentIonUpdateCount > 0 Then
                     '---------------------------------------------------------
-                    ' Reopen the XML file and update the entries for those ions in udtScanList that had their
+                    ' Reopen the XML file and update the entries for those ions in scanList that had their
                     ' Optimal peak apex scan numbers updated
                     '---------------------------------------------------------
 
@@ -10007,7 +9860,7 @@ Public Class clsMASIC
                     UpdatePeakMemoryUsage()
 
                     LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries")
-                    XmlOutputFileUpdateEntries(udtScanList, strInputFileName, strOutputFolderPath)
+                    XmlOutputFileUpdateEntries(scanList, strInputFileName, strOutputFolderPath)
                 End If
 
             Catch ex As Exception
@@ -10103,7 +9956,7 @@ Public Class clsMASIC
     End Function
 
     Private Function ProcessMZList(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       ByRef objSpectraCache As clsSpectraCache,
       udtSICOptions As udtSICOptionsType,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
@@ -10175,8 +10028,8 @@ Public Class clsMASIC
             ' Limit the total memory usage to ~50 MB
             ' Each m/z value will require 12 bytes per scan
 
-            If udtScanList.SurveyScanCount > 0 Then
-                intMaxMZCountInChunk = CInt((MAX_RAW_DATA_MEMORY_USAGE_MB * 1024 * 1024) / (udtScanList.SurveyScanCount * 12))
+            If scanList.SurveyScanCount > 0 Then
+                intMaxMZCountInChunk = CInt((MAX_RAW_DATA_MEMORY_USAGE_MB * 1024 * 1024) / (scanList.SurveyScanCount * 12))
             Else
                 intMaxMZCountInChunk = 1
             End If
@@ -10191,16 +10044,16 @@ Public Class clsMASIC
 
             ' Reserve room in intFullSICScanIndices for at most intMaxMZCountInChunk values and .SurveyScanCount scans
             ReDim intFullSICDataCount(intMaxMZCountInChunk - 1)
-            ReDim intFullSICScanIndices(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
-            ReDim sngFullSICIntensities(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
-            ReDim dblFullSICMasses(intMaxMZCountInChunk - 1, udtScanList.SurveyScanCount - 1)
+            ReDim intFullSICScanIndices(intMaxMZCountInChunk - 1, scanList.SurveyScanCount - 1)
+            ReDim sngFullSICIntensities(intMaxMZCountInChunk - 1, scanList.SurveyScanCount - 1)
+            ReDim dblFullSICMasses(intMaxMZCountInChunk - 1, scanList.SurveyScanCount - 1)
 
-            ReDim sngFullSICIntensities1D(udtScanList.SurveyScanCount - 1)
+            ReDim sngFullSICIntensities1D(scanList.SurveyScanCount - 1)
 
             ' Pre-reserve space in the arrays in udtSICDetails
             With udtSICDetails
                 .SICDataCount = 0
-                .SICScanType = eScanTypeConstants.SurveyScan
+                .SICScanType = clsScanList.eScanTypeConstants.SurveyScan
 
                 ReDim .SICScanIndices(DATA_COUNT_MEMORY_RESERVE)
                 ReDim .SICScanNumbers(DATA_COUNT_MEMORY_RESERVE)
@@ -10231,7 +10084,7 @@ Public Class clsMASIC
         Try
 
             ' Uncomment the following to debug ScanOrAcqTimeToAbsolute and ScanOrAcqTimeToScanTime
-            'TestScanConversions(udtScanList)
+            'TestScanConversions(scanList)
 
             intMZSearchChunkCount = 0
             intMZIndex = 0
@@ -10299,33 +10152,33 @@ Public Class clsMASIC
                         End With
 
                         intFullSICDataCount(intMZIndexWork) = 0
-                        For intSurveyScanIndex = 0 To udtScanList.SurveyScanCount - 1
+                        For intSurveyScanIndex = 0 To scanList.SurveyScanCount - 1
                             intFullSICScanIndices(intMZIndexWork, intSurveyScanIndex) = -1
                         Next intSurveyScanIndex
                     Next intMZIndexWork
 
                     '---------------------------------------------------------
-                    ' Step through udtScanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
+                    ' Step through scanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
                     ' We're stepping scan by scan since the process of loading a scan from disk is slower than the process of searching for each m/z in the scan
                     '---------------------------------------------------------
-                    For intSurveyScanIndex = 0 To udtScanList.SurveyScanCount - 1
+                    For intSurveyScanIndex = 0 To scanList.SurveyScanCount - 1
                         If blnProcessSIMScans Then
-                            If udtScanList.SurveyScans(intSurveyScanIndex).SIMScan AndAlso
-                               udtScanList.SurveyScans(intSurveyScanIndex).SIMIndex = intSIMIndex Then
+                            If scanList.SurveyScans(intSurveyScanIndex).SIMScan AndAlso
+                               scanList.SurveyScans(intSurveyScanIndex).SIMIndex = intSIMIndex Then
                                 blnUseScan = True
                             Else
                                 blnUseScan = False
                             End If
                         Else
-                            blnUseScan = Not udtScanList.SurveyScans(intSurveyScanIndex).SIMScan
+                            blnUseScan = Not scanList.SurveyScans(intSurveyScanIndex).SIMScan
 
-                            If udtScanList.SurveyScans(intSurveyScanIndex).ZoomScan Then
+                            If scanList.SurveyScans(intSurveyScanIndex).ZoomScan Then
                                 blnUseScan = False
                             End If
                         End If
 
                         If blnUseScan Then
-                            If Not objSpectraCache.ValidateSpectrumInPool(udtScanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
+                            If Not objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
                                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                                 Return False
                             End If
@@ -10345,7 +10198,7 @@ Public Class clsMASIC
                                     sngFullSICIntensities(intMZIndexWork, intDataIndex) = sngIonSum
 
                                     If sngIonSum < Single.Epsilon AndAlso mSICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
-                                        sngFullSICIntensities(intMZIndexWork, intDataIndex) = udtScanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
+                                        sngFullSICIntensities(intMZIndexWork, intDataIndex) = scanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
                                     End If
 
                                     dblFullSICMasses(intMZIndexWork, intDataIndex) = dblClosestMZ
@@ -10360,9 +10213,9 @@ Public Class clsMASIC
                         End If
 
                         If intSurveyScanIndex Mod 100 = 0 Then
-                            SetSubtaskProcessingStepPct(CShort(Me.SubtaskProgressPercentComplete), "Loading raw SIC data: " & intSurveyScanIndex.ToString & " / " & udtScanList.SurveyScanCount.ToString)
+                            SetSubtaskProcessingStepPct(CShort(Me.SubtaskProgressPercentComplete), "Loading raw SIC data: " & intSurveyScanIndex.ToString & " / " & scanList.SurveyScanCount.ToString)
                             If mAbortProcessing Then
-                                udtScanList.ProcessingIncomplete = True
+                                scanList.ProcessingIncomplete = True
                                 Exit Do
                             End If
                         End If
@@ -10370,7 +10223,7 @@ Public Class clsMASIC
 
                     SetSubtaskProcessingStepPct(CShort(Me.SubtaskProgressPercentComplete), "Creating SIC's for the parent ions")
                     If mAbortProcessing Then
-                        udtScanList.ProcessingIncomplete = True
+                        scanList.ProcessingIncomplete = True
                         Exit Do
                     End If
 
@@ -10408,7 +10261,7 @@ Public Class clsMASIC
 
                         ' Populate udtSICDetails using the data centered around the highest intensity in intFullSICIntensities
                         ' Note that this function will update udtSICPeak.IndexObserved
-                        blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, udtScanList, intScanIndexObservedInFullSIC, udtSICDetails, udtSICPeak, udtSICOptions, False, 0)
+                        blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, scanList, intScanIndexObservedInFullSIC, udtSICDetails, udtSICPeak, udtSICOptions, False, 0)
 
                         ' Find the largest peak in the SIC for this m/z
                         blnLargestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
@@ -10416,7 +10269,7 @@ Public Class clsMASIC
                            udtSICPotentialAreaStatsForPeak, udtSICPeak,
                            udtSmoothedYDataSubset, udtSICOptions.SICPeakFinderOptions,
                            udtSICPotentialAreaStatsInFullSIC,
-                           True, udtScanList.SIMDataPresent, False)
+                           True, scanList.SIMDataPresent, False)
 
                         If blnLargestPeakFound Then
                             '--------------------------------------------------------
@@ -10430,10 +10283,10 @@ Public Class clsMASIC
                                 End If
 
                                 blnStorePeakInParentIon = False
-                                If udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
+                                If scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
 
                                 ' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
-                                With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+                                With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
                                     If .SurveyScanIndex >= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseLeft) AndAlso
                                        .SurveyScanIndex <= udtSICDetails.SICScanIndices(udtSICPeak.IndexBaseRight) Then
 
@@ -10443,13 +10296,13 @@ Public Class clsMASIC
 
 
                                 If blnStorePeakInParentIon Then
-                                    blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
+                                    blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
 
                                     ' Possibly save the stats for this SIC to the SICData file
-                                    SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
+                                    SaveSICDataToText(udtSICOptions, scanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
 
                                     ' Save the stats for this SIC to the XML file
-                                    SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
+                                    SaveDataToXML(scanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
 
                                     blnParentIonUpdated(intParentIonIndexPointer) = True
                                     intParentIonsProcessed += 1
@@ -10471,7 +10324,7 @@ Public Class clsMASIC
                                     intScanIndexObservedInFullSIC = -1
                                 End If
 
-                                With udtScanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+                                With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
                                     ' Clear udtSICPotentialAreaStatsForPeak
                                     .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
 
@@ -10493,24 +10346,24 @@ Public Class clsMASIC
 
                                     ' Populate udtSICDetails using the data centered around intScanIndexObservedInFullSIC
                                     ' Note that this function will update udtSICPeak.IndexObserved
-                                    blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, udtScanList, intScanIndexObservedInFullSIC, udtSICDetails, .SICStats.Peak, udtSICOptions, .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
+                                    blnSuccess = ExtractSICDetailsFromFullSIC(intMZIndexWork, udtMZSearchChunk, intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses, scanList, intScanIndexObservedInFullSIC, udtSICDetails, .SICStats.Peak, udtSICOptions, .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
 
                                     blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(
                                      udtSICDetails.SICDataCount, udtSICDetails.SICScanNumbers, udtSICDetails.SICData,
                                      .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak,
                                      udtSmoothedYDataSubset, udtSICOptions.SICPeakFinderOptions,
                                      udtSICPotentialAreaStatsInFullSIC,
-                                     Not .CustomSICPeak, udtScanList.SIMDataPresent, False)
+                                     Not .CustomSICPeak, scanList.SIMDataPresent, False)
 
 
-                                    blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
+                                    blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
                                 End With
 
                                 ' Possibly save the stats for this SIC to the SICData file
-                                SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
+                                SaveSICDataToText(udtSICOptions, scanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtOutputFileHandles)
 
                                 ' Save the stats for this SIC to the XML file
-                                SaveDataToXML(udtScanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
+                                SaveDataToXML(scanList, intParentIonIndices(intParentIonIndexPointer), udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
 
                                 blnParentIonUpdated(intParentIonIndexPointer) = True
                                 intParentIonsProcessed += 1
@@ -10524,15 +10377,15 @@ Public Class clsMASIC
                         '---------------------------------------------------------
                         Try
 
-                            If udtScanList.ParentIonInfoCount > 1 Then
-                                SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (udtScanList.ParentIonInfoCount - 1) * 100))
+                            If scanList.ParentIonInfoCount > 1 Then
+                                SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
                             Else
                                 SetSubtaskProcessingStepPct(0)
                             End If
 
                             UpdateOverallProgress(objSpectraCache)
                             If mAbortProcessing Then
-                                udtScanList.ProcessingIncomplete = True
+                                scanList.ProcessingIncomplete = True
                                 Exit For
                             End If
 
@@ -10555,7 +10408,7 @@ Public Class clsMASIC
                 End If
 
                 If mAbortProcessing Then
-                    udtScanList.ProcessingIncomplete = True
+                    scanList.ProcessingIncomplete = True
                     Exit Do
                 End If
 
@@ -10574,7 +10427,7 @@ Public Class clsMASIC
     End Function
 
     Private Function ProcessMRMList(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtSICOptions As udtSICOptionsType,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
@@ -10617,43 +10470,43 @@ Public Class clsMASIC
             ' Initialize udtSICDetails
             With udtSICDetails
                 .SICDataCount = 0
-                .SICScanType = eScanTypeConstants.FragScan
+                .SICScanType = clsScanList.eScanTypeConstants.FragScan
 
-                ReDim .SICScanIndices(udtScanList.FragScanCount)
-                ReDim .SICScanNumbers(udtScanList.FragScanCount)
-                ReDim .SICData(udtScanList.FragScanCount)
-                ReDim .SICMasses(udtScanList.FragScanCount)
+                ReDim .SICScanIndices(scanList.FragScanCount)
+                ReDim .SICScanNumbers(scanList.FragScanCount)
+                ReDim .SICData(scanList.FragScanCount)
+                ReDim .SICMasses(scanList.FragScanCount)
             End With
 
             ' Reserve room in udtSmoothedYData and udtSmoothedYDataSubset
             With udtSmoothedYData
                 .DataCount = 0
-                ReDim .Data(udtScanList.FragScanCount)
+                ReDim .Data(scanList.FragScanCount)
             End With
 
             With udtSmoothedYDataSubset
                 .DataCount = 0
-                ReDim .Data(udtScanList.FragScanCount)
+                ReDim .Data(scanList.FragScanCount)
             End With
 
             ReDim udtBaselineNoiseStatSegments(0)
 
-            For intParentIonIndex = 0 To udtScanList.ParentIonInfoCount - 1
+            For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
 
-                If udtScanList.ParentIons(intParentIonIndex).MRMDaughterMZ > 0 Then
+                If scanList.ParentIons(intParentIonIndex).MRMDaughterMZ > 0 Then
                     ' Step 1: Create the SIC for this MRM Parent/Daughter pair
 
-                    dblParentIonMZ = udtScanList.ParentIons(intParentIonIndex).MZ
-                    dblMRMDaughterMZ = udtScanList.ParentIons(intParentIonIndex).MRMDaughterMZ
-                    dblSearchToleranceHalfWidth = udtScanList.ParentIons(intParentIonIndex).MRMToleranceHalfWidth
+                    dblParentIonMZ = scanList.ParentIons(intParentIonIndex).MZ
+                    dblMRMDaughterMZ = scanList.ParentIons(intParentIonIndex).MRMDaughterMZ
+                    dblSearchToleranceHalfWidth = scanList.ParentIons(intParentIonIndex).MRMToleranceHalfWidth
 
                     ' Reset udtSICDetails 
                     udtSICDetails.SICDataCount = 0
 
                     ' Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
-                    For intScanIndex = 0 To udtScanList.FragScanCount - 1
-                        If udtScanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
-                            With udtScanList.FragScans(intScanIndex)
+                    For intScanIndex = 0 To scanList.FragScanCount - 1
+                        If scanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
+                            With scanList.FragScans(intScanIndex)
 
                                 blnUseScan = False
                                 For intMRMMassIndex = 0 To .MRMScanInfo.MRMMassCount - 1
@@ -10669,8 +10522,8 @@ Public Class clsMASIC
                                 If blnUseScan Then
                                     ' Include this scan in the SIC for this parent ion
 
-                                    'sngMatchIntensity = AggregateIonsInRange(objSpectraCache, udtScanList.FragScans, intScanIndex, dblMRMDaughterMZ, dblSearchToleranceHalfWidth, intIonMatchCount, dblClosestMZ, True)
-                                    blnMatchFound = FindMaxValueInMZRange(objSpectraCache, udtScanList.FragScans, intScanIndex, dblMRMDaughterMZ - dblSearchToleranceHalfWidth, dblMRMDaughterMZ + dblSearchToleranceHalfWidth, dblClosestMZ, sngMatchIntensity)
+                                    'sngMatchIntensity = AggregateIonsInRange(objSpectraCache, scanList.FragScans, intScanIndex, dblMRMDaughterMZ, dblSearchToleranceHalfWidth, intIonMatchCount, dblClosestMZ, True)
+                                    blnMatchFound = FindMaxValueInMZRange(objSpectraCache, scanList.FragScans, intScanIndex, dblMRMDaughterMZ - dblSearchToleranceHalfWidth, dblMRMDaughterMZ + dblSearchToleranceHalfWidth, dblClosestMZ, sngMatchIntensity)
 
                                     If udtSICDetails.SICDataCount >= udtSICDetails.SICData.Length Then
                                         ReDim Preserve udtSICDetails.SICScanIndices(udtSICDetails.SICScanIndices.Length * 2 - 1)
@@ -10703,15 +10556,15 @@ Public Class clsMASIC
                     End If
 
                     ' Initialize the peak
-                    udtScanList.ParentIons(intParentIonIndex).SICStats.Peak = New MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
+                    scanList.ParentIons(intParentIonIndex).SICStats.Peak = New MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
 
                     ' Find the data point with the maximum intensity
                     sngMaximumIntensity = 0
-                    udtScanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved = 0
+                    scanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved = 0
                     For intScanIndex = 0 To udtSICDetails.SICDataCount - 1
                         If udtSICDetails.SICData(intScanIndex) > sngMaximumIntensity Then
                             sngMaximumIntensity = udtSICDetails.SICData(intScanIndex)
-                            udtScanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved = intScanIndex
+                            scanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved = intScanIndex
                         End If
                     Next intScanIndex
 
@@ -10719,10 +10572,10 @@ Public Class clsMASIC
                     ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
                     mMASICPeakFinder.FindPotentialPeakArea(udtSICDetails.SICDataCount, udtSICDetails.SICData, udtSICPotentialAreaStatsInFullSIC, udtSICOptions.SICPeakFinderOptions)
 
-                    ' Update .BaselineNoiseStats in udtScanList.ParentIons(intParentIonIndex).SICStats.Peak
-                    udtScanList.ParentIons(intParentIonIndex).SICStats.Peak.BaselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(udtScanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved, udtBaselineNoiseStatSegments)
+                    ' Update .BaselineNoiseStats in scanList.ParentIons(intParentIonIndex).SICStats.Peak
+                    scanList.ParentIons(intParentIonIndex).SICStats.Peak.BaselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(scanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved, udtBaselineNoiseStatSegments)
 
-                    With udtScanList.ParentIons(intParentIonIndex)
+                    With scanList.ParentIons(intParentIonIndex)
 
                         ' Clear udtSICPotentialAreaStatsForPeak
                         .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
@@ -10732,20 +10585,20 @@ Public Class clsMASIC
                          .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak,
                          udtSmoothedYDataSubset, udtSICOptions.SICPeakFinderOptions,
                          udtSICPotentialAreaStatsInFullSIC,
-                         False, udtScanList.SIMDataPresent, False)
+                         False, scanList.SIMDataPresent, False)
 
 
-                        blnSuccess = StorePeakInParentIon(udtScanList, intParentIonIndex, udtSICDetails, .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
+                        blnSuccess = StorePeakInParentIon(scanList, intParentIonIndex, udtSICDetails, .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
                     End With
 
 
                     ' Step 3: store the results
 
                     ' Possibly save the stats for this SIC to the SICData file
-                    SaveSICDataToText(udtSICOptions, udtScanList, intParentIonIndex, udtSICDetails, udtOutputFileHandles)
+                    SaveSICDataToText(udtSICOptions, scanList, intParentIonIndex, udtSICDetails, udtOutputFileHandles)
 
                     ' Save the stats for this SIC to the XML file
-                    SaveDataToXML(udtScanList, intParentIonIndex, udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
+                    SaveDataToXML(scanList, intParentIonIndex, udtSICDetails, udtSmoothedYDataSubset, udtOutputFileHandles)
 
                     intParentIonsProcessed += 1
 
@@ -10757,15 +10610,15 @@ Public Class clsMASIC
                 '---------------------------------------------------------
                 Try
 
-                    If udtScanList.ParentIonInfoCount > 1 Then
-                        SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (udtScanList.ParentIonInfoCount - 1) * 100))
+                    If scanList.ParentIonInfoCount > 1 Then
+                        SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
                     Else
                         SetSubtaskProcessingStepPct(0)
                     End If
 
                     UpdateOverallProgress(objSpectraCache)
                     If mAbortProcessing Then
-                        udtScanList.ProcessingIncomplete = True
+                        scanList.ProcessingIncomplete = True
                         Exit For
                     End If
 
@@ -10792,7 +10645,7 @@ Public Class clsMASIC
     End Function
 
     Private Function SaveBPIs(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       strInputFilePathFull As String,
       strOutputFolderPath As String) As Boolean
@@ -10823,7 +10676,7 @@ Public Class clsMASIC
             'strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
             'LogMessage("Saving ICR Tools TIC to " & Path.GetFileName(strOutputFilePath))
 
-            'SaveICRToolsChromatogramByScan(udtScanList.SurveyScans, udtScanList.SurveyScanCount, strOutputFilePath, False, True, strInputFilePathFull)
+            'SaveICRToolsChromatogramByScan(scanList.SurveyScans, scanList.SurveyScanCount, strOutputFilePath, False, True, strInputFilePathFull)
 
             intStepsCompleted += 1
             SetSubtaskProcessingStepPct(CShort(intStepsCompleted / intBPIStepCount * 100))
@@ -10833,7 +10686,7 @@ Public Class clsMASIC
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSChromatogramFile)
             LogMessage("Saving Decon2LS MS Chromatogram File to " & Path.GetFileName(strOutputFilePath))
 
-            SaveDecon2LSChromatogram(udtScanList.SurveyScans, udtScanList.SurveyScanCount, objSpectraCache, strOutputFilePath)
+            SaveDecon2LSChromatogram(scanList.SurveyScans, scanList.SurveyScanCount, objSpectraCache, strOutputFilePath)
 
             intStepsCompleted += 1
             SetSubtaskProcessingStepPct(CShort(intStepsCompleted / intBPIStepCount * 100))
@@ -10843,7 +10696,7 @@ Public Class clsMASIC
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile)
             LogMessage("Saving Decon2LS MSMS Chromatogram File to " & Path.GetFileName(strOutputFilePath))
 
-            SaveDecon2LSChromatogram(udtScanList.FragScans, udtScanList.FragScanCount, objSpectraCache, strOutputFilePath)
+            SaveDecon2LSChromatogram(scanList.FragScans, scanList.FragScanCount, objSpectraCache, strOutputFilePath)
 
             SetSubtaskProcessingStepPct(100)
             blnSuccess = True
@@ -10857,7 +10710,7 @@ Public Class clsMASIC
     End Function
 
     Private Sub SaveBPIWork(
-      ByRef udtScans() As udtScanInfoType,
+      scanList() As clsScanInfo,
       intScanCount As Integer,
       strOutputFilePath As String,
       blnSaveTIC As Boolean,
@@ -10875,7 +10728,7 @@ Public Class clsMASIC
         End If
 
         For intScanIndex = 0 To intScanCount - 1
-            With udtScans(intScanIndex)
+            With scanList(intScanIndex)
                 If blnSaveTIC Then
                     srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString & cColDelimiter &
                       Math.Round(.TotalIonIntensity, 2).ToString)
@@ -10893,7 +10746,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub SaveDecon2LSChromatogram(
-      ByRef udtScans() As udtScanInfoType,
+      scanList() As clsScanInfo,
       intScanCount As Integer,
       objSpectraCache As clsSpectraCache,
       strOutputFilePath As String)
@@ -10908,7 +10761,7 @@ Public Class clsMASIC
 
         ' Step through the scans and write each one
         For intScanIndex = 0 To intScanCount - 1
-            WriteDecon2LSScanFileEntry(srScanInfoOutfile, udtScans(intScanIndex), objSpectraCache)
+            WriteDecon2LSScanFileEntry(srScanInfoOutfile, scanList(intScanIndex), objSpectraCache)
 
             If intScanIndex Mod 250 = 0 Then
                 UpdateOverallProgress(objSpectraCache)
@@ -10922,7 +10775,7 @@ Public Class clsMASIC
 
     <Obsolete("No longer used")>
     Private Sub SaveICRToolsChromatogramByScan(
-      ByRef udtScans() As udtScanInfoType,
+      scanList() As clsScanInfo,
       intScanCount As Integer,
       strOutputFilePath As String,
       blnSaveElutionTimeInsteadOfScan As Boolean,
@@ -10986,9 +10839,9 @@ Public Class clsMASIC
         srOutFile.WriteLine("CurrentXmin: 0 ")
         If intScanCount > 0 Then
             If blnSaveElutionTimeInsteadOfScan Then
-                srOutFile.WriteLine("CurrentXmax: " & udtScans(intScanCount - 1).ScanTime.ToString & " ")
+                srOutFile.WriteLine("CurrentXmax: " & scanList(intScanCount - 1).ScanTime.ToString & " ")
             Else
-                srOutFile.WriteLine("CurrentXmax: " & udtScans(intScanCount - 1).ScanNumber.ToString & " ")
+                srOutFile.WriteLine("CurrentXmax: " & scanList(intScanCount - 1).ScanNumber.ToString & " ")
             End If
         Else
             srOutFile.WriteLine("CurrentXmax: 0")
@@ -11011,7 +10864,7 @@ Public Class clsMASIC
         srBinaryOut.Write(CByte(27))
 
         For intScanIndex = 0 To intScanCount - 1
-            With udtScans(intScanIndex)
+            With scanList(intScanIndex)
                 ' Note: Using CSng to assure that we write out single precision numbers
                 ' .TotalIonIntensity and .BasePeakIonIntensity are actually already singles
 
@@ -11036,7 +10889,7 @@ Public Class clsMASIC
 
     Private Function SaveSICDataToText(
       ByRef udtSICOptions As udtSICOptionsType,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intParentIonIndex As Integer,
       ByRef udtSICDetails As udtSICStatsDetailsType,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType) As Boolean
@@ -11053,13 +10906,13 @@ Public Class clsMASIC
 
             ' Write the detailed SIC values for the given parent ion to the text file
 
-            For intFragScanIndex = 0 To udtScanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+            For intFragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
 
                 ' "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
                 strPrefix = udtSICOptions.DatasetNumber.ToString & ControlChars.Tab &
                    intParentIonIndex.ToString & ControlChars.Tab &
                    intFragScanIndex.ToString & ControlChars.Tab &
-                   Math.Round(udtScanList.ParentIons(intParentIonIndex).MZ, 4).ToString & ControlChars.Tab
+                   Math.Round(scanList.ParentIons(intParentIonIndex).MZ, 4).ToString & ControlChars.Tab
 
                 With udtSICDetails
                     If .SICDataCount = 0 Then
@@ -11085,7 +10938,7 @@ Public Class clsMASIC
     End Function
 
     Private Function SaveDataToXML(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intParentIonIndex As Integer,
       ByRef udtSICDetails As udtSICStatsDetailsType,
       ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType,
@@ -11139,27 +10992,27 @@ Public Class clsMASIC
             sbPeakYDataSmoothed = New Text.StringBuilder
 
             ' Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
-            For intFragScanIndex = 0 To udtScanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+            For intFragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
                 strLastGoodLoc = "intFragScanIndex=" & intFragScanIndex.ToString
 
                 objXMLOut.WriteStartElement("ParentIon")
                 objXMLOut.WriteAttributeString("Index", intParentIonIndex.ToString)             ' Parent ion Index
                 objXMLOut.WriteAttributeString("FragScanIndex", intFragScanIndex.ToString)      ' Frag Scan Index
 
-                strLastGoodLoc = "With udtScanList.ParentIons(intParentIonIndex)"
-                With udtScanList.ParentIons(intParentIonIndex)
+                strLastGoodLoc = "With scanList.ParentIons(intParentIonIndex)"
+                With scanList.ParentIons(intParentIonIndex)
                     objXMLOut.WriteElementString("MZ", Math.Round(.MZ, 4).ToString)
 
-                    If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < udtScanList.SurveyScans.Length Then
-                        objXMLOut.WriteElementString("SurveyScanNumber", udtScanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString)
+                    If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < scanList.SurveyScans.Length Then
+                        objXMLOut.WriteElementString("SurveyScanNumber", scanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString)
                     Else
                         objXMLOut.WriteElementString("SurveyScanNumber", "-1")
                     End If
 
                     strLastGoodLoc = "Write FragScanNumber"
-                    If intFragScanIndex < udtScanList.FragScanCount Then
-                        objXMLOut.WriteElementString("FragScanNumber", udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString)
-                        objXMLOut.WriteElementString("FragScanTime", udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime.ToString)
+                    If intFragScanIndex < scanList.FragScanCount Then
+                        objXMLOut.WriteElementString("FragScanNumber", scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString)
+                        objXMLOut.WriteElementString("FragScanTime", scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime.ToString)
                     Else
                         ' Fragmentation scan does not exist
                         objXMLOut.WriteElementString("FragScanNumber", "0")
@@ -11180,16 +11033,16 @@ Public Class clsMASIC
                     strLastGoodLoc = "With .SICStats"
                     With .SICStats
                         With .Peak
-                            If udtSICDetails.SICScanType = eScanTypeConstants.FragScan Then
+                            If udtSICDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then
                                 objXMLOut.WriteElementString("SICScanType", "FragScan")
-                                objXMLOut.WriteElementString("PeakScanStart", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
-                                objXMLOut.WriteElementString("PeakScanEnd", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
-                                objXMLOut.WriteElementString("PeakScanMaxIntensity", udtScanList.FragScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanStart", scanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanEnd", scanList.FragScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanMaxIntensity", scanList.FragScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
                             Else
                                 objXMLOut.WriteElementString("SICScanType", "SurveyScan")
-                                objXMLOut.WriteElementString("PeakScanStart", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
-                                objXMLOut.WriteElementString("PeakScanEnd", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
-                                objXMLOut.WriteElementString("PeakScanMaxIntensity", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanStart", scanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseLeft)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanEnd", scanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexBaseRight)).ScanNumber.ToString)
+                                objXMLOut.WriteElementString("PeakScanMaxIntensity", scanList.SurveyScans(udtSICDetails.SICScanIndices(.IndexMax)).ScanNumber.ToString)
                             End If
 
                             objXMLOut.WriteElementString("PeakIntensity", StringUtilities.ValueToString(.MaxIntensityValue, 5))
@@ -11218,10 +11071,10 @@ Public Class clsMASIC
 
                         End With
 
-                        If udtSICDetails.SICScanType = eScanTypeConstants.FragScan Then
-                            objXMLOut.WriteElementString("SICScanStart", udtScanList.FragScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
+                        If udtSICDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then
+                            objXMLOut.WriteElementString("SICScanStart", scanList.FragScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
                         Else
-                            objXMLOut.WriteElementString("SICScanStart", udtScanList.SurveyScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
+                            objXMLOut.WriteElementString("SICScanStart", scanList.SurveyScans(udtSICDetails.SICScanIndices(0)).ScanNumber.ToString)
                         End If
 
                         If mUseBase64DataEncoding Then
@@ -11423,7 +11276,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function SaveExtendedScanStatsFiles(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       strInputFileName As String,
       strOutputFolderPath As String,
       udtSICOptions As udtSICOptionsType,
@@ -11438,7 +11291,7 @@ Public Class clsMASIC
 
         Dim intNonConstantHeaderIDs() As Integer = Nothing
 
-        Dim udtCurrentScan As udtScanInfoType
+        Dim udtCurrentScan As clsScanInfo
         Try
             SetSubtaskProcessingStepPct(0, "Saving extended scan stats to flat file")
 
@@ -11454,7 +11307,7 @@ Public Class clsMASIC
 
             ' Lookup extended stats values that are constants for all scans
             ' The following will also remove the constant header values from mExtendedHeaderInfo
-            Dim strConstantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(intNonConstantHeaderIDs, udtScanList.SurveyScans, udtScanList.FragScans, cColDelimiter)
+            Dim strConstantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(intNonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter)
             If strConstantExtendedHeaderValues Is Nothing Then strConstantExtendedHeaderValues = String.Empty
 
             ' Write the constant extended stats values to a text file
@@ -11470,15 +11323,15 @@ Public Class clsMASIC
                     srOutFile.WriteLine(strOutLine)
                 End If
 
-                For intScanIndex = 0 To udtScanList.MasterScanOrderCount - 1
+                For intScanIndex = 0 To scanList.MasterScanOrderCount - 1
 
-                    udtCurrentScan = GetScanByMasterScanIndex(udtScanList, intScanIndex)
+                    udtCurrentScan = GetScanByMasterScanIndex(scanList, intScanIndex)
 
                     Dim strOutLine = ConcatenateExtendedStats(intNonConstantHeaderIDs, udtSICOptions.DatasetNumber, udtCurrentScan.ScanNumber, udtCurrentScan.ExtendedHeaderInfo, cColDelimiter)
                     srOutFile.WriteLine(strOutLine)
 
                     If intScanIndex Mod 100 = 0 Then
-                        SetSubtaskProcessingStepPct(CShort(intScanIndex / (udtScanList.MasterScanOrderCount - 1) * 100))
+                        SetSubtaskProcessingStepPct(CShort(intScanIndex / (scanList.MasterScanOrderCount - 1) * 100))
                     End If
                 Next intScanIndex
 
@@ -11495,7 +11348,7 @@ Public Class clsMASIC
     End Function
 
     Private Function SaveHeaderGlossary(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       strInputFileName As String,
       strOutputFolderPath As String) As Boolean
 
@@ -11513,16 +11366,16 @@ Public Class clsMASIC
 
             ' ScanStats
             srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) & ":")
-            srOutFile.WriteLine(GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.ScanStatsFlatFile))
+            srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsFlatFile))
             srOutFile.WriteLine()
 
             ' SICStats
             srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.SICStatsFlatFile) & ":")
-            srOutFile.WriteLine(GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.SICStatsFlatFile))
+            srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile))
             srOutFile.WriteLine()
 
             ' ScanStatsExtended
-            strHeaders = GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
+            strHeaders = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
             If Not strHeaders Is Nothing AndAlso strHeaders.Length > 0 Then
                 srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) & ":")
                 srOutFile.WriteLine(strHeaders)
@@ -11870,7 +11723,7 @@ Public Class clsMASIC
     End Function
 
     Private Function SaveSICStatsFlatFile(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       strInputFileName As String,
       strOutputFolderPath As String,
       udtSICOptions As udtSICOptionsType,
@@ -11891,8 +11744,8 @@ Public Class clsMASIC
 
         Dim sngSurveyScanTime, sngFragScanTime, sngOptimalPeakApexScanTime As Single
 
-        ' Populate intScanListArray with the scan numbers in udtScanList.SurveyScans
-        PopulateScanListPointerArray(udtScanList.SurveyScans, udtScanList.SurveyScanCount, intScanListArray)
+        ' Populate intScanListArray with the scan numbers in scanList.SurveyScans
+        PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScanCount, intScanListArray)
 
         Try
             sbOutLine = New Text.StringBuilder
@@ -11908,34 +11761,34 @@ Public Class clsMASIC
                 ' The file is tab delimited
                 ' If blnIncludeHeaders = True, then headers are included
                 If blnIncludeHeaders Then
-                    srOutfile.WriteLine(GetHeadersForOutputFile(udtScanList, eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
+                    srOutfile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
                 End If
 
-                For intParentIonIndex = 0 To udtScanList.ParentIonInfoCount - 1
+                For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
                     If Me.LimitSearchToCustomMZList Then
-                        blnIncludeParentIon = udtScanList.ParentIons(intParentIonIndex).CustomSICPeak
+                        blnIncludeParentIon = scanList.ParentIons(intParentIonIndex).CustomSICPeak
                     Else
                         blnIncludeParentIon = True
                     End If
 
                     If blnIncludeParentIon Then
-                        For intFragScanIndex = 0 To udtScanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+                        For intFragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
                             sbOutLine.Length = 0
-                            With udtScanList.ParentIons(intParentIonIndex)
+                            With scanList.ParentIons(intParentIonIndex)
                                 sbOutLine.Append(udtSICOptions.DatasetNumber.ToString & cColDelimiter)                               ' Dataset number
                                 sbOutLine.Append(intParentIonIndex.ToString & cColDelimiter)                                         ' Parent Ion Index
 
                                 sbOutLine.Append(Math.Round(.MZ, 4).ToString & cColDelimiter)                                        ' MZ
-                                If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < udtScanList.SurveyScans.Length Then
-                                    sbOutLine.Append(udtScanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString & cColDelimiter)  ' Survey scan number
-                                    sngSurveyScanTime = udtScanList.SurveyScans(.SurveyScanIndex).ScanTime
+                                If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < scanList.SurveyScans.Length Then
+                                    sbOutLine.Append(scanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString & cColDelimiter)  ' Survey scan number
+                                    sngSurveyScanTime = scanList.SurveyScans(.SurveyScanIndex).ScanTime
                                 Else
                                     sbOutLine.Append("-1" & cColDelimiter)      ' Survey scan number
                                     sngSurveyScanTime = 0
                                 End If
 
-                                If intFragScanIndex < udtScanList.FragScanCount Then
-                                    sbOutLine.Append(udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString & cColDelimiter)  ' Fragmentation scan number
+                                If intFragScanIndex < scanList.FragScanCount Then
+                                    sbOutLine.Append(scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString & cColDelimiter)  ' Fragmentation scan number
                                 Else
                                     sbOutLine.Append("0" & cColDelimiter)    ' Fragmentation scan does not exist
                                 End If
@@ -11943,13 +11796,13 @@ Public Class clsMASIC
                                 sbOutLine.Append(.OptimalPeakApexScanNumber.ToString & cColDelimiter)                ' Optimal peak apex scan number
 
                                 If blnIncludeScanTimesInSICStatsFile Then
-                                    If intFragScanIndex < udtScanList.FragScanCount Then
-                                        sngFragScanTime = udtScanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime
+                                    If intFragScanIndex < scanList.FragScanCount Then
+                                        sngFragScanTime = scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime
                                     Else
                                         sngFragScanTime = 0                ' Fragmentation scan does not exist
                                     End If
 
-                                    sngOptimalPeakApexScanTime = ScanNumberToScanTime(udtScanList, .OptimalPeakApexScanNumber)
+                                    sngOptimalPeakApexScanTime = ScanNumberToScanTime(scanList, .OptimalPeakApexScanNumber)
                                 End If
 
                                 sbOutLine.Append(.PeakApexOverrideParentIonIndex.ToString & cColDelimiter)           ' Parent Ion Index that supplied the optimal peak apex scan number
@@ -11960,15 +11813,16 @@ Public Class clsMASIC
                                 End If
 
                                 With .SICStats
-                                    If .ScanTypeForPeakIndices = eScanTypeConstants.FragScan Then
-                                        sbOutLine.Append(udtScanList.FragScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
-                                        sbOutLine.Append(udtScanList.FragScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
-                                        sbOutLine.Append(udtScanList.FragScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
+                                    If .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
+                                        sbOutLine.Append(scanList.FragScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
+                                        sbOutLine.Append(scanList.FragScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
+                                        sbOutLine.Append(scanList.FragScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
                                     Else
-                                        sbOutLine.Append(udtScanList.SurveyScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
-                                        sbOutLine.Append(udtScanList.SurveyScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
-                                        sbOutLine.Append(udtScanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
+                                        sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
+                                        sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
+                                        sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
                                     End If
+
                                     With .Peak
                                         sbOutLine.Append(StringUtilities.ValueToString(.MaxIntensityValue, 5) & cColDelimiter)           ' Peak Intensity
                                         sbOutLine.Append(StringUtilities.ValueToString(.SignalToNoiseRatio, 4) & cColDelimiter)          ' Peak signal to noise ratio
@@ -12006,15 +11860,15 @@ Public Class clsMASIC
                         Next intFragScanIndex
                     End If
 
-                    If udtScanList.ParentIonInfoCount > 1 Then
+                    If scanList.ParentIonInfoCount > 1 Then
                         If intParentIonIndex Mod 100 = 0 Then
-                            SetSubtaskProcessingStepPct(CShort(intParentIonIndex / (udtScanList.ParentIonInfoCount - 1) * 100))
+                            SetSubtaskProcessingStepPct(CShort(intParentIonIndex / (scanList.ParentIonInfoCount - 1) * 100))
                         End If
                     Else
                         SetSubtaskProcessingStepPct(1)
                     End If
                     If mAbortProcessing Then
-                        udtScanList.ProcessingIncomplete = True
+                        scanList.ProcessingIncomplete = True
                         Exit For
                     End If
                 Next intParentIonIndex
@@ -12031,9 +11885,9 @@ Public Class clsMASIC
     End Function
 
     Private Sub SaveRawDatatoDiskWork(
-      ByRef srDataOutFile As StreamWriter,
-      ByRef srScanInfoOutfile As StreamWriter,
-      ByRef udtScan As udtScanInfoType,
+      srDataOutFile As StreamWriter,
+      srScanInfoOutfile As StreamWriter,
+      currentScan As clsScanInfo,
       objSpectraCache As clsSpectraCache,
       strInputFileName As String,
       blnFragmentationScan As Boolean,
@@ -12042,9 +11896,9 @@ Public Class clsMASIC
 
         Select Case udtRawDataExportOptions.FileFormat
             Case eExportRawDataFileFormatConstants.PEKFile
-                SavePEKFileToDiskWork(srDataOutFile, udtScan, objSpectraCache, strInputFileName, blnFragmentationScan, intSpectrumExportCount, udtRawDataExportOptions)
+                SavePEKFileToDiskWork(srDataOutFile, currentScan, objSpectraCache, strInputFileName, blnFragmentationScan, intSpectrumExportCount, udtRawDataExportOptions)
             Case eExportRawDataFileFormatConstants.CSVFile
-                SaveCSVFilesToDiskWork(srDataOutFile, srScanInfoOutfile, udtScan, objSpectraCache, blnFragmentationScan, intSpectrumExportCount, udtRawDataExportOptions)
+                SaveCSVFilesToDiskWork(srDataOutFile, srScanInfoOutfile, currentScan, objSpectraCache, blnFragmentationScan, intSpectrumExportCount, udtRawDataExportOptions)
             Case Else
                 ' Unknown format
                 ' This code should never be reached
@@ -12052,9 +11906,9 @@ Public Class clsMASIC
     End Sub
 
     Private Sub SaveCSVFilesToDiskWork(
-      ByRef srDataOutFile As StreamWriter,
-      ByRef srScanInfoOutfile As StreamWriter,
-      ByRef udtScan As udtScanInfoType,
+      srDataOutFile As StreamWriter,
+      srScanInfoOutfile As StreamWriter,
+      currentScan As clsScanInfo,
       objSpectraCache As clsSpectraCache,
       blnFragmentationScan As Boolean,
       ByRef intSpectrumExportCount As Integer,
@@ -12085,14 +11939,14 @@ Public Class clsMASIC
 
         intExportCount = 0
 
-        If Not objSpectraCache.ValidateSpectrumInPool(udtScan.ScanNumber, intPoolIndex) Then
+        If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
             SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
             Exit Sub
         End If
 
         intSpectrumExportCount += 1
 
-        With udtScan
+        With currentScan
             ' First, write an entry to the "_scans.csv" file
 
             If udtRawDataExportOptions.RenumberScans Then
@@ -12126,7 +11980,7 @@ Public Class clsMASIC
             ''             sngPeakIntensityThreshold & "," &
             ''             sngPeptideIntensityThreshold
 
-            WriteDecon2LSScanFileEntry(srScanInfoOutfile, udtScan, intScanNumber, intMSLevel, intNumPeaks, intNumIsotopicSignatures)
+            WriteDecon2LSScanFileEntry(srScanInfoOutfile, currentScan, intScanNumber, intMSLevel, intNumPeaks, intNumIsotopicSignatures)
         End With
 
 
@@ -12161,7 +12015,7 @@ Public Class clsMASIC
 
                 ' If udtRawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update sngMinimumIntensityCurrentScan
                 If udtRawDataExportOptions.MinimumSignalToNoiseRatio > 0 Then
-                    sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, udtScan.BaselineNoiseStats.NoiseLevel * udtRawDataExportOptions.MinimumSignalToNoiseRatio)
+                    sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * udtRawDataExportOptions.MinimumSignalToNoiseRatio)
                 End If
 
                 intExportCount = 0
@@ -12192,8 +12046,8 @@ Public Class clsMASIC
     End Sub
 
     Private Sub SavePEKFileToDiskWork(
-      ByRef srOutFile As StreamWriter,
-      ByRef udtScan As udtScanInfoType,
+      srOutFile As StreamWriter,
+      currentScan As clsScanInfo,
       objSpectraCache As clsSpectraCache,
       strInputFileName As String,
       blnFragmentationScan As Boolean,
@@ -12213,14 +12067,14 @@ Public Class clsMASIC
 
         intExportCount = 0
 
-        If Not objSpectraCache.ValidateSpectrumInPool(udtScan.ScanNumber, intPoolIndex) Then
+        If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
             SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
             Exit Sub
         End If
 
         intSpectrumExportCount += 1
 
-        With udtScan
+        With currentScan
 
             srOutFile.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString)          ' Store the base peak ion intensity as the time domain signal level value
 
@@ -12282,7 +12136,7 @@ Public Class clsMASIC
 
                 ' If udtRawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update sngMinimumIntensityCurrentScan
                 If udtRawDataExportOptions.MinimumSignalToNoiseRatio > 0 Then
-                    sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, udtScan.BaselineNoiseStats.NoiseLevel * udtRawDataExportOptions.MinimumSignalToNoiseRatio)
+                    sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * udtRawDataExportOptions.MinimumSignalToNoiseRatio)
                 End If
 
                 intExportCount = 0
@@ -12305,74 +12159,71 @@ Public Class clsMASIC
 
     Private Sub SaveScanStatEntry(
       swOutFile As StreamWriter,
-      eScanType As eScanTypeConstants,
-      ByRef udtCurrentScan As udtScanInfoType,
+      eScanType As clsScanList.eScanTypeConstants,
+      currentScan As clsScanInfo,
       intDatasetNumber As Integer)
 
         Const cColDelimiter As Char = ControlChars.Tab
-        Dim strLineOut As String
 
         Dim objScanStatsEntry As New DSSummarizer.clsScanStatsEntry
 
-        objScanStatsEntry.ScanNumber = udtCurrentScan.ScanNumber
+        objScanStatsEntry.ScanNumber = currentScan.ScanNumber
 
-        If eScanType = eScanTypeConstants.SurveyScan Then
+        If eScanType = clsScanList.eScanTypeConstants.SurveyScan Then
             objScanStatsEntry.ScanType = 1
-            objScanStatsEntry.ScanTypeName = String.Copy(udtCurrentScan.ScanTypeName)
+            objScanStatsEntry.ScanTypeName = String.Copy(currentScan.ScanTypeName)
         Else
-            If udtCurrentScan.FragScanInfo.MSLevel <= 1 Then
+            If currentScan.FragScanInfo.MSLevel <= 1 Then
                 ' This is a fragmentation scan, so it must have a scan type of at least 2
                 objScanStatsEntry.ScanType = 2
             Else
                 ' .MSLevel is 2 or higher, record the actual MSLevel value
-                objScanStatsEntry.ScanType = udtCurrentScan.FragScanInfo.MSLevel
+                objScanStatsEntry.ScanType = currentScan.FragScanInfo.MSLevel
             End If
-            objScanStatsEntry.ScanTypeName = String.Copy(udtCurrentScan.ScanTypeName)
+            objScanStatsEntry.ScanTypeName = String.Copy(currentScan.ScanTypeName)
         End If
 
-        objScanStatsEntry.ScanFilterText = udtCurrentScan.ScanHeaderText
+        objScanStatsEntry.ScanFilterText = currentScan.ScanHeaderText
 
-        objScanStatsEntry.ElutionTime = udtCurrentScan.ScanTime.ToString("0.0000")
-        objScanStatsEntry.TotalIonIntensity = StringUtilities.ValueToString(udtCurrentScan.TotalIonIntensity, 5)
-        objScanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(udtCurrentScan.BasePeakIonIntensity, 5)
-        objScanStatsEntry.BasePeakMZ = Math.Round(udtCurrentScan.BasePeakIonMZ, 4).ToString
+        objScanStatsEntry.ElutionTime = currentScan.ScanTime.ToString("0.0000")
+        objScanStatsEntry.TotalIonIntensity = StringUtilities.ValueToString(currentScan.TotalIonIntensity, 5)
+        objScanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(currentScan.BasePeakIonIntensity, 5)
+        objScanStatsEntry.BasePeakMZ = Math.Round(currentScan.BasePeakIonMZ, 4).ToString
 
         ' Base peak signal to noise ratio
-        objScanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(udtCurrentScan.BasePeakIonIntensity, udtCurrentScan.BaselineNoiseStats.NoiseLevel), 4)
+        objScanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(currentScan.BasePeakIonIntensity, currentScan.BaselineNoiseStats.NoiseLevel), 4)
 
-        objScanStatsEntry.IonCount = udtCurrentScan.IonCount
-        objScanStatsEntry.IonCountRaw = udtCurrentScan.IonCountRaw
+        objScanStatsEntry.IonCount = currentScan.IonCount
+        objScanStatsEntry.IonCountRaw = currentScan.IonCountRaw
 
         mScanStats.Add(objScanStatsEntry)
 
-        strLineOut = String.Empty
-        strLineOut &= intDatasetNumber.ToString & cColDelimiter                     ' Dataset number
-        strLineOut &= objScanStatsEntry.ScanNumber.ToString & cColDelimiter         ' Scan number
-        strLineOut &= objScanStatsEntry.ElutionTime & cColDelimiter                 ' Scan time (minutes)
-        strLineOut &= objScanStatsEntry.ScanType.ToString & cColDelimiter           ' Scan type (1 for MS, 2 for MS2, etc.)
-        strLineOut &= objScanStatsEntry.TotalIonIntensity & cColDelimiter           ' Total ion intensity
-        strLineOut &= objScanStatsEntry.BasePeakIntensity & cColDelimiter           ' Base peak ion intensity
-        strLineOut &= objScanStatsEntry.BasePeakMZ & cColDelimiter                  ' Base peak ion m/z
-        strLineOut &= objScanStatsEntry.BasePeakSignalToNoiseRatio & cColDelimiter  ' Base peak signal to noise ratio
-        strLineOut &= objScanStatsEntry.IonCount.ToString & cColDelimiter           ' Number of peaks (aka ions) in the spectrum
-        strLineOut &= objScanStatsEntry.IonCountRaw.ToString & cColDelimiter        ' Number of peaks (aka ions) in the spectrum prior to any filtering
-        strLineOut &= objScanStatsEntry.ScanTypeName                                ' Scan type name
-
-        swOutFile.WriteLine(strLineOut)
+        swOutFile.WriteLine(
+          intDatasetNumber.ToString & cColDelimiter &                    ' Dataset number
+          objScanStatsEntry.ScanNumber.ToString & cColDelimiter &        ' Scan number
+          objScanStatsEntry.ElutionTime & cColDelimiter &                ' Scan time (minutes)
+          objScanStatsEntry.ScanType.ToString & cColDelimiter &          ' Scan type (1 for MS, 2 for MS2, etc.)
+          objScanStatsEntry.TotalIonIntensity & cColDelimiter &          ' Total ion intensity
+          objScanStatsEntry.BasePeakIntensity & cColDelimiter &          ' Base peak ion intensity
+          objScanStatsEntry.BasePeakMZ & cColDelimiter &                 ' Base peak ion m/z
+          objScanStatsEntry.BasePeakSignalToNoiseRatio & cColDelimiter & ' Base peak signal to noise ratio
+          objScanStatsEntry.IonCount.ToString & cColDelimiter &          ' Number of peaks (aka ions) in the spectrum
+          objScanStatsEntry.IonCountRaw.ToString & cColDelimiter &       ' Number of peaks (aka ions) in the spectrum prior to any filtering
+          objScanStatsEntry.ScanTypeName)                                ' Scan type name
 
     End Sub
 
     ''' <summary>
     ''' Converts a scan number of acquisition time to an actual scan number
     ''' </summary>
-    ''' <param name="udtScanList"></param>
+    ''' <param name="scanList"></param>
     ''' <param name="sngScanOrAcqTime">Value to convert</param>
     ''' <param name="eScanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
     ''' <param name="blnConvertingRangeOrTolerance">True when converting a range</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Private Function ScanOrAcqTimeToAbsolute(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       sngScanOrAcqTime As Single,
       eScanType As eCustomSICScanTypeConstants,
       blnConvertingRangeOrTolerance As Boolean) As Integer
@@ -12396,7 +12247,7 @@ Public Class clsMASIC
                     ' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
                     ' Use the total range of scan numbers
-                    With udtScanList
+                    With scanList
                         If .MasterScanOrderCount > 0 Then
                             intTotalScanRange = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
 
@@ -12413,7 +12264,7 @@ Public Class clsMASIC
                     '   call this function again with that relative time
 
                     If blnConvertingRangeOrTolerance Then
-                        With udtScanList
+                        With scanList
                             sngTotalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
                             If sngTotalRunTime < 0.1 Then
                                 sngTotalRunTime = 1
@@ -12422,11 +12273,11 @@ Public Class clsMASIC
                             sngRelativeTime = sngScanOrAcqTime / sngTotalRunTime
                         End With
 
-                        intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+                        intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
                     Else
-                        intMasterScanIndex = FindNearestScanNumIndex(udtScanList, sngScanOrAcqTime, eScanType)
-                        If intMasterScanIndex >= 0 AndAlso udtScanList.MasterScanOrderCount > 0 Then
-                            intAbsoluteScanNumber = udtScanList.MasterScanNumList(intMasterScanIndex)
+                        intMasterScanIndex = FindNearestScanNumIndex(scanList, sngScanOrAcqTime, eScanType)
+                        If intMasterScanIndex >= 0 AndAlso scanList.MasterScanOrderCount > 0 Then
+                            intAbsoluteScanNumber = scanList.MasterScanNumList(intMasterScanIndex)
                         End If
                     End If
 
@@ -12447,7 +12298,7 @@ Public Class clsMASIC
     End Function
 
     Private Function ScanOrAcqTimeToScanTime(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       sngScanOrAcqTime As Single,
       eScanType As eCustomSICScanTypeConstants,
       blnConvertingRangeOrTolerance As Boolean) As Single
@@ -12470,7 +12321,7 @@ Public Class clsMASIC
                     '   call this function again with that relative time
 
                     If blnConvertingRangeOrTolerance Then
-                        With udtScanList
+                        With scanList
                             Dim intTotalScans As Integer
                             intTotalScans = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
                             If intTotalScans < 1 Then
@@ -12480,11 +12331,11 @@ Public Class clsMASIC
                             sngRelativeTime = sngScanOrAcqTime / intTotalScans
                         End With
 
-                        sngComputedScanTime = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+                        sngComputedScanTime = ScanOrAcqTimeToScanTime(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
                     Else
-                        intMasterScanIndex = FindNearestScanNumIndex(udtScanList, sngScanOrAcqTime, eScanType)
-                        If intMasterScanIndex >= 0 AndAlso udtScanList.MasterScanOrderCount > 0 Then
-                            sngComputedScanTime = udtScanList.MasterScanTimeList(intMasterScanIndex)
+                        intMasterScanIndex = FindNearestScanNumIndex(scanList, sngScanOrAcqTime, eScanType)
+                        If intMasterScanIndex >= 0 AndAlso scanList.MasterScanOrderCount > 0 Then
+                            sngComputedScanTime = scanList.MasterScanTimeList(intMasterScanIndex)
                         End If
                     End If
 
@@ -12492,7 +12343,7 @@ Public Class clsMASIC
                     ' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
                     ' Use the total range of scan times
-                    With udtScanList
+                    With scanList
                         If .MasterScanOrderCount > 0 Then
                             sngTotalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
 
@@ -12523,11 +12374,11 @@ Public Class clsMASIC
     End Function
 
     Protected Function ScanNumberToIndex(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intScanNumber As Integer,
-      ByRef eScanType As eScanTypeConstants) As Integer
+      ByRef eScanType As clsScanList.eScanTypeConstants) As Integer
 
-        ' Looks for intScanNumber in udtScanList and returns the index containing the scan number
+        ' Looks for intScanNumber in scanList and returns the index containing the scan number
         ' Returns -1 if no match
 
         Dim intIndex As Integer
@@ -12539,31 +12390,31 @@ Public Class clsMASIC
         End If
 
         intScanIndexMatch = -1
-        eScanType = eScanTypeConstants.SurveyScan
+        eScanType = clsScanList.eScanTypeConstants.SurveyScan
 
-        intScanIndexMatch = Array.BinarySearch(udtScanList.SurveyScans, 0, udtScanList.SurveyScanCount, intScanNumber, objScanInfoComparer)
+        intScanIndexMatch = Array.BinarySearch(scanList.SurveyScans, 0, scanList.SurveyScanCount, intScanNumber, objScanInfoComparer)
         If intScanIndexMatch >= 0 Then
-            eScanType = eScanTypeConstants.SurveyScan
+            eScanType = clsScanList.eScanTypeConstants.SurveyScan
         Else
-            intScanIndexMatch = Array.BinarySearch(udtScanList.FragScans, 0, udtScanList.FragScanCount, intScanNumber, objScanInfoComparer)
+            intScanIndexMatch = Array.BinarySearch(scanList.FragScans, 0, scanList.FragScanCount, intScanNumber, objScanInfoComparer)
             If intScanIndexMatch >= 0 Then
-                eScanType = eScanTypeConstants.FragScan
+                eScanType = clsScanList.eScanTypeConstants.FragScan
             Else
-                ' Match still not found; brute force search udtScanList.SurveyScans for intScanNumber
-                For intIndex = 0 To udtScanList.SurveyScanCount - 1
-                    If udtScanList.SurveyScans(intIndex).ScanNumber = intScanNumber Then
+                ' Match still not found; brute force search scanList.SurveyScans for intScanNumber
+                For intIndex = 0 To scanList.SurveyScanCount - 1
+                    If scanList.SurveyScans(intIndex).ScanNumber = intScanNumber Then
                         intScanIndexMatch = intIndex
-                        eScanType = eScanTypeConstants.SurveyScan
+                        eScanType = clsScanList.eScanTypeConstants.SurveyScan
                         Exit For
                     End If
                 Next intIndex
 
                 If intScanIndexMatch < 0 Then
-                    ' Still no match; brute force search & udtScanList.FragScans for intScanNumber
-                    For intIndex = 0 To udtScanList.FragScanCount - 1
-                        If udtScanList.FragScans(intIndex).ScanNumber = intScanNumber Then
+                    ' Still no match; brute force search & scanList.FragScans for intScanNumber
+                    For intIndex = 0 To scanList.FragScanCount - 1
+                        If scanList.FragScans(intIndex).ScanNumber = intScanNumber Then
                             intScanIndexMatch = intIndex
-                            eScanType = eScanTypeConstants.FragScan
+                            eScanType = clsScanList.eScanTypeConstants.FragScan
                             Exit For
                         End If
                     Next intIndex
@@ -12576,23 +12427,23 @@ Public Class clsMASIC
     End Function
 
     Protected Function ScanNumberToScanTime(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intScanNumber As Integer) As Single
 
         Dim intScanIndexMatch As Integer
-        Dim eScanTypeMatch As eScanTypeConstants
+        Dim eScanTypeMatch As clsScanList.eScanTypeConstants
 
         Dim sngScantime As Single
 
         sngScantime = 0
 
-        intScanIndexMatch = ScanNumberToIndex(udtScanList, intScanNumber, eScanTypeMatch)
+        intScanIndexMatch = ScanNumberToIndex(scanList, intScanNumber, eScanTypeMatch)
         If intScanIndexMatch >= 0 Then
             Select Case eScanTypeMatch
-                Case eScanTypeConstants.SurveyScan
-                    sngScantime = udtScanList.SurveyScans(intScanIndexMatch).ScanTime
-                Case eScanTypeConstants.FragScan
-                    sngScantime = udtScanList.FragScans(intScanIndexMatch).ScanTime
+                Case clsScanList.eScanTypeConstants.SurveyScan
+                    sngScantime = scanList.SurveyScans(intScanIndexMatch).ScanTime
+                Case clsScanList.eScanTypeConstants.FragScan
+                    sngScantime = scanList.FragScans(intScanIndexMatch).ScanTime
                 Case Else
                     ' Unknown scan type
             End Select
@@ -12796,18 +12647,18 @@ Public Class clsMASIC
 
     End Sub
 
-    Private Sub SetDefaultPeakLocValues(ByRef udtScanList As udtScanListType)
+    Private Sub SetDefaultPeakLocValues(scanList As clsScanList)
 
         Dim intParentIonIndex As Integer
         Dim intScanIndexObserved As Integer
 
         Try
-            For intParentIonIndex = 0 To udtScanList.ParentIonInfoCount - 1
-                With udtScanList.ParentIons(intParentIonIndex)
+            For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+                With scanList.ParentIons(intParentIonIndex)
                     intScanIndexObserved = .SurveyScanIndex
 
                     With .SICStats
-                        .ScanTypeForPeakIndices = eScanTypeConstants.SurveyScan
+                        .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan
                         .PeakScanIndexStart = intScanIndexObserved
                         .PeakScanIndexEnd = intScanIndexObserved
                         .PeakScanIndexMax = intScanIndexObserved
@@ -13019,7 +12870,7 @@ Public Class clsMASIC
 
     Private Sub StoreMzXmlSpectrum(
       objMSSpectrum As clsMSSpectrum,
-      ByRef udtScanInfo As udtScanInfoType,
+      scanInfo As clsScanInfo,
       objSpectraCache As clsSpectraCache,
       udtNoiseThresholdOptions As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseOptionsType,
       blnDiscardLowIntensityData As Boolean,
@@ -13033,21 +12884,19 @@ Public Class clsMASIC
         Try
 
             If objMSSpectrum.IonsMZ Is Nothing OrElse objMSSpectrum.IonsIntensity Is Nothing Then
-                udtScanInfo.IonCount = 0
-                udtScanInfo.IonCountRaw = 0
+                scanInfo.IonCount = 0
+                scanInfo.IonCountRaw = 0
             Else
                 objMSSpectrum.IonCount = objMSSpectrum.IonsMZ.Length
 
-                With udtScanInfo
-                    .IonCount = objMSSpectrum.IonCount
-                    .IonCountRaw = .IonCount
-                End With
+                scanInfo.IonCount = objMSSpectrum.IonCount
+                scanInfo.IonCountRaw = scanInfo.IonCount
             End If
 
-            objMSSpectrum.ScanNumber = udtScanInfo.ScanNumber
+            objMSSpectrum.ScanNumber = scanInfo.ScanNumber
 
-            If udtScanInfo.IonCount > 0 Then
-                With udtScanInfo
+            If scanInfo.IonCount > 0 Then
+                With scanInfo
                     ' Confirm the total scan intensity stored in the mzXML file
                     sngTotalIonIntensity = 0
                     For intIonIndex = 0 To objMSSpectrum.IonCount - 1
@@ -13060,9 +12909,9 @@ Public Class clsMASIC
 
                 End With
 
-                ProcessAndStoreSpectrum(udtScanInfo, objSpectraCache, objMSSpectrum, udtNoiseThresholdOptions, blnDiscardLowIntensityData, blnCompressSpectraData, dblMSDataResolution, blnKeepRawSpectrum)
+                ProcessAndStoreSpectrum(scanInfo, objSpectraCache, objMSSpectrum, udtNoiseThresholdOptions, blnDiscardLowIntensityData, blnCompressSpectraData, dblMSDataResolution, blnKeepRawSpectrum)
             Else
-                udtScanInfo.TotalIonIntensity = 0
+                scanInfo.TotalIonIntensity = 0
             End If
 
         Catch ex As Exception
@@ -13072,7 +12921,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function StorePeakInParentIon(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       intParentIonIndex As Integer,
       ByRef udtSICDetails As udtSICStatsDetailsType,
       ByRef udtSICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType,
@@ -13089,7 +12938,7 @@ Public Class clsMASIC
 
         Try
 
-            With udtScanList
+            With scanList
                 If udtSICDetails.SICData Is Nothing OrElse udtSICDetails.SICDataCount = 0 Then
                     ' Either .SICData is nothing or no SIC data exists
                     ' Cannot find peaks for this parent ion
@@ -13119,10 +12968,10 @@ Public Class clsMASIC
 
                             .ScanTypeForPeakIndices = udtSICDetails.SICScanType
                             If blnProcessingMRMPeak Then
-                                If .ScanTypeForPeakIndices <> eScanTypeConstants.FragScan Then
+                                If .ScanTypeForPeakIndices <> clsScanList.eScanTypeConstants.FragScan Then
                                     ' ScanType is not FragScan; this is unexpected
                                     LogErrors("StorePeakInParentIon", "Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", Nothing, True, True, eMasicErrorCodes.FindSICPeaksError)
-                                    .ScanTypeForPeakIndices = eScanTypeConstants.FragScan
+                                    .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan
                                 End If
                             End If
 
@@ -13148,13 +12997,13 @@ Public Class clsMASIC
                                 End If
                             End If
 
-                            If udtScanList.FragScanCount > 0 AndAlso udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0) < udtScanList.FragScanCount Then
+                            If scanList.FragScanCount > 0 AndAlso scanList.ParentIons(intParentIonIndex).FragScanIndices(0) < scanList.FragScanCount Then
                                 ' Record the fragmentation scan number
-                                intFragScanNumber = udtScanList.FragScans(udtScanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
+                                intFragScanNumber = scanList.FragScans(scanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
                             Else
                                 ' Use the parent scan number as the fragmentation scan number
                                 ' This is OK based on how mMASICPeakFinder.ComputeParentIonIntensity() uses intFragScanNumber
-                                intFragScanNumber = udtScanList.SurveyScans(udtScanList.ParentIons(intParentIonIndex).SurveyScanIndex).ScanNumber
+                                intFragScanNumber = scanList.SurveyScans(scanList.ParentIons(intParentIonIndex).SurveyScanIndex).ScanNumber
                             End If
 
                             If blnProcessingMRMPeak Then
@@ -13194,9 +13043,9 @@ Public Class clsMASIC
                     ' Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
                     With .ParentIons(intParentIonIndex)
                         If blnProcessingMRMPeak Then
-                            .OptimalPeakApexScanNumber = udtScanList.FragScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+                            .OptimalPeakApexScanNumber = scanList.FragScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
                         Else
-                            .OptimalPeakApexScanNumber = udtScanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+                            .OptimalPeakApexScanNumber = scanList.SurveyScans(udtSICDetails.SICScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
                         End If
                     End With
 
@@ -13219,7 +13068,7 @@ Public Class clsMASIC
 
     Private Function AggregateIonsInRange(
       objSpectraCache As clsSpectraCache,
-      ByRef udtScanInfo() As udtScanInfoType,
+      scanList() As clsScanInfo,
       intSpectrumIndex As Integer,
       dblSearchMZ As Double,
       dblSearchToleranceHalfWidth As Double,
@@ -13235,7 +13084,7 @@ Public Class clsMASIC
             intIonMatchCount = 0
             sngIonSumOrMax = 0
 
-            If Not objSpectraCache.ValidateSpectrumInPool(udtScanInfo(intSpectrumIndex).ScanNumber, intPoolIndex) Then
+            If Not objSpectraCache.ValidateSpectrumInPool(scanList(intSpectrumIndex).ScanNumber, intPoolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
             Else
                 sngIonSumOrMax = AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex), dblSearchMZ, dblSearchToleranceHalfWidth, intIonMatchCount, dblClosestMZ, blnReturnMax)
@@ -13407,7 +13256,7 @@ Public Class clsMASIC
 
     End Sub
 
-    Private Sub TestScanConversions(ByRef udtScanList As udtScanListType)
+    Private Sub TestScanConversions(scanList As clsScanList)
 
         Dim intScanNumber As Integer
         Dim sngRelativeTime As Single
@@ -13422,9 +13271,9 @@ Public Class clsMASIC
             sngScanTime = 30            ' The scan at 30 minutes
 
             ' Find the scan number corresponding to each of these values
-            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
-            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
-            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
+            sngResult = ScanOrAcqTimeToAbsolute(scanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
+            sngResult = ScanOrAcqTimeToAbsolute(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
+            sngResult = ScanOrAcqTimeToAbsolute(scanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
 
 
             ' Convert ranges
@@ -13433,9 +13282,9 @@ Public Class clsMASIC
             sngScanTime = 5             ' 5 minutes
 
             ' Convert each of these ranges to a scan time range in minutes
-            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
-            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
-            sngResult = ScanOrAcqTimeToAbsolute(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
+            sngResult = ScanOrAcqTimeToAbsolute(scanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
+            sngResult = ScanOrAcqTimeToAbsolute(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+            sngResult = ScanOrAcqTimeToAbsolute(scanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
 
 
 
@@ -13445,9 +13294,9 @@ Public Class clsMASIC
             sngScanTime = 30            ' The scan at 30 minutes
 
             ' Find the scan number corresponding to each of these values
-            sngResult = ScanOrAcqTimeToScanTime(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
-            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
-            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
+            sngResult = ScanOrAcqTimeToScanTime(scanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, False)
+            sngResult = ScanOrAcqTimeToScanTime(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, False)
+            sngResult = ScanOrAcqTimeToScanTime(scanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, False)
 
 
             ' Convert ranges
@@ -13456,9 +13305,9 @@ Public Class clsMASIC
             sngScanTime = 5             ' 5 minutes
 
             ' Convert each of these ranges to a scan time range in minutes
-            sngResult = ScanOrAcqTimeToScanTime(udtScanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
-            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
-            sngResult = ScanOrAcqTimeToScanTime(udtScanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
+            sngResult = ScanOrAcqTimeToScanTime(scanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
+            sngResult = ScanOrAcqTimeToScanTime(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+            sngResult = ScanOrAcqTimeToScanTime(scanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
 
 
         Catch ex As Exception
@@ -13519,7 +13368,7 @@ Public Class clsMASIC
       intDatasetID As Integer,
       ByRef objXcaliburAccessor As XRawFileIO) As Boolean
 
-        Dim scanInfo = New clsScanInfo(0)
+        Dim scanInfo = New ThermoRawFileReader.clsScanInfo(0)
 
         Dim intScanEnd As Integer
         Dim blnSuccess As Boolean
@@ -13770,19 +13619,20 @@ Public Class clsMASIC
         End If
 
     End Sub
-    Private Sub ValidateMasterScanOrderSorting(ByRef udtScanList As udtScanListType)
+
+    Private Sub ValidateMasterScanOrderSorting(scanList As clsScanList)
         ' Validate that .MasterScanOrder() really is sorted by scan number
         ' Cannot use an IComparer because .MasterScanOrder points into other arrays
 
         Dim intMasterScanOrderIndices() As Integer
-        Dim udtMasterScanOrderListCopy() As udtScanOrderPointerType
+        Dim udtMasterScanOrderListCopy() As clsScanList.udtScanOrderPointerType
         Dim sngMasterScanTimeListCopy() As Single
 
         Dim intIndex As Integer
 
         Dim blnListWasSorted As Boolean
 
-        With udtScanList
+        With scanList
 
             ReDim intMasterScanOrderIndices(.MasterScanOrderCount - 1)
 
@@ -13928,8 +13778,8 @@ Public Class clsMASIC
     End Sub
 
     Private Sub WriteDecon2LSScanFileEntry(
-      ByRef srScanInfoOutFile As StreamWriter,
-      ByRef udtScan As udtScanInfoType,
+      srScanInfoOutFile As StreamWriter,
+      currentScan As clsScanInfo,
       objSpectraCache As clsSpectraCache)
 
         Dim intPoolIndex As Integer
@@ -13942,30 +13792,27 @@ Public Class clsMASIC
         If objSpectraCache Is Nothing Then
             intNumPeaks = 0
         Else
-            If Not objSpectraCache.ValidateSpectrumInPool(udtScan.ScanNumber, intPoolIndex) Then
+            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                 Exit Sub
             End If
             intNumPeaks = objSpectraCache.SpectraPool(intPoolIndex).IonCount
         End If
 
-        With udtScan
-            intScanNumber = udtScan.ScanNumber
+        intScanNumber = currentScan.ScanNumber
 
-            intMSLevel = .FragScanInfo.MSLevel
-            If intMSLevel < 1 Then intMSLevel = 1
-
-        End With
+        intMSLevel = currentScan.FragScanInfo.MSLevel
+        If intMSLevel < 1 Then intMSLevel = 1
 
         intNumIsotopicSignatures = 0
 
-        WriteDecon2LSScanFileEntry(srScanInfoOutFile, udtScan, intScanNumber, intMSLevel, intNumPeaks, intNumIsotopicSignatures)
+        WriteDecon2LSScanFileEntry(srScanInfoOutFile, currentScan, intScanNumber, intMSLevel, intNumPeaks, intNumIsotopicSignatures)
 
     End Sub
 
     Private Sub WriteDecon2LSScanFileEntry(
       ByRef srScanInfoOutFile As StreamWriter,
-      udtScan As udtScanInfoType,
+      currentScan As clsScanInfo,
       intScanNumber As Integer,
       intMSLevel As Integer,
       intNumPeaks As Integer,
@@ -13973,7 +13820,7 @@ Public Class clsMASIC
 
         Dim strLineOut As String
 
-        With udtScan
+        With currentScan
             strLineOut = intScanNumber.ToString & "," &
              .ScanTime.ToString("0.0000") & "," &
              intMSLevel & "," &
@@ -13991,7 +13838,7 @@ Public Class clsMASIC
 
     Private Function XMLOutputFileFinalize(
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache) As Boolean
 
 
@@ -14012,7 +13859,7 @@ Public Class clsMASIC
             End With
             objXMLOut.WriteEndElement()
 
-            If udtScanList.ProcessingIncomplete Then
+            If scanList.ProcessingIncomplete Then
                 objXMLOut.WriteElementString("ProcessingComplete", "False")
             Else
                 objXMLOut.WriteElementString("ProcessingComplete", "True")
@@ -14035,7 +13882,7 @@ Public Class clsMASIC
       strInputFilePathFull As String,
       strOutputFolderPath As String,
       ByRef udtOutputFileHandles As udtOutputFileHandlesType,
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       ByRef udtSICOptions As udtSICOptionsType,
       ByRef udtBinningOptions As clsCorrelation.udtBinningOptionsType) As Boolean
@@ -14086,9 +13933,9 @@ Public Class clsMASIC
             objXMLOut.WriteElementString("MASICProcessingDate", DateTime.Now.ToShortDateString & " " & DateTime.Now.ToLongTimeString)
             objXMLOut.WriteElementString("MASICVersion", MyBase.FileVersion)
             objXMLOut.WriteElementString("MASICPeakFinderDllVersion", mMASICPeakFinder.ProgramVersion)
-            objXMLOut.WriteElementString("ScanCountTotal", udtScanList.MasterScanOrderCount.ToString)
-            objXMLOut.WriteElementString("SurveyScanCount", udtScanList.SurveyScanCount.ToString)
-            objXMLOut.WriteElementString("FragScanCount", udtScanList.FragScanCount.ToString)
+            objXMLOut.WriteElementString("ScanCountTotal", scanList.MasterScanOrderCount.ToString)
+            objXMLOut.WriteElementString("SurveyScanCount", scanList.SurveyScanCount.ToString)
+            objXMLOut.WriteElementString("FragScanCount", scanList.FragScanCount.ToString)
             objXMLOut.WriteElementString("SkipMSMSProcessing", mSkipMSMSProcessing.ToString)
 
             objXMLOut.WriteElementString("ParentIonDecoyMassDa", mParentIonDecoyMassDa.ToString("0.0000"))
@@ -14215,7 +14062,7 @@ Public Class clsMASIC
     End Function
 
     Private Function XmlOutputFileUpdateEntries(
-      ByRef udtScanList As udtScanListType,
+      scanList As clsScanList,
       strInputFileName As String,
       strOutputFolderPath As String) As Boolean
 
@@ -14274,16 +14121,16 @@ Public Class clsMASIC
                                         intParentIonsProcessed += 1
 
                                         ' Update progress
-                                        If udtScanList.ParentIonInfoCount > 1 Then
+                                        If scanList.ParentIonInfoCount > 1 Then
                                             If intParentIonsProcessed Mod 100 = 0 Then
-                                                SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (udtScanList.ParentIonInfoCount - 1) * 100))
+                                                SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
                                             End If
                                         Else
                                             SetSubtaskProcessingStepPct(0)
                                         End If
 
                                         If mAbortProcessing Then
-                                            udtScanList.ProcessingIncomplete = True
+                                            scanList.ProcessingIncomplete = True
                                             Exit Do
                                         End If
 
@@ -14294,12 +14141,12 @@ Public Class clsMASIC
                             srOutFile.WriteLine(strLineIn)
 
                         ElseIf strLineInTrimmedAndLower.StartsWith("<" & OPTIMAL_PEAK_APEX_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
-                            If intParentIonIndex < udtScanList.ParentIonInfoCount Then
-                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, OPTIMAL_PEAK_APEX_TAG_NAME, udtScanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber)
+                            If intParentIonIndex < scanList.ParentIonInfoCount Then
+                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, OPTIMAL_PEAK_APEX_TAG_NAME, scanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber)
                             End If
                         ElseIf strLineInTrimmedAndLower.StartsWith("<" & PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
-                            If intParentIonIndex < udtScanList.ParentIonInfoCount Then
-                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME, udtScanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex)
+                            If intParentIonIndex < scanList.ParentIonInfoCount Then
+                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME, scanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex)
                             End If
                         Else
                             srOutFile.WriteLine(strLineIn)
@@ -14402,10 +14249,10 @@ Public Class clsMASIC
         Implements IComparer
 
         Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
-            Dim udtScanInfo As udtScanInfoType
+            Dim udtScanInfo As clsScanInfo
             Dim intScanNumber As Integer
 
-            udtScanInfo = DirectCast(x, udtScanInfoType)
+            udtScanInfo = DirectCast(x, clsScanInfo)
             intScanNumber = DirectCast(y, Integer)
 
             If udtScanInfo.ScanNumber > intScanNumber Then
