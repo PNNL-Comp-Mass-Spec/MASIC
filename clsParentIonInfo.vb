@@ -73,4 +73,11 @@
     ''' Only applicable to MRM scans
     ''' </summary>
     Public MRMToleranceHalfWidth As Double
+
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
+    Public Sub New()
+        ReDim FragScanIndices(0)
+    End Sub
 End Class

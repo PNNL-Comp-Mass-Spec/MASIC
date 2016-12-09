@@ -76,7 +76,7 @@ Public Class clsScanInfo
     ''' <summary>
     ''' Information specific to fragmentation scans
     ''' </summary>
-    Public FragScanInfo As clsFragScanInfo
+    Public ReadOnly FragScanInfo As clsFragScanInfo
 
     ''' <summary>
     ''' Information specific to MRM/SRM scans
@@ -103,7 +103,9 @@ Public Class clsScanInfo
     Public Sub New()
         MRMScanType = MRMScanTypeConstants.NotMRM
 
-        ExtendedHeaderInfo = New Dictionary(Of Integer, String)
+        FragScanInfo = New clsFragScanInfo()
+        MRMScanInfo = New clsMRMScanInfo()
 
+        ExtendedHeaderInfo = New Dictionary(Of Integer, String)
     End Sub
 End Class
