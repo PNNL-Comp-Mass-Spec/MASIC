@@ -1,4 +1,4 @@
-Option Explicit On 
+Option Explicit On
 Option Strict On
 
 Friend Class clsCorrelation
@@ -56,7 +56,7 @@ Friend Class clsCorrelation
         Get
             Return mBinningOptions.StartX
         End Get
-        Set(ByVal Value As Single)
+        Set(Value As Single)
             mBinningOptions.StartX = Value
         End Set
     End Property
@@ -65,7 +65,7 @@ Friend Class clsCorrelation
         Get
             Return mBinningOptions.EndX
         End Get
-        Set(ByVal Value As Single)
+        Set(Value As Single)
             mBinningOptions.EndX = Value
         End Set
     End Property
@@ -74,7 +74,7 @@ Friend Class clsCorrelation
         Get
             Return mBinningOptions.BinSize
         End Get
-        Set(ByVal Value As Single)
+        Set(Value As Single)
             If Value <= 0 Then Value = 1
             mBinningOptions.BinSize = Value
         End Set
@@ -84,7 +84,7 @@ Friend Class clsCorrelation
         Get
             Return mBinningOptions.IntensityPrecisionPercent
         End Get
-        Set(ByVal Value As Single)
+        Set(Value As Single)
             If Value < 0 Or Value > 100 Then Value = 1
             mBinningOptions.IntensityPrecisionPercent = Value
         End Set
@@ -94,7 +94,7 @@ Friend Class clsCorrelation
         Get
             Return mNoiseThresholdIntensity
         End Get
-        Set(ByVal Value As Single)
+        Set(Value As Single)
             mNoiseThresholdIntensity = Value
         End Set
     End Property
@@ -103,7 +103,7 @@ Friend Class clsCorrelation
         Get
             Return mBinningOptions.Normalize
         End Get
-        Set(ByVal Value As Boolean)
+        Set(Value As Boolean)
             mBinningOptions.Normalize = Value
         End Set
     End Property
@@ -112,7 +112,7 @@ Friend Class clsCorrelation
         Get
             Return mBinningOptions.SumAllIntensitiesForBin
         End Get
-        Set(ByVal Value As Boolean)
+        Set(Value As Boolean)
             mBinningOptions.SumAllIntensitiesForBin = Value
         End Set
     End Property
@@ -121,7 +121,7 @@ Friend Class clsCorrelation
         Get
             Return mBinningOptions.MaximumBinCount
         End Get
-        Set(ByVal Value As Integer)
+        Set(Value As Integer)
             If Value < 2 Then Value = 10
             If Value > 1000000 Then Value = 1000000
             mBinningOptions.MaximumBinCount = Value
@@ -129,7 +129,7 @@ Friend Class clsCorrelation
     End Property
 #End Region
 
-    Private Function BetaCF(ByVal a As Double, ByVal b As Double, ByVal x As Double) As Double
+    Private Function BetaCF(a As Double, b As Double, x As Double) As Double
 
         Dim MAXIT = 100
         Dim EPS = 0.0000003
@@ -175,7 +175,7 @@ Friend Class clsCorrelation
 
     End Function
 
-    Private Function BetaI(ByVal a As Double, ByVal b As Double, ByVal x As Double) As Double
+    Private Function BetaI(a As Double, b As Double, x As Double) As Double
 
         Dim bt As Double
 
@@ -250,7 +250,7 @@ Friend Class clsCorrelation
 
     End Function
 
-    Private Sub BinDataWork(ByRef sngXData() As Single, ByRef sngYData() As Single, ByVal intDataCount As Integer, ByRef sngBinnedYData() As Single, ByVal intBinCount As Integer, ByVal udtBinningOptions As udtBinningOptionsType, ByVal sngOffset As Single)
+    Private Sub BinDataWork(ByRef sngXData() As Single, ByRef sngYData() As Single, intDataCount As Integer, ByRef sngBinnedYData() As Single, intBinCount As Integer, udtBinningOptions As udtBinningOptionsType, sngOffset As Single)
 
         Dim intIndex As Integer
         Dim intBinNumber As Integer
@@ -314,7 +314,7 @@ Friend Class clsCorrelation
 
     End Sub
 
-    Public Function Correlate(ByRef sngDataList1() As Single, ByRef sngDataList2() As Single, ByVal eCorrelationMethod As cmCorrelationMethodConstants) As Single
+    Public Function Correlate(ByRef sngDataList1() As Single, ByRef sngDataList2() As Single, eCorrelationMethod As cmCorrelationMethodConstants) As Single
         ' Finds the correlation value between the two lists of data
         ' The lists must have the same number of data points
         ' If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, then the correlation value returned will be 0
@@ -508,7 +508,7 @@ Friend Class clsCorrelation
 
     End Sub
 
-    Private Sub CorrelSpearman(ByVal sngDataList1() As Single, ByVal sngDataList2() As Single, ByRef DiffInRanks As Single, ByRef ZD As Single, ByRef ProbOfSignificance As Single, ByRef RS As Single, ByRef ProbRS As Single)
+    Private Sub CorrelSpearman(sngDataList1() As Single, sngDataList2() As Single, ByRef DiffInRanks As Single, ByRef ZD As Single, ByRef ProbOfSignificance As Single, ByRef RS As Single, ByRef ProbRS As Single)
         ' Performs a Spearman correlation of the two lists
         ' The lists must have the same number of data points in each and should be 0-based arrays
         '
@@ -580,7 +580,7 @@ Friend Class clsCorrelation
 
     End Sub
 
-    Private Sub CRank(ByVal n As Integer, ByRef w() As Single, ByRef s As Single)
+    Private Sub CRank(n As Integer, ByRef w() As Single, ByRef s As Single)
 
         ' Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including midranking of ties,
         ' and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
@@ -618,7 +618,7 @@ Friend Class clsCorrelation
 
     End Sub
 
-    Private Function ErfCC(ByVal x As Double) As Double
+    Private Function ErfCC(x As Double) As Double
 
         Dim t, z, ans As Double
 
@@ -637,7 +637,7 @@ Friend Class clsCorrelation
 
     End Function
 
-    Private Function GammLn(ByVal xx As Double) As Double
+    Private Function GammLn(xx As Double) As Double
         Dim x, y, tmp, ser As Double
         Static cof() As Double = New Double() {76.180091729471457, -86.505320329416776,
                                                24.014098240830911, -1.231739572450155,
@@ -672,11 +672,11 @@ Friend Class clsCorrelation
         End With
     End Sub
 
-    Public Sub SetBinningOptions(ByVal udtBinningOptions As udtBinningOptionsType)
+    Public Sub SetBinningOptions(udtBinningOptions As udtBinningOptionsType)
         mBinningOptions = udtBinningOptions
     End Sub
 
-    Private Function SquareNum(ByVal dblNum As Double) As Double
+    Private Function SquareNum(dblNum As Double) As Double
 
         If dblNum = 0 Then
             Return 0
@@ -686,7 +686,7 @@ Friend Class clsCorrelation
 
     End Function
 
-    Private Function ValueToBinNumber(ByVal ThisValue As Single, ByVal StartValue As Single, ByVal BinSize As Single) As Integer
+    Private Function ValueToBinNumber(ThisValue As Single, StartValue As Single, BinSize As Single) As Integer
 
         Dim WorkingValue As Single
 

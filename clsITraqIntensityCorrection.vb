@@ -17,10 +17,10 @@ Public Class clsITraqIntensityCorrection
     Protected Const EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH As Integer = 8
     Protected Const EIGHT_PLEX_LOW_RES_MATRIX_LENGTH As Integer = 9
 
-	Public Enum eCorrectionFactorsiTRAQ4Plex
-		ABSciex = 0
-		BroadInstitute = 1			' Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
-	End Enum
+    Public Enum eCorrectionFactorsiTRAQ4Plex
+        ABSciex = 0
+        BroadInstitute = 1          ' Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
+    End Enum
 #End Region
 
 #Region "Structures"
@@ -36,12 +36,12 @@ Public Class clsITraqIntensityCorrection
 #Region "Classwide Variables"
     Protected mITraqMode As clsMASIC.eReporterIonMassModeConstants
 
-	Protected mITraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex
+    Protected mITraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex
 
     ' Matrix of coefficients, derived from the isotope contribution table
     Protected mCoeffs(,) As Double
 
-    Private mMatrixUtility As MatrixDecompositionUtility.LUDecomposition
+    Private ReadOnly mMatrixUtility As MatrixDecompositionUtility.LUDecomposition
 
 #End Region
 
@@ -51,57 +51,57 @@ Public Class clsITraqIntensityCorrection
         Get
             Return mITraqMode
         End Get
-	End Property
+    End Property
 
-	Public ReadOnly Property ITraq4PlexCorrectionFactorType() As eCorrectionFactorsiTRAQ4Plex
-		Get
-			Return mITraq4PlexCorrectionFactorType
-		End Get
-	End Property
+    Public ReadOnly Property ITraq4PlexCorrectionFactorType() As eCorrectionFactorsiTRAQ4Plex
+        Get
+            Return mITraq4PlexCorrectionFactorType
+        End Get
+    End Property
 #End Region
 
-	''' <summary>
-	''' Constructor; assumes iTraq4PlexCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
-	''' </summary>
-	''' <param name="eITraqMode">iTRAQ mode</param>
-	''' <remarks></remarks>
-	Public Sub New(ByVal eITraqMode As clsMASIC.eReporterIonMassModeConstants)
-		Me.New(eITraqMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
-	End Sub
+    ''' <summary>
+    ''' Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
+    ''' </summary>
+    ''' <param name="eITraqMode">iTRAQ mode</param>
+    ''' <remarks></remarks>
+    Public Sub New(eITraqMode As clsMASIC.eReporterIonMassModeConstants)
+        Me.New(eITraqMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
+    End Sub
 
-	''' <summary>
-	''' Constructor
-	''' </summary>
-	''' <param name="eITraqMode">iTRAQ mode</param>
-	''' <param name="iTraq4PlexCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
-	''' <remarks>The iTraq4PlexCorrectionFactorType parameter is only used if eITraqMode is ITraqFourMZ</remarks>
-	Public Sub New(ByVal eITraqMode As clsMASIC.eReporterIonMassModeConstants, ByVal iTraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
-		mITraqMode = eITraqMode
-		mITraq4PlexCorrectionFactorType = iTraq4PlexCorrectionFactorType
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
+    ''' <param name="eITraqMode">iTRAQ mode</param>
+    ''' <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
+    ''' <remarks>The iTraqCorrectionFactorType parameter is only used if eITraqMode is ITraqFourMZ</remarks>
+    Public Sub New(eITraqMode As clsMASIC.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
+        mITraqMode = eITraqMode
+        mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType
 
-		mMatrixUtility = New MatrixDecompositionUtility.LUDecomposition()
+        mMatrixUtility = New MatrixDecompositionUtility.LUDecomposition()
 
-		InitializeCoefficients(False)
-	End Sub
+        InitializeCoefficients(False)
+    End Sub
 
-	Public Sub UpdateITraqMode(ByVal eITraqMode As clsMASIC.eReporterIonMassModeConstants)
-		UpdateITraqMode(eITraqMode, mITraq4PlexCorrectionFactorType)
-	End Sub
+    Public Sub UpdateITraqMode(eITraqMode As clsMASIC.eReporterIonMassModeConstants)
+        UpdateITraqMode(eITraqMode, mITraq4PlexCorrectionFactorType)
+    End Sub
 
-	Public Sub UpdateITraqMode(ByVal eITraqMode As clsMASIC.eReporterIonMassModeConstants, ByVal iTraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
-		If mITraqMode <> eITraqMode OrElse mITraq4PlexCorrectionFactorType <> iTraq4PlexCorrectionFactorType Then
-			mITraqMode = eITraqMode
-			mITraq4PlexCorrectionFactorType = iTraq4PlexCorrectionFactorType
-			InitializeCoefficients(False)
-		End If
-	End Sub
+    Public Sub UpdateITraqMode(eITraqMode As clsMASIC.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
+        If mITraqMode <> eITraqMode OrElse mITraq4PlexCorrectionFactorType <> iTraqCorrectionFactorType Then
+            mITraqMode = eITraqMode
+            mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType
+            InitializeCoefficients(False)
+        End If
+    End Sub
 
-	Public Function ApplyCorrection(ByRef sngReporterIonIntensites() As Single) As Boolean
+    Public Function ApplyCorrection(ByRef sngReporterIonIntensites() As Single) As Boolean
 
-		Dim dblOriginalIntensities() As Double
-		Dim intDataCount As Integer = sngReporterIonIntensites.Count - 1
+        Dim dblOriginalIntensities() As Double
+        Dim intDataCount As Integer = sngReporterIonIntensites.Count - 1
 
-		ReDim dblOriginalIntensities(intDataCount)
+        ReDim dblOriginalIntensities(intDataCount)
         For intIndex = 0 To intDataCount
             dblOriginalIntensities(intIndex) = sngReporterIonIntensites(intIndex)
         Next
@@ -111,47 +111,47 @@ Public Class clsITraqIntensityCorrection
                 sngReporterIonIntensites(intIndex) = CSng(dblOriginalIntensities(intIndex))
             Next
             Return True
-		Else
-			Return False
-		End If
+        Else
+            Return False
+        End If
 
-	End Function
+    End Function
 
-	Public Function ApplyCorrection(ByRef dblReporterIonIntensites() As Double) As Boolean
+    Public Function ApplyCorrection(ByRef dblReporterIonIntensites() As Double) As Boolean
 
-		Dim dblCorrectedIntensities() As Double
+        Dim dblCorrectedIntensities() As Double
 
-		Dim strITraqMode As String
-		Dim intMatrixSize As Integer
+        Dim strITraqMode As String
+        Dim intMatrixSize As Integer
 
-		Dim intIndex As Integer
+        Dim intIndex As Integer
 
-		intMatrixSize = GetMatrixLength(mITraqMode)
-		strITraqMode = clsMASIC.GetReporterIonModeDescription(mITraqMode)
+        intMatrixSize = GetMatrixLength(mITraqMode)
+        strITraqMode = clsMASIC.GetReporterIonModeDescription(mITraqMode)
 
-		If dblReporterIonIntensites.Length <> intMatrixSize Then
-			Throw New InvalidOperationException("Length of ReporterIonIntensites array must be " & intMatrixSize.ToString & " when using the " & strITraqMode & " mode")
-			Return False
-		End If
+        If dblReporterIonIntensites.Length <> intMatrixSize Then
+            Throw New InvalidOperationException("Length of ReporterIonIntensites array must be " & intMatrixSize.ToString & " when using the " & strITraqMode & " mode")
+            Return False
+        End If
 
-		dblCorrectedIntensities = mMatrixUtility.ProcessData(mCoeffs, intMatrixSize, dblReporterIonIntensites)
+        dblCorrectedIntensities = mMatrixUtility.ProcessData(mCoeffs, intMatrixSize, dblReporterIonIntensites)
 
-		' Now update dblReporterIonIntensites
-		For intIndex = 0 To intMatrixSize - 1
-			If dblReporterIonIntensites(intIndex) > 0 Then
-				If dblCorrectedIntensities(intIndex) < 0 Then
-					dblReporterIonIntensites(intIndex) = 0
-				Else
-					dblReporterIonIntensites(intIndex) = dblCorrectedIntensities(intIndex)
-				End If
-			End If
-		Next
+        ' Now update dblReporterIonIntensites
+        For intIndex = 0 To intMatrixSize - 1
+            If dblReporterIonIntensites(intIndex) > 0 Then
+                If dblCorrectedIntensities(intIndex) < 0 Then
+                    dblReporterIonIntensites(intIndex) = 0
+                Else
+                    dblReporterIonIntensites(intIndex) = dblCorrectedIntensities(intIndex)
+                End If
+            End If
+        Next
 
-		Return True
+        Return True
 
-	End Function
+    End Function
 
-    Protected Function GetMatrixLength(ByVal eITraqMode As clsMASIC.eReporterIonMassModeConstants) As Integer
+    Protected Function GetMatrixLength(eITraqMode As clsMASIC.eReporterIonMassModeConstants) As Integer
         Select Case eITraqMode
             Case clsMASIC.eReporterIonMassModeConstants.ITraqFourMZ
                 Return FOUR_PLEX_MATRIX_LENGTH
@@ -160,11 +160,11 @@ Public Class clsITraqIntensityCorrection
             Case clsMASIC.eReporterIonMassModeConstants.ITraqEightMZLowRes
                 Return EIGHT_PLEX_LOW_RES_MATRIX_LENGTH
             Case Else
-				Throw New ArgumentOutOfRangeException("Invalid value for eITRAQMode: " & eITraqMode.ToString())
+                Throw New ArgumentOutOfRangeException("Invalid value for eITRAQMode: " & eITraqMode.ToString())
         End Select
     End Function
 
-    Protected Sub InitializeCoefficients(ByVal blnShowMatrixTableInConsole As Boolean)
+    Protected Sub InitializeCoefficients(blnShowMatrixTableInConsole As Boolean)
 
         Dim intMatrixSize As Integer
         Dim i As Integer
@@ -185,62 +185,62 @@ Public Class clsITraqIntensityCorrection
         Select Case mITraqMode
             Case clsMASIC.eReporterIonMassModeConstants.ITraqFourMZ
 
-				If mITraq4PlexCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex Then
-					' 4-plex ITraq, isotope contribution table
-					' Source percentages provided by Applied Biosystems
+                If mITraq4PlexCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex Then
+                    ' 4-plex ITraq, isotope contribution table
+                    ' Source percentages provided by Applied Biosystems
 
-					udtIsoPct114 = DefineITraqIsotopeContribution(0, 1, 92.9, 5.9, 0.2)
-					udtIsoPct115 = DefineITraqIsotopeContribution(0, 2, 92.3, 5.6, 0.1)
-					udtIsoPct116 = DefineITraqIsotopeContribution(0, 3, 92.4, 4.5, 0.1)
-					udtIsoPct117 = DefineITraqIsotopeContribution(0.1, 4, 92.3, 3.5, 0.1)
+                    udtIsoPct114 = DefineITraqIsotopeContribution(0, 1, 92.9, 5.9, 0.2)
+                    udtIsoPct115 = DefineITraqIsotopeContribution(0, 2, 92.3, 5.6, 0.1)
+                    udtIsoPct116 = DefineITraqIsotopeContribution(0, 3, 92.4, 4.5, 0.1)
+                    udtIsoPct117 = DefineITraqIsotopeContribution(0.1, 4, 92.3, 3.5, 0.1)
 
-				Else
+                Else
 
-					' 4-plex ITraq, isotope contribution table
-					' Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org) 
+                    ' 4-plex ITraq, isotope contribution table
+                    ' Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org) 
 
-					udtIsoPct114 = DefineITraqIsotopeContribution(0, 0, 95.5, 4.5, 0)
-					udtIsoPct115 = DefineITraqIsotopeContribution(0, 0.9, 94.6, 4.5, 0)
-					udtIsoPct116 = DefineITraqIsotopeContribution(0, 0.9, 95.7, 3.4, 0)
-					udtIsoPct117 = DefineITraqIsotopeContribution(0, 1.4, 98.6, 0, 0)
+                    udtIsoPct114 = DefineITraqIsotopeContribution(0, 0, 95.5, 4.5, 0)
+                    udtIsoPct115 = DefineITraqIsotopeContribution(0, 0.9, 94.6, 4.5, 0)
+                    udtIsoPct116 = DefineITraqIsotopeContribution(0, 0.9, 95.7, 3.4, 0)
+                    udtIsoPct117 = DefineITraqIsotopeContribution(0, 1.4, 98.6, 0, 0)
 
-				End If
+                End If
 
-				' Goal is to generate either of these two matrices (depending on mITraq4PlexCorrectionFactorType):
-				'        0      1      2      3
-				'      -----  -----  -----  -----
-				'  0   0.929  0.020    0      0
-				'  1   0.059  0.923  0.030  0.001
-				'  2   0.002  0.056  0.924  0.040
-				'  3     0    0.001  0.045  0.923
+                ' Goal is to generate either of these two matrices (depending on mITraq4PlexCorrectionFactorType):
+                '        0      1      2      3
+                '      -----  -----  -----  -----
+                '  0   0.929  0.020    0      0
+                '  1   0.059  0.923  0.030  0.001
+                '  2   0.002  0.056  0.924  0.040
+                '  3     0    0.001  0.045  0.923
 
-				'        0      1      2      3
-				'      -----  -----  -----  -----
-				'  0   0.955  0.009    0      0
-				'  1   0.045  0.946  0.009    0
-				'  2     0    0.045  0.957  0.014
-				'  3     0      0    0.034  0.986
+                '        0      1      2      3
+                '      -----  -----  -----  -----
+                '  0   0.955  0.009    0      0
+                '  1   0.045  0.946  0.009    0
+                '  2     0    0.045  0.957  0.014
+                '  3     0      0    0.034  0.986
 
 
-				ReDim mCoeffs(intMatrixSize - 1, intMatrixSize - 1)
+                ReDim mCoeffs(intMatrixSize - 1, intMatrixSize - 1)
 
-				mCoeffs(0, 0) = udtIsoPct114.Zero
-				mCoeffs(0, 1) = udtIsoPct115.Minus1
-				mCoeffs(0, 2) = udtIsoPct116.Minus2
+                mCoeffs(0, 0) = udtIsoPct114.Zero
+                mCoeffs(0, 1) = udtIsoPct115.Minus1
+                mCoeffs(0, 2) = udtIsoPct116.Minus2
 
-				mCoeffs(1, 0) = udtIsoPct114.Plus1
-				mCoeffs(1, 1) = udtIsoPct115.Zero
-				mCoeffs(1, 2) = udtIsoPct116.Minus1
-				mCoeffs(1, 3) = udtIsoPct117.Minus2
+                mCoeffs(1, 0) = udtIsoPct114.Plus1
+                mCoeffs(1, 1) = udtIsoPct115.Zero
+                mCoeffs(1, 2) = udtIsoPct116.Minus1
+                mCoeffs(1, 3) = udtIsoPct117.Minus2
 
-				mCoeffs(2, 0) = udtIsoPct114.Plus2
-				mCoeffs(2, 2) = udtIsoPct116.Zero
-				mCoeffs(2, 1) = udtIsoPct115.Plus1
-				mCoeffs(2, 3) = udtIsoPct117.Minus1
+                mCoeffs(2, 0) = udtIsoPct114.Plus2
+                mCoeffs(2, 2) = udtIsoPct116.Zero
+                mCoeffs(2, 1) = udtIsoPct115.Plus1
+                mCoeffs(2, 3) = udtIsoPct117.Minus1
 
-				mCoeffs(3, 1) = udtIsoPct115.Plus2
-				mCoeffs(3, 2) = udtIsoPct116.Plus1
-				mCoeffs(3, 3) = udtIsoPct117.Zero
+                mCoeffs(3, 1) = udtIsoPct115.Plus2
+                mCoeffs(3, 2) = udtIsoPct116.Plus1
+                mCoeffs(3, 3) = udtIsoPct117.Zero
 
             Case clsMASIC.eReporterIonMassModeConstants.ITraqEightMZHighRes
 
@@ -438,21 +438,21 @@ Public Class clsITraqIntensityCorrection
 
     End Sub
 
-	''' <summary>
-	''' Given a set of isotope correction values
-	''' </summary>
-	''' <param name="Minus2"></param>
-	''' <param name="Minus1"></param>
-	''' <param name="Zero"></param>
-	''' <param name="Plus1"></param>
-	''' <param name="Plus2"></param>
-	''' <returns></returns>
-	''' <remarks></remarks>
-    Private Function DefineITraqIsotopeContribution(ByVal Minus2 As Single, _
-                                                    ByVal Minus1 As Single, _
-                                                    ByVal Zero As Single, _
-                                                    ByVal Plus1 As Single, _
-                                                    ByVal Plus2 As Single) As udtITraqIsotopeContributionType
+    ''' <summary>
+    ''' Given a set of isotope correction values
+    ''' </summary>
+    ''' <param name="Minus2"></param>
+    ''' <param name="Minus1"></param>
+    ''' <param name="Zero"></param>
+    ''' <param name="Plus1"></param>
+    ''' <param name="Plus2"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function DefineITraqIsotopeContribution(Minus2 As Single,
+                                                    Minus1 As Single,
+                                                    Zero As Single,
+                                                    Plus1 As Single,
+                                                    Plus2 As Single) As udtITraqIsotopeContributionType
 
         Dim udtITraqIsotopePct As udtITraqIsotopeContributionType
 
