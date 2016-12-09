@@ -7195,6 +7195,99 @@ Public Class clsMASIC
 
     End Function
 
+    Private Function GetFakeParentIonForFragScan(scanList As clsScanList, fragScanIndex As Integer, parentIonMZ As Double) As clsParentIonInfo
+
+        Dim newParentIon = New clsParentIonInfo()
+        Dim currentFragScan = scanList.FragScans(fragScanIndex)
+
+        newParentIon.MZ = parentIonMZ
+        newParentIon.SurveyScanIndex = 0
+
+        ' Find the previous MS1 scan that occurs before the frag scan
+        Dim surveyScanNumberAbsolute = 0
+        If fragScanIndex < scanList.FragScanCount Then
+            surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1
+        End If
+
+        ReDim newParentIon.FragScanIndices(0)
+        newParentIon.FragScanIndices(0) = fragScanIndex
+        newParentIon.FragScanIndexCount = 1
+
+        If scanList.MasterScanOrderCount > 0 Then
+            Dim surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+
+            While surveyScanIndexMatch >= 0 AndAlso scanList.MasterScanOrder(surveyScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.FragScan
+                surveyScanIndexMatch -= 1
+            End While
+
+            If surveyScanIndexMatch < 0 Then
+                ' Did not find the previous survey scan; find the next survey scan
+                surveyScanIndexMatch += 1
+                While surveyScanIndexMatch < scanList.MasterScanOrderCount AndAlso scanList.MasterScanOrder(surveyScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.FragScan
+                    surveyScanIndexMatch += 1
+                End While
+
+                If surveyScanIndexMatch >= scanList.MasterScanOrderCount Then
+                    surveyScanIndexMatch = 0
+                End If
+            End If
+
+            newParentIon.SurveyScanIndex = scanList.MasterScanOrder(surveyScanIndexMatch).ScanIndexPointer
+        End If
+
+        If newParentIon.SurveyScanIndex < scanList.SurveyScans.Count Then
+            newParentIon.OptimalPeakApexScanNumber =
+                scanList.SurveyScans(newParentIon.SurveyScanIndex).ScanNumber
+        Else
+            newParentIon.OptimalPeakApexScanNumber = surveyScanNumberAbsolute
+        End If
+
+        newParentIon.PeakApexOverrideParentIonIndex = -1
+
+        newParentIon.SICStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan
+        newParentIon.SICStats.PeakScanIndexStart = fragScanIndex
+        newParentIon.SICStats.PeakScanIndexEnd = fragScanIndex
+        newParentIon.SICStats.PeakScanIndexMax = fragScanIndex
+
+        With newParentIon.SICStats.Peak
+            .MaxIntensityValue = currentFragScan.BasePeakIonIntensity
+            .SignalToNoiseRatio = 1
+            .FWHMScanWidth = 1
+            .Area = currentFragScan.BasePeakIonIntensity
+            .ParentIonIntensity = currentFragScan.BasePeakIonIntensity
+        End With
+
+        Return newParentIon
+
+    End Function
+
+    Private Function GetFakeSurveyScan(scanNumber As Integer, scanTime As Single) As clsScanInfo
+
+        Dim surveyScan = New clsScanInfo()
+        surveyScan.ScanNumber = scanNumber
+        surveyScan.ScanTime = scanTime
+        surveyScan.ScanHeaderText = "Full ms"
+        surveyScan.ScanTypeName = "MS"
+
+        surveyScan.BasePeakIonMZ = 0
+        surveyScan.BasePeakIonIntensity = 0
+        surveyScan.FragScanInfo.ParentIonInfoIndex = -1                        ' Survey scans typically lead to multiple parent ions; we do not record them here
+        surveyScan.TotalIonIntensity = 0
+
+        surveyScan.ZoomScan = False
+        surveyScan.SIMScan = False
+        surveyScan.MRMScanType = MRMScanTypeConstants.NotMRM
+
+        surveyScan.LowMass = 0
+        surveyScan.HighMass = 0
+
+        ' Store the collision mode and possibly the scan filter text
+        surveyScan.FragScanInfo.CollisionMode = String.Empty
+
+        Return surveyScan
+
+    End Function
+
     Private Function GetFilePathPrefixChar() As String
         If Me.ShowMessages Then
             Return ControlChars.NewLine
@@ -11730,20 +11823,13 @@ Public Class clsMASIC
         Dim strOutputFilePath As String = String.Empty
 
         Const cColDelimiter As Char = ControlChars.Tab
-        Dim sbOutLine As Text.StringBuilder
-
-        Dim intParentIonIndex, intFragScanIndex As Integer
 
         Dim intScanListArray() As Integer = Nothing
-        Dim blnIncludeParentIon As Boolean
-
-        Dim sngSurveyScanTime, sngFragScanTime, sngOptimalPeakApexScanTime As Single
 
         ' Populate intScanListArray with the scan numbers in scanList.SurveyScans
         PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScanCount, intScanListArray)
 
         Try
-            sbOutLine = New Text.StringBuilder
 
             SetSubtaskProcessingStepPct(0, "Saving SIC data to flat file")
 
@@ -11759,118 +11845,72 @@ Public Class clsMASIC
                     srOutfile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
                 End If
 
-                For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
-                    If Me.LimitSearchToCustomMZList Then
-                        blnIncludeParentIon = scanList.ParentIons(intParentIonIndex).CustomSICPeak
-                    Else
-                        blnIncludeParentIon = True
-                    End If
+                If scanList.SurveyScanCount = 0 AndAlso scanList.ParentIonInfoCount = 0 Then
+                    ' Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
+                    For fragScanIndex = 0 To scanList.FragScanCount - 1
 
-                    If blnIncludeParentIon Then
-                        For intFragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
-                            sbOutLine.Length = 0
-                            With scanList.ParentIons(intParentIonIndex)
-                                sbOutLine.Append(udtSICOptions.DatasetNumber.ToString & cColDelimiter)                               ' Dataset number
-                                sbOutLine.Append(intParentIonIndex.ToString & cColDelimiter)                                         ' Parent Ion Index
+                        Dim fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex, scanList.FragScans(fragScanIndex).BasePeakIonMZ)
+                        Dim intParentIonIndex = 0
 
-                                sbOutLine.Append(Math.Round(.MZ, 4).ToString & cColDelimiter)                                        ' MZ
-                                If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < scanList.SurveyScans.Length Then
-                                    sbOutLine.Append(scanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString & cColDelimiter)  ' Survey scan number
-                                    sngSurveyScanTime = scanList.SurveyScans(.SurveyScanIndex).ScanTime
-                                Else
-                                    sbOutLine.Append("-1" & cColDelimiter)      ' Survey scan number
-                                    sngSurveyScanTime = 0
-                                End If
+                        Dim surveyScanNumber As Integer
+                        Dim surveyScanTime As Single
 
-                                If intFragScanIndex < scanList.FragScanCount Then
-                                    sbOutLine.Append(scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString & cColDelimiter)  ' Fragmentation scan number
-                                Else
-                                    sbOutLine.Append("0" & cColDelimiter)    ' Fragmentation scan does not exist
-                                End If
+                        WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, udtSICOptions, scanList,
+                                                   fakeParentIon, intParentIonIndex, surveyScanNumber, surveyScanTime,
+                                                   0, blnIncludeScanTimesInSICStatsFile)
+                    Next
+                Else
 
-                                sbOutLine.Append(.OptimalPeakApexScanNumber.ToString & cColDelimiter)                ' Optimal peak apex scan number
+                    For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+                        Dim blnIncludeParentIon As Boolean
 
-                                If blnIncludeScanTimesInSICStatsFile Then
-                                    If intFragScanIndex < scanList.FragScanCount Then
-                                        sngFragScanTime = scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime
-                                    Else
-                                        sngFragScanTime = 0                ' Fragmentation scan does not exist
-                                    End If
-
-                                    sngOptimalPeakApexScanTime = ScanNumberToScanTime(scanList, .OptimalPeakApexScanNumber)
-                                End If
-
-                                sbOutLine.Append(.PeakApexOverrideParentIonIndex.ToString & cColDelimiter)           ' Parent Ion Index that supplied the optimal peak apex scan number
-                                If .CustomSICPeak Then
-                                    sbOutLine.Append("1" & cColDelimiter)                                            ' Custom SIC peak, record 1
-                                Else
-                                    sbOutLine.Append("0" & cColDelimiter)                                            ' Not a Custom SIC peak, record 0
-                                End If
-
-                                With .SICStats
-                                    If .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
-                                        sbOutLine.Append(scanList.FragScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
-                                        sbOutLine.Append(scanList.FragScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
-                                        sbOutLine.Append(scanList.FragScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
-                                    Else
-                                        sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
-                                        sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
-                                        sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
-                                    End If
-
-                                    With .Peak
-                                        sbOutLine.Append(StringUtilities.ValueToString(.MaxIntensityValue, 5) & cColDelimiter)           ' Peak Intensity
-                                        sbOutLine.Append(StringUtilities.ValueToString(.SignalToNoiseRatio, 4) & cColDelimiter)          ' Peak signal to noise ratio
-                                        sbOutLine.Append(.FWHMScanWidth.ToString & cColDelimiter)                                       ' Full width at half max (in scans)
-                                        sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)                       ' Peak area
-
-                                        sbOutLine.Append(StringUtilities.ValueToString(.ParentIonIntensity, 5) & cColDelimiter)          ' Intensity of the parent ion (just before the fragmentation scan)
-                                        With .BaselineNoiseStats
-                                            sbOutLine.Append(StringUtilities.ValueToString(.NoiseLevel, 5) & cColDelimiter)
-                                            sbOutLine.Append(StringUtilities.ValueToString(.NoiseStDev, 3) & cColDelimiter)
-                                            sbOutLine.Append(.PointsUsed.ToString & cColDelimiter)
-                                        End With
-
-                                        With .StatisticalMoments
-                                            sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)
-                                            sbOutLine.Append(.CenterOfMassScan.ToString & cColDelimiter)
-                                            sbOutLine.Append(StringUtilities.ValueToString(.StDev, 3) & cColDelimiter)
-                                            sbOutLine.Append(StringUtilities.ValueToString(.Skew, 4) & cColDelimiter)
-                                            sbOutLine.Append(StringUtilities.ValueToString(.KSStat, 4) & cColDelimiter)
-                                            sbOutLine.Append(.DataCountUsed.ToString)
-                                        End With
-
-                                    End With
-                                End With
-                            End With
-
-                            If blnIncludeScanTimesInSICStatsFile Then
-                                sbOutLine.Append(cColDelimiter)
-                                sbOutLine.Append(Math.Round(sngSurveyScanTime, 5).ToString & cColDelimiter)             ' SurveyScanTime
-                                sbOutLine.Append(Math.Round(sngFragScanTime, 5).ToString & cColDelimiter)               ' FragScanTime
-                                sbOutLine.Append(Math.Round(sngOptimalPeakApexScanTime, 5).ToString & cColDelimiter)    ' OptimalPeakApexScanTime
-                            End If
-
-                            srOutfile.WriteLine(sbOutLine.ToString)
-                        Next intFragScanIndex
-                    End If
-
-                    If scanList.ParentIonInfoCount > 1 Then
-                        If intParentIonIndex Mod 100 = 0 Then
-                            SetSubtaskProcessingStepPct(CShort(intParentIonIndex / (scanList.ParentIonInfoCount - 1) * 100))
+                        If Me.LimitSearchToCustomMZList Then
+                            blnIncludeParentIon = scanList.ParentIons(intParentIonIndex).CustomSICPeak
+                        Else
+                            blnIncludeParentIon = True
                         End If
-                    Else
-                        SetSubtaskProcessingStepPct(1)
-                    End If
-                    If mAbortProcessing Then
-                        scanList.ProcessingIncomplete = True
-                        Exit For
-                    End If
-                Next intParentIonIndex
+
+                        If blnIncludeParentIon Then
+                            For fragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+
+                                Dim parentIon = scanList.ParentIons(intParentIonIndex)
+                                Dim surveyScanNumber As Integer
+                                Dim surveyScanTime As Single
+
+                                If parentIon.SurveyScanIndex >= 0 AndAlso parentIon.SurveyScanIndex < scanList.SurveyScans.Length Then
+                                    surveyScanNumber = scanList.SurveyScans(parentIon.SurveyScanIndex).ScanNumber
+                                    surveyScanTime = scanList.SurveyScans(parentIon.SurveyScanIndex).ScanTime
+                                Else
+                                    surveyScanNumber = -1
+                                    surveyScanTime = 0
+                                End If
+
+                                WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, udtSICOptions, scanList,
+                                                           parentIon, intParentIonIndex, surveyScanNumber, surveyScanTime,
+                                                           fragScanIndex, blnIncludeScanTimesInSICStatsFile)
+
+                            Next
+                        End If
+
+                        If scanList.ParentIonInfoCount > 1 Then
+                            If intParentIonIndex Mod 100 = 0 Then
+                                SetSubtaskProcessingStepPct(CShort(intParentIonIndex / (scanList.ParentIonInfoCount - 1) * 100))
+                            End If
+                        Else
+                            SetSubtaskProcessingStepPct(1)
+                        End If
+                        If mAbortProcessing Then
+                            scanList.ProcessingIncomplete = True
+                            Exit For
+                        End If
+                    Next intParentIonIndex
+
+                End If
 
             End Using
 
         Catch ex As Exception
+            Console.WriteLine(ex.StackTrace)
             LogErrors("SaveSICStatsFlatFile", "Error writing the Peak Stats to" & GetFilePathPrefixChar() & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
             Return False
         End Try
@@ -11878,6 +11918,102 @@ Public Class clsMASIC
         Return True
 
     End Function
+
+    Private Sub WriteSICStatsFlatFileEntry(
+      srOutfile As StreamWriter,
+      cColDelimiter As Char,
+      udtSICOptions As udtSICOptionsType,
+      scanList As clsScanList,
+      parentIon As clsParentIonInfo,
+      intParentIonIndex As Integer,
+      intSurveyScanNumber As Integer,
+      sngSurveyScanTime As Single,
+      intFragScanIndex As Integer,
+      blnIncludeScanTimesInSICStatsFile As Boolean)
+
+        Dim sbOutLine = New Text.StringBuilder()
+
+        Dim fragScanTime As Single = 0
+        Dim optimalPeakApexScanTime As Single = 0
+
+        sbOutLine.Append(udtSICOptions.DatasetNumber.ToString & cColDelimiter)                              ' Dataset number
+        sbOutLine.Append(intParentIonIndex.ToString & cColDelimiter)                                        ' Parent Ion Index
+
+        sbOutLine.Append(Math.Round(parentIon.MZ, 4).ToString & cColDelimiter)                              ' MZ
+
+        sbOutLine.Append(intSurveyScanNumber & cColDelimiter)                                               ' Survey scan number
+
+        If intFragScanIndex < scanList.FragScanCount Then
+            sbOutLine.Append(scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).ScanNumber.ToString & cColDelimiter)  ' Fragmentation scan number
+        Else
+            sbOutLine.Append("0" & cColDelimiter)    ' Fragmentation scan does not exist
+        End If
+
+        sbOutLine.Append(parentIon.OptimalPeakApexScanNumber.ToString & cColDelimiter)                ' Optimal peak apex scan number
+
+        If blnIncludeScanTimesInSICStatsFile Then
+            If intFragScanIndex < scanList.FragScanCount Then
+                fragScanTime = scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).ScanTime
+            Else
+                fragScanTime = 0                ' Fragmentation scan does not exist
+            End If
+
+            optimalPeakApexScanTime = ScanNumberToScanTime(scanList, parentIon.OptimalPeakApexScanNumber)
+        End If
+
+        sbOutLine.Append(parentIon.PeakApexOverrideParentIonIndex.ToString & cColDelimiter)           ' Parent Ion Index that supplied the optimal peak apex scan number
+        If parentIon.CustomSICPeak Then
+            sbOutLine.Append("1" & cColDelimiter)                                            ' Custom SIC peak, record 1
+        Else
+            sbOutLine.Append("0" & cColDelimiter)                                            ' Not a Custom SIC peak, record 0
+        End If
+
+        With parentIon.SICStats
+            If .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
+                sbOutLine.Append(scanList.FragScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
+                sbOutLine.Append(scanList.FragScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
+                sbOutLine.Append(scanList.FragScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
+            Else
+                sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexStart).ScanNumber.ToString & cColDelimiter)   ' Peak Scan Start
+                sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexEnd).ScanNumber.ToString & cColDelimiter)     ' Peak Scan End
+                sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString & cColDelimiter)     ' Peak Scan Max Intensity
+            End If
+
+            With .Peak
+                sbOutLine.Append(StringUtilities.ValueToString(.MaxIntensityValue, 5) & cColDelimiter)           ' Peak Intensity
+                sbOutLine.Append(StringUtilities.ValueToString(.SignalToNoiseRatio, 4) & cColDelimiter)          ' Peak signal to noise ratio
+                sbOutLine.Append(.FWHMScanWidth.ToString & cColDelimiter)                                       ' Full width at half max (in scans)
+                sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)                       ' Peak area
+
+                sbOutLine.Append(StringUtilities.ValueToString(.ParentIonIntensity, 5) & cColDelimiter)          ' Intensity of the parent ion (just before the fragmentation scan)
+                With .BaselineNoiseStats
+                    sbOutLine.Append(StringUtilities.ValueToString(.NoiseLevel, 5) & cColDelimiter)
+                    sbOutLine.Append(StringUtilities.ValueToString(.NoiseStDev, 3) & cColDelimiter)
+                    sbOutLine.Append(.PointsUsed.ToString & cColDelimiter)
+                End With
+
+                With .StatisticalMoments
+                    sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)
+                    sbOutLine.Append(.CenterOfMassScan.ToString & cColDelimiter)
+                    sbOutLine.Append(StringUtilities.ValueToString(.StDev, 3) & cColDelimiter)
+                    sbOutLine.Append(StringUtilities.ValueToString(.Skew, 4) & cColDelimiter)
+                    sbOutLine.Append(StringUtilities.ValueToString(.KSStat, 4) & cColDelimiter)
+                    sbOutLine.Append(.DataCountUsed.ToString)
+                End With
+
+            End With
+        End With
+
+        If blnIncludeScanTimesInSICStatsFile Then
+            sbOutLine.Append(cColDelimiter)
+            sbOutLine.Append(Math.Round(sngSurveyScanTime, 5).ToString & cColDelimiter)          ' SurveyScanTime
+            sbOutLine.Append(Math.Round(fragScanTime, 5).ToString & cColDelimiter)               ' FragScanTime
+            sbOutLine.Append(Math.Round(optimalPeakApexScanTime, 5).ToString & cColDelimiter)    ' OptimalPeakApexScanTime
+        End If
+
+        srOutfile.WriteLine(sbOutLine.ToString)
+
+    End Sub
 
     Private Sub SaveRawDatatoDiskWork(
       srDataOutFile As StreamWriter,

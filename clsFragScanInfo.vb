@@ -23,6 +23,7 @@
     ''' Constructor
     ''' </summary>
     Public Sub New()
+        ' -1 means undefined; only used for fragmentation scans
         ParentIonInfoIndex = -1
     End Sub
 End Class

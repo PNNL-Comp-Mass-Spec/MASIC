@@ -662,7 +662,7 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
             mLogDataCache.Clear()
 
             Using srLogFile = New StreamReader(New FileStream(strLogFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                While srLogFile.Peek > -1
+                While Not srLogFile.EndOfStream
                     Dim strLineIn = srLogFile.ReadLine()
                     Dim reMatch = reParseLine.Match(strLineIn)
 
