@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.6.6186; December 8, 2016
+	- Converted several structs into classes
+	- Now creating a _SICstats.txt file with placeholder values for datasets that only have MS2 data
+
 Version 2.6.6033; July 8, 2016
 	- Updated MSDataFileReader.dll, PRISM.dll, and SpectraTypeClassifier.dll
 	- Updated to .NET 4.5.1
