@@ -19,10 +19,12 @@ Public Class clsBinarySearch
         ReturnNextPoint = 2
     End Enum
 
-    Public Shared Function BinarySearchFindNearest(ByRef intArrayToSearch() As Integer, ByVal intItemToSearchFor As Integer, ByVal intDataCount As Integer, Optional ByVal eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+    Public Shared Function BinarySearchFindNearest(
+      ByRef intArrayToSearch() As Integer, intItemToSearchFor As Integer, intDataCount As Integer,
+      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through intArrayToSearch() for intItemToSearchFor, returning
         '  the index of the item if found
-		' If not found, returns the index of the closest match, based on eMissingDataMode
+        ' If not found, returns the index of the closest match, based on eMissingDataMode
         ' Assumes intArrayToSearch() is already sorted
 
         Dim intIndexFirst As Integer, intIndexLast As Integer
@@ -85,7 +87,7 @@ Public Class clsBinarySearch
                         ' No exact match; find the nearest match
                         If intArrayToSearch(intMidIndex) < intItemToSearchFor Then
                             If intMidIndex < intIndexLast Then
-                                If Math.Abs(intArrayToSearch(intMidIndex) - intItemToSearchFor) <= _
+                                If Math.Abs(intArrayToSearch(intMidIndex) - intItemToSearchFor) <=
                                    Math.Abs(intArrayToSearch(intMidIndex + 1) - intItemToSearchFor) Then
                                     intMatchIndex = intMidIndex
                                 Else
@@ -97,7 +99,7 @@ Public Class clsBinarySearch
                         Else
                             ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
                             If intMidIndex > intIndexFirst Then
-                                If Math.Abs(intArrayToSearch(intMidIndex - 1) - intItemToSearchFor) <= _
+                                If Math.Abs(intArrayToSearch(intMidIndex - 1) - intItemToSearchFor) <=
                                    Math.Abs(intArrayToSearch(intMidIndex) - intItemToSearchFor) Then
                                     intMatchIndex = intMidIndex - 1
                                 Else
@@ -137,7 +139,9 @@ Public Class clsBinarySearch
 
     End Function
 
-    Public Shared Function BinarySearchFindNearest(ByRef sngArrayToSearch() As Single, ByVal sngItemToSearchFor As Single, ByVal intDataCount As Integer, Optional ByVal eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+    Public Shared Function BinarySearchFindNearest(
+      ByRef sngArrayToSearch() As Single, sngItemToSearchFor As Single, intDataCount As Integer,
+      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through sngArrayToSearch() for sngItemToSearchFor, returning
         '  the index of the item if found
         ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
@@ -203,7 +207,7 @@ Public Class clsBinarySearch
                         ' No exact match; find the nearest match
                         If sngArrayToSearch(intMidIndex) < sngItemToSearchFor Then
                             If intMidIndex < intIndexLast Then
-                                If Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) <= _
+                                If Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) <=
                                    Math.Abs(sngArrayToSearch(intMidIndex + 1) - sngItemToSearchFor) Then
                                     intMatchIndex = intMidIndex
                                 Else
@@ -215,7 +219,7 @@ Public Class clsBinarySearch
                         Else
                             ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
                             If intMidIndex > intIndexFirst Then
-                                If Math.Abs(sngArrayToSearch(intMidIndex - 1) - sngItemToSearchFor) <= _
+                                If Math.Abs(sngArrayToSearch(intMidIndex - 1) - sngItemToSearchFor) <=
                                    Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) Then
                                     intMatchIndex = intMidIndex - 1
                                 Else
@@ -255,7 +259,9 @@ Public Class clsBinarySearch
 
     End Function
 
-    Public Shared Function BinarySearchFindNearest(ByRef dblArrayToSearch() As Double, ByVal dblItemToSearchFor As Double, ByVal intDataCount As Integer, Optional ByVal eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+    Public Shared Function BinarySearchFindNearest(
+      ByRef dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer,
+      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through dblArrayToSearch() for dblItemToSearchFor, returning
         '  the index of the item if found
         ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
@@ -321,7 +327,7 @@ Public Class clsBinarySearch
                         ' No exact match; find the nearest match
                         If dblArrayToSearch(intMidIndex) < dblItemToSearchFor Then
                             If intMidIndex < intIndexLast Then
-                                If Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) <= _
+                                If Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) <=
                                    Math.Abs(dblArrayToSearch(intMidIndex + 1) - dblItemToSearchFor) Then
                                     intMatchIndex = intMidIndex
                                 Else
@@ -333,7 +339,7 @@ Public Class clsBinarySearch
                         Else
                             ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
                             If intMidIndex > intIndexFirst Then
-                                If Math.Abs(dblArrayToSearch(intMidIndex - 1) - dblItemToSearchFor) <= _
+                                If Math.Abs(dblArrayToSearch(intMidIndex - 1) - dblItemToSearchFor) <=
                                    Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) Then
                                     intMatchIndex = intMidIndex - 1
                                 Else
@@ -580,7 +586,7 @@ Public Class clsBinarySearch
 
     End Sub
 
-    Private Function GetMissingDataModeName(ByVal eMissingDataMode As eMissingDataModeConstants) As String
+    Private Function GetMissingDataModeName(eMissingDataMode As eMissingDataModeConstants) As String
         Select Case eMissingDataMode
             Case eMissingDataModeConstants.ReturnClosestPoint
                 Return "Return Closest Point"

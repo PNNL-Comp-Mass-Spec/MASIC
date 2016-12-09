@@ -63,7 +63,7 @@ Public Class clsSearchRange
         End Get
     End Property
 
-    Public ReadOnly Property OriginalIndex(ByVal intIndex As Integer) As Integer
+    Public ReadOnly Property OriginalIndex(intIndex As Integer) As Integer
         Get
             If mPointerArrayIsValid Then
                 Try
@@ -85,7 +85,7 @@ Public Class clsSearchRange
         Get
             Return mUsePointerIndexArray
         End Get
-        Set(ByVal Value As Boolean)
+        Set(Value As Boolean)
             mUsePointerIndexArray = Value
         End Set
     End Property
@@ -93,7 +93,7 @@ Public Class clsSearchRange
 
 #Region "Binary Search Range"
 
-    Private Sub BinarySearchRangeInt(ByVal intSearchValue As Integer, ByVal intToleranceHalfWidth As Integer, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
+    Private Sub BinarySearchRangeInt(intSearchValue As Integer, intToleranceHalfWidth As Integer, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
         ' Recursive search function
 
         Dim intIndexMidpoint As Integer
@@ -146,7 +146,7 @@ Public Class clsSearchRange
 
     End Sub
 
-    Private Sub BinarySearchRangeSng(ByVal sngSearchValue As Single, ByVal sngToleranceHalfWidth As Single, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
+    Private Sub BinarySearchRangeSng(sngSearchValue As Single, sngToleranceHalfWidth As Single, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
         ' Recursive search function
 
         Dim intIndexMidpoint As Integer
@@ -199,7 +199,7 @@ Public Class clsSearchRange
 
     End Sub
 
-    Private Sub BinarySearchRangeDbl(ByVal dblSearchValue As Double, ByVal dblToleranceHalfWidth As Double, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
+    Private Sub BinarySearchRangeDbl(dblSearchValue As Double, dblToleranceHalfWidth As Double, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
         ' Recursive search function
 
         Dim intIndexMidpoint As Integer
@@ -364,7 +364,7 @@ Public Class clsSearchRange
 
 #Region "Find Value Range"
 
-    Public Function FindValueRange(ByVal intSearchValue As Integer, ByVal intToleranceHalfWidth As Integer, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
+    Public Function FindValueRange(intSearchValue As Integer, intToleranceHalfWidth As Integer, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
         ' Searches the loaded data for intSearchValue with a tolerance of +/-intToleranceHalfWidth
         ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
         ' Otherwise, returns false
@@ -407,7 +407,7 @@ Public Class clsSearchRange
         Return blnMatchFound
     End Function
 
-    Public Function FindValueRange(ByVal dblSearchValue As Double, ByVal dblToleranceHalfWidth As Double, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
+    Public Function FindValueRange(dblSearchValue As Double, dblToleranceHalfWidth As Double, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
         ' Searches the loaded data for dblSearchValue with a tolerance of +/-dblTolerance
         ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
         ' Otherwise, returns false
@@ -450,7 +450,7 @@ Public Class clsSearchRange
         Return blnMatchFound
     End Function
 
-    Public Function FindValueRange(ByVal sngSearchValue As Single, ByVal sngToleranceHalfWidth As Single, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
+    Public Function FindValueRange(sngSearchValue As Single, sngToleranceHalfWidth As Single, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
         ' Searches the loaded data for sngSearchValue with a tolerance of +/-sngTolerance
         ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
         ' Otherwise, returns false
@@ -496,7 +496,7 @@ Public Class clsSearchRange
 
 
 #Region "Get Value by Index"
-    Public Function GetValueByIndexInt(ByVal intIndex As Integer) As Integer
+    Public Function GetValueByIndexInt(intIndex As Integer) As Integer
         Try
             Return CInt(GetValueByIndex(intIndex))
         Catch ex As Exception
@@ -504,7 +504,7 @@ Public Class clsSearchRange
         End Try
     End Function
 
-    Public Function GetValueByIndex(ByVal intIndex As Integer) As Double
+    Public Function GetValueByIndex(intIndex As Integer) As Double
         Try
             If mDataType = eDataTypeToUse.NoDataPresent Then
                 Return 0
@@ -524,7 +524,7 @@ Public Class clsSearchRange
         End Try
     End Function
 
-    Public Function GetValueByIndexSng(ByVal intIndex As Integer) As Single
+    Public Function GetValueByIndexSng(intIndex As Integer) As Single
         Try
             Return CSng(GetValueByIndex(intIndex))
         Catch ex As Exception
@@ -535,7 +535,7 @@ Public Class clsSearchRange
 
 
 #Region "Get Value by Original Index"
-    Public Function GetValueByOriginalIndexInt(ByVal intIndex As Integer) As Integer
+    Public Function GetValueByOriginalIndexInt(intIndex As Integer) As Integer
         Try
             Return CInt(GetValueByOriginalIndex(intIndex))
         Catch ex As Exception
@@ -543,7 +543,7 @@ Public Class clsSearchRange
         End Try
     End Function
 
-    Public Function GetValueByOriginalIndex(ByVal intIndexOriginal As Integer) As Double
+    Public Function GetValueByOriginalIndex(intIndexOriginal As Integer) As Double
         Dim intIndex As Integer
 
         If Not mPointerArrayIsValid OrElse mDataType = eDataTypeToUse.NoDataPresent Then
@@ -569,7 +569,7 @@ Public Class clsSearchRange
         End If
     End Function
 
-    Public Function GetValueByOriginalIndexSng(ByVal intIndex As Integer) As Single
+    Public Function GetValueByOriginalIndexSng(intIndex As Integer) As Single
         Try
             Return CSng(GetValueByOriginalIndex(intIndex))
         Catch ex As Exception
@@ -587,7 +587,7 @@ Public Class clsSearchRange
 
     End Sub
 
-    Private Sub InitializePointerIndexArray(ByVal intLength As Integer)
+    Private Sub InitializePointerIndexArray(intLength As Integer)
         Dim intIndex As Integer
 
         If intLength < 0 Then intLength = 0

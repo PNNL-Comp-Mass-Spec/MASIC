@@ -26,7 +26,7 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "July 8, 2016"
+    Public Const PROGRAM_DATE As String = "December 9, 2016"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -69,7 +69,7 @@ Public Module modMain
 
     End Function
 
-    ''Private Sub InitializeTraceLogFile(ByVal strUserDefinedLogFilePath As String)
+    ''Private Sub InitializeTraceLogFile(strUserDefinedLogFilePath As String)
     ''    Dim strTraceFilePath As String
 
     ''    Static blnTraceFileEnabled As Boolean
@@ -216,7 +216,7 @@ Public Module modMain
 
     End Sub
 
-    Private Sub DisplayProgressPercent(ByVal intPercentComplete As Integer, ByVal blnAddCarriageReturn As Boolean)
+    Private Sub DisplayProgressPercent(intPercentComplete As Integer, blnAddCarriageReturn As Boolean)
         If blnAddCarriageReturn Then
             Console.WriteLine()
         End If
@@ -232,7 +232,7 @@ Public Module modMain
     End Function
 
 
-    Private Function SetOptionsUsingCommandLineParameters(ByVal objParseCommandLine As clsParseCommandLine) As Boolean
+    Private Function SetOptionsUsingCommandLineParameters(objParseCommandLine As clsParseCommandLine) As Boolean
         ' Returns True if no problems; otherwise, returns false
 
         Dim strValue As String = String.Empty
@@ -312,7 +312,7 @@ Public Module modMain
 
     End Function
 
-    Private Sub ShowErrorMessage(ByVal strMessage As String)
+    Private Sub ShowErrorMessage(strMessage As String)
         Dim strSeparator = "------------------------------------------------------------------------------"
 
         Console.WriteLine()
@@ -324,7 +324,7 @@ Public Module modMain
         WriteToErrorStream(strMessage)
     End Sub
 
-    Private Sub ShowErrorMessage(ByVal strTitle As String, ByVal items As List(Of String))
+    Private Sub ShowErrorMessage(strTitle As String, items As List(Of String))
         Dim strSeparator = "------------------------------------------------------------------------------"
         Dim strMessage As String
 
@@ -416,7 +416,7 @@ Public Module modMain
         End Try
     End Sub
 
-    Private Sub mMASIC_ProgressChanged(ByVal taskDescription As String, ByVal percentComplete As Single) Handles mMASIC.ProgressChanged
+    Private Sub mMASIC_ProgressChanged(taskDescription As String, percentComplete As Single) Handles mMASIC.ProgressChanged
         Const PERCENT_REPORT_INTERVAL = 25
         Const PROGRESS_DOT_INTERVAL_MSEC = 250
 

@@ -63,7 +63,7 @@ Public Class clsSpectraCache
 
     Public Structure udtSpectrumCacheOptionsType
         Public DiskCachingAlwaysDisabled As Boolean             ' If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
-		Public FolderPath As String								' Path to the cache folder (can be relative or absolute, aka rooted); if empty, then the user's AppData folder is used
+        Public FolderPath As String                             ' Path to the cache folder (can be relative or absolute, aka rooted); if empty, then the user's AppData folder is used
         Public SpectraToRetainInMemory As Integer
         Public MinimumFreeMemoryMB As Single                    ' Legacy parameter; no longer used
         Public MaximumMemoryUsageMB As Single                   ' Legacy parameter; no longer used
@@ -223,7 +223,7 @@ Public Class clsSpectraCache
         Return blnSuccess
     End Function
 
-    Private Sub CacheSpectrum(ByVal intPoolIndexToCache As Integer)
+    Private Sub CacheSpectrum(intPoolIndexToCache As Integer)
         ' Returns True if already cached or if successfully cached
         ' Returns False if an error
 
