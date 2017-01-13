@@ -8069,13 +8069,13 @@ Public Class clsMASIC
     End Sub
 
     Private Function InterpolateRTandFragScanNumber(
-      ByRef udtSurveyScans() As clsScanInfo,
+      surveyScans As IList(Of clsScanInfo),
       intSurveyScanCount As Integer,
       intLastSurveyScanIndex As Integer,
       intFragScanNumber As Integer,
-      ByRef intFragScanIteration As Integer) As Single
+      <Out()> ByRef intFragScanIteration As Integer) As Single
 
-        ' Examine the scan numbers in udtSurveyScans, starting at intLastSurveyScanIndex, to find the survey scans on either side of intFragScanNumber
+        ' Examine the scan numbers in surveyScans, starting at intLastSurveyScanIndex, to find the survey scans on either side of intFragScanNumber
         ' Interpolate the retention time that corresponds to intFragScanNumber
         ' Determine intFragScanNumber, which is generally 1, 2, or 3, indicating if this is the 1st, 2nd, or 3rd MS/MS scan after the survey scan
 
@@ -8084,17 +8084,18 @@ Public Class clsMASIC
         Dim sngNextScanRT As Single
         Dim intScanDiff As Integer
 
+        intFragScanIteration = 1
+
         Try
-            intFragScanIteration = 1
 
             ' Decrement intLastSurveyScanIndex if the corresponding SurveyScan's scan number is larger than intFragScanNumber
-            Do While intLastSurveyScanIndex > 0 AndAlso udtSurveyScans(intLastSurveyScanIndex).ScanNumber > intFragScanNumber
+            Do While intLastSurveyScanIndex > 0 AndAlso surveyScans(intLastSurveyScanIndex).ScanNumber > intFragScanNumber
                 ' This code will generally not be reached, provided the calling function passed the correct intLastSurveyScanIndex value to this function
                 intLastSurveyScanIndex -= 1
             Loop
 
             ' Increment intLastSurveyScanIndex if the next SurveyScan's scan number is smaller than intFragScanNumber
-            Do While intLastSurveyScanIndex < intSurveyScanCount - 1 AndAlso udtSurveyScans(intLastSurveyScanIndex + 1).ScanNumber < intFragScanNumber
+            Do While intLastSurveyScanIndex < intSurveyScanCount - 1 AndAlso surveyScans(intLastSurveyScanIndex + 1).ScanNumber < intFragScanNumber
                 ' This code will generally not be reached, provided the calling function passed the correct intLastSurveyScanIndex value to this function
                 intLastSurveyScanIndex += 1
             Loop
@@ -8106,9 +8107,9 @@ Public Class clsMASIC
                         ' Use the scan numbers of the last 2 survey scans to extrapolate the scan number for this fragmentation scan
 
                         intLastSurveyScanIndex = intSurveyScanCount - 1
-                        With udtSurveyScans(intLastSurveyScanIndex)
-                            intScanDiff = .ScanNumber - udtSurveyScans(intLastSurveyScanIndex - 1).ScanNumber
-                            sngPrevScanRT = udtSurveyScans(intLastSurveyScanIndex - 1).ScanTime
+                        With surveyScans(intLastSurveyScanIndex)
+                            intScanDiff = .ScanNumber - surveyScans(intLastSurveyScanIndex - 1).ScanNumber
+                            sngPrevScanRT = surveyScans(intLastSurveyScanIndex - 1).ScanTime
 
                             ' Compute intFragScanIteration
                             intFragScanIteration = intFragScanNumber - .ScanNumber
@@ -8118,7 +8119,7 @@ Public Class clsMASIC
                             Else
                                 ' Adjacent survey scans have the same scan number
                                 ' This shouldn't happen
-                                sngRT = udtSurveyScans(intLastSurveyScanIndex).ScanTime
+                                sngRT = surveyScans(intLastSurveyScanIndex).ScanTime
                             End If
 
                             If intFragScanIteration < 1 Then intFragScanIteration = 1
@@ -8126,16 +8127,16 @@ Public Class clsMASIC
                         End With
                     Else
                         ' Use the scan time of the highest survey scan in memory
-                        sngRT = udtSurveyScans(intSurveyScanCount - 1).ScanTime
+                        sngRT = surveyScans(intSurveyScanCount - 1).ScanTime
                     End If
                 Else
                     sngRT = 0
                 End If
             Else
                 ' Interpolate retention time
-                With udtSurveyScans(intLastSurveyScanIndex)
-                    intScanDiff = udtSurveyScans(intLastSurveyScanIndex + 1).ScanNumber - .ScanNumber
-                    sngNextScanRT = udtSurveyScans(intLastSurveyScanIndex + 1).ScanTime
+                With surveyScans(intLastSurveyScanIndex)
+                    intScanDiff = surveyScans(intLastSurveyScanIndex + 1).ScanNumber - .ScanNumber
+                    sngNextScanRT = surveyScans(intLastSurveyScanIndex + 1).ScanTime
 
                     ' Compute intFragScanIteration
                     intFragScanIteration = intFragScanNumber - .ScanNumber
