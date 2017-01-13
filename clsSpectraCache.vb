@@ -1,5 +1,7 @@
 Option Strict On
 
+Imports System.Runtime.InteropServices
+
 Public Class clsSpectraCache
 
     ' Utilizes a spectrum pool to store mass spectra
@@ -86,17 +88,17 @@ Public Class clsSpectraCache
     Private mPageFileWriter As BinaryWriter
 
     Private mFolderPathValidated As Boolean
-    Private mCacheFileNameBase As String                    ' Base filename for this instance of clsMasic, includes a timestamp to allow multiple instances to write to the same cache folder
+
+    ' Base filename for this instance of clsMasic, includes a timestamp to allow multiple instances to write to the same cache folder
+    Private mCacheFileNameBase As String
+
     Private mCacheEventCount As Integer
     Private mUnCacheEventCount As Integer
 
     Private mMaximumPoolLength As Integer
     Private mNextAvailablePoolIndex As Integer
 
-    ''Private mAccessIterator As System.Int64
-
     Private mSpectrumIndexInPool As Hashtable
-    ''Private mPoolAccessHistory As System.Collections.Hashtable        ' Assigns a unique long integer (access iterator) to each scan present in SpectraPool(); look for the item with the smallest access iterator value to determine the best candidate for purging (though LockInMemory cannot be true)
     Private mSpectrumByteOffset As Hashtable         ' Records the byte offset of the data in the page file for a given scan number
 
     Private mShowMessages As Boolean
@@ -546,10 +548,13 @@ Public Class clsSpectraCache
         End With
     End Sub
 
-    Private Function UnCacheSpectrum(intScanNumber As Integer, ByRef intTargetPoolIndex As Integer) As Boolean
-        ' Returns True if successfully uncached
-        ' Returns False if an error
-        ' intTargetPoolIndex will contain the index of the spectrum in the Spectrum Pool 
+    ''' <summary>
+    ''' Load the spectrum from disk and cache in SpectraPool
+    ''' </summary>
+    ''' <param name="intScanNumber">Scan number to load</param>
+    ''' <param name="intTargetPoolIndex">Output: index in the array that contains the given spectrum</param>
+    ''' <returns>True if successfully uncached, false if an error</returns>
+    Private Function UnCacheSpectrum(intScanNumber As Integer, <Out()> ByRef intTargetPoolIndex As Integer) As Boolean
 
         Dim blnSuccess As Boolean
         Dim blnReturnBlankSpectrum As Boolean
@@ -611,7 +616,7 @@ Public Class clsSpectraCache
             ' Scan not found; create a new, blank mass spectrum
             ' Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
             If SpectraPool(intTargetPoolIndex) Is Nothing Then
-                SpectraPool(intTargetPoolIndex) = New clsMSSpectrum
+                SpectraPool(intTargetPoolIndex) = New clsMSSpectrum()
             End If
 
             With SpectraPool(intTargetPoolIndex)
@@ -621,19 +626,19 @@ Public Class clsSpectraCache
             blnSuccess = True
         End If
 
-        If blnSuccess Then
-            SpectraPoolInfo(intTargetPoolIndex).CacheState = eCacheStateConstants.LoadedFromCache
+        If Not blnSuccess Then Return False
 
-            If mSpectrumIndexInPool.Contains(intScanNumber) Then
-                mSpectrumIndexInPool.Item(intScanNumber) = intTargetPoolIndex
-            Else
-                mSpectrumIndexInPool.Add(intScanNumber, intTargetPoolIndex)
-            End If
+        SpectraPoolInfo(intTargetPoolIndex).CacheState = eCacheStateConstants.LoadedFromCache
 
-            If Not blnReturnBlankSpectrum Then mUnCacheEventCount += 1
+        If mSpectrumIndexInPool.Contains(intScanNumber) Then
+            mSpectrumIndexInPool.Item(intScanNumber) = intTargetPoolIndex
+        Else
+            mSpectrumIndexInPool.Add(intScanNumber, intTargetPoolIndex)
         End If
 
-        Return blnSuccess
+        If Not blnReturnBlankSpectrum Then mUnCacheEventCount += 1
+
+        Return True
 
     End Function
 
@@ -755,28 +760,31 @@ Public Class clsSpectraCache
 
     End Function
 
-    Public Function ValidateSpectrumInPool(intScanNumber As Integer, ByRef intPoolIndex As Integer) As Boolean
-
-        ' Make sure the spectrum given by intScanNumber is present in FragScanSpectra
-        ' When doing this, update the Pool Access History with this scan number to assure it doesn't get purged from the pool anytime soon
-        ' Update intPoolIndex to hold the index in the array that contains the given spectrum
+    ''' <summary>
+    ''' Make sure the spectrum given by intScanNumber is present in FragScanSpectra
+    ''' When doing this, update the Pool Access History with this scan number to assure it doesn't get purged from the pool anytime soon
+    ''' </summary>
+    ''' <param name="intScanNumber">Scan number to load</param>
+    ''' <param name="intPoolIndex">Output: index in the array that contains the given spectrum; -1 if no match</param>
+    ''' <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
+    Public Function ValidateSpectrumInPool(intScanNumber As Integer, <Out()> ByRef intPoolIndex As Integer) As Boolean
 
         Dim blnSuccess As Boolean
 
         Try
             If mSpectrumIndexInPool.Contains(intScanNumber) Then
                 intPoolIndex = CInt(mSpectrumIndexInPool(intScanNumber))
-                blnSuccess = True
-            Else
-                ' Need to load the spectrum
-                blnSuccess = UnCacheSpectrum(intScanNumber, intPoolIndex)
+                Return True
             End If
+
+            ' Need to load the spectrum
+            blnSuccess = UnCacheSpectrum(intScanNumber, intPoolIndex)
+            Return blnSuccess
         Catch ex As Exception
             LogErrors("ValidateSpectrumInPool", ex.Message, ex, True, True)
-            blnSuccess = False
+            intPoolIndex = -1
+            Return False
         End Try
-
-        Return blnSuccess
 
     End Function
 
