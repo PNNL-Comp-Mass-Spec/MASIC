@@ -48,7 +48,7 @@ Friend Class clsPeakDetection
         Dim dblSegmentX() As Double
         Dim dblSegmentY() As Double
 
-		Dim dblCoefficients() As Double = Nothing
+        Dim dblCoefficients() As Double = Nothing
 
         If dblXValsZeroBased Is Nothing OrElse dblXValsZeroBased.Length = 0 Then Return 0
 
@@ -397,7 +397,7 @@ Friend Class clsPeakDetection
         Dim dblSegmentX() As Double
         Dim dblSegmentY() As Double
 
-		Dim dblCoefficients() As Double = Nothing
+        Dim dblCoefficients() As Double = Nothing
 
         Dim intSubIndex As Integer, intStartIndex As Integer
         Dim intMidPointIndex As Integer
@@ -686,8 +686,8 @@ Friend Class clsPeakDetection
     '    ByVal iSaveStateFlag As Integer, _
     '    ByRef handle As Integer) As Integer
 
-	''The following is only needed when using eolsrt.dll; used for real-time least squares fitting, utilizing data buffering
-	''Private Declare Sub EoLeastSquaresFitClose Lib "eolsrt.dll" (ByRef handle As Long)
+    ''The following is only needed when using eolsrt.dll; used for real-time least squares fitting, utilizing data buffering
+    ''Private Declare Sub EoLeastSquaresFitClose Lib "eolsrt.dll" (ByRef handle As Long)
 
     'Private Sub LeastSquaresFitEolsDll(ByVal dblXVals() As Double, ByVal dblYVals() As Double, ByRef dblCoefficients() As Double, ByVal intPolynomialOrder As Integer)
     '    ' Uses the EoLeastSquaresFit function in the eols.dll file to compute a least squares fit on the portion of the data between intIndexStart and intIndexEnd
