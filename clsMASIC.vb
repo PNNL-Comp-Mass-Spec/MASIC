@@ -34,7 +34,6 @@ Option Strict On
 Imports ThermoRawFileReader
 Imports PNNLOmics.Utilities
 Imports System.Runtime.InteropServices
-Imports PNNLOmics.Data
 
 Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
@@ -2621,7 +2620,7 @@ Public Class clsMASIC
        ByRef intNonConstantHeaderIDs() As Integer,
        intDatasetID As Integer,
        intScanNumber As Integer,
-       ExtendedHeaderInfo As Dictionary(Of Integer, String),
+       ExtendedHeaderInfo As IReadOnlyDictionary(Of Integer, String),
        cColDelimiter As Char) As String
 
         Dim strOutLine As String
@@ -7158,19 +7157,16 @@ Public Class clsMASIC
 
     End Function
 
-    Private Function GetFakeParentIonForFragScan(scanList As clsScanList, fragScanIndex As Integer, parentIonMZ As Double) As clsParentIonInfo
+    Private Function GetFakeParentIonForFragScan(scanList As clsScanList, fragScanIndex As Integer) As clsParentIonInfo
 
         Dim newParentIon = New clsParentIonInfo()
         Dim currentFragScan = scanList.FragScans(fragScanIndex)
 
-        newParentIon.MZ = parentIonMZ
+        newParentIon.MZ = currentFragScan.BasePeakIonMZ
         newParentIon.SurveyScanIndex = 0
 
         ' Find the previous MS1 scan that occurs before the frag scan
-        Dim surveyScanNumberAbsolute = 0
-        If fragScanIndex < scanList.FragScanCount Then
-            surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1
-        End If
+        Dim surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1
 
         ReDim newParentIon.FragScanIndices(0)
         newParentIon.FragScanIndices(0) = fragScanIndex
