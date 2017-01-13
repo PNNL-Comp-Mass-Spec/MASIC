@@ -12452,83 +12452,22 @@ Public Class clsMASIC
 
     End Function
 
-    Protected Function ScanNumberToIndex(
-      scanList As clsScanList,
-      intScanNumber As Integer,
-      ByRef eScanType As clsScanList.eScanTypeConstants) As Integer
-
-        ' Looks for intScanNumber in scanList and returns the index containing the scan number
-        ' Returns -1 if no match
-
-        Dim intIndex As Integer
-        Dim intScanIndexMatch As Integer
-        Static objScanInfoComparer As clsScanInfoScanNumComparer
-
-        If objScanInfoComparer Is Nothing Then
-            objScanInfoComparer = New clsScanInfoScanNumComparer
-        End If
-
-        intScanIndexMatch = -1
-        eScanType = clsScanList.eScanTypeConstants.SurveyScan
-
-        intScanIndexMatch = Array.BinarySearch(scanList.SurveyScans, 0, scanList.SurveyScanCount, intScanNumber, objScanInfoComparer)
-        If intScanIndexMatch >= 0 Then
-            eScanType = clsScanList.eScanTypeConstants.SurveyScan
-        Else
-            intScanIndexMatch = Array.BinarySearch(scanList.FragScans, 0, scanList.FragScanCount, intScanNumber, objScanInfoComparer)
-            If intScanIndexMatch >= 0 Then
-                eScanType = clsScanList.eScanTypeConstants.FragScan
-            Else
-                ' Match still not found; brute force search scanList.SurveyScans for intScanNumber
-                For intIndex = 0 To scanList.SurveyScanCount - 1
-                    If scanList.SurveyScans(intIndex).ScanNumber = intScanNumber Then
-                        intScanIndexMatch = intIndex
-                        eScanType = clsScanList.eScanTypeConstants.SurveyScan
-                        Exit For
-                    End If
-                Next intIndex
-
-                If intScanIndexMatch < 0 Then
-                    ' Still no match; brute force search & scanList.FragScans for intScanNumber
-                    For intIndex = 0 To scanList.FragScanCount - 1
-                        If scanList.FragScans(intIndex).ScanNumber = intScanNumber Then
-                            intScanIndexMatch = intIndex
-                            eScanType = clsScanList.eScanTypeConstants.FragScan
-                            Exit For
-                        End If
-                    Next intIndex
-                End If
-            End If
-        End If
-
-        Return intScanIndexMatch
-
-    End Function
-
     Protected Function ScanNumberToScanTime(
       scanList As clsScanList,
       intScanNumber As Integer) As Single
 
-        Dim intScanIndexMatch As Integer
-        Dim eScanTypeMatch As clsScanList.eScanTypeConstants
+        Dim surveyScanMatches = (From item In scanList.SurveyScans Where item.ScanNumber = intScanNumber Select item).ToList()
 
-        Dim sngScantime As Single
-
-        sngScantime = 0
-
-        intScanIndexMatch = ScanNumberToIndex(scanList, intScanNumber, eScanTypeMatch)
-        If intScanIndexMatch >= 0 Then
-            Select Case eScanTypeMatch
-                Case clsScanList.eScanTypeConstants.SurveyScan
-                    sngScantime = scanList.SurveyScans(intScanIndexMatch).ScanTime
-                Case clsScanList.eScanTypeConstants.FragScan
-                    sngScantime = scanList.FragScans(intScanIndexMatch).ScanTime
-                Case Else
-                    ' Unknown scan type
-            End Select
+        If surveyScanMatches.Count > 0 Then
+            Return surveyScanMatches.First.ScanTime
         End If
 
-        Return sngScantime
+        Dim fragScanMatches = (From item In scanList.FragScans Where item.ScanNumber = intScanNumber Select item).ToList()
+        If fragScanMatches.Count > 0 Then
+            Return fragScanMatches.First.ScanTime
+        End If
+
+        Return 0
 
     End Function
 
