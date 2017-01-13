@@ -8078,7 +8078,6 @@ Public Class clsMASIC
 
     Private Function InterpolateRTandFragScanNumber(
       surveyScans As IList(Of clsScanInfo),
-      intSurveyScanCount As Integer,
       intLastSurveyScanIndex As Integer,
       intFragScanNumber As Integer,
       <Out()> ByRef intFragScanIteration As Integer) As Single
@@ -8103,18 +8102,18 @@ Public Class clsMASIC
             Loop
 
             ' Increment intLastSurveyScanIndex if the next SurveyScan's scan number is smaller than intFragScanNumber
-            Do While intLastSurveyScanIndex < intSurveyScanCount - 1 AndAlso surveyScans(intLastSurveyScanIndex + 1).ScanNumber < intFragScanNumber
+            Do While intLastSurveyScanIndex < surveyScans.Count - 1 AndAlso surveyScans(intLastSurveyScanIndex + 1).ScanNumber < intFragScanNumber
                 ' This code will generally not be reached, provided the calling function passed the correct intLastSurveyScanIndex value to this function
                 intLastSurveyScanIndex += 1
             Loop
 
-            If intLastSurveyScanIndex >= intSurveyScanCount - 1 Then
+            If intLastSurveyScanIndex >= surveyScans.Count - 1 Then
                 ' Cannot easily interpolate since FragScanNumber is greater than the last survey scan number
-                If intSurveyScanCount > 0 Then
-                    If intSurveyScanCount >= 2 Then
+                If surveyScans.Count > 0 Then
+                    If surveyScans.Count >= 2 Then
                         ' Use the scan numbers of the last 2 survey scans to extrapolate the scan number for this fragmentation scan
 
-                        intLastSurveyScanIndex = intSurveyScanCount - 1
+                        intLastSurveyScanIndex = surveyScans.Count - 1
                         With surveyScans(intLastSurveyScanIndex)
                             intScanDiff = .ScanNumber - surveyScans(intLastSurveyScanIndex - 1).ScanNumber
                             sngPrevScanRT = surveyScans(intLastSurveyScanIndex - 1).ScanTime
@@ -8135,7 +8134,7 @@ Public Class clsMASIC
                         End With
                     Else
                         ' Use the scan time of the highest survey scan in memory
-                        sngRT = surveyScans(intSurveyScanCount - 1).ScanTime
+                        sngRT = surveyScans(surveyScans.Count - 1).ScanTime
                     End If
                 Else
                     sngRT = 0
@@ -9568,17 +9567,15 @@ Public Class clsMASIC
 
             InitializeMemoryManagementOptions(mProcessingStats)
 
-            Dim objSpectraCache = New clsSpectraCache
-            With objSpectraCache
-                .ShowMessages = MyBase.ShowMessages
-                .DiskCachingAlwaysDisabled = Me.DiskCachingAlwaysDisabled
-                .CacheFolderPath = Me.CacheFolderPath
-                .CacheSpectraToRetainInMemory = Me.CacheSpectraToRetainInMemory
-                .CacheMinimumFreeMemoryMB = Me.CacheMinimumFreeMemoryMB
+            Dim objSpectraCache = New clsSpectraCache() With {
+                .ShowMessages = MyBase.ShowMessages,
+                .DiskCachingAlwaysDisabled = Me.DiskCachingAlwaysDisabled,
+                .CacheFolderPath = Me.CacheFolderPath,
+                .CacheSpectraToRetainInMemory = Me.CacheSpectraToRetainInMemory,
+                .CacheMinimumFreeMemoryMB = Me.CacheMinimumFreeMemoryMB,
                 .CacheMaximumMemoryUsageMB = Me.CacheMaximumMemoryUsageMB
-
-                .InitializeSpectraPool()
-            End With
+            }
+            objSpectraCache.InitializeSpectraPool()
 
             Try
                 '---------------------------------------------------------
@@ -14268,26 +14265,6 @@ Public Class clsMASIC
         Return dblPPMToConvert / 1000000.0 * dblCurrentMZ
     End Function
 #End Region
-
-    Protected Class clsScanInfoScanNumComparer
-        Implements IComparer
-
-        Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
-            Dim udtScanInfo As clsScanInfo
-            Dim intScanNumber As Integer
-
-            udtScanInfo = DirectCast(x, clsScanInfo)
-            intScanNumber = DirectCast(y, Integer)
-
-            If udtScanInfo.ScanNumber > intScanNumber Then
-                Return 1
-            ElseIf udtScanInfo.ScanNumber < intScanNumber Then
-                Return -1
-            Else
-                Return 0
-            End If
-        End Function
-    End Class
 
     Protected Class clsMZBinListComparer
         Implements IComparer
