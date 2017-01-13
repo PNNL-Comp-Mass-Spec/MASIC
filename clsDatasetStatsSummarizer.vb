@@ -82,19 +82,19 @@ Namespace DSSummarizer
 #End Region
 
 #Region "Classwide Variables"
-        Protected mFileDate As String
-        Protected mDatasetStatsSummaryFileName As String
-        Protected mErrorMessage As String = String.Empty
+        Private mFileDate As String
+        Private mDatasetStatsSummaryFileName As String
+        Private mErrorMessage As String = String.Empty
 
-        Protected mDatasetScanStats As List(Of clsScanStatsEntry)
+        Private mDatasetScanStats As List(Of clsScanStatsEntry)
         Public DatasetFileInfo As udtDatasetFileInfoType
         Public SampleInfo As udtSampleInfoType
 
-        Protected WithEvents mSpectraTypeClassifier As clsSpectrumTypeClassifier
-        Protected mDatasetSummaryStatsUpToDate As Boolean
-        Protected mDatasetSummaryStats As clsDatasetSummaryStats
+        Private WithEvents mSpectraTypeClassifier As clsSpectrumTypeClassifier
+        Private mDatasetSummaryStatsUpToDate As Boolean
+        Private mDatasetSummaryStats As clsDatasetSummaryStats
 
-        Protected mMedianUtils As clsMedianUtilities
+        Private mMedianUtils As clsMedianUtilities
 
 #End Region
 
@@ -257,7 +257,7 @@ Namespace DSSummarizer
 
         End Function
 
-        Protected Sub ComputeScanStatsUpdateDetails(
+        Private Sub ComputeScanStatsUpdateDetails(
           ByRef objScanStats As clsScanStatsEntry,
           ByRef dblElutionTimeMax As Double,
           ByRef udtSummaryStatDetails As clsDatasetSummaryStats.udtSummaryStatDetailsType,
@@ -300,7 +300,7 @@ Namespace DSSummarizer
 
         End Sub
 
-        Protected Function ComputeMedian(ByRef dblList() As Double, intItemCount As Integer) As Double
+        Private Function ComputeMedian(ByRef dblList() As Double, intItemCount As Integer) As Double
 
             Dim lstData = New List(Of Double)(intItemCount)
             For i = 0 To intItemCount - 1
@@ -748,7 +748,7 @@ Namespace DSSummarizer
 
         End Function
 
-        Protected Function FixNull(strText As String) As String
+        Private Function FixNull(strText As String) As String
             If String.IsNullOrEmpty(strText) Then
                 Return String.Empty
             Else
@@ -776,7 +776,7 @@ Namespace DSSummarizer
             ClearCachedData()
         End Sub
 
-        Protected Sub ReportError(message As String)
+        Private Sub ReportError(message As String)
             mErrorMessage = String.Copy(message)
             RaiseEvent ErrorEvent(mErrorMessage)
         End Sub

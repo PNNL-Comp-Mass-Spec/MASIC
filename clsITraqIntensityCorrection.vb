@@ -13,9 +13,9 @@ Public Class clsITraqIntensityCorrection
 
 #Region "Constants and Enums"
 
-    Protected Const FOUR_PLEX_MATRIX_LENGTH As Integer = 4
-    Protected Const EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH As Integer = 8
-    Protected Const EIGHT_PLEX_LOW_RES_MATRIX_LENGTH As Integer = 9
+    Private Const FOUR_PLEX_MATRIX_LENGTH As Integer = 4
+    Private Const EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH As Integer = 8
+    Private Const EIGHT_PLEX_LOW_RES_MATRIX_LENGTH As Integer = 9
 
     Public Enum eCorrectionFactorsiTRAQ4Plex
         ABSciex = 0
@@ -24,7 +24,7 @@ Public Class clsITraqIntensityCorrection
 #End Region
 
 #Region "Structures"
-    Protected Structure udtITraqIsotopeContributionType
+    Private Structure udtITraqIsotopeContributionType
         Public Minus2 As Single
         Public Minus1 As Single
         Public Zero As Single
@@ -34,12 +34,12 @@ Public Class clsITraqIntensityCorrection
 #End Region
 
 #Region "Classwide Variables"
-    Protected mITraqMode As clsMASIC.eReporterIonMassModeConstants
+    Private mITraqMode As clsMASIC.eReporterIonMassModeConstants
 
-    Protected mITraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex
+    Private mITraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex
 
     ' Matrix of coefficients, derived from the isotope contribution table
-    Protected mCoeffs(,) As Double
+    Private mCoeffs(,) As Double
 
     Private ReadOnly mMatrixUtility As MatrixDecompositionUtility.LUDecomposition
 
@@ -151,7 +151,7 @@ Public Class clsITraqIntensityCorrection
 
     End Function
 
-    Protected Function GetMatrixLength(eITraqMode As clsMASIC.eReporterIonMassModeConstants) As Integer
+    Private Function GetMatrixLength(eITraqMode As clsMASIC.eReporterIonMassModeConstants) As Integer
         Select Case eITraqMode
             Case clsMASIC.eReporterIonMassModeConstants.ITraqFourMZ
                 Return FOUR_PLEX_MATRIX_LENGTH
@@ -164,7 +164,7 @@ Public Class clsITraqIntensityCorrection
         End Select
     End Function
 
-    Protected Sub InitializeCoefficients(blnShowMatrixTableInConsole As Boolean)
+    Private Sub InitializeCoefficients(blnShowMatrixTableInConsole As Boolean)
 
         Dim intMatrixSize As Integer
         Dim i As Integer

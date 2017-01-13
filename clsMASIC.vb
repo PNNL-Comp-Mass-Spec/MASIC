@@ -104,7 +104,7 @@ Public Class clsMASIC
         Undefined = 3
     End Enum
 
-    Protected Enum eCustomSICFileColumns
+    Private Enum eCustomSICFileColumns
         MZ = 0
         MZToleranceDa = 1
         ScanCenter = 2              ' Absolute scan or Relative Scan, or Acquisition Time
@@ -151,7 +151,7 @@ Public Class clsMASIC
         UnspecifiedError = -1
     End Enum
 
-    Protected Enum eOutputFileTypeConstants
+    Private Enum eOutputFileTypeConstants
         XMLFile = 0
         ScanStatsFlatFile = 1
         ScanStatsExtendedFlatFile = 2
@@ -209,7 +209,7 @@ Public Class clsMASIC
 
 #Region "Structures"
 
-    Protected Structure udtSICOptionsType
+    Private Structure udtSICOptionsType
         Public DatasetNumber As Integer                     ' Provided by the user at the command line or through the Property Function Interface; 0 if unknown
         Public SICTolerance As Double                       ' Defaults to 10 ppm
         Public SICToleranceIsPPM As Boolean                 ' When true, then SICToleranceDa is treated as a PPM value
@@ -246,7 +246,7 @@ Public Class clsMASIC
         Public SpectrumSimilarityMinimum As Single              ' 0.8
     End Structure
 
-    Protected Structure udtSICStatsDetailsType
+    Private Structure udtSICStatsDetailsType
         Public SICDataCount As Integer
 
         Public SICScanType As clsScanList.eScanTypeConstants            ' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
@@ -258,7 +258,7 @@ Public Class clsMASIC
 
     End Structure
 
-    Protected Structure udtRawDataExportOptionsType
+    Private Structure udtRawDataExportOptionsType
         Public ExportEnabled As Boolean
         Public FileFormat As eExportRawDataFileFormatConstants
 
@@ -271,7 +271,7 @@ Public Class clsMASIC
 
     End Structure
 
-    Protected Structure udtBinnedDataType
+    Private Structure udtBinnedDataType
         Public BinnedDataStartX As Single
         Public BinSize As Single
         Public BinCount As Integer
@@ -279,7 +279,7 @@ Public Class clsMASIC
         Public BinnedIntensitiesOffset() As Single          ' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX + BinSize/2
     End Structure
 
-    Protected Structure udtUniqueMZListType
+    Private Structure udtUniqueMZListType
         Public MZAvg As Double
         Public MaxIntensity As Single                   ' Highest intensity value of the similar parent ions
         Public MaxPeakArea As Single                    ' Largest peak intensity value of the similar parent ions
@@ -291,7 +291,7 @@ Public Class clsMASIC
         Public MatchIndices() As Integer            ' Pointer to an entry in .ParentIons()
     End Structure
 
-    Protected Structure udtFindSimilarIonsDataType
+    Private Structure udtFindSimilarIonsDataType
         Public MZPointerArray() As Integer
         Public IonInUseCount As Integer
         Public IonUsed() As Boolean
@@ -307,7 +307,7 @@ Public Class clsMASIC
         Public Comment As String
     End Structure
 
-    Protected Structure udtCustomMZSearchListType
+    Private Structure udtCustomMZSearchListType
         Public ScanToleranceType As eCustomSICScanTypeConstants
         Public ScanOrAcqTimeTolerance As Single                         ' This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime; set to 0 to search the entire file for the given mass
         Public CustomMZSearchValues() As udtCustomMZSearchSpecType
@@ -318,7 +318,7 @@ Public Class clsMASIC
         Public RawTextScanOrAcqTimeToleranceList As String
     End Structure
 
-    Protected Structure udtProcessingStatsType
+    Private Structure udtProcessingStatsType
         Public PeakMemoryUsageMB As Single
         Public TotalProcessingTimeAtStart As Single
         Public CacheEventCount As Integer
@@ -336,7 +336,7 @@ Public Class clsMASIC
 
     End Structure
 
-    Protected Structure udtOutputFileHandlesType
+    Private Structure udtOutputFileHandlesType
         Public ScanStats As StreamWriter
         Public SICDataFile As StreamWriter
         Public XMLFileForSICs As Xml.XmlTextWriter
@@ -344,7 +344,7 @@ Public Class clsMASIC
         Public MSTuneFilePathBase As String
     End Structure
 
-    Protected Structure udtMZSearchInfoType
+    Private Structure udtMZSearchInfoType
         Public SearchMZ As Double
 
         Public MZIndexStart As Integer
@@ -360,7 +360,7 @@ Public Class clsMASIC
         Public BaselineNoiseStatSegments() As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseStatSegmentsType
     End Structure
 
-    Protected Structure udtMZBinListType
+    Private Structure udtMZBinListType
         Public MZ As Double
         Public MZTolerance As Double
         Public MZToleranceIsPPM As Boolean
@@ -464,7 +464,7 @@ Public Class clsMASIC
     Private mScanStats As List(Of DSSummarizer.clsScanStatsEntry)
     Private mDatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType
 
-    Protected WithEvents mXcaliburAccessor As XRawFileIO
+    Private WithEvents mXcaliburAccessor As XRawFileIO
 
     ' Note: Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
     ' Use ProgressSubtaskChanged when updating the sub task progress
@@ -2936,7 +2936,7 @@ Public Class clsMASIC
             End If
 
             ' Sort udtMZBinList ascending and sort intParentIonIndices in parallel
-            Array.Sort(udtMZBinList, intParentIonIndices, New clsMZBinListComparer)
+            Array.Sort(udtMZBinList, intParentIonIndices, New clsMZBinListComparer())
             Return True
         Else
             Return False
@@ -3874,7 +3874,7 @@ Public Class clsMASIC
             With objMSSpectrum
 
                 If objMSSpectrum.IonCount > intMaxIonCountToRetain Then
-                    objFilterDataArray = New clsFilterDataArrayMaxCount
+                    objFilterDataArray = New clsFilterDataArrayMaxCount()
 
                     objFilterDataArray.MaximumDataCountToLoad = intMaxIonCountToRetain
                     objFilterDataArray.TotalIntensityPercentageFilterEnabled = False
@@ -5189,7 +5189,7 @@ Public Class clsMASIC
 
     End Function
 
-    Protected Function ExtractXcaliburSurveyScan(
+    Private Function ExtractXcaliburSurveyScan(
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtOutputFileHandles As udtOutputFileHandlesType,
@@ -5484,7 +5484,7 @@ Public Class clsMASIC
         Dim objSpectrumInfo As MSDataFileReader.clsSpectrumInfo = Nothing
         Dim objMZXmlSpectrumInfo As MSDataFileReader.clsSpectrumInfoMzXML = Nothing
 
-        Dim objMSSpectrum As New clsMSSpectrum
+        Dim objMSSpectrum As New clsMSSpectrum()
 
         ' ReSharper disable once NotAccessedVariable
         Dim dblMSDataResolution As Double
@@ -6411,7 +6411,7 @@ Public Class clsMASIC
                 udtReporterIonInfo(intReporterIonIndex) = mReporterIonInfo(intReporterIonIndex)
             Next intReporterIonIndex
 
-            Array.Sort(udtReporterIonInfo, New clsReportIonInfoComparer)
+            Array.Sort(udtReporterIonInfo, New clsReportIonInfoComparer())
 
             strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ReporterIonsFile)
             srOutFile = New StreamWriter(strOutputFilePath)
@@ -6845,7 +6845,7 @@ Public Class clsMASIC
             LogMessage("FindSimilarParentIons: Populate objSearchRange")
 
             ' Populate objSearchRange
-            objSearchRange = New clsSearchRange
+            objSearchRange = New clsSearchRange()
 
             ' Set to false to prevent sorting the input array when calling .FillWithData (saves memory)
             ' Array was already above
@@ -7657,11 +7657,11 @@ Public Class clsMASIC
 
     End Function
 
-    Protected Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double) As Double
+    Private Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double) As Double
         Return GetParentIonToleranceDa(udtSICOptions, dblParentIonMZ, udtSICOptions.SICTolerance)
     End Function
 
-    Protected Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double, dblParentIonTolerance As Double) As Double
+    Private Function GetParentIonToleranceDa(udtSICOptions As udtSICOptionsType, dblParentIonMZ As Double, dblParentIonTolerance As Double) As Double
         If udtSICOptions.SICToleranceIsPPM Then
             Return PPMToMass(dblParentIonTolerance, dblParentIonMZ)
         Else
@@ -7672,7 +7672,7 @@ Public Class clsMASIC
     Private Function GetScanByMasterScanIndex(scanList As clsScanList, intMasterScanIndex As Integer) As clsScanInfo
         Dim udtCurrentScan As clsScanInfo
 
-        udtCurrentScan = New clsScanInfo
+        udtCurrentScan = New clsScanInfo()
         If Not scanList.MasterScanOrder Is Nothing Then
             If intMasterScanIndex < 0 Then
                 intMasterScanIndex = 0
@@ -8206,7 +8206,7 @@ Public Class clsMASIC
 
     End Function
 
-    Protected Function IsNumber(strValue As String) As Boolean
+    Private Function IsNumber(strValue As String) As Boolean
         Try
             Return Double.TryParse(strValue, 0)
         Catch ex As Exception
@@ -8517,7 +8517,7 @@ Public Class clsMASIC
 
     End Function
 
-    Protected Function LoadCustomSICListFromFile(strCustomSICValuesFileName As String) As Boolean
+    Private Function LoadCustomSICListFromFile(strCustomSICValuesFileName As String) As Boolean
 
         Dim strLineIn As String
         Dim strSplitLine() As String
@@ -8777,7 +8777,7 @@ Public Class clsMASIC
 
     End Function
 
-    Protected Function ParseCustomSICList(
+    Private Function ParseCustomSICList(
       strMZList As String,
       strMZToleranceDaList As String,
       strScanCenterList As String,
@@ -8905,7 +8905,7 @@ Public Class clsMASIC
 
         Dim dblTIC As Double
 
-        Dim objMSSpectrum As New clsMSSpectrum
+        Dim objMSSpectrum As New clsMSSpectrum()
         Dim dblIntensityList() As Double = Nothing
 
         Dim blnDiscardLowIntensityDataWork As Boolean
@@ -12449,7 +12449,7 @@ Public Class clsMASIC
 
     End Function
 
-    Protected Function ScanNumberToScanTime(
+    Private Function ScanNumberToScanTime(
       scanList As clsScanList,
       intScanNumber As Integer) As Single
 
@@ -12576,7 +12576,7 @@ Public Class clsMASIC
         SetReporterIons(udtReporterIonInfo, True)
     End Sub
 
-    Protected Sub SetReporterIons(
+    Private Sub SetReporterIons(
       udtReporterIonInfo() As udtReporterIonInfoType,
       blnCustomReporterIons As Boolean)
 
@@ -12605,7 +12605,7 @@ Public Class clsMASIC
 
     End Sub
 
-    Protected Sub SetReporterIons(
+    Private Sub SetReporterIons(
       dblReporterIonMZList() As Double,
       dblMZToleranceDa As Double, blnCustomReporterIons As Boolean)
 
