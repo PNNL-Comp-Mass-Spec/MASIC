@@ -2472,10 +2472,12 @@ Public Class clsMASIC
         MASICPeakFinder.clsMASICPeakFinder.InitializeBaselineNoiseStats(scanInfo.BaselineNoiseStats, 0, udtNoiseThresholdOptions.BaselineNoiseMode)
 
         If udtNoiseThresholdOptions.BaselineNoiseMode = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold Then
-            With scanInfo.BaselineNoiseStats
-                .NoiseLevel = udtNoiseThresholdOptions.BaselineNoiseLevelAbsolute
-                .PointsUsed = 1
-            End With
+            Dim noiseStats = scanInfo.BaselineNoiseStats
+
+            noiseStats.NoiseLevel = udtNoiseThresholdOptions.BaselineNoiseLevelAbsolute
+            noiseStats.PointsUsed = 1
+
+            scanInfo.BaselineNoiseStats = noiseStats
         Else
             If objMSSpectrum.IonCount > 0 Then
                 mMASICPeakFinder.ComputeTrimmedNoiseLevel(objMSSpectrum.IonsIntensity, 0, objMSSpectrum.IonCount - 1, udtNoiseThresholdOptions, IGNORE_NON_POSITIVE_DATA, scanInfo.BaselineNoiseStats)
