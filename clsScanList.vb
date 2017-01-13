@@ -10,7 +10,7 @@ Public Class clsScanList
 
     Public Structure udtScanOrderPointerType
         Public ScanType As eScanTypeConstants
-        Public ScanIndexPointer As Integer                  ' Pointer to entry into udtScanList.SurveyScans() or udtScanList.FragScans()
+        Public ScanIndexPointer As Integer                  ' Pointer to entry into list clsScanList.SurveyScans or clsScanList.FragScans
     End Structure
 
 
@@ -21,17 +21,15 @@ Public Class clsScanList
     ''' <summary>
     ''' 0-based array, holding survey scans, the order is the same as in the original data file, and thus is by increasing scan number
     ''' </summary>
-    Public SurveyScans() As clsScanInfo
-    Public SurveyScanCount As Integer
+    Public SurveyScans As List(Of clsScanInfo)
 
     ''' <summary>
     ''' 0-based array, holding fragmentation scans, the order is the same as in the original data file, and thus is by increasing scan number
     ''' </summary>
-    Public FragScans() As clsScanInfo
-    Public FragScanCount As Integer
+    Public FragScans As List(Of clsScanInfo)
 
     ''' <summary>
-    ''' 0-based array, holding pointers to either the SurveyScans() or FragScans() arrays, in order of scan number
+    ''' 0-based array, holding pointers to either the SurveyScans or FragScans lists, in order of scan number
     ''' </summary>
     Public MasterScanOrder() As udtScanOrderPointerType
     Public MasterScanOrderCount As Integer
@@ -64,6 +62,7 @@ Public Class clsScanList
     ''' Constructor
     ''' </summary>
     Public Sub New()
-
+        SurveyScans = New List(Of clsScanInfo)
+        FragScans = New List(Of clsScanInfo)
     End Sub
 End Class
