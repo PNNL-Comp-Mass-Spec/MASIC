@@ -5242,22 +5242,22 @@ Public Class clsMASIC
                     htSIMScanMapping.Add(strSIMKey, htSIMScanMapping.Count)
                 End If
             End If
-
-            ' Store the ScanEvent values in .ExtendedHeaderInfo
-            StoreExtendedHeaderInfo(.ExtendedHeaderInfo, scanInfo.ScanEvents)
-
-            ' Store the collision mode and possibly the scan filter text
-            .FragScanInfo.CollisionMode = scanInfo.CollisionMode
-            StoreExtendedHeaderInfo(.ExtendedHeaderInfo, EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
-            If mWriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(.ExtendedHeaderInfo, EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
-            End If
-
-            If mWriteExtendedStatsStatusLog Then
-                ' Store the StatusLog values in .ExtendedHeaderInfo
-                StoreExtendedHeaderInfo(.ExtendedHeaderInfo, scanInfo.StatusLog, mStatusLogKeyNameFilterList)
-            End If
         End With
+
+        ' Store the ScanEvent values in .ExtendedHeaderInfo
+        StoreExtendedHeaderInfo(newSurveyScan, scanInfo.ScanEvents)
+
+        ' Store the collision mode and possibly the scan filter text
+        newSurveyScan.FragScanInfo.CollisionMode = scanInfo.CollisionMode
+        StoreExtendedHeaderInfo(newSurveyScan, EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
+        If mWriteExtendedStatsIncludeScanFilterText Then
+            StoreExtendedHeaderInfo(newSurveyScan, EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
+        End If
+
+        If mWriteExtendedStatsStatusLog Then
+            ' Store the StatusLog values in .ExtendedHeaderInfo
+            StoreExtendedHeaderInfo(newSurveyScan, scanInfo.StatusLog, mStatusLogKeyNameFilterList)
+        End If
 
         scanList.SurveyScans.Add(newSurveyScan)
 
@@ -5356,22 +5356,22 @@ Public Class clsMASIC
         With newFragScan
             .LowMass = scanInfo.LowMass
             .HighMass = scanInfo.HighMass
-
-            ' Store the ScanEvent values in .ExtendedHeaderInfo
-            StoreExtendedHeaderInfo(.ExtendedHeaderInfo, scanInfo.ScanEvents)
-
-            ' Store the collision mode and possibly the scan filter text
-            .FragScanInfo.CollisionMode = scanInfo.CollisionMode
-            StoreExtendedHeaderInfo(.ExtendedHeaderInfo, EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
-            If mWriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(.ExtendedHeaderInfo, EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
-            End If
-
-            If mWriteExtendedStatsStatusLog Then
-                ' Store the StatusLog values in .ExtendedHeaderInfo
-                StoreExtendedHeaderInfo(.ExtendedHeaderInfo, scanInfo.StatusLog, mStatusLogKeyNameFilterList)
-            End If
         End With
+
+        ' Store the ScanEvent values in .ExtendedHeaderInfo
+        StoreExtendedHeaderInfo(newFragScan, scanInfo.ScanEvents)
+
+        ' Store the collision mode and possibly the scan filter text
+        newFragScan.FragScanInfo.CollisionMode = scanInfo.CollisionMode
+        StoreExtendedHeaderInfo(newFragScan, EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
+        If mWriteExtendedStatsIncludeScanFilterText Then
+            StoreExtendedHeaderInfo(newFragScan, EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
+        End If
+
+        If mWriteExtendedStatsStatusLog Then
+            ' Store the StatusLog values in .ExtendedHeaderInfo
+            StoreExtendedHeaderInfo(newFragScan, scanInfo.StatusLog, mStatusLogKeyNameFilterList)
+        End If
 
         scanList.FragScans.Add(newFragScan)
 
@@ -12858,7 +12858,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub StoreExtendedHeaderInfo(
-      ByRef htExtendedHeaderInfo As Dictionary(Of Integer, String),
+      scanInfo As clsScanInfo,
       strEntryName As String,
       strEntryValue As String)
 
@@ -12870,19 +12870,19 @@ Public Class clsMASIC
         Dim statusEntries = New List(Of KeyValuePair(Of String, String))
         statusEntries.Add(New KeyValuePair(Of String, String)(strEntryName, strEntryValue))
 
-        StoreExtendedHeaderInfo(htExtendedHeaderInfo, statusEntries)
+        StoreExtendedHeaderInfo(scanInfo, statusEntries)
 
     End Sub
 
     Private Sub StoreExtendedHeaderInfo(
-      ByRef htExtendedHeaderInfo As Dictionary(Of Integer, String),
+      scanInfo As clsScanInfo,
       statusEntries As List(Of KeyValuePair(Of String, String)))
 
-        StoreExtendedHeaderInfo(htExtendedHeaderInfo, statusEntries, New String() {})
+        StoreExtendedHeaderInfo(scanInfo, statusEntries, New String() {})
     End Sub
 
     Private Sub StoreExtendedHeaderInfo(
-      ByRef htExtendedHeaderInfo As Dictionary(Of Integer, String),
+      scanInfo As clsScanInfo,
       statusEntries As List(Of KeyValuePair(Of String, String)),
       ByRef strKeyNameFilterList() As String)
 
@@ -12892,10 +12892,6 @@ Public Class clsMASIC
 
         Dim blnFilterItems As Boolean
         Dim blnSaveItem As Boolean
-
-        If htExtendedHeaderInfo Is Nothing Then
-            htExtendedHeaderInfo = New Dictionary(Of Integer, String)
-        End If
 
         Try
             If (statusEntries Is Nothing) Then Exit Sub
@@ -12936,7 +12932,8 @@ Public Class clsMASIC
                     End If
 
                     ' Add or update the value for intIDValue
-                    htExtendedHeaderInfo(intIDValue) = statusEntry.Value
+                    scanInfo.ExtendedHeaderInfo(intIDValue) = statusEntry.Value
+
                 End If
 
             Next
