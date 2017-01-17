@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace MatrixDecompositionUtility
 {
@@ -7,10 +6,10 @@ namespace MatrixDecompositionUtility
     {
         
         public double[] ProcessData(double[,] a, int n, double[] b) {
-            int[] indx = new int[n];
+            var indx = new int[n];
 
-            double[,] MatrixA = (double[,])a.Clone();
-            double[] MatrixB = (double[])b.Clone();
+            var MatrixA = (double[,])a.Clone();
+            var MatrixB = (double[])b.Clone();
 
             // Solve the system of linear equations by first calling ludcmp and then calling lubksb
             // The goal is to solve for X in A.X = B
@@ -31,9 +30,9 @@ namespace MatrixDecompositionUtility
             int i;
             int j;
             double sum;
-            int ii = -1;
+            var ii = -1;
             for (i = 0; i < n; i++) {
-                int ip = indx[i];
+                var ip = indx[i];
                 sum = b[ip];
                 b[ip] = b[i];
                 if (ii > -1) {
@@ -61,10 +60,10 @@ namespace MatrixDecompositionUtility
         private void ludcmp(double[,] a, int n, int[] indx) {
             int j;
             double big;
-            int imax = 0;
-            double[] vv = new double[n];
-            double d = 1.0;
-            int i = 0;
+            var imax = 0;
+            var vv = new double[n];
+            var d = 1.0;
+            var i = 0;
             while (i < n) {
                 big = 0.0;
                 j = 0;
@@ -75,7 +74,7 @@ namespace MatrixDecompositionUtility
                     }
                     j++;
                 }
-                if (big == 0.0) {
+                if (Math.Abs(big) < double.Epsilon) {
                     Console.WriteLine("Singular matrix in routing ludcmp!!");
                 }
                 vv[i] = 1.0 / big;
@@ -122,7 +121,7 @@ namespace MatrixDecompositionUtility
                     vv[imax] = vv[j];
                 }
                 indx[j] = imax;
-                if (a[j, j] == 0.0) {
+                if (Math.Abs(a[j, j]) < double.Epsilon) {
                     a[j, j] = double.MinValue;
                 }
                 if (j != n) {
@@ -135,20 +134,20 @@ namespace MatrixDecompositionUtility
         }
 
         private void printData(double[,] a, int n, int[] indx, double[] b) {
-            for (int i = 0; i < n; i++) {
-                for (int m = 0; m < n; m++) {
+            for (var i = 0; i < n; i++) {
+                for (var m = 0; m < n; m++) {
                     Console.Write("{0}\t", a[i, m]);
                 }
                 Console.WriteLine("");
             }
             Console.WriteLine("N is {0}", n);
             Console.Write("indx[]: ");
-            for (int j = 0; j < n; j++) {
+            for (var j = 0; j < n; j++) {
                 Console.Write("{0}\t", indx[j]);
             }
             Console.WriteLine("");
             Console.Write("B matrix: ");
-            for (int k = 0; k < n; k++) {
+            for (var k = 0; k < n; k++) {
                 Console.Write("{0}\t", b[k]);
             }
             Console.WriteLine("");
