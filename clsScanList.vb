@@ -11,6 +11,10 @@ Public Class clsScanList
     Public Structure udtScanOrderPointerType
         Public ScanType As eScanTypeConstants
         Public ScanIndexPointer As Integer                  ' Pointer to entry into list clsScanList.SurveyScans or clsScanList.FragScans
+
+        Public Overrides Function ToString() As String
+            Return ScanIndexPointer & ": " & ScanType.ToString()
+        End Function
     End Structure
 
 

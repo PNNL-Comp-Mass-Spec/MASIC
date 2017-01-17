@@ -55,6 +55,10 @@ Namespace DSSummarizer
                 ScanCount = 0
                 FileSizeBytes = 0
             End Sub
+
+            Public Overrides Function ToString() As String
+                Return "Dataset " & DatasetName & ", ScanCount=" & ScanCount
+            End Function
         End Structure
 
         Public Structure udtSampleInfoType
@@ -76,6 +80,10 @@ Namespace DSSummarizer
                 Else
                     Return False
                 End If
+            End Function
+
+            Public Overrides Function ToString() As String
+                Return SampleName
             End Function
         End Structure
 
@@ -984,6 +992,10 @@ Namespace DSSummarizer
             Public BPIMax As Double
             Public TICMedian As Double
             Public BPIMedian As Double
+
+            Public Overrides Function ToString() As String
+                Return "ScanCount: " & ScanCount
+            End Function
         End Structure
 
         Public Sub Clear()

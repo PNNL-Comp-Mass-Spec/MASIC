@@ -9,8 +9,11 @@
         Public PeakScanIndexMax As Integer                ' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
 
         Public SICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-    End Structure
 
+        Public Overrides Function ToString() As String
+            Return "Peak at index " & Peak.IndexMax & ", area " & Peak.Area
+        End Function
+    End Structure
 
     ''' <summary>
     ''' m/z value
@@ -80,4 +83,13 @@
     Public Sub New()
         ReDim FragScanIndices(0)
     End Sub
+
+    Public Overrides Function ToString() As String
+        If CustomSICPeak Then
+            Return "m/z " & MZ.ToString("0.00") & " (Custom SIC peak)"
+        Else
+            Return "m/z " & MZ.ToString("0.00")
+        End If
+
+    End Function
 End Class

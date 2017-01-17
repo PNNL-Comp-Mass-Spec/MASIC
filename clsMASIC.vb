@@ -244,6 +244,13 @@ Public Class clsMASIC
         Public SimilarIonMZToleranceHalfWidth As Single         ' 0.1       m/z Tolerance for finding similar parent ions; full tolerance is +/- this value
         Public SimilarIonToleranceHalfWidthMinutes As Single    ' 5         Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
         Public SpectrumSimilarityMinimum As Single              ' 0.8
+        Public Overrides Function ToString() As String
+            If SICToleranceIsPPM Then
+                Return "SIC Tolerance: " & SICTolerance.ToString("0.00") & " ppm"
+            Else
+                Return "SIC Tolerance: " & SICTolerance.ToString("0.0000") & " Da"
+            End If
+        End Function
     End Structure
 
     Private Structure udtSICStatsDetailsType
@@ -256,6 +263,10 @@ Public Class clsMASIC
         Public SICData() As Single                          ' SIC Abundances
         Public SICMasses() As Double                        ' SIC Masses
 
+
+        Public Overrides Function ToString() As String
+            Return "SICDataCount: " & SICDataCount
+        End Function
     End Structure
 
     Private Structure udtRawDataExportOptionsType
@@ -269,6 +280,14 @@ Public Class clsMASIC
         Public MaxIonCountPerScan As Integer
         Public IntensityMinimum As Single
 
+        Public Overrides Function ToString() As String
+            If ExportEnabled Then
+                Return "Export raw data as " & FileFormat.ToString()
+            Else
+                Return "Raw data export is disabled"
+            End If
+        End Function
+
     End Structure
 
     Private Structure udtBinnedDataType
@@ -277,6 +296,10 @@ Public Class clsMASIC
         Public BinCount As Integer
         Public BinnedIntensities() As Single                ' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX
         Public BinnedIntensitiesOffset() As Single          ' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX + BinSize/2
+
+        Public Overrides Function ToString() As String
+            Return "BinCount: " & BinCount & ", BinSize: " & BinSize.ToString("0.0") & ", StartX: " & BinnedDataStartX.ToString("0.0")
+        End Function
     End Structure
 
     Private Structure udtUniqueMZListType
@@ -289,6 +312,9 @@ Public Class clsMASIC
         Public ParentIonIndexMaxPeakArea As Integer     ' Pointer to an entry in .ParentIons()
         Public MatchCount As Integer
         Public MatchIndices() As Integer            ' Pointer to an entry in .ParentIons()
+        Public Overrides Function ToString() As String
+            Return "m/z avg: " & MZAvg & ", MatchCount: " & MatchCount
+        End Function
     End Structure
 
     Private Structure udtFindSimilarIonsDataType
@@ -297,6 +323,9 @@ Public Class clsMASIC
         Public IonUsed() As Boolean
         Public UniqueMZListCount As Integer
         Public UniqueMZList() As udtUniqueMZListType
+        Public Overrides Function ToString() As String
+            Return "IonInUseCount: " & IonInUseCount
+        End Function
     End Structure
 
     Public Structure udtCustomMZSearchSpecType
@@ -305,6 +334,9 @@ Public Class clsMASIC
         Public ScanOrAcqTimeCenter As Single         ' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
         Public ScanOrAcqTimeTolerance As Single      ' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanType = .Relative or ScanType = .AcquisitionTime; set to 0 to search the entire file for the given mass
         Public Comment As String
+        Public Overrides Function ToString() As String
+            Return "m/z: " & MZ.ToString("0.0000") & " �" & MZToleranceDa.ToString("0.0000")
+        End Function
     End Structure
 
     Private Structure udtCustomMZSearchListType
@@ -316,6 +348,15 @@ Public Class clsMASIC
         Public RawTextMZToleranceDaList As String
         Public RawTextScanOrAcqTimeCenterList As String
         Public RawTextScanOrAcqTimeToleranceList As String
+
+        Public Overrides Function ToString() As String
+            If CustomMZSearchValues Is Nothing OrElse CustomMZSearchValues.Count = 0 Then
+                Return "0 custom m/z search values"
+            Else
+                Return CustomMZSearchValues.Count & " custom m/z search values"
+            End If
+        End Function
+
     End Structure
 
     Private Structure udtProcessingStatsType
@@ -333,6 +374,12 @@ Public Class clsMASIC
         Public MemoryUsageMBAtStart As Single
         Public MemoryUsageMBDuringLoad As Single
         Public MemoryUsageMBAtEnd As Single
+
+        Public Overrides Function ToString() As String
+            Return "PeakMemoryUsageMB: " & PeakMemoryUsageMB.ToString("0.0") & ", " &
+                "CacheEventCount: " & CacheEventCount & ", " &
+                "UnCacheEventCount: " & UnCacheEventCount
+        End Function
 
     End Structure
 
@@ -358,23 +405,44 @@ Public Class clsMASIC
         Public ScanIndexMax As Integer
 
         Public BaselineNoiseStatSegments() As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseStatSegmentsType
+
+        Public Overrides Function ToString() As String
+            Return "m/z: " & SearchMZ.ToString("0.0") & ", Intensity: " & MaximumIntensity.ToString("0.0")
+        End Function
     End Structure
 
     Private Structure udtMZBinListType
         Public MZ As Double
         Public MZTolerance As Double
         Public MZToleranceIsPPM As Boolean
+
+        Public Overrides Function ToString() As String
+            If MZToleranceIsPPM Then
+                Return "m/z: " & MZ.ToString("0.0") & ", MZTolerance: " & MZTolerance.ToString("0.0") & " ppm"
+            Else
+                Return "m/z: " & MZ.ToString("0.0") & ", MZTolerance: " & MZTolerance.ToString("0.000") & " Da"
+            End If
+
+        End Function
     End Structure
 
     Public Structure udtReporterIonInfoType
         Public MZ As Double
         Public MZToleranceDa As Double
         Public ContaminantIon As Boolean        ' Should be False for Reporter Ions and True for other ions, e.g. immonium loss from phenylalanine
+
+        Public Overrides Function ToString() As String
+            Return "m/z: " & MZ.ToString("0.0000") & " �" & MZToleranceDa.ToString("0.0000")
+        End Function
     End Structure
 
     Private Structure udtSRMListType
         Public ParentIonMZ As Double
         Public CentralMass As Double
+
+        Public Overrides Function ToString() As String
+            Return "m/z " & ParentIonMZ.ToString("0.00")
+        End Function
     End Structure
 
 #End Region
