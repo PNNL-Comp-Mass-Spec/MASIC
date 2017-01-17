@@ -67,8 +67,16 @@ Public Class clsSpectraCache
         Public DiskCachingAlwaysDisabled As Boolean             ' If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
         Public FolderPath As String                             ' Path to the cache folder (can be relative or absolute, aka rooted); if empty, then the user's AppData folder is used
         Public SpectraToRetainInMemory As Integer
-        Public MinimumFreeMemoryMB As Single                    ' Legacy parameter; no longer used
-        Public MaximumMemoryUsageMB As Single                   ' Legacy parameter; no longer used
+
+        <Obsolete("Legacy parameter; no longer used")>
+        Public MinimumFreeMemoryMB As Single
+
+        <Obsolete("Legacy parameter; no longer used")>
+        Public MaximumMemoryUsageMB As Single
+
+        Public Overrides Function ToString() As String
+            Return "Cache up to " & SpectraToRetainInMemory & " in folder " & FolderPath
+        End Function
     End Structure
 
     Private Structure udtSpectraPoolInfoType
@@ -126,6 +134,7 @@ Public Class clsSpectraCache
         End Set
     End Property
 
+    <Obsolete("Legacy parameter; no longer used")>
     Public Property CacheMaximumMemoryUsageMB() As Single
         Get
             Return mCacheOptions.MaximumMemoryUsageMB
@@ -135,6 +144,7 @@ Public Class clsSpectraCache
         End Set
     End Property
 
+    <Obsolete("Legacy parameter; no longer used")>
     Public Property CacheMinimumFreeMemoryMB() As Single
         Get
             Return mCacheOptions.MinimumFreeMemoryMB
@@ -543,8 +553,8 @@ Public Class clsSpectraCache
             .DiskCachingAlwaysDisabled = False
             .FolderPath = Path.GetTempPath()
             .SpectraToRetainInMemory = 5000
-            .MinimumFreeMemoryMB = 250
-            .MaximumMemoryUsageMB = 3000             ' Spectrum caching to disk will be enabled if the memory usage rises over this value
+            '.MinimumFreeMemoryMB = 250
+            '.MaximumMemoryUsageMB = 3000             ' Spectrum caching to disk will be enabled if the memory usage rises over this value
         End With
     End Sub
 

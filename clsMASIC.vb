@@ -1479,6 +1479,7 @@ Public Class clsMASIC
         End Set
     End Property
 
+    <Obsolete("Legacy parameter; no longer used")>
     Public Property CacheMaximumMemoryUsageMB() As Single
         Get
             Return mCacheOptions.MaximumMemoryUsageMB
@@ -1488,6 +1489,7 @@ Public Class clsMASIC
         End Set
     End Property
 
+    <Obsolete("Legacy parameter; no longer used")>
     Public Property CacheMinimumFreeMemoryMB() As Single
         Get
             Return mCacheOptions.MinimumFreeMemoryMB
@@ -8529,8 +8531,6 @@ Public Class clsMASIC
                     Me.CacheFolderPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", Me.CacheFolderPath)
 
                     Me.CacheSpectraToRetainInMemory = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", Me.CacheSpectraToRetainInMemory)
-                    Me.CacheMinimumFreeMemoryMB = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMinimumFreeMemoryMB", Me.CacheMinimumFreeMemoryMB)
-                    Me.CacheMaximumMemoryUsageMB = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMaximumMemoryUsageMB", Me.CacheMaximumMemoryUsageMB)
 
                 End With
 
@@ -9639,9 +9639,7 @@ Public Class clsMASIC
                 .ShowMessages = MyBase.ShowMessages,
                 .DiskCachingAlwaysDisabled = Me.DiskCachingAlwaysDisabled,
                 .CacheFolderPath = Me.CacheFolderPath,
-                .CacheSpectraToRetainInMemory = Me.CacheSpectraToRetainInMemory,
-                .CacheMinimumFreeMemoryMB = Me.CacheMinimumFreeMemoryMB,
-                .CacheMaximumMemoryUsageMB = Me.CacheMaximumMemoryUsageMB
+                .CacheSpectraToRetainInMemory = Me.CacheSpectraToRetainInMemory
             }
             objSpectraCache.InitializeSpectraPool()
 
@@ -11755,8 +11753,6 @@ Public Class clsMASIC
                     .SetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", Me.DiskCachingAlwaysDisabled)
                     .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", Me.CacheFolderPath)
                     .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", Me.CacheSpectraToRetainInMemory)
-                    .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMinimumFreeMemoryMB", Me.CacheMinimumFreeMemoryMB)
-                    .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheMaximumMemoryUsageMB", Me.CacheMaximumMemoryUsageMB)
 
                 End With
 
@@ -14036,8 +14032,6 @@ Public Class clsMASIC
 
                 objXMLOut.WriteElementString("CacheAlwaysDisabled", .DiskCachingAlwaysDisabled.ToString)
                 objXMLOut.WriteElementString("CacheSpectraToRetainInMemory", .CacheSpectraToRetainInMemory.ToString)
-                objXMLOut.WriteElementString("CacheMinimumFreeMemoryMB", .CacheMinimumFreeMemoryMB.ToString)
-                objXMLOut.WriteElementString("CacheMaximumMemoryUsageMB", .CacheMaximumMemoryUsageMB.ToString)
 
             End With
             objXMLOut.WriteEndElement()

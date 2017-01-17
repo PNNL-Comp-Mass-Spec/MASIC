@@ -1121,7 +1121,7 @@ Public Class frmMain
 
                 ' Raw data export options
                 chkExportRawSpectraData.Checked = .ExportRawSpectraData                 ' Create .PEK file, or similar
-                cboExportRawDataFileFormat.SelectedIndex = .ExportRawDataFileFormat     ' ToDo: Add XML
+                cboExportRawDataFileFormat.SelectedIndex = .ExportRawDataFileFormat
 
                 chkExportRawDataIncludeMSMS.Checked = .ExportRawDataIncludeMSMS
                 chkExportRawDataRenumberScans.Checked = .ExportRawDataRenumberScans
@@ -1237,8 +1237,6 @@ Public Class frmMain
                 mCacheOptions.DiskCachingAlwaysDisabled = .DiskCachingAlwaysDisabled
                 mCacheOptions.FolderPath = .CacheFolderPath
                 mCacheOptions.SpectraToRetainInMemory = .CacheSpectraToRetainInMemory
-                mCacheOptions.MinimumFreeMemoryMB = .CacheMinimumFreeMemoryMB
-                mCacheOptions.MaximumMemoryUsageMB = .CacheMaximumMemoryUsageMB
 
                 ' Reporter ion options
                 txtReporterIonMZToleranceDa.Text = Math.Round(.ReporterIonToleranceDaDefault, 6).ToString
@@ -1789,8 +1787,6 @@ Public Class frmMain
                 .DiskCachingAlwaysDisabled = mCacheOptions.DiskCachingAlwaysDisabled
                 .CacheFolderPath = mCacheOptions.FolderPath
                 .CacheSpectraToRetainInMemory = mCacheOptions.SpectraToRetainInMemory
-                .CacheMinimumFreeMemoryMB = mCacheOptions.MinimumFreeMemoryMB
-                .CacheMaximumMemoryUsageMB = mCacheOptions.MaximumMemoryUsageMB
 
                 ' Reporter ion options
                 .ReporterIonStatsEnabled = chkReporterIonStatsEnabled.Checked
