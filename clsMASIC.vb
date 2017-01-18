@@ -5008,7 +5008,10 @@ Public Class clsMASIC
         Dim dtLastLogTime As DateTime
 
         ' Use Xraw to read the .Raw files
-        mXcaliburAccessor = New XRawFileIO
+        Dim xcaliburAccessor = New XRawFileIO()
+        AddHandler xcaliburAccessor.ReportError, AddressOf mXcaliburAccessor_ReportError
+        AddHandler xcaliburAccessor.ReportWarning, AddressOf mXcaliburAccessor_ReportWarning
+
         strIOMode = "Xraw"
 
         ' Assume success for now
@@ -5024,29 +5027,29 @@ Public Class clsMASIC
             ioFileInfo = New FileInfo(strFilePath)
             strInputFileFullPath = ioFileInfo.FullName
 
-            mXcaliburAccessor.LoadMSMethodInfo = mWriteMSMethodFile
-            mXcaliburAccessor.LoadMSTuneInfo = mWriteMSTuneFile
+            xcaliburAccessor.LoadMSMethodInfo = mWriteMSMethodFile
+            xcaliburAccessor.LoadMSTuneInfo = mWriteMSTuneFile
 
             ' Open a handle to the data file
-            If Not mXcaliburAccessor.OpenRawFile(strInputFileFullPath) Then
-                strStatusMessage = "Error opening input data file: " & strInputFileFullPath & " (mXcaliburAccessor.OpenRawFile returned False)"
+            If Not xcaliburAccessor.OpenRawFile(strInputFileFullPath) Then
+                strStatusMessage = "Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor.OpenRawFile returned False)"
                 SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                 Return False
             End If
 
-            If mXcaliburAccessor Is Nothing Then
-                strStatusMessage = "Error opening input data file: " & strInputFileFullPath & " (mXcaliburAccessor is Nothing)"
+            If xcaliburAccessor Is Nothing Then
+                strStatusMessage = "Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor is Nothing)"
                 SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                 Return False
             End If
 
-            blnSuccess = UpdateDatasetFileStats(mDatasetFileInfo, ioFileInfo, intDatasetID, mXcaliburAccessor)
+            blnSuccess = UpdateDatasetFileStats(mDatasetFileInfo, ioFileInfo, intDatasetID, xcaliburAccessor)
 
-            If mWriteMSMethodFile Then SaveMSMethodFile(mXcaliburAccessor, udtOutputFileHandles)
+            If mWriteMSMethodFile Then SaveMSMethodFile(xcaliburAccessor, udtOutputFileHandles)
 
-            If mWriteMSTuneFile Then SaveMSTuneFile(mXcaliburAccessor, udtOutputFileHandles)
+            If mWriteMSTuneFile Then SaveMSTuneFile(xcaliburAccessor, udtOutputFileHandles)
 
-            intScanCount = mXcaliburAccessor.GetNumScans()
+            intScanCount = xcaliburAccessor.GetNumScans()
 
             If intScanCount <= 0 Then
                 ' No scans found
@@ -5055,8 +5058,8 @@ Public Class clsMASIC
                 Return False
             Else
 
-                intScanStart = mXcaliburAccessor.FileInfo.ScanStart
-                intScanEnd = mXcaliburAccessor.FileInfo.ScanEnd
+                intScanStart = xcaliburAccessor.FileInfo.ScanStart
+                intScanEnd = xcaliburAccessor.FileInfo.ScanEnd
 
                 With udtSICOptions
                     If .ScanRangeStart > 0 And .ScanRangeEnd = 0 Then
@@ -5086,11 +5089,11 @@ Public Class clsMASIC
 
                     Dim scanInfo As ThermoRawFileReader.clsScanInfo = Nothing
 
-                    blnSuccess = mXcaliburAccessor.GetScanInfo(intScanNumber, scanInfo)
+                    blnSuccess = xcaliburAccessor.GetScanInfo(intScanNumber, scanInfo)
 
                     If Not blnSuccess Then
                         ' GetScanInfo returned false
-                        LogMessage("mXcaliburAccessor.GetScanInfo returned false for scan " & intScanNumber.ToString & "; aborting read", eMessageTypeConstants.Warning)
+                        LogMessage("xcaliburAccessor.GetScanInfo returned false for scan " & intScanNumber.ToString & "; aborting read", eMessageTypeConstants.Warning)
                         Exit For
                     End If
 
@@ -5104,7 +5107,7 @@ Public Class clsMASIC
                         ' If yes, determine the scan number of the survey scan
                         If scanInfo.MSLevel <= 1 Then
                             ' Survey Scan
-                            blnSuccess = ExtractXcaliburSurveyScan(
+                            blnSuccess = ExtractXcaliburSurveyScan(xcaliburAccessor,
                                scanList, objSpectraCache, udtOutputFileHandles, udtSICOptions,
                                blnKeepRawSpectra, scanInfo, htSIMScanMapping,
                                intLastNonZoomSurveyScanIndex, intScanNumber)
@@ -5112,7 +5115,7 @@ Public Class clsMASIC
                         Else
 
                             ' Fragmentation Scan
-                            blnSuccess = ExtractXcaliburFragmentationScan(
+                            blnSuccess = ExtractXcaliburFragmentationScan(xcaliburAccessor,
                                scanList, objSpectraCache, udtOutputFileHandles, udtSICOptions, udtBinningOptions,
                                blnKeepRawSpectra, blnKeepMSMSSpectra, scanInfo,
                                intLastNonZoomSurveyScanIndex, intScanNumber)
@@ -5169,14 +5172,14 @@ Public Class clsMASIC
         mProcessingStats.MemoryUsageMBDuringLoad = GetProcessMemoryUsageMB()
 
         ' Close the handle to the data file
-        mXcaliburAccessor.CloseRawFile()
-        mXcaliburAccessor = Nothing
+        xcaliburAccessor.CloseRawFile()
 
         Return blnSuccess
 
     End Function
 
     Private Function ExtractXcaliburSurveyScan(
+      xcaliburAccessor As XRawFileIO,
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtOutputFileHandles As udtOutputFileHandlesType,
@@ -5215,6 +5218,7 @@ Public Class clsMASIC
 
             .LowMass = scanInfo.LowMass
             .HighMass = scanInfo.HighMass
+            .IsFTMS = scanInfo.IsFTMS
 
             If .SIMScan Then
                 scanList.SIMDataPresent = True
@@ -5268,7 +5272,7 @@ Public Class clsMASIC
         End If
 
         ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-        Dim blnSuccess = LoadSpectraForFinniganDataFile(mXcaliburAccessor, objSpectraCache, intScanNumber, newSurveyScan, udtSICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, udtSICOptions.CompressMSSpectraData, dblMSDataResolution, blnKeepRawSpectra)
+        Dim blnSuccess = LoadSpectraForFinniganDataFile(xcaliburAccessor, objSpectraCache, intScanNumber, newSurveyScan, udtSICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, udtSICOptions.CompressMSSpectraData, dblMSDataResolution, blnKeepRawSpectra)
         If Not blnSuccess Then Return False
 
         SaveScanStatEntry(udtOutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, newSurveyScan, udtSICOptions.DatasetNumber)
@@ -5278,6 +5282,7 @@ Public Class clsMASIC
     End Function
 
     Private Function ExtractXcaliburFragmentationScan(
+      xcaliburAccessor As XRawFileIO,
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       udtOutputFileHandles As udtOutputFileHandlesType,
@@ -5342,6 +5347,7 @@ Public Class clsMASIC
         With newFragScan
             .LowMass = scanInfo.LowMass
             .HighMass = scanInfo.HighMass
+            .IsFTMS = scanInfo.IsFTMS
         End With
 
         ' Store the ScanEvent values in .ExtendedHeaderInfo
@@ -5367,7 +5373,7 @@ Public Class clsMASIC
         Dim dblMSDataResolution = udtBinningOptions.BinSize / udtSICOptions.CompressToleranceDivisorForDa
 
         Dim blnSuccess = LoadSpectraForFinniganDataFile(
-              mXcaliburAccessor,
+              xcaliburAccessor,
               objSpectraCache,
               intScanNumber,
               newFragScan,
@@ -5570,6 +5576,7 @@ Public Class clsMASIC
 
                                 .LowMass = objSpectrumInfo.mzRangeStart
                                 .HighMass = objSpectrumInfo.mzRangeEnd
+                                .IsFTMS = False
 
                             End With
 
@@ -5700,6 +5707,7 @@ Public Class clsMASIC
                             With newFragScan
                                 .LowMass = objSpectrumInfo.mzRangeStart
                                 .HighMass = objSpectrumInfo.mzRangeEnd
+                                .IsFTMS = False
                             End With
 
                             scanList.FragScans.Add(newFragScan)
@@ -14384,12 +14392,12 @@ Public Class clsMASIC
         End Function
     End Class
 
-    Private Sub mXcaliburAccessor_ReportError(strMessage As String) Handles mXcaliburAccessor.ReportError
+    Private Sub mXcaliburAccessor_ReportError(strMessage As String)
         Console.WriteLine(strMessage)
         LogErrors("XcaliburAccessor", strMessage, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
     End Sub
 
-    Private Sub mXcaliburAccessor_ReportWarning(strMessage As String) Handles mXcaliburAccessor.ReportWarning
+    Private Sub mXcaliburAccessor_ReportWarning(strMessage As String)
         Console.WriteLine(strMessage)
         LogErrors("XcaliburAccessor", strMessage, Nothing, False, False, eMasicErrorCodes.InputFileDataReadError)
     End Sub
