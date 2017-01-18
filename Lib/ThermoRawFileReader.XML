@@ -478,8 +478,9 @@
         </member>
         <member name="F:ThermoRawFileReader.udtFTLabelInfoType.Mass">
             <summary>
-            Peak Mass
+            Peak m/z
             </summary>
+            <remarks>This is observed m/z; it is not monoisotopic mass</remarks>
         </member>
         <member name="F:ThermoRawFileReader.udtFTLabelInfoType.Intensity">
             <summary>
@@ -500,11 +501,25 @@
             <summary>
             Peak Noise
             </summary>
+            <remarks>For signal/noise ratio, see SignalToNoise</remarks>
         </member>
         <member name="F:ThermoRawFileReader.udtFTLabelInfoType.Charge">
             <summary>
             Peak Charge
             </summary>
+            <remarks>Will be 0 if the charge could not be determined</remarks>
+        </member>
+        <member name="P:ThermoRawFileReader.udtFTLabelInfoType.SignalToNoise">
+            <summary>
+            Signal to noise ratio
+            </summary>
+            <returns>Intensity divided by noise, or 0 if Noise is 0</returns>
+        </member>
+        <member name="M:ThermoRawFileReader.udtFTLabelInfoType.ToString">
+            <summary>
+            Return a summary of this object
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:ThermoRawFileReader.ActivationTypeConstants">
             <summary>
@@ -754,7 +769,7 @@
             Class for reading Thermo Finnigan .raw files, using the IXRawfile5 interface
             </summary>
         </member>
-        <member name="F:ThermoRawFileReader.XRawFileIO.MAX_SCANS_TO_CACHE_INFO">
+        <member name="F:ThermoRawFileReader.XRawFileIO.mMaxScansToCacheInfo">
             <summary>
             Maximum size of the scan info cache
             </summary>
@@ -799,6 +814,11 @@
             MS Tune Info
             </summary>
         </member>
+        <member name="P:ThermoRawFileReader.XRawFileIO.ScanInfoCacheMaxSize">
+            <summary>
+            Changes the maximum number of scan metadata cached. Set to 0 to disable caching. Default 50000.
+            </summary>
+        </member>
         <member name="E:ThermoRawFileReader.XRawFileIO.ReportError">
             <summary>
             Event handler for reporting error messages
@@ -837,6 +857,19 @@
             <summary>
             Test the functionality of the reader - can we instantiate the MSFileReader Object?
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.IsMSFileReaderInstalled">
+            <summary>
+            Tests to see if we can load the needed Thermo MSFileReader DLL class without errors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.IsMSFileReaderInstalled(System.String@)">
+            <summary>
+            Tests to see if we can load the needed Thermo MSFileReader DLL class without errors
+            </summary>
+            <param name="error">Reason for failure</param>
             <returns></returns>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.CloseRawFile">

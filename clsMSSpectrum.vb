@@ -12,12 +12,24 @@ Public Class clsMSSpectrum
 
     Public Const DEFAULT_SPECTRUM_ION_COUNT As Integer = 500
 
-    Public ScanNumber As Integer                        ' 0 if not in use
+    ' 0 if not in use
+    Public ScanNumber As Integer
+
     Public IonCount As Integer
-    Public IonsMZ() As Double                           ' 0-based array, ranging from 0 to IonCount-1; note that IonsMZ.Length could be > IonCount, so do not use .Length to determine the data count
-    Public IonsIntensity() As Single                    ' 0-based array, ranging from 0 to IonCount-1; note that IonsIntensity.Length could be > IonCount, so do not use .Length to determine the data count
 
+    ''' <summary>
+    ''' 0-based array, ranging from 0 to IonCount-1; note that IonsMZ.Length could be > IonCount, so do not use .Length to determine the data count
+    ''' </summary>
+    Public IonsMZ() As Double
 
+    ''' <summary>
+    ''' 0-based array, ranging from 0 to IonCount-1; note that IonsIntensity.Length could be > IonCount, so do not use .Length to determine the data count
+    ''' </summary>
+    Public IonsIntensity() As Single
+
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
     Public Sub New()
 
         ScanNumber = 0

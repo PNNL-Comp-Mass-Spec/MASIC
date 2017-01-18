@@ -56,16 +56,18 @@ Public Class clsSpectraCache
 #End Region
 
 #Region "Structures"
-    ''Public Structure udtMSSpectrumType
-    ''    Public ScanNumber As Integer                        ' 0 if not in use
-    ''    Public IonCount As Integer
-    ''    Public IonsMZ() As Double                           ' 0-based array, ranging from 0 to IonCount-1; note that IonsMZ.Length could be > IonCount, so do not use .Length to determine the data count
-    ''    Public IonsIntensity() As Single                    ' 0-based array, ranging from 0 to IonCount-1; note that IonsIntensity.Length could be > IonCount, so do not use .Length to determine the data count
-    ''End Structure
 
     Public Structure udtSpectrumCacheOptionsType
-        Public DiskCachingAlwaysDisabled As Boolean             ' If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
-        Public FolderPath As String                             ' Path to the cache folder (can be relative or absolute, aka rooted); if empty, then the user's AppData folder is used
+        ''' <summary>
+        ''' If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
+        ''' </summary>
+        Public DiskCachingAlwaysDisabled As Boolean
+
+        ''' <summary>
+        ''' Path to the cache folder (can be relative or absolute, aka rooted); if empty, then the user's AppData folder is used
+        ''' </summary>
+        Public FolderPath As String
+
         Public SpectraToRetainInMemory As Integer
 
         <Obsolete("Legacy parameter; no longer used")>

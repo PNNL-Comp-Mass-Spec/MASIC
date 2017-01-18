@@ -74,6 +74,12 @@ Public Class clsScanInfo
     Public Property HighMass As Double
 
     ''' <summary>
+    ''' True if the scan was collected in the FT cell of a Thermo instrument
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property IsFTMS As Boolean
+
+    ''' <summary>
     ''' Information specific to fragmentation scans
     ''' </summary>
     Public ReadOnly Property FragScanInfo As clsFragScanInfo

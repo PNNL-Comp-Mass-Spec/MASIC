@@ -78,13 +78,17 @@ Public Class clsMASIC
     Private Const EXTENDED_STATS_HEADER_COLLISION_MODE As String = "Collision Mode"
     Private Const EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT As String = "Scan Filter Text"
 
-    Private Const DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD As Boolean = False          ' Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
-    Private Const DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD As Boolean = True         ' Disabling this will slow down the correlation process (slightly)
+    ' Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
+    Private Const DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD As Boolean = False
+
+    ' Disabling this will slow down the correlation process (slightly)
+    Private Const DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD As Boolean = True
 
     Public Const DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA As Double = 5
     Public Const DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM As Double = 3
 
-    Private Const MAX_ALLOWABLE_ION_COUNT As Integer = 50000                        ' Absolute maximum number of ions that will be tracked for a mass spectrum
+    ' Absolute maximum number of ions that will be tracked for a mass spectrum
+    Private Const MAX_ALLOWABLE_ION_COUNT As Integer = 50000
 
     Public Const DEFAULT_MASIC_STATUS_FILE_NAME As String = "MasicStatus.xml"
     Private Const MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS As Integer = 3
@@ -210,40 +214,100 @@ Public Class clsMASIC
 #Region "Structures"
 
     Private Structure udtSICOptionsType
-        Public DatasetNumber As Integer                     ' Provided by the user at the command line or through the Property Function Interface; 0 if unknown
-        Public SICTolerance As Double                       ' Defaults to 10 ppm
-        Public SICToleranceIsPPM As Boolean                 ' When true, then SICToleranceDa is treated as a PPM value
+        ''' <summary>
+        ''' Provided by the user at the command line or through the Property Function Interface; 0 if unknown
+        ''' </summary>
+        Public DatasetNumber As Integer
 
-        Public RefineReportedParentIonMZ As Boolean         ' If True, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICToleranceDa / udtSICOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
-        Public ScanRangeStart As Integer                    ' If both ScanRangeStart >=0 and ScanRangeEnd > 0 then will only process data between those scan numbers
-        Public ScanRangeEnd As Integer                      '
+        ''' <summary>
+        ''' Defaults to 10 ppm
+        ''' </summary>
+        Public SICTolerance As Double
 
-        Public RTRangeStart As Single                       ' If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
+        ''' <summary>
+        ''' When true, then SICTolerance is treated as a PPM value
+        ''' </summary>
+        Public SICToleranceIsPPM As Boolean
+
+        ''' <summary>
+        ''' If True, then will look through the m/z values in the parent ion spectrum data to find the closest match 
+        ''' (within SICToleranceDa / udtSICOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
+        ''' </summary>
+        Public RefineReportedParentIonMZ As Boolean
+
+        ''' <summary>
+        ''' If both ScanRangeStart >=0 and ScanRangeEnd > 0 then will only process data between those scan numbers
+        ''' </summary>
+        Public ScanRangeStart As Integer
+        Public ScanRangeEnd As Integer
+
+        ''' <summary>
+        ''' If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
+        ''' </summary>
+        Public RTRangeStart As Single
         Public RTRangeEnd As Single
 
-        Public CompressMSSpectraData As Boolean             ' If true, then combines data points that have similar m/z values (within tolerance) when loading; tolerance is udtSICOptions.SICToleranceDa / udtSICOptions.CompressToleranceDivisorForDa (or divided by udtSICOptions.CompressToleranceDivisorForPPM if udtSICOptions.SICToleranceIsPPM=True)
-        Public CompressMSMSSpectraData As Boolean           ' If true, then combines data points that have similar m/z values (within tolerance) when loading; tolerance is udtBinningOptions.BinSize / udtSICOptions.CompressToleranceDivisorForDa
+        ''' <summary>
+        ''' If true, then combines data points that have similar m/z values (within tolerance) when loading
+        ''' Tolerance is udtSICOptions.SICToleranceDa / udtSICOptions.CompressToleranceDivisorForDa 
+        ''' (or divided by udtSICOptions.CompressToleranceDivisorForPPM if udtSICOptions.SICToleranceIsPPM=True)
+        ''' </summary>
+        Public CompressMSSpectraData As Boolean
 
-        Public CompressToleranceDivisorForDa As Double      ' When compressing spectra, udtSICOptions.SICTolerance and udtBinningOptions.BinSize will be divided by this value to determine the resolution to compress the data to
-        Public CompressToleranceDivisorForPPM As Double     ' If udtSICOptions.SICToleranceIsPPM is True, then this divisor is used instead of CompressToleranceDivisorForDa
+        ''' <summary>
+        ''' If true, then combines data points that have similar m/z values (within tolerance) when loading
+        ''' Tolerance is udtBinningOptions.BinSize / udtSICOptions.CompressToleranceDivisorForDa
+        ''' </summary>
+        Public CompressMSMSSpectraData As Boolean
+
+        ''' <summary>
+        ''' When compressing spectra, udtSICOptions.SICTolerance and udtBinningOptions.BinSize will be divided by this value 
+        ''' to determine the resolution to compress the data to
+        ''' </summary>
+        Public CompressToleranceDivisorForDa As Double
+
+        ''' <summary>
+        ''' If udtSICOptions.SICToleranceIsPPM is True, then this divisor is used instead of CompressToleranceDivisorForDa
+        ''' </summary>
+        Public CompressToleranceDivisorForPPM As Double
 
         ' The SIC is extended left and right until:
         '      1) the SIC intensity falls below IntensityThresholdAbsoluteMinimum, 
         '      2) the SIC intensity falls below the maximum value observed times IntensityThresholdFractionMax, 
         '   or 3) the distance exceeds MaxSICPeakWidthMinutesBackward or MaxSICPeakWidthMinutesForward
 
+        ''' <summary>
+        ''' Defaults to 3
+        ''' </summary>
+        Public MaxSICPeakWidthMinutesBackward As Single
 
-        Public MaxSICPeakWidthMinutesBackward As Single     ' 3
-        Public MaxSICPeakWidthMinutesForward As Single      ' 3
+        ''' <summary>
+        ''' Defaults to 3
+        ''' </summary>
+        Public MaxSICPeakWidthMinutesForward As Single
 
         Public SICPeakFinderOptions As MASICPeakFinder.clsMASICPeakFinder.udtSICPeakFinderOptionsType
         Public ReplaceSICZeroesWithMinimumPositiveValueFromMSData As Boolean
 
         Public SaveSmoothedData As Boolean
 
-        Public SimilarIonMZToleranceHalfWidth As Single         ' 0.1       m/z Tolerance for finding similar parent ions; full tolerance is +/- this value
-        Public SimilarIonToleranceHalfWidthMinutes As Single    ' 5         Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
-        Public SpectrumSimilarityMinimum As Single              ' 0.8
+        ''' <summary>
+        ''' m/z Tolerance for finding similar parent ions; full tolerance is +/- this value
+        ''' </summary>
+        ''' <remarks>Defaults to 0.1</remarks>
+        Public SimilarIonMZToleranceHalfWidth As Single
+
+        ''' <summary>
+        ''' Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
+        ''' </summary>
+        ''' <remarks>Defaults to 5</remarks>
+        Public SimilarIonToleranceHalfWidthMinutes As Single
+
+        ''' <summary>
+        ''' Defaults to 0.8
+        ''' </summary>
+        Public SpectrumSimilarityMinimum As Single
+
         Public Overrides Function ToString() As String
             If SICToleranceIsPPM Then
                 Return "SIC Tolerance: " & SICTolerance.ToString("0.00") & " ppm"
@@ -256,13 +320,30 @@ Public Class clsMASIC
     Private Structure udtSICStatsDetailsType
         Public SICDataCount As Integer
 
-        Public SICScanType As clsScanList.eScanTypeConstants            ' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
-        Public SICScanIndices() As Integer                  ' This array is necessary since SIMScan data uses non-adjacent survey scans
+        ''' <summary>
+        ''' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
+        ''' </summary>
+        Public SICScanType As clsScanList.eScanTypeConstants
 
-        Public SICScanNumbers() As Integer                  ' Populated as a convenience since necessary to pass to various functions
-        Public SICData() As Single                          ' SIC Abundances
-        Public SICMasses() As Double                        ' SIC Masses
+        ''' <summary>
+        ''' This array is necessary since SIMScan data uses non-adjacent survey scans
+        ''' </summary>
+        Public SICScanIndices() As Integer
 
+        ''' <summary>
+        ''' Populated as a convenience since necessary to pass to various functions
+        ''' </summary>
+        Public SICScanNumbers() As Integer
+
+        ''' <summary>
+        ''' SIC Abundances
+        ''' </summary>
+        Public SICData() As Single
+
+        ''' <summary>
+        ''' SIC Masses
+        ''' </summary>
+        Public SICMasses() As Double
 
         Public Overrides Function ToString() As String
             Return "SICDataCount: " & SICDataCount
@@ -294,8 +375,16 @@ Public Class clsMASIC
         Public BinnedDataStartX As Single
         Public BinSize As Single
         Public BinCount As Integer
-        Public BinnedIntensities() As Single                ' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX
-        Public BinnedIntensitiesOffset() As Single          ' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX + BinSize/2
+
+        ''' <summary>
+        ''' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX
+        ''' </summary>
+        Public BinnedIntensities() As Single
+
+        ''' <summary>
+        ''' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX + BinSize/2
+        ''' </summary>
+        Public BinnedIntensitiesOffset() As Single
 
         Public Overrides Function ToString() As String
             Return "BinCount: " & BinCount & ", BinSize: " & BinSize.ToString("0.0") & ", StartX: " & BinnedDataStartX.ToString("0.0")
@@ -303,15 +392,48 @@ Public Class clsMASIC
     End Structure
 
     Private Structure udtUniqueMZListType
+        ''' <summary>
+        ''' Average m/z
+        ''' </summary>
         Public MZAvg As Double
-        Public MaxIntensity As Single                   ' Highest intensity value of the similar parent ions
-        Public MaxPeakArea As Single                    ' Largest peak intensity value of the similar parent ions
-        Public ScanNumberMaxIntensity As Integer        ' Scan number of the parent ion with the highest intensity
-        Public ScanTimeMaxIntensity As Single           ' Elution time of the parent ion with the highest intensity
-        Public ParentIonIndexMaxIntensity As Integer    ' Pointer to an entry in .ParentIons()
-        Public ParentIonIndexMaxPeakArea As Integer     ' Pointer to an entry in .ParentIons()
+
+        ''' <summary>
+        ''' Highest intensity value of the similar parent ions
+        ''' </summary>
+        Public MaxIntensity As Single
+
+        ''' <summary>
+        ''' Largest peak intensity value of the similar parent ions
+        ''' </summary>
+        Public MaxPeakArea As Single
+
+        ''' <summary>
+        ''' Scan number of the parent ion with the highest intensity
+        ''' </summary>
+        Public ScanNumberMaxIntensity As Integer
+
+        ''' <summary>
+        ''' Elution time of the parent ion with the highest intensity
+        ''' </summary>
+        Public ScanTimeMaxIntensity As Single
+
+        ''' <summary>
+        ''' Pointer to an entry in .ParentIons()
+        ''' </summary>
+        Public ParentIonIndexMaxIntensity As Integer
+
+        ''' <summary>
+        ''' Pointer to an entry in .ParentIons()
+        ''' </summary>
+        Public ParentIonIndexMaxPeakArea As Integer
+
         Public MatchCount As Integer
-        Public MatchIndices() As Integer            ' Pointer to an entry in .ParentIons()
+
+        ''' <summary>
+        ''' Pointer to an entry in .ParentIons()
+        ''' </summary>
+        Public MatchIndices() As Integer
+
         Public Overrides Function ToString() As String
             Return "m/z avg: " & MZAvg & ", MatchCount: " & MatchCount
         End Function
@@ -323,6 +445,7 @@ Public Class clsMASIC
         Public IonUsed() As Boolean
         Public UniqueMZListCount As Integer
         Public UniqueMZList() As udtUniqueMZListType
+
         Public Overrides Function ToString() As String
             Return "IonInUseCount: " & IonInUseCount
         End Function
@@ -330,10 +453,24 @@ Public Class clsMASIC
 
     Public Structure udtCustomMZSearchSpecType
         Public MZ As Double
-        Public MZToleranceDa As Double               ' If 0, then uses the global search tolerance defined
-        Public ScanOrAcqTimeCenter As Single         ' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
-        Public ScanOrAcqTimeTolerance As Single      ' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanType = .Relative or ScanType = .AcquisitionTime; set to 0 to search the entire file for the given mass
+
+        ''' <summary>
+        ''' If 0, then uses the global search tolerance defined
+        ''' </summary>
+        Public MZToleranceDa As Double
+
+        ''' <summary>
+        ''' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
+        ''' </summary>
+        Public ScanOrAcqTimeCenter As Single
+
+        ''' <summary>
+        ''' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanType = .Relative or ScanType = .AcquisitionTime; set to 0 to search the entire file for the given mass
+        ''' </summary>
+        Public ScanOrAcqTimeTolerance As Single
+
         Public Comment As String
+
         Public Overrides Function ToString() As String
             Return "m/z: " & MZ.ToString("0.0000") & " �" & MZToleranceDa.ToString("0.0000")
         End Function
@@ -341,9 +478,21 @@ Public Class clsMASIC
 
     Private Structure udtCustomMZSearchListType
         Public ScanToleranceType As eCustomSICScanTypeConstants
-        Public ScanOrAcqTimeTolerance As Single                         ' This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute; it is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime; set to 0 to search the entire file for the given mass
+
+        ''' <summary>
+        ''' This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute
+        ''' It is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime
+        ''' Set to 0 to search the entire file for the given mass
+        ''' </summary>
+        Public ScanOrAcqTimeTolerance As Single
+
         Public CustomMZSearchValues() As udtCustomMZSearchSpecType
-        Public LimitSearchToCustomMZList As Boolean                     ' When True, then will only search for the m/z values listed in the custom m/z list
+
+        ''' <summary>
+        ''' When True, then will only search for the m/z values listed in the custom m/z list
+        ''' </summary>
+        Public LimitSearchToCustomMZList As Boolean
+
         Public RawTextMZList As String
         Public RawTextMZToleranceDaList As String
         Public RawTextScanOrAcqTimeCenterList As String
@@ -428,8 +577,29 @@ Public Class clsMASIC
 
     Public Structure udtReporterIonInfoType
         Public MZ As Double
+
         Public MZToleranceDa As Double
-        Public ContaminantIon As Boolean        ' Should be False for Reporter Ions and True for other ions, e.g. immonium loss from phenylalanine
+
+        ''' <summary>
+        ''' Should be False for Reporter Ions and True for other ions, e.g. immonium loss from phenylalanine
+        ''' </summary>
+        Public ContaminantIon As Boolean
+
+        ''' <summary>
+        ''' Signal/Noise ratio; only populated for FTMS MS2 spectra on Thermo instruments
+        ''' </summary>
+        Public SignalToNoise As Double
+
+        ''' <summary>
+        ''' Resolution; only populated for FTMS MS2 spectra on Thermo instruments
+        ''' </summary>
+        Public Resolution As Double
+
+        ''' <summary>
+        ''' m/z value for which the resolution and signal/noise value was computed
+        ''' Only populated for FTMS MS2 spectra on Thermo instruments
+        ''' </summary>
+        Public LabelDataMZ As Double
 
         Public Overrides Function ToString() As String
             Return "m/z: " & MZ.ToString("0.0000") & " �" & MZToleranceDa.ToString("0.0000")
@@ -449,15 +619,26 @@ Public Class clsMASIC
 
 #Region "Classwide Variables"
 
-    Private mSICOptions As udtSICOptionsType                            ' Set options through the Property Functions or by passing strParameterFilePath to ProcessFile()
-    Private mBinningOptions As clsCorrelation.udtBinningOptionsType     ' Binning options for MS/MS spectra; only applies to spectrum similarity testing
+    ''' <summary>
+    ''' Set options through the Property Functions or by passing strParameterFilePath to ProcessFile()
+    ''' </summary>
+    Private mSICOptions As udtSICOptionsType
+
+    ''' <summary>
+    ''' Binning options for MS/MS spectra; only applies to spectrum similarity testing
+    ''' </summary>
+    Private mBinningOptions As clsCorrelation.udtBinningOptionsType
+
     Private mMASICPeakFinder As MASICPeakFinder.clsMASICPeakFinder
 
     Private mCustomSICListFileName As String
     Private mCustomSICList As udtCustomMZSearchListType
 
-    ' Keys are strings of extended info names
-    ' values are the assigned ID value for the extended info name; the order of the values defines the appropriate output order for the names
+    ''' <summary>
+    ''' Keys are strings of extended info names
+    ''' Values are the assigned ID value for the extended info name
+    ''' </summary>
+    ''' <remarks>The order of the values defines the appropriate output order for the names</remarks>
     Private mExtendedHeaderInfo As List(Of KeyValuePair(Of String, Integer))
 
     Private mDatabaseConnectionString As String
@@ -468,35 +649,67 @@ Public Class clsMASIC
     Private mIncludeScanTimesInSICStatsFile As Boolean
     Private mFastExistingXMLFileTest As Boolean
 
-    Private mSkipMSMSProcessing As Boolean                      ' Using this will reduce memory usage, but not as much as when mSkipSICAndRawDataProcessing = True
-    Private mSkipSICAndRawDataProcessing As Boolean             ' Using this will drastically reduce memory usage since raw mass spec data is not retained
-    Private mExportRawDataOnly As Boolean                       ' When True, then will not create any SICs; automatically set to false if mSkipSICAndRawDataProcessing = True
+    ''' <summary>
+    ''' Using this will reduce memory usage, but not as much as when mSkipSICAndRawDataProcessing = True
+    ''' </summary>
+    Private mSkipMSMSProcessing As Boolean
+
+    ''' <summary>
+    ''' Using this will drastically reduce memory usage since raw mass spec data is not retained
+    ''' </summary>
+    Private mSkipSICAndRawDataProcessing As Boolean
+
+    ''' <summary>
+    ''' When True, then will not create any SICs; automatically set to false if mSkipSICAndRawDataProcessing = True
+    ''' </summary>
+    Private mExportRawDataOnly As Boolean
 
     Private mWriteDetailedSICDataFile As Boolean
     Private mWriteMSMethodFile As Boolean
     Private mWriteMSTuneFile As Boolean
 
     Private mWriteExtendedStats As Boolean
-    Private mWriteExtendedStatsIncludeScanFilterText As Boolean     ' When enabled, the the scan filter text will also be included in the extended stats file (e.g. ITMS + c NSI Full ms [300.00-2000.00] or ITMS + c NSI d Full ms2 756.98@35.00 [195.00-2000.00])
-    Private mWriteExtendedStatsStatusLog As Boolean                 ' Adds a large number of additional columns with information like voltage, current, temperature, pressure, and gas flow rate; if mStatusLogKeyNameFilterList contains any entries, then only the entries matching the specs in mStatusLogKeyNameFilterList will be saved
+
+    ''' <summary>
+    ''' When enabled, the the scan filter text will also be included in the extended stats file 
+    ''' (e.g. ITMS + c NSI Full ms [300.00-2000.00] or ITMS + c NSI d Full ms2 756.98@35.00 [195.00-2000.00])
+    ''' </summary>
+    Private mWriteExtendedStatsIncludeScanFilterText As Boolean
+
+    ''' <summary>
+    ''' Adds a large number of additional columns with information like voltage, current, temperature, pressure, and gas flow rate
+    ''' If mStatusLogKeyNameFilterList contains any entries, then only the entries matching the specs in mStatusLogKeyNameFilterList will be saved
+    ''' </summary>
+    Private mWriteExtendedStatsStatusLog As Boolean
+
     Private mConsolidateConstantExtendedHeaderValues As Boolean
 
-    ' Since there are so many values listed in the Status Log, use mStatusLogKeyNameFilterList to limit the items saved 
-    '  to only those matching the specs in mStatusLogKeyNameFilterList
-    ' When parsing the entries in mStatusLogKeyNameFilterList, if any part of the text in mStatusLogKeyNameFilterList() matches the status log key name, that key name is saved (key names are not case sensitive)
+    ''' <summary>
+    ''' Since there are so many values listed in the Status Log, this is used to limit the items saved to only those matching the specs in mStatusLogKeyNameFilterList
+    ''' </summary>
+    ''' <remarks>
+    ''' When parsing the entries in mStatusLogKeyNameFilterList, if any part of the text in mStatusLogKeyNameFilterList() matches the status log key name, 
+    ''' that key name is saved (key names are not case sensitive)
+    ''' </remarks>
     Private mStatusLogKeyNameFilterList() As String
 
     Private mWriteMRMDataList As Boolean
     Private mWriteMRMIntensityCrosstab As Boolean
 
-    Private mSuppressNoParentIonsError As Boolean                   ' If this is true, then an error will not be raised if the input file contains no parent ions or no survey scans
+    ''' <summary>
+    ''' If this is true, then an error will not be raised if the input file contains no parent ions or no survey scans
+    ''' </summary>
+    Private mSuppressNoParentIonsError As Boolean
 
     Private mRawDataExportOptions As udtRawDataExportOptionsType
 
     Private mReporterIonStatsEnabled As Boolean
     Private mReporterIonMassMode As eReporterIonMassModeConstants
 
-    ' When mReporterIonStatsEnabled = True, these variables will be populated with the m/z range of the reporter ions being processed
+    ''' <summary>
+    ''' When mReporterIonStatsEnabled = True, mMZIntensityFilterIgnoreRangeStart and mMZIntensityFilterIgnoreRangeEnd 
+    ''' will be populated with the m/z range of the reporter ions being processed
+    ''' </summary>
     Private mMZIntensityFilterIgnoreRangeStart As Double
     Private mMZIntensityFilterIgnoreRangeEnd As Double
 
@@ -504,8 +717,15 @@ Public Class clsMASIC
     Private mReporterIonApplyAbundanceCorrection As Boolean
     Private mReporterIonITraq4PlexCorrectionFactorType As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
 
+    ''' <summary>
+    ''' When true, observed m/z values of the reporter ions will be included in the _ReporterIons.txt file
+    ''' </summary>
     Private mReporterIonSaveObservedMasses As Boolean
-    Private mReporterIonSaveUncorrectedIntensities As Boolean       ' This is ignored if mReporterIonApplyAbundanceCorrection is False
+
+    ''' <summary>
+    ''' This is ignored if mReporterIonApplyAbundanceCorrection is False
+    ''' </summary>
+    Private mReporterIonSaveUncorrectedIntensities As Boolean
 
     Private mReporterIonCount As Integer
     Private mReporterIonInfo() As udtReporterIonInfoType
@@ -519,8 +739,16 @@ Public Class clsMASIC
     Private mCacheOptions As clsSpectraCache.udtSpectrumCacheOptionsType
     Private mMASICStatusFilename As String = DEFAULT_MASIC_STATUS_FILE_NAME
 
-    Private mProcessingStep As eProcessingStepConstants         ' Current processing step
-    Private mSubtaskProcessingStepPct As Short                         ' Percent completion for the current sub task
+    ''' <summary>
+    ''' Current processing step
+    ''' </summary>
+    Private mProcessingStep As eProcessingStepConstants
+
+    ''' <summary>
+    ''' Percent completion for the current sub task
+    ''' </summary>
+    Private mSubtaskProcessingStepPct As Short
+
     Private mSubtaskDescription As String = String.Empty
 
     Private mLocalErrorCode As eMasicErrorCodes
@@ -532,11 +760,12 @@ Public Class clsMASIC
     Private mScanStats As List(Of DSSummarizer.clsScanStatsEntry)
     Private mDatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType
 
-    Private WithEvents mXcaliburAccessor As XRawFileIO
-
-    ' Note: Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
-    ' Use ProgressSubtaskChanged when updating the sub task progress
+    ''' <summary>
+    ''' Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
+    ''' Use ProgressSubtaskChanged when updating the sub task progress
+    ''' </summary>
     Public Event ProgressSubtaskChanged()
+
     Public Event ProgressResetKeypressAbort()
 
 #End Region
@@ -886,7 +1115,10 @@ Public Class clsMASIC
         End Set
     End Property
 
-    ' This property is included for historical reasons since SIC tolerance can now be Da or PPM
+    ''' <summary>
+    ''' This property is included for historical reasons since SIC tolerance can now be Da or PPM
+    ''' </summary>
+    ''' <returns></returns>
     Public Property SICToleranceDa() As Double
         Get
             If mSICOptions.SICToleranceIsPPM Then
