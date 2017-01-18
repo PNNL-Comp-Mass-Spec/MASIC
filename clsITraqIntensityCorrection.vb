@@ -117,7 +117,7 @@ Public Class clsITraqIntensityCorrection
 
     End Function
 
-    Public Function ApplyCorrection(ByRef dblReporterIonIntensites() As Double) As Boolean
+    Public Function ApplyCorrection(dblReporterIonIntensites() As Double) As Boolean
 
         Dim dblCorrectedIntensities() As Double
 

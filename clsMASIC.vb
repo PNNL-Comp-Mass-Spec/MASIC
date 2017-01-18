@@ -39,7 +39,7 @@ Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
 
     Public Sub New()
-        MyBase.mFileDate = "June 13, 2016"
+        MyBase.mFileDate = "January 16, 2017"
         InitializeVariables()
     End Sub
 
@@ -184,7 +184,6 @@ Public Class clsMASIC
         SICDataFile = 25
     End Enum
 
-    ' ToDo: Add XML
     Public Enum eExportRawDataFileFormatConstants
         PEKFile = 0
         CSVFile = 1
@@ -472,7 +471,7 @@ Public Class clsMASIC
         Public Comment As String
 
         Public Overrides Function ToString() As String
-            Return "m/z: " & MZ.ToString("0.0000") & " ï¿½" & MZToleranceDa.ToString("0.0000")
+            Return "m/z: " & MZ.ToString("0.0000") & " ±" & MZToleranceDa.ToString("0.0000")
         End Function
     End Structure
 
@@ -602,7 +601,7 @@ Public Class clsMASIC
         Public LabelDataMZ As Double
 
         Public Overrides Function ToString() As String
-            Return "m/z: " & MZ.ToString("0.0000") & " ï¿½" & MZToleranceDa.ToString("0.0000")
+            Return "m/z: " & MZ.ToString("0.0000") & " ±" & MZToleranceDa.ToString("0.0000")
         End Function
     End Structure
 
@@ -4597,8 +4596,8 @@ Public Class clsMASIC
                                 ' Copy the Total Scan Intensity to .TotalIonIntensity
                                 .TotalIonIntensity = CSng(dblScanTotalIntensity)
 
-                                .FragScanInfo.ParentIonInfoIndex = -1 _
                                 ' Survey scans typically lead to multiple parent ions; we do not record them here
+                                .FragScanInfo.ParentIonInfoIndex = -1
 
                                 .ScanHeaderText = String.Empty
                                 .ScanTypeName = "MS"
@@ -4831,7 +4830,6 @@ Public Class clsMASIC
 
                             .ScanHeaderText = String.Empty
                             .ScanTypeName = "MSn"
-
                         End With
                         .FragScans.Add(newFragScan)
 
@@ -6001,8 +5999,8 @@ Public Class clsMASIC
       currentScan As clsScanInfo,
       dblMZStart As Double,
       dblMZEnd As Double,
-      ByRef dblBestMatchMZ As Double,
-      ByRef sngMatchIntensity As Single) As Boolean
+      <Out()> ByRef dblBestMatchMZ As Double,
+      <Out()> ByRef sngMatchIntensity As Single) As Boolean
 
         ' Searches currentScan.IonsMZ for the maximum value between dblMZStart and dblMZEnd
         ' If a match is found, then updates dblBestMatchMZ to the m/z of the match, updates sngMatchIntensity to its intensity,
@@ -6014,6 +6012,8 @@ Public Class clsMASIC
 
         Dim intPoolIndex As Integer
         Dim blnSuccess As Boolean
+        dblBestMatchMZ = 0
+        sngMatchIntensity = 0
 
         Try
             If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
@@ -6039,8 +6039,8 @@ Public Class clsMASIC
       intIonCount As Integer,
       dblMZStart As Double,
       dblMZEnd As Double,
-      ByRef dblBestMatchMZ As Double,
-      ByRef sngMatchIntensity As Single) As Boolean
+      <Out()> ByRef dblBestMatchMZ As Double,
+      <Out()> ByRef sngMatchIntensity As Single) As Boolean
 
         ' Searches dblMZList for the maximum value between dblMZStart and dblMZEnd
         ' If a match is found, then updates dblBestMatchMZ to the m/z of the match, updates sngMatchIntensity to its intensity,
@@ -6361,16 +6361,18 @@ Public Class clsMASIC
     ''' <param name="udtSICOptions"></param>
     ''' <param name="scanList"></param>
     ''' <param name="objSpectraCache"></param>
-    ''' <param name="strInputFileName"></param>
+    ''' <param name="strInputFilePathFull">Full path to the input file</param>
     ''' <param name="strOutputFolderPath"></param>
+    ''' <param name="saveObservedMasses"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Private Function FindReporterIons(
       ByRef udtSICOptions As udtSICOptionsType,
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
-      strInputFileName As String,
-      strOutputFolderPath As String) As Boolean
+      strInputFilePathFull As String,
+      strOutputFolderPath As String,
+      saveObservedMasses As Boolean) As Boolean
 
         Const cColDelimiter As Char = ControlChars.Tab
 
@@ -7206,8 +7208,8 @@ Public Class clsMASIC
 
         Dim strErrorMessage As String
 
-        If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError OrElse
-           MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError Then
+        If MyBase.ErrorCode = eProcessFilesErrorCodes.LocalizedError OrElse
+           MyBase.ErrorCode = eProcessFilesErrorCodes.NoError Then
             Select Case mLocalErrorCode
                 Case eMasicErrorCodes.NoError
                     strErrorMessage = String.Empty
@@ -7345,6 +7347,7 @@ Public Class clsMASIC
 
         surveyScan.LowMass = 0
         surveyScan.HighMass = 0
+        surveyScan.IsFTMS = False
 
         ' Store the collision mode and possibly the scan filter text
         surveyScan.FragScanInfo.CollisionMode = String.Empty
@@ -7538,7 +7541,7 @@ Public Class clsMASIC
     Private Function GetProcessMemoryUsageMB() As Single
 
         ' Obtain a handle to the current process
-        Dim objProcess = Diagnostics.Process.GetCurrentProcess()
+        Dim objProcess = Process.GetCurrentProcess()
 
         ' The WorkingSet is the total physical memory usage 
         Return CSng(objProcess.WorkingSet64 / 1024 / 1024)
@@ -7776,9 +7779,7 @@ Public Class clsMASIC
     End Function
 
     Private Function GetScanByMasterScanIndex(scanList As clsScanList, intMasterScanIndex As Integer) As clsScanInfo
-        Dim udtCurrentScan As clsScanInfo
-
-        udtCurrentScan = New clsScanInfo()
+        Dim currentScan = New clsScanInfo()
         If Not scanList.MasterScanOrder Is Nothing Then
             If intMasterScanIndex < 0 Then
                 intMasterScanIndex = 0
@@ -7789,16 +7790,16 @@ Public Class clsMASIC
             Select Case scanList.MasterScanOrder(intMasterScanIndex).ScanType
                 Case clsScanList.eScanTypeConstants.SurveyScan
                     ' Survey scan
-                    udtCurrentScan = scanList.SurveyScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                    currentScan = scanList.SurveyScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
                 Case clsScanList.eScanTypeConstants.FragScan
                     ' Frag Scan
-                    udtCurrentScan = scanList.FragScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                    currentScan = scanList.FragScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
                 Case Else
                     ' Unkown scan type
             End Select
         End If
 
-        Return udtCurrentScan
+        Return currentScan
 
     End Function
 
@@ -7869,8 +7870,7 @@ Public Class clsMASIC
 
     Private Function GetTotalProcessingTimeSec() As Single
 
-        Dim objProcess As Diagnostics.Process
-        objProcess = Diagnostics.Process.GetCurrentProcess()
+        Dim objProcess = Process.GetCurrentProcess()
 
         Return CSng(objProcess.TotalProcessorTime().TotalSeconds)
 
@@ -8361,7 +8361,7 @@ Public Class clsMASIC
                 strParameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
                 If Not File.Exists(strParameterFilePath) Then
                     LogErrors("LoadParameterFileSettings", "Parameter file not found: " & strParameterFilePath, Nothing, True, False)
-                    MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.ParameterFileNotFound)
+                    MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.ParameterFileNotFound)
                     Return False
                 End If
             End If
@@ -8453,7 +8453,7 @@ Public Class clsMASIC
                         Else
                             ShowErrorMessage(strErrorMessage)
                         End If
-                        MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
+                        MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
                         Return False
                     Else
                         ' SIC Options
@@ -8537,7 +8537,7 @@ Public Class clsMASIC
                             ShowErrorMessage(strErrorMessage)
                         End If
 
-                        MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
+                        MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
                         Return False
                     Else
                         Me.BinStartX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX", Me.BinStartX)
@@ -8598,7 +8598,7 @@ Public Class clsMASIC
 
                         strScanCommentList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
 
-                        blnSuccess = ParseCustomSICList(strMZList, strMZToleranceDaList, strScanCenterList, strScanToleranceList, strScanCommentList, strParameterFilePath)
+                        blnSuccess = ParseCustomSICList(strMZList, strMZToleranceDaList, strScanCenterList, strScanToleranceList, strScanCommentList)
                     End If
 
                     If Not blnSuccess Then
@@ -8885,8 +8885,7 @@ Public Class clsMASIC
       strMZToleranceDaList As String,
       strScanCenterList As String,
       strScanToleranceList As String,
-      strScanCommentList As String,
-      strParameterFilePath As String) As Boolean
+      strScanCommentList As String) As Boolean
 
         Dim strDelimList = New Char() {","c, ControlChars.Tab}
 
@@ -9414,7 +9413,6 @@ Public Class clsMASIC
         Dim blnSuccess As Boolean
         Dim intMaxAllowableIonCount As Integer
 
-        Static intSpectraStored As Integer = 0
         Static intSpectraFoundExceedingMaxIonCount As Integer = 0
         Static intMaxIonCountReported As Integer = 0
 
@@ -9526,8 +9524,8 @@ Public Class clsMASIC
 
             MyBase.ShowErrorMessage(mStatusMessage)
 
-            If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError Then
-                MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidParameterFile)
+            If MyBase.ErrorCode = eProcessFilesErrorCodes.NoError Then
+                MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
             End If
             UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
 
@@ -9545,7 +9543,7 @@ Public Class clsMASIC
                 LogMessage("ProcessFile: Reading custom SIC values file: " & Me.CustomSICListFileName)
                 blnSuccess = LoadCustomSICListFromFile(Me.CustomSICListFileName)
                 If Not blnSuccess Then
-                    If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.UnspecifiedError)
+                    If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.UnspecifiedError)
                     Exit Try
                 End If
             End If
@@ -9556,7 +9554,7 @@ Public Class clsMASIC
 
             If strInputFilePath Is Nothing OrElse strInputFilePath.Length = 0 Then
                 ShowErrorMessage("Input file name is empty")
-                MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.InvalidInputFilePath)
+                MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidInputFilePath)
                 Exit Try
             End If
 
@@ -9583,7 +9581,7 @@ Public Class clsMASIC
             End If
 
             If Not blnSuccess Then
-                If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.FilePathError)
+                If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.FilePathError)
                 Exit Try
             End If
 
@@ -9828,7 +9826,7 @@ Public Class clsMASIC
 
                     If mReporterIonStatsEnabled Then
                         ' Look for Reporter Ions in the Fragmentation spectra
-                        FindReporterIons(udtSICOptions, scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                        FindReporterIons(udtSICOptions, scanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath, mReporterIonSaveObservedMasses)
                     End If
 
                     '---------------------------------------------------------
@@ -11423,7 +11421,6 @@ Public Class clsMASIC
 
         Dim intNonConstantHeaderIDs() As Integer = Nothing
 
-        Dim udtCurrentScan As clsScanInfo
         Try
             SetSubtaskProcessingStepPct(0, "Saving extended scan stats to flat file")
 
@@ -11457,9 +11454,9 @@ Public Class clsMASIC
 
                 For intScanIndex = 0 To scanList.MasterScanOrderCount - 1
 
-                    udtCurrentScan = GetScanByMasterScanIndex(scanList, intScanIndex)
+                    Dim currentScan = GetScanByMasterScanIndex(scanList, intScanIndex)
 
-                    Dim strOutLine = ConcatenateExtendedStats(intNonConstantHeaderIDs, udtSICOptions.DatasetNumber, udtCurrentScan.ScanNumber, udtCurrentScan.ExtendedHeaderInfo, cColDelimiter)
+                    Dim strOutLine = ConcatenateExtendedStats(intNonConstantHeaderIDs, udtSICOptions.DatasetNumber, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo, cColDelimiter)
                     srOutFile.WriteLine(strOutLine)
 
                     If intScanIndex Mod 100 = 0 Then
@@ -12798,11 +12795,11 @@ Public Class clsMASIC
             mLocalErrorCode = eNewErrorCode
 
             If eNewErrorCode = eMasicErrorCodes.NoError Then
-                If MyBase.ErrorCode = clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError Then
-                    MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.NoError)
+                If MyBase.ErrorCode = eProcessFilesErrorCodes.LocalizedError Then
+                    MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.NoError)
                 End If
             Else
-                MyBase.SetBaseClassErrorCode(clsProcessFilesBaseClass.eProcessFilesErrorCodes.LocalizedError)
+                MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.LocalizedError)
             End If
         End If
 
@@ -13207,36 +13204,41 @@ Public Class clsMASIC
 
     End Function
 
+    ''' <summary>
+    ''' When blnReturnMax is false, determine the sum of the data within the search mass tolerance
+    ''' When blnReturnMaxis true, determine the maximum of the data within the search mass tolerance
+    ''' </summary>
+    ''' <param name="objMSSpectrum"></param>
+    ''' <param name="dblSearchMZ"></param>
+    ''' <param name="dblSearchToleranceHalfWidth"></param>
+    ''' <param name="intIonMatchCount"></param>
+    ''' <param name="dblClosestMZ"></param>
+    ''' <param name="blnReturnMax"></param>
+    ''' <returns>The sum or maximum of the matching data; 0 if no matches</returns>
+    ''' <remarks>
+    ''' Note that this function performs a recursive search of objMSSpectrum.IonsMZ
+    ''' It is therefore very efficient regardless of the number of data points in the spectrum
+    ''' For sparse spectra, you can alternatively use FindMaxValueInMZRange
+    ''' </remarks>
     Private Function AggregateIonsInRange(
       objMSSpectrum As clsMSSpectrum,
       dblSearchMZ As Double,
       dblSearchToleranceHalfWidth As Double,
-      ByRef intIonMatchCount As Integer,
-      ByRef dblClosestMZ As Double,
+      <Out()> ByRef intIonMatchCount As Integer,
+      <Out()> ByRef dblClosestMZ As Double,
       blnReturnMax As Boolean) As Single
 
-        ' Returns the sum of the data within the search mass tolerance (if blnReturnMax = False)
-        ' Returns the maximum of the data within the search mass tolerance (if blnReturnMax = True)
-        ' Returns intIonMatchCount = 0 if no matches
-        '
-        ' Note that this function performs a recursive search of objMSSpectrum.IonsMZ; it is therefore very efficient regardless
-        '  of the number of data points in the spectrum
-        ' For sparse spectra, you can alternatively use FindMaxValueInMZRange
-
-        Dim intIonIndex As Integer
-        Dim intIndexFirst, intIndexLast As Integer
-        Dim sngIonSumOrMax As Single
-        Dim dblTestDifference As Double
-        Dim dblSmallestDifference As Double
+        intIonMatchCount = 0
+        dblClosestMZ = 0
+        Dim sngIonSumOrMax As Single = 0
 
         Try
 
-            sngIonSumOrMax = 0
-            intIonMatchCount = 0
-            dblClosestMZ = 0
-            dblSmallestDifference = Double.MaxValue
+
+            Dim dblSmallestDifference = Double.MaxValue
 
             If Not objMSSpectrum.IonsMZ Is Nothing AndAlso objMSSpectrum.IonCount > 0 Then
+                Dim intIndexFirst, intIndexLast As Integer
                 If SumIonsFindValueInRange(objMSSpectrum.IonsMZ, objMSSpectrum.IonCount, dblSearchMZ, dblSearchToleranceHalfWidth, intIndexFirst, intIndexLast) Then
                     For intIonIndex = intIndexFirst To intIndexLast
                         If blnReturnMax Then
@@ -13249,7 +13251,7 @@ Public Class clsMASIC
                             sngIonSumOrMax += objMSSpectrum.IonsIntensity(intIonIndex)
                         End If
 
-                        dblTestDifference = Math.Abs(objMSSpectrum.IonsMZ(intIonIndex) - dblSearchMZ)
+                        Dim dblTestDifference = Math.Abs(objMSSpectrum.IonsMZ(intIonIndex) - dblSearchMZ)
                         If dblTestDifference < dblSmallestDifference Then
                             dblSmallestDifference = dblTestDifference
                             dblClosestMZ = objMSSpectrum.IonsMZ(intIonIndex)
@@ -13272,8 +13274,8 @@ Public Class clsMASIC
       intDataCount As Integer,
       dblSearchValue As Double,
       dblToleranceHalfWidth As Double,
-      Optional ByRef intMatchIndexStart As Integer = 0,
-      Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
+      <Out()> ByRef intMatchIndexStart As Integer,
+      <Out()> ByRef intMatchIndexEnd As Integer) As Boolean
 
         ' Searches DataDouble for dblSearchValue with a tolerance of +/-dblToleranceHalfWidth
         ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
@@ -13800,14 +13802,23 @@ Public Class clsMASIC
         End If
 
         Try
-            Dim objXRawAccess As New XRawFileIO
+            Dim objXRawAccess As New XRawFileIO()
+            Dim isValid = objXRawAccess.IsMSFileReaderInstalled()
 
-            blnValidationSaved = objXRawAccess.CheckFunctionality()
+            If isValid Then
+                blnValidationSaved = True
+                Return True
+            Else
+                ShowErrorMessage("MSFileReader was not found; Thermo .raw files cannot be read.  Download the MSFileReader installer " &
+                                 "by creating an account at https://thermo.flexnetoperations.com/control/thmo/login , " &
+                                 "then logging in and choosing 'Utility Software'")
+                Return False
+            End If
+
         Catch ex As Exception
             blnValidationSaved = False
+            Return False
         End Try
-
-        Return blnValidationSaved
 
     End Function
 
@@ -13846,7 +13857,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub WriteDecon2LSIsosFileEntry(
-      ByRef srIsosOutFile As StreamWriter,
+      srIsosOutFile As StreamWriter,
       intScanNumber As Integer,
       intCharge As Integer,
       sngIntensity As Single,
@@ -13920,7 +13931,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub WriteDecon2LSScanFileEntry(
-      ByRef srScanInfoOutFile As StreamWriter,
+      srScanInfoOutFile As StreamWriter,
       currentScan As clsScanInfo,
       intScanNumber As Integer,
       intMSLevel As Integer,
