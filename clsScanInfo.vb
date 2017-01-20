@@ -90,7 +90,7 @@ Public Class clsScanInfo
     Public Property MRMScanInfo As clsMRMScanInfo
 
     ''' <summary>
-    ''' Keys are ID values pointing to mExtendedHeaderInfo (where the name is defined); values are the string or numeric values for the settings
+    ''' Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
     ''' </summary>
     Public ReadOnly Property ExtendedHeaderInfo As Dictionary(Of Integer, String)
 

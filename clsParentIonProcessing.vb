@@ -321,7 +321,7 @@ Public Class clsParentIonProcessing
       intParentIonIndex2 As Integer,
       binningOptions As clsBinningOptions,
       noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
-      dataImportUtilities As clsDataImport) As Single
+      dataImportUtilities As DataInput.clsDataImport) As Single
 
         ' Compare the fragmentation spectra for the two parent ions
         ' Returns the highest similarity score (ranging from 0 to 1)
@@ -565,7 +565,7 @@ Public Class clsParentIonProcessing
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       masicOptions As clsMASICOptions,
-      dataImportUtilities As clsDataImport,
+      dataImportUtilities As DataInput.clsDataImport,
       ByRef intIonUpdateCount As Integer) As Boolean
 
         ' Look for parent ions that have similar m/z values and are nearby one another in time
@@ -797,8 +797,6 @@ Public Class clsParentIonProcessing
                     Exit Do
                 End If
 
-                UpdateStatusFile()
-
                 If intParentIonIndex Mod 100 = 0 Then
                     If DateTime.UtcNow.Subtract(dtLastLogTime).TotalSeconds >= 10 OrElse intParentIonIndex Mod 500 = 0 Then
                         ReportMessage("Parent Ion Index: " & intParentIonIndex.ToString)
@@ -852,7 +850,7 @@ Public Class clsParentIonProcessing
       scanList As clsScanList,
       ByRef udtFindSimilarIonsData As udtFindSimilarIonsDataType,
       masicOptions As clsMASICOptions,
-      dataImportUtilities As clsDataImport,
+      dataImportUtilities As DataInput.clsDataImport,
       ByRef objSearchRange As clsSearchRange)
 
         Dim intMatchIndex As Integer

@@ -22,8 +22,6 @@ Option Strict On
 ' SOFTWARE.  This notice including this sentence must appear on any copies of 
 ' this computer software.
 
-Imports System.Windows.Forms
-Imports MASIC.clsMASIC
 Imports MASICPeakFinder.clsMASICPeakFinder
 
 Public Class frmMain
@@ -917,7 +915,7 @@ Public Class frmMain
                         If intRowsAlreadyPresent = 1 Then
                             strMessage = "1 row of thresholds was"
                         Else
-                            strMessage = intRowsAlreadyPresent.ToString & " rows of thresholds were"
+                            strMessage = intRowsAlreadyPresent.ToString() & " rows of thresholds were"
                         End If
 
                         Windows.Forms.MessageBox.Show(strMessage & " already present in the table; duplicate rows are not allowed.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -927,7 +925,7 @@ Public Class frmMain
                         If intRowsSkipped = 1 Then
                             strMessage = "1 row was skipped because it"
                         Else
-                            strMessage = intRowsSkipped.ToString & " rows were skipped because they"
+                            strMessage = intRowsSkipped.ToString() & " rows were skipped because they"
                         End If
 
                         Windows.Forms.MessageBox.Show(strMessage & " didn't contain two columns of numeric data.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -1041,7 +1039,7 @@ Public Class frmMain
 
                     If blnSuccess Then
                         ' Grab the status message, but insert a carriage return directly after "in folder:"
-                        Windows.Forms.MessageBox.Show(.StatusMessage.Replace("in folder:", "in folder:" & ControlChars.NewLine) & ControlChars.NewLine & "Elapsed time: " & Math.Round(DateTime.UtcNow.Subtract(dtStartTime).TotalSeconds, 2).ToString & " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Windows.Forms.MessageBox.Show(.StatusMessage.Replace("in folder:", "in folder:" & ControlChars.NewLine) & ControlChars.NewLine & "Elapsed time: " & Math.Round(DateTime.UtcNow.Subtract(dtStartTime).TotalSeconds, 2).ToString() & " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information)
                     Else
                         Windows.Forms.MessageBox.Show("Error analyzing input file with MASIC: " & ControlChars.NewLine & .GetErrorMessage() & ControlChars.NewLine & .StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                     End If
@@ -1495,7 +1493,7 @@ Public Class frmMain
             .SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.25")
             .SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter")
 
-            .SetToolTip(chkRefineReportedParentIonMZ, "If enabled, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / " & DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA.ToString & "); will update the reported m/z value to the one found")
+            .SetToolTip(chkRefineReportedParentIonMZ, "If enabled, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / " & DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA.ToString() & "); will update the reported m/z value to the one found")
 
             .SetToolTip(txtStatusLogKeyNameFilterList, "Enter a comma and/or NewLine separated list of Status Log Key names to match (will match any part of the key name to the text you enter).  Leave blank to include all Status Log entries.")
         End With

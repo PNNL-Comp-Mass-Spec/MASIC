@@ -1,8 +1,15 @@
 ﻿Public Class clsScanTracking
     Inherits clsEventNotifier
 
+#Region "Properties"
+    Public ReadOnly Property ScanStats As List(Of DSSummarizer.clsScanStatsEntry)
+#End Region
+
+#Region "Classwide variables"
     Private ReadOnly mReporterIons As clsReporterIons
     Private ReadOnly mPeakFinder As MASICPeakFinder.clsMASICPeakFinder
+
+#End Region
 
     ''' <summary>
     ''' Constructor
@@ -12,96 +19,11 @@
     Public Sub New(reporterIons As clsReporterIons, peakfinder As MASICPeakFinder.clsMASICPeakFinder)
         mReporterIons = reporterIons
         mPeakFinder = peakfinder
+
+        ScanStats = New List(Of DSSummarizer.clsScanStatsEntry)
     End Sub
 
-    Private Function AddFakeSurveyScan(scanList As clsScanList) As Integer
-        Const intScanNumber = 0
-        Const sngScanTime As Single = 0
-
-        Return AddFakeSurveyScan(scanList, intScanNumber, sngScanTime)
-    End Function
-
-    ''' <summary>
-    ''' Adds a "fake" survey scan with the given scan number and scan time
-    ''' </summary>
-    ''' <param name="scanList"></param>
-    ''' <param name="scanNumber"></param>
-    ''' <param name="scanTime"></param>
-    ''' <returns>The index in scanList.SurveyScans() at which the new scan was added</returns>
-    Private Function AddFakeSurveyScan(
-      scanList As clsScanList,
-      scanNumber As Integer,
-      scanTime As Single) As Integer
-
-        Dim surveyScan = GetFakeSurveyScan(scanNumber, scanTime)
-
-        Dim intSurveyScanIndex = scanList.SurveyScans.Count
-
-        scanList.SurveyScans.Add(surveyScan)
-
-        AddMasterScanEntry(scanList, clsScanList.eScanTypeConstants.SurveyScan, intSurveyScanIndex)
-
-        Return intSurveyScanIndex
-    End Function
-
-    Private Sub AddMasterScanEntry(scanList As clsScanList, eScanType As clsScanList.eScanTypeConstants, intScanIndex As Integer)
-        ' Adds a new entry to .MasterScanOrder using an existing entry in scanList.SurveyScans() or scanList.FragScans()
-
-        If eScanType = clsScanList.eScanTypeConstants.SurveyScan Then
-            If scanList.SurveyScans.Count > 0 AndAlso intScanIndex < scanList.SurveyScans.Count Then
-                AddMasterScanEntry(scanList, eScanType, intScanIndex, scanList.SurveyScans(intScanIndex).ScanNumber, scanList.SurveyScans(intScanIndex).ScanTime)
-            Else
-                ' This code shouldn't normally be reached
-                ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Survey ScanIndex {intScanIndex}: index is out of range")
-                AddMasterScanEntry(scanList, eScanType, intScanIndex, 0, 0)
-            End If
-
-        ElseIf eScanType = clsScanList.eScanTypeConstants.FragScan Then
-            If scanList.FragScans.Count > 0 AndAlso intScanIndex < scanList.FragScans.Count Then
-                AddMasterScanEntry(scanList, eScanType, intScanIndex, scanList.FragScans(intScanIndex).ScanNumber, scanList.FragScans(intScanIndex).ScanTime)
-            Else
-                ' This code shouldn't normally be reached
-                AddMasterScanEntry(scanList, eScanType, intScanIndex, 0, 0)
-                ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Frag ScanIndex {intScanIndex}: index is out of range")
-            End If
-
-        Else
-            ' Unknown type; cannot add
-            ReportError("AddMasterScanEntry", "Programming error: unknown value for eScanType: " & eScanType, Nothing, True, False)
-        End If
-
-    End Sub
-
-    Private Sub AddMasterScanEntry(
-       scanList As clsScanList,
-       eScanType As clsScanList.eScanTypeConstants,
-       intScanIndex As Integer,
-       intScanNumber As Integer,
-       sngScanTime As Single)
-
-        Dim initialScanCount = scanList.MasterScanOrderCount
-
-        If scanList.MasterScanOrder Is Nothing Then
-            ReDim scanList.MasterScanOrder(99)
-            ReDim scanList.MasterScanNumList(99)
-            ReDim scanList.MasterScanTimeList(99)
-        ElseIf initialScanCount >= scanList.MasterScanOrder.Length Then
-            ReDim Preserve scanList.MasterScanOrder(initialScanCount + 100)
-            ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrder.Length - 1)
-            ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrder.Length - 1)
-        End If
-
-        scanList.MasterScanOrder(initialScanCount).ScanType = eScanType
-        scanList.MasterScanOrder(initialScanCount).ScanIndexPointer = intScanIndex
-
-        scanList.MasterScanNumList(initialScanCount) = intScanNumber
-        scanList.MasterScanTimeList(initialScanCount) = sngScanTime
-
-        scanList.MasterScanOrderCount += 1
-
-    End Sub
-
-    Private Function CheckScanInRange(
+    Public Function CheckScanInRange(
       intScanNumber As Integer,
       dblRetentionTime As Double,
       sicOptions As clsSICOptions) As Boolean
@@ -288,34 +210,6 @@
 
     End Sub
 
-    Private Function GetFakeSurveyScan(scanNumber As Integer, scanTime As Single) As clsScanInfo
-
-        Dim surveyScan = New clsScanInfo()
-        surveyScan.ScanNumber = scanNumber
-        surveyScan.ScanTime = scanTime
-        surveyScan.ScanHeaderText = "Full ms"
-        surveyScan.ScanTypeName = "MS"
-
-        surveyScan.BasePeakIonMZ = 0
-        surveyScan.BasePeakIonIntensity = 0
-        surveyScan.FragScanInfo.ParentIonInfoIndex = -1                        ' Survey scans typically lead to multiple parent ions; we do not record them here
-        surveyScan.TotalIonIntensity = 0
-
-        surveyScan.ZoomScan = False
-        surveyScan.SIMScan = False
-        surveyScan.MRMScanType = ThermoRawFileReader.MRMScanTypeConstants.NotMRM
-
-        surveyScan.LowMass = 0
-        surveyScan.HighMass = 0
-        surveyScan.IsFTMS = False
-
-        ' Store the collision mode and possibly the scan filter text
-        surveyScan.FragScanInfo.CollisionMode = String.Empty
-
-        Return surveyScan
-
-    End Function
-
     Public Function ProcessAndStoreSpectrum(
       scanInfo As clsScanInfo,
       objSpectraCache As clsSpectraCache,
@@ -379,7 +273,7 @@
                     ' In addition, display a new message every time a new max value is encountered
                     If intSpectraFoundExceedingMaxIonCount <= 10 OrElse objMSSpectrum.IonCount > intMaxIonCountReported Then
                         Console.WriteLine()
-                        Console.WriteLine("Note: Scan " & scanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; will only retain " & intMaxAllowableIonCount & " (trimmed " & intSpectraFoundExceedingMaxIonCount.ToString & " spectra)")
+                        Console.WriteLine("Note: Scan " & scanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; will only retain " & intMaxAllowableIonCount & " (trimmed " & intSpectraFoundExceedingMaxIonCount.ToString() & " spectra)")
 
                         intMaxIonCountReported = objMSSpectrum.IonCount
                     End If
@@ -399,7 +293,7 @@
             End If
 
         Catch ex As Exception
-            ReportError("ProcessAndStoreSpectrum", "Error in ProcessAndStoreSpectrum (LastKnownLocation: " & strLastKnownLocation & ")", ex, True, True, clsMASIC.eMasicErrorCodes.InputFileDataReadError)
+            ReportError("ProcessAndStoreSpectrum", "Error in ProcessAndStoreSpectrum (LastKnownLocation: " & strLastKnownLocation & ")", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
         End Try
 
         Return blnSuccess

@@ -416,7 +416,7 @@ Public Class clsBinarySearch
 
             srOutFile.WriteLine("Data_Index" & ControlChars.Tab & "Data_Value")
             For intIndex = 0 To intDataList.Length - 1
-                srOutFile.WriteLine(intIndex.ToString & ControlChars.Tab & intDataList(intIndex).ToString)
+                srOutFile.WriteLine(intIndex.ToString() & ControlChars.Tab & intDataList(intIndex).ToString)
             Next intIndex
 
             srOutFile.WriteLine()
@@ -519,7 +519,7 @@ Public Class clsBinarySearch
 
             srOutFile.WriteLine("Data_Index" & ControlChars.Tab & "Data_Value")
             For intIndex = 0 To dblDataList.Length - 1
-                srOutFile.WriteLine(intIndex.ToString & ControlChars.Tab & dblDataList(intIndex).ToString)
+                srOutFile.WriteLine(intIndex.ToString() & ControlChars.Tab & dblDataList(intIndex).ToString)
             Next intIndex
 
             srOutFile.WriteLine()

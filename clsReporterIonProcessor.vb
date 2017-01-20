@@ -1,4 +1,5 @@
-﻿Imports ThermoRawFileReader
+﻿Imports MASIC.clsMASIC
+Imports ThermoRawFileReader
 
 Public Class clsReporterIonProcessor
     Inherits clsEventNotifier
@@ -222,7 +223,7 @@ Public Class clsReporterIonProcessor
             Return True
 
         Catch ex As Exception
-            ReportError("FindReporterIons", "Error writing the reporter ions to" & GetFilePathPrefixChar() & outputFilePath, ex, True, True, clsMASIC.eMasicErrorCodes.OutputFileWriteError)
+            ReportError("FindReporterIons", "Error writing the reporter ions to: " & outputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
             Return False
         End Try
 
@@ -279,7 +280,7 @@ Public Class clsReporterIonProcessor
 
         Dim intPoolIndex As Integer
         If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
-            SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
+            SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
             Exit Sub
         End If
 
@@ -513,12 +514,12 @@ Public Class clsReporterIonProcessor
 
     Private Sub mXcaliburAccessor_ReportError(strMessage As String)
         Console.WriteLine(strMessage)
-        ReportError("XcaliburAccessor", strMessage, Nothing, True, False, clsMASIC.eMasicErrorCodes.InputFileDataReadError)
+        ReportError("XcaliburAccessor", strMessage, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
     End Sub
 
     Private Sub mXcaliburAccessor_ReportWarning(strMessage As String)
         Console.WriteLine(strMessage)
-        ReportError("XcaliburAccessor", strMessage, Nothing, False, False, clsMASIC.eMasicErrorCodes.InputFileDataReadError)
+        ReportError("XcaliburAccessor", strMessage, Nothing, False, False, eMasicErrorCodes.InputFileDataReadError)
     End Sub
 
     Protected Class clsReportIonInfoComparer

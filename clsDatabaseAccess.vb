@@ -93,9 +93,9 @@ Public Class clsDatabaseAccess
                                         blnDatasetFoundInDB = True
                                     Catch ex As Exception
                                         Try
-                                            ReportError("LookupDatasetNumber", "Error converting '" & objRow.Item(intDatasetIDCol).ToString & "' to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                            ReportError("LookupDatasetNumber", "Error converting '" & objRow.Item(intDatasetIDCol).ToString() & "' to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
                                         Catch ex2 As Exception
-                                            ReportError("LookupDatasetNumber", "Error converting column " & intDatasetIDCol.ToString & " from the dataset report to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                            ReportError("LookupDatasetNumber", "Error converting column " & intDatasetIDCol.ToString() & " from the dataset report to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
                                         End Try
                                         blnDatasetFoundInDB = False
                                     End Try

@@ -1,5 +1,5 @@
-﻿
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
+Imports MASIC.clsMASIC
 Imports ThermoRawFileReader
 
 Public Class clsMRMProcessing
@@ -134,7 +134,7 @@ Public Class clsMRMProcessing
             End If
 
         Catch ex As Exception
-            ReportError("DetermineMRMSettings", "Error determining the MRM settings", ex, True, True, clsMASIC.eMasicErrorCodes.OutputFileWriteError)
+            ReportError("DetermineMRMSettings", "Error determining the MRM settings", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
             blnSuccess = False
         End Try
 
@@ -142,8 +142,7 @@ Public Class clsMRMProcessing
 
     End Function
 
-
-    Private Function DuplicateMRMInfo(
+    Public Shared Function DuplicateMRMInfo(
       oSource As ThermoRawFileReader.MRMInfo,
       dblParentIonMZ As Double) As clsMRMScanInfo
 
@@ -416,7 +415,7 @@ Public Class clsMRMProcessing
             blnSuccess = True
 
         Catch ex As Exception
-            ReportError("ExportMRMDataToDisk", "Error writing the SRM data to disk", ex, True, True, clsMASIC.eMasicErrorCodes.OutputFileWriteError)
+            ReportError("ExportMRMDataToDisk", "Error writing the SRM data to disk", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
             blnSuccess = False
         Finally
             If Not srDataOutfile Is Nothing Then
@@ -449,7 +448,7 @@ Public Class clsMRMProcessing
         Dim strOutLine As String
 
         intNonZeroCount = 0
-        strOutLine = intScanFirst.ToString & cColDelimiter &
+        strOutLine = intScanFirst.ToString() & cColDelimiter &
          Math.Round(sngScanTimeFirst, 5).ToString
 
         ' Construct a tab-delimited list of the values
@@ -664,7 +663,7 @@ Public Class clsMRMProcessing
                         udtBaselineNoiseStatSegments)
 
                     If Not blnSuccess Then
-                        SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, True)
+                        SetLocalErrorCode(eMasicErrorCodes.FindSICPeaksError, True)
                         Exit Try
                     End If
 
@@ -750,13 +749,13 @@ Public Class clsMRMProcessing
                     End If
 
                 Catch ex As Exception
-                    ReportError("ProcessMRMList", "Error updating progress", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+                    ReportError("ProcessMRMList", "Error updating progress", ex, True, True, eMasicErrorCodes.CreateSICsError)
                 End Try
 
             Next intParentIonIndex
 
         Catch ex As Exception
-            ReportError("ProcessMRMList", "Error creating SICs for MRM spectra", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+            ReportError("ProcessMRMList", "Error creating SICs for MRM spectra", ex, True, True, eMasicErrorCodes.CreateSICsError)
             blnSuccess = False
         End Try
 

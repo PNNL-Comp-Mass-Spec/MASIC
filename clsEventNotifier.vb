@@ -1,4 +1,6 @@
-﻿Public MustInherit Class clsEventNotifier
+﻿Imports MASIC.clsMASIC
+
+Public MustInherit Class clsEventNotifier
 
     Private mLastPercentComplete As Short = 0
 
@@ -19,7 +21,7 @@
       ex As Exception,
       allowInformUser As Boolean,
       allowThrowException As Boolean,
-      eNewErrorCode As clsMASIC.eMasicErrorCodes)
+      eNewErrorCode As eMasicErrorCodes)
 
     ''' <summary>
     ''' Describes a status message
@@ -28,7 +30,7 @@
     Public Event MessageEvent(message As String)
 
     ''' <summary>
-    ''' Describes a progress update
+    ''' Describes a progress update for a given subtask
     ''' </summary>
     ''' <param name="percentComplete">Value between 0 and 100</param>
     ''' <param name="progressMessage">Progress message</param>
@@ -47,7 +49,7 @@
     ''' </summary>
     ''' <param name="eNewErrorCode"></param>
     ''' <param name="leaveExistingErrorCodeUnchanged"></param>
-    Public Event UpdateErrorCodeEvent(eNewErrorCode As clsMASIC.eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
+    Public Event UpdateErrorCodeEvent(eNewErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
 
     ''' <summary>
     ''' Describes a warning event
@@ -72,7 +74,7 @@
       ex As Exception,
       allowInformUser As Boolean,
       allowThrowException As Boolean,
-      eNewErrorCode As clsMASIC.eMasicErrorCodes)
+      eNewErrorCode As eMasicErrorCodes)
         RaiseEvent ErrorEvent(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
     End Sub
 
@@ -85,7 +87,7 @@
     End Sub
 
     ''' <summary>
-    ''' Progress udpate
+    ''' Update the progress of a given subtask
     ''' </summary>
     ''' <param name="percentComplete">Value between 0 and 100</param>
     ''' <param name="progressMessage">Progress message</param>
@@ -106,7 +108,7 @@
         RaiseEvent WarningEvent(source, message)
     End Sub
 
-    Private Sub OnUpdateErrorCode(eNewErrorCode As clsMASIC.eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
+    Private Sub OnUpdateErrorCode(eNewErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
         RaiseEvent UpdateErrorCodeEvent(eNewErrorCode, leaveExistingErrorCodeUnchanged)
     End Sub
 
@@ -137,7 +139,7 @@
       ex As Exception,
       Optional allowInformUser As Boolean = True,
       Optional allowThrowException As Boolean = True,
-      Optional eNewErrorCode As clsMASIC.eMasicErrorCodes = clsMASIC.eMasicErrorCodes.NoError)
+      Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
 
         OnErrorEvent(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
 
@@ -147,7 +149,7 @@
         OnWarningEvent(source, message)
     End Sub
 
-    Protected Sub SetLocalErrorCode(eNewErrorCode As clsMASIC.eMasicErrorCodes, Optional leaveExistingErrorCodeUnchanged As Boolean = False)
+    Protected Sub SetLocalErrorCode(eNewErrorCode As eMasicErrorCodes, Optional leaveExistingErrorCodeUnchanged As Boolean = False)
         OnUpdateErrorCode(eNewErrorCode, leaveExistingErrorCodeUnchanged)
     End Sub
 
@@ -155,6 +157,10 @@
         OnUpdateCacheStats(objSpectraCache.CacheEventCount, objSpectraCache.UnCacheEventCount)
     End Sub
 
+    ''' <summary>
+    ''' Update the progress of a given subtask
+    ''' </summary>
+    ''' <param name="percentComplete"></param>
     Protected Sub UpdateProgress(percentComplete As Short)
         OnProgressUpdate(percentComplete, "")
     End Sub
@@ -181,7 +187,7 @@
       ex As Exception,
       allowInformUser As Boolean,
       allowThrowException As Boolean,
-      eNewErrorCode As clsMASIC.eMasicErrorCodes)
+      eNewErrorCode As eMasicErrorCodes)
         ReportError(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
     End Sub
 
@@ -197,7 +203,7 @@
         OnUpdateCacheStats(cacheEventCount, unCacheEventCount)
     End Sub
 
-    Private Sub UpdateErrorCodeEventHandler(eErrorCode As clsMASIC.eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
+    Private Sub UpdateErrorCodeEventHandler(eErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
         SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged)
     End Sub
 #End Region

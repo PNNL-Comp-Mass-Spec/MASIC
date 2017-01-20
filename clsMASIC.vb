@@ -32,7 +32,6 @@ Option Strict On
 ' this computer software.
 
 Imports System.Runtime.InteropServices
-Imports MASIC.DataInput
 
 Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
@@ -55,8 +54,6 @@ Public Class clsMASIC
         mOptions.InitializeVariables()
         RegisterEvents(mOptions)
 
-        mExtendedHeaderInfo = New List(Of KeyValuePair(Of String, Integer))
-
         Try
             mFreeMemoryPerformanceCounter = New Diagnostics.PerformanceCounter("Memory", "Available MBytes")
             mFreeMemoryPerformanceCounter.ReadOnly = True
@@ -67,10 +64,6 @@ Public Class clsMASIC
     End Sub
 
 #Region "Constants and Enums"
-
-
-    Private Const EXTENDED_STATS_HEADER_COLLISION_MODE As String = "Collision Mode"
-    Private Const EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT As String = "Scan Filter Text"
 
     ' Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
     Public Const DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD As Boolean = False
@@ -130,13 +123,6 @@ Public Class clsMASIC
     Private ReadOnly mProcessingStats As clsProcessingStats
 
     ''' <summary>
-    ''' Keys are strings of extended info names
-    ''' Values are the assigned ID value for the extended info name
-    ''' </summary>
-    ''' <remarks>The order of the values defines the appropriate output order for the names</remarks>
-    Private ReadOnly mExtendedHeaderInfo As List(Of KeyValuePair(Of String, Integer))
-
-    ''' <summary>
     ''' Current processing step
     ''' </summary>
     Private mProcessingStep As eProcessingStepConstants
@@ -152,8 +138,6 @@ Public Class clsMASIC
     Private mStatusMessage As String
 
     Private mFreeMemoryPerformanceCounter As PerformanceCounter
-
-    Private mScanStats As List(Of DSSummarizer.clsScanStatsEntry)
 
 #End Region
 
@@ -1068,7 +1052,7 @@ Public Class clsMASIC
     End Sub
 
     Public Overrides Function GetDefaultExtensionsToParse() As String()
-        Return clsDataImport.GetDefaultExtensionsToParse()
+        Return DataInput.clsDataImport.GetDefaultExtensionsToParse()
     End Function
 
     Public Overrides Function GetErrorMessage() As String
@@ -1129,14 +1113,6 @@ Public Class clsMASIC
 
         Return strErrorMessage
 
-    End Function
-
-    Private Function GetFilePathPrefixChar() As String
-        If Me.ShowMessages Then
-            Return ControlChars.NewLine
-        Else
-            Return ": "
-        End If
     End Function
 
     Private Function GetFreeMemoryMB() As Single
@@ -1232,8 +1208,6 @@ Public Class clsMASIC
       strParameterFilePath As String,
       blnResetErrorCode As Boolean) As Boolean
 
-        Dim scanList = New clsScanList()
-
         Dim ioFileInfo As FileInfo
 
         Dim blnSuccess, blnDoNotProcess As Boolean
@@ -1256,10 +1230,6 @@ Public Class clsMASIC
 
         mStatusMessage = String.Empty
 
-        mScanStats = New List(Of DSSummarizer.clsScanStatsEntry)
-
-        mExtendedHeaderInfo.Clear()
-
         UpdateStatusFile(True)
 
         If Not mOptions.LoadParameterFileSettings(strParameterFilePath) Then
@@ -1281,13 +1251,13 @@ Public Class clsMASIC
             Return False
         End If
 
-        Dim dataOutputHandler = New clsDataOutput()
+        Dim dataOutputHandler = New DataOutput.clsDataOutput(mOptions)
         RegisterEvents(dataOutputHandler)
 
         Try
             ' If a Custom SICList file is defined, then load the custom SIC values now
             If mOptions.CustomSICList.CustomSICListFileName.Length > 0 Then
-                Dim sicListReader = New clsCustomSICListReader(mOptions.CustomSICList)
+                Dim sicListReader = New DataInput.clsCustomSICListReader(mOptions.CustomSICList)
                 RegisterEvents(sicListReader)
 
                 LogMessage("ProcessFile: Reading custom SIC values file: " & mOptions.CustomSICList.CustomSICListFileName)
@@ -1338,7 +1308,7 @@ Public Class clsMASIC
                 Exit Try
             End If
 
-            Dim xmlResultsWriter = New clsXMLResultsWriter(mOptions)
+            Dim xmlResultsWriter = New DataOutput.clsXMLResultsWriter(mOptions)
             RegisterEvents(xmlResultsWriter)
 
             Try
@@ -1423,10 +1393,16 @@ Public Class clsMASIC
 
             Dim datasetFileInfo = new DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType
 
+            Dim scanList = New clsScanList()
+            RegisterEvents(scanList)
+
             Dim parentIonProcessor = New clsParentIonProcessing(mOptions.ReporterIons)
             RegisterEvents(parentIonProcessor)
 
-            Dim dataImporterBase As clsDataImport = Nothing
+            Dim scanTracking = New clsScanTracking(mOptions.ReporterIons, mMASICPeakFinder)
+            RegisterEvents(scanTracking)
+
+            Dim dataImporterBase As DataInput.clsDataImport = Nothing
 
             Try
 
@@ -1458,10 +1434,11 @@ Public Class clsMASIC
                 mOptions.SICOptions.ValidateSICOptions()
 
                 Select Case Path.GetExtension(strInputFilePath).ToUpper()
-                    Case clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()
+                    Case DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()
+
                         ' Open the .Raw file and obtain the scan information
 
-                        Dim dataImporter = New clsDataImportThermoRaw(mOptions, mMASICPeakFinder, parentIonProcessor)
+                        Dim dataImporter = New DataInput.clsDataImportThermoRaw(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
                         RegisterDataImportEvents(dataImporter)
                         dataImporterBase = dataImporter
 
@@ -1473,10 +1450,12 @@ Public Class clsMASIC
 
                         datasetFileInfo = dataImporter.DatasetFileInfo
 
-                    Case clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper(), clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper()
+                    Case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper(),
+                         DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper()
+
                         ' Open the .mzXML file and obtain the scan information
 
-                        Dim dataImporter = New clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor)
+                        Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
                         RegisterDataImportEvents(dataImporter)
                         dataImporterBase = dataImporter
 
@@ -1488,10 +1467,12 @@ Public Class clsMASIC
 
                         datasetFileInfo = dataImporter.DatasetFileInfo
 
-                    Case clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper(), clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper()
+                    Case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper(),
+                         DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper()
+
                         ' Open the .mzData file and obtain the scan information
 
-                        Dim dataImporter = New clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor)
+                        Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
                         RegisterDataImportEvents(dataImporter)
                         dataImporterBase = dataImporter
 
@@ -1502,10 +1483,12 @@ Public Class clsMASIC
 
                         datasetFileInfo = dataImporter.DatasetFileInfo
 
-                    Case clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper(), clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper()
+                    Case DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper(),
+                         DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper()
+
                         ' Open the .MGF and .CDF files to obtain the scan information
 
-                        Dim dataImporter = New clsDataImportMGFandCDF(mOptions, mMASICPeakFinder, parentIonProcessor)
+                        Dim dataImporter = New DataInput.clsDataImportMGFandCDF(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
                         RegisterDataImportEvents(dataImporter)
                         dataImporterBase = dataImporter
 
@@ -1580,7 +1563,7 @@ Public Class clsMASIC
                 UpdatePeakMemoryUsage()
 
                 If mOptions.SkipSICAndRawDataProcessing OrElse Not mOptions.ExportRawDataOnly Then
-                    Dim bpiWriter = New clsBPIWriter()
+                    Dim bpiWriter = New DataOutput.clsBPIWriter()
                     RegisterEvents(bpiWriter)
 
                     LogMessage("ProcessFile: Call SaveBPIs")
@@ -1604,7 +1587,7 @@ Public Class clsMASIC
                 '---------------------------------------------------------
 
                 LogMessage("ProcessFile: Create DatasetInfo File")
-                dataOutputHandler.CreateDatasetInfoFile(strInputFileName, strOutputFolderPath, mScanStats, datasetFileInfo)
+                dataOutputHandler.CreateDatasetInfoFile(strInputFileName, strOutputFolderPath, scanTracking, datasetFileInfo)
 
                 If mOptions.SkipSICAndRawDataProcessing Then
                     LogMessage("ProcessFile: Skipping SIC Processing")
@@ -1616,7 +1599,7 @@ Public Class clsMASIC
                     ' Optionally, export the raw mass spectra data
                     '---------------------------------------------------------
                     If mOptions.RawDataExportOptions.ExportEnabled Then
-                        Dim rawDataExporter = New clsSpectrumDataWriter()
+                        Dim rawDataExporter = New DataOutput.clsSpectrumDataWriter()
                         RegisterEvents(rawDataExporter)
 
                         rawDataExporter.ExportRawDataToDisk(scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
@@ -1726,12 +1709,9 @@ Public Class clsMASIC
                     SetSubtaskProcessingStepPct(0)
                     UpdatePeakMemoryUsage()
 
-                    Dim extendedStatsWriter = New clsExtendedStatsWriter()
-                    RegisterEvents(extendedStatsWriter)
-
                     LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
-                    blnSuccess = extendedStatsWriter.SaveExtendedScanStatsFiles(scanList, strInputFileName, strOutputFolderPath,
-                                                                                mOptions.SICOptions, mOptions.IncludeHeadersInExportFile)
+                    blnSuccess = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
+                        scanList, strInputFileName, strOutputFolderPath, mOptions.IncludeHeadersInExportFile)
 
                     If Not blnSuccess Then
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
@@ -1750,7 +1730,7 @@ Public Class clsMASIC
 
                 If Not mOptions.ExportRawDataOnly Then
 
-                    Dim sicStatsWriter = New clsSICStatsWriter()
+                    Dim sicStatsWriter = New DataOutput.clsSICStatsWriter()
                     RegisterEvents(sicStatsWriter)
 
                     LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
@@ -1808,7 +1788,7 @@ Public Class clsMASIC
 
             Catch ex As Exception
                 blnSuccess = False
-                LogErrors("ProcessFile", "Error creating or writing to the output file in folder" & GetFilePathPrefixChar() & strOutputFolderPath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                LogErrors("ProcessFile", "Error creating or writing to the output file in folder: " & strOutputFolderPath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
             End Try
 
         Catch ex As Exception
@@ -1896,7 +1876,7 @@ Public Class clsMASIC
 
     End Function
 
-    Private Sub RegisterDataImportEvents(dataImporter As clsDataImport)
+    Private Sub RegisterDataImportEvents(dataImporter As DataInput.clsDataImport)
         RegisterEvents(dataImporter)
         AddHandler dataImporter.UpdateMemoryUsageEvent, AddressOf UpdateMemoryUsageEventHandler
     End Sub
@@ -2196,7 +2176,7 @@ Public Class clsMASIC
       ex As Exception,
       allowInformUser As Boolean,
       allowThrowException As Boolean,
-      eNewErrorCode As clsMASIC.eMasicErrorCodes)
+      eNewErrorCode As eMasicErrorCodes)
         LogErrors(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
     End Sub
 
