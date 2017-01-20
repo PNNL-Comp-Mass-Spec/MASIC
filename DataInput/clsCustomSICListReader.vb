@@ -1,5 +1,7 @@
-﻿
+﻿Imports MASIC.clsMASIC
+
 Namespace DataInput
+
     Public Class clsCustomSICListReader
         Inherits clsEventNotifier
 
@@ -284,7 +286,7 @@ Namespace DataInput
                 End Using
 
             Catch ex As Exception
-                ReportError("LoadCustomSICListFromFile", "Error in LoadCustomSICListFromFile", ex, True, True, clsMASIC.eMasicErrorCodes.InvalidCustomSICValues)
+                ReportError("LoadCustomSICListFromFile", "Error in LoadCustomSICListFromFile", ex, True, True, eMasicErrorCodes.InvalidCustomSICValues)
                 mCustomSICList.CustomMZSearchValues.Clear()
                 Return False
             End Try
