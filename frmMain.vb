@@ -357,13 +357,6 @@ Public Class frmMain
 
     End Sub
 
-    <Obsolete("Unused")>
-    Private Sub DeleteCachedSpectrumFiles()
-        Dim objSpectraCache As New clsSpectraCache
-        objSpectraCache.DeleteSpectrumCacheFiles()
-        objSpectraCache = Nothing
-    End Sub
-
     Private Sub EnableDisableControls()
         Dim blnCreateSICsAndRawData As Boolean
         Dim blnExportRawDataOnly As Boolean
@@ -595,7 +588,7 @@ Public Class frmMain
                 .LoadSettings(strFilePath, False)
 
                 Try
-                    txtDatasetLookupFilePath.Text = .GetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
+                    txtDatasetLookupFilePath.Text = .GetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
                     Try
                         If Not File.Exists(txtDatasetLookupFilePath.Text) Then
                             txtDatasetLookupFilePath.Text = String.Empty
@@ -605,21 +598,21 @@ Public Class frmMain
                     End Try
 
                     If blnUpdateIOPaths Then
-                        txtInputFilePath.Text = .GetParam(XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
+                        txtInputFilePath.Text = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
                     End If
 
-                    Me.Width = .GetParam(XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
-                    Me.Height = .GetParam(XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
+                    Me.Width = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
+                    Me.Height = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
 
                     If blnUpdateIOPaths Then
-                        txtOutputFolderPath.Text = .GetParam(XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputFolderPath.Text)
+                        txtOutputFolderPath.Text = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputFolderPath.Text)
                     End If
 
                     If txtOutputFolderPath.TextLength = 0 Then
                         txtOutputFolderPath.Text = clsProcessFilesBaseClass.GetAppFolderPath()
                     End If
 
-                    mPreferredInputFileExtension = .GetParam(XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
+                    mPreferredInputFileExtension = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
 
                 Catch ex As Exception
                     Windows.Forms.MessageBox.Show("Invalid parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -719,20 +712,20 @@ Public Class frmMain
                     If Not blnSaveWindowDimensionsOnly Then
                         Try
                             If File.Exists(txtDatasetLookupFilePath.Text) Then
-                                .SetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
+                                .SetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
                             End If
                         Catch ex As Exception
                             ' Ignore any errors here
                         End Try
 
-                        .SetParam(XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
+                        .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
                     End If
 
-                    .SetParam(XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputFolderPath.Text)
-                    .SetParam(XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
+                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputFolderPath.Text)
+                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
 
-                    .SetParam(XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
-                    .SetParam(XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
+                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
+                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
 
                 Catch ex As Exception
                     Windows.Forms.MessageBox.Show("Error storing parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -951,10 +944,10 @@ Public Class frmMain
         With cboExportRawDataFileFormat
             With .Items
                 .Clear()
-                .Insert(eExportRawDataFileFormatConstants.PEKFile, "PEK File")
-                .Insert(eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File")
+                .Insert(clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile, "PEK File")
+                .Insert(clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File")
             End With
-            .SelectedIndex = eExportRawDataFileFormatConstants.CSVFile
+            .SelectedIndex = clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile
         End With
 
         With cboSICNoiseThresholdMode
@@ -1077,7 +1070,7 @@ Public Class frmMain
 
         Dim dblSICTolerance As Double, blnSICToleranceIsPPM As Boolean
 
-        Dim udtCustomMZList() As udtCustomMZSearchSpecType
+        Dim customMzList() As udtCustomMZSearchSpecType
         Dim intIndex As Integer
 
         If blnConfirm Then
@@ -1262,13 +1255,13 @@ Public Class frmMain
                 txtCustomSICScanOrAcqTimeTolerance.Text = .CustomSICListScanTolerance.ToString
 
                 ' Load the Custom m/z values from mCustomSICList
-                udtCustomMZList = .CustomSICListSearchValues()
+                customMzList = .CustomSICListSearchValues()
 
             End With
 
             ClearCustomSICList(False)
-            For intIndex = 0 To udtCustomMZList.Length - 1
-                With udtCustomMZList(intIndex)
+            For intIndex = 0 To customMzList.Length - 1
+                With customMzList(intIndex)
                     AddCustomSICRow(.MZ, .MZToleranceDa, .ScanOrAcqTimeCenter, .ScanOrAcqTimeTolerance, .Comment)
                 End With
             Next intIndex
@@ -1607,7 +1600,7 @@ Public Class frmMain
 
         Dim blnError As Boolean
 
-        Dim eScanType As eCustomSICScanTypeConstants
+        Dim eScanType As clsCustomSICList.eCustomSICScanTypeConstants
         Dim sngScanOrAcqTimeTolerance As Single
 
         Dim dblSICTolerance As Double
@@ -1640,7 +1633,7 @@ Public Class frmMain
 
                 ' Raw data export options
                 .ExportRawSpectraData = chkExportRawSpectraData.Checked
-                .ExportRawDataFileFormat = CType(cboExportRawDataFileFormat.SelectedIndex, eExportRawDataFileFormatConstants)
+                .ExportRawDataFileFormat = CType(cboExportRawDataFileFormat.SelectedIndex, clsRawDataExportOptions.eExportRawDataFileFormatConstants)
 
                 .ExportRawDataIncludeMSMS = chkExportRawDataIncludeMSMS.Checked
                 .ExportRawDataRenumberScans = chkExportRawDataRenumberScans.Checked
@@ -2216,7 +2209,6 @@ Public Class frmMain
 
     Private Sub frmMain_Closing(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
         IniFileSaveOptions(GetSettingsFilePath(), True)
-        '' DeleteCachedSpectrumFiles()
     End Sub
 
     Private Sub mMASIC_ProgressChanged(taskDescription As String, percentComplete As Single) Handles mMasic.ProgressChanged

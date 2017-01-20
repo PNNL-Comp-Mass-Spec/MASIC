@@ -34,7 +34,7 @@ Public Class clsITraqIntensityCorrection
 #End Region
 
 #Region "Classwide Variables"
-    Private mITraqMode As clsMASIC.eReporterIonMassModeConstants
+    Private mITraqMode As clsReporterIons.eReporterIonMassModeConstants
 
     Private mITraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex
 
@@ -47,7 +47,7 @@ Public Class clsITraqIntensityCorrection
 
 #Region "Properties"
 
-    Public ReadOnly Property ITraqMode() As clsMASIC.eReporterIonMassModeConstants
+    Public ReadOnly Property ITraqMode() As clsReporterIons.eReporterIonMassModeConstants
         Get
             Return mITraqMode
         End Get
@@ -65,7 +65,7 @@ Public Class clsITraqIntensityCorrection
     ''' </summary>
     ''' <param name="eITraqMode">iTRAQ mode</param>
     ''' <remarks></remarks>
-    Public Sub New(eITraqMode As clsMASIC.eReporterIonMassModeConstants)
+    Public Sub New(eITraqMode As clsReporterIons.eReporterIonMassModeConstants)
         Me.New(eITraqMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
     End Sub
 
@@ -75,7 +75,7 @@ Public Class clsITraqIntensityCorrection
     ''' <param name="eITraqMode">iTRAQ mode</param>
     ''' <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
     ''' <remarks>The iTraqCorrectionFactorType parameter is only used if eITraqMode is ITraqFourMZ</remarks>
-    Public Sub New(eITraqMode As clsMASIC.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
+    Public Sub New(eITraqMode As clsReporterIons.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
         mITraqMode = eITraqMode
         mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType
 
@@ -84,11 +84,11 @@ Public Class clsITraqIntensityCorrection
         InitializeCoefficients(False)
     End Sub
 
-    Public Sub UpdateITraqMode(eITraqMode As clsMASIC.eReporterIonMassModeConstants)
+    Public Sub UpdateITraqMode(eITraqMode As clsReporterIons.eReporterIonMassModeConstants)
         UpdateITraqMode(eITraqMode, mITraq4PlexCorrectionFactorType)
     End Sub
 
-    Public Sub UpdateITraqMode(eITraqMode As clsMASIC.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
+    Public Sub UpdateITraqMode(eITraqMode As clsReporterIons.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
         If mITraqMode <> eITraqMode OrElse mITraq4PlexCorrectionFactorType <> iTraqCorrectionFactorType Then
             mITraqMode = eITraqMode
             mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType
@@ -151,13 +151,13 @@ Public Class clsITraqIntensityCorrection
 
     End Function
 
-    Private Function GetMatrixLength(eITraqMode As clsMASIC.eReporterIonMassModeConstants) As Integer
+    Private Function GetMatrixLength(eITraqMode As clsReporterIons.eReporterIonMassModeConstants) As Integer
         Select Case eITraqMode
-            Case clsMASIC.eReporterIonMassModeConstants.ITraqFourMZ
+            Case clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ
                 Return FOUR_PLEX_MATRIX_LENGTH
-            Case clsMASIC.eReporterIonMassModeConstants.ITraqEightMZHighRes
+            Case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes
                 Return EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH
-            Case clsMASIC.eReporterIonMassModeConstants.ITraqEightMZLowRes
+            Case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes
                 Return EIGHT_PLEX_LOW_RES_MATRIX_LENGTH
             Case Else
                 Throw New ArgumentOutOfRangeException("Invalid value for eITRAQMode: " & eITraqMode.ToString())
@@ -183,7 +183,7 @@ Public Class clsITraqIntensityCorrection
         intMatrixSize = GetMatrixLength(mITraqMode)
 
         Select Case mITraqMode
-            Case clsMASIC.eReporterIonMassModeConstants.ITraqFourMZ
+            Case clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ
 
                 If mITraq4PlexCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex Then
                     ' 4-plex ITraq, isotope contribution table
@@ -242,7 +242,7 @@ Public Class clsITraqIntensityCorrection
                 mCoeffs(3, 2) = udtIsoPct116.Plus1
                 mCoeffs(3, 3) = udtIsoPct117.Zero
 
-            Case clsMASIC.eReporterIonMassModeConstants.ITraqEightMZHighRes
+            Case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes
 
                 ' 8-plex ITraq, isotope contribution table for High Res MS/MS
                 ' Source percentages provided by Applied Biosystems
@@ -312,7 +312,7 @@ Public Class clsITraqIntensityCorrection
                 mCoeffs(7, 5) = udtIsoPct118.Plus2
                 mCoeffs(7, 7) = udtIsoPct121.Zero
 
-            Case clsMASIC.eReporterIonMassModeConstants.ITraqEightMZLowRes
+            Case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes
 
                 ' 8-plex ITraq, isotope contribution table for Low Res MS/MS
                 ' Source percentages come from page 664 in:

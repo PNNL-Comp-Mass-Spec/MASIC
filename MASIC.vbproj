@@ -184,9 +184,34 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsBinarySearch.vb" />
+    <Compile Include="clsBinningOptions.vb" />
     <Compile Include="clsCorrelation.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clsCustomMZSearchSpec.vb" />
+    <Compile Include="clsCustomSICList.vb" />
+    <Compile Include="clsDataAggregation.vb" />
+    <Compile Include="clsDatabaseAccess.vb" />
+    <Compile Include="DataOutput\clsOutputFileHandles.vb" />
+    <Compile Include="clsEventNotifier.vb" />
+    <Compile Include="clsProcessingStats.vb" />
+    <Compile Include="clsRawDataExportOptions.vb" />
+    <Compile Include="clsReporterIonInfo.vb" />
+    <Compile Include="clsReporterIonProcessor.vb" />
+    <Compile Include="clsSpectrumCacheOptions.vb" />
+    <Compile Include="clsTests.vb" />
+    <Compile Include="clsUnused.vb" />
+    <Compile Include="DataInput\clsDataImportMSXml.vb" />
+    <Compile Include="DataInput\clsDataImportThermoRaw.vb" />
+    <Compile Include="clsDataObjects.vb" />
+    <Compile Include="DataInput\clsDataImport.vb" />
+    <Compile Include="DataInput\clsCustomSICListReader.vb" />
+    <Compile Include="clsMASICOptions.vb" />
+    <Compile Include="DataOutput\clsBPIWriter.vb" />
+    <Compile Include="DataOutput\clsDataOutput.vb" />
+    <Compile Include="DataInput\clsDataImportMGFandCDF.vb" />
+    <Compile Include="DataOutput\clsExtendedStatsWriter.vb" />
+    <Compile Include="DataOutput\clsSICStatsWriter.vb" />
     <Compile Include="clsFilterDataArrayMaxCount.vb" />
     <Compile Include="clsFragScanInfo.vb" />
     <Compile Include="clsITraqIntensityCorrection.vb" />
@@ -194,25 +219,36 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsDatasetStatsSummarizer.vb" />
+    <Compile Include="clsMRMProcessing.vb" />
     <Compile Include="clsMRMScanInfo.vb" />
     <Compile Include="clsMSSpectrum.vb" />
+    <Compile Include="clsParentIonProcessing.vb" />
+    <Compile Include="clsScanNumScanTimeConversion.vb" />
+    <Compile Include="clsScanTracking.vb" />
+    <Compile Include="clsSICOptions.vb" />
     <Compile Include="clsParentIonInfo.vb" />
     <Compile Include="clsParseCommandLine.vb" />
     <Compile Include="clsProcessFilesBaseClass.vb">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsProcessFilesOrFoldersBase.vb" />
+    <Compile Include="clsReporterIons.vb" />
     <Compile Include="clsScanInfo.vb" />
     <Compile Include="clsScanList.vb" />
     <Compile Include="clsSearchRange.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clsSICProcessing.vb" />
     <Compile Include="clsSpectraCache.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clsUtilities.vb" />
     <Compile Include="clsXmlSettingsFileAccessor.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataOutput\clsSpectrumDataWriter.vb" />
+    <Compile Include="DataOutput\clsThermoMetadataWriter.vb" />
+    <Compile Include="DataOutput\clsXMLResultsWriter.vb" />
     <Compile Include="frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
     </Compile>

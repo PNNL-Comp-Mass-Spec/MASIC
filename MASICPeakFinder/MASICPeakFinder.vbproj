@@ -167,12 +167,14 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clsBaselineNoiseOptions.vb" />
     <Compile Include="clsMASICPeakFinder.vb">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsPeakDetection.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="clsSICPeakFinderOptions.vb" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />

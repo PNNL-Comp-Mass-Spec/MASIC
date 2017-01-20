@@ -151,7 +151,6 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
         mLogDataCache = New Dictionary(Of String, DateTime)        
     End Sub
 
-
     Public Overridable Sub AbortProcessingNow()
         mAbortProcessing = True
     End Sub

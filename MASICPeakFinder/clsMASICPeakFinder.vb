@@ -15,7 +15,7 @@ Option Strict On
 Public Class clsMASICPeakFinder
 
 #Region "Constants and Enums"
-    Public PROGRAM_DATE As String = "November 22, 2013"
+    Public PROGRAM_DATE As String = "January 18, 2017"
 
     Public Const MINIMUM_PEAK_WIDTH As Integer = 3                         ' Width in points
 
@@ -42,43 +42,9 @@ Public Class clsMASICPeakFinder
 
 #Region "Structures"
 
-    ' This was previously named udtNoiseThresholdOptionsType
-    Public Structure udtBaselineNoiseOptionsType
-        Public BaselineNoiseMode As eNoiseThresholdModes        ' Method to use to determine the baseline noise level
-        Public BaselineNoiseLevelAbsolute As Single             ' Explicitly defined noise intensity; only used if .BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra
-        Public MinimumSignalToNoiseRatio As Single              ' Typically 2 or 3 for spectra; 0 for SICs
-        Public MinimumBaselineNoiseLevel As Single              ' If the noise threshold computed is less than this value, then will use this value to compute S/N; additionally, this is used as the minimum intensity threshold when computing a trimmed noise level
-        Public TrimmedMeanFractionLowIntensityDataToAverage As Single   ' Typically 0.75 for SICs, 0.5 for MS/MS spectra; only used for eNoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
-        Public DualTrimmedMeanStdDevLimits As Short                     ' Typically 5; distance from the mean in standard deviation units (SqrRt(Variance)) to discard data for computing the trimmed mean
-        Public DualTrimmedMeanMaximumSegments As Short          ' Typically 3; set to 1 to disable segmentation
-    End Structure
-
     Public Structure udtSICPotentialAreaStatsType
         Public MinimumPotentialPeakArea As Double
         Public PeakCountBasisForMinimumPotentialArea As Integer
-    End Structure
-
-    Public Structure udtSICPeakFinderOptionsType
-        Public IntensityThresholdFractionMax As Single      ' 0.01
-        Public IntensityThresholdAbsoluteMinimum As Single  ' 0
-
-        Public SICBaselineNoiseOptions As udtBaselineNoiseOptionsType
-
-        Public MaxDistanceScansNoOverlap As Integer         ' 0         Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion
-        Public MaxAllowedUpwardSpikeFractionMax As Single   ' 0.20      Maximum fraction of the peak maximum that an upward spike can be to be included in the peak
-        Public InitialPeakWidthScansScaler As Single        ' 0.5       Multiplied by scaled S/N for the given spectrum to determine the initial minimum peak width (in scans) to try.  Scaled "S/N" = Math.Log10(Math.Floor("S/N")) * 10
-        Public InitialPeakWidthScansMaximum As Integer      ' 30        Maximum initial peak width to allow
-
-        Public FindPeaksOnSmoothedData As Boolean
-        Public SmoothDataRegardlessOfMinimumPeakWidth As Boolean
-        Public UseButterworthSmooth As Boolean              ' .UseButterworthSmooth takes precedence over .UseSavitzkyGolaySmooth
-        Public ButterworthSamplingFrequency As Single
-        Public ButterworthSamplingFrequencyDoubledForSIMData As Boolean
-
-        Public UseSavitzkyGolaySmooth As Boolean
-        Public SavitzkyGolayFilterOrder As Short            ' 0         Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter
-
-        Public MassSpectraNoiseThresholdOptions As udtBaselineNoiseOptionsType
     End Structure
 
     Public Structure udtSmoothedYDataSubsetType
@@ -178,7 +144,7 @@ Public Class clsMASICPeakFinder
         Get
             Return mShowMessages
         End Get
-        Set(ByVal Value As Boolean)
+        Set(Value As Boolean)
             mShowMessages = Value
         End Set
     End Property
@@ -190,12 +156,12 @@ Public Class clsMASICPeakFinder
     End Property
 #End Region
 
-    Public Sub AttachErrorLogger(ByVal objLogger As PRISM.Logging.ILogger, ByVal intDebugLevel As Integer)
+    Public Sub AttachErrorLogger(objLogger As PRISM.Logging.ILogger, intDebugLevel As Integer)
         If Not mErrorLogger Is Nothing Then Exit Sub
         mErrorLogger = objLogger
     End Sub
 
-    Public Shared Function BaselineAdjustArea(ByRef udtSICPeak As udtSICStatsPeakType, ByVal intSICPeakWidthFullScans As Integer, ByVal blnAllowNegativeValues As Boolean) As Single
+    Public Shared Function BaselineAdjustArea(ByRef udtSICPeak As udtSICStatsPeakType, intSICPeakWidthFullScans As Integer, blnAllowNegativeValues As Boolean) As Single
         ' Note, compute intSICPeakWidthFullScans using:
         '  Width = SICScanNumbers(.Peak.IndexBaseRight) - SICScanNumbers(.Peak.IndexBaseLeft) + 1
 
@@ -204,7 +170,7 @@ Public Class clsMASICPeakFinder
         End With
     End Function
 
-    Public Shared Function BaselineAdjustArea(ByVal sngPeakArea As Single, ByVal sngBaselineNoiseLevel As Single, ByVal intSICPeakFWHMScans As Integer, ByVal intSICPeakWidthFullScans As Integer, ByVal blnAllowNegativeValues As Boolean) As Single
+    Public Shared Function BaselineAdjustArea(sngPeakArea As Single, sngBaselineNoiseLevel As Single, intSICPeakFWHMScans As Integer, intSICPeakWidthFullScans As Integer, blnAllowNegativeValues As Boolean) As Single
         Dim sngCorrectedArea As Single
         Dim intWidthToSubtract As Integer
 
@@ -218,13 +184,13 @@ Public Class clsMASICPeakFinder
         End If
     End Function
 
-    Public Shared Function BaselineAdjustIntensity(ByRef udtSICPeak As udtSICStatsPeakType, ByVal blnAllowNegativeValues As Boolean) As Single
+    Public Shared Function BaselineAdjustIntensity(ByRef udtSICPeak As udtSICStatsPeakType, blnAllowNegativeValues As Boolean) As Single
         With udtSICPeak
             Return BaselineAdjustIntensity(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel, blnAllowNegativeValues)
         End With
     End Function
 
-    Public Shared Function BaselineAdjustIntensity(ByVal sngRawIntensity As Single, ByVal sngBaselineNoiseLevel As Single, ByVal blnAllowNegativeValues As Boolean) As Single
+    Public Shared Function BaselineAdjustIntensity(sngRawIntensity As Single, sngBaselineNoiseLevel As Single, blnAllowNegativeValues As Boolean) As Single
         If blnAllowNegativeValues OrElse sngRawIntensity > sngBaselineNoiseLevel Then
             Return sngRawIntensity - sngBaselineNoiseLevel
         Else
@@ -232,7 +198,7 @@ Public Class clsMASICPeakFinder
         End If
     End Function
 
-    Private Function ComputeAverageNoiseLevelCheckCounts(ByVal intValidDataCountA As Integer, ByVal intValidDataCountB As Integer, ByVal dblSumA As Double, ByVal dblSumB As Double, ByVal intMinimumCount As Integer, ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+    Private Function ComputeAverageNoiseLevelCheckCounts(intValidDataCountA As Integer, intValidDataCountB As Integer, dblSumA As Double, dblSumB As Double, intMinimumCount As Integer, ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
 
         Dim blnUseBothSides As Boolean
         Dim blnUseLeftData As Boolean
@@ -285,7 +251,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeAverageNoiseLevelExcludingRegion(ByVal intDatacount As Integer, ByVal sngData() As Single, ByVal intIndexStart As Integer, ByVal intIndexEnd As Integer, ByVal intExclusionIndexStart As Integer, ByVal intExclusionIndexEnd As Integer, ByRef udtBaselineNoiseOptions As udtBaselineNoiseOptionsType, ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+    Private Function ComputeAverageNoiseLevelExcludingRegion(intDatacount As Integer, sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer, intExclusionIndexStart As Integer, intExclusionIndexEnd As Integer, baselineNoiseOptions As clsBaselineNoiseOptions, ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
 
         ' Compute the average intensity level between intIndexStart and intExclusionIndexStart
         ' Also compute the average between intExclusionIndexEnd and intIndexEnd
@@ -375,24 +341,25 @@ Public Class clsMASICPeakFinder
         End If
 
         If Not blnSuccess Then
-            Dim udtBaselineNoiseOptionsOverride As udtBaselineNoiseOptionsType
+            Dim baselineNoiseOptionsOverride = baselineNoiseOptions.Clone()
 
-            udtBaselineNoiseOptionsOverride = udtBaselineNoiseOptions
-            With udtBaselineNoiseOptionsOverride
+            With baselineNoiseOptionsOverride
                 .BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance
                 .TrimmedMeanFractionLowIntensityDataToAverage = 0.33
             End With
 
-            blnSuccess = ComputeTrimmedNoiseLevel(sngData, intIndexStart, intIndexEnd, udtBaselineNoiseOptionsOverride, False, udtBaselineNoiseStats)
+            blnSuccess = ComputeTrimmedNoiseLevel(sngData, intIndexStart, intIndexEnd, baselineNoiseOptionsOverride, False, udtBaselineNoiseStats)
         End If
 
         Return blnSuccess
 
     End Function
 
-    Public Function ComputeDualTrimmedNoiseLevelTTest(ByVal sngData() As Single, ByVal intIndexStart As Integer, ByVal intIndexEnd As Integer, ByVal udtBaselineNoiseOptions As udtBaselineNoiseOptionsType, ByRef udtBaselineNoiseStats() As udtBaselineNoiseStatSegmentsType) As Boolean
+    Public Function ComputeDualTrimmedNoiseLevelTTest(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
+                                                      baselineNoiseOptions As clsBaselineNoiseOptions,
+                                                      ByRef udtBaselineNoiseStats() As udtBaselineNoiseStatSegmentsType) As Boolean
 
-        ' Divide the data into the number of segments given by udtBaselineNoiseOptions.DualTrimmedMeanMaximumSegments  (use 3 by default)
+        ' Divide the data into the number of segments given by baselineNoiseOptions.DualTrimmedMeanMaximumSegments  (use 3 by default)
         ' Call ComputeDualTrimmedNoiseLevel for each segment
         ' Use a TTest to determine whether we need to define a custom noise threshold for each segment
 
@@ -409,7 +376,7 @@ Public Class clsMASICPeakFinder
 
         Try
 
-            intSegmentCountLocal = udtBaselineNoiseOptions.DualTrimmedMeanMaximumSegments
+            intSegmentCountLocal = baselineNoiseOptions.DualTrimmedMeanMaximumSegments
             If intSegmentCountLocal = 0 Then intSegmentCountLocal = 3
             If intSegmentCountLocal < 1 Then intSegmentCountLocal = 1
 
@@ -417,7 +384,7 @@ Public Class clsMASICPeakFinder
 
             ' Initialize BaselineNoiseStats for each segment now, in case an error occurs
             For intSegmentIndex = 0 To intSegmentCountLocal - 1
-                InitializeBaselineNoiseStats(udtBaselineNoiseStats(intSegmentIndex).BaselineNoiseStats, udtBaselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+                InitializeBaselineNoiseStats(udtBaselineNoiseStats(intSegmentIndex).BaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.DualTrimmedMeanByAbundance)
             Next intSegmentIndex
 
             ' Determine the segment length
@@ -444,7 +411,7 @@ Public Class clsMASICPeakFinder
             ' Call ComputeDualTrimmedNoiseLevel for each segment
             For intSegmentIndex = 0 To intSegmentCountLocal - 1
                 With udtBaselineNoiseStats(intSegmentIndex)
-                    ComputeDualTrimmedNoiseLevel(sngData, .SegmentIndexStart, .SegmentIndexEnd, udtBaselineNoiseOptions, .BaselineNoiseStats)
+                    ComputeDualTrimmedNoiseLevel(sngData, .SegmentIndexStart, .SegmentIndexEnd, baselineNoiseOptions, .BaselineNoiseStats)
                 End With
             Next intSegmentIndex
 
@@ -463,7 +430,7 @@ Public Class clsMASICPeakFinder
                     ' Not a significant difference; recompute the Baseline Noise stats using the two segments combined
                     With udtBaselineNoiseStats(intSegmentIndex - 1)
                         .SegmentIndexEnd = udtBaselineNoiseStats(intSegmentIndex).SegmentIndexEnd
-                        ComputeDualTrimmedNoiseLevel(sngData, .SegmentIndexStart, .SegmentIndexEnd, udtBaselineNoiseOptions, .BaselineNoiseStats)
+                        ComputeDualTrimmedNoiseLevel(sngData, .SegmentIndexStart, .SegmentIndexEnd, baselineNoiseOptions, .BaselineNoiseStats)
                     End With
 
                     For intSegmentIndexCopy = intSegmentIndex To intSegmentCountLocal - 2
@@ -485,9 +452,11 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Function ComputeDualTrimmedNoiseLevel(ByVal sngData() As Single, ByVal intIndexStart As Integer, ByVal intIndexEnd As Integer, ByVal udtBaselineNoiseOptions As udtBaselineNoiseOptionsType, ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+    Public Function ComputeDualTrimmedNoiseLevel(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
+                                                 baselineNoiseOptions As clsBaselineNoiseOptions,
+                                                 ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
         ' Computes the average of all of the data in sngData()
-        ' Next, discards the data above and below udtBaselineNoiseOptions.DualTrimmedMeanStdDevLimits of the mean
+        ' Next, discards the data above and below baselineNoiseOptions.DualTrimmedMeanStdDevLimits of the mean
         ' Finally, recomputes the average using the data that remains
         ' Returns True if success, False if error (or no data in sngData)
 
@@ -512,7 +481,7 @@ Public Class clsMASICPeakFinder
         Dim intDataUsedCount As Integer
 
         ' Initialize udtBaselineNoiseStats
-        InitializeBaselineNoiseStats(udtBaselineNoiseStats, udtBaselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+        InitializeBaselineNoiseStats(udtBaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.DualTrimmedMeanByAbundance)
 
         If sngData Is Nothing OrElse intIndexEnd - intIndexStart < 0 Then
             Return False
@@ -555,13 +524,13 @@ Public Class clsMASICPeakFinder
             dblVariance = 0
         End If
 
-        If udtBaselineNoiseOptions.DualTrimmedMeanStdDevLimits < 1 Then
-            udtBaselineNoiseOptions.DualTrimmedMeanStdDevLimits = 1
+        If baselineNoiseOptions.DualTrimmedMeanStdDevLimits < 1 Then
+            baselineNoiseOptions.DualTrimmedMeanStdDevLimits = 1
         End If
 
         ' Note: Standard Deviation = sigma = SquareRoot(Variance)
-        dblIntensityThresholdMin = dblAverage - Math.Sqrt(dblVariance) * udtBaselineNoiseOptions.DualTrimmedMeanStdDevLimits
-        dblIntensityThresholdMax = dblAverage + Math.Sqrt(dblVariance) * udtBaselineNoiseOptions.DualTrimmedMeanStdDevLimits
+        dblIntensityThresholdMin = dblAverage - Math.Sqrt(dblVariance) * baselineNoiseOptions.DualTrimmedMeanStdDevLimits
+        dblIntensityThresholdMax = dblAverage + Math.Sqrt(dblVariance) * baselineNoiseOptions.DualTrimmedMeanStdDevLimits
 
         ' Recompute the average using only the data between dblIntensityThresholdMin and dblIntensityThresholdMax in sngDataSorted
         dblSum = 0
@@ -602,14 +571,14 @@ Public Class clsMASICPeakFinder
             End With
 
         Else
-            udtBaselineNoiseStats.NoiseLevel = Math.Max(sngMinimumPositiveValue, udtBaselineNoiseOptions.MinimumBaselineNoiseLevel)
+            udtBaselineNoiseStats.NoiseLevel = Math.Max(sngMinimumPositiveValue, baselineNoiseOptions.MinimumBaselineNoiseLevel)
             udtBaselineNoiseStats.NoiseStDev = 0
         End If
 
         ' Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
         With udtBaselineNoiseStats
-            If .NoiseLevel < udtBaselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso udtBaselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
-                .NoiseLevel = udtBaselineNoiseOptions.MinimumBaselineNoiseLevel
+            If .NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso baselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
+                .NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel
                 .NoiseStDev = 0                             ' Set this to 0 since we have overridden .NoiseLevel
             End If
         End With
@@ -618,7 +587,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeFWHM(ByVal SICScanNumbers() As Integer, ByVal SICData() As Single, ByRef udtSICPeak As udtSICStatsPeakType, ByVal blnSubtractBaselineNoise As Boolean) As Integer
+    Private Function ComputeFWHM(SICScanNumbers() As Integer, SICData() As Single, ByRef udtSICPeak As udtSICStatsPeakType, blnSubtractBaselineNoise As Boolean) As Integer
         ' Note: The calling function should have already populated udtSICPeak.MaxIntensityValue, plus .IndexMax, .IndexBaseLeft, and .IndexBaseRight
         ' If blnSubtractBaselineNoise is True, then this function also uses udtSICPeak.BaselineNoiseStats....
         ' Note: This function returns the FWHM value in units of scan number; it does not update the value stored in udtSICPeak
@@ -788,7 +757,7 @@ Public Class clsMASICPeakFinder
 
     End Sub
 
-    Private Function ComputeKSStatistic(ByVal intDataCount As Integer, ByVal intXDataIn() As Integer, ByVal sngYDataIn() As Single, ByVal peakMean As Single, ByVal peakStDev As Double) As Double
+    Private Function ComputeKSStatistic(intDataCount As Integer, intXDataIn() As Integer, sngYDataIn() As Single, peakMean As Single, peakStDev As Double) As Double
         Dim intScanOffset As Integer
         Dim intXData() As Integer
         Dim dblYData() As Double
@@ -867,23 +836,27 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Function ComputeNoiseLevelForSICData(ByVal intDatacount As Integer, ByVal sngData() As Single, ByVal udtBaselineNoiseOptions As udtBaselineNoiseOptionsType, ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+    Public Function ComputeNoiseLevelForSICData(intDatacount As Integer, sngData() As Single,
+                                                baselineNoiseOptions As clsBaselineNoiseOptions,
+                                                ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
         ' Updates udtBaselineNoiseStats with the baseline noise level
         ' Returns True if success, false in an error
 
         Const IGNORE_NON_POSITIVE_DATA As Boolean = False
 
-        If udtBaselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold Then
-            udtBaselineNoiseStats.NoiseLevel = udtBaselineNoiseOptions.BaselineNoiseLevelAbsolute
+        If baselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold Then
+            udtBaselineNoiseStats.NoiseLevel = baselineNoiseOptions.BaselineNoiseLevelAbsolute
             Return True
-        ElseIf udtBaselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
-            Return ComputeDualTrimmedNoiseLevel(sngData, 0, intDatacount - 1, udtBaselineNoiseOptions, udtBaselineNoiseStats)
+        ElseIf baselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
+            Return ComputeDualTrimmedNoiseLevel(sngData, 0, intDatacount - 1, baselineNoiseOptions, udtBaselineNoiseStats)
         Else
-            Return ComputeTrimmedNoiseLevel(sngData, 0, intDatacount - 1, udtBaselineNoiseOptions, IGNORE_NON_POSITIVE_DATA, udtBaselineNoiseStats)
+            Return ComputeTrimmedNoiseLevel(sngData, 0, intDatacount - 1, baselineNoiseOptions, IGNORE_NON_POSITIVE_DATA, udtBaselineNoiseStats)
         End If
     End Function
 
-    Public Function ComputeNoiseLevelInPeakVicinity(ByVal intDatacount As Integer, ByVal SICScanNumbers() As Integer, ByVal sngData() As Single, ByRef udtSICPeak As udtSICStatsPeakType, ByVal udtBaselineNoiseOptions As udtBaselineNoiseOptionsType) As Boolean
+    Public Function ComputeNoiseLevelInPeakVicinity(intDatacount As Integer, SICScanNumbers() As Integer, sngData() As Single,
+                                                    ByRef udtSICPeak As udtSICStatsPeakType,
+                                                    baselineNoiseOptions As clsBaselineNoiseOptions) As Boolean
 
         Const NOISE_ESTIMATE_DATACOUNT_MINIMUM As Integer = 5
         Const NOISE_ESTIMATE_DATACOUNT_MAXIMUM As Integer = 100
@@ -903,7 +876,7 @@ Public Class clsMASICPeakFinder
         Dim blnShiftLeft As Boolean
 
         ' Initialize udtBaselineNoiseStats
-        InitializeBaselineNoiseStats(udtSICPeak.BaselineNoiseStats, udtBaselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.MeanOfDataInPeakVicinity)
+        InitializeBaselineNoiseStats(udtSICPeak.BaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.MeanOfDataInPeakVicinity)
 
         ' Only use a portion of the data to compute the noise level
         ' The number of points to extend from the left and right is based on the width at 4 sigma; useful for tailing peaks
@@ -986,12 +959,12 @@ Public Class clsMASICPeakFinder
         End If
 
         With udtSICPeak
-            blnSuccess = ComputeAverageNoiseLevelExcludingRegion(intDatacount, sngData, intIndexStart, intIndexEnd, intIndexBaseLeft, intIndexBaseRight, udtBaselineNoiseOptions, .BaselineNoiseStats)
+            blnSuccess = ComputeAverageNoiseLevelExcludingRegion(intDatacount, sngData, intIndexStart, intIndexEnd, intIndexBaseLeft, intIndexBaseRight, baselineNoiseOptions, .BaselineNoiseStats)
 
             ' Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
             With .BaselineNoiseStats
-                If .NoiseLevel < Math.Max(1, udtBaselineNoiseOptions.MinimumBaselineNoiseLevel) Then
-                    .NoiseLevel = Math.Max(1, udtBaselineNoiseOptions.MinimumBaselineNoiseLevel)
+                If .NoiseLevel < Math.Max(1, baselineNoiseOptions.MinimumBaselineNoiseLevel) Then
+                    .NoiseLevel = Math.Max(1, baselineNoiseOptions.MinimumBaselineNoiseLevel)
                     .NoiseStDev = 0                             ' Set this to 0 since we have overridden .NoiseLevel
                 End If
             End With
@@ -1002,7 +975,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Function ComputeParentIonIntensity(ByVal intSICDataCount As Integer, ByVal SICScanNumbers() As Integer, ByVal SICData() As Single, ByRef udtSICPeak As udtSICStatsPeakType, ByVal intFragScanNumber As Integer) As Boolean
+    Public Function ComputeParentIonIntensity(intSICDataCount As Integer, SICScanNumbers() As Integer, SICData() As Single, ByRef udtSICPeak As udtSICStatsPeakType, intFragScanNumber As Integer) As Boolean
 
         ' Determine the value for udtSICPeak.ParentIonIntensity
         ' The goal is to determine the intensity that the SIC data has in one scan prior to udtSICPeak.IndexObserved
@@ -1056,7 +1029,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeSICPeakArea(ByVal SICScanNumbers() As Integer, ByVal SICData() As Single, ByRef udtSICPeak As udtSICStatsPeakType) As Boolean
+    Private Function ComputeSICPeakArea(SICScanNumbers() As Integer, SICData() As Single, ByRef udtSICPeak As udtSICStatsPeakType) As Boolean
         ' The calling function must populate udtSICPeak.IndexMax, udtSICPeak.IndexBaseLeft, and udtSICPeak.IndexBaseRight
 
         Dim intAreaDataCount As Integer
@@ -1145,7 +1118,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeAvgScanInterval(ByVal intScanData() As Integer, ByVal intDataIndexStart As Integer, ByVal intDataIndexEnd As Integer) As Single
+    Private Function ComputeAvgScanInterval(intScanData() As Integer, intDataIndexStart As Integer, intDataIndexEnd As Integer) As Single
 
         Dim sngScansPerPoint As Single
 
@@ -1165,7 +1138,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeStatisticalMomentsStats(ByVal intSICDataCount As Integer, ByVal SICScanNumbers() As Integer, ByVal SICData() As Single, ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType, ByRef udtSICPeak As udtSICStatsPeakType) As Boolean
+    Private Function ComputeStatisticalMomentsStats(intSICDataCount As Integer, SICScanNumbers() As Integer, SICData() As Single, ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType, ByRef udtSICPeak As udtSICStatsPeakType) As Boolean
         ' The calling function must populate udtSICPeak.IndexMax, udtSICPeak.IndexBaseLeft, and udtSICPeak.IndexBaseRight
         ' Returns True if success; false if an error or less than 3 usable data points
 
@@ -1545,7 +1518,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Shared Function ComputeSignalToNoise(ByVal sngSignal As Single, ByVal sngNoiseThresholdIntensity As Single) As Single
+    Public Shared Function ComputeSignalToNoise(sngSignal As Single, sngNoiseThresholdIntensity As Single) As Single
 
         If sngNoiseThresholdIntensity > 0 Then
             Return sngSignal / sngNoiseThresholdIntensity
@@ -1555,8 +1528,11 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Function ComputeTrimmedNoiseLevel(ByVal sngData() As Single, ByVal intIndexStart As Integer, ByVal intIndexEnd As Integer, ByVal udtBaselineNoiseOptions As udtBaselineNoiseOptionsType, ByVal blnIgnoreNonPositiveData As Boolean, ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
-        ' Computes a trimmed mean or trimmed median using the low intensity data up to udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
+    Public Function ComputeTrimmedNoiseLevel(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
+                                             baselineNoiseOptions As clsBaselineNoiseOptions,
+                                             blnIgnoreNonPositiveData As Boolean,
+                                             ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+        ' Computes a trimmed mean or trimmed median using the low intensity data up to baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
         ' Additionally, computes a full median using all data in sngData
         ' If blnIgnoreNonPositiveData is True, then removes data from sngData() <= 0 and <= .MinimumBaselineNoiseLevel
         ' Returns True if success, False if error (or no data in sngData)
@@ -1576,7 +1552,7 @@ Public Class clsMASICPeakFinder
         Dim intCountSummed As Integer
 
         ' Initialize udtBaselineNoiseStats
-        InitializeBaselineNoiseStats(udtBaselineNoiseStats, udtBaselineNoiseOptions.MinimumBaselineNoiseLevel, udtBaselineNoiseOptions.BaselineNoiseMode)
+        InitializeBaselineNoiseStats(udtBaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, baselineNoiseOptions.BaselineNoiseMode)
 
         If sngData Is Nothing OrElse intIndexEnd - intIndexStart < 0 Then
             Return False
@@ -1623,13 +1599,13 @@ Public Class clsMASICPeakFinder
         ' Look for the minimum positive value and replace all data in sngDataSorted with that value
         Dim sngMinimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(intDataSortedCount, sngDataSorted)
 
-        Select Case udtBaselineNoiseOptions.BaselineNoiseMode
+        Select Case baselineNoiseOptions.BaselineNoiseMode
             Case eNoiseThresholdModes.TrimmedMeanByAbundance, eNoiseThresholdModes.TrimmedMeanByCount
 
-                If udtBaselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.TrimmedMeanByAbundance Then
+                If baselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.TrimmedMeanByAbundance Then
                     ' Average the data that has intensity values less than
-                    '  Minimum + udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
-                    With udtBaselineNoiseOptions
+                    '  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
+                    With baselineNoiseOptions
                         dblIntensityThreshold = sngDataSorted(0) + .TrimmedMeanFractionLowIntensityDataToAverage * (sngDataSorted(intDataSortedCount - 1) - sngDataSorted(0))
                     End With
 
@@ -1648,9 +1624,9 @@ Public Class clsMASICPeakFinder
                     intIndexEnd = intCountSummed - 1
                 Else
                     ' eNoiseThresholdModes.TrimmedMeanByCount
-                    ' Find the index of the data point at intDataSortedCount * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
+                    ' Find the index of the data point at intDataSortedCount * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
                     '  average the data from the start to that index
-                    intIndexEnd = CInt(Math.Round((intDataSortedCount - 1) * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0))
+                    intIndexEnd = CInt(Math.Round((intDataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0))
 
                     intCountSummed = intIndexEnd + 1
                     dblSum = 0
@@ -1687,12 +1663,12 @@ Public Class clsMASICPeakFinder
                 End If
 
             Case eNoiseThresholdModes.TrimmedMedianByAbundance
-                If udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage >= 1 Then
+                If baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage >= 1 Then
                     intIndexEnd = intDataSortedCount - 1
                 Else
                     'Find the median of the data that has intensity values less than
-                    '  Minimum + udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
-                    With udtBaselineNoiseOptions
+                    '  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
+                    With baselineNoiseOptions
                         dblIntensityThreshold = sngDataSorted(0) + .TrimmedMeanFractionLowIntensityDataToAverage * (sngDataSorted(intDataSortedCount - 1) - sngDataSorted(0))
                     End With
 
@@ -1739,14 +1715,14 @@ Public Class clsMASICPeakFinder
                 End With
             Case Else
                 ' Unknown mode
-                LogErrors("clsMASICPeakFinder->ComputeTrimmedNoiseLevel", "Unknown Noise Threshold Mode encountered: " & udtBaselineNoiseOptions.BaselineNoiseMode.ToString, Nothing, True, False)
+                LogErrors("clsMASICPeakFinder->ComputeTrimmedNoiseLevel", "Unknown Noise Threshold Mode encountered: " & baselineNoiseOptions.BaselineNoiseMode.ToString, Nothing, True, False)
                 Return False
         End Select
 
         ' Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
         With udtBaselineNoiseStats
-            If .NoiseLevel < udtBaselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso udtBaselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
-                .NoiseLevel = udtBaselineNoiseOptions.MinimumBaselineNoiseLevel
+            If .NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso baselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
+                .NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel
                 .NoiseStDev = 0                             ' Set this to 0 since we have overridden .NoiseLevel
             End If
         End With
@@ -1755,7 +1731,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Shared Function ComputeWidthAtBaseUsingFWHM(ByRef udtSICPeak As udtSICStatsPeakType, ByVal SICScanNumbers() As Integer, ByVal SigmaValueForBase As Short) As Integer
+    Private Shared Function ComputeWidthAtBaseUsingFWHM(ByRef udtSICPeak As udtSICStatsPeakType, SICScanNumbers() As Integer, SigmaValueForBase As Short) As Integer
         ' Computes the width of the peak (in scans) using the FWHM value in udtSICPeak
         Dim intPeakWidthFullScans As Integer
 
@@ -1768,7 +1744,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Shared Function ComputeWidthAtBaseUsingFWHM(ByVal intSICPeakFWHMScans As Integer, ByVal intSICPeakWidthFullScans As Integer, Optional ByVal SigmaValueForBase As Short = 4) As Integer
+    Private Shared Function ComputeWidthAtBaseUsingFWHM(intSICPeakFWHMScans As Integer, intSICPeakWidthFullScans As Integer, Optional SigmaValueForBase As Short = 4) As Integer
         ' Computes the width of the peak (in scans) using the FWHM value
         ' However, does not allow the width determined to be larger than intSICPeakWidthFullScans
 
@@ -1799,7 +1775,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ConvertScanWidthToPoints(ByVal intPeakWidthBaseScans As Integer, ByRef udtSICPeak As udtSICStatsPeakType, ByVal SICScanNumbers() As Integer) As Integer
+    Private Function ConvertScanWidthToPoints(intPeakWidthBaseScans As Integer, ByRef udtSICPeak As udtSICStatsPeakType, SICScanNumbers() As Integer) As Integer
         ' Convert from intPeakWidthFullScans to points; estimate number of scans per point to get this
 
         Dim sngScansPerPoint As Single
@@ -1809,7 +1785,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Function FindMinimumPositiveValue(ByVal intDatacount As Integer, ByVal sngData() As Single, ByVal sngAbsoluteMinimumValue As Single) As Single
+    Public Function FindMinimumPositiveValue(intDatacount As Integer, sngData() As Single, sngAbsoluteMinimumValue As Single) As Single
         ' Note: Do not use sngData.Length to determine the length of the array; use intDataCount
         ' However, if intDataCount is > sngData.Length then sngData.Length-1 will be used for the maximum index to examine
 
@@ -1837,7 +1813,23 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function FindPeaks(ByVal intDataCount As Integer, ByVal intScanNumbers() As Integer, ByVal sngIntensityData() As Single, ByRef intPeakIndexStart As Integer, ByRef intPeakIndexEnd As Integer, ByRef intPeakLocationIndex As Integer, ByRef intPreviousPeakFWHMPointRight As Integer, ByRef intNextPeakFWHMPointLeft As Integer, ByRef intShoulderCount As Integer, ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType, ByVal blnSIMDataPresent As Boolean, ByVal udtSICPeakFinderOptions As udtSICPeakFinderOptionsType, ByVal sngSICNoiseThresholdIntensity As Single, ByVal dblMinimumPotentialPeakArea As Double, ByVal blnReturnClosestPeak As Boolean) As Boolean
+    Private Function FindPeaks(
+      intDataCount As Integer,
+      intScanNumbers() As Integer,
+      sngIntensityData() As Single,
+      ByRef intPeakIndexStart As Integer,
+      ByRef intPeakIndexEnd As Integer,
+      ByRef intPeakLocationIndex As Integer,
+      ByRef intPreviousPeakFWHMPointRight As Integer,
+      ByRef intNextPeakFWHMPointLeft As Integer,
+      ByRef intShoulderCount As Integer,
+      ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType,
+      blnSIMDataPresent As Boolean,
+      sicPeakFinderOptions As clsSICPeakFinderOptions,
+      sngSICNoiseThresholdIntensity As Single,
+      dblMinimumPotentialPeakArea As Double,
+      blnReturnClosestPeak As Boolean) As Boolean
+
         ' Returns True if a valid peak is found in sngIntensityData()
         ' Otherwise, returns false
         '
@@ -1908,7 +1900,7 @@ Public Class clsMASICPeakFinder
                 If sngIntensityData(intIndex) >= sngSICNoiseThresholdIntensity Then
                     ' Add this intensity to dblPotentialPeakArea
                     dblPotentialPeakArea += sngIntensityData(intIndex)
-                    If queIntensityList.Count >= udtSICPeakFinderOptions.InitialPeakWidthScansMaximum Then
+                    If queIntensityList.Count >= sicPeakFinderOptions.InitialPeakWidthScansMaximum Then
                         ' Decrement dblPotentialPeakArea by the oldest item in the queue
                         dblPotentialPeakArea -= CDbl(queIntensityList.Dequeue())
                     End If
@@ -1927,8 +1919,8 @@ Public Class clsMASICPeakFinder
             ' Determine the initial value for .PeakWidthPointsMinimum
             ' We will use dblMaximumIntensity and sngMinimumPeakIntensity to compute a S/N value to help pick .PeakWidthPointsMinimum
 
-            ' Old: If udtSICPeakFinderOptions.SICNoiseThresholdIntensity < 1 Then udtSICPeakFinderOptions.SICNoiseThresholdIntensity = 1
-            ' Old: dblAreaSignalToNoise = dblMaximumIntensity / udtSICPeakFinderOptions.SICNoiseThresholdIntensity
+            ' Old: If sicPeakFinderOptions.SICNoiseThresholdIntensity < 1 Then sicPeakFinderOptions.SICNoiseThresholdIntensity = 1
+            ' Old: dblAreaSignalToNoise = dblMaximumIntensity / sicPeakFinderOptions.SICNoiseThresholdIntensity
 
             If dblMinimumPotentialPeakArea < 1 Then dblMinimumPotentialPeakArea = 1
             dblAreaSignalToNoise = dblMaximumPotentialPeakArea / dblMinimumPotentialPeakArea
@@ -1936,13 +1928,13 @@ Public Class clsMASICPeakFinder
 
             With udtPeakData
 
-                If Math.Abs(udtSICPeakFinderOptions.ButterworthSamplingFrequency - 0) < Single.Epsilon Then udtSICPeakFinderOptions.ButterworthSamplingFrequency = 0.25
+                If Math.Abs(sicPeakFinderOptions.ButterworthSamplingFrequency - 0) < Single.Epsilon Then sicPeakFinderOptions.ButterworthSamplingFrequency = 0.25
 
-                .PeakWidthPointsMinimum = CInt(udtSICPeakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(dblAreaSignalToNoise)) * 10)
+                .PeakWidthPointsMinimum = CInt(sicPeakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(dblAreaSignalToNoise)) * 10)
 
                 ' Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum 
                 '  and no greater than intDataPointCountAboveThreshold/2 (rounded up)
-                .PeakWidthPointsMinimum = Math.Min(.PeakWidthPointsMinimum, udtSICPeakFinderOptions.InitialPeakWidthScansMaximum)
+                .PeakWidthPointsMinimum = Math.Min(.PeakWidthPointsMinimum, sicPeakFinderOptions.InitialPeakWidthScansMaximum)
                 .PeakWidthPointsMinimum = Math.Min(.PeakWidthPointsMinimum, CInt(Math.Ceiling(intDataPointCountAboveThreshold / 2)))
 
                 If .PeakWidthPointsMinimum > .SourceDataCount * 0.8 Then
@@ -1954,7 +1946,7 @@ Public Class clsMASICPeakFinder
 
                 ' Save the original value for intPeakLocationIndex
                 .OriginalPeakLocationIndex = intPeakLocationIndex
-                .MaxAllowedUpwardSpikeFractionMax = udtSICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
+                .MaxAllowedUpwardSpikeFractionMax = sicPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
 
             End With
 
@@ -1966,7 +1958,7 @@ Public Class clsMASICPeakFinder
                 End If
 
                 Try
-                    blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, udtPeakData, blnSIMDataPresent, udtSICPeakFinderOptions, blnTestingMinimumPeakWidth, blnReturnClosestPeak)
+                    blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, blnTestingMinimumPeakWidth, blnReturnClosestPeak)
                 Catch ex As Exception
                     LogErrors("clsMASICPeakFinder->FindPeaks", "Error calling FindPeaksWork", ex, True, True, True)
                     blnValidPeakFound = False
@@ -2079,7 +2071,7 @@ Public Class clsMASICPeakFinder
                         If udtPeakData.MaxAllowedUpwardSpikeFractionMax > 0.05 Then
                             udtPeakData.MaxAllowedUpwardSpikeFractionMax = 0.05
                         End If
-                        blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, udtPeakData, blnSIMDataPresent, udtSICPeakFinderOptions, True, blnReturnClosestPeak)
+                        blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, True, blnReturnClosestPeak)
 
                         If blnValidPeakFound Then
                             With udtPeakData
@@ -2090,7 +2082,7 @@ Public Class clsMASICPeakFinder
                                         ' Make sure it's not the same peak as the "official" peak
                                         If .PeakLocs(intIndex) <> intPeakLocationIndex Then
                                             ' Now see if the comparison peak's intensity is at least .IntensityThresholdFractionMax of the intensity of the "official" peak
-                                            If sngIntensityData(.PeakLocs(intIndex)) >= udtSICPeakFinderOptions.IntensityThresholdFractionMax * sngIntensityData(intPeakLocationIndex) Then
+                                            If sngIntensityData(.PeakLocs(intIndex)) >= sicPeakFinderOptions.IntensityThresholdFractionMax * sngIntensityData(intPeakLocationIndex) Then
                                                 ' Yes, this is a shoulder peak
                                                 intShoulderCount += 1
                                             End If
@@ -2229,7 +2221,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function FindPeaksWork(ByVal objPeakDetector As clsPeakDetection, ByVal intScanNumbers() As Integer, ByRef udtPeakData As udtFindPeaksDataType, ByVal blnSIMDataPresent As Boolean, ByVal udtSICPeakFinderOptions As udtSICPeakFinderOptionsType, ByVal blnTestingMinimumPeakWidth As Boolean, ByVal blnReturnClosestPeak As Boolean) As Boolean
+    Private Function FindPeaksWork(objPeakDetector As clsPeakDetection, intScanNumbers() As Integer, ByRef udtPeakData As udtFindPeaksDataType, blnSIMDataPresent As Boolean, sicPeakFinderOptions As clsSICPeakFinderOptions, blnTestingMinimumPeakWidth As Boolean, blnReturnClosestPeak As Boolean) As Boolean
         ' Returns True if a valid peak is found; otherwise, returns false
         ' When blnReturnClosestPeak is True, then a valid peak is one that contains udtPeakData.OriginalPeakLocationIndex
         ' When blnReturnClosestPeak is False, then stores the index of the most intense peak in udtpeakdata.BestPeakIndex
@@ -2256,13 +2248,13 @@ Public Class clsMASICPeakFinder
 
         ' Smooth the Y data, and store in udtPeakData.SmoothedYData
         ' Note that if using a Butterworth filter, then we increase udtPeakData.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
-        blnDataIsSmoothed = FindPeaksWorkSmoothData(udtPeakData, blnSIMDataPresent, udtSICPeakFinderOptions, udtPeakData.PeakWidthPointsMinimum, strErrorMessage)
-        If udtSICPeakFinderOptions.FindPeaksOnSmoothedData AndAlso blnDataIsSmoothed Then
-            udtPeakData.PeakCount = objPeakDetector.DetectPeaks(udtPeakData.XData, udtPeakData.SmoothedYData, udtSICPeakFinderOptions.IntensityThresholdAbsoluteMinimum, udtPeakData.PeakWidthPointsMinimum, udtPeakData.PeakLocs, udtPeakData.PeakEdgesLeft, udtPeakData.PeakEdgesRight, udtPeakData.PeakAreas, CInt(udtSICPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
+        blnDataIsSmoothed = FindPeaksWorkSmoothData(udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, udtPeakData.PeakWidthPointsMinimum, strErrorMessage)
+        If sicPeakFinderOptions.FindPeaksOnSmoothedData AndAlso blnDataIsSmoothed Then
+            udtPeakData.PeakCount = objPeakDetector.DetectPeaks(udtPeakData.XData, udtPeakData.SmoothedYData, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum, udtPeakData.PeakWidthPointsMinimum, udtPeakData.PeakLocs, udtPeakData.PeakEdgesLeft, udtPeakData.PeakEdgesRight, udtPeakData.PeakAreas, CInt(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
             blnUsedSmoothedDataForPeakDetection = True
         Else
             ' Look for the peaks, using udtPeakData.PeakWidthPointsMinimum as the minimum peak width 
-            udtPeakData.PeakCount = objPeakDetector.DetectPeaks(udtPeakData.XData, udtPeakData.YData, udtSICPeakFinderOptions.IntensityThresholdAbsoluteMinimum, udtPeakData.PeakWidthPointsMinimum, udtPeakData.PeakLocs, udtPeakData.PeakEdgesLeft, udtPeakData.PeakEdgesRight, udtPeakData.PeakAreas, CInt(udtSICPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
+            udtPeakData.PeakCount = objPeakDetector.DetectPeaks(udtPeakData.XData, udtPeakData.YData, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum, udtPeakData.PeakWidthPointsMinimum, udtPeakData.PeakLocs, udtPeakData.PeakEdgesLeft, udtPeakData.PeakEdgesRight, udtPeakData.PeakAreas, CInt(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
             blnUsedSmoothedDataForPeakDetection = False
         End If
 
@@ -2355,7 +2347,7 @@ Public Class clsMASICPeakFinder
 
                 If Not blnDataIsSmoothed Then
                     ' Need to smooth the data now
-                    blnDataIsSmoothed = FindPeaksWorkSmoothData(udtPeakData, blnSIMDataPresent, udtSICPeakFinderOptions, udtPeakData.PeakWidthPointsMinimum, strErrorMessage)
+                    blnDataIsSmoothed = FindPeaksWorkSmoothData(udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, udtPeakData.PeakWidthPointsMinimum, strErrorMessage)
                 End If
 
                 ' First see if we need to narrow the peak by looking for decreasing intensities moving toward the peak center
@@ -2389,7 +2381,7 @@ Public Class clsMASICPeakFinder
 
                     'If dblCurrentSlope > 0 AndAlso _
                     '   intPeakLocationIndex - intPeakIndexStart > 3 AndAlso _
-                    '   udtPeakData.SmoothedYData(intPeakIndexStart - 1) < Math.Max(udtSICPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, udtSICPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
+                    '   udtPeakData.SmoothedYData(intPeakIndexStart - 1) < Math.Max(sicPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
                     '    ' We reached a low intensity data point and we're going downhill (i.e. the slope from this point to intPeakLocationIndex is positive)
                     '    ' Step once more and stop
                     '    intPeakIndexStart -= 1
@@ -2432,7 +2424,7 @@ Public Class clsMASICPeakFinder
 
                     'If dblCurrentSlope < 0 AndAlso _
                     '   intPeakIndexEnd - intPeakLocationIndex > 3 AndAlso _
-                    '   udtPeakData.SmoothedYData(intPeakIndexEnd + 1) < Math.Max(udtSICPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, udtSICPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
+                    '   udtPeakData.SmoothedYData(intPeakIndexEnd + 1) < Math.Max(sicPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
                     '    ' We reached a low intensity data point and we're going downhill (i.e. the slope from intPeakLocationIndex to this point is negative)
                     '    intPeakIndexEnd += 1
                     '    Exit Do
@@ -2475,11 +2467,11 @@ Public Class clsMASICPeakFinder
                     '  either of the peak edges; if not, then mark the peak as invalid since it does not contain the 
                     '  scan for the parent ion
                     If udtPeakData.OriginalPeakLocationIndex < intPeakIndexStart Then
-                        If Math.Abs(intScanNumbers(udtPeakData.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexStart)) > udtSICPeakFinderOptions.MaxDistanceScansNoOverlap Then
+                        If Math.Abs(intScanNumbers(udtPeakData.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexStart)) > sicPeakFinderOptions.MaxDistanceScansNoOverlap Then
                             udtPeakData.PeakIsValid(intFoundPeakIndex) = False
                         End If
                     ElseIf udtPeakData.OriginalPeakLocationIndex > intPeakIndexEnd Then
-                        If Math.Abs(intScanNumbers(udtPeakData.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexEnd)) > udtSICPeakFinderOptions.MaxDistanceScansNoOverlap Then
+                        If Math.Abs(intScanNumbers(udtPeakData.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexEnd)) > sicPeakFinderOptions.MaxDistanceScansNoOverlap Then
                             udtPeakData.PeakIsValid(intFoundPeakIndex) = False
                         End If
                     End If
@@ -2515,7 +2507,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function FindPeaksWorkSmoothData(ByRef udtPeakData As udtFindPeaksDataType, ByVal blnSIMDataPresent As Boolean, ByRef udtSICPeakFinderOptions As udtSICPeakFinderOptionsType, ByRef intPeakWidthPointsMinimum As Integer, ByRef strErrorMessage As String) As Boolean
+    Private Function FindPeaksWorkSmoothData(ByRef udtPeakData As udtFindPeaksDataType, blnSIMDataPresent As Boolean, ByRef sicPeakFinderOptions As clsSICPeakFinderOptions, ByRef intPeakWidthPointsMinimum As Integer, ByRef strErrorMessage As String) As Boolean
         ' Returns True if the data was smoothed; false if not or an error
         ' The smoothed data is returned in udtPeakData.SmoothedYData
 
@@ -2530,17 +2522,17 @@ Public Class clsMASICPeakFinder
 
         ReDim udtPeakData.SmoothedYData(udtPeakData.SourceDataCount - 1)
 
-        If (intPeakWidthPointsMinimum > 4 AndAlso (udtSICPeakFinderOptions.UseSavitzkyGolaySmooth OrElse udtSICPeakFinderOptions.UseButterworthSmooth)) OrElse
-         udtSICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth Then
+        If (intPeakWidthPointsMinimum > 4 AndAlso (sicPeakFinderOptions.UseSavitzkyGolaySmooth OrElse sicPeakFinderOptions.UseButterworthSmooth)) OrElse
+         sicPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth Then
 
             udtPeakData.YData.CopyTo(udtPeakData.SmoothedYData, 0)
 
-            If udtSICPeakFinderOptions.UseButterworthSmooth Then
+            If sicPeakFinderOptions.UseButterworthSmooth Then
                 ' Filter the data with a Butterworth filter (.UseButterworthSmooth takes precedence over .UseSavitzkyGolaySmooth)
-                If blnSIMDataPresent AndAlso udtSICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData Then
-                    sngButterWorthFrequency = udtSICPeakFinderOptions.ButterworthSamplingFrequency * 2
+                If blnSIMDataPresent AndAlso sicPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData Then
+                    sngButterWorthFrequency = sicPeakFinderOptions.ButterworthSamplingFrequency * 2
                 Else
-                    sngButterWorthFrequency = udtSICPeakFinderOptions.ButterworthSamplingFrequency
+                    sngButterWorthFrequency = sicPeakFinderOptions.ButterworthSamplingFrequency
                 End If
                 blnSuccess = objFilter.ButterworthFilter(udtPeakData.SmoothedYData, 0, udtPeakData.SourceDataCount - 1, sngButterWorthFrequency)
                 If Not blnSuccess Then
@@ -2571,7 +2563,7 @@ Public Class clsMASICPeakFinder
 
                 ' Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
                 ' Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-                blnSuccess = objFilter.SavitzkyGolayFilter(udtPeakData.SmoothedYData, 0, udtPeakData.SmoothedYData.Length - 1, intFilterThirdWidth, intFilterThirdWidth, udtSICPeakFinderOptions.SavitzkyGolayFilterOrder, True, strErrorMessage)
+                blnSuccess = objFilter.SavitzkyGolayFilter(udtPeakData.SmoothedYData, 0, udtPeakData.SmoothedYData.Length - 1, intFilterThirdWidth, intFilterThirdWidth, sicPeakFinderOptions.SavitzkyGolayFilterOrder, True, strErrorMessage)
                 If Not blnSuccess Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData", "Error with the Savitzky-Golay filter: " & strErrorMessage, Nothing, True, False)
                     Return False
@@ -2588,7 +2580,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Sub FindPotentialPeakArea(ByVal intSICDataCount As Integer, ByRef SICData() As Single, ByRef udtSICPotentialAreaStats As udtSICPotentialAreaStatsType, ByVal udtSICPeakFinderOptions As udtSICPeakFinderOptionsType)
+    Public Sub FindPotentialPeakArea(intSICDataCount As Integer, ByRef SICData() As Single, ByRef udtSICPotentialAreaStats As udtSICPotentialAreaStatsType, sicPeakFinderOptions As clsSICPeakFinderOptions)
         ' This function computes the potential peak area for a given SIC 
         '  and stores in udtSICPotentialAreaStats.MinimumPotentialPeakArea
         ' However, the summed intensity is not used if the number of points >= .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
@@ -2625,17 +2617,17 @@ Public Class clsMASICPeakFinder
                 ' If this data point is > .MinimumBaselineNoiseLevel, then add this intensity to dblPotentialPeakArea
                 '  and increment intValidPeakCount
                 sngIntensityToUse = Math.Max(sngMinimumPositiveValue, SICData(intIndex))
-                If sngIntensityToUse >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel Then
+                If sngIntensityToUse >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel Then
                     dblPotentialPeakArea += sngIntensityToUse
                     intValidPeakCount += 1
                 End If
 
-                If queIntensityList.Count >= udtSICPeakFinderOptions.InitialPeakWidthScansMaximum Then
+                If queIntensityList.Count >= sicPeakFinderOptions.InitialPeakWidthScansMaximum Then
                     ' Decrement dblPotentialPeakArea by the oldest item in the queue
                     ' If that item is >= .MinimumBaselineNoiseLevel, then decrement intValidPeakCount too
                     dblOldestIntensity = CDbl(queIntensityList.Dequeue())
 
-                    If dblOldestIntensity >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso
+                    If dblOldestIntensity >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso
                        dblOldestIntensity > 0 Then
                         dblPotentialPeakArea -= dblOldestIntensity
                         intValidPeakCount -= 1
@@ -2671,7 +2663,7 @@ Public Class clsMASICPeakFinder
 
     End Sub
 
-    Public Function FindSICPeakAndArea(ByVal intSICDataCount As Integer, ByVal SICScanNumbers() As Integer, ByVal SICData() As Single, ByRef udtSICPotentialAreaStatsForPeak As udtSICPotentialAreaStatsType, ByRef udtSICPeak As udtSICStatsPeakType, ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType, ByVal udtSICPeakFinderOptions As udtSICPeakFinderOptionsType, ByRef udtSICPotentialAreaStatsForRegion As udtSICPotentialAreaStatsType, ByVal blnReturnClosestPeak As Boolean, ByVal blnSIMDataPresent As Boolean, ByVal blnRecomputeNoiseLevel As Boolean) As Boolean
+    Public Function FindSICPeakAndArea(intSICDataCount As Integer, SICScanNumbers() As Integer, SICData() As Single, ByRef udtSICPotentialAreaStatsForPeak As udtSICPotentialAreaStatsType, ByRef udtSICPeak As udtSICStatsPeakType, ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType, sicPeakFinderOptions As clsSICPeakFinderOptions, ByRef udtSICPotentialAreaStatsForRegion As udtSICPotentialAreaStatsType, blnReturnClosestPeak As Boolean, blnSIMDataPresent As Boolean, blnRecomputeNoiseLevel As Boolean) As Boolean
         ' Note: The calling function should populate udtSICPeak.IndexObserved with the index in SICData() that the 
         '       parent ion m/z was actually observed; this will be used as the default peak location if a peak cannot be found
 
@@ -2686,7 +2678,7 @@ Public Class clsMASICPeakFinder
 
         Try
             ' Compute the potential peak area for this SIC
-            FindPotentialPeakArea(intSICDataCount, SICData, udtSICPotentialAreaStatsForPeak, udtSICPeakFinderOptions)
+            FindPotentialPeakArea(intSICDataCount, SICData, udtSICPotentialAreaStatsForPeak, sicPeakFinderOptions)
 
             ' See if the potential peak area for this SIC is lower than the values for the Region
             ' If so, then update the region values with this peak's values
@@ -2740,7 +2732,7 @@ Public Class clsMASICPeakFinder
                     ' This value is first computed using all data in the SIC; it is later updated 
                     '  to be the minimum value of the average of the data to the immediate left and
                     '  immediate right of the peak identified in the SIC
-                    blnSuccess = ComputeNoiseLevelForSICData(intSICDataCount, SICData, udtSICPeakFinderOptions.SICBaselineNoiseOptions, udtSICPeak.BaselineNoiseStats)
+                    blnSuccess = ComputeNoiseLevelForSICData(intSICDataCount, SICData, sicPeakFinderOptions.SICBaselineNoiseOptions, udtSICPeak.BaselineNoiseStats)
                 End If
 
 
@@ -2749,7 +2741,7 @@ Public Class clsMASICPeakFinder
                 With udtSICPeak
                     blnSuccess = FindPeaks(intSICDataCount, SICScanNumbers, SICData, .IndexBaseLeft, .IndexBaseRight, .IndexMax,
                       .PreviousPeakFWHMPointRight, .NextPeakFWHMPointLeft, .ShoulderCount,
-                      udtSmoothedYDataSubset, blnSIMDataPresent, udtSICPeakFinderOptions,
+                      udtSmoothedYDataSubset, blnSIMDataPresent, sicPeakFinderOptions,
                       udtSICPeak.BaselineNoiseStats.NoiseLevel,
                       udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea,
                       blnReturnClosestPeak)
@@ -2761,12 +2753,12 @@ Public Class clsMASICPeakFinder
 
                     If blnRecomputeNoiseLevel Then
                         ' Update the value for udtSICPotentialAreaStatsForPeak.SICNoiseThresholdIntensity based on the data around the peak
-                        blnSuccess = ComputeNoiseLevelInPeakVicinity(intSICDataCount, SICScanNumbers, SICData, udtSICPeak, udtSICPeakFinderOptions.SICBaselineNoiseOptions)
+                        blnSuccess = ComputeNoiseLevelInPeakVicinity(intSICDataCount, SICScanNumbers, SICData, udtSICPeak, sicPeakFinderOptions.SICBaselineNoiseOptions)
                     End If
 
                     '' ' Compute the trimmed median of the data in SICData (replacing nonpositive values with the minimum)
                     '' ' If the median is less than udtSICPeak.BaselineNoiseStats.NoiseLevel then update udtSICPeak.BaselineNoiseStats.NoiseLevel
-                    ''udtNoiseOptionsOverride = udtSICPeakFinderOptions.SICBaselineNoiseOptions
+                    ''udtNoiseOptionsOverride = sicPeakFinderOptions.SICBaselineNoiseOptions
                     ''With udtNoiseOptionsOverride
                     ''    .BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance
                     ''    .TrimmedMeanFractionLowIntensityDataToAverage = 0.75
@@ -2787,7 +2779,7 @@ Public Class clsMASICPeakFinder
 
                     ' If smoothing was enabled, then see if the smoothed value is larger than udtSICPeak.MaxIntensityValue 
                     ' If it is, then use the smoothed value for udtSICPeak.MaxIntensityValue
-                    If udtSICPeakFinderOptions.UseSavitzkyGolaySmooth OrElse udtSICPeakFinderOptions.UseButterworthSmooth Then
+                    If sicPeakFinderOptions.UseSavitzkyGolaySmooth OrElse sicPeakFinderOptions.UseButterworthSmooth Then
                         intDataIndex = udtSICPeak.IndexMax - udtSmoothedYDataSubset.DataStartIndex
                         If intDataIndex >= 0 AndAlso Not udtSmoothedYDataSubset.Data Is Nothing AndAlso intDataIndex < udtSmoothedYDataSubset.DataCount Then
                             ' Possibly use the intensity of the smoothed data as the peak intensity
@@ -2841,10 +2833,10 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Shared Function GetDefaultNoiseThresholdOptions() As udtBaselineNoiseOptionsType
-        Dim udtBaselineNoiseOptions As udtBaselineNoiseOptionsType
+    Public Shared Function GetDefaultNoiseThresholdOptions() As clsBaselineNoiseOptions
+        Dim baselineNoiseOptions = New clsBaselineNoiseOptions()
 
-        With udtBaselineNoiseOptions
+        With baselineNoiseOptions
             .BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance
             .BaselineNoiseLevelAbsolute = 0
             .MinimumSignalToNoiseRatio = 0                      ' ToDo: Figure out how best to use this when > 0; for now, the SICNoiseMinimumSignalToNoiseRatio property ignores any attempts to set this value
@@ -2854,13 +2846,13 @@ Public Class clsMASICPeakFinder
             .DualTrimmedMeanMaximumSegments = 3
         End With
 
-        Return udtBaselineNoiseOptions
+        Return baselineNoiseOptions
     End Function
 
-    Public Shared Function GetDefaultSICPeakFinderOptions() As udtSICPeakFinderOptionsType
-        Dim udtSICPeakFinderOptions As udtSICPeakFinderOptionsType
+    Public Shared Function GetDefaultSICPeakFinderOptions() As clsSICPeakFinderOptions
+        Dim sicPeakFinderOptions = New clsSICPeakFinderOptions()
 
-        With udtSICPeakFinderOptions
+        With sicPeakFinderOptions
             .IntensityThresholdFractionMax = 0.01           ' 1% of the peak maximum
             .IntensityThresholdAbsoluteMinimum = 0
 
@@ -2895,7 +2887,7 @@ Public Class clsMASICPeakFinder
             End With
         End With
 
-        Return udtSICPeakFinderOptions
+        Return sicPeakFinderOptions
 
     End Function
 
@@ -2913,7 +2905,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Shared Sub InitializeBaselineNoiseStats(ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType, ByVal sngMinimumBaselineNoiseLevel As Single, ByVal eNoiseThresholdMode As eNoiseThresholdModes)
+    Public Shared Sub InitializeBaselineNoiseStats(ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType, sngMinimumBaselineNoiseLevel As Single, eNoiseThresholdMode As eNoiseThresholdModes)
         With udtBaselineNoiseStats
             .NoiseLevel = sngMinimumBaselineNoiseLevel
             .NoiseStDev = 0
@@ -2922,7 +2914,7 @@ Public Class clsMASICPeakFinder
         End With
     End Sub
 
-    Private Function InterpolateX(ByRef sngInterpolatedXValue As Single, ByVal X1 As Integer, ByVal X2 As Integer, ByVal Y1 As Single, ByVal Y2 As Single, ByVal sngTargetY As Single) As Boolean
+    Private Function InterpolateX(ByRef sngInterpolatedXValue As Single, X1 As Integer, X2 As Integer, Y1 As Single, Y2 As Single, sngTargetY As Single) As Boolean
         ' Determines the X value that corresponds to sngTargetY by interpolating the line between (X1, Y1) and (X2, Y2)
         ' Returns True on success, false on error
 
@@ -2947,7 +2939,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function InterpolateY(ByRef sngInterpolatedIntensity As Single, ByVal X1 As Integer, ByVal X2 As Integer, ByVal Y1 As Single, ByVal Y2 As Single, ByVal sngXValToInterpolate As Single) As Boolean
+    Private Function InterpolateY(ByRef sngInterpolatedIntensity As Single, X1 As Integer, X2 As Integer, Y1 As Single, Y2 As Single, sngXValToInterpolate As Single) As Boolean
         ' Given two X,Y coordinates interpolate or extrapolate to determine the Y value that would be seen for a given X value
 
         Dim intScanDifference As Integer
@@ -2962,7 +2954,7 @@ Public Class clsMASICPeakFinder
         End If
     End Function
 
-    Private Sub LogErrors(ByVal strSource As String, ByVal strMessage As String, ByVal ex As Exception, Optional ByVal blnAllowInformUser As Boolean = True, Optional ByVal blnAllowThrowingException As Boolean = True, Optional ByVal blnLogLocalOnly As Boolean = True)
+    Private Sub LogErrors(strSource As String, strMessage As String, ex As Exception, Optional blnAllowInformUser As Boolean = True, Optional blnAllowThrowingException As Boolean = True, Optional blnLogLocalOnly As Boolean = True)
         Dim strMessageWithoutCRLF As String
 
         mStatusMessage = String.Copy(strMessage)
@@ -2991,7 +2983,7 @@ Public Class clsMASICPeakFinder
         End If
     End Sub
 
-    Public Function LookupNoiseStatsUsingSegments(ByVal intScanIndexObserved As Integer, ByVal udtBaselineNoiseStatSegments() As udtBaselineNoiseStatSegmentsType) As udtBaselineNoiseStatsType
+    Public Function LookupNoiseStatsUsingSegments(intScanIndexObserved As Integer, udtBaselineNoiseStatSegments() As udtBaselineNoiseStatSegmentsType) As udtBaselineNoiseStatsType
 
         Dim intNoiseSegmentIndex As Integer
         Dim intIndexSegmentA As Integer
@@ -3095,7 +3087,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ReplaceSortedDataWithMinimumPositiveValue(ByVal intDataCount As Integer, ByRef sngDataSorted() As Single) As Single
+    Private Function ReplaceSortedDataWithMinimumPositiveValue(intDataCount As Integer, ByRef sngDataSorted() As Single) As Single
         ' This function assumes sngDataSorted() is sorted ascending
         ' It looks for the minimum positive value in sngDataSorted() and returns that value
         ' Additionally, it replaces all values of 0 in sngDataSorted() with sngMinimumPositiveValue
@@ -3126,7 +3118,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function TestSignificanceUsingTTest(ByVal dblMean1 As Double, ByVal dblMean2 As Double, ByVal dblStDev1 As Double, ByVal dblStDev2 As Double, ByVal intCount1 As Integer, ByVal intCount2 As Integer, ByVal eConfidenceLevel As eTTestConfidenceLevelConstants, ByRef TCalculated As Double) As Boolean
+    Private Function TestSignificanceUsingTTest(dblMean1 As Double, dblMean2 As Double, dblStDev1 As Double, dblStDev2 As Double, intCount1 As Integer, intCount2 As Integer, eConfidenceLevel As eTTestConfidenceLevelConstants, ByRef TCalculated As Double) As Boolean
         ' Uses the means and sigma values to compute the t-test value between the two populations to determine if they are statistically different
         ' To use the t-test you must use sample variance values, not population variance values
         ' Note: Variance_Sample = Sum((x-mean)^2) / (count-1)

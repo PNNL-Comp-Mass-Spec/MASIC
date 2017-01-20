@@ -27,9 +27,6 @@ Public Class clsSearchRange
     End Enum
 #End Region
 
-#Region "Structures"
-#End Region
-
 #Region "Classwide Variables"
     Private mDataType As eDataTypeToUse
 
@@ -57,7 +54,7 @@ Public Class clsSearchRange
                 Case eDataTypeToUse.NoDataPresent
                     Return 0
                 Case Else
-                    Debug.Assert(False, "Unknown data type encountered: " & mDataType.ToString)
+                    LogErrors("Unknown data type encountered: " & mDataType.ToString)
                     Return 0
             End Select
         End Get

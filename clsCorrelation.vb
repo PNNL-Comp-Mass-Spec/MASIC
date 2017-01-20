@@ -1,7 +1,8 @@
 Option Explicit On
 Option Strict On
 
-Friend Class clsCorrelation
+Public Class clsCorrelation
+    Inherits clsEventNotifier
 
     ' This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
     ' The lists of numbers must have the same number of values
@@ -16,9 +17,12 @@ Friend Class clsCorrelation
     '
     ' Last modified November 7, 2004
 
-
     Public Sub New()
-        InitializeBinningOptions(mBinningOptions)
+        Me.New(GetDefaultBinningOptions())
+    End Sub
+
+    Public Sub New(binningOptions As clsBinningOptions)
+        mBinningOptions = binningOptions
         mNoiseThresholdIntensity = 0
     End Sub
 
@@ -32,21 +36,10 @@ Friend Class clsCorrelation
         Kendall = 2
     End Enum
 
-    Friend Structure udtBinningOptionsType
-        Public StartX As Single
-        Public EndX As Single
-        Public BinSize As Single
-
-        Public IntensityPrecisionPercent As Single
-        Public Normalize As Boolean
-        Public SumAllIntensitiesForBin As Boolean                  ' Sum all of the intensities for binned ions of the same bin together
-        Public MaximumBinCount As Integer
-    End Structure
-
 #End Region
 
 #Region "Local Member Variables"
-    Private mBinningOptions As udtBinningOptionsType
+    Private ReadOnly mBinningOptions As clsBinningOptions
     Private mNoiseThresholdIntensity As Single
 #End Region
 
@@ -241,7 +234,7 @@ Friend Class clsCorrelation
             BinDataWork(sngXData, sngYData, intDataCount, sngBinnedOffsetYData, intBinCount, mBinningOptions, sngBin2Offset)
 
         Catch ex As Exception
-            Debug.Assert(False, "Error in clsCorrelation->BinData: " & ex.Message)
+            ReportError("clsCorrelation->BinData", "BinData: " & ex.Message, ex)
             ReDim sngBinnedYData(0)
             Return False
         End Try
@@ -250,7 +243,8 @@ Friend Class clsCorrelation
 
     End Function
 
-    Private Sub BinDataWork(ByRef sngXData() As Single, ByRef sngYData() As Single, intDataCount As Integer, ByRef sngBinnedYData() As Single, intBinCount As Integer, udtBinningOptions As udtBinningOptionsType, sngOffset As Single)
+    Private Sub BinDataWork(ByRef sngXData() As Single, ByRef sngYData() As Single, intDataCount As Integer,
+                            ByRef sngBinnedYData() As Single, intBinCount As Integer, binningOptions As clsBinningOptions, sngOffset As Single)
 
         Dim intIndex As Integer
         Dim intBinNumber As Integer
@@ -263,9 +257,9 @@ Friend Class clsCorrelation
             sngMaximumIntensity = Single.MinValue
             For intIndex = 0 To intDataCount - 1
                 If sngYData(intIndex) >= mNoiseThresholdIntensity Then
-                    intBinNumber = ValueToBinNumber(sngXData(intIndex), udtBinningOptions.StartX + sngOffset, udtBinningOptions.BinSize)
+                    intBinNumber = ValueToBinNumber(sngXData(intIndex), binningOptions.StartX + sngOffset, binningOptions.BinSize)
                     If intBinNumber >= 0 And intBinNumber < intBinCount Then
-                        If udtBinningOptions.SumAllIntensitiesForBin Then
+                        If binningOptions.SumAllIntensitiesForBin Then
                             ' Add this ion's intensity to the bin intensity
                             sngBinnedYData(intBinNumber) = sngBinnedYData(intBinNumber) + sngYData(intIndex)
                         Else
@@ -286,9 +280,9 @@ Friend Class clsCorrelation
 
             If sngMaximumIntensity = Single.MinValue Then sngMaximumIntensity = 0
 
-            If udtBinningOptions.IntensityPrecisionPercent > 0 Then
+            If binningOptions.IntensityPrecisionPercent > 0 Then
                 ' Quantize the intensities to .IntensityPrecisionPercent of sngMaximumIntensity
-                sngIntensityQuantizationValue = udtBinningOptions.IntensityPrecisionPercent / 100 * sngMaximumIntensity
+                sngIntensityQuantizationValue = binningOptions.IntensityPrecisionPercent / 100 * sngMaximumIntensity
                 If sngIntensityQuantizationValue <= 0 Then sngIntensityQuantizationValue = 1
                 If sngIntensityQuantizationValue > 1 Then sngIntensityQuantizationValue = CSng(Math.Round(sngIntensityQuantizationValue, 0))
 
@@ -300,7 +294,7 @@ Friend Class clsCorrelation
 
             End If
 
-            If udtBinningOptions.Normalize And sngMaximumIntensity > 0 Then
+            If binningOptions.Normalize And sngMaximumIntensity > 0 Then
                 For intIndex = 0 To intBinCount - 1
                     If sngBinnedYData(intIndex) <> 0 Then
                         sngBinnedYData(intIndex) /= sngMaximumIntensity * 100
@@ -309,7 +303,7 @@ Friend Class clsCorrelation
             End If
 
         Catch ex As Exception
-            Debug.Assert(False, "Error in clsCorrelation->BinDataWork: " & ex.Message)
+            ReportError("clsCorrelation->BinDataWork", "BinDataWork: " & ex.Message, ex)
         End Try
 
     End Sub
@@ -376,7 +370,7 @@ Friend Class clsCorrelation
             End Select
 
         Catch ex As Exception
-            Debug.Assert(False, "Error in clsCorrelation->Correlate: " & ex.Message)
+            ReportError("clsCorrelation->Correlate", "Correlate: " & ex.Message, ex)
             Return -1
         End Try
 
@@ -660,8 +654,10 @@ Friend Class clsCorrelation
 
     End Function
 
-    Public Shared Sub InitializeBinningOptions(ByRef udtBinningOptions As udtBinningOptionsType)
-        With udtBinningOptions
+    Public Shared Function GetDefaultBinningOptions() As clsBinningOptions
+        Dim binningOptions = New clsBinningOptions()
+
+        With binningOptions
             .StartX = 50
             .EndX = 2000
             .BinSize = 1
@@ -670,10 +666,17 @@ Friend Class clsCorrelation
             .SumAllIntensitiesForBin = True                     ' Sum all of the intensities for binned ions of the same bin together
             .MaximumBinCount = 100000
         End With
+
+        Return binningOptions
+    End Function
+
+    <Obsolete("Use GetDefaultBinningOptions, which returns an instance of clsBinningOptions")>
+    Public Shared Sub InitializeBinningOptions(ByRef binningOptions As clsBinningOptions)
+        binningOptions = GetDefaultBinningOptions()
     End Sub
 
-    Public Sub SetBinningOptions(udtBinningOptions As udtBinningOptionsType)
-        mBinningOptions = udtBinningOptions
+    Public Sub SetBinningOptions(binningOptions As clsBinningOptions)
+        mBinningOptions = binningOptions
     End Sub
 
     Private Function SquareNum(dblNum As Double) As Double

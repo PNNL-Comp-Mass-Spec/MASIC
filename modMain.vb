@@ -26,7 +26,7 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "January 12, 2017"
+    Public Const PROGRAM_DATE As String = "January 18, 2017"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -204,9 +204,8 @@ Public Module modMain
 
     Private Sub RunTests()
         Try
-            Dim oMASIC = New clsMASIC()
 
-            oMASIC.TestValueToString()
+            clsTests.TestValueToString()
 
             Console.WriteLine()
 

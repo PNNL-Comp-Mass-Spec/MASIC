@@ -1,4 +1,4 @@
-Option Explicit On 
+Option Explicit On
 Option Strict On
 
 Friend Class clsPeakDetection
@@ -228,12 +228,12 @@ Friend Class clsPeakDetection
                             End If
 
                             If intPeakEdgesLeft(intPeakLocationsCount) > intPeakLocations(intPeakLocationsCount) Then
-                                Debug.Assert(False, "Left edge is > peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
+                                Console.WriteLine("Left edge is > peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
                                 intPeakEdgesLeft(intPeakLocationsCount) = intPeakLocations(intPeakLocationsCount)
                             End If
 
                             If intPeakEdgesRight(intPeakLocationsCount) < intPeakLocations(intPeakLocationsCount) Then
-                                Debug.Assert(False, "Right edge is < peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
+                                Console.WriteLine("Right edge is < peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
                                 intPeakEdgesRight(intPeakLocationsCount) = intPeakLocations(intPeakLocationsCount)
                             End If
 
@@ -331,7 +331,7 @@ Friend Class clsPeakDetection
                     End If
                 Else
                     ' 0-width peak; this shouldn't happen
-                    Debug.Assert(False, "0-width peak; this shouldn't happen (clsPeakDetection->DetectPeaks)")
+                    Console.WriteLine("0-width peak; this shouldn't happen (clsPeakDetection->DetectPeaks)")
                     dblPeakAreas(intIndex) = 0
                 End If
             Next intIndex
@@ -360,7 +360,8 @@ Friend Class clsPeakDetection
             End If
 
         Catch ex As Exception
-            Debug.Assert(False, "Error in clsPeakDetection->DetectPeaks (or in a child function)" & vbCrLf & ex.Message)
+            Console.WriteLine("Error in clsPeakDetection->DetectPeaks (or in a child function): " & ex.Message)
+            Return 0
         End Try
 
         Return intPeakLocationsCount

@@ -12,7 +12,8 @@ Public Class clsSpectraCache
     '
     ' Last modified March 21, 2005
 
-    Public Sub New()
+    Public Sub New(cacheOptions As clsSpectrumCacheOptions)
+        mCacheOptions = cacheOptions
         InitializeVariables()
     End Sub
 
@@ -57,30 +58,6 @@ Public Class clsSpectraCache
 
 #Region "Structures"
 
-    Public Structure udtSpectrumCacheOptionsType
-        ''' <summary>
-        ''' If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
-        ''' </summary>
-        Public DiskCachingAlwaysDisabled As Boolean
-
-        ''' <summary>
-        ''' Path to the cache folder (can be relative or absolute, aka rooted); if empty, then the user's AppData folder is used
-        ''' </summary>
-        Public FolderPath As String
-
-        Public SpectraToRetainInMemory As Integer
-
-        <Obsolete("Legacy parameter; no longer used")>
-        Public MinimumFreeMemoryMB As Single
-
-        <Obsolete("Legacy parameter; no longer used")>
-        Public MaximumMemoryUsageMB As Single
-
-        Public Overrides Function ToString() As String
-            Return "Cache up to " & SpectraToRetainInMemory & " in folder " & FolderPath
-        End Function
-    End Structure
-
     Private Structure udtSpectraPoolInfoType
         Public CacheState As eCacheStateConstants
         'Public LockInMemory As Boolean
@@ -92,7 +69,7 @@ Public Class clsSpectraCache
     Public SpectraPool() As clsMSSpectrum                   ' Pool (collection) of currently loaded spectra; 0-based array
     Private SpectraPoolInfo() As udtSpectraPoolInfoType     ' Parallel with SpectraPool(), but not publicly visible
 
-    Private mCacheOptions As udtSpectrumCacheOptionsType
+    Private ReadOnly mCacheOptions As clsSpectrumCacheOptions
 
     Private mPageFileReader As BinaryReader
     Private mPageFileWriter As BinaryWriter
@@ -387,7 +364,7 @@ Public Class clsSpectraCache
 
             intCharIndex = strFilePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal)
             If intCharIndex < 0 Then
-                Debug.Assert(False, "intCharIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles")
+                LogErrors("intCharIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles")
                 Return
             End If
 
@@ -550,7 +527,9 @@ Public Class clsSpectraCache
         End If
     End Sub
 
-    Public Shared Sub ResetCacheOptions(ByRef udtCacheOptions As udtSpectrumCacheOptionsType)
+    Public Shared Function GetDefaultCacheOptions() As clsSpectrumCacheOptions
+        Dim udtCacheOptions = New clsSpectrumCacheOptions
+
         With udtCacheOptions
             .DiskCachingAlwaysDisabled = False
             .FolderPath = Path.GetTempPath()
@@ -558,6 +537,13 @@ Public Class clsSpectraCache
             '.MinimumFreeMemoryMB = 250
             '.MaximumMemoryUsageMB = 3000             ' Spectrum caching to disk will be enabled if the memory usage rises over this value
         End With
+
+        Return udtCacheOptions
+    End Function
+
+    <Obsolete("Use GetDefaultCacheOptions, which returns a new instance of clsSpectrumCacheOptions")>
+    Public Shared Sub ResetCacheOptions(ByRef udtCacheOptions As clsSpectrumCacheOptions)
+        udtCacheOptions = GetDefaultCacheOptions()
     End Sub
 
     ''' <summary>
@@ -602,7 +588,9 @@ Public Class clsSpectraCache
                 With SpectraPool(intTargetPoolIndex)
                     .ScanNumber = intScanNumber
 
-                    Debug.Assert(intScanNumberInCacheFile = .ScanNumber, "Error: scan number in cache file doesn't agree with expected scan number in UnCacheSpectrum")
+                    If (intScanNumberInCacheFile <> .ScanNumber) Then
+                        LogErrors("Warning: scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum")
+                    End If
 
                     .IonCount = intIonCount
                     For intIndex = 0 To .IonCount - 1
