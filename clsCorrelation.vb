@@ -39,7 +39,7 @@ Public Class clsCorrelation
 #End Region
 
 #Region "Local Member Variables"
-    Private ReadOnly mBinningOptions As clsBinningOptions
+    Private mBinningOptions As clsBinningOptions
     Private mNoiseThresholdIntensity As Single
 #End Region
 
@@ -176,7 +176,7 @@ Public Class clsCorrelation
             Throw New Exception("Bad x in routine clsCorrelation->BetaI; should be between 0 and 1")
         Else
 
-            If (x = 0.0 Or x = 1.0) Then
+            If (Math.Abs(x) < Double.Epsilon Or Math.Abs(x - 1.0) < Double.Epsilon) Then
                 bt = 0.0
             Else
                 bt = Math.Exp(GammLn(a + b) - GammLn(a) - GammLn(b) + a * Math.Log(x) + b * Math.Log(1.0 - x))
@@ -278,7 +278,7 @@ Public Class clsCorrelation
                 End If
             Next intIndex
 
-            If sngMaximumIntensity = Single.MinValue Then sngMaximumIntensity = 0
+            If Not sngMaximumIntensity > Single.MinValue Then sngMaximumIntensity = 0
 
             If binningOptions.IntensityPrecisionPercent > 0 Then
                 ' Quantize the intensities to .IntensityPrecisionPercent of sngMaximumIntensity
@@ -287,7 +287,7 @@ Public Class clsCorrelation
                 If sngIntensityQuantizationValue > 1 Then sngIntensityQuantizationValue = CSng(Math.Round(sngIntensityQuantizationValue, 0))
 
                 For intIndex = 0 To intBinCount - 1
-                    If sngBinnedYData(intIndex) <> 0 Then
+                    If Math.Abs(sngBinnedYData(intIndex)) > Single.Epsilon Then
                         sngBinnedYData(intIndex) = CSng(Math.Round(sngBinnedYData(intIndex) / sngIntensityQuantizationValue, 0)) * sngIntensityQuantizationValue
                     End If
                 Next intIndex
@@ -296,7 +296,7 @@ Public Class clsCorrelation
 
             If binningOptions.Normalize And sngMaximumIntensity > 0 Then
                 For intIndex = 0 To intBinCount - 1
-                    If sngBinnedYData(intIndex) <> 0 Then
+                    If Math.Abs(sngBinnedYData(intIndex) - 0) > Single.Epsilon Then
                         sngBinnedYData(intIndex) /= sngMaximumIntensity * 100
                     End If
                 Next intIndex
@@ -479,7 +479,7 @@ Public Class clsCorrelation
                 a1 = sngDataList1(j) - sngDataList1(k)
                 a2 = sngDataList2(j) - sngDataList2(k)
                 aa = a1 * a2
-                If aa <> 0 Then
+                If Math.Abs(aa - 0) > Double.Epsilon Then
                     n1 += 1
                     n2 += 1
                     If aa > 0 Then
@@ -488,8 +488,8 @@ Public Class clsCorrelation
                         intIS -= 1
                     End If
                 Else
-                    If a1 <> 0 Then n1 += 1
-                    If a2 <> 0 Then n2 += 1
+                    If Math.Abs(a1) > Double.Epsilon Then n1 += 1
+                    If Math.Abs(a2) > Double.Epsilon Then n2 += 1
                 End If
             Next k
         Next j
@@ -586,12 +586,12 @@ Public Class clsCorrelation
         s = 0
         j = 0
         Do While j < n - 1
-            If w(j + 1) <> w(j) Then
+            If Math.Abs(w(j + 1) - w(j)) > Single.Epsilon Then
                 w(j) = j + 1            ' Rank = j + 1
                 j += 1
             Else
                 jt = j + 1
-                Do While jt < n AndAlso w(jt) = w(j)
+                Do While jt < n AndAlso Math.Abs(w(jt) - w(j)) < Single.Epsilon
                     jt += 1
                 Loop
                 rank = 0.5! * (j + jt - 1) + 1
@@ -681,7 +681,7 @@ Public Class clsCorrelation
 
     Private Function SquareNum(dblNum As Double) As Double
 
-        If dblNum = 0 Then
+        If Math.Abs(dblNum) < Double.Epsilon Then
             Return 0
         Else
             Return dblNum * dblNum

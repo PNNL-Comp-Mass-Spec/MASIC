@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports MASIC.DataOutput
 Imports ThermoRawFileReader
 
 Public Class clsReporterIonProcessor
@@ -44,7 +45,7 @@ Public Class clsReporterIonProcessor
             AddHandler xcaliburAccessor.ReportError, AddressOf mXcaliburAccessor_ReportError
             AddHandler xcaliburAccessor.ReportWarning, AddressOf mXcaliburAccessor_ReportWarning
 
-            If strInputFilePathFull.ToUpper().EndsWith(FINNIGAN_RAW_FILE_EXTENSION.ToUpper()) Then
+            If strInputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()) Then
 
                 ' Processing a thermo .Raw file
                 ' Check whether any of the frag scans has IsFTMS true
@@ -112,6 +113,8 @@ Public Class clsReporterIonProcessor
                 Dim blnSaveUncorrectedIntensities As Boolean =
                     mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection AndAlso mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities
 
+                Dim dataAggregation = New clsDataAggregation()
+                RegisterEvents(dataAggregation)
 
                 For Each reporterIon In reporterIons
 
@@ -178,7 +181,7 @@ Public Class clsReporterIonProcessor
                 ' Write the headers to the output file, separated by tabs
                 srOutFile.WriteLine(String.Join(cColDelimiter, headerColumns))
 
-                SetSubtaskProcessingStepPct(0, "Searching for reporter ions")
+                UpdateProgress(0, "Searching for reporter ions")
 
                 For masterOrderIndex = 0 To scanList.MasterScanOrderCount - 1
                     Dim scanPointer = scanList.MasterScanOrder(masterOrderIndex).ScanIndexPointer
@@ -189,6 +192,7 @@ Public Class clsReporterIonProcessor
 
                     FindReporterIonsWork(
                         xcaliburAccessor,
+                        dataAggregation,
                         includeFtmsColumns,
                         mOptions.SICOptions,
                         scanList,
@@ -201,9 +205,9 @@ Public Class clsReporterIonProcessor
                         mOptions.ReporterIons.ReporterIonSaveObservedMasses)
 
                     If scanList.MasterScanOrderCount > 1 Then
-                        SetSubtaskProcessingStepPct(CShort(masterOrderIndex / (scanList.MasterScanOrderCount - 1) * 100))
+                        UpdateProgress(CShort(masterOrderIndex / (scanList.MasterScanOrderCount - 1) * 100))
                     Else
-                        SetSubtaskProcessingStepPct(0)
+                        UpdateProgress(0)
                     End If
 
                     UpdateCacheStats(objSpectraCache)
@@ -234,6 +238,7 @@ Public Class clsReporterIonProcessor
     ''' Calls AggregateIonsInRange with blnReturnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
     ''' </summary>
     ''' <param name="xcaliburAccessor"></param>
+    ''' <param name="dataAggregation"></param>
     ''' <param name="includeFtmsColumns"></param>
     ''' <param name="sicOptions"></param>
     ''' <param name="scanList"></param>
@@ -247,6 +252,7 @@ Public Class clsReporterIonProcessor
     ''' <remarks></remarks>
     Private Sub FindReporterIonsWork(
       xcaliburAccessor As XRawFileIO,
+      dataAggregation As clsDataAggregation,
       includeFtmsColumns As Boolean,
       sicOptions As clsSICOptions,
       scanList As clsScanList,
@@ -317,7 +323,7 @@ Public Class clsReporterIonProcessor
 
             With reporterIons(intReporterIonIndex)
                 ' Search for the reporter ion MZ in this mass spectrum
-                sngReporterIntensities(intReporterIonIndex) = AggregateIonsInRange(
+                sngReporterIntensities(intReporterIonIndex) = dataAggregation.AggregateIonsInRange(
                     objSpectraCache.SpectraPool(intPoolIndex),
                     .MZ,
                     .MZToleranceDa,

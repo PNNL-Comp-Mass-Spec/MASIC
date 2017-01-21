@@ -22,9 +22,11 @@ Public Class clsDataAggregation
             sngIonSumOrMax = 0
 
             If Not objSpectraCache.ValidateSpectrumInPool(scanList(intSpectrumIndex).ScanNumber, intPoolIndex) Then
-                SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
+                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
             Else
-                sngIonSumOrMax = AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex), dblSearchMZ, dblSearchToleranceHalfWidth, intIonMatchCount, dblClosestMZ, blnReturnMax)
+                sngIonSumOrMax = AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex),
+                                                      dblSearchMZ, dblSearchToleranceHalfWidth,
+                                                      intIonMatchCount, dblClosestMZ, blnReturnMax)
             End If
         Catch ex As Exception
             ReportError("AggregateIonsInRange_SpectraCache", "Error in AggregateIonsInRange", ex, True, False)
@@ -123,7 +125,7 @@ Public Class clsDataAggregation
 
         Try
             If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
-                SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
+                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
                 blnSuccess = False
             Else
                 With objSpectraCache.SpectraPool(intPoolIndex)

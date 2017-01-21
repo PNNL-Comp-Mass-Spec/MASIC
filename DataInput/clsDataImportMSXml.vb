@@ -27,8 +27,7 @@ Namespace DataInput
             Try
                 objXMLReader = New MSDataFileReader.clsMzXMLFileReader
                 Return ExtractScanInfoFromMSXMLDataFile(strFilePath, objXMLReader, scanList, objSpectraCache,
-                                                    dataOutputHandler,
-                                                    mStatusMessage, blnKeepRawSpectra, blnKeepMSMSSpectra)
+                                                    dataOutputHandler, blnKeepRawSpectra, blnKeepMSMSSpectra)
 
             Catch ex As Exception
                 ReportError("ExtractScanInfoFromMZXMLDataFile", "Error in ExtractScanInfoFromMZXMLDataFile", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
@@ -337,7 +336,7 @@ Namespace DataInput
                                 newFragScan,
                                 objSpectraCache,
                                 sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
-                                clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
+                                DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
                                 sicOptions.CompressMSMSSpectraData,
                                 mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa,
                                 blnKeepRawSpectra And blnKeepMSMSSpectra)
@@ -349,10 +348,12 @@ Namespace DataInput
 
                             If eMRMScanType = MRMScanTypeConstants.NotMRM Then
                                 ' This is not an MRM scan
-                                AddUpdateParentIons(scanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
+                                mParentIonProcessor.AddUpdateParentIons(scanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
+                                                                        scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
                             Else
                                 ' This is an MRM scan
-                                AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, objSpectrumInfo.ParentIonMZ, newFragScan.MRMScanInfo, objSpectraCache, sicOptions)
+                                mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
+                                                                        newFragScan.MRMScanInfo, objSpectraCache, sicOptions)
                             End If
 
                         End If
@@ -404,7 +405,6 @@ Namespace DataInput
             If Not objXMLReader Is Nothing Then
                 Try
                     objXMLReader.CloseFile()
-                    objXMLReader = Nothing
                 Catch ex As Exception
                     ' Ignore errors here
                 End Try
@@ -455,7 +455,14 @@ Namespace DataInput
 
                     End With
 
-                    mScanTracking.ProcessAndStoreSpectrum(scanInfo, objSpectraCache, objMSSpectrum, noiseThresholdOptions, blnDiscardLowIntensityData, blnCompressSpectraData, dblMSDataResolution, blnKeepRawSpectrum)
+                    mScanTracking.ProcessAndStoreSpectrum(
+                        scanInfo, Me,
+                        objSpectraCache, objMSSpectrum,
+                        noiseThresholdOptions,
+                        blnDiscardLowIntensityData,
+                        blnCompressSpectraData,
+                        dblMSDataResolution,
+                        blnKeepRawSpectrum)
                 Else
                     scanInfo.TotalIonIntensity = 0
                 End If
@@ -487,7 +494,7 @@ Namespace DataInput
                         .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(.ScanHeaderText)
 
                         ' Now populate .SIMScan, .MRMScanType and .ZoomScan
-                        Dim blnValidScan = XRawFileIO.ValidateMSScan(.ScanHeaderText, intMSLevelFromFilter, .SIMScan, .MRMScanType, .ZoomScan)
+                        XRawFileIO.ValidateMSScan(.ScanHeaderText, intMSLevelFromFilter, .SIMScan, .MRMScanType, .ZoomScan)
 
                     Else
                         .ScanHeaderText = String.Empty

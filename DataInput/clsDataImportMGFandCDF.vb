@@ -73,8 +73,7 @@ Namespace DataInput
 
                 If intMsScanCount <= 0 Then
                     ' No scans found
-                    ReportError("No scans found in the input file: " & strCDFInputFilePathFull)
-                    ShowErrorMessage(strStatusMessage)
+                    ReportError("ExtractScanInfoFromMGFandCDF", "No scans found in the input file: " & strCDFInputFilePathFull)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
@@ -184,22 +183,23 @@ Namespace DataInput
                                     ' However, if the lowest m/z value is < 100, then use 100 m/z
                                     If dblMZMin < 100 Then
                                         dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
-                                                          sicOptions.CompressToleranceDivisorForPPM
+                                            sicOptions.CompressToleranceDivisorForPPM
                                     Else
                                         dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, dblMZMin) /
-                                                          sicOptions.CompressToleranceDivisorForPPM
+                                            sicOptions.CompressToleranceDivisorForPPM
                                     End If
                                 Else
-                                    dblMSDataResolution = sicOptions.SICTolerance /
-                                                      sicOptions.CompressToleranceDivisorForDa
+                                    dblMSDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
                                 End If
 
-                                mScanTracking.ProcessAndStoreSpectrum(newSurveyScan, objSpectraCache, objMSSpectrum,
-                                                    sicOptions.SICPeakFinderOptions.
-                                                       MassSpectraNoiseThresholdOptions,
-                                                    clsMASIC.DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
-                                                    sicOptions.CompressMSSpectraData, dblMSDataResolution,
-                                                    blnKeepRawSpectra)
+                                mScanTracking.ProcessAndStoreSpectrum(
+                                    newSurveyScan, Me,
+                                    objSpectraCache, objMSSpectrum,
+                                    sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                                    DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
+                                    sicOptions.CompressMSSpectraData,
+                                    dblMSDataResolution,
+                                    blnKeepRawSpectra)
 
                             Else
                                 With newSurveyScan
@@ -396,14 +396,17 @@ Namespace DataInput
 
                             End With
 
-                            mScanTracking.ProcessAndStoreSpectrum(newFragScan, objSpectraCache, objMSSpectrum,
-                                                sicOptions.SICPeakFinderOptions.
-                                                   MassSpectraNoiseThresholdOptions,
-                                                clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
-                                                sicOptions.CompressMSMSSpectraData,
-                                                mOptions.BinningOptions.BinSize /
-                                                sicOptions.CompressToleranceDivisorForDa,
-                                                blnKeepRawSpectra And blnKeepMSMSSpectra)
+                            Dim dblMSDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
+                            Dim blnKeepRawSpectrum = blnKeepRawSpectra And blnKeepMSMSSpectra
+
+                            mScanTracking.ProcessAndStoreSpectrum(
+                                newFragScan, Me,
+                                objSpectraCache, objMSSpectrum,
+                                sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                                DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
+                                sicOptions.CompressMSMSSpectraData,
+                                dblMSDataResolution,
+                                blnKeepRawSpectrum)
 
                         Else
                             With newFragScan
@@ -415,8 +418,8 @@ Namespace DataInput
 
                     End With
 
-                    AddUpdateParentIons(scanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
-                                    scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
+                    mParentIonProcessor.AddUpdateParentIons(scanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
+                                                            scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
 
                     ' Note: We need to take intMsScanCount * 2, in addition to adding intMsScanCount to intLastSurveyScanIndex, since we have to read two different files
                     If intMsScanCount > 1 Then
@@ -500,7 +503,6 @@ Namespace DataInput
             End Try
 
         End Function
-
 
         Private Function FindBasePeakIon(
           ByRef dblMZList() As Double,

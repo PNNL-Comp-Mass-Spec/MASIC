@@ -55,9 +55,9 @@ Public Class clsTests
             sngScanTime = 5             ' 5 minutes
 
             ' Convert each of these ranges to a scan time range in minutes
-            sngResult = ScanOrAcqTimeToScanTime(scanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
-            sngResult = ScanOrAcqTimeToScanTime(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
-            sngResult = ScanOrAcqTimeToScanTime(scanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
+            sngResult = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, intScanNumber, eCustomSICScanTypeConstants.Absolute, True)
+            sngResult = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, sngRelativeTime, eCustomSICScanTypeConstants.Relative, True)
+            sngResult = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, sngScanTime, eCustomSICScanTypeConstants.AcquisitionTime, True)
 
 
         Catch ex As Exception

@@ -83,7 +83,7 @@ Namespace DataInput
 
                 blnSuccess = UpdateDatasetFileStats(ioFileInfo, intDatasetID, xcaliburAccessor)
 
-                Dim metadataWriter = New clsThermoMetadataWriter()
+                Dim metadataWriter = New DataOutput.clsThermoMetadataWriter()
                 RegisterEvents(metadataWriter)
 
                 If mOptions.WriteMSMethodFile Then
@@ -286,14 +286,14 @@ Namespace DataInput
 
             ' Store the collision mode and possibly the scan filter text
             newSurveyScan.FragScanInfo.CollisionMode = scanInfo.CollisionMode
-            StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
+            StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
             If mOptions.WriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
+                StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
             End If
 
             If mOptions.WriteExtendedStatsStatusLog Then
                 ' Store the StatusLog values in .ExtendedHeaderInfo
-                StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, scanInfo.StatusLog, mStatusLogKeyNameFilterList)
+                StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, scanInfo.StatusLog, mOptions.StatusLogKeyNameFilterList)
             End If
 
             scanList.SurveyScans.Add(newSurveyScan)
@@ -310,9 +310,11 @@ Namespace DataInput
                 ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
                 ' However, if the lowest m/z value is < 100, then use 100 m/z
                 If scanInfo.LowMass < 100 Then
-                    dblMSDataResolution = GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM
+                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
+                        sicOptions.CompressToleranceDivisorForPPM
                 Else
-                    dblMSDataResolution = GetParentIonToleranceDa(sicOptions, scanInfo.LowMass) / sicOptions.CompressToleranceDivisorForPPM
+                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, scanInfo.LowMass) /
+                        sicOptions.CompressToleranceDivisorForPPM
                 End If
             Else
                 dblMSDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
@@ -402,14 +404,14 @@ Namespace DataInput
 
             ' Store the collision mode and possibly the scan filter text
             newFragScan.FragScanInfo.CollisionMode = scanInfo.CollisionMode
-            StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
+            StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
             If mOptions.WriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
+                StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
             End If
 
             If mOptions.WriteExtendedStatsStatusLog Then
                 ' Store the StatusLog values in .ExtendedHeaderInfo
-                StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, scanInfo.StatusLog, mStatusLogKeyNameFilterList)
+                StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, scanInfo.StatusLog, mOptions.StatusLogKeyNameFilterList)
             End If
 
             scanList.FragScans.Add(newFragScan)
@@ -425,7 +427,7 @@ Namespace DataInput
               intScanNumber,
               newFragScan,
               sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
-              clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
+              DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
               sicOptions.CompressMSMSSpectraData,
               dblMSDataResolution,
               blnKeepRawSpectra And blnKeepMSMSSpectra)
@@ -544,7 +546,14 @@ Namespace DataInput
                     End If
 
                     strLastKnownLocation = "Call ProcessAndStoreSpectrum"
-                    mScanTracking.ProcessAndStoreSpectrum(scanInfo, objSpectraCache, objMSSpectrum, noiseThresholdOptions, blnDiscardLowIntensityDataWork, blnCompressSpectraDataWork, dblMSDataResolution, blnKeepRawSpectrum)
+                    mScanTracking.ProcessAndStoreSpectrum(
+                        scanInfo, Me,
+                        objSpectraCache, objMSSpectrum,
+                        noiseThresholdOptions,
+                        blnDiscardLowIntensityDataWork,
+                        blnCompressSpectraDataWork,
+                        dblMSDataResolution,
+                        blnKeepRawSpectrum)
                 Else
                     scanInfo.TotalIonIntensity = 0
                 End If
@@ -628,17 +637,14 @@ Namespace DataInput
           scanInfo As clsScanInfo,
           statusEntries As List(Of KeyValuePair(Of String, String)))
 
-            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries, New String() {})
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries, New SortedSet(Of String))
         End Sub
 
         Private Sub StoreExtendedHeaderInfo(
           dataOutputHandler As DataOutput.clsDataOutput,
           scanInfo As clsScanInfo,
           statusEntries As List(Of KeyValuePair(Of String, String)),
-          ByRef strKeyNameFilterList() As String)
-
-            Dim intIndex As Integer
-            Dim intFilterIndex As Integer
+          keyNameFilterList As SortedSet(Of String))
 
             Dim blnFilterItems As Boolean
             Dim blnSaveItem As Boolean
@@ -646,13 +652,10 @@ Namespace DataInput
             Try
                 If (statusEntries Is Nothing) Then Exit Sub
 
-                If Not strKeyNameFilterList Is Nothing AndAlso strKeyNameFilterList.Length > 0 Then
-                    For intIndex = 0 To strKeyNameFilterList.Length - 1
-                        If strKeyNameFilterList(intIndex).Length > 0 Then
-                            blnFilterItems = True
-                            Exit For
-                        End If
-                    Next
+                If Not keyNameFilterList Is Nothing AndAlso keyNameFilterList.Count > 0 Then
+                    If keyNameFilterList.Any(Function(item) item.Length > 0) Then
+                        blnFilterItems = True
+                    End If
                 End If
 
                 For Each statusEntry In statusEntries
@@ -663,12 +666,13 @@ Namespace DataInput
 
                     If blnFilterItems Then
                         blnSaveItem = False
-                        For intFilterIndex = 0 To strKeyNameFilterList.Length - 1
-                            If statusEntry.Key.ToLower().Contains(strKeyNameFilterList(intFilterIndex).ToLower()) Then
+
+                        For Each item In keyNameFilterList
+                            If statusEntry.Key.ToLower().Contains(item.ToLower()) Then
                                 blnSaveItem = True
                                 Exit For
                             End If
-                        Next intFilterIndex
+                        Next
                     Else
                         blnSaveItem = True
                     End If

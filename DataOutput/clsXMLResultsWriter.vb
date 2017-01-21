@@ -358,7 +358,9 @@ Namespace DataOutput
         Public Function XMLOutputFileFinalize(
            dataOutputHandler As clsDataOutput,
            scanList As clsScanList,
-           objSpectraCache As clsSpectraCache) As Boolean
+           objSpectraCache As clsSpectraCache,
+           processingStats As clsProcessingStats,
+           processingTimeSec As Single) As Boolean
 
 
             Dim objXMLOut As Xml.XmlTextWriter
@@ -372,9 +374,9 @@ Namespace DataOutput
                     objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString)
                 End With
 
-                With mProcessingStats
+                With processingStats
                     objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(.PeakMemoryUsageMB, 2).ToString)
-                    objXMLOut.WriteElementString("TotalProcessingTimeSeconds", Math.Round(GetTotalProcessingTimeSec() - .TotalProcessingTimeAtStart, 2).ToString)
+                    objXMLOut.WriteElementString("TotalProcessingTimeSeconds", Math.Round(processingTimeSec - .TotalProcessingTimeAtStart, 2).ToString)
                 End With
                 objXMLOut.WriteEndElement()
 
@@ -476,7 +478,7 @@ Namespace DataOutput
                     ' SIC Options
 
                     ' "SICToleranceDa" is a legacy parameter; If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
-                    objXMLOut.WriteElementString("SICToleranceDa", GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"))
+                    objXMLOut.WriteElementString("SICToleranceDa", clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"))
 
                     objXMLOut.WriteElementString("SICTolerance", .SICTolerance.ToString("0.0000"))
                     objXMLOut.WriteElementString("SICToleranceIsPPM", .SICToleranceIsPPM.ToString)
@@ -598,7 +600,7 @@ Namespace DataOutput
             If intCharIndex > 0 Then
                 ' Isolate the number
                 strWork = strWork.Substring(0, intCharIndex)
-                If IsNumber(strWork) Then
+                If clsUtilities.IsNumber(strWork) Then
                     intCurrentValue = CInt(strWork)
 
                     If intNewValueToSave <> intCurrentValue Then
@@ -637,7 +639,7 @@ Namespace DataOutput
             Dim intParentIonIndex As Integer
             Dim intParentIonsProcessed As Integer
 
-            strXMLReadFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.XMLFile)
+            strXMLReadFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
 
             strXMLOutputFilePath = Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
 
@@ -653,7 +655,7 @@ Namespace DataOutput
                 Using srInFile = New StreamReader(strXMLReadFilePath),
                   srOutFile = New StreamWriter(strXMLOutputFilePath, False)
 
-                    SetSubtaskProcessingStepPct(0, "Updating XML file with optimal peak apex values")
+                    UpdateProgress(0, "Updating XML file with optimal peak apex values")
 
                     intParentIonIndex = -1
                     intParentIonsProcessed = 0
@@ -669,17 +671,17 @@ Namespace DataOutput
                                     intCharIndex = strWork.IndexOf(ControlChars.Quote)
                                     If intCharIndex > 0 Then
                                         strWork = strWork.Substring(0, intCharIndex)
-                                        If IsNumber(strWork) Then
+                                        If clsUtilities.IsNumber(strWork) Then
                                             intParentIonIndex = CInt(strWork)
                                             intParentIonsProcessed += 1
 
                                             ' Update progress
                                             If scanList.ParentIonInfoCount > 1 Then
                                                 If intParentIonsProcessed Mod 100 = 0 Then
-                                                    SetSubtaskProcessingStepPct(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
+                                                    UpdateProgress(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
                                                 End If
                                             Else
-                                                SetSubtaskProcessingStepPct(0)
+                                                UpdateProgress(0)
                                             End If
 
                                             If mOptions.AbortProcessing Then
@@ -727,7 +729,7 @@ Namespace DataOutput
                     Return False
                 End Try
 
-                SetSubtaskProcessingStepPct(100)
+                UpdateProgress(100)
                 Windows.Forms.Application.DoEvents()
 
             Catch ex As Exception

@@ -45,7 +45,7 @@ Namespace DataOutput
 
 
                 ' Second, write an MS-based _scans.csv file (readable with Decon2LS)
-                strOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSChromatogramFile)
+                strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSChromatogramFile)
                 ReportMessage("Saving Decon2LS MS Chromatogram File to " & Path.GetFileName(strOutputFilePath))
 
                 SaveDecon2LSChromatogram(scanList.SurveyScans, objSpectraCache, strOutputFilePath)
@@ -55,7 +55,7 @@ Namespace DataOutput
 
 
                 ' Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
-                strOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile)
+                strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile)
                 ReportMessage("Saving Decon2LS MSMS Chromatogram File to " & Path.GetFileName(strOutputFilePath))
 
                 SaveDecon2LSChromatogram(scanList.FragScans, objSpectraCache, strOutputFilePath)
@@ -71,49 +71,13 @@ Namespace DataOutput
             Return blnSuccess
         End Function
 
-        Private Sub SaveBPIWork(
-          scanList As IList(Of clsScanInfo),
-          intScanCount As Integer,
-          strOutputFilePath As String,
-          blnSaveTIC As Boolean,
-          cColDelimiter As Char)
-
-            Dim srOutFile As StreamWriter
-            Dim intScanIndex As Integer
-
-            srOutFile = New StreamWriter(strOutputFilePath)
-
-            If blnSaveTIC Then
-                srOutFile.WriteLine("Time" & cColDelimiter & "TotalIonIntensity")
-            Else
-                srOutFile.WriteLine("Time" & cColDelimiter & "BasePeakIntensity" & cColDelimiter & "m/z")
-            End If
-
-            For intScanIndex = 0 To intScanCount - 1
-                With scanList(intScanIndex)
-                    If blnSaveTIC Then
-                        srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString() & cColDelimiter &
-                          Math.Round(.TotalIonIntensity, 2).ToString)
-                    Else
-                        srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString() & cColDelimiter &
-                          Math.Round(.BasePeakIonIntensity, 2).ToString() & cColDelimiter &
-                          Math.Round(.BasePeakIonMZ, 4).ToString)
-                    End If
-
-                End With
-            Next intScanIndex
-
-            srOutFile.Close()
-
-        End Sub
-
         Private Sub SaveDecon2LSChromatogram(
           scanList As IList(Of clsScanInfo),
           objSpectraCache As clsSpectraCache,
           strOutputFilePath As String)
 
             Dim srScanInfoOutfile As StreamWriter
-            Dim scansWritten As Integer = 0
+            Dim scansWritten = 0
 
             srScanInfoOutfile = New StreamWriter(strOutputFilePath)
 
@@ -249,11 +213,11 @@ Namespace DataOutput
 
         End Sub
 
-        Private Sub WriteDecon2LSIsosFileHeaders(srOutFile As StreamWriter)
+        Public Sub WriteDecon2LSIsosFileHeaders(srOutFile As StreamWriter)
             srOutFile.WriteLine("scan_num,charge,abundance,mz,fit,average_mw,monoisotopic_mw,mostabundant_mw,fwhm,signal_noise,mono_abundance,mono_plus2_abundance")
         End Sub
 
-        Private Sub WriteDecon2LSIsosFileEntry(
+        Public Sub WriteDecon2LSIsosFileEntry(
           srIsosOutFile As StreamWriter,
           intScanNumber As Integer,
           intCharge As Integer,
@@ -287,7 +251,7 @@ Namespace DataOutput
 
         End Sub
 
-        Private Sub WriteDecon2LSScanFileHeaders(srOutFile As StreamWriter)
+        Public Sub WriteDecon2LSScanFileHeaders(srOutFile As StreamWriter)
             srOutFile.WriteLine("scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped")
 
             ' Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
@@ -327,7 +291,7 @@ Namespace DataOutput
 
         End Sub
 
-        Private Sub WriteDecon2LSScanFileEntry(
+        Public Sub WriteDecon2LSScanFileEntry(
           srScanInfoOutFile As StreamWriter,
           currentScan As clsScanInfo,
           intScanNumber As Integer,

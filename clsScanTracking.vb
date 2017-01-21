@@ -1,5 +1,14 @@
-﻿Public Class clsScanTracking
+﻿Imports MASIC.clsMASIC
+
+Public Class clsScanTracking
     Inherits clsEventNotifier
+
+#Region "Constants and Enums"
+
+    ' Absolute maximum number of ions that will be tracked for a mass spectrum
+    Private Const MAX_ALLOWABLE_ION_COUNT As Integer = 50000
+
+#End Region
 
 #Region "Properties"
     Public ReadOnly Property ScanStats As List(Of DSSummarizer.clsScanStatsEntry)
@@ -212,6 +221,7 @@
 
     Public Function ProcessAndStoreSpectrum(
       scanInfo As clsScanInfo,
+      dataImportUtilities As DataInput.clsDataImport,
       objSpectraCache As clsSpectraCache,
       objMSSpectrum As clsMSSpectrum,
       noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
@@ -244,7 +254,7 @@
                         ' Discard data below the noise level or below the minimum S/N level
                         ' If we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
                         strLastKnownLocation = "Call DiscardDataBelowNoiseThreshold"
-                        DiscardDataBelowNoiseThreshold(objMSSpectrum,
+                        dataImportUtilities.DiscardDataBelowNoiseThreshold(objMSSpectrum,
                                                        scanInfo.BaselineNoiseStats.NoiseLevel,
                                                        mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                                        mReporterIons.MZIntensityFilterIgnoreRangeEnd,
@@ -273,15 +283,18 @@
                     ' In addition, display a new message every time a new max value is encountered
                     If intSpectraFoundExceedingMaxIonCount <= 10 OrElse objMSSpectrum.IonCount > intMaxIonCountReported Then
                         Console.WriteLine()
-                        Console.WriteLine("Note: Scan " & scanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; will only retain " & intMaxAllowableIonCount & " (trimmed " & intSpectraFoundExceedingMaxIonCount.ToString() & " spectra)")
+                        Console.WriteLine("Note: Scan " & scanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; " &
+                                          "will only retain " & intMaxAllowableIonCount &
+                                          " (trimmed " & intSpectraFoundExceedingMaxIonCount.ToString() & " spectra)")
 
                         intMaxIonCountReported = objMSSpectrum.IonCount
                     End If
 
-                    DiscardDataToLimitIonCount(objMSSpectrum,
-                                               mReporterIons.MZIntensityFilterIgnoreRangeStart,
-                                               mReporterIons.MZIntensityFilterIgnoreRangeEnd,
-                                               intMaxAllowableIonCount)
+                    dataImportUtilities.DiscardDataToLimitIonCount(
+                        objMSSpectrum,
+                        mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                        mReporterIons.MZIntensityFilterIgnoreRangeEnd,
+                        intMaxAllowableIonCount)
 
                     scanInfo.IonCount = objMSSpectrum.IonCount
                 End If

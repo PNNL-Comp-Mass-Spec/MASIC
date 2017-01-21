@@ -1,4 +1,6 @@
-﻿Public Class clsSICOptions
+﻿Imports System.Runtime.InteropServices
+
+Public Class clsSICOptions
 
 #Region "Constants and Enums"
 
@@ -6,6 +8,8 @@
     Public Const DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM As Double = 3
 
 #End Region
+
+#Region "Properties"
 
     ''' <summary>
     ''' Provided by the user at the command line or through the Property Function Interface; 0 if unknown
@@ -22,6 +26,19 @@
     ''' </summary>
     Public Property SICToleranceIsPPM As Boolean
 
+    Public Property SICToleranceDa As Double
+        Get
+            If SICToleranceIsPPM Then
+                ' Return the Da tolerance value that will result for the given ppm tolerance at 1000 m/z
+                Return clsParentIonProcessing.GetParentIonToleranceDa(Me, 1000)
+            Else
+                Return SICTolerance
+            End If
+        End Get
+        Set(value As Double)
+            SetSICTolerance(value, False)
+        End Set
+    End Property
     ''' <summary>
     ''' If True, then will look through the m/z values in the parent ion spectrum data to find the closest match 
     ''' (within SICToleranceDa / sicOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
@@ -70,16 +87,31 @@
     '   or 3) the distance exceeds MaxSICPeakWidthMinutesBackward or MaxSICPeakWidthMinutesForward
 
     ''' <summary>
-    ''' Defaults to 3
+    ''' Defaults to 5
     ''' </summary>
     Public Property MaxSICPeakWidthMinutesBackward As Single
+        Get
+            Return mMaxSICPeakWidthMinutesBackward
+        End Get
+        Set(value As Single)
+            If value < 0 Or value > 10000 Then value = 5
+            mMaxSICPeakWidthMinutesBackward = value
+        End Set
+    End Property
 
     ''' <summary>
-    ''' Defaults to 3
+    ''' Defaults to 5
     ''' </summary>
     Public Property MaxSICPeakWidthMinutesForward As Single
-
-    Public Property SICPeakFinderOptions As MASICPeakFinder.clsMASICPeakFinder.udtSICPeakFinderOptionsType
+        Get
+            Return mMaxSICPeakWidthMinutesForward
+        End Get
+        Set(value As Single)
+            If value < 0 Or value > 10000 Then value = 5
+            mMaxSICPeakWidthMinutesForward = value
+        End Set
+    End Property
+    Public Property SICPeakFinderOptions As MASICPeakFinder.clsSICPeakFinderOptions
 
     Public Property ReplaceSICZeroesWithMinimumPositiveValueFromMSData As Boolean
 
@@ -90,17 +122,57 @@
     ''' </summary>
     ''' <remarks>Defaults to 0.1</remarks>
     Public Property SimilarIonMZToleranceHalfWidth As Single
+        Get
+            Return mSimilarIonMZToleranceHalfWidth
+        End Get
+        Set(value As Single)
+            If value < 0.001 Or value > 100 Then value = 0.1
+            mSimilarIonMZToleranceHalfWidth = value
+        End Set
+    End Property
 
     ''' <summary>
     ''' Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
     ''' </summary>
     ''' <remarks>Defaults to 5</remarks>
     Public Property SimilarIonToleranceHalfWidthMinutes As Single
+        Get
+            Return mSimilarIonToleranceHalfWidthMinutes
+        End Get
+        Set(value As Single)
+            If value < 0 Or value > 100000 Then value = 5
+            mSimilarIonToleranceHalfWidthMinutes = value
+        End Set
+    End Property
 
     ''' <summary>
     ''' Defaults to 0.8
     ''' </summary>
     Public Property SpectrumSimilarityMinimum As Single
+        Get
+            Return mSpectrumSimilarityMinimum
+        End Get
+        Set(value As Single)
+            If value < 0 Or value > 1 Then value = 0.8
+            mSpectrumSimilarityMinimum = value
+        End Set
+    End Property
+#End Region
+
+#Region "Classwide Variables"
+    Private mMaxSICPeakWidthMinutesBackward As Single
+    Private mMaxSICPeakWidthMinutesForward As Single
+#End Region
+
+    Public Function GetSICTolerance() As Double
+        Dim blnToleranceIsPPM As Boolean
+        Return GetSICTolerance(blnToleranceIsPPM)
+    End Function
+
+    Public Function GetSICTolerance(<Out()> ByRef blnSICToleranceIsPPM As Boolean) As Double
+        blnSICToleranceIsPPM = SICToleranceIsPPM
+        Return SICTolerance
+    End Function
 
     Public Sub Reset()
         SICTolerance = 10
@@ -140,6 +212,17 @@
         SpectrumSimilarityMinimum = 0.8
     End Sub
 
+    Public Sub SetSICTolerance(dblSICTolerance As Double, blnSICToleranceIsPPM As Boolean)
+        SICToleranceIsPPM = blnSICToleranceIsPPM
+
+        If SICToleranceIsPPM Then
+            If dblSICTolerance < 0 Or dblSICTolerance > 1000000 Then dblSICTolerance = 100
+        Else
+            If dblSICTolerance < 0 Or dblSICTolerance > 10000 Then dblSICTolerance = 0.6
+        End If
+        SICTolerance = dblSICTolerance
+    End Sub
+
     Public Sub ValidateSICOptions()
 
         If CompressToleranceDivisorForDa < 1 Then
@@ -160,4 +243,10 @@
         End If
     End Function
 
+#Region "Classwide variables"
+    Private mSimilarIonMZToleranceHalfWidth As Single = 0.1
+    Private mSimilarIonToleranceHalfWidthMinutes As Single = 5
+    Private mSpectrumSimilarityMinimum As Single = 0.8
+
+#End Region
 End Class

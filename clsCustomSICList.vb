@@ -20,6 +20,18 @@
 #Region "Properties"
 
     Public Property CustomSICListFileName As String
+        Get
+            If mCustomSICListFileName Is Nothing Then Return String.Empty
+            Return mCustomSICListFileName
+        End Get
+        Set(value As String)
+            If value Is Nothing Then
+                mCustomSICListFileName = String.Empty
+            Else
+                mCustomSICListFileName = value.Trim()
+            End If
+        End Set
+    End Property
 
     Public Property ScanToleranceType As eCustomSICScanTypeConstants
 
@@ -44,6 +56,9 @@
 
 #End Region
 
+#Region "Classwide variables"
+    Private mCustomSICListFileName As String
+#End Region
     ''' <summary>
     ''' Constructor
     ''' </summary>
@@ -82,7 +97,7 @@
                         scanList, 0.5, eCustomSICScanTypeConstants.Relative)
                 Else
                     currentParentIon.SurveyScanIndex = scanNumScanConverter.FindNearestSurveyScanIndex(
-                        scanList, customMzSearchValue.ScanOrAcqTimeCenter, mScanToleranceType)
+                        scanList, customMzSearchValue.ScanOrAcqTimeCenter, ScanToleranceType)
                 End If
 
                 ' Find the next MS2 scan that occurs after the survey scan (parent scan)
@@ -239,7 +254,7 @@
 
             If lstScanCenters.Count > intIndex Then
                 If clsUtilities.IsNumber(lstScanCenters(intIndex)) Then
-                    If ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
+                    If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
                         mzSearchSpec.ScanOrAcqTimeCenter = CInt(lstScanCenters(intIndex))
                     Else
                         ' Includes .Relative and .AcquisitionTime
@@ -250,7 +265,7 @@
 
             If lstScanTolerances.Count > intIndex Then
                 If clsUtilities.IsNumber(lstScanTolerances(intIndex)) Then
-                    If ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
+                    If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
                         mzSearchSpec.ScanOrAcqTimeTolerance = CInt(lstScanTolerances(intIndex))
                     Else
                         ' Includes .Relative and .AcquisitionTime
@@ -281,7 +296,7 @@
 
     Public Sub Reset()
 
-        ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
+        ScanToleranceType = eCustomSICScanTypeConstants.Absolute
         ScanOrAcqTimeTolerance = 1000
 
         ResetMzSearchValues()

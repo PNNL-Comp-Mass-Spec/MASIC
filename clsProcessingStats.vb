@@ -1,19 +1,19 @@
 ﻿Public Class clsProcessingStats
 
-    Public PeakMemoryUsageMB As Single
-    Public TotalProcessingTimeAtStart As Single
-    Public CacheEventCount As Integer
-    Public UnCacheEventCount As Integer
+    Public Property PeakMemoryUsageMB As Single
+    Public Property TotalProcessingTimeAtStart As Single
+    Public Property CacheEventCount As Integer
+    Public Property UnCacheEventCount As Integer
 
-    Public FileLoadStartTime As DateTime
-    Public FileLoadEndTime As DateTime
+    Public Property FileLoadStartTime As DateTime
+    Public Property FileLoadEndTime As DateTime
 
-    Public ProcessingStartTime As DateTime
-    Public ProcessingEndTime As DateTime
+    Public Property ProcessingStartTime As DateTime
+    Public Property ProcessingEndTime As DateTime
 
-    Public MemoryUsageMBAtStart As Single
-    Public MemoryUsageMBDuringLoad As Single
-    Public MemoryUsageMBAtEnd As Single
+    Public Property MemoryUsageMBAtStart As Single
+    Public Property MemoryUsageMBDuringLoad As Single
+    Public Property MemoryUsageMBAtEnd As Single
 
     Public Overrides Function ToString() As String
         Return "PeakMemoryUsageMB: " & PeakMemoryUsageMB.ToString("0.0") & ", " &

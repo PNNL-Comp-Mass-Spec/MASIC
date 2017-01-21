@@ -95,8 +95,6 @@ Partial Class frmMain
         Me.lblSICToleranceDa = New System.Windows.Forms.Label()
         Me.TabPagePeakFindingOptions = New System.Windows.Forms.TabPage()
         Me.fraSICNoiseThresholds = New System.Windows.Forms.GroupBox()
-        Me.txtSICNoiseMinimumSignalToNoiseRatio = New System.Windows.Forms.TextBox()
-        Me.lblSICNoiseMinimumSignalToNoiseRatio = New System.Windows.Forms.Label()
         Me.cboSICNoiseThresholdMode = New System.Windows.Forms.ComboBox()
         Me.lblNoiseThresholdMode = New System.Windows.Forms.Label()
         Me.txtSICNoiseFractionLowIntensityDataToAverage = New System.Windows.Forms.TextBox()
@@ -249,7 +247,7 @@ Partial Class frmMain
         'txtInputFilePath
         '
         Me.txtInputFilePath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtInputFilePath.Location = New System.Drawing.Point(125, 30)
         Me.txtInputFilePath.Name = "txtInputFilePath"
         Me.txtInputFilePath.Size = New System.Drawing.Size(741, 22)
@@ -266,7 +264,7 @@ Partial Class frmMain
         'fraInputFilePath
         '
         Me.fraInputFilePath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraInputFilePath.Controls.Add(Me.cmdSelectFile)
         Me.fraInputFilePath.Controls.Add(Me.txtInputFilePath)
         Me.fraInputFilePath.Location = New System.Drawing.Point(10, 9)
@@ -275,7 +273,7 @@ Partial Class frmMain
         Me.fraInputFilePath.TabIndex = 0
         Me.fraInputFilePath.TabStop = False
         Me.fraInputFilePath.Text = "Input File Path (Finnigan Ion Trap .Raw or Agilent .CDF/.MGF combo or mzXML or mz" &
-          "Data)"
+    "Data)"
         '
         'MainMenuControl
         '
@@ -362,7 +360,7 @@ Partial Class frmMain
         'tbsOptions
         '
         Me.tbsOptions.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tbsOptions.Controls.Add(Me.TabPageMasicExportOptions)
         Me.tbsOptions.Controls.Add(Me.TabPageSICOptions)
         Me.tbsOptions.Controls.Add(Me.TabPagePeakFindingOptions)
@@ -842,8 +840,6 @@ Partial Class frmMain
         '
         'fraSICNoiseThresholds
         '
-        Me.fraSICNoiseThresholds.Controls.Add(Me.txtSICNoiseMinimumSignalToNoiseRatio)
-        Me.fraSICNoiseThresholds.Controls.Add(Me.lblSICNoiseMinimumSignalToNoiseRatio)
         Me.fraSICNoiseThresholds.Controls.Add(Me.cboSICNoiseThresholdMode)
         Me.fraSICNoiseThresholds.Controls.Add(Me.lblNoiseThresholdMode)
         Me.fraSICNoiseThresholds.Controls.Add(Me.txtSICNoiseFractionLowIntensityDataToAverage)
@@ -856,22 +852,6 @@ Partial Class frmMain
         Me.fraSICNoiseThresholds.TabIndex = 0
         Me.fraSICNoiseThresholds.TabStop = False
         Me.fraSICNoiseThresholds.Text = "Initial Noise Threshold Determination for SICs"
-        '
-        'txtSICNoiseMinimumSignalToNoiseRatio
-        '
-        Me.txtSICNoiseMinimumSignalToNoiseRatio.Location = New System.Drawing.Point(298, 120)
-        Me.txtSICNoiseMinimumSignalToNoiseRatio.Name = "txtSICNoiseMinimumSignalToNoiseRatio"
-        Me.txtSICNoiseMinimumSignalToNoiseRatio.Size = New System.Drawing.Size(67, 22)
-        Me.txtSICNoiseMinimumSignalToNoiseRatio.TabIndex = 7
-        Me.txtSICNoiseMinimumSignalToNoiseRatio.Text = "3"
-        '
-        'lblSICNoiseMinimumSignalToNoiseRatio
-        '
-        Me.lblSICNoiseMinimumSignalToNoiseRatio.Location = New System.Drawing.Point(19, 122)
-        Me.lblSICNoiseMinimumSignalToNoiseRatio.Name = "lblSICNoiseMinimumSignalToNoiseRatio"
-        Me.lblSICNoiseMinimumSignalToNoiseRatio.Size = New System.Drawing.Size(269, 16)
-        Me.lblSICNoiseMinimumSignalToNoiseRatio.TabIndex = 6
-        Me.lblSICNoiseMinimumSignalToNoiseRatio.Text = "Minimum Signal to Noise Ratio (unused)"
         '
         'cboSICNoiseThresholdMode
         '
@@ -1426,7 +1406,7 @@ Partial Class frmMain
         'txtCustomSICFileName
         '
         Me.txtCustomSICFileName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtCustomSICFileName.Location = New System.Drawing.Point(125, 74)
         Me.txtCustomSICFileName.Name = "txtCustomSICFileName"
         Me.txtCustomSICFileName.Size = New System.Drawing.Size(534, 22)
@@ -1542,7 +1522,7 @@ Partial Class frmMain
         'dgCustomSICValues
         '
         Me.dgCustomSICValues.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgCustomSICValues.CaptionText = "Custom SIC Values"
         Me.dgCustomSICValues.DataMember = ""
         Me.dgCustomSICValues.HeaderForeColor = System.Drawing.SystemColors.ControlText
@@ -1822,7 +1802,7 @@ Partial Class frmMain
         'fraDatasetLookupInfo
         '
         Me.fraDatasetLookupInfo.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraDatasetLookupInfo.Controls.Add(Me.cmdSetConnectionStringToPNNLServer)
         Me.fraDatasetLookupInfo.Controls.Add(Me.txtDatasetInfoQuerySQL)
         Me.fraDatasetLookupInfo.Controls.Add(Me.lblDatasetInfoQuerySQL)
@@ -1883,7 +1863,7 @@ Partial Class frmMain
         Me.lblDatasetLookupFilePath.Size = New System.Drawing.Size(633, 18)
         Me.lblDatasetLookupFilePath.TabIndex = 5
         Me.lblDatasetLookupFilePath.Text = "Dataset lookup file (dataset name and dataset ID number, tab-separated); used if " &
-          "DB not available"
+    "DB not available"
         '
         'cmdSelectDatasetLookupFile
         '
@@ -1896,7 +1876,7 @@ Partial Class frmMain
         'txtDatasetLookupFilePath
         '
         Me.txtDatasetLookupFilePath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDatasetLookupFilePath.Location = New System.Drawing.Point(125, 138)
         Me.txtDatasetLookupFilePath.Name = "txtDatasetLookupFilePath"
         Me.txtDatasetLookupFilePath.Size = New System.Drawing.Size(708, 22)
@@ -1941,7 +1921,7 @@ Partial Class frmMain
         'fraOutputFolderPath
         '
         Me.fraOutputFolderPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.fraOutputFolderPath.Controls.Add(Me.cmdStartProcessing)
         Me.fraOutputFolderPath.Controls.Add(Me.cmdSelectOutputFolder)
         Me.fraOutputFolderPath.Controls.Add(Me.txtOutputFolderPath)
@@ -1971,7 +1951,7 @@ Partial Class frmMain
         'txtOutputFolderPath
         '
         Me.txtOutputFolderPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOutputFolderPath.Location = New System.Drawing.Point(125, 30)
         Me.txtOutputFolderPath.Name = "txtOutputFolderPath"
         Me.txtOutputFolderPath.Size = New System.Drawing.Size(741, 22)
@@ -2161,8 +2141,6 @@ Partial Class frmMain
     Friend WithEvents lblMassSpectraNoiseThresholdIntensity As System.Windows.Forms.Label
     Friend WithEvents txtExportRawDataSignalToNoiseRatioMinimum As System.Windows.Forms.TextBox
     Friend WithEvents lblExportRawDataSignalToNoiseRatioMinimum As System.Windows.Forms.Label
-    Friend WithEvents txtSICNoiseMinimumSignalToNoiseRatio As System.Windows.Forms.TextBox
-    Friend WithEvents lblSICNoiseMinimumSignalToNoiseRatio As System.Windows.Forms.Label
     Friend WithEvents txtMassSpectraNoiseMinimumSignalToNoiseRatio As System.Windows.Forms.TextBox
     Friend WithEvents lblMassSpectraNoiseMinimumSignalToNoiseRatio As System.Windows.Forms.Label
     Friend WithEvents fraInputFileRangeFilters As System.Windows.Forms.GroupBox

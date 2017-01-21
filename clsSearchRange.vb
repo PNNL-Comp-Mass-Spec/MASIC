@@ -54,8 +54,7 @@ Public Class clsSearchRange
                 Case eDataTypeToUse.NoDataPresent
                     Return 0
                 Case Else
-                    LogErrors("Unknown data type encountered: " & mDataType.ToString)
-                    Return 0
+                    Throw New Exception("Unknown data type encountered: " & mDataType.ToString)
             End Select
         End Get
     End Property
@@ -517,8 +516,11 @@ Public Class clsSearchRange
             End If
         Catch ex As Exception
             ' intIndex is probably out of range
-            Return 0
+            ' Ignore errors
         End Try
+
+        Return 0
+
     End Function
 
     Public Function GetValueByIndexSng(intIndex As Integer) As Single
@@ -561,9 +563,11 @@ Public Class clsSearchRange
                     Return 0
                 End If
             Catch ex As Exception
-                Return 0
+                ' Ignore errors
             End Try
         End If
+
+        Return 0
     End Function
 
     Public Function GetValueByOriginalIndexSng(intIndex As Integer) As Single

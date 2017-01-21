@@ -1,5 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports MASIC.clsMASIC
+Imports MASIC.DataOutput
 Imports ThermoRawFileReader
 
 Public Class clsMRMProcessing
@@ -143,7 +144,7 @@ Public Class clsMRMProcessing
     End Function
 
     Public Shared Function DuplicateMRMInfo(
-      oSource As ThermoRawFileReader.MRMInfo,
+      oSource As MRMInfo,
       dblParentIonMZ As Double) As clsMRMScanInfo
 
         Dim oTarget = New clsMRMScanInfo()
@@ -223,33 +224,6 @@ Public Class clsMRMProcessing
         Dim srDataOutfile As StreamWriter = Nothing
         Dim srCrosstabOutfile As StreamWriter = Nothing
 
-        Dim intScanFirst As Integer
-        Dim sngScanTimeFirst As Single
-        Dim sngCrosstabColumnValue() As Single
-        Dim blnCrosstabColumnFlag() As Boolean
-
-        Dim strMRMSettingsFilePath As String
-        Dim strDataFilePath As String
-        Dim strCrosstabFilePath As String
-
-        Dim strCrosstabHeaders As String = String.Empty
-        Dim strLineStart As String
-        Dim strOutLine As String
-        Dim strSRMMapKey As String
-
-        Dim intMRMInfoIndex As Integer
-        Dim intMRMMassIndex As Integer
-        Dim intSRMIndex As Integer
-        Dim intSRMIndexLast As Integer
-
-        Dim dblMZStart As Double
-        Dim dblMZEnd As Double
-        Dim dblMRMToleranceHalfWidth As Double
-
-        Dim dblClosestMZ As Double
-        Dim sngMatchIntensity As Single
-
-        Dim blnMatchFound As Boolean
         Dim blnSuccess As Boolean
 
         Try
@@ -262,15 +236,18 @@ Public Class clsMRMProcessing
             UpdateProgress(0, "Exporting MRM data")
 
             ' Write out the MRM Settings
-            strMRMSettingsFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile)
+            Dim strMRMSettingsFilePath = clsDataOutput.ConstructOutputFilePath(
+                strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile)
+
             Using srSettingsOutFile = New StreamWriter(strMRMSettingsFilePath)
 
                 srSettingsOutFile.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile))
 
+
                 For intMRMInfoIndex = 0 To mrmSettings.Count - 1
                     With mrmSettings(intMRMInfoIndex)
                         For intMRMMassIndex = 0 To .MRMMassCount - 1
-                            strOutLine = intMRMInfoIndex & cColDelimiter &
+                            Dim strOutLine = intMRMInfoIndex & cColDelimiter &
                              .ParentIonMZ.ToString("0.000") & cColDelimiter &
                              .MRMMassList(intMRMMassIndex).CentralMass & cColDelimiter &
                              .MRMMassList(intMRMMassIndex).StartMass & cColDelimiter &
@@ -283,7 +260,6 @@ Public Class clsMRMProcessing
                     End With
                 Next intMRMInfoIndex
 
-
                 If mOptions.WriteMRMDataList Or mOptions.WriteMRMIntensityCrosstab Then
 
                     ' Populate srmKeyToIndexMap
@@ -294,7 +270,7 @@ Public Class clsMRMProcessing
 
                     If mOptions.WriteMRMDataList Then
                         ' Write out the raw MRM Data
-                        strDataFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.MRMDatafile)
+                        Dim strDataFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.MRMDatafile)
                         srDataOutfile = New StreamWriter(strDataFilePath)
 
                         ' Write the file headers
@@ -304,11 +280,11 @@ Public Class clsMRMProcessing
 
                     If mOptions.WriteMRMIntensityCrosstab Then
                         ' Write out the raw MRM Data
-                        strCrosstabFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.MRMCrosstabFile)
+                        Dim strCrosstabFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.MRMCrosstabFile)
                         srCrosstabOutfile = New StreamWriter(strCrosstabFilePath)
 
                         ' Initialize the crosstab header variable using the data in udtSRMList()
-                        strCrosstabHeaders = "Scan_First" & cColDelimiter & "ScanTime"
+                        Dim strCrosstabHeaders = "Scan_First" & cColDelimiter & "ScanTime"
 
                         For intSRMIndex = 0 To srmList.Count - 1
                             strCrosstabHeaders &= cColDelimiter & ConstructSRMMapKey(srmList(intSRMIndex))
@@ -317,8 +293,13 @@ Public Class clsMRMProcessing
                         srCrosstabOutfile.WriteLine(strCrosstabHeaders)
                     End If
 
-                    intScanFirst = Integer.MinValue
-                    intSRMIndexLast = 0
+                    Dim intScanFirst = Integer.MinValue
+                    Dim sngScanTimeFirst As Single
+                    Dim intSRMIndexLast = 0
+
+                    Dim sngCrosstabColumnValue() As Single
+                    Dim blnCrosstabColumnFlag() As Boolean
+
                     ReDim sngCrosstabColumnValue(srmList.Count - 1)
                     ReDim blnCrosstabColumnFlag(srmList.Count - 1)
 
@@ -335,24 +316,32 @@ Public Class clsMRMProcessing
                                 sngScanTimeFirst = .ScanTime
                             End If
 
-                            strLineStart = .ScanNumber & cColDelimiter &
-                               .MRMScanInfo.ParentIonMZ.ToString("0.000") & cColDelimiter
+                            Dim strLineStart = .ScanNumber & cColDelimiter &
+                                               .MRMScanInfo.ParentIonMZ.ToString("0.000") & cColDelimiter
 
                             ' Look for each of the m/z values specified in .MRMScanInfo.MRMMassList
                             For intMRMMassIndex = 0 To .MRMScanInfo.MRMMassCount - 1
                                 ' Find the maximum value between .StartMass and .EndMass
                                 ' Need to define a tolerance to account for numeric rounding artifacts in the variables
 
-                                dblMZStart = .MRMScanInfo.MRMMassList(intMRMMassIndex).StartMass
-                                dblMZEnd = .MRMScanInfo.MRMMassList(intMRMMassIndex).EndMass
-                                dblMRMToleranceHalfWidth = Math.Round((dblMZEnd - dblMZStart) / 2, 6)
+                                Dim dblMZStart = .MRMScanInfo.MRMMassList(intMRMMassIndex).StartMass
+                                Dim dblMZEnd = .MRMScanInfo.MRMMassList(intMRMMassIndex).EndMass
+                                Dim dblMRMToleranceHalfWidth = Math.Round((dblMZEnd - dblMZStart) / 2, 6)
                                 If dblMRMToleranceHalfWidth < 0.001 Then
                                     dblMRMToleranceHalfWidth = 0.001
                                 End If
 
-                                blnMatchFound = mDataAggregation.FindMaxValueInMZRange(objSpectraCache, fragScan, dblMZStart - dblMRMToleranceHalfWidth, dblMZEnd + dblMRMToleranceHalfWidth, dblClosestMZ, sngMatchIntensity)
+                                Dim dblClosestMZ As Double
+                                Dim sngMatchIntensity As Single
+
+                                Dim blnMatchFound = mDataAggregation.FindMaxValueInMZRange(
+                                    objSpectraCache, fragScan,
+                                    dblMZStart - dblMRMToleranceHalfWidth,
+                                    dblMZEnd + dblMRMToleranceHalfWidth,
+                                    dblClosestMZ, sngMatchIntensity)
 
                                 If mOptions.WriteMRMDataList Then
+                                    Dim strOutLine As String
                                     If blnMatchFound Then
                                         strOutLine = strLineStart & .MRMScanInfo.MRMMassList(intMRMMassIndex).CentralMass.ToString("0.000") &
                                          cColDelimiter & sngMatchIntensity.ToString("0.000")
@@ -367,7 +356,8 @@ Public Class clsMRMProcessing
 
 
                                 If mOptions.WriteMRMIntensityCrosstab Then
-                                    strSRMMapKey = ConstructSRMMapKey(.MRMScanInfo.ParentIonMZ, .MRMScanInfo.MRMMassList(intMRMMassIndex).CentralMass)
+                                    Dim strSRMMapKey = ConstructSRMMapKey(.MRMScanInfo.ParentIonMZ, .MRMScanInfo.MRMMassList(intMRMMassIndex).CentralMass)
+                                    Dim intSRMIndex As Integer
 
                                     ' Use srmKeyToIndexMap to determine the appropriate column index for strSRMMapKey
                                     If srmKeyToIndexMap.TryGetValue(strSRMMapKey, intSRMIndex) Then
@@ -491,7 +481,6 @@ Public Class clsMRMProcessing
 
     End Function
 
-
     Private Function MRMParentDaughterMatch(
       ByRef udtSRMListEntry As udtSRMListType,
       mrmSettingsEntry As clsMRMScanInfo,
@@ -505,23 +494,10 @@ Public Class clsMRMProcessing
     End Function
 
     Private Function MRMParentDaughterMatch(
-      ByRef udtSRMListEntry As udtSRMListType,
-      dblParentIonMZ As Double,
-      dblMRMDaughterMZ As Double) As Boolean
-
-        Return MRMParentDaughterMatch(
-          udtSRMListEntry.ParentIonMZ,
-          udtSRMListEntry.CentralMass,
-          dblParentIonMZ,
-          dblMRMDaughterMZ)
-    End Function
-
-    Private Function MRMParentDaughterMatch(
       dblParentIonMZ1 As Double,
       dblMRMDaughterMZ1 As Double,
       dblParentIonMZ2 As Double,
       dblMRMDaughterMZ2 As Double) As Boolean
-
 
         Const COMPARISON_TOLERANCE = 0.01
 

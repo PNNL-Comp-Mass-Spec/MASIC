@@ -1,4 +1,6 @@
-﻿Public Class clsMASICOptions
+﻿Imports MASIC.clsMASIC
+
+Public Class clsMASICOptions
     Inherits clsEventNotifier
 
 #Region "Constants and Enums"
@@ -68,20 +70,11 @@
 
     ''' <summary>
     ''' Adds a large number of additional columns with information like voltage, current, temperature, pressure, and gas flow rate
-    ''' If mStatusLogKeyNameFilterList contains any entries, then only the entries matching the specs in mStatusLogKeyNameFilterList will be saved
+    ''' If StatusLogKeyNameFilterList contains any entries, then only the entries matching the specs in StatusLogKeyNameFilterList will be saved
     ''' </summary>
     Public Property WriteExtendedStatsStatusLog As Boolean
 
     Public Property ConsolidateConstantExtendedHeaderValues As Boolean
-
-    ''' <summary>
-    ''' Since there are so many values listed in the Status Log, this is used to limit the items saved to only those matching the specs in mStatusLogKeyNameFilterList
-    ''' </summary>
-    ''' <remarks>
-    ''' When parsing the entries in mStatusLogKeyNameFilterList, if any part of the text in mStatusLogKeyNameFilterList() matches the status log key name, 
-    ''' that key name is saved (key names are not case sensitive)
-    ''' </remarks>
-    Private mStatusLogKeyNameFilterList() As String
 
     Public Property WriteMRMDataList As Boolean
     Public Property WriteMRMIntensityCrosstab As Boolean
@@ -135,6 +128,8 @@
         BinningOptions = New clsBinningOptions()
 
         SICOptions = New clsSICOptions()
+
+        StatusLogKeyNameFilterList = New SortedSet(Of String)
     End Sub
 
     Public Function GetScanToleranceTypeFromText(strScanType As String) As clsCustomSICList.eCustomSICScanTypeConstants
@@ -154,41 +149,22 @@
 
     End Function
 
-    Public Function GetStatusLogKeyNameFilterList() As String()
-        If mStatusLogKeyNameFilterList Is Nothing Then
-            ReDim mStatusLogKeyNameFilterList(-1)
-        End If
-
-        Return mStatusLogKeyNameFilterList
-    End Function
+    Public ReadOnly Property StatusLogKeyNameFilterList() As SortedSet(Of String)
 
     ''' <summary>
-    ''' Returns the contents of mStatusLogKeyNameFilterList
+    ''' Returns the contents of StatusLogKeyNameFilterList
     ''' </summary>
     ''' <param name="blnCommaSeparatedList">When true, then returns a comma separated list; when false, returns separates items with CrLf</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function GetStatusLogKeyNameFilterListAsText(blnCommaSeparatedList As Boolean) As String
-        If mStatusLogKeyNameFilterList Is Nothing Then
-            ReDim mStatusLogKeyNameFilterList(-1)
+
+        If blnCommaSeparatedList Then
+            Return String.Join(ControlChars.NewLine, StatusLogKeyNameFilterList)
+        Else
+            Return String.Join(", ", StatusLogKeyNameFilterList)
         End If
 
-        Dim intIndex As Integer
-        Dim strList As String
-        strList = String.Empty
-
-        For intIndex = 0 To mStatusLogKeyNameFilterList.Length - 1
-            If intIndex > 0 Then
-                If blnCommaSeparatedList Then
-                    strList &= ", "
-                Else
-                    strList &= ControlChars.NewLine
-                End If
-            End If
-            strList &= mStatusLogKeyNameFilterList(intIndex)
-        Next
-
-        Return strList
     End Function
 
     Public Sub InitializeVariables()
@@ -218,7 +194,6 @@
         WriteExtendedStatsStatusLog = True
         ConsolidateConstantExtendedHeaderValues = True
 
-        ReDim mStatusLogKeyNameFilterList(-1)
         SetStatusLogKeyNameFilterList("Source", ","c)
 
         WriteMRMDataList = False
@@ -234,9 +209,9 @@
 
         SICOptions.Reset()
 
-        BinningOptions = clsCorrelation.GetDefaultBinningOptions()
+        BinningOptions.Reset()
 
-        CacheOptions = clsSpectraCache.GetDefaultCacheOptions()
+        CacheOptions.Reset()
 
         CustomSICList.Reset()
 
@@ -244,29 +219,29 @@
 
     Public Function LoadParameterFileSettings(strParameterFilePath As String) As Boolean
 
-        Dim objSettingsFile As New XmlSettingsFileAccessor
+        'Dim objSettingsFile As New XmlSettingsFileAccessor
 
-        Dim strMZList As String
-        Dim strMZToleranceDaList As String
+        'Dim strMZList As String
+        'Dim strMZToleranceDaList As String
 
-        Dim strScanCenterList As String
-        Dim strScanToleranceList As String
+        'Dim strScanCenterList As String
+        'Dim strScanToleranceList As String
 
-        Dim strScanCommentList As String
-        Dim strScanTolerance As String
-        Dim strScanType As String
-        Dim strFilterList As String
+        'Dim strScanCommentList As String
+        'Dim strScanTolerance As String
+        'Dim strScanType As String
+        'Dim strFilterList As String
 
-        Dim eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants
-        Dim eReporterIonITraq4PlexCorrectionFactorType As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
+        'Dim eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants
+        'Dim eReporterIonITraq4PlexCorrectionFactorType As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
 
-        Dim dblSICTolerance As Double
-        Dim blnSICToleranceIsPPM As Boolean
+        'Dim dblSICTolerance As Double
+        'Dim blnSICToleranceIsPPM As Boolean
 
-        Dim strErrorMessage As String
-        Dim blnNotPresent As Boolean
+        'Dim strErrorMessage As String
+        'Dim blnNotPresent As Boolean
 
-        Dim blnSuccess As Boolean
+        'Dim blnSuccess As Boolean
 
         Try
 
@@ -281,250 +256,453 @@
 
             If Not File.Exists(strParameterFilePath) Then
                 ' See if strParameterFilePath points to a file in the same directory as the application
-                strParameterFilePath = Path.Combine(clsProcessFilesOrFoldersBase.GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
+                strParameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
                 If Not File.Exists(strParameterFilePath) Then
                     ReportError("LoadParameterFileSettings", "Parameter file not found: " & strParameterFilePath, Nothing, True, False)
                     Return False
                 End If
             End If
 
+            Dim objSettingsFile = New XmlSettingsFileAccessor()
+
             ' Pass False to .LoadSettings() here to turn off case sensitive matching
-            If objSettingsFile.LoadSettings(strParameterFilePath, False) Then
-                With objSettingsFile
+            If Not objSettingsFile.LoadSettings(strParameterFilePath, False) Then
+                ReportError("LoadParameterFileSettings",
+                            "Error calling objSettingsFile.LoadSettings for " & strParameterFilePath, Nothing, True,
+                            False, eMasicErrorCodes.InputFileDataReadError)
+                Return False
+            End If
 
-                    If Not .SectionPresent(XML_SECTION_DATABASE_SETTINGS) Then
-                        ' Database settings section not found; that's ok
-                    Else
-                        Me.DatabaseConnectionString = .GetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString", Me.DatabaseConnectionString)
-                        Me.DatasetInfoQuerySql = .GetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql", Me.DatasetInfoQuerySql)
-                    End If
+            With objSettingsFile
 
-                    If Not .SectionPresent(XML_SECTION_IMPORT_OPTIONS) Then
-                        ' Import options section not found; that's ok
-                    Else
-                        Me.CDFTimeInSeconds = .GetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", Me.CDFTimeInSeconds)
-                        Me.ParentIonDecoyMassDa = .GetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", Me.ParentIonDecoyMassDa)
-                    End If
-
-                    ' Masic Export Options
-                    If Not .SectionPresent(XML_SECTION_EXPORT_OPTIONS) Then
-                        ' Export options section not found; that's ok
-                    Else
-                        Me.IncludeHeadersInExportFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", Me.IncludeHeadersInExportFile)
-                        Me.IncludeScanTimesInSICStatsFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", Me.IncludeScanTimesInSICStatsFile)
-                        Me.SkipMSMSProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", Me.SkipMSMSProcessing)
-
-                        ' Check for both "SkipSICProcessing" and "SkipSICAndRawDataProcessing" in the XML file
-                        ' If either is true, then mExportRawDataOnly will be auto-set to false in function ProcessFiles
-                        Me.SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICProcessing", Me.SkipSICAndRawDataProcessing)
-                        Me.SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICAndRawDataProcessing", Me.SkipSICAndRawDataProcessing)
-
-                        Me.ExportRawDataOnly = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", Me.ExportRawDataOnly)
-
-                        Me.SuppressNoParentIonsError = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError", Me.SuppressNoParentIonsError)
-
-                        Me.WriteDetailedSICDataFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile", Me.WriteDetailedSICDataFile)
-                        Me.WriteMSMethodFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", Me.WriteMSMethodFile)
-                        Me.WriteMSTuneFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", Me.WriteMSTuneFile)
-
-                        Me.WriteExtendedStats = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats", Me.WriteExtendedStats)
-                        Me.WriteExtendedStatsIncludeScanFilterText = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsIncludeScanFilterText", Me.WriteExtendedStatsIncludeScanFilterText)
-                        Me.WriteExtendedStatsStatusLog = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsStatusLog", Me.WriteExtendedStatsStatusLog)
-                        strFilterList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", String.Empty)
-                        If Not strFilterList Is Nothing AndAlso strFilterList.Length > 0 Then
-                            SetStatusLogKeyNameFilterList(strFilterList, ","c)
-                        End If
-
-                        Me.ConsolidateConstantExtendedHeaderValues = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ConsolidateConstantExtendedHeaderValues", Me.ConsolidateConstantExtendedHeaderValues)
-
-                        Me.WriteMRMDataList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", Me.WriteMRMDataList)
-                        Me.WriteMRMIntensityCrosstab = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab", Me.WriteMRMIntensityCrosstab)
-
-                        Me.FastExistingXMLFileTest = .GetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", Me.FastExistingXMLFileTest)
-
-                        Me.ReporterIonStatsEnabled = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", Me.ReporterIonStatsEnabled)
-                        eReporterIonMassMode = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", CInt(Me.ReporterIonMassMode)), eReporterIonMassModeConstants)
-                        Me.ReporterIonToleranceDaDefault = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", Me.ReporterIonToleranceDaDefault)
-                        Me.ReporterIonApplyAbundanceCorrection = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", Me.ReporterIonApplyAbundanceCorrection)
-
-                        eReporterIonITraq4PlexCorrectionFactorType = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", CInt(Me.ReporterIonITraq4PlexCorrectionFactorType)), clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)
-                        Me.ReporterIonITraq4PlexCorrectionFactorType = eReporterIonITraq4PlexCorrectionFactorType
-
-                        Me.ReporterIonSaveObservedMasses = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", Me.ReporterIonSaveObservedMasses)
-                        Me.ReporterIonSaveUncorrectedIntensities = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", Me.ReporterIonSaveUncorrectedIntensities)
-
-                        SetReporterIonMassMode(eReporterIonMassMode, Me.ReporterIonToleranceDaDefault)
-
-                        ' Raw data export options
-                        Me.ExportRawSpectraData = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", Me.ExportRawSpectraData)
-                        Me.ExportRawDataFileFormat = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", CInt(Me.ExportRawDataFileFormat)), clsRawDataExportOptions.eExportRawDataFileFormatConstants)
-
-                        Me.ExportRawDataIncludeMSMS = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", Me.ExportRawDataIncludeMSMS)
-                        Me.ExportRawDataRenumberScans = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", Me.ExportRawDataRenumberScans)
-
-                        Me.ExportRawDataMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", Me.ExportRawDataMinimumSignalToNoiseRatio)
-                        Me.ExportRawDataMaxIonCountPerScan = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", Me.ExportRawDataMaxIonCountPerScan)
-                        Me.ExportRawDataIntensityMinimum = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", Me.ExportRawDataIntensityMinimum)
-                    End If
-
-                    If Not .SectionPresent(XML_SECTION_SIC_OPTIONS) Then
-                        strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS & ControlChars.Quote & "> was not found in the parameter file: " & strParameterFilePath
-                        ReportError("LoadParameterFileSettings", strErrorMessage)
-                        Return False
-                    Else
-                        ' SIC Options
-                        ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
-
-                        ' Preferentially use "SICTolerance", if it is present
-                        dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", GetSICTolerance(), blnNotPresent)
-
-                        If blnNotPresent Then
-                            ' Check for "SICToleranceDa", which is a legacy setting
-                            dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", Me.SICToleranceDa, blnNotPresent)
-
-                            If Not blnNotPresent Then
-                                SetSICTolerance(dblSICTolerance, False)
-                            End If
-                        Else
-                            blnSICToleranceIsPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", False)
-
-                            SetSICTolerance(dblSICTolerance, blnSICToleranceIsPPM)
-                        End If
-
-                        Me.RefineReportedParentIonMZ = .GetParam(XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", Me.RefineReportedParentIonMZ)
-                        Me.ScanRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart", Me.ScanRangeStart)
-                        Me.ScanRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeEnd", Me.ScanRangeEnd)
-                        Me.RTRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeStart", Me.RTRangeStart)
-                        Me.RTRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeEnd", Me.RTRangeEnd)
-
-                        Me.CompressMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData", Me.CompressMSSpectraData)
-                        Me.CompressMSMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSMSSpectraData", Me.CompressMSMSSpectraData)
-
-                        Me.CompressToleranceDivisorForDa = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForDa", Me.CompressToleranceDivisorForDa)
-                        Me.CompressToleranceDivisorForPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForPPM", Me.CompressToleranceDivisorForPPM)
-
-                        Me.MaxSICPeakWidthMinutesBackward = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesBackward", Me.MaxSICPeakWidthMinutesBackward)
-                        Me.MaxSICPeakWidthMinutesForward = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesForward", Me.MaxSICPeakWidthMinutesForward)
-                        Me.IntensityThresholdFractionMax = .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", Me.IntensityThresholdFractionMax)
-                        Me.IntensityThresholdAbsoluteMinimum = .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", Me.IntensityThresholdAbsoluteMinimum)
-
-                        ' Peak Finding Options
-                        Me.SICNoiseThresholdMode = CType(.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", CInt(Me.SICNoiseThresholdMode)), MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
-                        Me.SICNoiseThresholdIntensity = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", Me.SICNoiseThresholdIntensity)
-                        Me.SICNoiseFractionLowIntensityDataToAverage = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", Me.SICNoiseFractionLowIntensityDataToAverage)
-                        Me.SICNoiseMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseMinimumSignalToNoiseRatio", Me.SICNoiseMinimumSignalToNoiseRatio)
-
-                        Me.MaxDistanceScansNoOverlap = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap", Me.MaxDistanceScansNoOverlap)
-                        Me.MaxAllowedUpwardSpikeFractionMax = .GetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", Me.MaxAllowedUpwardSpikeFractionMax)
-                        Me.InitialPeakWidthScansScaler = .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler", Me.InitialPeakWidthScansScaler)
-                        Me.InitialPeakWidthScansMaximum = .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum", Me.InitialPeakWidthScansMaximum)
-
-                        Me.FindPeaksOnSmoothedData = .GetParam(XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData", Me.FindPeaksOnSmoothedData)
-                        Me.SmoothDataRegardlessOfMinimumPeakWidth = .GetParam(XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth", Me.SmoothDataRegardlessOfMinimumPeakWidth)
-                        Me.UseButterworthSmooth = .GetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth", Me.UseButterworthSmooth)
-                        Me.ButterworthSamplingFrequency = .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", Me.ButterworthSamplingFrequency)
-                        Me.ButterworthSamplingFrequencyDoubledForSIMData = .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData", Me.ButterworthSamplingFrequencyDoubledForSIMData)
-
-                        Me.UseSavitzkyGolaySmooth = .GetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth", Me.UseSavitzkyGolaySmooth)
-                        Me.SavitzkyGolayFilterOrder = .GetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder", Me.SavitzkyGolayFilterOrder)
-                        SICOptions.SaveSmoothedData = .GetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", SICOptions.SaveSmoothedData)
-
-                        Me.MassSpectraNoiseThresholdMode = CType(.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", CInt(Me.MassSpectraNoiseThresholdMode)), MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
-                        Me.MassSpectraNoiseThresholdIntensity = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", Me.MassSpectraNoiseThresholdIntensity)
-                        Me.MassSpectraNoiseFractionLowIntensityDataToAverage = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", Me.MassSpectraNoiseFractionLowIntensityDataToAverage)
-                        Me.MassSpectraNoiseMinimumSignalToNoiseRatio = .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio ", Me.MassSpectraNoiseMinimumSignalToNoiseRatio)
-
-                        Me.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = .GetParam(XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData", Me.ReplaceSICZeroesWithMinimumPositiveValueFromMSData)
-
-                        ' Similarity Options
-                        Me.SimilarIonMZToleranceHalfWidth = .GetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonMZToleranceHalfWidth", Me.SimilarIonMZToleranceHalfWidth)
-                        Me.SimilarIonToleranceHalfWidthMinutes = .GetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonToleranceHalfWidthMinutes", Me.SimilarIonToleranceHalfWidthMinutes)
-                        Me.SpectrumSimilarityMinimum = .GetParam(XML_SECTION_SIC_OPTIONS, "SpectrumSimilarityMinimum", Me.SpectrumSimilarityMinimum)
-
-                    End If
-
-                    ' Binning Options
-                    If Not .SectionPresent(XML_SECTION_BINNING_OPTIONS) Then
-                        strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_BINNING_OPTIONS & ControlChars.Quote & "> was not found in the parameter file: " & strParameterFilePath
-                        If MyBase.ShowMessages Then
-                            Windows.Forms.MessageBox.Show(strErrorMessage, "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                            LogMessage(strErrorMessage, eMessageTypeConstants.ErrorMsg)
-                        Else
-                            ShowErrorMessage(strErrorMessage)
-                        End If
-
-                        MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
-                        Return False
-                    Else
-                        BinningOptions.StartX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX", BinningOptions.StartX)
-                        BinningOptions.EndX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinEndX", BinningOptions.EndX)
-                        BinningOptions.BinSize = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinSize", BinningOptions.BinSize)
-                        BinningOptions.MaximumBinCount = .GetParam(XML_SECTION_BINNING_OPTIONS, "MaximumBinCount", BinningOptions.MaximumBinCount)
-
-                        BinningOptions.IntensityPrecisionPercent = .GetParam(XML_SECTION_BINNING_OPTIONS, "IntensityPrecisionPercent", BinningOptions.IntensityPrecisionPercent)
-                        BinningOptions.Normalize = .GetParam(XML_SECTION_BINNING_OPTIONS, "Normalize", BinningOptions.Normalize)
-                        BinningOptions.SumAllIntensitiesForBin = .GetParam(XML_SECTION_BINNING_OPTIONS, "SumAllIntensitiesForBin", BinningOptions.SumAllIntensitiesForBin)
-                    End If
-
-                    ' Memory management options
-                    Me.DiskCachingAlwaysDisabled = .GetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", Me.DiskCachingAlwaysDisabled)
-                    Me.CacheFolderPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", Me.CacheFolderPath)
-
-                    Me.CacheSpectraToRetainInMemory = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", Me.CacheSpectraToRetainInMemory)
-
-                End With
-
-                If Not objSettingsFile.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES) Then
-                    ' Custom SIC values section not found; that's ok
+                If Not .SectionPresent(XML_SECTION_DATABASE_SETTINGS) Then
+                    ' Database settings section not found; that's ok
                 Else
-                    Me.LimitSearchToCustomMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "LimitSearchToCustomMZList", Me.LimitSearchToCustomMZList)
+                    DatabaseConnectionString = .GetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString",
+                                                         DatabaseConnectionString)
+                    DatasetInfoQuerySql = .GetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql",
+                                                    DatasetInfoQuerySql)
+                End If
 
-                    strScanType = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", String.Empty)
-                    strScanTolerance = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", String.Empty)
+                If Not .SectionPresent(XML_SECTION_IMPORT_OPTIONS) Then
+                    ' Import options section not found; that's ok
+                Else
+                    CDFTimeInSeconds = .GetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", CDFTimeInSeconds)
+                    ParentIonDecoyMassDa = .GetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa",
+                                                     ParentIonDecoyMassDa)
+                End If
 
-                    With mCustomSICList
-                        .ScanToleranceType = GetScanToleranceTypeFromText(strScanType)
+                ' Masic Export Options
+                If Not .SectionPresent(XML_SECTION_EXPORT_OPTIONS) Then
+                    ' Export options section not found; that's ok
+                Else
+                    IncludeHeadersInExportFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders",
+                                                           IncludeHeadersInExportFile)
 
-                        If strScanTolerance.Length > 0 AndAlso IsNumber(strScanTolerance) Then
-                            If .ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
-                                .ScanOrAcqTimeTolerance = CInt(strScanTolerance)
-                            Else
-                                ' Includes .Relative and .AcquisitionTime
-                                .ScanOrAcqTimeTolerance = CSng(strScanTolerance)
-                            End If
-                        Else
-                            .ScanOrAcqTimeTolerance = 0
+                    IncludeScanTimesInSICStatsFile = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                               "IncludeScanTimesInSICStatsFile",
+                                                               IncludeScanTimesInSICStatsFile)
+
+                    SkipMSMSProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing",
+                                                   SkipMSMSProcessing)
+
+                    ' Check for both "SkipSICProcessing" and "SkipSICAndRawDataProcessing" in the XML file
+                    ' If either is true, then mExportRawDataOnly will be auto-set to false in function ProcessFiles
+                    SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICProcessing",
+                                                            SkipSICAndRawDataProcessing)
+
+                    SkipSICAndRawDataProcessing = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                            "SkipSICAndRawDataProcessing",
+                                                            SkipSICAndRawDataProcessing)
+
+                    ExportRawDataOnly = .GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", ExportRawDataOnly)
+
+                    SuppressNoParentIonsError = .GetParam(XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError",
+                                                          SuppressNoParentIonsError)
+
+                    WriteDetailedSICDataFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile",
+                                                         WriteDetailedSICDataFile)
+
+                    WriteMSMethodFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", WriteMSMethodFile)
+
+                    WriteMSTuneFile = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", WriteMSTuneFile)
+
+                    WriteExtendedStats = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats",
+                                                   WriteExtendedStats)
+
+                    WriteExtendedStatsIncludeScanFilterText = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                        "WriteExtendedStatsIncludeScanFilterText",
+                                                                        WriteExtendedStatsIncludeScanFilterText)
+
+                    WriteExtendedStatsStatusLog = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                            "WriteExtendedStatsStatusLog",
+                                                            WriteExtendedStatsStatusLog)
+
+                    Dim strFilterList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList",
+                                                  String.Empty)
+                    If Not strFilterList Is Nothing AndAlso strFilterList.Length > 0 Then
+                        SetStatusLogKeyNameFilterList(strFilterList, ","c)
+                    End If
+
+                    ConsolidateConstantExtendedHeaderValues = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                        "ConsolidateConstantExtendedHeaderValues",
+                                                                        ConsolidateConstantExtendedHeaderValues)
+
+                    WriteMRMDataList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", WriteMRMDataList)
+
+                    WriteMRMIntensityCrosstab = .GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab",
+                                                          WriteMRMIntensityCrosstab)
+
+                    FastExistingXMLFileTest = .GetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest",
+                                                        FastExistingXMLFileTest)
+
+                    ReporterIons.ReporterIonStatsEnabled = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                     "ReporterIonStatsEnabled",
+                                                                     ReporterIons.ReporterIonStatsEnabled)
+
+                    Dim eReporterIonMassMode = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode",
+                                                               CInt(ReporterIons.ReporterIonMassMode)),
+                                                     clsReporterIons.eReporterIonMassModeConstants)
+
+                    ReporterIons.ReporterIonToleranceDaDefault = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                           "ReporterIonToleranceDa",
+                                                                           ReporterIons.ReporterIonToleranceDaDefault)
+
+                    ReporterIons.ReporterIonApplyAbundanceCorrection = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                                 "ReporterIonApplyAbundanceCorrection",
+                                                                                 ReporterIons.ReporterIonApplyAbundanceCorrection)
+
+                    Dim eReporterIonITraq4PlexCorrectionFactorType = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                                     "ReporterIonITraq4PlexCorrectionFactorType",
+                                                                                     CInt(ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)),
+                                                                           clsITraqIntensityCorrection.
+                            eCorrectionFactorsiTRAQ4Plex)
+
+                    ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
+                        eReporterIonITraq4PlexCorrectionFactorType
+
+                    ReporterIons.ReporterIonSaveObservedMasses = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                           "ReporterIonSaveObservedMasses",
+                                                                           ReporterIons.ReporterIonSaveObservedMasses)
+
+                    ReporterIons.ReporterIonSaveUncorrectedIntensities = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                                   "ReporterIonSaveUncorrectedIntensities",
+                                                                                   ReporterIons.ReporterIonSaveUncorrectedIntensities)
+
+                    ReporterIons.SetReporterIonMassMode(eReporterIonMassMode,
+                                                        ReporterIons.ReporterIonToleranceDaDefault)
+
+                    ' Raw data export options
+                    RawDataExportOptions.ExportEnabled = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                   "ExportRawSpectraData",
+                                                                   RawDataExportOptions.ExportEnabled)
+
+                    RawDataExportOptions.FileFormat = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                      "ExportRawDataFileFormat",
+                                                                      CInt(RawDataExportOptions.FileFormat)),
+                                                            clsRawDataExportOptions.
+                                                                eExportRawDataFileFormatConstants)
+
+                    RawDataExportOptions.IncludeMSMS = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                 "ExportRawDataIncludeMSMS",
+                                                                 RawDataExportOptions.IncludeMSMS)
+
+                    RawDataExportOptions.RenumberScans = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                   "ExportRawDataRenumberScans",
+                                                                   RawDataExportOptions.RenumberScans)
+
+                    RawDataExportOptions.MinimumSignalToNoiseRatio = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                               "ExportRawDataMinimumSignalToNoiseRatio",
+                                                                               RawDataExportOptions.MinimumSignalToNoiseRatio)
+
+                    RawDataExportOptions.MaxIonCountPerScan = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                        "ExportRawDataMaxIonCountPerScan",
+                                                                        RawDataExportOptions.MaxIonCountPerScan)
+
+                    RawDataExportOptions.IntensityMinimum = .GetParam(XML_SECTION_EXPORT_OPTIONS,
+                                                                      "ExportRawDataIntensityMinimum",
+                                                                      RawDataExportOptions.IntensityMinimum)
+                End If
+
+                If Not .SectionPresent(XML_SECTION_SIC_OPTIONS) Then
+                    Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS &
+                                          ControlChars.Quote & "> was not found in the parameter file: " &
+                                          strParameterFilePath
+                    ReportError("LoadParameterFileSettings", strErrorMessage)
+                    Return False
+                Else
+                    ' SIC Options
+                    ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
+
+                    Dim blnNotPresent As Boolean
+
+                    ' Preferentially use "SICTolerance", if it is present
+                    Dim dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance",
+                                                    SICOptions.GetSICTolerance(), blnNotPresent)
+
+                    If blnNotPresent Then
+                        ' Check for "SICToleranceDa", which is a legacy setting
+                        dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa",
+                                                    SICOptions.SICToleranceDa, blnNotPresent)
+
+                        If Not blnNotPresent Then
+                            SICOptions.SetSICTolerance(dblSICTolerance, False)
                         End If
-                    End With
-
-                    CustomSICList.CustomSICListFileName = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", String.Empty)
-
-                    If CustomSICList.CustomSICListFileName.Length > 0 Then
-                        ' Clear mCustomSICList; we'll read the data from the file when ProcessFile is called()
-
-                        CustomSICList.ResetMzSearchValues()
-
-                        blnSuccess = True
                     Else
-                        strMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Empty)
-                        strMZToleranceDaList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", String.Empty)
+                        Dim blnSICToleranceIsPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", False)
 
-                        strScanCenterList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", String.Empty)
-                        strScanToleranceList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", String.Empty)
-
-                        strScanCommentList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
-
-                        blnSuccess = CustomSICList.ParseCustomSICList(strMZList, strMZToleranceDaList, strScanCenterList, strScanToleranceList, strScanCommentList)
+                        SICOptions.SetSICTolerance(dblSICTolerance, blnSICToleranceIsPPM)
                     End If
 
-                    If Not blnSuccess Then
-                        Return False
-                    End If
+                    SICOptions.RefineReportedParentIonMZ = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                     "RefineReportedParentIonMZ",
+                                                                     SICOptions.RefineReportedParentIonMZ)
+
+                    SICOptions.ScanRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart",
+                                                          SICOptions.ScanRangeStart)
+
+                    SICOptions.ScanRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeEnd",
+                                                        SICOptions.ScanRangeEnd)
+
+                    SICOptions.RTRangeStart = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeStart",
+                                                        SICOptions.RTRangeStart)
+
+                    SICOptions.RTRangeEnd = .GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeEnd", SICOptions.RTRangeEnd)
+
+                    SICOptions.CompressMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData",
+                                                                 SICOptions.CompressMSSpectraData)
+
+                    SICOptions.CompressMSMSSpectraData = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                   "CompressMSMSSpectraData",
+                                                                   SICOptions.CompressMSMSSpectraData)
+
+                    SICOptions.CompressToleranceDivisorForDa = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                         "CompressToleranceDivisorForDa",
+                                                                         SICOptions.CompressToleranceDivisorForDa)
+
+                    SICOptions.CompressToleranceDivisorForPPM = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                          "CompressToleranceDivisorForPPM",
+                                                                          SICOptions.CompressToleranceDivisorForPPM)
+
+                    SICOptions.MaxSICPeakWidthMinutesBackward = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                          "MaxSICPeakWidthMinutesBackward",
+                                                                          SICOptions.MaxSICPeakWidthMinutesBackward)
+
+                    SICOptions.MaxSICPeakWidthMinutesForward = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                         "MaxSICPeakWidthMinutesForward",
+                                                                         SICOptions.MaxSICPeakWidthMinutesForward)
+
+                    SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax",
+                                  SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax)
+
+                    SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum",
+                                  SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum)
+
+                    ' Peak Finding Options
+                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode =
+                        CType(.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode",
+                                        CInt(
+                                            SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.
+                                           BaselineNoiseMode)),
+                              MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
+
+                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity",
+                                  SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute)
+
+                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage =
+                        .GetParam(XML_SECTION_SIC_OPTIONS,
+                                  "SICNoiseFractionLowIntensityDataToAverage",
+                                  SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage)
+
+                    ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
+                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
+
+                    SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap",
+                                  SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap)
+
+                    SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax",
+                                  SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax)
+
+                    SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler",
+                                  SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler)
+
+                    SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum",
+                                  SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
+
+                    SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData",
+                                  SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData)
+
+                    SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth",
+                                  SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth)
+
+                    SICOptions.SICPeakFinderOptions.UseButterworthSmooth =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth",
+                                  SICOptions.SICPeakFinderOptions.UseButterworthSmooth)
+
+                    SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency",
+                                  SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency)
+
+                    SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData",
+                                  SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData)
+
+                    SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth",
+                                  SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth)
+
+                    SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder",
+                                  SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder)
+
+                    SICOptions.SaveSmoothedData = .GetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData",
+                                                            SICOptions.SaveSmoothedData)
+
+                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode =
+                        CType(.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode",
+                                        CInt(SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode)),
+                              MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
+
+                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity",
+                                  SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.
+                                     BaselineNoiseLevelAbsolute)
+
+                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.
+                        TrimmedMeanFractionLowIntensityDataToAverage =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage",
+                                  SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage)
+
+                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio ",
+                                  SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio)
+
+                    SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData =
+                        .GetParam(XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData",
+                                  SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData)
+
+                    ' Similarity Options
+                    SICOptions.SimilarIonMZToleranceHalfWidth = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                          "SimilarIonMZToleranceHalfWidth",
+                                                                          SICOptions.SimilarIonMZToleranceHalfWidth)
+
+                    SICOptions.SimilarIonToleranceHalfWidthMinutes = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                               "SimilarIonToleranceHalfWidthMinutes",
+                                                                               SICOptions.SimilarIonToleranceHalfWidthMinutes)
+
+                    SICOptions.SpectrumSimilarityMinimum = .GetParam(XML_SECTION_SIC_OPTIONS,
+                                                                     "SpectrumSimilarityMinimum",
+                                                                     SICOptions.SpectrumSimilarityMinimum)
 
                 End If
+
+                ' Binning Options
+                If Not .SectionPresent(XML_SECTION_BINNING_OPTIONS) Then
+                    Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote &
+                                          XML_SECTION_BINNING_OPTIONS & ControlChars.Quote &
+                                          "> was not found in the parameter file: " & strParameterFilePath
+                    ReportError("LoadParameterFileSettings", strErrorMessage)
+
+                    SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
+                    Return False
+                Else
+                    BinningOptions.StartX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX",
+                                                      BinningOptions.StartX)
+                    BinningOptions.EndX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinEndX", BinningOptions.EndX)
+                    BinningOptions.BinSize = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinSize",
+                                                       BinningOptions.BinSize)
+
+                    BinningOptions.MaximumBinCount = .GetParam(XML_SECTION_BINNING_OPTIONS, "MaximumBinCount",
+                                                               BinningOptions.MaximumBinCount)
+
+                    BinningOptions.IntensityPrecisionPercent = .GetParam(XML_SECTION_BINNING_OPTIONS,
+                                                                         "IntensityPrecisionPercent",
+                                                                         BinningOptions.IntensityPrecisionPercent)
+                    BinningOptions.Normalize = .GetParam(XML_SECTION_BINNING_OPTIONS, "Normalize",
+                                                         BinningOptions.Normalize)
+                    BinningOptions.SumAllIntensitiesForBin = .GetParam(XML_SECTION_BINNING_OPTIONS,
+                                                                       "SumAllIntensitiesForBin",
+                                                                       BinningOptions.SumAllIntensitiesForBin)
+                End If
+
+                ' Memory management options
+                CacheOptions.DiskCachingAlwaysDisabled = .GetParam(XML_SECTION_MEMORY_OPTIONS,
+                                                                   "DiskCachingAlwaysDisabled",
+                                                                   CacheOptions.DiskCachingAlwaysDisabled)
+
+                CacheOptions.FolderPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath",
+                                                    CacheOptions.FolderPath)
+
+                CacheOptions.SpectraToRetainInMemory = .GetParam(XML_SECTION_MEMORY_OPTIONS,
+                                                                 "CacheSpectraToRetainInMemory",
+                                                                 CacheOptions.SpectraToRetainInMemory)
+
+            End With
+
+            If Not objSettingsFile.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES) Then
+                ' Custom SIC values section not found; that's ok
+                ' No more settings to load so return true
+                Return True
+            End If
+
+            CustomSICList.LimitSearchToCustomMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                                               "LimitSearchToCustomMZList",
+                                                                               CustomSICList.LimitSearchToCustomMZList)
+
+            Dim strScanType = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", String.Empty)
+            Dim strScanTolerance = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", String.Empty)
+
+            With CustomSICList
+                .ScanToleranceType = GetScanToleranceTypeFromText(strScanType)
+
+                If strScanTolerance.Length > 0 AndAlso clsUtilities.IsNumber(strScanTolerance) Then
+                    If .ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
+                        .ScanOrAcqTimeTolerance = CInt(strScanTolerance)
+                    Else
+                        ' Includes .Relative and .AcquisitionTime
+                        .ScanOrAcqTimeTolerance = CSng(strScanTolerance)
+                    End If
+                Else
+                    .ScanOrAcqTimeTolerance = 0
+                End If
+            End With
+
+            CustomSICList.CustomSICListFileName = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                                           "CustomMZFile", String.Empty)
+
+            If CustomSICList.CustomSICListFileName.Length > 0 Then
+                ' Clear mCustomSICList; we'll read the data from the file when ProcessFile is called()
+
+                CustomSICList.ResetMzSearchValues()
+
+                Return True
             Else
-                ReportError("LoadParameterFileSettings", "Error calling objSettingsFile.LoadSettings for " & strParameterFilePath, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
-                Return False
+                Dim strMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Empty)
+                Dim strMZToleranceDaList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                                    "MZToleranceDaList", String.Empty)
+
+                Dim strScanCenterList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList",
+                                                                 String.Empty)
+                Dim strScanToleranceList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                                    "ScanToleranceList", String.Empty)
+
+                Dim strScanCommentList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                                  "ScanCommentList", String.Empty)
+
+                Dim blnSuccess = CustomSICList.ParseCustomSICList(strMZList, strMZToleranceDaList,
+                                                                  strScanCenterList, strScanToleranceList,
+                                                                  strScanCommentList)
+
+                Return blnSuccess
             End If
 
         Catch ex As Exception
@@ -532,224 +710,240 @@
             Return False
         End Try
 
-        Return True
-
     End Function
 
     Public Function SaveParameterFileSettings(strParameterFilePath As String) As Boolean
 
         Dim objSettingsFile As New XmlSettingsFileAccessor
 
-        Dim blnScanCommentsDefined As Boolean
-
-        Dim dblSICTolerance As Double, blnSICToleranceIsPPM As Boolean
-
         Try
 
             If strParameterFilePath Is Nothing OrElse strParameterFilePath.Length = 0 Then
                 ' No parameter file specified; unable to save
+                ReportError("SaveParameterFileSettings", "Empty parameter file path sent to SaveParameterFileSettings")
                 Return False
             End If
 
             ' Pass True to .LoadSettings() here so that newly made Xml files will have the correct capitalization
-            If objSettingsFile.LoadSettings(strParameterFilePath, True) Then
-                With objSettingsFile
+            If Not objSettingsFile.LoadSettings(strParameterFilePath, True) Then
+                ReportError("SaveParameterFileSettings", "LoadSettings returned false while initializing " & strParameterFilePath)
+                Return False
+            End If
 
-                    ' Database settings
-                    .SetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString", Me.DatabaseConnectionString)
-                    .SetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql", Me.DatasetInfoQuerySql)
+            With objSettingsFile
 
-
-                    ' Import Options
-                    .SetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", Me.CDFTimeInSeconds)
-                    .SetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", Me.ParentIonDecoyMassDa)
-
-
-                    ' Masic Export Options
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", Me.IncludeHeadersInExportFile)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", Me.IncludeScanTimesInSICStatsFile)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", Me.SkipMSMSProcessing)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICAndRawDataProcessing", Me.SkipSICAndRawDataProcessing)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", Me.ExportRawDataOnly)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError", Me.SuppressNoParentIonsError)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats", Me.WriteExtendedStats)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsIncludeScanFilterText", Me.WriteExtendedStatsIncludeScanFilterText)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsStatusLog", Me.WriteExtendedStatsStatusLog)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", Me.GetStatusLogKeyNameFilterListAsText(True))
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ConsolidateConstantExtendedHeaderValues", Me.ConsolidateConstantExtendedHeaderValues)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile", Me.WriteDetailedSICDataFile)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", Me.WriteMSMethodFile)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", Me.WriteMSTuneFile)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", Me.WriteMRMDataList)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab", Me.WriteMRMIntensityCrosstab)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", Me.FastExistingXMLFileTest)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", CInt(ReporterIons.ReporterIonMassMode))
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", ReporterIons.ReporterIonToleranceDaDefault)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", ReporterIons.ReporterIonSaveObservedMasses)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", Me.ExportRawSpectraData)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", Me.ExportRawDataFileFormat)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", Me.ExportRawDataIncludeMSMS)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", Me.ExportRawDataRenumberScans)
-
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", Me.ExportRawDataMinimumSignalToNoiseRatio)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", Me.ExportRawDataMaxIonCountPerScan)
-                    .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", Me.ExportRawDataIntensityMinimum)
+                ' Database settings
+                .SetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString", Me.DatabaseConnectionString)
+                .SetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql", Me.DatasetInfoQuerySql)
 
 
-                    ' SIC Options
-                    ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
-
-                    ' "SICToleranceDa" is a legacy parameter.  If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa.ToString("0.0000"))
-
-                    dblSICTolerance = GetSICTolerance(blnSICToleranceIsPPM)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", dblSICTolerance.ToString("0.0000"))
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", blnSICToleranceIsPPM.ToString)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", SICOptions.RefineReportedParentIonMZ)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart", SICOptions.ScanRangeStart)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeEnd", SICOptions.ScanRangeEnd)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "RTRangeStart", SICOptions.RTRangeStart)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "RTRangeEnd", SICOptions.RTRangeEnd)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData", SICOptions.CompressMSSpectraData)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "CompressMSMSSpectraData", SICOptions.CompressMSMSSpectraData)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForDa", SICOptions.CompressToleranceDivisorForDa)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForPPM", SICOptions.CompressToleranceDivisorForPPM)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesBackward", SICOptions.MaxSICPeakWidthMinutesBackward)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesForward", SICOptions.MaxSICPeakWidthMinutesForward)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum)
-
-                    ' Peak Finding Options
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", SICOptions.SICPeakFinderOptions.SICNoiseThresholdMode)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.SICNoiseThresholdIntensity)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.SICNoiseFractionLowIntensityDataToAverage)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseMinimumSignalToNoiseRatio", SICOptions.SICPeakFinderOptions.SICNoiseMinimumSignalToNoiseRatio)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap", SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler", SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum", SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData", SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth", SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth", SICOptions.SICPeakFinderOptions.UseButterworthSmooth)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth", SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder", SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", SICOptions.SaveSmoothedData)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdMode)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdIntensity)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.MassSpectraNoiseFractionLowIntensityDataToAverage)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio", SICOptions.SICPeakFinderOptions.MassSpectraNoiseMinimumSignalToNoiseRatio)
-
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData", SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData)
-
-                    ' Similarity Options
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonMZToleranceHalfWidth", SICOptions.SimilarIonMZToleranceHalfWidth)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonToleranceHalfWidthMinutes", SICOptions.SimilarIonToleranceHalfWidthMinutes)
-                    .SetParam(XML_SECTION_SIC_OPTIONS, "SpectrumSimilarityMinimum", SICOptions.SpectrumSimilarityMinimum)
+                ' Import Options
+                .SetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", Me.CDFTimeInSeconds)
+                .SetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", Me.ParentIonDecoyMassDa)
 
 
+                ' Masic Export Options
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", Me.IncludeHeadersInExportFile)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", Me.IncludeScanTimesInSICStatsFile)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", Me.SkipMSMSProcessing)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICAndRawDataProcessing", Me.SkipSICAndRawDataProcessing)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", Me.ExportRawDataOnly)
 
-                    ' Binning Options
-                    .SetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX", BinningOptions.StartX)
-                    .SetParam(XML_SECTION_BINNING_OPTIONS, "BinEndX", BinningOptions.EndX)
-                    .SetParam(XML_SECTION_BINNING_OPTIONS, "BinSize", BinningOptions.BinSize)
-                    .SetParam(XML_SECTION_BINNING_OPTIONS, "MaximumBinCount", BinningOptions.MaximumBinCount)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError", Me.SuppressNoParentIonsError)
 
-                    .SetParam(XML_SECTION_BINNING_OPTIONS, "IntensityPrecisionPercent", BinningOptions.IntensityPrecisionPercent)
-                    .SetParam(XML_SECTION_BINNING_OPTIONS, "Normalize", BinningOptions.Normalize)
-                    .SetParam(XML_SECTION_BINNING_OPTIONS, "SumAllIntensitiesForBin", BinningOptions.SumAllIntensitiesForBin)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats", Me.WriteExtendedStats)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsIncludeScanFilterText", Me.WriteExtendedStatsIncludeScanFilterText)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsStatusLog", Me.WriteExtendedStatsStatusLog)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", Me.GetStatusLogKeyNameFilterListAsText(True))
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ConsolidateConstantExtendedHeaderValues", Me.ConsolidateConstantExtendedHeaderValues)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile", Me.WriteDetailedSICDataFile)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", Me.WriteMSMethodFile)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", Me.WriteMSTuneFile)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", Me.WriteMRMDataList)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab", Me.WriteMRMIntensityCrosstab)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", Me.FastExistingXMLFileTest)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", CInt(ReporterIons.ReporterIonMassMode))
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", ReporterIons.ReporterIonToleranceDaDefault)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", ReporterIons.ReporterIonSaveObservedMasses)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", RawDataExportOptions.ExportEnabled)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", RawDataExportOptions.FileFormat)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", RawDataExportOptions.IncludeMSMS)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", RawDataExportOptions.RenumberScans)
+
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", RawDataExportOptions.MinimumSignalToNoiseRatio)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", RawDataExportOptions.MaxIonCountPerScan)
+                .SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", RawDataExportOptions.IntensityMinimum)
 
 
-                    ' Memory management options
-                    .SetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", Me.DiskCachingAlwaysDisabled)
-                    .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", Me.CacheFolderPath)
-                    .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", Me.CacheSpectraToRetainInMemory)
+                ' SIC Options
+                ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
+
+                ' "SICToleranceDa" is a legacy parameter.  If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa.ToString("0.0000"))
+
+                Dim blnSICToleranceIsPPM As Boolean
+                Dim dblSICTolerance = SICOptions.GetSICTolerance(blnSICToleranceIsPPM)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", dblSICTolerance.ToString("0.0000"))
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", blnSICToleranceIsPPM.ToString)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", SICOptions.RefineReportedParentIonMZ)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart", SICOptions.ScanRangeStart)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeEnd", SICOptions.ScanRangeEnd)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "RTRangeStart", SICOptions.RTRangeStart)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "RTRangeEnd", SICOptions.RTRangeEnd)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData", SICOptions.CompressMSSpectraData)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "CompressMSMSSpectraData", SICOptions.CompressMSMSSpectraData)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForDa", SICOptions.CompressToleranceDivisorForDa)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForPPM", SICOptions.CompressToleranceDivisorForPPM)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesBackward", SICOptions.MaxSICPeakWidthMinutesBackward)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesForward", SICOptions.MaxSICPeakWidthMinutesForward)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum)
+
+                ' Peak Finding Options
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage)
+
+                ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
+                SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseMinimumSignalToNoiseRatio", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap", SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler", SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum", SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData", SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth", SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth", SICOptions.SICPeakFinderOptions.UseButterworthSmooth)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth", SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder", SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", SICOptions.SaveSmoothedData)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData", SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData)
+
+                ' Similarity Options
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonMZToleranceHalfWidth", SICOptions.SimilarIonMZToleranceHalfWidth)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SimilarIonToleranceHalfWidthMinutes", SICOptions.SimilarIonToleranceHalfWidthMinutes)
+
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SpectrumSimilarityMinimum", SICOptions.SpectrumSimilarityMinimum)
+
+                ' Binning Options
+                .SetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX", BinningOptions.StartX)
+                .SetParam(XML_SECTION_BINNING_OPTIONS, "BinEndX", BinningOptions.EndX)
+                .SetParam(XML_SECTION_BINNING_OPTIONS, "BinSize", BinningOptions.BinSize)
+                .SetParam(XML_SECTION_BINNING_OPTIONS, "MaximumBinCount", BinningOptions.MaximumBinCount)
+
+                .SetParam(XML_SECTION_BINNING_OPTIONS, "IntensityPrecisionPercent", BinningOptions.IntensityPrecisionPercent)
+                .SetParam(XML_SECTION_BINNING_OPTIONS, "Normalize", BinningOptions.Normalize)
+                .SetParam(XML_SECTION_BINNING_OPTIONS, "SumAllIntensitiesForBin", BinningOptions.SumAllIntensitiesForBin)
+
+
+                ' Memory management options
+                .SetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", CacheOptions.DiskCachingAlwaysDisabled)
+                .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", CacheOptions.FolderPath)
+                .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory)
+
+            End With
+
+            ' Construct the strRawText strings using mCustomSICList
+            Dim blnScanCommentsDefined = False
+
+            Dim lstMzValues = New List(Of String)
+            Dim lstMzTolerances = New List(Of String)
+            Dim lstScanCenters = New List(Of String)
+            Dim lstScanTolerances = New List(Of String)
+            Dim lstComments = New List(Of String)
+
+            For Each mzSearchValue In CustomSICList.CustomMZSearchValues
+                With mzSearchValue
+                    lstMzValues.Add(.MZ.ToString())
+                    lstMzTolerances.Add(.MZToleranceDa.ToString())
+
+                    lstScanCenters.Add(.ScanOrAcqTimeCenter.ToString())
+                    lstScanTolerances.Add(.ScanOrAcqTimeTolerance.ToString())
+
+                    If .Comment Is Nothing Then
+                        lstComments.Add(String.Empty)
+                    Else
+                        If .Comment.Length > 0 Then
+                            blnScanCommentsDefined = True
+                        End If
+                        lstComments.Add(.Comment)
+                    End If
 
                 End With
+            Next
 
-                ' Construct the strRawText strings using mCustomSICList
-                blnScanCommentsDefined = False
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Join(ControlChars.Tab, lstMzValues))
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", String.Join(ControlChars.Tab, lstMzTolerances))
 
-                Dim lstMzValues = New List(Of String)
-                Dim lstMzTolerances = New List(Of String)
-                Dim lstScanCenters = New List(Of String)
-                Dim lstScanTolerances = New List(Of String)
-                Dim lstComments = New List(Of String)
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", String.Join(ControlChars.Tab, lstScanCenters))
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", String.Join(ControlChars.Tab, lstScanTolerances))
 
-                For Each mzSearchValue In mCustomSICList.CustomMZSearchValues
-                    With mzSearchValue
-                        lstMzValues.Add(.MZ.ToString())
-                        lstMzTolerances.Add(.MZToleranceDa.ToString())
-
-                        lstScanCenters.Add(.ScanOrAcqTimeCenter.ToString())
-                        lstScanTolerances.Add(.ScanOrAcqTimeTolerance.ToString())
-
-                        If .Comment Is Nothing Then
-                            lstComments.Add(String.Empty)
-                        Else
-                            If .Comment.Length > 0 Then
-                                blnScanCommentsDefined = True
-                            End If
-                            lstComments.Add(.Comment)
-                        End If
-
-                    End With
-                Next
-
-                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Join(ControlChars.Tab, lstMzValues))
-                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", String.Join(ControlChars.Tab, lstMzTolerances))
-
-                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", String.Join(ControlChars.Tab, lstScanCenters))
-                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", String.Join(ControlChars.Tab, lstScanTolerances))
-
-                If blnScanCommentsDefined Then
-                    objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Join(ControlChars.Tab, lstComments))
-                Else
-                    objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
-                End If
-
-                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", mCustomSICList.ScanOrAcqTimeTolerance.ToString)
-
-                Select Case mCustomSICList.ScanToleranceType
-                    Case clsCustomSICList.eCustomSICScanTypeConstants.Relative
-                        objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE)
-                    Case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
-                        objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME)
-                    Case Else
-                        ' Assume absolute
-                        objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ABSOLUTE)
-                End Select
-
-                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", mCustomSICList.CustomSICListFileName)
-
-                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "LimitSearchToCustomMZList", mCustomSICList.LimitSearchToCustomMZList)
-
-
-                objSettingsFile.SaveSettings()
-
+            If blnScanCommentsDefined Then
+                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Join(ControlChars.Tab, lstComments))
+            Else
+                objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
             End If
+
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", CustomSICList.ScanOrAcqTimeTolerance.ToString)
+
+            Select Case CustomSICList.ScanToleranceType
+                Case clsCustomSICList.eCustomSICScanTypeConstants.Relative
+                    objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE)
+                Case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
+                    objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME)
+                Case Else
+                    ' Assume absolute
+                    objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ABSOLUTE)
+            End Select
+
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", CustomSICList.CustomSICListFileName)
+
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "LimitSearchToCustomMZList", CustomSICList.LimitSearchToCustomMZList)
+
+
+            objSettingsFile.SaveSettings()
 
         Catch ex As Exception
             ReportError("SaveParameterFileSettings", "Error in SaveParameterFileSettings", ex, True, False, eMasicErrorCodes.OutputFileWriteError)
@@ -760,12 +954,15 @@
 
     End Function
 
-    Public Sub SetStatusLogKeyNameFilterList(ByRef strMatchSpecList() As String)
+    Public Sub SetStatusLogKeyNameFilterList(strMatchSpecList() As String)
         Try
+            StatusLogKeyNameFilterList.Clear()
+
             If Not strMatchSpecList Is Nothing Then
-                ReDim mStatusLogKeyNameFilterList(strMatchSpecList.Length - 1)
-                Array.Copy(strMatchSpecList, mStatusLogKeyNameFilterList, strMatchSpecList.Length)
-                Array.Sort(mStatusLogKeyNameFilterList)
+                Dim query = (From item In strMatchSpecList Select item).Distinct()
+                For Each item In query
+                    StatusLogKeyNameFilterList.Add(item)
+                Next
             End If
         Catch ex As Exception
             ' Ignore errors here

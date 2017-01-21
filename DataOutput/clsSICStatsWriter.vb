@@ -92,9 +92,8 @@ Namespace DataOutput
           scanList As clsScanList,
           strInputFileName As String,
           strOutputFolderPath As String,
-          sicOptions As clsSICOptions,
-          blnIncludeHeaders As Boolean,
-          blnIncludeScanTimesInSICStatsFile As Boolean) As Boolean
+          masicOptions As clsMASICOptions,
+          dataOutputHandler As clsDataOutput) As Boolean
 
             ' Writes out a flat file containing identified peaks and statistics
 
@@ -118,9 +117,11 @@ Namespace DataOutput
 
                     ' Write the SIC stats to the output file
                     ' The file is tab delimited
-                    ' If blnIncludeHeaders = True, then headers are included
-                    If blnIncludeHeaders Then
-                        srOutfile.WriteLine(GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
+
+                    Dim blnIncludeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile
+
+                    If masicOptions.IncludeHeadersInExportFile Then
+                        srOutfile.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
                     End If
 
                     If scanList.SurveyScans.Count = 0 AndAlso scanList.ParentIonInfoCount = 0 Then
@@ -133,7 +134,7 @@ Namespace DataOutput
                             Dim surveyScanNumber As Integer
                             Dim surveyScanTime As Single
 
-                            WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, sicOptions, scanList,
+                            WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, masicOptions.SICOptions, scanList,
                                                    fakeParentIon, intParentIonIndex, surveyScanNumber, surveyScanTime,
                                                    0, blnIncludeScanTimesInSICStatsFile)
                         Next
@@ -142,7 +143,7 @@ Namespace DataOutput
                         For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
                             Dim blnIncludeParentIon As Boolean
 
-                            If Me.LimitSearchToCustomMZList Then
+                            If masicOptions.CustomSICList.LimitSearchToCustomMZList Then
                                 blnIncludeParentIon = scanList.ParentIons(intParentIonIndex).CustomSICPeak
                             Else
                                 blnIncludeParentIon = True
@@ -163,7 +164,7 @@ Namespace DataOutput
                                         surveyScanTime = 0
                                     End If
 
-                                    WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, sicOptions, scanList,
+                                    WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, masicOptions.SICOptions, scanList,
                                                            parentIon, intParentIonIndex, surveyScanNumber, surveyScanTime,
                                                            fragScanIndex, blnIncludeScanTimesInSICStatsFile)
 
@@ -177,7 +178,7 @@ Namespace DataOutput
                             Else
                                 UpdateProgress(1)
                             End If
-                            If mAbortProcessing Then
+                            If masicOptions.AbortProcessing Then
                                 scanList.ProcessingIncomplete = True
                                 Exit For
                             End If
@@ -189,7 +190,7 @@ Namespace DataOutput
 
             Catch ex As Exception
                 Console.WriteLine(ex.StackTrace)
-                LogErrors("SaveSICStatsFlatFile", "Error writing the Peak Stats to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("SaveSICStatsFlatFile", "Error writing the Peak Stats to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

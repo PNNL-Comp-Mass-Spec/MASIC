@@ -204,8 +204,10 @@ Namespace DataOutput
 
                                                 Case "SICNoiseThresholdMode" : .SICBaselineNoiseOptions.BaselineNoiseMode = CType(objValueNode.InnerText, MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
                                                 Case "SICNoiseThresholdIntensity" : .SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = CSng(objValueNode.InnerText)
-                                                Case "SICNoiseFractionLowIntensityDataToAverage" : .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = CSng(objValueNode.InnerText)
-                                                Case "SICNoiseMinimumSignalToNoiseRatio" : .SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = CSng(objValueNode.InnerText)
+                                                Case "SICNoiseFractionLowIntensityDataToAverage"
+                                                    .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = CSng(objValueNode.InnerText)
+                                                Case "SICNoiseMinimumSignalToNoiseRatio" : .SICBaselineNoiseOptions.MinimumSignalToNoiseRatio =
+                                                        CSng(objValueNode.InnerText)
 
                                                 Case "MaxDistanceScansNoOverlap" : .MaxDistanceScansNoOverlap = CInt(objValueNode.InnerText)
                                                 Case "MaxAllowedUpwardSpikeFractionMax" : .MaxAllowedUpwardSpikeFractionMax = CSng(objValueNode.InnerText)
@@ -497,7 +499,7 @@ Namespace DataOutput
             Return GetHeadersForOutputFile(scanList, eOutputFileType, ControlChars.Tab)
         End Function
 
-        Private Function GetHeadersForOutputFile(
+        Public Function GetHeadersForOutputFile(
           scanList As clsScanList, eOutputFileType As eOutputFileTypeConstants, cColDelimiter As Char) As String
 
             Dim strHeaders As String

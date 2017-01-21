@@ -143,11 +143,11 @@ Public Module modMain
 
             mMASIC = New clsMASIC()
 
-            mMASIC.DatasetLookupFilePath = mDatasetLookupFilePath
-            mMASIC.DatasetNumber = mDatasetNumber
+            mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath
+            mMASIC.Options.SICOptions.DatasetNumber = mDatasetNumber
 
             If Not mMASICStatusFilename Is Nothing AndAlso mMASICStatusFilename.Length > 0 Then
-                mMASIC.MASICStatusFilename = mMASICStatusFilename
+                mMASIC.Options.MASICStatusFilename = mMASICStatusFilename
             End If
 
             mMASIC.ShowMessages = Not mQuietMode
@@ -383,7 +383,7 @@ Public Module modMain
             Console.WriteLine("When using /S, you can use /R to re-create the input folder hierarchy in the alternate output folder (if defined).")
             Console.WriteLine()
             Console.WriteLine("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file.")
-            Console.WriteLine("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASIC.DEFAULT_MASIC_STATUS_FILE_NAME & ").")
+            Console.WriteLine("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME & ").")
             Console.WriteLine("The optional /Q switch will suppress all error messages.")
             Console.WriteLine()
 

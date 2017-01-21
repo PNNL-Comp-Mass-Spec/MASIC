@@ -1,6 +1,4 @@
-﻿Imports ThermoRawFileReader
-
-Public Class clsReporterIons
+﻿Public Class clsReporterIons
 
 #Region "Constants and Enums"
     Public Const REPORTER_ION_TOLERANCE_DA_DEFAULT As Double = 0.5
@@ -317,12 +315,10 @@ Public Class clsReporterIons
 
         ' Note: If eReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone then nothing is changed
 
-        Dim reporterIonInfo As New List(Of clsReporterIonInfo)
-
         If eReporterIonMassMode <> eReporterIonMassModeConstants.CustomOrNone Then
             Me.ReporterIonToleranceDaDefault = dblMZToleranceDa
 
-            reporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, dblMZToleranceDa)
+            Dim reporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, dblMZToleranceDa)
 
             SetReporterIons(reporterIonInfo, False)
             mReporterIonMassMode = eReporterIonMassMode

@@ -75,11 +75,11 @@ Namespace DataInput
         End Sub
 
         Public Sub DiscardDataBelowNoiseThreshold(
-      objMSSpectrum As clsMSSpectrum,
-      sngNoiseThresholdIntensity As Single,
-      dblMZIgnoreRangeStart As Double,
-      dblMZIgnoreRangeEnd As Double,
-      noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions)
+          objMSSpectrum As clsMSSpectrum,
+          sngNoiseThresholdIntensity As Single,
+          dblMZIgnoreRangeStart As Double,
+          dblMZIgnoreRangeEnd As Double,
+          noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions)
 
             Dim intIonCountNew As Integer
             Dim intIonIndex As Integer
@@ -153,11 +153,11 @@ Namespace DataInput
 
         End Sub
 
-        Private Sub DiscardDataToLimitIonCount(
-      objMSSpectrum As clsMSSpectrum,
-      dblMZIgnoreRangeStart As Double,
-      dblMZIgnoreRangeEnd As Double,
-      intMaxIonCountToRetain As Integer)
+        Public Sub DiscardDataToLimitIonCount(
+          objMSSpectrum As clsMSSpectrum,
+          dblMZIgnoreRangeStart As Double,
+          dblMZIgnoreRangeEnd As Double,
+          intMaxIonCountToRetain As Integer)
 
             Dim intIonCountNew As Integer
             Dim intIonIndex As Integer

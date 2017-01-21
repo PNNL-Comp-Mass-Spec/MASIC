@@ -127,11 +127,11 @@ Public Class clsITraqIntensityCorrection
         Dim intIndex As Integer
 
         intMatrixSize = GetMatrixLength(mITraqMode)
-        strITraqMode = clsMASIC.GetReporterIonModeDescription(mITraqMode)
+        strITraqMode = clsReporterIons.GetReporterIonModeDescription(mITraqMode)
 
         If dblReporterIonIntensites.Length <> intMatrixSize Then
-            Throw New InvalidOperationException("Length of ReporterIonIntensites array must be " & intMatrixSize.ToString() & " when using the " & strITraqMode & " mode")
-            Return False
+            Throw New InvalidOperationException("Length of ReporterIonIntensites array must be " & intMatrixSize.ToString() &
+                                                " when using the " & strITraqMode & " mode")
         End If
 
         dblCorrectedIntensities = mMatrixUtility.ProcessData(mCoeffs, intMatrixSize, dblReporterIonIntensites)
@@ -425,7 +425,7 @@ Public Class clsITraqIntensityCorrection
 
                 Console.Write("  " & i.ToString() & "  ")
                 For j = 0 To intMatrixSize - 1
-                    If mCoeffs(i, j) = 0 Then
+                    If Math.Abs(mCoeffs(i, j)) < Single.Epsilon Then
                         Console.Write("   0    ")
                     Else
                         Console.Write(" " & mCoeffs(i, j).ToString("0.0000") & " ")

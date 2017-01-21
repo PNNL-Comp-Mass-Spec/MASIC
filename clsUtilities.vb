@@ -23,7 +23,6 @@ Public Class clsUtilities
 
     End Function
 
-
     Public Shared Function ConvoluteMass(
       dblMassMZ As Double,
       intCurrentCharge As Short,

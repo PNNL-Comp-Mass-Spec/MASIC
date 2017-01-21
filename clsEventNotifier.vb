@@ -48,6 +48,12 @@ Public MustInherit Class clsEventNotifier
     ''' Update the code associated with an error
     ''' </summary>
     ''' <param name="eNewErrorCode"></param>
+    Public Event UpdateBaseClassErrorCodeEvent(eNewErrorCode As eProcessFilesErrorCodes)
+
+    ''' <summary>
+    ''' Update the code associated with an error
+    ''' </summary>
+    ''' <param name="eNewErrorCode"></param>
     ''' <param name="leaveExistingErrorCodeUnchanged"></param>
     Public Event UpdateErrorCodeEvent(eNewErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
 
@@ -108,6 +114,10 @@ Public MustInherit Class clsEventNotifier
         RaiseEvent WarningEvent(source, message)
     End Sub
 
+    Private Sub OnUpdateBaseClassErrorCode(eNewErrorCode As eProcessFilesErrorCodes)
+        RaiseEvent UpdateBaseClassErrorCodeEvent(eNewErrorCode)
+    End Sub
+
     Private Sub OnUpdateErrorCode(eNewErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
         RaiseEvent UpdateErrorCodeEvent(eNewErrorCode, leaveExistingErrorCodeUnchanged)
     End Sub
@@ -118,6 +128,7 @@ Public MustInherit Class clsEventNotifier
         AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
         AddHandler oClass.ProgressUpdate, AddressOf ProgressUpdateHandler
         AddHandler oClass.UpdateCacheStatsEvent, AddressOf UpdatedCacheStatsEventHandler
+        AddHandler oClass.UpdateBaseClassErrorCodeEvent, AddressOf UpdateBaseClassErrorCodeEventHandler
         AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
     End Sub
 
@@ -147,6 +158,10 @@ Public MustInherit Class clsEventNotifier
 
     Protected Sub ReportWarning(source As String, message As String)
         OnWarningEvent(source, message)
+    End Sub
+
+    Protected Sub SetBaseClassErrorCode(eNewErrorCode As eProcessFilesErrorCodes)
+        OnUpdateBaseClassErrorCode(eNewErrorCode)
     End Sub
 
     Protected Sub SetLocalErrorCode(eNewErrorCode As eMasicErrorCodes, Optional leaveExistingErrorCodeUnchanged As Boolean = False)
@@ -201,6 +216,10 @@ Public MustInherit Class clsEventNotifier
 
     Private Sub UpdatedCacheStatsEventHandler(cacheEventCount As Integer, unCacheEventCount As Integer)
         OnUpdateCacheStats(cacheEventCount, unCacheEventCount)
+    End Sub
+
+    Private Sub UpdateBaseClassErrorCodeEventHandler(eErrorCode As eProcessFilesErrorCodes)
+        SetBaseClassErrorCode(eErrorCode)
     End Sub
 
     Private Sub UpdateErrorCodeEventHandler(eErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
