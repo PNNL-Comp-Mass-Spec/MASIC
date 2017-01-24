@@ -3,40 +3,6 @@
 Public Class clsDataAggregation
     Inherits clsEventNotifier
 
-    Private Function AggregateIonsInRange(
-      objSpectraCache As clsSpectraCache,
-      scanList As IList(Of clsScanInfo),
-      intSpectrumIndex As Integer,
-      dblSearchMZ As Double,
-      dblSearchToleranceHalfWidth As Double,
-      ByRef intIonMatchCount As Integer,
-      ByRef dblClosestMZ As Double,
-      blnReturnMax As Boolean) As Single
-
-
-        Dim intPoolIndex As Integer
-        Dim sngIonSumOrMax As Single
-
-        Try
-            intIonMatchCount = 0
-            sngIonSumOrMax = 0
-
-            If Not objSpectraCache.ValidateSpectrumInPool(scanList(intSpectrumIndex).ScanNumber, intPoolIndex) Then
-                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
-            Else
-                sngIonSumOrMax = AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex),
-                                                      dblSearchMZ, dblSearchToleranceHalfWidth,
-                                                      intIonMatchCount, dblClosestMZ, blnReturnMax)
-            End If
-        Catch ex As Exception
-            ReportError("AggregateIonsInRange_SpectraCache", "Error in AggregateIonsInRange", ex, True, False)
-            intIonMatchCount = 0
-        End Try
-
-        Return sngIonSumOrMax
-
-    End Function
-
     ''' <summary>
     ''' When blnReturnMax is false, determine the sum of the data within the search mass tolerance
     ''' When blnReturnMaxis true, determine the maximum of the data within the search mass tolerance
