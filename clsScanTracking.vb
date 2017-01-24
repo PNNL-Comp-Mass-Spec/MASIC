@@ -11,7 +11,7 @@ Public Class clsScanTracking
 #End Region
 
 #Region "Properties"
-    Public ReadOnly Property ScanStats As List(Of DSSummarizer.clsScanStatsEntry)
+    Public ReadOnly Property ScanStats As List(Of clsScanStatsEntry)
 #End Region
 
 #Region "Classwide variables"
@@ -29,7 +29,7 @@ Public Class clsScanTracking
         mReporterIons = reporterIons
         mPeakFinder = peakfinder
 
-        ScanStats = New List(Of DSSummarizer.clsScanStatsEntry)
+        ScanStats = New List(Of clsScanStatsEntry)
     End Sub
 
     Public Function CheckScanInRange(

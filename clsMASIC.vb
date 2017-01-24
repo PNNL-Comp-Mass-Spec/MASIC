@@ -1438,7 +1438,7 @@ Public Class clsMASIC
 
             objSpectraCache.InitializeSpectraPool()
 
-            Dim datasetFileInfo = new DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType
+            Dim datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType
 
             Dim scanList = New clsScanList()
             RegisterEvents(scanList)
@@ -1553,7 +1553,7 @@ Public Class clsMASIC
 
                         ' Instantiate this object to avoid a warning below about the object potentially not being initialized
                         ' In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
-                        datasetFileInfo = New DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType()
+                        datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
                 End Select
 
                 If Not blnSuccess Then

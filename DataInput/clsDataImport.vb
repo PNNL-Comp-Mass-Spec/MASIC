@@ -27,12 +27,12 @@ Namespace DataInput
 
         Protected ReadOnly mScanTracking As clsScanTracking
 
-        Protected mDatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType
+        Protected mDatasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType
 #End Region
 
 #Region "Properties"
 
-        Public ReadOnly Property DatasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType
+        Public ReadOnly Property DatasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType
             Get
                 Return mDatasetFileInfo
             End Get
@@ -70,7 +70,7 @@ Namespace DataInput
             mParentIonProcessor = parentIonProcessor
             mScanTracking = scanTracking
 
-            mDatasetFileInfo = New DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType()
+            mDatasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
 
         End Sub
 
@@ -269,7 +269,7 @@ Namespace DataInput
 
             Const cColDelimiter As Char = ControlChars.Tab
 
-            Dim objScanStatsEntry As New DSSummarizer.clsScanStatsEntry
+            Dim objScanStatsEntry As New clsScanStatsEntry
 
             objScanStatsEntry.ScanNumber = currentScan.ScanNumber
 

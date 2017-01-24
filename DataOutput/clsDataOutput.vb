@@ -461,22 +461,22 @@ Namespace DataOutput
           strInputFileName As String,
           strOutputFolderPath As String,
           scanTracking As clsScanTracking,
-          datasetFileInfo As DSSummarizer.clsDatasetStatsSummarizer.udtDatasetFileInfoType) As Boolean
+          datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType) As Boolean
 
             Dim blnSuccess As Boolean
 
             Dim strDatasetName As String
             Dim strDatasetInfoFilePath As String
 
-            Dim objDatasetStatsSummarizer As DSSummarizer.clsDatasetStatsSummarizer
-            Dim udtSampleInfo = New DSSummarizer.clsDatasetStatsSummarizer.udtSampleInfoType
+            Dim objDatasetStatsSummarizer As clsDatasetStatsSummarizer
+            Dim udtSampleInfo = New clsDatasetStatsSummarizer.udtSampleInfoType
             udtSampleInfo.Clear()
 
             Try
                 strDatasetName = Path.GetFileNameWithoutExtension(strInputFileName)
                 strDatasetInfoFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DatasetInfoFile)
 
-                objDatasetStatsSummarizer = New DSSummarizer.clsDatasetStatsSummarizer
+                objDatasetStatsSummarizer = New clsDatasetStatsSummarizer
 
                 blnSuccess = objDatasetStatsSummarizer.CreateDatasetInfoFile(
                   strDatasetName, strDatasetInfoFilePath,
@@ -629,7 +629,7 @@ Namespace DataOutput
                 ' ScanStatsExtended
                 strHeaders = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
                 If Not strHeaders Is Nothing AndAlso strHeaders.Length > 0 Then
-                    srOutFile.WriteLine(clsDataOutput.ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) & ":")
+                    srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) & ":")
                     srOutFile.WriteLine(strHeaders)
                 End If
 
