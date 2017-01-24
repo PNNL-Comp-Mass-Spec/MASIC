@@ -388,11 +388,11 @@ Public Class clsUnused
             With scanList(intScanIndex)
                 If blnSaveTIC Then
                     srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString() & cColDelimiter &
-                          Math.Round(.TotalIonIntensity, 2).ToString)
+                          Math.Round(.TotalIonIntensity, 2).ToString())
                 Else
                     srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString() & cColDelimiter &
                           Math.Round(.BasePeakIonIntensity, 2).ToString() & cColDelimiter &
-                          Math.Round(.BasePeakIonMZ, 4).ToString)
+                          Math.Round(.BasePeakIonMZ, 4).ToString())
                 End If
 
             End With

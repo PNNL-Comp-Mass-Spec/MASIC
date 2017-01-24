@@ -795,7 +795,7 @@ Public Class clsMASICOptions
                 Dim blnSICToleranceIsPPM As Boolean
                 Dim dblSICTolerance = SICOptions.GetSICTolerance(blnSICToleranceIsPPM)
                 .SetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", dblSICTolerance.ToString("0.0000"))
-                .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", blnSICToleranceIsPPM.ToString)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", blnSICToleranceIsPPM.ToString())
 
                 .SetParam(XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", SICOptions.RefineReportedParentIonMZ)
                 .SetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart", SICOptions.ScanRangeStart)
@@ -926,7 +926,7 @@ Public Class clsMASICOptions
                 objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
             End If
 
-            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", CustomSICList.ScanOrAcqTimeTolerance.ToString)
+            objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", CustomSICList.ScanOrAcqTimeTolerance.ToString())
 
             Select Case CustomSICList.ScanToleranceType
                 Case clsCustomSICList.eCustomSICScanTypeConstants.Relative

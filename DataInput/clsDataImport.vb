@@ -140,7 +140,7 @@ Namespace DataInput
                             End If
                         Case Else
                             ReportError("DiscardDataBelowNoiseThreshold", "Unknown BaselineNoiseMode encountered in DiscardDataBelowNoiseThreshold: " &
-                                    noiseThresholdOptions.BaselineNoiseMode.ToString)
+                                    noiseThresholdOptions.BaselineNoiseMode.ToString())
                     End Select
 
                     If intIonCountNew < .IonCount Then

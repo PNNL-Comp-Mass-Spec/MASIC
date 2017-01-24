@@ -254,7 +254,7 @@ Namespace DataOutput
 
             With currentScan
 
-                srOutFile.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString)          ' Store the base peak ion intensity as the time domain signal level value
+                srOutFile.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString())          ' Store the base peak ion intensity as the time domain signal level value
 
                 srOutFile.WriteLine("MASIC " & mOptions.MASICVersion)                     ' Software version
                 strLineOut = "MS/MS-based PEK file"
@@ -327,8 +327,8 @@ Namespace DataOutput
                     Next intIonIndex
                 End If
 
-                srOutFile.WriteLine("Number of peaks in spectrum = " & .IonCount.ToString)
-                srOutFile.WriteLine("Number of isotopic distributions detected = " & intExportCount.ToString)
+                srOutFile.WriteLine("Number of peaks in spectrum = " & .IonCount.ToString())
+                srOutFile.WriteLine("Number of isotopic distributions detected = " & intExportCount.ToString())
                 srOutFile.WriteLine()
 
             End With

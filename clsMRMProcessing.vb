@@ -707,7 +707,7 @@ Public Class clsMRMProcessing
 
                     If intParentIonsProcessed Mod 100 = 0 Then
                         If DateTime.UtcNow.Subtract(mOptions.LastParentIonProcessingLogTime).TotalSeconds >= 10 OrElse intParentIonsProcessed Mod 500 = 0 Then
-                            ReportMessage("Parent Ions Processed: " & intParentIonsProcessed.ToString)
+                            ReportMessage("Parent Ions Processed: " & intParentIonsProcessed.ToString())
                             Console.Write(".")
                             mOptions.LastParentIonProcessingLogTime = DateTime.UtcNow
                         End If

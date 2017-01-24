@@ -297,7 +297,7 @@ Namespace DataOutput
                         sbOutLine.Append(StringUtilities.ValueToString(.StDev, 3) & cColDelimiter)
                         sbOutLine.Append(StringUtilities.ValueToString(.Skew, 4) & cColDelimiter)
                         sbOutLine.Append(StringUtilities.ValueToString(.KSStat, 4) & cColDelimiter)
-                        sbOutLine.Append(.DataCountUsed.ToString)
+                        sbOutLine.Append(.DataCountUsed.ToString())
                     End With
 
                 End With
@@ -310,7 +310,7 @@ Namespace DataOutput
                 sbOutLine.Append(Math.Round(optimalPeakApexScanTime, 5).ToString() & cColDelimiter)    ' OptimalPeakApexScanTime
             End If
 
-            srOutfile.WriteLine(sbOutLine.ToString)
+            srOutfile.WriteLine(sbOutLine.ToString())
 
         End Sub
 

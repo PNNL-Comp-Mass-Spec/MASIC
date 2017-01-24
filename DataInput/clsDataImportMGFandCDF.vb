@@ -82,7 +82,7 @@ Namespace DataInput
                 scanList.Initialize(intMsScanCount, 0)
 
                 UpdateProgress("Reading CDF/MGF data (" & intMsScanCount.ToString() & " scans)" & ControlChars.NewLine & Path.GetFileName(strFilePath))
-                ReportMessage("Reading CDF/MGF data; Total MS scan count: " & intMsScanCount.ToString)
+                ReportMessage("Reading CDF/MGF data; Total MS scan count: " & intMsScanCount.ToString())
 
                 ' Read all of the Survey scans from the CDF file
                 ' CDF files created by the Agilent XCT list the first scan number as 0; use intScanNumberCorrection to correct for this
@@ -226,7 +226,7 @@ Namespace DataInput
                     End If
 
                     If intMsScanIndex Mod 100 = 0 Then
-                        ReportMessage("Reading MS scan index: " & intMsScanIndex.ToString)
+                        ReportMessage("Reading MS scan index: " & intMsScanIndex.ToString())
                         Console.Write(".")
                     End If
 

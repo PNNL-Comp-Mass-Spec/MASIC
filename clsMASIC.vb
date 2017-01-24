@@ -1886,17 +1886,17 @@ Public Class clsMASIC
             End If
 
             With mProcessingStats
-                LogMessage("ProcessingStats: Memory Usage At Start (MB) = " & .MemoryUsageMBAtStart.ToString)
-                LogMessage("ProcessingStats: Peak memory usage (MB) = " & .PeakMemoryUsageMB.ToString)
+                LogMessage("ProcessingStats: Memory Usage At Start (MB) = " & .MemoryUsageMBAtStart.ToString())
+                LogMessage("ProcessingStats: Peak memory usage (MB) = " & .PeakMemoryUsageMB.ToString())
 
-                LogMessage("ProcessingStats: File Load Time (seconds) = " & .FileLoadEndTime.Subtract(.FileLoadStartTime).TotalSeconds.ToString)
-                LogMessage("ProcessingStats: Memory Usage During Load (MB) = " & .MemoryUsageMBDuringLoad.ToString)
+                LogMessage("ProcessingStats: File Load Time (seconds) = " & .FileLoadEndTime.Subtract(.FileLoadStartTime).TotalSeconds.ToString())
+                LogMessage("ProcessingStats: Memory Usage During Load (MB) = " & .MemoryUsageMBDuringLoad.ToString())
 
-                LogMessage("ProcessingStats: Processing Time (seconds) = " & .ProcessingEndTime.Subtract(.ProcessingStartTime).TotalSeconds.ToString)
-                LogMessage("ProcessingStats: Memory Usage At End (MB) = " & .MemoryUsageMBAtEnd.ToString)
+                LogMessage("ProcessingStats: Processing Time (seconds) = " & .ProcessingEndTime.Subtract(.ProcessingStartTime).TotalSeconds.ToString())
+                LogMessage("ProcessingStats: Memory Usage At End (MB) = " & .MemoryUsageMBAtEnd.ToString())
 
-                LogMessage("ProcessingStats: Cache Event Count = " & .CacheEventCount.ToString)
-                LogMessage("ProcessingStats: UncCache Event Count = " & .UnCacheEventCount.ToString)
+                LogMessage("ProcessingStats: Cache Event Count = " & .CacheEventCount.ToString())
+                LogMessage("ProcessingStats: UncCache Event Count = " & .UnCacheEventCount.ToString())
             End With
 
             If blnSuccess Then
@@ -2046,7 +2046,7 @@ Public Class clsMASIC
             mSubtaskProcessingStepPct = subtaskPercentComplete
         End If
 
-        If forceUpdate OrElse blnRaiseEvent OrElse 
+        If forceUpdate OrElse blnRaiseEvent OrElse
             DateTime.UtcNow.Subtract(LastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS Then
             LastFileWriteTime = DateTime.UtcNow
 
@@ -2163,23 +2163,23 @@ Public Class clsMASIC
                 objXMLOut.WriteStartElement("Root")
 
                 objXMLOut.WriteStartElement("General")
-                objXMLOut.WriteElementString("LastUpdate", DateTime.Now.ToString)
-                objXMLOut.WriteElementString("ProcessingStep", mProcessingStep.ToString)
-                objXMLOut.WriteElementString("Progress", Math.Round(mProgressPercentComplete, 2).ToString)
+                objXMLOut.WriteElementString("LastUpdate", DateTime.Now.ToString())
+                objXMLOut.WriteElementString("ProcessingStep", mProcessingStep.ToString())
+                objXMLOut.WriteElementString("Progress", Math.Round(mProgressPercentComplete, 2).ToString())
                 objXMLOut.WriteElementString("Error", GetErrorMessage())
                 objXMLOut.WriteEndElement()
 
                 objXMLOut.WriteStartElement("Statistics")
-                objXMLOut.WriteElementString("FreeMemoryMB", Math.Round(GetFreeMemoryMB, 1).ToString)
-                objXMLOut.WriteElementString("MemoryUsageMB", Math.Round(GetProcessMemoryUsageMB, 1).ToString)
-                objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(mProcessingStats.PeakMemoryUsageMB, 1).ToString)
+                objXMLOut.WriteElementString("FreeMemoryMB", Math.Round(GetFreeMemoryMB, 1).ToString())
+                objXMLOut.WriteElementString("MemoryUsageMB", Math.Round(GetProcessMemoryUsageMB, 1).ToString())
+                objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(mProcessingStats.PeakMemoryUsageMB, 1).ToString())
 
                 With mProcessingStats
-                    objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString)
-                    objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString)
+                    objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
+                    objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
                 End With
 
-                objXMLOut.WriteElementString("ProcessingTimeSec", Math.Round(GetTotalProcessingTimeSec(), 2).ToString)
+                objXMLOut.WriteElementString("ProcessingTimeSec", Math.Round(GetTotalProcessingTimeSec(), 2).ToString())
                 objXMLOut.WriteEndElement()
 
                 objXMLOut.WriteEndElement()  'End the "Root" element.

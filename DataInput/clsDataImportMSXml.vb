@@ -373,7 +373,7 @@ Namespace DataInput
                     End If
 
                     If (scanList.MasterScanOrderCount - 1) Mod 100 = 0 Then
-                        ReportMessage("Reading scan index: " & (scanList.MasterScanOrderCount - 1).ToString)
+                        ReportMessage("Reading scan index: " & (scanList.MasterScanOrderCount - 1).ToString())
                         Console.Write(".")
                     End If
 

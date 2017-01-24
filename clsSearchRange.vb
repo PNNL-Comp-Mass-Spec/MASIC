@@ -49,7 +49,7 @@ Public Class clsSearchRange
                 Case eDataTypeToUse.NoDataPresent
                     Return 0
                 Case Else
-                    Throw New Exception("Unknown data type encountered: " & mDataType.ToString)
+                    Throw New Exception("Unknown data type encountered: " & mDataType.ToString())
             End Select
         End Get
     End Property

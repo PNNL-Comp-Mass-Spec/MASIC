@@ -799,7 +799,7 @@ Public Class clsParentIonProcessing
 
                 If intParentIonIndex Mod 100 = 0 Then
                     If DateTime.UtcNow.Subtract(dtLastLogTime).TotalSeconds >= 10 OrElse intParentIonIndex Mod 500 = 0 Then
-                        ReportMessage("Parent Ion Index: " & intParentIonIndex.ToString)
+                        ReportMessage("Parent Ion Index: " & intParentIonIndex.ToString())
                         Console.Write(".")
                         dtLastLogTime = DateTime.UtcNow
                     End If
