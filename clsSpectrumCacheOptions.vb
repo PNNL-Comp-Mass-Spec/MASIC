@@ -31,7 +31,7 @@
 #End Region
 
 #Region "Classwide variables"
-    Private mSpectraToRetainInMemory As Integer = 500
+    Private mSpectraToRetainInMemory As Integer = 1000
 #End Region
 
     Public Sub Reset()

@@ -489,9 +489,7 @@ Public Class clsSpectraCache
         With udtCacheOptions
             .DiskCachingAlwaysDisabled = False
             .FolderPath = Path.GetTempPath()
-            .SpectraToRetainInMemory = 5000
-            '.MinimumFreeMemoryMB = 250
-            '.MaximumMemoryUsageMB = 3000             ' Spectrum caching to disk will be enabled if the memory usage rises over this value
+            .SpectraToRetainInMemory = 1000
         End With
 
         Return udtCacheOptions
