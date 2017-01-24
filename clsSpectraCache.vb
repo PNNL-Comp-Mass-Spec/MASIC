@@ -2,16 +2,11 @@ Option Strict On
 
 Imports System.Runtime.InteropServices
 
+''' <summary>
+''' Utilizes a spectrum pool to store mass spectra
+''' </summary>
 Public Class clsSpectraCache
     Inherits clsEventNotifier
-
-    ' Utilizes a spectrum pool to store mass spectra
-
-    ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-    ' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
-    ' Started March 20, 2005
-    '
-    ' Last modified March 21, 2005
 
     Public Sub New(cacheOptions As clsSpectrumCacheOptions)
         mCacheOptions = cacheOptions

@@ -1,17 +1,12 @@
 Option Strict On
 
-' This class can be used to search a list of values for a given value, plus or minus a given tolerance
-' The input list need not be sorted, since mPointerIndices() will be populated when the data is loaded,
-' afterwhich the data array will be sorted
-' 
-' To prevent this behavior, and save memory by not populating mPointerIndices, set mUsePointerIndexArray = False
-'
-' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
-' Started November 16, 2003
-'
-' Last modified October 13, 2004
-
+''' <summary>
+''' This class can be used to search a list of values for a given value, plus or minus a given tolerance
+''' The input list need not be sorted, since mPointerIndices() will be populated when the data is loaded,
+''' afterwhich the data array will be sorted
+''' 
+''' To prevent this behavior, and save memory by not populating mPointerIndices, set mUsePointerIndexArray = False
+''' </summary>
 Public Class clsSearchRange
 
     Public Sub New()

@@ -1,16 +1,11 @@
 ﻿Option Strict On
 
-' This class can be used to search a list of values for the value closest to the search value
-' If an exact match is found, then the index of that result is returned
-' If an exact match is not found, then the MissingDataMode defines which value will be returned (closest, always previous, or always next)
-'
-' Note: The search functions assume the input data is already sorted
-'
-' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-' Copyright 2008, Battelle Memorial Institute.  All Rights Reserved.
-'
-' Last modified April 17, 2008
-
+''' <summary>
+''' This class can be used to search a list of values for the value closest to the search value
+''' If an exact match is found, then the index of that result is returned
+''' If an exact match is not found, then the MissingDataMode defines which value will be returned (closest, always previous, or always next)
+''' </summary>
+''' <remarks>The search functions assume the input data is already sorted</remarks>
 Public Class clsBinarySearch
 
     Public Enum eMissingDataModeConstants

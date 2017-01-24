@@ -1,14 +1,9 @@
 ﻿Option Strict On
 
+''' <summary>
+''' Used to track the MZ and Intensity values of a given mass spectrum
+''' </summary>
 Public Class clsMSSpectrum
-
-    ' Used to track the MZ and Intensity values of a given mass spectrum
-
-    ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-    ' Copyright 2009, Battelle Memorial Institute.  All Rights Reserved.
-    ' Started October 26, 2009
-    '
-    ' Last modified March 21, 2005
 
     Public Const DEFAULT_SPECTRUM_ION_COUNT As Integer = 500
 

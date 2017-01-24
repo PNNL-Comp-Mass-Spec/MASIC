@@ -1,21 +1,17 @@
 Option Explicit On
 Option Strict On
 
+''' <summary>
+''' This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
+''' The lists of numbers must have the same number of values
+''' Use the BinData function to bin a list of X,Y pairs into bins ranging from .BinStartX to .BinEndX
+''' 
+''' These functions were originally written in VB6 and required the use of a C DLL
+''' They have since been ported to VB.NET
+''' </summary>
 Public Class clsCorrelation
     Inherits clsEventNotifier
 
-    ' This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
-    ' The lists of numbers must have the same number of values
-    ' Use the BinData function to bin a list of X,Y pairs into bins ranging from .BinStartX to .BinEndX
-    '
-    ' These functions were originally written in VB6 and required the use of a C DLL
-    ' They have since been ported to VB.NET
-    '
-    ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-    ' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
-    ' Started October 24, 2003
-    '
-    ' Last modified November 7, 2004
 
     Public Sub New()
         Me.New(GetDefaultBinningOptions())
