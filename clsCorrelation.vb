@@ -21,15 +21,16 @@ Public Class clsCorrelation
     ''' </summary>
     Public Sub New()
         Me.New(GetDefaultBinningOptions())
-        mCoefficients = New Double() {76.180091729471457, -86.505320329416776,
-                                      24.014098240830911, -1.231739572450155,
-                                      0.001208650973866179, -0.000005395239384953}
-
     End Sub
 
     Public Sub New(binningOptions As clsBinningOptions)
         mBinningOptions = binningOptions
         mNoiseThresholdIntensity = 0
+
+        mCoefficients = New Double() {76.180091729471457, -86.505320329416776,
+                                      24.014098240830911, -1.231739572450155,
+                                      0.001208650973866179, -0.000005395239384953}
+
     End Sub
 
 #Region "Constants and Structures"
