@@ -169,12 +169,15 @@ Namespace DataInput
 
                                 ' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
                                 .ScanHeaderText = String.Empty
-                                .ScanTypeName = "MS"                ' This may get updated via the call to UpdateMSXmlScanType()
+
+                                ' This may get updated via the call to UpdateMSXmlScanType()
+                                .ScanTypeName = "MS"
 
                                 .BasePeakIonMZ = objSpectrumInfo.BasePeakMZ
                                 .BasePeakIonIntensity = objSpectrumInfo.BasePeakIntensity
 
-                                .FragScanInfo.ParentIonInfoIndex = -1                        ' Survey scans typically lead to multiple parent ions; we do not record them here
+                                ' Survey scans typically lead to multiple parent ions; we do not record them here
+                                .FragScanInfo.ParentIonInfoIndex = -1
                                 .TotalIonIntensity = CSng(Math.Min(objSpectrumInfo.TotalIonCurrent, Single.MaxValue))
 
                                 ' Determine the minimum positive intensity in this scan
@@ -195,40 +198,39 @@ Namespace DataInput
 
                             UpdateMSXmlScanType(newSurveyScan, objSpectrumInfo.MSLevel, "MS", blnIsMzXML, objMZXmlSpectrumInfo)
 
-                            With scanList
-                                intLastSurveyScanIndex = .SurveyScans.Count - 1
 
-                                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
-                                intLastSurveyScanIndexInMasterSeqOrder = .MasterScanOrderCount - 1
+                            intLastSurveyScanIndex = scanList.SurveyScans.Count - 1
 
-                                If mOptions.SICOptions.SICToleranceIsPPM Then
-                                    ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
-                                    ' However, if the lowest m/z value is < 100, then use 100 m/z
-                                    If objSpectrumInfo.mzRangeStart < 100 Then
-                                        dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM
-                                    Else
-                                        dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, objSpectrumInfo.mzRangeStart) / sicOptions.CompressToleranceDivisorForPPM
-                                    End If
+                            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
+                            intLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1
+
+                            If mOptions.SICOptions.SICToleranceIsPPM Then
+                                ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
+                                ' However, if the lowest m/z value is < 100, then use 100 m/z
+                                If objSpectrumInfo.mzRangeStart < 100 Then
+                                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM
                                 Else
-                                    dblMSDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
+                                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, objSpectrumInfo.mzRangeStart) / sicOptions.CompressToleranceDivisorForPPM
                                 End If
+                            Else
+                                dblMSDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
+                            End If
 
 
-                                ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-                                StoreMzXmlSpectrum(
-                                objMSSpectrum,
-                                newSurveyScan,
-                                objSpectraCache,
-                                sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
-                                DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
-                                sicOptions.CompressMSSpectraData,
-                                sicOptions.SimilarIonMZToleranceHalfWidth / sicOptions.CompressToleranceDivisorForDa,
-                                blnKeepRawSpectra)
+                            ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+                            StoreMzXmlSpectrum(
+                            objMSSpectrum,
+                            newSurveyScan,
+                            objSpectraCache,
+                            sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                            DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
+                            sicOptions.CompressMSSpectraData,
+                            sicOptions.SimilarIonMZToleranceHalfWidth / sicOptions.CompressToleranceDivisorForDa,
+                            blnKeepRawSpectra)
 
-                                SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
-                                              clsScanList.eScanTypeConstants.SurveyScan, newSurveyScan, sicOptions.DatasetNumber)
+                            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
+                                          clsScanList.eScanTypeConstants.SurveyScan, newSurveyScan, sicOptions.DatasetNumber)
 
-                            End With
                         Else
                             ' Fragmentation Scan
 
@@ -239,12 +241,15 @@ Namespace DataInput
 
                                 ' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
                                 .ScanHeaderText = String.Empty
-                                .ScanTypeName = "MSn"               ' This may get updated via the call to UpdateMSXmlScanType()
+
+                                ' This may get updated via the call to UpdateMSXmlScanType()
+                                .ScanTypeName = "MSn"
 
                                 .BasePeakIonMZ = objSpectrumInfo.BasePeakMZ
                                 .BasePeakIonIntensity = objSpectrumInfo.BasePeakIntensity
 
-                                .FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder      ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
+                                ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
+                                .FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder
                                 .FragScanInfo.MSLevel = objSpectrumInfo.MSLevel
 
                                 .TotalIonIntensity = CSng(Math.Min(objSpectrumInfo.TotalIonCurrent, Single.MaxValue))
@@ -283,7 +288,8 @@ Namespace DataInput
 
                                         If objSpectrumInfo.mzRangeEnd - objSpectrumInfo.mzRangeStart >= 0.5 Then
                                             ' The data is likely MRM and not SRM
-                                            ' We cannot currently handle data like this (would need to examine the mass values and find the clumps of data to infer the transitions present
+                                            ' We cannot currently handle data like this 
+                                            ' (would need to examine the mass values  and find the clumps of data to infer the transitions present)
                                             intWarnCount += 1
                                             If intWarnCount <= 5 Then
                                                 ReportError("ExtractScanInfoFromMSXMLDataFile",
@@ -326,12 +332,11 @@ Namespace DataInput
                             End With
 
                             scanList.FragScans.Add(newFragScan)
-                            With scanList
 
-                                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, .FragScans.Count - 1)
+                            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
 
-                                ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-                                StoreMzXmlSpectrum(
+                            ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+                            StoreMzXmlSpectrum(
                                 objMSSpectrum,
                                 newFragScan,
                                 objSpectraCache,
@@ -341,10 +346,8 @@ Namespace DataInput
                                 mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa,
                                 blnKeepRawSpectra And blnKeepMSMSSpectra)
 
-                                SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
+                            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
                                               clsScanList.eScanTypeConstants.FragScan, newFragScan, sicOptions.DatasetNumber)
-
-                            End With
 
                             If eMRMScanType = MRMScanTypeConstants.NotMRM Then
                                 ' This is not an MRM scan
@@ -378,11 +381,9 @@ Namespace DataInput
                 Loop While blnScanFound
 
                 ' Shrink the memory usage of the scanList arrays
-                With scanList
-                    ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
-                    ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
-                    ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
-                End With
+                ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
+                ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
+                ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
 
                 If scanList.MasterScanOrderCount <= 0 Then
                     ' No scans found

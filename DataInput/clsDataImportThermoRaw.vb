@@ -201,11 +201,9 @@ Namespace DataInput
                     Console.WriteLine()
 
                     ' Shrink the memory usage of the scanList arrays
-                    With scanList
-                        ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
-                        ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
-                        ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
-                    End With
+                    ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
+                    ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
+                    ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
 
                 End If
 
