@@ -260,7 +260,7 @@ Public Class clsFilterDataArrayMaxCount
                         dblBinToSortAbundanceMaximum = dblHistogramBinStartIntensity(intBinToSort + 1)
                     End If
 
-                    If dblBinToSortAbundanceMaximum = dblBinToSortAbundanceMinimum Then
+                    If Math.Abs(dblBinToSortAbundanceMaximum - dblBinToSortAbundanceMinimum) < Single.Epsilon Then
                         ' Is this code ever reached?
                         ' If yes, then the code below won't populate sngBinToSortAbundances() and intBinToSortDataIndices() with any data
                         blnUseFullDataSort = True
@@ -329,7 +329,7 @@ Public Class clsFilterDataArrayMaxCount
                                 intOriginalDataArrayIndex += 1
                             Loop
 
-                            If sngBinToSortAbundances(intIndex) = mSkipDataPointFlag Then
+                            If Math.Abs(sngBinToSortAbundances(intIndex) - mSkipDataPointFlag) < Single.Epsilon Then
                                 If mDataIndices(intOriginalDataArrayIndex) = intBinToSortDataIndices(intIndex) Then
                                     mDataValues(intOriginalDataArrayIndex) = mSkipDataPointFlag
                                 Else
@@ -360,8 +360,8 @@ Public Class clsFilterDataArrayMaxCount
 
             Exit Sub
 
-        Catch ex As System.Exception
-            Throw New System.Exception("Error in FilterDataByMaxDataCountToKeep: " & ex.Message, ex)
+        Catch ex As Exception
+            Throw New Exception("Error in FilterDataByMaxDataCountToKeep: " & ex.Message, ex)
         End Try
 
     End Sub

@@ -1,4 +1,6 @@
-﻿''' <summary>
+﻿Imports ThermoRawFileReader
+
+''' <summary>
 ''' 
 ''' </summary>
 Public Class clsScanList
@@ -106,10 +108,10 @@ Public Class clsScanList
         Return intSurveyScanIndex
     End Function
 
-    Public Sub AddMasterScanEntry(eScanType As clsScanList.eScanTypeConstants, intScanIndex As Integer)
+    Public Sub AddMasterScanEntry(eScanType As eScanTypeConstants, intScanIndex As Integer)
         ' Adds a new entry to .MasterScanOrder using an existing entry in SurveyScans() or FragScans()
 
-        If eScanType = clsScanList.eScanTypeConstants.SurveyScan Then
+        If eScanType = eScanTypeConstants.SurveyScan Then
             If SurveyScans.Count > 0 AndAlso intScanIndex < SurveyScans.Count Then
                 AddMasterScanEntry(eScanType, intScanIndex, SurveyScans(intScanIndex).ScanNumber, SurveyScans(intScanIndex).ScanTime)
             Else
@@ -118,7 +120,7 @@ Public Class clsScanList
                 AddMasterScanEntry(eScanType, intScanIndex, 0, 0)
             End If
 
-        ElseIf eScanType = clsScanList.eScanTypeConstants.FragScan Then
+        ElseIf eScanType = eScanTypeConstants.FragScan Then
             If FragScans.Count > 0 AndAlso intScanIndex < FragScans.Count Then
                 AddMasterScanEntry(eScanType, intScanIndex, FragScans(intScanIndex).ScanNumber, FragScans(intScanIndex).ScanTime)
             Else
@@ -135,7 +137,7 @@ Public Class clsScanList
     End Sub
 
     Public Sub AddMasterScanEntry(
-       eScanType As clsScanList.eScanTypeConstants,
+       eScanType As eScanTypeConstants,
        intScanIndex As Integer,
        intScanNumber As Integer,
        sngScanTime As Single)
@@ -177,7 +179,7 @@ Public Class clsScanList
 
         surveyScan.ZoomScan = False
         surveyScan.SIMScan = False
-        surveyScan.MRMScanType = ThermoRawFileReader.MRMScanTypeConstants.NotMRM
+        surveyScan.MRMScanType = MRMScanTypeConstants.NotMRM
 
         surveyScan.LowMass = 0
         surveyScan.HighMass = 0

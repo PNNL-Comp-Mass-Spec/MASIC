@@ -416,7 +416,7 @@ Public Class clsITraqIntensityCorrection
                     Console.WriteLine()
 
                     Console.Write("     ")
-                    For j = 0 To intMatrixSize - 1
+                    For k = 0 To intMatrixSize - 1
                         Console.Write(" ------ ")
                     Next
                     Console.WriteLine()

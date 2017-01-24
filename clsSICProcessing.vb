@@ -98,7 +98,7 @@ Public Class clsSICProcessing
       masicOptions As clsMASICOptions,
       dataOutputHandler As clsDataOutput,
       sicProcessor As clsSICProcessing,
-      xmlResultsWriter As DataOutput.clsXMLResultsWriter) As Boolean
+      xmlResultsWriter As clsXMLResultsWriter) As Boolean
 
         Dim blnSuccess As Boolean
         Dim intParentIonIndex As Integer

@@ -169,7 +169,7 @@ Public Class clsBinarySearch
                 intMidIndex = (intCurrentFirst + intCurrentLast) \ 2            ' Note: Using Integer division
                 If intMidIndex < intCurrentFirst Then intMidIndex = intCurrentFirst
 
-                Do While intCurrentFirst <= intCurrentLast AndAlso sngArrayToSearch(intMidIndex) <> sngItemToSearchFor
+                Do While intCurrentFirst <= intCurrentLast AndAlso Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) > Single.Epsilon
                     If sngItemToSearchFor < sngArrayToSearch(intMidIndex) Then
                         ' Search the lower half
                         intCurrentLast = intMidIndex - 1
@@ -192,7 +192,7 @@ Public Class clsBinarySearch
                 intMatchIndex = -1
                 ' See if an exact match has been found
                 If intMidIndex >= intCurrentFirst AndAlso intMidIndex <= intCurrentLast Then
-                    If sngArrayToSearch(intMidIndex) = sngItemToSearchFor Then
+                    If Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) < Single.Epsilon Then
                         intMatchIndex = intMidIndex
                     End If
                 End If
@@ -289,7 +289,7 @@ Public Class clsBinarySearch
                 intMidIndex = (intCurrentFirst + intCurrentLast) \ 2            ' Note: Using Integer division
                 If intMidIndex < intCurrentFirst Then intMidIndex = intCurrentFirst
 
-                Do While intCurrentFirst <= intCurrentLast AndAlso dblArrayToSearch(intMidIndex) <> dblItemToSearchFor
+                Do While intCurrentFirst <= intCurrentLast AndAlso Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) > Single.Epsilon
                     If dblItemToSearchFor < dblArrayToSearch(intMidIndex) Then
                         ' Search the lower half
                         intCurrentLast = intMidIndex - 1
@@ -312,7 +312,7 @@ Public Class clsBinarySearch
                 intMatchIndex = -1
                 ' See if an exact match has been found
                 If intMidIndex >= intCurrentFirst AndAlso intMidIndex <= intCurrentLast Then
-                    If dblArrayToSearch(intMidIndex) = dblItemToSearchFor Then
+                    If Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) < Double.Epsilon Then
                         intMatchIndex = intMidIndex
                     End If
                 End If

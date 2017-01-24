@@ -590,43 +590,46 @@ Public Class clsMRMProcessing
 
                     ' Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
                     For intScanIndex = 0 To scanList.FragScans.Count - 1
-                        If scanList.FragScans(intScanIndex).MRMScanType = MRMScanTypeConstants.SRM Then
-                            With scanList.FragScans(intScanIndex)
-
-                                blnUseScan = False
-                                For intMRMMassIndex = 0 To .MRMScanInfo.MRMMassCount - 1
-                                    If MRMParentDaughterMatch(
-                                      .MRMScanInfo.ParentIonMZ,
-                                      .MRMScanInfo.MRMMassList(intMRMMassIndex).CentralMass,
-                                      dblParentIonMZ, dblMRMDaughterMZ) Then
-                                        blnUseScan = True
-                                        Exit For
-                                    End If
-                                Next
-
-                                If blnUseScan Then
-                                    ' Include this scan in the SIC for this parent ion
-
-                                    'sngMatchIntensity = AggregateIonsInRange(objSpectraCache, scanList.FragScans, intScanIndex, dblMRMDaughterMZ, dblSearchToleranceHalfWidth, intIonMatchCount, dblClosestMZ, True)
-                                    blnMatchFound = mDataAggregation.FindMaxValueInMZRange(objSpectraCache, scanList.FragScans(intScanIndex), dblMRMDaughterMZ - dblSearchToleranceHalfWidth, dblMRMDaughterMZ + dblSearchToleranceHalfWidth, dblClosestMZ, sngMatchIntensity)
-
-                                    If udtSICDetails.SICDataCount >= udtSICDetails.SICData.Length Then
-                                        ReDim Preserve udtSICDetails.SICScanIndices(udtSICDetails.SICScanIndices.Length * 2 - 1)
-                                        ReDim Preserve udtSICDetails.SICScanNumbers(udtSICDetails.SICScanIndices.Length - 1)
-                                        ReDim Preserve udtSICDetails.SICData(udtSICDetails.SICScanIndices.Length - 1)
-                                        ReDim Preserve udtSICDetails.SICMasses(udtSICDetails.SICScanIndices.Length - 1)
-                                    End If
-
-                                    udtSICDetails.SICScanIndices(udtSICDetails.SICDataCount) = intScanIndex
-                                    udtSICDetails.SICScanNumbers(udtSICDetails.SICDataCount) = .ScanNumber
-                                    udtSICDetails.SICData(udtSICDetails.SICDataCount) = sngMatchIntensity
-                                    udtSICDetails.SICMasses(udtSICDetails.SICDataCount) = dblClosestMZ
-
-                                    udtSICDetails.SICDataCount += 1
-                                End If
-
-                            End With
+                        If scanList.FragScans(intScanIndex).MRMScanType <> MRMScanTypeConstants.SRM Then
+                            Continue For
                         End If
+
+                        With scanList.FragScans(intScanIndex)
+
+                            blnUseScan = False
+                            For intMRMMassIndex = 0 To .MRMScanInfo.MRMMassCount - 1
+                                If MRMParentDaughterMatch(
+                                    .MRMScanInfo.ParentIonMZ,
+                                    .MRMScanInfo.MRMMassList(intMRMMassIndex).CentralMass,
+                                    dblParentIonMZ, dblMRMDaughterMZ) Then
+                                    blnUseScan = True
+                                    Exit For
+                                End If
+                            Next
+
+                            If Not blnUseScan Then Continue For
+
+                            ' Include this scan in the SIC for this parent ion
+
+                            blnMatchFound = mDataAggregation.FindMaxValueInMZRange(objSpectraCache, scanList.FragScans(intScanIndex), dblMRMDaughterMZ - dblSearchToleranceHalfWidth, dblMRMDaughterMZ + dblSearchToleranceHalfWidth, dblClosestMZ, sngMatchIntensity)
+
+                            If udtSICDetails.SICDataCount >= udtSICDetails.SICData.Length Then
+                                ReDim Preserve udtSICDetails.SICScanIndices(udtSICDetails.SICScanIndices.Length * 2 - 1)
+                                ReDim Preserve udtSICDetails.SICScanNumbers(udtSICDetails.SICScanIndices.Length - 1)
+                                ReDim Preserve udtSICDetails.SICData(udtSICDetails.SICScanIndices.Length - 1)
+                                ReDim Preserve udtSICDetails.SICMasses(udtSICDetails.SICScanIndices.Length - 1)
+                            End If
+
+                            udtSICDetails.SICScanIndices(udtSICDetails.SICDataCount) = intScanIndex
+                            udtSICDetails.SICScanNumbers(udtSICDetails.SICDataCount) = .ScanNumber
+                            udtSICDetails.SICData(udtSICDetails.SICDataCount) = sngMatchIntensity
+                            udtSICDetails.SICMasses(udtSICDetails.SICDataCount) = dblClosestMZ
+
+                            udtSICDetails.SICDataCount += 1
+
+
+                        End With
+
                     Next intScanIndex
 
 

@@ -84,8 +84,6 @@ Public Class clsSpectraCache
     Private mSpectrumIndexInPool As Hashtable
     Private mSpectrumByteOffset As Hashtable         ' Records the byte offset of the data in the page file for a given scan number
 
-    Private mShowMessages As Boolean
-
 #End Region
 
     Public ReadOnly Property CacheEventCount() As Integer
@@ -151,14 +149,7 @@ Public Class clsSpectraCache
         End Set
     End Property
 
-    Public Property ShowMessages() As Boolean
-        Get
-            Return mShowMessages
-        End Get
-        Set(Value As Boolean)
-            mShowMessages = Value
-        End Set
-    End Property
+    Public Property ShowMessages As Boolean
 
     Public ReadOnly Property UnCacheEventCount() As Integer
         Get
