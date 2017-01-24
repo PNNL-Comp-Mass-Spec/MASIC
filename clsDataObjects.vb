@@ -1,38 +1,5 @@
 ﻿Public Class clsDataObjects
 
-    Public Structure udtSICStatsDetailsType
-        Public SICDataCount As Integer
-
-        ''' <summary>
-        ''' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
-        ''' </summary>
-        Public SICScanType As clsScanList.eScanTypeConstants
-
-        ''' <summary>
-        ''' This array is necessary since SIMScan data uses non-adjacent survey scans
-        ''' </summary>
-        Public SICScanIndices() As Integer
-
-        ''' <summary>
-        ''' Populated as a convenience since necessary to pass to various functions
-        ''' </summary>
-        Public SICScanNumbers() As Integer
-
-        ''' <summary>
-        ''' SIC Abundances
-        ''' </summary>
-        Public SICData() As Single
-
-        ''' <summary>
-        ''' SIC Masses
-        ''' </summary>
-        Public SICMasses() As Double
-
-        Public Overrides Function ToString() As String
-            Return "SICDataCount: " & SICDataCount
-        End Function
-    End Structure
-
     Friend Structure udtMZSearchInfoType
         Public SearchMZ As Double
 

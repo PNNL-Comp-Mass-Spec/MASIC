@@ -192,6 +192,8 @@
     <Compile Include="clsCustomSICList.vb" />
     <Compile Include="clsDataAggregation.vb" />
     <Compile Include="clsDatabaseAccess.vb" />
+    <Compile Include="clsSICData.vb" />
+    <Compile Include="clsSICDetails.vb" />
     <Compile Include="DataOutput\clsOutputFileHandles.vb" />
     <Compile Include="clsEventNotifier.vb" />
     <Compile Include="clsProcessingStats.vb" />

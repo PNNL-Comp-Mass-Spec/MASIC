@@ -21,7 +21,7 @@ Namespace DataOutput
         Public Function SaveDataToXML(
           scanList As clsScanList,
           intParentIonIndex As Integer,
-          ByRef udtSICDetails As clsDataObjects.udtSICStatsDetailsType,
+          sicDetails As clsSICDetails,
           ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType,
           dataOutputHandler As clsDataOutput) As Boolean
 
@@ -50,21 +50,22 @@ Namespace DataOutput
 
             Try
                 ' Populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
-                With udtSICDetails
-                    If .SICDataCount = 0 Then
-                        ReDim SICDataScanIntervals(0)
-                    Else
-                        ReDim SICDataScanIntervals(.SICDataCount - 1)
-                        For intScanIndex = 1 To .SICDataCount - 1
-                            intScanDelta = .SICScanNumbers(intScanIndex) - .SICScanNumbers(intScanIndex - 1)
-                            ' When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
-                            ' However, for MRM data, field size can be much larger
-                            SICDataScanIntervals(intScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))
-                        Next intScanIndex
-                    End If
-                End With
 
-                objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
+                If sicDetails.SICDataCount = 0 Then
+                    ReDim SICDataScanIntervals(0)
+                Else
+                    ReDim SICDataScanIntervals(sicDetails.SICDataCount - 1)
+                    Dim sicScanNumbers = sicDetails.SICScanNumbers
+
+                    For intScanIndex = 1 To sicDetails.SICDataCount - 1
+                        Dim intScanDelta = sicScanNumbers(intScanIndex) - sicScanNumbers(intScanIndex - 1)
+                        ' When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
+                        ' However, for MRM data, field size can be much larger
+                        SICDataScanIntervals(intScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))
+                    Next intScanIndex
+                End If
+
+
                 If objXMLOut Is Nothing Then Return False
 
                 ' Initialize the StringBuilder objects
@@ -189,36 +190,31 @@ Namespace DataOutput
                             End If
 
                             strLastGoodLoc = "Write SICPeakIndexStart"
-                            objXMLOut.WriteElementString("SICPeakIndexStart", .Peak.IndexBaseLeft.ToString)
-                            objXMLOut.WriteElementString("SICPeakIndexEnd", .Peak.IndexBaseRight.ToString)
-                            objXMLOut.WriteElementString("SICDataCount", udtSICDetails.SICDataCount.ToString)
+                            objXMLOut.WriteElementString("SICPeakIndexStart", .Peak.IndexBaseLeft.ToString())
+                            objXMLOut.WriteElementString("SICPeakIndexEnd", .Peak.IndexBaseRight.ToString())
+                            objXMLOut.WriteElementString("SICDataCount", sicDetails.SICDataCount.ToString())
 
                             If mOptions.SICOptions.SaveSmoothedData Then
                                 objXMLOut.WriteElementString("SICSmoothedYDataIndexStart", udtSmoothedYDataSubset.DataStartIndex.ToString)
                             End If
 
                             If mOptions.UseBase64DataEncoding Then
-                                Dim DataArray() As Single
-                                ReDim DataArray(udtSICDetails.SICDataCount - 1)
 
                                 ' Save intensity and mass data lists as base-64 encoded strings
                                 ' Note that these field names are purposely different than the DataList names used below for comma separated lists
                                 strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
-                                Array.Copy(udtSICDetails.SICData, DataArray, udtSICDetails.SICDataCount)
-                                SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", DataArray)
+                                SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", sicDetails.SICIntensities)
 
                                 strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
-                                For intSICDataIndex = 0 To udtSICDetails.SICDataCount - 1
-                                    DataArray(intSICDataIndex) = CSng(udtSICDetails.SICMasses(intSICDataIndex))
-                                Next intSICDataIndex
-                                SaveDataToXMLEncodeArray(objXMLOut, "SICMassData", DataArray)
+                                SaveDataToXMLEncodeArray(objXMLOut, "SICMassData", sicDetails.SICMassesAsFloat)
 
                                 If mOptions.SICOptions.SaveSmoothedData Then
                                     ' Need to copy the data into an array with the correct number of elements
-                                    ReDim DataArray(udtSmoothedYDataSubset.DataCount - 1)
-                                    Array.Copy(udtSmoothedYDataSubset.Data, DataArray, udtSmoothedYDataSubset.DataCount)
+                                    Dim dataArray As Single()
+                                    ReDim dataArray(udtSmoothedYDataSubset.DataCount - 1)
+                                    Array.Copy(udtSmoothedYDataSubset.Data, dataArray, udtSmoothedYDataSubset.DataCount)
 
-                                    SaveDataToXMLEncodeArray(objXMLOut, "SICSmoothedYData", DataArray)
+                                    SaveDataToXMLEncodeArray(objXMLOut, "SICSmoothedYData", dataArray)
                                 End If
                             Else
                                 ' Save intensity and mass data lists as tab-delimited text list
@@ -231,21 +227,20 @@ Namespace DataOutput
                                     sbIntensityDataList.Length = 0
                                     sbMassDataList.Length = 0
 
-                                    If Not udtSICDetails.SICData Is Nothing AndAlso udtSICDetails.SICDataCount > 0 Then
-                                        For intSICDataIndex = 0 To udtSICDetails.SICDataCount - 1
-                                            If udtSICDetails.SICData(intSICDataIndex) > 0 Then
-                                                sbIntensityDataList.Append(Math.Round(udtSICDetails.SICData(intSICDataIndex), 1).ToString() & ",")
+                                    If sicDetails.SICDataCount > 0 Then
+                                        For Each dataPoint In sicDetails.SICData
+                                            If dataPoint.Intensity > 0 Then
+                                                sbIntensityDataList.Append(Math.Round(dataPoint.Intensity, 1).ToString() & ",")
                                             Else
                                                 sbIntensityDataList.Append(","c)     ' Do not output any number if the intensity is 0
                                             End If
 
-                                            If udtSICDetails.SICMasses(intSICDataIndex) > 0 Then
-                                                sbMassDataList.Append(Math.Round(udtSICDetails.SICMasses(intSICDataIndex), 3).ToString() & ",")
+                                            If dataPoint.Mass > 0 Then
+                                                sbMassDataList.Append(Math.Round(dataPoint.Mass, 3).ToString() & ",")
                                             Else
                                                 sbMassDataList.Append(","c)     ' Do not output any number if the mass is 0
                                             End If
-                                        Next intSICDataIndex
-
+                                        Next
 
                                         ' Trim the trailing comma
                                         If sbIntensityDataList.Chars(sbIntensityDataList.Length - 1) = ","c Then

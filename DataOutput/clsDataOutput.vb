@@ -648,7 +648,7 @@ Namespace DataOutput
           sicOptions As clsSICOptions,
           scanList As clsScanList,
           intParentIonIndex As Integer,
-          ByRef udtSICDetails As clsDataObjects.udtSICStatsDetailsType) As Boolean
+          sicDetails As clsSICDetails) As Boolean
 
 
             Dim intFragScanIndex As Integer
@@ -670,16 +670,17 @@ Namespace DataOutput
                        intFragScanIndex.ToString() & ControlChars.Tab &
                        Math.Round(scanList.ParentIons(intParentIonIndex).MZ, 4).ToString() & ControlChars.Tab
 
-                    With udtSICDetails
-                        If .SICDataCount = 0 Then
-                            ' Nothing to write
-                            OutputFileHandles.SICDataFile.WriteLine(strPrefix & "0" & ControlChars.Tab & "0" & ControlChars.Tab & "0")
-                        Else
-                            For intScanIndex = 0 To .SICDataCount - 1
-                                OutputFileHandles.SICDataFile.WriteLine(strPrefix & .SICScanNumbers(intScanIndex) & ControlChars.Tab & .SICMasses(intScanIndex) & ControlChars.Tab & .SICData(intScanIndex))
-                            Next intScanIndex
-                        End If
-                    End With
+                    If sicDetails.SICDataCount = 0 Then
+                        ' Nothing to write
+                        OutputFileHandles.SICDataFile.WriteLine(strPrefix & "0" & ControlChars.Tab & "0" & ControlChars.Tab & "0")
+                    Else
+                        For Each dataPoint In sicDetails.SICData
+                            OutputFileHandles.SICDataFile.WriteLine(strPrefix &
+                                                                    dataPoint.ScanNumber & ControlChars.Tab &
+                                                                    dataPoint.Mass & ControlChars.Tab &
+                                                                    dataPoint.Intensity)
+                        Next
+                    End If
 
                 Next intFragScanIndex
 
