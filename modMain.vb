@@ -47,8 +47,6 @@ Public Module modMain
     Private mMASICStatusFilename As String = String.Empty
     Private mQuietMode As Boolean
 
-    Private mTestMode As Boolean
-
     Private WithEvents mMASIC As clsMASIC
     Private mProgressForm As ProgressFormNET.frmProgress
 
@@ -115,7 +113,6 @@ Public Module modMain
         mRecurseFoldersMaxLevels = 0
 
         mQuietMode = False
-        mTestMode = False
         mLogMessagesToFile = False
         mLogFilePath = String.Empty
 
@@ -127,11 +124,6 @@ Public Module modMain
 
             If (objParseCommandLine.ParameterCount + objParseCommandLine.NonSwitchParameterCount = 0) And Not objParseCommandLine.NeedToShowHelp Then
                 ShowGUI()
-                Return 0
-            End If
-
-            If mTestMode Then
-                RunTests()
                 Return 0
             End If
 
@@ -201,19 +193,6 @@ Public Module modMain
 
     End Function
 
-    Private Sub RunTests()
-        Try
-
-            clsTests.TestValueToString()
-
-            Console.WriteLine()
-
-        Catch ex As Exception
-            ShowErrorMessage("Error occurred in modMain->RunTests: " & Environment.NewLine & ex.Message)
-        End Try
-
-    End Sub
-
     Private Sub DisplayProgressPercent(intPercentComplete As Integer, blnAddCarriageReturn As Boolean)
         If blnAddCarriageReturn Then
             Console.WriteLine()
@@ -234,7 +213,7 @@ Public Module modMain
         ' Returns True if no problems; otherwise, returns false
 
         Dim strValue As String = String.Empty
-        Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "Test", "LogFolder", "Q"}
+        Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "LogFolder", "Q"}
         Dim intValue As Integer
 
         Try
@@ -284,10 +263,6 @@ Public Module modMain
 
                     If .RetrieveValueForParameter("SF", strValue) Then
                         mMASICStatusFilename = strValue
-                    End If
-
-                    If .IsParameterPresent("Test") Then
-                        mTestMode = True
                     End If
 
                     If .RetrieveValueForParameter("LogFolder", strValue) Then

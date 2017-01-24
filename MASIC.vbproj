@@ -199,7 +199,6 @@
     <Compile Include="clsReporterIonInfo.vb" />
     <Compile Include="clsReporterIonProcessor.vb" />
     <Compile Include="clsSpectrumCacheOptions.vb" />
-    <Compile Include="clsTests.vb" />
     <Compile Include="clsUnused.vb" />
     <Compile Include="DataInput\clsDataImportMSXml.vb" />
     <Compile Include="DataInput\clsDataImportThermoRaw.vb" />
