@@ -18,6 +18,9 @@ Public Class clsScanTracking
     Private ReadOnly mReporterIons As clsReporterIons
     Private ReadOnly mPeakFinder As MASICPeakFinder.clsMASICPeakFinder
 
+    Private mSpectraFoundExceedingMaxIonCount As Integer = 0
+    Private mMaxIonCountReported As Integer = 0
+
 #End Region
 
     ''' <summary>
@@ -234,9 +237,6 @@ Public Class clsScanTracking
         Dim blnSuccess As Boolean
         Dim intMaxAllowableIonCount As Integer
 
-        Static intSpectraFoundExceedingMaxIonCount As Integer = 0
-        Static intMaxIonCountReported As Integer = 0
-
         Dim strLastKnownLocation = "Start"
 
         Try
@@ -277,17 +277,17 @@ Public Class clsScanTracking
                 If objMSSpectrum.IonCount > intMaxAllowableIonCount Then
                     ' Do not keep more than 50,000 ions
                     strLastKnownLocation = "Call DiscardDataToLimitIonCount"
-                    intSpectraFoundExceedingMaxIonCount += 1
+                    mSpectraFoundExceedingMaxIonCount += 1
 
                     ' Display a message at the console the first 10 times we encounter spectra with over intMaxAllowableIonCount ions
                     ' In addition, display a new message every time a new max value is encountered
-                    If intSpectraFoundExceedingMaxIonCount <= 10 OrElse objMSSpectrum.IonCount > intMaxIonCountReported Then
+                    If mSpectraFoundExceedingMaxIonCount <= 10 OrElse objMSSpectrum.IonCount > mMaxIonCountReported Then
                         Console.WriteLine()
                         Console.WriteLine("Note: Scan " & scanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; " &
                                           "will only retain " & intMaxAllowableIonCount &
-                                          " (trimmed " & intSpectraFoundExceedingMaxIonCount.ToString() & " spectra)")
+                                          " (trimmed " & mSpectraFoundExceedingMaxIonCount.ToString() & " spectra)")
 
-                        intMaxIonCountReported = objMSSpectrum.IonCount
+                        mMaxIonCountReported = objMSSpectrum.IonCount
                     End If
 
                     dataImportUtilities.DiscardDataToLimitIonCount(

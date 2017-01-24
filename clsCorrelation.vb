@@ -12,9 +12,19 @@ Option Strict On
 Public Class clsCorrelation
     Inherits clsEventNotifier
 
+#Region "Classwide variables"
+    Private ReadOnly mCoefficients As Double()
+#End Region
 
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
     Public Sub New()
         Me.New(GetDefaultBinningOptions())
+        mCoefficients = New Double() {76.180091729471457, -86.505320329416776,
+                                      24.014098240830911, -1.231739572450155,
+                                      0.001208650973866179, -0.000005395239384953}
+
     End Sub
 
     Public Sub New(binningOptions As clsBinningOptions)
@@ -25,7 +35,6 @@ Public Class clsCorrelation
 #Region "Constants and Structures"
     Private Const MIN_NON_ZERO_ION_COUNT As Integer = 5
 
-    Private Const CORRELATION_MODE_COUNT As Integer = 3
     Public Enum cmCorrelationMethodConstants
         Pearson = 0
         Spearman = 1
@@ -629,9 +638,6 @@ Public Class clsCorrelation
 
     Private Function GammLn(xx As Double) As Double
         Dim x, y, tmp, ser As Double
-        Static cof() As Double = New Double() {76.180091729471457, -86.505320329416776,
-                                               24.014098240830911, -1.231739572450155,
-                                               0.001208650973866179, -0.000005395239384953}
         Dim j As Integer
 
         x = xx
@@ -643,7 +649,7 @@ Public Class clsCorrelation
 
         For j = 0 To 5
             y += 1
-            ser += cof(j) / y
+            ser += mCoefficients(j) / y
         Next j
 
         Return -tmp + Math.Log(2.5066282746310007 * ser / x)
