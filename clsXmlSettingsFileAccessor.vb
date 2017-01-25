@@ -1,35 +1,47 @@
 Option Strict On
 
-Imports System.Collections.Specialized
-Imports System.IO
+Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Xml
 
-' This class is used to read or write settings in an Xml settings file
-' Based on a class from the DMS Analysis Manager software written by Dave Clark and Gary Kiebel (PNNL, Richland, WA)
-' Additional features added by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in October 2003
-' Copyright 2005, Battelle Memorial Institute
-'
-' Updated in October 2004 to truly be case-insensitive if IsCaseSensitive = False when calling LoadSettings()
-' Updated in August 2007 to remove the PRISM.Logging functionality and to include class XMLFileReader inside class XmlSettingsFileAccessor
-' Updated in December 2010 to rename objects from Ini to XML
-
+''' <summary>
+''' This class is used to read or write settings in an Xml settings file
+''' Based on a class from the DMS Analysis Manager software written by Dave Clark and Gary Kiebel (PNNL, Richland, WA)
+''' Additional features added by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in October 2003
+''' Copyright 2005, Battelle Memorial Institute
+'''
+''' Updated in October 2004 to truly be case-insensitive if IsCaseSensitive = False when calling LoadSettings()
+''' Updated in August 2007 to remove the PRISM.Logging functionality and to include class XMLFileReader inside class XmlSettingsFileAccessor
+''' Updated in December 2010 to rename objects from Ini to XML
+''' </summary>
 Public Class XmlSettingsFileAccessor
 
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
     Public Sub New()
         mCaseSensitive = False
-        htSectionNames = New Hashtable
+        mSectionNames = New Dictionary(Of String, String)
 
         mCachedSection = New udtRecentSectionType
         With mCachedSection
             .SectionName = String.Empty
-            .htKeys = New Hashtable
+            .KeyNames = New Dictionary(Of String, String)
         End With
     End Sub
 
     Private Structure udtRecentSectionType
-        Public SectionName As String            ' Stores the section name whose keys are cached; the section name is capitalized identically to that actually present in the Xml file
-        Public htKeys As Hashtable
+        ''' <summary>
+        ''' Stores the section name whose keys are cached; the section name is capitalized identically to that actually present in the Xml file
+        ''' </summary>
+        Public SectionName As String
+
+        ''' <summary>
+        ''' Keys for this section
+        ''' Keys in KeyNames are the lower case version of the name in the file if mCaseSensitive is true, or the actual version if mCaseSensitive is false
+        ''' Values in KeyNames are the actual way the key name is capitalized in the Xml file
+        ''' </summary>
+        Public KeyNames As Dictionary(Of String, String)
     End Structure
 
     ' XML file reader
@@ -39,10 +51,10 @@ Public Class XmlSettingsFileAccessor
 
     Private mCaseSensitive As Boolean
 
-    ' When mCaseSensitive = False, then htSectionNames stores mapping between lowercase section name and actual section name stored in file
-    '   If section is present more than once in file, then only grabs the last occurence of the section
-    ' When mCaseSensitive = True, then the mappings in htSectionNames are effectively not used
-    Private ReadOnly htSectionNames As Hashtable
+    ' When mCaseSensitive = False, then mSectionNames stores the mapping between lowercase section name and actual section name stored in file
+    '   If section is present more than once in file, then only grabs the first occurence of the section
+    ' When mCaseSensitive = True, then the mappings in mSectionNames are effectively not used
+    Private ReadOnly mSectionNames As Dictionary(Of String, String)
     Private mCachedSection As udtRecentSectionType
 
     Public Event InformationMessage(msg As String)
@@ -59,7 +71,8 @@ Public Class XmlSettingsFileAccessor
     ''' Loads the settings for the defined Xml Settings File.   Assumes names are not case sensitive
     ''' </summary>
     ''' <param name="XmlSettingsFilePath">The path to the XML settings file.</param>
-    ''' <return>The function returns a boolean that shows if the file was successfully loaded.</return>
+    ''' <return>True if the file was successfully loaded (or created)</return>
+    ''' <remarks>The XML file will be created if it does not exist</remarks>
     Public Function LoadSettings(XmlSettingsFilePath As String) As Boolean
         Return LoadSettings(XmlSettingsFilePath, False)
     End Function
@@ -69,6 +82,8 @@ Public Class XmlSettingsFileAccessor
     ''' </summary>
     ''' <param name="XmlSettingsFilePath">The path to the XML settings file.</param>
     ''' <param name="IsCaseSensitive">Case sensitive names if True.  Non-case sensitive if false.</param>
+    ''' <return>True if the file was successfully loaded (or created)</return>
+    ''' <remarks>The XML file will be created if it does not exist</remarks>
     Public Function LoadSettings(XmlSettingsFilePath As String, IsCaseSensitive As Boolean) As Boolean
         mCaseSensitive = IsCaseSensitive
 
@@ -130,14 +145,12 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="sectionName">The name of the section to look for.</param>
     ''' <return>The function returns a boolean that shows if the section is present.</return>
     Public Function SectionPresent(sectionName As String) As Boolean
-        Dim strSections As StringCollection
-        Dim intIndex As Integer
 
-        strSections = m_XMLFileAccessor.AllSections
+        Dim strSections = m_XMLFileAccessor.AllSections
 
-        For intIndex = 0 To strSections.Count - 1
-            If SetNameCase(strSections.Item(intIndex)) = SetNameCase(sectionName) Then Return True
-        Next intIndex
+        For Each candidateSectionName In strSections
+            If SetNameCase(candidateSectionName) = SetNameCase(sectionName) Then Return True
+        Next
 
         Return False
 
@@ -147,14 +160,10 @@ Public Class XmlSettingsFileAccessor
         ' Looks up the Key Names for the given section, storing them in mCachedSection
         ' This is done so that this class will know the correct capitalization for the key names
 
-        Dim strKeys As StringCollection
-        Dim intIndex As Integer
-
-        Dim sectionNameInFile As String
-        Dim strKeyNameToStore As String
+        Dim strKeys As List(Of String)
 
         ' Lookup the correct capitalization for sectionName (only truly important if mCaseSensitive = False)
-        sectionNameInFile = GetCachedSectionName(sectionName)
+        Dim sectionNameInFile = GetCachedSectionName(sectionName)
         If String.IsNullOrWhiteSpace(sectionNameInFile) Then Return False
 
         Try
@@ -172,20 +181,19 @@ Public Class XmlSettingsFileAccessor
         ' Update mCachedSection with the key names for the given section
         With mCachedSection
             .SectionName = sectionNameInFile
-            .htKeys.Clear()
+            .KeyNames.Clear()
 
-            For intIndex = 0 To strKeys.Count - 1
-                If mCaseSensitive Then
-                    strKeyNameToStore = String.Copy(strKeys.Item(intIndex))
+            For Each keyName In strKeys
+                ' Change the key name to lowercase if mCaseSensitive is true
+                Dim strKeyNameToStore = SetNameCase(keyName)
+
+                If Not .KeyNames.Keys.Contains(strKeyNameToStore) Then
+                    .KeyNames.Add(strKeyNameToStore, keyName)
                 Else
-                    strKeyNameToStore = String.Copy(strKeys.Item(intIndex).ToLower)
+                    Console.WriteLine("Note: ignoring duplicate key in the XML file: " & keyName)
                 End If
 
-                If Not .htKeys.Contains(strKeyNameToStore) Then
-                    .htKeys.Add(strKeyNameToStore, strKeys.Item(intIndex))
-                End If
-
-            Next intIndex
+            Next
         End With
 
         Return True
@@ -196,27 +204,20 @@ Public Class XmlSettingsFileAccessor
         ' Looks up the Section Names in the XML file
         ' This is done so that this class will know the correct capitalization for the section names
 
-        Dim strSections As StringCollection
-        Dim strSectionNameToStore As String
+        Dim strSections = m_XMLFileAccessor.AllSections
 
-        Dim intIndex As Integer
+        mSectionNames.Clear()
 
-        strSections = m_XMLFileAccessor.AllSections
+        For Each section In strSections
+            Dim strSectionNameToStore = SetNameCase(section)
 
-        htSectionNames.Clear()
-
-        For intIndex = 0 To strSections.Count - 1
-            If mCaseSensitive Then
-                strSectionNameToStore = String.Copy(strSections.Item(intIndex))
+            If Not mSectionNames.ContainsKey(strSectionNameToStore) Then
+                mSectionNames.Add(strSectionNameToStore, section)
             Else
-                strSectionNameToStore = String.Copy(strSections.Item(intIndex).ToLower)
+                Console.WriteLine("Note: ignoring duplicate section in the XML file: " & section)
             End If
 
-            If Not htSectionNames.Contains(strSectionNameToStore) Then
-                htSectionNames.Add(strSectionNameToStore, strSections.Item(intIndex))
-            End If
-
-        Next intIndex
+        Next
 
     End Sub
 
@@ -242,8 +243,8 @@ Public Class XmlSettingsFileAccessor
         If blnSuccess Then
             With mCachedSection
                 keyNameToFind = SetNameCase(keyName)
-                If .htKeys.ContainsKey(keyNameToFind) Then
-                    Return CStr(.htKeys(keyNameToFind))
+                If .KeyNames.ContainsKey(keyNameToFind) Then
+                    Return .KeyNames(keyNameToFind)
                 Else
                     Return String.Empty
                 End If
@@ -257,11 +258,10 @@ Public Class XmlSettingsFileAccessor
         ' Looks up the correct capitalization for sectionName
         ' Returns String.Empty if not found
 
-        Dim sectionNameToFind As String
+        Dim sectionNameToFind = SetNameCase(sectionName)
 
-        sectionNameToFind = SetNameCase(sectionName)
-        If htSectionNames.ContainsKey(sectionNameToFind) Then
-            Return CStr(htSectionNames(sectionNameToFind))
+        If mSectionNames.ContainsKey(sectionNameToFind) Then
+            Return mSectionNames(sectionNameToFind)
         Else
             Return String.Empty
         End If
