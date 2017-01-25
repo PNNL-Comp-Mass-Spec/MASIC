@@ -108,7 +108,7 @@ Public Class clsReporterIonProcessor
                 Dim uncorrectedIntensityHeaders = New List(Of String)
                 Dim ftmsSignalToNoise = New List(Of String)
                 Dim ftmsResolution = New List(Of String)
-                Dim ftmsLabelDataMz = New List(Of String)
+                ' Dim ftmsLabelDataMz = New List(Of String)
 
                 Dim blnSaveUncorrectedIntensities As Boolean =
                     mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection AndAlso mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities
@@ -154,8 +154,9 @@ Public Class clsReporterIonProcessor
                         ftmsSignalToNoise.Add("Ion_" & mzValue & "_SignalToNoise")
                         ftmsResolution.Add("Ion_" & mzValue & "_Resolution")
 
-                        ' This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                        ftmsLabelDataMz.Add("Ion_" & mzValue & "_LabelDataMZ")
+                        ' Uncomment to include the label data m/z value in the _ReporterIons.txt file
+                        '' This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
+                        'ftmsLabelDataMz.Add("Ion_" & mzValue & "_LabelDataMZ")
                     End If
 
                 Next
@@ -173,9 +174,10 @@ Public Class clsReporterIonProcessor
                 If includeFtmsColumns Then
                     headerColumns.AddRange(ftmsSignalToNoise)
                     headerColumns.AddRange(ftmsResolution)
-                    If mOptions.ReporterIons.ReporterIonSaveObservedMasses Then
-                        headerColumns.AddRange(ftmsLabelDataMz)
-                    End If
+                    ' Uncomment to include the label data m/z value in the _ReporterIons.txt file
+                    'If mOptions.ReporterIons.ReporterIonSaveObservedMasses Then
+                    '    headerColumns.AddRange(ftmsLabelDataMz)
+                    'End If
                 End If
 
                 ' Write the headers to the output file, separated by tabs
@@ -310,7 +312,7 @@ Public Class clsReporterIonProcessor
 
         Dim ftmsSignalToNoise = New List(Of String)
         Dim ftmsResolution = New List(Of String)
-        Dim ftmsLabelDataMz = New List(Of String)
+        ' Dim ftmsLabelDataMz = New List(Of String)
 
         Dim sngReporterIntensityMax As Single = 0
 
@@ -465,11 +467,11 @@ Public Class clsReporterIonProcessor
                         ' A match was not found in the label data; display blanks (not zeroes)
                         ftmsSignalToNoise.Add("")
                         ftmsResolution.Add("")
-                        ftmsLabelDataMz.Add("")
+                        ' ftmsLabelDataMz.Add("")
                     Else
                         ftmsSignalToNoise.Add(Math.Round(reporterIons(intReporterIonIndex).SignalToNoise, 2).ToString())
                         ftmsResolution.Add(Math.Round(reporterIons(intReporterIonIndex).Resolution, 2).ToString())
-                        ftmsLabelDataMz.Add(Math.Round(reporterIons(intReporterIonIndex).LabelDataMZ, 4).ToString())
+                        ' ftmsLabelDataMz.Add(Math.Round(reporterIons(intReporterIonIndex).LabelDataMZ, 4).ToString())
                     End If
 
                 End If
@@ -509,9 +511,10 @@ Public Class clsReporterIonProcessor
             dataColumns.AddRange(ftmsSignalToNoise)
             dataColumns.AddRange(ftmsResolution)
 
-            If saveObservedMasses Then
-                dataColumns.AddRange(ftmsLabelDataMz)
-            End If
+            ' Uncomment to include the label data m/z value in the _ReporterIons.txt file
+            'If saveObservedMasses Then
+            '    dataColumns.AddRange(ftmsLabelDataMz)
+            'End If
         End If
 
         srOutFile.WriteLine(String.Join(cColDelimiter, dataColumns))
