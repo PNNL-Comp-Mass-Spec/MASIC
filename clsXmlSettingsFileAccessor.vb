@@ -733,6 +733,11 @@ Public Class XmlSettingsFileAccessor
 
             ' Try to load the file as an XML file
             Try
+                If Not File.Exists(strXmlFilename) Then
+                    ManualParseXmlOrIniFile(strXmlFilename)
+                    Return
+                End If
+
                 m_XmlDoc.Load(strXmlFilename)
                 UpdateSections()
                 m_XmlFilename = strXmlFilename
@@ -1545,5 +1550,6 @@ Public Class XmlSettingsFileAccessor
     End Class
 
 End Class
+
 
 
