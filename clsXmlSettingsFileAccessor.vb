@@ -1246,32 +1246,6 @@ Public Class XmlSettingsFileAccessor
             Return False
         End Function
 
-        ''' <summary>The funtions creates a section name.</summary>
-        ''' <param name="sectionName">The name of the section.</param>
-        ''' <param name="keyName">The name of the key.</param>
-        ''' <param name="newValue">The new value to be created.</param>
-        ''' <return>The function returns a Boolean.</return>
-        Private Function CreateItem(sectionName As String, keyName As String, newValue As String) As Boolean
-            Dim item As XmlElement
-            Dim section As XmlElement
-            Try
-                section = GetSection(sectionName)
-                If Not section Is Nothing Then
-                    item = m_XmlDoc.CreateElement("item")
-                    item.SetAttribute("key", keyName)
-                    item.SetAttribute("newValue", newValue)
-                    section.AppendChild(item)
-                    Return True
-                End If
-                Return False
-            Catch e As Exception
-                If NotifyOnException Then
-                    Throw New Exception("Failed to create item.")
-                End If
-                Return False
-            End Try
-        End Function
-
         ''' <summary>
         ''' Manually read a XML or .INI settings file line-by-line, extracting out any settings in the expected format
         ''' </summary>
