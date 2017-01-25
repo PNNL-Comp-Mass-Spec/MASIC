@@ -1939,27 +1939,33 @@ Public Class clsMASIC
         AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
     End Sub
 
+    <Obsolete("Use Options.SaveParameterFileSettings")>
     Public Function SaveParameterFileSettings(strParameterFilePath As String) As Boolean
         Dim success = mOptions.SaveParameterFileSettings(strParameterFilePath)
         Return success
     End Function
 
+    <Obsolete("Use Options.ReporterIons.SetReporterIons")>
     Public Sub SetReporterIons(dblReporterIonMZList() As Double)
         mOptions.ReporterIons.SetReporterIons(dblReporterIonMZList)
     End Sub
 
+    <Obsolete("Use Options.ReporterIons.SetReporterIons")>
     Public Sub SetReporterIons(dblReporterIonMZList() As Double, dblMZToleranceDa As Double)
         mOptions.ReporterIons.SetReporterIons(dblReporterIonMZList, dblMZToleranceDa)
     End Sub
 
+    <Obsolete("Use Options.ReporterIons.SetReporterIons")>
     Public Sub SetReporterIons(reporterIons As List(Of clsReporterIonInfo))
         mOptions.ReporterIons.SetReporterIons(reporterIons, True)
     End Sub
 
+    <Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")>
     Public Sub SetReporterIonMassMode(eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants)
         mOptions.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode)
     End Sub
 
+    <Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")>
     Public Sub SetReporterIonMassMode(
       eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants,
       dblMZToleranceDa As Double)

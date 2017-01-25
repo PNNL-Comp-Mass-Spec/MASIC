@@ -693,7 +693,7 @@ Public Class frmMain
 
                 UpdateMasicSettings(objMasic)
 
-                objMasic.SaveParameterFileSettings(strFilePath)
+                objMasic.Options.SaveParameterFileSettings(strFilePath)
 
                 ' Sleep for 100 msec, just to be safe
                 Threading.Thread.Sleep(100)
