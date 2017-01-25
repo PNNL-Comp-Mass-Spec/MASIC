@@ -683,7 +683,7 @@ Public Class XmlSettingsFileAccessor
         Private m_XmlFilename As String
         Private m_XmlDoc As XmlDocument
 
-        Private sections As StringCollection = New StringCollection
+        Private m_sections As List(Of String) = New List(Of String)
         Private m_CaseSensitive As Boolean = False
         Private m_SaveFilename As String
         Private m_initialized As Boolean = False
@@ -801,10 +801,10 @@ Public Class XmlSettingsFileAccessor
         ''' </summary>
         ''' <return>The function returns the last section as System.Xml.XmlElement.</return>
         Private Function GetLastSection() As XmlElement
-            If sections.Count = 0 Then
+            If m_sections.Count = 0 Then
                 Return GetRoot()
             Else
-                Return GetSection(sections(sections.Count - 1))
+                Return GetSection(m_sections.Last())
             End If
         End Function
 
@@ -1007,7 +1007,7 @@ Public Class XmlSettingsFileAccessor
         ''' <summary>
         ''' Legacy function name; calls GetXmlSectionComments
         ''' </summary>
-        Public Function GetIniComments(sectionName As String) As StringCollection
+        Public Function GetIniComments(sectionName As String) As List(Of String)
             Return GetXmlSectionComments(sectionName)
         End Function
 
@@ -1016,9 +1016,9 @@ Public Class XmlSettingsFileAccessor
         ''' </summary>
         ''' <param name="sectionName">The name of the section.</param>
         '''<return>The function returns a string collection with comments</return>
-        Public Function GetXmlSectionComments(sectionName As String) As StringCollection
+        Public Function GetXmlSectionComments(sectionName As String) As List(Of String)
             If Not Initialized Then Throw New XMLFileReaderNotInitializedException
-            Dim sc = New StringCollection
+            Dim sc = New List(Of String)
             Dim target As XmlNode
             Dim nodes As XmlNodeList
             Dim N As XmlNode
@@ -1041,7 +1041,7 @@ Public Class XmlSettingsFileAccessor
         ''' <summary>
         ''' Legacy function name; calls SetXMLComments
         ''' </summary>
-        Public Function SetIniComments(sectionName As String, comments As StringCollection) As Boolean
+        Public Function SetIniComments(sectionName As String, comments As List(Of String)) As Boolean
             Return SetXMLComments(sectionName, comments)
         End Function
 
@@ -1051,7 +1051,7 @@ Public Class XmlSettingsFileAccessor
         ''' <param name="sectionName">The name of the section.</param>
         ''' <param name="comments">A string collection.</param>
         '''<return>The function returns a Boolean that shows if the change was done.</return>
-        Public Function SetXMLComments(sectionName As String, comments As StringCollection) As Boolean
+        Public Function SetXMLComments(sectionName As String, comments As List(Of String)) As Boolean
             If Not Initialized Then Throw New XMLFileReaderNotInitializedException
             Dim target As XmlNode
             Dim nodes As XmlNodeList
@@ -1097,12 +1097,12 @@ Public Class XmlSettingsFileAccessor
         ''' The subroutine gets the sections.
         ''' </summary>
         ''' <return>The subroutine returns a strin collection of sections.</return>
-        Public ReadOnly Property AllSections() As StringCollection
+        Public ReadOnly Property AllSections() As List(Of String)
             Get
                 If Not Initialized Then
-                    Return New StringCollection()
+                    Return New List(Of String)
                 Else
-                    Return sections
+                    Return m_sections
                 End If
             End Get
         End Property
@@ -1113,9 +1113,9 @@ Public Class XmlSettingsFileAccessor
         ''' <param name="sectionName">The name of the section.</param>
         ''' <param name="itemType">Item type.</param>
         ''' <return>The function returns a string colection of items in a section.</return>
-        Private Function GetItemsInSection(sectionName As String, itemType As XMLItemTypeEnum) As StringCollection
-            Dim nodes As XmlNodeList
-            Dim items = New StringCollection
+        Private Function GetItemsInSection(sectionName As String, itemType As XMLItemTypeEnum) As List(Of String)
+
+            Dim items = New List(Of String)
             Dim section As XmlNode = GetSection(sectionName)
             Dim N As XmlNode
             If section Is Nothing Then
@@ -1142,7 +1142,7 @@ Public Class XmlSettingsFileAccessor
         ''' <summary>The funtions gets a collection of keys in a section.</summary>
         ''' <param name="sectionName">The name of the section.</param>
         ''' <return>The function returns a string colection of all the keys in a section.</return>
-        Public Function AllKeysInSection(sectionName As String) As StringCollection
+        Public Function AllKeysInSection(sectionName As String) As List(Of String)
             If Not Initialized Then Throw New XMLFileReaderNotInitializedException
             Return GetItemsInSection(sectionName, XMLItemTypeEnum.GetKeys)
         End Function
@@ -1150,7 +1150,7 @@ Public Class XmlSettingsFileAccessor
         ''' <summary>The funtions gets a collection of values in a section.</summary>
         ''' <param name="sectionName">The name of the section.</param>
         ''' <return>The function returns a string colection of all the values in a section.</return>
-        Public Function AllValuesInSection(sectionName As String) As StringCollection
+        Public Function AllValuesInSection(sectionName As String) As List(Of String)
             If Not Initialized Then Throw New XMLFileReaderNotInitializedException
             Return GetItemsInSection(sectionName, XMLItemTypeEnum.GetValues)
         End Function
@@ -1158,7 +1158,7 @@ Public Class XmlSettingsFileAccessor
         ''' <summary>The funtions gets a collection of items in a section.</summary>
         ''' <param name="sectionName">The name of the section.</param>
         ''' <return>The function returns a string colection of all the items in a section.</return>
-        Public Function AllItemsInSection(sectionName As String) As StringCollection
+        Public Function AllItemsInSection(sectionName As String) As List(Of String)
             If Not Initialized Then Throw New XMLFileReaderNotInitializedException
             Return (GetItemsInSection(sectionName, XMLItemTypeEnum.GetKeysAndValues))
         End Function
