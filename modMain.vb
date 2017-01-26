@@ -26,7 +26,7 @@ Option Strict On
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "January 24, 2017"
+    Public Const PROGRAM_DATE As String = "January 25, 2017"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -187,9 +187,6 @@ Public Module modMain
                 mProgressForm = Nothing
             End If
         End Try
-
-        ''Trace.Close()
-
 
     End Function
 
