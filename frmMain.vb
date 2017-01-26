@@ -1865,46 +1865,32 @@ Public Class frmMain
 
             ' Store the custom M/Z values in mCustomSICList
 
-            strCustomSICFileName = txtCustomSICFileName.Text.Trim
+            Dim strCustomSICFileName = txtCustomSICFileName.Text.Trim()
             masicOptions.CustomSICList.CustomSICListFileName = strCustomSICFileName
 
-            If strCustomSICFileName.Length > 0 Then
-                ReDim dblMZList(-1)
-                ReDim dblMZToleranceList(-1)
-                ReDim sngScanOrAcqTimeList(-1)
-                ReDim sngScanOrAcqTimeToleranceList(-1)
-                ReDim strScanComments(-1)
-            Else
+            Dim mzSearchSpecs = New List(Of clsCustomMZSearchSpec)
 
-                With mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATATABLE)
+            ' Only use the data in table CUSTOM_SIC_VALUES_DATATABLE if the CustomSicFileName is empty
+            If String.IsNullOrWhiteSpace(strCustomSICFileName) Then
 
-                    intCustomSICListCount = 0
-                    ReDim dblMZList(.Rows.Count - 1)
-                    ReDim dblMZToleranceList(.Rows.Count - 1)
-                    ReDim sngScanOrAcqTimeList(.Rows.Count - 1)
-                    ReDim sngScanOrAcqTimeToleranceList(.Rows.Count - 1)
-                    ReDim strScanComments(.Rows.Count - 1)
+                For Each myDataRow As DataRow In mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATATABLE).Rows
+                    With myDataRow
+                        If IsNumeric(.Item(0)) And IsNumeric(.Item(1)) Then
 
-                    For Each myDataRow In .Rows
-                        With myDataRow
-                            If IsNumeric(.Item(0)) And IsNumeric(.Item(1)) Then
-                                dblMZList(intCustomSICListCount) = CDbl(.Item(0))
-                                dblMZToleranceList(intCustomSICListCount) = CDbl(.Item(1))
-                                sngScanOrAcqTimeList(intCustomSICListCount) = CSng(.Item(2))
-                                sngScanOrAcqTimeToleranceList(intCustomSICListCount) = CSng(.Item(3))
-                                strScanComments(intCustomSICListCount) = SharedVBNetRoutines.VBNetRoutines.CStrSafe(.Item(4))
-                                intCustomSICListCount += 1
-                            End If
-                        End With
-                    Next myDataRow
+                            Dim targetMz = CDbl(.Item(0))
+                            Dim mzSearchSpec = New clsCustomMZSearchSpec(targetMz)
 
-                    ReDim Preserve dblMZList(intCustomSICListCount - 1)
-                    ReDim Preserve dblMZToleranceList(intCustomSICListCount - 1)
-                    ReDim Preserve sngScanOrAcqTimeList(intCustomSICListCount - 1)
-                    ReDim Preserve sngScanOrAcqTimeToleranceList(intCustomSICListCount - 1)
-                    ReDim Preserve strScanComments(intCustomSICListCount - 1)
+                            mzSearchSpec.MZToleranceDa = CDbl(.Item(1))
 
-                End With
+                            mzSearchSpec.ScanOrAcqTimeCenter = CSng(.Item(2))
+                            mzSearchSpec.ScanOrAcqTimeTolerance = CSng(.Item(3))
+                            mzSearchSpec.Comment = CStrSafe(.Item(4))
+
+                            mzSearchSpecs.Add(mzSearchSpec)
+                        End If
+                    End With
+                Next myDataRow
+
             End If
 
             If optCustomSICScanToleranceAbsolute.Checked Then
@@ -1921,7 +1907,7 @@ Public Class frmMain
             sngScanOrAcqTimeTolerance = ParseTextboxValueSng(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text & " must be a value", blnError)
             If blnError Then Exit Try
 
-            objMasic.Options.CustomSICList.SetCustomSICListValues(eScanType, masicOptions.SICOptions.SICToleranceDa, sngScanOrAcqTimeTolerance, dblMZList, dblMZToleranceList, sngScanOrAcqTimeList, sngScanOrAcqTimeToleranceList, strScanComments)
+            masicOptions.CustomSICList.SetCustomSICListValues(eScanType, sngScanOrAcqTimeTolerance, mzSearchSpecs)
 
         Catch ex As Exception
             Windows.Forms.MessageBox.Show("Error applying setting to clsMASIC: " & ControlChars.NewLine & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)

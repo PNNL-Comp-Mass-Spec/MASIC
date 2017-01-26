@@ -314,6 +314,7 @@
 
     End Sub
 
+    <Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")>
     Public Function SetCustomSICListValues(
       eScanType As eCustomSICScanTypeConstants,
       dblMZToleranceDa As Double,
@@ -386,6 +387,34 @@
             AddMzSearchTarget(mzSearchSpec)
 
         Next intIndex
+
+        ValidateCustomSICList()
+
+        Return True
+
+    End Function
+
+    Public Function SetCustomSICListValues(
+      eScanType As eCustomSICScanTypeConstants,
+      sngScanOrAcqTimeTolerance As Single,
+      mzSearchSpecs As List(Of clsCustomMZSearchSpec)) As Boolean
+
+        ' Returns True if success
+
+        ResetMzSearchValues()
+
+        ScanToleranceType = eScanType
+
+        ' This value is used if sngScanOrAcqTimeToleranceList is blank or for any entries in sngScanOrAcqTimeToleranceList() that are zero
+        ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance
+
+        If mzSearchSpecs.Count = 0 Then
+            Return True
+        End If
+
+        For Each mzSearchSpec In mzSearchSpecs
+            AddMzSearchTarget(mzSearchSpec)
+        Next
 
         ValidateCustomSICList()
 
