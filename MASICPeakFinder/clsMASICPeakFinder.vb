@@ -1,5 +1,6 @@
 Option Strict On
 
+Imports System.Runtime.InteropServices
 ' -------------------------------------------------------------------------------
 ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
 ' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
@@ -15,7 +16,7 @@ Option Strict On
 Public Class clsMASICPeakFinder
 
 #Region "Constants and Enums"
-    Public PROGRAM_DATE As String = "January 18, 2017"
+    Public PROGRAM_DATE As String = "January 25, 2017"
 
     Public Const MINIMUM_PEAK_WIDTH As Integer = 3                         ' Width in points
 
@@ -54,8 +55,17 @@ Public Class clsMASICPeakFinder
     End Structure
 
     Public Structure udtBaselineNoiseStatsType
-        Public NoiseLevel As Single             ' Typically the average of the data being sampled to determine the baseline noise estimate
-        Public NoiseStDev As Single             ' Standard Deviation of the data used to compute the baseline estimate
+
+        ''' <summary>
+        ''' Typically the average of the data being sampled to determine the baseline noise estimate
+        ''' </summary>
+        Public NoiseLevel As Single
+
+        ''' <summary>
+        ''' Standard Deviation of the data used to compute the baseline estimate
+        ''' </summary>
+        Public NoiseStDev As Single
+
         Public PointsUsed As Integer
         Public NoiseThresholdModeUsed As eNoiseThresholdModes
     End Structure
@@ -67,29 +77,90 @@ Public Class clsMASICPeakFinder
     End Structure
 
     Public Structure udtStatisticalMomentsType
-        Public Area As Single                       ' Area; Zeroth central moment (m0); using baseline-corrected intensities unless all of the data is below the baseline -- if that's the case, then using the 3 points surrounding the peak apex
-        Public CenterOfMassScan As Integer          ' Center of Mass of the peak; First central moment (m1); reported as an absolute scan number
-        Public StDev As Single                      ' Standard Deviation; Sqrt(Variance) where Variance is the second central moment (m2)
-        Public Skew As Single                       ' Computed using the third central moment via m3 / sigma^3 where m3 is the third central moment and sigma^3 = (Sqrt(m2))^3
-        Public KSStat As Single                     ' The Kolmogorov-Smirnov Goodness-of-Fit value (not officially a statistical moment, but we'll put it here anyway)
+        ''' <summary>
+        ''' Area; Zeroth central moment (m0); using baseline-corrected intensities unless all of the data is below the baseline -- if that's the case, then using the 3 points surrounding the peak apex
+        ''' </summary>
+        Public Area As Single
+
+        ''' <summary>
+        ''' Center of Mass of the peak; First central moment (m1); reported as an absolute scan number
+        ''' </summary>
+        Public CenterOfMassScan As Integer
+
+        ''' <summary>
+        ''' Standard Deviation; Sqrt(Variance) where Variance is the second central moment (m2)
+        ''' </summary>
+        Public StDev As Single
+
+        ''' <summary>
+        ''' Computed using the third central moment via m3 / sigma^3 where m3 is the third central moment and sigma^3 = (Sqrt(m2))^3
+        ''' </summary>
+        Public Skew As Single
+
+        ''' <summary>
+        ''' The Kolmogorov-Smirnov Goodness-of-Fit value (not officially a statistical moment, but we'll put it here anyway)
+        ''' </summary>
+        Public KSStat As Single
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
         Public DataCountUsed As Integer
     End Structure
 
     Public Structure udtSICStatsPeakType
-        Public IndexBaseLeft As Integer         ' Index that the SIC peak officially starts; Pointer to entry in .SICData()
-        Public IndexBaseRight As Integer        ' Index that the SIC peak officially ends; Pointer to entry in .SICData() 
-        Public IndexMax As Integer              ' Index of the maximum of the SIC peak; Pointer to entry in .SICData() 
-        Public IndexObserved As Integer         ' Index that the SIC peak was first observed in by the instrument(and thus caused it to be chosen for fragmentation); Pointer to entry in .SICData()
-        Public ParentIonIntensity As Single     ' Intensity of the parent ion in the scan just prior to the scan in which the peptide was fragmented; if previous scan was not MS1, then interpolates between MS1 scans bracketing the MS2 scan
+        ''' <summary>
+        ''' Index that the SIC peak officially starts; Pointer to entry in .SICData()
+        ''' </summary>
+        Public IndexBaseLeft As Integer
 
-        Public PreviousPeakFWHMPointRight As Integer    ' Index of the FWHM point in the previous closest peak in the SIC; filtering to only include peaks with intensities >= BestPeak'sIntensity/3
-        Public NextPeakFWHMPointLeft As Integer         ' Index of the FWHM point in the next closest peak in the SIC; filtering to only include peaks with intensities >= BestPeak'sIntensity/3
+        ''' <summary>
+        ''' Index that the SIC peak officially ends; Pointer to entry in .SICData() 
+        ''' </summary>
+        Public IndexBaseRight As Integer
+
+        ''' <summary>
+        ''' Index of the maximum of the SIC peak; Pointer to entry in .SICData() 
+        ''' </summary>
+        Public IndexMax As Integer
+
+        ''' <summary>
+        ''' Index that the SIC peak was first observed in by the instrument(and thus caused it to be chosen for fragmentation); Pointer to entry in .SICData()
+        ''' </summary>
+        Public IndexObserved As Integer
+
+        ''' <summary>
+        ''' Intensity of the parent ion in the scan just prior to the scan in which the peptide was fragmented; if previous scan was not MS1, then interpolates between MS1 scans bracketing the MS2 scan
+        ''' </summary>
+        Public ParentIonIntensity As Single
+
+        ''' <summary>
+        ''' Index of the FWHM point in the previous closest peak in the SIC; filtering to only include peaks with intensities >= BestPeak'sIntensity/3
+        ''' </summary>
+        Public PreviousPeakFWHMPointRight As Integer
+
+        ''' <summary>
+        ''' Index of the FWHM point in the next closest peak in the SIC; filtering to only include peaks with intensities >= BestPeak'sIntensity/3
+        ''' </summary>
+        Public NextPeakFWHMPointLeft As Integer
 
         Public FWHMScanWidth As Integer
 
-        Public MaxIntensityValue As Single      ' Maximum intensity of the SIC Peak -- not necessarily the maximum intensity in .SICData(); Not baseline corrected
-        Public Area As Single                   ' Area of the SIC peak -- Equivalent to the zeroth statistical moment (m0); Not baseline corrected
-        Public ShoulderCount As Integer         ' Number of small peaks that are contained by the peak
+        ''' <summary>
+        ''' Maximum intensity of the SIC Peak -- not necessarily the maximum intensity in .SICData(); Not baseline corrected
+        ''' </summary>
+        Public MaxIntensityValue As Single
+
+        ''' <summary>
+        ''' Area of the SIC peak -- Equivalent to the zeroth statistical moment (m0); Not baseline corrected
+        ''' </summary>
+        Public Area As Single
+
+        ''' <summary>
+        ''' Number of small peaks that are contained by the peak
+        ''' </summary>
+        Public ShoulderCount As Integer
+
         Public SignalToNoiseRatio As Single
 
         Public BaselineNoiseStats As udtBaselineNoiseStatsType
