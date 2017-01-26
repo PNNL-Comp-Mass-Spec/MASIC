@@ -172,11 +172,10 @@ Public Class clsDatasetStatsSummarizer
     ''' Summarizes the scan info in objScanStats()
     ''' </summary>
     ''' <param name="objScanStats">ScanStats data to parse</param>
-    ''' <param name="objSummaryStats">Stats output</param>
+    ''' <param name="objSummaryStats">Stats output (initialized if nothing)</param>
     ''' <returns>>True if success, false if error</returns>
     ''' <remarks></remarks>
-    Public Function ComputeScanStatsSummary(
-                                            ByRef objScanStats As List(Of clsScanStatsEntry),
+    Public Function ComputeScanStatsSummary(objScanStats As List(Of clsScanStatsEntry),
                                             ByRef objSummaryStats As clsDatasetSummaryStats) As Boolean
 
         Dim intScanStatsCount As Integer
@@ -460,24 +459,9 @@ Public Class clsDatasetStatsSummarizer
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
                                          strDatasetName As String,
-                                         ByRef objScanStats As List(Of clsScanStatsEntry),
+                                         objScanStats As List(Of clsScanStatsEntry),
                                          ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
                                          ByRef udtSampleInfo As udtSampleInfoType) As String
-
-        ' Create a MemoryStream to hold the results
-        Dim objMemStream As MemoryStream
-        Dim objXMLSettings As XmlWriterSettings
-
-        Dim objDSInfo As XmlWriter
-        Dim objEnum As Dictionary(Of String, Integer).Enumerator
-
-        Dim objSummaryStats As clsDatasetSummaryStats
-
-        Dim intIndexMatch As Integer
-        Dim strScanType As String
-        Dim strScanFilterText As String
-
-        Dim includeCentroidStats = False
 
         Try
 
@@ -488,6 +472,9 @@ Public Class clsDatasetStatsSummarizer
                 mErrorMessage = ""
             End If
 
+            Dim objSummaryStats As clsDatasetSummaryStats
+            Dim includeCentroidStats As Boolean
+
             If objScanStats Is mDatasetScanStats Then
                 objSummaryStats = GetDatasetSummaryStats()
                 If mSpectraTypeClassifier.TotalSpectra > 0 Then
@@ -495,7 +482,7 @@ Public Class clsDatasetStatsSummarizer
                 End If
 
             Else
-                objSummaryStats = New clsDatasetSummaryStats
+                objSummaryStats = New clsDatasetSummaryStats()
 
                 ' Parse the data in objScanStats to compute the bulk values
                 Me.ComputeScanStatsSummary(objScanStats, objSummaryStats)
@@ -503,7 +490,7 @@ Public Class clsDatasetStatsSummarizer
                 includeCentroidStats = False
             End If
 
-            objXMLSettings = New XmlWriterSettings()
+            Dim objXMLSettings = New XmlWriterSettings()
 
             With objXMLSettings
                 .CheckCharacters = True
@@ -532,8 +519,8 @@ Public Class clsDatasetStatsSummarizer
             '  and so you see the attribute encoding="utf-8" in the opening XML declaration encoding 
             '  (since we used objXMLSettings.Encoding = System.Encoding.UTF8)
             '
-            objMemStream = New MemoryStream()
-            objDSInfo = XmlWriter.Create(objMemStream, objXMLSettings)
+            Dim objMemStream = New MemoryStream()
+            Dim objDSInfo = XmlWriter.Create(objMemStream, objXMLSettings)
 
             objDSInfo.WriteStartDocument(True)
 
@@ -544,11 +531,12 @@ Public Class clsDatasetStatsSummarizer
 
             objDSInfo.WriteStartElement("ScanTypes")
 
-            objEnum = objSummaryStats.objScanTypeStats.GetEnumerator()
+            Dim objEnum = objSummaryStats.objScanTypeStats.GetEnumerator()
             Do While objEnum.MoveNext
 
-                strScanType = objEnum.Current.Key
-                intIndexMatch = strScanType.IndexOf(SCANTYPE_STATS_SEPCHAR, StringComparison.Ordinal)
+                Dim strScanType = objEnum.Current.Key
+                Dim intIndexMatch = strScanType.IndexOf(SCANTYPE_STATS_SEPCHAR, StringComparison.Ordinal)
+                Dim strScanFilterText As String
 
                 If intIndexMatch >= 0 Then
                     strScanFilterText = strScanType.Substring(intIndexMatch + SCANTYPE_STATS_SEPCHAR.Length)
@@ -690,7 +678,7 @@ Public Class clsDatasetStatsSummarizer
     Public Function CreateScanStatsFile(
                                         strDatasetName As String,
                                         strScanStatsFilePath As String,
-                                        ByRef objScanStats As List(Of clsScanStatsEntry),
+                                        objScanStats As List(Of clsScanStatsEntry),
                                         ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
                                         ByRef udtSampleInfo As udtSampleInfoType) As Boolean
 
@@ -845,7 +833,7 @@ Public Class clsDatasetStatsSummarizer
     Public Function UpdateDatasetStatsTextFile(
                                                strDatasetName As String,
                                                strDatasetStatsFilePath As String,
-                                               ByRef objScanStats As List(Of clsScanStatsEntry),
+                                               objScanStats As List(Of clsScanStatsEntry),
                                                ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
                                                ByRef udtSampleInfo As udtSampleInfoType) As Boolean
 
@@ -869,7 +857,7 @@ Public Class clsDatasetStatsSummarizer
             If objScanStats Is mDatasetScanStats Then
                 objSummaryStats = GetDatasetSummaryStats()
             Else
-                objSummaryStats = New clsDatasetSummaryStats
+                objSummaryStats = New clsDatasetSummaryStats()
 
                 ' Parse the data in objScanStats to compute the bulk values
                 Me.ComputeScanStatsSummary(objScanStats, objSummaryStats)

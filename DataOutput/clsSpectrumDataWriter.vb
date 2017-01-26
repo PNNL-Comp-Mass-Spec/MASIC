@@ -232,18 +232,8 @@ Namespace DataOutput
           blnFragmentationScan As Boolean,
           ByRef intSpectrumExportCount As Integer)
 
-            Dim strLineOut As String
-            Dim intIonIndex As Integer
-            Dim sngIntensities() As Single
-            Dim intPointerArray() As Integer
-
-            Dim intScanNumber As Integer
             Dim intPoolIndex As Integer
-
-            Dim intStartIndex As Integer, intExportCount As Integer
-            Dim sngMinimumIntensityCurrentScan As Single
-
-            intExportCount = 0
+            Dim intExportCount = 0
 
             If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
@@ -257,7 +247,7 @@ Namespace DataOutput
                 srOutFile.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString())          ' Store the base peak ion intensity as the time domain signal level value
 
                 srOutFile.WriteLine("MASIC " & mOptions.MASICVersion)                     ' Software version
-                strLineOut = "MS/MS-based PEK file"
+                Dim strLineOut = "MS/MS-based PEK file"
                 If mOptions.RawDataExportOptions.IncludeMSMS Then
                     strLineOut &= " (includes both survey scans and fragmentation spectra)"
                 Else
@@ -265,6 +255,7 @@ Namespace DataOutput
                 End If
                 srOutFile.WriteLine(strLineOut)
 
+                Dim intScanNumber As Integer
                 If mOptions.RawDataExportOptions.RenumberScans Then
                     intScanNumber = intSpectrumExportCount
                 Else
@@ -287,6 +278,9 @@ Namespace DataOutput
 
                 If .IonCount > 0 Then
                     ' Populate sngIntensities and intPointerArray()
+                    Dim sngIntensities() As Single
+                    Dim intPointerArray() As Integer
+
                     ReDim sngIntensities(.IonCount - 1)
                     ReDim intPointerArray(.IonCount - 1)
                     For intIonIndex = 0 To .IonCount - 1
@@ -297,6 +291,8 @@ Namespace DataOutput
                     ' Sort intPointerArray() based on the intensities in sngIntensities
                     Array.Sort(sngIntensities, intPointerArray)
 
+                    Dim intStartIndex As Integer
+
                     If mOptions.RawDataExportOptions.MaxIonCountPerScan > 0 Then
                         ' Possibly limit the number of ions to intMaxIonCount
                         intStartIndex = .IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan
@@ -305,9 +301,8 @@ Namespace DataOutput
                         intStartIndex = 0
                     End If
 
-
                     ' Define the minimum data point intensity value
-                    sngMinimumIntensityCurrentScan = .IonsIntensity(intPointerArray(intStartIndex))
+                    Dim sngMinimumIntensityCurrentScan = .IonsIntensity(intPointerArray(intStartIndex))
 
                     ' Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
                     sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum)
@@ -320,7 +315,13 @@ Namespace DataOutput
                     intExportCount = 0
                     For intIonIndex = 0 To .IonCount - 1
                         If .IonsIntensity(intIonIndex) >= sngMinimumIntensityCurrentScan Then
-                            strLineOut = "1" & ControlChars.Tab & "1" & ControlChars.Tab & .IonsIntensity(intIonIndex) & ControlChars.Tab & .IonsMZ(intIonIndex) & ControlChars.Tab & "0"
+                            Dim strLineOut =
+                                "1" & ControlChars.Tab &
+                                "1" & ControlChars.Tab &
+                                .IonsIntensity(intIonIndex) & ControlChars.Tab &
+                                .IonsMZ(intIonIndex) & ControlChars.Tab &
+                                "0"
+
                             srOutFile.WriteLine(strLineOut)
                             intExportCount += 1
                         End If

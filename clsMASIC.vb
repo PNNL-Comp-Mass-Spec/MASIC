@@ -40,7 +40,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "January 24, 2017"
+        MyBase.mFileDate = "January 25, 2017"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
@@ -1402,11 +1402,9 @@ Public Class clsMASIC
                 Dim strOutputFileTestPath As String
                 strOutputFileTestPath = Path.Combine(strOutputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
 
-                Dim fsOutFileTest As New StreamWriter(strOutputFileTestPath, False)
-
-                fsOutFileTest.WriteLine("Test")
-                fsOutFileTest.Flush()
-                fsOutFileTest.Close()
+                Using fsOutFileTest As New StreamWriter(strOutputFileTestPath, False)
+                    fsOutFileTest.WriteLine("Test")
+                End Using
 
                 ' Wait 250 msec, then delete the file
                 Threading.Thread.Sleep(250)
@@ -1557,6 +1555,9 @@ Public Class clsMASIC
                 End Select
 
                 If Not blnSuccess Then
+                    If mLocalErrorCode = eMasicErrorCodes.NoParentIonsFoundInInputFile AndAlso String.IsNullOrWhiteSpace(mStatusMessage) Then
+                        mStatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range"
+                    End If
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, True)
                 End If
             Catch ex As Exception
@@ -1573,6 +1574,7 @@ Public Class clsMASIC
                 Else
                     mStatusMessage = "Unable to parse file: " & mStatusMessage
                 End If
+
                 If MyBase.ShowMessages Then
                     MessageBox.Show(mStatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                     LogMessage(mStatusMessage, eMessageTypeConstants.ErrorMsg)
@@ -2145,53 +2147,50 @@ Public Class clsMASIC
 
     Private Sub UpdateStatusFile(Optional blnForceUpdate As Boolean = False)
 
-        Dim strPath As String
-        Dim strTempPath As String
-        Dim objXMLOut As Xml.XmlTextWriter
-
         Static LastFileWriteTime As DateTime = DateTime.UtcNow
 
         If blnForceUpdate OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS Then
             LastFileWriteTime = DateTime.UtcNow
 
             Try
-                strTempPath = Path.Combine(GetAppFolderPath(), "Temp_" & mOptions.MASICStatusFilename)
-                strPath = Path.Combine(GetAppFolderPath(), mOptions.MASICStatusFilename)
+                Dim strTempPath = Path.Combine(GetAppFolderPath(), "Temp_" & mOptions.MASICStatusFilename)
+                Dim strPath = Path.Combine(GetAppFolderPath(), mOptions.MASICStatusFilename)
 
-                objXMLOut = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
-                objXMLOut.Formatting = Xml.Formatting.Indented
-                objXMLOut.Indentation = 2
+                Using objXMLOut = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
 
-                objXMLOut.WriteStartDocument(True)
-                objXMLOut.WriteComment("MASIC processing status")
+                    objXMLOut.Formatting = Xml.Formatting.Indented
+                    objXMLOut.Indentation = 2
 
-                'Write the beginning of the "Root" element.
-                objXMLOut.WriteStartElement("Root")
+                    objXMLOut.WriteStartDocument(True)
+                    objXMLOut.WriteComment("MASIC processing status")
 
-                objXMLOut.WriteStartElement("General")
-                objXMLOut.WriteElementString("LastUpdate", DateTime.Now.ToString())
-                objXMLOut.WriteElementString("ProcessingStep", mProcessingStep.ToString())
-                objXMLOut.WriteElementString("Progress", Math.Round(mProgressPercentComplete, 2).ToString())
-                objXMLOut.WriteElementString("Error", GetErrorMessage())
-                objXMLOut.WriteEndElement()
+                    'Write the beginning of the "Root" element.
+                    objXMLOut.WriteStartElement("Root")
 
-                objXMLOut.WriteStartElement("Statistics")
-                objXMLOut.WriteElementString("FreeMemoryMB", Math.Round(GetFreeMemoryMB, 1).ToString())
-                objXMLOut.WriteElementString("MemoryUsageMB", Math.Round(GetProcessMemoryUsageMB, 1).ToString())
-                objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(mProcessingStats.PeakMemoryUsageMB, 1).ToString())
+                    objXMLOut.WriteStartElement("General")
+                    objXMLOut.WriteElementString("LastUpdate", DateTime.Now.ToString())
+                    objXMLOut.WriteElementString("ProcessingStep", mProcessingStep.ToString())
+                    objXMLOut.WriteElementString("Progress", Math.Round(mProgressPercentComplete, 2).ToString())
+                    objXMLOut.WriteElementString("Error", GetErrorMessage())
+                    objXMLOut.WriteEndElement()
 
-                With mProcessingStats
-                    objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
-                    objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
-                End With
+                    objXMLOut.WriteStartElement("Statistics")
+                    objXMLOut.WriteElementString("FreeMemoryMB", Math.Round(GetFreeMemoryMB, 1).ToString())
+                    objXMLOut.WriteElementString("MemoryUsageMB", Math.Round(GetProcessMemoryUsageMB, 1).ToString())
+                    objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(mProcessingStats.PeakMemoryUsageMB, 1).ToString())
 
-                objXMLOut.WriteElementString("ProcessingTimeSec", Math.Round(GetTotalProcessingTimeSec(), 2).ToString())
-                objXMLOut.WriteEndElement()
+                    With mProcessingStats
+                        objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
+                        objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
+                    End With
 
-                objXMLOut.WriteEndElement()  'End the "Root" element.
-                objXMLOut.WriteEndDocument() 'End the document
+                    objXMLOut.WriteElementString("ProcessingTimeSec", Math.Round(GetTotalProcessingTimeSec(), 2).ToString())
+                    objXMLOut.WriteEndElement()
 
-                objXMLOut.Close()
+                    objXMLOut.WriteEndElement()  'End the "Root" element.
+                    objXMLOut.WriteEndDocument() 'End the document
+
+                End Using
 
                 GC.Collect()
                 GC.WaitForPendingFinalizers()

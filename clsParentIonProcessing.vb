@@ -122,7 +122,6 @@ Public Class clsParentIonProcessing
         Dim dblMRMDaughterMZ As Double
         Dim dblMRMToleranceHalfWidth As Double
 
-
         For intMRMIndex = 0 To mrmInfo.MRMMassCount - 1
             dblMRMDaughterMZ = mrmInfo.MRMMassList(intMRMIndex).CentralMass
             dblMRMToleranceHalfWidth = Math.Round((mrmInfo.MRMMassList(intMRMIndex).EndMass - mrmInfo.MRMMassList(intMRMIndex).StartMass) / 2, 6)
@@ -159,13 +158,9 @@ Public Class clsParentIonProcessing
         ' In this case, we cannot properly associate the fragmentation scan with a survey scan
 
         Dim intParentIonIndex As Integer
-        Dim intIndex As Integer
+
         Dim dblParentIonTolerance As Double
-        Dim dblParentIonToleranceDa As Double
-
         Dim dblParentIonMZMatch As Double
-
-        Dim blnMatchFound As Boolean
 
         If sicOptions.SICToleranceIsPPM Then
             dblParentIonTolerance = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForPPM
@@ -180,7 +175,7 @@ Public Class clsParentIonProcessing
         End If
 
         ' See if an entry exists yet in .ParentIons for the parent ion for this fragmentation scan
-        blnMatchFound = False
+        Dim blnMatchFound = False
 
         If dblMRMDaughterMZ > 0 Then
             If sicOptions.SICToleranceIsPPM Then
@@ -194,7 +189,7 @@ Public Class clsParentIonProcessing
 
         If dblParentIonMZ > 0 Then
 
-            dblParentIonToleranceDa = GetParentIonToleranceDa(sicOptions, dblParentIonMZ, dblParentIonTolerance)
+            Dim dblParentIonToleranceDa = GetParentIonToleranceDa(sicOptions, dblParentIonMZ, dblParentIonTolerance)
 
             For intParentIonIndex = scanList.ParentIonInfoCount - 1 To 0 Step -1
                 If scanList.ParentIons(intParentIonIndex).SurveyScanIndex >= intSurveyScanIndex Then
@@ -520,7 +515,7 @@ Public Class clsParentIonProcessing
     End Function
 
     Private Function FindClosestMZ(
-      ByRef dblMZList() As Double,
+      dblMZList() As Double,
       intIonCount As Integer,
       dblSearchMZ As Double,
       dblToleranceMZ As Double,
@@ -571,29 +566,6 @@ Public Class clsParentIonProcessing
         ' Look for parent ions that have similar m/z values and are nearby one another in time
         ' For the groups of similar ions, assign the scan number of the highest intensity parent ion to the other similar parent ions
 
-        Dim intMatchIndex As Integer
-        Dim intParentIonIndex As Integer
-        Dim intOriginalIndex As Integer
-
-        Dim dblMZList() As Double                   ' Original m/z values, rounded to 2 decimal places
-
-        Dim dblCurrentMZ As Double
-
-        Dim intFindSimilarIonsDataCount As Integer
-
-        Dim udtFindSimilarIonsData As udtFindSimilarIonsDataType
-        Dim intIntensityPointerArray() As Integer
-        Dim sngIntensityList() As Single
-
-        Dim intIonInUseCountOriginal As Integer
-
-        Dim intUniqueMZIndex As Integer
-
-        Dim objSearchRange As clsSearchRange
-
-        Dim dtLastLogTime As DateTime
-
-        Dim blnIncludeParentIon As Boolean
         Dim blnSuccess As Boolean
 
         Try
@@ -611,44 +583,56 @@ Public Class clsParentIonProcessing
             ReportMessage("Finding similar parent ions")
             UpdateProgress(0, "Finding similar parent ions")
 
-            With scanList
-                ' Populate udtFindSimilarIonsData.MZPointerArray and dblMZList, plus intIntensityPointerArray and sngIntensityList()
-                ReDim udtFindSimilarIonsData.MZPointerArray(.ParentIonInfoCount - 1)
-                ReDim udtFindSimilarIonsData.IonUsed(.ParentIonInfoCount - 1)
+            Dim intFindSimilarIonsDataCount As Integer
+            Dim udtFindSimilarIonsData As udtFindSimilarIonsDataType
 
-                ReDim dblMZList(.ParentIonInfoCount - 1)
-                ReDim intIntensityPointerArray(.ParentIonInfoCount - 1)
-                ReDim sngIntensityList(.ParentIonInfoCount - 1)
+            ' Original m/z values, rounded to 2 decimal places
+            Dim dblMZList() As Double
+            Dim intIntensityPointerArray() As Integer
+            Dim sngIntensityList() As Single
 
-                intFindSimilarIonsDataCount = 0
-                For intParentIonIndex = 0 To .ParentIonInfoCount - 1
-                    If .ParentIons(intParentIonIndex).MRMDaughterMZ > 0 Then
-                        blnIncludeParentIon = False
+            ' Populate udtFindSimilarIonsData.MZPointerArray and dblMZList, plus intIntensityPointerArray and sngIntensityList()
+            ReDim udtFindSimilarIonsData.MZPointerArray(scanList.ParentIonInfoCount - 1)
+            ReDim udtFindSimilarIonsData.IonUsed(scanList.ParentIonInfoCount - 1)
+
+            ReDim dblMZList(scanList.ParentIonInfoCount - 1)
+            ReDim intIntensityPointerArray(scanList.ParentIonInfoCount - 1)
+            ReDim sngIntensityList(scanList.ParentIonInfoCount - 1)
+
+            Dim intParentIonIndex As Integer
+            Dim intIonInUseCountOriginal As Integer
+
+            intFindSimilarIonsDataCount = 0
+            For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+
+                Dim blnIncludeParentIon As Boolean
+
+                If scanList.ParentIons(intParentIonIndex).MRMDaughterMZ > 0 Then
+                    blnIncludeParentIon = False
+                Else
+                    If masicOptions.CustomSICList.LimitSearchToCustomMZList Then
+                        blnIncludeParentIon = scanList.ParentIons(intParentIonIndex).CustomSICPeak
                     Else
-                        If masicOptions.CustomSICList.LimitSearchToCustomMZList Then
-                            blnIncludeParentIon = .ParentIons(intParentIonIndex).CustomSICPeak
-                        Else
-                            blnIncludeParentIon = True
-                        End If
+                        blnIncludeParentIon = True
                     End If
-
-                    If blnIncludeParentIon Then
-                        udtFindSimilarIonsData.MZPointerArray(intFindSimilarIonsDataCount) = intParentIonIndex
-                        dblMZList(intFindSimilarIonsDataCount) = Math.Round(.ParentIons(intParentIonIndex).MZ, 2)
-
-                        intIntensityPointerArray(intFindSimilarIonsDataCount) = intParentIonIndex
-                        sngIntensityList(intFindSimilarIonsDataCount) = .ParentIons(intParentIonIndex).SICStats.Peak.MaxIntensityValue
-                        intFindSimilarIonsDataCount += 1
-                    End If
-                Next intParentIonIndex
-
-                If udtFindSimilarIonsData.MZPointerArray.Length <> intFindSimilarIonsDataCount AndAlso intFindSimilarIonsDataCount > 0 Then
-                    ReDim Preserve udtFindSimilarIonsData.MZPointerArray(intFindSimilarIonsDataCount - 1)
-                    ReDim Preserve dblMZList(intFindSimilarIonsDataCount - 1)
-                    ReDim Preserve intIntensityPointerArray(intFindSimilarIonsDataCount - 1)
-                    ReDim Preserve sngIntensityList(intFindSimilarIonsDataCount - 1)
                 End If
-            End With
+
+                If blnIncludeParentIon Then
+                    udtFindSimilarIonsData.MZPointerArray(intFindSimilarIonsDataCount) = intParentIonIndex
+                    dblMZList(intFindSimilarIonsDataCount) = Math.Round(scanList.ParentIons(intParentIonIndex).MZ, 2)
+
+                    intIntensityPointerArray(intFindSimilarIonsDataCount) = intParentIonIndex
+                    sngIntensityList(intFindSimilarIonsDataCount) = scanList.ParentIons(intParentIonIndex).SICStats.Peak.MaxIntensityValue
+                    intFindSimilarIonsDataCount += 1
+                End If
+            Next intParentIonIndex
+
+            If udtFindSimilarIonsData.MZPointerArray.Length <> intFindSimilarIonsDataCount AndAlso intFindSimilarIonsDataCount > 0 Then
+                ReDim Preserve udtFindSimilarIonsData.MZPointerArray(intFindSimilarIonsDataCount - 1)
+                ReDim Preserve dblMZList(intFindSimilarIonsDataCount - 1)
+                ReDim Preserve intIntensityPointerArray(intFindSimilarIonsDataCount - 1)
+                ReDim Preserve sngIntensityList(intFindSimilarIonsDataCount - 1)
+            End If
 
             If intFindSimilarIonsDataCount = 0 Then
                 If masicOptions.SuppressNoParentIonsError Then
@@ -670,7 +654,7 @@ Public Class clsParentIonProcessing
             ReportMessage("FindSimilarParentIons: Populate objSearchRange")
 
             ' Populate objSearchRange
-            objSearchRange = New clsSearchRange()
+            Dim objSearchRange = New clsSearchRange()
 
             ' Set to false to prevent sorting the input array when calling .FillWithData (saves memory)
             ' Array was already above
@@ -699,13 +683,13 @@ Public Class clsParentIonProcessing
             InitializeUniqueMZListMatchIndices(udtFindSimilarIonsData.UniqueMZList, 0, intFindSimilarIonsDataCount - 1)
 
             ReportMessage("FindSimilarParentIons: Look for similar parent ions by using m/z and scan")
-            dtLastLogTime = DateTime.UtcNow
+            Dim dtLastLogTime = DateTime.UtcNow
 
             ' Look for similar parent ions by using m/z and scan
             ' Step through the ions by decreasing intensity
             intParentIonIndex = 0
             Do
-                intOriginalIndex = intIntensityPointerArray(intParentIonIndex)
+                Dim intOriginalIndex = intIntensityPointerArray(intParentIonIndex)
                 If udtFindSimilarIonsData.IonUsed(intOriginalIndex) Then
                     ' Parent ion was already used; move onto the next one
                     intParentIonIndex += 1
@@ -729,55 +713,54 @@ Public Class clsParentIonProcessing
                     ' If new values are added, then repeat the search using the updated udtUniqueMZList().MZAvg value
                     Do
                         intIonInUseCountOriginal = udtFindSimilarIonsData.IonInUseCount
-                        With udtFindSimilarIonsData
-                            dblCurrentMZ = .UniqueMZList(.UniqueMZListCount - 1).MZAvg
-                        End With
+                        Dim dblCurrentMZ = udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).MZAvg
 
-                        If dblCurrentMZ > 0 Then
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0, intOriginalIndex,
+                        If dblCurrentMZ <= 0 Then Continue Do
+
+                        FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0, intOriginalIndex,
+                                                  scanList, udtFindSimilarIonsData,
+                                                  masicOptions, dataImportUtilities, objSearchRange)
+
+                        ' Look for similar 1+ spaced m/z values
+                        FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 1, intOriginalIndex,
+                                                  scanList, udtFindSimilarIonsData,
+                                                  masicOptions, dataImportUtilities, objSearchRange)
+
+                        FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -1, intOriginalIndex,
+                                                  scanList, udtFindSimilarIonsData,
+                                                  masicOptions, dataImportUtilities, objSearchRange)
+
+                        ' Look for similar 2+ spaced m/z values
+                        FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.5, intOriginalIndex,
+                                                  scanList, udtFindSimilarIonsData,
+                                                  masicOptions, dataImportUtilities, objSearchRange)
+
+                        FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.5, intOriginalIndex,
+                                                  scanList, udtFindSimilarIonsData,
+                                                  masicOptions, dataImportUtilities, objSearchRange)
+
+                        Dim parentIonToleranceDa = GetParentIonToleranceDa(masicOptions.SICOptions, dblCurrentMZ)
+
+                        If parentIonToleranceDa <= 0.25 AndAlso masicOptions.SICOptions.SimilarIonMZToleranceHalfWidth <= 0.15 Then
+                            ' Also look for similar 3+ spaced m/z values
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.666, intOriginalIndex,
                                                       scanList, udtFindSimilarIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
 
-                            ' Look for similar 1+ spaced m/z values
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 1, intOriginalIndex,
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.333, intOriginalIndex,
                                                       scanList, udtFindSimilarIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
 
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -1, intOriginalIndex,
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.333, intOriginalIndex,
                                                       scanList, udtFindSimilarIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
 
-                            ' Look for similar 2+ spaced m/z values
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.5, intOriginalIndex,
+                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.666, intOriginalIndex,
                                                       scanList, udtFindSimilarIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
-
-                            FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.5, intOriginalIndex,
-                                                      scanList, udtFindSimilarIonsData,
-                                                      masicOptions, dataImportUtilities, objSearchRange)
-
-                            Dim parentIonToleranceDa = GetParentIonToleranceDa(masicOptions.SICOptions, dblCurrentMZ)
-
-                            If parentIonToleranceDa <= 0.25 AndAlso masicOptions.SICOptions.SimilarIonMZToleranceHalfWidth <= 0.15 Then
-                                ' Also look for similar 3+ spaced m/z values
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.666, intOriginalIndex,
-                                                          scanList, udtFindSimilarIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange)
-
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, 0.333, intOriginalIndex,
-                                                          scanList, udtFindSimilarIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange)
-
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.333, intOriginalIndex,
-                                                          scanList, udtFindSimilarIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange)
-
-                                FindSimilarParentIonsWork(objSpectraCache, dblCurrentMZ, -0.666, intOriginalIndex,
-                                                          scanList, udtFindSimilarIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange)
-                            End If
-
                         End If
+
+
                     Loop While udtFindSimilarIonsData.IonInUseCount > intIonInUseCountOriginal
 
                     intParentIonIndex += 1
@@ -851,11 +834,8 @@ Public Class clsParentIonProcessing
       ByRef udtFindSimilarIonsData As udtFindSimilarIonsDataType,
       masicOptions As clsMASICOptions,
       dataImportUtilities As DataInput.clsDataImport,
-      ByRef objSearchRange As clsSearchRange)
+      objSearchRange As clsSearchRange)
 
-        Dim intMatchIndex As Integer
-        Dim intMatchOriginalIndex As Integer
-        Dim sngTimeDiff As Single
         Dim intIndexFirst As Integer
         Dim intIndexLast As Integer
 
@@ -866,46 +846,49 @@ Public Class clsParentIonProcessing
 
             For intMatchIndex = intIndexFirst To intIndexLast
                 ' See if the matches are unused and within the scan tolerance
-                intMatchOriginalIndex = udtFindSimilarIonsData.MZPointerArray(intMatchIndex)
+                Dim intMatchOriginalIndex = udtFindSimilarIonsData.MZPointerArray(intMatchIndex)
 
-                If Not udtFindSimilarIonsData.IonUsed(intMatchOriginalIndex) Then
-                    With scanList.ParentIons(intMatchOriginalIndex)
+                If udtFindSimilarIonsData.IonUsed(intMatchOriginalIndex) Then Continue For
 
-                        If .SICStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
-                            If scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
-                              udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
-                                ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                                sngTimeDiff = CSng(Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
-                            Else
-                                sngTimeDiff = Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
-                            End If
+                Dim sngTimeDiff As Single
+
+                With scanList.ParentIons(intMatchOriginalIndex)
+
+                    If .SICStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
+                        If scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
+                           udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
+                            ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
+                            sngTimeDiff = CSng(Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
                         Else
-                            If scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
-                              udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
-                                ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                                sngTimeDiff = CSng(Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
-                            Else
-                                sngTimeDiff = Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
-                            End If
+                            sngTimeDiff = Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
                         End If
-
-                        If sngTimeDiff <= sicOptions.SimilarIonToleranceHalfWidthMinutes Then
-                            ' Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
-
-                            Dim similarityScore = CompareFragSpectraForParentIons(scanList, objSpectraCache, intOriginalIndex, intMatchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities)
-
-                            If similarityScore > sicOptions.SpectrumSimilarityMinimum Then
-                                ' Yes, the spectra are similar
-                                ' Add this parent ion to udtUniqueMZList(intUniqueMZListCount - 1)
-                                With udtFindSimilarIonsData
-                                    AppendParentIonToUniqueMZEntry(scanList, intMatchOriginalIndex, .UniqueMZList(.UniqueMZListCount - 1), dblSearchMZOffset)
-                                End With
-                                udtFindSimilarIonsData.IonUsed(intMatchOriginalIndex) = True
-                                udtFindSimilarIonsData.IonInUseCount += 1
-                            End If
+                    Else
+                        If scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
+                           udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
+                            ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
+                            sngTimeDiff = CSng(Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
+                        Else
+                            sngTimeDiff = Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
                         End If
-                    End With
-                End If
+                    End If
+
+                    If sngTimeDiff <= sicOptions.SimilarIonToleranceHalfWidthMinutes Then
+                        ' Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
+
+                        Dim similarityScore = CompareFragSpectraForParentIons(scanList, objSpectraCache, intOriginalIndex, intMatchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities)
+
+                        If similarityScore > sicOptions.SpectrumSimilarityMinimum Then
+                            ' Yes, the spectra are similar
+                            ' Add this parent ion to udtUniqueMZList(intUniqueMZListCount - 1)
+                            With udtFindSimilarIonsData
+                                AppendParentIonToUniqueMZEntry(scanList, intMatchOriginalIndex, .UniqueMZList(.UniqueMZListCount - 1), dblSearchMZOffset)
+                            End With
+                            udtFindSimilarIonsData.IonUsed(intMatchOriginalIndex) = True
+                            udtFindSimilarIonsData.IonInUseCount += 1
+                        End If
+                    End If
+                End With
+
             Next intMatchIndex
         End If
 

@@ -70,10 +70,6 @@ Namespace DataOutput
 
             Dim strFilePathToCheck As String
 
-            Dim objXMLDoc As Xml.XmlDocument
-            Dim objMatchingNodeList As Xml.XmlNodeList
-            Dim objValueNode As Xml.XmlNode
-
             Dim sicOptionsCompare = New clsSICOptions()
             Dim binningOptionsCompare = New clsBinningOptions
 
@@ -107,7 +103,7 @@ Namespace DataOutput
                     End If
 
                     ' Open the XML file and look for the "ProcessingComplete" node
-                    objXMLDoc = New Xml.XmlDocument
+                    Dim objXMLDoc = New Xml.XmlDocument
                     Try
                         objXMLDoc.Load(strFilePathToCheck)
                     Catch ex As Exception
@@ -120,7 +116,7 @@ Namespace DataOutput
 
                     If objRootElement.Name = "SICData" Then
                         ' See if the ProcessingComplete node has a value of True
-                        objMatchingNodeList = objRootElement.GetElementsByTagName("ProcessingComplete")
+                        Dim objMatchingNodeList = objRootElement.GetElementsByTagName("ProcessingComplete")
                         If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
                         If objMatchingNodeList.Item(0).InnerText.ToLower <> "true" Then Exit Try
 
@@ -128,7 +124,7 @@ Namespace DataOutput
                         objMatchingNodeList = objRootElement.GetElementsByTagName("ProcessingSummary")
                         If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
 
-                        For Each objValueNode In objMatchingNodeList(0).ChildNodes
+                        For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
                             With sicOptionsCompare
                                 Select Case objValueNode.Name
                                     Case "DatasetNumber" : .DatasetNumber = CInt(objValueNode.InnerText)
@@ -159,7 +155,7 @@ Namespace DataOutput
                         ' Check if the source file stats match
                         Dim ioFileInfo As New FileInfo(strInputFilePathFull)
                         dtSourceFileDateTime = ioFileInfo.LastWriteTime()
-                        If strSourceFileDateTimeCheck <> (dtSourceFileDateTime.ToShortDateString & " " & dtSourceFileDateTime.ToShortTimeString) Then Exit Try
+                        If strSourceFileDateTimeCheck <> (dtSourceFileDateTime.ToShortDateString() & " " & dtSourceFileDateTime.ToShortTimeString()) Then Exit Try
                         If lngSourceFileSizeBytes <> ioFileInfo.Length Then Exit Try
 
                         ' Check that blnSkipMSMSProcessing matches
@@ -169,7 +165,7 @@ Namespace DataOutput
                         objMatchingNodeList = objRootElement.GetElementsByTagName("ProcessingOptions")
                         If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
 
-                        For Each objValueNode In objMatchingNodeList(0).ChildNodes
+                        For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
                             With sicOptionsCompare
                                 Select Case objValueNode.Name
                                     Case "SICToleranceDa" : .SICTolerance = CDbl(objValueNode.InnerText)            ' Legacy name
@@ -237,7 +233,7 @@ Namespace DataOutput
                         objMatchingNodeList = objRootElement.GetElementsByTagName("BinningOptions")
                         If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
 
-                        For Each objValueNode In objMatchingNodeList(0).ChildNodes
+                        For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
                             With binningOptionsCompare
                                 Select Case objValueNode.Name
                                     Case "BinStartX" : .StartX = CSng(objValueNode.InnerText)
@@ -260,7 +256,7 @@ Namespace DataOutput
                         If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then
                             ' Custom values not defined; that's OK
                         Else
-                            For Each objValueNode In objMatchingNodeList(0).ChildNodes
+                            For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
                                 With customSICListCompare
                                     Select Case objValueNode.Name
                                         Case "MZList" : .RawTextMZList = objValueNode.InnerText
@@ -463,35 +459,30 @@ Namespace DataOutput
           scanTracking As clsScanTracking,
           datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType) As Boolean
 
-            Dim blnSuccess As Boolean
-
-            Dim strDatasetName As String
-            Dim strDatasetInfoFilePath As String
-
-            Dim objDatasetStatsSummarizer As clsDatasetStatsSummarizer
             Dim udtSampleInfo = New clsDatasetStatsSummarizer.udtSampleInfoType
             udtSampleInfo.Clear()
 
             Try
-                strDatasetName = Path.GetFileNameWithoutExtension(strInputFileName)
-                strDatasetInfoFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DatasetInfoFile)
+                Dim strDatasetName = Path.GetFileNameWithoutExtension(strInputFileName)
+                Dim strDatasetInfoFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DatasetInfoFile)
 
-                objDatasetStatsSummarizer = New clsDatasetStatsSummarizer
+                Dim objDatasetStatsSummarizer = New clsDatasetStatsSummarizer()
 
-                blnSuccess = objDatasetStatsSummarizer.CreateDatasetInfoFile(
+                Dim blnSuccess = objDatasetStatsSummarizer.CreateDatasetInfoFile(
                   strDatasetName, strDatasetInfoFilePath,
                   scanTracking.ScanStats, datasetFileInfo, udtSampleInfo)
 
-                If Not blnSuccess Then
-                    ReportError("Error calling objDatasetStatsSummarizer.CreateDatasetInfoFile", objDatasetStatsSummarizer.ErrorMessage, New Exception("Error calling objDatasetStatsSummarizer.CreateDatasetInfoFile: " & objDatasetStatsSummarizer.ErrorMessage), True, False)
+                If blnSuccess Then
+                    Return True
                 End If
+
+                ReportError("Error calling objDatasetStatsSummarizer.CreateDatasetInfoFile", objDatasetStatsSummarizer.ErrorMessage,
+                            New Exception("Error calling objDatasetStatsSummarizer.CreateDatasetInfoFile: " & objDatasetStatsSummarizer.ErrorMessage), True, False)
 
             Catch ex As Exception
                 ReportError("CreateDatasetInfoFile", "Error creating dataset info file", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
-                blnSuccess = False
+                Return False
             End Try
-
-            Return blnSuccess
 
         End Function
 
@@ -604,36 +595,32 @@ Namespace DataOutput
           strInputFileName As String,
           strOutputFolderPath As String) As Boolean
 
-
-            Dim srOutFile As StreamWriter
-
-            Dim strHeaders As String
             Dim strOutputFilePath = "?undefinedfile?"
 
             Try
                 strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.HeaderGlossary)
                 ReportMessage("Saving Header Glossary to " & Path.GetFileName(strOutputFilePath))
 
-                srOutFile = New StreamWriter(strOutputFilePath, False)
+                Using srOutFile = New StreamWriter(strOutputFilePath, False)
 
-                ' ScanStats
-                srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) & ":")
-                srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsFlatFile))
-                srOutFile.WriteLine()
+                    ' ScanStats
+                    srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) & ":")
+                    srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsFlatFile))
+                    srOutFile.WriteLine()
 
-                ' SICStats
-                srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.SICStatsFlatFile) & ":")
-                srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile))
-                srOutFile.WriteLine()
+                    ' SICStats
+                    srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.SICStatsFlatFile) & ":")
+                    srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile))
+                    srOutFile.WriteLine()
 
-                ' ScanStatsExtended
-                strHeaders = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
-                If Not strHeaders Is Nothing AndAlso strHeaders.Length > 0 Then
-                    srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) & ":")
-                    srOutFile.WriteLine(strHeaders)
-                End If
+                    ' ScanStatsExtended
+                    Dim strHeaders = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
+                    If Not String.IsNullOrWhiteSpace(strHeaders) Then
+                        srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) & ":")
+                        srOutFile.WriteLine(strHeaders)
+                    End If
 
-                srOutFile.Close()
+                End Using
 
             Catch ex As Exception
                 ReportError("SaveHeaderGlossary", "Error writing the Header Glossary to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)

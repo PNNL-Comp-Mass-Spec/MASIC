@@ -25,30 +25,15 @@ Namespace DataInput
             ' Returns True if Success, False if failure
             ' Note: This function assumes strFilePath exists
 
-            Dim ioFileInfo As FileInfo
-            Dim strInputFileFullPath As String
-
-            Dim intScanCount As Integer
-            Dim intLastNonZoomSurveyScanIndex As Integer
-
-            Dim intScanStart As Integer
-            Dim intScanEnd As Integer
-            Dim intScanNumber As Integer
-
-            Dim blnSuccess As Boolean
-
-            Dim strIOMode As String
-            Dim dtLastLogTime As DateTime
-
             ' Use Xraw to read the .Raw files
             Dim xcaliburAccessor = New XRawFileIO()
             AddHandler xcaliburAccessor.ReportError, AddressOf mXcaliburAccessor_ReportError
             AddHandler xcaliburAccessor.ReportWarning, AddressOf mXcaliburAccessor_ReportWarning
 
-            strIOMode = "Xraw"
+            Dim strIOMode = "Xraw"
 
             ' Assume success for now
-            blnSuccess = True
+            Dim blnSuccess = True
 
             Try
                 Console.Write("Reading Xcalibur data file ")
@@ -57,8 +42,8 @@ Namespace DataInput
                 UpdateProgress(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(strFilePath))
 
                 ' Obtain the full path to the file
-                ioFileInfo = New FileInfo(strFilePath)
-                strInputFileFullPath = ioFileInfo.FullName
+                Dim ioFileInfo = New FileInfo(strFilePath)
+                Dim strInputFileFullPath = ioFileInfo.FullName
 
                 xcaliburAccessor.LoadMSMethodInfo = mOptions.WriteMSMethodFile
                 xcaliburAccessor.LoadMSTuneInfo = mOptions.WriteMSTuneFile
@@ -94,118 +79,116 @@ Namespace DataInput
                     metadataWriter.SaveMSTuneFile(xcaliburAccessor, dataOutputHandler)
                 End If
 
-                intScanCount = xcaliburAccessor.GetNumScans()
+                Dim intScanCount = xcaliburAccessor.GetNumScans()
 
                 If intScanCount <= 0 Then
                     ' No scans found
                     ReportError("ExtractScanInfoFromXcaliburDataFile", "No scans found in the input file: " & strFilePath)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
-                Else
-
-                    intScanStart = xcaliburAccessor.FileInfo.ScanStart
-                    intScanEnd = xcaliburAccessor.FileInfo.ScanEnd
-
-                    With sicOptions
-                        If .ScanRangeStart > 0 And .ScanRangeEnd = 0 Then
-                            .ScanRangeEnd = Integer.MaxValue
-                        End If
-
-                        If .ScanRangeStart >= 0 AndAlso .ScanRangeEnd > .ScanRangeStart Then
-                            intScanStart = Math.Max(intScanStart, .ScanRangeStart)
-                            intScanEnd = Math.Min(intScanEnd, .ScanRangeEnd)
-                        End If
-                    End With
-
-                    UpdateProgress("Reading Xcalibur data with " & strIOMode & " (" & intScanCount.ToString() & " scans)" & ControlChars.NewLine & Path.GetFileName(strFilePath))
-                    ReportMessage("Reading Xcalibur data with " & strIOMode & "; Total scan count: " & intScanCount.ToString())
-                    dtLastLogTime = DateTime.UtcNow
-
-                    ' Pre-reserve memory for the maximum number of scans that might be loaded
-                    ' Re-dimming after loading each scan is extremly slow and uses additional memory
-                    scanList.Initialize(intScanEnd - intScanStart + 1, intScanEnd - intScanStart + 1)
-                    intLastNonZoomSurveyScanIndex = -1
-
-                    Dim htSIMScanMapping = New Dictionary(Of String, Integer)
-                    scanList.SIMDataPresent = False
-                    scanList.MRMDataPresent = False
-
-                    For intScanNumber = intScanStart To intScanEnd
-
-                        Dim scanInfo As ThermoRawFileReader.clsScanInfo = Nothing
-
-                        blnSuccess = xcaliburAccessor.GetScanInfo(intScanNumber, scanInfo)
-
-                        If Not blnSuccess Then
-                            ' GetScanInfo returned false
-                            ReportWarning("ExtractScanInfoFromXcaliburDataFile",
-                                      "xcaliburAccessor.GetScanInfo returned false for scan " & intScanNumber.ToString() & "; aborting read")
-                            Exit For
-                        End If
-
-                        If mScanTracking.CheckScanInRange(intScanNumber, scanInfo.RetentionTime, sicOptions) Then
-
-                            If scanInfo.ParentIonMZ > 0 AndAlso Math.Abs(mOptions.ParentIonDecoyMassDa) > 0 Then
-                                scanInfo.ParentIonMZ += mOptions.ParentIonDecoyMassDa
-                            End If
-
-                            ' Determine if this was an MS/MS scan
-                            ' If yes, determine the scan number of the survey scan
-                            If scanInfo.MSLevel <= 1 Then
-                                ' Survey Scan
-                                blnSuccess = ExtractXcaliburSurveyScan(xcaliburAccessor,
-                               scanList, objSpectraCache, dataOutputHandler, sicOptions,
-                               blnKeepRawSpectra, scanInfo, htSIMScanMapping,
-                               intLastNonZoomSurveyScanIndex, intScanNumber)
-
-                            Else
-
-                                ' Fragmentation Scan
-                                blnSuccess = ExtractXcaliburFragmentationScan(xcaliburAccessor,
-                               scanList, objSpectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
-                               blnKeepRawSpectra, blnKeepMSMSSpectra, scanInfo,
-                               intLastNonZoomSurveyScanIndex, intScanNumber)
-
-                            End If
-
-                        End If
-
-                        If intScanCount > 0 Then
-                            If intScanNumber Mod 10 = 0 Then
-                                UpdateProgress(CShort(intScanNumber / intScanCount * 100))
-                            End If
-                        Else
-                            UpdateProgress(0)
-                        End If
-
-                        UpdateCacheStats(objSpectraCache)
-                        If mOptions.AbortProcessing Then
-                            scanList.ProcessingIncomplete = True
-                            Exit For
-                        End If
-
-                        If intScanNumber Mod 100 = 0 Then
-                            If DateTime.UtcNow.Subtract(dtLastLogTime).TotalSeconds >= 10 OrElse intScanNumber Mod 500 = 0 Then
-                                ReportMessage("Reading scan: " & intScanNumber.ToString())
-                                Console.Write(".")
-                                dtLastLogTime = DateTime.UtcNow
-                            End If
-
-                            ' Call the garbage collector every 100 spectra
-                            GC.Collect()
-                            GC.WaitForPendingFinalizers()
-                            Threading.Thread.Sleep(50)
-                        End If
-
-                    Next intScanNumber
-                    Console.WriteLine()
-
-                    ' Shrink the memory usage of the scanList arrays
-                    ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
-                    ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
-                    ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
-
                 End If
+
+                Dim intScanStart = xcaliburAccessor.FileInfo.ScanStart
+                Dim intScanEnd = xcaliburAccessor.FileInfo.ScanEnd
+
+                With sicOptions
+                    If .ScanRangeStart > 0 And .ScanRangeEnd = 0 Then
+                        .ScanRangeEnd = Integer.MaxValue
+                    End If
+
+                    If .ScanRangeStart >= 0 AndAlso .ScanRangeEnd > .ScanRangeStart Then
+                        intScanStart = Math.Max(intScanStart, .ScanRangeStart)
+                        intScanEnd = Math.Min(intScanEnd, .ScanRangeEnd)
+                    End If
+                End With
+
+                UpdateProgress("Reading Xcalibur data with " & strIOMode & " (" & intScanCount.ToString() & " scans)" & ControlChars.NewLine & Path.GetFileName(strFilePath))
+                ReportMessage("Reading Xcalibur data with " & strIOMode & "; Total scan count: " & intScanCount.ToString())
+                Dim dtLastLogTime = DateTime.UtcNow
+
+                ' Pre-reserve memory for the maximum number of scans that might be loaded
+                ' Re-dimming after loading each scan is extremly slow and uses additional memory
+                scanList.Initialize(intScanEnd - intScanStart + 1, intScanEnd - intScanStart + 1)
+                Dim intLastNonZoomSurveyScanIndex = -1
+
+                Dim htSIMScanMapping = New Dictionary(Of String, Integer)
+                scanList.SIMDataPresent = False
+                scanList.MRMDataPresent = False
+
+                For intScanNumber = intScanStart To intScanEnd
+
+                    Dim scanInfo As ThermoRawFileReader.clsScanInfo = Nothing
+
+                    blnSuccess = xcaliburAccessor.GetScanInfo(intScanNumber, scanInfo)
+
+                    If Not blnSuccess Then
+                        ' GetScanInfo returned false
+                        ReportWarning("ExtractScanInfoFromXcaliburDataFile",
+                                  "xcaliburAccessor.GetScanInfo returned false for scan " & intScanNumber.ToString() & "; aborting read")
+                        Exit For
+                    End If
+
+                    If mScanTracking.CheckScanInRange(intScanNumber, scanInfo.RetentionTime, sicOptions) Then
+
+                        If scanInfo.ParentIonMZ > 0 AndAlso Math.Abs(mOptions.ParentIonDecoyMassDa) > 0 Then
+                            scanInfo.ParentIonMZ += mOptions.ParentIonDecoyMassDa
+                        End If
+
+                        ' Determine if this was an MS/MS scan
+                        ' If yes, determine the scan number of the survey scan
+                        If scanInfo.MSLevel <= 1 Then
+                            ' Survey Scan
+                            blnSuccess = ExtractXcaliburSurveyScan(xcaliburAccessor,
+                           scanList, objSpectraCache, dataOutputHandler, sicOptions,
+                           blnKeepRawSpectra, scanInfo, htSIMScanMapping,
+                           intLastNonZoomSurveyScanIndex, intScanNumber)
+
+                        Else
+
+                            ' Fragmentation Scan
+                            blnSuccess = ExtractXcaliburFragmentationScan(xcaliburAccessor,
+                           scanList, objSpectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
+                           blnKeepRawSpectra, blnKeepMSMSSpectra, scanInfo,
+                           intLastNonZoomSurveyScanIndex, intScanNumber)
+
+                        End If
+
+                    End If
+
+                    If intScanCount > 0 Then
+                        If intScanNumber Mod 10 = 0 Then
+                            UpdateProgress(CShort(intScanNumber / intScanCount * 100))
+                        End If
+                    Else
+                        UpdateProgress(0)
+                    End If
+
+                    UpdateCacheStats(objSpectraCache)
+                    If mOptions.AbortProcessing Then
+                        scanList.ProcessingIncomplete = True
+                        Exit For
+                    End If
+
+                    If intScanNumber Mod 100 = 0 Then
+                        If DateTime.UtcNow.Subtract(dtLastLogTime).TotalSeconds >= 10 OrElse intScanNumber Mod 500 = 0 Then
+                            ReportMessage("Reading scan: " & intScanNumber.ToString())
+                            Console.Write(".")
+                            dtLastLogTime = DateTime.UtcNow
+                        End If
+
+                        ' Call the garbage collector every 100 spectra
+                        GC.Collect()
+                        GC.WaitForPendingFinalizers()
+                        Threading.Thread.Sleep(50)
+                    End If
+
+                Next intScanNumber
+                Console.WriteLine()
+
+                ' Shrink the memory usage of the scanList arrays
+                ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
+                ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
+                ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
 
             Catch ex As Exception
                 Console.WriteLine(ex.StackTrace)

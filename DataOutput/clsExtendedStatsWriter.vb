@@ -47,15 +47,12 @@ Namespace DataOutput
           ExtendedHeaderInfo As IReadOnlyDictionary(Of Integer, String),
           cColDelimiter As Char) As String
 
-            Dim strOutLine As String
-            Dim strValue As String = String.Empty
-
-            Dim intIndex As Integer
-
-            strOutLine = intDatasetID.ToString() & cColDelimiter & intScanNumber.ToString() & cColDelimiter
+            Dim strOutLine = intDatasetID.ToString() & cColDelimiter & intScanNumber.ToString() & cColDelimiter
 
             If Not ExtendedHeaderInfo Is Nothing AndAlso Not intNonConstantHeaderIDs Is Nothing Then
                 For intIndex = 0 To intNonConstantHeaderIDs.Length - 1
+
+                    Dim strValue As String = Nothing
                     If ExtendedHeaderInfo.TryGetValue(intNonConstantHeaderIDs(intIndex), strValue) Then
                         If clsUtilities.IsNumber(strValue) Then
                             If Math.Abs(Val(strValue)) < Single.Epsilon Then strValue = "0"

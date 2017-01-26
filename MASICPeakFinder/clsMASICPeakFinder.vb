@@ -258,17 +258,7 @@ Public Class clsMASICPeakFinder
         ' Use ComputeAverageNoiseLevelCheckCounts to determine whether both averages are used to determine
         '  the baseline noise level or whether just one of the averages is used
 
-        Dim intIndex As Integer
-        Dim intValidDataCountA As Integer
-        Dim intValidDataCountB As Integer
-
-        Dim dblSumA As Double
-        Dim dblSumB As Double
-        Dim sngMinimumPositiveValue As Single
-
-        Dim blnSuccess As Boolean
-
-        blnSuccess = False
+        Dim blnSuccess = False
 
         ' Examine the exclusion range.  If the exclusion range excludes all
         '  data to the left or right of the peak, then use a few data points anyway, even if this does include some of the peak
@@ -290,17 +280,17 @@ Public Class clsMASICPeakFinder
            intExclusionIndexEnd >= intExclusionIndexStart AndAlso intExclusionIndexEnd <= intIndexEnd _
            Then
 
-            sngMinimumPositiveValue = FindMinimumPositiveValue(intDatacount, sngData, 1)
+            Dim sngMinimumPositiveValue = FindMinimumPositiveValue(intDatacount, sngData, 1)
 
-            intValidDataCountA = 0
-            dblSumA = 0
+            Dim intValidDataCountA = 0
+            Dim dblSumA As Double = 0
             For intIndex = intIndexStart To intExclusionIndexStart
                 dblSumA += Math.Max(sngMinimumPositiveValue, sngData(intIndex))
                 intValidDataCountA += 1
             Next intIndex
 
-            intValidDataCountB = 0
-            dblSumB = 0
+            Dim intValidDataCountB = 0
+            Dim dblSumB As Double = 0
             For intIndex = intExclusionIndexEnd To intIndexEnd
                 dblSumB += Math.Max(sngMinimumPositiveValue, sngData(intIndex))
                 intValidDataCountB += 1
@@ -363,32 +353,21 @@ Public Class clsMASICPeakFinder
         ' Call ComputeDualTrimmedNoiseLevel for each segment
         ' Use a TTest to determine whether we need to define a custom noise threshold for each segment
 
-        Dim udtPrevSegmentStats As udtBaselineNoiseStatsType
-        Dim eConfidenceLevel As eTTestConfidenceLevelConstants
-
-        Dim intSegmentCountLocal As Integer
-        Dim intSegmentLength As Integer
-        Dim intSegmentIndex As Integer
-        Dim intSegmentIndexCopy As Integer
-
-        Dim dblTCalculated As Double
-        Dim blnSignificantDifference As Boolean
-
         Try
 
-            intSegmentCountLocal = baselineNoiseOptions.DualTrimmedMeanMaximumSegments
+            Dim intSegmentCountLocal = CInt(baselineNoiseOptions.DualTrimmedMeanMaximumSegments)
             If intSegmentCountLocal = 0 Then intSegmentCountLocal = 3
             If intSegmentCountLocal < 1 Then intSegmentCountLocal = 1
 
             ReDim udtBaselineNoiseStats(intSegmentCountLocal - 1)
 
             ' Initialize BaselineNoiseStats for each segment now, in case an error occurs
-            For intSegmentIndex = 0 To intSegmentCountLocal - 1
-                InitializeBaselineNoiseStats(udtBaselineNoiseStats(intSegmentIndex).BaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.DualTrimmedMeanByAbundance)
-            Next intSegmentIndex
+            For intIndex = 0 To intSegmentCountLocal - 1
+                InitializeBaselineNoiseStats(udtBaselineNoiseStats(intIndex).BaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+            Next
 
             ' Determine the segment length
-            intSegmentLength = CInt(Math.Round((intIndexEnd - intIndexStart) / intSegmentCountLocal, 0))
+            Dim intSegmentLength = CInt(Math.Round((intIndexEnd - intIndexStart) / intSegmentCountLocal, 0))
 
             ' Initialize the first segment
             udtBaselineNoiseStats(0).SegmentIndexStart = intIndexStart
@@ -399,27 +378,31 @@ Public Class clsMASICPeakFinder
             End If
 
             ' Initialize the remaining segments
-            For intSegmentIndex = 1 To intSegmentCountLocal - 1
-                udtBaselineNoiseStats(intSegmentIndex).SegmentIndexStart = udtBaselineNoiseStats(intSegmentIndex - 1).SegmentIndexEnd + 1
-                If intSegmentIndex = intSegmentCountLocal - 1 Then
-                    udtBaselineNoiseStats(intSegmentIndex).SegmentIndexEnd = intIndexEnd
+            For intIndex = 1 To intSegmentCountLocal - 1
+                udtBaselineNoiseStats(intIndex).SegmentIndexStart = udtBaselineNoiseStats(intIndex - 1).SegmentIndexEnd + 1
+                If intIndex = intSegmentCountLocal - 1 Then
+                    udtBaselineNoiseStats(intIndex).SegmentIndexEnd = intIndexEnd
                 Else
-                    udtBaselineNoiseStats(intSegmentIndex).SegmentIndexEnd = udtBaselineNoiseStats(intSegmentIndex).SegmentIndexStart + intSegmentLength - 1
+                    udtBaselineNoiseStats(intIndex).SegmentIndexEnd = udtBaselineNoiseStats(intIndex).SegmentIndexStart + intSegmentLength - 1
                 End If
-            Next intSegmentIndex
+            Next
 
             ' Call ComputeDualTrimmedNoiseLevel for each segment
-            For intSegmentIndex = 0 To intSegmentCountLocal - 1
-                With udtBaselineNoiseStats(intSegmentIndex)
+            For intIndex = 0 To intSegmentCountLocal - 1
+                With udtBaselineNoiseStats(intIndex)
                     ComputeDualTrimmedNoiseLevel(sngData, .SegmentIndexStart, .SegmentIndexEnd, baselineNoiseOptions, .BaselineNoiseStats)
                 End With
-            Next intSegmentIndex
+            Next
 
             ' Compare adjacent segments using a T-Test, starting with the final segment and working backward
-            eConfidenceLevel = eTTestConfidenceLevelConstants.Conf90Pct
-            intSegmentIndex = intSegmentCountLocal - 1
+            Dim eConfidenceLevel = eTTestConfidenceLevelConstants.Conf90Pct
+            Dim intSegmentIndex = intSegmentCountLocal - 1
+
             Do While intSegmentIndex > 0
-                udtPrevSegmentStats = udtBaselineNoiseStats(intSegmentIndex - 1).BaselineNoiseStats
+                Dim udtPrevSegmentStats = udtBaselineNoiseStats(intSegmentIndex - 1).BaselineNoiseStats
+                Dim blnSignificantDifference As Boolean
+                Dim dblTCalculated As Double
+
                 With udtBaselineNoiseStats(intSegmentIndex).BaselineNoiseStats
                     blnSignificantDifference = TestSignificanceUsingTTest(.NoiseLevel, udtPrevSegmentStats.NoiseLevel, .NoiseStDev, udtPrevSegmentStats.NoiseStDev, .PointsUsed, udtPrevSegmentStats.PointsUsed, eConfidenceLevel, dblTCalculated)
                 End With
@@ -463,23 +446,6 @@ Public Class clsMASICPeakFinder
         ' Note: Replaces values of 0 with the minimum positive value in sngData()
         ' Note: You cannot use sngData.Length to determine the length of the array; use intIndexStart and intIndexEnd to find the limits
 
-        Dim dblIntensityThresholdMin As Double
-        Dim dblIntensityThresholdMax As Double
-
-        Dim dblSum As Double
-        Dim dblAverage As Double
-        Dim dblVariance As Double
-
-        Dim intIndex As Integer
-
-        Dim intDataSortedCount As Integer
-        Dim sngDataSorted() As Single
-        Dim sngMinimumPositiveValue As Single
-
-        Dim intDataSortedIndexStart As Integer
-        Dim intDataSortedIndexEnd As Integer
-        Dim intDataUsedCount As Integer
-
         ' Initialize udtBaselineNoiseStats
         InitializeBaselineNoiseStats(udtBaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, eNoiseThresholdModes.DualTrimmedMeanByAbundance)
 
@@ -488,7 +454,8 @@ Public Class clsMASICPeakFinder
         End If
 
         ' Copy the data into sngDataSorted
-        intDataSortedCount = intIndexEnd - intIndexStart + 1
+        Dim intDataSortedCount = intIndexEnd - intIndexStart + 1
+        Dim sngDataSorted() As Single
         ReDim sngDataSorted(intDataSortedCount - 1)
 
         For intIndex = intIndexStart To intIndexEnd
@@ -499,19 +466,21 @@ Public Class clsMASICPeakFinder
         Array.Sort(sngDataSorted)
 
         ' Look for the minimum positive value and replace all data in sngDataSorted with that value
-        sngMinimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(intDataSortedCount, sngDataSorted)
+        Dim sngMinimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(intDataSortedCount, sngDataSorted)
 
         ' Initialize the indices to use in sngDataSorted()
-        intDataSortedIndexStart = 0
-        intDataSortedIndexEnd = intDataSortedCount - 1
+        Dim intDataSortedIndexStart = 0
+        Dim intDataSortedIndexEnd = intDataSortedCount - 1
 
         ' Compute the average using the data in sngDataSorted between intDataSortedIndexStart and intDataSortedIndexEnd (i.e. all the data)
-        dblSum = 0
+        Dim dblSum As Double = 0
         For intIndex = intDataSortedIndexStart To intDataSortedIndexEnd
             dblSum += sngDataSorted(intIndex)
         Next intIndex
-        intDataUsedCount = intDataSortedIndexEnd - intDataSortedIndexStart + 1
-        dblAverage = dblSum / intDataUsedCount
+
+        Dim intDataUsedCount = intDataSortedIndexEnd - intDataSortedIndexStart + 1
+        Dim dblAverage = dblSum / intDataUsedCount
+        Dim dblVariance As Double
 
         If intDataUsedCount > 1 Then
             ' Compute the variance (this is a sample variance, not a population variance)
@@ -529,26 +498,26 @@ Public Class clsMASICPeakFinder
         End If
 
         ' Note: Standard Deviation = sigma = SquareRoot(Variance)
-        dblIntensityThresholdMin = dblAverage - Math.Sqrt(dblVariance) * baselineNoiseOptions.DualTrimmedMeanStdDevLimits
-        dblIntensityThresholdMax = dblAverage + Math.Sqrt(dblVariance) * baselineNoiseOptions.DualTrimmedMeanStdDevLimits
+        Dim dblIntensityThresholdMin = dblAverage - Math.Sqrt(dblVariance) * baselineNoiseOptions.DualTrimmedMeanStdDevLimits
+        Dim dblIntensityThresholdMax = dblAverage + Math.Sqrt(dblVariance) * baselineNoiseOptions.DualTrimmedMeanStdDevLimits
 
         ' Recompute the average using only the data between dblIntensityThresholdMin and dblIntensityThresholdMax in sngDataSorted
         dblSum = 0
-        intIndex = intDataSortedIndexStart
-        Do While intIndex <= intDataSortedIndexEnd
-            If sngDataSorted(intIndex) >= dblIntensityThresholdMin Then
-                intDataSortedIndexStart = intIndex
-                Do While intIndex <= intDataSortedIndexEnd
-                    If sngDataSorted(intIndex) <= dblIntensityThresholdMax Then
-                        dblSum += sngDataSorted(intIndex)
+        Dim intSortedIndex = intDataSortedIndexStart
+        Do While intSortedIndex <= intDataSortedIndexEnd
+            If sngDataSorted(intSortedIndex) >= dblIntensityThresholdMin Then
+                intDataSortedIndexStart = intSortedIndex
+                Do While intSortedIndex <= intDataSortedIndexEnd
+                    If sngDataSorted(intSortedIndex) <= dblIntensityThresholdMax Then
+                        dblSum += sngDataSorted(intSortedIndex)
                     Else
-                        intDataSortedIndexEnd = intIndex - 1
+                        intDataSortedIndexEnd = intSortedIndex - 1
                         Exit Do
                     End If
-                    intIndex += 1
+                    intSortedIndex += 1
                 Loop
             End If
-            intIndex += 1
+            intSortedIndex += 1
         Loop
         intDataUsedCount = intDataSortedIndexEnd - intDataSortedIndexStart + 1
 
@@ -579,7 +548,8 @@ Public Class clsMASICPeakFinder
         With udtBaselineNoiseStats
             If .NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso baselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
                 .NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel
-                .NoiseStDev = 0                             ' Set this to 0 since we have overridden .NoiseLevel
+                ' Set this to 0 since we have overridden .NoiseLevel
+                .NoiseStDev = 0
             End If
         End With
 
@@ -1841,7 +1811,7 @@ Public Class clsMASICPeakFinder
         Dim objPeakDetector As New clsPeakDetection
         Dim blnTestingMinimumPeakWidth As Boolean
 
-        Dim udtPeakData As udtFindPeaksDataType = New udtFindPeaksDataType
+        Dim udtPeakData = New udtFindPeaksDataType
         Dim udtPeakDataSaved As udtFindPeaksDataType
 
         Dim dblMaximumIntensity, dblAreaSignalToNoise As Double
@@ -2580,7 +2550,12 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Sub FindPotentialPeakArea(intSICDataCount As Integer, ByRef SICData() As Single, ByRef udtSICPotentialAreaStats As udtSICPotentialAreaStatsType, sicPeakFinderOptions As clsSICPeakFinderOptions)
+    Public Sub FindPotentialPeakArea(
+      intSICDataCount As Integer,
+      SICData() As Single,
+      <Out()> ByRef udtSICPotentialAreaStats As udtSICPotentialAreaStatsType,
+      sicPeakFinderOptions As clsSICPeakFinderOptions)
+
         ' This function computes the potential peak area for a given SIC 
         '  and stores in udtSICPotentialAreaStats.MinimumPotentialPeakArea
         ' However, the summed intensity is not used if the number of points >= .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
@@ -2656,6 +2631,7 @@ Public Class clsMASICPeakFinder
             dblMinimumPotentialPeakArea = 1
         End If
 
+        udtSICPotentialAreaStats = New udtSICPotentialAreaStatsType()
         With udtSICPotentialAreaStats
             .MinimumPotentialPeakArea = dblMinimumPotentialPeakArea
             .PeakCountBasisForMinimumPotentialArea = intPeakCountBasisForMinimumPotentialArea

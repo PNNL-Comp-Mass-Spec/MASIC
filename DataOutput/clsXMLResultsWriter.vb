@@ -296,10 +296,9 @@ Namespace DataOutput
         End Function
 
         Private Sub SaveDataToXMLEncodeArray(
-          ByRef objXMLOut As Xml.XmlTextWriter,
+          objXMLOut As Xml.XmlTextWriter,
           strElementName As String,
-          ByRef dataArray() As Byte)
-
+          dataArray() As Byte)
 
             Dim intPrecisionBits As Integer
             Dim strDataTypeName As String = String.Empty
@@ -317,10 +316,9 @@ Namespace DataOutput
         End Sub
 
         Private Sub SaveDataToXMLEncodeArray(
-          ByRef objXMLOut As Xml.XmlTextWriter,
+          objXMLOut As Xml.XmlTextWriter,
           strElementName As String,
-          ByRef dataArray() As Single)
-
+          dataArray() As Single)
 
             Dim intPrecisionBits As Integer
             Dim strDataTypeName As String = String.Empty
@@ -345,8 +343,7 @@ Namespace DataOutput
            processingTimeSec As Single) As Boolean
 
 
-            Dim objXMLOut As Xml.XmlTextWriter
-            objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
+            Dim objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
             If objXMLOut Is Nothing Then Return False
 
             Try
@@ -390,23 +387,14 @@ Namespace DataOutput
           sicOptions As clsSICOptions,
           binningOptions As clsBinningOptions) As Boolean
 
-
-            Dim strXMLOutputFilePath As String = String.Empty
-
-            Dim ioFileInfo As FileInfo
-
-            Dim LastModTime As Date
-            Dim strLastModTime As String
-            Dim strFileSizeBytes As String
-
-            Dim objXMLOut As Xml.XmlTextWriter
+            Dim strXMLOutputFilePath = String.Empty
 
             Try
 
                 strXMLOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
 
                 dataOutputHandler.OutputFileHandles.XMLFileForSICs = New Xml.XmlTextWriter(strXMLOutputFilePath, Text.Encoding.UTF8)
-                objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
+                Dim objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
 
                 With objXMLOut
                     .Formatting = Xml.Formatting.Indented
@@ -420,11 +408,14 @@ Namespace DataOutput
                 objXMLOut.WriteElementString("DatasetNumber", sicOptions.DatasetNumber.ToString())
                 objXMLOut.WriteElementString("SourceFilePath", strInputFilePathFull)
 
+                Dim strLastModTime As String
+                Dim strFileSizeBytes As String
+
                 Try
-                    ioFileInfo = New FileInfo(strInputFilePathFull)
-                    LastModTime = ioFileInfo.LastWriteTime()
-                    strLastModTime = LastModTime.ToShortDateString & " " & LastModTime.ToShortTimeString
-                    strFileSizeBytes = ioFileInfo.Length.ToString
+                    Dim ioFileInfo = New FileInfo(strInputFilePathFull)
+                    Dim dtLastModTime = ioFileInfo.LastWriteTime()
+                    strLastModTime = dtLastModTime.ToShortDateString() & " " & dtLastModTime.ToShortTimeString()
+                    strFileSizeBytes = ioFileInfo.Length.ToString()
                 Catch ex As Exception
                     strLastModTime = String.Empty
                     strFileSizeBytes = "0"
@@ -433,7 +424,7 @@ Namespace DataOutput
                 objXMLOut.WriteElementString("SourceFileDateTime", strLastModTime)
                 objXMLOut.WriteElementString("SourceFileSizeBytes", strFileSizeBytes)
 
-                objXMLOut.WriteElementString("MASICProcessingDate", DateTime.Now.ToShortDateString & " " & DateTime.Now.ToLongTimeString)
+                objXMLOut.WriteElementString("MASICProcessingDate", DateTime.Now.ToShortDateString() & " " & DateTime.Now.ToLongTimeString())
                 objXMLOut.WriteElementString("MASICVersion", mOptions.MASICVersion)
                 objXMLOut.WriteElementString("MASICPeakFinderDllVersion", mOptions.PeakFinderVersion)
                 objXMLOut.WriteElementString("ScanCountTotal", scanList.MasterScanOrderCount.ToString())
@@ -610,20 +601,9 @@ Namespace DataOutput
             Const OPTIMAL_PEAK_APEX_TAG_NAME = "OptimalPeakApexScanNumber"
             Const PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME = "PeakApexOverrideParentIonIndex"
 
-            Dim strXMLReadFilePath As String
-            Dim strXMLOutputFilePath As String
+            Dim strXMLReadFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
 
-            Dim strLineIn As String
-            Dim strLineInTrimmedAndLower As String
-            Dim strWork As String
-
-            Dim intCharIndex As Integer
-            Dim intParentIonIndex As Integer
-            Dim intParentIonsProcessed As Integer
-
-            strXMLReadFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
-
-            strXMLOutputFilePath = Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
+            Dim strXMLOutputFilePath = Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
 
             Try
                 ' Wait 2 seconds before reopening the file, to make sure the handle is closed
@@ -639,56 +619,57 @@ Namespace DataOutput
 
                     UpdateProgress(0, "Updating XML file with optimal peak apex values")
 
-                    intParentIonIndex = -1
-                    intParentIonsProcessed = 0
+                    Dim intParentIonIndex = -1
+                    Dim intParentIonsProcessed = 0
                     Do While Not srInFile.EndOfStream
-                        strLineIn = srInFile.ReadLine()
-                        If Not strLineIn Is Nothing Then
-                            strLineInTrimmedAndLower = strLineIn.Trim.ToLower
+                        Dim strLineIn = srInFile.ReadLine()
+                        If strLineIn Is Nothing Then Continue Do
 
-                            If strLineInTrimmedAndLower.StartsWith(PARENT_ION_TAG_START_LCASE) Then
-                                intCharIndex = strLineInTrimmedAndLower.IndexOf(INDEX_ATTRIBUTE_LCASE, StringComparison.CurrentCultureIgnoreCase)
+                        Dim strLineInTrimmedAndLower = strLineIn.Trim.ToLower()
+
+                        If strLineInTrimmedAndLower.StartsWith(PARENT_ION_TAG_START_LCASE) Then
+                            Dim intCharIndex = strLineInTrimmedAndLower.IndexOf(INDEX_ATTRIBUTE_LCASE, StringComparison.CurrentCultureIgnoreCase)
+                            If intCharIndex > 0 Then
+                                Dim strWork = strLineInTrimmedAndLower.Substring(intCharIndex + INDEX_ATTRIBUTE_LCASE.Length + 1)
+                                intCharIndex = strWork.IndexOf(ControlChars.Quote)
                                 If intCharIndex > 0 Then
-                                    strWork = strLineInTrimmedAndLower.Substring(intCharIndex + INDEX_ATTRIBUTE_LCASE.Length + 1)
-                                    intCharIndex = strWork.IndexOf(ControlChars.Quote)
-                                    If intCharIndex > 0 Then
-                                        strWork = strWork.Substring(0, intCharIndex)
-                                        If clsUtilities.IsNumber(strWork) Then
-                                            intParentIonIndex = CInt(strWork)
-                                            intParentIonsProcessed += 1
+                                    strWork = strWork.Substring(0, intCharIndex)
+                                    If clsUtilities.IsNumber(strWork) Then
+                                        intParentIonIndex = CInt(strWork)
+                                        intParentIonsProcessed += 1
 
-                                            ' Update progress
-                                            If scanList.ParentIonInfoCount > 1 Then
-                                                If intParentIonsProcessed Mod 100 = 0 Then
-                                                    UpdateProgress(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
-                                                End If
-                                            Else
-                                                UpdateProgress(0)
+                                        ' Update progress
+                                        If scanList.ParentIonInfoCount > 1 Then
+                                            If intParentIonsProcessed Mod 100 = 0 Then
+                                                UpdateProgress(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
                                             End If
-
-                                            If mOptions.AbortProcessing Then
-                                                scanList.ProcessingIncomplete = True
-                                                Exit Do
-                                            End If
-
+                                        Else
+                                            UpdateProgress(0)
                                         End If
+
+                                        If mOptions.AbortProcessing Then
+                                            scanList.ProcessingIncomplete = True
+                                            Exit Do
+                                        End If
+
                                     End If
                                 End If
-
-                                srOutFile.WriteLine(strLineIn)
-
-                            ElseIf strLineInTrimmedAndLower.StartsWith("<" & OPTIMAL_PEAK_APEX_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
-                                If intParentIonIndex < scanList.ParentIonInfoCount Then
-                                    XmlOutputFileReplaceSetting(srOutFile, strLineIn, OPTIMAL_PEAK_APEX_TAG_NAME, scanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber)
-                                End If
-                            ElseIf strLineInTrimmedAndLower.StartsWith("<" & PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
-                                If intParentIonIndex < scanList.ParentIonInfoCount Then
-                                    XmlOutputFileReplaceSetting(srOutFile, strLineIn, PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME, scanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex)
-                                End If
-                            Else
-                                srOutFile.WriteLine(strLineIn)
                             End If
+
+                            srOutFile.WriteLine(strLineIn)
+
+                        ElseIf strLineInTrimmedAndLower.StartsWith("<" & OPTIMAL_PEAK_APEX_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
+                            If intParentIonIndex < scanList.ParentIonInfoCount Then
+                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, OPTIMAL_PEAK_APEX_TAG_NAME, scanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber)
+                            End If
+                        ElseIf strLineInTrimmedAndLower.StartsWith("<" & PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
+                            If intParentIonIndex < scanList.ParentIonInfoCount Then
+                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME, scanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex)
+                            End If
+                        Else
+                            srOutFile.WriteLine(strLineIn)
                         End If
+
                     Loop
 
                 End Using

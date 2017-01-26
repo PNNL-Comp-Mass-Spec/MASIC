@@ -159,8 +159,7 @@ Public Class clsSpectraCache
 
     Public Function AddSpectrumToPool(
        objMSSpectrum As clsMSSpectrum,
-       intScanNumber As Integer,
-       ByRef intTargetPoolIndex As Integer) As Boolean
+       intScanNumber As Integer) As Boolean
 
         ' Adds objMSSpectrum to the spectrum pool
         ' Returns the index of the spectrum in the pool in intTargetPoolIndex
@@ -168,6 +167,8 @@ Public Class clsSpectraCache
         Dim blnSuccess As Boolean
 
         Try
+            Dim intTargetPoolIndex As Integer
+
             If mSpectrumIndexInPool.Contains(intScanNumber) Then
                 ' Replace the spectrum data with objMSSpectrum
                 intTargetPoolIndex = CInt(mSpectrumIndexInPool(intScanNumber))
@@ -333,30 +334,20 @@ Public Class clsSpectraCache
         ' Looks for and deletes the spectrum cache files created by this instance of MASIC
         ' Additionally, looks for and deletes spectrum cache files with modification dates more than SPECTRUM_CACHE_MAX_FILE_AGE_HOURS from the present
 
-        Dim dtFileDateTolerance As DateTime
-        Dim strFilePathMatch As String
-        Dim intCharIndex As Integer
-        Dim intIndex As Integer
-
-        Dim strFiles() As String
-
-        Dim objFolder As DirectoryInfo
-        Dim objFile As FileInfo
-
-        dtFileDateTolerance = DateTime.UtcNow.Subtract(New TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0))
+        Dim dtFileDateTolerance = DateTime.UtcNow.Subtract(New TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0))
 
         Try
             ' Delete the cached files for this instance of clsMasic
-            strFilePathMatch = ConstructCachedSpectrumPath()
+            Dim strFilePathMatch = ConstructCachedSpectrumPath()
 
-            intCharIndex = strFilePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal)
+            Dim intCharIndex = strFilePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal)
             If intCharIndex < 0 Then
                 ReportError("DeleteSpectrumCacheFiles", "intCharIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles")
                 Return
             End If
 
             strFilePathMatch = strFilePathMatch.Substring(0, intCharIndex)
-            strFiles = Directory.GetFiles(mCacheOptions.FolderPath, Path.GetFileName(strFilePathMatch) & "*")
+            Dim strFiles = Directory.GetFiles(mCacheOptions.FolderPath, Path.GetFileName(strFilePathMatch) & "*")
 
             For intIndex = 0 To strFiles.Length - 1
                 File.Delete(strFiles(intIndex))
@@ -369,9 +360,9 @@ Public Class clsSpectraCache
 
         ' Now look for old spectrum cache files
         Try
-            strFilePathMatch = SPECTRUM_CACHE_FILE_PREFIX & "*" & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & "*"
+            Dim strFilePathMatch = SPECTRUM_CACHE_FILE_PREFIX & "*" & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & "*"
 
-            objFolder = New DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())))
+            Dim objFolder = New DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())))
 
             If Not objFolder Is Nothing Then
                 For Each objFile In objFolder.GetFiles(strFilePathMatch)
@@ -509,25 +500,17 @@ Public Class clsSpectraCache
     Private Function UnCacheSpectrum(intScanNumber As Integer, <Out()> ByRef intTargetPoolIndex As Integer) As Boolean
 
         Dim blnSuccess As Boolean
-        Dim blnReturnBlankSpectrum As Boolean
-
-        Dim intIndex As Integer
-        Dim intIonCount As Integer
-        Dim intScanNumberInCacheFile As Integer
-
-        Dim lngByteOffset As Int64
-
         intTargetPoolIndex = GetNextAvailablePoolIndex()
 
         ' Uncache the spectrum from disk
-        blnReturnBlankSpectrum = False
+        Dim blnReturnBlankSpectrum = False
 
         ' All of the spectra are stored in one large file
         If ValidatePageFileIO(False) Then
             ' Lookup the byte offset for the given spectrum 
 
             If mSpectrumByteOffset.Contains(intScanNumber) Then
-                lngByteOffset = CType(mSpectrumByteOffset.Item(intScanNumber), Long)
+                Dim lngByteOffset As Int64 = CType(mSpectrumByteOffset.Item(intScanNumber), Long)
 
                 ' Make sure all previous spectra are flushed to disk
                 mPageFileWriter.Flush()
@@ -535,8 +518,8 @@ Public Class clsSpectraCache
                 ' Read the spectrum from the page file
                 mPageFileReader.BaseStream.Seek(lngByteOffset, SeekOrigin.Begin)
 
-                intScanNumberInCacheFile = mPageFileReader.ReadInt32()
-                intIonCount = mPageFileReader.ReadInt32()
+                Dim intScanNumberInCacheFile = mPageFileReader.ReadInt32()
+                Dim intIonCount = mPageFileReader.ReadInt32()
                 ValidateMemoryAllocation(SpectraPool(intTargetPoolIndex), intIonCount)
 
                 With SpectraPool(intTargetPoolIndex)
@@ -580,7 +563,9 @@ Public Class clsSpectraCache
             blnSuccess = True
         End If
 
-        If Not blnSuccess Then Return False
+        If Not blnSuccess Then
+            Return False
+        End If
 
         SpectraPoolInfo(intTargetPoolIndex).CacheState = eCacheStateConstants.LoadedFromCache
 
@@ -595,18 +580,6 @@ Public Class clsSpectraCache
         Return True
 
     End Function
-
-    ''Private Function UpdatePoolAccessHistory(intScanNumber As Integer) As Boolean
-    ''    ' Returns True if the scan is present in mPoolAccessHistory, otherwise, returns false
-
-    ''    If mPoolAccessHistory.Contains(intScanNumber) Then
-    ''        mAccessIterator += 1
-    ''        mPoolAccessHistory.Item(intScanNumber) = mAccessIterator
-    ''        Return True
-    ''    Else
-    ''        Return False
-    ''    End If
-    ''End Function
 
     Private Function ValidateCachedSpectrumFolder() As Boolean
 
@@ -668,49 +641,44 @@ Public Class clsSpectraCache
         ' Validates that we can read and write from a Page file
         ' Opens the page file reader and writer if not yet opened
 
-        Dim blnValid As Boolean
-
-        If mPageFileReader Is Nothing Then
-            If blnCreateIfUninitialized Then
-                Dim strCacheFilePath As String
-                Dim fsWrite As FileStream
-                Dim fsRead As FileStream
-
-                Try
-                    ' Construct the page file path
-                    strCacheFilePath = ConstructCachedSpectrumPath()
-
-                    ' Initialize the binary writer and create the file
-                    fsWrite = New FileStream(strCacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)
-                    mPageFileWriter = New BinaryWriter(fsWrite)
-
-                    ' Write a header line
-                    mPageFileWriter.Write("MASIC Spectrum Cache Page File.  Created " & DateTime.Now.ToLongDateString() & " " & DateTime.Now.ToLongTimeString())
-
-                    ' Add 64 bytes of white space                    
-                    ' ReSharper disable once RedundantAssignment
-                    For intIndex = 0 To 63
-                        mPageFileWriter.Write(Byte.MinValue)
-                    Next intIndex
-                    mPageFileWriter.Flush()
-
-                    ' Initialize the binary reader
-                    fsRead = New FileStream(strCacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-                    mPageFileReader = New BinaryReader(fsRead)
-
-                    blnValid = True
-                Catch ex As Exception
-                    ReportError("ValidatePageFileIO", ex.Message, ex, True, True)
-                    blnValid = False
-                End Try
-            Else
-                blnValid = False
-            End If
-        Else
-            blnValid = True
+        If mPageFileReader IsNot Nothing Then
+            Return True
         End If
 
-        Return blnValid
+        If Not blnCreateIfUninitialized Then
+            Return False
+        End If
+
+        Try
+            ' Construct the page file path
+            Dim strCacheFilePath = ConstructCachedSpectrumPath()
+
+            ' Initialize the binary writer and create the file
+            Dim fsWrite = New FileStream(strCacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)
+            mPageFileWriter = New BinaryWriter(fsWrite)
+
+            ' Write a header line
+            mPageFileWriter.Write(
+                "MASIC Spectrum Cache Page File.  Created " & DateTime.Now.ToLongDateString() & " " &
+                DateTime.Now.ToLongTimeString())
+
+            ' Add 64 bytes of white space                    
+            ' ReSharper disable once RedundantAssignment
+            For intIndex = 0 To 63
+                mPageFileWriter.Write(Byte.MinValue)
+            Next intIndex
+            mPageFileWriter.Flush()
+
+            ' Initialize the binary reader
+            Dim fsRead = New FileStream(strCacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+            mPageFileReader = New BinaryReader(fsRead)
+
+            Return True
+
+        Catch ex As Exception
+            ReportError("ValidatePageFileIO", ex.Message, ex, True, True)
+            Return False
+        End Try
 
     End Function
 

@@ -406,15 +406,12 @@ Public Class frmMain
     End Sub
 
     Private Sub EnableDisableControls()
-        Dim blnCreateSICsAndRawData As Boolean
-        Dim blnExportRawDataOnly As Boolean
-        Dim blnMSMSProcessingEnabled As Boolean
 
         Dim blnRawExportEnabled As Boolean
 
-        blnCreateSICsAndRawData = Not chkSkipSICAndRawDataProcessing.Checked
-        blnMSMSProcessingEnabled = Not chkSkipMSMSProcessing.Checked
-        blnExportRawDataOnly = chkExportRawDataOnly.Checked And chkExportRawSpectraData.Checked
+        Dim blnCreateSICsAndRawData As Boolean = Not chkSkipSICAndRawDataProcessing.Checked
+        Dim blnMSMSProcessingEnabled As Boolean = Not chkSkipMSMSProcessing.Checked
+        Dim blnExportRawDataOnly As Boolean = chkExportRawDataOnly.Checked And chkExportRawSpectraData.Checked
 
         chkSkipMSMSProcessing.Enabled = blnCreateSICsAndRawData
         chkExportRawDataOnly.Enabled = blnCreateSICsAndRawData And chkExportRawSpectraData.Checked
@@ -843,141 +840,136 @@ Public Class frmMain
     End Sub
 
     Private Sub PasteCustomSICValues(blnClearList As Boolean)
-        Dim objData As Windows.Forms.IDataObject
-
-        Dim strData As String
-        Dim strLines() As String
-        Dim strColumns() As String
-
-        Dim dblMZ As Double
-        Dim sngScanOrAcqTime As Single
-        Dim strComment As String = String.Empty
-
-        Dim strMessage As String
-
-        Dim blnExistingRowFound As Boolean
-        Dim intRowsAlreadyPresent As Integer
-        Dim intRowsSkipped As Integer
-
-        Dim intLineIndex As Integer
 
         Dim LineDelimiters = New Char() {ControlChars.Cr, ControlChars.Lf}
         Dim ColumnDelimiters = New Char() {ControlChars.Tab, ","c}
 
-        Dim dblMZToleranceDa As Double
-        Dim sngScanOrAcqTimeTolerance As Single
+        ' Examine the clipboard contents
+        Dim objData = Clipboard.GetDataObject()
+
+        If objData Is Nothing Then
+            Return
+        End If
+
+        If Not objData.GetDataPresent(Windows.Forms.DataFormats.StringFormat, True) Then
+            Return
+        End If
+
+        Dim strData = CType(objData.GetData(Windows.Forms.DataFormats.StringFormat, True), String)
+
+        ' Split strData on carriage return or line feed characters
+        ' Lines that end in CrLf will give two separate lines; one with with the text, and one blank; that's OK
+        Dim strLines = strData.Split(LineDelimiters, 50000)
+
+        If strLines.Length = 0 Then
+            Return
+        End If
 
         Dim dblDefaultMZTolerance As Double
         Dim sngDefaultScanOrAcqTimeTolerance As Single
 
-        ' Examine the clipboard contents
-        objData = Clipboard.GetDataObject()
+        GetCurrentCustomSICTolerances(dblDefaultMZTolerance, sngDefaultScanOrAcqTimeTolerance)
 
-        If Not objData Is Nothing Then
-            If objData.GetDataPresent(Windows.Forms.DataFormats.StringFormat, True) Then
-                strData = CType(objData.GetData(Windows.Forms.DataFormats.StringFormat, True), String)
+        If blnClearList Then
+            If Not ClearCustomSICList(True) Then Return
+        End If
 
-                ' Split strData on carriage return or line feed characters
-                ' Lines that end in CrLf will give two separate lines; one with with the text, and one blank; that's OK
-                strLines = strData.Split(LineDelimiters, 50000)
+        Dim intRowsAlreadyPresent = 0
+        Dim intRowsSkipped = 0
 
-                If strLines.Length > 0 Then
-                    GetCurrentCustomSICTolerances(dblDefaultMZTolerance, sngDefaultScanOrAcqTimeTolerance)
+        For Each dataLine In strLines
+            If String.IsNullOrWhiteSpace(dataLine) Then
+                Continue For
+            End If
 
-                    If blnClearList Then
-                        If Not ClearCustomSICList(True) Then Return
+            Dim strColumns = dataLine.Split(ColumnDelimiters, 5)
+            If strColumns.Length < 2 Then
+                intRowsSkipped += 1
+                Continue For
+            End If
+
+            Try
+                Dim dblMZ As Double = 0
+                Dim sngScanOrAcqTime As Single
+                Dim strComment As String = String.Empty
+                Dim dblMZToleranceDa = dblDefaultMZTolerance
+                Dim sngScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
+
+                If strColumns.Length = 2 Then
+                    ' Assume pasted data is m/z and scan
+                    dblMZ = Double.Parse(strColumns(0))
+                    sngScanOrAcqTime = Single.Parse(strColumns(1))
+
+                ElseIf strColumns.Length >= 3 AndAlso strColumns(2).Length > 0 AndAlso
+                    Not IsNumber(strColumns(2).Chars(0)) Then
+                    ' Assume pasted data is m/z, scan, and comment
+                    dblMZ = Double.Parse(strColumns(0))
+                    sngScanOrAcqTime = Single.Parse(strColumns(1))
+                    strComment = strColumns(2)
+
+                ElseIf strColumns.Length > 2 Then
+                    ' Assume pasted data is m/z, m/z tolerance, scan, scan tolerance, and comment
+                    dblMZ = Double.Parse(strColumns(0))
+                    dblMZToleranceDa = Double.Parse(strColumns(1))
+                    If Math.Abs(dblMZToleranceDa) < Single.Epsilon Then
+                        dblMZToleranceDa = dblDefaultMZTolerance
                     End If
 
-                    intRowsAlreadyPresent = 0
-                    intRowsSkipped = 0
+                    sngScanOrAcqTime = Single.Parse(strColumns(2))
 
-                    For intLineIndex = 0 To strLines.Length - 1
-                        If Not strLines(intLineIndex) Is Nothing AndAlso strLines(intLineIndex).Length > 0 Then
-                            strColumns = strLines(intLineIndex).Split(ColumnDelimiters, 5)
-                            If strColumns.Length >= 2 Then
-                                Try
-                                    dblMZ = 0
-                                    dblMZToleranceDa = dblDefaultMZTolerance
-                                    sngScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
-
-                                    If strColumns.Length = 2 Then
-                                        ' Assume pasted data is m/z and scan
-                                        dblMZ = Double.Parse(strColumns(0))
-                                        sngScanOrAcqTime = Single.Parse(strColumns(1))
-
-                                    ElseIf strColumns.Length >= 3 AndAlso strColumns(2).Length > 0 AndAlso Not SharedVBNetRoutines.VBNetRoutines.IsNumber(strColumns(2).Chars(0)) Then
-                                        ' Assume pasted data is m/z, scan, and comment
-                                        dblMZ = Double.Parse(strColumns(0))
-                                        sngScanOrAcqTime = Single.Parse(strColumns(1))
-                                        strComment = strColumns(2)
-
-                                    ElseIf strColumns.Length > 2 Then
-                                        ' Assume pasted data is m/z, m/z tolerance, scan, scan tolerance, and comment
-                                        dblMZ = Double.Parse(strColumns(0))
-                                        dblMZToleranceDa = Double.Parse(strColumns(1))
-                                        If Math.Abs(dblMZToleranceDa) < Single.Epsilon Then
-                                            dblMZToleranceDa = dblDefaultMZTolerance
-                                        End If
-
-                                        sngScanOrAcqTime = Single.Parse(strColumns(2))
-
-                                        If strColumns.Length >= 4 Then
-                                            sngScanOrAcqTimeTolerance = Single.Parse(strColumns(3))
-                                        Else
-                                            sngScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
-                                        End If
-
-                                        If strColumns.Length >= 5 Then
-                                            strComment = strColumns(4)
-                                        Else
-                                            strComment = String.Empty
-                                        End If
-
-                                    End If
-
-                                    If dblMZ > 0 Then
-                                        blnExistingRowFound = False
-                                        AddCustomSICRow(dblMZ, dblMZToleranceDa, sngScanOrAcqTime, sngScanOrAcqTimeTolerance, strComment, blnExistingRowFound)
-
-                                        If blnExistingRowFound Then
-                                            intRowsAlreadyPresent += 1
-                                        End If
-                                    End If
-
-                                Catch ex As Exception
-                                    ' Skip this row
-                                    intRowsSkipped += 1
-                                End Try
-                            Else
-                                intRowsSkipped += 1
-                            End If
-                        End If
-                    Next intLineIndex
-
-                    If intRowsAlreadyPresent > 0 Then
-                        If intRowsAlreadyPresent = 1 Then
-                            strMessage = "1 row of thresholds was"
-                        Else
-                            strMessage = intRowsAlreadyPresent.ToString() & " rows of thresholds were"
-                        End If
-
-                        Windows.Forms.MessageBox.Show(strMessage & " already present in the table; duplicate rows are not allowed.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    If strColumns.Length >= 4 Then
+                        sngScanOrAcqTimeTolerance = Single.Parse(strColumns(3))
+                    Else
+                        sngScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
                     End If
 
-                    If intRowsSkipped > 0 Then
-                        If intRowsSkipped = 1 Then
-                            strMessage = "1 row was skipped because it"
-                        Else
-                            strMessage = intRowsSkipped.ToString() & " rows were skipped because they"
-                        End If
-
-                        Windows.Forms.MessageBox.Show(strMessage & " didn't contain two columns of numeric data.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    If strColumns.Length >= 5 Then
+                        strComment = strColumns(4)
+                    Else
+                        strComment = String.Empty
                     End If
 
                 End If
+
+                If dblMZ > 0 Then
+                    Dim blnExistingRowFound = False
+                    AddCustomSICRow(dblMZ, dblMZToleranceDa, sngScanOrAcqTime, sngScanOrAcqTimeTolerance, strComment,
+                                    blnExistingRowFound)
+
+                    If blnExistingRowFound Then
+                        intRowsAlreadyPresent += 1
+                    End If
+                End If
+
+            Catch ex As Exception
+                ' Skip this row
+                intRowsSkipped += 1
+            End Try
+
+        Next
+
+        If intRowsAlreadyPresent > 0 Then
+            Dim strMessage As String
+            If intRowsAlreadyPresent = 1 Then
+                strMessage = "1 row of thresholds was"
+            Else
+                strMessage = intRowsAlreadyPresent.ToString() & " rows of thresholds were"
             End If
 
+            Windows.Forms.MessageBox.Show(strMessage & " already present in the table; duplicate rows are not allowed.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End If
+
+        If intRowsSkipped > 0 Then
+            Dim strMessage As String
+            If intRowsSkipped = 1 Then
+                strMessage = "1 row was skipped because it"
+            Else
+                strMessage = intRowsSkipped.ToString() & " rows were skipped because they"
+            End If
+
+            Windows.Forms.MessageBox.Show(strMessage & " didn't contain two columns of numeric data.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        End If
+
     End Sub
 
     Private Sub PopulateComboBoxes()
@@ -1114,10 +1106,6 @@ Public Class frmMain
         Dim eResponse As Windows.Forms.DialogResult
         Dim blnExistingMasicObjectUsed As Boolean
 
-        Dim dblSICTolerance As Double, blnSICToleranceIsPPM As Boolean
-
-        Dim customMzList As List(Of clsCustomMZSearchSpec)
-
         If blnConfirm Then
             eResponse = Windows.Forms.MessageBox.Show("Are you sure you want to reset all settings to their default values?", "Reset to Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
             If eResponse <> DialogResult.Yes Then Exit Sub
@@ -1201,7 +1189,9 @@ Public Class frmMain
                 End Try
 
                 ' SIC Options
-                dblSICTolerance = .SICOptions.GetSICTolerance(blnSICToleranceIsPPM)
+                Dim blnSICToleranceIsPPM As Boolean
+                Dim dblSICTolerance = .SICOptions.GetSICTolerance(blnSICToleranceIsPPM)
+
                 txtSICTolerance.Text = Math.Round(dblSICTolerance, 6).ToString()
                 If blnSICToleranceIsPPM Then
                     optSICTolerancePPM.Checked = True
@@ -1332,10 +1322,10 @@ Public Class frmMain
 
                 txtCustomSICScanOrAcqTimeTolerance.Text = .ScanOrAcqTimeTolerance.ToString()
 
-                ' Load the Custom m/z values from mCustomSICList
-                customMzList = .CustomMZSearchValues()
-
             End With
+
+            ' Load the Custom m/z values from mCustomSICList
+            Dim customMzList = masicOptions.CustomSICList.CustomMZSearchValues()
 
             ClearCustomSICList(False)
             For Each customMzSpec In customMzList
@@ -1672,22 +1662,6 @@ Public Class frmMain
 
         Dim blnError As Boolean
 
-        Dim eScanType As clsCustomSICList.eCustomSICScanTypeConstants
-        Dim sngScanOrAcqTimeTolerance As Single
-
-        Dim dblSICTolerance As Double
-
-        Dim intCustomSICListCount As Integer
-        Dim dblMZList() As Double
-        Dim dblMZToleranceList() As Double
-        Dim sngScanOrAcqTimeList() As Single
-        Dim sngScanOrAcqTimeToleranceList() As Single
-        Dim strScanComments() As String
-
-        Dim strCustomSICFileName As String
-
-        Dim myDataRow As DataRow
-
         Try
             Dim masicOptions = objMasic.Options
 
@@ -1714,11 +1688,14 @@ Public Class frmMain
                 .IncludeMSMS = chkExportRawDataIncludeMSMS.Checked
                 .RenumberScans = chkExportRawDataRenumberScans.Checked
 
-                .MinimumSignalToNoiseRatio = ParseTextboxValueSng(txtExportRawDataSignalToNoiseRatioMinimum, lblExportRawDataSignalToNoiseRatioMinimum.Text & " must be a value", blnError)
+                .MinimumSignalToNoiseRatio = ParseTextboxValueSng(txtExportRawDataSignalToNoiseRatioMinimum,
+                                                                  lblExportRawDataSignalToNoiseRatioMinimum.Text & " must be a value", blnError)
                 If blnError Then Exit Try
-                .MaxIonCountPerScan = ParseTextboxValueInt(txtExportRawDataMaxIonCountPerScan, lblExportRawDataMaxIonCountPerScan.Text & " must be an integer value", blnError)
+                .MaxIonCountPerScan = ParseTextboxValueInt(txtExportRawDataMaxIonCountPerScan,
+                                                           lblExportRawDataMaxIonCountPerScan.Text & " must be an integer value", blnError)
                 If blnError Then Exit Try
-                .IntensityMinimum = ParseTextboxValueSng(txtExportRawDataIntensityMinimum, lblExportRawDataIntensityMinimum.Text & " must be a value", blnError)
+                .IntensityMinimum = ParseTextboxValueSng(txtExportRawDataIntensityMinimum,
+                                                         lblExportRawDataIntensityMinimum.Text & " must be a value", blnError)
                 If blnError Then Exit Try
             End With
 
@@ -1757,10 +1734,11 @@ Public Class frmMain
                     .DatasetLookupFilePath = String.Empty
                 End Try
 
-                ' SIC Options
-                dblSICTolerance = ParseTextboxValueDbl(txtSICTolerance, lblSICToleranceDa.Text & " must be a value", blnError)
-                If blnError Then Exit Try
             End With
+
+            ' SIC Options
+            Dim dblSICTolerance = ParseTextboxValueDbl(txtSICTolerance, lblSICToleranceDa.Text & " must be a value", blnError)
+            If blnError Then Exit Try
 
             With masicOptions.SICOptions
                 .SetSICTolerance(dblSICTolerance, optSICTolerancePPM.Checked)
@@ -1940,6 +1918,7 @@ Public Class frmMain
 
             End If
 
+            Dim eScanType As clsCustomSICList.eCustomSICScanTypeConstants
             If optCustomSICScanToleranceAbsolute.Checked Then
                 eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
             ElseIf optCustomSICScanToleranceRelative.Checked Then
@@ -1951,7 +1930,7 @@ Public Class frmMain
                 eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
             End If
 
-            sngScanOrAcqTimeTolerance = ParseTextboxValueSng(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text & " must be a value", blnError)
+            Dim sngScanOrAcqTimeTolerance = ParseTextboxValueSng(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text & " must be a value", blnError)
             If blnError Then Exit Try
 
             masicOptions.CustomSICList.SetCustomSICListValues(eScanType, sngScanOrAcqTimeTolerance, mzSearchSpecs)

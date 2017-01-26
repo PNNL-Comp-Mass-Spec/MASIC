@@ -552,9 +552,6 @@ Namespace DataInput
             ' Determine intFragScanNumber, which is generally 1, 2, or 3, indicating if this is the 1st, 2nd, or 3rd MS/MS scan after the survey scan
 
             Dim sngRT As Single
-            Dim sngPrevScanRT As Single
-            Dim sngNextScanRT As Single
-            Dim intScanDiff As Integer
 
             intFragScanIteration = 1
 
@@ -580,8 +577,8 @@ Namespace DataInput
 
                             intLastSurveyScanIndex = surveyScans.Count - 1
                             With surveyScans(intLastSurveyScanIndex)
-                                intScanDiff = .ScanNumber - surveyScans(intLastSurveyScanIndex - 1).ScanNumber
-                                sngPrevScanRT = surveyScans(intLastSurveyScanIndex - 1).ScanTime
+                                Dim intScanDiff = .ScanNumber - surveyScans(intLastSurveyScanIndex - 1).ScanNumber
+                                Dim sngPrevScanRT = surveyScans(intLastSurveyScanIndex - 1).ScanTime
 
                                 ' Compute intFragScanIteration
                                 intFragScanIteration = intFragScanNumber - .ScanNumber
@@ -607,8 +604,8 @@ Namespace DataInput
                 Else
                     ' Interpolate retention time
                     With surveyScans(intLastSurveyScanIndex)
-                        intScanDiff = surveyScans(intLastSurveyScanIndex + 1).ScanNumber - .ScanNumber
-                        sngNextScanRT = surveyScans(intLastSurveyScanIndex + 1).ScanTime
+                        Dim intScanDiff = surveyScans(intLastSurveyScanIndex + 1).ScanNumber - .ScanNumber
+                        Dim sngNextScanRT = surveyScans(intLastSurveyScanIndex + 1).ScanTime
 
                         ' Compute intFragScanIteration
                         intFragScanIteration = intFragScanNumber - .ScanNumber

@@ -66,36 +66,24 @@ Namespace DataInput
 
         Public Function LoadCustomSICListFromFile(strCustomSICValuesFileName As String) As Boolean
 
-            Dim strLineIn As String
-            Dim strSplitLine() As String
 
             Dim strDelimList = New Char() {ControlChars.Tab}
-
-            Dim strErrorMessage As String
-
-            Dim blnMZHeaderFound As Boolean
-
-            Dim blnScanTimeHeaderFound As Boolean
-            Dim blnTimeToleranceHeaderFound As Boolean
             Dim blnForceAcquisitionTimeMode As Boolean
 
-            Dim intColIndex As Integer
-
-            Dim eColumnMapping() As Integer
-
             Try
-                blnMZHeaderFound = False
-                blnScanTimeHeaderFound = False
-                blnTimeToleranceHeaderFound = False
+                Dim blnMZHeaderFound = False
+                Dim blnScanTimeHeaderFound = False
+                Dim blnTimeToleranceHeaderFound = False
 
                 mCustomSICList.ResetMzSearchValues()
 
                 ' eColumnMapping will be initialized when the headers are read
+                Dim eColumnMapping() As Integer
                 ReDim eColumnMapping(-1)
 
                 If Not File.Exists(strCustomSICValuesFileName) Then
                     ' Custom SIC file not found
-                    strErrorMessage = "Custom MZ List file not found: " & strCustomSICValuesFileName
+                    Dim strErrorMessage = "Custom MZ List file not found: " & strCustomSICValuesFileName
                     ReportError("CustomSICListReader", strErrorMessage)
                     mCustomSICList.CustomMZSearchValues.Clear()
                     Return False
@@ -105,7 +93,7 @@ Namespace DataInput
 
                     Dim intLinesRead = 0
                     Do While Not srInFile.EndOfStream
-                        strLineIn = srInFile.ReadLine
+                        Dim strLineIn = srInFile.ReadLine
                         If strLineIn Is Nothing Then Continue Do
 
                         If intLinesRead = 0 AndAlso Not strLineIn.Contains(ControlChars.Tab) Then
@@ -113,7 +101,7 @@ Namespace DataInput
                             strDelimList = New Char() {","c}
                         End If
 
-                        strSplitLine = strLineIn.Split(strDelimList)
+                        Dim strSplitLine = strLineIn.Split(strDelimList)
 
                         If (strSplitLine Is Nothing) OrElse strSplitLine.Length <= 0 Then Continue Do
 
@@ -163,7 +151,7 @@ Namespace DataInput
                             ' Make sure that, at a minimum, the MZ column is present
                             If Not blnMZHeaderFound Then
 
-                                strErrorMessage = "Custom M/Z List file " & strCustomSICValuesFileName & "does not have a column header named " & CUSTOM_SIC_COLUMN_MZ & " in the first row; this header is required (valid column headers are: " & GetCustomMZFileColumnHeaders() & ")"
+                                Dim strErrorMessage = "Custom M/Z List file " & strCustomSICValuesFileName & "does not have a column header named " & CUSTOM_SIC_COLUMN_MZ & " in the first row; this header is required (valid column headers are: " & GetCustomMZFileColumnHeaders() & ")"
                                 ReportError("CustomSICListReader", strErrorMessage)
 
                                 mCustomSICList.CustomMZSearchValues.Clear()
@@ -200,16 +188,14 @@ Namespace DataInput
                                 Select Case eColumnMapping(intColIndex)
                                     Case eCustomSICFileColumns.MZ
                                         If Not Double.TryParse(strSplitLine(intColIndex), .MZ) Then
-                                            Throw _
-                                                New InvalidCastException(
+                                            Throw New InvalidCastException(
                                                     "Non-numeric value for the MZ column in row " & intLinesRead + 1 &
                                                     ", column " & intColIndex + 1)
                                         End If
 
                                     Case eCustomSICFileColumns.MZToleranceDa
                                         If Not Double.TryParse(strSplitLine(intColIndex), .MZToleranceDa) Then
-                                            Throw _
-                                                New InvalidCastException(
+                                            Throw New InvalidCastException(
                                                     "Non-numeric value for the MZToleranceDa column in row " &
                                                     intLinesRead + 1 & ", column " & intColIndex + 1)
                                         End If
@@ -218,8 +204,7 @@ Namespace DataInput
                                         ' Do not use this value if both the ScanTime and the TimeTolerance columns were present
                                         If Not blnForceAcquisitionTimeMode Then
                                             If Not Single.TryParse(strSplitLine(intColIndex), .ScanOrAcqTimeCenter) Then
-                                                Throw _
-                                                    New InvalidCastException(
+                                                Throw New InvalidCastException(
                                                         "Non-numeric value for the ScanCenter column in row " &
                                                         intLinesRead + 1 & ", column " & intColIndex + 1)
                                             End If
@@ -228,18 +213,12 @@ Namespace DataInput
                                     Case eCustomSICFileColumns.ScanTolerance
                                         ' Do not use this value if both the ScanTime and the TimeTolerance columns were present
                                         If Not blnForceAcquisitionTimeMode Then
-                                            If _
-                                                mCustomSICList.ScanToleranceType =
-                                                clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
+                                            If mCustomSICList.ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
                                                 .ScanOrAcqTimeTolerance = CInt(strSplitLine(intColIndex))
                                             Else
                                                 ' Includes .Relative and .AcquisitionTime
-                                                If _
-                                                    Not _
-                                                    Single.TryParse(strSplitLine(intColIndex), .ScanOrAcqTimeTolerance) _
-                                                    Then
-                                                    Throw _
-                                                        New InvalidCastException(
+                                                If Not Single.TryParse(strSplitLine(intColIndex), .ScanOrAcqTimeTolerance) Then
+                                                    Throw New InvalidCastException(
                                                             "Non-numeric value for the ScanTolerance column in row " &
                                                             intLinesRead + 1 & ", column " & intColIndex + 1)
                                                 End If
@@ -250,8 +229,7 @@ Namespace DataInput
                                         ' Only use this value if both the ScanTime and the TimeTolerance columns were present
                                         If blnForceAcquisitionTimeMode Then
                                             If Not Single.TryParse(strSplitLine(intColIndex), .ScanOrAcqTimeCenter) Then
-                                                Throw _
-                                                    New InvalidCastException(
+                                                Throw New InvalidCastException(
                                                         "Non-numeric value for the ScanTime column in row " &
                                                         intLinesRead + 1 & ", column " & intColIndex + 1)
                                             End If
@@ -260,10 +238,8 @@ Namespace DataInput
                                     Case eCustomSICFileColumns.TimeTolerance
                                         ' Only use this value if both the ScanTime and the TimeTolerance columns were present
                                         If blnForceAcquisitionTimeMode Then
-                                            If Not Single.TryParse(strSplitLine(intColIndex), .ScanOrAcqTimeTolerance) _
-                                                Then
-                                                Throw _
-                                                    New InvalidCastException(
+                                            If Not Single.TryParse(strSplitLine(intColIndex), .ScanOrAcqTimeTolerance) Then
+                                                Throw New InvalidCastException(
                                                         "Non-numeric value for the TimeTolerance column in row " &
                                                         intLinesRead + 1 & ", column " & intColIndex + 1)
                                             End If

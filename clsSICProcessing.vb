@@ -1,5 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports MASIC.DataOutput
+Imports PNNLOmics.Data
 
 Public Class clsSICProcessing
     Inherits clsEventNotifier

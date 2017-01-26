@@ -30,24 +30,14 @@ Public Class clsDatabaseAccess
         ' First tries to poll the database for the dataset number
         ' If this doesn't work, then looks for the dataset name in mDatasetLookupFilePath
 
-        Dim strFileNameCompare As String
-        Dim intNewDatasetNumber As Integer
-
-        Dim strAvoidErrorMessage As String
-
-        Dim blnDatasetFoundInDB As Boolean
-
-        Dim intRowCount As Integer
-        Dim dsDatasetInfo As DataSet = Nothing
-        Dim objRow As DataRow
-
         ' Initialize intNewDatasetNumber and strFileNameCompare
-        strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper
-        intNewDatasetNumber = intDefaultDatasetNumber
+        Dim strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper
+        Dim intNewDatasetNumber = intDefaultDatasetNumber
 
-        strAvoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and 'Dataset Info Query SQL' entries on the Advanced tab."
+        Dim strAvoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " &
+            "'Dataset Info Query SQL' entries on the Advanced tab."
 
-        blnDatasetFoundInDB = False
+        Dim blnDatasetFoundInDB = False
 
         If Not mOptions.DatabaseConnectionString Is Nothing AndAlso mOptions.DatabaseConnectionString.Length > 0 Then
             ' Attempt to lookup the dataset number in the database
@@ -64,6 +54,9 @@ Public Class clsDatabaseAccess
                     strQuery &= " WHERE Dataset = '" & strFileNameCompare & "'"
                     blnQueryingSingleDataset = True
                 End If
+
+                Dim dsDatasetInfo As DataSet = Nothing
+                Dim intRowCount As Integer
 
                 If objDBTools.GetDiscDataSet(strQuery, dsDatasetInfo, intRowCount) Then
                     If intRowCount > 0 Then
@@ -85,7 +78,7 @@ Public Class clsDatabaseAccess
 
                         If intTextCol >= 0 Then
                             ' Find the row in the datatable that matches strFileNameCompare
-                            For Each objRow In dsDatasetInfo.Tables(0).Rows
+                            For Each objRow As DataRow In dsDatasetInfo.Tables(0).Rows
                                 If CStr(objRow.Item(intTextCol)).ToUpper = strFileNameCompare Then
                                     ' Match found
                                     Try
