@@ -2105,35 +2105,35 @@ Public Class frmMain
 
 #Region "Textbox Events"
     Private Sub txtMassSpectraNoiseThresholdIntensity_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtMassSpectraNoiseThresholdIntensity.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtMassSpectraNoiseThresholdIntensity, e, True, True)
+        TextBoxKeyPressHandler(txtMassSpectraNoiseThresholdIntensity, e, True, True)
     End Sub
 
     Private Sub txtMassSpectraNoiseFractionLowIntensityDataToAverage_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtMassSpectraNoiseFractionLowIntensityDataToAverage.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtMassSpectraNoiseFractionLowIntensityDataToAverage, e, True, True)
+        TextBoxKeyPressHandler(txtMassSpectraNoiseFractionLowIntensityDataToAverage, e, True, True)
     End Sub
 
     Private Sub txtBinnedDataIntensityPrecisionPct_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtBinnedDataIntensityPrecisionPct.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtBinnedDataIntensityPrecisionPct, e, True, True)
+        TextBoxKeyPressHandler(txtBinnedDataIntensityPrecisionPct, e, True, True)
     End Sub
 
     Private Sub txtBinSize_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtBinSize.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtBinSize, e, True, True)
+        TextBoxKeyPressHandler(txtBinSize, e, True, True)
     End Sub
 
     Private Sub txtBinStartX_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtBinStartX.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtBinStartX, e, True, True)
+        TextBoxKeyPressHandler(txtBinStartX, e, True, True)
     End Sub
 
     Private Sub txtBinEndX_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtBinEndX.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtBinEndX, e, True, True)
+        TextBoxKeyPressHandler(txtBinEndX, e, True, True)
     End Sub
 
     Private Sub txtButterworthSamplingFrequency_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtButterworthSamplingFrequency.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtButterworthSamplingFrequency, e, True, True)
+        TextBoxKeyPressHandler(txtButterworthSamplingFrequency, e, True, True)
     End Sub
 
     Private Sub txtButterworthSamplingFrequency_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles txtButterworthSamplingFrequency.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxSng(txtButterworthSamplingFrequency, 0.01, 0.99, 0.25)
+        ValidateTextboxSng(txtButterworthSamplingFrequency, 0.01, 0.99, 0.25)
     End Sub
 
     Private Sub txtCustomSICFileDescription_KeyDown(sender As Object, e As Windows.Forms.KeyEventArgs) Handles txtCustomSICFileDescription.KeyDown
@@ -2147,107 +2147,107 @@ Public Class frmMain
     End Sub
 
     Private Sub txtCustomSICScanOrAcqTimeTolerance_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtCustomSICScanOrAcqTimeTolerance.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtCustomSICScanOrAcqTimeTolerance, e, True, True)
+        TextBoxKeyPressHandler(txtCustomSICScanOrAcqTimeTolerance, e, True, True)
     End Sub
 
     Private Sub txtDatasetNumber_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtDatasetNumber.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtDatasetNumber, e, True, False)
+        TextBoxKeyPressHandler(txtDatasetNumber, e, True, False)
     End Sub
 
     Private Sub txtExportRawDataIntensityMinimum_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtExportRawDataIntensityMinimum.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtExportRawDataIntensityMinimum, e, True, True)
+        TextBoxKeyPressHandler(txtExportRawDataIntensityMinimum, e, True, True)
     End Sub
 
     Private Sub txtExportRawDataMaxIonCountPerScan_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtExportRawDataMaxIonCountPerScan.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtExportRawDataMaxIonCountPerScan, e)
+        TextBoxKeyPressHandler(txtExportRawDataMaxIonCountPerScan, e)
     End Sub
 
     Private Sub txtExportRawDataSignalToNoiseRatioMinimum_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtExportRawDataSignalToNoiseRatioMinimum.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtExportRawDataSignalToNoiseRatioMinimum, e, True, True)
+        TextBoxKeyPressHandler(txtExportRawDataSignalToNoiseRatioMinimum, e, True, True)
     End Sub
 
     Private Sub txtInitialPeakWidthScansMaximum_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtInitialPeakWidthScansMaximum.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtInitialPeakWidthScansMaximum, e)
+        TextBoxKeyPressHandler(txtInitialPeakWidthScansMaximum, e)
     End Sub
 
     Private Sub txtInitialPeakWidthScansScaler_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtInitialPeakWidthScansScaler.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtInitialPeakWidthScansScaler, e)
+        TextBoxKeyPressHandler(txtInitialPeakWidthScansScaler, e)
     End Sub
 
     Private Sub txtIntensityThresholdAbsoluteMinimum_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtIntensityThresholdAbsoluteMinimum.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtIntensityThresholdAbsoluteMinimum, e, True, True)
+        TextBoxKeyPressHandler(txtIntensityThresholdAbsoluteMinimum, e, True, True)
     End Sub
 
     Private Sub txtIntensityThresholdFractionMax_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtIntensityThresholdFractionMax.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtIntensityThresholdFractionMax, e, True, True)
+        TextBoxKeyPressHandler(txtIntensityThresholdFractionMax, e, True, True)
     End Sub
 
     Private Sub txtMaxAllowedUpwardSpikeFractionMax_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtMaxAllowedUpwardSpikeFractionMax.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtMaxAllowedUpwardSpikeFractionMax, e, True, True)
+        TextBoxKeyPressHandler(txtMaxAllowedUpwardSpikeFractionMax, e, True, True)
     End Sub
 
     Private Sub txtMaxDistanceScansNoOverlap_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtMaxDistanceScansNoOverlap.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtMaxDistanceScansNoOverlap, e)
+        TextBoxKeyPressHandler(txtMaxDistanceScansNoOverlap, e)
     End Sub
 
     Private Sub txtMaximumBinCount_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtMaximumBinCount.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtMaximumBinCount, e)
+        TextBoxKeyPressHandler(txtMaximumBinCount, e)
     End Sub
 
     Private Sub txtMaxPeakWidthMinutesBackward_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtMaxPeakWidthMinutesBackward.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtMaxPeakWidthMinutesBackward, e, True, True)
+        TextBoxKeyPressHandler(txtMaxPeakWidthMinutesBackward, e, True, True)
     End Sub
 
     Private Sub txtMaxPeakWidthMinutesForward_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtMaxPeakWidthMinutesForward.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtMaxPeakWidthMinutesForward, e, True, True)
+        TextBoxKeyPressHandler(txtMaxPeakWidthMinutesForward, e, True, True)
     End Sub
 
     Private Sub txtSICNoiseThresholdIntensity_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtSICNoiseThresholdIntensity.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtSICNoiseThresholdIntensity, e, True, True)
+        TextBoxKeyPressHandler(txtSICNoiseThresholdIntensity, e, True, True)
     End Sub
 
     Private Sub txtSICNoiseFractionLowIntensityDataToAverage_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtSICNoiseFractionLowIntensityDataToAverage.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtSICNoiseFractionLowIntensityDataToAverage, e, True, True)
+        TextBoxKeyPressHandler(txtSICNoiseFractionLowIntensityDataToAverage, e, True, True)
     End Sub
 
     Private Sub txtSavitzkyGolayFilterOrder_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtSavitzkyGolayFilterOrder.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtSavitzkyGolayFilterOrder, e)
+        TextBoxKeyPressHandler(txtSavitzkyGolayFilterOrder, e)
     End Sub
 
     Private Sub txtSavitzkyGolayFilterOrder_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles txtSavitzkyGolayFilterOrder.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
+        ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
     End Sub
 
     Private Sub txtSICTolerance_KeyPress(sender As Object, e As Windows.Forms.KeyPressEventArgs) Handles txtSICTolerance.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtSICTolerance, e, True, True)
+        TextBoxKeyPressHandler(txtSICTolerance, e, True, True)
     End Sub
 
     Private Sub txtSimilarIonMZToleranceHalfWidth_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtSimilarIonMZToleranceHalfWidth.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtSimilarIonMZToleranceHalfWidth, e, True, True)
+        TextBoxKeyPressHandler(txtSimilarIonMZToleranceHalfWidth, e, True, True)
     End Sub
 
     Private Sub txtSimilarIonToleranceHalfWidthMinutes_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtSimilarIonToleranceHalfWidthMinutes.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtSimilarIonToleranceHalfWidthMinutes, e, True, True)
+        TextBoxKeyPressHandler(txtSimilarIonToleranceHalfWidthMinutes, e, True, True)
     End Sub
 
     Private Sub txtSpectrumSimilarityMinimum_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtSpectrumSimilarityMinimum.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtSpectrumSimilarityMinimum, e, True, True)
+        TextBoxKeyPressHandler(txtSpectrumSimilarityMinimum, e, True, True)
     End Sub
 
     Private Sub txtScanEnd_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtScanEnd.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtScanEnd, e, True, False)
+        TextBoxKeyPressHandler(txtScanEnd, e, True, False)
     End Sub
 
     Private Sub txtScanStart_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtScanStart.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtScanStart, e, True, False)
+        TextBoxKeyPressHandler(txtScanStart, e, True, False)
     End Sub
 
     Private Sub txtTimeEnd_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtTimeEnd.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtTimeEnd, e, True, True)
+        TextBoxKeyPressHandler(txtTimeEnd, e, True, True)
     End Sub
 
     Private Sub txtTimeStart_KeyPress(sender As System.Object, e As Windows.Forms.KeyPressEventArgs) Handles txtTimeStart.KeyPress
-        SharedVBNetRoutines.VBNetRoutines.TextBoxKeyPressHandler(txtTimeStart, e, True, True)
+        TextBoxKeyPressHandler(txtTimeStart, e, True, True)
     End Sub
 #End Region
 
