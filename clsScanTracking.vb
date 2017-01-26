@@ -300,7 +300,7 @@ Public Class clsScanTracking
                 End If
 
                 strLastKnownLocation = "Call AddSpectrumToPool"
-                blnSuccess = objSpectraCache.AddSpectrumToPool(objMSSpectrum, scanInfo.ScanNumber, 0)
+                blnSuccess = objSpectraCache.AddSpectrumToPool(objMSSpectrum, scanInfo.ScanNumber)
             Else
                 blnSuccess = True
             End If
