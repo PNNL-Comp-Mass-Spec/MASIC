@@ -35,8 +35,8 @@ Source: ..\MASICBrowser\bin\Interop.CWUIControlsLib.dll    ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Interop.MSComctlLib.dll        ; DestDir: {app}
 Source: ..\MASICBrowser\bin\stdole.dll                     ; DestDir: {app}
 
-Source: "C:\Program Files (x86)\National Instruments\Shared\Mesa\mesa.dll"
-Source: c:\windows\syswow64\cwui.ocx
+Source: "C:\Program Files (x86)\National Instruments\Shared\Mesa\mesa.dll"    ; DestDir: {app}
+Source: c:\windows\syswow64\cwui.ocx                                          ; DestDir: {app}
 
 Source: ..\Readme.txt                           ; DestDir: {app}
 Source: ..\RevisionHistory.txt                  ; DestDir: {app}
