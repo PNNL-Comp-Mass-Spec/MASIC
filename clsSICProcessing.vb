@@ -496,60 +496,17 @@ Public Class clsSICProcessing
       intSIMIndex As Integer,
       ByRef intParentIonsProcessed As Integer) As Boolean
 
-
         ' Step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
         ' Note that udtMZBinList() and intParentIonIndices() are parallel arrays, with udtMZBinList() sorted on ascending m/z
         Const MAX_RAW_DATA_MEMORY_USAGE_MB = 50
-        Const DATA_COUNT_MEMORY_RESERVE = 200
 
-        Dim intMZIndex As Integer
-        Dim intMZIndexWork As Integer
         Dim intMaxMZCountInChunk As Integer
-
-        Dim intSurveyScanIndex As Integer
-        Dim intParentIonIndexPointer As Integer
-        Dim intDataIndex As Integer
-        Dim intScanIndexObservedInFullSIC As Integer
-
-        Dim intPoolIndex As Integer
-
-        Dim sngIonSum As Single
-        Dim dblClosestMZ As Double
-        Dim intIonMatchCount As Integer
-
-        Dim dblMZToleranceDa As Double
 
         ' Ranges from 0 to intMZSearchChunkCount-1
         Dim intMZSearchChunkCount As Integer
         Dim udtMZSearchChunk() As clsDataObjects.udtMZSearchInfoType
 
-        ' The following are 2D arrays, ranging from 0 to intMZSearchChunkCount-1 in the first dimension and 0 to .SurveyScans.Count - 1 in the second dimension
-        ' I could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
-        Dim intFullSICScanIndices(,) As Integer     ' Pointer into .SurveyScans
-        Dim sngFullSICIntensities(,) As Single
-        Dim dblFullSICMasses(,) As Double
-        Dim intFullSICDataCount() As Integer        ' Count of the number of valid entries in the second dimension of the above 3 arrays
-
-        ' The following is a 1D array, containing the SIC intensities for a single m/z group
-        Dim sngFullSICIntensities1D() As Single
-
-        Dim udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
-        Dim udtSICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-        Dim udtSICPotentialAreaStatsInFullSIC As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-
-        Dim sicDetails As clsSICDetails
-        Dim udtSmoothedYData As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-        Dim udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-
         Dim blnParentIonUpdated() As Boolean
-
-        Dim blnUseScan As Boolean
-        Dim blnStorePeakInParentIon As Boolean
-        Dim blnLargestPeakFound As Boolean
-        Dim blnSuccess As Boolean
-
-        Const DebugParentIonIndexToFind = 3139
-        Const DebugMZToFind As Single = 488.47
 
         Try
             ' Determine the maximum number of m/z values to process simultaneously
@@ -570,32 +527,6 @@ Public Class clsSICProcessing
             ' Reserve room in dblSearchMZs
             ReDim udtMZSearchChunk(intMaxMZCountInChunk - 1)
 
-            ' Reserve room in intFullSICScanIndices for at most intMaxMZCountInChunk values and .SurveyScans.Count scans
-            ReDim intFullSICDataCount(intMaxMZCountInChunk - 1)
-            ReDim intFullSICScanIndices(intMaxMZCountInChunk - 1, scanList.SurveyScans.Count - 1)
-            ReDim sngFullSICIntensities(intMaxMZCountInChunk - 1, scanList.SurveyScans.Count - 1)
-            ReDim dblFullSICMasses(intMaxMZCountInChunk - 1, scanList.SurveyScans.Count - 1)
-
-            ReDim sngFullSICIntensities1D(scanList.SurveyScans.Count - 1)
-
-            ' Initialize sicDetails
-            sicDetails = New clsSICDetails()
-            With sicDetails
-                .Reset()
-                .SICScanType = clsScanList.eScanTypeConstants.SurveyScan
-            End With
-
-            ' Reserve room in udtSmoothedYData and udtSmoothedYDataSubset
-            With udtSmoothedYData
-                .DataCount = 0
-                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
-            End With
-
-            With udtSmoothedYDataSubset
-                .DataCount = 0
-                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
-            End With
-
             ' Reserve room in blnParentIonUpdated
             ReDim blnParentIonUpdated(intParentIonIndices.Length - 1)
 
@@ -613,7 +544,7 @@ Public Class clsSICProcessing
             RegisterEvents(scanNumScanConverter)
 
             intMZSearchChunkCount = 0
-            intMZIndex = 0
+            Dim intMZIndex = 0
             Do While intMZIndex < udtMZBinList.Length
 
                 '---------------------------------------------------------
@@ -623,13 +554,13 @@ Public Class clsSICProcessing
                     ' Initially set the MZIndexStart to intMZIndex
                     .MZIndexStart = intMZIndex
 
-
                     ' Look for adjacent m/z values within udtMZBinList(.MZIndexStart).MZToleranceDa / 2 
                     '  of the m/z value that starts this group
                     ' Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
                     .MZTolerance = udtMZBinList(.MZIndexStart).MZTolerance
                     .MZToleranceIsPPM = udtMZBinList(.MZIndexStart).MZToleranceIsPPM
 
+                    Dim dblMZToleranceDa As Double
                     If .MZToleranceIsPPM Then
                         dblMZToleranceDa = clsUtilities.PPMToMass(.MZTolerance, udtMZBinList(.MZIndexStart).MZ)
                     Else
@@ -664,305 +595,32 @@ Public Class clsSICProcessing
                 intMZSearchChunkCount += 1
 
                 If intMZSearchChunkCount >= intMaxMZCountInChunk OrElse intMZIndex = udtMZBinList.Length - 1 Then
+
                     '---------------------------------------------------------
                     ' Reached intMaxMZCountInChunk m/z value
                     ' Process all of the m/z values in udtMZSearchChunk
                     '---------------------------------------------------------
 
-                    ' Initialize .MaximumIntensity and .ScanIndexMax
-                    ' Additionally, reset intFullSICDataCount() and, for safety, set intFullSICScanIndices() to -1
-                    For intMZIndexWork = 0 To intMZSearchChunkCount - 1
-                        With udtMZSearchChunk(intMZIndexWork)
-                            .MaximumIntensity = 0
-                            .ScanIndexMax = 0
-                        End With
+                    Dim blnSuccess = ProcessMzSearchChunk(
+                        masicOptions,
+                        scanList,
+                        dataAggregation, dataOutputHandler, xmlResultsWriter,
+                        objSpectraCache, scanNumScanConverter,
+                        intMZSearchChunkCount,
+                        udtMZSearchChunk,
+                        intParentIonIndices,
+                        blnProcessSIMScans,
+                        intSIMIndex,
+                        blnParentIonUpdated,
+                        intParentIonsProcessed)
 
-                        intFullSICDataCount(intMZIndexWork) = 0
-                        For intSurveyScanIndex = 0 To scanList.SurveyScans.Count - 1
-                            intFullSICScanIndices(intMZIndexWork, intSurveyScanIndex) = -1
-                        Next intSurveyScanIndex
-                    Next intMZIndexWork
-
-                    '---------------------------------------------------------
-                    ' Step through scanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
-                    ' We're stepping scan by scan since the process of loading a scan from disk is slower than the process of searching for each m/z in the scan
-                    '---------------------------------------------------------
-                    For intSurveyScanIndex = 0 To scanList.SurveyScans.Count - 1
-                        If blnProcessSIMScans Then
-                            If scanList.SurveyScans(intSurveyScanIndex).SIMScan AndAlso
-                               scanList.SurveyScans(intSurveyScanIndex).SIMIndex = intSIMIndex Then
-                                blnUseScan = True
-                            Else
-                                blnUseScan = False
-                            End If
-                        Else
-                            blnUseScan = Not scanList.SurveyScans(intSurveyScanIndex).SIMScan
-
-                            If scanList.SurveyScans(intSurveyScanIndex).ZoomScan Then
-                                blnUseScan = False
-                            End If
-                        End If
-
-                        If blnUseScan Then
-                            If Not objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
-                                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
-                                Return False
-                            End If
-
-                            For intMZIndexWork = 0 To intMZSearchChunkCount - 1
-                                With udtMZSearchChunk(intMZIndexWork)
-                                    If .MZToleranceIsPPM Then
-                                        dblMZToleranceDa = clsUtilities.PPMToMass(.MZTolerance, .SearchMZ)
-                                    Else
-                                        dblMZToleranceDa = .MZTolerance
-                                    End If
-
-                                    sngIonSum = dataAggregation.AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex), .SearchMZ, dblMZToleranceDa, intIonMatchCount, dblClosestMZ, False)
-
-                                    intDataIndex = intFullSICDataCount(intMZIndexWork)
-                                    intFullSICScanIndices(intMZIndexWork, intDataIndex) = intSurveyScanIndex
-                                    sngFullSICIntensities(intMZIndexWork, intDataIndex) = sngIonSum
-
-                                    If sngIonSum < Single.Epsilon AndAlso masicOptions.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
-                                        sngFullSICIntensities(intMZIndexWork, intDataIndex) = scanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
-                                    End If
-
-                                    dblFullSICMasses(intMZIndexWork, intDataIndex) = dblClosestMZ
-                                    If sngIonSum > .MaximumIntensity Then
-                                        .MaximumIntensity = sngIonSum
-                                        .ScanIndexMax = intDataIndex
-                                    End If
-
-                                    intFullSICDataCount(intMZIndexWork) += 1
-                                End With
-                            Next intMZIndexWork
-                        End If
-
-                        If intSurveyScanIndex Mod 100 = 0 Then
-                            UpdateProgress("Loading raw SIC data: " & intSurveyScanIndex & " / " & scanList.SurveyScans.Count)
-                            If masicOptions.AbortProcessing Then
-                                scanList.ProcessingIncomplete = True
-                                Exit Do
-                            End If
-                        End If
-                    Next intSurveyScanIndex
-
-                    UpdateProgress("Creating SIC's for the parent ions")
-
-                    If masicOptions.AbortProcessing Then
-                        scanList.ProcessingIncomplete = True
-                        Exit Do
+                    If Not blnSuccess Then
+                        Return False
                     End If
-
-                    '---------------------------------------------------------
-                    ' Compute the noise level in sngFullSICIntensities() for each m/z in udtMZSearchChunk
-                    ' Also, find the peaks for each m/z in udtMZSearchChunk and retain the largest peak found
-                    '---------------------------------------------------------
-                    For intMZIndexWork = 0 To intMZSearchChunkCount - 1
-
-                        ' Use this for debugging
-                        If Math.Abs(udtMZSearchChunk(intMZIndexWork).SearchMZ - DebugMZToFind) < 0.1 Then
-                            intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart
-                        End If
-
-                        ' Copy the data for this m/z into sngFullSICIntensities1D()
-                        For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
-                            sngFullSICIntensities1D(intDataIndex) = sngFullSICIntensities(intMZIndexWork, intDataIndex)
-                        Next intDataIndex
-
-                        ' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
-                        blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1, masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, udtMZSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
-
-                        If Not blnSuccess Then
-                            SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, True)
-                            Exit Try
-                        End If
-
-                        ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
-                        mMASICPeakFinder.FindPotentialPeakArea(intFullSICDataCount(intMZIndexWork), sngFullSICIntensities1D, udtSICPotentialAreaStatsInFullSIC, masicOptions.SICOptions.SICPeakFinderOptions)
-
-                        ' Clear udtSICPotentialAreaStatsForPeak
-                        udtSICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-
-                        intScanIndexObservedInFullSIC = udtMZSearchChunk(intMZIndexWork).ScanIndexMax
-
-                        ' Populate sicDetails using the data centered around the highest intensity in intFullSICIntensities
-                        ' Note that this function will update udtSICPeak.IndexObserved
-                        blnSuccess = ExtractSICDetailsFromFullSIC(
-                            intMZIndexWork, udtMZSearchChunk,
-                            intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses,
-                            scanList, intScanIndexObservedInFullSIC,
-                            sicDetails, udtSICPeak,
-                            masicOptions, scanNumScanConverter, False, 0)
-
-                        Dim mzIndexSICScanNumbers = sicDetails.SICScanNumbers
-                        Dim mzIndexSICIntensities = sicDetails.SICIntensities
-                        Dim mzIndexSICIndices = sicDetails.SICScanIndices
-
-                        ' Find the largest peak in the SIC for this m/z
-                        blnLargestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
-                           sicDetails.SICDataCount, mzIndexSICScanNumbers, mzIndexSICIntensities,
-                           udtSICPotentialAreaStatsForPeak, udtSICPeak,
-                           udtSmoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
-                           udtSICPotentialAreaStatsInFullSIC,
-                           True, scanList.SIMDataPresent, False)
-
-                        If blnLargestPeakFound Then
-                            '--------------------------------------------------------
-                            ' Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
-                            ' If it is, then assign the stats of the largest peak to the given parent ion
-                            '--------------------------------------------------------
-
-                            For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
-                                ' Use this for debugging
-                                If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
-                                    intScanIndexObservedInFullSIC = -1
-                                End If
-
-                                blnStorePeakInParentIon = False
-                                If scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
-
-                                ' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
-                                With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
-                                    If .SurveyScanIndex >= mzIndexSICIndices(udtSICPeak.IndexBaseLeft) AndAlso
-                                       .SurveyScanIndex <= mzIndexSICIndices(udtSICPeak.IndexBaseRight) Then
-
-                                        blnStorePeakInParentIon = True
-                                    End If
-                                End With
-
-
-                                If blnStorePeakInParentIon Then
-                                    blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer),
-                                                                      sicDetails, mzIndexSICScanNumbers, mzIndexSICIntensities, mzIndexSICIndices,
-                                                                      udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
-
-                                    ' Possibly save the stats for this SIC to the SICData file
-                                    dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
-                                                                        intParentIonIndices(intParentIonIndexPointer), sicDetails)
-
-                                    ' Save the stats for this SIC to the XML file
-                                    xmlResultsWriter.SaveDataToXML(scanList,
-                                                                   intParentIonIndices(intParentIonIndexPointer), sicDetails,
-                                                                   udtSmoothedYDataSubset, dataOutputHandler)
-
-                                    blnParentIonUpdated(intParentIonIndexPointer) = True
-                                    intParentIonsProcessed += 1
-
-                                End If
-
-
-                            Next intParentIonIndexPointer
-                        End If
-
-                        '--------------------------------------------------------
-                        ' Now step through the parent ions and process those that were not updated using udtSICPeak
-                        ' For each, search for the closest peak in sngSICIntensity
-                        '--------------------------------------------------------
-                        For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
-
-                            If Not blnParentIonUpdated(intParentIonIndexPointer) Then
-                                If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
-                                    intScanIndexObservedInFullSIC = -1
-                                End If
-
-                                With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
-                                    ' Clear udtSICPotentialAreaStatsForPeak
-                                    .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-
-                                    ' Record the index in the Full SIC that the parent ion mass was first observed
-                                    ' Search for .SurveyScanIndex in intFullSICScanIndices
-                                    intScanIndexObservedInFullSIC = -1
-                                    For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
-                                        If intFullSICScanIndices(intMZIndexWork, intDataIndex) >= .SurveyScanIndex Then
-                                            intScanIndexObservedInFullSIC = intDataIndex
-                                            Exit For
-                                        End If
-                                    Next intDataIndex
-
-                                    If intScanIndexObservedInFullSIC = -1 Then
-                                        ' Match wasn't found; this is unexpected
-                                        ReportError("ProcessMZList", "Programming error: survey scan index not found in intFullSICScanIndices()", Nothing, True, True, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
-                                        intScanIndexObservedInFullSIC = 0
-                                    End If
-
-                                    ' Populate udtSICDetails using the data centered around intScanIndexObservedInFullSIC
-                                    ' Note that this function will update udtSICPeak.IndexObserved
-                                    blnSuccess = ExtractSICDetailsFromFullSIC(
-                                        intMZIndexWork, udtMZSearchChunk,
-                                        intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses,
-                                        scanList, intScanIndexObservedInFullSIC,
-                                        sicDetails, .SICStats.Peak,
-                                        masicOptions, scanNumScanConverter,
-                                        .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
-
-
-                                    Dim sicScanNumbers = sicDetails.SICScanNumbers
-                                    Dim sicIntensities = sicDetails.SICIntensities
-                                    Dim sicIndices = sicDetails.SICScanIndices
-
-                                    blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(
-                                     sicDetails.SICDataCount, sicScanNumbers, sicIntensities,
-                                     .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak,
-                                     udtSmoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
-                                     udtSICPotentialAreaStatsInFullSIC,
-                                     Not .CustomSICPeak, scanList.SIMDataPresent, False)
-
-
-                                    blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer),
-                                                                      sicDetails, sicScanNumbers, sicIntensities, sicIndices,
-                                                                      .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
-                                End With
-
-                                ' Possibly save the stats for this SIC to the SICData file
-                                dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
-                                                                    intParentIonIndices(intParentIonIndexPointer), sicDetails)
-
-                                ' Save the stats for this SIC to the XML file
-                                xmlResultsWriter.SaveDataToXML(scanList,
-                                                               intParentIonIndices(intParentIonIndexPointer), sicDetails,
-                                                               udtSmoothedYDataSubset, dataOutputHandler)
-
-                                blnParentIonUpdated(intParentIonIndexPointer) = True
-                                intParentIonsProcessed += 1
-
-                            End If
-                        Next intParentIonIndexPointer
-
-
-                        '---------------------------------------------------------
-                        ' Update progress
-                        '---------------------------------------------------------
-                        Try
-
-                            If scanList.ParentIonInfoCount > 1 Then
-                                UpdateProgress(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
-                            Else
-                                UpdateProgress(0)
-                            End If
-
-                            UpdateCacheStats(objSpectraCache)
-                            If masicOptions.AbortProcessing Then
-                                scanList.ProcessingIncomplete = True
-                                Exit For
-                            End If
-
-                            If intParentIonsProcessed Mod 100 = 0 Then
-                                If DateTime.UtcNow.Subtract(masicOptions.LastParentIonProcessingLogTime).TotalSeconds >= 10 OrElse intParentIonsProcessed Mod 500 = 0 Then
-                                    ReportMessage("Parent Ions Processed: " & intParentIonsProcessed.ToString())
-                                    Console.Write(".")
-                                    masicOptions.LastParentIonProcessingLogTime = DateTime.UtcNow
-                                End If
-                            End If
-
-                        Catch ex As Exception
-                            ReportError("ProcessMZList", "Error updating progress", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
-                        End Try
-
-                    Next intMZIndexWork
 
                     ' Reset intMZSearchChunkCount to 0
                     intMZSearchChunkCount = 0
+
                 End If
 
                 If masicOptions.AbortProcessing Then
@@ -973,14 +631,391 @@ Public Class clsSICProcessing
                 intMZIndex += 1
             Loop
 
-            blnSuccess = True
+            Return True
         Catch ex As Exception
             ReportError("ProcessMZList", "Error processing the m/z chunks to create the SIC data", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
-            blnSuccess = False
+            Return False
         End Try
 
+    End Function
 
-        Return blnSuccess
+    Private Function ProcessMzSearchChunk(
+      masicOptions As clsMASICOptions,
+      scanList As clsScanList,
+      dataAggregation As clsDataAggregation,
+      dataOutputHandler As clsDataOutput,
+      xmlResultsWriter As clsXMLResultsWriter,
+      objSpectraCache As clsSpectraCache,
+      scanNumScanConverter As clsScanNumScanTimeConversion,
+      intMZSearchChunkCount As Integer,
+      udtMZSearchChunk() As clsDataObjects.udtMZSearchInfoType,
+      intParentIonIndices As Integer(),
+      blnProcessSIMScans As Boolean,
+      intSIMIndex As Integer,
+      blnParentIonUpdated() As Boolean,
+      ByRef intParentIonsProcessed As Integer) As Boolean
+
+        Const DATA_COUNT_MEMORY_RESERVE = 200
+
+        ' The following are 2D arrays, ranging from 0 to intMZSearchChunkCount-1 in the first dimension and 0 to .SurveyScans.Count - 1 in the second dimension
+        ' We could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
+        Dim intFullSICScanIndices(,) As Integer     ' Pointer into .SurveyScans
+        Dim sngFullSICIntensities(,) As Single
+        Dim dblFullSICMasses(,) As Double
+        Dim intFullSICDataCount() As Integer        ' Count of the number of valid entries in the second dimension of the above 3 arrays
+
+        ' The following is a 1D array, containing the SIC intensities for a single m/z group
+        Dim sngFullSICIntensities1D() As Single
+
+        ' Reserve room in intFullSICScanIndices for at most intMaxMZCountInChunk values and .SurveyScans.Count scans
+        ReDim intFullSICDataCount(intMZSearchChunkCount - 1)
+        ReDim intFullSICScanIndices(intMZSearchChunkCount - 1, scanList.SurveyScans.Count - 1)
+        ReDim sngFullSICIntensities(intMZSearchChunkCount - 1, scanList.SurveyScans.Count - 1)
+        ReDim dblFullSICMasses(intMZSearchChunkCount - 1, scanList.SurveyScans.Count - 1)
+
+        ReDim sngFullSICIntensities1D(scanList.SurveyScans.Count - 1)
+
+
+        ' Initialize .MaximumIntensity and .ScanIndexMax
+        ' Additionally, reset intFullSICDataCount() and, for safety, set intFullSICScanIndices() to -1
+        For intMZIndexWork = 0 To intMZSearchChunkCount - 1
+            With udtMZSearchChunk(intMZIndexWork)
+                .MaximumIntensity = 0
+                .ScanIndexMax = 0
+            End With
+
+            intFullSICDataCount(intMZIndexWork) = 0
+            For intSurveyScanIndex = 0 To scanList.SurveyScans.Count - 1
+                intFullSICScanIndices(intMZIndexWork, intSurveyScanIndex) = -1
+            Next intSurveyScanIndex
+        Next intMZIndexWork
+
+        '---------------------------------------------------------
+        ' Step through scanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
+        ' We're stepping scan by scan since the process of loading a scan from disk is slower than the process of searching for each m/z in the scan
+        '---------------------------------------------------------
+        For intSurveyScanIndex = 0 To scanList.SurveyScans.Count - 1
+
+            Dim blnUseScan As Boolean
+
+            If blnProcessSIMScans Then
+                If scanList.SurveyScans(intSurveyScanIndex).SIMScan AndAlso
+                   scanList.SurveyScans(intSurveyScanIndex).SIMIndex = intSIMIndex Then
+                    blnUseScan = True
+                Else
+                    blnUseScan = False
+                End If
+            Else
+                blnUseScan = Not scanList.SurveyScans(intSurveyScanIndex).SIMScan
+
+                If scanList.SurveyScans(intSurveyScanIndex).ZoomScan Then
+                    blnUseScan = False
+                End If
+            End If
+
+            If Not blnUseScan Then
+                Continue For
+            End If
+
+            Dim intPoolIndex As Integer
+
+            If _
+                Not _
+                objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intSurveyScanIndex).ScanNumber,
+                                                       intPoolIndex) Then
+                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
+                Return False
+            End If
+
+            For intMZIndexWork = 0 To intMZSearchChunkCount - 1
+                With udtMZSearchChunk(intMZIndexWork)
+                    Dim dblMZToleranceDa As Double
+
+                    If .MZToleranceIsPPM Then
+                        dblMZToleranceDa = clsUtilities.PPMToMass(.MZTolerance, .SearchMZ)
+                    Else
+                        dblMZToleranceDa = .MZTolerance
+                    End If
+
+                    Dim intIonMatchCount As Integer
+                    Dim dblClosestMZ As Double
+
+                    Dim sngIonSum = dataAggregation.AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex),
+                                                                         .SearchMZ, dblMZToleranceDa,
+                                                                         intIonMatchCount, dblClosestMZ, False)
+
+                    Dim intDataIndex = intFullSICDataCount(intMZIndexWork)
+                    intFullSICScanIndices(intMZIndexWork, intDataIndex) = intSurveyScanIndex
+                    sngFullSICIntensities(intMZIndexWork, intDataIndex) = sngIonSum
+
+                    If _
+                        sngIonSum < Single.Epsilon AndAlso
+                        masicOptions.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
+                        sngFullSICIntensities(intMZIndexWork, intDataIndex) =
+                            scanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
+                    End If
+
+                    dblFullSICMasses(intMZIndexWork, intDataIndex) = dblClosestMZ
+                    If sngIonSum > .MaximumIntensity Then
+                        .MaximumIntensity = sngIonSum
+                        .ScanIndexMax = intDataIndex
+                    End If
+
+                    intFullSICDataCount(intMZIndexWork) += 1
+                End With
+            Next intMZIndexWork
+
+            If intSurveyScanIndex Mod 100 = 0 Then
+                UpdateProgress("Loading raw SIC data: " & intSurveyScanIndex & " / " & scanList.SurveyScans.Count)
+                If masicOptions.AbortProcessing Then
+                    scanList.ProcessingIncomplete = True
+                    Return False
+                End If
+            End If
+        Next intSurveyScanIndex
+
+        UpdateProgress("Creating SIC's for the parent ions")
+
+        If masicOptions.AbortProcessing Then
+            scanList.ProcessingIncomplete = True
+            Return False
+        End If
+
+        Const DebugParentIonIndexToFind = 3139
+        Const DebugMZToFind As Single = 488.47
+
+        '---------------------------------------------------------
+        ' Compute the noise level in sngFullSICIntensities() for each m/z in udtMZSearchChunk
+        ' Also, find the peaks for each m/z in udtMZSearchChunk and retain the largest peak found
+        '---------------------------------------------------------
+        For intMZIndexWork = 0 To intMZSearchChunkCount - 1
+
+            ' Use this for debugging
+            If Math.Abs(udtMZSearchChunk(intMZIndexWork).SearchMZ - DebugMZToFind) < 0.1 Then
+                Dim intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart
+            End If
+
+            ' Copy the data for this m/z into sngFullSICIntensities1D()
+            For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
+                sngFullSICIntensities1D(intDataIndex) = sngFullSICIntensities(intMZIndexWork, intDataIndex)
+            Next intDataIndex
+
+            ' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
+            Dim blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1, masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, udtMZSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
+
+            If Not blnSuccess Then
+                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, True)
+                Return False
+            End If
+
+            Dim udtSICPotentialAreaStatsInFullSIC As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+
+            ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
+            mMASICPeakFinder.FindPotentialPeakArea(
+                intFullSICDataCount(intMZIndexWork),
+                sngFullSICIntensities1D,
+                udtSICPotentialAreaStatsInFullSIC,
+                masicOptions.SICOptions.SICPeakFinderOptions)
+
+            ' Clear udtSICPotentialAreaStatsForPeak
+            Dim udtSICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+
+            Dim intScanIndexObservedInFullSIC = udtMZSearchChunk(intMZIndexWork).ScanIndexMax
+
+            ' Initialize sicDetails
+            Dim sicDetails = New clsSICDetails()
+            sicDetails.SICScanType = clsScanList.eScanTypeConstants.SurveyScan
+
+            Dim udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
+
+            ' Populate sicDetails using the data centered around the highest intensity in intFullSICIntensities
+            ' Note that this function will update udtSICPeak.IndexObserved
+            blnSuccess = ExtractSICDetailsFromFullSIC(
+                intMZIndexWork, udtMZSearchChunk,
+                intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses,
+                scanList, intScanIndexObservedInFullSIC,
+                sicDetails, udtSICPeak,
+                masicOptions, scanNumScanConverter, False, 0)
+
+            Dim udtSmoothedYData As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
+            Dim udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
+
+            ' Reserve room in udtSmoothedYData and udtSmoothedYDataSubset
+            With udtSmoothedYData
+                .DataCount = 0
+                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
+            End With
+
+            With udtSmoothedYDataSubset
+                .DataCount = 0
+                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
+            End With
+
+            Dim mzIndexSICScanNumbers = sicDetails.SICScanNumbers
+            Dim mzIndexSICIntensities = sicDetails.SICIntensities
+            Dim mzIndexSICIndices = sicDetails.SICScanIndices
+
+            ' Find the largest peak in the SIC for this m/z
+            Dim blnLargestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
+                sicDetails.SICDataCount, mzIndexSICScanNumbers, mzIndexSICIntensities,
+                udtSICPotentialAreaStatsForPeak, udtSICPeak,
+                udtSmoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
+                udtSICPotentialAreaStatsInFullSIC,
+                True, scanList.SIMDataPresent, False)
+
+            If blnLargestPeakFound Then
+                '--------------------------------------------------------
+                ' Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
+                ' If it is, then assign the stats of the largest peak to the given parent ion
+                '--------------------------------------------------------
+
+                For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
+                    ' Use this for debugging
+                    If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
+                        intScanIndexObservedInFullSIC = -1
+                    End If
+
+                    Dim blnStorePeakInParentIon = False
+                    If scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
+
+                    ' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
+                    With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+                        If .SurveyScanIndex >= mzIndexSICIndices(udtSICPeak.IndexBaseLeft) AndAlso
+                           .SurveyScanIndex <= mzIndexSICIndices(udtSICPeak.IndexBaseRight) Then
+
+                            blnStorePeakInParentIon = True
+                        End If
+                    End With
+
+                    If blnStorePeakInParentIon Then
+                        blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer),
+                                                          sicDetails, mzIndexSICScanNumbers, mzIndexSICIntensities, mzIndexSICIndices,
+                                                          udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
+
+                        ' Possibly save the stats for this SIC to the SICData file
+                        dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
+                                                            intParentIonIndices(intParentIonIndexPointer), sicDetails)
+
+                        ' Save the stats for this SIC to the XML file
+                        xmlResultsWriter.SaveDataToXML(scanList,
+                                                       intParentIonIndices(intParentIonIndexPointer), sicDetails,
+                                                       udtSmoothedYDataSubset, dataOutputHandler)
+
+                        blnParentIonUpdated(intParentIonIndexPointer) = True
+                        intParentIonsProcessed += 1
+
+                    End If
+
+
+                Next intParentIonIndexPointer
+            End If
+
+            '--------------------------------------------------------
+            ' Now step through the parent ions and process those that were not updated using udtSICPeak
+            ' For each, search for the closest peak in sngSICIntensity
+            '--------------------------------------------------------
+            For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
+
+                If blnParentIonUpdated(intParentIonIndexPointer) Then Continue For
+
+                If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
+                    intScanIndexObservedInFullSIC = -1
+                End If
+
+                With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+                    ' Clear udtSICPotentialAreaStatsForPeak
+                    .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+
+                    ' Record the index in the Full SIC that the parent ion mass was first observed
+                    ' Search for .SurveyScanIndex in intFullSICScanIndices
+                    intScanIndexObservedInFullSIC = -1
+                    For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
+                        If intFullSICScanIndices(intMZIndexWork, intDataIndex) >= .SurveyScanIndex Then
+                            intScanIndexObservedInFullSIC = intDataIndex
+                            Exit For
+                        End If
+                    Next intDataIndex
+
+                    If intScanIndexObservedInFullSIC = -1 Then
+                        ' Match wasn't found; this is unexpected
+                        ReportError("ProcessMZList", "Programming error: survey scan index not found in intFullSICScanIndices()", Nothing, True, True, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
+                        intScanIndexObservedInFullSIC = 0
+                    End If
+
+                    ' Populate udtSICDetails using the data centered around intScanIndexObservedInFullSIC
+                    ' Note that this function will update udtSICPeak.IndexObserved
+                    blnSuccess = ExtractSICDetailsFromFullSIC(
+                        intMZIndexWork, udtMZSearchChunk,
+                        intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses,
+                        scanList, intScanIndexObservedInFullSIC,
+                        sicDetails, .SICStats.Peak,
+                        masicOptions, scanNumScanConverter,
+                        .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
+
+
+                    Dim sicScanNumbers = sicDetails.SICScanNumbers
+                    Dim sicIntensities = sicDetails.SICIntensities
+                    Dim sicIndices = sicDetails.SICScanIndices
+
+                    blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(
+                        sicDetails.SICDataCount, sicScanNumbers, sicIntensities,
+                        .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak,
+                        udtSmoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
+                        udtSICPotentialAreaStatsInFullSIC,
+                        Not .CustomSICPeak, scanList.SIMDataPresent, False)
+
+
+                    blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer),
+                                                      sicDetails, sicScanNumbers, sicIntensities, sicIndices,
+                                                      .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
+                End With
+
+                ' Possibly save the stats for this SIC to the SICData file
+                dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
+                                                    intParentIonIndices(intParentIonIndexPointer), sicDetails)
+
+                ' Save the stats for this SIC to the XML file
+                xmlResultsWriter.SaveDataToXML(scanList,
+                                               intParentIonIndices(intParentIonIndexPointer), sicDetails,
+                                               udtSmoothedYDataSubset, dataOutputHandler)
+
+                blnParentIonUpdated(intParentIonIndexPointer) = True
+                intParentIonsProcessed += 1
+
+            Next intParentIonIndexPointer
+
+            '---------------------------------------------------------
+            ' Update progress
+            '---------------------------------------------------------
+            Try
+
+                If scanList.ParentIonInfoCount > 1 Then
+                    UpdateProgress(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
+                Else
+                    UpdateProgress(0)
+                End If
+
+                UpdateCacheStats(objSpectraCache)
+                If masicOptions.AbortProcessing Then
+                    scanList.ProcessingIncomplete = True
+                    Exit For
+                End If
+
+                If intParentIonsProcessed Mod 100 = 0 Then
+                    If DateTime.UtcNow.Subtract(masicOptions.LastParentIonProcessingLogTime).TotalSeconds >= 10 OrElse intParentIonsProcessed Mod 500 = 0 Then
+                        ReportMessage("Parent Ions Processed: " & intParentIonsProcessed.ToString())
+                        Console.Write(".")
+                        masicOptions.LastParentIonProcessingLogTime = DateTime.UtcNow
+                    End If
+                End If
+
+            Catch ex As Exception
+                ReportError("ProcessMZList", "Error updating progress", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+            End Try
+
+        Next intMZIndexWork
+
+        Return True
 
     End Function
 
