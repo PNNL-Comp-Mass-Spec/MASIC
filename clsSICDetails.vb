@@ -43,30 +43,6 @@
         End Get
     End Property
 
-
-
-    ''Public SICDataCount As Integer
-
-    '''' <summary>
-    '''' This array is necessary since SIMScan data uses non-adjacent survey scans
-    '''' </summary>
-    'Public SICScanIndices() As Integer
-
-    '''' <summary>
-    '''' Populated as a convenience since necessary to pass to various functions
-    '''' </summary>
-    'Public SICScanNumbers() As Integer
-
-    '''' <summary>
-    '''' SIC Abundances
-    '''' </summary>
-    'Public SICData() As Single
-
-    '''' <summary>
-    '''' SIC Masses
-    '''' </summary>
-    'Public SICMasses() As Double
-
     ''' <summary>
     ''' Constructor
     ''' </summary>
@@ -74,11 +50,11 @@
         SICData = New List(Of clsSICDataPoint)
     End Sub
 
-
     Public Function AddData(scanNumber As Integer, intensity As Single, mass As Double, scanIndex As Integer) As Integer
         Dim dataPoint = New clsSICDataPoint(scanNumber, intensity, mass, scanIndex)
         SICData.Add(dataPoint)
     End Function
+
     Public Sub Reset()
         SICData.Clear()
         SICScanType = clsScanList.eScanTypeConstants.SurveyScan
