@@ -22,6 +22,7 @@ Option Strict On
 ' SOFTWARE.  This notice including this sentence must appear on any copies of 
 ' this computer software.
 
+Imports System.Text
 Imports MASIC.DataInput
 Imports MASICPeakFinder.clsMASICPeakFinder
 Imports SharedVBNetRoutines.VBNetRoutines
@@ -38,6 +39,8 @@ Public Class frmMain
         InitializeControls()
 
         mCacheOptions = New clsSpectrumCacheOptions()
+        mLogMessages = New List(Of String)
+
     End Sub
 
 #Region "Constants and Enums"
@@ -89,6 +92,12 @@ Public Class frmMain
 
     Private WithEvents mMasic As clsMASIC
     Private mProgressForm As ProgressFormNET.frmProgress
+
+    ''' <summary>
+    ''' Log messages, including warnings and errors, with the newest message at the top
+    ''' </summary>
+    Private mLogMessages As List(Of String)
+
 #End Region
 
 #Region "Procedures"
@@ -136,6 +145,40 @@ Public Class frmMain
                 .Rows.Add(myDataRow)
             End If
         End With
+
+    End Sub
+
+    Private Sub AppendToLog(messageType As EventLogEntryType, message As String)
+
+        If message.StartsWith("ProcessingStats") OrElse message.StartsWith("Parameter file not specified") Then
+            Return
+        End If
+
+        Dim textToAppend As String
+        Dim doEvents = False
+
+        Select Case messageType
+            Case EventLogEntryType.Error
+                textToAppend = "Error: " & message
+                tbsOptions.SelectTab(tbsOptions.TabCount - 1)
+                doEvents = True
+            Case EventLogEntryType.Warning
+                textToAppend = "Warning: " & message
+                tbsOptions.SelectTab(tbsOptions.TabCount - 1)
+                doEvents = True
+            Case Else
+                ' Includes Case EventLogEntryType.Information
+                textToAppend = message
+        End Select
+
+        mLogMessages.Insert(0, textToAppend)
+
+        txtLogMessages.AppendText(textToAppend & ControlChars.NewLine)
+        txtLogMessages.ScrollToCaret()
+
+        If doEvents Then
+            Application.DoEvents()
+        End If
 
     End Sub
 
@@ -2282,6 +2325,18 @@ Public Class frmMain
             End If
             Application.DoEvents()
         End If
+    End Sub
+
+    Private Sub MessageEventHandler(message As String)
+        AppendToLog(EventLogEntryType.Information, message)
+    End Sub
+
+    Private Sub ErrorEventHandler(message As String)
+        AppendToLog(EventLogEntryType.Error, message)
+    End Sub
+
+    Private Sub WarningEventHandler(message As String)
+        AppendToLog(EventLogEntryType.Warning, message)
     End Sub
 #End Region
 

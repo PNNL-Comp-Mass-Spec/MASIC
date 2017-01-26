@@ -213,6 +213,8 @@ Partial Class frmMain
         Me.cmdStartProcessing = New System.Windows.Forms.Button()
         Me.cmdSelectOutputFolder = New System.Windows.Forms.Button()
         Me.txtOutputFolderPath = New System.Windows.Forms.TextBox()
+        Me.TabPageLog = New System.Windows.Forms.TabPage()
+        Me.txtLogMessages = New System.Windows.Forms.TextBox()
         Me.fraInputFilePath.SuspendLayout()
         Me.tbsOptions.SuspendLayout()
         Me.TabPageMasicExportOptions.SuspendLayout()
@@ -242,6 +244,7 @@ Partial Class frmMain
         Me.fraDatasetLookupInfo.SuspendLayout()
         Me.fraMemoryConservationOptions.SuspendLayout()
         Me.fraOutputFolderPath.SuspendLayout()
+        Me.TabPageLog.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtInputFilePath
@@ -368,6 +371,7 @@ Partial Class frmMain
         Me.tbsOptions.Controls.Add(Me.TabPageCustomSICOptions)
         Me.tbsOptions.Controls.Add(Me.TabPageReporterIons)
         Me.tbsOptions.Controls.Add(Me.TabPageAdvancedOptions)
+        Me.tbsOptions.Controls.Add(Me.TabPageLog)
         Me.tbsOptions.Location = New System.Drawing.Point(10, 203)
         Me.tbsOptions.Name = "tbsOptions"
         Me.tbsOptions.SelectedIndex = 0
@@ -1957,6 +1961,28 @@ Partial Class frmMain
         Me.txtOutputFolderPath.Size = New System.Drawing.Size(741, 22)
         Me.txtOutputFolderPath.TabIndex = 1
         '
+        'TabPageLog
+        '
+        Me.TabPageLog.Controls.Add(Me.txtLogMessages)
+        Me.TabPageLog.Location = New System.Drawing.Point(4, 25)
+        Me.TabPageLog.Name = "TabPageLog"
+        Me.TabPageLog.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageLog.Size = New System.Drawing.Size(882, 327)
+        Me.TabPageLog.TabIndex = 10
+        Me.TabPageLog.Text = "Log"
+        Me.TabPageLog.UseVisualStyleBackColor = True
+        '
+        'txtLogMessages
+        '
+        Me.txtLogMessages.Location = New System.Drawing.Point(6, 6)
+        Me.txtLogMessages.Multiline = True
+        Me.txtLogMessages.Name = "txtLogMessages"
+        Me.txtLogMessages.ReadOnly = True
+        Me.txtLogMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtLogMessages.Size = New System.Drawing.Size(870, 315)
+        Me.txtLogMessages.TabIndex = 1
+        Me.txtLogMessages.Text = "No log messages."
+        '
         'frmMain
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
@@ -2016,6 +2042,8 @@ Partial Class frmMain
         Me.fraMemoryConservationOptions.ResumeLayout(False)
         Me.fraOutputFolderPath.ResumeLayout(False)
         Me.fraOutputFolderPath.PerformLayout()
+        Me.TabPageLog.ResumeLayout(False)
+        Me.TabPageLog.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2209,5 +2237,6 @@ Partial Class frmMain
     Friend WithEvents fraReporterIonMassMode As System.Windows.Forms.GroupBox
     Friend WithEvents cboReporterIonMassMode As System.Windows.Forms.ComboBox
     Friend WithEvents chkReporterIonSaveObservedMasses As System.Windows.Forms.CheckBox
-
+    Friend WithEvents TabPageLog As TabPage
+    Friend WithEvents txtLogMessages As TextBox
 End Class
