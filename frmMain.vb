@@ -41,6 +41,9 @@ Public Class frmMain
         mCacheOptions = New clsSpectrumCacheOptions()
         mLogMessages = New List(Of String)
 
+        mMasic = New clsMASIC()
+        RegisterEvents(mMasic)
+
     End Sub
 
 #Region "Constants and Enums"
@@ -90,7 +93,7 @@ Public Class frmMain
     Private mHeightAdjustForce As Integer
     Private mHeightAdjustTime As DateTime
 
-    Private WithEvents mMasic As clsMASIC
+    Private mMasic As clsMASIC
     Private mProgressForm As ProgressFormNET.frmProgress
 
     ''' <summary>
@@ -732,7 +735,7 @@ Public Class frmMain
 
         Try
             If Not blnSaveWindowDimensionsOnly Then
-                objMasic = New clsMASIC
+                objMasic = New clsMASIC()
 
                 UpdateMasicSettings(objMasic)
 
@@ -1043,10 +1046,8 @@ Public Class frmMain
         If Not mWorking AndAlso ConfirmPaths() Then
             Try
 
-                If mMasic Is Nothing Then
-                    mMasic = New clsMASIC
-                End If
                 mMasic.ShowMessages = True
+                txtLogMessages.ResetText()
 
                 ' Configure settings
                 blnSuccess = UpdateMasicSettings(mMasic)
@@ -1084,7 +1085,6 @@ Public Class frmMain
                         Windows.Forms.MessageBox.Show("Error analyzing input file with MASIC: " & ControlChars.NewLine & .GetErrorMessage() & ControlChars.NewLine & .StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                     End If
                 End With
-                mMasic = Nothing
 
             Catch ex As Exception
                 Windows.Forms.MessageBox.Show("Error in frmMain->ProcessFileUsingMASIC: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -1096,9 +1096,17 @@ Public Class frmMain
 
                 mWorking = False
                 cmdStartProcessing.Enabled = True
-                mMasic = Nothing
             End Try
         End If
+    End Sub
+
+    Private Sub RegisterEvents(oClass As clsMASIC)
+        AddHandler oClass.MessageEvent, AddressOf MessageEventHandler
+        AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
+        AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
+        AddHandler oClass.ProgressChanged, AddressOf MASIC_ProgressChanged
+        AddHandler oClass.ProgressResetKeypressAbort, AddressOf MASIC_ProgressResetKeypressAbort
+        AddHandler oClass.ProgressSubtaskChanged, AddressOf MASIC_ProgressSubtaskChanged
     End Sub
 
     Private Sub ResetToDefaults(blnConfirm As Boolean, Optional ByRef objMasic As clsMASIC = Nothing)
@@ -1116,7 +1124,7 @@ Public Class frmMain
         End If
 
         If objMasic Is Nothing Then
-            objMasic = New clsMASIC
+            objMasic = New clsMASIC()
             blnExistingMasicObjectUsed = False
         Else
             blnExistingMasicObjectUsed = True
@@ -1574,10 +1582,6 @@ Public Class frmMain
 
     Private Sub ShowAboutBox()
         Dim strMessage As String
-
-        If mMasic Is Nothing Then
-            mMasic = New clsMASIC
-        End If
 
         strMessage = String.Empty
 
@@ -2299,7 +2303,7 @@ Public Class frmMain
         IniFileSaveOptions(GetSettingsFilePath(), True)
     End Sub
 
-    Private Sub mMASIC_ProgressChanged(taskDescription As String, percentComplete As Single) Handles mMasic.ProgressChanged
+    Private Sub MASIC_ProgressChanged(taskDescription As String, percentComplete As Single)
         If Not mProgressForm Is Nothing Then
             mProgressForm.UpdateCurrentTask(mMasic.ProgressStepDescription)
             mProgressForm.UpdateProgressBar(percentComplete)
@@ -2310,13 +2314,13 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub mMASIC_ProgressResetKeypressAbort() Handles mMasic.ProgressResetKeypressAbort
+    Private Sub MASIC_ProgressResetKeypressAbort()
         If Not mProgressForm Is Nothing Then
             mProgressForm.ResetKeyPressAbortProcess()
         End If
     End Sub
 
-    Private Sub mMASIC_ProgressSubtaskChanged() Handles mMasic.ProgressSubtaskChanged
+    Private Sub MASIC_ProgressSubtaskChanged()
         If Not mProgressForm Is Nothing Then
             mProgressForm.UpdateCurrentSubTask(mMasic.SubtaskDescription)
             mProgressForm.UpdateSubtaskProgressBar(mMasic.SubtaskProgressPercentComplete)
