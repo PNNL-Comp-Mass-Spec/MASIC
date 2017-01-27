@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.7.6235; January 26, 2017
+	- Write an empty XML tag for MZToleranceDaList and ScanToleranceList if the tolerances are all zero or undefined
+
 Version 2.7.6234; January 25, 2017
 	- Include SignalToNoise and Resolution for reporter ions detected in Thermo FTMS spectra
 	- Widescale refactor to reduce the size of clsMasic
