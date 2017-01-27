@@ -18,6 +18,44 @@ Namespace DataOutput
             mOptions = masicOptions
         End Sub
 
+        ''' <summary>
+        ''' Examines the values in toleranceList
+        ''' If all empty and/or all 0, returns an empty string
+        ''' </summary>
+        ''' <param name="toleranceList">Comma separated list of values</param>
+        ''' <returns></returns>
+        Private Function CheckForEmptyToleranceList(toleranceList As String) As String
+
+            Dim toleranceValues = toleranceList.Split(","c)
+            Dim valuesDefined = False
+
+            For Each value In toleranceValues
+                If String.IsNullOrWhiteSpace(value) Then
+                    Continue For
+                End If
+
+                If value.Trim() = "0" Then
+                    Continue For
+                End If
+
+                Dim dblValue As Double
+                If Double.TryParse(value, dblValue) Then
+                    If Math.Abs(dblValue) < Double.Epsilon Then
+                        Continue For
+                    End If
+                End If
+
+                valuesDefined = True
+            Next
+
+            If valuesDefined Then
+                Return toleranceList
+            Else
+                Return String.Empty
+            End If
+
+        End Function
+
         Public Function SaveDataToXML(
           scanList As clsScanList,
           intParentIonIndex As Integer,
@@ -534,9 +572,9 @@ Namespace DataOutput
                 objXMLOut.WriteStartElement("CustomSICValues")
                 With mOptions.CustomSICList
                     objXMLOut.WriteElementString("MZList", .RawTextMZList)
-                    objXMLOut.WriteElementString("MZToleranceDaList", .RawTextMZToleranceDaList)
+                    objXMLOut.WriteElementString("MZToleranceDaList", CheckForEmptyToleranceList(.RawTextMZToleranceDaList))
                     objXMLOut.WriteElementString("ScanCenterList", .RawTextScanOrAcqTimeCenterList)
-                    objXMLOut.WriteElementString("ScanToleranceList", .RawTextScanOrAcqTimeToleranceList)
+                    objXMLOut.WriteElementString("ScanToleranceList", CheckForEmptyToleranceList(.RawTextScanOrAcqTimeToleranceList))
                     objXMLOut.WriteElementString("ScanTolerance", .ScanOrAcqTimeTolerance.ToString())
                     objXMLOut.WriteElementString("ScanType", .ScanToleranceType.ToString())
                     objXMLOut.WriteElementString("LimitSearchToCustomMZList", .LimitSearchToCustomMZList.ToString())

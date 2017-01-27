@@ -219,30 +219,6 @@ Public Class clsMASICOptions
 
     Public Function LoadParameterFileSettings(strParameterFilePath As String) As Boolean
 
-        'Dim objSettingsFile As New XmlSettingsFileAccessor
-
-        'Dim strMZList As String
-        'Dim strMZToleranceDaList As String
-
-        'Dim strScanCenterList As String
-        'Dim strScanToleranceList As String
-
-        'Dim strScanCommentList As String
-        'Dim strScanTolerance As String
-        'Dim strScanType As String
-        'Dim strFilterList As String
-
-        'Dim eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants
-        'Dim eReporterIonITraq4PlexCorrectionFactorType As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
-
-        'Dim dblSICTolerance As Double
-        'Dim blnSICToleranceIsPPM As Boolean
-
-        'Dim strErrorMessage As String
-        'Dim blnNotPresent As Boolean
-
-        'Dim blnSuccess As Boolean
-
         Try
 
             If strParameterFilePath Is Nothing OrElse strParameterFilePath.Length = 0 Then

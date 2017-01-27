@@ -40,7 +40,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "January 25, 2017"
+        MyBase.mFileDate = "January 26, 2017"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
