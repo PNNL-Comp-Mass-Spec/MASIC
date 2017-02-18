@@ -3024,7 +3024,8 @@ Public Class clsMASICPeakFinder
         End If
 
         If mShowMessages AndAlso blnAllowInformUser Then
-            Windows.Forms.MessageBox.Show(mStatusMessage & ControlChars.NewLine & ex.Message, "Error", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Exclamation)
+            System.Windows.Forms.MessageBox.Show(mStatusMessage & ControlChars.NewLine & ex.Message, "Error",
+                                                 System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation)
         ElseIf blnAllowThrowingException Then
             Throw New Exception(mStatusMessage, ex)
         End If
