@@ -195,7 +195,7 @@ Public Class clsMASICPeakFinder
 #Region "Classwide Variables"
     Private mShowMessages As Boolean
     Private mStatusMessage As String
-    Private mErrorLogger As PRISM.Logging.ILogger
+    Private mErrorLogger As PRISM.ILogger
 #End Region
 
 #Region "Properties"
@@ -227,7 +227,7 @@ Public Class clsMASICPeakFinder
     End Property
 #End Region
 
-    Public Sub AttachErrorLogger(objLogger As PRISM.Logging.ILogger, intDebugLevel As Integer)
+    Public Sub AttachErrorLogger(objLogger As PRISM.ILogger, intDebugLevel As Integer)
         If Not mErrorLogger Is Nothing Then Exit Sub
         mErrorLogger = objLogger
     End Sub
