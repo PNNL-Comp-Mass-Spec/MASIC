@@ -26,6 +26,7 @@ Imports System.Text
 Imports MASIC.DataInput
 Imports MASICPeakFinder.clsMASICPeakFinder
 Imports SharedVBNetRoutines.VBNetRoutines
+Imports ShFolderBrowser.FolderBrowser
 
 Public Class frmMain
 
@@ -1503,7 +1504,7 @@ Public Class frmMain
 
     Private Sub SelectOutputFolder()
 
-        Dim objFolderBrowserDialog As New PRISM.Files.FolderBrowser
+        Dim objFolderBrowserDialog As New FolderBrowser()
 
         With objFolderBrowserDialog
             ' No need to set the Browse Flags; default values are already set

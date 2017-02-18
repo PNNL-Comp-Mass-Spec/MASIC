@@ -133,6 +133,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\SharedVBNetRoutines.dll</HintPath>
     </Reference>
+    <Reference Include="ShFolderBrowser">
+      <HintPath>Lib\ShFolderBrowser.dll</HintPath>
+    </Reference>
     <Reference Include="SpectraTypeClassifier">
       <HintPath>Lib\SpectraTypeClassifier.dll</HintPath>
     </Reference>
