@@ -21,6 +21,7 @@ Source: ..\bin\MSDataFileReader.dll           ; DestDir: {app}
 Source: ..\bin\NetCDFReader.dll               ; DestDir: {app}
 Source: ..\bin\PNNLOmics.dll                  ; DestDir: {app}
 Source: ..\bin\PRISM.dll                      ; DestDir: {app}
+Source: ..\bin\ShFolderBrowser.dll            ; DestDir: {app}
 Source: ..\bin\ProgressFormNET.dll            ; DestDir: {app}
 Source: ..\bin\SavGolCS.dll                   ; DestDir: {app}
 Source: ..\bin\SharedVBNetRoutines.dll        ; DestDir: {app}

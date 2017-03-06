@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.7.6274; March 6, 2017
+	- Update PRISM.dll and add ShFolderBrowser.dll
+
 Version 2.7.6235; January 26, 2017
 	- Write an empty XML tag for MZToleranceDaList and ScanToleranceList if the tolerances are all zero or undefined
 
