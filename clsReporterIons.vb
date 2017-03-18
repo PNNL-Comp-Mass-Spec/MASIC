@@ -23,6 +23,7 @@
         FSFACustomCarbonyl = 13
         FSFACustomCarboxylic = 14
         FSFACustomHydroxyl = 15
+        TMTElevenMZ = 16
     End Enum
 
 #End Region
@@ -146,15 +147,31 @@
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
                 reporterIons.Add(New clsReporterIonInfo(126.127725))
-                reporterIons.Add(New clsReporterIonInfo(127.12476))
-                reporterIons.Add(New clsReporterIonInfo(127.131079))
-                reporterIons.Add(New clsReporterIonInfo(128.128114))
-                reporterIons.Add(New clsReporterIonInfo(128.134433))
-                reporterIons.Add(New clsReporterIonInfo(129.131468))
-                reporterIons.Add(New clsReporterIonInfo(129.137787))
-                reporterIons.Add(New clsReporterIonInfo(130.134822))
-                reporterIons.Add(New clsReporterIonInfo(130.141141))
-                reporterIons.Add(New clsReporterIonInfo(131.138176))
+                reporterIons.Add(New clsReporterIonInfo(127.12476))         ' 127N
+                reporterIons.Add(New clsReporterIonInfo(127.131079))        ' 127C
+                reporterIons.Add(New clsReporterIonInfo(128.128114))        ' 128N
+                reporterIons.Add(New clsReporterIonInfo(128.134433))        ' 128C
+                reporterIons.Add(New clsReporterIonInfo(129.131468))        ' 129N
+                reporterIons.Add(New clsReporterIonInfo(129.137787))        ' 129C
+                reporterIons.Add(New clsReporterIonInfo(130.134822))        ' 130N
+                reporterIons.Add(New clsReporterIonInfo(130.141141))        ' 130C
+                reporterIons.Add(New clsReporterIonInfo(131.138176))        ' 131N
+
+            Case eReporterIonMassModeConstants.TMTElevenMZ
+                ' TMT 11-plex Isobaric tags (from Thermo)
+                ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
+                ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
+                reporterIons.Add(New clsReporterIonInfo(126.127725))
+                reporterIons.Add(New clsReporterIonInfo(127.12476))         ' 127N
+                reporterIons.Add(New clsReporterIonInfo(127.131079))        ' 127C
+                reporterIons.Add(New clsReporterIonInfo(128.128114))        ' 128N
+                reporterIons.Add(New clsReporterIonInfo(128.134433))        ' 128C
+                reporterIons.Add(New clsReporterIonInfo(129.131468))        ' 129N
+                reporterIons.Add(New clsReporterIonInfo(129.137787))        ' 129C
+                reporterIons.Add(New clsReporterIonInfo(130.134822))        ' 130N
+                reporterIons.Add(New clsReporterIonInfo(130.141141))        ' 130C
+                reporterIons.Add(New clsReporterIonInfo(131.138176))        ' 131N
+                reporterIons.Add(New clsReporterIonInfo(131.144495))        ' 131C
 
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
 
@@ -261,6 +278,8 @@
                 Return "6-plex TMT"
             Case eReporterIonMassModeConstants.TMTTenMZ
                 Return "10-plex TMT"
+            Case eReporterIonMassModeConstants.TMTElevenMZ
+                Return "11-plex TMT"
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
                 Return "8-plex iTraq (High Res MS/MS)"
             Case eReporterIonMassModeConstants.ITraqEightMZLowRes

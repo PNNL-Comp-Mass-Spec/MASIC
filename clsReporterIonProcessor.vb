@@ -123,7 +123,8 @@ Public Class clsReporterIonProcessor
                         ' We skip contaminant ions, unless blnSaveUncorrectedIntensities is True, then we include them
 
                         Dim mzValue As String
-                        If (mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ) Then
+                        If (mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ OrElse
+                            mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ) Then
                             mzValue = reporterIon.MZ.ToString("#0.000")
                         Else
                             mzValue = CInt(reporterIon.MZ).ToString()

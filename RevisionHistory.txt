@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.7.6285; March 17, 2017
+	- Add TMT11 (eleven-plex TMT)
+
 Version 2.7.6274; March 6, 2017
 	- Update PRISM.dll and add ShFolderBrowser.dll
 
