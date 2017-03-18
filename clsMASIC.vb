@@ -6,7 +6,7 @@ Option Strict On
 '   a BPI for the fragmentation scans, an XML file containing the SIC data
 '   for each parent ion, and a "flat file" ready for import into the database
 '   containing summaries of the SIC data statistics
-' Supported file types are Finnigan .Raw files (LCQ, LTQ, LTQ-FT), 
+' Supported file types are Finnigan .Raw files (LCQ, LTQ, LTQ-FT),
 '   Agilent Ion Trap (.MGF and .CDF files), and mzXML files
 
 ' -------------------------------------------------------------------------------
@@ -17,18 +17,18 @@ Option Strict On
 ' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
 ' Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
 ' -------------------------------------------------------------------------------
-' 
+'
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at 
+' in compliance with the License.  You may obtain a copy of the License at
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
-' Notice: This computer software was prepared by Battelle Memorial Institute, 
-' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the 
-' Department of Energy (DOE).  All rights in the computer software are reserved 
-' by DOE on behalf of the United States Government and the Contractor as 
-' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY 
-' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS 
-' SOFTWARE.  This notice including this sentence must appear on any copies of 
+' Notice: This computer software was prepared by Battelle Memorial Institute,
+' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
+' Department of Energy (DOE).  All rights in the computer software are reserved
+' by DOE on behalf of the United States Government and the Contractor as
+' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY
+' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS
+' SOFTWARE.  This notice including this sentence must appear on any copies of
 ' this computer software.
 
 Imports System.Runtime.InteropServices
@@ -1171,7 +1171,7 @@ Public Class clsMASIC
         ' Obtain a handle to the current process
         Dim objProcess = Process.GetCurrentProcess()
 
-        ' The WorkingSet is the total physical memory usage 
+        ' The WorkingSet is the total physical memory usage
         Return CSng(objProcess.WorkingSet64 / 1024 / 1024)
 
     End Function
@@ -1804,7 +1804,7 @@ Public Class clsMASIC
 
                     LogMessage("ProcessFile: Call FinalizeXMLFile")
                     Dim processingTimeSec = GetTotalProcessingTimeSec()
-                    blnSuccess = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, objSpectraCache, 
+                    blnSuccess = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, objSpectraCache,
                                                                         mProcessingStats, processingTimeSec)
 
                 End If
@@ -2097,10 +2097,10 @@ Public Class clsMASIC
         Dim sngWeightingFactors() As Single
 
         If mOptions.SkipMSMSProcessing Then
-            ' Step                              0   1     2     3  4   5      6      7      8     
+            ' Step                              0   1     2     3  4   5      6      7      8
             sngWeightingFactors = New Single() {0, 0.97, 0.002, 0, 0, 0.001, 0.025, 0.001, 0.001}            ' The sum of these factors should be 1.00
         Else
-            ' Step                              0   1      2      3     4     5      6      7      8     
+            ' Step                              0   1      2      3     4     5      6      7      8
             sngWeightingFactors = New Single() {0, 0.194, 0.003, 0.65, 0.09, 0.001, 0.006, 0.001, 0.055}     ' The sum of these factors should be 1.00
         End If
 

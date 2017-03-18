@@ -1,7 +1,7 @@
 ﻿Imports ThermoRawFileReader
 
 ''' <summary>
-''' 
+''' Used to track all spectra (scans) in the instrument data file
 ''' </summary>
 Public Class clsScanList
     Inherits clsEventNotifier

@@ -38,13 +38,13 @@
 #Region "Properties"
 
     ''' <summary>
-    ''' When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd 
+    ''' When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
     ''' will be populated with the m/z range of the reporter ions being processed
     ''' </summary>
     Public Property MZIntensityFilterIgnoreRangeStart As Double
 
     ''' <summary>
-    ''' When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd 
+    ''' When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
     ''' will be populated with the m/z range of the reporter ions being processed
     ''' </summary>
     Public Property MZIntensityFilterIgnoreRangeEnd As Double
@@ -126,7 +126,7 @@
                 reporterIons.Add(New clsReporterIonInfo(104.1107))
 
             Case eReporterIonMassModeConstants.TMTTwoMZ
-                ' TMT duplex Isobaric tags (from Thermo)               
+                ' TMT duplex Isobaric tags (from Thermo)
                 reporterIons.Add(New clsReporterIonInfo(126.1283))
                 reporterIons.Add(New clsReporterIonInfo(127.1316))
 
@@ -171,7 +171,7 @@
 
             Case eReporterIonMassModeConstants.ITraqEightMZLowRes
 
-                ' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS               
+                ' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS
                 reporterIons.Add(New clsReporterIonInfo(113.107873))
                 reporterIons.Add(New clsReporterIonInfo(114.111228))
                 reporterIons.Add(New clsReporterIonInfo(115.108263))
@@ -187,49 +187,49 @@
 
             Case eReporterIonMassModeConstants.PCGalnaz
 
-                ' Custom reporter ions for Josh Alfaro               
+                ' Custom reporter ions for Josh Alfaro
                 reporterIons.Add(New clsReporterIonInfo(204.0871934))     ' C8H14NO5
                 reporterIons.Add(New clsReporterIonInfo(300.130787))      ' C11H18N5O5
                 reporterIons.Add(New clsReporterIonInfo(503.2101566))     ' C19H31N6O10
 
             Case eReporterIonMassModeConstants.HemeCFragment
 
-                ' Custom reporter ions for Eric Merkley               
+                ' Custom reporter ions for Eric Merkley
                 reporterIons.Add(New clsReporterIonInfo(616.1767))
                 reporterIons.Add(New clsReporterIonInfo(617.1845))
 
             Case eReporterIonMassModeConstants.LycAcetFragment
 
-                ' Custom reporter ions for Ernesto Nakayasu               
+                ' Custom reporter ions for Ernesto Nakayasu
                 reporterIons.Add(New clsReporterIonInfo(126.09134))
                 reporterIons.Add(New clsReporterIonInfo(127.094695))
 
             Case eReporterIonMassModeConstants.OGlcNAc
-                ' O-GlcNAc               
+                ' O-GlcNAc
                 reporterIons.Add(New clsReporterIonInfo(204.0872))
                 reporterIons.Add(New clsReporterIonInfo(300.13079))
                 reporterIons.Add(New clsReporterIonInfo(503.21017))
 
             Case eReporterIonMassModeConstants.FrackingAmine20160217
-                ' Product ions associated with FrackingFluid_amine_1_02172016               
+                ' Product ions associated with FrackingFluid_amine_1_02172016
                 reporterIons.Add(New clsReporterIonInfo(157.089))
                 reporterIons.Add(New clsReporterIonInfo(170.097))
                 reporterIons.Add(New clsReporterIonInfo(234.059))
 
             Case eReporterIonMassModeConstants.FSFACustomCarbonyl
-                ' Custom product ions from Chengdong Xu               
+                ' Custom product ions from Chengdong Xu
                 reporterIons.Add(New clsReporterIonInfo(171.104))
                 reporterIons.Add(New clsReporterIonInfo(236.074))
                 reporterIons.Add(New clsReporterIonInfo(257.088))
 
             Case eReporterIonMassModeConstants.FSFACustomCarboxylic
-                ' Custom product ions from Chengdong Xu               
+                ' Custom product ions from Chengdong Xu
                 reporterIons.Add(New clsReporterIonInfo(171.104))
                 reporterIons.Add(New clsReporterIonInfo(234.058))
                 reporterIons.Add(New clsReporterIonInfo(336.174))
 
             Case eReporterIonMassModeConstants.FSFACustomHydroxyl
-                ' Custom product ions from Chengdong Xu               
+                ' Custom product ions from Chengdong Xu
                 reporterIons.Add(New clsReporterIonInfo(151.063))
                 reporterIons.Add(New clsReporterIonInfo(166.087))
 

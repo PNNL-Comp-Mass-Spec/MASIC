@@ -8,18 +8,18 @@ Option Strict On
 ' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
 ' Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
 ' -------------------------------------------------------------------------------
-' 
+'
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at 
+' in compliance with the License.  You may obtain a copy of the License at
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
-' Notice: This computer software was prepared by Battelle Memorial Institute, 
-' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the 
-' Department of Energy (DOE).  All rights in the computer software are reserved 
-' by DOE on behalf of the United States Government and the Contractor as 
-' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY 
-' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS 
-' SOFTWARE.  This notice including this sentence must appear on any copies of 
+' Notice: This computer software was prepared by Battelle Memorial Institute,
+' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
+' Department of Energy (DOE).  All rights in the computer software are reserved
+' by DOE on behalf of the United States Government and the Contractor as
+' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY
+' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS
+' SOFTWARE.  This notice including this sentence must appear on any copies of
 ' this computer software.
 
 Imports MASIC.DataInput
@@ -1542,7 +1542,7 @@ Public Class frmMain
     Public Sub SetHeightAdjustForce(intHeightToForce As Integer)
         ' This function can be used to prevent the form from resizing itself if the MyBase.Resize event
         '  fires within 2 seconds of the current time
-        ' See CatchUnrequestedHeightChange for more info        
+        ' See CatchUnrequestedHeightChange for more info
         mHeightAdjustForce = intHeightToForce
         mHeightAdjustTime = DateTime.UtcNow
     End Sub
@@ -1604,7 +1604,7 @@ Public Class frmMain
         Dim tsCustomSICValues As System.Windows.Forms.DataGridTableStyle
         Dim blnTimeTolerance As Boolean
 
-        ' Define the PM Thresholds table style 
+        ' Define the PM Thresholds table style
         tsCustomSICValues = New System.Windows.Forms.DataGridTableStyle
 
         ' Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATATABLE will cause this style to be used with that table

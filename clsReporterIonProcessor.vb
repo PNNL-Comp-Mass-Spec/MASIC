@@ -137,7 +137,7 @@ Public Class clsReporterIonProcessor
                         Try
                             reporterIonMZsUnique.Add(mzValue)
                         Catch ex As Exception
-                            ' Error updating the sortedset; 
+                            ' Error updating the sortedset;
                             ' this shouldn't happen based on the .ContainsKey test above
                         End Try
 

@@ -4,7 +4,7 @@
 ' It supports 4-plex and 8-plex iTraq
 '
 ' The isotopic distribution weights were provided by Feng Yang (and originally came from the iTraq manufacturer)
-' 
+'
 ' There are two options for the iTRAQ 4-plex weights:
 '   eCorrectionFactorsiTRAQ4Plex.ABSciex
 '   eCorrectionFactorsiTRAQ4Plex.BroadInstitute
@@ -197,7 +197,7 @@ Public Class clsITraqIntensityCorrection
                 Else
 
                     ' 4-plex ITraq, isotope contribution table
-                    ' Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org) 
+                    ' Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
 
                     udtIsoPct114 = DefineITraqIsotopeContribution(0, 0, 95.5, 4.5, 0)
                     udtIsoPct115 = DefineITraqIsotopeContribution(0, 0.9, 94.6, 4.5, 0)
@@ -316,7 +316,7 @@ Public Class clsITraqIntensityCorrection
 
                 ' 8-plex ITraq, isotope contribution table for Low Res MS/MS
                 ' Source percentages come from page 664 in:
-                '  Vaudel, M., Sickmann, A., and L. Martens. "Peptide and protein quantification: A map of the minefield", 
+                '  Vaudel, M., Sickmann, A., and L. Martens. "Peptide and protein quantification: A map of the minefield",
                 '  Proteomics 2010, 10, 650-670.
 
                 udtIsoPct113 = DefineITraqIsotopeContribution(0, 0, 92.89, 6.89, 0.22)
