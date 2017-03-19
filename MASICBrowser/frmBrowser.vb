@@ -11,24 +11,26 @@ Option Strict On
 ' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
 ' Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
 ' -------------------------------------------------------------------------------
-' 
+'
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at 
+' in compliance with the License.  You may obtain a copy of the License at
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
-' Notice: This computer software was prepared by Battelle Memorial Institute, 
-' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the 
-' Department of Energy (DOE).  All rights in the computer software are reserved 
-' by DOE on behalf of the United States Government and the Contractor as 
-' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY 
-' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS 
-' SOFTWARE.  This notice including this sentence must appear on any copies of 
+' Notice: This computer software was prepared by Battelle Memorial Institute,
+' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
+' Department of Energy (DOE).  All rights in the computer software are reserved
+' by DOE on behalf of the United States Government and the Contractor as
+' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY
+' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS
+' SOFTWARE.  This notice including this sentence must appear on any copies of
 ' this computer software.
 
+Imports System.IO
 Imports PNNLOmics.Utilities
+Imports System.Windows.Forms
 
 Public Class frmBrowser
-    Inherits System.Windows.Forms.Form
+    Inherits Form
 
     Private Const PROGRAM_DATE As String = "January 24, 2017"
 
@@ -37,8 +39,8 @@ Public Class frmBrowser
     Public Sub New()
         MyBase.New()
 
-        System.Windows.Forms.Application.EnableVisualStyles()
-        System.Windows.Forms.Application.DoEvents()
+        Application.EnableVisualStyles()
+        Application.DoEvents()
 
         'This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -61,168 +63,168 @@ Public Class frmBrowser
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
+    'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
-    Friend WithEvents lblParentIon As System.Windows.Forms.Label
-    Friend WithEvents cmdSelectFile As System.Windows.Forms.Button
-    Friend WithEvents lblSortOrder As System.Windows.Forms.Label
-    Friend WithEvents cboSortOrder As System.Windows.Forms.ComboBox
-    Friend WithEvents chkFixXRange As System.Windows.Forms.CheckBox
-    Friend WithEvents txtFixXRange As System.Windows.Forms.TextBox
-    Friend WithEvents lblFixXRange As System.Windows.Forms.Label
-    Friend WithEvents lblMinimumIntensity As System.Windows.Forms.Label
-    Friend WithEvents txtMinimumIntensity As System.Windows.Forms.TextBox
-    Friend WithEvents chkFilterByIntensity As System.Windows.Forms.CheckBox
+    Friend WithEvents lblParentIon As Label
+    Friend WithEvents cmdSelectFile As Button
+    Friend WithEvents lblSortOrder As Label
+    Friend WithEvents cboSortOrder As ComboBox
+    Friend WithEvents chkFixXRange As CheckBox
+    Friend WithEvents txtFixXRange As TextBox
+    Friend WithEvents lblFixXRange As Label
+    Friend WithEvents lblMinimumIntensity As Label
+    Friend WithEvents txtMinimumIntensity As TextBox
+    Friend WithEvents chkFilterByIntensity As CheckBox
     Friend WithEvents tmrAutoStep As System.Timers.Timer
-    Friend WithEvents fraNavigation As System.Windows.Forms.GroupBox
-    Friend WithEvents chkAutoStepForward As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAutoStep As System.Windows.Forms.TextBox
-    Friend WithEvents lblAutoStep As System.Windows.Forms.Label
-    Friend WithEvents cmdAutoStep As System.Windows.Forms.Button
-    Friend WithEvents cmdPrevious As System.Windows.Forms.Button
-    Friend WithEvents cmdNext As System.Windows.Forms.Button
-    Friend WithEvents cmdJump As System.Windows.Forms.Button
-    Friend WithEvents txtFilterByMZ As System.Windows.Forms.TextBox
-    Friend WithEvents lblFilterByMZ As System.Windows.Forms.Label
-    Friend WithEvents chkFilterByMZ As System.Windows.Forms.CheckBox
-    Friend WithEvents txtFilterByMZTol As System.Windows.Forms.TextBox
-    Friend WithEvents lblFilterByMZTolUnits As System.Windows.Forms.Label
-    Friend WithEvents lblFilterByMZTol As System.Windows.Forms.Label
-    Friend WithEvents txtFixYRange As System.Windows.Forms.TextBox
-    Friend WithEvents lblFixYRange As System.Windows.Forms.Label
-    Friend WithEvents chkFixYRange As System.Windows.Forms.CheckBox
-    Friend WithEvents lblSICsTypeFilter As System.Windows.Forms.Label
-    Friend WithEvents cboSICsTypeFilter As System.Windows.Forms.ComboBox
-    Friend WithEvents MainMenuControl As System.Windows.Forms.MainMenu
-    Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileExit As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSelectMASICInputFile As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuHelpAbout As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuEditShowOptimalPeakApexCursor As System.Windows.Forms.MenuItem
-    Friend WithEvents chkSortDescending As System.Windows.Forms.CheckBox
-    Friend WithEvents lstParentIonData As System.Windows.Forms.ListBox
-    Friend WithEvents fraResmoothingOptions As System.Windows.Forms.GroupBox
-    Friend WithEvents optUseSavitzkyGolaySmooth As System.Windows.Forms.RadioButton
-    Friend WithEvents txtButterworthSamplingFrequency As System.Windows.Forms.TextBox
-    Friend WithEvents lblButterworthSamplingFrequency As System.Windows.Forms.Label
-    Friend WithEvents txtSavitzkyGolayFilterOrder As System.Windows.Forms.TextBox
-    Friend WithEvents lblSavitzkyGolayFilterOrder As System.Windows.Forms.Label
-    Friend WithEvents optUseButterworthSmooth As System.Windows.Forms.RadioButton
-    Friend WithEvents optDoNotResmooth As System.Windows.Forms.RadioButton
-    Friend WithEvents txtPeakWidthPointsMinimum As System.Windows.Forms.TextBox
-    Friend WithEvents lblPeakWidthPointsMinimum As System.Windows.Forms.Label
-    Friend WithEvents fraPeakFinder As System.Windows.Forms.GroupBox
-    Friend WithEvents chkUsePeakFinder As System.Windows.Forms.CheckBox
-    Friend WithEvents chkFindPeaksSubtractBaseline As System.Windows.Forms.CheckBox
-    Friend WithEvents txtMinimumSignalToNoise As System.Windows.Forms.TextBox
-    Friend WithEvents chkFilterBySignalToNoise As System.Windows.Forms.CheckBox
-    Friend WithEvents cmdRedoSICPeakFindingAllData As System.Windows.Forms.Button
-    Friend WithEvents fraSortOrderAndStats As System.Windows.Forms.GroupBox
-    Friend WithEvents mnuFileSelectMSMSSearchResultsFile As System.Windows.Forms.MenuItem
-    Friend WithEvents chkShowSmoothedData As System.Windows.Forms.CheckBox
-    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents tpSICFilters As System.Windows.Forms.TabPage
-    Friend WithEvents tpMsMsSearchResultsFilters As System.Windows.Forms.TabPage
-    Friend WithEvents txtMinimumXCorr As System.Windows.Forms.TextBox
-    Friend WithEvents txtSequenceFilter As System.Windows.Forms.TextBox
-    Friend WithEvents lblMinimumXCorr As System.Windows.Forms.Label
-    Friend WithEvents lblChargeFilter As System.Windows.Forms.Label
-    Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
-    Friend WithEvents lblSequenceFilter As System.Windows.Forms.Label
-    Friend WithEvents chkSequenceFilterExactMatch As System.Windows.Forms.CheckBox
-    Friend WithEvents txtStats1 As System.Windows.Forms.TextBox
-    Friend WithEvents txtStats3 As System.Windows.Forms.TextBox
-    Friend WithEvents txtStats2 As System.Windows.Forms.TextBox
-    Friend WithEvents chkShowBaselineCorrectedStats As System.Windows.Forms.CheckBox
-    Friend WithEvents pnlInputFile As System.Windows.Forms.Panel
-    Friend WithEvents pnlSICs As System.Windows.Forms.Panel
-    Friend WithEvents pnlNavigationAndOptions As System.Windows.Forms.Panel
-    Friend WithEvents pnlBottom As System.Windows.Forms.Panel
-    Friend WithEvents txtDataFilePath As System.Windows.Forms.TextBox
+    Friend WithEvents fraNavigation As GroupBox
+    Friend WithEvents chkAutoStepForward As CheckBox
+    Friend WithEvents txtAutoStep As TextBox
+    Friend WithEvents lblAutoStep As Label
+    Friend WithEvents cmdAutoStep As Button
+    Friend WithEvents cmdPrevious As Button
+    Friend WithEvents cmdNext As Button
+    Friend WithEvents cmdJump As Button
+    Friend WithEvents txtFilterByMZ As TextBox
+    Friend WithEvents lblFilterByMZ As Label
+    Friend WithEvents chkFilterByMZ As CheckBox
+    Friend WithEvents txtFilterByMZTol As TextBox
+    Friend WithEvents lblFilterByMZTolUnits As Label
+    Friend WithEvents lblFilterByMZTol As Label
+    Friend WithEvents txtFixYRange As TextBox
+    Friend WithEvents lblFixYRange As Label
+    Friend WithEvents chkFixYRange As CheckBox
+    Friend WithEvents lblSICsTypeFilter As Label
+    Friend WithEvents cboSICsTypeFilter As ComboBox
+    Friend WithEvents MainMenuControl As MainMenu
+    Friend WithEvents mnuFile As MenuItem
+    Friend WithEvents mnuFileExit As MenuItem
+    Friend WithEvents mnuFileSelectMASICInputFile As MenuItem
+    Friend WithEvents mnuFileSep1 As MenuItem
+    Friend WithEvents mnuEdit As MenuItem
+    Friend WithEvents mnuHelp As MenuItem
+    Friend WithEvents mnuHelpAbout As MenuItem
+    Friend WithEvents mnuEditShowOptimalPeakApexCursor As MenuItem
+    Friend WithEvents chkSortDescending As CheckBox
+    Friend WithEvents lstParentIonData As ListBox
+    Friend WithEvents fraResmoothingOptions As GroupBox
+    Friend WithEvents optUseSavitzkyGolaySmooth As RadioButton
+    Friend WithEvents txtButterworthSamplingFrequency As TextBox
+    Friend WithEvents lblButterworthSamplingFrequency As Label
+    Friend WithEvents txtSavitzkyGolayFilterOrder As TextBox
+    Friend WithEvents lblSavitzkyGolayFilterOrder As Label
+    Friend WithEvents optUseButterworthSmooth As RadioButton
+    Friend WithEvents optDoNotResmooth As RadioButton
+    Friend WithEvents txtPeakWidthPointsMinimum As TextBox
+    Friend WithEvents lblPeakWidthPointsMinimum As Label
+    Friend WithEvents fraPeakFinder As GroupBox
+    Friend WithEvents chkUsePeakFinder As CheckBox
+    Friend WithEvents chkFindPeaksSubtractBaseline As CheckBox
+    Friend WithEvents txtMinimumSignalToNoise As TextBox
+    Friend WithEvents chkFilterBySignalToNoise As CheckBox
+    Friend WithEvents cmdRedoSICPeakFindingAllData As Button
+    Friend WithEvents fraSortOrderAndStats As GroupBox
+    Friend WithEvents mnuFileSelectMSMSSearchResultsFile As MenuItem
+    Friend WithEvents chkShowSmoothedData As CheckBox
+    Friend WithEvents TabControl1 As TabControl
+    Friend WithEvents tpSICFilters As TabPage
+    Friend WithEvents tpMsMsSearchResultsFilters As TabPage
+    Friend WithEvents txtMinimumXCorr As TextBox
+    Friend WithEvents txtSequenceFilter As TextBox
+    Friend WithEvents lblMinimumXCorr As Label
+    Friend WithEvents lblChargeFilter As Label
+    Friend WithEvents TextBox2 As TextBox
+    Friend WithEvents lblSequenceFilter As Label
+    Friend WithEvents chkSequenceFilterExactMatch As CheckBox
+    Friend WithEvents txtStats1 As TextBox
+    Friend WithEvents txtStats3 As TextBox
+    Friend WithEvents txtStats2 As TextBox
+    Friend WithEvents chkShowBaselineCorrectedStats As CheckBox
+    Friend WithEvents pnlInputFile As Panel
+    Friend WithEvents pnlSICs As Panel
+    Friend WithEvents pnlNavigationAndOptions As Panel
+    Friend WithEvents pnlBottom As Panel
+    Friend WithEvents txtDataFilePath As TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
-        Me.lblParentIon = New System.Windows.Forms.Label
-        Me.txtDataFilePath = New System.Windows.Forms.TextBox
-        Me.cmdSelectFile = New System.Windows.Forms.Button
-        Me.lblSortOrder = New System.Windows.Forms.Label
-        Me.cboSortOrder = New System.Windows.Forms.ComboBox
-        Me.chkFixXRange = New System.Windows.Forms.CheckBox
-        Me.txtFixXRange = New System.Windows.Forms.TextBox
-        Me.lblFixXRange = New System.Windows.Forms.Label
-        Me.lblMinimumIntensity = New System.Windows.Forms.Label
-        Me.txtMinimumIntensity = New System.Windows.Forms.TextBox
-        Me.chkFilterByIntensity = New System.Windows.Forms.CheckBox
-        Me.tmrAutoStep = New System.Timers.Timer
-        Me.fraNavigation = New System.Windows.Forms.GroupBox
-        Me.chkAutoStepForward = New System.Windows.Forms.CheckBox
-        Me.txtAutoStep = New System.Windows.Forms.TextBox
-        Me.lblAutoStep = New System.Windows.Forms.Label
-        Me.cmdAutoStep = New System.Windows.Forms.Button
-        Me.cmdPrevious = New System.Windows.Forms.Button
-        Me.cmdNext = New System.Windows.Forms.Button
-        Me.cmdJump = New System.Windows.Forms.Button
-        Me.txtFilterByMZ = New System.Windows.Forms.TextBox
-        Me.lblFilterByMZ = New System.Windows.Forms.Label
-        Me.chkFilterByMZ = New System.Windows.Forms.CheckBox
-        Me.txtFilterByMZTol = New System.Windows.Forms.TextBox
-        Me.lblFilterByMZTolUnits = New System.Windows.Forms.Label
-        Me.lblFilterByMZTol = New System.Windows.Forms.Label
-        Me.txtFixYRange = New System.Windows.Forms.TextBox
-        Me.lblFixYRange = New System.Windows.Forms.Label
-        Me.chkFixYRange = New System.Windows.Forms.CheckBox
-        Me.lblSICsTypeFilter = New System.Windows.Forms.Label
-        Me.cboSICsTypeFilter = New System.Windows.Forms.ComboBox
-        Me.txtStats1 = New System.Windows.Forms.TextBox
-        Me.MainMenuControl = New System.Windows.Forms.MainMenu(Me.components)
-        Me.mnuFile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSelectMASICInputFile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSelectMSMSSearchResultsFile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuFileExit = New System.Windows.Forms.MenuItem
-        Me.mnuEdit = New System.Windows.Forms.MenuItem
-        Me.mnuEditShowOptimalPeakApexCursor = New System.Windows.Forms.MenuItem
-        Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.mnuHelpAbout = New System.Windows.Forms.MenuItem
-        Me.chkSortDescending = New System.Windows.Forms.CheckBox
-        Me.lstParentIonData = New System.Windows.Forms.ListBox
-        Me.txtMinimumSignalToNoise = New System.Windows.Forms.TextBox
-        Me.chkFilterBySignalToNoise = New System.Windows.Forms.CheckBox
-        Me.fraResmoothingOptions = New System.Windows.Forms.GroupBox
-        Me.chkShowSmoothedData = New System.Windows.Forms.CheckBox
-        Me.txtPeakWidthPointsMinimum = New System.Windows.Forms.TextBox
-        Me.lblPeakWidthPointsMinimum = New System.Windows.Forms.Label
-        Me.optDoNotResmooth = New System.Windows.Forms.RadioButton
-        Me.optUseSavitzkyGolaySmooth = New System.Windows.Forms.RadioButton
-        Me.txtButterworthSamplingFrequency = New System.Windows.Forms.TextBox
-        Me.lblButterworthSamplingFrequency = New System.Windows.Forms.Label
-        Me.txtSavitzkyGolayFilterOrder = New System.Windows.Forms.TextBox
-        Me.lblSavitzkyGolayFilterOrder = New System.Windows.Forms.Label
-        Me.optUseButterworthSmooth = New System.Windows.Forms.RadioButton
-        Me.fraPeakFinder = New System.Windows.Forms.GroupBox
-        Me.cmdRedoSICPeakFindingAllData = New System.Windows.Forms.Button
-        Me.chkUsePeakFinder = New System.Windows.Forms.CheckBox
-        Me.chkFindPeaksSubtractBaseline = New System.Windows.Forms.CheckBox
-        Me.fraSortOrderAndStats = New System.Windows.Forms.GroupBox
-        Me.chkShowBaselineCorrectedStats = New System.Windows.Forms.CheckBox
-        Me.txtStats2 = New System.Windows.Forms.TextBox
-        Me.txtStats3 = New System.Windows.Forms.TextBox
-        Me.TabControl1 = New System.Windows.Forms.TabControl
-        Me.tpSICFilters = New System.Windows.Forms.TabPage
-        Me.tpMsMsSearchResultsFilters = New System.Windows.Forms.TabPage
-        Me.chkSequenceFilterExactMatch = New System.Windows.Forms.CheckBox
-        Me.lblSequenceFilter = New System.Windows.Forms.Label
-        Me.lblChargeFilter = New System.Windows.Forms.Label
-        Me.TextBox2 = New System.Windows.Forms.TextBox
-        Me.lblMinimumXCorr = New System.Windows.Forms.Label
-        Me.txtSequenceFilter = New System.Windows.Forms.TextBox
-        Me.txtMinimumXCorr = New System.Windows.Forms.TextBox
-        Me.pnlInputFile = New System.Windows.Forms.Panel
-        Me.pnlSICs = New System.Windows.Forms.Panel
-        Me.pnlNavigationAndOptions = New System.Windows.Forms.Panel
-        Me.pnlBottom = New System.Windows.Forms.Panel
+        Me.components = New System.ComponentModel.Container()
+        Me.lblParentIon = New Label()
+        Me.txtDataFilePath = New TextBox()
+        Me.cmdSelectFile = New Button()
+        Me.lblSortOrder = New Label()
+        Me.cboSortOrder = New ComboBox()
+        Me.chkFixXRange = New CheckBox()
+        Me.txtFixXRange = New TextBox()
+        Me.lblFixXRange = New Label()
+        Me.lblMinimumIntensity = New Label()
+        Me.txtMinimumIntensity = New TextBox()
+        Me.chkFilterByIntensity = New CheckBox()
+        Me.tmrAutoStep = New System.Timers.Timer()
+        Me.fraNavigation = New GroupBox()
+        Me.chkAutoStepForward = New CheckBox()
+        Me.txtAutoStep = New TextBox()
+        Me.lblAutoStep = New Label()
+        Me.cmdAutoStep = New Button()
+        Me.cmdPrevious = New Button()
+        Me.cmdNext = New Button()
+        Me.cmdJump = New Button()
+        Me.txtFilterByMZ = New TextBox()
+        Me.lblFilterByMZ = New Label()
+        Me.chkFilterByMZ = New CheckBox()
+        Me.txtFilterByMZTol = New TextBox()
+        Me.lblFilterByMZTolUnits = New Label()
+        Me.lblFilterByMZTol = New Label()
+        Me.txtFixYRange = New TextBox()
+        Me.lblFixYRange = New Label()
+        Me.chkFixYRange = New CheckBox()
+        Me.lblSICsTypeFilter = New Label()
+        Me.cboSICsTypeFilter = New ComboBox()
+        Me.txtStats1 = New TextBox()
+        Me.MainMenuControl = New MainMenu(Me.components)
+        Me.mnuFile = New MenuItem()
+        Me.mnuFileSelectMASICInputFile = New MenuItem()
+        Me.mnuFileSelectMSMSSearchResultsFile = New MenuItem()
+        Me.mnuFileSep1 = New MenuItem()
+        Me.mnuFileExit = New MenuItem()
+        Me.mnuEdit = New MenuItem()
+        Me.mnuEditShowOptimalPeakApexCursor = New MenuItem()
+        Me.mnuHelp = New MenuItem()
+        Me.mnuHelpAbout = New MenuItem()
+        Me.chkSortDescending = New CheckBox()
+        Me.lstParentIonData = New ListBox()
+        Me.txtMinimumSignalToNoise = New TextBox()
+        Me.chkFilterBySignalToNoise = New CheckBox()
+        Me.fraResmoothingOptions = New GroupBox()
+        Me.chkShowSmoothedData = New CheckBox()
+        Me.txtPeakWidthPointsMinimum = New TextBox()
+        Me.lblPeakWidthPointsMinimum = New Label()
+        Me.optDoNotResmooth = New RadioButton()
+        Me.optUseSavitzkyGolaySmooth = New RadioButton()
+        Me.txtButterworthSamplingFrequency = New TextBox()
+        Me.lblButterworthSamplingFrequency = New Label()
+        Me.txtSavitzkyGolayFilterOrder = New TextBox()
+        Me.lblSavitzkyGolayFilterOrder = New Label()
+        Me.optUseButterworthSmooth = New RadioButton()
+        Me.fraPeakFinder = New GroupBox()
+        Me.cmdRedoSICPeakFindingAllData = New Button()
+        Me.chkUsePeakFinder = New CheckBox()
+        Me.chkFindPeaksSubtractBaseline = New CheckBox()
+        Me.fraSortOrderAndStats = New GroupBox()
+        Me.chkShowBaselineCorrectedStats = New CheckBox()
+        Me.txtStats2 = New TextBox()
+        Me.txtStats3 = New TextBox()
+        Me.TabControl1 = New TabControl()
+        Me.tpSICFilters = New TabPage()
+        Me.tpMsMsSearchResultsFilters = New TabPage()
+        Me.chkSequenceFilterExactMatch = New CheckBox()
+        Me.lblSequenceFilter = New Label()
+        Me.lblChargeFilter = New Label()
+        Me.TextBox2 = New TextBox()
+        Me.lblMinimumXCorr = New Label()
+        Me.txtSequenceFilter = New TextBox()
+        Me.txtMinimumXCorr = New TextBox()
+        Me.pnlInputFile = New Panel()
+        Me.pnlSICs = New Panel()
+        Me.pnlNavigationAndOptions = New Panel()
+        Me.pnlBottom = New Panel()
         CType(Me.tmrAutoStep, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.fraNavigation.SuspendLayout()
         Me.fraResmoothingOptions.SuspendLayout()
@@ -239,100 +241,100 @@ Public Class frmBrowser
         '
         'lblParentIon
         '
-        Me.lblParentIon.Location = New System.Drawing.Point(8, 8)
+        Me.lblParentIon.Location = New System.Drawing.Point(10, 9)
         Me.lblParentIon.Name = "lblParentIon"
-        Me.lblParentIon.Size = New System.Drawing.Size(152, 16)
+        Me.lblParentIon.Size = New System.Drawing.Size(182, 19)
         Me.lblParentIon.TabIndex = 2
         Me.lblParentIon.Text = "Parent Ion SIC to View"
         '
         'txtDataFilePath
         '
-        Me.txtDataFilePath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDataFilePath.Location = New System.Drawing.Point(96, 16)
+        Me.txtDataFilePath.Anchor = CType(((AnchorStyles.Top Or AnchorStyles.Left) _
+            Or AnchorStyles.Right), AnchorStyles)
+        Me.txtDataFilePath.Location = New System.Drawing.Point(115, 18)
         Me.txtDataFilePath.Name = "txtDataFilePath"
-        Me.txtDataFilePath.Size = New System.Drawing.Size(472, 20)
+        Me.txtDataFilePath.Size = New System.Drawing.Size(472, 22)
         Me.txtDataFilePath.TabIndex = 1
         Me.txtDataFilePath.Text = "D:\"
         '
         'cmdSelectFile
         '
-        Me.cmdSelectFile.Location = New System.Drawing.Point(8, 16)
+        Me.cmdSelectFile.Location = New System.Drawing.Point(10, 18)
         Me.cmdSelectFile.Name = "cmdSelectFile"
-        Me.cmdSelectFile.Size = New System.Drawing.Size(80, 24)
+        Me.cmdSelectFile.Size = New System.Drawing.Size(96, 28)
         Me.cmdSelectFile.TabIndex = 0
         Me.cmdSelectFile.Text = "&Select File"
         '
         'lblSortOrder
         '
-        Me.lblSortOrder.Location = New System.Drawing.Point(8, 8)
+        Me.lblSortOrder.Location = New System.Drawing.Point(10, 9)
         Me.lblSortOrder.Name = "lblSortOrder"
-        Me.lblSortOrder.Size = New System.Drawing.Size(88, 16)
+        Me.lblSortOrder.Size = New System.Drawing.Size(105, 19)
         Me.lblSortOrder.TabIndex = 0
         Me.lblSortOrder.Text = "Sort Order"
         '
         'cboSortOrder
         '
-        Me.cboSortOrder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboSortOrder.Location = New System.Drawing.Point(8, 28)
+        Me.cboSortOrder.DropDownStyle = ComboBoxStyle.DropDownList
+        Me.cboSortOrder.Location = New System.Drawing.Point(10, 32)
         Me.cboSortOrder.Name = "cboSortOrder"
-        Me.cboSortOrder.Size = New System.Drawing.Size(264, 21)
+        Me.cboSortOrder.Size = New System.Drawing.Size(316, 24)
         Me.cboSortOrder.TabIndex = 1
         '
         'chkFixXRange
         '
         Me.chkFixXRange.Checked = True
-        Me.chkFixXRange.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkFixXRange.Location = New System.Drawing.Point(8, 64)
+        Me.chkFixXRange.CheckState = CheckState.Checked
+        Me.chkFixXRange.Location = New System.Drawing.Point(10, 74)
         Me.chkFixXRange.Name = "chkFixXRange"
-        Me.chkFixXRange.Size = New System.Drawing.Size(88, 16)
+        Me.chkFixXRange.Size = New System.Drawing.Size(105, 18)
         Me.chkFixXRange.TabIndex = 2
         Me.chkFixXRange.Text = "Fix X Range"
         '
         'txtFixXRange
         '
-        Me.txtFixXRange.Location = New System.Drawing.Point(128, 64)
+        Me.txtFixXRange.Location = New System.Drawing.Point(154, 74)
         Me.txtFixXRange.Name = "txtFixXRange"
-        Me.txtFixXRange.Size = New System.Drawing.Size(72, 20)
+        Me.txtFixXRange.Size = New System.Drawing.Size(86, 22)
         Me.txtFixXRange.TabIndex = 3
         Me.txtFixXRange.Text = "300"
         '
         'lblFixXRange
         '
-        Me.lblFixXRange.Location = New System.Drawing.Point(200, 68)
+        Me.lblFixXRange.Location = New System.Drawing.Point(240, 78)
         Me.lblFixXRange.Name = "lblFixXRange"
-        Me.lblFixXRange.Size = New System.Drawing.Size(46, 16)
+        Me.lblFixXRange.Size = New System.Drawing.Size(55, 19)
         Me.lblFixXRange.TabIndex = 4
         Me.lblFixXRange.Text = "scans"
         '
         'lblMinimumIntensity
         '
-        Me.lblMinimumIntensity.Location = New System.Drawing.Point(200, 140)
+        Me.lblMinimumIntensity.Location = New System.Drawing.Point(240, 162)
         Me.lblMinimumIntensity.Name = "lblMinimumIntensity"
-        Me.lblMinimumIntensity.Size = New System.Drawing.Size(46, 16)
+        Me.lblMinimumIntensity.Size = New System.Drawing.Size(55, 18)
         Me.lblMinimumIntensity.TabIndex = 12
         Me.lblMinimumIntensity.Text = "counts"
         '
         'txtMinimumIntensity
         '
-        Me.txtMinimumIntensity.Location = New System.Drawing.Point(144, 136)
+        Me.txtMinimumIntensity.Location = New System.Drawing.Point(173, 157)
         Me.txtMinimumIntensity.Name = "txtMinimumIntensity"
-        Me.txtMinimumIntensity.Size = New System.Drawing.Size(56, 20)
+        Me.txtMinimumIntensity.Size = New System.Drawing.Size(67, 22)
         Me.txtMinimumIntensity.TabIndex = 11
         Me.txtMinimumIntensity.Text = "1000000"
         '
         'chkFilterByIntensity
         '
-        Me.chkFilterByIntensity.Location = New System.Drawing.Point(8, 136)
+        Me.chkFilterByIntensity.Location = New System.Drawing.Point(10, 157)
         Me.chkFilterByIntensity.Name = "chkFilterByIntensity"
-        Me.chkFilterByIntensity.Size = New System.Drawing.Size(144, 16)
+        Me.chkFilterByIntensity.Size = New System.Drawing.Size(172, 18)
         Me.chkFilterByIntensity.TabIndex = 10
         Me.chkFilterByIntensity.Text = "Minimum Intensity"
         '
         'tmrAutoStep
         '
         Me.tmrAutoStep.Enabled = True
-        Me.tmrAutoStep.Interval = 10
+        Me.tmrAutoStep.Interval = 10.0R
         Me.tmrAutoStep.SynchronizingObject = Me
         '
         'fraNavigation
@@ -345,9 +347,9 @@ Public Class frmBrowser
         Me.fraNavigation.Controls.Add(Me.cmdNext)
         Me.fraNavigation.Controls.Add(Me.cmdJump)
         Me.fraNavigation.Enabled = False
-        Me.fraNavigation.Location = New System.Drawing.Point(16, 24)
+        Me.fraNavigation.Location = New System.Drawing.Point(19, 28)
         Me.fraNavigation.Name = "fraNavigation"
-        Me.fraNavigation.Size = New System.Drawing.Size(224, 128)
+        Me.fraNavigation.Size = New System.Drawing.Size(269, 147)
         Me.fraNavigation.TabIndex = 4
         Me.fraNavigation.TabStop = False
         Me.fraNavigation.Text = "Navigation"
@@ -355,168 +357,168 @@ Public Class frmBrowser
         'chkAutoStepForward
         '
         Me.chkAutoStepForward.Checked = True
-        Me.chkAutoStepForward.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAutoStepForward.Location = New System.Drawing.Point(112, 104)
+        Me.chkAutoStepForward.CheckState = CheckState.Checked
+        Me.chkAutoStepForward.Location = New System.Drawing.Point(134, 120)
         Me.chkAutoStepForward.Name = "chkAutoStepForward"
-        Me.chkAutoStepForward.Size = New System.Drawing.Size(104, 16)
+        Me.chkAutoStepForward.Size = New System.Drawing.Size(125, 18)
         Me.chkAutoStepForward.TabIndex = 6
         Me.chkAutoStepForward.Text = "Move forward"
         '
         'txtAutoStep
         '
-        Me.txtAutoStep.Location = New System.Drawing.Point(112, 80)
+        Me.txtAutoStep.Location = New System.Drawing.Point(134, 92)
         Me.txtAutoStep.Name = "txtAutoStep"
-        Me.txtAutoStep.Size = New System.Drawing.Size(32, 20)
+        Me.txtAutoStep.Size = New System.Drawing.Size(39, 22)
         Me.txtAutoStep.TabIndex = 4
         Me.txtAutoStep.Text = "150"
         '
         'lblAutoStep
         '
-        Me.lblAutoStep.Location = New System.Drawing.Point(152, 80)
+        Me.lblAutoStep.Location = New System.Drawing.Point(182, 92)
         Me.lblAutoStep.Name = "lblAutoStep"
-        Me.lblAutoStep.Size = New System.Drawing.Size(64, 16)
+        Me.lblAutoStep.Size = New System.Drawing.Size(77, 19)
         Me.lblAutoStep.TabIndex = 5
         '
         'cmdAutoStep
         '
-        Me.cmdAutoStep.Location = New System.Drawing.Point(8, 80)
+        Me.cmdAutoStep.Location = New System.Drawing.Point(10, 92)
         Me.cmdAutoStep.Name = "cmdAutoStep"
-        Me.cmdAutoStep.Size = New System.Drawing.Size(88, 24)
+        Me.cmdAutoStep.Size = New System.Drawing.Size(105, 28)
         Me.cmdAutoStep.TabIndex = 2
         Me.cmdAutoStep.Text = "&Auto Step"
         '
         'cmdPrevious
         '
-        Me.cmdPrevious.Location = New System.Drawing.Point(8, 24)
+        Me.cmdPrevious.Location = New System.Drawing.Point(10, 28)
         Me.cmdPrevious.Name = "cmdPrevious"
-        Me.cmdPrevious.Size = New System.Drawing.Size(88, 24)
+        Me.cmdPrevious.Size = New System.Drawing.Size(105, 27)
         Me.cmdPrevious.TabIndex = 0
         Me.cmdPrevious.Text = "&Previous"
         '
         'cmdNext
         '
-        Me.cmdNext.Location = New System.Drawing.Point(8, 48)
+        Me.cmdNext.Location = New System.Drawing.Point(10, 55)
         Me.cmdNext.Name = "cmdNext"
-        Me.cmdNext.Size = New System.Drawing.Size(88, 24)
+        Me.cmdNext.Size = New System.Drawing.Size(105, 28)
         Me.cmdNext.TabIndex = 1
         Me.cmdNext.Text = "&Next"
         '
         'cmdJump
         '
-        Me.cmdJump.Location = New System.Drawing.Point(112, 24)
+        Me.cmdJump.Location = New System.Drawing.Point(134, 28)
         Me.cmdJump.Name = "cmdJump"
-        Me.cmdJump.Size = New System.Drawing.Size(96, 24)
+        Me.cmdJump.Size = New System.Drawing.Size(116, 27)
         Me.cmdJump.TabIndex = 3
         Me.cmdJump.Text = "&Jump to Scan"
         '
         'txtFilterByMZ
         '
-        Me.txtFilterByMZ.Location = New System.Drawing.Point(144, 160)
+        Me.txtFilterByMZ.Location = New System.Drawing.Point(173, 185)
         Me.txtFilterByMZ.Name = "txtFilterByMZ"
-        Me.txtFilterByMZ.Size = New System.Drawing.Size(56, 20)
+        Me.txtFilterByMZ.Size = New System.Drawing.Size(67, 22)
         Me.txtFilterByMZ.TabIndex = 14
         Me.txtFilterByMZ.Text = "543"
         '
         'lblFilterByMZ
         '
-        Me.lblFilterByMZ.Location = New System.Drawing.Point(200, 164)
+        Me.lblFilterByMZ.Location = New System.Drawing.Point(240, 189)
         Me.lblFilterByMZ.Name = "lblFilterByMZ"
-        Me.lblFilterByMZ.Size = New System.Drawing.Size(24, 16)
+        Me.lblFilterByMZ.Size = New System.Drawing.Size(29, 19)
         Me.lblFilterByMZ.TabIndex = 15
         Me.lblFilterByMZ.Text = "m/z"
         '
         'chkFilterByMZ
         '
-        Me.chkFilterByMZ.Location = New System.Drawing.Point(8, 160)
+        Me.chkFilterByMZ.Location = New System.Drawing.Point(10, 185)
         Me.chkFilterByMZ.Name = "chkFilterByMZ"
-        Me.chkFilterByMZ.Size = New System.Drawing.Size(96, 16)
+        Me.chkFilterByMZ.Size = New System.Drawing.Size(115, 18)
         Me.chkFilterByMZ.TabIndex = 13
         Me.chkFilterByMZ.Text = "Filter by m/z"
         '
         'txtFilterByMZTol
         '
-        Me.txtFilterByMZTol.Location = New System.Drawing.Point(160, 184)
+        Me.txtFilterByMZTol.Location = New System.Drawing.Point(192, 212)
         Me.txtFilterByMZTol.Name = "txtFilterByMZTol"
-        Me.txtFilterByMZTol.Size = New System.Drawing.Size(40, 20)
+        Me.txtFilterByMZTol.Size = New System.Drawing.Size(48, 22)
         Me.txtFilterByMZTol.TabIndex = 17
         Me.txtFilterByMZTol.Text = "0.2"
         '
         'lblFilterByMZTolUnits
         '
-        Me.lblFilterByMZTolUnits.Location = New System.Drawing.Point(200, 188)
+        Me.lblFilterByMZTolUnits.Location = New System.Drawing.Point(240, 217)
         Me.lblFilterByMZTolUnits.Name = "lblFilterByMZTolUnits"
-        Me.lblFilterByMZTolUnits.Size = New System.Drawing.Size(32, 16)
+        Me.lblFilterByMZTolUnits.Size = New System.Drawing.Size(38, 18)
         Me.lblFilterByMZTolUnits.TabIndex = 18
         Me.lblFilterByMZTolUnits.Text = "m/z"
         '
         'lblFilterByMZTol
         '
-        Me.lblFilterByMZTol.Location = New System.Drawing.Point(136, 188)
+        Me.lblFilterByMZTol.Location = New System.Drawing.Point(163, 217)
         Me.lblFilterByMZTol.Name = "lblFilterByMZTol"
-        Me.lblFilterByMZTol.Size = New System.Drawing.Size(16, 16)
+        Me.lblFilterByMZTol.Size = New System.Drawing.Size(19, 18)
         Me.lblFilterByMZTol.TabIndex = 16
         Me.lblFilterByMZTol.Text = "±"
         Me.lblFilterByMZTol.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtFixYRange
         '
-        Me.txtFixYRange.Location = New System.Drawing.Point(128, 88)
+        Me.txtFixYRange.Location = New System.Drawing.Point(154, 102)
         Me.txtFixYRange.Name = "txtFixYRange"
-        Me.txtFixYRange.Size = New System.Drawing.Size(72, 20)
+        Me.txtFixYRange.Size = New System.Drawing.Size(86, 22)
         Me.txtFixYRange.TabIndex = 6
         Me.txtFixYRange.Text = "1E6"
         '
         'lblFixYRange
         '
-        Me.lblFixYRange.Location = New System.Drawing.Point(200, 92)
+        Me.lblFixYRange.Location = New System.Drawing.Point(240, 106)
         Me.lblFixYRange.Name = "lblFixYRange"
-        Me.lblFixYRange.Size = New System.Drawing.Size(46, 16)
+        Me.lblFixYRange.Size = New System.Drawing.Size(55, 19)
         Me.lblFixYRange.TabIndex = 7
         Me.lblFixYRange.Text = "counts"
         '
         'chkFixYRange
         '
         Me.chkFixYRange.Checked = True
-        Me.chkFixYRange.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkFixYRange.Location = New System.Drawing.Point(8, 88)
+        Me.chkFixYRange.CheckState = CheckState.Checked
+        Me.chkFixYRange.Location = New System.Drawing.Point(10, 102)
         Me.chkFixYRange.Name = "chkFixYRange"
-        Me.chkFixYRange.Size = New System.Drawing.Size(88, 16)
+        Me.chkFixYRange.Size = New System.Drawing.Size(105, 18)
         Me.chkFixYRange.TabIndex = 5
         Me.chkFixYRange.Text = "Fix Y Range"
         '
         'lblSICsTypeFilter
         '
-        Me.lblSICsTypeFilter.Location = New System.Drawing.Point(8, 8)
+        Me.lblSICsTypeFilter.Location = New System.Drawing.Point(10, 9)
         Me.lblSICsTypeFilter.Name = "lblSICsTypeFilter"
-        Me.lblSICsTypeFilter.Size = New System.Drawing.Size(152, 16)
+        Me.lblSICsTypeFilter.Size = New System.Drawing.Size(182, 19)
         Me.lblSICsTypeFilter.TabIndex = 0
         Me.lblSICsTypeFilter.Text = "SIC Type Filter"
         '
         'cboSICsTypeFilter
         '
-        Me.cboSICsTypeFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboSICsTypeFilter.Location = New System.Drawing.Point(8, 24)
+        Me.cboSICsTypeFilter.DropDownStyle = ComboBoxStyle.DropDownList
+        Me.cboSICsTypeFilter.Location = New System.Drawing.Point(10, 28)
         Me.cboSICsTypeFilter.Name = "cboSICsTypeFilter"
-        Me.cboSICsTypeFilter.Size = New System.Drawing.Size(232, 21)
+        Me.cboSICsTypeFilter.Size = New System.Drawing.Size(278, 24)
         Me.cboSICsTypeFilter.TabIndex = 1
         '
         'txtStats1
         '
-        Me.txtStats1.Location = New System.Drawing.Point(8, 80)
+        Me.txtStats1.Location = New System.Drawing.Point(10, 92)
         Me.txtStats1.Multiline = True
         Me.txtStats1.Name = "txtStats1"
         Me.txtStats1.ReadOnly = True
-        Me.txtStats1.Size = New System.Drawing.Size(132, 88)
+        Me.txtStats1.Size = New System.Drawing.Size(158, 102)
         Me.txtStats1.TabIndex = 4
         '
         'MainMenuControl
         '
-        Me.MainMenuControl.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuHelp})
+        Me.MainMenuControl.MenuItems.AddRange(New MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuHelp})
         '
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectMASICInputFile, Me.mnuFileSelectMSMSSearchResultsFile, Me.mnuFileSep1, Me.mnuFileExit})
+        Me.mnuFile.MenuItems.AddRange(New MenuItem() {Me.mnuFileSelectMASICInputFile, Me.mnuFileSelectMSMSSearchResultsFile, Me.mnuFileSep1, Me.mnuFileExit})
         Me.mnuFile.Text = "&File"
         '
         'mnuFileSelectMASICInputFile
@@ -542,7 +544,7 @@ Public Class frmBrowser
         'mnuEdit
         '
         Me.mnuEdit.Index = 1
-        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditShowOptimalPeakApexCursor})
+        Me.mnuEdit.MenuItems.AddRange(New MenuItem() {Me.mnuEditShowOptimalPeakApexCursor})
         Me.mnuEdit.Text = "&Edit"
         '
         'mnuEditShowOptimalPeakApexCursor
@@ -554,7 +556,7 @@ Public Class frmBrowser
         'mnuHelp
         '
         Me.mnuHelp.Index = 2
-        Me.mnuHelp.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuHelpAbout})
+        Me.mnuHelp.MenuItems.AddRange(New MenuItem() {Me.mnuHelpAbout})
         Me.mnuHelp.Text = "&Help"
         '
         'mnuHelpAbout
@@ -564,40 +566,41 @@ Public Class frmBrowser
         '
         'chkSortDescending
         '
-        Me.chkSortDescending.Location = New System.Drawing.Point(160, 8)
+        Me.chkSortDescending.Location = New System.Drawing.Point(192, 9)
         Me.chkSortDescending.Name = "chkSortDescending"
-        Me.chkSortDescending.Size = New System.Drawing.Size(112, 16)
+        Me.chkSortDescending.Size = New System.Drawing.Size(134, 19)
         Me.chkSortDescending.TabIndex = 2
         Me.chkSortDescending.Text = "Sort Descending"
         '
         'lstParentIonData
         '
-        Me.lstParentIonData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstParentIonData.Location = New System.Drawing.Point(8, 24)
+        Me.lstParentIonData.Anchor = CType(((AnchorStyles.Top Or AnchorStyles.Bottom) _
+            Or AnchorStyles.Left), AnchorStyles)
+        Me.lstParentIonData.ItemHeight = 16
+        Me.lstParentIonData.Location = New System.Drawing.Point(10, 28)
         Me.lstParentIonData.Name = "lstParentIonData"
-        Me.lstParentIonData.Size = New System.Drawing.Size(272, 160)
+        Me.lstParentIonData.Size = New System.Drawing.Size(326, 68)
         Me.lstParentIonData.TabIndex = 3
         '
         'txtMinimumSignalToNoise
         '
-        Me.txtMinimumSignalToNoise.Location = New System.Drawing.Point(144, 112)
+        Me.txtMinimumSignalToNoise.Location = New System.Drawing.Point(173, 129)
         Me.txtMinimumSignalToNoise.Name = "txtMinimumSignalToNoise"
-        Me.txtMinimumSignalToNoise.Size = New System.Drawing.Size(56, 20)
+        Me.txtMinimumSignalToNoise.Size = New System.Drawing.Size(67, 22)
         Me.txtMinimumSignalToNoise.TabIndex = 9
         Me.txtMinimumSignalToNoise.Text = "3"
         '
         'chkFilterBySignalToNoise
         '
-        Me.chkFilterBySignalToNoise.Location = New System.Drawing.Point(8, 112)
+        Me.chkFilterBySignalToNoise.Location = New System.Drawing.Point(10, 129)
         Me.chkFilterBySignalToNoise.Name = "chkFilterBySignalToNoise"
-        Me.chkFilterBySignalToNoise.Size = New System.Drawing.Size(120, 16)
+        Me.chkFilterBySignalToNoise.Size = New System.Drawing.Size(144, 19)
         Me.chkFilterBySignalToNoise.TabIndex = 8
         Me.chkFilterBySignalToNoise.Text = "Minimum S/N"
         '
         'fraResmoothingOptions
         '
-        Me.fraResmoothingOptions.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.fraResmoothingOptions.Anchor = CType((AnchorStyles.Bottom Or AnchorStyles.Left), AnchorStyles)
         Me.fraResmoothingOptions.Controls.Add(Me.chkShowSmoothedData)
         Me.fraResmoothingOptions.Controls.Add(Me.txtPeakWidthPointsMinimum)
         Me.fraResmoothingOptions.Controls.Add(Me.lblPeakWidthPointsMinimum)
@@ -608,9 +611,9 @@ Public Class frmBrowser
         Me.fraResmoothingOptions.Controls.Add(Me.txtSavitzkyGolayFilterOrder)
         Me.fraResmoothingOptions.Controls.Add(Me.lblSavitzkyGolayFilterOrder)
         Me.fraResmoothingOptions.Controls.Add(Me.optUseButterworthSmooth)
-        Me.fraResmoothingOptions.Location = New System.Drawing.Point(8, 8)
+        Me.fraResmoothingOptions.Location = New System.Drawing.Point(10, 9)
         Me.fraResmoothingOptions.Name = "fraResmoothingOptions"
-        Me.fraResmoothingOptions.Size = New System.Drawing.Size(320, 136)
+        Me.fraResmoothingOptions.Size = New System.Drawing.Size(384, 157)
         Me.fraResmoothingOptions.TabIndex = 7
         Me.fraResmoothingOptions.TabStop = False
         Me.fraResmoothingOptions.Text = "Smoothing Options"
@@ -618,129 +621,129 @@ Public Class frmBrowser
         'chkShowSmoothedData
         '
         Me.chkShowSmoothedData.Checked = True
-        Me.chkShowSmoothedData.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowSmoothedData.Location = New System.Drawing.Point(16, 16)
+        Me.chkShowSmoothedData.CheckState = CheckState.Checked
+        Me.chkShowSmoothedData.Location = New System.Drawing.Point(19, 18)
         Me.chkShowSmoothedData.Name = "chkShowSmoothedData"
-        Me.chkShowSmoothedData.Size = New System.Drawing.Size(152, 16)
+        Me.chkShowSmoothedData.Size = New System.Drawing.Size(183, 19)
         Me.chkShowSmoothedData.TabIndex = 0
         Me.chkShowSmoothedData.Text = "Show Smoothed Data"
         '
         'txtPeakWidthPointsMinimum
         '
-        Me.txtPeakWidthPointsMinimum.Location = New System.Drawing.Point(264, 104)
+        Me.txtPeakWidthPointsMinimum.Location = New System.Drawing.Point(317, 120)
         Me.txtPeakWidthPointsMinimum.Name = "txtPeakWidthPointsMinimum"
-        Me.txtPeakWidthPointsMinimum.Size = New System.Drawing.Size(48, 20)
+        Me.txtPeakWidthPointsMinimum.Size = New System.Drawing.Size(57, 22)
         Me.txtPeakWidthPointsMinimum.TabIndex = 9
         Me.txtPeakWidthPointsMinimum.Text = "6"
         '
         'lblPeakWidthPointsMinimum
         '
-        Me.lblPeakWidthPointsMinimum.Location = New System.Drawing.Point(96, 112)
+        Me.lblPeakWidthPointsMinimum.Location = New System.Drawing.Point(115, 129)
         Me.lblPeakWidthPointsMinimum.Name = "lblPeakWidthPointsMinimum"
-        Me.lblPeakWidthPointsMinimum.Size = New System.Drawing.Size(160, 16)
+        Me.lblPeakWidthPointsMinimum.Size = New System.Drawing.Size(192, 19)
         Me.lblPeakWidthPointsMinimum.TabIndex = 8
         Me.lblPeakWidthPointsMinimum.Text = "Minimum Peak Width (points)"
         '
         'optDoNotResmooth
         '
         Me.optDoNotResmooth.Checked = True
-        Me.optDoNotResmooth.Location = New System.Drawing.Point(16, 48)
+        Me.optDoNotResmooth.Location = New System.Drawing.Point(19, 55)
         Me.optDoNotResmooth.Name = "optDoNotResmooth"
-        Me.optDoNotResmooth.Size = New System.Drawing.Size(200, 16)
+        Me.optDoNotResmooth.Size = New System.Drawing.Size(240, 19)
         Me.optDoNotResmooth.TabIndex = 1
         Me.optDoNotResmooth.TabStop = True
         Me.optDoNotResmooth.Text = "Do Not Show Smoothed Data"
         '
         'optUseSavitzkyGolaySmooth
         '
-        Me.optUseSavitzkyGolaySmooth.Location = New System.Drawing.Point(16, 80)
+        Me.optUseSavitzkyGolaySmooth.Location = New System.Drawing.Point(19, 92)
         Me.optUseSavitzkyGolaySmooth.Name = "optUseSavitzkyGolaySmooth"
-        Me.optUseSavitzkyGolaySmooth.Size = New System.Drawing.Size(168, 16)
+        Me.optUseSavitzkyGolaySmooth.Size = New System.Drawing.Size(202, 19)
         Me.optUseSavitzkyGolaySmooth.TabIndex = 5
         Me.optUseSavitzkyGolaySmooth.Text = "Use Savitzky Golay Smooth"
         '
         'txtButterworthSamplingFrequency
         '
-        Me.txtButterworthSamplingFrequency.Location = New System.Drawing.Point(264, 56)
+        Me.txtButterworthSamplingFrequency.Location = New System.Drawing.Point(317, 65)
         Me.txtButterworthSamplingFrequency.Name = "txtButterworthSamplingFrequency"
-        Me.txtButterworthSamplingFrequency.Size = New System.Drawing.Size(48, 20)
+        Me.txtButterworthSamplingFrequency.Size = New System.Drawing.Size(57, 22)
         Me.txtButterworthSamplingFrequency.TabIndex = 4
         Me.txtButterworthSamplingFrequency.Text = "0.25"
         '
         'lblButterworthSamplingFrequency
         '
-        Me.lblButterworthSamplingFrequency.Location = New System.Drawing.Point(184, 64)
+        Me.lblButterworthSamplingFrequency.Location = New System.Drawing.Point(221, 74)
         Me.lblButterworthSamplingFrequency.Name = "lblButterworthSamplingFrequency"
-        Me.lblButterworthSamplingFrequency.Size = New System.Drawing.Size(72, 16)
+        Me.lblButterworthSamplingFrequency.Size = New System.Drawing.Size(86, 18)
         Me.lblButterworthSamplingFrequency.TabIndex = 3
         Me.lblButterworthSamplingFrequency.Text = "Filter Order"
         '
         'txtSavitzkyGolayFilterOrder
         '
-        Me.txtSavitzkyGolayFilterOrder.Location = New System.Drawing.Point(264, 80)
+        Me.txtSavitzkyGolayFilterOrder.Location = New System.Drawing.Point(317, 92)
         Me.txtSavitzkyGolayFilterOrder.Name = "txtSavitzkyGolayFilterOrder"
-        Me.txtSavitzkyGolayFilterOrder.Size = New System.Drawing.Size(48, 20)
+        Me.txtSavitzkyGolayFilterOrder.Size = New System.Drawing.Size(57, 22)
         Me.txtSavitzkyGolayFilterOrder.TabIndex = 7
         Me.txtSavitzkyGolayFilterOrder.Text = "0"
         '
         'lblSavitzkyGolayFilterOrder
         '
-        Me.lblSavitzkyGolayFilterOrder.Location = New System.Drawing.Point(184, 88)
+        Me.lblSavitzkyGolayFilterOrder.Location = New System.Drawing.Point(221, 102)
         Me.lblSavitzkyGolayFilterOrder.Name = "lblSavitzkyGolayFilterOrder"
-        Me.lblSavitzkyGolayFilterOrder.Size = New System.Drawing.Size(72, 16)
+        Me.lblSavitzkyGolayFilterOrder.Size = New System.Drawing.Size(86, 18)
         Me.lblSavitzkyGolayFilterOrder.TabIndex = 6
         Me.lblSavitzkyGolayFilterOrder.Text = "Filter Order"
         '
         'optUseButterworthSmooth
         '
-        Me.optUseButterworthSmooth.Location = New System.Drawing.Point(16, 64)
+        Me.optUseButterworthSmooth.Location = New System.Drawing.Point(19, 74)
         Me.optUseButterworthSmooth.Name = "optUseButterworthSmooth"
-        Me.optUseButterworthSmooth.Size = New System.Drawing.Size(168, 16)
+        Me.optUseButterworthSmooth.Size = New System.Drawing.Size(202, 18)
         Me.optUseButterworthSmooth.TabIndex = 2
         Me.optUseButterworthSmooth.Text = "Use Butterworth Smooth"
         '
         'fraPeakFinder
         '
-        Me.fraPeakFinder.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.fraPeakFinder.Anchor = CType((AnchorStyles.Bottom Or AnchorStyles.Left), AnchorStyles)
         Me.fraPeakFinder.Controls.Add(Me.cmdRedoSICPeakFindingAllData)
         Me.fraPeakFinder.Controls.Add(Me.chkUsePeakFinder)
         Me.fraPeakFinder.Controls.Add(Me.chkFindPeaksSubtractBaseline)
-        Me.fraPeakFinder.Location = New System.Drawing.Point(336, 8)
+        Me.fraPeakFinder.Location = New System.Drawing.Point(403, 9)
         Me.fraPeakFinder.Name = "fraPeakFinder"
-        Me.fraPeakFinder.Size = New System.Drawing.Size(200, 128)
+        Me.fraPeakFinder.Size = New System.Drawing.Size(240, 148)
         Me.fraPeakFinder.TabIndex = 8
         Me.fraPeakFinder.TabStop = False
         Me.fraPeakFinder.Text = "SIC Peak Finding"
         '
         'cmdRedoSICPeakFindingAllData
         '
-        Me.cmdRedoSICPeakFindingAllData.Location = New System.Drawing.Point(16, 80)
+        Me.cmdRedoSICPeakFindingAllData.Location = New System.Drawing.Point(19, 92)
         Me.cmdRedoSICPeakFindingAllData.Name = "cmdRedoSICPeakFindingAllData"
-        Me.cmdRedoSICPeakFindingAllData.Size = New System.Drawing.Size(112, 40)
+        Me.cmdRedoSICPeakFindingAllData.Size = New System.Drawing.Size(135, 46)
         Me.cmdRedoSICPeakFindingAllData.TabIndex = 20
         Me.cmdRedoSICPeakFindingAllData.Text = "Redo SIC Peak Finding For All Data"
         '
         'chkUsePeakFinder
         '
-        Me.chkUsePeakFinder.Location = New System.Drawing.Point(8, 16)
+        Me.chkUsePeakFinder.Location = New System.Drawing.Point(10, 18)
         Me.chkUsePeakFinder.Name = "chkUsePeakFinder"
-        Me.chkUsePeakFinder.Size = New System.Drawing.Size(184, 16)
+        Me.chkUsePeakFinder.Size = New System.Drawing.Size(220, 19)
         Me.chkUsePeakFinder.TabIndex = 18
         Me.chkUsePeakFinder.Text = "Recompute SIC Peak Stats"
         '
         'chkFindPeaksSubtractBaseline
         '
         Me.chkFindPeaksSubtractBaseline.Checked = True
-        Me.chkFindPeaksSubtractBaseline.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkFindPeaksSubtractBaseline.Location = New System.Drawing.Point(16, 33)
+        Me.chkFindPeaksSubtractBaseline.CheckState = CheckState.Checked
+        Me.chkFindPeaksSubtractBaseline.Location = New System.Drawing.Point(19, 38)
         Me.chkFindPeaksSubtractBaseline.Name = "chkFindPeaksSubtractBaseline"
-        Me.chkFindPeaksSubtractBaseline.Size = New System.Drawing.Size(176, 32)
+        Me.chkFindPeaksSubtractBaseline.Size = New System.Drawing.Size(211, 37)
         Me.chkFindPeaksSubtractBaseline.TabIndex = 19
         Me.chkFindPeaksSubtractBaseline.Text = "Subtract baseline when computing Intensity and Area"
         '
         'fraSortOrderAndStats
         '
-        Me.fraSortOrderAndStats.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.fraSortOrderAndStats.Anchor = CType((AnchorStyles.Bottom Or AnchorStyles.Left), AnchorStyles)
         Me.fraSortOrderAndStats.Controls.Add(Me.chkShowBaselineCorrectedStats)
         Me.fraSortOrderAndStats.Controls.Add(Me.txtStats2)
         Me.fraSortOrderAndStats.Controls.Add(Me.txtStats3)
@@ -748,49 +751,49 @@ Public Class frmBrowser
         Me.fraSortOrderAndStats.Controls.Add(Me.lblSortOrder)
         Me.fraSortOrderAndStats.Controls.Add(Me.chkSortDescending)
         Me.fraSortOrderAndStats.Controls.Add(Me.txtStats1)
-        Me.fraSortOrderAndStats.Location = New System.Drawing.Point(0, 184)
+        Me.fraSortOrderAndStats.Location = New System.Drawing.Point(0, 116)
         Me.fraSortOrderAndStats.Name = "fraSortOrderAndStats"
-        Me.fraSortOrderAndStats.Size = New System.Drawing.Size(282, 224)
+        Me.fraSortOrderAndStats.Size = New System.Drawing.Size(338, 259)
         Me.fraSortOrderAndStats.TabIndex = 5
         Me.fraSortOrderAndStats.TabStop = False
         '
         'chkShowBaselineCorrectedStats
         '
         Me.chkShowBaselineCorrectedStats.Checked = True
-        Me.chkShowBaselineCorrectedStats.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowBaselineCorrectedStats.Location = New System.Drawing.Point(8, 58)
+        Me.chkShowBaselineCorrectedStats.CheckState = CheckState.Checked
+        Me.chkShowBaselineCorrectedStats.Location = New System.Drawing.Point(10, 67)
         Me.chkShowBaselineCorrectedStats.Name = "chkShowBaselineCorrectedStats"
-        Me.chkShowBaselineCorrectedStats.Size = New System.Drawing.Size(216, 16)
+        Me.chkShowBaselineCorrectedStats.Size = New System.Drawing.Size(259, 18)
         Me.chkShowBaselineCorrectedStats.TabIndex = 14
         Me.chkShowBaselineCorrectedStats.Text = "Show Baseline Corrected Stats"
         '
         'txtStats2
         '
-        Me.txtStats2.Location = New System.Drawing.Point(144, 80)
+        Me.txtStats2.Location = New System.Drawing.Point(173, 92)
         Me.txtStats2.Multiline = True
         Me.txtStats2.Name = "txtStats2"
         Me.txtStats2.ReadOnly = True
-        Me.txtStats2.Size = New System.Drawing.Size(132, 88)
+        Me.txtStats2.Size = New System.Drawing.Size(158, 102)
         Me.txtStats2.TabIndex = 6
         '
         'txtStats3
         '
-        Me.txtStats3.Location = New System.Drawing.Point(8, 176)
+        Me.txtStats3.Location = New System.Drawing.Point(10, 203)
         Me.txtStats3.Multiline = True
         Me.txtStats3.Name = "txtStats3"
         Me.txtStats3.ReadOnly = True
-        Me.txtStats3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtStats3.Size = New System.Drawing.Size(266, 40)
+        Me.txtStats3.ScrollBars = ScrollBars.Vertical
+        Me.txtStats3.Size = New System.Drawing.Size(319, 46)
         Me.txtStats3.TabIndex = 5
         '
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.tpSICFilters)
         Me.TabControl1.Controls.Add(Me.tpMsMsSearchResultsFilters)
-        Me.TabControl1.Location = New System.Drawing.Point(16, 160)
+        Me.TabControl1.Location = New System.Drawing.Point(19, 185)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(256, 240)
+        Me.TabControl1.Size = New System.Drawing.Size(307, 277)
         Me.TabControl1.TabIndex = 6
         '
         'tpSICFilters
@@ -814,9 +817,9 @@ Public Class frmBrowser
         Me.tpSICFilters.Controls.Add(Me.chkFilterBySignalToNoise)
         Me.tpSICFilters.Controls.Add(Me.txtFilterByMZ)
         Me.tpSICFilters.Controls.Add(Me.lblFilterByMZ)
-        Me.tpSICFilters.Location = New System.Drawing.Point(4, 22)
+        Me.tpSICFilters.Location = New System.Drawing.Point(4, 25)
         Me.tpSICFilters.Name = "tpSICFilters"
-        Me.tpSICFilters.Size = New System.Drawing.Size(248, 214)
+        Me.tpSICFilters.Size = New System.Drawing.Size(299, 248)
         Me.tpSICFilters.TabIndex = 0
         Me.tpSICFilters.Text = "SIC Filters"
         '
@@ -829,70 +832,70 @@ Public Class frmBrowser
         Me.tpMsMsSearchResultsFilters.Controls.Add(Me.lblMinimumXCorr)
         Me.tpMsMsSearchResultsFilters.Controls.Add(Me.txtSequenceFilter)
         Me.tpMsMsSearchResultsFilters.Controls.Add(Me.txtMinimumXCorr)
-        Me.tpMsMsSearchResultsFilters.Location = New System.Drawing.Point(4, 22)
+        Me.tpMsMsSearchResultsFilters.Location = New System.Drawing.Point(4, 25)
         Me.tpMsMsSearchResultsFilters.Name = "tpMsMsSearchResultsFilters"
-        Me.tpMsMsSearchResultsFilters.Size = New System.Drawing.Size(248, 214)
+        Me.tpMsMsSearchResultsFilters.Size = New System.Drawing.Size(299, 248)
         Me.tpMsMsSearchResultsFilters.TabIndex = 1
         Me.tpMsMsSearchResultsFilters.Text = "MS/MS Results Filters"
         '
         'chkSequenceFilterExactMatch
         '
         Me.chkSequenceFilterExactMatch.Checked = True
-        Me.chkSequenceFilterExactMatch.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkSequenceFilterExactMatch.CheckState = CheckState.Checked
         Me.chkSequenceFilterExactMatch.Enabled = False
-        Me.chkSequenceFilterExactMatch.Location = New System.Drawing.Point(144, 72)
+        Me.chkSequenceFilterExactMatch.Location = New System.Drawing.Point(173, 83)
         Me.chkSequenceFilterExactMatch.Name = "chkSequenceFilterExactMatch"
-        Me.chkSequenceFilterExactMatch.Size = New System.Drawing.Size(90, 16)
+        Me.chkSequenceFilterExactMatch.Size = New System.Drawing.Size(108, 19)
         Me.chkSequenceFilterExactMatch.TabIndex = 5
         Me.chkSequenceFilterExactMatch.Text = "Exact Match?"
         '
         'lblSequenceFilter
         '
-        Me.lblSequenceFilter.Location = New System.Drawing.Point(8, 72)
+        Me.lblSequenceFilter.Location = New System.Drawing.Point(10, 83)
         Me.lblSequenceFilter.Name = "lblSequenceFilter"
-        Me.lblSequenceFilter.Size = New System.Drawing.Size(96, 16)
+        Me.lblSequenceFilter.Size = New System.Drawing.Size(115, 19)
         Me.lblSequenceFilter.TabIndex = 4
         Me.lblSequenceFilter.Text = "Sequence Filter"
         '
         'lblChargeFilter
         '
-        Me.lblChargeFilter.Location = New System.Drawing.Point(8, 40)
+        Me.lblChargeFilter.Location = New System.Drawing.Point(10, 46)
         Me.lblChargeFilter.Name = "lblChargeFilter"
-        Me.lblChargeFilter.Size = New System.Drawing.Size(96, 16)
+        Me.lblChargeFilter.Size = New System.Drawing.Size(115, 19)
         Me.lblChargeFilter.TabIndex = 2
         Me.lblChargeFilter.Text = "Charge Filter"
         '
         'TextBox2
         '
         Me.TextBox2.Enabled = False
-        Me.TextBox2.Location = New System.Drawing.Point(144, 40)
+        Me.TextBox2.Location = New System.Drawing.Point(173, 46)
         Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(56, 20)
+        Me.TextBox2.Size = New System.Drawing.Size(67, 22)
         Me.TextBox2.TabIndex = 3
         Me.TextBox2.Text = "0"
         '
         'lblMinimumXCorr
         '
-        Me.lblMinimumXCorr.Location = New System.Drawing.Point(8, 16)
+        Me.lblMinimumXCorr.Location = New System.Drawing.Point(10, 18)
         Me.lblMinimumXCorr.Name = "lblMinimumXCorr"
-        Me.lblMinimumXCorr.Size = New System.Drawing.Size(96, 16)
+        Me.lblMinimumXCorr.Size = New System.Drawing.Size(115, 19)
         Me.lblMinimumXCorr.TabIndex = 0
         Me.lblMinimumXCorr.Text = "XCorr Minimum"
         '
         'txtSequenceFilter
         '
         Me.txtSequenceFilter.Enabled = False
-        Me.txtSequenceFilter.Location = New System.Drawing.Point(8, 88)
+        Me.txtSequenceFilter.Location = New System.Drawing.Point(10, 102)
         Me.txtSequenceFilter.Name = "txtSequenceFilter"
-        Me.txtSequenceFilter.Size = New System.Drawing.Size(230, 20)
+        Me.txtSequenceFilter.Size = New System.Drawing.Size(276, 22)
         Me.txtSequenceFilter.TabIndex = 6
         '
         'txtMinimumXCorr
         '
         Me.txtMinimumXCorr.Enabled = False
-        Me.txtMinimumXCorr.Location = New System.Drawing.Point(144, 16)
+        Me.txtMinimumXCorr.Location = New System.Drawing.Point(173, 18)
         Me.txtMinimumXCorr.Name = "txtMinimumXCorr"
-        Me.txtMinimumXCorr.Size = New System.Drawing.Size(56, 20)
+        Me.txtMinimumXCorr.Size = New System.Drawing.Size(67, 22)
         Me.txtMinimumXCorr.TabIndex = 1
         Me.txtMinimumXCorr.Text = "2.2"
         '
@@ -900,10 +903,10 @@ Public Class frmBrowser
         '
         Me.pnlInputFile.Controls.Add(Me.txtDataFilePath)
         Me.pnlInputFile.Controls.Add(Me.cmdSelectFile)
-        Me.pnlInputFile.Dock = System.Windows.Forms.DockStyle.Top
+        Me.pnlInputFile.Dock = DockStyle.Top
         Me.pnlInputFile.Location = New System.Drawing.Point(0, 0)
         Me.pnlInputFile.Name = "pnlInputFile"
-        Me.pnlInputFile.Size = New System.Drawing.Size(576, 56)
+        Me.pnlInputFile.Size = New System.Drawing.Size(596, 65)
         Me.pnlInputFile.TabIndex = 9
         '
         'pnlSICs
@@ -911,42 +914,42 @@ Public Class frmBrowser
         Me.pnlSICs.Controls.Add(Me.lblParentIon)
         Me.pnlSICs.Controls.Add(Me.lstParentIonData)
         Me.pnlSICs.Controls.Add(Me.fraSortOrderAndStats)
-        Me.pnlSICs.Dock = System.Windows.Forms.DockStyle.Left
-        Me.pnlSICs.Location = New System.Drawing.Point(0, 56)
+        Me.pnlSICs.Dock = DockStyle.Left
+        Me.pnlSICs.Location = New System.Drawing.Point(0, 65)
         Me.pnlSICs.Name = "pnlSICs"
-        Me.pnlSICs.Size = New System.Drawing.Size(288, 418)
+        Me.pnlSICs.Size = New System.Drawing.Size(346, 386)
         Me.pnlSICs.TabIndex = 10
         '
         'pnlNavigationAndOptions
         '
         Me.pnlNavigationAndOptions.Controls.Add(Me.fraNavigation)
         Me.pnlNavigationAndOptions.Controls.Add(Me.TabControl1)
-        Me.pnlNavigationAndOptions.Dock = System.Windows.Forms.DockStyle.Left
-        Me.pnlNavigationAndOptions.Location = New System.Drawing.Point(288, 56)
+        Me.pnlNavigationAndOptions.Dock = DockStyle.Left
+        Me.pnlNavigationAndOptions.Location = New System.Drawing.Point(346, 65)
         Me.pnlNavigationAndOptions.Name = "pnlNavigationAndOptions"
-        Me.pnlNavigationAndOptions.Size = New System.Drawing.Size(280, 418)
+        Me.pnlNavigationAndOptions.Size = New System.Drawing.Size(336, 386)
         Me.pnlNavigationAndOptions.TabIndex = 11
         '
         'pnlBottom
         '
         Me.pnlBottom.Controls.Add(Me.fraPeakFinder)
         Me.pnlBottom.Controls.Add(Me.fraResmoothingOptions)
-        Me.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlBottom.Location = New System.Drawing.Point(0, 474)
+        Me.pnlBottom.Dock = DockStyle.Bottom
+        Me.pnlBottom.Location = New System.Drawing.Point(0, 451)
         Me.pnlBottom.Name = "pnlBottom"
-        Me.pnlBottom.Size = New System.Drawing.Size(576, 152)
+        Me.pnlBottom.Size = New System.Drawing.Size(596, 175)
         Me.pnlBottom.TabIndex = 12
         '
         'frmBrowser
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(576, 626)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.ClientSize = New System.Drawing.Size(596, 626)
         Me.Controls.Add(Me.pnlNavigationAndOptions)
         Me.Controls.Add(Me.pnlSICs)
         Me.Controls.Add(Me.pnlInputFile)
         Me.Controls.Add(Me.pnlBottom)
         Me.Menu = Me.MainMenuControl
-        Me.MinimumSize = New System.Drawing.Size(512, 0)
+        Me.MinimumSize = New System.Drawing.Size(614, 0)
         Me.Name = "frmBrowser"
         Me.Text = "MASIC Browser"
         CType(Me.tmrAutoStep, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1119,7 +1122,7 @@ Public Class frmBrowser
     Private mParentIonCount As Integer
     Private mParentIonStats() As udtParentIonStatsType          ' 0-based array, ranging from 0 to mParentIonCount-1
 
-    Private mMsMsResults As System.Data.DataSet
+    Private mMsMsResults As DataSet
 
     Private mSICPeakFinderOptions As MASICPeakFinder.clsSICPeakFinderOptions
 
@@ -1137,26 +1140,26 @@ Public Class frmBrowser
     Private Sub AutoOpenMsMsResults(strMASICFilePath As String, ByRef objProgress As ProgressFormNET.frmProgress)
         ' Look for a corresponding Synopsis or First hits file in the same folder as strMASICFilePath
 
-        Dim ioFolderInfo As New System.IO.DirectoryInfo(System.IO.Path.GetDirectoryName(strMASICFilePath))
+        Dim ioFolderInfo As New DirectoryInfo(Path.GetDirectoryName(strMASICFilePath))
         Dim strFileNameToFind As String
         Dim strFileNameBase As String
 
-        strFileNameBase = System.IO.Path.GetFileNameWithoutExtension(strMASICFilePath)
+        strFileNameBase = Path.GetFileNameWithoutExtension(strMASICFilePath)
         If strFileNameBase.ToLower.EndsWith("_sics") Then
             strFileNameBase = strFileNameBase.Substring(0, strFileNameBase.Length - 5)
         End If
 
         strFileNameToFind = strFileNameBase & "_fht.txt"
-        strFileNameToFind = System.IO.Path.Combine(ioFolderInfo.FullName, strFileNameToFind)
+        strFileNameToFind = Path.Combine(ioFolderInfo.FullName, strFileNameToFind)
 
         txtStats3.Visible = False
-        If System.IO.File.Exists(strFileNameToFind) Then
+        If File.Exists(strFileNameToFind) Then
             ReadMsMsSearchEngineResults(strFileNameToFind, objProgress)
         Else
             strFileNameToFind = strFileNameBase & "_syn.txt"
-            strFileNameToFind = System.IO.Path.Combine(ioFolderInfo.FullName, strFileNameToFind)
+            strFileNameToFind = Path.Combine(ioFolderInfo.FullName, strFileNameToFind)
 
-            If System.IO.File.Exists(strFileNameToFind) Then
+            If File.Exists(strFileNameToFind) Then
                 ReadMsMsSearchEngineResults(strFileNameToFind, objProgress)
                 txtStats3.Visible = True
             End If
@@ -1167,7 +1170,7 @@ Public Class frmBrowser
 
 
     Private Sub CheckAutoStep()
-        If System.DateTime.Now().Subtract(mLastUpdate).TotalMilliseconds >= mAutoStepIntervalMsec Then
+        If DateTime.Now().Subtract(mLastUpdate).TotalMilliseconds >= mAutoStepIntervalMsec Then
             mLastUpdate = mLastUpdate.AddMilliseconds(mAutoStepIntervalMsec)
             NavigateScanList(chkAutoStepForward.Checked)
             Application.DoEvents()
@@ -1203,7 +1206,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub DisplaySICStats(intParentIonIndex As Integer, ByRef udtSICStats As udtSICStatsType)
-        ' udtSICStats will be populated with either the original SIC stats found by MASIC or with the 
+        ' udtSICStats will be populated with either the original SIC stats found by MASIC or with the
         '  updated SIC stats if chkUsePeakFinder is Checked
         ' Also, if re-smooth data is enabled, then the SIC data will be re-smoothed
 
@@ -1402,7 +1405,7 @@ Public Class frmBrowser
             With mParentIonStats(intParentIonIndex)
                 blnReturnClosestPeak = Not .CustomSICPeak
 
-                ' Look for .SurveyScanNumber in .SICScans in order to populate udtSICStats.Peak.IndexObserved 
+                ' Look for .SurveyScanNumber in .SICScans in order to populate udtSICStats.Peak.IndexObserved
                 If udtSICStats.Peak.IndexObserved = 0 Then
                     For intIndex = 0 To .DataCount - 1
                         If .SICScans(intIndex) = .SurveyScanNumber Then
@@ -1449,7 +1452,7 @@ Public Class frmBrowser
                 ' Index out of range; ignore the error
             End Try
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in FindSICPeakAndAreaForParentIon: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in FindSICPeakAndAreaForParentIon: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             blnSuccess = False
         End Try
 
@@ -1548,7 +1551,7 @@ Public Class frmBrowser
                             ' Sort the data in intSimilarFragScans
                             Array.Sort(intSimilarFragScans, 0, intSimilarFragScanCount)
 
-                            ' Copy the sorted data into .SimilarFragScanList 
+                            ' Copy the sorted data into .SimilarFragScanList
                             ' When copying, make sure we don't have any duplicates
                             ' Also, populate SimilarFragScanPlottingIntensity
                             ReDim .SimilarFragScanList(intSimilarFragScanCount - 1)
@@ -1625,7 +1628,7 @@ Public Class frmBrowser
             Next intParentIonIndex
 
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in FindSimilarParentIon: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in FindSimilarParentIon: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
     End Sub
 
@@ -1693,12 +1696,12 @@ Public Class frmBrowser
     End Sub
 
     Private Sub InitializeMsMsResultsStorage()
-        Dim dtDataTable As System.Data.DataTable
+        Dim dtDataTable As DataTable
 
         '---------------------------------------------------------
         ' Create the MS/MS Search Engine Results DataTable
         '---------------------------------------------------------
-        dtDataTable = New System.Data.DataTable(TABLE_NAME_MSMSRESULTS)
+        dtDataTable = New DataTable(TABLE_NAME_MSMSRESULTS)
 
         ' Add the columns to the datatable
         SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SCAN)
@@ -1714,12 +1717,12 @@ Public Class frmBrowser
 
         ' Define a primary key
         With dtDataTable
-            Dim PrimaryKeyColumn As System.Data.DataColumn() = New System.Data.DataColumn() { .Columns(COL_NAME_SCAN), .Columns(COL_NAME_CHARGE), .Columns(COL_NAME_SEQUENCEID)}
+            Dim PrimaryKeyColumn As DataColumn() = New DataColumn() { .Columns(COL_NAME_SCAN), .Columns(COL_NAME_CHARGE), .Columns(COL_NAME_SEQUENCEID)}
             .PrimaryKey = PrimaryKeyColumn
         End With
 
         ' Instantiate the DataSet
-        mMsMsResults = New System.Data.DataSet("MsMsData")
+        mMsMsResults = New DataSet("MsMsData")
 
         ' Add the table to the DataSet
         mMsMsResults.Tables.Add(dtDataTable)
@@ -1727,7 +1730,7 @@ Public Class frmBrowser
         '---------------------------------------------------------
         ' Create the Sequence to Protein Map DataTable
         '---------------------------------------------------------
-        dtDataTable = New System.Data.DataTable(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
+        dtDataTable = New DataTable(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
         ' Add the columns to the datatable
         SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID)
@@ -1735,7 +1738,7 @@ Public Class frmBrowser
 
         ' Define a primary key
         With dtDataTable
-            Dim PrimaryKeyColumn As System.Data.DataColumn() = New System.Data.DataColumn() { .Columns(COL_NAME_SEQUENCEID), .Columns(COL_NAME_PROTEIN)}
+            Dim PrimaryKeyColumn As DataColumn() = New DataColumn() { .Columns(COL_NAME_SEQUENCEID), .Columns(COL_NAME_PROTEIN)}
             .PrimaryKey = PrimaryKeyColumn
         End With
 
@@ -1753,7 +1756,7 @@ Public Class frmBrowser
     Private Sub InitializeSequencesDataTable()
         Dim dtDataTable As DataTable
 
-        dtDataTable = New System.Data.DataTable(TABLE_NAME_SEQUENCES)
+        dtDataTable = New DataTable(TABLE_NAME_SEQUENCES)
 
         ' Add the columns to the datatable
         SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID, 0, True, True, True)
@@ -1761,7 +1764,7 @@ Public Class frmBrowser
 
         ' Define a primary key
         With dtDataTable
-            Dim PrimaryKeyColumn As System.Data.DataColumn() = New System.Data.DataColumn() { .Columns(COL_NAME_SEQUENCE)}
+            Dim PrimaryKeyColumn As DataColumn() = New DataColumn() { .Columns(COL_NAME_SEQUENCE)}
             .PrimaryKey = PrimaryKeyColumn
         End With
 
@@ -1868,7 +1871,7 @@ Public Class frmBrowser
                     End If
                 End If
             Else
-                Windows.Forms.MessageBox.Show("No data is in memory", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                MessageBox.Show("No data is in memory", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
 
         Catch ex As Exception
@@ -1882,10 +1885,10 @@ Public Class frmBrowser
         Dim intSequenceID As Integer
         Dim intSequenceCount As Integer
 
-        Dim objRows() As System.Data.DataRow
-        Dim objSeqRows() As System.Data.DataRow
+        Dim objRows() As DataRow
+        Dim objSeqRows() As DataRow
 
-        Dim objRow As System.Data.DataRow
+        Dim objRow As DataRow
 
         Dim strSequences As String = String.Empty
 
@@ -1924,7 +1927,7 @@ Public Class frmBrowser
         ' Additionally, adds a mapping between strSequence and strProtein in mMsMsResults.Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
         Dim strSequenceNoSuffixes As String
-        Dim objNewRow As System.Data.DataRow
+        Dim objNewRow As DataRow
         Dim intSequenceID As Integer
 
         intSequenceID = -1
@@ -2271,7 +2274,7 @@ Public Class frmBrowser
             End If
 
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in PlotData: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in PlotData: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -2327,7 +2330,7 @@ Public Class frmBrowser
         Dim intIndex As Integer
 
         Dim htFragScanToIndex As New Hashtable
-        Dim objRow As System.Data.DataRow
+        Dim objRow As DataRow
 
         For intIndex = 0 To mParentIonCount - 1
             If Not htFragScanToIndex.ContainsKey(mParentIonStats(intIndex).FragScanObserved) Then
@@ -2369,7 +2372,7 @@ Public Class frmBrowser
             End If
 
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in PopulateSpectrumList: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in PopulateSpectrumList: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
     End Sub
 
@@ -2398,7 +2401,7 @@ Public Class frmBrowser
 
     Private Sub ReadDataFileXMLTextReader(strFilePath As String)
 
-        Dim srDataFile As System.IO.StreamReader
+        Dim srDataFile As StreamReader
 
         Dim eCurrentXMLDataFileSection As eCurrentXMLDataFileSectionConstants
 
@@ -2437,7 +2440,7 @@ Public Class frmBrowser
 
         Dim strSICScanType As String
 
-        If Not System.IO.File.Exists(strFilePath) Then
+        If Not File.Exists(strFilePath) Then
             Exit Sub
         End If
 
@@ -2448,14 +2451,14 @@ Public Class frmBrowser
         Try
 
             ' Initialize the stream reader and the XML Text Reader
-            srDataFile = New System.IO.StreamReader(strFilePath)
+            srDataFile = New StreamReader(strFilePath)
             Using objXMLReader As System.Xml.XmlTextReader = New System.Xml.XmlTextReader(srDataFile)
 
                 strErrorLog = String.Empty
 
                 objProgress.InitializeProgressForm("Reading file " & ControlChars.NewLine & SharedVBNetRoutines.VBNetRoutines.CompactPathString(strFilePath, 40), 0, 1, True)
                 objProgress.Show()
-                Windows.Forms.Application.DoEvents()
+                Application.DoEvents()
 
                 ' Initialize mParentIonStats, initially reserving space for 5000 items
                 mParentIonCount = 0
@@ -2516,7 +2519,7 @@ Public Class frmBrowser
                                         If dblPercentComplete > 1 Then dblPercentComplete = 1
 
                                         objProgress.UpdateProgressBar(dblPercentComplete)
-                                        Windows.Forms.Application.DoEvents()
+                                        Application.DoEvents()
                                         If objProgress.KeyPressAbortProcess Then Exit Do
 
                                         ' Advance to the next tag
@@ -2887,7 +2890,7 @@ Public Class frmBrowser
 
 
             If eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.UnknownFile Then
-                System.Windows.Forms.MessageBox.Show("Root element 'SICData' not found in the input file: " & ControlChars.NewLine & strFilePath, "Invalid File Format", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                MessageBox.Show("Root element 'SICData' not found in the input file: " & ControlChars.NewLine & strFilePath, "Invalid File Format", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Else
 
                 ' Set the smoothing options
@@ -2911,7 +2914,7 @@ Public Class frmBrowser
 
                 ' Inform the user if any errors occurred
                 If strErrorLog.Length > 0 Then
-                    System.Windows.Forms.MessageBox.Show(strErrorLog, "Invalid Lines", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    MessageBox.Show(strErrorLog, "Invalid Lines", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End If
 
                 ' Sort the data
@@ -2923,15 +2926,15 @@ Public Class frmBrowser
                 End If
 
                 If objProgress.KeyPressAbortProcess Then
-                    System.Windows.Forms.MessageBox.Show("Load cancelled before all of the data was read", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    MessageBox.Show("Load cancelled before all of the data was read", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 Else
-                    AutoOpenMsMsResults(System.IO.Path.GetFullPath(strFilePath), objProgress)
+                    AutoOpenMsMsResults(Path.GetFullPath(strFilePath), objProgress)
                 End If
 
             End If
 
         Catch ex As Exception
-            System.Windows.Forms.MessageBox.Show("Unable to read the input file: " & strFilePath & ControlChars.NewLine & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Unable to read the input file: " & strFilePath & ControlChars.NewLine & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         Finally
             If Not objProgress Is Nothing Then
                 objProgress.HideForm()
@@ -2943,7 +2946,7 @@ Public Class frmBrowser
 
     Private Sub ReadMsMsSearchEngineResults(strFilePath As String, ByRef objProgress As ProgressFormNET.frmProgress)
 
-        Dim ioStream As System.IO.FileStream
+        Dim ioStream As FileStream
         Dim chSepChars() As Char = New Char() {ControlChars.Tab}
 
         Dim strLineIn As String
@@ -2957,12 +2960,12 @@ Public Class frmBrowser
 
         Dim blnCreatedNewProgressForm As Boolean
 
-        Dim objNewRow As System.Data.DataRow
+        Dim objNewRow As DataRow
 
         Try
-            ioStream = New System.IO.FileStream(strFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+            ioStream = New FileStream(strFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
 
-            Using fsInFile As System.IO.StreamReader = New System.IO.StreamReader(ioStream)
+            Using fsInFile As StreamReader = New StreamReader(ioStream)
 
                 If objProgress Is Nothing Then
                     objProgress = New ProgressFormNET.frmProgress
@@ -2972,7 +2975,7 @@ Public Class frmBrowser
                 objProgress.InitializeProgressForm("Reading MS/MS Search Engine Results ", 0, ioStream.Length, True)
                 objProgress.Show()
                 objProgress.BringToFront()
-                Windows.Forms.Application.DoEvents()
+                Application.DoEvents()
 
                 With mMsMsResults
                     If .Tables(TABLE_NAME_MSMSRESULTS).Rows.Count > 0 Or .Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP).Rows.Count > 0 Or .Tables(TABLE_NAME_SEQUENCES).Rows.Count > 0 Then
@@ -2990,7 +2993,7 @@ Public Class frmBrowser
 
                         If intLinesRead Mod 50 = 0 Then
                             objProgress.UpdateProgressBar(lngBytesRead)
-                            Windows.Forms.Application.DoEvents()
+                            Application.DoEvents()
                             If objProgress.KeyPressAbortProcess Then Exit Do
                         End If
 
@@ -3033,13 +3036,13 @@ Public Class frmBrowser
 
             End Using
 
-            ' Populate column .Item(COL_NAME_PARENTIONINDEX) 
+            ' Populate column .Item(COL_NAME_PARENTIONINDEX)
             PopulateParentIonIndexColumnInMsMsResultsTable()
 
             txtStats3.Visible = True
             PositionControls()
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in ReadMsMsSearchEngineResults: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in ReadMsMsSearchEngineResults: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         Finally
 
             If blnCreatedNewProgressForm Then
@@ -3067,7 +3070,7 @@ Public Class frmBrowser
 
             objProgress.InitializeProgressForm("Repeating SIC peak finding ", 0, mParentIonCount, True)
             objProgress.Show()
-            Windows.Forms.Application.DoEvents()
+            Application.DoEvents()
 
             UpdateSICPeakFinderOptions()
 
@@ -3079,7 +3082,7 @@ Public Class frmBrowser
                 End If
 
                 objProgress.UpdateProgressBar(intParentIonIndex + 1)
-                Windows.Forms.Application.DoEvents()
+                Application.DoEvents()
                 If objProgress.KeyPressAbortProcess Then Exit For
 
             Next intParentIonIndex
@@ -3087,7 +3090,7 @@ Public Class frmBrowser
             SortData()
 
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in RedoSICPeakFindingAllData: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in RedoSICPeakFindingAllData: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         Finally
             If Not objProgress Is Nothing Then
                 objProgress.HideForm()
@@ -3128,7 +3131,7 @@ Public Class frmBrowser
             txtAutoStep.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", 150).ToString
 
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in RegReadSettings: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in RegReadSettings: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
 
     End Sub
@@ -3175,20 +3178,20 @@ Public Class frmBrowser
 
             End If
         Catch ex As Exception
-            Windows.Forms.MessageBox.Show("Error in RegSaveSettings: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error in RegSaveSettings: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
     End Sub
 
     Private Sub SelectMASICInputFile()
 
-        Dim dlgOpenFile As New System.Windows.Forms.OpenFileDialog
+        Dim dlgOpenFile As New OpenFileDialog
 
         With dlgOpenFile
             .Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*"
             .FilterIndex = 1
             If Len(txtDataFilePath.Text.Length) > 0 Then
                 Try
-                    .InitialDirectory = System.IO.Directory.GetParent(txtDataFilePath.Text).ToString
+                    .InitialDirectory = Directory.GetParent(txtDataFilePath.Text).ToString
                 Catch
                     .InitialDirectory = Application.StartupPath
                 End Try
@@ -3212,14 +3215,14 @@ Public Class frmBrowser
     End Sub
 
     Private Sub SelectMsMsSearchResultsInputFile()
-        Dim dlgOpenFile As New System.Windows.Forms.OpenFileDialog
+        Dim dlgOpenFile As New OpenFileDialog
 
         With dlgOpenFile
             .Filter = "First Hits Files(*_fht.txt)|*_fht.txt|Synopsis Hits Files(*_syn.txt)|*_syn.txt|All files (*.*)|*.*"
             .FilterIndex = 1
             If Len(txtDataFilePath.Text.Length) > 0 Then
                 Try
-                    .InitialDirectory = System.IO.Directory.GetParent(txtDataFilePath.Text).ToString
+                    .InitialDirectory = Directory.GetParent(txtDataFilePath.Text).ToString
                 Catch
                     .InitialDirectory = Application.StartupPath
                 End Try
@@ -3239,7 +3242,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub SetToolTips()
-        Dim objToolTipControl As New System.Windows.Forms.ToolTip
+        Dim objToolTipControl As New ToolTip
 
         With objToolTipControl
 
@@ -3262,7 +3265,7 @@ Public Class frmBrowser
         strMessage &= "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" & ControlChars.NewLine
         strMessage &= "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." & ControlChars.NewLine & ControlChars.NewLine
 
-        strMessage &= "This is version " & System.Windows.Forms.Application.ProductVersion & " (" & PROGRAM_DATE & ")" & ControlChars.NewLine & ControlChars.NewLine
+        strMessage &= "This is version " & Application.ProductVersion & " (" & PROGRAM_DATE & ")" & ControlChars.NewLine & ControlChars.NewLine
 
         strMessage &= "E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com" & ControlChars.NewLine
         strMessage &= "Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/" & ControlChars.NewLine & ControlChars.NewLine
@@ -3279,7 +3282,7 @@ Public Class frmBrowser
         strMessage &= "SOFTWARE.  This notice including this sentence must appear on any copies of "
         strMessage &= "this computer software." & ControlChars.NewLine
 
-        Windows.Forms.MessageBox.Show(strMessage, "About", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        MessageBox.Show(strMessage, "About", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
     End Sub
 
@@ -3632,7 +3635,7 @@ Public Class frmBrowser
             ElseIf lstParentIonData.SelectedIndex = mParentIonPointerArrayCount - 1 AndAlso chkAutoStepForward.Checked Then
                 chkAutoStepForward.Checked = False
             End If
-            mLastUpdate = System.DateTime.Now()
+            mLastUpdate = DateTime.Now()
             mAutoStepEnabled = True
             cmdAutoStep.Text = "Stop &Auto"
         End If
@@ -3987,7 +3990,7 @@ Public Class frmBrowser
         SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
     End Sub
 
-    Private Sub txtStats1_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtStats1.KeyPress
+    Private Sub txtStats1_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtStats1.KeyPress
         If Char.IsControl(e.KeyChar) Then
             Select Case Asc(e.KeyChar)
                 Case 3
@@ -4003,7 +4006,7 @@ Public Class frmBrowser
         End If
     End Sub
 
-    Private Sub txtStats2_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtStats2.KeyPress
+    Private Sub txtStats2_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtStats2.KeyPress
         If Char.IsControl(e.KeyChar) Then
             Select Case Asc(e.KeyChar)
                 Case 3
@@ -4019,7 +4022,7 @@ Public Class frmBrowser
         End If
     End Sub
 
-    Private Sub txStats3_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtStats3.KeyPress
+    Private Sub txStats3_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtStats3.KeyPress
         If Char.IsControl(e.KeyChar) Then
             Select Case Asc(e.KeyChar)
                 Case 3
