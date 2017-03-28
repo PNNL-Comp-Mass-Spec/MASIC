@@ -1,6 +1,6 @@
 Option Strict On
 
-' This class can be used to parse the text following the program name when a 
+' This class can be used to parse the text following the program name when a
 '  program is started from the command line
 '
 ' -------------------------------------------------------------------------------
@@ -10,103 +10,131 @@ Option Strict On
 ' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
 ' Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
 ' -------------------------------------------------------------------------------
-' 
+'
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at 
+' in compliance with the License.  You may obtain a copy of the License at
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
-' Notice: This computer software was prepared by Battelle Memorial Institute, 
-' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the 
-' Department of Energy (DOE).  All rights in the computer software are reserved 
-' by DOE on behalf of the United States Government and the Contractor as 
-' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY 
-' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS 
-' SOFTWARE.  This notice including this sentence must appear on any copies of 
+' Notice: This computer software was prepared by Battelle Memorial Institute,
+' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
+' Department of Energy (DOE).  All rights in the computer software are reserved
+' by DOE on behalf of the United States Government and the Contractor as
+' provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY
+' WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS
+' SOFTWARE.  This notice including this sentence must appear on any copies of
 ' this computer software.
 
 '
-' Last modified October 29, 2015
+' Last modified March 28, 2017
 
 Imports System.Collections.Generic
 Imports System.Runtime.InteropServices
+Imports Microsoft.VisualBasic
 
 Public Class clsParseCommandLine
 
+    ''' <summary>
+    ''' Default switch char
+    ''' </summary>
     Public Const DEFAULT_SWITCH_CHAR As Char = "/"c
+
+    ''' <summary>
+    ''' Alternate switch char
+    ''' </summary>
     Public Const ALTERNATE_SWITCH_CHAR As Char = "-"c
 
+    ''' <summary>
+    ''' Default character between the switch name and a value to associate with the parameter
+    ''' </summary>
     Public Const DEFAULT_SWITCH_PARAM_CHAR As Char = ":"c
 
     Private ReadOnly mSwitches As New Dictionary(Of String, String)
     Private ReadOnly mNonSwitchParameters As New List(Of String)
 
     Private mShowHelp As Boolean = False
-    Private mDebugMode As Boolean = False
 
+    ''' <summary>
+    ''' If true, we need to show the syntax to the user due to a switch error, invalid switch, or the presence of /? or /help
+    ''' </summary>
     Public ReadOnly Property NeedToShowHelp() As Boolean
         Get
             Return mShowHelp
         End Get
     End Property
 
+    ' ReSharper disable once UnusedMember.Global
+    ''' <summary>
+    ''' Number of switches
+    ''' </summary>
     Public ReadOnly Property ParameterCount() As Integer
         Get
             Return mSwitches.Count
         End Get
     End Property
 
+    ' ReSharper disable once UnusedMember.Global
+    ''' <summary>
+    ''' Number of parameters that are not preceded by a switch
+    ''' </summary>
     Public ReadOnly Property NonSwitchParameterCount() As Integer
         Get
             Return mNonSwitchParameters.Count
         End Get
     End Property
 
-    Public Property DebugMode() As Boolean
-        Get
-            Return mDebugMode
-        End Get
-        Set(value As Boolean)
-            mDebugMode = value
-        End Set
-    End Property
+    ''' <summary>
+    ''' Set to true to see extra debug information
+    ''' </summary>
+    Public ReadOnly Property DebugMode() As Boolean
+
+    Public Sub New(Optional blnDebugMode As Boolean = False)
+        DebugMode = blnDebugMode
+    End Sub
 
     ''' <summary>
     ''' Compares the parameter names in objParameterList with the parameters at the command line
     ''' </summary>
-    ''' <param name="objParameterList">Parameter list</param>
-    ''' <returns>True if any of the parameters are not present in strParameterList()</returns>
-    Public Function InvalidParametersPresent(objParameterList As List(Of String)) As Boolean
-        Const blnCaseSensitive = False
-        Return InvalidParametersPresent(objParameterList, blnCaseSensitive)
+    ''' <param name="parameterList">Parameter list</param>
+    ''' <returns>True if any of the parameters are not present in parameterList()</returns>
+    Public Function InvalidParametersPresent(parameterList As List(Of String)) As Boolean
+        Const caseSensitive = False
+        Return InvalidParametersPresent(parameterList, caseSensitive)
+    End Function
+
+    ' ReSharper disable once UnusedMember.Global
+    ''' <summary>
+    ''' Compares the parameter names in parameterList with the parameters at the command line
+    ''' </summary>
+    ''' <param name="parameterList">Parameter list</param>
+    ''' <returns>True if any of the parameters are not present in parameterList()</returns>
+    Public Function InvalidParametersPresent(parameterList() As String) As Boolean
+        Const caseSensitive = False
+        Return InvalidParametersPresent(parameterList, caseSensitive)
     End Function
 
     ''' <summary>
-    ''' Compares the parameter names in strParameterList with the parameters at the command line
+    ''' Compares the parameter names in parameterList with the parameters at the command line
     ''' </summary>
-    ''' <param name="strParameterList">Parameter list</param>
-    ''' <returns>True if any of the parameters are not present in strParameterList()</returns>
-    Public Function InvalidParametersPresent(strParameterList() As String) As Boolean
-        Const blnCaseSensitive = False
-        Return InvalidParametersPresent(strParameterList, blnCaseSensitive)
-    End Function
-
-    ''' <summary>
-    ''' Compares the parameter names in strParameterList with the parameters at the command line
-    ''' </summary>
-    ''' <param name="strParameterList">Parameter list</param>
-    ''' <param name="blnCaseSensitive">True to perform case-sensitive matching of the parameter name</param>
-    ''' <returns>True if any of the parameters are not present in strParameterList()</returns>
-    Public Function InvalidParametersPresent(strParameterList() As String, blnCaseSensitive As Boolean) As Boolean
-        If InvalidParameters(strParameterList.ToList()).Count > 0 Then
+    ''' <param name="parameterList">Parameter list</param>
+    ''' <param name="caseSensitive">True to perform case-sensitive matching of the parameter name</param>
+    ''' <returns>True if any of the parameters are not present in parameterList()</returns>
+    Public Function InvalidParametersPresent(parameterList() As String, caseSensitive As Boolean) As Boolean
+        If InvalidParameters(parameterList.ToList(), caseSensitive).Count > 0 Then
             Return True
         Else
             Return False
         End If
     End Function
 
-    Public Function InvalidParametersPresent(lstValidParameters As List(Of String), blnCaseSensitive As Boolean) As Boolean
+    ''' <summary>
+    ''' Validate that the user-provided parameters are in the validParameters list
+    ''' </summary>
+    ''' <param name="validParameters"></param>
+    ''' <param name="caseSensitive"></param>
+    ''' <returns></returns>
+    Public Function InvalidParametersPresent(validParameters As List(Of String), caseSensitive As Boolean) As Boolean
 
-        If InvalidParameters(lstValidParameters, blnCaseSensitive).Count > 0 Then
+        If InvalidParameters(validParameters, caseSensitive).Count > 0 Then
             Return True
         Else
             Return False
@@ -114,30 +142,41 @@ Public Class clsParseCommandLine
 
     End Function
 
-    Public Function InvalidParameters(lstValidParameters As List(Of String)) As List(Of String)
-        Const blnCaseSensitive = False
-        Return InvalidParameters(lstValidParameters, blnCaseSensitive)
+    ''' <summary>
+    ''' Retrieve a list of the user-provided parameters that are not in validParameters
+    ''' </summary>
+    ''' <param name="validParameters"></param>
+    ''' <returns></returns>
+    Public Function InvalidParameters(validParameters As List(Of String)) As List(Of String)
+        Const caseSensitive = False
+        Return InvalidParameters(validParameters, caseSensitive)
     End Function
 
-    Public Function InvalidParameters(lstValidParameters As List(Of String), blnCaseSensitive As Boolean) As List(Of String)
-        Dim lstInvalidParameters = New List(Of String)
+    ''' <summary>
+    ''' Retrieve a list of the user-provided parameters that are not in validParameters
+    ''' </summary>
+    ''' <param name="validParameters"></param>
+    ''' <param name="caseSensitive"></param>
+    ''' <returns></returns>
+    Public Function InvalidParameters(validParameters As List(Of String), caseSensitive As Boolean) As List(Of String)
+        Dim invalidParams = New List(Of String)
 
         Try
 
-            ' Find items in mSwitches whose keys are not in lstValidParameters)		
+            ' Find items in mSwitches whose keys are not in validParameters)
             For Each item As KeyValuePair(Of String, String) In mSwitches
 
                 Dim itemKey As String = item.Key
                 Dim intMatchCount As Integer
 
-                If blnCaseSensitive Then
-                    intMatchCount = (From validItem In lstValidParameters Where validItem = itemKey).Count
+                If caseSensitive Then
+                    intMatchCount = (From validItem In validParameters Where validItem = itemKey).Count
                 Else
-                    intMatchCount = (From validItem In lstValidParameters Where String.Equals(validItem, itemKey, StringComparison.InvariantCultureIgnoreCase)).Count
+                    intMatchCount = (From validItem In validParameters Where String.Equals(validItem, itemKey, StringComparison.InvariantCultureIgnoreCase)).Count
                 End If
 
                 If intMatchCount = 0 Then
-                    lstInvalidParameters.Add(item.Key)
+                    invalidParams.Add(item.Key)
                 End If
             Next
 
@@ -145,20 +184,20 @@ Public Class clsParseCommandLine
             Throw New Exception("Error in InvalidParameters", ex)
         End Try
 
-        Return lstInvalidParameters
+        Return invalidParams
 
     End Function
 
     ''' <summary>
     ''' Look for parameter on the command line
     ''' </summary>
-    ''' <param name="strParameterName">Parameter name</param>
+    ''' <param name="paramName">Parameter name</param>
     ''' <returns>True if present, otherwise false</returns>
     ''' <remarks>Does not work for /? or /help -- for those, use .NeedToShowHelp</remarks>
-    Public Function IsParameterPresent(strParameterName As String) As Boolean
-        Dim strValue As String = String.Empty
-        Const blnCaseSensitive = False
-        Return RetrieveValueForParameter(strParameterName, strValue, blnCaseSensitive)
+    Public Function IsParameterPresent(paramName As String) As Boolean
+        Dim paramValue As String = String.Empty
+        Const caseSensitive = False
+        Return RetrieveValueForParameter(paramName, paramValue, caseSensitive)
     End Function
 
     ''' <summary>
@@ -170,29 +209,30 @@ Public Class clsParseCommandLine
         Return ParseCommandLine(DEFAULT_SWITCH_CHAR, DEFAULT_SWITCH_PARAM_CHAR)
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Parse the parameters and switches at the command line; uses : for the switch parameter character
     ''' </summary>
     ''' <returns>Returns True if any command line parameters were found; otherwise false</returns>
     ''' <remarks>If /? or /help is found, then returns False and sets mShowHelp to True</remarks>
-    Public Function ParseCommandLine(strSwitchStartChar As Char) As Boolean
-        Return ParseCommandLine(strSwitchStartChar, DEFAULT_SWITCH_PARAM_CHAR)
+    Public Function ParseCommandLine(switchStartChar As Char) As Boolean
+        Return ParseCommandLine(switchStartChar, DEFAULT_SWITCH_PARAM_CHAR)
     End Function
 
     ''' <summary>
     ''' Parse the parameters and switches at the command line
     ''' </summary>
-    ''' <param name="chSwitchStartChar"></param>
-    ''' <param name="chSwitchParameterChar"></param>
+    ''' <param name="switchStartChar"></param>
+    ''' <param name="switchParameterChar"></param>
     ''' <returns>Returns True if any command line parameters were found; otherwise false</returns>
     ''' <remarks>If /? or /help is found, then returns False and sets mShowHelp to True</remarks>
-    Public Function ParseCommandLine(chSwitchStartChar As Char, chSwitchParameterChar As Char) As Boolean
+    Public Function ParseCommandLine(switchStartChar As Char, switchParameterChar As Char) As Boolean
         ' Returns True if any command line parameters were found
         ' Otherwise, returns false
         '
         ' If /? or /help is found, then returns False and sets mShowHelp to True
 
-        Dim strCmdLine As String = String.Empty
+        Dim strCmdLine As String
 
         mSwitches.Clear()
         mNonSwitchParameters.Clear()
@@ -206,22 +246,22 @@ Public Class clsParseCommandLine
                 ' Note that .NET will strip out the starting and ending double quote if the user provides a parameter like this:
                 ' MyProgram.exe "C:\Program Files\FileToProcess"
                 '
-                ' In this case, strParameters(1) will not have a double quote at the start but it will have a double quote at the end:
-                '  strParameters(1) = C:\Program Files\FileToProcess"
+                ' In this case, paramList(1) will not have a double quote at the start but it will have a double quote at the end:
+                '  paramList(1) = C:\Program Files\FileToProcess"
 
                 ' One very odd feature of Environment.GetCommandLineArgs() is that if the command line looks like this:
                 '    MyProgram.exe "D:\My Folder\Subfolder\" /O:D:\OutputFolder
-                ' Then strParameters will have:
-                '    strParameters(1) = D:\My Folder\Subfolder" /O:D:\OutputFolder
+                ' Then paramList will have:
+                '    paramList(1) = D:\My Folder\Subfolder" /O:D:\OutputFolder
                 '
                 ' To avoid this problem instead specify the command line as:
                 '    MyProgram.exe "D:\My Folder\Subfolder" /O:D:\OutputFolder
                 ' which gives:
-                '    strParameters(1) = D:\My Folder\Subfolder
-                '    strParameters(2) = /O:D:\OutputFolder
+                '    paramList(1) = D:\My Folder\Subfolder
+                '    paramList(2) = /O:D:\OutputFolder
                 '
                 ' Due to the idiosyncrasies of .GetCommandLineArgs, we will instead use SplitCommandLineParams to do the splitting
-                ' strParameters = Environment.GetCommandLineArgs()
+                ' paramList = Environment.GetCommandLineArgs()
 
             Catch ex As Exception
                 ' In .NET 1.x, programs would fail if called from a network share
@@ -241,89 +281,89 @@ Public Class clsParseCommandLine
                 Return False
             End Try
 
-            If mDebugMode Then
+            If DebugMode Then
                 Console.WriteLine()
                 Console.WriteLine("Debugging command line parsing")
                 Console.WriteLine()
             End If
 
-            Dim strParameters = SplitCommandLineParams(strCmdLine)
+            Dim paramList = SplitCommandLineParams(strCmdLine)
 
-            If mDebugMode Then
+            If DebugMode Then
                 Console.WriteLine()
             End If
 
             If String.IsNullOrWhiteSpace(strCmdLine) Then
                 Return False
-            ElseIf strCmdLine.IndexOf(chSwitchStartChar & "?", StringComparison.Ordinal) > 0 OrElse strCmdLine.ToLower().IndexOf(chSwitchStartChar & "help", StringComparison.Ordinal) > 0 Then
+            ElseIf strCmdLine.IndexOf(switchStartChar & "?", StringComparison.Ordinal) > 0 OrElse strCmdLine.ToLower().IndexOf(switchStartChar & "help", StringComparison.Ordinal) > 0 Then
                 mShowHelp = True
                 Return False
             End If
 
             ' Parse the command line
-            ' Note that strParameters(0) is the path to the Executable for the calling program
-            For intIndex = 1 To strParameters.Length - 1
+            ' Note that paramList(0) is the path to the Executable for the calling program
+            For intIndex = 1 To paramList.Length - 1
 
-                If strParameters(intIndex).Length > 0 Then
-                    Dim strKey = strParameters(intIndex).TrimStart(" "c)
-                    Dim strValue = String.Empty
-                    Dim blnSwitchParam As Boolean
+                If paramList(intIndex).Length > 0 Then
+                    Dim paramName = paramList(intIndex).TrimStart(" "c)
+                    Dim paramValue = String.Empty
+                    Dim isSwitchParam As Boolean
 
-                    If strKey.StartsWith(chSwitchStartChar) Then
-                        blnSwitchParam = True
-                    ElseIf strKey.StartsWith(ALTERNATE_SWITCH_CHAR) OrElse strKey.StartsWith(DEFAULT_SWITCH_CHAR) Then
-                        blnSwitchParam = True
+                    If paramName.StartsWith(switchStartChar) Then
+                        isSwitchParam = True
+                    ElseIf paramName.StartsWith(ALTERNATE_SWITCH_CHAR) OrElse paramName.StartsWith(DEFAULT_SWITCH_CHAR) Then
+                        isSwitchParam = True
                     Else
-                        ' Parameter doesn't start with strSwitchStartChar or / or -
-                        blnSwitchParam = False
+                        ' Parameter doesn't start with switchStartChar or / or -
+                        isSwitchParam = False
                     End If
 
-                    If blnSwitchParam Then
-                        ' Look for strSwitchParameterChar in strParameters(intIndex)
-                        Dim intCharIndex = strParameters(intIndex).IndexOf(chSwitchParameterChar)
+                    If isSwitchParam Then
+                        ' Look for switchParameterChar in paramList(intIndex)
+                        Dim charIndex = paramList(intIndex).IndexOf(switchParameterChar)
 
-                        If intCharIndex >= 0 Then
+                        If charIndex >= 0 Then
                             ' Parameter is of the form /I:MyParam or /I:"My Parameter" or -I:"My Parameter" or /MyParam:Setting
-                            strValue = strKey.Substring(intCharIndex + 1).Trim
+                            paramValue = paramName.Substring(charIndex + 1).Trim()
 
                             ' Remove any starting and ending quotation marks
-                            strValue = strValue.Trim(""""c)
+                            paramValue = paramValue.Trim(""""c)
 
-                            strKey = strKey.Substring(0, intCharIndex)
+                            paramName = paramName.Substring(0, charIndex)
                         Else
                             ' Parameter is of the form /S or -S
                         End If
 
-                        ' Remove the switch character from strKey
-                        strKey = strKey.Substring(1).Trim
+                        ' Remove the switch character from paramName
+                        paramName = paramName.Substring(1).Trim()
 
-                        If mDebugMode Then
-                            Console.WriteLine("SwitchParam: " & strKey & "=" & strValue)
+                        If DebugMode Then
+                            Console.WriteLine("SwitchParam: " & paramName & "=" & paramValue)
                         End If
 
-                        ' Note: .Item() will add strKey if it doesn't exist (which is normally the case)
-                        mSwitches.Item(strKey) = strValue
+                        ' Note: .Item() will add paramName if it doesn't exist (which is normally the case)
+                        mSwitches.Item(paramName) = paramValue
                     Else
-                        ' Non-switch parameter since strSwitchParameterChar was not found and does not start with strSwitchStartChar
+                        ' Non-switch parameter since switchParameterChar was not found and does not start with switchStartChar
 
                         ' Remove any starting and ending quotation marks
-                        strKey = strKey.Trim(""""c)
+                        paramName = paramName.Trim(""""c)
 
-                        If mDebugMode Then
-                            Console.WriteLine("NonSwitchParam " & mNonSwitchParameters.Count & ": " & strKey)
+                        If DebugMode Then
+                            Console.WriteLine("NonSwitchParam " & mNonSwitchParameters.Count & ": " & paramName)
                         End If
 
-                        mNonSwitchParameters.Add(strKey)
+                        mNonSwitchParameters.Add(paramName)
                     End If
 
                 End If
-            Next intIndex
+            Next
 
         Catch ex As Exception
             Throw New Exception("Error in ParseCommandLine", ex)
         End Try
 
-        If mDebugMode Then
+        If DebugMode Then
             Console.WriteLine()
             Console.WriteLine("Switch Count = " & mSwitches.Count)
             Console.WriteLine("NonSwitch Count = " & mNonSwitchParameters.Count)
@@ -338,81 +378,85 @@ Public Class clsParseCommandLine
 
     End Function
 
-    Public Shared Sub PauseAtConsole(intMillisecondsToPause As Integer, intMillisecondsBetweenDots As Integer)
+    ''' <summary>
+    ''' Pause the program for the specified number of milliseconds, displaying a period at a set interval while paused
+    ''' </summary>
+    ''' <param name="millisecondsToPause">Milliseconds to pause; default 5 seconds</param>
+    ''' <param name="millisecondsBetweenDots">Seconds between each period; default 1 second</param>
+    Public Shared Sub PauseAtConsole(millisecondsToPause As Integer, millisecondsBetweenDots As Integer)
 
-        Dim intIteration As Integer
-        Dim intTotalIterations As Integer
+        Dim totalIterations As Integer
 
         Console.WriteLine()
-        Console.Write("Continuing in " & (intMillisecondsToPause / 1000.0).ToString("0") & " seconds ")
+        Console.Write("Continuing in " & (millisecondsToPause / 1000.0).ToString("0") & " seconds ")
 
         Try
-            If intMillisecondsBetweenDots = 0 Then intMillisecondsBetweenDots = intMillisecondsToPause
+            If millisecondsBetweenDots = 0 Then millisecondsBetweenDots = millisecondsToPause
 
-            intTotalIterations = CInt(Math.Round(intMillisecondsToPause / intMillisecondsBetweenDots, 0))
+            totalIterations = CInt(Math.Round(millisecondsToPause / CDbl(millisecondsBetweenDots), 0))
         Catch ex As Exception
-            intTotalIterations = 1
+            totalIterations = 1
         End Try
 
-        intIteration = 0
+        Dim iteration = 0
         Do
             Console.Write("."c)
 
-            System.Threading.Thread.Sleep(intMillisecondsBetweenDots)
+            Threading.Thread.Sleep(millisecondsBetweenDots)
 
-            intIteration += 1
-        Loop While intIteration < intTotalIterations
+            iteration += 1
+        Loop While iteration < totalIterations
 
         Console.WriteLine()
 
     End Sub
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Returns the value of the non-switch parameter at the given index
     ''' </summary>
-    ''' <param name="intParameterIndex">Parameter index</param>
+    ''' <param name="parameterIndex">Parameter index</param>
     ''' <returns>The value of the parameter at the given index; empty string if no value or invalid index</returns>
-    Public Function RetrieveNonSwitchParameter(intParameterIndex As Integer) As String
-        Dim strValue As String = String.Empty
+    Public Function RetrieveNonSwitchParameter(parameterIndex As Integer) As String
+        Dim paramValue As String = String.Empty
 
-        If intParameterIndex < mNonSwitchParameters.Count Then
-            strValue = mNonSwitchParameters(intParameterIndex)
+        If parameterIndex < mNonSwitchParameters.Count Then
+            paramValue = mNonSwitchParameters(parameterIndex)
         End If
 
-        If strValue Is Nothing Then
-            strValue = String.Empty
+        If paramValue Is Nothing Then
+            Return String.Empty
         End If
 
-        Return strValue
+        Return paramValue
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Returns the parameter at the given index
     ''' </summary>
-    ''' <param name="intParameterIndex">Parameter index</param>
-    ''' <param name="strKey">Parameter name (output)</param>
-    ''' <param name="strValue">Value associated with the parameter; empty string if no value (output)</param>
+    ''' <param name="parameterIndex">Parameter index</param>
+    ''' <param name="paramName">Parameter name (output)</param>
+    ''' <param name="paramValue">Value associated with the parameter; empty string if no value (output)</param>
     ''' <returns></returns>
-    Public Function RetrieveParameter(intParameterIndex As Integer, <Out()> ByRef strKey As String, <Out()> ByRef strValue As String) As Boolean
-
-        Dim intIndex As Integer
+    Public Function RetrieveParameter(parameterIndex As Integer, <Out()> ByRef paramName As String, <Out()> ByRef paramValue As String) As Boolean
 
         Try
-            strKey = String.Empty
-            strValue = String.Empty
+            paramName = String.Empty
+            paramValue = String.Empty
 
-            If intParameterIndex < mSwitches.Count Then
+            If parameterIndex < mSwitches.Count Then
                 Dim iEnum As Dictionary(Of String, String).Enumerator = mSwitches.GetEnumerator()
 
-                intIndex = 0
+                Dim switchIndex = 0
                 Do While iEnum.MoveNext()
-                    If intIndex = intParameterIndex Then
-                        strKey = iEnum.Current.Key
-                        strValue = iEnum.Current.Value
+                    If switchIndex = parameterIndex Then
+                        paramName = iEnum.Current.Key
+                        paramValue = iEnum.Current.Value
                         Return True
                     End If
-                    intIndex += 1
+                    switchIndex += 1
                 Loop
             Else
                 Return False
@@ -425,43 +469,44 @@ Public Class clsParseCommandLine
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
-    ''' Look for parameter on the command line and returns its value in strValue
+    ''' Look for parameter on the command line and returns its value in paramValue
     ''' </summary>
-    ''' <param name="strKey">Parameter name</param>
-    ''' <param name="strValue">Value associated with the parameter; empty string if no value (output)</param>
+    ''' <param name="paramName">Parameter name</param>
+    ''' <param name="paramValue">Value associated with the parameter; empty string if no value (output)</param>
     ''' <returns>True if present, otherwise false</returns>
-    Public Function RetrieveValueForParameter(strKey As String, <Out()> ByRef strValue As String) As Boolean
-        Return RetrieveValueForParameter(strKey, strValue, False)
+    Public Function RetrieveValueForParameter(paramName As String, <Out()> ByRef paramValue As String) As Boolean
+        Return RetrieveValueForParameter(paramName, paramValue, False)
     End Function
 
     ''' <summary>
-    ''' Look for parameter on the command line and returns its value in strValue
+    ''' Look for parameter on the command line and returns its value in paramValue
     ''' </summary>
-    ''' <param name="strKey">Parameter name</param>
-    ''' <param name="strValue">Value associated with the parameter; empty string if no value (output)</param>
-    ''' <param name="blnCaseSensitive">True to perform case-sensitive matching of the parameter name</param>
+    ''' <param name="paramName">Parameter name</param>
+    ''' <param name="paramValue">Value associated with the parameter; empty string if no value (output)</param>
+    ''' <param name="caseSensitive">True to perform case-sensitive matching of the parameter name</param>
     ''' <returns>True if present, otherwise false</returns>
-    Public Function RetrieveValueForParameter(strKey As String, <Out()> ByRef strValue As String, blnCaseSensitive As Boolean) As Boolean
+    Public Function RetrieveValueForParameter(paramName As String, <Out()> ByRef paramValue As String, caseSensitive As Boolean) As Boolean
 
         Try
-            strValue = String.Empty
+            paramValue = String.Empty
 
-            If blnCaseSensitive Then
-                If mSwitches.ContainsKey(strKey) Then
-                    strValue = CStr(mSwitches(strKey))
+            If caseSensitive Then
+                If mSwitches.ContainsKey(paramName) Then
+                    paramValue = CStr(mSwitches(paramName))
                     Return True
                 Else
                     Return False
                 End If
             Else
-                Dim query = (From item In mSwitches Where String.Equals(item.Key, strKey, StringComparison.InvariantCultureIgnoreCase) Select item).ToList()
+                Dim query = (From item In mSwitches Where String.Equals(item.Key, paramName, StringComparison.InvariantCultureIgnoreCase) Select item).ToList()
 
                 If query.Count = 0 Then
                     Return False
                 End If
 
-                strValue = query.FirstOrDefault.Value
+                paramValue = query.FirstOrDefault.Value
                 Return True
 
             End If
@@ -472,12 +517,10 @@ Public Class clsParseCommandLine
     End Function
 
     Private Function SplitCommandLineParams(strCmdLine As String) As String()
-        Dim strParameters As New List(Of String)
-        Dim strParameter As String
+        Dim paramList As New List(Of String)
 
-        Dim intIndexStart = 0
-        Dim intIndexEnd = 0
-        Dim blnInsideDoubleQuotes As Boolean
+        Dim indexStart = 0
+        Dim indexEnd = 0
 
         Try
             If Not String.IsNullOrEmpty(strCmdLine) Then
@@ -487,41 +530,41 @@ Public Class clsParseCommandLine
                 strCmdLine = strCmdLine.Replace(ControlChars.Cr, " ")
                 strCmdLine = strCmdLine.Replace(ControlChars.Lf, " ")
 
-                blnInsideDoubleQuotes = False
+                Dim insideDoubleQuotes = False
 
-                Do While intIndexStart < strCmdLine.Length
+                Do While indexStart < strCmdLine.Length
                     ' Step through the characters to find the next space
                     ' However, if we find a double quote, then stop checking for spaces
 
-                    If strCmdLine.Chars(intIndexEnd) = """"c Then
-                        blnInsideDoubleQuotes = Not blnInsideDoubleQuotes
+                    If strCmdLine.Chars(indexEnd) = """"c Then
+                        insideDoubleQuotes = Not insideDoubleQuotes
                     End If
 
-                    If Not blnInsideDoubleQuotes OrElse intIndexEnd = strCmdLine.Length - 1 Then
-                        If strCmdLine.Chars(intIndexEnd) = " "c OrElse intIndexEnd = strCmdLine.Length - 1 Then
+                    If Not insideDoubleQuotes OrElse indexEnd = strCmdLine.Length - 1 Then
+                        If strCmdLine.Chars(indexEnd) = " "c OrElse indexEnd = strCmdLine.Length - 1 Then
                             ' Found the end of a parameter
-                            strParameter = strCmdLine.Substring(intIndexStart, intIndexEnd - intIndexStart + 1).TrimEnd(" "c)
+                            Dim paramName = strCmdLine.Substring(indexStart, indexEnd - indexStart + 1).TrimEnd(" "c)
 
-                            If strParameter.StartsWith(""""c) Then
-                                strParameter = strParameter.Substring(1)
+                            If paramName.StartsWith(""""c) Then
+                                paramName = paramName.Substring(1)
                             End If
 
-                            If strParameter.EndsWith(""""c) Then
-                                strParameter = strParameter.Substring(0, strParameter.Length - 1)
+                            If paramName.EndsWith(""""c) Then
+                                paramName = paramName.Substring(0, paramName.Length - 1)
                             End If
 
-                            If Not String.IsNullOrEmpty(strParameter) Then
-                                If mDebugMode Then
-                                    Console.WriteLine("Param " & strParameters.Count & ": " & strParameter)
+                            If Not String.IsNullOrEmpty(paramName) Then
+                                If DebugMode Then
+                                    Console.WriteLine("Param " & paramList.Count & ": " & paramName)
                                 End If
-                                strParameters.Add(strParameter)
+                                paramList.Add(paramName)
                             End If
 
-                            intIndexStart = intIndexEnd + 1
+                            indexStart = indexEnd + 1
                         End If
                     End If
 
-                    intIndexEnd += 1
+                    indexEnd += 1
                 Loop
 
             End If
@@ -530,7 +573,7 @@ Public Class clsParseCommandLine
             Throw New Exception("Error in SplitCommandLineParams", ex)
         End Try
 
-        Return strParameters.ToArray()
+        Return paramList.ToArray()
 
     End Function
 End Class

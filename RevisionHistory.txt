@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.8.6296; March 28, 2017
+	- Update to .NET 4.6.2
+	- Updated PRISM.dll and clsParseCommandLine.vb
+
 Version 2.7.6285; March 17, 2017
 	- Add TMT11 (eleven-plex TMT)
 
