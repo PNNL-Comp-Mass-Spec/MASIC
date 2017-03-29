@@ -302,7 +302,7 @@ Public Class clsCorrelation
 
             If binningOptions.Normalize And sngMaximumIntensity > 0 Then
                 For intIndex = 0 To intBinCount - 1
-                    If Math.Abs(sngBinnedYData(intIndex) - 0) > Single.Epsilon Then
+                    If Math.Abs(sngBinnedYData(intIndex)) > Single.Epsilon Then
                         sngBinnedYData(intIndex) /= sngMaximumIntensity * 100
                     End If
                 Next intIndex
@@ -485,7 +485,7 @@ Public Class clsCorrelation
                 a1 = sngDataList1(j) - sngDataList1(k)
                 a2 = sngDataList2(j) - sngDataList2(k)
                 aa = a1 * a2
-                If Math.Abs(aa - 0) > Double.Epsilon Then
+                If Math.Abs(aa) > Double.Epsilon Then
                     n1 += 1
                     n2 += 1
                     If aa > 0 Then
