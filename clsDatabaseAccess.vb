@@ -31,7 +31,7 @@ Public Class clsDatabaseAccess
         ' If this doesn't work, then looks for the dataset name in mDatasetLookupFilePath
 
         ' Initialize intNewDatasetNumber and strFileNameCompare
-        Dim strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper
+        Dim strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper()
         Dim intNewDatasetNumber = intDefaultDatasetNumber
 
         Dim strAvoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " &
@@ -44,70 +44,72 @@ Public Class clsDatabaseAccess
             Try
                 Dim objDBTools = New PRISM.clsDBTools(mOptions.DatabaseConnectionString)
 
-                Dim intTextCol As Integer = -1
-                Dim intDatasetIDCol As Integer = -1
                 Dim blnQueryingSingleDataset = False
 
-                Dim strQuery = String.Copy(mOptions.DatasetInfoQuerySql)
-                If strQuery.ToUpper.StartsWith("SELECT DATASET") Then
-                    ' Add a where clause to the query
-                    strQuery &= " WHERE Dataset = '" & strFileNameCompare & "'"
-                    blnQueryingSingleDataset = True
-                End If
+                For iteration = 1 To 2
 
-                Dim dsDatasetInfo As DataSet = Nothing
-                Dim intRowCount As Integer
+                    Dim sqlQuery = mOptions.DatasetInfoQuerySql
 
-                If objDBTools.GetDiscDataSet(strQuery, dsDatasetInfo, intRowCount) Then
-                    If intRowCount > 0 Then
-                        With dsDatasetInfo.Tables(0)
-                            If .Columns(0).DataType Is Type.GetType("System.String") Then
-                                ' First column is text; make sure the second is a number
-                                If Not .Columns(1).DataType Is Type.GetType("System.String") Then
-                                    intTextCol = 0
-                                    intDatasetIDCol = 1
-                                End If
-                            Else
-                                ' First column is not text; make sure the second is text
-                                If .Columns(1).DataType Is Type.GetType("System.String") Then
-                                    intTextCol = 1
-                                    intDatasetIDCol = 0
-                                End If
-                            End If
-                        End With
+                    If String.IsNullOrEmpty(sqlQuery) Then
+                        sqlQuery = "Select Dataset, ID FROM V_Dataset_Export"
+                    End If
 
-                        If intTextCol >= 0 Then
-                            ' Find the row in the datatable that matches strFileNameCompare
-                            For Each objRow As DataRow In dsDatasetInfo.Tables(0).Rows
-                                If CStr(objRow.Item(intTextCol)).ToUpper = strFileNameCompare Then
-                                    ' Match found
-                                    Try
-                                        intNewDatasetNumber = CInt(objRow.Item(intDatasetIDCol))
-                                        blnDatasetFoundInDB = True
-                                    Catch ex As Exception
-                                        Try
-                                            ReportError("LookupDatasetNumber", "Error converting '" & objRow.Item(intDatasetIDCol).ToString() & "' to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
-                                        Catch ex2 As Exception
-                                            ReportError("LookupDatasetNumber", "Error converting column " & intDatasetIDCol.ToString() & " from the dataset report to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
-                                        End Try
-                                        blnDatasetFoundInDB = False
-                                    End Try
-                                    Exit For
-                                End If
-                            Next objRow
+                    If sqlQuery.ToUpper().StartsWith("SELECT DATASET") Then
+                        ' Add a where clause to the query
+                        If iteration = 1 Then
+                            sqlQuery &= " WHERE Dataset = '" & strFileNameCompare & "'"
+                            blnQueryingSingleDataset = True
+                        Else
+                            sqlQuery &= " WHERE Dataset Like '" & strFileNameCompare & "%'"
                         End If
+                    End If
 
-                        If Not blnDatasetFoundInDB AndAlso blnQueryingSingleDataset Then
+                    Dim lstResults As List(Of List(Of String)) = Nothing
+
+                    Dim success = objDBTools.GetQueryResults(sqlQuery, lstResults, "LookupDatasetNumber")
+                    If success Then
+
+                        ' Find the row in the datatable that matches strFileNameCompare
+                        For Each datasetItem In lstResults
+                            If String.Equals(datasetItem(0), strFileNameCompare, StringComparison.InvariantCultureIgnoreCase) Then
+                                ' Match found
+                                Try
+                                    If Integer.TryParse(datasetItem(1), intNewDatasetNumber) Then
+                                        blnDatasetFoundInDB = True
+                                    End If
+
+                                Catch ex As Exception
+                                    Try
+                                        ReportError("LookupDatasetNumber", "Error converting '" & datasetItem(1) & "' to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                    Catch ex2 As Exception
+                                        ReportError("LookupDatasetNumber", "Error converting column 2 from the dataset report to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                    End Try
+                                    blnDatasetFoundInDB = False
+                                End Try
+                                Exit For
+                            End If
+                        Next
+
+                        If Not blnDatasetFoundInDB AndAlso lstResults.Count > 0 Then
+
                             Try
-                                Integer.TryParse(dsDatasetInfo.Tables(0).Rows(0).Item(1).ToString(), intNewDatasetNumber)
-                                blnDatasetFoundInDB = True
+                                If blnQueryingSingleDataset OrElse lstResults.First().Item(0).StartsWith(strFileNameCompare) Then
+                                    Integer.TryParse(lstResults.First().Item(1), intNewDatasetNumber)
+                                    blnDatasetFoundInDB = True
+                                End If
+
                             Catch ex As Exception
                                 ' Ignore errors here
                             End Try
 
                         End If
+
                     End If
-                End If
+
+                    If blnDatasetFoundInDB Then
+                        Exit For
+                    End If
+                Next
 
             Catch ex2 As NullReferenceException
                 ReportError("LookupDatasetNumber", "Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, Nothing, True, False, eMasicErrorCodes.InvalidDatasetNumber)
