@@ -1,6 +1,9 @@
 Option Explicit On
 Option Strict On
 
+Imports System.Collections.Generic
+Imports System.Runtime.InteropServices
+
 Friend Class clsPeakDetection
 
     ' Peak detection routines
@@ -38,7 +41,7 @@ Friend Class clsPeakDetection
 
     ''Private mEolsDllNotFound As Boolean
 
-    Public Function ComputeSlope(ByRef dblXValsZeroBased() As Double, ByRef dblYValsZeroBased() As Double, ByVal intStartIndex As Integer, ByVal intEndIndex As Integer) As Double
+    Public Function ComputeSlope(dblXValsZeroBased() As Double, dblYValsZeroBased() As Double, intStartIndex As Integer, intEndIndex As Integer) As Double
 
         Const POLYNOMIAL_ORDER As Integer = 1
 
@@ -70,7 +73,16 @@ Friend Class clsPeakDetection
 
     End Function
 
-    Public Function DetectPeaks(ByRef dblXValsZeroBased() As Double, ByRef dblYValsZeroBased() As Double, ByVal dblIntensityThresholdAbsoluteMinimum As Double, ByVal intPeakWidthPointsMinimum As Integer, ByRef intPeakLocations() As Integer, ByRef intPeakEdgesLeft() As Integer, ByRef intPeakEdgesRight() As Integer, ByRef dblPeakAreas() As Double, Optional ByVal intPeakDetectIntensityThresholdPercentageOfMaximum As Integer = 0, Optional ByVal intPeakWidthInSigma As Integer = 4, Optional ByVal blnUseValleysForPeakWidth As Boolean = True, Optional ByVal blnMovePeakLocationToMaxIntensity As Boolean = True) As Integer
+    Public Function DetectPeaks(
+      dblXValsZeroBased() As Double,
+      dblYValsZeroBased() As Double,
+      dblIntensityThresholdAbsoluteMinimum As Double,
+      intPeakWidthPointsMinimum As Integer,
+      Optional intPeakDetectIntensityThresholdPercentageOfMaximum As Integer = 0,
+      Optional intPeakWidthInSigma As Integer = 4,
+      Optional blnUseValleysForPeakWidth As Boolean = True,
+      Optional blnMovePeakLocationToMaxIntensity As Boolean = True) As List(Of clsPeakInfo)
+
         ' Finds peaks in the parallel arrays dblXValsZeroBased() and dblYValsZeroBased()
         ' dblIntensityThreshold is the minimum absolute intensity allowable for a peak
         ' intPeakDetectIntensityThresholdPercentageOfMaximum allows one to specify a minimum intensity as a percentage of the maximum peak intensity
@@ -84,7 +96,7 @@ Friend Class clsPeakDetection
         ' Returns the right edges of the peaks in intPeakEdgesRight()                                   -- These values could be larger than intSourceDataCount-1 if blnUseValleysForPeakWidth = False
         ' Returns the areas of the peaks in dblPeakAreas()
 
-        ' Note: Compute peak width using: intPeakWidthPoints = intPeakEdgesRight(intPeakLocationsCount) - intPeakEdgesLeft(intPeakLocationsCount) + 1
+        ' Note: Compute peak width using: intPeakWidthPoints = newPeak.RightEdge - newPeak.LeftEdge + 1
 
         ' The function returns the number of peaks found; if none are found, returns 0
 
@@ -98,12 +110,9 @@ Friend Class clsPeakDetection
         '  and h''(t_r) is the height of the second derivative of the peak
         ' In chromatography, the baseline peak intWidthInPoints = 4*dblSigma
 
-        Const PEAK_LOCS_DIM_CHUNK As Integer = 10
-
         Dim intIndex, intIndexLast, intIndexFirst As Integer
         Dim intCompareIndex As Integer
         Dim intPeakHalfWidth As Integer
-        Dim intPeakLocationsCount As Integer, intPeakLocationsCountDimmed As Integer
 
         Dim intLowIntensityPointCount As Integer
 
@@ -119,18 +128,14 @@ Friend Class clsPeakDetection
         Dim intThisPeakStartIndex As Integer, intThisPeakEndIndex As Integer
         Dim intAreaValsCopyIndex As Integer
 
+        ' Initialize the list of detected peaks
+        Dim detectedPeaks = New List(Of clsPeakInfo)
+
         Try
 
-            ' Initialize intPeakLocations()
-            intPeakLocationsCount = 0
-            intPeakLocationsCountDimmed = PEAK_LOCS_DIM_CHUNK
-            ReDim intPeakLocations(intPeakLocationsCountDimmed)
-            ReDim intPeakEdgesLeft(intPeakLocationsCountDimmed)
-            ReDim intPeakEdgesRight(intPeakLocationsCountDimmed)
-            ReDim dblPeakAreas(intPeakLocationsCountDimmed)
 
             intSourceDataCount = dblXValsZeroBased.Length
-            If intSourceDataCount <= 0 Then Return 0
+            If intSourceDataCount <= 0 Then Return detectedPeaks
 
             ' Reserve space for the first and second derivatives
             ReDim dblFirstDerivative(intSourceDataCount - 1)
@@ -153,7 +158,7 @@ Friend Class clsPeakDetection
             End If
 
             ' Exit the function if none of the data is above the minimum threshold
-            If dblMaximumIntensity < dblIntensityThreshold Then Return 0
+            If dblMaximumIntensity < dblIntensityThreshold Then Return detectedPeaks
 
             ' Do the actual work
             FitSegments(dblXValsZeroBased, dblYValsZeroBased, intSourceDataCount, intPeakWidthPointsMinimum, intPeakHalfWidth, dblFirstDerivative, dblSecondDerivative)
@@ -163,7 +168,6 @@ Friend Class clsPeakDetection
             ' Examine the First Derivative function and look for zero crossings (in the downward direction)
             ' If looking for valleys, would look for zero crossings in the upward direction
             ' Only significant if intensity of point is above threshold
-            intPeakLocationsCount = 0
             If intPeakWidthPointsMinimum <= 0 Then intPeakWidthPointsMinimum = 1
 
             ' We'll start looking for peaks halfway into intPeakWidthPointsMinimum
@@ -176,7 +180,7 @@ Friend Class clsPeakDetection
                     If dblYValsZeroBased(intIndex) >= dblIntensityThreshold Or dblYValsZeroBased(intIndex + 1) >= dblIntensityThreshold Then
                         ' Actual peak
 
-                        intPeakLocations(intPeakLocationsCount) = intIndex
+                        Dim newPeak = New clsPeakInfo(intIndex)
 
                         If blnUseValleysForPeakWidth Then
                             ' Determine the peak width by looking for the adjacent valleys
@@ -184,17 +188,17 @@ Friend Class clsPeakDetection
                             ' set the edge intPeakHalfWidth - 1 points closer to the peak maximum
 
                             If intIndex > 0 Then
-                                intPeakEdgesLeft(intPeakLocationsCount) = 0
+                                newPeak.LeftEdge = 0
                                 intLowIntensityPointCount = 0
                                 For intCompareIndex = intIndex - 1 To 0 Step -1
                                     If dblFirstDerivative(intCompareIndex) <= 0 And dblFirstDerivative(intCompareIndex + 1) >= 0 Then
                                         ' Found a valley; this is the left edge
-                                        intPeakEdgesLeft(intPeakLocationsCount) = intCompareIndex + 1
+                                        newPeak.LeftEdge = intCompareIndex + 1
                                         Exit For
                                     ElseIf dblYValsZeroBased(intCompareIndex) < dblIntensityThreshold Then
                                         intLowIntensityPointCount += 1
                                         If intLowIntensityPointCount > intPeakHalfWidth Then
-                                            intPeakEdgesLeft(intPeakLocationsCount) = intCompareIndex + (intPeakHalfWidth - 1)
+                                            newPeak.LeftEdge = intCompareIndex + (intPeakHalfWidth - 1)
                                             Exit For
                                         End If
                                     Else
@@ -202,21 +206,21 @@ Friend Class clsPeakDetection
                                     End If
                                 Next intCompareIndex
                             Else
-                                intPeakEdgesLeft(intPeakLocationsCount) = 0
+                                newPeak.LeftEdge = 0
                             End If
 
                             If intIndex < intSourceDataCount - 2 Then
-                                intPeakEdgesRight(intPeakLocationsCount) = intSourceDataCount - 1
+                                newPeak.RightEdge = intSourceDataCount - 1
                                 intLowIntensityPointCount = 0
                                 For intCompareIndex = intIndex + 1 To intSourceDataCount - 2
                                     If dblFirstDerivative(intCompareIndex) <= 0 And dblFirstDerivative(intCompareIndex + 1) >= 0 Then
                                         ' Found a valley; this is the right edge
-                                        intPeakEdgesRight(intPeakLocationsCount) = intCompareIndex
+                                        newPeak.RightEdge = intCompareIndex
                                         Exit For
                                     ElseIf dblYValsZeroBased(intCompareIndex) < dblIntensityThreshold Then
                                         intLowIntensityPointCount += 1
                                         If intLowIntensityPointCount > intPeakHalfWidth Then
-                                            intPeakEdgesRight(intPeakLocationsCount) = intCompareIndex - (intPeakHalfWidth - 1)
+                                            newPeak.RightEdge = intCompareIndex - (intPeakHalfWidth - 1)
                                             Exit For
                                         End If
                                     Else
@@ -224,17 +228,17 @@ Friend Class clsPeakDetection
                                     End If
                                 Next intCompareIndex
                             Else
-                                intPeakEdgesRight(intPeakLocationsCount) = intSourceDataCount - 1
+                                newPeak.RightEdge = intSourceDataCount - 1
                             End If
 
-                            If intPeakEdgesLeft(intPeakLocationsCount) > intPeakLocations(intPeakLocationsCount) Then
-                                Console.WriteLine("Left edge is > peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
-                                intPeakEdgesLeft(intPeakLocationsCount) = intPeakLocations(intPeakLocationsCount)
+                            If newPeak.LeftEdge > newPeak.PeakLocation Then
+                                Console.WriteLine("Warning: Left edge is > peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
+                                newPeak.LeftEdge = newPeak.PeakLocation
                             End If
 
-                            If intPeakEdgesRight(intPeakLocationsCount) < intPeakLocations(intPeakLocationsCount) Then
-                                Console.WriteLine("Right edge is < peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
-                                intPeakEdgesRight(intPeakLocationsCount) = intPeakLocations(intPeakLocationsCount)
+                            If newPeak.RightEdge < newPeak.PeakLocation Then
+                                Console.WriteLine("Warning: Right edge is < peak center; this is unexpected (clsPeakDetection->DetectPeaks)")
+                                newPeak.RightEdge = newPeak.PeakLocation
                             End If
 
                         Else
@@ -260,56 +264,38 @@ Friend Class clsPeakDetection
                             ' Otherwise, offset to the right of intIndex
                             If intWidthInPoints Mod 2 = 0 Then
                                 ' Even number
-                                intPeakEdgesLeft(intPeakLocationsCount) = intIndex - CInt(intWidthInPoints / 2)
-                                intPeakEdgesRight(intPeakLocationsCount) = intIndex + CInt(intWidthInPoints / 2) - 1
+                                newPeak.LeftEdge = intIndex - CInt(intWidthInPoints / 2)
+                                newPeak.RightEdge = intIndex + CInt(intWidthInPoints / 2) - 1
                             Else
                                 ' Odd number
-                                intPeakEdgesLeft(intPeakLocationsCount) = intIndex - CInt((intWidthInPoints - 1) / 2)
-                                intPeakEdgesRight(intPeakLocationsCount) = intIndex + CInt((intWidthInPoints - 1) / 2)
+                                newPeak.LeftEdge = intIndex - CInt((intWidthInPoints - 1) / 2)
+                                newPeak.RightEdge = intIndex + CInt((intWidthInPoints - 1) / 2)
                             End If
 
                         End If
 
-                        intPeakLocationsCount += 1
-                        If intPeakLocationsCount >= intPeakLocationsCountDimmed Then
-                            intPeakLocationsCountDimmed += PEAK_LOCS_DIM_CHUNK
-                            ReDim Preserve intPeakLocations(intPeakLocationsCountDimmed)
-                            ReDim Preserve intPeakEdgesLeft(intPeakLocationsCountDimmed)
-                            ReDim Preserve intPeakEdgesRight(intPeakLocationsCountDimmed)
-                            ReDim Preserve dblPeakAreas(intPeakLocationsCountDimmed)
-                        End If
+                        detectedPeaks.Add(newPeak)
+
                     End If
                 End If
             Next intIndex
 
-            ' Shrink the arrays to the proper length
-            If intPeakLocationsCount > 0 Then
-                ReDim Preserve intPeakLocations(intPeakLocationsCount - 1)
-                ReDim Preserve intPeakEdgesLeft(intPeakLocationsCount - 1)
-                ReDim Preserve intPeakEdgesRight(intPeakLocationsCount - 1)
-                ReDim Preserve dblPeakAreas(intPeakLocationsCount - 1)
-            Else
-                ReDim intPeakLocations(0)
-                ReDim intPeakEdgesLeft(0)
-                ReDim intPeakEdgesRight(0)
-                ReDim dblPeakAreas(0)
-            End If
 
             ' Compute the peak areas
-            For intIndex = 0 To intPeakLocationsCount - 1
-                intThisPeakWidthInPoints = intPeakEdgesRight(intIndex) - intPeakEdgesLeft(intIndex) + 1
+            For Each peakItem In detectedPeaks
+                intThisPeakWidthInPoints = peakItem.RightEdge - peakItem.LeftEdge + 1
 
                 If intThisPeakWidthInPoints > 0 Then
                     If intThisPeakWidthInPoints = 1 Then
                         ' I don't think this can happen
-                        ' Just in case, we'll set the area equal to the peak intensity 
-                        dblPeakAreas(intIndex) = dblYValsZeroBased(intPeakLocations(intIndex))
+                        ' Just in case, we'll set the area equal to the peak intensity
+                        peakItem.PeakArea = dblYValsZeroBased(peakItem.PeakLocation)
                     Else
                         ReDim dblXValsForArea(intThisPeakWidthInPoints - 1)
                         ReDim dblYValsForArea(intThisPeakWidthInPoints - 1)
 
-                        intThisPeakStartIndex = intPeakEdgesLeft(intIndex)
-                        intThisPeakEndIndex = intPeakEdgesRight(intIndex)
+                        intThisPeakStartIndex = peakItem.LeftEdge
+                        intThisPeakEndIndex = peakItem.RightEdge
 
                         If intThisPeakStartIndex < 0 Then
                             ' This will happen if the width is too large, or if not all of the peak's data was included in the data arrays
@@ -326,49 +312,48 @@ Friend Class clsPeakDetection
                             dblYValsForArea(intAreaValsCopyIndex - intThisPeakStartIndex) = dblYValsZeroBased(intAreaValsCopyIndex)
                         Next intAreaValsCopyIndex
 
-                        dblPeakAreas(intIndex) = FindArea(dblXValsForArea, dblYValsForArea, intThisPeakWidthInPoints)
+                        peakItem.PeakArea = FindArea(dblXValsForArea, dblYValsForArea, intThisPeakWidthInPoints)
 
                     End If
                 Else
                     ' 0-width peak; this shouldn't happen
-                    Console.WriteLine("0-width peak; this shouldn't happen (clsPeakDetection->DetectPeaks)")
-                    dblPeakAreas(intIndex) = 0
+                    Console.WriteLine("Warning: 0-width peak; this shouldn't happen (clsPeakDetection->DetectPeaks)")
+                    peakItem.PeakArea = 0
                 End If
-            Next intIndex
+            Next
 
             If blnMovePeakLocationToMaxIntensity Then
-                For intIndex = 0 To intPeakLocationsCount - 1
+                For Each peakItem In detectedPeaks
                     ' The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
                     ' Define the maximum allowed peak apex shift to be 33% of intPeakWidthPointsMinimum
-                    intDataIndexCheckStart = intPeakLocations(intIndex) - CInt(Math.Floor(intPeakWidthPointsMinimum / 3))
+                    intDataIndexCheckStart = peakItem.PeakLocation - CInt(Math.Floor(intPeakWidthPointsMinimum / 3))
                     If intDataIndexCheckStart < 0 Then intDataIndexCheckStart = 0
 
-                    intDataIndexCheckEnd = intPeakLocations(intIndex) + CInt(Math.Floor(intPeakWidthPointsMinimum / 3))
+                    intDataIndexCheckEnd = peakItem.PeakLocation + CInt(Math.Floor(intPeakWidthPointsMinimum / 3))
                     If intDataIndexCheckEnd > intSourceDataCount - 1 Then intDataIndexCheckEnd = intSourceDataCount - 1
 
-                    dblMaximumIntensity = dblYValsZeroBased(intPeakLocations(intIndex))
+                    dblMaximumIntensity = dblYValsZeroBased(peakItem.PeakLocation)
                     For intDataIndexCheck = intDataIndexCheckStart To intDataIndexCheckEnd
                         If dblYValsZeroBased(intDataIndexCheck) > dblMaximumIntensity Then
-                            intPeakLocations(intIndex) = intDataIndexCheck
+                            peakItem.PeakLocation = intDataIndexCheck
                             dblMaximumIntensity = dblYValsZeroBased(intDataIndexCheck)
                         End If
                     Next intDataIndexCheck
 
-                    If intPeakLocations(intIndex) < intPeakEdgesLeft(intIndex) Then intPeakEdgesLeft(intIndex) = intPeakLocations(intIndex)
-                    If intPeakLocations(intIndex) > intPeakEdgesRight(intIndex) Then intPeakEdgesRight(intIndex) = intPeakLocations(intIndex)
-                Next intIndex
+                    If peakItem.PeakLocation < peakItem.LeftEdge Then peakItem.LeftEdge = peakItem.PeakLocation
+                    If peakItem.PeakLocation > peakItem.RightEdge Then peakItem.RightEdge = peakItem.PeakLocation
+                Next
             End If
 
         Catch ex As Exception
-            Console.WriteLine("Error in clsPeakDetection->DetectPeaks (or in a child function): " & ex.Message)
-            Return 0
+            Console.WriteLine("Warning: Error in clsPeakDetection->DetectPeaks (or in a child function)" & vbCrLf & ex.Message)
         End Try
 
-        Return intPeakLocationsCount
+        Return detectedPeaks
 
     End Function
 
-    Private Function FindArea(ByVal dblXVals() As Double, ByVal dblYVals() As Double, ByVal intArrayCount As Integer) As Double
+    Private Function FindArea(dblXVals() As Double, dblYVals() As Double, intArrayCount As Integer) As Double
         ' dblYVals() should be 0-based
 
         ' Finds the area under the curve, using trapezoidal integration
@@ -390,7 +375,7 @@ Friend Class clsPeakDetection
 
     End Function
 
-    Private Sub FitSegments(ByRef dblXVals() As Double, ByRef dblYVals() As Double, ByVal intSourceDataCount As Integer, ByVal intPeakWidthPointsMinimum As Integer, ByVal intPeakWidthMidPoint As Integer, ByRef dblFirstDerivative() As Double, ByRef dblSecondDerivative() As Double)
+    Private Sub FitSegments(dblXVals() As Double, dblYVals() As Double, intSourceDataCount As Integer, intPeakWidthPointsMinimum As Integer, intPeakWidthMidPoint As Integer, ByRef dblFirstDerivative() As Double, ByRef dblSecondDerivative() As Double)
         ' dblXVals() and dblYVals() are zero-based arrays
 
         Const POLYNOMIAL_ORDER As Integer = 2
@@ -431,7 +416,7 @@ Friend Class clsPeakDetection
 
 #Region "LinearLeastSquaresFitting"
 
-    Private Function LeastSquaresFit(ByRef dblXVals() As Double, ByRef dblYVals() As Double, ByRef dblCoefficients() As Double, ByVal intPolynomialOrder As Integer) As Boolean
+    Private Function LeastSquaresFit(dblXVals() As Double, dblYVals() As Double, <Out()> ByRef dblCoefficients() As Double, intPolynomialOrder As Integer) As Boolean
 
         ' Code from article "Fit for Purpose" written by Steven Abbot
         ' and published in the February 2003 issue of Hardcore Visual Basic.
@@ -472,7 +457,7 @@ Friend Class clsPeakDetection
 
     End Function
 
-    Private Function LLSqFit(ByRef DataX() As Double, ByRef DataY() As Double, ByRef udtEquationTerms() As udtLeastSquaresFitEquationTermType) As Boolean
+    Private Function LLSqFit(DataX() As Double, DataY() As Double, ByRef udtEquationTerms() As udtLeastSquaresFitEquationTermType) As Boolean
 
         'Linear Least Squares Fit
 
@@ -518,7 +503,7 @@ Friend Class clsPeakDetection
 
     End Function
 
-    Private Sub GetLVals(ByVal X As Double, ByRef udtEquationTerms() As udtLeastSquaresFitEquationTermType, ByRef PFuncVal() As Double)
+    Private Sub GetLVals(X As Double, ByRef udtEquationTerms() As udtLeastSquaresFitEquationTermType, ByRef PFuncVal() As Double)
         ' Get values for Linear Least Squares
         ' udtEquationTerms() is a 0-based array defining the form of each term
 
@@ -564,7 +549,7 @@ Friend Class clsPeakDetection
                 End Select
 
                 If .Inverse Then
-                    If v = 0 Then
+                    If Math.Abs(v) < Double.Epsilon Then
                         PFuncVal(i) = 0
                     Else 'NOT V...
                         PFuncVal(i) = 1 / v
@@ -626,7 +611,7 @@ Friend Class clsPeakDetection
 
                 indxr(i) = irow
                 indxc(i) = icol
-                If A(icol, icol) = 0 Then
+                If Math.Abs(A(icol, icol)) < Double.Epsilon Then
                     ' Error, the matrix was singular
                     Return False
                 End If

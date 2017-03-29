@@ -8,9 +8,9 @@ Imports System.Runtime.InteropServices
 ' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
 ' Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
 ' -------------------------------------------------------------------------------
-' 
+'
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at 
+' in compliance with the License.  You may obtain a copy of the License at
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
 Public Class clsMASICPeakFinder
@@ -103,7 +103,7 @@ Public Class clsMASICPeakFinder
         Public KSStat As Single
 
         ''' <summary>
-        ''' 
+        '''
         ''' </summary>
         Public DataCountUsed As Integer
     End Structure
@@ -115,12 +115,12 @@ Public Class clsMASICPeakFinder
         Public IndexBaseLeft As Integer
 
         ''' <summary>
-        ''' Index that the SIC peak officially ends; Pointer to entry in .SICData() 
+        ''' Index that the SIC peak officially ends; Pointer to entry in .SICData()
         ''' </summary>
         Public IndexBaseRight As Integer
 
         ''' <summary>
-        ''' Index of the maximum of the SIC peak; Pointer to entry in .SICData() 
+        ''' Index of the maximum of the SIC peak; Pointer to entry in .SICData()
         ''' </summary>
         Public IndexMax As Integer
 
@@ -168,28 +168,6 @@ Public Class clsMASICPeakFinder
 
     End Structure
 
-    Private Structure udtFindPeaksDataType
-
-        Public OriginalPeakLocationIndex As Integer
-
-        Public SourceDataCount As Integer
-        Public XData() As Double
-        Public YData() As Double
-        Public SmoothedYData() As Double
-
-        Public PeakCount As Integer
-        Public PeakLocs() As Integer
-        Public PeakEdgesLeft() As Integer
-        Public PeakEdgesRight() As Integer
-        Public PeakAreas() As Double
-        Public PeakIsValid() As Boolean
-
-        Public PeakWidthPointsMinimum As Integer
-        Public MaxAllowedUpwardSpikeFractionMax As Single
-        Public BestPeakIndex As Integer
-        Public BestPeakArea As Single
-
-    End Structure
 #End Region
 
 #Region "Classwide Variables"
@@ -828,7 +806,7 @@ Public Class clsMASICPeakFinder
         For intIndex = 0 To dblYData.Length - 1
             dblYDataSum += dblYData(intIndex)
         Next intIndex
-        If Math.Abs(dblYDataSum - 0) < Double.Epsilon Then dblYDataSum = 1
+        If Math.Abs(dblYDataSum) < Double.Epsilon Then dblYDataSum = 1
 
         ' Compute the Vector of normalized intensities = observed pdf
         ReDim dblYDataNormalized(dblYData.Length - 1)
@@ -957,7 +935,7 @@ Public Class clsMASICPeakFinder
 
             If intIndexStart < 0 Then intIndexStart = 0
 
-            ' If not enough points, then alternately shift intIndexStart to the left 1 point and 
+            ' If not enough points, then alternately shift intIndexStart to the left 1 point and
             '  intIndexBaseLeft to the right one point until we do have enough points
             blnShiftLeft = True
             Do While intIndexBaseLeft - intIndexStart + 1 < NOISE_ESTIMATE_DATACOUNT_MINIMUM
@@ -982,7 +960,7 @@ Public Class clsMASICPeakFinder
 
             If intIndexEnd >= intDatacount Then intIndexEnd = intDatacount - 1
 
-            ' If not enough points, then alternately shift intIndexEnd to the right 1 point and 
+            ' If not enough points, then alternately shift intIndexEnd to the right 1 point and
             '  intIndexBaseRight to the left one point until we do have enough points
             blnShiftLeft = False
             Do While intIndexEnd - intIndexBaseRight + 1 < NOISE_ESTIMATE_DATACOUNT_MINIMUM
@@ -1306,7 +1284,7 @@ Public Class clsMASICPeakFinder
             Loop
 
             If intValidDataIndexLeft > 0 OrElse intValidDataIndexRight < intDataCount - 1 Then
-                ' Shrink the arrays to only retain the data centered around intIndexMaximumIntensity and 
+                ' Shrink the arrays to only retain the data centered around intIndexMaximumIntensity and
                 '  having and intensity >= sngIntensityThreshold, though one additional data point is retained at the beginning and end of the data
                 For intDataIndex = intValidDataIndexLeft To intValidDataIndexRight
                     intIndexPointer = intDataIndex - intValidDataIndexLeft
@@ -1615,7 +1593,7 @@ Public Class clsMASICPeakFinder
         Array.Sort(sngDataSorted)
 
         If blnIgnoreNonPositiveData Then
-            ' Remove data with a value <= 0 
+            ' Remove data with a value <= 0
 
             If sngDataSorted(0) <= 0 Then
                 intValidDataCount = 0
@@ -1882,8 +1860,8 @@ Public Class clsMASICPeakFinder
         Dim objPeakDetector As New clsPeakDetection
         Dim blnTestingMinimumPeakWidth As Boolean
 
-        Dim udtPeakData = New udtFindPeaksDataType
-        Dim udtPeakDataSaved As udtFindPeaksDataType
+        Dim peakData = New clsPeaksContainer()
+        Dim peakDataSaved As clsPeaksContainer
 
         Dim dblMaximumIntensity, dblAreaSignalToNoise As Double
         Dim dblPotentialPeakArea, dblMaximumPotentialPeakArea As Double
@@ -1902,8 +1880,8 @@ Public Class clsMASICPeakFinder
         Dim blnValidPeakFound As Boolean
 
         Try
-            udtPeakData.SourceDataCount = intDataCount
-            If udtPeakData.SourceDataCount <= 1 Then
+            peakData.SourceDataCount = intDataCount
+            If peakData.SourceDataCount <= 1 Then
                 ' Only 1 or fewer points in sngIntensityData()
                 ' No point in looking for a "peak"
                 intPeakIndexStart = 0
@@ -1918,8 +1896,8 @@ Public Class clsMASICPeakFinder
 
             ' The peak finder class requires Arrays of type Double
             ' Copy the data from the source arrays into udtPeakData.XData() and udtPeakData.YData()
-            ReDim udtPeakData.XData(udtPeakData.SourceDataCount - 1)
-            ReDim udtPeakData.YData(udtPeakData.SourceDataCount - 1)
+            ReDim peakData.XData(peakData.SourceDataCount - 1)
+            ReDim peakData.YData(peakData.SourceDataCount - 1)
 
             dblMaximumIntensity = sngIntensityData(0)
             dblMaximumPotentialPeakArea = 0
@@ -1930,11 +1908,11 @@ Public Class clsMASICPeakFinder
             dblPotentialPeakArea = 0
             intDataPointCountAboveThreshold = 0
 
-            For intIndex = 0 To udtPeakData.SourceDataCount - 1
-                udtPeakData.XData(intIndex) = intScanNumbers(intIndex)
-                udtPeakData.YData(intIndex) = sngIntensityData(intIndex)
-                If udtPeakData.YData(intIndex) > dblMaximumIntensity Then
-                    dblMaximumIntensity = udtPeakData.YData(intIndex)
+            For intIndex = 0 To peakData.SourceDataCount - 1
+                peakData.XData(intIndex) = intScanNumbers(intIndex)
+                peakData.YData(intIndex) = sngIntensityData(intIndex)
+                If peakData.YData(intIndex) > dblMaximumIntensity Then
+                    dblMaximumIntensity = peakData.YData(intIndex)
                     intIndexMaxIntensity = intIndex
                 End If
 
@@ -1967,39 +1945,35 @@ Public Class clsMASICPeakFinder
             dblAreaSignalToNoise = dblMaximumPotentialPeakArea / dblMinimumPotentialPeakArea
             If dblAreaSignalToNoise < 1 Then dblAreaSignalToNoise = 1
 
-            With udtPeakData
 
-                If Math.Abs(sicPeakFinderOptions.ButterworthSamplingFrequency - 0) < Single.Epsilon Then sicPeakFinderOptions.ButterworthSamplingFrequency = 0.25
+            If Math.Abs(sicPeakFinderOptions.ButterworthSamplingFrequency) < Single.Epsilon Then sicPeakFinderOptions.ButterworthSamplingFrequency = 0.25
 
-                .PeakWidthPointsMinimum = CInt(sicPeakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(dblAreaSignalToNoise)) * 10)
+            peakData.PeakWidthPointsMinimum = CInt(sicPeakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(dblAreaSignalToNoise)) * 10)
 
-                ' Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum 
-                '  and no greater than intDataPointCountAboveThreshold/2 (rounded up)
-                .PeakWidthPointsMinimum = Math.Min(.PeakWidthPointsMinimum, sicPeakFinderOptions.InitialPeakWidthScansMaximum)
-                .PeakWidthPointsMinimum = Math.Min(.PeakWidthPointsMinimum, CInt(Math.Ceiling(intDataPointCountAboveThreshold / 2)))
+            ' Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum
+            '  and no greater than intDataPointCountAboveThreshold/2 (rounded up)
+            peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, sicPeakFinderOptions.InitialPeakWidthScansMaximum)
+            peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, CInt(Math.Ceiling(intDataPointCountAboveThreshold / 2)))
 
-                If .PeakWidthPointsMinimum > .SourceDataCount * 0.8 Then
-                    .PeakWidthPointsMinimum = CInt(Math.Floor(.SourceDataCount * 0.8))
-                End If
+            If peakData.PeakWidthPointsMinimum > peakData.SourceDataCount * 0.8 Then
+                peakData.PeakWidthPointsMinimum = CInt(Math.Floor(peakData.SourceDataCount * 0.8))
+            End If
 
-                If .PeakWidthPointsMinimum < MINIMUM_PEAK_WIDTH Then .PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH
+            If peakData.PeakWidthPointsMinimum < MINIMUM_PEAK_WIDTH Then peakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH
 
-
-                ' Save the original value for intPeakLocationIndex
-                .OriginalPeakLocationIndex = intPeakLocationIndex
-                .MaxAllowedUpwardSpikeFractionMax = sicPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
-
-            End With
+            ' Save the original value for intPeakLocationIndex
+            peakData.OriginalPeakLocationIndex = intPeakLocationIndex
+            peakData.MaxAllowedUpwardSpikeFractionMax = sicPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
 
             Do
-                If udtPeakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH Then
+                If peakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH Then
                     blnTestingMinimumPeakWidth = True
                 Else
                     blnTestingMinimumPeakWidth = False
                 End If
 
                 Try
-                    blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, blnTestingMinimumPeakWidth, blnReturnClosestPeak)
+                    blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, peakData, blnSIMDataPresent, sicPeakFinderOptions, blnTestingMinimumPeakWidth, blnReturnClosestPeak)
                 Catch ex As Exception
                     LogErrors("clsMASICPeakFinder->FindPeaks", "Error calling FindPeaksWork", ex, True, True, True)
                     blnValidPeakFound = False
@@ -2007,44 +1981,47 @@ Public Class clsMASICPeakFinder
                 End Try
 
                 If blnValidPeakFound Then
-                    With udtPeakData
-                        ' For each peak, see if several zero intensity values are in a row in the raw data
-                        ' If found, then narrow the peak to leave just one zero intensity value
-                        For intPeakIndexCompare = 0 To udtPeakData.PeakCount - 1
 
-                            Do While .PeakEdgesLeft(intPeakIndexCompare) < intDataCount - 1 AndAlso
-                               .PeakEdgesLeft(intPeakIndexCompare) < .PeakEdgesRight(intPeakIndexCompare)
-                                If Math.Abs(sngIntensityData(.PeakEdgesLeft(intPeakIndexCompare)) - 0) < Single.Epsilon AndAlso
-                                   Math.Abs(sngIntensityData(.PeakEdgesLeft(intPeakIndexCompare) + 1) - 0) < Single.Epsilon Then
-                                    .PeakEdgesLeft(intPeakIndexCompare) += 1
-                                Else
-                                    Exit Do
-                                End If
-                            Loop
+                    ' For each peak, see if several zero intensity values are in a row in the raw data
+                    ' If found, then narrow the peak to leave just one zero intensity value
+                    For intPeakIndexCompare = 0 To peakData.Peaks.Count - 1
+                        Dim currentPeak = peakData.Peaks(intPeakIndexCompare)
 
-                            Do While .PeakEdgesRight(intPeakIndexCompare) > 0 AndAlso
-                               .PeakEdgesRight(intPeakIndexCompare) > .PeakEdgesLeft(intPeakIndexCompare)
-                                If Math.Abs(sngIntensityData(.PeakEdgesRight(intPeakIndexCompare)) - 0) < Single.Epsilon AndAlso
-                                   Math.Abs(sngIntensityData(.PeakEdgesRight(intPeakIndexCompare) - 1) - 0) < Single.Epsilon Then
-                                    .PeakEdgesRight(intPeakIndexCompare) -= 1
-                                Else
-                                    Exit Do
-                                End If
-                            Loop
+                        Do While currentPeak.LeftEdge < intDataCount - 1 AndAlso
+                            currentPeak.LeftEdge < currentPeak.RightEdge
+                            If Math.Abs(sngIntensityData(currentPeak.LeftEdge)) < Single.Epsilon AndAlso
+                                Math.Abs(sngIntensityData(currentPeak.LeftEdge + 1)) < Single.Epsilon Then
+                                currentPeak.LeftEdge += 1
+                            Else
+                                Exit Do
+                            End If
+                        Loop
 
-                            ' Update the stats for the "official" peak
-                            intPeakLocationIndex = .PeakLocs(.BestPeakIndex)
-                            intPeakIndexStart = .PeakEdgesLeft(.BestPeakIndex)
-                            intPeakIndexEnd = .PeakEdgesRight(.BestPeakIndex)
-                        Next intPeakIndexCompare
-
+                        Do While currentPeak.RightEdge > 0 AndAlso
+                            currentPeak.RightEdge > currentPeak.LeftEdge
+                            If Math.Abs(sngIntensityData(currentPeak.RightEdge)) < Single.Epsilon AndAlso
+                                Math.Abs(sngIntensityData(currentPeak.RightEdge - 1)) < Single.Epsilon Then
+                                currentPeak.RightEdge -= 1
+                            Else
+                                Exit Do
+                            End If
+                        Loop
 
                         ' Update the stats for the "official" peak
-                        intPeakLocationIndex = .PeakLocs(.BestPeakIndex)
-                        intPeakIndexStart = .PeakEdgesLeft(.BestPeakIndex)
-                        intPeakIndexEnd = .PeakEdgesRight(.BestPeakIndex)
-                    End With
+                        Dim bestPeak = peakData.Peaks(peakData.BestPeakIndex)
 
+                        intPeakLocationIndex = bestPeak.PeakLocation
+                        intPeakIndexStart = bestPeak.LeftEdge
+                        intPeakIndexEnd = bestPeak.RightEdge
+                    Next intPeakIndexCompare
+
+
+                    ' Update the stats for the "official" peak
+                    Dim bestPeakOverall = peakData.Peaks(peakData.BestPeakIndex)
+
+                    intPeakLocationIndex = bestPeakOverall.PeakLocation
+                    intPeakIndexStart = bestPeakOverall.LeftEdge
+                    intPeakIndexEnd = bestPeakOverall.RightEdge
 
                     ' Copy the smoothed Y data for the peak into udtSmoothedYDataSubset.Data()
                     ' Include some data to the left and right of the peak start and end
@@ -2081,67 +2058,52 @@ Public Class clsMASICPeakFinder
                         End If
 
                         For intIndex = .DataStartIndex To intSmoothedYDataEndIndex
-                            .Data(intIndex - .DataStartIndex) = CSng(Math.Min(udtPeakData.SmoothedYData(intIndex), Single.MaxValue))
+                            .Data(intIndex - .DataStartIndex) = CSng(Math.Min(peakData.SmoothedYData(intIndex), Single.MaxValue))
                         Next intIndex
 
                     End With
 
                     ' Copy the PeakLocs and PeakEdges into udtPeakDataSaved since we're going to call FindPeaksWork again and the data will get overwritten
                     ' We first equate udtPeakDataSaved to udtPeakData, effectively performing a shallow copy
-                    udtPeakDataSaved = udtPeakData
-                    With udtPeakDataSaved
-                        ReDim .PeakLocs(.PeakCount - 1)
-                        ReDim .PeakEdgesLeft(.PeakCount - 1)
-                        ReDim .PeakEdgesRight(.PeakCount - 1)
-                        ReDim .PeakAreas(.PeakCount - 1)
-                        ReDim .PeakIsValid(.PeakCount - 1)
+                    peakDataSaved = peakData.Clone()
 
-                        For intPeakIndexCompare = 0 To .PeakCount - 1
-                            .PeakLocs(intPeakIndexCompare) = udtPeakData.PeakLocs(intPeakIndexCompare)
-                            .PeakEdgesLeft(intPeakIndexCompare) = udtPeakData.PeakEdgesLeft(intPeakIndexCompare)
-                            .PeakEdgesRight(intPeakIndexCompare) = udtPeakData.PeakEdgesRight(intPeakIndexCompare)
-                            .PeakAreas(intPeakIndexCompare) = udtPeakData.PeakAreas(intPeakIndexCompare)
-                            .PeakIsValid(intPeakIndexCompare) = udtPeakData.PeakIsValid(intPeakIndexCompare)
-                        Next intPeakIndexCompare
-                    End With
-
-                    If udtPeakData.PeakWidthPointsMinimum <> MINIMUM_PEAK_WIDTH Then
+                    If peakData.PeakWidthPointsMinimum <> MINIMUM_PEAK_WIDTH Then
                         ' Determine the number of shoulder peaks for this peak
                         ' Use a minimum peak width of MINIMUM_PEAK_WIDTH and use a Max Allow Upward Spike Fraction of just 0.05 (= 5%)
-                        udtPeakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH
-                        If udtPeakData.MaxAllowedUpwardSpikeFractionMax > 0.05 Then
-                            udtPeakData.MaxAllowedUpwardSpikeFractionMax = 0.05
+                        peakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH
+                        If peakData.MaxAllowedUpwardSpikeFractionMax > 0.05 Then
+                            peakData.MaxAllowedUpwardSpikeFractionMax = 0.05
                         End If
-                        blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, True, blnReturnClosestPeak)
+                        blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, peakData, blnSIMDataPresent, sicPeakFinderOptions, True, blnReturnClosestPeak)
 
                         If blnValidPeakFound Then
-                            With udtPeakData
+                            For Each peakItem In peakData.Peaks
                                 intShoulderCount = 0
-                                For intIndex = 0 To .PeakCount - 1
-                                    If .PeakLocs(intIndex) >= intPeakIndexStart AndAlso .PeakLocs(intIndex) <= intPeakIndexEnd Then
-                                        ' The peak at intIndex has a peak center between the "official" peak's boundaries
-                                        ' Make sure it's not the same peak as the "official" peak
-                                        If .PeakLocs(intIndex) <> intPeakLocationIndex Then
-                                            ' Now see if the comparison peak's intensity is at least .IntensityThresholdFractionMax of the intensity of the "official" peak
-                                            If sngIntensityData(.PeakLocs(intIndex)) >= sicPeakFinderOptions.IntensityThresholdFractionMax * sngIntensityData(intPeakLocationIndex) Then
-                                                ' Yes, this is a shoulder peak
-                                                intShoulderCount += 1
-                                            End If
+
+                                If peakItem.PeakLocation >= intPeakIndexStart AndAlso peakItem.PeakLocation <= intPeakIndexEnd Then
+                                    ' The peak at intIndex has a peak center between the "official" peak's boundaries
+                                    ' Make sure it's not the same peak as the "official" peak
+                                    If peakItem.PeakLocation <> intPeakLocationIndex Then
+                                        ' Now see if the comparison peak's intensity is at least .IntensityThresholdFractionMax of the intensity of the "official" peak
+                                        If sngIntensityData(peakItem.PeakLocation) >= sicPeakFinderOptions.IntensityThresholdFractionMax * sngIntensityData(intPeakLocationIndex) Then
+                                            ' Yes, this is a shoulder peak
+                                            intShoulderCount += 1
                                         End If
                                     End If
-                                Next intIndex
-                            End With
+                                End If
+
+                            Next
                         End If
                     Else
                         intShoulderCount = 0
                     End If
 
                     ' Make sure intPeakLocationIndex really is the point with the highest intensity (in the smoothed data)
-                    dblMaximumIntensity = udtPeakData.SmoothedYData(intPeakLocationIndex)
+                    dblMaximumIntensity = peakData.SmoothedYData(intPeakLocationIndex)
                     For intIndex = intPeakIndexStart To intPeakIndexEnd
-                        If udtPeakData.SmoothedYData(intIndex) > dblMaximumIntensity Then
+                        If peakData.SmoothedYData(intIndex) > dblMaximumIntensity Then
                             ' A more intense data point was found; update intPeakLocationIndex
-                            dblMaximumIntensity = udtPeakData.SmoothedYData(intIndex)
+                            dblMaximumIntensity = peakData.SmoothedYData(intIndex)
                             intPeakLocationIndex = intIndex
                         End If
                     Next intIndex
@@ -2155,24 +2117,26 @@ Public Class clsMASICPeakFinder
                     sngAdjacentPeakIntensityThreshold = sngIntensityData(intPeakLocationIndex) / 3
 
                     ' Search through udtPeakDataSaved to find the closest peak (with a signficant intensity) to the left of this peak
-                    ' Note that the peaks in udtPeakDataSaved are not necessarily ordered by increasing index, 
+                    ' Note that the peaks in udtPeakDataSaved are not necessarily ordered by increasing index,
                     '  thus the need for an exhaustive search
                     intAdjacentIndex = -1       ' Initially assign an invalid index
                     intSmallestIndexDifference = intDataCount + 1
-                    For intPeakIndexCompare = 0 To udtPeakDataSaved.PeakCount - 1
-                        If intPeakIndexCompare <> udtPeakDataSaved.BestPeakIndex AndAlso
-                           udtPeakDataSaved.PeakLocs(intPeakIndexCompare) <= intPeakIndexStart Then
+                    For intPeakIndexCompare = 0 To peakDataSaved.Peaks.Count - 1
+                        Dim comparisonPeak = peakDataSaved.Peaks(intPeakIndexCompare)
+
+                        If intPeakIndexCompare <> peakDataSaved.BestPeakIndex AndAlso
+                           comparisonPeak.PeakLocation <= intPeakIndexStart Then
                             ' The peak is before intPeakIndexStart; is its intensity large enough?
-                            If sngIntensityData(udtPeakDataSaved.PeakLocs(intPeakIndexCompare)) >= sngAdjacentPeakIntensityThreshold Then
+                            If sngIntensityData(comparisonPeak.PeakLocation) >= sngAdjacentPeakIntensityThreshold Then
                                 ' Yes, the intensity is large enough
 
                                 ' Initialize intComparisonPeakedgeIndex to the right edge of the adjacent peak
-                                intComparisonPeakEdgeIndex = udtPeakDataSaved.PeakEdgesRight(intPeakIndexCompare)
+                                intComparisonPeakEdgeIndex = comparisonPeak.RightEdge
 
                                 ' Find the first point in the adjacent peak that is at least 50% of the maximum in the adjacent peak
                                 ' Store that point in intComparisonPeakedgeIndex
-                                sngTargetIntensity = sngIntensityData(udtPeakDataSaved.PeakLocs(intPeakIndexCompare)) / 2
-                                For intDataIndex = intComparisonPeakEdgeIndex To udtPeakDataSaved.PeakLocs(intPeakIndexCompare) Step -1
+                                sngTargetIntensity = sngIntensityData(comparisonPeak.PeakLocation) / 2
+                                For intDataIndex = intComparisonPeakEdgeIndex To comparisonPeak.PeakLocation Step -1
                                     If sngIntensityData(intDataIndex) >= sngTargetIntensity Then
                                         intComparisonPeakEdgeIndex = intDataIndex
                                         Exit For
@@ -2196,23 +2160,25 @@ Public Class clsMASICPeakFinder
                     Next intPeakIndexCompare
 
                     ' Search through udtPeakDataSaved to find the closest peak to the right of this peak
-                    intAdjacentIndex = udtPeakDataSaved.PeakCount    ' Initially assign an invalid index
+                    intAdjacentIndex = peakDataSaved.Peaks.Count    ' Initially assign an invalid index
                     intSmallestIndexDifference = intDataCount + 1
-                    For intPeakIndexCompare = udtPeakDataSaved.PeakCount - 1 To 0 Step -1
-                        If intPeakIndexCompare <> udtPeakDataSaved.BestPeakIndex AndAlso
-                           udtPeakDataSaved.PeakLocs(intPeakIndexCompare) >= intPeakIndexEnd Then
+                    For intPeakIndexCompare = peakDataSaved.Peaks.Count - 1 To 0 Step -1
+                        Dim comparisonPeak = peakDataSaved.Peaks(intPeakIndexCompare)
+
+                        If intPeakIndexCompare <> peakDataSaved.BestPeakIndex AndAlso
+                           comparisonPeak.PeakLocation >= intPeakIndexEnd Then
 
                             ' The peak is after intPeakIndexEnd; is its intensity large enough?
-                            If sngIntensityData(udtPeakDataSaved.PeakLocs(intPeakIndexCompare)) >= sngAdjacentPeakIntensityThreshold Then
+                            If sngIntensityData(comparisonPeak.PeakLocation) >= sngAdjacentPeakIntensityThreshold Then
                                 ' Yes, the intensity is large enough
 
                                 ' Initialize intComparisonPeakEdgeIndex to the left edge of the adjacent peak
-                                intComparisonPeakEdgeIndex = udtPeakDataSaved.PeakEdgesLeft(intPeakIndexCompare)
+                                intComparisonPeakEdgeIndex = comparisonPeak.LeftEdge
 
                                 ' Find the first point in the adjacent peak that is at least 50% of the maximum in the adjacent peak
                                 ' Store that point in intComparisonPeakedgeIndex
-                                sngTargetIntensity = sngIntensityData(udtPeakDataSaved.PeakLocs(intPeakIndexCompare)) / 2
-                                For intDataIndex = intComparisonPeakEdgeIndex To udtPeakDataSaved.PeakLocs(intPeakIndexCompare)
+                                sngTargetIntensity = sngIntensityData(comparisonPeak.PeakLocation) / 2
+                                For intDataIndex = intComparisonPeakEdgeIndex To comparisonPeak.PeakLocation
                                     If sngIntensityData(intDataIndex) >= sngTargetIntensity Then
                                         intComparisonPeakEdgeIndex = intDataIndex
                                         Exit For
@@ -2238,14 +2204,14 @@ Public Class clsMASICPeakFinder
 
                 Else
                     ' No peaks or no peaks containing .OriginalPeakLocationIndex
-                    ' If udtPeakData.PeakWidthPointsMinimum is greater than 3 and blnTestingMinimumPeakWidth = False, then decrement it by 50%
-                    If udtPeakData.PeakWidthPointsMinimum > MINIMUM_PEAK_WIDTH AndAlso Not blnTestingMinimumPeakWidth Then
-                        udtPeakData.PeakWidthPointsMinimum = CInt(Math.Floor(udtPeakData.PeakWidthPointsMinimum / 2))
-                        If udtPeakData.PeakWidthPointsMinimum < MINIMUM_PEAK_WIDTH Then udtPeakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH
+                    ' If peakData.PeakWidthPointsMinimum is greater than 3 and blnTestingMinimumPeakWidth = False, then decrement it by 50%
+                    If peakData.PeakWidthPointsMinimum > MINIMUM_PEAK_WIDTH AndAlso Not blnTestingMinimumPeakWidth Then
+                        peakData.PeakWidthPointsMinimum = CInt(Math.Floor(peakData.PeakWidthPointsMinimum / 2))
+                        If peakData.PeakWidthPointsMinimum < MINIMUM_PEAK_WIDTH Then peakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH
                     Else
-                        intPeakLocationIndex = udtPeakData.OriginalPeakLocationIndex
-                        intPeakIndexStart = udtPeakData.OriginalPeakLocationIndex
-                        intPeakIndexEnd = udtPeakData.OriginalPeakLocationIndex
+                        intPeakLocationIndex = peakData.OriginalPeakLocationIndex
+                        intPeakIndexStart = peakData.OriginalPeakLocationIndex
+                        intPeakIndexEnd = peakData.OriginalPeakLocationIndex
                         intPreviousPeakFWHMPointRight = intPeakIndexStart
                         intNextPeakFWHMPointLeft = intPeakIndexEnd
                         blnValidPeakFound = True
@@ -2262,11 +2228,11 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function FindPeaksWork(objPeakDetector As clsPeakDetection, intScanNumbers() As Integer, ByRef udtPeakData As udtFindPeaksDataType, blnSIMDataPresent As Boolean, sicPeakFinderOptions As clsSICPeakFinderOptions, blnTestingMinimumPeakWidth As Boolean, blnReturnClosestPeak As Boolean) As Boolean
+    Private Function FindPeaksWork(objPeakDetector As clsPeakDetection, intScanNumbers() As Integer, peaksContainer As clsPeaksContainer, blnSIMDataPresent As Boolean, sicPeakFinderOptions As clsSICPeakFinderOptions, blnTestingMinimumPeakWidth As Boolean, blnReturnClosestPeak As Boolean) As Boolean
         ' Returns True if a valid peak is found; otherwise, returns false
-        ' When blnReturnClosestPeak is True, then a valid peak is one that contains udtPeakData.OriginalPeakLocationIndex
-        ' When blnReturnClosestPeak is False, then stores the index of the most intense peak in udtpeakdata.BestPeakIndex
-        ' All of the identified peaks are returned in udtpeakdata.PeakLocs(), regardless of whether they are valid or not
+        ' When blnReturnClosestPeak is True, then a valid peak is one that contains peaksContainer.OriginalPeakLocationIndex
+        ' When blnReturnClosestPeak is False, then stores the index of the most intense peak in peaksContainer.BestPeakIndex
+        ' All of the identified peaks are returned in peaksContainer.PeakLocs(), regardless of whether they are valid or not
 
         Dim intFoundPeakIndex As Integer
 
@@ -2287,82 +2253,76 @@ Public Class clsMASICPeakFinder
 
         Dim strErrorMessage As String = String.Empty
 
-        ' Smooth the Y data, and store in udtPeakData.SmoothedYData
-        ' Note that if using a Butterworth filter, then we increase udtPeakData.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
-        blnDataIsSmoothed = FindPeaksWorkSmoothData(udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, udtPeakData.PeakWidthPointsMinimum, strErrorMessage)
+        ' Smooth the Y data, and store in peaksContainer.SmoothedYData
+        ' Note that if using a Butterworth filter, then we increase peaksContainer.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
+        blnDataIsSmoothed = FindPeaksWorkSmoothData(peaksContainer, blnSIMDataPresent, sicPeakFinderOptions, peaksContainer.PeakWidthPointsMinimum, strErrorMessage)
         If sicPeakFinderOptions.FindPeaksOnSmoothedData AndAlso blnDataIsSmoothed Then
-            udtPeakData.PeakCount = objPeakDetector.DetectPeaks(udtPeakData.XData, udtPeakData.SmoothedYData, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum, udtPeakData.PeakWidthPointsMinimum, udtPeakData.PeakLocs, udtPeakData.PeakEdgesLeft, udtPeakData.PeakEdgesRight, udtPeakData.PeakAreas, CInt(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
+            peaksContainer.Peaks = objPeakDetector.DetectPeaks(peaksContainer.XData, peaksContainer.SmoothedYData, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum, peaksContainer.PeakWidthPointsMinimum, CInt(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
             blnUsedSmoothedDataForPeakDetection = True
         Else
-            ' Look for the peaks, using udtPeakData.PeakWidthPointsMinimum as the minimum peak width 
-            udtPeakData.PeakCount = objPeakDetector.DetectPeaks(udtPeakData.XData, udtPeakData.YData, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum, udtPeakData.PeakWidthPointsMinimum, udtPeakData.PeakLocs, udtPeakData.PeakEdgesLeft, udtPeakData.PeakEdgesRight, udtPeakData.PeakAreas, CInt(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
+            ' Look for the peaks, using peaksContainer.PeakWidthPointsMinimum as the minimum peak width
+            peaksContainer.Peaks = objPeakDetector.DetectPeaks(peaksContainer.XData, peaksContainer.YData, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum, peaksContainer.PeakWidthPointsMinimum, CInt(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, True, True)
             blnUsedSmoothedDataForPeakDetection = False
         End If
 
 
-        If udtPeakData.PeakCount = -1 Then
+        If peaksContainer.Peaks.Count = -1 Then
             ' Fatal error occurred while finding peaks
             Return False
         End If
 
         If blnTestingMinimumPeakWidth Then
-            If udtPeakData.PeakCount <= 0 Then
+            If peaksContainer.Peaks.Count <= 0 Then
                 ' No peaks were found; create a new peak list using the original peak location index as the peak center
-                With udtPeakData
-                    .PeakCount = 1
-                    ReDim .PeakLocs(0)
-                    ReDim .PeakEdgesLeft(0)
-                    ReDim .PeakEdgesRight(0)
+                Dim newPeak = New clsPeakInfo(peaksContainer.OriginalPeakLocationIndex) With {
+                    .LeftEdge = peaksContainer.OriginalPeakLocationIndex,
+                    .RightEdge = peaksContainer.OriginalPeakLocationIndex
+                }
 
-                    .PeakLocs(0) = udtPeakData.OriginalPeakLocationIndex
-                    .PeakEdgesLeft(0) = udtPeakData.OriginalPeakLocationIndex
-                    .PeakEdgesRight(0) = udtPeakData.OriginalPeakLocationIndex
-                End With
+                peaksContainer.Peaks.Add(newPeak)
+
             Else
                 If blnReturnClosestPeak Then
-                    ' Make sure one of the peaks is within 1 of the original peak location 
+                    ' Make sure one of the peaks is within 1 of the original peak location
                     blnSuccess = False
-                    For intFoundPeakIndex = 0 To udtPeakData.PeakCount - 1
-                        If Math.Abs(udtPeakData.PeakLocs(intFoundPeakIndex) - udtPeakData.OriginalPeakLocationIndex) <= 1 Then
+                    For intFoundPeakIndex = 0 To peaksContainer.Peaks.Count - 1
+                        If Math.Abs(peaksContainer.Peaks(intFoundPeakIndex).PeakLocation - peaksContainer.OriginalPeakLocationIndex) <= 1 Then
                             blnSuccess = True
                             Exit For
                         End If
                     Next intFoundPeakIndex
 
                     If Not blnSuccess Then
-                        ' No match was found; add a new peak at udtPeakData.OriginalPeakLocationIndex
-                        With udtPeakData
-                            ReDim Preserve .PeakLocs(udtPeakData.PeakCount)
-                            ReDim Preserve .PeakEdgesLeft(udtPeakData.PeakCount)
-                            ReDim Preserve .PeakEdgesRight(udtPeakData.PeakCount)
-                            ReDim Preserve .PeakAreas(udtPeakData.PeakCount)
+                        ' No match was found; add a new peak at peaksContainer.OriginalPeakLocationIndex
 
-                            .PeakLocs(udtPeakData.PeakCount) = .OriginalPeakLocationIndex
-                            .PeakEdgesLeft(udtPeakData.PeakCount) = .OriginalPeakLocationIndex
-                            .PeakEdgesRight(udtPeakData.PeakCount) = .OriginalPeakLocationIndex
-                            .PeakAreas(udtPeakData.PeakCount) = .YData(udtPeakData.OriginalPeakLocationIndex)
+                        Dim newPeak = New clsPeakInfo(peaksContainer.OriginalPeakLocationIndex) With {
+                            .LeftEdge = peaksContainer.OriginalPeakLocationIndex,
+                            .RightEdge = peaksContainer.OriginalPeakLocationIndex,
+                            .PeakArea = peaksContainer.YData(peaksContainer.OriginalPeakLocationIndex)
+                        }
 
-                            .PeakCount += 1
-                        End With
+                        peaksContainer.Peaks.Add(newPeak)
+
                     End If
                 End If
             End If
         End If
 
-        If udtPeakData.PeakCount <= 0 Then
+        If peaksContainer.Peaks.Count <= 0 Then
             ' No peaks were found
             blnValidPeakFound = False
         Else
 
-            ReDim udtPeakData.PeakIsValid(udtPeakData.PeakCount - 1)
-            For intFoundPeakIndex = 0 To udtPeakData.PeakCount - 1
+            For Each peakItem In peaksContainer.Peaks
+
+                peakItem.PeakIsValid = False
 
                 ' Find the center and boundaries of this peak
 
                 ' Copy from the PeakEdges arrays to the working variables
-                intPeakLocationIndex = udtPeakData.PeakLocs(intFoundPeakIndex)
-                intPeakIndexStart = udtPeakData.PeakEdgesLeft(intFoundPeakIndex)
-                intPeakIndexEnd = udtPeakData.PeakEdgesRight(intFoundPeakIndex)
+                intPeakLocationIndex = peakItem.PeakLocation
+                intPeakIndexStart = peakItem.LeftEdge
+                intPeakIndexEnd = peakItem.RightEdge
 
                 ' Make sure intPeakLocationIndex is between intPeakIndexStart and intPeakIndexEnd
                 If intPeakIndexStart > intPeakLocationIndex Then
@@ -2375,27 +2335,27 @@ Public Class clsMASICPeakFinder
                     intPeakIndexEnd = intPeakLocationIndex
                 End If
 
-                ' See if the peak boundaries (left and right edges) need to be narrowed or expanded 
-                ' Do this by stepping left or right while the intensity is decreasing.  If an increase is found, but the 
-                ' next point after the increasing point is less than the current point, then possibly keep stepping; the 
-                ' test for whether to keep stepping is that the next point away from the increasing point must be less 
-                ' than the current point.  If this is the case, replace the increasing point with the average of the 
+                ' See if the peak boundaries (left and right edges) need to be narrowed or expanded
+                ' Do this by stepping left or right while the intensity is decreasing.  If an increase is found, but the
+                ' next point after the increasing point is less than the current point, then possibly keep stepping; the
+                ' test for whether to keep stepping is that the next point away from the increasing point must be less
+                ' than the current point.  If this is the case, replace the increasing point with the average of the
                 ' current point and the point two points away
                 '
                 ' Use smoothed data for this step
-                ' Determine the smoothing window based on udtPeakData.PeakWidthPointsMinimum
-                ' If udtPeakData.PeakWidthPointsMinimum <= 4 then do not filter
+                ' Determine the smoothing window based on peaksContainer.PeakWidthPointsMinimum
+                ' If peaksContainer.PeakWidthPointsMinimum <= 4 then do not filter
 
                 If Not blnDataIsSmoothed Then
                     ' Need to smooth the data now
-                    blnDataIsSmoothed = FindPeaksWorkSmoothData(udtPeakData, blnSIMDataPresent, sicPeakFinderOptions, udtPeakData.PeakWidthPointsMinimum, strErrorMessage)
+                    blnDataIsSmoothed = FindPeaksWorkSmoothData(peaksContainer, blnSIMDataPresent, sicPeakFinderOptions, peaksContainer.PeakWidthPointsMinimum, strErrorMessage)
                 End If
 
                 ' First see if we need to narrow the peak by looking for decreasing intensities moving toward the peak center
                 ' We'll use the unsmoothed data for this
                 Do While intPeakIndexStart < intPeakLocationIndex - 1
-                    If udtPeakData.YData(intPeakIndexStart) > udtPeakData.YData(intPeakIndexStart + 1) Then
-                        ' OrElse (blnUsedSmoothedDataForPeakDetection AndAlso udtPeakData.SmoothedYData(intPeakIndexStart) < 0) Then
+                    If peaksContainer.YData(intPeakIndexStart) > peaksContainer.YData(intPeakIndexStart + 1) Then
+                        ' OrElse (blnUsedSmoothedDataForPeakDetection AndAlso peaksContainer.SmoothedYData(intPeakIndexStart) < 0) Then
                         intPeakIndexStart += 1
                     Else
                         Exit Do
@@ -2403,8 +2363,8 @@ Public Class clsMASICPeakFinder
                 Loop
 
                 Do While intPeakIndexEnd > intPeakLocationIndex + 1
-                    If udtPeakData.YData(intPeakIndexEnd - 1) < udtPeakData.YData(intPeakIndexEnd) Then
-                        ' OrElse (blnUsedSmoothedDataForPeakDetection AndAlso udtPeakData.SmoothedYData(intPeakIndexEnd) < 0) Then
+                    If peaksContainer.YData(intPeakIndexEnd - 1) < peaksContainer.YData(intPeakIndexEnd) Then
+                        ' OrElse (blnUsedSmoothedDataForPeakDetection AndAlso peaksContainer.SmoothedYData(intPeakIndexEnd) < 0) Then
                         intPeakIndexEnd -= 1
                     Else
                         Exit Do
@@ -2412,33 +2372,33 @@ Public Class clsMASICPeakFinder
                 Loop
 
 
-                ' Now see if we need to expand the peak by looking for decreasing intensities moving away from the peak center, 
+                ' Now see if we need to expand the peak by looking for decreasing intensities moving away from the peak center,
                 '  but allowing for small increases
                 ' We'll use the smoothed data for this; if we encounter negative values in the smoothed data, we'll keep going until we reach the low point since huge peaks can cause some odd behavior with the Butterworth filter
                 ' Keep track of the number of times we step over an increased value
                 intStepOverIncreaseCount = 0
                 Do While intPeakIndexStart > 0
-                    'dblCurrentSlope = objPeakDetector.ComputeSlope(udtPeakData.XData, udtPeakData.SmoothedYData, intPeakIndexStart, intPeakLocationIndex)
+                    'dblCurrentSlope = objPeakDetector.ComputeSlope(peaksContainer.XData, peaksContainer.SmoothedYData, intPeakIndexStart, intPeakLocationIndex)
 
                     'If dblCurrentSlope > 0 AndAlso _
                     '   intPeakLocationIndex - intPeakIndexStart > 3 AndAlso _
-                    '   udtPeakData.SmoothedYData(intPeakIndexStart - 1) < Math.Max(sicPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
+                    '   peaksContainer.SmoothedYData(intPeakIndexStart - 1) < Math.Max(sicPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
                     '    ' We reached a low intensity data point and we're going downhill (i.e. the slope from this point to intPeakLocationIndex is positive)
                     '    ' Step once more and stop
                     '    intPeakIndexStart -= 1
                     '    Exit Do
-                    If udtPeakData.SmoothedYData(intPeakIndexStart - 1) < udtPeakData.SmoothedYData(intPeakIndexStart) Then
+                    If peaksContainer.SmoothedYData(intPeakIndexStart - 1) < peaksContainer.SmoothedYData(intPeakIndexStart) Then
                         ' The adjacent point is lower than the current point
                         intPeakIndexStart -= 1
-                    ElseIf Math.Abs(udtPeakData.SmoothedYData(intPeakIndexStart - 1) - udtPeakData.SmoothedYData(intPeakIndexStart)) < Double.Epsilon Then
+                    ElseIf Math.Abs(peaksContainer.SmoothedYData(intPeakIndexStart - 1) - peaksContainer.SmoothedYData(intPeakIndexStart)) < Double.Epsilon Then
                         ' The adjacent point is equal to the current point
                         intPeakIndexStart -= 1
                     Else
                         ' The next point to the left is not lower; what about the point after it?
                         If intPeakIndexStart > 1 Then
-                            If udtPeakData.SmoothedYData(intPeakIndexStart - 2) <= udtPeakData.SmoothedYData(intPeakIndexStart) Then
+                            If peaksContainer.SmoothedYData(intPeakIndexStart - 2) <= peaksContainer.SmoothedYData(intPeakIndexStart) Then
                                 ' Only allow ignoring an upward spike if the delta from this point to the next is <= .MaxAllowedUpwardSpikeFractionMax of sngPeakMaximum
-                                If udtPeakData.SmoothedYData(intPeakIndexStart - 1) - udtPeakData.SmoothedYData(intPeakIndexStart) > udtPeakData.MaxAllowedUpwardSpikeFractionMax * sngPeakMaximum Then
+                                If peaksContainer.SmoothedYData(intPeakIndexStart - 1) - peaksContainer.SmoothedYData(intPeakIndexStart) > peaksContainer.MaxAllowedUpwardSpikeFractionMax * sngPeakMaximum Then
                                     Exit Do
                                 End If
 
@@ -2460,27 +2420,27 @@ Public Class clsMASICPeakFinder
                 Loop
 
                 intStepOverIncreaseCount = 0
-                Do While intPeakIndexEnd < udtPeakData.SourceDataCount - 1
-                    'dblCurrentSlope = objPeakDetector.ComputeSlope(udtPeakData.XData, udtPeakData.SmoothedYData, intPeakLocationIndex, intPeakIndexEnd)
+                Do While intPeakIndexEnd < peaksContainer.SourceDataCount - 1
+                    'dblCurrentSlope = objPeakDetector.ComputeSlope(peaksContainer.XData, peaksContainer.SmoothedYData, intPeakLocationIndex, intPeakIndexEnd)
 
                     'If dblCurrentSlope < 0 AndAlso _
                     '   intPeakIndexEnd - intPeakLocationIndex > 3 AndAlso _
-                    '   udtPeakData.SmoothedYData(intPeakIndexEnd + 1) < Math.Max(sicPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
+                    '   peaksContainer.SmoothedYData(intPeakIndexEnd + 1) < Math.Max(sicPeakFinderOptions.IntensityThresholdFractionMax * sngPeakMaximum, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum) Then
                     '    ' We reached a low intensity data point and we're going downhill (i.e. the slope from intPeakLocationIndex to this point is negative)
                     '    intPeakIndexEnd += 1
                     '    Exit Do
-                    If udtPeakData.SmoothedYData(intPeakIndexEnd + 1) < udtPeakData.SmoothedYData(intPeakIndexEnd) Then
+                    If peaksContainer.SmoothedYData(intPeakIndexEnd + 1) < peaksContainer.SmoothedYData(intPeakIndexEnd) Then
                         ' The adjacent point is lower than the current point
                         intPeakIndexEnd += 1
-                    ElseIf Math.Abs(udtPeakData.SmoothedYData(intPeakIndexEnd + 1) - udtPeakData.SmoothedYData(intPeakIndexEnd)) < Double.Epsilon Then
+                    ElseIf Math.Abs(peaksContainer.SmoothedYData(intPeakIndexEnd + 1) - peaksContainer.SmoothedYData(intPeakIndexEnd)) < Double.Epsilon Then
                         ' The adjacent point is equal to the current point
                         intPeakIndexEnd += 1
                     Else
                         ' The next point to the right is not lower; what about the point after it?
-                        If intPeakIndexEnd < udtPeakData.SourceDataCount - 2 Then
-                            If udtPeakData.SmoothedYData(intPeakIndexEnd + 2) <= udtPeakData.SmoothedYData(intPeakIndexEnd) Then
+                        If intPeakIndexEnd < peaksContainer.SourceDataCount - 2 Then
+                            If peaksContainer.SmoothedYData(intPeakIndexEnd + 2) <= peaksContainer.SmoothedYData(intPeakIndexEnd) Then
                                 ' Only allow ignoring an upward spike if the delta from this point to the next is <= .MaxAllowedUpwardSpikeFractionMax of sngPeakMaximum
-                                If udtPeakData.SmoothedYData(intPeakIndexEnd + 1) - udtPeakData.SmoothedYData(intPeakIndexEnd) > udtPeakData.MaxAllowedUpwardSpikeFractionMax * sngPeakMaximum Then
+                                If peaksContainer.SmoothedYData(intPeakIndexEnd + 1) - peaksContainer.SmoothedYData(intPeakIndexEnd) > peaksContainer.MaxAllowedUpwardSpikeFractionMax * sngPeakMaximum Then
                                     Exit Do
                                 End If
 
@@ -2501,43 +2461,45 @@ Public Class clsMASICPeakFinder
                     End If
                 Loop
 
-                udtPeakData.PeakIsValid(intFoundPeakIndex) = True
+                peakItem.PeakIsValid = True
                 If blnReturnClosestPeak Then
-                    ' If udtPeakData.OriginalPeakLocationIndex is not between intPeakIndexStart and intPeakIndexEnd, then check
-                    '  if the scan number for udtPeakData.OriginalPeakLocationIndex is within .MaxDistanceScansNoOverlap scans of
-                    '  either of the peak edges; if not, then mark the peak as invalid since it does not contain the 
+                    ' If peaksContainer.OriginalPeakLocationIndex is not between intPeakIndexStart and intPeakIndexEnd, then check
+                    '  if the scan number for peaksContainer.OriginalPeakLocationIndex is within .MaxDistanceScansNoOverlap scans of
+                    '  either of the peak edges; if not, then mark the peak as invalid since it does not contain the
                     '  scan for the parent ion
-                    If udtPeakData.OriginalPeakLocationIndex < intPeakIndexStart Then
-                        If Math.Abs(intScanNumbers(udtPeakData.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexStart)) > sicPeakFinderOptions.MaxDistanceScansNoOverlap Then
-                            udtPeakData.PeakIsValid(intFoundPeakIndex) = False
+                    If peaksContainer.OriginalPeakLocationIndex < intPeakIndexStart Then
+                        If Math.Abs(intScanNumbers(peaksContainer.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexStart)) > sicPeakFinderOptions.MaxDistanceScansNoOverlap Then
+                            peakItem.PeakIsValid = False
                         End If
-                    ElseIf udtPeakData.OriginalPeakLocationIndex > intPeakIndexEnd Then
-                        If Math.Abs(intScanNumbers(udtPeakData.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexEnd)) > sicPeakFinderOptions.MaxDistanceScansNoOverlap Then
-                            udtPeakData.PeakIsValid(intFoundPeakIndex) = False
+                    ElseIf peaksContainer.OriginalPeakLocationIndex > intPeakIndexEnd Then
+                        If Math.Abs(intScanNumbers(peaksContainer.OriginalPeakLocationIndex) - intScanNumbers(intPeakIndexEnd)) > sicPeakFinderOptions.MaxDistanceScansNoOverlap Then
+                            peakItem.PeakIsValid = False
                         End If
                     End If
                 End If
 
                 ' Copy back from the working variables to the PeakEdges arrays
-                udtPeakData.PeakLocs(intFoundPeakIndex) = intPeakLocationIndex
-                udtPeakData.PeakEdgesLeft(intFoundPeakIndex) = intPeakIndexStart
-                udtPeakData.PeakEdgesRight(intFoundPeakIndex) = intPeakIndexEnd
+                peakItem.PeakLocation = intPeakLocationIndex
+                peakItem.LeftEdge = intPeakIndexStart
+                peakItem.RightEdge = intPeakIndexEnd
 
-            Next intFoundPeakIndex
+            Next
 
-            ' Find the peak with the largest area that has udtPeakData.PeakIsValid = True
-            udtPeakData.BestPeakIndex = -1
-            udtPeakData.BestPeakArea = Single.MinValue
-            For intFoundPeakIndex = 0 To udtPeakData.PeakCount - 1
-                If udtPeakData.PeakIsValid(intFoundPeakIndex) Then
-                    If udtPeakData.PeakAreas(intFoundPeakIndex) > udtPeakData.BestPeakArea Then
-                        udtPeakData.BestPeakIndex = intFoundPeakIndex
-                        udtPeakData.BestPeakArea = CSng(Math.Min(udtPeakData.PeakAreas(intFoundPeakIndex), Single.MaxValue))
+            ' Find the peak with the largest area that has peaksContainer.PeakIsValid = True
+            peaksContainer.BestPeakIndex = -1
+            peaksContainer.BestPeakArea = Single.MinValue
+            For intFoundPeakIndex = 0 To peaksContainer.Peaks.Count - 1
+                Dim currentPeak = peaksContainer.Peaks(intFoundPeakIndex)
+
+                If currentPeak.PeakIsValid Then
+                    If currentPeak.PeakArea > peaksContainer.BestPeakArea Then
+                        peaksContainer.BestPeakIndex = intFoundPeakIndex
+                        peaksContainer.BestPeakArea = CSng(Math.Min(currentPeak.PeakArea, Single.MaxValue))
                     End If
                 End If
             Next intFoundPeakIndex
 
-            If udtPeakData.BestPeakIndex >= 0 Then
+            If peaksContainer.BestPeakIndex >= 0 Then
                 blnValidPeakFound = True
             Else
                 blnValidPeakFound = False
@@ -2548,7 +2510,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function FindPeaksWorkSmoothData(ByRef udtPeakData As udtFindPeaksDataType, blnSIMDataPresent As Boolean, ByRef sicPeakFinderOptions As clsSICPeakFinderOptions, ByRef intPeakWidthPointsMinimum As Integer, ByRef strErrorMessage As String) As Boolean
+    Private Function FindPeaksWorkSmoothData(peaksContainer As clsPeaksContainer, blnSIMDataPresent As Boolean, ByRef sicPeakFinderOptions As clsSICPeakFinderOptions, ByRef intPeakWidthPointsMinimum As Integer, ByRef strErrorMessage As String) As Boolean
         ' Returns True if the data was smoothed; false if not or an error
         ' The smoothed data is returned in udtPeakData.SmoothedYData
 
@@ -2561,12 +2523,12 @@ Public Class clsMASICPeakFinder
 
         Dim objFilter As New DataFilter.clsDataFilter
 
-        ReDim udtPeakData.SmoothedYData(udtPeakData.SourceDataCount - 1)
+        ReDim peaksContainer.SmoothedYData(peaksContainer.SourceDataCount - 1)
 
         If (intPeakWidthPointsMinimum > 4 AndAlso (sicPeakFinderOptions.UseSavitzkyGolaySmooth OrElse sicPeakFinderOptions.UseButterworthSmooth)) OrElse
          sicPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth Then
 
-            udtPeakData.YData.CopyTo(udtPeakData.SmoothedYData, 0)
+            peaksContainer.YData.CopyTo(peaksContainer.SmoothedYData, 0)
 
             If sicPeakFinderOptions.UseButterworthSmooth Then
                 ' Filter the data with a Butterworth filter (.UseButterworthSmooth takes precedence over .UseSavitzkyGolaySmooth)
@@ -2575,7 +2537,7 @@ Public Class clsMASICPeakFinder
                 Else
                     sngButterWorthFrequency = sicPeakFinderOptions.ButterworthSamplingFrequency
                 End If
-                blnSuccess = objFilter.ButterworthFilter(udtPeakData.SmoothedYData, 0, udtPeakData.SourceDataCount - 1, sngButterWorthFrequency)
+                blnSuccess = objFilter.ButterworthFilter(peaksContainer.SmoothedYData, 0, peaksContainer.SourceDataCount - 1, sngButterWorthFrequency)
                 If Not blnSuccess Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData", "Error with the Butterworth filter" & strErrorMessage, Nothing, True, False)
                     Return False
@@ -2594,7 +2556,7 @@ Public Class clsMASICPeakFinder
 
             Else
                 ' Filter the data with a Savitzky Golay filter
-                intFilterThirdWidth = CInt(Math.Floor(udtPeakData.PeakWidthPointsMinimum / 3))
+                intFilterThirdWidth = CInt(Math.Floor(peaksContainer.PeakWidthPointsMinimum / 3))
                 If intFilterThirdWidth > 3 Then intFilterThirdWidth = 3
 
                 ' Make sure intFilterThirdWidth is Odd
@@ -2604,7 +2566,7 @@ Public Class clsMASICPeakFinder
 
                 ' Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
                 ' Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-                blnSuccess = objFilter.SavitzkyGolayFilter(udtPeakData.SmoothedYData, 0, udtPeakData.SmoothedYData.Length - 1, intFilterThirdWidth, intFilterThirdWidth, sicPeakFinderOptions.SavitzkyGolayFilterOrder, True, strErrorMessage)
+                blnSuccess = objFilter.SavitzkyGolayFilter(peaksContainer.SmoothedYData, 0, peaksContainer.SmoothedYData.Length - 1, intFilterThirdWidth, intFilterThirdWidth, sicPeakFinderOptions.SavitzkyGolayFilterOrder, True, strErrorMessage)
                 If Not blnSuccess Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData", "Error with the Savitzky-Golay filter: " & strErrorMessage, Nothing, True, False)
                     Return False
@@ -2615,7 +2577,7 @@ Public Class clsMASICPeakFinder
             End If
         Else
             ' Do not filter
-            udtPeakData.YData.CopyTo(udtPeakData.SmoothedYData, 0)
+            peaksContainer.YData.CopyTo(peaksContainer.SmoothedYData, 0)
             Return False
         End If
 
@@ -2627,7 +2589,7 @@ Public Class clsMASICPeakFinder
       <Out()> ByRef udtSICPotentialAreaStats As udtSICPotentialAreaStatsType,
       sicPeakFinderOptions As clsSICPeakFinderOptions)
 
-        ' This function computes the potential peak area for a given SIC 
+        ' This function computes the potential peak area for a given SIC
         '  and stores in udtSICPotentialAreaStats.MinimumPotentialPeakArea
         ' However, the summed intensity is not used if the number of points >= .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
 
@@ -2711,7 +2673,7 @@ Public Class clsMASICPeakFinder
     End Sub
 
     Public Function FindSICPeakAndArea(intSICDataCount As Integer, SICScanNumbers() As Integer, SICData() As Single, ByRef udtSICPotentialAreaStatsForPeak As udtSICPotentialAreaStatsType, ByRef udtSICPeak As udtSICStatsPeakType, ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType, sicPeakFinderOptions As clsSICPeakFinderOptions, ByRef udtSICPotentialAreaStatsForRegion As udtSICPotentialAreaStatsType, blnReturnClosestPeak As Boolean, blnSIMDataPresent As Boolean, blnRecomputeNoiseLevel As Boolean) As Boolean
-        ' Note: The calling function should populate udtSICPeak.IndexObserved with the index in SICData() that the 
+        ' Note: The calling function should populate udtSICPeak.IndexObserved with the index in SICData() that the
         '       parent ion m/z was actually observed; this will be used as the default peak location if a peak cannot be found
 
         ' Note: You cannot use SICScanNumbers().Length or SICData().Length to determine the length of the array; use intSICDataCount
@@ -2776,7 +2738,7 @@ Public Class clsMASICPeakFinder
 
                 If blnRecomputeNoiseLevel Then
                     ' Compute the Noise Threshold for this SIC
-                    ' This value is first computed using all data in the SIC; it is later updated 
+                    ' This value is first computed using all data in the SIC; it is later updated
                     '  to be the minimum value of the average of the data to the immediate left and
                     '  immediate right of the peak identified in the SIC
                     blnSuccess = ComputeNoiseLevelForSICData(intSICDataCount, SICData, sicPeakFinderOptions.SICBaselineNoiseOptions, udtSICPeak.BaselineNoiseStats)
@@ -2824,7 +2786,7 @@ Public Class clsMASICPeakFinder
                     ''    End If
                     ''End With
 
-                    ' If smoothing was enabled, then see if the smoothed value is larger than udtSICPeak.MaxIntensityValue 
+                    ' If smoothing was enabled, then see if the smoothed value is larger than udtSICPeak.MaxIntensityValue
                     ' If it is, then use the smoothed value for udtSICPeak.MaxIntensityValue
                     If sicPeakFinderOptions.UseSavitzkyGolaySmooth OrElse sicPeakFinderOptions.UseButterworthSmooth Then
                         intDataIndex = udtSICPeak.IndexMax - udtSmoothedYDataSubset.DataStartIndex
