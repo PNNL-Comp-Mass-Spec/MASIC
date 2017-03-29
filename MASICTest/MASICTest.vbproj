@@ -90,11 +90,16 @@
     <Compile Include="clsBinarySearchTests.vb" />
     <Compile Include="clsTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="clsDatabaseTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MASIC.vbproj">
       <Project>{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}</Project>
       <Name>MASIC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MASICPeakFinder\MASICPeakFinder.vbproj">
+      <Project>{8363e31c-ca3d-4172-99d5-3d2d3c3fd999}</Project>
+      <Name>MASICPeakFinder</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
