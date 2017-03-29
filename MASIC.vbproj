@@ -24,8 +24,7 @@
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>On</OptionStrict>
     <RootNamespace>MASIC</RootNamespace>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>MASIC.modMain</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <MyType>Console</MyType>
@@ -92,7 +91,7 @@
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
@@ -121,9 +120,8 @@
     <Reference Include="PNNLOmics">
       <HintPath>Lib\PNNLOmics.dll</HintPath>
     </Reference>
-    <Reference Include="PRISM">
-      <Name>PRISM</Name>
-      <HintPath>lib\PRISM.dll</HintPath>
+    <Reference Include="PRISM, Version=2.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\PRISM-Library.1.0.1\lib\net462\PRISM.dll</HintPath>
     </Reference>
     <Reference Include="ProgressFormNET">
       <Name>ProgressFormNET</Name>
@@ -265,6 +263,7 @@
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
     </EmbeddedResource>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
