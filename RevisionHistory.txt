@@ -1,5 +1,11 @@
 MASIC Change Log
 
+Version 2.8.6297; March 29, 2017
+	- New version of PRISM.dll from NuGet that includes clsParseCommandLine
+	- Replace udtFindPeaksDataType with clsPeaksContainer and clsPeakInfo
+	- Add class DatabaseTests to the test project
+	- Remove unnecessary ByRefs and use <Out()> for output parameters
+
 Version 2.8.6296; March 28, 2017
 	- Update to .NET 4.6.2
 	- Updated PRISM.dll and clsParseCommandLine.vb
