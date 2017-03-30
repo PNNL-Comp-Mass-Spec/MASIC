@@ -280,7 +280,6 @@ Friend Class clsPeakDetection
                 End If
             Next intIndex
 
-
             ' Compute the peak areas
             For Each peakItem In detectedPeaks
                 intThisPeakWidthInPoints = peakItem.RightEdge - peakItem.LeftEdge + 1

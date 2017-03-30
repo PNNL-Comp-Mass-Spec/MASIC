@@ -2074,9 +2074,9 @@ Public Class clsMASICPeakFinder
                         blnValidPeakFound = FindPeaksWork(objPeakDetector, intScanNumbers, peakData, blnSIMDataPresent, sicPeakFinderOptions, True, blnReturnClosestPeak)
 
                         If blnValidPeakFound Then
-                            For Each peakItem In peakData.Peaks
-                                intShoulderCount = 0
+                            intShoulderCount = 0
 
+                            For Each peakItem In peakData.Peaks
                                 If peakItem.PeakLocation >= intPeakIndexStart AndAlso peakItem.PeakLocation <= intPeakIndexEnd Then
                                     ' The peak at intIndex has a peak center between the "official" peak's boundaries
                                     ' Make sure it's not the same peak as the "official" peak
