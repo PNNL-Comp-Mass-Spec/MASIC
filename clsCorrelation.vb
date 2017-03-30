@@ -1,11 +1,13 @@
 Option Explicit On
 Option Strict On
 
+Imports System.Runtime.InteropServices
+
 ''' <summary>
 ''' This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
 ''' The lists of numbers must have the same number of values
 ''' Use the BinData function to bin a list of X,Y pairs into bins ranging from .BinStartX to .BinEndX
-''' 
+'''
 ''' These functions were originally written in VB6 and required the use of a C DLL
 ''' They have since been ported to VB.NET
 ''' </summary>
@@ -197,7 +199,13 @@ Public Class clsCorrelation
 
     End Function
 
-    Public Function BinData(ByRef sngXData() As Single, ByRef sngYData() As Single, ByRef sngBinnedYData() As Single, ByRef sngBinnedOffsetYData() As Single, ByRef intBinCount As Integer) As Boolean
+    Public Function BinData(
+      sngXData() As Single,
+      sngYData() As Single,
+      <Out()> ByRef sngBinnedYData() As Single,
+      <Out()> ByRef sngBinnedOffsetYData() As Single,
+      <Out()> ByRef intBinCount As Integer) As Boolean
+
         ' Bins the data in sngXData() according to sngStartBinXValue and sngBinSize
         ' Returns the binned data in sngBinnedYData() and sngBinnedOffsetYData()
         ' The difference between the two is that the StartX value is offset by 50% of the bin size when populating sngBinnedOffsetYData()
@@ -211,7 +219,9 @@ Public Class clsCorrelation
         Try
             intDataCount = sngXData.Length
             If intDataCount <= 0 Then
-                ReDim sngBinnedYData(0)
+                ReDim sngBinnedYData(-1)
+                ReDim sngBinnedOffsetYData(-1)
+                intBinCount = 0
                 Return False
             End If
 
@@ -241,7 +251,9 @@ Public Class clsCorrelation
 
         Catch ex As Exception
             ReportError("clsCorrelation->BinData", "BinData: " & ex.Message, ex)
-            ReDim sngBinnedYData(0)
+            ReDim sngBinnedYData(-1)
+            ReDim sngBinnedOffsetYData(-1)
+            intBinCount = 0
             Return False
         End Try
 
@@ -249,8 +261,8 @@ Public Class clsCorrelation
 
     End Function
 
-    Private Sub BinDataWork(ByRef sngXData() As Single, ByRef sngYData() As Single, intDataCount As Integer,
-                            ByRef sngBinnedYData() As Single, intBinCount As Integer, binningOptions As clsBinningOptions, sngOffset As Single)
+    Private Sub BinDataWork(sngXData() As Single, sngYData() As Single, intDataCount As Integer,
+                            sngBinnedYData() As Single, intBinCount As Integer, binningOptions As clsBinningOptions, sngOffset As Single)
 
         Dim intIndex As Integer
         Dim intBinNumber As Integer
@@ -267,7 +279,7 @@ Public Class clsCorrelation
                     If intBinNumber >= 0 And intBinNumber < intBinCount Then
                         If binningOptions.SumAllIntensitiesForBin Then
                             ' Add this ion's intensity to the bin intensity
-                            sngBinnedYData(intBinNumber) = sngBinnedYData(intBinNumber) + sngYData(intIndex)
+                            sngBinnedYData(intBinNumber) += sngYData(intIndex)
                         Else
                             ' Only change the bin's intensity if this ion's intensity is larger than the bin's intensity
                             ' If it is, then set the bin intensity to equal the ion's intensity
@@ -314,7 +326,7 @@ Public Class clsCorrelation
 
     End Sub
 
-    Public Function Correlate(ByRef sngDataList1() As Single, ByRef sngDataList2() As Single, eCorrelationMethod As cmCorrelationMethodConstants) As Single
+    Public Function Correlate(sngDataList1() As Single, sngDataList2() As Single, eCorrelationMethod As cmCorrelationMethodConstants) As Single
         ' Finds the correlation value between the two lists of data
         ' The lists must have the same number of data points
         ' If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, then the correlation value returned will be 0
@@ -323,7 +335,6 @@ Public Class clsCorrelation
         ' If an error, returns -1
         '
         ' Note: If necessary, use the BinData function before calling this function to bin the data
-        ' Note: We're passing the Data Lists ByRef for performance reasons; they are not modified by this function
 
         Dim intIndex As Integer
         Dim intDataCount As Integer
@@ -382,14 +393,17 @@ Public Class clsCorrelation
 
     End Function
 
-    Private Sub CorrelPearson(ByRef sngDataList1() As Single, ByRef sngDataList2() As Single, ByRef RValue As Single, ByRef ProbOfSignificance As Single, ByRef FishersZ As Single)
+    Private Sub CorrelPearson(
+      sngDataList1() As Single, sngDataList2() As Single,
+      <Out()> ByRef RValue As Single,
+      <Out()> ByRef ProbOfSignificance As Single,
+      <Out()> ByRef FishersZ As Single)
+
         ' Performs a Pearson correlation (aka linear correlation) of the two lists
         ' The lists must have the same number of data points in each and should be 0-based arrays
         '
         ' Code from Numerical Recipes in C
-
-        ' Note: We're passing the Data Lists ByRef for performance reasons; they are not modified by this function
-
+        
         '  TINY is used to "regularize" the unusual case of complete correlation
         Dim TINY = 1.0E-20
 
@@ -448,13 +462,17 @@ Public Class clsCorrelation
 
     End Sub
 
-    Private Sub CorrelKendall(ByRef sngDataList1() As Single, ByRef sngDataList2() As Single, ByRef KendallsTau As Single, ByRef Z As Single, ByRef ProbOfSignificance As Single)
+    Private Sub CorrelKendall(
+      sngDataList1() As Single, 
+      sngDataList2() As Single, 
+      <Out()> ByRef KendallsTau As Single, 
+      <Out()> ByRef Z As Single, 
+      <Out()> ByRef ProbOfSignificance As Single)
+
         ' Performs a Kendall correlation (aka linear correlation) of the two lists
         ' The lists must have the same number of data points in each and should be 0-based arrays
         '
         ' Code from Numerical Recipes in C
-
-        ' Note: We're passing the Data Lists ByRef for performance reasons; they are not modified by this function
 
         ' Given data arrays data1[1..n] and data2[1..n], this program returns Kendall's tau as tau,
         ' its number of standard deviations from zero as z, and its two-sided significance level as prob.
@@ -508,7 +526,15 @@ Public Class clsCorrelation
 
     End Sub
 
-    Private Sub CorrelSpearman(sngDataList1() As Single, sngDataList2() As Single, ByRef DiffInRanks As Single, ByRef ZD As Single, ByRef ProbOfSignificance As Single, ByRef RS As Single, ByRef ProbRS As Single)
+    Private Sub CorrelSpearman(
+      sngDataList1() As Single,
+      sngDataList2() As Single,
+      <Out()> ByRef DiffInRanks As Single,
+      <Out()> ByRef ZD As Single,
+      <Out()> ByRef ProbOfSignificance As Single,
+      <Out()> ByRef RS As Single,
+      <Out()> ByRef ProbRS As Single)
+
         ' Performs a Spearman correlation of the two lists
         ' The lists must have the same number of data points in each and should be 0-based arrays
         '
@@ -520,7 +546,7 @@ Public Class clsCorrelation
         ' difference of ranks as D, the number of standard deviations by which D deviates from its null hypothesis
         ' expected value as zd, the two-sided significance level of this deviation as probd,
         ' Spearman's rank correlation rs as rs, and the two-sided significance level of its deviation from
-        ' zero as probrs. The external routine CRank is used.  A small value of either probd or probrs indicates 
+        ' zero as probrs. The external routine CRank is used.  A small value of either probd or probrs indicates
         ' a significant correlation (rs positive) or anticorrelation (rs negative).
 
         Dim n As Integer
@@ -580,7 +606,7 @@ Public Class clsCorrelation
 
     End Sub
 
-    Private Sub CRank(n As Integer, ByRef w() As Single, ByRef s As Single)
+    Private Sub CRank(n As Integer, w() As Single, <Out()> ByRef s As Single)
 
         ' Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including midranking of ties,
         ' and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
@@ -674,7 +700,7 @@ Public Class clsCorrelation
     End Function
 
     <Obsolete("Use GetDefaultBinningOptions, which returns an instance of clsBinningOptions")>
-    Public Shared Sub InitializeBinningOptions(ByRef binningOptions As clsBinningOptions)
+    Public Shared Sub InitializeBinningOptions(<Out()> ByRef binningOptions As clsBinningOptions)
         binningOptions = GetDefaultBinningOptions()
     End Sub
 
