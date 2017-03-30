@@ -1832,6 +1832,28 @@ Public Class clsMASICPeakFinder
 
     End Function
 
+    ''' <summary>
+    ''' Find peaks in intScanNumbers and sngIntensityData
+    ''' </summary>
+    ''' <param name="intDataCount">Number of data points in intScanNumbers</param>
+    ''' <param name="intScanNumbers">Scan numbers (0-based array, parallel with sngIntensityData)</param>
+    ''' <param name="sngIntensityData">Intenties (0-based array)</param>
+    ''' <param name="intPeakIndexStart">Output</param>
+    ''' <param name="intPeakIndexEnd">Output</param>
+    ''' <param name="intPeakLocationIndex">Output</param>
+    ''' <param name="intPreviousPeakFWHMPointRight">Output</param>
+    ''' <param name="intNextPeakFWHMPointLeft">Output</param>
+    ''' <param name="intShoulderCount">Output</param>
+    ''' <param name="udtSmoothedYDataSubset">Output</param>
+    ''' <param name="blnSIMDataPresent"></param>
+    ''' <param name="sicPeakFinderOptions"></param>
+    ''' <param name="sngSICNoiseThresholdIntensity"></param>
+    ''' <param name="dblMinimumPotentialPeakArea"></param>
+    ''' <param name="blnReturnClosestPeak">
+    ''' When true, intPeakLocationIndex should be populated with the "best guess" location of the peak in the intScanNumbers() and sngIntensityData() arrays
+    ''' The peak closest to intPeakLocationIndex will be the chosen peak, even if it is not the most intense peak found
+    ''' </param>
+    ''' <returns>Returns True if a valid peak is found in sngIntensityData(), otherwise false</returns>
     Private Function FindPeaks(
       intDataCount As Integer,
       intScanNumbers() As Integer,
@@ -1849,38 +1871,17 @@ Public Class clsMASICPeakFinder
       dblMinimumPotentialPeakArea As Double,
       blnReturnClosestPeak As Boolean) As Boolean
 
-        ' Returns True if a valid peak is found in sngIntensityData()
-        ' Otherwise, returns false
-        '
-        ' When blnReturnClosestPeak = True, then intPeakLocationIndex should be populated with the "best guess" location of the peak in the intScanNumbers() and sngIntensityData() arrays
-        '   The peak closest to intPeakLocationIndex will be the chosen peak, even if it is not the most intense peak found
-
-        Const SMOOTHED_DATA_PADDING_COUNT As Integer = 2
-
-        Dim objPeakDetector As New clsPeakDetection
-        Dim blnTestingMinimumPeakWidth As Boolean
-
-        Dim peakData = New clsPeaksContainer()
-        Dim peakDataSaved As clsPeaksContainer
-
-        Dim dblMaximumIntensity, dblAreaSignalToNoise As Double
-        Dim dblPotentialPeakArea, dblMaximumPotentialPeakArea As Double
-        Dim queIntensityList As New Queue                                   ' The queue is used to keep track of the most recent intensity values
-        Dim intDataPointCountAboveThreshold As Integer
-
-        Dim intIndex As Integer, intPeakIndexCompare As Integer
-        Dim intSmoothedYDataEndIndex As Integer
-        Dim intIndexMaxIntensity As Integer
-
-        ' ReSharper disable once NotAccessedVariable
-        Dim intAdjacentIndex As Integer
-        Dim intSmallestIndexDifference As Integer
-        Dim sngAdjacentPeakIntensityThreshold As Single
+        Const SMOOTHED_DATA_PADDING_COUNT = 2
 
         Dim blnValidPeakFound As Boolean
 
         Try
-            peakData.SourceDataCount = intDataCount
+            Dim objPeakDetector As New clsPeakDetection()
+
+            Dim peakData = New clsPeaksContainer() With {
+                .SourceDataCount = intDataCount
+            }
+
             If peakData.SourceDataCount <= 1 Then
                 ' Only 1 or fewer points in sngIntensityData()
                 ' No point in looking for a "peak"
@@ -1899,14 +1900,16 @@ Public Class clsMASICPeakFinder
             ReDim peakData.XData(peakData.SourceDataCount - 1)
             ReDim peakData.YData(peakData.SourceDataCount - 1)
 
-            dblMaximumIntensity = sngIntensityData(0)
-            dblMaximumPotentialPeakArea = 0
-            intIndexMaxIntensity = 0
+            Dim dblMaximumIntensity As Double = sngIntensityData(0)
+            Dim dblMaximumPotentialPeakArea As Double = 0
+            Dim intIndexMaxIntensity = 0
 
             ' Initialize the intensity queue
-            queIntensityList.Clear()
-            dblPotentialPeakArea = 0
-            intDataPointCountAboveThreshold = 0
+            ' The queue is used to keep track of the most recent intensity values
+            Dim queIntensityList As New Queue()
+
+            Dim dblPotentialPeakArea As Double = 0
+            Dim intDataPointCountAboveThreshold = 0
 
             For intIndex = 0 To peakData.SourceDataCount - 1
                 peakData.XData(intIndex) = intScanNumbers(intIndex)
@@ -1942,7 +1945,7 @@ Public Class clsMASICPeakFinder
             ' Old: dblAreaSignalToNoise = dblMaximumIntensity / sicPeakFinderOptions.SICNoiseThresholdIntensity
 
             If dblMinimumPotentialPeakArea < 1 Then dblMinimumPotentialPeakArea = 1
-            dblAreaSignalToNoise = dblMaximumPotentialPeakArea / dblMinimumPotentialPeakArea
+            Dim dblAreaSignalToNoise = dblMaximumPotentialPeakArea / dblMinimumPotentialPeakArea
             If dblAreaSignalToNoise < 1 Then dblAreaSignalToNoise = 1
 
 
@@ -1966,6 +1969,8 @@ Public Class clsMASICPeakFinder
             peakData.MaxAllowedUpwardSpikeFractionMax = sicPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
 
             Do
+                Dim blnTestingMinimumPeakWidth As Boolean
+
                 If peakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH Then
                     blnTestingMinimumPeakWidth = True
                 Else
@@ -2007,27 +2012,20 @@ Public Class clsMASICPeakFinder
                             End If
                         Loop
 
-                        ' Update the stats for the "official" peak
-                        Dim bestPeak = peakData.Peaks(peakData.BestPeakIndex)
-
-                        intPeakLocationIndex = bestPeak.PeakLocation
-                        intPeakIndexStart = bestPeak.LeftEdge
-                        intPeakIndexEnd = bestPeak.RightEdge
                     Next intPeakIndexCompare
 
-
                     ' Update the stats for the "official" peak
-                    Dim bestPeakOverall = peakData.Peaks(peakData.BestPeakIndex)
+                    Dim bestPeak = peakData.Peaks(peakData.BestPeakIndex)
 
-                    intPeakLocationIndex = bestPeakOverall.PeakLocation
-                    intPeakIndexStart = bestPeakOverall.LeftEdge
-                    intPeakIndexEnd = bestPeakOverall.RightEdge
+                    intPeakLocationIndex = bestPeak.PeakLocation
+                    intPeakIndexStart = bestPeak.LeftEdge
+                    intPeakIndexEnd = bestPeak.RightEdge
 
                     ' Copy the smoothed Y data for the peak into udtSmoothedYDataSubset.Data()
                     ' Include some data to the left and right of the peak start and end
                     ' Additionally, be sure the smoothed data includes the data around the most intense data point in sngIntensityData
                     udtSmoothedYDataSubset.DataStartIndex = intPeakIndexStart - SMOOTHED_DATA_PADDING_COUNT
-                    intSmoothedYDataEndIndex = intPeakIndexEnd + SMOOTHED_DATA_PADDING_COUNT
+                    Dim intSmoothedYDataEndIndex = intPeakIndexEnd + SMOOTHED_DATA_PADDING_COUNT
 
                     ' Make sure the maximum intensity point is included (with padding on either side)
                     If intIndexMaxIntensity - SMOOTHED_DATA_PADDING_COUNT < udtSmoothedYDataSubset.DataStartIndex Then
@@ -2113,13 +2111,14 @@ Public Class clsMASICPeakFinder
                     Dim intDataIndex As Integer
 
                     ' Populate intPreviousPeakFWHMPointRight and intNextPeakFWHMPointLeft
-                    sngAdjacentPeakIntensityThreshold = sngIntensityData(intPeakLocationIndex) / 3
+                    Dim sngAdjacentPeakIntensityThreshold = sngIntensityData(intPeakLocationIndex) / 3
 
-                    ' Search through udtPeakDataSaved to find the closest peak (with a signficant intensity) to the left of this peak
-                    ' Note that the peaks in udtPeakDataSaved are not necessarily ordered by increasing index,
+                    ' Search through peakDataSaved to find the closest peak (with a signficant intensity) to the left of this peak
+                    ' Note that the peaks in peakDataSaved are not necessarily ordered by increasing index,
                     '  thus the need for an exhaustive search
-                    intAdjacentIndex = -1       ' Initially assign an invalid index
-                    intSmallestIndexDifference = intDataCount + 1
+
+                    Dim intAdjacentIndex = -1       ' Initially assign an invalid index
+                    Dim intSmallestIndexDifference = intDataCount + 1
                     For intPeakIndexCompare = 0 To peakDataSaved.Peaks.Count - 1
                         Dim comparisonPeak = peakDataSaved.Peaks(intPeakIndexCompare)
 
@@ -2158,7 +2157,7 @@ Public Class clsMASICPeakFinder
                         End If
                     Next intPeakIndexCompare
 
-                    ' Search through udtPeakDataSaved to find the closest peak to the right of this peak
+                    ' Search through peakDataSaved to find the closest peak to the right of this peak
                     intAdjacentIndex = peakDataSaved.Peaks.Count    ' Initially assign an invalid index
                     intSmallestIndexDifference = intDataCount + 1
                     For intPeakIndexCompare = peakDataSaved.Peaks.Count - 1 To 0 Step -1
