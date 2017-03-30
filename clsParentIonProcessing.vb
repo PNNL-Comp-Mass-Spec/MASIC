@@ -149,7 +149,7 @@ Public Class clsParentIonProcessing
 
         ' Checks to see if the parent ion specified by intSurveyScanIndex and dblParentIonMZ exists in .ParentIons()
         ' If dblMRMDaughterMZ is > 0, then also considers that value when determining uniqueness
-        ' 
+        '
         ' If the parent ion entry already exists, then adds an entry to .FragScanIndices()
         ' If it does not exist, then adds a new entry to .ParentIons()
         ' Note that typically intFragScanIndex will equal scanList.FragScans.Count - 1
@@ -415,6 +415,7 @@ Public Class clsParentIonProcessing
             If Not blnSuccess Then Return -1
 
             ' Now compare the binned spectra
+            ' Similarity will be 0 if either intance of BinnedIntensities has fewer than 5 data points
             Dim sngSimilarity1 = objCorrelate.Correlate(udtBinnedSpectrum1.BinnedIntensities, udtBinnedSpectrum2.BinnedIntensities, eCorrelationMethod)
 
             If Not blnConsiderOffsetBinnedData Then
@@ -668,7 +669,7 @@ Public Class clsParentIonProcessing
             Array.Sort(sngIntensityList, intIntensityPointerArray)
 
             ' Reverse the order of intIntensityPointerArray so that it is ordered from the most intense to the least intense ion
-            ' Note: We don't really need to reverse sngIntensityList since we're done using it, but 
+            ' Note: We don't really need to reverse sngIntensityList since we're done using it, but
             ' it doesn't take long, it won't hurt, and it will keep sngIntensityList sync'd with intIntensityPointerArray
             Array.Reverse(intIntensityPointerArray)
             Array.Reverse(sngIntensityList)
