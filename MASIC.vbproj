@@ -120,8 +120,8 @@
     <Reference Include="PNNLOmics">
       <HintPath>Lib\PNNLOmics.dll</HintPath>
     </Reference>
-    <Reference Include="PRISM, Version=2.4.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\PRISM-Library.1.0.1\lib\net462\PRISM.dll</HintPath>
+    <Reference Include="PRISM, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\PRISM-Library.1.0.2\lib\net462\PRISM.dll</HintPath>
     </Reference>
     <Reference Include="ProgressFormNET">
       <Name>ProgressFormNET</Name>
@@ -229,7 +229,6 @@
     <Compile Include="clsScanTracking.vb" />
     <Compile Include="clsSICOptions.vb" />
     <Compile Include="clsParentIonInfo.vb" />
-    <Compile Include="clsParseCommandLine.vb" />
     <Compile Include="clsProcessFilesBaseClass.vb">
       <SubType>Code</SubType>
     </Compile>

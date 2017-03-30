@@ -1,5 +1,6 @@
 Option Strict On
 
+Imports PRISM
 ' See clsMASIC for a program description
 '
 ' -------------------------------------------------------------------------------
