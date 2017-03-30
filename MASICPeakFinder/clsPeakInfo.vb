@@ -25,4 +25,8 @@
         Return newPeak
 
     End Function
+
+    Public Overrides Function ToString() As String
+        Return string.Format("Peak Index {0}, Area {1:E1}", peaklocation, PeakArea)
+    End Function
 End Class

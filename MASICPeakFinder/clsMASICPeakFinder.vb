@@ -2063,9 +2063,8 @@ Public Class clsMASICPeakFinder
 
                     End With
 
-                    ' Copy the PeakLocs and PeakEdges into udtPeakDataSaved since we're going to call FindPeaksWork again and the data will get overwritten
-                    ' We first equate udtPeakDataSaved to udtPeakData, effectively performing a shallow copy
-                    peakDataSaved = peakData.Clone()
+                    ' Copy the PeakLocs and PeakEdges into peakDataSaved since we're going to call FindPeaksWork again and the data will get overwritten
+                    Dim peakDataSaved = peakData.Clone(True)
 
                     If peakData.PeakWidthPointsMinimum <> MINIMUM_PEAK_WIDTH Then
                         ' Determine the number of shoulder peaks for this peak

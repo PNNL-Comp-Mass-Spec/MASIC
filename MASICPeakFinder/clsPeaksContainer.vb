@@ -20,7 +20,7 @@ Public Class clsPeaksContainer
         Peaks = New List(Of clsPeakInfo)
     End Sub
 
-    Public Function Clone() As clsPeaksContainer
+    Public Function Clone(Optional skipSourceData As Boolean = False) As clsPeaksContainer
         Dim clonedContainer = New clsPeaksContainer() With {
             .OriginalPeakLocationIndex = Me.OriginalPeakLocationIndex,
             .SourceDataCount = Me.SourceDataCount,
@@ -30,10 +30,12 @@ Public Class clsPeaksContainer
             .BestPeakArea = Me.BestPeakArea
         }
 
-        If Me.SourceDataCount <= 0 Then
-            ReDim clonedContainer.XData(0)
-            ReDim clonedContainer.YData(0)
-            ReDim clonedContainer.SmoothedYData(0)
+        If skipSourceData OrElse Me.SourceDataCount <= 0 Then
+            clonedContainer.SourceDataCount = 0
+
+            ReDim clonedContainer.XData(-1)
+            ReDim clonedContainer.YData(-1)
+            ReDim clonedContainer.SmoothedYData(-1)
 
         Else
             ReDim clonedContainer.XData(Me.SourceDataCount)
