@@ -28,6 +28,7 @@ Option Strict On
 Imports System.IO
 Imports PNNLOmics.Utilities
 Imports System.Windows.Forms
+Imports OxyDataPlotter
 
 Public Class frmBrowser
     Inherits Form
@@ -1121,7 +1122,7 @@ Public Class frmBrowser
 
 #Region "Classwide Variables"
 
-    Private mSpectrum As CWSpectrumDLLNET.Spectrum
+    Private mSpectrum As OxyDataPlotter.Spectrum
 
     Private mParentIonCount As Integer
     Private mParentIonStats() As udtParentIonStatsType          ' 0-based array, ranging from 0 to mParentIonCount-1
@@ -2021,7 +2022,7 @@ Public Class frmBrowser
                 Dim seriesFormatRequired = False
 
                 If mSpectrum Is Nothing Then
-                    mSpectrum = New CWSpectrumDLLNET.Spectrum
+                    mSpectrum = New OxyDataPlotter.Spectrum
 
                     mSpectrum.SetSpectrumFormWindowCaption("Selected Ion Chromatogram")
                     mSpectrum.SetSeriesCount(4)
@@ -2207,7 +2208,7 @@ Public Class frmBrowser
                 If chkShowSmoothedData.Checked Then
                     If mSpectrum.GetSeriesCount < 4 Then
                         mSpectrum.SetSeriesCount(4)
-                        mSpectrum.SetSeriesPlotMode(4, CWSpectrumDLLNET.ctlOxyPlotControl.pmPlotModeConstants.pmLines, True)
+                        mSpectrum.SetSeriesPlotMode(4, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmLines, True)
                         mSpectrum.SetSeriesPointStyle(4, OxyPlot.MarkerType.None)
                         mSpectrum.SetSeriesColor(4, System.Drawing.Color.Purple)
                         mSpectrum.SetSeriesLineWidth(4, 2)
@@ -2222,16 +2223,16 @@ Public Class frmBrowser
                 If seriesFormatRequired Then
 
                     ' SIC Data
-                    mSpectrum.SetSeriesPlotMode(1, CWSpectrumDLLNET.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, True)
+                    mSpectrum.SetSeriesPlotMode(1, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, True)
 
                     ' SICData Peak
-                    mSpectrum.SetSeriesPlotMode(2, CWSpectrumDLLNET.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, False)
+                    mSpectrum.SetSeriesPlotMode(2, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, False)
 
                     ' Similar Frag Scans
-                    mSpectrum.SetSeriesPlotMode(3, CWSpectrumDLLNET.ctlOxyPlotControl.pmPlotModeConstants.pmPoints, False)
+                    mSpectrum.SetSeriesPlotMode(3, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPoints, False)
 
                     ' Smoothed Data
-                    mSpectrum.SetSeriesPlotMode(4, CWSpectrumDLLNET.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, False)
+                    mSpectrum.SetSeriesPlotMode(4, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, False)
 
                     mSpectrum.SetDisplayPrecisionX(0)
                     mSpectrum.SetDisplayPrecisionY(0)
