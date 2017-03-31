@@ -25,6 +25,7 @@ Option Strict On
 ' SOFTWARE.  This notice including this sentence must appear on any copies of
 ' this computer software.
 
+Imports System.Collections.Generic
 Imports System.IO
 Imports PNNLOmics.Utilities
 Imports System.Windows.Forms
@@ -1638,6 +1639,28 @@ Public Class frmBrowser
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Search dataSeries to find the closest distance between searchValue and a value in dataSeries
+    ''' </summary>
+    ''' <param name="dataSeries"></param>
+    ''' <param name="dataCount"></param>
+    ''' <param name="searchValue"></param>
+    ''' <returns></returns>
+    Private Function GetClosestDistance(dataSeries As IList(Of Double), dataCount As Integer, searchValue As Integer) As Double
+
+        Dim closestDistance = Double.MaxValue
+
+        For intIndex = 0 To dataCount - 1
+            Dim distance = Math.Abs(dataSeries(intIndex) - searchValue)
+            If distance < closestDistance Then
+                closestDistance = distance
+            End If
+        Next
+
+        Return closestDistance
+
+    End Function
+
     Private Function GetSettingVal(strAppName As String, strSectionName As String, strKey As String, DefaultValue As Boolean) As Boolean
         Dim strValue As String
 
@@ -2261,13 +2284,37 @@ Public Class frmBrowser
                 mSpectrum.SetSeriesPointSize(3, 7)
 
                 Dim annotationOffsetY = maxIntensity * 0.05
+                Dim arrowLengthPixels = 15
+                Dim captionOffsetDirection As ctlOxyPlotControl.eCaptionOffsetDirection
 
                 ' Old: mSpectrum.SetCursorPosition(CDbl(.FragScanObserved), dblScanObservedIntensity, 1)
-                mSpectrum.SetAnnotationByXY(mParentIonStats(intIndexToPlot).FragScanObserved, dblScanObservedIntensity + annotationOffsetY, "MS2")
+                'mSpectrum.SetAnnotationByXY(mParentIonStats(intIndexToPlot).FragScanObserved, dblScanObservedIntensity + annotationOffsetY, "MS2")
+
+                ' ToDo: Determine whether to associate the annotation with series 1 or series 2
+
+                If mParentIonStats(intIndexToPlot).FragScanObserved <= mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber Then
+                    captionOffsetDirection = ctlOxyPlotControl.eCaptionOffsetDirection.TopLeft
+                Else
+                    captionOffsetDirection = ctlOxyPlotControl.eCaptionOffsetDirection.TopRight
+                End If
+
+                Dim fragScanObserved = mParentIonStats(intIndexToPlot).FragScanObserved
+                Dim closestDistance1 As Double = GetClosestDistance(dblXDataSeries1, intDataCountSeries1, fragScanObserved)
+                Dim closestDistance2 As Double = GetClosestDistance(dblXDataSeries2, intDataCountSeries2, fragScanObserved)
+
+                Dim seriesToUse As Integer
+                If closestDistance2 < closestDistance1 Then
+                    seriesToUse = 2
+                Else
+                    seriesToUse = 1
+                End If
+
+                mSpectrum.SetAnnotationForDataPoint(seriesToUse, fragScanObserved, dblScanObservedIntensity,
+                                                    "MS2", captionOffsetDirection, arrowLengthPixels)
 
                 If mnuEditShowOptimalPeakApexCursor.Checked Then
-                    ' Old: mSpectrum.SetCursorPosition(CDbl(.OptimalPeakApexScanNumber), dblOptimalPeakApexIntensity, 2)
-                    mSpectrum.SetAnnotationByXY(mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber, dblOptimalPeakApexIntensity - annotationOffsetY, "Peak")
+                    mSpectrum.SetAnnotationForDataPoint(2, mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber, dblOptimalPeakApexIntensity,
+                                            "Peak", ctlOxyPlotControl.eCaptionOffsetDirection.TopLeft, arrowLengthPixels)
                 End If
 
                 Dim intXRangeHalfWidth As Integer
