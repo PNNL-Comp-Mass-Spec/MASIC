@@ -25,16 +25,14 @@ Option Strict On
 ' SOFTWARE.  This notice including this sentence must appear on any copies of
 ' this computer software.
 
-Imports System.Collections.Generic
 Imports System.IO
 Imports PNNLOmics.Utilities
-Imports System.Windows.Forms
 Imports OxyDataPlotter
 
 Public Class frmBrowser
     Inherits Form
 
-    Private Const PROGRAM_DATE As String = "March 29, 2017"
+    Private Const PROGRAM_DATE As String = "April 1, 2017"
 
 #Region "Windows Form Designer generated code"
 
@@ -1639,28 +1637,6 @@ Public Class frmBrowser
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Search dataSeries to find the closest distance between searchValue and a value in dataSeries
-    ''' </summary>
-    ''' <param name="dataSeries"></param>
-    ''' <param name="dataCount"></param>
-    ''' <param name="searchValue"></param>
-    ''' <returns></returns>
-    Private Function GetClosestDistance(dataSeries As IList(Of Double), dataCount As Integer, searchValue As Integer) As Double
-
-        Dim closestDistance = Double.MaxValue
-
-        For intIndex = 0 To dataCount - 1
-            Dim distance = Math.Abs(dataSeries(intIndex) - searchValue)
-            If distance < closestDistance Then
-                closestDistance = distance
-            End If
-        Next
-
-        Return closestDistance
-
-    End Function
-
     Private Function GetSettingVal(strAppName As String, strSectionName As String, strKey As String, DefaultValue As Boolean) As Boolean
         Dim strValue As String
 
@@ -2042,15 +2018,10 @@ Public Class frmBrowser
             If intIndexToPlot >= 0 And intIndexToPlot < mParentIonCount Then
 
                 Me.Cursor = Cursors.WaitCursor
-                Dim seriesFormatRequired = False
 
                 If mSpectrum Is Nothing Then
-                    mSpectrum = New OxyDataPlotter.Spectrum
-
+                    mSpectrum = New OxyDataPlotter.Spectrum()
                     mSpectrum.SetSpectrumFormWindowCaption("Selected Ion Chromatogram")
-                    mSpectrum.SetSeriesCount(4)
-
-                    seriesFormatRequired = True
                 End If
 
                 mSpectrum.RemoveAllAnnotations()
@@ -2113,8 +2084,8 @@ Public Class frmBrowser
 
                 ' Populate Series 3 with the similar frag scan values
                 For intIndex = 0 To mParentIonStats(intIndexToPlot).SimilarFragScanCount - 1
-                    dblXDataSeries3(intIndex) = CDbl(mParentIonStats(intIndexToPlot).SimilarFragScanList(intIndex))
-                    dblYDataSeries3(intIndex) = CDbl(mParentIonStats(intIndexToPlot).SimilarFragScanPlottingIntensity(intIndex))
+                    dblXDataSeries3(intIndex) = mParentIonStats(intIndexToPlot).SimilarFragScanList(intIndex)
+                    dblYDataSeries3(intIndex) = mParentIonStats(intIndexToPlot).SimilarFragScanPlottingIntensity(intIndex)
                 Next intIndex
 
                 For intIndex = 0 To mParentIonStats(intIndexToPlot).DataCount - 1
@@ -2209,10 +2180,9 @@ Public Class frmBrowser
 
                 Dim maxIntensity As Double = dblYDataSeries2.Max()
 
-
                 mSpectrum.ShowSpectrum()
 
-                mSpectrum.SetDataXvsY(1, dblXDataSeries1, dblYDataSeries1, intDataCountSeries1, "SIC Data")
+                mSpectrum.SetDataXvsY(1, dblXDataSeries1, dblYDataSeries1, intDataCountSeries1, ctlOxyPlotControl.SeriesPlotMode.PointsAndLines, "SIC Data")
 
                 Dim strCaption As String
 
@@ -2223,48 +2193,21 @@ Public Class frmBrowser
                 Else
                     strCaption = "SIC Data Peak"
                 End If
-                mSpectrum.SetDataXvsY(2, dblXDataSeries2, dblYDataSeries2, intDataCountSeries2, strCaption)
+                mSpectrum.SetDataXvsY(2, dblXDataSeries2, dblYDataSeries2, intDataCountSeries2, ctlOxyPlotControl.SeriesPlotMode.PointsAndLines, strCaption)
 
                 strCaption = "Similar Frag scans"
-                mSpectrum.SetDataXvsY(3, dblXDataSeries3, dblYDataSeries3, intDataCountSeries3, strCaption)
+                mSpectrum.SetDataXvsY(3, dblXDataSeries3, dblYDataSeries3, intDataCountSeries3, ctlOxyPlotControl.SeriesPlotMode.Points, strCaption)
 
                 If chkShowSmoothedData.Checked Then
-                    If mSpectrum.GetSeriesCount < 4 Then
-                        mSpectrum.SetSeriesCount(4)
-                        mSpectrum.SetSeriesPlotMode(4, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmLines, True)
-                        mSpectrum.SetSeriesPointStyle(4, OxyPlot.MarkerType.None)
-                        mSpectrum.SetSeriesColor(4, System.Drawing.Color.Purple)
-                        mSpectrum.SetSeriesLineWidth(4, 2)
-                    End If
-                    mSpectrum.SetDataXvsY(4, dblXDataSeries4, dblYDataSeries4, intDataCountSeries4, "Smoothed data")
+                    mSpectrum.SetDataXvsY(4, dblXDataSeries4, dblYDataSeries4, intDataCountSeries4, ctlOxyPlotControl.SeriesPlotMode.Lines, "Smoothed data")
                 Else
-                    If mSpectrum.GetSeriesCount >= 4 Then
-                        mSpectrum.SetSeriesCount(3)
-                    End If
-                End If
-
-                If seriesFormatRequired Then
-
-                    ' SIC Data
-                    mSpectrum.SetSeriesPlotMode(1, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, True)
-
-                    ' SICData Peak
-                    mSpectrum.SetSeriesPlotMode(2, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, False)
-
-                    ' Similar Frag Scans
-                    mSpectrum.SetSeriesPlotMode(3, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPoints, False)
-
-                    ' Smoothed Data
-                    mSpectrum.SetSeriesPlotMode(4, OxyDataPlotter.ctlOxyPlotControl.pmPlotModeConstants.pmPointsAndLines, False)
-
-                    mSpectrum.SetDisplayPrecisionX(0)
-                    mSpectrum.SetDisplayPrecisionY(0)
-
+                    Do While mSpectrum.GetSeriesCount >= 4
+                        mSpectrum.RemoveSeries(4)
+                    Loop
                 End If
 
                 mSpectrum.SetSeriesLineStyle(1, OxyPlot.LineStyle.Automatic)
                 mSpectrum.SetSeriesLineStyle(2, OxyPlot.LineStyle.Automatic)
-                mSpectrum.SetSeriesLineStyle(3, OxyPlot.LineStyle.None)
                 mSpectrum.SetSeriesLineStyle(4, OxyPlot.LineStyle.Automatic)
 
                 mSpectrum.SetSeriesPointStyle(1, OxyPlot.MarkerType.Diamond)
@@ -2283,38 +2226,25 @@ Public Class frmBrowser
 
                 mSpectrum.SetSeriesPointSize(3, 7)
 
-                Dim annotationOffsetY = maxIntensity * 0.05
                 Dim arrowLengthPixels = 15
-                Dim captionOffsetDirection As ctlOxyPlotControl.eCaptionOffsetDirection
-
-                ' Old: mSpectrum.SetCursorPosition(CDbl(.FragScanObserved), dblScanObservedIntensity, 1)
-                'mSpectrum.SetAnnotationByXY(mParentIonStats(intIndexToPlot).FragScanObserved, dblScanObservedIntensity + annotationOffsetY, "MS2")
-
-                ' ToDo: Determine whether to associate the annotation with series 1 or series 2
+                Dim captionOffsetDirection As ctlOxyPlotControl.CaptionOffsetDirection
 
                 If mParentIonStats(intIndexToPlot).FragScanObserved <= mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber Then
-                    captionOffsetDirection = ctlOxyPlotControl.eCaptionOffsetDirection.TopLeft
+                    captionOffsetDirection = ctlOxyPlotControl.CaptionOffsetDirection.TopLeft
                 Else
-                    captionOffsetDirection = ctlOxyPlotControl.eCaptionOffsetDirection.TopRight
+                    captionOffsetDirection = ctlOxyPlotControl.CaptionOffsetDirection.TopRight
                 End If
 
                 Dim fragScanObserved = mParentIonStats(intIndexToPlot).FragScanObserved
-                Dim closestDistance1 As Double = GetClosestDistance(dblXDataSeries1, intDataCountSeries1, fragScanObserved)
-                Dim closestDistance2 As Double = GetClosestDistance(dblXDataSeries2, intDataCountSeries2, fragScanObserved)
 
-                Dim seriesToUse As Integer
-                If closestDistance2 < closestDistance1 Then
-                    seriesToUse = 2
-                Else
-                    seriesToUse = 1
-                End If
-
-                mSpectrum.SetAnnotationForDataPoint(seriesToUse, fragScanObserved, dblScanObservedIntensity,
-                                                    "MS2", captionOffsetDirection, arrowLengthPixels)
+                Const seriesToUse = 0
+                mSpectrum.SetAnnotationForDataPoint(fragScanObserved, dblScanObservedIntensity, "MS2",
+                                                    seriesToUse, captionOffsetDirection, arrowLengthPixels, )
 
                 If mnuEditShowOptimalPeakApexCursor.Checked Then
-                    mSpectrum.SetAnnotationForDataPoint(2, mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber, dblOptimalPeakApexIntensity,
-                                            "Peak", ctlOxyPlotControl.eCaptionOffsetDirection.TopLeft, arrowLengthPixels)
+                    mSpectrum.SetAnnotationForDataPoint(
+                        mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber, dblOptimalPeakApexIntensity, "Peak",
+                        2, ctlOxyPlotControl.CaptionOffsetDirection.TopLeft, arrowLengthPixels)
                 End If
 
                 Dim intXRangeHalfWidth As Integer
@@ -2331,29 +2261,22 @@ Public Class frmBrowser
                     sngYRange = 0
                 End If
 
-                Dim blnXFixed As Boolean
-                Dim blnYFixed As Boolean
+                ' Update the axis padding
+                mSpectrum.XAxisPaddingMinimum = 0.01
+                mSpectrum.XAxisPaddingMaximum = 0.01
+
+                mSpectrum.YAxisPaddingMinimum = 0.02
+                mSpectrum.YAxisPaddingMaximum = 0.15
 
                 If chkFixXRange.Checked And intXRangeHalfWidth > 0 Then
                     mSpectrum.SetAutoscaleXAxis(False)
                     mSpectrum.SetRangeX(udtSICStats.ScanNumberMaxIntensity - intXRangeHalfWidth, udtSICStats.ScanNumberMaxIntensity + intXRangeHalfWidth)
-                    blnXFixed = True
                 End If
 
                 If chkFixYRange.Checked And sngYRange > 0 Then
                     mSpectrum.SetAutoscaleYAxis(False)
                     mSpectrum.SetRangeY(0, CDbl(sngYRange))
-                    blnYFixed = True
                 End If
-
-
-                'If blnXFixed And blnYFixed Then
-                '    ' Do not autoscale anything
-                'ElseIf blnXFixed Then
-                '    mSpectrum.SetAutoscaleYAxis(True)
-                'ElseIf blnYFixed Then
-                '    mSpectrum.SetAutoscaleXAxis(True)
-                'End If
 
             End If
 
@@ -3227,39 +3150,39 @@ Public Class frmBrowser
         Try
             If txtDataFilePath.Text.Length > 0 Then
                 SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "DatafilePath", txtDataFilePath.Text)
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeWidth", Me.Width.ToString)
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeHeight", Me.Height.ToString)
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowPosTop", Me.Top.ToString)
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowPosLeft", Me.Left.ToString)
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeWidth", Me.Width.ToString())
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeHeight", Me.Height.ToString())
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowPosTop", Me.Top.ToString())
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowPosLeft", Me.Left.ToString())
 
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortOrder", cboSortOrder.SelectedIndex.ToString)
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortDescending", chkSortDescending.Checked.ToString)
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortOrder", cboSortOrder.SelectedIndex.ToString())
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortDescending", chkSortDescending.Checked.ToString())
 
                 If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFixXRange.Text) Then
-                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", CInt(txtFixXRange.Text).ToString)
+                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", CInt(txtFixXRange.Text).ToString())
                 End If
                 If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFixYRange.Text) Then
-                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", CInt(txtFixYRange.Text).ToString)
+                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", CLng(txtFixYRange.Text).ToString())
                 End If
                 If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtMinimumSignalToNoise.Text) Then
-                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", CSng(txtMinimumSignalToNoise.Text).ToString)
+                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", CSng(txtMinimumSignalToNoise.Text).ToString())
                 End If
                 If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtMinimumIntensity.Text) Then
-                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", CInt(txtMinimumIntensity.Text).ToString)
+                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", CInt(txtMinimumIntensity.Text).ToString())
                 End If
                 If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFilterByMZ.Text) Then
-                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", CSng(txtFilterByMZ.Text).ToString)
+                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", CSng(txtFilterByMZ.Text).ToString())
                 End If
                 If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFilterByMZTol.Text) Then
-                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", CSng(txtFilterByMZTol.Text).ToString)
+                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", CSng(txtFilterByMZTol.Text).ToString())
                 End If
                 If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtAutoStep.Text) Then
-                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", CInt(txtAutoStep.Text).ToString)
+                    SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", CInt(txtAutoStep.Text).ToString())
                 End If
 
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRangeEnabled", chkFixXRange.Checked.ToString)
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRangeEnabled", chkFixYRange.Checked.ToString)
-                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterBySignalToNoise", chkFilterBySignalToNoise.Checked.ToString)
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRangeEnabled", chkFixXRange.Checked.ToString())
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRangeEnabled", chkFixYRange.Checked.ToString())
+                SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterBySignalToNoise", chkFilterBySignalToNoise.Checked.ToString())
 
             End If
         Catch ex As Exception
@@ -4040,7 +3963,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtFixYRange_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles txtFixYRange.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtFixYRange, 10, Integer.MaxValue, 5000000)
+        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxSng(txtFixYRange, 10, Long.MaxValue, 5000000)
     End Sub
 
     Private Sub txtMinimumIntensity_Leave(sender As Object, e As System.EventArgs) Handles txtMinimumIntensity.Leave

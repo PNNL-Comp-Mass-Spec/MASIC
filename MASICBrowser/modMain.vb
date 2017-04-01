@@ -3,7 +3,6 @@
 Imports System.Collections.Generic
 Imports System.IO
 Imports System.Reflection
-Imports PRISM
 Imports SharedVBNetRoutines
 
 ' -------------------------------------------------------------------------------
@@ -21,7 +20,7 @@ Imports SharedVBNetRoutines
 
 Module modMain
 
-    Public Const PROGRAM_DATE As String = "March 29, 2017"
+    Public Const PROGRAM_DATE As String = "April 1, 2017"
 
     Private mInputFilePath As String
 
