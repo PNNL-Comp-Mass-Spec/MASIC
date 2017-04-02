@@ -10,6 +10,7 @@ AppName=MASIC
 WelcomeLabel2=This will install [name/ver] on your computer.
 ; Example with multiple lines:
 ; WelcomeLabel2=Welcome message%n%nAdditional sentence
+
 [Files]
 Source: ..\bin\MASIC.exe                      ; DestDir: {app}
 Source: ..\bin\MASIC.pdb                      ; DestDir: {app}
@@ -21,33 +22,30 @@ Source: ..\bin\MSDataFileReader.dll           ; DestDir: {app}
 Source: ..\bin\NetCDFReader.dll               ; DestDir: {app}
 Source: ..\bin\PNNLOmics.dll                  ; DestDir: {app}
 Source: ..\bin\PRISM.dll                      ; DestDir: {app}
-Source: ..\bin\ShFolderBrowser.dll            ; DestDir: {app}
 Source: ..\bin\ProgressFormNET.dll            ; DestDir: {app}
 Source: ..\bin\SavGolCS.dll                   ; DestDir: {app}
 Source: ..\bin\SharedVBNetRoutines.dll        ; DestDir: {app}
+Source: ..\bin\ShFolderBrowser.dll            ; DestDir: {app}
 Source: ..\bin\SpectraTypeClassifier.dll      ; DestDir: {app}
 Source: ..\bin\ThermoRawFileReader.dll        ; DestDir: {app}
 
-Source: ..\MASICBrowser\bin\MASICBrowser.exe               ; DestDir: {app}
-Source: ..\MASICBrowser\bin\AxInterop.CWUIControlsLib.dll  ; DestDir: {app}
-Source: ..\MASICBrowser\bin\AxInterop.MSComctlLib.dll      ; DestDir: {app}
-Source: ..\MASICBrowser\bin\CWSpectrumDLLNET.dll           ; DestDir: {app}
-Source: ..\MASICBrowser\bin\Interop.CWUIControlsLib.dll    ; DestDir: {app}
-Source: ..\MASICBrowser\bin\Interop.MSComctlLib.dll        ; DestDir: {app}
-Source: ..\MASICBrowser\bin\stdole.dll                     ; DestDir: {app}
+Source: ..\MASICBrowser\bin\MASICBrowser.exe          ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyDataPlotter.dll        ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyPlot.dll               ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyPlot.WindowsForms.dll  ; DestDir: {app}
+Source: ..\MASICBrowser\bin\PNNLOmics.dll             ; DestDir: {app}
+Source: ..\MASICBrowser\bin\Svg.dll                   ; DestDir: {app}
 
-Source: "C:\Program Files (x86)\National Instruments\Shared\Mesa\mesa.dll"    ; DestDir: {app}
-Source: c:\windows\syswow64\cwui.ocx                                          ; DestDir: {app}
-
-Source: ..\Readme.txt                           ; DestDir: {app}
-Source: ..\RevisionHistory.txt                  ; DestDir: {app}
-Source: Images\delete_16x.ico                   ; DestDir: {app}
-
-Source: ..\bin\MASICParameters.xml              ; DestDir: {app}
-Source: ..\bin\QC_Standards_Excerpt.mzXML       ; DestDir: {app}
-Source: ..\bin\CustomMZList_AcqTime.txt         ; DestDir: {app}
-Source: ..\bin\QC_Standards_Excerpt_SICs.xml    ; DestDir: {app}
-Source: ..\bin\CustomMZList.txt                 ; DestDir: {app}
+Source: ..\Readme.txt                            ; DestDir: {app}
+Source: ..\RevisionHistory.txt                   ; DestDir: {app}
+Source: Images\delete_16x.ico                    ; DestDir: {app}
+                                                
+Source: ..\docs\MASICParameters.xml              ; DestDir: {app}
+Source: ..\docs\QC_Standards_Excerpt.mzXML       ; DestDir: {app}
+Source: ..\docs\QC_Standards_Excerpt_SICs.xml    ; DestDir: {app}
+Source: ..\docs\CustomMZList_AcqTime.txt         ; DestDir: {app}
+Source: ..\docs\CustomMZList.txt                 ; DestDir: {app}
+Source: ..\docs\Example_Orbitrap_Data_SICs.xml   ; DestDir: {app}
 
 [Dirs]
 Name: {commonappdata}\MASIC; Flags: uninsalwaysuninstall
