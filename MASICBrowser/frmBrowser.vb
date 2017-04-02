@@ -251,15 +251,15 @@ Public Class frmBrowser
         '
         Me.txtDataFilePath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDataFilePath.Location = New System.Drawing.Point(115, 18)
+        Me.txtDataFilePath.Location = New System.Drawing.Point(115, 11)
         Me.txtDataFilePath.Name = "txtDataFilePath"
-        Me.txtDataFilePath.Size = New System.Drawing.Size(1217, 22)
+        Me.txtDataFilePath.Size = New System.Drawing.Size(587, 22)
         Me.txtDataFilePath.TabIndex = 1
         Me.txtDataFilePath.Text = "D:\"
         '
         'cmdSelectFile
         '
-        Me.cmdSelectFile.Location = New System.Drawing.Point(10, 18)
+        Me.cmdSelectFile.Location = New System.Drawing.Point(10, 9)
         Me.cmdSelectFile.Name = "cmdSelectFile"
         Me.cmdSelectFile.Size = New System.Drawing.Size(96, 28)
         Me.cmdSelectFile.TabIndex = 0
@@ -552,6 +552,7 @@ Public Class frmBrowser
         Me.mnuEditShowOptimalPeakApexCursor.Checked = True
         Me.mnuEditShowOptimalPeakApexCursor.Index = 0
         Me.mnuEditShowOptimalPeakApexCursor.Text = "&Show optimal peak apex cursor"
+        Me.mnuEditShowOptimalPeakApexCursor.Visible = False
         '
         'mnuHelp
         '
@@ -579,7 +580,7 @@ Public Class frmBrowser
         Me.lstParentIonData.ItemHeight = 16
         Me.lstParentIonData.Location = New System.Drawing.Point(10, 28)
         Me.lstParentIonData.Name = "lstParentIonData"
-        Me.lstParentIonData.Size = New System.Drawing.Size(326, 68)
+        Me.lstParentIonData.Size = New System.Drawing.Size(326, 100)
         Me.lstParentIonData.TabIndex = 3
         '
         'txtMinimumSignalToNoise
@@ -751,7 +752,7 @@ Public Class frmBrowser
         Me.fraSortOrderAndStats.Controls.Add(Me.lblSortOrder)
         Me.fraSortOrderAndStats.Controls.Add(Me.chkSortDescending)
         Me.fraSortOrderAndStats.Controls.Add(Me.txtStats1)
-        Me.fraSortOrderAndStats.Location = New System.Drawing.Point(0, 116)
+        Me.fraSortOrderAndStats.Location = New System.Drawing.Point(0, 141)
         Me.fraSortOrderAndStats.Name = "fraSortOrderAndStats"
         Me.fraSortOrderAndStats.Size = New System.Drawing.Size(338, 259)
         Me.fraSortOrderAndStats.TabIndex = 5
@@ -906,7 +907,7 @@ Public Class frmBrowser
         Me.pnlInputFile.Dock = System.Windows.Forms.DockStyle.Top
         Me.pnlInputFile.Location = New System.Drawing.Point(0, 0)
         Me.pnlInputFile.Name = "pnlInputFile"
-        Me.pnlInputFile.Size = New System.Drawing.Size(1341, 65)
+        Me.pnlInputFile.Size = New System.Drawing.Size(711, 46)
         Me.pnlInputFile.TabIndex = 9
         '
         'pnlSICs
@@ -915,9 +916,9 @@ Public Class frmBrowser
         Me.pnlSICs.Controls.Add(Me.lstParentIonData)
         Me.pnlSICs.Controls.Add(Me.fraSortOrderAndStats)
         Me.pnlSICs.Dock = System.Windows.Forms.DockStyle.Left
-        Me.pnlSICs.Location = New System.Drawing.Point(0, 65)
+        Me.pnlSICs.Location = New System.Drawing.Point(0, 46)
         Me.pnlSICs.Name = "pnlSICs"
-        Me.pnlSICs.Size = New System.Drawing.Size(346, 386)
+        Me.pnlSICs.Size = New System.Drawing.Size(346, 411)
         Me.pnlSICs.TabIndex = 10
         '
         'pnlNavigationAndOptions
@@ -925,9 +926,9 @@ Public Class frmBrowser
         Me.pnlNavigationAndOptions.Controls.Add(Me.fraNavigation)
         Me.pnlNavigationAndOptions.Controls.Add(Me.TabControl1)
         Me.pnlNavigationAndOptions.Dock = System.Windows.Forms.DockStyle.Left
-        Me.pnlNavigationAndOptions.Location = New System.Drawing.Point(346, 65)
+        Me.pnlNavigationAndOptions.Location = New System.Drawing.Point(346, 46)
         Me.pnlNavigationAndOptions.Name = "pnlNavigationAndOptions"
-        Me.pnlNavigationAndOptions.Size = New System.Drawing.Size(336, 386)
+        Me.pnlNavigationAndOptions.Size = New System.Drawing.Size(336, 411)
         Me.pnlNavigationAndOptions.TabIndex = 11
         '
         'pnlBottom
@@ -935,15 +936,15 @@ Public Class frmBrowser
         Me.pnlBottom.Controls.Add(Me.fraPeakFinder)
         Me.pnlBottom.Controls.Add(Me.fraResmoothingOptions)
         Me.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlBottom.Location = New System.Drawing.Point(0, 451)
+        Me.pnlBottom.Location = New System.Drawing.Point(0, 457)
         Me.pnlBottom.Name = "pnlBottom"
-        Me.pnlBottom.Size = New System.Drawing.Size(1341, 175)
+        Me.pnlBottom.Size = New System.Drawing.Size(711, 175)
         Me.pnlBottom.TabIndex = 12
         '
         'frmBrowser
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(1341, 626)
+        Me.ClientSize = New System.Drawing.Size(711, 632)
         Me.Controls.Add(Me.pnlNavigationAndOptions)
         Me.Controls.Add(Me.pnlSICs)
         Me.Controls.Add(Me.pnlInputFile)
@@ -3116,7 +3117,7 @@ Public Class frmBrowser
 
             Me.Width = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeWidth", Me.Width)
             'Me.Height = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeHeight", Me.Height)
-            Me.Height = 648
+            Me.Height = 700
 
             Me.Top = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowPosTop", Me.Top)
             Me.Left = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowPosLeft", Me.Left)
