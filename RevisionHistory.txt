@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.8.6300; April 1, 2017
+	- Updated the installer
+
 Version 2.8.6297; March 29, 2017
 	- New version of PRISM.dll from NuGet that includes clsParseCommandLine
 	- Replace udtFindPeaksDataType with clsPeaksContainer and clsPeakInfo
