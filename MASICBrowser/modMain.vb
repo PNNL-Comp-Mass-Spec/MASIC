@@ -36,6 +36,8 @@ Module modMain
             blnProceed = False
             If objParseCommandLine.ParseCommandLine Then
                 If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then blnProceed = True
+            ElseIf Not objParseCommandLine.NeedToShowHelp Then
+                blnProceed = True
             End If
 
             If objParseCommandLine.NeedToShowHelp OrElse Not blnProceed Then
