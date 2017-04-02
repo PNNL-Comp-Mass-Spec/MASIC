@@ -114,5 +114,5 @@ XRawVB6/*
 
 /MASICBrowser/packages
 
-Lib/Old/*
+*/Old/*
 Docs/Example_Orbitrap_Data.mzXML

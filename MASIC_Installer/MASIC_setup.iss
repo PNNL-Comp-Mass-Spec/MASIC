@@ -68,6 +68,7 @@ AppPublisher=Pacific Northwest National Laboratory
 AppPublisherURL=http://omics.pnl.gov/software
 AppSupportURL=http://omics.pnl.gov/software
 AppUpdatesURL=http://omics.pnl.gov/software
+ArchitecturesInstallIn64BitMode=x64
 DefaultDirName={pf}\MASIC
 DefaultGroupName=PAST Toolkit
 AppCopyright=© PNNL
