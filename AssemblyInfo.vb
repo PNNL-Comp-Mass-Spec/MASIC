@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("")>
+<Assembly: AssemblyTitle("MASIC")>
 <Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("")>
+<Assembly: AssemblyCompany("Pacific Northwest National Laboratory")>
+<Assembly: AssemblyProduct("MASIC")>
 <Assembly: AssemblyCopyright("")>
 <Assembly: AssemblyTrademark("")>
 <Assembly: CLSCompliant(True)>
