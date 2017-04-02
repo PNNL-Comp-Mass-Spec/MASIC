@@ -113,3 +113,6 @@ XRawVB6/*
 /Releases
 
 /MASICBrowser/packages
+
+Lib/Old/*
+Docs/Example_Orbitrap_Data.mzXML
