@@ -116,3 +116,6 @@ XRawVB6/*
 
 */Old/*
 Docs/Example_Orbitrap_Data.mzXML
+Lib/MASIC.exe
+Lib/MASICPeakFinder.dll
+Lib/MatrixDecompositionUtility.dll
