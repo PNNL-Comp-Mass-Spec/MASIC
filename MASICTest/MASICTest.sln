@@ -5,32 +5,16 @@ VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MASICTest", "MASICTest.csproj", "{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MASIC", "..\MASIC.vbproj", "{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Debug|x86.Build.0 = Debug|Any CPU
 		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Release|x86.ActiveCfg = Release|Any CPU
-		{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}.Release|x86.Build.0 = Release|Any CPU
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Debug|x86.ActiveCfg = Debug|x86
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Debug|x86.Build.0 = Debug|x86
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Release|x86.ActiveCfg = Release|x86
-		{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
