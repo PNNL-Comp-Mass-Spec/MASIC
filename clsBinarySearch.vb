@@ -15,7 +15,7 @@ Public Class clsBinarySearch
     End Enum
 
     Public Shared Function BinarySearchFindNearest(
-      ByRef intArrayToSearch() As Integer, intItemToSearchFor As Integer, intDataCount As Integer,
+      intArrayToSearch() As Integer, intItemToSearchFor As Integer, intDataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through intArrayToSearch() for intItemToSearchFor, returning
         '  the index of the item if found
@@ -135,7 +135,7 @@ Public Class clsBinarySearch
     End Function
 
     Public Shared Function BinarySearchFindNearest(
-      ByRef sngArrayToSearch() As Single, sngItemToSearchFor As Single, intDataCount As Integer,
+      sngArrayToSearch() As Single, sngItemToSearchFor As Single, intDataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through sngArrayToSearch() for sngItemToSearchFor, returning
         '  the index of the item if found
@@ -255,7 +255,7 @@ Public Class clsBinarySearch
     End Function
 
     Public Shared Function BinarySearchFindNearest(
-      ByRef dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer,
+      dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through dblArrayToSearch() for dblItemToSearchFor, returning
         '  the index of the item if found
