@@ -1,255 +1,244 @@
-﻿Imports MASIC
-Imports MASIC.clsCustomSICList
-Imports NUnit.Framework
-Imports PNNLOmics.Utilities
-Imports ThermoRawFileReader
+﻿using System;
+using System.Collections.Generic;
+using MASIC;
+using NUnit.Framework;
+using PNNLOmics.Utilities;
+using ThermoRawFileReader;
 
-Public Class clsTests
-    Inherits clsEventNotifier
+namespace MASICTest
+{
+    [TestFixture]
+    public class clsTests : clsEventNotifier
+    {
 
-    <Test>
-    Public Sub TestScanConversions()
-        Const MZ_MINIMUM As Double = 100
-        Const INTENSITY_MINIMUM As Double = 10000
-        Const SCAN_TIME_SCALAR As Double = 10.0
+        [Test()]
+        public void TestScanConversions()
+        {
+            const double MZ_MINIMUM = 100;
+            const float INTENSITY_MINIMUM = 10000;
+            const float SCAN_TIME_SCALAR = 10;
 
-        Dim scanList = New clsScanList()
-        Dim oRand = New Random()
+            var scanList = new clsScanList();
+            var oRand = new Random();
 
-        Dim intLastSurveyScanIndex As Integer = -1
-        Dim intLastSurveyScanIndexInMasterSeqOrder = -1
+            var intLastSurveyScanIndexInMasterSeqOrder = -1;
 
-        ' Populate scanList with example scan data
-        For scanNumber = 1 To 1750
+            // Populate scanList with example scan data
 
-            If scanNumber Mod 10 = 0 Then
-                ' Add a survey scan
-                Dim newSurveyScan = New MASIC.clsScanInfo()
-                With newSurveyScan
-                    .ScanNumber = scanNumber
-                    .ScanTime = scanNumber / SCAN_TIME_SCALAR
+            for (var scanNumber = 1; scanNumber <= 1750; scanNumber++) {
+                if (scanNumber % 10 == 0) {
+                    // Add a survey scan
+                    // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
+                    var newSurveyScan = new MASIC.clsScanInfo
+                    {
+                        ScanNumber = scanNumber,
+                        ScanTime = scanNumber / SCAN_TIME_SCALAR,
+                        ScanHeaderText = string.Empty,
+                        ScanTypeName = "MS",
+                        BasePeakIonMZ = MZ_MINIMUM + oRand.NextDouble() * 1000,
+                        BasePeakIonIntensity = INTENSITY_MINIMUM + (float)oRand.NextDouble() * 1000
+                    };
 
-                    ' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
-                    .ScanHeaderText = String.Empty
-                    .ScanTypeName = "MS"
+                    // Survey scans typically lead to multiple parent ions; we do not record them here
+                    newSurveyScan.FragScanInfo.ParentIonInfoIndex = -1;
+                    newSurveyScan.TotalIonIntensity = newSurveyScan.BasePeakIonIntensity * (float)(0.25 + oRand.NextDouble() * 5);
 
-                    .BasePeakIonMZ = MZ_MINIMUM + oRand.NextDouble() * 1000
-                    .BasePeakIonIntensity = INTENSITY_MINIMUM + oRand.NextDouble() * 1000
+                    // Determine the minimum positive intensity in this scan
+                    newSurveyScan.MinimumPositiveIntensity = INTENSITY_MINIMUM;
 
-                    ' Survey scans typically lead to multiple parent ions; we do not record them here
-                    .FragScanInfo.ParentIonInfoIndex = -1
-                    .TotalIonIntensity = .BasePeakIonIntensity * (0.25 + oRand.NextDouble() * 5)
+                    // If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
+                    newSurveyScan.ZoomScan = false;
+                    newSurveyScan.SIMScan = false;
+                    newSurveyScan.MRMScanType = MRMScanTypeConstants.NotMRM;
 
-                    ' Determine the minimum positive intensity in this scan
-                    .MinimumPositiveIntensity = INTENSITY_MINIMUM
-
-                    ' If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
-                    .ZoomScan = False
-                    .SIMScan = False
-                    .MRMScanType = MRMScanTypeConstants.NotMRM
-
-                    .LowMass = MZ_MINIMUM
-                    .HighMass = Math.Max(.BasePeakIonMZ * 1.1, MZ_MINIMUM * 10)
-                    .IsFTMS = False
-
-                End With
-
-                scanList.SurveyScans.Add(newSurveyScan)
-
-                With scanList
-                    intLastSurveyScanIndex = .SurveyScans.Count - 1
-
-                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
-                    intLastSurveyScanIndexInMasterSeqOrder = .MasterScanOrderCount - 1
-                End With
-            Else
-
-                Dim newFragScan = New MASIC.clsScanInfo()
-                With newFragScan
-                    .ScanNumber = scanNumber
-                    .ScanTime = scanNumber / SCAN_TIME_SCALAR
-
-                    ' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
-                    .ScanHeaderText = String.Empty
-                    .ScanTypeName = "MSn"
-
-                    .BasePeakIonMZ = MZ_MINIMUM + oRand.NextDouble() * 1000
-                    .BasePeakIonIntensity = INTENSITY_MINIMUM + oRand.NextDouble() * 1000
-
-                    ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
-                    .FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder
-                    .FragScanInfo.MSLevel = 2
-
-                    .TotalIonIntensity = .BasePeakIonIntensity * (0.25 + oRand.NextDouble() * 2)
-
-                    ' Determine the minimum positive intensity in this scan
-                    .MinimumPositiveIntensity = INTENSITY_MINIMUM
-
-                    ' If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
-                    .ZoomScan = False
-                    .SIMScan = False
-                    .MRMScanType = MRMScanTypeConstants.NotMRM
-
-                    .MRMScanInfo.MRMMassCount = 0
-
-                End With
-
-                newFragScan.MRMScanInfo.MRMMassCount = 0
-
-                With newFragScan
-                    .LowMass = MZ_MINIMUM
-                    .HighMass = Math.Max(.BasePeakIonMZ * 1.1, MZ_MINIMUM * 10)
-                    .IsFTMS = False
-                End With
-
-                scanList.FragScans.Add(newFragScan)
-                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
-            End If
-        Next
+                    newSurveyScan.LowMass = MZ_MINIMUM;
+                    newSurveyScan.HighMass = Math.Max(newSurveyScan.BasePeakIonMZ * 1.1, MZ_MINIMUM * 10);
+                    newSurveyScan.IsFTMS = false;
 
 
-        Dim scanNumScanConverter As New clsScanNumScanTimeConversion()
-        RegisterEvents(scanNumScanConverter)
+                    scanList.SurveyScans.Add(newSurveyScan);
 
-        ' Convert absolute values
-        ' Scan 500, relative scan 0.5, and the scan at 30 minutes
-        TestScanConversionToAbsolute(scanList, scanNumScanConverter,
-                               New KeyValuePair(Of Integer, Integer)(500, 500),
-                               New KeyValuePair(Of Single, Single)(0.5, 876),
-                               New KeyValuePair(Of Single, Single)(30, 300))
+                    var intLastSurveyScanIndex = scanList.SurveyScans.Count - 1;
 
-        TestScanConversionToTime(scanList, scanNumScanConverter,
-                               New KeyValuePair(Of Integer, Integer)(500, 50),
-                               New KeyValuePair(Of Single, Single)(0.5, 87.55),
-                               New KeyValuePair(Of Single, Single)(30, 30))
+                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex);
+                    intLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1;
 
-        ' Convert ranges
-        ' 50 scans wide, 10% of the run, and 5 minutes
-        TestScanConversionToAbsolute(scanList, scanNumScanConverter,
-                               New KeyValuePair(Of Integer, Integer)(50, 50),
-                               New KeyValuePair(Of Single, Single)(0.1, 176),
-                               New KeyValuePair(Of Single, Single)(5, 50))
+                } else {
+                    // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
+                    var newFragScan = new MASIC.clsScanInfo
+                    {
+                        ScanNumber = scanNumber,
+                        ScanTime = scanNumber / SCAN_TIME_SCALAR,
+                        ScanHeaderText = string.Empty,
+                        ScanTypeName = "MSn",
+                        BasePeakIonMZ = MZ_MINIMUM + oRand.NextDouble() * 1000,
+                        BasePeakIonIntensity = INTENSITY_MINIMUM + (float)oRand.NextDouble() * 1000
+                    };
 
-        TestScanConversionToTime(scanList, scanNumScanConverter,
-                               New KeyValuePair(Of Integer, Integer)(50, 5),
-                               New KeyValuePair(Of Single, Single)(0.1, 17.59),
-                               New KeyValuePair(Of Single, Single)(5, 5))
+                    // 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
+                    newFragScan.FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder;
+                    newFragScan.FragScanInfo.MSLevel = 2;
+
+                    newFragScan.TotalIonIntensity = newFragScan.BasePeakIonIntensity * (float)(0.25 + oRand.NextDouble() * 2);
+
+                    // Determine the minimum positive intensity in this scan
+                    newFragScan.MinimumPositiveIntensity = INTENSITY_MINIMUM;
+
+                    // If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
+                    newFragScan.ZoomScan = false;
+                    newFragScan.SIMScan = false;
+                    newFragScan.MRMScanType = MRMScanTypeConstants.NotMRM;
+
+                    newFragScan.MRMScanInfo.MRMMassCount = 0;
+
+                    newFragScan.LowMass = MZ_MINIMUM;
+                    newFragScan.HighMass = Math.Max(newFragScan.BasePeakIonMZ * 1.1, MZ_MINIMUM * 10);
+                    newFragScan.IsFTMS = false;
+
+                    scanList.FragScans.Add(newFragScan);
+                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1);
+                }
+            }
 
 
-    End Sub
+            var scanNumScanConverter = new clsScanNumScanTimeConversion();
+            RegisterEvents(scanNumScanConverter);
 
-    ''' <summary>
-    ''' Test ScanOrAcqTimeToAbsolute
-    ''' </summary>
-    ''' <param name="scanList"></param>
-    ''' <param name="scanNumScanConverter"></param>
-    ''' <param name="scanNumber">Absolute scan number</param>
-    ''' <param name="relativeTime">Relative scan (value between 0 and 1)</param>
-    ''' <param name="scanTime">Scan time</param>
-    Public Sub TestScanConversionToAbsolute(
-      scanList As clsScanList,
-      scanNumScanConverter As clsScanNumScanTimeConversion,
-      scanNumber As KeyValuePair(Of Integer, Integer),
-      relativeTime As KeyValuePair(Of Single, Single),
-      scanTime As KeyValuePair(Of Single, Single))
+            // Convert absolute values
+            // Scan 500, relative scan 0.5, and the scan at 30 minutes
+            TestScanConversionToAbsolute(
+                scanList, scanNumScanConverter,
+                new KeyValuePair<int, int>(500, 500),
+                new KeyValuePair<float, float>(0.5F, 876),
+                new KeyValuePair<float, float>(30, 300));
 
-        Dim sngResult As Single
+            TestScanConversionToTime(
+                scanList, scanNumScanConverter,
+                new KeyValuePair<int, int>(500, 50),
+                new KeyValuePair<float, float>(0.5F, 87.55F),
+                new KeyValuePair<float, float>(30, 30));
 
-        Try
+            // Convert ranges
+            // 50 scans wide, 10% of the run, and 5 minutes
+            TestScanConversionToAbsolute(
+                scanList, scanNumScanConverter,
+                new KeyValuePair<int, int>(50, 50),
+                new KeyValuePair<float, float>(0.1F, 176),
+                new KeyValuePair<float, float>(5, 50));
 
-            ' Find the scan number corresponding to each of these values
-            sngResult = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanNumber.Key, eCustomSICScanTypeConstants.Absolute, False)
-            Console.WriteLine(scanNumber.Key & " -> " & sngResult)
-            Assert.AreEqual(scanNumber.Value, sngResult, 0.00001)
+            TestScanConversionToTime(
+                scanList, scanNumScanConverter,
+                new KeyValuePair<int, int>(50, 5),
+                new KeyValuePair<float, float>(0.1F, 17.59F),
+                new KeyValuePair<float, float>(5, 5));
 
-            sngResult = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, relativeTime.Key, eCustomSICScanTypeConstants.Relative, False)
-            Console.WriteLine(relativeTime.Key & " -> " & sngResult)
-            Assert.AreEqual(relativeTime.Value, sngResult, 0.00001)
 
-            sngResult = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanTime.Key, eCustomSICScanTypeConstants.AcquisitionTime, False)
-            Console.WriteLine(scanTime.Key & " -> " & sngResult)
-            Assert.AreEqual(scanTime.Value, sngResult, 0.00001)
+        }
 
-            Console.WriteLine()
+        /// <summary>
+        /// Test ScanOrAcqTimeToAbsolute
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="scanNumScanConverter"></param>
+        /// <param name="scanNumber">Absolute scan number</param>
+        /// <param name="relativeTime">Relative scan (value between 0 and 1)</param>
+        /// <param name="scanTime">Scan time</param>
+        private void TestScanConversionToAbsolute(
+            clsScanList scanList,
+            clsScanNumScanTimeConversion scanNumScanConverter,
+            KeyValuePair<int, int> scanNumber,
+            KeyValuePair<float, float> relativeTime,
+            KeyValuePair<float, float> scanTime)
+        {
+            try {
+                // Find the scan number corresponding to each of these values
+                float result1 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanNumber.Key, clsCustomSICList.eCustomSICScanTypeConstants.Absolute, false);
+                Console.WriteLine(scanNumber.Key + " -> " + result1);
+                Assert.AreEqual(scanNumber.Value, result1, 1E-05);
 
-        Catch ex As Exception
-            Console.WriteLine("Error caught: " & ex.Message)
-        End Try
+                float result2 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, relativeTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.Relative, false);
+                Console.WriteLine(relativeTime.Key + " -> " + result2);
+                Assert.AreEqual(relativeTime.Value, result2, 1E-05);
 
-    End Sub
+                float result3 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime, false);
+                Console.WriteLine(scanTime.Key + " -> " + result3);
+                Assert.AreEqual(scanTime.Value, result3, 1E-05);
 
-    ''' <summary>
-    ''' Test ScanOrAcqTimeToAbsolute
-    ''' </summary>
-    ''' <param name="scanList"></param>
-    ''' <param name="scanNumScanConverter"></param>
-    ''' <param name="scanNumber">Absolute scan number</param>
-    ''' <param name="relativeTime">Relative scan (value between 0 and 1)</param>
-    ''' <param name="scanTime">Scan time</param>
-    Public Sub TestScanConversionToTime(
-      scanList As clsScanList,
-      scanNumScanConverter As clsScanNumScanTimeConversion,
-      scanNumber As KeyValuePair(Of Integer, Integer),
-      relativeTime As KeyValuePair(Of Single, Single),
-      scanTime As KeyValuePair(Of Single, Single))
+                Console.WriteLine();
 
-        Dim sngResult As Single
+            } catch (Exception ex) {
+                Console.WriteLine("Error caught: " + ex.Message);
+            }
 
-        Try
+        }
 
-            ' Find the scan time corresponding to each of these values
-            sngResult = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanNumber.Key, eCustomSICScanTypeConstants.Absolute, False)
-            Console.WriteLine(scanNumber.Key & " -> " & sngResult & " minutes")
-            Assert.AreEqual(scanNumber.Value, sngResult, 0.00001)
+        /// <summary>
+        /// Test ScanOrAcqTimeToAbsolute
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="scanNumScanConverter"></param>
+        /// <param name="scanNumber">Absolute scan number</param>
+        /// <param name="relativeTime">Relative scan (value between 0 and 1)</param>
+        /// <param name="scanTime">Scan time</param>
 
-            sngResult = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, relativeTime.Key, eCustomSICScanTypeConstants.Relative, False)
-            Console.WriteLine(relativeTime.Key & " -> " & sngResult & " minutes")
-            Assert.AreEqual(relativeTime.Value, sngResult, 0.00001)
+        public void TestScanConversionToTime(clsScanList scanList, clsScanNumScanTimeConversion scanNumScanConverter, KeyValuePair<int, int> scanNumber, KeyValuePair<float, float> relativeTime, KeyValuePair<float, float> scanTime)
+        {
+            try {
+                // Find the scan time corresponding to each of these values
+                var result1 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanNumber.Key, clsCustomSICList.eCustomSICScanTypeConstants.Absolute, false);
+                Console.WriteLine(scanNumber.Key + " -> " + result1 + " minutes");
+                Assert.AreEqual(scanNumber.Value, result1, 1E-05);
 
-            sngResult = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanTime.Key, eCustomSICScanTypeConstants.AcquisitionTime, False)
-            Console.WriteLine(scanTime.Key & " -> " & sngResult & " minutes")
-            Assert.AreEqual(scanTime.Value, sngResult, 0.00001)
+                var result2 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, relativeTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.Relative, false);
+                Console.WriteLine(relativeTime.Key + " -> " + result2 + " minutes");
+                Assert.AreEqual(relativeTime.Value, result2, 1E-05);
 
-            Console.WriteLine()
+                var result3 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime, false);
+                Console.WriteLine(scanTime.Key + " -> " + result3 + " minutes");
+                Assert.AreEqual(scanTime.Value, result3, 1E-05);
 
-        Catch ex As Exception
-            Console.WriteLine("Error caught: " & ex.Message)
-        End Try
+                Console.WriteLine();
 
-    End Sub
+            } catch (Exception ex) {
+                Console.WriteLine("Error caught: " + ex.Message);
+            }
 
-    <TestCase(1.2301, "1.23", 3, 100000)>
-    <TestCase(1.2, "1.2", 3, 100000)>
-    <TestCase(1.003, "1", 3, 100000)>
-    <TestCase(999.995, "999.995", 9, 100000)>
-    <TestCase(999.995, "999.995", 8, 100000)>
-    <TestCase(999.995, "999.995", 7, 100000)>
-    <TestCase(999.995, "999.995", 6, 100000)>
-    <TestCase(999.995, "1000", 5, 100000)>
-    <TestCase(999.995, "1000", 4, 100000)>
-    <TestCase(1000.995, "1001", 3, 100000)>
-    <TestCase(1000.995, "1001", 2, 100000)>
-    <TestCase(1.003, "1.003", 5, 0)>
-    <TestCase(1.23123, "1.2312", 5, 0)>
-    <TestCase(12.3123, "12.312", 5, 0)>
-    <TestCase(123.123, "123.12", 5, 0)>
-    <TestCase(1231.23, "1231.2", 5, 0)>
-    <TestCase(12312.3, "12312", 5, 0)>
-    <TestCase(123123, "123123", 5, 0)>
-    <TestCase(1231234, "1.2312E+06", 5, 0)>
-    <TestCase(12312345, "1.2312E+07", 5, 0)>
-    <TestCase(123123456, "1.2312E+08", 5, 0)>
-    Public Sub TestValueToString(valueToConvert As Double, expectedResult As String, digitsOfPrecision As Integer, scientificNotationThreshold As Integer)
+        }
 
-        Dim result As String
-        If scientificNotationThreshold > 0 Then
-            result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision, scientificNotationThreshold)
-        Else
-            result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision)
-        End If
+        [Test()]
+        [TestCase(1.2301, "1.23", 3, 100000)]
+        [TestCase(1.2, "1.2", 3, 100000)]
+        [TestCase(1.003, "1", 3, 100000)]
+        [TestCase(999.995, "999.995", 9, 100000)]
+        [TestCase(999.995, "999.995", 8, 100000)]
+        [TestCase(999.995, "999.995", 7, 100000)]
+        [TestCase(999.995, "999.995", 6, 100000)]
+        [TestCase(999.995, "1000", 5, 100000)]
+        [TestCase(999.995, "1000", 4, 100000)]
+        [TestCase(1000.995, "1001", 3, 100000)]
+        [TestCase(1000.995, "1001", 2, 100000)]
+        [TestCase(1.003, "1.003", 5, 0)]
+        [TestCase(1.23123, "1.2312", 5, 0)]
+        [TestCase(12.3123, "12.312", 5, 0)]
+        [TestCase(123.123, "123.12", 5, 0)]
+        [TestCase(1231.23, "1231.2", 5, 0)]
+        [TestCase(12312.3, "12312", 5, 0)]
+        [TestCase(123123, "123123", 5, 0)]
+        [TestCase(1231234, "1.2312E+06", 5, 0)]
+        [TestCase(12312345, "1.2312E+07", 5, 0)]
+        [TestCase(123123456, "1.2312E+08", 5, 0)]
+        public void TestValueToString(double valueToConvert, string expectedResult, byte digitsOfPrecision, int scientificNotationThreshold)
+        {
+            string result;
+            if (scientificNotationThreshold > 0) {
+                result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision, scientificNotationThreshold);
+            } else {
+                result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision);
+            }
 
-        Console.WriteLine(String.Format("{0,-12} -> {1,-12}", valueToConvert, result))
+            Console.WriteLine(string.Format("{0,-12} -> {1,-12}", valueToConvert, result));
 
-    End Sub
+        }
 
-End Class
+    }
+}
