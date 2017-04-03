@@ -403,7 +403,7 @@ Public Class clsCorrelation
         ' The lists must have the same number of data points in each and should be 0-based arrays
         '
         ' Code from Numerical Recipes in C
-        
+
         '  TINY is used to "regularize" the unusual case of complete correlation
         Dim TINY = 1.0E-20
 
@@ -463,10 +463,10 @@ Public Class clsCorrelation
     End Sub
 
     Private Sub CorrelKendall(
-      sngDataList1() As Single, 
-      sngDataList2() As Single, 
-      <Out()> ByRef KendallsTau As Single, 
-      <Out()> ByRef Z As Single, 
+      sngDataList1() As Single,
+      sngDataList2() As Single,
+      <Out()> ByRef KendallsTau As Single,
+      <Out()> ByRef Z As Single,
       <Out()> ByRef ProbOfSignificance As Single)
 
         ' Performs a Kendall correlation (aka linear correlation) of the two lists
