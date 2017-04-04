@@ -179,6 +179,14 @@ Public Class clsMASICPeakFinder
     Private mShowMessages As Boolean
     Private mStatusMessage As String
     Private mErrorLogger As PRISM.ILogger
+
+    ' TTest Significance Table:
+    ' Confidence Levels and critical values:
+    ' 80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
+    ' 1.886, 2.920, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598
+
+    Private ReadOnly TTestConfidenceLevels As Single() = New Single() {1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598}
+
 #End Region
 
 #Region "Properties"
@@ -3459,16 +3467,6 @@ Public Class clsMASICPeakFinder
         ' To use the t-test you must use sample variance values, not population variance values
         ' Note: Variance_Sample = Sum((x-mean)^2) / (count-1)
         ' Note: Sigma = SquareRoot(Variance_Sample)
-        '
-        ' Returns True if the two populations are statistically different, based on the given significance threshold
-
-
-        ' Significance Table:
-        ' Confidence Levels and critical values:
-        ' 80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
-        ' 1.886, 2.920, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598
-
-        Static ConfidenceLevels() As Single = New Single() {1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598}
 
         Dim SPooled As Double
         Dim intConfidenceLevelIndex As Integer
@@ -3485,11 +3483,11 @@ Public Class clsMASICPeakFinder
             intConfidenceLevelIndex = eConfidenceLevel
             If intConfidenceLevelIndex < 0 Then
                 intConfidenceLevelIndex = 0
-            ElseIf intConfidenceLevelIndex >= ConfidenceLevels.Length Then
-                intConfidenceLevelIndex = ConfidenceLevels.Length - 1
+            ElseIf intConfidenceLevelIndex >= TTestConfidenceLevels.Length Then
+                intConfidenceLevelIndex = TTestConfidenceLevels.Length - 1
             End If
 
-            If TCalculated >= ConfidenceLevels(intConfidenceLevelIndex) Then
+            If TCalculated >= TTestConfidenceLevels(intConfidenceLevelIndex) Then
                 ' Differences are significant
                 Return True
             Else
