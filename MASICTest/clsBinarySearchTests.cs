@@ -10,18 +10,22 @@ namespace MASICTest
     [TestFixture]
     public class clsBinarySearchTests
     {
+        private const string OUTPUT_FOLDER = @"\\proto-2\UnitTest_Files\MASIC\Results";
 
+        [Test]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnNextPoint)]
         public void TestSearchFunctionsInt(clsBinarySearch.eMissingDataModeConstants eMissingDataMode)
         {
-            try {
+            try
+            {
                 // Initialize a data list with 20 items
                 var dataPoints = new List<int>();
                 var maxDataValue = 0;
 
-                for (var index = 0; index <= 19; index++) {
+                for (var index = 0; index <= 19; index++)
+                {
                     maxDataValue = index + Convert.ToInt32(Math.Pow(index, 1.5));
                     dataPoints.Add(maxDataValue);
                 }
@@ -29,14 +33,19 @@ namespace MASICTest
                 dataPoints.Sort();
 
                 // Write the data to disk
-                // Note that when running NUnit with resharper the output file path will be of the form
-                // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs14\BinarySearch_Test_Int.txt
+                // The output folder will be below \\proto-2\UnitTest_Files\ if that folder exists
+                // Otherwise, it will be local, and when running NUnit with resharper the output file path will be of the form
+                // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
-                var outputFileName = "BinarySearch_Test_Int" + eMissingDataMode + ".txt";
-                using (var srOutFile = new StreamWriter(outputFileName, false)) {
+                var outputFolderPath = GetOutputFolderPath();
+                var outputFilePath = Path.Combine(outputFolderPath, "BinarySearch_Test_Int_" + eMissingDataMode + ".txt");
 
-                    srOutFile.WriteLine("Data_Index\tData_Value");
-                    for (var index = 0; index <= dataPoints.Count - 1; index++) {
+                using (var srOutFile = new StreamWriter(outputFilePath, false))
+                {
+
+                    srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
+                    for (var index = 0; index <= dataPoints.Count - 1; index++)
+                    {
                         srOutFile.WriteLine(index.ToString() + '\t' + dataPoints[index]);
                     }
 
@@ -54,7 +63,8 @@ namespace MASICTest
                     var searchresults = new Dictionary<int, int>();
 
                     // Search intDataList for each number between intSearchValueStart and intSearchValueEnd
-                    for (var dataPointToFind = searchValueStart; dataPointToFind <= searchValueEnd; dataPointToFind++) {
+                    for (var dataPointToFind = searchValueStart; dataPointToFind <= searchValueEnd; dataPointToFind++)
+                    {
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints.ToArray(), dataPointToFind, dataPoints.Count, eMissingDataMode);
                         searchresults.Add(dataPointToFind, dataPoints[indexMatch]);
 
@@ -62,7 +72,8 @@ namespace MASICTest
                     }
 
                     // Verify some of the results
-                    switch (eMissingDataMode) {
+                    switch (eMissingDataMode)
+                    {
                         case clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint:
                             Assert.AreEqual(searchresults[10], 8);
                             Assert.AreEqual(searchresults[11], 12);
@@ -92,24 +103,30 @@ namespace MASICTest
 
                 }
 
+                Console.WriteLine("Test complete; see file " + outputFilePath);
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " + ex.Message);
             }
 
         }
 
+        [Test]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint)]
         [TestCase(clsBinarySearch.eMissingDataModeConstants.ReturnNextPoint)]
         public void TestSearchFunctionsDbl(clsBinarySearch.eMissingDataModeConstants eMissingDataMode)
         {
-            try {
+            try
+            {
                 // Initialize a data list with 20 items
                 var dataPoints = new List<double>();
                 double maxDataValue = 0;
 
-                for (var index = 0; index <= 19; index++) {
+                for (var index = 0; index <= 19; index++)
+                {
                     maxDataValue = index + Math.Pow(index, 1.5);
                     dataPoints.Add(maxDataValue);
                 }
@@ -117,14 +134,19 @@ namespace MASICTest
                 dataPoints.Sort();
 
                 // Write the data to disk
-                // Note that when running NUnit with resharper the output file path will be of the form
-                // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs14\BinarySearch_Test_Int.txt
+                // The output folder will be below \\proto-2\UnitTest_Files\ if that folder exists
+                // Otherwise, it will be local, and when running NUnit with resharper the output file path will be of the form
+                // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
-                var outputFileName = "BinarySearch_TestDouble" + eMissingDataMode.ToString() + ".txt";
-                using (var srOutFile = new StreamWriter(outputFileName, false)) {
+                var outputFolderPath = GetOutputFolderPath();
+                var outputFilePath = Path.Combine(outputFolderPath, "BinarySearch_Test_Double_" + eMissingDataMode + ".txt");
+
+                using (var srOutFile = new StreamWriter(outputFilePath, false))
+                {
 
                     srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
-                    for (var index = 0; index <= dataPoints.Count - 1; index++) {
+                    for (var index = 0; index <= dataPoints.Count - 1; index++)
+                    {
                         srOutFile.WriteLine(index.ToString() + '\t' + dataPoints[index].ToString(CultureInfo.InvariantCulture));
                     }
 
@@ -142,7 +164,8 @@ namespace MASICTest
                     var searchresults = new Dictionary<double, double>();
 
                     // Search intDataList for each number between intSearchValueStart and intSearchValueEnd
-                    for (var index = searchValueStart; index <= searchValueEnd; index++) {
+                    for (var index = searchValueStart; index <= searchValueEnd; index++)
+                    {
                         var dataPointToFind = Convert.ToDouble(index) + index / 10.0;
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints.ToArray(), dataPointToFind, dataPoints.Count, eMissingDataMode);
                         searchresults.Add(dataPointToFind, dataPoints[indexMatch]);
@@ -151,7 +174,8 @@ namespace MASICTest
                     }
 
                     // Verify some of the results
-                    switch (eMissingDataMode) {
+                    switch (eMissingDataMode)
+                    {
                         case clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint:
                             Assert.AreEqual(searchresults[23.1], 20.69693846, 1E-06);
                             Assert.AreEqual(searchresults[24.2], 25.52025918, 1E-06);
@@ -186,24 +210,43 @@ namespace MASICTest
 
                 }
 
+                Console.WriteLine("Test complete; see file " + outputFilePath);
 
-            } catch (Exception ex) {
+                var entryAssembly = System.Reflection.Assembly.GetExecutingAssembly();
+
+                Console.WriteLine(entryAssembly);
+                Console.WriteLine(@"C:\Users\d3l243\AppData\Local\JetBrains\Installations");
+
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " + ex.Message);
             }
         }
-
-        private string GetMissingDataModeName(clsBinarySearch.eMissingDataModeConstants eMissingDataMode)
+       
+        private string GetOutputFolderPath()
         {
-            switch (eMissingDataMode) {
-                case clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint:
-                    return "Return Closest Point";
-                case clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint:
-                    return "Return Previous Point";
-                case clsBinarySearch.eMissingDataModeConstants.ReturnNextPoint:
-                    return "Return Next Point";
-                default:
-                    return "Unknown mode";
+            try
+            {
+                var defaultOutputFolder = new DirectoryInfo(OUTPUT_FOLDER);
+
+                if (defaultOutputFolder.Exists)
+                    return defaultOutputFolder.FullName;
+
+                if (defaultOutputFolder.Parent != null && defaultOutputFolder.Parent.Exists)
+                {
+                    defaultOutputFolder.Create();
+                }
+                return defaultOutputFolder.FullName;
+
+
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception determining the best output folder path: " + ex.Message);
+            }
+
+            return string.Empty;
         }
 
     }

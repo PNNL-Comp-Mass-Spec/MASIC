@@ -11,7 +11,7 @@ namespace MASICTest
     public class clsTests : clsEventNotifier
     {
 
-        [Test()]
+        [Test]
         public void TestScanConversions()
         {
             const double MZ_MINIMUM = 100;
@@ -205,7 +205,7 @@ namespace MASICTest
 
         }
 
-        [Test()]
+        [Test]
         [TestCase(1.2301, "1.23", 3, 100000)]
         [TestCase(1.2, "1.2", 3, 100000)]
         [TestCase(1.003, "1", 3, 100000)]

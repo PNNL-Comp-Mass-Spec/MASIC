@@ -18,7 +18,7 @@ namespace MASICTest
             mMASICPeakFinder = new MASICPeakFinder.clsMASICPeakFinder();
         }
 
-        [Test()]
+        [Test]
         [TestCase("FakeNonexistentDataset.raw", 1)]
         [TestCase(@"c:\Temp\FakeNonexistentDataset.raw", 1)]
         [TestCase("QC_Shew_16_01_R1_23Mar17_Pippin_16-11-03", 571774)]
@@ -31,7 +31,7 @@ namespace MASICTest
             TestDatasetLookup(datasetName, expectedDatasetID, "Integrated", "");
         }
 
-        [Test()]
+        [Test]
         [TestCase("FakeNonexistentDataset.raw", 1)]
         [TestCase(@"c:\Temp\FakeNonexistentDataset.raw", 1)]
         [TestCase("QC_Shew_16_01_R1_23Mar17_Pippin_16-11-03", 571774)]
