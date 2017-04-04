@@ -338,7 +338,7 @@ Public Class clsReporterIonProcessor
                 .Resolution = 0
                 .LabelDataMZ = 0
             End With
-        Next intReporterIonIndex
+        Next
 
         If includeFtmsColumns AndAlso currentScan.IsFTMS Then
 

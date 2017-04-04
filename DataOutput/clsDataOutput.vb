@@ -669,7 +669,7 @@ Namespace DataOutput
                         Next
                     End If
 
-                Next intFragScanIndex
+                Next
 
             Catch ex As Exception
                 ReportError("SaveSICDataToText", "Error writing to detailed SIC data text file", ex, True, False, eMasicErrorCodes.OutputFileWriteError)

@@ -294,7 +294,7 @@ Public Class clsCorrelation
                         ' Bin is Out of range; ignore the value
                     End If
                 End If
-            Next intIndex
+            Next
 
             If Not sngMaximumIntensity > Single.MinValue Then sngMaximumIntensity = 0
 
@@ -308,7 +308,7 @@ Public Class clsCorrelation
                     If Math.Abs(sngBinnedYData(intIndex)) > Single.Epsilon Then
                         sngBinnedYData(intIndex) = CSng(Math.Round(sngBinnedYData(intIndex) / sngIntensityQuantizationValue, 0)) * sngIntensityQuantizationValue
                     End If
-                Next intIndex
+                Next
 
             End If
 
@@ -317,7 +317,7 @@ Public Class clsCorrelation
                     If Math.Abs(sngBinnedYData(intIndex)) > Single.Epsilon Then
                         sngBinnedYData(intIndex) /= sngMaximumIntensity * 100
                     End If
-                Next intIndex
+                Next
             End If
 
         Catch ex As Exception
@@ -362,13 +362,13 @@ Public Class clsCorrelation
             intNonZeroDataCount = 0
             For intIndex = 0 To intDataCount - 1
                 If sngDataList1(intIndex) > 0 Then intNonZeroDataCount += 1
-            Next intIndex
+            Next
             If intNonZeroDataCount < MIN_NON_ZERO_ION_COUNT Then Return 0
 
             intNonZeroDataCount = 0
             For intIndex = 0 To intDataCount - 1
                 If sngDataList2(intIndex) > 0 Then intNonZeroDataCount += 1
-            Next intIndex
+            Next
             If intNonZeroDataCount < MIN_NON_ZERO_ION_COUNT Then Return 0
 
 

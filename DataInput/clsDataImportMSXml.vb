@@ -473,7 +473,7 @@ Namespace DataInput
                         Dim sngTotalIonIntensity As Single = 0
                         For intIonIndex = 0 To objMSSpectrum.IonCount - 1
                             sngTotalIonIntensity += objMSSpectrum.IonsIntensity(intIonIndex)
-                        Next intIonIndex
+                        Next
 
                         If .TotalIonIntensity < Single.Epsilon Then
                             .TotalIonIntensity = sngTotalIonIntensity

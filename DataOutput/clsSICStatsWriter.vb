@@ -81,7 +81,7 @@ Namespace DataOutput
 
                 For intIndex = 0 To intSurveyScanCount - 1
                     intScanListArray(intIndex) = surveyScans(intIndex).ScanNumber
-                Next intIndex
+                Next
             Else
                 ReDim intScanListArray(0)
             End If
@@ -182,7 +182,7 @@ Namespace DataOutput
                                 scanList.ProcessingIncomplete = True
                                 Exit For
                             End If
-                        Next intParentIonIndex
+                        Next
 
                     End If
 

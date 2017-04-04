@@ -44,7 +44,7 @@ Namespace DataOutput
                         End With
 
                     End Using
-                Next intIndex
+                Next
 
             Catch ex As Exception
                 ReportError("SaveMSMethodFile", "Error writing the MS Method to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
@@ -95,7 +95,7 @@ Namespace DataOutput
 
                     End Using
 
-                Next intIndex
+                Next
 
             Catch ex As Exception
                 ReportError("SaveMSTuneFile", "Error writing the MS Tune Settings to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)

@@ -104,7 +104,7 @@ Public Class clsScanTracking
                             Else
                                 Exit For
                             End If
-                        Next intComparisonIndex
+                        Next
 
                         If intCountCombined > 1 Then
                             ' Only keep the first and last data point in the block
@@ -173,7 +173,7 @@ Public Class clsScanTracking
                                 Else
                                     Exit For
                                 End If
-                            Next intComparisonIndex
+                            Next
                         End If
 
                     End If

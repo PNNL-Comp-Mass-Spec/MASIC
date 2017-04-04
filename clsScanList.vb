@@ -217,7 +217,7 @@ Public Class clsScanList
         ReDim ParentIons(intFragScanCountToAllocate - 1)
         For intIndex = 0 To intFragScanCountToAllocate - 1
             ParentIons(intIndex) = New clsParentIonInfo()
-        Next intIndex
+        Next
 
     End Sub
 

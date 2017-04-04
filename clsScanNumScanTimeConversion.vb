@@ -59,7 +59,7 @@
                     End If
                     Exit For
                 End If
-            Next intIndex
+            Next
 
             If intSurveyScanIndexMatch < 0 Then
                 ' Match not found; return either the first or the last survey scan

@@ -386,7 +386,7 @@
 
             AddMzSearchTarget(mzSearchSpec)
 
-        Next intIndex
+        Next
 
         ValidateCustomSICList()
 

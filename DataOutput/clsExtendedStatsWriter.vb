@@ -69,7 +69,7 @@ Namespace DataOutput
                     Else
                         strOutLine &= "0" & cColDelimiter
                     End If
-                Next intIndex
+                Next
 
                 ' remove the trailing delimiter
                 If strOutLine.Length > 0 Then
@@ -112,7 +112,7 @@ Namespace DataOutput
 
                 For intIndex = 0 To intHeaderCount - 1
                     strHeaders &= strHeaderNames(intIndex).TrimEnd(cTrimChars) & cColDelimiter
-                Next intIndex
+                Next
 
                 ' remove the trailing delimiter
                 If strHeaders.Length > 0 Then
@@ -166,7 +166,7 @@ Namespace DataOutput
             ReDim intNonConstantHeaderIDs(mExtendedHeaderNameMap.Count - 1)
             For intIndex = 0 To mExtendedHeaderNameMap.Count - 1
                 intNonConstantHeaderIDs(intIndex) = intIndex
-            Next intIndex
+            Next
 
             If Not mOptions.ConsolidateConstantExtendedHeaderValues Then
                 ' Do not try to consolidate anything
@@ -372,7 +372,7 @@ Namespace DataOutput
                         If intScanIndex Mod 100 = 0 Then
                             UpdateProgress(CShort(intScanIndex / (scanList.MasterScanOrderCount - 1) * 100))
                         End If
-                    Next intScanIndex
+                    Next
 
                 End Using
 

@@ -55,7 +55,7 @@ Public Class clsDataAggregation
                             dblSmallestDifference = dblTestDifference
                             dblClosestMZ = objMSSpectrum.IonsMZ(intIonIndex)
                         End If
-                    Next intIonIndex
+                    Next
                     intIonMatchCount = intIndexLast - intIndexFirst + 1
                 End If
             End If
@@ -142,7 +142,7 @@ Public Class clsDataAggregation
                         sngHighestIntensity = sngIntensityList(intDataIndex)
                     End If
                 End If
-            Next intDataIndex
+            Next
 
         Catch ex As Exception
             ReportError("FindMaxValueInMZRange", "Error in FindMaxValueInMZRange", ex, True, False)

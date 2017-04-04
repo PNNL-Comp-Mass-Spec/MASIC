@@ -966,7 +966,7 @@ Public Class clsMASICOptions
                         End If
                         intTargetIndex += 1
                     End If
-                Next intIndex
+                Next
 
                 If intTargetIndex < strItems.Length Then
                     ReDim Preserve strItems(intTargetIndex - 1)

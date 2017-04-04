@@ -84,7 +84,7 @@ Namespace DataOutput
                         ' When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
                         ' However, for MRM data, field size can be much larger
                         SICDataScanIntervals(intScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))
-                    Next intScanIndex
+                    Next
                 End If
 
 
@@ -209,7 +209,7 @@ Namespace DataOutput
                                         Else
                                             strScanIntervalList &= "z"
                                         End If
-                                    Next intScanIntervalIndex
+                                    Next
                                 End If
                                 objXMLOut.WriteElementString("SICScanIntervals", strScanIntervalList)
                             End If
@@ -302,7 +302,7 @@ Namespace DataOutput
                                         If Not udtSmoothedYDataSubset.Data Is Nothing AndAlso udtSmoothedYDataSubset.DataCount > 0 Then
                                             For intIndex = 0 To udtSmoothedYDataSubset.DataCount - 1
                                                 sbPeakYDataSmoothed.Append(Math.Round(udtSmoothedYDataSubset.Data(intIndex)).ToString() & ",")
-                                            Next intIndex
+                                            Next
 
                                             ' Trim the trailing comma
                                             sbPeakYDataSmoothed.Length -= 1
@@ -322,7 +322,7 @@ Namespace DataOutput
                         End With
                     End With
                     objXMLOut.WriteEndElement()
-                Next intFragScanIndex
+                Next
 
             Catch ex As Exception
                 ReportError("SaveDataToXML", "Error writing the XML data to the output file; Last good location: " & strLastGoodLoc, ex, True, False, eMasicErrorCodes.OutputFileWriteError)

@@ -108,7 +108,7 @@ Namespace DataInput
                                         intIonCountNew += 1
                                     End If
 
-                                Next intIonIndex
+                                Next
                             Else
                                 intIonCountNew = .IonCount
                             End If
@@ -134,7 +134,7 @@ Namespace DataInput
                                         intIonCountNew += 1
                                     End If
 
-                                Next intIonIndex
+                                Next
                             Else
                                 intIonCountNew = .IonCount
                             End If
@@ -220,7 +220,7 @@ Namespace DataInput
                                 intIonCountNew += 1
                             End If
 
-                        Next intIonIndex
+                        Next
                     Else
                         intIonCountNew = .IonCount
                     End If

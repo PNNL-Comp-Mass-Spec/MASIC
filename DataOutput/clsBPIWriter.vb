@@ -194,7 +194,7 @@ Namespace DataOutput
                         End If
 
                     End With
-                Next intScanIndex
+                Next
 
             End Using
 

@@ -207,7 +207,7 @@ Public Class frmMain
                 With mDefaultCustomSICList(intIndex)
                     AddCustomSICRow(.MZ, dblDefaultMZTolerance, .ScanCenter, sngDefaultScanOrAcqTimeTolerance, .Comment)
                 End With
-            Next intIndex
+            Next
 
         End If
 

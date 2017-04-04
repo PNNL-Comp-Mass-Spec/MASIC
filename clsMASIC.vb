@@ -40,7 +40,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "April 1, 2017"
+        MyBase.mFileDate = "April 4, 2017"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
@@ -1993,7 +1993,7 @@ Public Class clsMASIC
                         .PeakScanIndexMax = intScanIndexObserved
                     End With
                 End With
-            Next intParentIonIndex
+            Next
         Catch ex As Exception
             LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex, True, False)
         End Try
@@ -2114,7 +2114,7 @@ Public Class clsMASIC
             sngOverallPctCompleted = 0
             For intIndex = 0 To intCurrentStep - 1
                 sngOverallPctCompleted += sngWeightingFactors(intIndex) * 100
-            Next intIndex
+            Next
 
             sngOverallPctCompleted += sngWeightingFactors(intCurrentStep) * mSubtaskProcessingStepPct
 

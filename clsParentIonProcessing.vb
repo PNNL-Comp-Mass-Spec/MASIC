@@ -130,7 +130,7 @@ Public Class clsParentIonProcessing
             End If
 
             AddUpdateParentIons(scanList, intSurveyScanIndex, dblParentIonMZ, dblMRMDaughterMZ, dblMRMToleranceHalfWidth, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
-        Next intMRMIndex
+        Next
 
     End Sub
 
@@ -203,7 +203,7 @@ Public Class clsParentIonProcessing
                 Else
                     Exit For
                 End If
-            Next intParentIonIndex
+            Next
         End If
 
 
@@ -216,7 +216,7 @@ Public Class clsParentIonProcessing
                         ReDim Preserve .ParentIons(.ParentIonInfoCount + 100)
                         For intIndex = .ParentIonInfoCount To .ParentIons.Length - 1
                             ReDim .ParentIons(intIndex).FragScanIndices(0)
-                        Next intIndex
+                        Next
                     End If
 
                     With .ParentIons(.ParentIonInfoCount)
@@ -367,8 +367,8 @@ Public Class clsParentIonProcessing
                         If sngSimilarityScore > sngHighestSimilarityScore Then
                             sngHighestSimilarityScore = sngSimilarityScore
                         End If
-                    Next intFragIndex2
-                Next intFragIndex1
+                    Next
+                Next
 
             End If
         Catch ex As Exception
@@ -455,7 +455,7 @@ Public Class clsParentIonProcessing
                 sngYData(filteredDataCount) = fragSpectrum.IonsIntensity(intIndex)
                 filteredDataCount += 1
             End If
-        Next intIndex
+        Next
 
         If filteredDataCount > 0 Then
             ReDim Preserve sngXData(filteredDataCount - 1)
@@ -540,7 +540,7 @@ Public Class clsParentIonProcessing
                         dblBestMassDifferenceAbs = dblMassDifferenceAbs
                     End If
                 End If
-            Next intDataIndex
+            Next
 
         Catch ex As Exception
             ReportError("FindClosestMZ", "Error in FindClosestMZ", ex, True, False)
@@ -626,7 +626,7 @@ Public Class clsParentIonProcessing
                     sngIntensityList(intFindSimilarIonsDataCount) = scanList.ParentIons(intParentIonIndex).SICStats.Peak.MaxIntensityValue
                     intFindSimilarIonsDataCount += 1
                 End If
-            Next intParentIonIndex
+            Next
 
             If udtFindSimilarIonsData.MZPointerArray.Length <> intFindSimilarIonsDataCount AndAlso intFindSimilarIonsDataCount > 0 Then
                 ReDim Preserve udtFindSimilarIonsData.MZPointerArray(intFindSimilarIonsDataCount - 1)
@@ -812,9 +812,9 @@ Public Class clsParentIonProcessing
                                 scanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex = .ParentIonIndexMaxIntensity
                             End If
                         End If
-                    Next intMatchIndex
+                    Next
                 End With
-            Next intUniqueMZIndex
+            Next
 
             blnSuccess = True
 
@@ -890,7 +890,7 @@ Public Class clsParentIonProcessing
                     End If
                 End With
 
-            Next intMatchIndex
+            Next
         End If
 
     End Sub
@@ -917,7 +917,7 @@ Public Class clsParentIonProcessing
         For intIndex = intStartIndex To intEndIndex
             ReDim udtUniqueMZList(intIndex).MatchIndices(0)
             udtUniqueMZList(intIndex).MatchCount = 0
-        Next intIndex
+        Next
 
     End Sub
 

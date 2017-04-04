@@ -182,7 +182,7 @@ Namespace DataInput
                         Threading.Thread.Sleep(50)
                     End If
 
-                Next intScanNumber
+                Next
                 Console.WriteLine()
 
                 ' Shrink the memory usage of the scanList arrays
@@ -485,7 +485,7 @@ Namespace DataInput
                             sortRequired = True
                             Exit For
                         End If
-                    Next intIndex
+                    Next
 
                     If sortRequired Then
                         Array.Sort(objMSSpectrum.IonsMZ, dblIntensityList)
@@ -506,7 +506,7 @@ Namespace DataInput
                     For intIonIndex = 0 To .IonCount - 1
                         .IonsIntensity(intIonIndex) = CSng(dblIntensityList(intIonIndex))
                         dblTIC += dblIntensityList(intIonIndex)
-                    Next intIonIndex
+                    Next
                 End With
 
                 ' Determine the minimum positive intensity in this scan

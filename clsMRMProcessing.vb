@@ -119,7 +119,7 @@ Public Class clsMRMProcessing
 
                                     srmList.Add(newSRMItem)
                                 End If
-                            Next intMRMMassIndex
+                            Next
                         Else
                             mrmInfoForHash.ScanCount += 1
                         End If
@@ -258,7 +258,7 @@ Public Class clsMRMProcessing
                         Next
 
                     End With
-                Next intMRMInfoIndex
+                Next
 
                 If mOptions.WriteMRMDataList Or mOptions.WriteMRMIntensityCrosstab Then
 
@@ -266,7 +266,7 @@ Public Class clsMRMProcessing
                     Dim srmKeyToIndexMap = New Dictionary(Of String, Integer)
                     For intSRMIndex = 0 To srmList.Count - 1
                         srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList(intSRMIndex)), intSRMIndex)
-                    Next intSRMIndex
+                    Next
 
                     If mOptions.WriteMRMDataList Then
                         ' Write out the raw MRM Data
@@ -288,7 +288,7 @@ Public Class clsMRMProcessing
 
                         For intSRMIndex = 0 To srmList.Count - 1
                             strCrosstabHeaders &= cColDelimiter & ConstructSRMMapKey(srmList(intSRMIndex))
-                        Next intSRMIndex
+                        Next
 
                         srCrosstabOutfile.WriteLine(strCrosstabHeaders)
                     End If
@@ -383,7 +383,7 @@ Public Class clsMRMProcessing
                                     End If
                                 End If
 
-                            Next intMRMMassIndex
+                            Next
 
                         End With
 
@@ -453,7 +453,7 @@ Public Class clsMRMProcessing
 
             sngCrosstabColumnValue(intIndex) = 0
             blnCrosstabColumnFlag(intIndex) = False
-        Next intIndex
+        Next
 
         If intNonZeroCount > 0 OrElse blnForceWrite Then
             srCrosstabOutfile.WriteLine(strOutLine)
@@ -474,7 +474,7 @@ Public Class clsMRMProcessing
                   .MRMMassList(intIndex).StartMass.ToString("0.000") & "_" &
                   .MRMMassList(intIndex).EndMass.ToString("0.000")
 
-            Next intIndex
+            Next
         End With
 
         Return strHash
@@ -596,7 +596,7 @@ Public Class clsMRMProcessing
 
                     End With
 
-                Next intScanIndex
+                Next
 
 
                 ' Step 2: Find the largest peak in the SIC
@@ -627,7 +627,7 @@ Public Class clsMRMProcessing
                         sngMaximumIntensity = sicIntensities(intScanIndex)
                         scanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved = intScanIndex
                     End If
-                Next intScanIndex
+                Next
 
                 Dim udtSICPotentialAreaStatsInFullSIC As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
 
@@ -705,7 +705,7 @@ Public Class clsMRMProcessing
                     ReportError("ProcessMRMList", "Error updating progress", ex, True, True, eMasicErrorCodes.CreateSICsError)
                 End Try
 
-            Next intParentIonIndex
+            Next
 
         Catch ex As Exception
             ReportError("ProcessMRMList", "Error creating SICs for MRM spectra", ex, True, True, eMasicErrorCodes.CreateSICsError)

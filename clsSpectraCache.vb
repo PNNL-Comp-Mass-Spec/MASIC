@@ -238,12 +238,12 @@ Public Class clsSpectraCache
                             ' Write the m/z values
                             For intIndex = 0 To .IonCount - 1
                                 mPageFileWriter.Write(.IonsMZ(intIndex))
-                            Next intIndex
+                            Next
 
                             ' Write the intensity values
                             For intIndex = 0 To .IonCount - 1
                                 mPageFileWriter.Write(.IonsIntensity(intIndex))
-                            Next intIndex
+                            Next
                         End With
 
                         ' Write four blank bytes (not really necessary, but adds a little padding between spectra)                        
@@ -351,7 +351,7 @@ Public Class clsSpectraCache
 
             For intIndex = 0 To strFiles.Length - 1
                 File.Delete(strFiles(intIndex))
-            Next intIndex
+            Next
 
         Catch ex As Exception
             ' Ignore errors here
@@ -391,7 +391,7 @@ Public Class clsSpectraCache
             For intIndex = intCurrentPoolLength To mMaximumPoolLength - 1
                 SpectraPool(intIndex) = New clsMSSpectrum
                 SpectraPoolInfo(intIndex).CacheState = eCacheStateConstants.UnusedSlot
-            Next intIndex
+            Next
         End If
 
     End Sub
@@ -464,7 +464,7 @@ Public Class clsSpectraCache
         For intIndex = 0 To SpectraPool.Length - 1
             SpectraPool(intIndex) = New clsMSSpectrum
             SpectraPoolInfo(intIndex).CacheState = eCacheStateConstants.UnusedSlot
-        Next intIndex
+        Next
 
     End Sub
 
@@ -532,11 +532,11 @@ Public Class clsSpectraCache
                     .IonCount = intIonCount
                     For intIndex = 0 To .IonCount - 1
                         .IonsMZ(intIndex) = mPageFileReader.ReadDouble()
-                    Next intIndex
+                    Next
 
                     For intIndex = 0 To .IonCount - 1
                         .IonsIntensity(intIndex) = mPageFileReader.ReadSingle()
-                    Next intIndex
+                    Next
 
                 End With
 
@@ -666,7 +666,7 @@ Public Class clsSpectraCache
             ' ReSharper disable once RedundantAssignment
             For intIndex = 0 To 63
                 mPageFileWriter.Write(Byte.MinValue)
-            Next intIndex
+            Next
             mPageFileWriter.Flush()
 
             ' Initialize the binary reader

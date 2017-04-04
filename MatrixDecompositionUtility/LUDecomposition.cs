@@ -4,7 +4,7 @@ namespace MatrixDecompositionUtility
 {
     public class LUDecomposition
     {
-        
+
         public double[] ProcessData(double[,] a, int n, double[] b) {
             var indx = new int[n];
 

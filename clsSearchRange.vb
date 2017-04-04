@@ -591,7 +591,7 @@ Public Class clsSearchRange
 
         For intIndex = 0 To intLength - 1
             mPointerIndices(intIndex) = intIndex
-        Next intIndex
+        Next
 
         If intLength > 0 Then
             mPointerArrayIsValid = True

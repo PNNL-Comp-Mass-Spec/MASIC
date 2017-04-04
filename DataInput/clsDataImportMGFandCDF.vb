@@ -230,7 +230,7 @@ Namespace DataInput
                         Console.Write(".")
                     End If
 
-                Next intMsScanIndex
+                Next
 
                 ' Record the current memory usage (before we close the .CDF file)
                 OnUpdateMemoryUsage()
@@ -293,7 +293,7 @@ Namespace DataInput
                             ElseIf scanList.SurveyScans(intSurveyScanIndex).ScanNumber > objSpectrumInfo.ScanNumber Then
                                 Exit For
                             End If
-                        Next intSurveyScanIndex
+                        Next
                     End If
 
                     If intScanNumberCorrection > 0 Then
@@ -384,7 +384,7 @@ Namespace DataInput
                             .TotalIonIntensity = 0
                             For intIonIndex = 0 To .IonCount - 1
                                 .TotalIonIntensity += objMSSpectrum.IonsIntensity(intIonIndex)
-                            Next intIonIndex
+                            Next
 
                             ' Determine the minimum positive intensity in this scan
                             .MinimumPositiveIntensity =
@@ -484,7 +484,7 @@ Namespace DataInput
                     End If
 
                     SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, eScanType, currentScan, sicOptions.DatasetNumber)
-                Next intScanIndex
+                Next
 
                 Console.WriteLine()
 
@@ -527,7 +527,7 @@ Namespace DataInput
                         dblMZMax = dblMZList(intDataIndex)
                     End If
 
-                Next intDataIndex
+                Next
 
                 sngBasePeakIonIntensity = sngIonIntensity(intBasePeakIndex)
                 Return dblMZList(intBasePeakIndex)
@@ -652,7 +652,7 @@ Namespace DataInput
 
                 For intIndex = 0 To .MasterScanOrderCount - 1
                     intMasterScanOrderIndices(intIndex) = intIndex
-                Next intIndex
+                Next
 
                 ' Sort .MasterScanNumList ascending, sorting the scan order indices array in parallel
                 Array.Sort(.MasterScanNumList, intMasterScanOrderIndices)
@@ -663,7 +663,7 @@ Namespace DataInput
                     If intMasterScanOrderIndices(intIndex) < intMasterScanOrderIndices(intIndex - 1) Then
                         blnListWasSorted = True
                     End If
-                Next intIndex
+                Next
 
                 If blnListWasSorted Then
                     ' Reorder .MasterScanOrder
@@ -676,7 +676,7 @@ Namespace DataInput
                     For intIndex = 0 To .MasterScanOrderCount - 1
                         .MasterScanOrder(intIndex) = udtMasterScanOrderListCopy(intMasterScanOrderIndices(intIndex))
                         .MasterScanTimeList(intIndex) = sngMasterScanTimeListCopy(intMasterScanOrderIndices(intIndex))
-                    Next intIndex
+                    Next
                 End If
 
 

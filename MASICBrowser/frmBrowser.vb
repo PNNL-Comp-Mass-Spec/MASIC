@@ -1376,7 +1376,7 @@ Public Class frmBrowser
                     End If
                 End With
             End With
-        Next intParentIonIndex
+        Next
 
         If udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = Double.MaxValue Then
             udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = 1
@@ -1415,7 +1415,7 @@ Public Class frmBrowser
                         If .SICScans(intIndex) = .SurveyScanNumber Then
                             udtSICStats.Peak.IndexObserved = intIndex
                         End If
-                    Next intIndex
+                    Next
                 End If
 
                 ' Determine the value for .ParentIonIntensity
@@ -1547,7 +1547,7 @@ Public Class frmBrowser
                                 End If
                             End If
                         End With
-                    Next intIndexCompare
+                    Next
 
                     With mParentIonStats(intParentIonIndex)
 
@@ -1587,7 +1587,7 @@ Public Class frmBrowser
                                                 intMatchIndex = intScanIndex
                                                 Exit For
                                             End If
-                                        Next intScanIndex
+                                        Next
                                     End If
 
                                     If intMatchIndex >= 0 Then
@@ -1629,7 +1629,7 @@ Public Class frmBrowser
                     End With
 
                 End If
-            Next intParentIonIndex
+            Next
 
         Catch ex As Exception
             MessageBox.Show("Error in FindSimilarParentIon: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -1855,7 +1855,7 @@ Public Class frmBrowser
                             intIndexMatch = intIndex
                             Exit For
                         End If
-                    Next intIndex
+                    Next
 
                     If intIndexMatch >= 0 Then
                         lstParentIonData.SelectedIndex = intIndexMatch
@@ -1867,7 +1867,7 @@ Public Class frmBrowser
                                 intScanDifference = Math.Abs(mParentIonStats(mParentIonPointerArray(intIndex)).FragScanObserved - intScanNumberToFind)
                                 intIndexMatch = intIndex
                             End If
-                        Next intIndex
+                        Next
 
                         If intIndexMatch >= 0 Then
                             lstParentIonData.SelectedIndex = intIndexMatch
@@ -2343,7 +2343,7 @@ Public Class frmBrowser
             If Not htFragScanToIndex.ContainsKey(mParentIonStats(intIndex).FragScanObserved) Then
                 htFragScanToIndex.Add(mParentIonStats(intIndex).FragScanObserved, intIndex)
             End If
-        Next intIndex
+        Next
 
         For Each objRow In mMsMsResults.Tables(TABLE_NAME_MSMSRESULTS).Rows
             If htFragScanToIndex.Contains(objRow.Item(COL_NAME_SCAN)) Then
@@ -2582,7 +2582,7 @@ Public Class frmBrowser
 
                                                 End If
                                                 .SICScans(intCharIndex) = .SICScans(intCharIndex - 1) + intInterval
-                                            Next intCharIndex
+                                            Next
                                         Else
                                             If strErrorLog.Length < 1024 Then
                                                 strErrorLog &= "Missing 'SICScanInterval' node for parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
@@ -2605,7 +2605,7 @@ Public Class frmBrowser
                                                 Else
                                                     .SICData(intIndex) = 0
                                                 End If
-                                            Next intIndex
+                                            Next
                                         Else
                                             If strErrorLog.Length < 1024 Then
                                                 strErrorLog &= "Missing 'IntensityDataList' node for parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
@@ -2627,7 +2627,7 @@ Public Class frmBrowser
                                                 Else
                                                     .SICMassData(intIndex) = 0
                                                 End If
-                                            Next intIndex
+                                            Next
                                         Else
                                             If strErrorLog.Length < 1024 Then
                                                 strErrorLog &= "Missing 'IntensityDataList' node for parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
@@ -2652,7 +2652,7 @@ Public Class frmBrowser
                                                 Else
                                                     .SICStats.SICSmoothedYData(intIndex) = 0
                                                 End If
-                                            Next intIndex
+                                            Next
 
                                             ReDim Preserve .SICStats.SICSmoothedYData(Math.Min(strValueList.Length, .DataCount) - 1)
                                         Else
@@ -2665,7 +2665,7 @@ Public Class frmBrowser
                                             If .SICData(intIndex) > .SICIntensityMax Then
                                                 .SICIntensityMax = .SICData(intIndex)
                                             End If
-                                        Next intIndex
+                                        Next
 
                                         If .SICStats.Peak.IndexBaseLeft < 0 Then
                                             .SICStats.Peak.IndexBaseLeft = 0
@@ -3092,7 +3092,7 @@ Public Class frmBrowser
                 Application.DoEvents()
                 If objProgress.KeyPressAbortProcess Then Exit For
 
-            Next intParentIonIndex
+            Next
 
             SortData()
 
@@ -3361,7 +3361,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByScanPeakCenter
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3371,7 +3371,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByScanOptimalPeakCenter
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3381,7 +3381,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByMz
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3391,7 +3391,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByPeakSignalToNoise
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3401,7 +3401,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByBaselineCorrectedPeakIntensity
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3413,7 +3413,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByBaselineCorrectedPeakArea
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3425,7 +3425,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByPeakWidth
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3436,7 +3436,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortBySICIntensityMax
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3452,7 +3452,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByPeakIntensity
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3462,7 +3462,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByPeakArea
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3472,7 +3472,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByFragScanToOptimalLocDistance
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3483,7 +3483,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByPeakCenterToOptimalLocDistance
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3494,7 +3494,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByShoulderCount
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3505,7 +3505,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByParentIonIntensity
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3515,7 +3515,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByPeakSkew
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3525,7 +3525,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByKSStat
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3535,7 +3535,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
             Case eSortOrderConstants.SortByBaselineNoiseLevel
                 For intIndex = 0 To mParentIonCount - 1
                     With mParentIonStats(intIndex)
@@ -3545,7 +3545,7 @@ Public Class frmBrowser
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
-                Next intIndex
+                Next
 
         End Select
 
@@ -3615,7 +3615,7 @@ Public Class frmBrowser
             strResults &= TestValueToStringWork(1234, intDigits) & ControlChars.NewLine
             strResults &= TestValueToStringWork(12340, intDigits) & ControlChars.NewLine
             strResults &= ControlChars.NewLine
-        Next intDigits
+        Next
 
 
         MsgBox(strResults)
@@ -3762,7 +3762,7 @@ Public Class frmBrowser
                 ReDim udtSICStats.SICSmoothedYData(dblSmoothedYData.Length - 1)
                 For intIndex = 0 To dblSmoothedYData.Length - 1
                     udtSICStats.SICSmoothedYData(intIndex) = CSng(dblSmoothedYData(intIndex))
-                Next intIndex
+                Next
             End With
         End If
 

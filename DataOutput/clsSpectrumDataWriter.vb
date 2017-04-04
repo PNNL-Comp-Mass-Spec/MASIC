@@ -87,7 +87,7 @@ Namespace DataOutput
                     If mOptions.AbortProcessing Then
                         Exit For
                     End If
-                Next intMasterOrderIndex
+                Next
 
                 If Not srDataOutfile Is Nothing Then srDataOutfile.Close()
                 If Not srScanInfoOutFile Is Nothing Then srScanInfoOutFile.Close()
@@ -174,7 +174,7 @@ Namespace DataOutput
                     For intIonIndex = 0 To .IonCount - 1
                         sngIntensities(intIonIndex) = .IonsIntensity(intIonIndex)
                         intPointerArray(intIonIndex) = intIonIndex
-                    Next intIonIndex
+                    Next
 
                     ' Sort intPointerArray() based on the intensities in sngIntensities
                     Array.Sort(sngIntensities, intPointerArray)
@@ -217,7 +217,7 @@ Namespace DataOutput
                               sngFWHM, sngSignalToNoise, sngMonoisotopicAbu, sngMonoPlus2Abu)
 
                         End If
-                    Next intIonIndex
+                    Next
                 End If
 
             End With
@@ -286,7 +286,7 @@ Namespace DataOutput
                     For intIonIndex = 0 To .IonCount - 1
                         sngIntensities(intIonIndex) = .IonsIntensity(intIonIndex)
                         intPointerArray(intIonIndex) = intIonIndex
-                    Next intIonIndex
+                    Next
 
                     ' Sort intPointerArray() based on the intensities in sngIntensities
                     Array.Sort(sngIntensities, intPointerArray)
@@ -325,7 +325,7 @@ Namespace DataOutput
                             srOutFile.WriteLine(strLineOut)
                             intExportCount += 1
                         End If
-                    Next intIonIndex
+                    Next
                 End If
 
                 srOutFile.WriteLine("Number of peaks in spectrum = " & .IonCount.ToString())

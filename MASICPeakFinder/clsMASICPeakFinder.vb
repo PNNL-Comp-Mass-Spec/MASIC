@@ -336,14 +336,14 @@ Public Class clsMASICPeakFinder
             For intIndex = intIndexStart To intExclusionIndexStart
                 dblSumA += Math.Max(sngMinimumPositiveValue, sngData(intIndex))
                 intValidDataCountA += 1
-            Next intIndex
+            Next
 
             Dim intValidDataCountB = 0
             Dim dblSumB As Double = 0
             For intIndex = intExclusionIndexEnd To intIndexEnd
                 dblSumB += Math.Max(sngMinimumPositiveValue, sngData(intIndex))
                 intValidDataCountB += 1
-            Next intIndex
+            Next
 
             blnSuccess = ComputeAverageNoiseLevelCheckCounts(intValidDataCountA, intValidDataCountB, dblSumA, dblSumB, MINIMUM_PEAK_WIDTH, udtBaselineNoiseStats)
 
@@ -362,12 +362,12 @@ Public Class clsMASICPeakFinder
                     For intIndex = intIndexStart To intExclusionIndexStart
                         dblSumA += (Math.Max(sngMinimumPositiveValue, sngData(intIndex)) - .NoiseLevel) ^ 2
                         intValidDataCountA += 1
-                    Next intIndex
+                    Next
 
                     For intIndex = intExclusionIndexEnd To intIndexEnd
                         dblSumB += (Math.Max(sngMinimumPositiveValue, sngData(intIndex)) - .NoiseLevel) ^ 2
                         intValidDataCountB += 1
-                    Next intIndex
+                    Next
                 End If
 
                 If intValidDataCountA + intValidDataCountB > 0 Then
@@ -467,7 +467,7 @@ Public Class clsMASICPeakFinder
 
                     For intSegmentIndexCopy = intSegmentIndex To intSegmentCountLocal - 2
                         udtBaselineNoiseStats(intSegmentIndexCopy) = udtBaselineNoiseStats(intSegmentIndexCopy + 1)
-                    Next intSegmentIndexCopy
+                    Next
                     intSegmentCountLocal -= 1
                 End If
                 intSegmentIndex -= 1
@@ -509,7 +509,7 @@ Public Class clsMASICPeakFinder
 
         For intIndex = intIndexStart To intIndexEnd
             sngDataSorted(intIndex - intIndexStart) = sngData(intIndex)
-        Next intIndex
+        Next
 
         ' Sort the array
         Array.Sort(sngDataSorted)
@@ -525,7 +525,7 @@ Public Class clsMASICPeakFinder
         Dim dblSum As Double = 0
         For intIndex = intDataSortedIndexStart To intDataSortedIndexEnd
             dblSum += sngDataSorted(intIndex)
-        Next intIndex
+        Next
 
         Dim intDataUsedCount = intDataSortedIndexEnd - intDataSortedIndexStart + 1
         Dim dblAverage = dblSum / intDataUsedCount
@@ -536,7 +536,7 @@ Public Class clsMASICPeakFinder
             dblSum = 0
             For intIndex = intDataSortedIndexStart To intDataSortedIndexEnd
                 dblSum += (sngDataSorted(intIndex) - dblAverage) ^ 2
-            Next intIndex
+            Next
             dblVariance = dblSum / (intDataUsedCount - 1)
         Else
             dblVariance = 0
@@ -577,7 +577,7 @@ Public Class clsMASICPeakFinder
             dblSum = 0
             For intIndex = intDataSortedIndexStart To intDataSortedIndexEnd
                 dblSum += (sngDataSorted(intIndex) - udtBaselineNoiseStats.NoiseLevel) ^ 2
-            Next intIndex
+            Next
 
             With udtBaselineNoiseStats
                 If intDataUsedCount > 1 Then
@@ -638,7 +638,7 @@ Public Class clsMASICPeakFinder
                             .IndexMax = intDataIndex
                             sngMaximumIntensity = SICData(intDataIndex)
                         End If
-                    Next intDataIndex
+                    Next
                 End If
 
                 ' Look for the intensity halfway down the peak (correcting for baseline noise level if blnSubtractBaselineNoise = True)
@@ -682,7 +682,7 @@ Public Class clsMASICPeakFinder
                             End If
                             Exit For
                         End If
-                    Next intDataIndex
+                    Next
                     If sngFWHMScanStart < 0 Then
                         If .IndexMax > .IndexBaseLeft Then
                             sngFWHMScanStart = SICScanNumbers(.IndexMax - 1)
@@ -716,7 +716,7 @@ Public Class clsMASICPeakFinder
                             End If
                             Exit For
                         End If
-                    Next intDataIndex
+                    Next
                     If sngFWHMScanEnd < 0 Then
                         If .IndexMax < .IndexBaseRight Then
                             sngFWHMScanEnd = SICScanNumbers(.IndexMax + 1)
@@ -800,19 +800,19 @@ Public Class clsMASICPeakFinder
         For intIndex = 0 To intDataCount - 1
             intXData(intIndex) = intXDataIn(intIndex) - intScanOffset
             dblYData(intIndex) = sngYDataIn(intIndex)
-        Next intIndex
+        Next
 
         dblYDataSum = 0
         For intIndex = 0 To dblYData.Length - 1
             dblYDataSum += dblYData(intIndex)
-        Next intIndex
+        Next
         If Math.Abs(dblYDataSum) < Double.Epsilon Then dblYDataSum = 1
 
         ' Compute the Vector of normalized intensities = observed pdf
         ReDim dblYDataNormalized(dblYData.Length - 1)
         For intIndex = 0 To dblYData.Length - 1
             dblYDataNormalized(intIndex) = dblYData(intIndex) / dblYDataSum
-        Next intIndex
+        Next
 
         ' Estimate the empirical distribution function (EDF) using an accumulating sum
         dblYDataSum = 0
@@ -820,19 +820,20 @@ Public Class clsMASICPeakFinder
         For intIndex = 0 To dblYDataNormalized.Length - 1
             dblYDataSum += dblYDataNormalized(intIndex)
             dblYDataEDF(intIndex) = dblYDataSum
-        Next intIndex
+        Next
 
         ' Compute the Vector of Normal PDF values evaluated at the X values in the peak window
         ReDim dblXDataPDF(intXData.Length - 1)
         For intIndex = 0 To intXData.Length - 1
-            dblXDataPDF(intIndex) = (1 / (Math.Sqrt(2 * Math.PI) * peakStDev)) * Math.Exp((-1 / 2) * ((intXData(intIndex) - (peakMean - intScanOffset)) / peakStDev) ^ 2)
-        Next intIndex
+            dblXDataPDF(intIndex) = (1 / (Math.Sqrt(2 * Math.PI) * peakStDev)) * Math.Exp((-1 / 2) *
+                                    ((intXData(intIndex) - (peakMean - intScanOffset)) / peakStDev) ^ 2)
+        Next
 
         Dim dblXDataPDFSum As Double
         dblXDataPDFSum = 0
         For intIndex = 0 To dblXDataPDF.Length - 1
             dblXDataPDFSum += dblXDataPDF(intIndex)
-        Next intIndex
+        Next
 
         ' Estimate the theoretical CDF using an accumulating sum
         ReDim dblXDataCDF(dblXDataPDF.Length - 1)
@@ -840,7 +841,7 @@ Public Class clsMASICPeakFinder
         For intIndex = 0 To dblXDataPDF.Length - 1
             dblYDataSum += dblXDataPDF(intIndex)
             dblXDataCDF(intIndex) = dblYDataSum / ((1 + (1 / intXData.Length)) * dblXDataPDFSum)
-        Next intIndex
+        Next
 
         ' Compute the maximum of the absolute differences between the YData EDF and XData CDF
         KS_gof = 0
@@ -849,7 +850,7 @@ Public Class clsMASICPeakFinder
             If dblCompare > KS_gof Then
                 KS_gof = dblCompare
             End If
-        Next intIndex
+        Next
 
         Return Math.Sqrt(intXData.Length) * KS_gof   '  return modified KS statistic
 
@@ -1101,7 +1102,7 @@ Public Class clsMASICPeakFinder
                 sngIntensities(intIndexPointer) = SICData(intDataIndex)
                 'sngIntensitiesSmoothed(intIndexPointer) = udtSmoothedYDataSubset.Data(intDataIndex - udtSmoothedYDataSubset.DataStartIndex)
                 'If sngIntensitiesSmoothed(intIndexPointer) < 0 Then sngIntensitiesSmoothed(intIndexPointer) = 0
-            Next intDataIndex
+            Next
             intAreaDataCount = udtSICPeak.IndexBaseRight - udtSICPeak.IndexBaseLeft + 1 + intAreaDataBaseIndex
 
             If SICData(udtSICPeak.IndexBaseRight) > sngIntensityThreshold Then
@@ -1122,7 +1123,7 @@ Public Class clsMASICPeakFinder
                 ' Area = 0.5 * DeltaX * (Y1 + Y2)
                 intScanDelta = intScanNumbers(intDataIndex + 1) - intScanNumbers(intDataIndex)
                 udtSICPeak.Area += CSng(0.5 * intScanDelta * (sngIntensities(intDataIndex) + sngIntensities(intDataIndex + 1)))
-            Next intDataIndex
+            Next
 
             If udtSICPeak.Area < 0 Then
                 udtSICPeak.Area = 0
@@ -1252,18 +1253,22 @@ Public Class clsMASICPeakFinder
                         End If
                         intDataCount += 1
                     End If
-                Next intDataIndex
+                Next
             Else
                 intDataCount = 0
                 For intDataIndex = udtSICPeak.IndexBaseLeft To udtSICPeak.IndexBaseRight
                     intScanNumbers(intDataCount) = SICScanNumbers(intDataIndex)
-                    sngIntensities(intDataCount) = BaselineAdjustIntensity(SICData(intDataIndex), udtSICPeak.BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
+                    sngIntensities(intDataCount) = BaselineAdjustIntensity(
+                      SICData(intDataIndex),
+                      udtSICPeak.BaselineNoiseStats.NoiseLevel,
+                      ALLOW_NEGATIVE_VALUES)
+
                     If sngIntensities(intDataCount) > sngMaximumBaselineAdjustedIntensity Then
                         sngMaximumBaselineAdjustedIntensity = sngIntensities(intDataCount)
                         intIndexMaximumIntensity = intDataCount
                     End If
                     intDataCount += 1
-                Next intDataIndex
+                Next
             End If
 
             ' Define an intensity threshold of 10% of MaximumBaselineAdjustedIntensity
@@ -1290,7 +1295,7 @@ Public Class clsMASICPeakFinder
                     intIndexPointer = intDataIndex - intValidDataIndexLeft
                     intScanNumbers(intIndexPointer) = intScanNumbers(intDataIndex)
                     sngIntensities(intIndexPointer) = sngIntensities(intDataIndex)
-                Next intDataIndex
+                Next
                 intDataCount = intValidDataIndexRight - intValidDataIndexLeft + 1
             End If
 
@@ -1315,7 +1320,7 @@ Public Class clsMASICPeakFinder
                             intIndexPointer = intDataIndex - intValidDataIndexLeft
                             intScanNumbers(intIndexPointer) = intScanNumbers(intDataIndex)
                             sngIntensities(intIndexPointer) = sngIntensities(intDataIndex)
-                        Next intDataIndex
+                        Next
                         intDataCount -= intValidDataIndexLeft
                     End If
 
@@ -1341,7 +1346,7 @@ Public Class clsMASICPeakFinder
                         For intDataIndex = intDataCount To 1 Step -1
                             intScanNumbers(intDataIndex) = intScanNumbers(intDataIndex - 1)
                             sngIntensities(intDataIndex) = sngIntensities(intDataIndex - 1)
-                        Next intDataIndex
+                        Next
                         intScanNumbers(0) = intScanNumbers(1) - intAvgScanInterval
                         sngIntensities(0) = sngIntensityThreshold
                         intDataCount += 1
@@ -1373,7 +1378,7 @@ Public Class clsMASICPeakFinder
                                 intDataCount += 1
                             End If
                         End If
-                    Next intDataIndex
+                    Next
                 Else
                     intValidDataIndexLeft = udtSICPeak.IndexMax - CInt(Math.Floor(intMinimumDataCount / 2))
                     If intValidDataIndexLeft < 0 Then intValidDataIndexLeft = 0
@@ -1384,7 +1389,7 @@ Public Class clsMASICPeakFinder
                             sngIntensities(intDataCount) = SICData(intDataIndex)
                             intDataCount += 1
                         End If
-                    Next intDataIndex
+                    Next
                 End If
 
                 If intDataCount < 3 Then
@@ -1408,9 +1413,10 @@ Public Class clsMASICPeakFinder
                     ' Interpolate between intDataIndex-1 and intValidDataIndexLeft
                     For intIndexPointer = intDataIndex To intValidDataIndexLeft - 1
                         If InterpolateY(sngInterpolatedIntensity, intScanNumbers(intDataIndex - 1), intScanNumbers(intValidDataIndexLeft), sngIntensities(intDataIndex - 1), sngIntensities(intValidDataIndexLeft), intScanNumbers(intIndexPointer)) Then
+                          intScanNumbers(intIndexPointer)) Then
                             sngIntensities(intIndexPointer) = sngInterpolatedIntensity
                         End If
-                    Next intIndexPointer
+                    Next
                     intDataIndex = intValidDataIndexLeft + 1
                 Else
                     intDataIndex += 1
@@ -1424,7 +1430,7 @@ Public Class clsMASICPeakFinder
                 ' Area = 0.5 * DeltaX * (Y1 + Y2)
                 intScanDelta = intScanNumbers(intDataIndex + 1) - intScanNumbers(intDataIndex)
                 dblArea += 0.5 * intScanDelta * (sngIntensities(intDataIndex) + sngIntensities(intDataIndex + 1))
-            Next intDataIndex
+            Next
 
             ' For the first moment (m1), need to sum: intensity times scan number
             ' For each of the moments, need to subtract intScanNumbers(0) from the scan numbers since statistical moments calcs are skewed if the first X value is not zero
@@ -1444,10 +1450,10 @@ Public Class clsMASICPeakFinder
                             If InterpolateY(sngInterpolatedIntensity, intScanNumbers(intDataIndex - 1), intScanNumbers(intDataIndex), sngIntensities(intDataIndex - 1), sngIntensities(intDataIndex), intScanNumberInterpolate) Then
                                 dblMoment1Sum += (intScanNumberInterpolate - intScanNumbers(0)) * sngInterpolatedIntensity
                             End If
-                        Next intScanNumberInterpolate
+                        Next
                     End If
                 End If
-            Next intDataIndex
+            Next
 
             If dblArea <= 0 Then
                 ' Cannot compute the center of mass; use the scan at .IndexMax instead
@@ -1486,14 +1492,19 @@ Public Class clsMASICPeakFinder
                         If sngIntensities(intDataIndex - 1) > 0 OrElse sngIntensities(intDataIndex) > 0 Then
                             For intScanNumberInterpolate = intScanNumbers(intDataIndex - 1) + 1 To intScanNumbers(intDataIndex) - 1
                                 ' Use InterpolateY() to fill in the scans between intDataIndex-1 and intDataIndex
-                                If InterpolateY(sngInterpolatedIntensity, intScanNumbers(intDataIndex - 1), intScanNumbers(intDataIndex), sngIntensities(intDataIndex - 1), sngIntensities(intDataIndex), intScanNumberInterpolate) Then
+                                If InterpolateY(
+                                  sngInterpolatedIntensity,
+                                  intScanNumbers(intDataIndex - 1), intScanNumbers(intDataIndex),
+                                  sngIntensities(intDataIndex - 1), sngIntensities(intDataIndex),
+                                  intScanNumberInterpolate) Then
+
                                     dblMoment2Sum += ((intScanNumberInterpolate - dblCenterOfMassDecimal) ^ 2) * sngInterpolatedIntensity
                                     dblMoment3Sum += ((intScanNumberInterpolate - dblCenterOfMassDecimal) ^ 3) * sngInterpolatedIntensity
                                 End If
-                            Next intScanNumberInterpolate
+                            Next
                         End If
                     End If
-                Next intDataIndex
+                Next
 
                 With udtSICPeak.StatisticalMoments
                     .StDev = CSng(Math.Sqrt(dblMoment2Sum / dblArea))
@@ -1586,7 +1597,7 @@ Public Class clsMASICPeakFinder
         Else
             For intIndex = intIndexStart To intIndexEnd
                 sngDataSorted(intIndex - intIndexStart) = sngData(intIndex)
-            Next intIndex
+            Next
         End If
 
         ' Sort the array
@@ -1602,7 +1613,7 @@ Public Class clsMASICPeakFinder
                         sngDataSorted(intValidDataCount) = sngDataSorted(intIndex)
                         intValidDataCount += 1
                     End If
-                Next intIndex
+                Next
 
                 If intValidDataCount < intDataSortedCount Then
                     intDataSortedCount = intValidDataCount
@@ -1639,7 +1650,7 @@ Public Class clsMASICPeakFinder
                             intCountSummed = intIndex
                             Exit For
                         End If
-                    Next intIndex
+                    Next
                     intIndexEnd = intCountSummed - 1
                 Else
                     ' eNoiseThresholdModes.TrimmedMeanByCount
@@ -1651,7 +1662,7 @@ Public Class clsMASICPeakFinder
                     dblSum = 0
                     For intIndex = 0 To intIndexEnd
                         dblSum += sngDataSorted(intIndex)
-                    Next intIndex
+                    Next
                 End If
 
                 If intCountSummed > 0 Then
@@ -1667,7 +1678,7 @@ Public Class clsMASICPeakFinder
                         dblSum = 0
                         For intIndex = 0 To intIndexEnd
                             dblSum += (sngDataSorted(intIndex) - udtBaselineNoiseStats.NoiseLevel) ^ 2
-                        Next intIndex
+                        Next
                         udtBaselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(dblSum / (intCountSummed - 1)))
                     Else
                         udtBaselineNoiseStats.NoiseStDev = 0
@@ -1698,7 +1709,7 @@ Public Class clsMASICPeakFinder
                             intIndexEnd = intIndex - 1
                             Exit For
                         End If
-                    Next intIndex
+                    Next
                 End If
 
                 If intIndexEnd Mod 2 = 0 Then
@@ -1721,7 +1732,7 @@ Public Class clsMASICPeakFinder
                 dblSum = 0
                 For intIndex = 0 To intIndexEnd
                     dblSum += (sngDataSorted(intIndex) - udtBaselineNoiseStats.NoiseLevel) ^ 2
-                Next intIndex
+                Next
 
                 With udtBaselineNoiseStats
                     intCountSummed = intIndexEnd + 1
@@ -1823,7 +1834,7 @@ Public Class clsMASICPeakFinder
                     sngMinimumPositiveValue = sngData(intIndex)
                 End If
             End If
-        Next intIndex
+        Next
         If sngMinimumPositiveValue >= Single.MaxValue OrElse sngMinimumPositiveValue < sngAbsoluteMinimumValue Then
             sngMinimumPositiveValue = sngAbsoluteMinimumValue
         End If
@@ -1936,7 +1947,7 @@ Public Class clsMASICPeakFinder
                     intDataPointCountAboveThreshold += 1
 
                 End If
-            Next intIndex
+            Next
 
             ' Determine the initial value for .PeakWidthPointsMinimum
             ' We will use dblMaximumIntensity and sngMinimumPeakIntensity to compute a S/N value to help pick .PeakWidthPointsMinimum
@@ -2012,7 +2023,7 @@ Public Class clsMASICPeakFinder
                             End If
                         Loop
 
-                    Next intPeakIndexCompare
+                    Next
 
                     ' Update the stats for the "official" peak
                     Dim bestPeak = peakData.Peaks(peakData.BestPeakIndex)
@@ -2057,7 +2068,7 @@ Public Class clsMASICPeakFinder
 
                         For intIndex = .DataStartIndex To intSmoothedYDataEndIndex
                             .Data(intIndex - .DataStartIndex) = CSng(Math.Min(peakData.SmoothedYData(intIndex), Single.MaxValue))
-                        Next intIndex
+                        Next
 
                     End With
 
@@ -2103,7 +2114,7 @@ Public Class clsMASICPeakFinder
                             dblMaximumIntensity = peakData.SmoothedYData(intIndex)
                             intPeakLocationIndex = intIndex
                         End If
-                    Next intIndex
+                    Next
 
 
                     Dim intComparisonPeakEdgeIndex As Integer
@@ -2139,7 +2150,7 @@ Public Class clsMASICPeakFinder
                                         intComparisonPeakEdgeIndex = intDataIndex
                                         Exit For
                                     End If
-                                Next intDataIndex
+                                Next
 
                                 ' Assure that intComparisonPeakEdgeIndex is less than intPeakIndexStart
                                 If intComparisonPeakEdgeIndex >= intPeakIndexStart Then
@@ -2155,7 +2166,7 @@ Public Class clsMASICPeakFinder
                                 End If
                             End If
                         End If
-                    Next intPeakIndexCompare
+                    Next
 
                     ' Search through peakDataSaved to find the closest peak to the right of this peak
                     intAdjacentIndex = peakDataSaved.Peaks.Count    ' Initially assign an invalid index
@@ -2181,7 +2192,7 @@ Public Class clsMASICPeakFinder
                                         intComparisonPeakEdgeIndex = intDataIndex
                                         Exit For
                                     End If
-                                Next intDataIndex
+                                Next
 
                                 ' Assure that intComparisonPeakEdgeIndex is greater than intPeakIndexEnd
                                 If intPeakIndexEnd >= intComparisonPeakEdgeIndex Then
@@ -2197,7 +2208,7 @@ Public Class clsMASICPeakFinder
                                 End If
                             End If
                         End If
-                    Next intPeakIndexCompare
+                    Next
 
 
                 Else
@@ -2288,7 +2299,7 @@ Public Class clsMASICPeakFinder
                             blnSuccess = True
                             Exit For
                         End If
-                    Next intFoundPeakIndex
+                    Next
 
                     If Not blnSuccess Then
                         ' No match was found; add a new peak at peaksContainer.OriginalPeakLocationIndex
@@ -2495,7 +2506,7 @@ Public Class clsMASICPeakFinder
                         peaksContainer.BestPeakArea = CSng(Math.Min(currentPeak.PeakArea, Single.MaxValue))
                     End If
                 End If
-            Next intFoundPeakIndex
+            Next
 
             If peaksContainer.BestPeakIndex >= 0 Then
                 blnValidPeakFound = True
@@ -2654,7 +2665,7 @@ Public Class clsMASICPeakFinder
                         End If
                     End If
                 End If
-            Next intIndex
+            Next
 
         End If
 
@@ -3085,7 +3096,7 @@ Public Class clsMASICPeakFinder
                         End If
                         Exit For
                     End If
-                Next intNoiseSegmentIndex
+                Next
             End If
         Catch ex As Exception
             ' Ignore Errors
@@ -3115,12 +3126,12 @@ Public Class clsMASICPeakFinder
                 sngMinimumPositiveValue = sngDataSorted(intIndex)
                 Exit For
             End If
-        Next intIndex
+        Next
 
         If sngMinimumPositiveValue < 1 Then sngMinimumPositiveValue = 1
         For intIndex = intIndexFirstPositiveValue To 0 Step -1
             sngDataSorted(intIndex) = sngMinimumPositiveValue
-        Next intIndex
+        Next
 
         Return sngMinimumPositiveValue
 

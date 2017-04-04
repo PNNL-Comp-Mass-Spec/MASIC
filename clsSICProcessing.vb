@@ -77,7 +77,7 @@ Public Class clsSICProcessing
                 intParentIonIndices(intMZListCount) = intParentIonIndex
                 intMZListCount += 1
             End If
-        Next intParentIonIndex
+        Next
 
         If intMZListCount > 0 Then
             If intMZListCount < scanList.ParentIonInfoCount Then
@@ -162,7 +162,7 @@ Public Class clsSICProcessing
                             End If
                         End If
                     End With
-                Next intParentIonIndex
+                Next
 
                 ' Now process each SIM Scan type
                 For intSIMIndex = 0 To intSIMIndexMax
@@ -172,7 +172,7 @@ Public Class clsSICProcessing
                                                    udtMZBinList, intParentIonIndices,
                                                    True, intSIMIndex, intParentIonsProcessed)
                     End If
-                Next intSIMIndex
+                Next
             End If
 
             ' Lastly, process the MRM scans (if any)
@@ -300,7 +300,7 @@ Public Class clsSICProcessing
                         sngMaximumIntensity = sngFullSICIntensities(intMZIndexWork, intScanIndex)
                         intScanIndexMax = intScanIndex
                     End If
-                Next intScanIndex
+                Next
             Catch ex As Exception
                 ReportError("ExtractSICDetailsFromFullSIC", "Error while creating initial SIC", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
             End Try
@@ -473,7 +473,7 @@ Public Class clsSICProcessing
                     Else
                         ' This shouldn't happen
                     End If
-                Next intScanIndex
+                Next
             End With
 
         Catch ex As Exception
@@ -687,8 +687,8 @@ Public Class clsSICProcessing
             intFullSICDataCount(intMZIndexWork) = 0
             For intSurveyScanIndex = 0 To scanList.SurveyScans.Count - 1
                 intFullSICScanIndices(intMZIndexWork, intSurveyScanIndex) = -1
-            Next intSurveyScanIndex
-        Next intMZIndexWork
+            Next
+        Next
 
         '---------------------------------------------------------
         ' Step through scanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
@@ -763,7 +763,7 @@ Public Class clsSICProcessing
 
                     intFullSICDataCount(intMZIndexWork) += 1
                 End With
-            Next intMZIndexWork
+            Next
 
             If intSurveyScanIndex Mod 100 = 0 Then
                 UpdateProgress("Loading raw SIC data: " & intSurveyScanIndex & " / " & scanList.SurveyScans.Count)
@@ -772,7 +772,7 @@ Public Class clsSICProcessing
                     Return False
                 End If
             End If
-        Next intSurveyScanIndex
+        Next
 
         UpdateProgress("Creating SIC's for the parent ions")
 
@@ -798,7 +798,7 @@ Public Class clsSICProcessing
             ' Copy the data for this m/z into sngFullSICIntensities1D()
             For intDataIndex = 0 To intFullSICDataCount(intMZIndexWork) - 1
                 sngFullSICIntensities1D(intDataIndex) = sngFullSICIntensities(intMZIndexWork, intDataIndex)
-            Next intDataIndex
+            Next
 
             ' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
             Dim blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1, masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, udtMZSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
@@ -907,7 +907,7 @@ Public Class clsSICProcessing
                     End If
 
 
-                Next intParentIonIndexPointer
+                Next
             End If
 
             '--------------------------------------------------------
@@ -934,7 +934,7 @@ Public Class clsSICProcessing
                             intScanIndexObservedInFullSIC = intDataIndex
                             Exit For
                         End If
-                    Next intDataIndex
+                    Next
 
                     If intScanIndexObservedInFullSIC = -1 Then
                         ' Match wasn't found; this is unexpected
@@ -982,7 +982,7 @@ Public Class clsSICProcessing
                 blnParentIonUpdated(intParentIonIndexPointer) = True
                 intParentIonsProcessed += 1
 
-            Next intParentIonIndexPointer
+            Next
 
             '---------------------------------------------------------
             ' Update progress
@@ -1013,7 +1013,7 @@ Public Class clsSICProcessing
                 ReportError("ProcessMZList", "Error updating progress", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
             End Try
 
-        Next intMZIndexWork
+        Next
 
         Return True
 
@@ -1099,7 +1099,7 @@ Public Class clsSICProcessing
                                 .Peak.IndexObserved = intDataIndex
                                 Exit For
                             End If
-                        Next intDataIndex
+                        Next
 
                         If .Peak.IndexObserved = -1 Then
                             ' Match wasn't found; this is unexpected

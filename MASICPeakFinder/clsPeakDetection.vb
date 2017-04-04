@@ -43,7 +43,7 @@ Friend Class clsPeakDetection
 
     Public Function ComputeSlope(dblXValsZeroBased() As Double, dblYValsZeroBased() As Double, intStartIndex As Integer, intEndIndex As Integer) As Double
 
-        Const POLYNOMIAL_ORDER As Integer = 1
+        Const POLYNOMIAL_ORDER = 1
 
         Dim intSegmentCount As Integer
         Dim intIndex As Integer
@@ -64,7 +64,7 @@ Friend Class clsPeakDetection
         For intIndex = intStartIndex To intEndIndex
             dblSegmentX(intIndex - intStartIndex) = dblXValsZeroBased(intIndex)
             dblSegmentY(intIndex - intStartIndex) = dblYValsZeroBased(intIndex)
-        Next intIndex
+        Next
 
         ' Compute the coefficients for the curve fit
         LeastSquaresFit(dblSegmentX, dblSegmentY, dblCoefficients, POLYNOMIAL_ORDER)
@@ -150,7 +150,7 @@ Friend Class clsPeakDetection
                 If dblYValsZeroBased(intIndex) > dblMaximumIntensity Then
                     dblMaximumIntensity = dblYValsZeroBased(intIndex)
                 End If
-            Next intIndex
+            Next
 
             dblIntensityThreshold = dblMaximumIntensity * (intPeakDetectIntensityThresholdPercentageOfMaximum / 100.0)
             If dblIntensityThreshold < dblIntensityThresholdAbsoluteMinimum Then
@@ -204,7 +204,7 @@ Friend Class clsPeakDetection
                                     Else
                                         intLowIntensityPointCount = 0
                                     End If
-                                Next intCompareIndex
+                                Next
                             Else
                                 newPeak.LeftEdge = 0
                             End If
@@ -226,7 +226,7 @@ Friend Class clsPeakDetection
                                     Else
                                         intLowIntensityPointCount = 0
                                     End If
-                                Next intCompareIndex
+                                Next
                             Else
                                 newPeak.RightEdge = intSourceDataCount - 1
                             End If
@@ -278,7 +278,7 @@ Friend Class clsPeakDetection
 
                     End If
                 End If
-            Next intIndex
+            Next
 
             ' Compute the peak areas
             For Each peakItem In detectedPeaks
@@ -309,7 +309,7 @@ Friend Class clsPeakDetection
                         For intAreaValsCopyIndex = intThisPeakStartIndex To intThisPeakEndIndex
                             dblXValsForArea(intAreaValsCopyIndex - intThisPeakStartIndex) = dblXValsZeroBased(intAreaValsCopyIndex)
                             dblYValsForArea(intAreaValsCopyIndex - intThisPeakStartIndex) = dblYValsZeroBased(intAreaValsCopyIndex)
-                        Next intAreaValsCopyIndex
+                        Next
 
                         peakItem.PeakArea = FindArea(dblXValsForArea, dblYValsForArea, intThisPeakWidthInPoints)
 
@@ -337,7 +337,7 @@ Friend Class clsPeakDetection
                             peakItem.PeakLocation = intDataIndexCheck
                             dblMaximumIntensity = dblYValsZeroBased(intDataIndexCheck)
                         End If
-                    Next intDataIndexCheck
+                    Next
 
                     If peakItem.PeakLocation < peakItem.LeftEdge Then peakItem.LeftEdge = peakItem.PeakLocation
                     If peakItem.PeakLocation > peakItem.RightEdge Then peakItem.RightEdge = peakItem.PeakLocation
@@ -368,7 +368,7 @@ Friend Class clsPeakDetection
             '   at the 2 points
 
             dblArea += 0.5 * Math.Abs(dblXVals(intIndex + 1) - dblXVals(intIndex)) * (dblYVals(intIndex) + dblYVals(intIndex + 1))
-        Next intIndex
+        Next
 
         Return dblArea
 
@@ -377,7 +377,7 @@ Friend Class clsPeakDetection
     Private Sub FitSegments(dblXVals() As Double, dblYVals() As Double, intSourceDataCount As Integer, intPeakWidthPointsMinimum As Integer, intPeakWidthMidPoint As Integer, ByRef dblFirstDerivative() As Double, ByRef dblSecondDerivative() As Double)
         ' dblXVals() and dblYVals() are zero-based arrays
 
-        Const POLYNOMIAL_ORDER As Integer = 2
+        Const POLYNOMIAL_ORDER = 2
 
         Dim dblSegmentX() As Double
         Dim dblSegmentY() As Double
@@ -399,7 +399,7 @@ Friend Class clsPeakDetection
             For intSubIndex = intStartIndex To intStartIndex + intPeakWidthPointsMinimum - 1
                 dblSegmentX(intSubIndex - intStartIndex) = dblXVals(intSubIndex)
                 dblSegmentY(intSubIndex - intStartIndex) = dblYVals(intSubIndex)
-            Next intSubIndex
+            Next
 
             ' Compute the coefficients for the curve fit
             LeastSquaresFit(dblSegmentX, dblSegmentY, dblCoefficients, POLYNOMIAL_ORDER)
@@ -409,7 +409,7 @@ Friend Class clsPeakDetection
             dblFirstDerivative(intMidPointIndex) = 2 * dblCoefficients(2) * dblXVals(intMidPointIndex) + dblCoefficients(1)
             dblSecondDerivative(intMidPointIndex) = 2 * dblCoefficients(2)
 
-        Next intStartIndex
+        Next
 
     End Sub
 
@@ -444,12 +444,12 @@ Friend Class clsPeakDetection
 
                     .ParamResult = 0
                 End With
-            Next intTerm
+            Next
 
             blnSuccess = LLSqFit(dblXVals, dblYVals, udtEquationTerms)
             For intTerm = 0 To intPolynomialOrder
                 dblCoefficients(intTerm) = udtEquationTerms(intTerm).ParamResult
-            Next intTerm
+            Next
         End If
 
         Return blnSuccess

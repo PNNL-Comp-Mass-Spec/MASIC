@@ -175,7 +175,7 @@ Public Class clsFilterDataArrayMaxCount
                 If mDataValues(intIndex) > sngMaxAbundance Then
                     sngMaxAbundance = mDataValues(intIndex)
                 End If
-            Next intIndex
+            Next
 
             ' Round sngMaxAbundance up to the next highest integer
             sngMaxAbundance = CLng(Math.Ceiling(sngMaxAbundance))
@@ -195,7 +195,7 @@ Public Class clsFilterDataArrayMaxCount
 
             For intIndex = 0 To intBinCount - 1
                 dblHistogramBinStartIntensity(intIndex) = intIndex * dblBinSize
-            Next intIndex
+            Next
 
             ' Parse mDataValues to populate intHistogramBinCounts
             For intIndex = 0 To mDataCount - 1
@@ -225,7 +225,7 @@ Public Class clsFilterDataArrayMaxCount
                 If intIndex Mod 10000 = 0 Then
                     UpdateProgress(CSng((0 + (intIndex + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
                 End If
-            Next intIndex
+            Next
 
             ' Now examine the frequencies in intHistogramBinCounts() to determine the minimum value to consider when sorting
             Dim intPointTotal = 0
@@ -236,7 +236,7 @@ Public Class clsFilterDataArrayMaxCount
                     intBinToSort = intIndex
                     Exit For
                 End If
-            Next intIndex
+            Next
 
             UpdateProgress(1 / SUBTASK_STEP_COUNT * 100.0#)
 
@@ -294,7 +294,7 @@ Public Class clsFilterDataArrayMaxCount
                         If intIndex Mod 10000 = 0 Then
                             UpdateProgress(CSng((1 + (intIndex + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
                         End If
-                    Next intIndex
+                    Next
 
                     If intBinToSortDataCount > 0 Then
                         If intBinToSortDataCount < sngBinToSortAbundances.Length Then
@@ -333,7 +333,7 @@ Public Class clsFilterDataArrayMaxCount
                         If intBinToSortDataCount < 1000 Or intBinToSortDataCount Mod 100 = 0 Then
                             UpdateProgress(CSng((3 + (intIndex + 1) / CDbl(intBinToSortDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
                         End If
-                    Next intIndex
+                    Next
                 End If
             Else
                 blnUseFullDataSort = True
@@ -371,7 +371,7 @@ Public Class clsFilterDataArrayMaxCount
             ' Change the abundance values to mSkipDataPointFlag for data up to index intDataCount-intMaximumDataCountInArraysToLoad-1
             For intIndex = 0 To intDataCount - intMaximumDataCountInArraysToLoad - 1
                 sngAbundances(intIndex) = mSkipDataPointFlag
-            Next intIndex
+            Next
 
             UpdateProgress(CSng((2.666 / intSubtaskStepCount) * 100.0#))
 

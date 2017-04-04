@@ -497,7 +497,7 @@ Public MustInherit Class clsProcessFilesBaseClass
                         strExtensionsToParse(intExtensionIndex) = strExtensionsToParse(intExtensionIndex).ToUpper()
                     End If
                 End If
-            Next intExtensionIndex
+            Next
         Catch ex As Exception
             HandleException("Error in RecurseFoldersWork", ex)
             mErrorCode = eProcessFilesErrorCodes.UnspecifiedError
@@ -530,7 +530,7 @@ Public MustInherit Class clsProcessFilesBaseClass
 
                     If mAbortProcessing Then Exit For
 
-                Next intExtensionIndex
+                Next
             Next ioFileMatch
         Catch ex As Exception
             HandleException("Error in RecurseFoldersWork", ex)

@@ -114,7 +114,7 @@ Namespace DataInput
                             ReDim eColumnMapping(strSplitLine.Length - 1)
                             For intColIndex = 0 To eColumnMapping.Length - 1
                                 eColumnMapping(intColIndex) = -1
-                            Next intColIndex
+                            Next
 
                             ' The first row must be the header row; parse the values
                             For intColIndex = 0 To strSplitLine.Length - 1
@@ -146,7 +146,7 @@ Namespace DataInput
                                     Case Else
                                         ' Unknown column name; ignore it
                                 End Select
-                            Next intColIndex
+                            Next
 
                             ' Make sure that, at a minimum, the MZ column is present
                             If Not blnMZHeaderFound Then
@@ -251,7 +251,7 @@ Namespace DataInput
                                         ' Unknown column code
                                 End Select
 
-                            Next intColIndex
+                            Next
 
                         End With
 

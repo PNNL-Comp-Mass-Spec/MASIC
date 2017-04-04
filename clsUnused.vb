@@ -35,7 +35,7 @@ Public Class clsUnused
     ''            End If
 
     ''        End With
-    ''    Next intParentIonIndex
+    ''    Next
 
     ''    If udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = Double.MaxValue Then
     ''        udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = 1
@@ -109,7 +109,7 @@ Public Class clsUnused
     ''                            .Peak.IndexObserved = intSurveyScanIndex
     ''                            Exit For
     ''                        End If
-    ''                    Next intSurveyScanIndex
+    ''                    Next
 
     ''                    If .Peak.IndexObserved = -1 Then
     ''                        ' Match wasn't found; this is unexpected
@@ -131,7 +131,7 @@ Public Class clsUnused
     ''                            intScanDelta = intSICScanNumbers(intSurveyScanIndex) - intSICScanNumbers(intSurveyScanIndex - 1)
     ''                            udtSICDetails.SICDataScanIntervals(intSurveyScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))        ' Make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
     ''                        End If
-    ''                    Next intSurveyScanIndex
+    ''                    Next
 
     ''                    ' Record the fragmentation scan number
     ''                    intFragScanNumber = scanList.FragScans(scanList.ParentIons(intParentIonIndex).FragScanIndices(0)).ScanNumber
@@ -354,7 +354,7 @@ Public Class clsUnused
                 intMatchIndex = 0
                 For intScanIndex = 0 To intScanListCount - 1
                     If scanList(intScanIndex).ScanNumber <= intScanNumberToFind Then intMatchIndex = intScanIndex
-                Next intScanIndex
+                Next
             End If
 
             Return scanList(intMatchIndex).ScanTime
@@ -396,7 +396,7 @@ Public Class clsUnused
                 End If
 
             End With
-        Next intScanIndex
+        Next
 
         srOutFile.Close()
 
