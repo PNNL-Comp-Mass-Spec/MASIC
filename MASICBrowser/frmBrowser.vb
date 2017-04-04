@@ -3263,33 +3263,36 @@ Public Class frmBrowser
     End Sub
 
     Private Sub ShowAboutBox()
-        Dim strMessage As String
+        Dim message = New List(Of String)
 
-        strMessage = String.Empty
+        message.Add("The MASIC Browser can be used to visualize the SIC's created using MASIC.")
+        message.Add("")
 
-        strMessage &= "The MASIC Browser can be used to visualize the SIC's created using MASIC." & ControlChars.NewLine & ControlChars.NewLine
+        message.Add("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003")
+        message.Add("Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.")
+        message.Add("")
 
-        strMessage &= "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" & ControlChars.NewLine
-        strMessage &= "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." & ControlChars.NewLine & ControlChars.NewLine
+        message.Add("This is version " & Application.ProductVersion & " (" & PROGRAM_DATE & ")")
+        message.Add("")
 
-        strMessage &= "This is version " & Application.ProductVersion & " (" & PROGRAM_DATE & ")" & ControlChars.NewLine & ControlChars.NewLine
+        message.Add("E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com")
+        message.Add("Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/")
+        message.Add("")
 
-        strMessage &= "E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com" & ControlChars.NewLine
-        strMessage &= "Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/" & ControlChars.NewLine & ControlChars.NewLine
+        message.Add("Licensed under the Apache License, Version 2.0; you may not use this file except in compliance with the License. ")
+        message.Add("You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0")
+        message.Add("")
 
-        strMessage &= "Licensed under the Apache License, Version 2.0; you may not use this file except in compliance with the License.  "
-        strMessage &= "You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0" & ControlChars.NewLine & ControlChars.NewLine
+        message.Add("Notice: This computer software was prepared by Battelle Memorial Institute, " &
+                    "hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the " &
+                    "Department of Energy (DOE).  All rights in the computer software are reserved " &
+                    "by DOE on behalf of the United States Government and the Contractor as " &
+                    "provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY " &
+                    "WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS " &
+                    "SOFTWARE.  This notice including this sentence must appear on any copies of " &
+                    "this computer software.")
 
-        strMessage &= "Notice: This computer software was prepared by Battelle Memorial Institute, "
-        strMessage &= "hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the "
-        strMessage &= "Department of Energy (DOE).  All rights in the computer software are reserved "
-        strMessage &= "by DOE on behalf of the United States Government and the Contractor as "
-        strMessage &= "provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY "
-        strMessage &= "WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS "
-        strMessage &= "SOFTWARE.  This notice including this sentence must appear on any copies of "
-        strMessage &= "this computer software." & ControlChars.NewLine
-
-        MessageBox.Show(strMessage, "About", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        MessageBox.Show(String.Join(ControlChars.NewLine, message), "About", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
     End Sub
 
