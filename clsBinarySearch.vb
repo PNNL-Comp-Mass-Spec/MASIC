@@ -1,5 +1,4 @@
-﻿Option Strict On
-
+﻿
 ''' <summary>
 ''' This class can be used to search a list of values for the value closest to the search value
 ''' If an exact match is found, then the index of that result is returned

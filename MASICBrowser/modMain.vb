@@ -1,6 +1,4 @@
-﻿Option Strict On
-
-Imports System.Collections.Generic
+﻿Imports System.Collections.Generic
 Imports System.IO
 Imports System.Reflection
 Imports SharedVBNetRoutines
