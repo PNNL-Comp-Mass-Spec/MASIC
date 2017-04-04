@@ -1,18 +1,12 @@
-﻿Option Strict On
-
+﻿
 Imports System.IO
 
-' This class can be used to search a list of values for the value closest to the search value
-' If an exact match is found, then the index of that result is returned
-' If an exact match is not found, then the MissingDataMode defines which value will be returned (closest, always previous, or always next)
-'
-' Note: The search functions assume the input data is already sorted
-'
-' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-' Copyright 2008, Battelle Memorial Institute.  All Rights Reserved.
-'
-' Last modified April 17, 2008
-
+''' <summary>
+''' This class can be used to search a list of values for the value closest to the search value
+''' If an exact match is found, then the index of that result is returned
+''' If an exact match is not found, then the MissingDataMode defines which value will be returned (closest, always previous, or always next)
+''' </summary>
+''' <remarks>The search functions assume the input data is already sorted</remarks>
 Public Class clsBinarySearch
 
     Public Enum eMissingDataModeConstants
@@ -21,10 +15,12 @@ Public Class clsBinarySearch
         ReturnNextPoint = 2
     End Enum
 
-    Public Shared Function BinarySearchFindNearest(ByRef intArrayToSearch() As Integer, intItemToSearchFor As Integer, intDataCount As Integer, Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+    Public Shared Function BinarySearchFindNearest(
+      intArrayToSearch() As Integer, intItemToSearchFor As Integer, intDataCount As Integer,
+      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through intArrayToSearch() for intItemToSearchFor, returning
         '  the index of the item if found
-        ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
+        ' If not found, returns the index of the closest match, based on eMissingDataMode
         ' Assumes intArrayToSearch() is already sorted
 
         Dim intIndexFirst As Integer, intIndexLast As Integer
@@ -139,7 +135,9 @@ Public Class clsBinarySearch
 
     End Function
 
-    Public Shared Function BinarySearchFindNearest(ByRef sngArrayToSearch() As Single, sngItemToSearchFor As Single, intDataCount As Integer, Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+    Public Shared Function BinarySearchFindNearest(
+      sngArrayToSearch() As Single, sngItemToSearchFor As Single, intDataCount As Integer,
+      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through sngArrayToSearch() for sngItemToSearchFor, returning
         '  the index of the item if found
         ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
@@ -172,7 +170,7 @@ Public Class clsBinarySearch
                 intMidIndex = (intCurrentFirst + intCurrentLast) \ 2            ' Note: Using Integer division
                 If intMidIndex < intCurrentFirst Then intMidIndex = intCurrentFirst
 
-                Do While intCurrentFirst <= intCurrentLast AndAlso sngArrayToSearch(intMidIndex) <> sngItemToSearchFor
+                Do While intCurrentFirst <= intCurrentLast AndAlso Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) > Single.Epsilon
                     If sngItemToSearchFor < sngArrayToSearch(intMidIndex) Then
                         ' Search the lower half
                         intCurrentLast = intMidIndex - 1
@@ -195,7 +193,7 @@ Public Class clsBinarySearch
                 intMatchIndex = -1
                 ' See if an exact match has been found
                 If intMidIndex >= intCurrentFirst AndAlso intMidIndex <= intCurrentLast Then
-                    If sngArrayToSearch(intMidIndex) = sngItemToSearchFor Then
+                    If Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) < Single.Epsilon Then
                         intMatchIndex = intMidIndex
                     End If
                 End If
@@ -257,7 +255,9 @@ Public Class clsBinarySearch
 
     End Function
 
-    Public Shared Function BinarySearchFindNearest(ByRef dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer, Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+    Public Shared Function BinarySearchFindNearest(
+      dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer,
+      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through dblArrayToSearch() for dblItemToSearchFor, returning
         '  the index of the item if found
         ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
@@ -290,7 +290,7 @@ Public Class clsBinarySearch
                 intMidIndex = (intCurrentFirst + intCurrentLast) \ 2            ' Note: Using Integer division
                 If intMidIndex < intCurrentFirst Then intMidIndex = intCurrentFirst
 
-                Do While intCurrentFirst <= intCurrentLast AndAlso dblArrayToSearch(intMidIndex) <> dblItemToSearchFor
+                Do While intCurrentFirst <= intCurrentLast AndAlso Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) > Single.Epsilon
                     If dblItemToSearchFor < dblArrayToSearch(intMidIndex) Then
                         ' Search the lower half
                         intCurrentLast = intMidIndex - 1
@@ -313,7 +313,7 @@ Public Class clsBinarySearch
                 intMatchIndex = -1
                 ' See if an exact match has been found
                 If intMidIndex >= intCurrentFirst AndAlso intMidIndex <= intCurrentLast Then
-                    If dblArrayToSearch(intMidIndex) = dblItemToSearchFor Then
+                    If Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) < Double.Epsilon Then
                         intMatchIndex = intMidIndex
                     End If
                 End If
@@ -376,222 +376,4 @@ Public Class clsBinarySearch
 
     End Function
 
-    Public Sub TestSearchFunctionsInt()
-        Const DATA_MODE_COUNT As Integer = 3
-
-        Dim intDataList() As Integer
-        Dim intSearchResults(,) As Integer
-        Dim intMaxDataValue As Integer
-
-        Dim intIndex As Integer
-        Dim intDataMode As Integer
-
-        Dim intSearchValueStart As Integer
-        Dim intSearchValueEnd As Integer
-        Dim intSearchResultIndex As Integer
-        Dim intIndexMatch As Integer
-
-        Dim eMissingDataMode As eMissingDataModeConstants
-
-        Dim srOutFile As StreamWriter
-        Dim strLineOut As String
-
-        Try
-            ' Initialize a data list with 10 items
-            ReDim intDataList(19)
-
-            For intIndex = 0 To intDataList.Length - 1
-                intMaxDataValue = intIndex + CInt(Math.Pow(intIndex, 1.5))
-                intDataList(intIndex) = intMaxDataValue
-            Next intIndex
-
-            Array.Sort(intDataList)
-
-            ' Write the data to disk
-            srOutFile = New StreamWriter("BinarySearch_Test_Int.txt", False)
-
-            srOutFile.WriteLine("Data_Index" & ControlChars.Tab & "Data_Value")
-            For intIndex = 0 To intDataList.Length - 1
-                srOutFile.WriteLine(intIndex.ToString & ControlChars.Tab & intDataList(intIndex).ToString)
-            Next intIndex
-
-            srOutFile.WriteLine()
-
-            ' Initialize intSearchResults
-            ' Note that intSearchResults(0,x) will contain the search values
-            '  while intSearchResults(1,x) and up will contain the search reuslts
-
-            intSearchValueStart = -10
-            intSearchValueEnd = intMaxDataValue + 10
-
-            ReDim intSearchResults(DATA_MODE_COUNT, intSearchValueEnd - intSearchValueStart)
-
-            intSearchResultIndex = 0
-            For intIndex = intSearchValueStart To intSearchValueEnd
-                intSearchResults(0, intSearchResultIndex) = intIndex
-                intSearchResultIndex += 1
-            Next intIndex
-
-            ' Search intDataList for each number between intSearchValueStart and intSearchValueEnd
-            For intDataMode = 0 To DATA_MODE_COUNT - 1
-                eMissingDataMode = CType(intDataMode, eMissingDataModeConstants)
-
-                For intIndex = 0 To intSearchResults.GetUpperBound(1)
-                    intIndexMatch = BinarySearchFindNearest(intDataList, intSearchResults(0, intIndex), intDataList.Length, eMissingDataMode)
-                    intSearchResults(intDataMode + 1, intIndex) = intIndexMatch
-                Next intIndex
-
-            Next intDataMode
-
-            ' Write the results to disk
-            strLineOut = "Search Value"
-            For intDataMode = 0 To DATA_MODE_COUNT - 1
-                strLineOut &= ControlChars.Tab & GetMissingDataModeName(CType(intDataMode, eMissingDataModeConstants)) & " Value"
-            Next
-
-            For intDataMode = 0 To DATA_MODE_COUNT - 1
-                strLineOut &= ControlChars.Tab & GetMissingDataModeName(CType(intDataMode, eMissingDataModeConstants))
-            Next
-
-            srOutFile.WriteLine(strLineOut)
-
-            intSearchResultIndex = 0
-            For intIndex = 0 To intSearchResults.GetUpperBound(1)
-                strLineOut = intSearchResults(0, intIndex).ToString
-
-                For intDataMode = 1 To DATA_MODE_COUNT
-                    strLineOut &= ControlChars.Tab & intDataList(intSearchResults(intDataMode, intIndex)).ToString
-                Next intDataMode
-
-                For intDataMode = 1 To DATA_MODE_COUNT
-                    strLineOut &= ControlChars.Tab & intSearchResults(intDataMode, intIndex).ToString
-                Next intDataMode
-
-                srOutFile.WriteLine(strLineOut)
-
-            Next intIndex
-
-            srOutFile.Close()
-
-        Catch ex As Exception
-            Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " & ex.Message)
-        End Try
-
-    End Sub
-
-    Public Sub TestSearchFunctionsDbl()
-        Const DATA_MODE_COUNT As Integer = 3
-
-        Dim dblDataList() As Double
-        Dim dblSearchResults(,) As Double
-        Dim dblMaxDataValue As Double
-
-        Dim intIndex As Integer
-        Dim intDataMode As Integer
-
-        Dim intSearchValueStart As Integer
-        Dim intSearchValueEnd As Integer
-        Dim intSearchResultIndex As Integer
-        Dim intIndexMatch As Integer
-
-        Dim eMissingDataMode As eMissingDataModeConstants
-
-        Dim srOutFile As StreamWriter
-        Dim strLineOut As String
-
-        Try
-            ' Initialize a data list with 10 items
-            ReDim dblDataList(19)
-
-            For intIndex = 0 To dblDataList.Length - 1
-                dblMaxDataValue = intIndex + CDbl(Math.Pow(intIndex, 1.5))
-                dblDataList(intIndex) = dblMaxDataValue
-            Next intIndex
-
-            Array.Sort(dblDataList)
-
-            ' Write the data to disk
-            srOutFile = New StreamWriter("BinarySearch_Test_Double.txt", False)
-
-            srOutFile.WriteLine("Data_Index" & ControlChars.Tab & "Data_Value")
-            For intIndex = 0 To dblDataList.Length - 1
-                srOutFile.WriteLine(intIndex.ToString & ControlChars.Tab & dblDataList(intIndex).ToString)
-            Next intIndex
-
-            srOutFile.WriteLine()
-
-            ' Initialize dblSearchResults
-            ' Note that dblSearchResults(0,x) will contain the search values
-            '  while dblSearchResults(1,x) and up will contain the search reuslts
-
-            intSearchValueStart = -10
-            intSearchValueEnd = CInt(dblMaxDataValue + 10)
-
-            ReDim dblSearchResults(DATA_MODE_COUNT, intSearchValueEnd - intSearchValueStart)
-
-            intSearchResultIndex = 0
-            For intIndex = intSearchValueStart To intSearchValueEnd
-                dblSearchResults(0, intSearchResultIndex) = CDbl(intIndex) + intIndex / 10.0
-                intSearchResultIndex += 1
-            Next intIndex
-
-            ' Search dblDataList for each number between intSearchValueStart and intSearchValueEnd
-            For intDataMode = 0 To DATA_MODE_COUNT - 1
-                eMissingDataMode = CType(intDataMode, eMissingDataModeConstants)
-
-                For intIndex = 0 To dblSearchResults.GetUpperBound(1)
-                    intIndexMatch = BinarySearchFindNearest(dblDataList, dblSearchResults(0, intIndex), dblDataList.Length, eMissingDataMode)
-                    dblSearchResults(intDataMode + 1, intIndex) = intIndexMatch
-                Next intIndex
-
-            Next intDataMode
-
-            ' Write the results to disk
-            strLineOut = "Search Value"
-            For intDataMode = 0 To DATA_MODE_COUNT - 1
-                strLineOut &= ControlChars.Tab & GetMissingDataModeName(CType(intDataMode, eMissingDataModeConstants)) & " Value"
-            Next
-
-            For intDataMode = 0 To DATA_MODE_COUNT - 1
-                strLineOut &= ControlChars.Tab & GetMissingDataModeName(CType(intDataMode, eMissingDataModeConstants))
-            Next
-
-            srOutFile.WriteLine(strLineOut)
-
-            intSearchResultIndex = 0
-            For intIndex = 0 To dblSearchResults.GetUpperBound(1)
-                strLineOut = dblSearchResults(0, intIndex).ToString
-
-                For intDataMode = 1 To DATA_MODE_COUNT
-                    strLineOut &= ControlChars.Tab & dblDataList(CInt(dblSearchResults(intDataMode, intIndex))).ToString
-                Next intDataMode
-
-                For intDataMode = 1 To DATA_MODE_COUNT
-                    strLineOut &= ControlChars.Tab & dblSearchResults(intDataMode, intIndex).ToString
-                Next intDataMode
-
-                srOutFile.WriteLine(strLineOut)
-
-            Next intIndex
-
-            srOutFile.Close()
-
-        Catch ex As Exception
-            Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " & ex.Message)
-        End Try
-
-    End Sub
-
-    Private Function GetMissingDataModeName(eMissingDataMode As eMissingDataModeConstants) As String
-        Select Case eMissingDataMode
-            Case eMissingDataModeConstants.ReturnClosestPoint
-                Return "Return Closest Point"
-            Case eMissingDataModeConstants.ReturnPreviousPoint
-                Return "Return Previous Point"
-            Case eMissingDataModeConstants.ReturnNextPoint
-                Return "Return Next Point"
-            Case Else
-                Return "Unknown mode"
-        End Select
-    End Function
 End Class
