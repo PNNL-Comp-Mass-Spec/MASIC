@@ -2259,8 +2259,8 @@ Public Class frmBrowser
                 sngYRange = 0
             End If
 
-                mSpectrum.YAxisPaddingMinimum = 0.02
-                mSpectrum.YAxisPaddingMaximum = 0.15
+            mSpectrum.SetLabelXAxis("Scan number")
+            mSpectrum.SetLabelYAxis("Intensity")
 
             ' Update the axis padding
             mSpectrum.XAxisPaddingMinimum = 0.01
