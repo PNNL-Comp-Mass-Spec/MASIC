@@ -56,7 +56,6 @@
   <ItemGroup>
     <Compile Include="clsBinarySearchTests.cs" />
     <Compile Include="clsDatabaseTests.cs" />
-    <Compile Include="clsDatabaseTestsNamedUser.cs" />
     <Compile Include="clsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -5,28 +5,17 @@ using NUnit.Framework;
 namespace MASICTest
 {
     [TestFixture]
-    [Category("DatabaseIntegrated")]
     public class DatabaseTests
     {
-
-        private clsMASICOptions mOptions;
-
-        private clsDatabaseAccess mDBAccessor;
+        private clsMASIC mMasic;
+        private MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
 
         [OneTimeSetUp()]
         public void Setup()
         {
-            var oMasic = new clsMASIC();
+            mMasic = new clsMASIC();
 
-            var oMASICPeakFinder = new MASICPeakFinder.clsMASICPeakFinder();
-
-            mOptions = new clsMASICOptions(oMasic.FileVersion, oMASICPeakFinder.ProgramVersion)
-            {
-                DatabaseConnectionString = "Data Source=gigasax;Initial Catalog=DMS5;Integrated Security=true"
-            };
-
-            mDBAccessor = new clsDatabaseAccess(mOptions);
-
+            mMASICPeakFinder = new MASICPeakFinder.clsMASICPeakFinder();
         }
 
         [Test()]
@@ -36,11 +25,47 @@ namespace MASICTest
         [TestCase("QC_Shew_16_01-500ng_3b_4Apr16_Falcon_16-01-09", 482564)]
         [TestCase(@"\\Proto-x\Share\QC_Shew_16_01-500ng_3b_4Apr16_Falcon_16-01-09", 482564)]
         [TestCase("nBSA_Supernatant_1_21Jul09", 155993)]
-        public void TestDatasetLookup(string datasetName, int expectedDatasetID)
+        [Category("DatabaseIntegrated")]
+        public void TestDatasetLookupIntegrated(string datasetName, int expectedDatasetID)
+        {
+            TestDatasetLookup(datasetName, expectedDatasetID, "Integrated", "");
+        }
+
+        [Test()]
+        [TestCase("FakeNonexistentDataset.raw", 1)]
+        [TestCase(@"c:\Temp\FakeNonexistentDataset.raw", 1)]
+        [TestCase("QC_Shew_16_01_R1_23Mar17_Pippin_16-11-03", 571774)]
+        [TestCase("QC_Shew_16_01-500ng_3b_4Apr16_Falcon_16-01-09", 482564)]
+        [TestCase(@"\\Proto-x\Share\QC_Shew_16_01-500ng_3b_4Apr16_Falcon_16-01-09", 482564)]
+        [TestCase("nBSA_Supernatant_1_21Jul09", 155993)]
+        [Category("DatabaseNamedUser")]
+        public void TestDatasetLookupNamedUser(string datasetName, int expectedDatasetID)
+        {
+            TestDatasetLookup(datasetName, expectedDatasetID, "dmsreader", "dms4fun");
+        }
+
+        private void TestDatasetLookup(string datasetName, int expectedDatasetID, string user, string password)
         {
             const string strDatasetLookupFilePath = "";
 
-            var datasetID = mDBAccessor.LookupDatasetNumber(datasetName, strDatasetLookupFilePath, 1);
+            string connectionString;
+            if (string.Equals(user, "integrated", StringComparison.OrdinalIgnoreCase))
+            {
+                connectionString = "Data Source=gigasax;Initial Catalog=DMS5;Integrated Security=true";
+            }
+            else
+            {
+                connectionString = "Data Source=gigasax;Initial Catalog=DMS5;User=" + user + ";Password=" + password;
+            }
+
+            var options = new clsMASICOptions(mMasic.FileVersion, mMASICPeakFinder.ProgramVersion)
+            {
+                DatabaseConnectionString = connectionString
+            };
+
+            var dbAccessor = new clsDatabaseAccess(options);
+
+            var datasetID = dbAccessor.LookupDatasetNumber(datasetName, strDatasetLookupFilePath, 1);
 
             Console.WriteLine("Data file " + datasetName + " is dataset ID " + datasetID);
 
