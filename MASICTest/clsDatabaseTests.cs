@@ -48,15 +48,7 @@ namespace MASICTest
         {
             const string strDatasetLookupFilePath = "";
 
-            string connectionString;
-            if (string.Equals(user, "integrated", StringComparison.OrdinalIgnoreCase))
-            {
-                connectionString = "Data Source=gigasax;Initial Catalog=DMS5;Integrated Security=true";
-            }
-            else
-            {
-                connectionString = "Data Source=gigasax;Initial Catalog=DMS5;User=" + user + ";Password=" + password;
-            }
+            var connectionString = GetConnectionString("Gigasax", "DMS5", user, password);
 
             var options = new clsMASICOptions(mMasic.FileVersion, mMASICPeakFinder.ProgramVersion)
             {
@@ -71,6 +63,14 @@ namespace MASICTest
 
             Assert.AreEqual(expectedDatasetID, datasetID, "DatasetID Mismatch");
 
+        }
+
+        private static string GetConnectionString(string server, string database, string user = "Integrated", string password = "")
+        {
+            if (string.Equals(user, "Integrated", StringComparison.OrdinalIgnoreCase))
+                return string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI;", server, database);
+
+            return string.Format("Data Source={0};Initial Catalog={1};User={2};Password={3};", server, database, user, password);
         }
 
     }
