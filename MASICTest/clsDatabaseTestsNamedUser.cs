@@ -5,10 +5,9 @@ using NUnit.Framework;
 namespace MASICTest
 {
     [TestFixture]
-    [Category("DatabaseIntegrated")]
-    public class DatabaseTests
+    [Category("DatabaseNamedUser")]
+    class clsDatabaseTestsNamedUser
     {
-
         private clsMASICOptions mOptions;
 
         private clsDatabaseAccess mDBAccessor;
@@ -22,7 +21,7 @@ namespace MASICTest
 
             mOptions = new clsMASICOptions(oMasic.FileVersion, oMASICPeakFinder.ProgramVersion)
             {
-                DatabaseConnectionString = "Data Source=gigasax;Initial Catalog=DMS5;Integrated Security=true"
+                DatabaseConnectionString = "Data Source=gigasax;Initial Catalog=DMS5;User=dmsreader;Password=dms4fun"
             };
 
             mDBAccessor = new clsDatabaseAccess(mOptions);
