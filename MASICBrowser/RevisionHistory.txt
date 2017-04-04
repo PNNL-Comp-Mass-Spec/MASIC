@@ -1,5 +1,8 @@
 MASIC Browser Change Log
 
+Version 1.1.6303; April 4, 2017
+	- Updated OxyDataPlotter.dll
+
 Version 1.1.6300; April 1, 2017
 	- Now using OxyDataPlotter.dll for displaying selected ion chromatograms
 	- Update to .NET 4.6.2

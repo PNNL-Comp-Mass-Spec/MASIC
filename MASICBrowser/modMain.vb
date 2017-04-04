@@ -18,14 +18,14 @@ Imports SharedVBNetRoutines
 
 Module modMain
 
-    Public Const PROGRAM_DATE As String = "April 1, 2017"
+    Public Const PROGRAM_DATE As String = "April 4, 2017"
 
     Private mInputFilePath As String
 
     Public Function Main() As Integer
         ' Returns 0 if no error, error code if an error
 
-        Dim objParseCommandLine As New clsParseCommandLine
+        Dim objParseCommandLine As New clsParseCommandLine()
         Dim blnProceed As Boolean
 
         mInputFilePath = String.Empty
