@@ -246,7 +246,7 @@ Public Class clsSpectraCache
                             Next
                         End With
 
-                        ' Write four blank bytes (not really necessary, but adds a little padding between spectra)                        
+                        ' Write four blank bytes (not really necessary, but adds a little padding between spectra)
                         mPageFileWriter.Write(0)
 
                     End If
@@ -507,7 +507,7 @@ Public Class clsSpectraCache
 
         ' All of the spectra are stored in one large file
         If ValidatePageFileIO(False) Then
-            ' Lookup the byte offset for the given spectrum 
+            ' Lookup the byte offset for the given spectrum
 
             If mSpectrumByteOffset.Contains(intScanNumber) Then
                 Dim lngByteOffset As Int64 = CType(mSpectrumByteOffset.Item(intScanNumber), Long)
@@ -662,7 +662,7 @@ Public Class clsSpectraCache
                 "MASIC Spectrum Cache Page File.  Created " & DateTime.Now.ToLongDateString() & " " &
                 DateTime.Now.ToLongTimeString())
 
-            ' Add 64 bytes of white space                    
+            ' Add 64 bytes of white space
             ' ReSharper disable once RedundantAssignment
             For intIndex = 0 To 63
                 mPageFileWriter.Write(Byte.MinValue)
