@@ -90,9 +90,9 @@
       <Name>DataFilter</Name>
       <HintPath>..\lib\DataFilter.dll</HintPath>
     </Reference>
-    <Reference Include="MASICPeakFinder">
-      <Name>MASICPeakFinder</Name>
-      <HintPath>..\MASICPeakFinder\bin\MASICPeakFinder.dll</HintPath>
+    <Reference Include="MASICPeakFinder, Version=1.1.6303.26169, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\MASICPeakFinder.dll</HintPath>
     </Reference>
     <Reference Include="OxyDataPlotter">
       <HintPath>..\Lib\OxyDataPlotter.dll</HintPath>
