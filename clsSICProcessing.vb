@@ -554,7 +554,7 @@ Public Class clsSICProcessing
                     ' Initially set the MZIndexStart to intMZIndex
                     .MZIndexStart = intMZIndex
 
-                    ' Look for adjacent m/z values within udtMZBinList(.MZIndexStart).MZToleranceDa / 2 
+                    ' Look for adjacent m/z values within udtMZBinList(.MZIndexStart).MZToleranceDa / 2
                     '  of the m/z value that starts this group
                     ' Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
                     .MZTolerance = udtMZBinList(.MZIndexStart).MZTolerance

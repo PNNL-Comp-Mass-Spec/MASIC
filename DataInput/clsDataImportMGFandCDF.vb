@@ -208,7 +208,7 @@ Namespace DataInput
                             End With
                         End If
 
-                        ' Note: Since we're reading all of the Survey Scan data, we cannot update .MasterScanOrder() at this time                                
+                        ' Note: Since we're reading all of the Survey Scan data, we cannot update .MasterScanOrder() at this time
 
                     End If
 

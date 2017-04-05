@@ -369,7 +369,7 @@ Namespace DataInput
 
                             If objSpectrumInfo.mzRangeEnd - objSpectrumInfo.mzRangeStart >= 0.5 Then
                                 ' The data is likely MRM and not SRM
-                                ' We cannot currently handle data like this 
+                                ' We cannot currently handle data like this
                                 ' (would need to examine the mass values  and find the clumps of data to infer the transitions present)
                                 intWarnCount += 1
                                 If intWarnCount <= 5 Then
@@ -563,7 +563,7 @@ Namespace DataInput
             End If
 
             If Not String.IsNullOrWhiteSpace(objMZXmlSpectrumInfo.ActivationMethod) Then
-                ' Update ScanTypeName to include the activation method, 
+                ' Update ScanTypeName to include the activation method,
                 ' For example, to be CID-MSn instead of simply MSn
                 scanInfo.ScanTypeName = objMZXmlSpectrumInfo.ActivationMethod & "-" & scanInfo.ScanTypeName
 
