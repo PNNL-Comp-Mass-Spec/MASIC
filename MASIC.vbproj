@@ -83,13 +83,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MASICPeakFinder, Version=1.1.6302.27880, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\MASICPeakFinder.dll</HintPath>
-    </Reference>
-    <Reference Include="MatrixDecompositionUtility">
-      <HintPath>Lib\MatrixDecompositionUtility.dll</HintPath>
-    </Reference>
     <Reference Include="MSDataFileReader, Version=1.3.4890.35456, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\MSDataFileReader.dll</HintPath>
@@ -250,6 +243,16 @@
     <PackageReference Include="PRISM-Library">
       <Version>1.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="MASICPeakFinder\MASICPeakFinder.vbproj">
+      <Project>{8363e31c-ca3d-4172-99d5-3d2d3c3fd999}</Project>
+      <Name>MASICPeakFinder</Name>
+    </ProjectReference>
+    <ProjectReference Include="MatrixDecompositionUtility\MatrixDecompositionUtility.csproj">
+      <Project>{b3b19bd9-1541-4abe-adb4-f224f64ac408}</Project>
+      <Name>MatrixDecompositionUtility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
