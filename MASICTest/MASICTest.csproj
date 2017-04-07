@@ -31,13 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MASIC, Version=2.8.6302.29719, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\MASIC.exe</HintPath>
-    </Reference>
-    <Reference Include="MASICPeakFinder">
-      <HintPath>..\Lib\MASICPeakFinder.dll</HintPath>
-    </Reference>
     <Reference Include="PNNLOmics">
       <HintPath>..\Lib\PNNLOmics.dll</HintPath>
     </Reference>
@@ -66,6 +59,16 @@
     <PackageReference Include="PRISM-Library">
       <Version>1.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MASIC.vbproj">
+      <Project>{9fef8822-30ae-4fdb-bce6-df99f9a86600}</Project>
+      <Name>MASIC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MASICPeakFinder\MASICPeakFinder.vbproj">
+      <Project>{8363e31c-ca3d-4172-99d5-3d2d3c3fd999}</Project>
+      <Name>MASICPeakFinder</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
