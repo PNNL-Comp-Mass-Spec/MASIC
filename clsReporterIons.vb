@@ -114,7 +114,7 @@
 
         Select Case eReporterIonMassMode
             Case eReporterIonMassModeConstants.ITraqFourMZ
-                ' ITRAQ
+                ' ITRAQ, aka iTRAQ4
                 reporterIons.Add(New clsReporterIonInfo(114.1112))
                 reporterIons.Add(New clsReporterIonInfo(115.1083))
                 reporterIons.Add(New clsReporterIonInfo(116.1116))
@@ -132,7 +132,7 @@
                 reporterIons.Add(New clsReporterIonInfo(127.1316))
 
             Case eReporterIonMassModeConstants.TMTSixMZ
-                ' TMT sixplex Isobaric tags (from Thermo)
+                ' TMT sixplex Isobaric tags (from Thermo), aka TMT6
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 '                                                           ' Old values:
                 reporterIons.Add(New clsReporterIonInfo(126.127725))        ' 126.1283
@@ -143,7 +143,7 @@
                 reporterIons.Add(New clsReporterIonInfo(131.138176))        ' 131.1387
 
             Case eReporterIonMassModeConstants.TMTTenMZ
-                ' TMT 10-plex Isobaric tags (from Thermo)
+                ' TMT 10-plex Isobaric tags (from Thermo), aka TMT10
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
                 reporterIons.Add(New clsReporterIonInfo(126.127725))
@@ -158,24 +158,24 @@
                 reporterIons.Add(New clsReporterIonInfo(131.138176))        ' 131N
 
             Case eReporterIonMassModeConstants.TMTElevenMZ
-                ' TMT 11-plex Isobaric tags (from Thermo)
+                ' TMT 11-plex Isobaric tags (from Thermo), aka TMT11
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                reporterIons.Add(New clsReporterIonInfo(126.127725))
-                reporterIons.Add(New clsReporterIonInfo(127.12476))         ' 127N
-                reporterIons.Add(New clsReporterIonInfo(127.131079))        ' 127C
-                reporterIons.Add(New clsReporterIonInfo(128.128114))        ' 128N
-                reporterIons.Add(New clsReporterIonInfo(128.134433))        ' 128C
-                reporterIons.Add(New clsReporterIonInfo(129.131468))        ' 129N
-                reporterIons.Add(New clsReporterIonInfo(129.137787))        ' 129C
-                reporterIons.Add(New clsReporterIonInfo(130.134822))        ' 130N
-                reporterIons.Add(New clsReporterIonInfo(130.141141))        ' 130C
-                reporterIons.Add(New clsReporterIonInfo(131.138176))        ' 131N
-                reporterIons.Add(New clsReporterIonInfo(131.144495))        ' 131C
+                reporterIons.Add(New clsReporterIonInfo(126.1277261))        '
+                reporterIons.Add(New clsReporterIonInfo(127.124761))         ' 127N
+                reporterIons.Add(New clsReporterIonInfo(127.1310809))        ' 127C
+                reporterIons.Add(New clsReporterIonInfo(128.1281158))        ' 128N
+                reporterIons.Add(New clsReporterIonInfo(128.1344357))        ' 128C
+                reporterIons.Add(New clsReporterIonInfo(129.1314706))        ' 129N
+                reporterIons.Add(New clsReporterIonInfo(129.1377905))        ' 129C
+                reporterIons.Add(New clsReporterIonInfo(130.1348254))        ' 130N
+                reporterIons.Add(New clsReporterIonInfo(130.1411453))        ' 130C
+                reporterIons.Add(New clsReporterIonInfo(131.1381802))        ' 131N
+                reporterIons.Add(New clsReporterIonInfo(131.144999))         ' 131C
 
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
 
-                ' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS
+                ' ITRAQ eight-plex Isobaric tags (iTRAQ8), High-Res MS/MS
                 reporterIons.Add(New clsReporterIonInfo(113.107873))
                 reporterIons.Add(New clsReporterIonInfo(114.111228))
                 reporterIons.Add(New clsReporterIonInfo(115.108263))
@@ -188,7 +188,7 @@
 
             Case eReporterIonMassModeConstants.ITraqEightMZLowRes
 
-                ' ITRAQ eight-plex Isobaric tags, Low-Res MS/MS
+                ' ITRAQ eight-plex Isobaric tags (iTRAQ8), Low-Res MS/MS
                 reporterIons.Add(New clsReporterIonInfo(113.107873))
                 reporterIons.Add(New clsReporterIonInfo(114.111228))
                 reporterIons.Add(New clsReporterIonInfo(115.108263))
