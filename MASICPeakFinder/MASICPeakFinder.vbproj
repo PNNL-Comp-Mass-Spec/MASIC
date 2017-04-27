@@ -120,6 +120,7 @@
     </Compile>
     <Compile Include="clsPeakInfo.vb" />
     <Compile Include="clsPeaksContainer.vb" />
+    <Compile Include="clsSICDataPoint.vb" />
     <Compile Include="clsSICPeakFinderOptions.vb" />
     <Compile Include="clsSICPotentialAreaStats.vb" />
     <Compile Include="clsSICStatsPeak.vb" />
