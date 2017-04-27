@@ -1,19 +1,5 @@
 ﻿Public Class clsParentIonInfo
 
-    Public Structure udtSICStatsType
-        Public Peak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
-
-        Public ScanTypeForPeakIndices As clsScanList.eScanTypeConstants
-        Public PeakScanIndexStart As Integer              ' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-        Public PeakScanIndexEnd As Integer                ' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-        Public PeakScanIndexMax As Integer                ' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-
-        Public SICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-
-        Public Overrides Function ToString() As String
-            Return "Peak at index " & Peak.IndexMax & ", area " & Peak.Area
-        End Function
-    End Structure
 
     ''' <summary>
     ''' m/z value

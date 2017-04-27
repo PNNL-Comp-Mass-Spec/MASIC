@@ -60,7 +60,7 @@ Namespace DataOutput
           scanList As clsScanList,
           intParentIonIndex As Integer,
           sicDetails As clsSICDetails,
-          ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType,
+          smoothedYDataSubset As MASICPeakFinder.clsSmoothedYDataSubset,
           dataOutputHandler As clsDataOutput) As Boolean
 
             ' Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
@@ -190,7 +190,7 @@ Namespace DataOutput
                                 SaveDataToXMLEncodeArray(objXMLOut, "SICScanIntervals", SICDataScanIntervals)
                             Else
                                 ' Save scan interval list as long list of numbers
-                                ' There are no tab delimiters, since we require that all 
+                                ' There are no tab delimiters, since we require that all
                                 '  of the SICDataScanInterval values be <= 61
                                 '   If the interval is <=9, then the interval is stored as a number
                                 '   For intervals between 10 and 35, uses letters A to Z

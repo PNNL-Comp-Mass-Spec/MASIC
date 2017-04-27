@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports MASICPeakFinder
 
 Public Class clsScanTracking
     Inherits clsEventNotifier
