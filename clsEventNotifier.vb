@@ -1,41 +1,11 @@
 ﻿Imports MASIC.clsMASIC
 
-Public MustInherit Class clsEventNotifier
+Public MustInherit Class clsMasicEventNotifier
+    Inherits PRISM.clsEventNotifier
 
     Private mLastPercentComplete As Short = 0
 
 #Region "Events"
-
-    ''' <summary>
-    ''' Describes an error event
-    ''' </summary>
-    ''' <param name="source"></param>
-    ''' <param name="message"></param>
-    ''' <param name="ex">Exception; allowed to be nothing</param>
-    ''' <param name="allowInformUser"></param>
-    ''' <param name="allowThrowException"></param>
-    ''' <param name="eNewErrorCode"></param>
-    Public Event ErrorEvent(
-      source As String,
-      message As String,
-      ex As Exception,
-      allowInformUser As Boolean,
-      allowThrowException As Boolean,
-      eNewErrorCode As eMasicErrorCodes)
-
-    ''' <summary>
-    ''' Describes a status message
-    ''' </summary>
-    ''' <param name="message"></param>
-    Public Event MessageEvent(message As String)
-
-    ''' <summary>
-    ''' Describes a progress update for a given subtask
-    ''' </summary>
-    ''' <param name="percentComplete">Value between 0 and 100</param>
-    ''' <param name="progressMessage">Progress message</param>
-    ''' <remarks>progressMessage can be an empty string if only updating the percent complete</remarks>
-    Public Event ProgressUpdate(percentComplete As Short, progressMessage As String)
 
     ''' <summary>
     ''' Provides information on the number of cache and uncache events in objSpectraCache
@@ -57,61 +27,10 @@ Public MustInherit Class clsEventNotifier
     ''' <param name="leaveExistingErrorCodeUnchanged"></param>
     Public Event UpdateErrorCodeEvent(eNewErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
 
-    ''' <summary>
-    ''' Describes a warning event
-    ''' </summary>
-    ''' <param name="message">Error message</param>
-    Public Event WarningEvent(source As String, message As String)
-
 #End Region
-
-    ''' <summary>
-    ''' Report an error
-    ''' </summary>
-    ''' <param name="source"></param>
-    ''' <param name="message"></param>
-    ''' <param name="ex"></param>
-    ''' <param name="allowInformUser"></param>
-    ''' <param name="allowThrowException"></param>
-    ''' <param name="eNewErrorCode"></param>
-    Private Sub OnErrorEvent(
-      source As String,
-      message As String,
-      ex As Exception,
-      allowInformUser As Boolean,
-      allowThrowException As Boolean,
-      eNewErrorCode As eMasicErrorCodes)
-        RaiseEvent ErrorEvent(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
-    End Sub
-
-    ''' <summary>
-    ''' Report a status message
-    ''' </summary>
-    ''' <param name="message"></param>
-    Private Sub OnMessageEvent(message As String)
-        RaiseEvent MessageEvent(message)
-    End Sub
-
-    ''' <summary>
-    ''' Update the progress of a given subtask
-    ''' </summary>
-    ''' <param name="percentComplete">Value between 0 and 100</param>
-    ''' <param name="progressMessage">Progress message</param>
-    Private Sub OnProgressUpdate(percentComplete As Short, progressMessage As String)
-        RaiseEvent ProgressUpdate(percentComplete, progressMessage)
-    End Sub
 
     Private Sub OnUpdateCacheStats(cacheEventCount As Integer, unCacheEventCount As Integer)
         RaiseEvent UpdateCacheStatsEvent(cacheEventCount, unCacheEventCount)
-    End Sub
-
-    ''' <summary>
-    ''' Report a warning
-    ''' </summary>
-    ''' <param name="source"></param>
-    ''' <param name="message"></param>
-    Private Sub OnWarningEvent(source As String, message As String)
-        RaiseEvent WarningEvent(source, message)
     End Sub
 
     Private Sub OnUpdateBaseClassErrorCode(eNewErrorCode As eProcessFilesErrorCodes)
@@ -122,42 +41,53 @@ Public MustInherit Class clsEventNotifier
         RaiseEvent UpdateErrorCodeEvent(eNewErrorCode, leaveExistingErrorCodeUnchanged)
     End Sub
 
-    Protected Sub RegisterEvents(oClass As clsEventNotifier)
-        AddHandler oClass.MessageEvent, AddressOf MessageEventHandler
-        AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
-        AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
-        AddHandler oClass.ProgressUpdate, AddressOf ProgressUpdateHandler
+    Protected Overloads Sub RegisterEvents(oClass As clsMasicEventNotifier)
+        MyBase.RegisterEvents(oClass)
+
         AddHandler oClass.UpdateCacheStatsEvent, AddressOf UpdatedCacheStatsEventHandler
         AddHandler oClass.UpdateBaseClassErrorCodeEvent, AddressOf UpdateBaseClassErrorCodeEventHandler
         AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
     End Sub
 
     Protected Sub ReportMessage(message As String)
-        OnMessageEvent(message)
+        OnStatusEvent(message)
     End Sub
 
-    Protected Sub ReportError(
-      source As String,
-      message As String)
+    Protected Sub ReportError(message As String,
+                              Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
 
-        ReportError(source, message, Nothing)
+        If eNewErrorCode <> eMasicErrorCodes.NoError Then
+            OnUpdateErrorCode(eNewErrorCode, False)
+        End If
 
+        OnErrorEvent(message)
     End Sub
 
+    Protected Sub ReportError(message As String,
+                              ex As Exception,
+                              Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
+
+        If eNewErrorCode <> eMasicErrorCodes.NoError Then
+            OnUpdateErrorCode(eNewErrorCode, False)
+        End If
+
+        OnErrorEvent(message, ex)
+    End Sub
+
+    <Obsolete("Source, allowInformUser, and allowThrowException are no longer supported")>
     Protected Sub ReportError(
       source As String,
       message As String,
       ex As Exception,
-      Optional allowInformUser As Boolean = True,
+      allowInformUser As Boolean,
       Optional allowThrowException As Boolean = True,
       Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
 
-        OnErrorEvent(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
-
+        ReportError(message, ex, eNewErrorCode)
     End Sub
 
-    Protected Sub ReportWarning(source As String, message As String)
-        OnWarningEvent(source, message)
+    Protected Sub ReportWarning(message As String)
+        OnWarningEvent(message)
     End Sub
 
     Protected Sub SetBaseClassErrorCode(eNewErrorCode As eProcessFilesErrorCodes)
@@ -177,42 +107,20 @@ Public MustInherit Class clsEventNotifier
     ''' </summary>
     ''' <param name="percentComplete"></param>
     Protected Sub UpdateProgress(percentComplete As Short)
-        OnProgressUpdate(percentComplete, "")
+        OnProgressUpdate("", percentComplete)
     End Sub
 
     Protected Sub UpdateProgress(progressMessage As String)
-        OnProgressUpdate(mLastPercentComplete, progressMessage)
+        OnProgressUpdate(progressMessage, mLastPercentComplete)
     End Sub
 
     Protected Sub UpdateProgress(percentComplete As Short, progressMessage As String)
         mLastPercentComplete = percentComplete
-        OnProgressUpdate(percentComplete, progressMessage)
+        OnProgressUpdate(progressMessage, percentComplete)
     End Sub
 
 
 #Region "Event Handlers"
-
-    Private Sub MessageEventHandler(message As String)
-        ReportMessage(message)
-    End Sub
-
-    Private Sub ErrorEventHandler(
-      source As String,
-      message As String,
-      ex As Exception,
-      allowInformUser As Boolean,
-      allowThrowException As Boolean,
-      eNewErrorCode As eMasicErrorCodes)
-        ReportError(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
-    End Sub
-
-    Private Sub WarningEventHandler(source As String, message As String)
-        ReportWarning(source, message)
-    End Sub
-
-    Private Sub ProgressUpdateHandler(percentComplete As Short, progressMessage As String)
-        UpdateProgress(percentComplete, progressMessage)
-    End Sub
 
     Private Sub UpdatedCacheStatsEventHandler(cacheEventCount As Integer, unCacheEventCount As Integer)
         OnUpdateCacheStats(cacheEventCount, unCacheEventCount)
