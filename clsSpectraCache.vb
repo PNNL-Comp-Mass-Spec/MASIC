@@ -6,7 +6,7 @@ Imports System.Runtime.InteropServices
 ''' Utilizes a spectrum pool to store mass spectra
 ''' </summary>
 Public Class clsSpectraCache
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
     Public Sub New(cacheOptions As clsSpectrumCacheOptions)
         mCacheOptions = cacheOptions
@@ -196,7 +196,7 @@ Public Class clsSpectraCache
 
             blnSuccess = True
         Catch ex As Exception
-            ReportError("AddSpectrumToPool", ex.Message, ex, True, True)
+            ReportError(ex.Message, ex)
         End Try
 
         Return blnSuccess
@@ -342,7 +342,7 @@ Public Class clsSpectraCache
 
             Dim intCharIndex = strFilePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal)
             If intCharIndex < 0 Then
-                ReportError("DeleteSpectrumCacheFiles", "intCharIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles")
+                ReportError("intCharIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles")
                 Return
             End If
 
@@ -355,7 +355,7 @@ Public Class clsSpectraCache
 
         Catch ex As Exception
             ' Ignore errors here
-            ReportError("DeleteSpectrumCacheFiles", "Error deleting cached spectrum files for this task", ex, True, False)
+            ReportError("Error deleting cached spectrum files for this task", ex)
         End Try
 
         ' Now look for old spectrum cache files
@@ -372,7 +372,7 @@ Public Class clsSpectraCache
                 Next objFile
             End If
         Catch ex As Exception
-            ReportError("DeleteSpectrumCacheFiles", "Error deleting old cached spectrum files", ex, True, False)
+            ReportError("Error deleting old cached spectrum files", ex)
         End Try
 
     End Sub
@@ -526,7 +526,7 @@ Public Class clsSpectraCache
                     .ScanNumber = intScanNumber
 
                     If (intScanNumberInCacheFile <> .ScanNumber) Then
-                        ReportWarning("UncacheSpectrum", "Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum")
+                        ReportWarning("Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum")
                     End If
 
                     .IonCount = intIonCount
@@ -599,7 +599,7 @@ Public Class clsSpectraCache
                     Directory.CreateDirectory(mCacheOptions.FolderPath)
 
                     If Not Directory.Exists(mCacheOptions.FolderPath) Then
-                        ReportError("ValidateCachedSpectrumFolder", "Error creating spectrum cache folder: " & mCacheOptions.FolderPath, Nothing, True, False)
+                        ReportError("Error creating spectrum cache folder: " & mCacheOptions.FolderPath)
                         Return False
                     End If
                 End If
@@ -609,7 +609,7 @@ Public Class clsSpectraCache
 
             Catch ex As Exception
                 ' Error defining .FolderPath
-                ReportError("ValidateCachedSpectrumFolder", "Error creating spectrum cache folder", ex, True, False)
+                ReportError("Error creating spectrum cache folder")
                 Return False
             End Try
         Else
@@ -676,7 +676,7 @@ Public Class clsSpectraCache
             Return True
 
         Catch ex As Exception
-            ReportError("ValidatePageFileIO", ex.Message, ex, True, True)
+            ReportError(ex.Message, ex)
             Return False
         End Try
 
@@ -703,7 +703,7 @@ Public Class clsSpectraCache
             blnSuccess = UnCacheSpectrum(intScanNumber, intPoolIndex)
             Return blnSuccess
         Catch ex As Exception
-            ReportError("ValidateSpectrumInPool", ex.Message, ex, True, True)
+            ReportError(ex.Message, ex)
             intPoolIndex = -1
             Return False
         End Try

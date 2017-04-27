@@ -32,7 +32,7 @@ Namespace DataInput
                                                     dataOutputHandler, blnKeepRawSpectra, blnKeepMSMSSpectra)
 
             Catch ex As Exception
-                ReportError("ExtractScanInfoFromMZXMLDataFile", "Error in ExtractScanInfoFromMZXMLDataFile", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in ExtractScanInfoFromMZXMLDataFile", ex, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End Try
 
@@ -55,7 +55,7 @@ Namespace DataInput
                                                     blnKeepRawSpectra, blnKeepMSMSSpectra)
 
             Catch ex As Exception
-                ReportError("ExtractScanInfoFromMZDataFile", "Error in ExtractScanInfoFromMZDataFile", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in ExtractScanInfoFromMZDataFile", ex, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End Try
 
@@ -94,7 +94,7 @@ Namespace DataInput
 
                 ' Open a handle to the data file
                 If Not objXMLReader.OpenFile(strInputFileFullPath) Then
-                    ReportError("ExtractScanInfoFromMSXMLDataFile", "Error opening input data file: " & strInputFileFullPath)
+                    ReportError("Error opening input data file: " & strInputFileFullPath)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
@@ -175,11 +175,10 @@ Namespace DataInput
                 If scanList.MasterScanOrderCount <= 0 Then
                     ' No scans found
                     If scansOutOfRange > 0 Then
-                        ReportWarning("ExtractScanInfoFromMSXMLDataFile",
-                                      "None of the spectra in the input file was within the specified scan number and/or scan time range: " & strFilePath)
+                        ReportWarning("None of the spectra in the input file was within the specified scan number and/or scan time range: " & strFilePath)
                         SetLocalErrorCode(eMasicErrorCodes.NoParentIonsFoundInInputFile)
                     Else
-                        ReportError("ExtractScanInfoFromMSXMLDataFile", "No scans found in the input file: " & strFilePath)
+                        ReportError("No scans found in the input file: " & strFilePath)
                         SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     End If
 
@@ -191,7 +190,7 @@ Namespace DataInput
                 Console.WriteLine()
 
             Catch ex As Exception
-                ReportError("ExtractScanInfoFromMSXMLDataFile", "Error in ExtractScanInfoFromMSXMLDataFile", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in ExtractScanInfoFromMSXMLDataFile", ex, eMasicErrorCodes.InputFileDataReadError)
             End Try
 
             ' Record the current memory usage (before we close the .mzXML file)
@@ -373,8 +372,7 @@ Namespace DataInput
                                 ' (would need to examine the mass values  and find the clumps of data to infer the transitions present)
                                 intWarnCount += 1
                                 If intWarnCount <= 5 Then
-                                    ReportError("ExtractScanInfoFromMSXMLDataFile",
-                                                "Warning: m/z range for SRM scan " & objSpectrumInfo.ScanNumber & " is " &
+                                    ReportError("Warning: m/z range for SRM scan " & objSpectrumInfo.ScanNumber & " is " &
                                                 (objSpectrumInfo.mzRangeEnd - objSpectrumInfo.mzRangeStart).ToString("0.0") &
                                                 " m/z; this is likely a MRM scan, but MASIC doesn't support inferring the " &
                                                 "MRM transition masses from the observed m/z values.  Results will likely not be meaningful")
@@ -494,7 +492,7 @@ Namespace DataInput
                 End If
 
             Catch ex As Exception
-                ReportError("StoreMzXMLSpectrum", "Error in clsMasic->StoreMzXMLSpectrum ", ex, True, True)
+                ReportError("Error in clsMasic->StoreMzXMLSpectrum ", ex)
             End Try
 
         End Sub

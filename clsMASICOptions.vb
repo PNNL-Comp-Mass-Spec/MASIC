@@ -1,7 +1,7 @@
 ﻿Imports MASIC.clsMASIC
 
 Public Class clsMASICOptions
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Constants and Enums"
     Public Const XML_SECTION_DATABASE_SETTINGS As String = "MasicDatabaseSettings"
@@ -63,7 +63,7 @@ Public Class clsMASICOptions
     Public Property WriteExtendedStats As Boolean
 
     ''' <summary>
-    ''' When enabled, the the scan filter text will also be included in the extended stats file 
+    ''' When enabled, the the scan filter text will also be included in the extended stats file
     ''' (e.g. ITMS + c NSI Full ms [300.00-2000.00] or ITMS + c NSI d Full ms2 756.98@35.00 [195.00-2000.00])
     ''' </summary>
     Public Property WriteExtendedStatsIncludeScanFilterText As Boolean
@@ -234,7 +234,7 @@ Public Class clsMASICOptions
                 ' See if strParameterFilePath points to a file in the same directory as the application
                 strParameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
                 If Not File.Exists(strParameterFilePath) Then
-                    ReportError("LoadParameterFileSettings", "Parameter file not found: " & strParameterFilePath, Nothing, True, False)
+                    ReportError("Parameter file not found: " & strParameterFilePath)
                     Return False
                 End If
             End If
@@ -243,9 +243,7 @@ Public Class clsMASICOptions
 
             ' Pass False to .LoadSettings() here to turn off case sensitive matching
             If Not objSettingsFile.LoadSettings(strParameterFilePath, False) Then
-                ReportError("LoadParameterFileSettings",
-                            "Error calling objSettingsFile.LoadSettings for " & strParameterFilePath, Nothing, True,
-                            False, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error calling objSettingsFile.LoadSettings for " & strParameterFilePath, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End If
 
@@ -404,7 +402,7 @@ Public Class clsMASICOptions
                     Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS &
                                           ControlChars.Quote & "> was not found in the parameter file: " &
                                           strParameterFilePath
-                    ReportError("LoadParameterFileSettings", strErrorMessage)
+                    ReportError(strErrorMessage)
                     Return False
                 Else
                     ' SIC Options
@@ -586,7 +584,7 @@ Public Class clsMASICOptions
                     Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote &
                                           XML_SECTION_BINNING_OPTIONS & ControlChars.Quote &
                                           "> was not found in the parameter file: " & strParameterFilePath
-                    ReportError("LoadParameterFileSettings", strErrorMessage)
+                    ReportError(strErrorMessage)
 
                     SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
                     Return False
@@ -682,7 +680,7 @@ Public Class clsMASICOptions
             End If
 
         Catch ex As Exception
-            ReportError("LoadParameterFileSettings", "Error in LoadParameterFileSettings", ex, True, False, eMasicErrorCodes.InputFileDataReadError)
+            ReportError("Error in LoadParameterFileSettings", ex, eMasicErrorCodes.InputFileDataReadError)
             Return False
         End Try
 
@@ -696,13 +694,13 @@ Public Class clsMASICOptions
 
             If strParameterFilePath Is Nothing OrElse strParameterFilePath.Length = 0 Then
                 ' No parameter file specified; unable to save
-                ReportError("SaveParameterFileSettings", "Empty parameter file path sent to SaveParameterFileSettings")
+                ReportError("Empty parameter file path sent to SaveParameterFileSettings")
                 Return False
             End If
 
             ' Pass True to .LoadSettings() here so that newly made Xml files will have the correct capitalization
             If Not objSettingsFile.LoadSettings(strParameterFilePath, True) Then
-                ReportError("SaveParameterFileSettings", "LoadSettings returned false while initializing " & strParameterFilePath)
+                ReportError("LoadSettings returned false while initializing " & strParameterFilePath)
                 Return False
             End If
 
@@ -922,7 +920,7 @@ Public Class clsMASICOptions
             objSettingsFile.SaveSettings()
 
         Catch ex As Exception
-            ReportError("SaveParameterFileSettings", "Error in SaveParameterFileSettings", ex, True, False, eMasicErrorCodes.OutputFileWriteError)
+            ReportError("Error in SaveParameterFileSettings", ex, eMasicErrorCodes.OutputFileWriteError)
             Return False
         End Try
 

@@ -3,7 +3,7 @@ Imports ThermoRawFileReader
 
 Namespace DataOutput
     Public Class clsThermoMetadataWriter
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
         Public Function SaveMSMethodFile(
           objXcaliburAccessor As XRawFileIO,
@@ -15,7 +15,7 @@ Namespace DataOutput
             Try
                 intInstMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count
             Catch ex As Exception
-                ReportError("SaveMSMethodFile", "Error looking up InstMethod length in objXcaliburAccessor.FileInfo", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error looking up InstMethod length in objXcaliburAccessor.FileInfo", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -47,7 +47,7 @@ Namespace DataOutput
                 Next
 
             Catch ex As Exception
-                ReportError("SaveMSMethodFile", "Error writing the MS Method to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the MS Method to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -67,7 +67,7 @@ Namespace DataOutput
             Try
                 intTuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count
             Catch ex As Exception
-                ReportError("SaveMSMethodFile", "Error looking up TuneMethods length in objXcaliburAccessor.FileInfo", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error looking up TuneMethods length in objXcaliburAccessor.FileInfo", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -98,7 +98,7 @@ Namespace DataOutput
                 Next
 
             Catch ex As Exception
-                ReportError("SaveMSTuneFile", "Error writing the MS Tune Settings to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the MS Tune Settings to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

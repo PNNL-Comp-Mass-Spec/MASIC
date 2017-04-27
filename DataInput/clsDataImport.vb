@@ -4,7 +4,7 @@ Imports PNNLOmics.Utilities
 Namespace DataInput
 
     Public MustInherit Class clsDataImport
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
 #Region "Constants and Enums"
 
@@ -139,7 +139,7 @@ Namespace DataInput
                                 intIonCountNew = .IonCount
                             End If
                         Case Else
-                            ReportError("DiscardDataBelowNoiseThreshold", "Unknown BaselineNoiseMode encountered in DiscardDataBelowNoiseThreshold: " &
+                            ReportError("Unknown BaselineNoiseMode encountered in DiscardDataBelowNoiseThreshold: " &
                                     noiseThresholdOptions.BaselineNoiseMode.ToString())
                     End Select
 
@@ -148,7 +148,7 @@ Namespace DataInput
                     End If
                 End With
             Catch ex As Exception
-                ReportError("DiscardDataBelowNoiseThreshold", "Error discarding data below the noise threshold", ex, True, True, eMasicErrorCodes.UnspecifiedError)
+                ReportError("Error discarding data below the noise threshold", ex, eMasicErrorCodes.UnspecifiedError)
             End Try
 
         End Sub
@@ -242,7 +242,7 @@ Namespace DataInput
 
                 End With
             Catch ex As Exception
-                ReportError("DiscardDataToLimitIonCount", "Error limiting the number of data points to " & intMaxIonCountToRetain.ToString, ex, True, True, eMasicErrorCodes.UnspecifiedError)
+                ReportError("Error limiting the number of data points to " & intMaxIonCountToRetain, ex, eMasicErrorCodes.UnspecifiedError)
             End Try
 
         End Sub

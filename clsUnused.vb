@@ -1,7 +1,7 @@
 ﻿Imports ThermoRawFileReader
 
 Public Class clsUnused
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
     ''Private Sub FindMinimumPotentialPeakAreaInRegion(scanList As clsScanList, intParentIonIndexStart As Integer, intParentIonIndexEnd As Integer, ByRef udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType)
     ''    ' This function finds the minimum potential peak area in the parent ions between
@@ -43,7 +43,7 @@ Public Class clsUnused
 
     ''End Sub
 
-    ''Private Function FindSICPeakAndAreaForParentIon(scanList As clsScanList, intParentIonIndex As Integer, ByRef udtSICDetails As  clsDataObjects.udtSICStatsDetailsType, ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType, sicOptions As clsSICOptions) As Boolean
+    ''Private Function FindSICPeakAndAreaForParentIon(scanList As clsScanList, intParentIonIndex As Integer, ByRef udtSICDetails As clsSICStatsDetails, ByRef udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType, sicOptions As clsSICOptions) As Boolean
 
     ''    Const RECOMPUTE_NOISE_LEVEL As Boolean = True
 
@@ -113,7 +113,7 @@ Public Class clsUnused
 
     ''                    If .Peak.IndexObserved = -1 Then
     ''                        ' Match wasn't found; this is unexpected
-    ''                        ReportError("FindSICPeakAndAreaForParentIon", "Programming error: survey scan index not found", Nothing, True, True, True, eMasicErrorCodes.FindSICPeaksError)
+    ''                        ReportError("Programming error: survey scan index not found", eMasicErrorCodes.FindSICPeaksError)
     ''                        .Peak.IndexObserved = 0
     ''                    End If
 
@@ -182,7 +182,7 @@ Public Class clsUnused
     ''        blnSuccess = True
 
     ''    Catch ex As Exception
-    ''        ReportError("FindSICPeakAndAreaForParentIon", "Error finding SIC peaks and their areas", ex, True, False, True, eMasicErrorCodes.FindSICPeaksError)
+    ''        ReportError("Error finding SIC peaks and their areas", ex, eMasicErrorCodes.FindSICPeaksError)
     ''        blnSuccess = False
     ''    End Try
 
@@ -311,7 +311,7 @@ Public Class clsUnused
             If Y1 < sngTargetY AndAlso Y2 < sngTargetY Then
                 ' Both of the Y values are less than sngTargetY
                 ' We cannot interpolate
-                ReportError("InterpolateX", "This code should normally not be reached (clsMasic->InterpolateX)")
+                ReportError("This code should normally not be reached (clsMasic->InterpolateX)")
                 Return False
             Else
                 sngDeltaY = Y2 - Y1                                 ' Yes, this is y-two minus y-one
@@ -324,7 +324,7 @@ Public Class clsUnused
                     sngInterpolatedXValue = sngTargetX
                     Return True
                 Else
-                    ReportError("InterpolateX", "TargetX is not between X1 and X2; this shouldn't happen (clsMasic->InterpolateX)")
+                    ReportError("TargetX is not between X1 and X2; this shouldn't happen (clsMasic->InterpolateX)")
                     Return False
                 End If
 
@@ -360,7 +360,7 @@ Public Class clsUnused
             Return scanList(intMatchIndex).ScanTime
         Catch ex As Exception
             ' Ignore any errors that occur in this function
-            ReportError("LookupRTByScanNumber", "Error in LookupRTByScanNumber", ex, True, False)
+            ReportError("Error in LookupRTByScanNumber", ex)
             Return 0
         End Try
 
@@ -419,9 +419,9 @@ Public Class clsUnused
                 blnValidationSaved = True
                 Return True
             Else
-                ReportError("ValidateXRawAccessor", "MSFileReader was not found; Thermo .raw files cannot be read.  Download the MSFileReader installer " &
-                                 "by creating an account at https://thermo.flexnetoperations.com/control/thmo/login , " &
-                                 "then logging in and choosing 'Utility Software'")
+                ReportError("MSFileReader was not found; Thermo .raw files cannot be read.  Download the MSFileReader installer " &
+                            "by creating an account at https://thermo.flexnetoperations.com/control/thmo/login , " &
+                            "then logging in and choosing 'Utility Software'")
                 Return False
             End If
 

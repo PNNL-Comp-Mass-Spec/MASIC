@@ -4,7 +4,7 @@ Imports MASIC.DataOutput.clsDataOutput
 
 Namespace DataOutput
     Public Class clsExtendedStatsWriter
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
 #Region "Constants and enums"
         Public Const EXTENDED_STATS_HEADER_COLLISION_MODE As String = "Collision Mode"
@@ -377,7 +377,7 @@ Namespace DataOutput
                 End Using
 
             Catch ex As Exception
-                ReportError("SaveExtendedScanStatsFiles", "Error writing the Extended Scan Stats to: " & strExtendedNonConstantHeaderOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the Extended Scan Stats to: " & strExtendedNonConstantHeaderOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

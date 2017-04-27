@@ -3,7 +3,7 @@ Imports MASIC.DataOutput
 Imports ThermoRawFileReader
 
 Public Class clsReporterIonProcessor
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Classwide variables"
     Private ReadOnly mOptions As clsMASICOptions
@@ -230,7 +230,7 @@ Public Class clsReporterIonProcessor
             Return True
 
         Catch ex As Exception
-            ReportError("FindReporterIons", "Error writing the reporter ions to: " & outputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+            ReportError("Error writing the reporter ions to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
             Return False
         End Try
 
@@ -524,12 +524,12 @@ Public Class clsReporterIonProcessor
 
     Private Sub mXcaliburAccessor_ReportError(strMessage As String)
         Console.WriteLine(strMessage)
-        ReportError("XcaliburAccessor", strMessage, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
+        ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
     End Sub
 
     Private Sub mXcaliburAccessor_ReportWarning(strMessage As String)
         Console.WriteLine(strMessage)
-        ReportError("XcaliburAccessor", strMessage, Nothing, False, False, eMasicErrorCodes.InputFileDataReadError)
+        ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
     End Sub
 
     Protected Class clsReportIonInfoComparer

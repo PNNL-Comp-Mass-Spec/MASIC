@@ -4,7 +4,7 @@ Imports MASIC.DataOutput
 Imports ThermoRawFileReader
 
 Public Class clsMRMProcessing
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Structures"
 
@@ -136,7 +136,7 @@ Public Class clsMRMProcessing
             End If
 
         Catch ex As Exception
-            ReportError("DetermineMRMSettings", "Error determining the MRM settings", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+            ReportError("Error determining the MRM settings", ex, eMasicErrorCodes.OutputFileWriteError)
             blnSuccess = False
         End Try
 
@@ -406,7 +406,7 @@ Public Class clsMRMProcessing
             blnSuccess = True
 
         Catch ex As Exception
-            ReportError("ExportMRMDataToDisk", "Error writing the SRM data to disk", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+            ReportError("Error writing the SRM data to disk", ex, eMasicErrorCodes.OutputFileWriteError)
             blnSuccess = False
         Finally
             If Not srDataOutfile Is Nothing Then
@@ -688,13 +688,13 @@ Public Class clsMRMProcessing
                     End If
 
                 Catch ex As Exception
-                    ReportError("ProcessMRMList", "Error updating progress", ex, True, True, eMasicErrorCodes.CreateSICsError)
+                    ReportError("Error updating progress", ex, eMasicErrorCodes.CreateSICsError)
                 End Try
 
             Next
 
         Catch ex As Exception
-            ReportError("ProcessMRMList", "Error creating SICs for MRM spectra", ex, True, True, eMasicErrorCodes.CreateSICsError)
+            ReportError("Error creating SICs for MRM spectra", ex, eMasicErrorCodes.CreateSICsError)
             blnSuccess = False
         End Try
 

@@ -1,6 +1,6 @@
 ﻿Namespace DataOutput
     Public Class clsOutputFileHandles
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
         Public Property ScanStats As StreamWriter
         Public Property SICDataFile As StreamWriter
@@ -32,7 +32,7 @@
 
                 Return True
             Catch ex As Exception
-                ReportError("CloseOutputFileHandles", "Error in CloseOutputFileHandles", ex, True, False)
+                ReportError("Error in CloseOutputFileHandles", ex)
                 Return False
             End Try
         End Function

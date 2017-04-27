@@ -3,7 +3,7 @@
 Namespace DataOutput
 
     Public Class clsDataOutput
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
 #Region "Constants and Enums"
 
@@ -375,7 +375,7 @@ Namespace DataOutput
                     End If
                 End If
             Catch ex As Exception
-                ReportError("CheckForExistingResults", "There may be a programming error in CheckForExistingResults", ex, True, False)
+                ReportError("There may be a programming error in CheckForExistingResults", ex)
                 blnValidExistingResultsFound = False
             End Try
 
@@ -476,11 +476,11 @@ Namespace DataOutput
                     Return True
                 End If
 
-                ReportError("Error calling objDatasetStatsSummarizer.CreateDatasetInfoFile", objDatasetStatsSummarizer.ErrorMessage,
-                            New Exception("Error calling objDatasetStatsSummarizer.CreateDatasetInfoFile: " & objDatasetStatsSummarizer.ErrorMessage), True, False)
+                ReportError("objDatasetStatsSummarizer.CreateDatasetInfoFil, error from DataStatsSummarizer: " + objDatasetStatsSummarizer.ErrorMessage,
+                            New Exception("DataStatsSummarizer error " & objDatasetStatsSummarizer.ErrorMessage))
 
             Catch ex As Exception
-                ReportError("CreateDatasetInfoFile", "Error creating dataset info file", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error creating dataset info file", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -563,7 +563,7 @@ Namespace DataOutput
                  "Intensity")
 
             Catch ex As Exception
-                ReportError("InitializeSICDetailsTextFile", "Error initializing the XML output file: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error initializing the XML output file: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -624,7 +624,7 @@ Namespace DataOutput
                 End Using
 
             Catch ex As Exception
-                ReportError("SaveHeaderGlossary", "Error writing the Header Glossary to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the Header Glossary to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -673,7 +673,7 @@ Namespace DataOutput
                 Next
 
             Catch ex As Exception
-                ReportError("SaveSICDataToText", "Error writing to detailed SIC data text file", ex, True, False, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing to detailed SIC data text file", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

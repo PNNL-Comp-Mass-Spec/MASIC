@@ -1,7 +1,7 @@
 ﻿Imports MASIC.clsMASIC
 
 Public Class clsDatabaseAccess
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Constants and Enums"
 
@@ -80,9 +80,9 @@ Public Class clsDatabaseAccess
 
                                 Catch ex As Exception
                                     Try
-                                        ReportError("LookupDatasetNumber", "Error converting '" & datasetItem(1) & "' to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                        ReportError("Error converting '" & datasetItem(1) & "' to a dataset ID", ex, eMasicErrorCodes.InvalidDatasetNumber)
                                     Catch ex2 As Exception
-                                        ReportError("LookupDatasetNumber", "Error converting column 2 from the dataset report to a dataset ID", ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                                        ReportError("Error converting column 2 from the dataset report to a dataset ID", ex, eMasicErrorCodes.InvalidDatasetNumber)
                                     End Try
                                     blnDatasetFoundInDB = False
                                 End Try
@@ -112,10 +112,10 @@ Public Class clsDatabaseAccess
                 Next
 
             Catch ex2 As NullReferenceException
-                ReportError("LookupDatasetNumber", "Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, Nothing, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, eMasicErrorCodes.InvalidDatasetNumber)
                 blnDatasetFoundInDB = False
             Catch ex As Exception
-                ReportError("LookupDatasetNumber", "Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, ex, True, False, eMasicErrorCodes.InvalidDatasetNumber)
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, ex, eMasicErrorCodes.InvalidDatasetNumber)
                 blnDatasetFoundInDB = False
             End Try
         End If
@@ -146,7 +146,7 @@ Public Class clsDatabaseAccess
                             intNewDatasetNumber = CInt(strSplitLine(1))
                             Exit Do
                         Else
-                            ReportWarning("LookupDatasetNumber", "Invalid dataset number: " & strSplitLine(1))
+                            ReportWarning("Invalid dataset number: " & strSplitLine(1))
                             Exit Do
                         End If
 
@@ -154,7 +154,7 @@ Public Class clsDatabaseAccess
                 End Using
 
             Catch ex As Exception
-                ReportError("LookupDatasetNumber", "Error reading the dataset lookup file", ex, True, True, eMasicErrorCodes.InvalidDatasetLookupFilePath)
+                ReportError("Error reading the dataset lookup file", ex, eMasicErrorCodes.InvalidDatasetLookupFilePath)
             End Try
 
         End If

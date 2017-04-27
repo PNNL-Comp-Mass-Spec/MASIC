@@ -1,6 +1,8 @@
 Option Strict On
 
+Imports System.Threading
 Imports PRISM
+Imports ProgressFormNET
 ' See clsMASIC for a program description
 '
 ' -------------------------------------------------------------------------------
@@ -48,8 +50,8 @@ Public Module modMain
     Private mMASICStatusFilename As String = String.Empty
     Private mQuietMode As Boolean
 
-    Private WithEvents mMASIC As clsMASIC
-    Private mProgressForm As ProgressFormNET.frmProgress
+    Private mMASIC As clsMASIC
+    Private mProgressForm As frmProgress
 
     Private mLastProgressReportTime As DateTime
     Private mLastProgressReportValue As Integer
@@ -134,6 +136,7 @@ Public Module modMain
             End If
 
             mMASIC = New clsMASIC()
+            RegisterEvents(mMASIC)
 
             mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath
             mMASIC.Options.SICOptions.DatasetNumber = mDatasetNumber
@@ -148,7 +151,7 @@ Public Module modMain
             mMASIC.LogFolderPath = mLogFolderPath
 
             If mMASIC.ShowMessages Then
-                mProgressForm = New ProgressFormNET.frmProgress
+                mProgressForm = New frmProgress
 
                 mProgressForm.InitializeProgressForm("Parsing " & Path.GetFileName(mInputFilePath), 0, 100, False, True)
                 mProgressForm.InitializeSubtask("", 0, 100, False)
@@ -206,6 +209,15 @@ Public Module modMain
         Return clsProcessFilesBaseClass.GetAppVersion(PROGRAM_DATE)
     End Function
 
+    Private Sub RegisterEvents(oClass As clsMASIC)
+        'AddHandler oClass.MessageEvent, AddressOf MessageEventHandler
+        'AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
+        'AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
+
+        AddHandler oClass.ProgressChanged, AddressOf ProgressChangedHandler
+        AddHandler oClass.ProgressResetKeypressAbort, AddressOf ProgressResetKeypressAbortHandler
+        AddHandler oClass.ProgressSubtaskChanged, AddressOf ProgressSubtaskChangedHandler
+    End Sub
 
     Private Function SetOptionsUsingCommandLineParameters(objParseCommandLine As clsParseCommandLine) As Boolean
         ' Returns True if no problems; otherwise, returns false
@@ -317,8 +329,8 @@ Public Module modMain
     Public Sub ShowGUI()
         Dim objFormMain As frmMain
 
-        System.Windows.Forms.Application.EnableVisualStyles()
-        System.Windows.Forms.Application.DoEvents()
+        Application.EnableVisualStyles()
+        Application.DoEvents()
 
         objFormMain = New frmMain
 
@@ -369,7 +381,7 @@ Public Module modMain
             Console.WriteLine()
 
             ' Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
-            Threading.Thread.Sleep(750)
+            Thread.Sleep(750)
 
         Catch ex As Exception
             ShowErrorMessage("Error displaying the program syntax: " & ex.Message)
@@ -387,7 +399,7 @@ Public Module modMain
         End Try
     End Sub
 
-    Private Sub mMASIC_ProgressChanged(taskDescription As String, percentComplete As Single) Handles mMASIC.ProgressChanged
+    Private Sub ProgressChangedHandler(taskDescription As String, percentComplete As Single)
         Const PERCENT_REPORT_INTERVAL = 25
         Const PROGRESS_DOT_INTERVAL_MSEC = 250
 
@@ -418,13 +430,13 @@ Public Module modMain
 
     End Sub
 
-    Private Sub mMASIC_ProgressResetKeypressAbort() Handles mMASIC.ProgressResetKeypressAbort
+    Private Sub ProgressResetKeypressAbortHandler()
         If Not mProgressForm Is Nothing Then
             mProgressForm.ResetKeyPressAbortProcess()
         End If
     End Sub
 
-    Private Sub mMASIC_ProgressSubtaskChanged() Handles mMASIC.ProgressSubtaskChanged
+    Private Sub ProgressSubtaskChangedHandler()
         If Not mProgressForm Is Nothing Then
             mProgressForm.UpdateCurrentSubTask(mMASIC.SubtaskDescription)
             mProgressForm.UpdateSubtaskProgressBar(mMASIC.SubtaskProgressPercentComplete)

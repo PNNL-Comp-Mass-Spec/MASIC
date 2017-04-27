@@ -2,7 +2,7 @@
 Imports MASICPeakFinder
 
 Public Class clsScanTracking
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Constants and Enums"
 
@@ -290,7 +290,7 @@ Public Class clsScanTracking
             Return success
 
         Catch ex As Exception
-            ReportError("ProcessAndStoreSpectrum", "Error in ProcessAndStoreSpectrum (LastKnownLocation: " & lastKnownLocation & ")", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+            ReportError("Error in ProcessAndStoreSpectrum (LastKnownLocation: " & lastKnownLocation & ")", ex, eMasicErrorCodes.InputFileDataReadError)
             Return False
         End Try
 

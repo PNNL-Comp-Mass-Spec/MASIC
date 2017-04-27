@@ -4,7 +4,7 @@ Imports PNNLOmics.Utilities
 
 Namespace DataOutput
     Public Class clsSICStatsWriter
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
         Private Function GetFakeParentIonForFragScan(scanList As clsScanList, fragScanIndex As Integer) As clsParentIonInfo
 
@@ -190,7 +190,7 @@ Namespace DataOutput
 
             Catch ex As Exception
                 Console.WriteLine(ex.StackTrace)
-                ReportError("SaveSICStatsFlatFile", "Error writing the Peak Stats to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the Peak Stats to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -216,7 +216,6 @@ Namespace DataOutput
             Return 0
 
         End Function
-
 
         Private Sub WriteSICStatsFlatFileEntry(
           srOutfile As StreamWriter,

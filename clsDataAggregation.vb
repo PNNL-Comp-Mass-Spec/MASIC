@@ -91,7 +91,7 @@ Public Class clsDataAggregation
 
         Try
             If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
-                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
+                OnErrorEvent("Error uncaching scan " & currentScan.ScanNumber)
                 blnSuccess = False
             Else
                 With objSpectraCache.SpectraPool(intPoolIndex)
@@ -99,7 +99,7 @@ Public Class clsDataAggregation
                 End With
             End If
         Catch ex As Exception
-            ReportError("FindMaxValueInMZRange", "Error in FindMaxValueInMZRange", ex, True, False)
+            OnErrorEvent("Error in FindMaxValueInMZRange (A): " & ex.Message, ex)
             blnSuccess = False
         End Try
 
@@ -145,7 +145,7 @@ Public Class clsDataAggregation
             Next
 
         Catch ex As Exception
-            ReportError("FindMaxValueInMZRange", "Error in FindMaxValueInMZRange", ex, True, False)
+            OnErrorEvent("Error in FindMaxValueInMZRange (B): " & ex.Message, ex)
             intClosestMatchIndex = -1
         End Try
 

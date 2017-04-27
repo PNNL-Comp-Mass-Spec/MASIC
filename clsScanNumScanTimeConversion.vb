@@ -1,4 +1,6 @@
-﻿Public Class clsScanNumScanTimeConversion
+﻿Imports PRISM
+
+Public Class clsScanNumScanTimeConversion
     Inherits clsEventNotifier
 
     ''' <summary>
@@ -29,7 +31,7 @@
             Return intScanIndexMatch
 
         Catch ex As Exception
-            ReportError("FindNearestScanNumIndex", "Error in FindNearestScanNumIndex", ex, True, False)
+            OnErrorEvent("Error in FindNearestScanNumIndex", ex)
             Return 0
         End Try
 
@@ -72,7 +74,7 @@
 
             Return intSurveyScanIndexMatch
         Catch ex As Exception
-            ReportError("FindNearestSurveyScanIndex", "Error in FindNearestSurveyScanIndex", ex, True, False)
+            OnErrorEvent("Error in FindNearestSurveyScanIndex", ex)
             Return 0
         End Try
 
@@ -149,7 +151,7 @@
 
             Return intAbsoluteScanNumber
         Catch ex As Exception
-            ReportError("ScanOrAcqTimeToAbsolute", "Error in clsMasic->ScanOrAcqTimeToAbsolute ", ex, True, False)
+            OnErrorEvent("Error in clsMasic->ScanOrAcqTimeToAbsolute", ex)
             Return 0
         End Try
 
@@ -215,7 +217,7 @@
 
             Return sngComputedScanTime
         Catch ex As Exception
-            ReportError("ScanOrAcqTimeToAbsolute", "Error in clsMasic->ScanOrAcqTimeToScanTime ", ex, True, False)
+            OnErrorEvent("Error in clsMasic->ScanOrAcqTimeToScanTime", ex)
             Return 0
         End Try
 

@@ -4,7 +4,7 @@ Imports PNNLOmics.Utilities
 Namespace DataOutput
 
     Public Class clsXMLResultsWriter
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
 #Region "Classwide variables"
         Private ReadOnly mOptions As clsMASICOptions
@@ -331,7 +331,7 @@ Namespace DataOutput
                 Next
 
             Catch ex As Exception
-                ReportError("SaveDataToXML", "Error writing the XML data to the output file; Last good location: " & strLastGoodLoc, ex, True, False, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the XML data to the output file; Last good location: " & strLastGoodLoc, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -414,7 +414,7 @@ Namespace DataOutput
                 objXMLOut.Close()
 
             Catch ex As Exception
-                ReportError("XMLOutputFileFinalize", "Error finalizing the XML output file", ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error finalizing the XML output file", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -589,7 +589,7 @@ Namespace DataOutput
 
 
             Catch ex As Exception
-                ReportError("XMLOutputFileFinalize", "Error initializing the XML output file: " & strXMLOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error initializing the XML output file: " & strXMLOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -732,7 +732,7 @@ Namespace DataOutput
                     End If
 
                 Catch ex As Exception
-                    ReportError("XmlOutputFileUpdateEntries", "Error renaming XML output file from temp name to: " & strXMLReadFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                    ReportError("Error renaming XML output file from temp name to: " & strXMLReadFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                     Return False
                 End Try
 
@@ -740,7 +740,7 @@ Namespace DataOutput
                 System.Windows.Forms.Application.DoEvents()
 
             Catch ex As Exception
-                ReportError("XmlOutputFileUpdateEntries", "Error updating the XML output file: " & strXMLReadFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error updating the XML output file: " & strXMLReadFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

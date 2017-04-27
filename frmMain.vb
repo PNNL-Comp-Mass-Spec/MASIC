@@ -1103,6 +1103,7 @@ Public Class frmMain
         AddHandler oClass.MessageEvent, AddressOf MessageEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
         AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
+
         AddHandler oClass.ProgressChanged, AddressOf MASIC_ProgressChanged
         AddHandler oClass.ProgressResetKeypressAbort, AddressOf MASIC_ProgressResetKeypressAbort
         AddHandler oClass.ProgressSubtaskChanged, AddressOf MASIC_ProgressSubtaskChanged

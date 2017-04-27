@@ -1,4 +1,5 @@
-﻿Imports MASIC.clsMASIC
+﻿Imports InterDetect
+Imports MASIC.clsMASIC
 Imports ThermoRawFileReader
 
 Namespace DataInput
@@ -162,15 +163,13 @@ Namespace DataInput
 
                 ' Open a handle to the data file
                 If Not xcaliburAccessor.OpenRawFile(strInputFileFullPath) Then
-                    ReportError("ExtractScanInfoFromXcaliburDataFile",
-                            "Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor.OpenRawFile returned False)")
+                    ReportError("Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor.OpenRawFile returned False)")
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
 
                 If xcaliburAccessor Is Nothing Then
-                    ReportError("ExtractScanInfoFromXcaliburDataFile",
-                            "Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor is Nothing)")
+                    ReportError("Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor is Nothing)")
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
@@ -195,7 +194,7 @@ Namespace DataInput
 
                 If intScanCount <= 0 Then
                     ' No scans found
-                    ReportError("ExtractScanInfoFromXcaliburDataFile", "No scans found in the input file: " & strFilePath)
+                    ReportError("No scans found in the input file: " & strFilePath)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
@@ -235,8 +234,7 @@ Namespace DataInput
 
                     If Not blnSuccess Then
                         ' GetScanInfo returned false
-                        ReportWarning("ExtractScanInfoFromXcaliburDataFile",
-                                  "xcaliburAccessor.GetScanInfo returned false for scan " & intScanNumber.ToString() & "; aborting read")
+                        ReportWarning("xcaliburAccessor.GetScanInfo returned false for scan " & intScanNumber.ToString() & "; aborting read")
                         Exit For
                     End If
 
@@ -304,8 +302,7 @@ Namespace DataInput
 
             Catch ex As Exception
                 Console.WriteLine(ex.StackTrace)
-                ReportError("ExtractScanInfoFromXcaliburDataFile",
-                        "Error in ExtractScanInfoFromXcaliburDataFile", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in ExtractScanInfoFromXcaliburDataFile", ex, eMasicErrorCodes.InputFileDataReadError)
             End Try
 
             ' Record the current memory usage (before we close the .Raw file)
@@ -634,7 +631,7 @@ Namespace DataInput
                 End If
 
             Catch ex As Exception
-                ReportError("LoadSpectraForFinniganDataFile", "Error in LoadSpectraForFinniganDataFile (LastKnownLocation: " & strLastKnownLocation & ")", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in LoadSpectraForFinniganDataFile (LastKnownLocation: " & strLastKnownLocation & ")", ex, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End Try
 
@@ -812,12 +809,12 @@ Namespace DataInput
 
         Private Sub mXcaliburAccessor_ReportError(strMessage As String)
             Console.WriteLine(strMessage)
-            ReportError("XcaliburAccessor", strMessage, Nothing, True, False, eMasicErrorCodes.InputFileDataReadError)
+            ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
         End Sub
 
         Private Sub mXcaliburAccessor_ReportWarning(strMessage As String)
             Console.WriteLine(strMessage)
-            ReportError("XcaliburAccessor", strMessage, Nothing, False, False, eMasicErrorCodes.InputFileDataReadError)
+            ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
         End Sub
 
     End Class

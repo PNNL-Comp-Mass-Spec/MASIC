@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 
 Public Class clsParentIonProcessing
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Structures"
     Private Structure udtBinnedDataType
@@ -373,7 +373,7 @@ Public Class clsParentIonProcessing
 
             End If
         Catch ex As Exception
-            ReportError("CompareFragSpectraForParentIons", "Error in CompareFragSpectraForParentIons", ex, True, False)
+            ReportError("Error in CompareFragSpectraForParentIons", ex)
             Return -1
         End Try
 
@@ -427,7 +427,7 @@ Public Class clsParentIonProcessing
             Return Math.Max(sngSimilarity1, sngSimilarity2)
 
         Catch ex As Exception
-            ReportError("CompareSectra", "CompareSectra: " & ex.Message, ex, True, False)
+            ReportError("CompareSectra: " & ex.Message, ex)
             Return -1
         End Try
 
@@ -508,7 +508,7 @@ Public Class clsParentIonProcessing
 
             End If
         Catch ex As Exception
-            ReportError("FindClosestMZ_SpectraCache", "Error in FindClosestMZ", ex, True, False)
+            ReportError("Error in FindClosestMZ", ex)
             blnSuccess = False
         End Try
 
@@ -544,7 +544,7 @@ Public Class clsParentIonProcessing
             Next
 
         Catch ex As Exception
-            ReportError("FindClosestMZ", "Error in FindClosestMZ", ex, True, False)
+            ReportError("Error in FindClosestMZ", ex)
             intClosestMatchIndex = -1
         End Try
 
@@ -820,7 +820,7 @@ Public Class clsParentIonProcessing
             blnSuccess = True
 
         Catch ex As Exception
-            ReportError("FindSimilarParentIons", "Error in FindSimilarParentIons", ex, True, False, eMasicErrorCodes.FindSimilarParentIonsError)
+            ReportError("Error in FindSimilarParentIons", ex, eMasicErrorCodes.FindSimilarParentIonsError)
             blnSuccess = False
         End Try
 

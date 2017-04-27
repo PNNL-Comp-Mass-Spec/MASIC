@@ -4,7 +4,7 @@ Imports MASIC.DataOutput.clsDataOutput
 Namespace DataOutput
 
     Public Class clsBPIWriter
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
         Public Function SaveBPIs(
           scanList As clsScanList,
@@ -62,7 +62,7 @@ Namespace DataOutput
                 Return True
 
             Catch ex As Exception
-                ReportError("SaveBPIs", "Error writing the BPI to: " & currentFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the BPI to: " & currentFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

@@ -3,7 +3,7 @@
 Namespace DataInput
 
     Public Class clsCustomSICListReader
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
 #Region "Constants and Enums"
 
@@ -84,7 +84,7 @@ Namespace DataInput
                 If Not File.Exists(strCustomSICValuesFileName) Then
                     ' Custom SIC file not found
                     Dim strErrorMessage = "Custom MZ List file not found: " & strCustomSICValuesFileName
-                    ReportError("CustomSICListReader", strErrorMessage)
+                    ReportError(strErrorMessage)
                     mCustomSICList.CustomMZSearchValues.Clear()
                     Return False
                 End If
@@ -152,7 +152,7 @@ Namespace DataInput
                             If Not blnMZHeaderFound Then
 
                                 Dim strErrorMessage = "Custom M/Z List file " & strCustomSICValuesFileName & "does not have a column header named " & CUSTOM_SIC_COLUMN_MZ & " in the first row; this header is required (valid column headers are: " & GetCustomMZFileColumnHeaders() & ")"
-                                ReportError("CustomSICListReader", strErrorMessage)
+                                ReportError(strErrorMessage)
 
                                 mCustomSICList.CustomMZSearchValues.Clear()
                                 Return False
@@ -262,7 +262,7 @@ Namespace DataInput
                 End Using
 
             Catch ex As Exception
-                ReportError("LoadCustomSICListFromFile", "Error in LoadCustomSICListFromFile", ex, True, True, eMasicErrorCodes.InvalidCustomSICValues)
+                ReportError("Error in LoadCustomSICListFromFile", ex, eMasicErrorCodes.InvalidCustomSICValues)
                 mCustomSICList.CustomMZSearchValues.Clear()
                 Return False
             End Try

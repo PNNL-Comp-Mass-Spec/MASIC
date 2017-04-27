@@ -1,9 +1,8 @@
 ﻿Imports System.Runtime.InteropServices
 Imports MASIC.DataOutput
-Imports PNNLOmics.Data
 
 Public Class clsSICProcessing
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Classwide variables"
     Private ReadOnly mMASICPeakFinder As MASICPeakFinder.clsMASICPeakFinder
@@ -177,7 +176,7 @@ Public Class clsSICProcessing
             blnSuccess = True
 
         Catch ex As Exception
-            ReportError("CreateParentIonSICs", "Error creating Parent Ion SICs", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+            ReportError("Error creating Parent Ion SICs", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
             blnSuccess = False
         End Try
 
@@ -276,7 +275,7 @@ Public Class clsSICProcessing
             If intScanIndexEnd >= intFullSICDataCount Then intScanIndexEnd = intFullSICDataCount - 1
 
         Catch ex As Exception
-            ReportError("ExtractSICDetailsFromFullSIC", "Error initializing SIC start/end indices", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+            ReportError("Error initializing SIC start/end indices", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
         End Try
 
         If intScanIndexEnd >= intScanIndexStart Then
@@ -294,7 +293,7 @@ Public Class clsSICProcessing
                     End If
                 Next
             Catch ex As Exception
-                ReportError("ExtractSICDetailsFromFullSIC", "Error while creating initial SIC", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+                ReportError("Error while creating initial SIC", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
             End Try
 
             ' Now extend the SIC, stepping left and right until a threshold is reached
@@ -366,7 +365,7 @@ Public Class clsSICProcessing
                     End If
 
                 Catch ex As Exception
-                    ReportError("ExtractSICDetailsFromFullSIC", "Error extending SIC to the left", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+                    ReportError("Error extending SIC to the left", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
                 End Try
 
                 Try
@@ -425,7 +424,7 @@ Public Class clsSICProcessing
                     End If
 
                 Catch ex As Exception
-                    ReportError("ExtractSICDetailsFromFullSIC", "Error extending SIC to the right", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+                    ReportError("Error extending SIC to the right", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
                 End Try
 
             Loop    ' While Not LeftDone and Not RightDone
@@ -437,7 +436,7 @@ Public Class clsSICProcessing
         If intScanIndexEnd >= intFullSICDataCount Then intScanIndexEnd = intFullSICDataCount - 1
 
         If intScanIndexEnd < intScanIndexStart Then
-            ReportError("ExtractSICDetailsFromFullSIC", "Programming error: intScanIndexEnd < intScanIndexStart", Nothing, True, True, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
+            ReportError("Programming error: intScanIndexEnd < intScanIndexStart", clsMASIC.eMasicErrorCodes.FindSICPeaksError)
             intScanIndexEnd = intScanIndexStart
         End If
 
@@ -469,7 +468,7 @@ Public Class clsSICProcessing
             End With
 
         Catch ex As Exception
-            ReportError("ExtractSICDetailsFromFullSIC", "Error populating .SICScanIndices, .SICData, and .SICMasses", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+            ReportError("Error populating .SICScanIndices, .SICData, and .SICMasses", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
         End Try
 
         Return True
@@ -517,7 +516,7 @@ Public Class clsSICProcessing
             ReDim blnParentIonUpdated(mzBinList.Count - 1)
 
         Catch ex As Exception
-            ReportError("ProcessMZList", "Error reserving memory for the m/z chunks", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+            ReportError("Error reserving memory for the m/z chunks", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
             Return False
         End Try
 
@@ -623,7 +622,7 @@ Public Class clsSICProcessing
 
             Return True
         Catch ex As Exception
-            ReportError("ProcessMZList", "Error processing the m/z chunks to create the SIC data", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+            ReportError("Error processing the m/z chunks to create the SIC data", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
             Return False
         End Try
 
@@ -911,7 +910,7 @@ Public Class clsSICProcessing
 
                     If intScanIndexObservedInFullSIC = -1 Then
                         ' Match wasn't found; this is unexpected
-                        ReportError("ProcessMZList", "Programming error: survey scan index not found in intFullSICScanIndices()", Nothing, True, True, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
+                        ReportError("Programming error: survey scan index not found in intFullSICScanIndices()", clsMASIC.eMasicErrorCodes.FindSICPeaksError)
                         intScanIndexObservedInFullSIC = 0
                     End If
 
@@ -983,7 +982,7 @@ Public Class clsSICProcessing
                 End If
 
             Catch ex As Exception
-                ReportError("ProcessMZList", "Error updating progress", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
+                ReportError("Error updating progress", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
             End Try
 
         Next
@@ -1054,7 +1053,7 @@ Public Class clsSICProcessing
                     If blnProcessingMRMPeak Then
                         If .ScanTypeForPeakIndices <> clsScanList.eScanTypeConstants.FragScan Then
                             ' ScanType is not FragScan; this is unexpected
-                            ReportError("StorePeakInParentIon", "Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", Nothing, True, True, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
+                            ReportError("Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", clsMASIC.eMasicErrorCodes.FindSICPeaksError)
                             .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan
                         End If
                     End If
@@ -1076,7 +1075,7 @@ Public Class clsSICProcessing
 
                         If .Peak.IndexObserved = -1 Then
                             ' Match wasn't found; this is unexpected
-                            ReportError("StorePeakInParentIon", "Programming error: survey scan index not found in sicScanIndices", Nothing, True, True, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
+                            ReportError("Programming error: survey scan index not found in sicScanIndices", clsMASIC.eMasicErrorCodes.FindSICPeaksError)
                             .Peak.IndexObserved = 0
                         End If
                     End If
@@ -1143,7 +1142,7 @@ Public Class clsSICProcessing
 
         Catch ex As Exception
 
-            ReportError("StorePeakInParentIon", "Error finding SIC peaks and their areas", ex, True, False, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
+            ReportError("Error finding SIC peaks and their areas", ex, clsMASIC.eMasicErrorCodes.FindSICPeaksError)
             blnSuccess = False
 
         End Try

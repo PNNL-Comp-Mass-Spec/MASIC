@@ -57,13 +57,13 @@ Namespace DataInput
 
                 ' Open a handle to each data file
                 If Not objCDFReader.OpenMSCdfFile(strCDFInputFilePathFull) Then
-                    ReportError("ExtractScanInfoFromMGFandCDF", "Error opening input data file: " & strCDFInputFilePathFull)
+                    ReportError("Error opening input data file: " & strCDFInputFilePathFull)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
 
                 If Not objMGFReader.OpenFile(strMGFInputFilePathFull) Then
-                    ReportError("ExtractScanInfoFromMGFandCDF", "Error opening input data file: " & strMGFInputFilePathFull)
+                    ReportError("Error opening input data file: " & strMGFInputFilePathFull)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
@@ -73,7 +73,7 @@ Namespace DataInput
 
                 If intMsScanCount <= 0 Then
                     ' No scans found
-                    ReportError("ExtractScanInfoFromMGFandCDF", "No scans found in the input file: " & strCDFInputFilePathFull)
+                    ReportError("No scans found in the input file: " & strCDFInputFilePathFull)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
@@ -99,7 +99,7 @@ Namespace DataInput
 
                     If Not blnSuccess Then
                         ' Error reading CDF file
-                        ReportError("ExtractScanInfoFromMGFandCDF", "Error obtaining data from CDF file: " & strCDFInputFilePathFull)
+                        ReportError("Error obtaining data from CDF file: " & strCDFInputFilePathFull)
                         SetLocalErrorCode(eMasicErrorCodes.InputFileDataReadError)
                         Return False
                     End If
@@ -147,13 +147,13 @@ Namespace DataInput
 
                                 If .IonsMZ.GetLength(0) < .IonCount Then
                                     ' Error with objCDFReader
-                                    ReportError("ExtractScanInfoFromMGFandCDF", "objCDFReader returned an array of data that was shorter than expected")
+                                    ReportError("objCDFReader returned an array of data that was shorter than expected")
                                     .IonCount = .IonsMZ.GetLength(0)
                                 End If
 
                                 If .IonsIntensity.GetLength(0) < .IonCount Then
                                     ' Error with objCDFReader
-                                    ReportError("ExtractScanInfoFromMGFandCDF", "objCDFReader returned an array of data that was shorter than expected")
+                                    ReportError("objCDFReader returned an array of data that was shorter than expected")
                                     .IonCount = .IonsIntensity.GetLength(0)
                                 End If
 
@@ -490,7 +490,7 @@ Namespace DataInput
 
                 Return blnSuccess
             Catch ex As Exception
-                ReportError("ExtractScanInfoFromMGFandCDF", "Error in ExtractScanInfoFromMGFandCDF", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in ExtractScanInfoFromMGFandCDF", ex, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End Try
 
@@ -533,7 +533,7 @@ Namespace DataInput
                 Return dblMZList(intBasePeakIndex)
 
             Catch ex As Exception
-                ReportError("FindBasePeakIon", "Error in FindBasePeakIon", ex, True, False)
+                ReportError("Error in FindBasePeakIon", ex)
                 sngBasePeakIonIntensity = 0
                 Return 0
             End Try
@@ -626,7 +626,7 @@ Namespace DataInput
 
             Catch ex As Exception
                 ' Ignore any errors that occur in this function
-                ReportError("InterpolateRTandFragScanNumber", "Error in InterpolateRTandFragScanNumber", ex, True, False)
+                ReportError("Error in InterpolateRTandFragScanNumber", ex)
             End Try
 
             Return sngRT

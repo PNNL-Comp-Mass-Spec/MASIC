@@ -2,6 +2,7 @@ Option Explicit On
 Option Strict On
 
 Imports System.Runtime.InteropServices
+Imports PRISM
 
 ''' <summary>
 ''' This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
@@ -250,7 +251,7 @@ Public Class clsCorrelation
             BinDataWork(sngXData, sngYData, intDataCount, sngBinnedOffsetYData, intBinCount, mBinningOptions, sngBin2Offset)
 
         Catch ex As Exception
-            ReportError("clsCorrelation->BinData", "BinData: " & ex.Message, ex)
+            OnErrorEvent("BinData: " & ex.Message, ex)
             ReDim sngBinnedYData(-1)
             ReDim sngBinnedOffsetYData(-1)
             intBinCount = 0
@@ -321,7 +322,7 @@ Public Class clsCorrelation
             End If
 
         Catch ex As Exception
-            ReportError("clsCorrelation->BinDataWork", "BinDataWork: " & ex.Message, ex)
+            OnErrorEvent("BinDataWork: " & ex.Message, ex)
         End Try
 
     End Sub
@@ -387,7 +388,7 @@ Public Class clsCorrelation
             End Select
 
         Catch ex As Exception
-            ReportError("clsCorrelation->Correlate", "Correlate: " & ex.Message, ex)
+            OnErrorEvent("Correlate: " & ex.Message, ex)
             Return -1
         End Try
 

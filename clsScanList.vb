@@ -4,7 +4,7 @@
 ''' Used to track all spectra (scans) in the instrument data file
 ''' </summary>
 Public Class clsScanList
-    Inherits clsEventNotifier
+    Inherits clsMasicEventNotifier
 
 #Region "Constants and Enums"
     Public Enum eScanTypeConstants
@@ -131,7 +131,7 @@ Public Class clsScanList
 
         Else
             ' Unknown type; cannot add
-            ReportError("AddMasterScanEntry", "Programming error: unknown value for eScanType: " & eScanType, Nothing, True, False)
+            ReportError("Programming error: unknown value for eScanType: " & eScanType)
         End If
 
     End Sub

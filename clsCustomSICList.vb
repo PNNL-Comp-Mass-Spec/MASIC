@@ -181,7 +181,7 @@
             End If
 
         Catch ex As Exception
-            ReportError("AddCustomSICValues", "Error in AddCustomSICValues", ex, True, False)
+            OnErrorEvent("Error in AddCustomSICValues", ex)
         End Try
 
     End Sub

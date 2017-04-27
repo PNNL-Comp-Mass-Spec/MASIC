@@ -127,7 +127,7 @@ Public Class clsMASIC
     ''' <summary>
     ''' Percent completion for the current sub task
     ''' </summary>
-    Private mSubtaskProcessingStepPct As Short
+    Private mSubtaskProcessingStepPct As Single
 
     Private mSubtaskDescription As String = String.Empty
 
@@ -1235,6 +1235,10 @@ Public Class clsMASIC
         ' Show the message and log to the clsProcessFilesBaseClass logger
         ShowErrorMessage(strSource & ": " & strMessageWithoutCRLF, True)
 
+        If Not ex Is Nothing Then
+            Console.WriteLine(PRISM.clsStackTraceFormatter.GetExceptionStackTraceMultiLine(ex))
+        End If
+
         If Not eNewErrorCode = eMasicErrorCodes.NoError Then
             SetLocalErrorCode(eNewErrorCode, True)
         End If
@@ -1931,16 +1935,20 @@ Public Class clsMASIC
         AddHandler dataImporter.UpdateMemoryUsageEvent, AddressOf UpdateMemoryUsageEventHandler
     End Sub
 
-    Private Sub RegisterEvents(oClass As clsEventNotifier)
-        AddHandler oClass.MessageEvent, AddressOf MessageEventHandler
+    Private Sub RegisterEventsBase(oClass As clsEventNotifier)
+        AddHandler oClass.StatusEvent, AddressOf MessageEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
         AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
         AddHandler oClass.ProgressUpdate, AddressOf ProgressUpdateHandler
+    End Sub
+
+    Private Sub RegisterEvents(oClass As clsMasicEventNotifier)
+        RegisterEventsBase(oClass)
+
         AddHandler oClass.UpdateCacheStatsEvent, AddressOf UpdatedCacheStatsEventHandler
         AddHandler oClass.UpdateBaseClassErrorCodeEvent, AddressOf UpdateBaseClassErrorCodeEventHandler
         AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
     End Sub
-
     <Obsolete("Use Options.SaveParameterFileSettings")>
     Public Function SaveParameterFileSettings(strParameterFilePath As String) As Boolean
         Dim success = mOptions.SaveParameterFileSettings(strParameterFilePath)
@@ -2028,7 +2036,7 @@ Public Class clsMASIC
     ''' Update subtask progress
     ''' </summary>
     ''' <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Short)
+    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single)
         SetSubtaskProcessingStepPct(subtaskPercentComplete, False)
     End Sub
 
@@ -2037,19 +2045,19 @@ Public Class clsMASIC
     ''' </summary>
     ''' <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
     ''' <param name="forceUpdate"></param>
-    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Short, forceUpdate As Boolean)
+    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single, forceUpdate As Boolean)
         Const MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250
 
         Dim blnRaiseEvent As Boolean
         Static LastFileWriteTime As DateTime = DateTime.UtcNow
 
-        If subtaskPercentComplete = 0 Then
+        If Math.Abs(subtaskPercentComplete) < Single.Epsilon Then
             mAbortProcessing = False
             RaiseEvent ProgressResetKeypressAbort()
             blnRaiseEvent = True
         End If
 
-        If subtaskPercentComplete <> mSubtaskProcessingStepPct Then
+        If Math.Abs(subtaskPercentComplete - mSubtaskProcessingStepPct) > Single.Epsilon Then
             blnRaiseEvent = True
             mSubtaskProcessingStepPct = subtaskPercentComplete
         End If
@@ -2069,7 +2077,7 @@ Public Class clsMASIC
     ''' </summary>
     ''' <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
     ''' <param name="strSubtaskDescription"></param>
-    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Short, strSubtaskDescription As String)
+    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single, strSubtaskDescription As String)
         mSubtaskDescription = strSubtaskDescription
         SetSubtaskProcessingStepPct(subtaskPercentComplete, True)
     End Sub
@@ -2224,20 +2232,21 @@ Public Class clsMASIC
     End Sub
 
     Private Sub ErrorEventHandler(
-      source As String,
       message As String,
-      ex As Exception,
-      allowInformUser As Boolean,
-      allowThrowException As Boolean,
-      eNewErrorCode As eMasicErrorCodes)
-        LogErrors(source, message, ex, allowInformUser, allowThrowException, eNewErrorCode)
+      ex As Exception)
+        LogErrors("", message, ex)
     End Sub
 
-    Private Sub WarningEventHandler(source As String, message As String)
+    Private Sub WarningEventHandler(message As String)
         LogMessage(message, eMessageTypeConstants.Warning)
     End Sub
 
-    Private Sub ProgressUpdateHandler(percentComplete As Short, progressMessage As String)
+    ''' <summary>
+    ''' Update progress
+    ''' </summary>
+    ''' <param name="progressMessage">Progress message (can be empty)</param>
+    ''' <param name="percentComplete">Value between 0 and 100</param>
+    Private Sub ProgressUpdateHandler(progressMessage As String, percentComplete As Single)
         If String.IsNullOrEmpty(progressMessage) Then
             SetSubtaskProcessingStepPct(percentComplete)
         Else

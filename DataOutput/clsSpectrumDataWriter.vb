@@ -3,7 +3,7 @@
 Namespace DataOutput
 
     Public Class clsSpectrumDataWriter
-        Inherits clsEventNotifier
+        Inherits clsMasicEventNotifier
 
 #Region "Classwide variables"
         Private ReadOnly mBPIWriter As clsBPIWriter
@@ -50,7 +50,7 @@ Namespace DataOutput
 
                     Case Else
                         ' Unknown format
-                        ReportError("ExportRawDataToDisk", "Unknown raw data file format: " & mOptions.RawDataExportOptions.FileFormat.ToString())
+                        ReportError("Unknown raw data file format: " & mOptions.RawDataExportOptions.FileFormat.ToString())
                         Return False
                 End Select
 
@@ -95,7 +95,7 @@ Namespace DataOutput
                 Return True
 
             Catch ex As Exception
-                ReportError("ExportRawDataToDisk", "Error writing the raw spectra data to: " & strOutputFilePath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the raw spectra data to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
