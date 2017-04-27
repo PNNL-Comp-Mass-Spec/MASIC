@@ -570,6 +570,8 @@ Namespace DataInput
                     End If
                 End If
 
+                scanInfo.IonCount = scanInfo.IonCountRaw
+
                 Dim objMSSpectrum As New clsMSSpectrum() With {
                     .ScanNumber = intScanNumber,
                     .IonCount = scanInfo.IonCountRaw

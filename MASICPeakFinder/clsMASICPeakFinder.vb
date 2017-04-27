@@ -18,7 +18,7 @@ Imports System.Runtime.InteropServices
 Public Class clsMASICPeakFinder
 
 #Region "Constants and Enums"
-    Public PROGRAM_DATE As String = "April 25, 2017"
+    Public PROGRAM_DATE As String = "April 27, 2017"
 
     Public Const MINIMUM_PEAK_WIDTH As Integer = 3                         ' Width in points
 
