@@ -1,5 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports MASIC.DataOutput
+Imports MASICPeakFinder
 
 Public Class clsSICProcessing
     Inherits clsMasicEventNotifier
@@ -779,17 +780,21 @@ Public Class clsSICProcessing
             Next
 
             ' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
+            Dim noiseStatSegments As List(Of clsBaselineNoiseStatsSegment) = Nothing
+
             Dim blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(
                 sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1,
                 masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions,
-                mzSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
+                noiseStatSegments)
 
             If Not blnSuccess Then
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, True)
                 Return False
             End If
 
-            Dim potentialAreaStatsInFullSIC As MASICPeakFinder.clsSICPotentialAreaStats = Nothing
+            mzSearchChunk(intMZIndexWork).BaselineNoiseStatSegments = noiseStatSegments
+
+            Dim potentialAreaStatsInFullSIC As clsSICPotentialAreaStats = Nothing
 
             ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
             mMASICPeakFinder.FindPotentialPeakArea(

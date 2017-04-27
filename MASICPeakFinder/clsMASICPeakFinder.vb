@@ -317,19 +317,15 @@ Public Class clsMASICPeakFinder
     Public Function ComputeDualTrimmedNoiseLevelTTest(
       sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
       baselineNoiseOptions As clsBaselineNoiseOptions,
-      noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As Boolean
+      <Out()> ByRef noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As Boolean
+
+        noiseStatsSegments = New List(Of clsBaselineNoiseStatsSegment)
 
         Try
 
             Dim intSegmentCountLocal = CInt(baselineNoiseOptions.DualTrimmedMeanMaximumSegments)
             If intSegmentCountLocal = 0 Then intSegmentCountLocal = 3
             If intSegmentCountLocal < 1 Then intSegmentCountLocal = 1
-
-            If noiseStatsSegments Is Nothing Then
-                noiseStatsSegments = New List(Of clsBaselineNoiseStatsSegment)
-            Else
-                noiseStatsSegments.Clear()
-            End If
 
             ' Initialize BaselineNoiseStats for each segment now, in case an error occurs
             For intIndex = 0 To intSegmentCountLocal - 1

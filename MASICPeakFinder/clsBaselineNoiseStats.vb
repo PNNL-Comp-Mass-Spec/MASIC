@@ -14,6 +14,10 @@
 
     Public Property NoiseThresholdModeUsed As clsMASICPeakFinder.eNoiseThresholdModes
 
+    Public Sub New()
+        NoiseThresholdModeUsed = clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold
+    End Sub
+
     Public Function Clone() As clsBaselineNoiseStats
         Dim clonedStats = New clsBaselineNoiseStats() With {
                 .NoiseLevel = NoiseLevel,

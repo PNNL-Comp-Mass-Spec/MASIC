@@ -230,6 +230,7 @@ Public Class clsScanTracking
         Try
 
             ' Determine the noise threshold intensity for this spectrum
+            ' Stored in scanInfo.BaselineNoiseStats
             lastKnownLocation = "Call ComputeNoiseLevelForMassSpectrum"
             ComputeNoiseLevelForMassSpectrum(scanInfo, objMSSpectrum, noiseThresholdOptions)
 
