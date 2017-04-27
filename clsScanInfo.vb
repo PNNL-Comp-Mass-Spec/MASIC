@@ -101,7 +101,7 @@ Public Class clsScanInfo
 
     Public Property IonCountRaw As Integer
 
-    Public Property BaselineNoiseStats As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseStatsType
+    Public Property BaselineNoiseStats As MASICPeakFinder.clsBaselineNoiseStats
 
     ''' <summary>
     ''' Constructor

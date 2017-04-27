@@ -243,8 +243,9 @@ Namespace DataInput
                 scanList.MasterScanOrderCount = 0
                 scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
 
-                Dim surveyScansRecorded = New SortedSet(Of Integer)
-                surveyScansRecorded.Add(intLastSurveyScanIndex)
+                Dim surveyScansRecorded = New SortedSet(Of Integer) From {
+                    intLastSurveyScanIndex
+                }
 
                 ' Reset intScanNumberCorrection; we might also apply it to MS/MS data
                 intScanNumberCorrection = 0
@@ -356,8 +357,9 @@ Namespace DataInput
                     End With
                     scanList.FragScans.Add(newFragScan)
 
-                    Dim objMSSpectrum As New clsMSSpectrum()
-                    objMSSpectrum.IonCount = objSpectrumInfo.DataCount
+                    Dim objMSSpectrum As New clsMSSpectrum() With {
+                        .IonCount = objSpectrumInfo.DataCount
+                    }
 
                     If objMSSpectrum.IonCount > 0 Then
                         objMSSpectrum.ScanNumber = newFragScan.ScanNumber

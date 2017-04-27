@@ -32,6 +32,7 @@ Option Strict On
 ' this computer software.
 
 Imports System.Runtime.InteropServices
+Imports PRISM
 
 Public Class clsMASIC
     Inherits clsProcessFilesBaseClass
@@ -55,8 +56,9 @@ Public Class clsMASIC
         RegisterEvents(mOptions)
 
         Try
-            mFreeMemoryPerformanceCounter = New Diagnostics.PerformanceCounter("Memory", "Available MBytes")
-            mFreeMemoryPerformanceCounter.ReadOnly = True
+            mFreeMemoryPerformanceCounter = New PerformanceCounter("Memory", "Available MBytes") With {
+                .ReadOnly = True
+            }
         Catch ex As Exception
             LogErrors("InitializeVariables", "Error instantiating the Memory->'Available MBytes' performance counter", ex, False, False, eMasicErrorCodes.NoError)
         End Try

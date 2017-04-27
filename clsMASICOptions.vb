@@ -27,7 +27,7 @@ Public Class clsMASICOptions
     ''' </summary>
     Public ReadOnly Property BinningOptions As clsBinningOptions
 
-    Public ReadOnly Property CustomSICList As New clsCustomSICList()
+    Public ReadOnly Property CustomSICList As clsCustomSICList
 
     Public Property AbortProcessing As Boolean
 

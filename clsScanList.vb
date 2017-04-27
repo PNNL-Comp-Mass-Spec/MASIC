@@ -165,25 +165,24 @@ Public Class clsScanList
     End Sub
 
     Private Function GetFakeSurveyScan(scanNumber As Integer, scanTime As Single) As clsScanInfo
+        Dim surveyScan = New clsScanInfo() With {
+            .ScanNumber = scanNumber,
+            .ScanTime = scanTime,
+            .ScanHeaderText = "Full ms",
+            .ScanTypeName = "MS",
+            .BasePeakIonMZ = 0,
+            .BasePeakIonIntensity = 0,
+            .TotalIonIntensity = 0,
+            .ZoomScan = False,
+            .SIMScan = False,
+            .MRMScanType = MRMScanTypeConstants.NotMRM,
+            .LowMass = 0,
+            .HighMass = 0,
+            .IsFTMS = False
+        }
 
-        Dim surveyScan = New clsScanInfo()
-        surveyScan.ScanNumber = scanNumber
-        surveyScan.ScanTime = scanTime
-        surveyScan.ScanHeaderText = "Full ms"
-        surveyScan.ScanTypeName = "MS"
-
-        surveyScan.BasePeakIonMZ = 0
-        surveyScan.BasePeakIonIntensity = 0
-        surveyScan.FragScanInfo.ParentIonInfoIndex = -1                        ' Survey scans typically lead to multiple parent ions; we do not record them here
-        surveyScan.TotalIonIntensity = 0
-
-        surveyScan.ZoomScan = False
-        surveyScan.SIMScan = False
-        surveyScan.MRMScanType = MRMScanTypeConstants.NotMRM
-
-        surveyScan.LowMass = 0
-        surveyScan.HighMass = 0
-        surveyScan.IsFTMS = False
+        ' Survey scans typically lead to multiple parent ions; we do not record them here
+        surveyScan.FragScanInfo.ParentIonInfoIndex = -1
 
         ' Store the collision mode and possibly the scan filter text
         surveyScan.FragScanInfo.CollisionMode = String.Empty
@@ -216,7 +215,7 @@ Public Class clsScanList
         ParentIonInfoCount = 0
         ReDim ParentIons(intFragScanCountToAllocate - 1)
         For intIndex = 0 To intFragScanCountToAllocate - 1
-            ParentIons(intIndex) = New clsParentIonInfo()
+            ParentIons(intIndex) = New clsParentIonInfo(0)
         Next
 
     End Sub

@@ -656,11 +656,11 @@ Public Class clsParentIonProcessing
             ReportMessage("FindSimilarParentIons: Populate objSearchRange")
 
             ' Populate objSearchRange
-            Dim objSearchRange = New clsSearchRange()
-
-            ' Set to false to prevent sorting the input array when calling .FillWithData (saves memory)
-            ' Array was already above
-            objSearchRange.UsePointerIndexArray = False
+            ' Set UsePointerIndexArray to false to prevent .FillWithData trying to sort dblMzList
+            ' (the data was already sorted above)
+            Dim objSearchRange = New clsSearchRange() With {
+                .UsePointerIndexArray = False
+            }
 
             blnSuccess = objSearchRange.FillWithData(dblMZList)
 

@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports MASIC.clsMASIC
 Imports MASIC.DataOutput
+Imports MASICPeakFinder
 Imports ThermoRawFileReader
 
 Public Class clsMRMProcessing
@@ -516,7 +517,7 @@ Public Class clsMRMProcessing
       objSpectraCache As clsSpectraCache,
       sicProcessor As clsSICProcessing,
       xmlResultsWriter As clsXMLResultsWriter,
-      peakFinder As MASICPeakFinder.clsMASICPeakFinder,
+      peakFinder As clsMASICPeakFinder,
       ByRef intParentIonsProcessed As Integer) As Boolean
 
         Dim blnSuccess As Boolean

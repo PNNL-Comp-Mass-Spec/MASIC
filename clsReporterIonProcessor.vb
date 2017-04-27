@@ -299,13 +299,14 @@ Public Class clsReporterIonProcessor
         ReDim dblClosestMZ(reporterIons.Length - 1)
 
         ' Initialize the output variables
-        Dim dataColumns = New List(Of String)
-        dataColumns.Add(sicOptions.DatasetNumber.ToString())
-        dataColumns.Add(currentScan.ScanNumber.ToString())
-        dataColumns.Add(currentScan.FragScanInfo.CollisionMode)
-        dataColumns.Add(Math.Round(dblParentIonMZ, 2).ToString())
-        dataColumns.Add(Math.Round(currentScan.BasePeakIonIntensity, 2).ToString())
-        dataColumns.Add(Math.Round(currentScan.BasePeakIonMZ, 4).ToString())
+        Dim dataColumns = New List(Of String) From {
+            sicOptions.DatasetNumber.ToString(),
+            currentScan.ScanNumber.ToString(),
+            currentScan.FragScanInfo.CollisionMode,
+            Math.Round(dblParentIonMZ, 2).ToString(),
+            Math.Round(currentScan.BasePeakIonIntensity, 2).ToString(),
+            Math.Round(currentScan.BasePeakIonMZ, 4).ToString()
+        }
 
         Dim reporterIntensityList = New List(Of String)
         Dim obsMZList = New List(Of String)

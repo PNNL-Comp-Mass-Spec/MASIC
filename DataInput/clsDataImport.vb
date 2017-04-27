@@ -163,8 +163,6 @@ Namespace DataInput
             Dim intIonIndex As Integer
             Dim blnPointPassesFilter As Boolean
 
-            Dim objFilterDataArray As clsFilterDataArrayMaxCount
-
             ' When this is true, then will write a text file of the mass spectrum before before and after it is filtered
             ' Used for debugging
             Dim blnWriteDebugData As Boolean
@@ -175,10 +173,10 @@ Namespace DataInput
                 With objMSSpectrum
 
                     If objMSSpectrum.IonCount > intMaxIonCountToRetain Then
-                        objFilterDataArray = New clsFilterDataArrayMaxCount()
-
-                        objFilterDataArray.MaximumDataCountToLoad = intMaxIonCountToRetain
-                        objFilterDataArray.TotalIntensityPercentageFilterEnabled = False
+                        Dim objFilterDataArray = New clsFilterDataArrayMaxCount() With {
+                            .MaximumDataCountToLoad = intMaxIonCountToRetain,
+                            .TotalIntensityPercentageFilterEnabled = False
+                        }
 
                         blnWriteDebugData = False
                         If blnWriteDebugData Then
@@ -269,9 +267,9 @@ Namespace DataInput
 
             Const cColDelimiter As Char = ControlChars.Tab
 
-            Dim objScanStatsEntry As New clsScanStatsEntry
-
-            objScanStatsEntry.ScanNumber = currentScan.ScanNumber
+            Dim objScanStatsEntry As New clsScanStatsEntry() With {
+                .ScanNumber = currentScan.ScanNumber
+            }
 
             If eScanType = clsScanList.eScanTypeConstants.SurveyScan Then
                 objScanStatsEntry.ScanType = 1
