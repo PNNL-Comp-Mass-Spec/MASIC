@@ -1,6 +1,6 @@
 ﻿Public Class clsSICStats
 
-    Public Peak As MASICPeakFinder.clsSICStatsPeak
+    Public Property Peak As MASICPeakFinder.clsSICStatsPeak
 
     Public Property ScanTypeForPeakIndices As clsScanList.eScanTypeConstants
 
@@ -22,12 +22,12 @@
     ''' <returns></returns>
     Public Property PeakScanIndexMax As Integer
 
-    Public SICPotentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats
+    Public Property SICPotentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats
 
     Public Sub New()
         Peak = New MASICPeakFinder.clsSICStatsPeak()
-
     End Sub
+
     Public Overrides Function ToString() As String
         Return "Peak at index " & Peak.IndexMax & ", area " & Peak.Area
     End Function

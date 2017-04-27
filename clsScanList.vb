@@ -68,9 +68,9 @@ Public Class clsScanList
     ''' <summary>
     ''' Set to true if the user cancels any of the processing steps
     ''' </summary>
-    Public ProcessingIncomplete As Boolean
-    Public SIMDataPresent As Boolean
-    Public MRMDataPresent As Boolean
+    Public Property ProcessingIncomplete As Boolean
+    Public Property SIMDataPresent As Boolean
+    Public Property MRMDataPresent As Boolean
 
     ''' <summary>
     ''' Constructor

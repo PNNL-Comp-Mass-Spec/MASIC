@@ -923,21 +923,46 @@ Public Class clsDatasetStatsSummarizer
 End Class
 
 Public Class clsScanStatsEntry
-    Public ScanNumber As Integer
-    Public ScanType As Integer              ' 1 for MS, 2 for MS2, 3 for MS3
+    Public Property ScanNumber As Integer
 
-    Public ScanFilterText As String        ' Example values: "FTMS + p NSI Full ms [400.00-2000.00]" or "ITMS + c ESI Full ms [300.00-2000.00]" or "ITMS + p ESI d Z ms [1108.00-1118.00]" or "ITMS + c ESI d Full ms2 342.90@cid35.00"
-    Public ScanTypeName As String          ' Example values: MS, HMS, Zoom, CID-MSn, or PQD-MSn
+    ''' <summary>
+    ''' 1 for MS, 2 for MS2, 3 for MS3
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ScanType As Integer
+
+    ''' <summary>
+    ''' Scan filter
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Examples:
+    ''' FTMS + p NSI Full ms [400.00-2000.00]
+    ''' ITMS + c ESI Full ms [300.00-2000.00]
+    ''' ITMS + p ESI d Z ms [1108.00-1118.00]
+    ''' ITMS + c ESI d Full ms2 342.90@cid35.00
+    ''' </remarks>
+    Public Property ScanFilterText As String
+
+    ''' <summary>
+    ''' Scan type name
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Examples:
+    ''' MS, HMS, Zoom, CID-MSn, or PQD-MSn
+    ''' </remarks>
+    Public Property ScanTypeName As String
 
     ' The following are strings to prevent the number formatting from changing
-    Public ElutionTime As String
-    Public TotalIonIntensity As String
-    Public BasePeakIntensity As String
-    Public BasePeakMZ As String
-    Public BasePeakSignalToNoiseRatio As String
+    Public Property ElutionTime As String
+    Public Property TotalIonIntensity As String
+    Public Property BasePeakIntensity As String
+    Public Property BasePeakMZ As String
+    Public Property BasePeakSignalToNoiseRatio As String
 
-    Public IonCount As Integer
-    Public IonCountRaw As Integer
+    Public Property IonCount As Integer
+    Public Property IonCountRaw As Integer
 
     Public Sub Clear()
         ScanNumber = 0
@@ -963,7 +988,7 @@ End Class
 
 Public Class clsDatasetSummaryStats
 
-    Public ElutionTimeMax As Double
+    Public Property ElutionTimeMax As Double
     Public MSStats As udtSummaryStatDetailsType
     Public MSnStats As udtSummaryStatDetailsType
 

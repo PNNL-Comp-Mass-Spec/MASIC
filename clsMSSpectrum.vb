@@ -8,9 +8,9 @@ Public Class clsMSSpectrum
     Public Const DEFAULT_SPECTRUM_ION_COUNT As Integer = 500
 
     ' 0 if not in use
-    Public ScanNumber As Integer
+    Public Property ScanNumber As Integer
 
-    Public IonCount As Integer
+    Public Property IonCount As Integer
 
     ''' <summary>
     ''' 0-based array, ranging from 0 to IonCount-1; note that IonsMZ.Length could be > IonCount, so do not use .Length to determine the data count
