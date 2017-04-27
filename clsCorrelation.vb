@@ -262,8 +262,8 @@ Public Class clsCorrelation
 
     End Function
 
-    Private Sub BinDataWork(sngXData() As Single, sngYData() As Single, intDataCount As Integer,
-                            sngBinnedYData() As Single, intBinCount As Integer, binningOptions As clsBinningOptions, sngOffset As Single)
+    Private Sub BinDataWork(sngXData As IList(Of Single), sngYData As IList(Of Single), intDataCount As Integer,
+                            sngBinnedYData As IList(Of Single), intBinCount As Integer, binningOptions As clsBinningOptions, sngOffset As Single)
 
         Dim intIndex As Integer
         Dim intBinNumber As Integer
@@ -395,7 +395,7 @@ Public Class clsCorrelation
     End Function
 
     Private Sub CorrelPearson(
-      sngDataList1() As Single, sngDataList2() As Single,
+      sngDataList1 As IList(Of Single), sngDataList2 As IList(Of Single),
       <Out()> ByRef RValue As Single,
       <Out()> ByRef ProbOfSignificance As Single,
       <Out()> ByRef FishersZ As Single)
@@ -426,8 +426,8 @@ Public Class clsCorrelation
         ProbOfSignificance = 0
         FishersZ = 0
 
-        n = sngDataList1.Length
-        If n <> sngDataList2.Length Then
+        n = sngDataList1.Count
+        If n <> sngDataList2.Count Then
             Throw New Exception("sngDataList1 and sngDataList2 must be arrays of the same length")
             n = 0
         End If
@@ -464,8 +464,8 @@ Public Class clsCorrelation
     End Sub
 
     Private Sub CorrelKendall(
-      sngDataList1() As Single,
-      sngDataList2() As Single,
+      sngDataList1 As IList(Of Single),
+      sngDataList2 As IList(Of Single),
       <Out()> ByRef KendallsTau As Single,
       <Out()> ByRef Z As Single,
       <Out()> ByRef ProbOfSignificance As Single)
@@ -492,8 +492,8 @@ Public Class clsCorrelation
         Z = 0
         ProbOfSignificance = 0
 
-        n = sngDataList1.Length
-        If n <> sngDataList2.Length Then
+        n = sngDataList1.Count
+        If n <> sngDataList2.Count Then
             Throw New Exception("sngDataList1 and sngDataList2 must be arrays of the same length")
             n = 0
         End If
@@ -607,7 +607,7 @@ Public Class clsCorrelation
 
     End Sub
 
-    Private Sub CRank(n As Integer, w() As Single, <Out()> ByRef s As Single)
+    Private Sub CRank(n As Integer, w As IList(Of Single), <Out()> ByRef s As Single)
 
         ' Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including midranking of ties,
         ' and returns as s the sum of f^3 - f, where f is the number of elements in each tie.

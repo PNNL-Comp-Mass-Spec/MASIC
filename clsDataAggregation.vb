@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports PRISM
 
 Public Class clsDataAggregation
     Inherits clsEventNotifier
@@ -108,8 +109,8 @@ Public Class clsDataAggregation
     End Function
 
     Private Function FindMaxValueInMZRange(
-      ByRef dblMZList() As Double,
-      ByRef sngIntensityList() As Single,
+      dblMZList As IList(Of Double),
+      sngIntensityList As IList(Of Single),
       intIonCount As Integer,
       dblMZStart As Double,
       dblMZEnd As Double,
