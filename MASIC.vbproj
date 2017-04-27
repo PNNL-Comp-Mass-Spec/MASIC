@@ -83,6 +83,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="InterDetect">
+      <HintPath>Lib\InterDetect.dll</HintPath>
+    </Reference>
     <Reference Include="MSDataFileReader, Version=1.3.4890.35456, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\MSDataFileReader.dll</HintPath>

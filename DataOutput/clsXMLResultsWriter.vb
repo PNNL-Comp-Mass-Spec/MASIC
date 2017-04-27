@@ -117,13 +117,18 @@ Namespace DataOutput
                         End If
 
                         strLastGoodLoc = "Write FragScanNumber"
+
+                        Dim interferenceScore As Double
+
                         If intFragScanIndex < scanList.FragScans.Count Then
                             objXMLOut.WriteElementString("FragScanNumber", scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString())
                             objXMLOut.WriteElementString("FragScanTime", scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime.ToString())
+                            interferenceScore = scanList.FragScans(.FragScanIndices(intFragScanIndex)).FragScanInfo.InteferenceScore
                         Else
                             ' Fragmentation scan does not exist
                             objXMLOut.WriteElementString("FragScanNumber", "0")
                             objXMLOut.WriteElementString("FragScanTime", "0")
+                            interferenceScore = 0
                         End If
 
                         objXMLOut.WriteElementString("OptimalPeakApexScanNumber", .OptimalPeakApexScanNumber.ToString())
@@ -176,6 +181,7 @@ Namespace DataOutput
                                     objXMLOut.WriteElementString("StatMomentsDataCountUsed", .DataCountUsed.ToString())
                                 End With
 
+                                objXMLOut.WriteElementString("InterferenceScore", StringUtilities.ValueToString(interferenceScore, 4))
                             End With
 
                             If sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then

@@ -1,8 +1,12 @@
-﻿Public Class clsMzBinList
+﻿Public Class clsMzBinInfo
 
     Public Property MZ As Double
+
     Public Property MZTolerance As Double
+
     Public Property MZToleranceIsPPM As Boolean
+
+    Public Property ParentIonIndex As Integer
 
     Public Overrides Function ToString() As String
         If MZToleranceIsPPM Then

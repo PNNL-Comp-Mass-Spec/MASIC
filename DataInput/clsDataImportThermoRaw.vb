@@ -6,13 +6,125 @@ Namespace DataInput
     Public Class clsDataImportThermoRaw
         Inherits clsDataImport
 
+        Private Const SCAN_EVENT_CHARGE_STATE = "Charge State"
+        Private Const SCAN_EVENT_MONOISOTOPIC_MZ = "Monoisotopic M/Z"
+        Private Const SCAN_EVENT_MS2_ISOLATION_WIDTH = "MS2 Isolation Width"
+
+        Private ReadOnly mInterferenceCalculator As InterferenceCalculator
+
+        Private ReadOnly mCachedPrecursorIons As List(Of InterDetect.Peak)
+        Private mCachedPrecursorScan As Integer
+
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="masicOptions"></param>
+        ''' <param name="peakFinder"></param>
+        ''' <param name="parentIonProcessor"></param>
+        ''' <param name="scanTracking"></param>
         Public Sub New(
           masicOptions As clsMASICOptions,
           peakFinder As MASICPeakFinder.clsMASICPeakFinder,
           parentIonProcessor As clsParentIonProcessing,
           scanTracking As clsScanTracking)
             MyBase.New(masicOptions, peakFinder, parentIonProcessor, scanTracking)
+
+            mInterferenceCalculator = New InterferenceCalculator()
+            RegisterEvents(mInterferenceCalculator)
+
+            mCachedPrecursorIons = New List(Of InterDetect.Peak)
+            mCachedPrecursorScan = 0
+
         End Sub
+
+        Private Function ComputeInterference(xcaliburAccessor As XRawFileIO, scanInfo As ThermoRawFileReader.clsScanInfo, precursorScanNumber As Integer) As Double
+
+            If Math.Abs(scanInfo.ParentIonMZ) < Single.Epsilon Then
+                ReportWarning("Parent ion m/z is 0; cannot compute inteference for scan " & scanInfo.ScanNumber)
+                Return 0
+            End If
+
+            If precursorScanNumber <> mCachedPrecursorScan Then
+
+                Dim centroidedIonsMz As Double() = Nothing
+                Dim centroidedIonsIntensity As Double() = Nothing
+
+                Dim ionCount = xcaliburAccessor.GetScanData(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity, 0, True)
+
+                mCachedPrecursorIons.Clear()
+                For index = 0 To ionCount - 1
+                    Dim newPeak = New InterDetect.Peak With {
+                        .Mz = centroidedIonsMz(index),
+                        .Abundance = centroidedIonsIntensity(index)
+                    }
+
+                    mCachedPrecursorIons.Add(newPeak)
+                Next
+
+                mCachedPrecursorScan = precursorScanNumber
+
+            End If
+
+            Dim chargeState As Integer
+            Dim isolationWidth As Double
+
+            Dim chargeStateText = ""
+            Dim isolationWidthText = ""
+
+            scanInfo.TryGetScanEvent(SCAN_EVENT_CHARGE_STATE, chargeStateText, True)
+            If Not String.IsNullOrWhiteSpace(chargeStateText) Then
+                If Not Integer.TryParse(chargeStateText, chargeState) Then
+                    chargeState = 0
+                End If
+            End If
+
+            If Not scanInfo.TryGetScanEvent(SCAN_EVENT_MS2_ISOLATION_WIDTH, isolationWidthText, True) Then
+                ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
+                              "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                Return 0
+            End If
+
+            If Not Double.TryParse(isolationWidthText, isolationWidth) Then
+                ReportWarning("MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & ") was non-numeric (" & isolationWidthText & "); " &
+                              "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                Return 0
+            End If
+
+            Dim parentIonMz As Double
+
+            If scanInfo.ParentIonMZ > 0 Then
+                parentIonMz = scanInfo.ParentIonMZ
+            Else
+                ' ThermoRawFileReader could not determine the parent ion m/z value (this is highly unlikely)
+                ' Use scan event "Monoisotopic M/Z" instead
+                Dim monoMzText = ""
+                If (Not scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText, True)) Then
+
+                    ReportWarning("Could not determine the parent ion m/z value (" & SCAN_EVENT_MONOISOTOPIC_MZ & "); " &
+                                  "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                    Return 0
+                End If
+
+                Dim mz As Double
+                If (Not Double.TryParse(monoMzText, mz)) Then
+
+                    OnWarningEvent(String.Format("Skipping scan {0} since scan event {1} was not a number: {2}",
+                                                 scanInfo.ScanNumber, SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText))
+                    Return 0
+                End If
+
+                parentIonMz = mz
+            End If
+
+            Dim oPrecursorInfo = New PrecursorInfo(parentIonMz, isolationWidth, chargeState) With {
+                .ScanNumber = precursorScanNumber
+            }
+
+            mInterferenceCalculator.Interference(oPrecursorInfo, mCachedPrecursorIons)
+
+            Return oPrecursorInfo.Interference
+
+        End Function
 
         Public Function ExtractScanInfoFromXcaliburDataFile(
           strFilePath As String,
@@ -139,17 +251,17 @@ Namespace DataInput
                         If scanInfo.MSLevel <= 1 Then
                             ' Survey Scan
                             blnSuccess = ExtractXcaliburSurveyScan(xcaliburAccessor,
-                           scanList, objSpectraCache, dataOutputHandler, sicOptions,
-                           blnKeepRawSpectra, scanInfo, htSIMScanMapping,
-                           intLastNonZoomSurveyScanIndex, intScanNumber)
+                               scanList, objSpectraCache, dataOutputHandler, sicOptions,
+                               blnKeepRawSpectra, scanInfo, htSIMScanMapping,
+                               intLastNonZoomSurveyScanIndex, intScanNumber)
 
                         Else
 
                             ' Fragmentation Scan
                             blnSuccess = ExtractXcaliburFragmentationScan(xcaliburAccessor,
-                           scanList, objSpectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
-                           blnKeepRawSpectra, blnKeepMSMSSpectra, scanInfo,
-                           intLastNonZoomSurveyScanIndex, intScanNumber)
+                               scanList, objSpectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
+                               blnKeepRawSpectra, blnKeepMSMSSpectra, scanInfo,
+                               intLastNonZoomSurveyScanIndex, intScanNumber)
 
                         End If
 
@@ -214,7 +326,7 @@ Namespace DataInput
           sicOptions As clsSICOptions,
           blnKeepRawSpectra As Boolean,
           scanInfo As ThermoRawFileReader.clsScanInfo,
-          htSIMScanMapping As Dictionary(Of String, Integer),
+          htSIMScanMapping As IDictionary(Of String, Integer),
           ByRef intLastNonZoomSurveyScanIndex As Integer,
           intScanNumber As Integer) As Boolean
 
@@ -324,41 +436,39 @@ Namespace DataInput
           ByRef intLastNonZoomSurveyScanIndex As Integer,
           intScanNumber As Integer) As Boolean
 
-            Dim newFragScan = New clsScanInfo()
+            ' Note that MinimumPositiveIntensity will be determined in LoadSpectraForFinniganDataFile
 
-            With newFragScan
-                .ScanNumber = intScanNumber
-                .ScanTime = CSng(scanInfo.RetentionTime)
+            Dim newFragScan = New clsScanInfo() With {
+                .ScanNumber = intScanNumber,
+                .ScanTime = CSng(scanInfo.RetentionTime),
+                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(scanInfo.FilterText),
+                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(scanInfo.FilterText),
+                .BasePeakIonMZ = scanInfo.BasePeakMZ,
+                .BasePeakIonIntensity = Math.Min(CSng(scanInfo.BasePeakIntensity), Single.MaxValue),
+                .TotalIonIntensity = Math.Min(CSng(scanInfo.TotalIonCurrent), Single.MaxValue),
+                .MinimumPositiveIntensity = 0,
+                .ZoomScan = scanInfo.ZoomScan,
+                .SIMScan = scanInfo.SIMScan,
+                .MRMScanType = scanInfo.MRMScanType
+            }
 
-                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(scanInfo.FilterText)
-                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(scanInfo.FilterText)
+            ' Typically .EventNumber is 1 for the parent-ion scan; 2 for 1st frag scan, 3 for 2nd frag scan, etc.
+            ' This resets for each new parent-ion scan
+            newFragScan.FragScanInfo.FragScanNumber = scanInfo.EventNumber - 1
 
-                .BasePeakIonMZ = scanInfo.BasePeakMZ
-                .BasePeakIonIntensity = Math.Min(CSng(scanInfo.BasePeakIntensity), Single.MaxValue)
+            ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
+            newFragScan.FragScanInfo.MSLevel = scanInfo.MSLevel
 
-                .FragScanInfo.FragScanNumber = scanInfo.EventNumber - 1                                      ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
-
-                ' The .EventNumber value is sometimes wrong; need to check for this
-                If scanList.FragScans.Count > 0 Then
-                    Dim prevFragScan = scanList.FragScans(scanList.FragScans.Count - 1)
-                    If prevFragScan.ScanNumber = .ScanNumber - 1 Then
-                        If .FragScanInfo.FragScanNumber <= prevFragScan.FragScanInfo.FragScanNumber Then
-                            .FragScanInfo.FragScanNumber = prevFragScan.FragScanInfo.FragScanNumber + 1
-                        End If
+            ' The .EventNumber value is sometimes wrong; need to check for this
+            ' For example, if the dataset only has MS2 scans and no parent-ion scan, .EventNumber will be 2 for every MS2 scan
+            If scanList.FragScans.Count > 0 Then
+                Dim prevFragScan = scanList.FragScans(scanList.FragScans.Count - 1)
+                If prevFragScan.ScanNumber = newFragScan.ScanNumber - 1 Then
+                    If newFragScan.FragScanInfo.FragScanNumber <= prevFragScan.FragScanInfo.FragScanNumber Then
+                        newFragScan.FragScanInfo.FragScanNumber = prevFragScan.FragScanInfo.FragScanNumber + 1
                     End If
                 End If
-
-                .FragScanInfo.MSLevel = scanInfo.MSLevel
-
-                .TotalIonIntensity = Math.Min(CSng(scanInfo.TotalIonCurrent), Single.MaxValue)
-
-                ' This will be determined in LoadSpectraForFinniganDataFile
-                .MinimumPositiveIntensity = 0
-
-                .ZoomScan = scanInfo.ZoomScan
-                .SIMScan = scanInfo.SIMScan
-                .MRMScanType = scanInfo.MRMScanType
-            End With
+            End If
 
             If Not newFragScan.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is an MRM scan
@@ -425,6 +535,13 @@ Namespace DataInput
                 mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, newFragScan.MRMScanInfo, objSpectraCache, sicOptions)
             End If
 
+            If intLastNonZoomSurveyScanIndex >= 0 Then
+                Dim precursorScanNumber = scanList.SurveyScans(intLastNonZoomSurveyScanIndex).ScanNumber
+
+                ' Compute the interference of the parent ion in the MS1 spectrum for this frag scan
+                newFragScan.FragScanInfo.InteferenceScore = ComputeInterference(xcaliburAccessor, scanInfo, precursorScanNumber)
+            End If
+
             Return True
 
         End Function
@@ -440,15 +557,8 @@ Namespace DataInput
           dblMSDataResolution As Double,
           blnKeepRawSpectrum As Boolean) As Boolean
 
-            Dim intIonIndex As Integer
-
-            Dim dblTIC As Double
-
-            Dim objMSSpectrum As New clsMSSpectrum()
+            Dim dblMzList() As Double = Nothing
             Dim dblIntensityList() As Double = Nothing
-
-            Dim blnDiscardLowIntensityDataWork As Boolean
-            Dim blnCompressSpectraDataWork As Boolean
 
             Dim strLastKnownLocation = "Start"
 
@@ -458,65 +568,49 @@ Namespace DataInput
 
                 strLastKnownLocation = "objXcaliburAccessor.GetScanData for scan " & intScanNumber
 
-                ' Start a new thread to load the data, in case MSFileReader encounters a corrupt scan
+                ' Retrieve the m/z and intensity values for the given scan
+                ' We retrieve the profile-mode data, since that's required for determing spectrum noise
+                scanInfo.IonCountRaw = objXcaliburAccessor.GetScanData(intScanNumber, dblMzList, dblIntensityList)
 
-                objMSSpectrum.IonCount = objXcaliburAccessor.GetScanData(intScanNumber, objMSSpectrum.IonsMZ, dblIntensityList)
-
-                scanInfo.IonCount = objMSSpectrum.IonCount
-                scanInfo.IonCountRaw = scanInfo.IonCount
-
-                If objMSSpectrum.IonCount > 0 Then
-                    If objMSSpectrum.IonCount <> objMSSpectrum.IonsMZ.Length Then
-                        If objMSSpectrum.IonCount = 0 Then
-                            Debug.WriteLine("LoadSpectraForFinniganDataFile: Survey Scan has IonCount = 0 -- Scan " & intScanNumber, "LoadSpectraForFinniganDataFile")
-                        Else
-                            Debug.WriteLine("LoadSpectraForFinniganDataFile: Survey Scan found where IonCount <> dblMZList.Length -- Scan " & intScanNumber, "LoadSpectraForFinniganDataFile")
-                        End If
+                If scanInfo.IonCountRaw > 0 Then
+                    Dim ionCountVerified = VerifyDataSorted(intScanNumber, scanInfo.IonCountRaw, dblMzList, dblIntensityList)
+                    If ionCountVerified <> scanInfo.IonCountRaw Then
+                        scanInfo.IonCountRaw = ionCountVerified
                     End If
-
-                    Dim sortRequired = False
-
-                    For intIndex = 1 To objMSSpectrum.IonCount - 1
-                        ' Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z, 
-                        ' we have observed a few cases in certain scans of certain datasets that points with 
-                        ' similar m/z values are swapped and ths slightly out of order
-                        ' The following if statement checks for this
-                        If (objMSSpectrum.IonsMZ(intIndex) < objMSSpectrum.IonsMZ(intIndex - 1)) Then
-                            sortRequired = True
-                            Exit For
-                        End If
-                    Next
-
-                    If sortRequired Then
-                        Array.Sort(objMSSpectrum.IonsMZ, dblIntensityList)
-                    End If
-
-                Else
-                    objMSSpectrum.IonCount = 0
                 End If
 
-                With objMSSpectrum
-                    .ScanNumber = intScanNumber
+                Dim objMSSpectrum As New clsMSSpectrum() With {
+                    .ScanNumber = intScanNumber,
+                    .IonCount = scanInfo.IonCountRaw
+                }
 
-                    strLastKnownLocation = "Redim .IonsIntensity(" & .IonCount.ToString() & " - 1)"
-                    ReDim .IonsIntensity(.IonCount - 1)
+                If objMSSpectrum.IonCount = 0 Then
+                    Return False
+                End If
 
-                    ' Copy the intensity data; and compute the total scan intensity
-                    dblTIC = 0
-                    For intIonIndex = 0 To .IonCount - 1
-                        .IonsIntensity(intIonIndex) = CSng(dblIntensityList(intIonIndex))
-                        dblTIC += dblIntensityList(intIonIndex)
-                    Next
-                End With
+                strLastKnownLocation = "Redim IonsMz and IonsIntensity to length " & objMSSpectrum.IonCount
+                ReDim objMSSpectrum.IonsMZ(objMSSpectrum.IonCount - 1)
+                ReDim objMSSpectrum.IonsIntensity(objMSSpectrum.IonCount - 1)
+
+                ' Copy the intensity data; and compute the total scan intensity
+                Dim dblTIC As Double = 0
+                For intIonIndex = 0 To scanInfo.IonCountRaw - 1
+                    objMSSpectrum.IonsMZ(intIonIndex) = dblMzList(intIonIndex)
+                    objMSSpectrum.IonsIntensity(intIonIndex) = CSng(dblIntensityList(intIonIndex))
+                    dblTIC += dblIntensityList(intIonIndex)
+                Next
 
                 ' Determine the minimum positive intensity in this scan
                 strLastKnownLocation = "Call mMASICPeakFinder.FindMinimumPositiveValue"
-                scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(objMSSpectrum.IonCount, objMSSpectrum.IonsIntensity, 0)
+                scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(scanInfo.IonCountRaw, objMSSpectrum.IonsIntensity, 0)
 
                 If objMSSpectrum.IonCount > 0 Then
                     If scanInfo.TotalIonIntensity < Single.Epsilon Then
                         scanInfo.TotalIonIntensity = CSng(Math.Min(dblTIC, Single.MaxValue))
                     End If
+
+                    Dim blnDiscardLowIntensityDataWork As Boolean
+                    Dim blnCompressSpectraDataWork As Boolean
 
                     If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                         blnDiscardLowIntensityDataWork = blnDiscardLowIntensityData
@@ -601,13 +695,13 @@ Namespace DataInput
           strEntryName As String,
           strEntryValue As String)
 
-
             If strEntryValue Is Nothing Then
                 strEntryValue = String.Empty
             End If
 
-            Dim statusEntries = New List(Of KeyValuePair(Of String, String))
-            statusEntries.Add(New KeyValuePair(Of String, String)(strEntryName, strEntryValue))
+            Dim statusEntries = New List(Of KeyValuePair(Of String, String)) From {
+                New KeyValuePair(Of String, String)(strEntryName, strEntryValue)
+            }
 
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries)
 
@@ -616,7 +710,7 @@ Namespace DataInput
         Private Sub StoreExtendedHeaderInfo(
           dataOutputHandler As DataOutput.clsDataOutput,
           scanInfo As clsScanInfo,
-          statusEntries As List(Of KeyValuePair(Of String, String)))
+          statusEntries As IReadOnlyCollection(Of KeyValuePair(Of String, String)))
 
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries, New SortedSet(Of String))
         End Sub
@@ -624,8 +718,8 @@ Namespace DataInput
         Private Sub StoreExtendedHeaderInfo(
           dataOutputHandler As DataOutput.clsDataOutput,
           scanInfo As clsScanInfo,
-          statusEntries As List(Of KeyValuePair(Of String, String)),
-          keyNameFilterList As SortedSet(Of String))
+          statusEntries As IReadOnlyCollection(Of KeyValuePair(Of String, String)),
+          keyNameFilterList As IReadOnlyCollection(Of String))
 
             Dim blnFilterItems As Boolean
             Dim blnSaveItem As Boolean
@@ -673,6 +767,48 @@ Namespace DataInput
             End Try
 
         End Sub
+
+        ''' <summary>
+        ''' Verify that data in mzList is sorted ascending
+        ''' </summary>
+        ''' <param name="scanNumber">Scan number</param>
+        ''' <param name="ionCount">Expected length of mzList and intensityList</param>
+        ''' <param name="mzList"></param>
+        ''' <param name="intensityList"></param>
+        ''' <returns>Number of data points in mzList</returns>
+        Private Function VerifyDataSorted(scanNumber As Integer, ionCount As Integer, mzList As Double(), intensityList As Double()) As Integer
+
+            If ionCount <> mzList.Length Then
+                If ionCount = 0 Then
+                    ReportWarning("Scan found with IonCount = 0, scan " & scanNumber)
+                Else
+                    ReportWarning(String.Format(
+                                  "Scan found where IonCount <> mzList.Length, scan {0}: {1} vs. {2}",
+                                  scanNumber, ionCount, mzList.Length))
+                End If
+                ionCount = Math.Min(ionCount, mzList.Length)
+            End If
+
+            Dim sortRequired = False
+
+            For intIndex = 1 To ionCount - 1
+                ' Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z,
+                ' we have observed a few cases in certain scans of certain datasets that points with
+                ' similar m/z values are swapped and ths slightly out of order
+                ' The following if statement checks for this
+                If (mzList(intIndex) < mzList(intIndex - 1)) Then
+                    sortRequired = True
+                    Exit For
+                End If
+            Next
+
+            If sortRequired Then
+                Array.Sort(mzList, intensityList)
+            End If
+
+            Return ionCount
+
+        End Function
 
         Private Sub mXcaliburAccessor_ReportError(strMessage As String)
             Console.WriteLine(strMessage)

@@ -230,25 +230,29 @@ Namespace DataOutput
           intFragScanIndex As Integer,
           blnIncludeScanTimesInSICStatsFile As Boolean)
 
-            Dim sbOutLine = New Text.StringBuilder()
+            Dim dataValues = New List(Of String)
 
             Dim fragScanTime As Single = 0
             Dim optimalPeakApexScanTime As Single = 0
 
-            sbOutLine.Append(sicOptions.DatasetNumber.ToString() & cColDelimiter)                              ' Dataset number
-            sbOutLine.Append(intParentIonIndex.ToString() & cColDelimiter)                                        ' Parent Ion Index
+            dataValues.Add(sicOptions.DatasetNumber.ToString())            ' Dataset number
+            dataValues.Add(intParentIonIndex.ToString())                   ' Parent Ion Index
 
-            sbOutLine.Append(Math.Round(parentIon.MZ, 4).ToString() & cColDelimiter)                              ' MZ
+            dataValues.Add(Math.Round(parentIon.MZ, 4).ToString())         ' MZ
 
-            sbOutLine.Append(intSurveyScanNumber & cColDelimiter)                                               ' Survey scan number
+            dataValues.Add(intSurveyScanNumber.ToString())                 ' Survey scan number
+
+            Dim interferenceScore As Double
 
             If intFragScanIndex < scanList.FragScans.Count Then
-                sbOutLine.Append(scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).ScanNumber.ToString() & cColDelimiter)  ' Fragmentation scan number
+                dataValues.Add(scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).ScanNumber.ToString())  ' Fragmentation scan number
+                interferenceScore = scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).FragScanInfo.InteferenceScore
             Else
-                sbOutLine.Append("0" & cColDelimiter)    ' Fragmentation scan does not exist
+                dataValues.Add("0")    ' Fragmentation scan does not exist
+                interferenceScore = 0
             End If
 
-            sbOutLine.Append(parentIon.OptimalPeakApexScanNumber.ToString() & cColDelimiter)                ' Optimal peak apex scan number
+            dataValues.Add(parentIon.OptimalPeakApexScanNumber.ToString())                ' Optimal peak apex scan number
 
             If blnIncludeScanTimesInSICStatsFile Then
                 If intFragScanIndex < scanList.FragScans.Count Then
@@ -260,57 +264,58 @@ Namespace DataOutput
                 optimalPeakApexScanTime = ScanNumberToScanTime(scanList, parentIon.OptimalPeakApexScanNumber)
             End If
 
-            sbOutLine.Append(parentIon.PeakApexOverrideParentIonIndex.ToString() & cColDelimiter)           ' Parent Ion Index that supplied the optimal peak apex scan number
+            dataValues.Add(parentIon.PeakApexOverrideParentIonIndex.ToString())           ' Parent Ion Index that supplied the optimal peak apex scan number
             If parentIon.CustomSICPeak Then
-                sbOutLine.Append("1" & cColDelimiter)                                            ' Custom SIC peak, record 1
+                dataValues.Add("1")   ' Custom SIC peak, record 1
             Else
-                sbOutLine.Append("0" & cColDelimiter)                                            ' Not a Custom SIC peak, record 0
+                dataValues.Add("0")   ' Not a Custom SIC peak, record 0
             End If
 
             With parentIon.SICStats
                 If .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
-                    sbOutLine.Append(scanList.FragScans(.PeakScanIndexStart).ScanNumber.ToString() & cColDelimiter)   ' Peak Scan Start
-                    sbOutLine.Append(scanList.FragScans(.PeakScanIndexEnd).ScanNumber.ToString() & cColDelimiter)     ' Peak Scan End
-                    sbOutLine.Append(scanList.FragScans(.PeakScanIndexMax).ScanNumber.ToString() & cColDelimiter)     ' Peak Scan Max Intensity
+                    dataValues.Add(scanList.FragScans(.PeakScanIndexStart).ScanNumber.ToString())    ' Peak Scan Start
+                    dataValues.Add(scanList.FragScans(.PeakScanIndexEnd).ScanNumber.ToString())      ' Peak Scan End
+                    dataValues.Add(scanList.FragScans(.PeakScanIndexMax).ScanNumber.ToString())      ' Peak Scan Max Intensity
                 Else
-                    sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexStart).ScanNumber.ToString() & cColDelimiter)   ' Peak Scan Start
-                    sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexEnd).ScanNumber.ToString() & cColDelimiter)     ' Peak Scan End
-                    sbOutLine.Append(scanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString() & cColDelimiter)     ' Peak Scan Max Intensity
+                    dataValues.Add(scanList.SurveyScans(.PeakScanIndexStart).ScanNumber.ToString())  ' Peak Scan Start
+                    dataValues.Add(scanList.SurveyScans(.PeakScanIndexEnd).ScanNumber.ToString())    ' Peak Scan End
+                    dataValues.Add(scanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString())    ' Peak Scan Max Intensity
                 End If
 
                 With .Peak
-                    sbOutLine.Append(StringUtilities.ValueToString(.MaxIntensityValue, 5) & cColDelimiter)           ' Peak Intensity
-                    sbOutLine.Append(StringUtilities.ValueToString(.SignalToNoiseRatio, 4) & cColDelimiter)          ' Peak signal to noise ratio
-                    sbOutLine.Append(.FWHMScanWidth.ToString() & cColDelimiter)                                       ' Full width at half max (in scans)
-                    sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)                       ' Peak area
+                    dataValues.Add(StringUtilities.ValueToString(.MaxIntensityValue, 5))          ' Peak Intensity
+                    dataValues.Add(StringUtilities.ValueToString(.SignalToNoiseRatio, 4))         ' Peak signal to noise ratio
+                    dataValues.Add(.FWHMScanWidth.ToString())                                     ' Full width at half max (in scans)
+                    dataValues.Add(StringUtilities.ValueToString(.Area, 5))                       ' Peak area
 
-                    sbOutLine.Append(StringUtilities.ValueToString(.ParentIonIntensity, 5) & cColDelimiter)          ' Intensity of the parent ion (just before the fragmentation scan)
+                    dataValues.Add(StringUtilities.ValueToString(.ParentIonIntensity, 5))         ' Intensity of the parent ion (just before the fragmentation scan)
                     With .BaselineNoiseStats
-                        sbOutLine.Append(StringUtilities.ValueToString(.NoiseLevel, 5) & cColDelimiter)
-                        sbOutLine.Append(StringUtilities.ValueToString(.NoiseStDev, 3) & cColDelimiter)
-                        sbOutLine.Append(.PointsUsed.ToString() & cColDelimiter)
+                        dataValues.Add(StringUtilities.ValueToString(.NoiseLevel, 5))
+                        dataValues.Add(StringUtilities.ValueToString(.NoiseStDev, 3))
+                        dataValues.Add(.PointsUsed.ToString())
                     End With
 
                     With .StatisticalMoments
-                        sbOutLine.Append(StringUtilities.ValueToString(.Area, 5) & cColDelimiter)
-                        sbOutLine.Append(.CenterOfMassScan.ToString() & cColDelimiter)
-                        sbOutLine.Append(StringUtilities.ValueToString(.StDev, 3) & cColDelimiter)
-                        sbOutLine.Append(StringUtilities.ValueToString(.Skew, 4) & cColDelimiter)
-                        sbOutLine.Append(StringUtilities.ValueToString(.KSStat, 4) & cColDelimiter)
-                        sbOutLine.Append(.DataCountUsed.ToString())
+                        dataValues.Add(StringUtilities.ValueToString(.Area, 5))
+                        dataValues.Add(.CenterOfMassScan.ToString())
+                        dataValues.Add(StringUtilities.ValueToString(.StDev, 3))
+                        dataValues.Add(StringUtilities.ValueToString(.Skew, 4))
+                        dataValues.Add(StringUtilities.ValueToString(.KSStat, 4))
+                        dataValues.Add(.DataCountUsed.ToString())
                     End With
 
                 End With
             End With
 
+            dataValues.Add(StringUtilities.ValueToString(interferenceScore, 4))     ' Interference Score
+
             If blnIncludeScanTimesInSICStatsFile Then
-                sbOutLine.Append(cColDelimiter)
-                sbOutLine.Append(Math.Round(sngSurveyScanTime, 5).ToString() & cColDelimiter)          ' SurveyScanTime
-                sbOutLine.Append(Math.Round(fragScanTime, 5).ToString() & cColDelimiter)               ' FragScanTime
-                sbOutLine.Append(Math.Round(optimalPeakApexScanTime, 5).ToString() & cColDelimiter)    ' OptimalPeakApexScanTime
+                dataValues.Add(Math.Round(sngSurveyScanTime, 5).ToString())         ' SurveyScanTime
+                dataValues.Add(Math.Round(fragScanTime, 5).ToString())              ' FragScanTime
+                dataValues.Add(Math.Round(optimalPeakApexScanTime, 5).ToString())   ' OptimalPeakApexScanTime
             End If
 
-            srOutfile.WriteLine(sbOutLine.ToString())
+            srOutfile.WriteLine(String.Join(cColDelimiter, dataValues))
 
         End Sub
 
