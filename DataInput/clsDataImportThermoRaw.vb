@@ -228,9 +228,9 @@ Namespace DataInput
 
                 For intScanNumber = intScanStart To intScanEnd
 
-                    Dim scanInfo As ThermoRawFileReader.clsScanInfo = Nothing
+                    Dim thermoScanInfo As ThermoRawFileReader.clsScanInfo = Nothing
 
-                    blnSuccess = xcaliburAccessor.GetScanInfo(intScanNumber, scanInfo)
+                    blnSuccess = xcaliburAccessor.GetScanInfo(intScanNumber, thermoScanInfo)
 
                     If Not blnSuccess Then
                         ' GetScanInfo returned false
@@ -238,19 +238,19 @@ Namespace DataInput
                         Exit For
                     End If
 
-                    If mScanTracking.CheckScanInRange(intScanNumber, scanInfo.RetentionTime, sicOptions) Then
+                    If mScanTracking.CheckScanInRange(intScanNumber, thermoScanInfo.RetentionTime, sicOptions) Then
 
-                        If scanInfo.ParentIonMZ > 0 AndAlso Math.Abs(mOptions.ParentIonDecoyMassDa) > 0 Then
-                            scanInfo.ParentIonMZ += mOptions.ParentIonDecoyMassDa
+                        If thermoScanInfo.ParentIonMZ > 0 AndAlso Math.Abs(mOptions.ParentIonDecoyMassDa) > 0 Then
+                            thermoScanInfo.ParentIonMZ += mOptions.ParentIonDecoyMassDa
                         End If
 
                         ' Determine if this was an MS/MS scan
                         ' If yes, determine the scan number of the survey scan
-                        If scanInfo.MSLevel <= 1 Then
+                        If thermoScanInfo.MSLevel <= 1 Then
                             ' Survey Scan
                             blnSuccess = ExtractXcaliburSurveyScan(xcaliburAccessor,
                                scanList, objSpectraCache, dataOutputHandler, sicOptions,
-                               blnKeepRawSpectra, scanInfo, htSIMScanMapping,
+                               blnKeepRawSpectra, thermoScanInfo, htSIMScanMapping,
                                intLastNonZoomSurveyScanIndex, intScanNumber)
 
                         Else
@@ -258,7 +258,7 @@ Namespace DataInput
                             ' Fragmentation Scan
                             blnSuccess = ExtractXcaliburFragmentationScan(xcaliburAccessor,
                                scanList, objSpectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
-                               blnKeepRawSpectra, blnKeepMSMSSpectra, scanInfo,
+                               blnKeepRawSpectra, blnKeepMSMSSpectra, thermoScanInfo,
                                intLastNonZoomSurveyScanIndex, intScanNumber)
 
                         End If
@@ -322,73 +322,67 @@ Namespace DataInput
           dataOutputHandler As DataOutput.clsDataOutput,
           sicOptions As clsSICOptions,
           blnKeepRawSpectra As Boolean,
-          scanInfo As ThermoRawFileReader.clsScanInfo,
+          thermoScanInfo As ThermoRawFileReader.clsScanInfo,
           htSIMScanMapping As IDictionary(Of String, Integer),
           ByRef intLastNonZoomSurveyScanIndex As Integer,
           intScanNumber As Integer) As Boolean
 
-            Dim newSurveyScan = New clsScanInfo()
-            With newSurveyScan
-                .ScanNumber = intScanNumber
-                .ScanTime = CSng(scanInfo.RetentionTime)
+            Dim scanInfo = New clsScanInfo() With {
+                .ScanNumber = intScanNumber,
+                .ScanTime = CSng(thermoScanInfo.RetentionTime),
+                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
+                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
+                .BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
+                .BasePeakIonIntensity = Math.Min(CSng(thermoScanInfo.BasePeakIntensity), Single.MaxValue),
+                .TotalIonIntensity = Math.Min(CSng(thermoScanInfo.TotalIonCurrent), Single.MaxValue),
+                .MinimumPositiveIntensity = 0,        ' This will be determined in LoadSpectraForFinniganDataFile
+                .ZoomScan = thermoScanInfo.ZoomScan,
+                .SIMScan = thermoScanInfo.SIMScan,
+                .MRMScanType = thermoScanInfo.MRMScanType,
+                .LowMass = thermoScanInfo.LowMass,
+                .HighMass = thermoScanInfo.HighMass,
+                .IsFTMS = thermoScanInfo.IsFTMS
+            }
 
-                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(scanInfo.FilterText)
-                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(scanInfo.FilterText)
+            ' Survey scans typically lead to multiple parent ions; we do not record them here
+            scanInfo.FragScanInfo.ParentIonInfoIndex = -1
 
-                .BasePeakIonMZ = scanInfo.BasePeakMZ
-                .BasePeakIonIntensity = Math.Min(CSng(scanInfo.BasePeakIntensity), Single.MaxValue)
+            If Not scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
+                ' This is an MRM scan
+                scanList.MRMDataPresent = True
+            End If
 
-                .FragScanInfo.ParentIonInfoIndex = -1                        ' Survey scans typically lead to multiple parent ions; we do not record them here
-                .TotalIonIntensity = Math.Min(CSng(scanInfo.TotalIonCurrent), Single.MaxValue)
+            If scanInfo.SIMScan Then
+                scanList.SIMDataPresent = True
+                Dim strSIMKey = scanInfo.LowMass & "_" & scanInfo.HighMass
+                Dim simIndex As Integer
 
-                ' This will be determined in LoadSpectraForFinniganDataFile
-                .MinimumPositiveIntensity = 0
-
-                .ZoomScan = scanInfo.ZoomScan
-                .SIMScan = scanInfo.SIMScan
-                .MRMScanType = scanInfo.MRMScanType
-
-                If Not .MRMScanType = MRMScanTypeConstants.NotMRM Then
-                    ' This is an MRM scan
-                    scanList.MRMDataPresent = True
+                If htSIMScanMapping.TryGetValue(strSIMKey, simIndex) Then
+                    scanInfo.SIMIndex = simIndex
+                Else
+                    scanInfo.SIMIndex = htSIMScanMapping.Count
+                    htSIMScanMapping.Add(strSIMKey, htSIMScanMapping.Count)
                 End If
-
-                .LowMass = scanInfo.LowMass
-                .HighMass = scanInfo.HighMass
-                .IsFTMS = scanInfo.IsFTMS
-
-                If .SIMScan Then
-                    scanList.SIMDataPresent = True
-                    Dim strSIMKey = .LowMass & "_" & .HighMass
-                    Dim simIndex As Integer
-
-                    If htSIMScanMapping.TryGetValue(strSIMKey, simIndex) Then
-                        .SIMIndex = simIndex
-                    Else
-                        .SIMIndex = htSIMScanMapping.Count
-                        htSIMScanMapping.Add(strSIMKey, htSIMScanMapping.Count)
-                    End If
-                End If
-            End With
+            End If
 
             ' Store the ScanEvent values in .ExtendedHeaderInfo
-            StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, scanInfo.ScanEvents)
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, thermoScanInfo.ScanEvents)
 
             ' Store the collision mode and possibly the scan filter text
-            newSurveyScan.FragScanInfo.CollisionMode = scanInfo.CollisionMode
-            StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
+            scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode)
             If mOptions.WriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText)
             End If
 
             If mOptions.WriteExtendedStatsStatusLog Then
                 ' Store the StatusLog values in .ExtendedHeaderInfo
-                StoreExtendedHeaderInfo(dataOutputHandler, newSurveyScan, scanInfo.StatusLog, mOptions.StatusLogKeyNameFilterList)
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, thermoScanInfo.StatusLog, mOptions.StatusLogKeyNameFilterList)
             End If
 
-            scanList.SurveyScans.Add(newSurveyScan)
+            scanList.SurveyScans.Add(scanInfo)
 
-            If Not newSurveyScan.ZoomScan Then
+            If Not scanInfo.ZoomScan Then
                 intLastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1
             End If
 
@@ -399,11 +393,11 @@ Namespace DataInput
             If sicOptions.SICToleranceIsPPM Then
                 ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
                 ' However, if the lowest m/z value is < 100, then use 100 m/z
-                If scanInfo.LowMass < 100 Then
+                If thermoScanInfo.LowMass < 100 Then
                     dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
                         sicOptions.CompressToleranceDivisorForPPM
                 Else
-                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, scanInfo.LowMass) /
+                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, thermoScanInfo.LowMass) /
                         sicOptions.CompressToleranceDivisorForPPM
                 End If
             Else
@@ -411,10 +405,10 @@ Namespace DataInput
             End If
 
             ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            Dim blnSuccess = LoadSpectraForFinniganDataFile(xcaliburAccessor, objSpectraCache, intScanNumber, newSurveyScan, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, dblMSDataResolution, blnKeepRawSpectra)
+            Dim blnSuccess = LoadSpectraForFinniganDataFile(xcaliburAccessor, objSpectraCache, intScanNumber, scanInfo, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, dblMSDataResolution, blnKeepRawSpectra)
             If Not blnSuccess Then Return False
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, newSurveyScan, sicOptions.DatasetNumber)
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
 
             Return True
 
@@ -429,80 +423,80 @@ Namespace DataInput
           binningOptions As clsBinningOptions,
           blnKeepRawSpectra As Boolean,
           blnKeepMSMSSpectra As Boolean,
-          scanInfo As ThermoRawFileReader.clsScanInfo,
+          thermoScanInfo As ThermoRawFileReader.clsScanInfo,
           ByRef intLastNonZoomSurveyScanIndex As Integer,
           intScanNumber As Integer) As Boolean
 
             ' Note that MinimumPositiveIntensity will be determined in LoadSpectraForFinniganDataFile
 
-            Dim newFragScan = New clsScanInfo() With {
+            Dim scanInfo = New clsScanInfo() With {
                 .ScanNumber = intScanNumber,
-                .ScanTime = CSng(scanInfo.RetentionTime),
-                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(scanInfo.FilterText),
-                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(scanInfo.FilterText),
-                .BasePeakIonMZ = scanInfo.BasePeakMZ,
-                .BasePeakIonIntensity = Math.Min(CSng(scanInfo.BasePeakIntensity), Single.MaxValue),
-                .TotalIonIntensity = Math.Min(CSng(scanInfo.TotalIonCurrent), Single.MaxValue),
+                .ScanTime = CSng(thermoScanInfo.RetentionTime),
+                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
+                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
+                .BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
+                .BasePeakIonIntensity = Math.Min(CSng(thermoScanInfo.BasePeakIntensity), Single.MaxValue),
+                .TotalIonIntensity = Math.Min(CSng(thermoScanInfo.TotalIonCurrent), Single.MaxValue),
                 .MinimumPositiveIntensity = 0,
-                .ZoomScan = scanInfo.ZoomScan,
-                .SIMScan = scanInfo.SIMScan,
-                .MRMScanType = scanInfo.MRMScanType
+                .ZoomScan = thermoScanInfo.ZoomScan,
+                .SIMScan = thermoScanInfo.SIMScan,
+                .MRMScanType = thermoScanInfo.MRMScanType
             }
 
             ' Typically .EventNumber is 1 for the parent-ion scan; 2 for 1st frag scan, 3 for 2nd frag scan, etc.
             ' This resets for each new parent-ion scan
-            newFragScan.FragScanInfo.FragScanNumber = scanInfo.EventNumber - 1
+            scanInfo.FragScanInfo.FragScanNumber = thermoScanInfo.EventNumber - 1
 
             ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
-            newFragScan.FragScanInfo.MSLevel = scanInfo.MSLevel
+            scanInfo.FragScanInfo.MSLevel = thermoScanInfo.MSLevel
 
             ' The .EventNumber value is sometimes wrong; need to check for this
             ' For example, if the dataset only has MS2 scans and no parent-ion scan, .EventNumber will be 2 for every MS2 scan
             If scanList.FragScans.Count > 0 Then
                 Dim prevFragScan = scanList.FragScans(scanList.FragScans.Count - 1)
-                If prevFragScan.ScanNumber = newFragScan.ScanNumber - 1 Then
-                    If newFragScan.FragScanInfo.FragScanNumber <= prevFragScan.FragScanInfo.FragScanNumber Then
-                        newFragScan.FragScanInfo.FragScanNumber = prevFragScan.FragScanInfo.FragScanNumber + 1
+                If prevFragScan.ScanNumber = scanInfo.ScanNumber - 1 Then
+                    If scanInfo.FragScanInfo.FragScanNumber <= prevFragScan.FragScanInfo.FragScanNumber Then
+                        scanInfo.FragScanInfo.FragScanNumber = prevFragScan.FragScanInfo.FragScanNumber + 1
                     End If
                 End If
             End If
 
-            If Not newFragScan.MRMScanType = MRMScanTypeConstants.NotMRM Then
+            If Not scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is an MRM scan
                 scanList.MRMDataPresent = True
 
-                newFragScan.MRMScanInfo = clsMRMProcessing.DuplicateMRMInfo(scanInfo.MRMInfo, scanInfo.ParentIonMZ)
+                scanInfo.MRMScanInfo = clsMRMProcessing.DuplicateMRMInfo(thermoScanInfo.MRMInfo, thermoScanInfo.ParentIonMZ)
 
                 If scanList.SurveyScans.Count = 0 Then
                     ' Need to add a "fake" survey scan that we can map this parent ion to
                     intLastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
                 End If
             Else
-                newFragScan.MRMScanInfo.MRMMassCount = 0
+                scanInfo.MRMScanInfo.MRMMassCount = 0
             End If
 
-            With newFragScan
-                .LowMass = scanInfo.LowMass
-                .HighMass = scanInfo.HighMass
-                .IsFTMS = scanInfo.IsFTMS
+            With scanInfo
+                .LowMass = thermoScanInfo.LowMass
+                .HighMass = thermoScanInfo.HighMass
+                .IsFTMS = thermoScanInfo.IsFTMS
             End With
 
             ' Store the ScanEvent values in .ExtendedHeaderInfo
-            StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, scanInfo.ScanEvents)
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, thermoScanInfo.ScanEvents)
 
             ' Store the collision mode and possibly the scan filter text
-            newFragScan.FragScanInfo.CollisionMode = scanInfo.CollisionMode
-            StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, scanInfo.CollisionMode)
+            scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode)
             If mOptions.WriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanInfo.FilterText)
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText)
             End If
 
             If mOptions.WriteExtendedStatsStatusLog Then
                 ' Store the StatusLog values in .ExtendedHeaderInfo
-                StoreExtendedHeaderInfo(dataOutputHandler, newFragScan, scanInfo.StatusLog, mOptions.StatusLogKeyNameFilterList)
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, thermoScanInfo.StatusLog, mOptions.StatusLogKeyNameFilterList)
             End If
 
-            scanList.FragScans.Add(newFragScan)
+            scanList.FragScans.Add(scanInfo)
 
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
 
@@ -513,7 +507,7 @@ Namespace DataInput
               xcaliburAccessor,
               objSpectraCache,
               intScanNumber,
-              newFragScan,
+              scanInfo,
               sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
               DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
               sicOptions.CompressMSMSSpectraData,
@@ -522,21 +516,21 @@ Namespace DataInput
 
             If Not blnSuccess Then Return False
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, newFragScan, sicOptions.DatasetNumber)
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetNumber)
 
-            If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
+            If thermoScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
             Else
                 ' This is an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, scanInfo.ParentIonMZ, newFragScan.MRMScanInfo, objSpectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanInfo.MRMScanInfo, objSpectraCache, sicOptions)
             End If
 
             If intLastNonZoomSurveyScanIndex >= 0 Then
                 Dim precursorScanNumber = scanList.SurveyScans(intLastNonZoomSurveyScanIndex).ScanNumber
 
                 ' Compute the interference of the parent ion in the MS1 spectrum for this frag scan
-                newFragScan.FragScanInfo.InteferenceScore = ComputeInterference(xcaliburAccessor, scanInfo, precursorScanNumber)
+                scanInfo.FragScanInfo.InteferenceScore = ComputeInterference(xcaliburAccessor, thermoScanInfo, precursorScanNumber)
             End If
 
             Return True

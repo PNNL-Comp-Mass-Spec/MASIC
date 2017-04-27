@@ -5,14 +5,14 @@ Public Class clsSICProcessing
     Inherits clsMasicEventNotifier
 
 #Region "Classwide variables"
-    Private ReadOnly mMASICPeakFinder As MASICPeakFinder.clsMASICPeakFinder
+    Private ReadOnly mMASICPeakFinder As clsMASICPeakFinder
     Private ReadOnly mMRMProcessor As clsMRMProcessing
 #End Region
 
     ''' <summary>
     ''' Constructor
     ''' </summary>
-    Public Sub New(peakFinder As MASICPeakFinder.clsMASICPeakFinder, mrmProcessor As clsMRMProcessing)
+    Public Sub New(peakFinder As clsMASICPeakFinder, mrmProcessor As clsMRMProcessing)
         mMASICPeakFinder = peakFinder
         mMRMProcessor = mrmProcessor
     End Sub
@@ -186,7 +186,7 @@ Public Class clsSICProcessing
 
     Private Function ExtractSICDetailsFromFullSIC(
       intMZIndexWork As Integer,
-      baselineNoiseStatSegments As List(Of MASICPeakFinder.clsBaselineNoiseStatsSegment),
+      baselineNoiseStatSegments As List(Of clsBaselineNoiseStatsSegment),
       intFullSICDataCount As Integer,
       intFullSICScanIndices(,) As Integer,
       sngFullSICIntensities(,) As Single,
@@ -194,7 +194,7 @@ Public Class clsSICProcessing
       scanList As clsScanList,
       intScanIndexObservedInFullSIC As Integer,
       sicDetails As clsSICDetails,
-      <Out()> ByRef sicPeak As MASICPeakFinder.clsSICStatsPeak,
+      <Out()> ByRef sicPeak As clsSICStatsPeak,
       masicOptions As clsMASICOptions,
       scanNumScanConverter As clsScanNumScanTimeConversion,
       blnCustomSICPeak As Boolean,
@@ -212,15 +212,16 @@ Public Class clsSICProcessing
 
         Dim sicOptions = masicOptions.SICOptions
 
+        Dim baselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(intScanIndexObservedInFullSIC, baselineNoiseStatSegments)
+
         ' Initialize the peak
-        sicPeak = New MASICPeakFinder.clsSICStatsPeak() With {
-            .BaselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(
-              intScanIndexObservedInFullSIC, baselineNoiseStatSegments)
+        sicPeak = New clsSICStatsPeak() With {
+            .BaselineNoiseStats = baselineNoiseStats
         }
 
         ' Initialize the values for the maximum width of the SIC peak; these might get altered for custom SIC values
-        Dim sngMaxSICPeakWidthMinutesBackward = sicOptions.MaxSICPeakWidthMinutesBackward
-        Dim sngMaxSICPeakWidthMinutesForward = sicOptions.MaxSICPeakWidthMinutesForward
+        Dim maxSICPeakWidthMinutesBackward = sicOptions.MaxSICPeakWidthMinutesBackward
+        Dim maxSICPeakWidthMinutesForward = sicOptions.MaxSICPeakWidthMinutesForward
 
         ' Limit the data examined to a portion of intFullSICScanIndices() and intFullSICIntensities, populating udtSICDetails
         Try
@@ -252,12 +253,12 @@ Public Class clsSICProcessing
                 End If
 
                 If blnCustomSICPeak Then
-                    If sngMaxSICPeakWidthMinutesBackward < sngCustomSICScanToleranceMinutesHalfWidth Then
-                        sngMaxSICPeakWidthMinutesBackward = sngCustomSICScanToleranceMinutesHalfWidth
+                    If maxSICPeakWidthMinutesBackward < sngCustomSICScanToleranceMinutesHalfWidth Then
+                        maxSICPeakWidthMinutesBackward = sngCustomSICScanToleranceMinutesHalfWidth
                     End If
 
-                    If sngMaxSICPeakWidthMinutesForward < sngCustomSICScanToleranceMinutesHalfWidth Then
-                        sngMaxSICPeakWidthMinutesForward = sngCustomSICScanToleranceMinutesHalfWidth
+                    If maxSICPeakWidthMinutesForward < sngCustomSICScanToleranceMinutesHalfWidth Then
+                        maxSICPeakWidthMinutesForward = sngCustomSICScanToleranceMinutesHalfWidth
                     End If
                 End If
             End With
@@ -358,7 +359,7 @@ Public Class clsSICProcessing
                         sngPeakWidthMinutesBackward = scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime -
                            scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexStart)).ScanTime
 
-                        If sngPeakWidthMinutesBackward >= sngMaxSICPeakWidthMinutesBackward Then
+                        If sngPeakWidthMinutesBackward >= maxSICPeakWidthMinutesBackward Then
                             blnLeftDone = True
                         End If
 
@@ -418,7 +419,7 @@ Public Class clsSICProcessing
                         sngPeakWidthMinutesForward = scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexEnd)).ScanTime -
                           scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndexObservedInFullSIC)).ScanTime
 
-                        If sngPeakWidthMinutesForward >= sngMaxSICPeakWidthMinutesForward Then
+                        If sngPeakWidthMinutesForward >= maxSICPeakWidthMinutesForward Then
                             blnRightDone = True
                         End If
                     End If
@@ -580,9 +581,7 @@ Public Class clsSICProcessing
                     End If
                 End If
 
-
                 mzSearchChunks.Add(mzSearchChunk)
-
 
                 If mzSearchChunks.Count >= intMaxMZCountInChunk OrElse intMZIndex = mzBinList.Count - 1 Then
 
@@ -799,7 +798,7 @@ Public Class clsSICProcessing
                 potentialAreaStatsInFullSIC,
                 masicOptions.SICOptions.SICPeakFinderOptions)
 
-            Dim potentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats = Nothing
+            Dim potentialAreaStatsForPeak As clsSICPotentialAreaStats = Nothing
 
             Dim intScanIndexObservedInFullSIC = mzSearchChunk(intMZIndexWork).ScanIndexMax
 
@@ -808,7 +807,7 @@ Public Class clsSICProcessing
                 .SICScanType = clsScanList.eScanTypeConstants.SurveyScan
             }
 
-            Dim sicPeak As MASICPeakFinder.clsSICStatsPeak = Nothing
+            Dim sicPeak As clsSICStatsPeak = Nothing
 
             ' Populate sicDetails using the data centered around the highest intensity in intFullSICIntensities
             ' Note that this function will update udtSICPeak.IndexObserved
@@ -819,7 +818,7 @@ Public Class clsSICProcessing
                 sicDetails, sicPeak,
                 masicOptions, scanNumScanConverter, False, 0)
 
-            Dim smoothedYDataSubset As MASICPeakFinder.clsSmoothedYDataSubset = Nothing
+            Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
 
             Dim mzIndexSICScanNumbers = sicDetails.SICScanNumbers
             Dim mzIndexSICIntensities = sicDetails.SICIntensities
@@ -892,11 +891,11 @@ Public Class clsSICProcessing
                     intScanIndexObservedInFullSIC = -1
                 End If
 
-                Dim smoothedYDataSubsetInSearchChunk As MASICPeakFinder.clsSmoothedYDataSubset = Nothing
+                Dim smoothedYDataSubsetInSearchChunk As clsSmoothedYDataSubset = Nothing
 
                 With scanList.ParentIons(parentIonIndices(intParentIonIndexPointer))
                     ' Clear udtSICPotentialAreaStatsForPeak
-                    .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsSICPotentialAreaStats()
+                    .SICStats.SICPotentialAreaStatsForPeak = New clsSICPotentialAreaStats()
 
                     ' Record the index in the Full SIC that the parent ion mass was first observed
                     ' Search for .SurveyScanIndex in intFullSICScanIndices
@@ -998,8 +997,8 @@ Public Class clsSICProcessing
       sicScanNumbers As Integer(),
       sicIntensities As Single(),
       sicScanIndices As Integer(),
-      potentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats,
-      sicPeak As MASICPeakFinder.clsSICStatsPeak,
+      potentialAreaStatsForPeak As clsSICPotentialAreaStats,
+      sicPeak As clsSICStatsPeak,
       blnPeakIsValid As Boolean) As Boolean
 
 
@@ -1121,7 +1120,7 @@ Public Class clsSICProcessing
                             ' Assign the intensity of the peak at the observed maximum to the area
                             .Area = .MaxIntensityValue
 
-                            .SignalToNoiseRatio = MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
+                            .SignalToNoiseRatio = clsMASICPeakFinder.ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
                         End With
                     End If
                 End With
