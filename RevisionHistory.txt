@@ -1,5 +1,10 @@
 MASIC Change Log
 
+Version 2.8.6326; April 27, 2017
+	- The SICStats file now includes precursor ion interference score
+	- clsEventNotifier renamed to clsMasicEventNotifier and now inherits from PRISM.clsEventNotifier
+	- Converted numerous structs into classes
+
 Version 2.8.6319; April 20, 2017
 	- Update masses for TMT11 (eleven-plex TMT)
 
