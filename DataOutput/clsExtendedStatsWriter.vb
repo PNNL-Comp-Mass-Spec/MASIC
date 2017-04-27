@@ -233,7 +233,7 @@ Namespace DataOutput
                 Return String.Empty
             End If
 
-            ' Populate strConsolidatedValues with the values in htConsolidatedValues, 
+            ' Populate strConsolidatedValues with the values in htConsolidatedValues,
             '  separating each header and value with a tab and separating each pair of values with a NewLine character
             ' Need to first populate intConstantHeaderIDs with the ID values and sort the list so that the values are
             '  stored in strConsolidatedValueList in the correct order

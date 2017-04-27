@@ -15,8 +15,8 @@ Public Class clsScanInfo
     ''' <summary>
     ''' String description of the scan mode for the given scan; only used for Finnigan .Raw files
     ''' </summary>
-    ''' <remarks>Typical values are: FTMS + p NSI Full ms, ITMS + c ESI Full ms, 
-    ''' ITMS + p ESI d Z ms, ITMS + c NSI d Full ms2, ITMS + c NSI d Full ms2, 
+    ''' <remarks>Typical values are: FTMS + p NSI Full ms, ITMS + c ESI Full ms,
+    ''' ITMS + p ESI d Z ms, ITMS + c NSI d Full ms2, ITMS + c NSI d Full ms2,
     ''' ITMS + c NSI d Full ms2, FTMS + c NSI d Full ms2, ITMS + c NSI d Full ms3</remarks>
     Public Property ScanHeaderText As String
 
@@ -25,7 +25,7 @@ Public Class clsScanInfo
     ''' </summary>
     ''' <remarks>Typical values: MS, HMS, Zoom, CID-MSn, or PQD-MSn</remarks>
     Public Property ScanTypeName As String
-    ' 
+
     ''' <summary>
     ''' mz of the most intense ion in this scan
     ''' </summary>
@@ -42,7 +42,7 @@ Public Class clsScanInfo
     Public Property TotalIonIntensity As Single
 
     ''' <summary>
-    ''' minimum intensity > 0 in this scan
+    ''' Minimum intensity > 0 in this scan (using profile-mode data)
     ''' </summary>
     Public Property MinimumPositiveIntensity As Single
 
@@ -95,10 +95,16 @@ Public Class clsScanInfo
     Public ReadOnly Property ExtendedHeaderInfo As Dictionary(Of Integer, String)
 
     ''' <summary>
-    ''' Note: the mass spectral data for this scan is tracked by a clsSpectraCache object
+    ''' Number of ions that remain after filtering / condensing the data loaded via GetScanData
+    ''' The mass spectral data for this scan is tracked by a clsSpectraCache object
     ''' </summary>
     Public Property IonCount As Integer
 
+    ''' <summary>
+    ''' Number of data points loaded via GetScanData
+    ''' (typically we load profile mode data)
+    ''' </summary>
+    ''' <returns></returns>
     Public Property IonCountRaw As Integer
 
     Public Property BaselineNoiseStats As MASICPeakFinder.clsBaselineNoiseStats
