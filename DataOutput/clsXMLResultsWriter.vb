@@ -220,7 +220,7 @@ Namespace DataOutput
                             objXMLOut.WriteElementString("SICDataCount", sicDetails.SICDataCount.ToString())
 
                             If mOptions.SICOptions.SaveSmoothedData Then
-                                objXMLOut.WriteElementString("SICSmoothedYDataIndexStart", udtSmoothedYDataSubset.DataStartIndex.ToString())
+                                objXMLOut.WriteElementString("SICSmoothedYDataIndexStart", smoothedYDataSubset.DataStartIndex.ToString())
                             End If
 
                             If mOptions.UseBase64DataEncoding Then
@@ -236,8 +236,8 @@ Namespace DataOutput
                                 If mOptions.SICOptions.SaveSmoothedData Then
                                     ' Need to copy the data into an array with the correct number of elements
                                     Dim dataArray As Single()
-                                    ReDim dataArray(udtSmoothedYDataSubset.DataCount - 1)
-                                    Array.Copy(udtSmoothedYDataSubset.Data, dataArray, udtSmoothedYDataSubset.DataCount)
+                                    ReDim dataArray(smoothedYDataSubset.DataCount - 1)
+                                    Array.Copy(smoothedYDataSubset.Data, dataArray, smoothedYDataSubset.DataCount)
 
                                     SaveDataToXMLEncodeArray(objXMLOut, "SICSmoothedYData", dataArray)
                                 End If
@@ -299,9 +299,9 @@ Namespace DataOutput
                                         strLastGoodLoc = "Populate sbPeakYDataSmoothed"
                                         sbPeakYDataSmoothed.Length = 0
 
-                                        If Not udtSmoothedYDataSubset.Data Is Nothing AndAlso udtSmoothedYDataSubset.DataCount > 0 Then
-                                            For intIndex = 0 To udtSmoothedYDataSubset.DataCount - 1
-                                                sbPeakYDataSmoothed.Append(Math.Round(udtSmoothedYDataSubset.Data(intIndex)).ToString() & ",")
+                                        If Not smoothedYDataSubset.Data Is Nothing AndAlso smoothedYDataSubset.DataCount > 0 Then
+                                            For intIndex = 0 To smoothedYDataSubset.DataCount - 1
+                                                sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data(intIndex)).ToString() & ",")
                                             Next
 
                                             ' Trim the trailing comma

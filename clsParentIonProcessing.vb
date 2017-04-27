@@ -220,7 +220,8 @@ Public Class clsParentIonProcessing
                     End If
 
                     With .ParentIons(.ParentIonInfoCount)
-                        .MZ = dblParentIonMZ
+                        .UpdateMz(dblParentIonMZ)
+
                         .SurveyScanIndex = intSurveyScanIndex
 
                         .FragScanIndices(0) = intFragScanIndex
@@ -239,7 +240,7 @@ Public Class clsParentIonProcessing
                     ' This is done to determine the parent ion mass more precisely
                     If sicOptions.RefineReportedParentIonMZ Then
                         If FindClosestMZ(objSpectraCache, .SurveyScans, intSurveyScanIndex, dblParentIonMZ, dblParentIonTolerance, dblParentIonMZMatch) Then
-                            .ParentIons(.ParentIonInfoCount).MZ = dblParentIonMZMatch
+                            .ParentIons(.ParentIonInfoCount).UpdateMz(dblParentIonMZMatch)
                         End If
                     End If
 

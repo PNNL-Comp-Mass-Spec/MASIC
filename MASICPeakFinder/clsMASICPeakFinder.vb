@@ -1,5 +1,7 @@
 Option Strict On
 
+Imports System.Collections.Generic
+Imports System.Linq
 Imports System.Runtime.InteropServices
 ' -------------------------------------------------------------------------------
 ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
@@ -16,7 +18,7 @@ Imports System.Runtime.InteropServices
 Public Class clsMASICPeakFinder
 
 #Region "Constants and Enums"
-    Public PROGRAM_DATE As String = "April 4, 2017"
+    Public PROGRAM_DATE As String = "April 25, 2017"
 
     Public Const MINIMUM_PEAK_WIDTH As Integer = 3                         ' Width in points
 
@@ -100,17 +102,17 @@ Public Class clsMASICPeakFinder
     ''' <summary>
     ''' Compute an updated peak area by adjusting for the baseline
     ''' </summary>
-    ''' <param name="udtSICPeak"></param>
+    ''' <param name="sicPeak"></param>
     ''' <param name="intSICPeakWidthFullScans"></param>
     ''' <param name="blnAllowNegativeValues"></param>
     ''' <returns>Adjusted peak area</returns>
     ''' <remarks>This method is used by MASIC Browser</remarks>
     Public Shared Function BaselineAdjustArea(
-      udtSICPeak As udtSICStatsPeakType, intSICPeakWidthFullScans As Integer, blnAllowNegativeValues As Boolean) As Single
+      sicPeak As clsSICStatsPeak, intSICPeakWidthFullScans As Integer, blnAllowNegativeValues As Boolean) As Single
         ' Note, compute intSICPeakWidthFullScans using:
         '  Width = SICScanNumbers(.Peak.IndexBaseRight) - SICScanNumbers(.Peak.IndexBaseLeft) + 1
 
-        Return BaselineAdjustArea(udtSICPeak.Area, udtSICPeak.BaselineNoiseStats.NoiseLevel, udtSICPeak.FWHMScanWidth, intSICPeakWidthFullScans, blnAllowNegativeValues)
+        Return BaselineAdjustArea(sicPeak.Area, sicPeak.BaselineNoiseStats.NoiseLevel, sicPeak.FWHMScanWidth, intSICPeakWidthFullScans, blnAllowNegativeValues)
 
     End Function
 
@@ -134,10 +136,8 @@ Public Class clsMASICPeakFinder
         End If
     End Function
 
-    Public Shared Function BaselineAdjustIntensity(ByRef udtSICPeak As udtSICStatsPeakType, blnAllowNegativeValues As Boolean) As Single
-        With udtSICPeak
-            Return BaselineAdjustIntensity(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel, blnAllowNegativeValues)
-        End With
+    Public Shared Function BaselineAdjustIntensity(sicPeak As clsSICStatsPeak, blnAllowNegativeValues As Boolean) As Single
+        Return BaselineAdjustIntensity(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel, blnAllowNegativeValues)
     End Function
 
     Public Shared Function BaselineAdjustIntensity(
@@ -156,7 +156,7 @@ Public Class clsMASICPeakFinder
       intValidDataCountA As Integer, intValidDataCountB As Integer,
       dblSumA As Double, dblSumB As Double,
       intMinimumCount As Integer,
-      ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+      baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         Dim blnUseBothSides As Boolean
         Dim blnUseLeftData As Boolean
@@ -178,26 +178,20 @@ Public Class clsMASICPeakFinder
             End If
 
             If blnUseBothSides Then
-                With udtBaselineNoiseStats
-                    .NoiseLevel = CSng((dblSumA + dblSumB) / (intValidDataCountA + intValidDataCountB))
-                    .NoiseStDev = 0      ' We'll compute noise StDev outside this function
-                    .PointsUsed = intValidDataCountA + intValidDataCountB
-                End With
+                baselineNoiseStats.NoiseLevel = CSng((dblSumA + dblSumB) / (intValidDataCountA + intValidDataCountB))
+                baselineNoiseStats.NoiseStDev = 0      ' We'll compute noise StDev outside this function
+                baselineNoiseStats.PointsUsed = intValidDataCountA + intValidDataCountB
             Else
                 If blnUseLeftData Then
                     ' Use left data only
-                    With udtBaselineNoiseStats
-                        .NoiseLevel = CSng(dblSumA / intValidDataCountA)
-                        .NoiseStDev = 0
-                        .PointsUsed = intValidDataCountA
-                    End With
+                    baselineNoiseStats.NoiseLevel = CSng(dblSumA / intValidDataCountA)
+                    baselineNoiseStats.NoiseStDev = 0
+                    baselineNoiseStats.PointsUsed = intValidDataCountA
                 ElseIf blnUseRightData Then
                     ' Use right data only
-                    With udtBaselineNoiseStats
-                        .NoiseLevel = CSng(dblSumB / intValidDataCountB)
-                        .NoiseStDev = 0
-                        .PointsUsed = intValidDataCountB
-                    End With
+                    baselineNoiseStats.NoiseLevel = CSng(dblSumB / intValidDataCountB)
+                    baselineNoiseStats.NoiseStDev = 0
+                    baselineNoiseStats.PointsUsed = intValidDataCountB
                 Else
                     Throw New Exception("Logic error; This code should not be reached")
                 End If
@@ -214,7 +208,7 @@ Public Class clsMASICPeakFinder
       intIndexStart As Integer, intIndexEnd As Integer,
       intExclusionIndexStart As Integer, intExclusionIndexEnd As Integer,
       baselineNoiseOptions As clsBaselineNoiseOptions,
-      ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+      baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         ' Compute the average intensity level between intIndexStart and intExclusionIndexStart
         ' Also compute the average between intExclusionIndexEnd and intIndexEnd
@@ -262,37 +256,35 @@ Public Class clsMASICPeakFinder
             blnSuccess = ComputeAverageNoiseLevelCheckCounts(
               intValidDataCountA, intValidDataCountB,
               dblSumA, dblSumB,
-              MINIMUM_PEAK_WIDTH, udtBaselineNoiseStats)
+              MINIMUM_PEAK_WIDTH, baselineNoiseStats)
 
             ' Assure that .NoiseLevel is at least as large as sngMinimumPositiveValue
-            If udtBaselineNoiseStats.NoiseLevel < sngMinimumPositiveValue Then
-                udtBaselineNoiseStats.NoiseLevel = sngMinimumPositiveValue
+            If baselineNoiseStats.NoiseLevel < sngMinimumPositiveValue Then
+                baselineNoiseStats.NoiseLevel = sngMinimumPositiveValue
             End If
 
             ' Populate .NoiseStDev
-            With udtBaselineNoiseStats
-                intValidDataCountA = 0
-                intValidDataCountB = 0
-                dblSumA = 0
-                dblSumB = 0
-                If .PointsUsed > 0 Then
-                    For intIndex = intIndexStart To intExclusionIndexStart
-                        dblSumA += (Math.Max(sngMinimumPositiveValue, sngData(intIndex)) - .NoiseLevel) ^ 2
-                        intValidDataCountA += 1
-                    Next
+            intValidDataCountA = 0
+            intValidDataCountB = 0
+            dblSumA = 0
+            dblSumB = 0
+            If baselineNoiseStats.PointsUsed > 0 Then
+                For intIndex = intIndexStart To intExclusionIndexStart
+                    dblSumA += (Math.Max(sngMinimumPositiveValue, sngData(intIndex)) - baselineNoiseStats.NoiseLevel) ^ 2
+                    intValidDataCountA += 1
+                Next
 
-                    For intIndex = intExclusionIndexEnd To intIndexEnd
-                        dblSumB += (Math.Max(sngMinimumPositiveValue, sngData(intIndex)) - .NoiseLevel) ^ 2
-                        intValidDataCountB += 1
-                    Next
-                End If
+                For intIndex = intExclusionIndexEnd To intIndexEnd
+                    dblSumB += (Math.Max(sngMinimumPositiveValue, sngData(intIndex)) - baselineNoiseStats.NoiseLevel) ^ 2
+                    intValidDataCountB += 1
+                Next
+            End If
 
-                If intValidDataCountA + intValidDataCountB > 0 Then
-                    .NoiseStDev = CSng(Math.Sqrt((dblSumA + dblSumB) / (intValidDataCountA + intValidDataCountB)))
-                Else
-                    .NoiseStDev = 0
-                End If
-            End With
+            If intValidDataCountA + intValidDataCountB > 0 Then
+                baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt((dblSumA + dblSumB) / (intValidDataCountA + intValidDataCountB)))
+            Else
+                baselineNoiseStats.NoiseStDev = 0
+            End If
 
         End If
 
@@ -304,7 +296,7 @@ Public Class clsMASICPeakFinder
                 .TrimmedMeanFractionLowIntensityDataToAverage = 0.33
             End With
 
-            blnSuccess = ComputeTrimmedNoiseLevel(sngData, intIndexStart, intIndexEnd, baselineNoiseOptionsOverride, False, udtBaselineNoiseStats)
+            blnSuccess = ComputeTrimmedNoiseLevel(sngData, intIndexStart, intIndexEnd, baselineNoiseOptionsOverride, False, baselineNoiseStats)
         End If
 
         Return blnSuccess
@@ -320,11 +312,12 @@ Public Class clsMASICPeakFinder
     ''' <param name="intIndexStart"></param>
     ''' <param name="intIndexEnd"></param>
     ''' <param name="baselineNoiseOptions"></param>
-    ''' <param name="udtBaselineNoiseStats"></param>
+    ''' <param name="noiseStatsSegments"></param>
     ''' <returns>True if success, False if error</returns>
-    Public Function ComputeDualTrimmedNoiseLevelTTest(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
-                                                      baselineNoiseOptions As clsBaselineNoiseOptions,
-                                                      ByRef udtBaselineNoiseStats() As udtBaselineNoiseStatSegmentsType) As Boolean
+    Public Function ComputeDualTrimmedNoiseLevelTTest(
+      sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
+      baselineNoiseOptions As clsBaselineNoiseOptions,
+      noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As Boolean
 
         Try
 
@@ -332,42 +325,49 @@ Public Class clsMASICPeakFinder
             If intSegmentCountLocal = 0 Then intSegmentCountLocal = 3
             If intSegmentCountLocal < 1 Then intSegmentCountLocal = 1
 
-            ReDim udtBaselineNoiseStats(intSegmentCountLocal - 1)
+            If noiseStatsSegments Is Nothing Then
+                noiseStatsSegments = New List(Of clsBaselineNoiseStatsSegment)
+            Else
+                noiseStatsSegments.Clear()
+            End If
 
             ' Initialize BaselineNoiseStats for each segment now, in case an error occurs
             For intIndex = 0 To intSegmentCountLocal - 1
-                InitializeBaselineNoiseStats(
-                  udtBaselineNoiseStats(intIndex).BaselineNoiseStats,
+                Dim baselineNoiseStats = InitializeBaselineNoiseStats(
                   baselineNoiseOptions.MinimumBaselineNoiseLevel,
                   eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+
+                noiseStatsSegments.Add(New clsBaselineNoiseStatsSegment(baselineNoiseStats))
             Next
 
             ' Determine the segment length
             Dim intSegmentLength = CInt(Math.Round((intIndexEnd - intIndexStart) / intSegmentCountLocal, 0))
 
             ' Initialize the first segment
-            udtBaselineNoiseStats(0).SegmentIndexStart = intIndexStart
+            Dim firstSegment = noiseStatsSegments.First()
+            firstSegment.SegmentIndexStart = intIndexStart
             If intSegmentCountLocal = 1 Then
-                udtBaselineNoiseStats(0).SegmentIndexEnd = intIndexEnd
+                firstSegment.SegmentIndexEnd = intIndexEnd
             Else
-                udtBaselineNoiseStats(0).SegmentIndexEnd = udtBaselineNoiseStats(0).SegmentIndexStart + intSegmentLength - 1
+                firstSegment.SegmentIndexEnd = firstSegment.SegmentIndexStart + intSegmentLength - 1
             End If
 
             ' Initialize the remaining segments
             For intIndex = 1 To intSegmentCountLocal - 1
-                udtBaselineNoiseStats(intIndex).SegmentIndexStart = udtBaselineNoiseStats(intIndex - 1).SegmentIndexEnd + 1
+                noiseStatsSegments(intIndex).SegmentIndexStart = noiseStatsSegments(intIndex - 1).SegmentIndexEnd + 1
                 If intIndex = intSegmentCountLocal - 1 Then
-                    udtBaselineNoiseStats(intIndex).SegmentIndexEnd = intIndexEnd
+                    noiseStatsSegments(intIndex).SegmentIndexEnd = intIndexEnd
                 Else
-                    udtBaselineNoiseStats(intIndex).SegmentIndexEnd = udtBaselineNoiseStats(intIndex).SegmentIndexStart + intSegmentLength - 1
+                    noiseStatsSegments(intIndex).SegmentIndexEnd = noiseStatsSegments(intIndex).SegmentIndexStart + intSegmentLength - 1
                 End If
             Next
 
             ' Call ComputeDualTrimmedNoiseLevel for each segment
             For intIndex = 0 To intSegmentCountLocal - 1
-                With udtBaselineNoiseStats(intIndex)
-                    ComputeDualTrimmedNoiseLevel(sngData, .SegmentIndexStart, .SegmentIndexEnd, baselineNoiseOptions, .BaselineNoiseStats)
-                End With
+                Dim current = noiseStatsSegments(intIndex)
+
+                ComputeDualTrimmedNoiseLevel(sngData, current.SegmentIndexStart, current.SegmentIndexEnd, baselineNoiseOptions, current.BaselineNoiseStats)
+
             Next
 
             ' Compare adjacent segments using a T-Test, starting with the final segment and working backward
@@ -375,42 +375,45 @@ Public Class clsMASICPeakFinder
             Dim intSegmentIndex = intSegmentCountLocal - 1
 
             Do While intSegmentIndex > 0
-                Dim udtPrevSegmentStats = udtBaselineNoiseStats(intSegmentIndex - 1).BaselineNoiseStats
+                Dim previous = noiseStatsSegments(intSegmentIndex - 1)
+                Dim current = noiseStatsSegments(intSegmentIndex)
+
                 Dim blnSignificantDifference As Boolean
                 Dim dblTCalculated As Double
 
-                With udtBaselineNoiseStats(intSegmentIndex).BaselineNoiseStats
-                    blnSignificantDifference = TestSignificanceUsingTTest(
-                      .NoiseLevel,
-                      udtPrevSegmentStats.NoiseLevel,
-                      .NoiseStDev,
-                      udtPrevSegmentStats.NoiseStDev,
-                      .PointsUsed,
-                      udtPrevSegmentStats.PointsUsed,
-                      eConfidenceLevel,
-                      dblTCalculated)
-                End With
+                blnSignificantDifference = TestSignificanceUsingTTest(
+                    current.BaselineNoiseStats.NoiseLevel,
+                    previous.BaselineNoiseStats.NoiseLevel,
+                    current.BaselineNoiseStats.NoiseStDev,
+                    previous.BaselineNoiseStats.NoiseStDev,
+                    current.BaselineNoiseStats.PointsUsed,
+                    previous.BaselineNoiseStats.PointsUsed,
+                    eConfidenceLevel,
+                    dblTCalculated)
 
                 If blnSignificantDifference Then
                     ' Significant difference; leave the 2 segments intact
                 Else
                     ' Not a significant difference; recompute the Baseline Noise stats using the two segments combined
-                    With udtBaselineNoiseStats(intSegmentIndex - 1)
-                        .SegmentIndexEnd = udtBaselineNoiseStats(intSegmentIndex).SegmentIndexEnd
-                        ComputeDualTrimmedNoiseLevel(sngData, .SegmentIndexStart, .SegmentIndexEnd, baselineNoiseOptions, .BaselineNoiseStats)
-                    End With
+                    previous.SegmentIndexEnd = current.SegmentIndexEnd
+                    ComputeDualTrimmedNoiseLevel(sngData,
+                                                 previous.SegmentIndexStart,
+                                                 previous.SegmentIndexEnd,
+                                                 baselineNoiseOptions,
+                                                 previous.BaselineNoiseStats)
 
                     For intSegmentIndexCopy = intSegmentIndex To intSegmentCountLocal - 2
-                        udtBaselineNoiseStats(intSegmentIndexCopy) = udtBaselineNoiseStats(intSegmentIndexCopy + 1)
+                        noiseStatsSegments(intSegmentIndexCopy) = noiseStatsSegments(intSegmentIndexCopy + 1)
                     Next
                     intSegmentCountLocal -= 1
                 End If
                 intSegmentIndex -= 1
             Loop
 
-            If intSegmentCountLocal <> udtBaselineNoiseStats.Length Then
-                ReDim Preserve udtBaselineNoiseStats(intSegmentCountLocal - 1)
-            End If
+            While noiseStatsSegments.Count > intSegmentCountLocal
+                noiseStatsSegments.RemoveAt(noiseStatsSegments.Count - 1)
+            End While
+
         Catch ex As Exception
             Return False
         End Try
@@ -428,7 +431,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="intIndexStart"></param>
     ''' <param name="intIndexEnd"></param>
     ''' <param name="baselineNoiseOptions"></param>
-    ''' <param name="udtBaselineNoiseStats"></param>
+    ''' <param name="baselineNoiseStats"></param>
     ''' <returns>True if success, False if error (or no data in sngData)</returns>
     ''' <remarks>
     ''' Replaces values of 0 with the minimum positive value in sngData()
@@ -436,11 +439,10 @@ Public Class clsMASICPeakFinder
     ''' </remarks>
     Public Function ComputeDualTrimmedNoiseLevel(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
                                                  baselineNoiseOptions As clsBaselineNoiseOptions,
-                                                 ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+                                                 <Out()> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         ' Initialize udtBaselineNoiseStats
-        InitializeBaselineNoiseStats(
-          udtBaselineNoiseStats,
+        baselineNoiseStats = InitializeBaselineNoiseStats(
           baselineNoiseOptions.MinimumBaselineNoiseLevel,
           eNoiseThresholdModes.DualTrimmedMeanByAbundance)
 
@@ -517,44 +519,42 @@ Public Class clsMASICPeakFinder
         intDataUsedCount = intDataSortedIndexEnd - intDataSortedIndexStart + 1
 
         If intDataUsedCount > 0 Then
-            udtBaselineNoiseStats.NoiseLevel = CSng(dblSum / intDataUsedCount)
+            baselineNoiseStats.NoiseLevel = CSng(dblSum / intDataUsedCount)
 
             ' Compute the variance (this is a sample variance, not a population variance)
             dblSum = 0
             For intIndex = intDataSortedIndexStart To intDataSortedIndexEnd
-                dblSum += (sngDataSorted(intIndex) - udtBaselineNoiseStats.NoiseLevel) ^ 2
+                dblSum += (sngDataSorted(intIndex) - baselineNoiseStats.NoiseLevel) ^ 2
             Next
 
-            With udtBaselineNoiseStats
-                If intDataUsedCount > 1 Then
-                    .NoiseStDev = CSng(Math.Sqrt(dblSum / (intDataUsedCount - 1)))
-                Else
-                    .NoiseStDev = 0
-                End If
-                .PointsUsed = intDataUsedCount
-            End With
-
+            If intDataUsedCount > 1 Then
+                baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(dblSum / (intDataUsedCount - 1)))
+            Else
+                baselineNoiseStats.NoiseStDev = 0
+            End If
+            baselineNoiseStats.PointsUsed = intDataUsedCount
         Else
-            udtBaselineNoiseStats.NoiseLevel = Math.Max(sngMinimumPositiveValue, baselineNoiseOptions.MinimumBaselineNoiseLevel)
-            udtBaselineNoiseStats.NoiseStDev = 0
+            baselineNoiseStats.NoiseLevel = Math.Max(sngMinimumPositiveValue, baselineNoiseOptions.MinimumBaselineNoiseLevel)
+            baselineNoiseStats.NoiseStDev = 0
         End If
 
         ' Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
-        With udtBaselineNoiseStats
-            If .NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso baselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
-                .NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel
-                ' Set this to 0 since we have overridden .NoiseLevel
-                .NoiseStDev = 0
-            End If
-        End With
+        If baselineNoiseStats.NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso
+           baselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
+
+            baselineNoiseStats.NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel
+
+            ' Set this to 0 since we have overridden .NoiseLevel
+            baselineNoiseStats.NoiseStDev = 0
+        End If
 
         Return True
 
     End Function
 
     Private Function ComputeFWHM(
-      SICScanNumbers() As Integer, SICData() As Single,
-      ByRef udtSICPeak As udtSICStatsPeakType,
+      SICScanNumbers As IList(Of Integer), SICData As IList(Of Single),
+      sicPeak As clsSICStatsPeak,
       blnSubtractBaselineNoise As Boolean) As Integer
 
         ' Note: The calling function should have already populated udtSICPeak.MaxIntensityValue, plus .IndexMax, .IndexBaseLeft, and .IndexBaseRight
@@ -574,122 +574,119 @@ Public Class clsMASICPeakFinder
 
         ' Determine the full width at half max (FWHM), in units of absolute scan number
         Try
-            With udtSICPeak
 
-                If .IndexMax <= .IndexBaseLeft OrElse .IndexMax >= .IndexBaseRight Then
-                    ' Find the index of the maximum (between .IndexBaseLeft and .IndexBaseRight)
-                    sngMaximumIntensity = 0
-                    If .IndexMax < .IndexBaseLeft OrElse .IndexMax > .IndexBaseRight Then
-                        .IndexMax = .IndexBaseLeft
-                    End If
-
-                    For intDataIndex = .IndexBaseLeft To .IndexBaseRight
-                        If SICData(intDataIndex) > sngMaximumIntensity Then
-                            .IndexMax = intDataIndex
-                            sngMaximumIntensity = SICData(intDataIndex)
-                        End If
-                    Next
+            If sicPeak.IndexMax <= sicPeak.IndexBaseLeft OrElse sicPeak.IndexMax >= sicPeak.IndexBaseRight Then
+                ' Find the index of the maximum (between .IndexBaseLeft and .IndexBaseRight)
+                sngMaximumIntensity = 0
+                If sicPeak.IndexMax < sicPeak.IndexBaseLeft OrElse sicPeak.IndexMax > sicPeak.IndexBaseRight Then
+                    sicPeak.IndexMax = sicPeak.IndexBaseLeft
                 End If
 
-                ' Look for the intensity halfway down the peak (correcting for baseline noise level if blnSubtractBaselineNoise = True)
-                If blnSubtractBaselineNoise Then
-                    sngTargetIntensity = BaselineAdjustIntensity(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES) / 2
-
-                    If sngTargetIntensity <= 0 Then
-                        ' The maximum intensity of the peak is below the baseline; do not correct for baseline noise level
-                        sngTargetIntensity = .MaxIntensityValue / 2
-                        blnSubtractBaselineNoise = False
+                For intDataIndex = sicPeak.IndexBaseLeft To sicPeak.IndexBaseRight
+                    If SICData(intDataIndex) > sngMaximumIntensity Then
+                        sicPeak.IndexMax = intDataIndex
+                        sngMaximumIntensity = SICData(intDataIndex)
                     End If
-                Else
-                    sngTargetIntensity = .MaxIntensityValue / 2
+                Next
+            End If
+
+            ' Look for the intensity halfway down the peak (correcting for baseline noise level if blnSubtractBaselineNoise = True)
+            If blnSubtractBaselineNoise Then
+                sngTargetIntensity = BaselineAdjustIntensity(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES) / 2
+
+                If sngTargetIntensity <= 0 Then
+                    ' The maximum intensity of the peak is below the baseline; do not correct for baseline noise level
+                    sngTargetIntensity = sicPeak.MaxIntensityValue / 2
+                    blnSubtractBaselineNoise = False
                 End If
+            Else
+                sngTargetIntensity = sicPeak.MaxIntensityValue / 2
+            End If
 
-                If sngTargetIntensity > 0 Then
+            If sngTargetIntensity > 0 Then
 
-                    ' Start the search at each peak edge to thus determine the largest FWHM value
-                    sngFWHMScanStart = -1
-                    For intDataIndex = .IndexBaseLeft To .IndexMax - 1
-                        If blnSubtractBaselineNoise Then
-                            sngY1 = BaselineAdjustIntensity(SICData(intDataIndex), .BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
-                            sngY2 = BaselineAdjustIntensity(SICData(intDataIndex + 1), .BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
+                ' Start the search at each peak edge to thus determine the largest FWHM value
+                sngFWHMScanStart = -1
+                For intDataIndex = sicPeak.IndexBaseLeft To sicPeak.IndexMax - 1
+                    If blnSubtractBaselineNoise Then
+                        sngY1 = BaselineAdjustIntensity(SICData(intDataIndex), sicPeak.BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
+                        sngY2 = BaselineAdjustIntensity(SICData(intDataIndex + 1), sicPeak.BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
+                    Else
+                        sngY1 = SICData(intDataIndex)
+                        sngY2 = SICData(intDataIndex + 1)
+                    End If
+
+                    If sngY1 > sngTargetIntensity OrElse sngY2 > sngTargetIntensity Then
+                        If sngY1 <= sngTargetIntensity AndAlso sngY2 >= sngTargetIntensity Then
+                            InterpolateX(
+                                sngFWHMScanStart,
+                                SICScanNumbers(intDataIndex), SICScanNumbers(intDataIndex + 1),
+                                sngY1, sngY2, sngTargetIntensity)
                         Else
-                            sngY1 = SICData(intDataIndex)
-                            sngY2 = SICData(intDataIndex + 1)
-                        End If
-
-                        If sngY1 > sngTargetIntensity OrElse sngY2 > sngTargetIntensity Then
-                            If sngY1 <= sngTargetIntensity AndAlso sngY2 >= sngTargetIntensity Then
-                                InterpolateX(
-                                  sngFWHMScanStart,
-                                  SICScanNumbers(intDataIndex), SICScanNumbers(intDataIndex + 1),
-                                  sngY1, sngY2, sngTargetIntensity)
+                            ' sngTargetIntensity is not between sngY1 and sngY2; simply use intDataIndex
+                            If intDataIndex = sicPeak.IndexBaseLeft Then
+                                ' At the start of the peak; use the scan number halfway between .IndexBaseLeft and .IndexMax
+                                sngFWHMScanStart = SICScanNumbers(intDataIndex + CInt(Math.Round((sicPeak.IndexMax - sicPeak.IndexBaseLeft) / 2, 0)))
                             Else
-                                ' sngTargetIntensity is not between sngY1 and sngY2; simply use intDataIndex
-                                If intDataIndex = .IndexBaseLeft Then
-                                    ' At the start of the peak; use the scan number halfway between .IndexBaseLeft and .IndexMax
-                                    sngFWHMScanStart = SICScanNumbers(intDataIndex + CInt(Math.Round((.IndexMax - .IndexBaseLeft) / 2, 0)))
-                                Else
-                                    ' This code will probably never be reached
-                                    sngFWHMScanStart = SICScanNumbers(intDataIndex)
-                                End If
+                                ' This code will probably never be reached
+                                sngFWHMScanStart = SICScanNumbers(intDataIndex)
                             End If
-                            Exit For
                         End If
-                    Next
-                    If sngFWHMScanStart < 0 Then
-                        If .IndexMax > .IndexBaseLeft Then
-                            sngFWHMScanStart = SICScanNumbers(.IndexMax - 1)
-                        Else
-                            sngFWHMScanStart = SICScanNumbers(.IndexBaseLeft)
-                        End If
+                        Exit For
                     End If
-
-                    sngFWHMScanEnd = -1
-                    For intDataIndex = .IndexBaseRight - 1 To .IndexMax Step -1
-                        If blnSubtractBaselineNoise Then
-                            sngY1 = BaselineAdjustIntensity(SICData(intDataIndex), .BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
-                            sngY2 = BaselineAdjustIntensity(SICData(intDataIndex + 1), .BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
-                        Else
-                            sngY1 = SICData(intDataIndex)
-                            sngY2 = SICData(intDataIndex + 1)
-                        End If
-
-                        If sngY1 > sngTargetIntensity OrElse sngY2 > sngTargetIntensity Then
-                            If sngY1 >= sngTargetIntensity AndAlso sngY2 <= sngTargetIntensity Then
-                                InterpolateX(
-                                  sngFWHMScanEnd,
-                                  SICScanNumbers(intDataIndex), SICScanNumbers(intDataIndex + 1),
-                                  sngY1, sngY2, sngTargetIntensity)
-                            Else
-                                ' sngTargetIntensity is not between sngY1 and sngY2; simply use intDataIndex+1
-                                If intDataIndex = .IndexBaseRight - 1 Then
-                                    ' At the end of the peak; use the scan number halfway between .IndexBaseRight and .IndexMax
-                                    sngFWHMScanEnd = SICScanNumbers(intDataIndex + 1 - CInt(Math.Round((.IndexBaseRight - .IndexMax) / 2, 0)))
-                                Else
-                                    ' This code will probably never be reached
-                                    sngFWHMScanEnd = SICScanNumbers(intDataIndex + 1)
-                                End If
-                            End If
-                            Exit For
-                        End If
-                    Next
-                    If sngFWHMScanEnd < 0 Then
-                        If .IndexMax < .IndexBaseRight Then
-                            sngFWHMScanEnd = SICScanNumbers(.IndexMax + 1)
-                        Else
-                            sngFWHMScanEnd = SICScanNumbers(.IndexBaseRight)
-                        End If
+                Next
+                If sngFWHMScanStart < 0 Then
+                    If sicPeak.IndexMax > sicPeak.IndexBaseLeft Then
+                        sngFWHMScanStart = SICScanNumbers(sicPeak.IndexMax - 1)
+                    Else
+                        sngFWHMScanStart = SICScanNumbers(sicPeak.IndexBaseLeft)
                     End If
-
-                    intFWHMScans = CInt(Math.Round(sngFWHMScanEnd - sngFWHMScanStart, 0))
-                    If intFWHMScans <= 0 Then intFWHMScans = 0
-                Else
-                    ' Maximum intensity value is <= 0
-                    ' Set FWHM to 1
-                    intFWHMScans = 1
                 End If
 
-            End With
+                sngFWHMScanEnd = -1
+                For intDataIndex = sicPeak.IndexBaseRight - 1 To sicPeak.IndexMax Step -1
+                    If blnSubtractBaselineNoise Then
+                        sngY1 = BaselineAdjustIntensity(SICData(intDataIndex), sicPeak.BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
+                        sngY2 = BaselineAdjustIntensity(SICData(intDataIndex + 1), sicPeak.BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES)
+                    Else
+                        sngY1 = SICData(intDataIndex)
+                        sngY2 = SICData(intDataIndex + 1)
+                    End If
+
+                    If sngY1 > sngTargetIntensity OrElse sngY2 > sngTargetIntensity Then
+                        If sngY1 >= sngTargetIntensity AndAlso sngY2 <= sngTargetIntensity Then
+                            InterpolateX(
+                                sngFWHMScanEnd,
+                                SICScanNumbers(intDataIndex), SICScanNumbers(intDataIndex + 1),
+                                sngY1, sngY2, sngTargetIntensity)
+                        Else
+                            ' sngTargetIntensity is not between sngY1 and sngY2; simply use intDataIndex+1
+                            If intDataIndex = sicPeak.IndexBaseRight - 1 Then
+                                ' At the end of the peak; use the scan number halfway between .IndexBaseRight and .IndexMax
+                                sngFWHMScanEnd = SICScanNumbers(intDataIndex + 1 - CInt(Math.Round((sicPeak.IndexBaseRight - sicPeak.IndexMax) / 2, 0)))
+                            Else
+                                ' This code will probably never be reached
+                                sngFWHMScanEnd = SICScanNumbers(intDataIndex + 1)
+                            End If
+                        End If
+                        Exit For
+                    End If
+                Next
+                If sngFWHMScanEnd < 0 Then
+                    If sicPeak.IndexMax < sicPeak.IndexBaseRight Then
+                        sngFWHMScanEnd = SICScanNumbers(sicPeak.IndexMax + 1)
+                    Else
+                        sngFWHMScanEnd = SICScanNumbers(sicPeak.IndexBaseRight)
+                    End If
+                End If
+
+                intFWHMScans = CInt(Math.Round(sngFWHMScanEnd - sngFWHMScanStart, 0))
+                If intFWHMScans <= 0 Then intFWHMScans = 0
+            Else
+                ' Maximum intensity value is <= 0
+                ' Set FWHM to 1
+                intFWHMScans = 1
+            End If
 
         Catch ex As Exception
             LogErrors("clsMASICPeakFinder->ComputeFWHM", "Error finding FWHM", ex, True, False, True)
@@ -734,8 +731,8 @@ Public Class clsMASICPeakFinder
 
     Private Function ComputeKSStatistic(
       intDataCount As Integer,
-      intXDataIn() As Integer,
-      sngYDataIn() As Single,
+      intXDataIn As IList(Of Integer),
+      sngYDataIn As IList(Of Single),
       peakMean As Single,
       peakStDev As Double) As Double
 
@@ -824,27 +821,32 @@ Public Class clsMASICPeakFinder
     ''' <param name="intDatacount"></param>
     ''' <param name="sngData"></param>
     ''' <param name="baselineNoiseOptions"></param>
-    ''' <param name="udtBaselineNoiseStats"></param>
+    ''' <param name="baselineNoiseStats"></param>
     ''' <returns>Returns True if success, false in an error</returns>
     ''' <remarks>Updates udtBaselineNoiseStats with the baseline noise level</remarks>
     Public Function ComputeNoiseLevelForSICData(intDatacount As Integer, sngData() As Single,
                                                 baselineNoiseOptions As clsBaselineNoiseOptions,
-                                                ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+                                                <Out()> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         Const IGNORE_NON_POSITIVE_DATA = False
 
         If baselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold Then
-            udtBaselineNoiseStats.NoiseLevel = baselineNoiseOptions.BaselineNoiseLevelAbsolute
+            baselineNoiseStats = InitializeBaselineNoiseStats(
+                baselineNoiseOptions.BaselineNoiseLevelAbsolute,
+                baselineNoiseOptions.BaselineNoiseMode)
+
             Return True
-        ElseIf baselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
-            Return ComputeDualTrimmedNoiseLevel(sngData, 0, intDatacount - 1, baselineNoiseOptions, udtBaselineNoiseStats)
+        End If
+
+        If baselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
+            Return ComputeDualTrimmedNoiseLevel(sngData, 0, intDatacount - 1, baselineNoiseOptions, baselineNoiseStats)
         Else
-            Return ComputeTrimmedNoiseLevel(sngData, 0, intDatacount - 1, baselineNoiseOptions, IGNORE_NON_POSITIVE_DATA, udtBaselineNoiseStats)
+            Return ComputeTrimmedNoiseLevel(sngData, 0, intDatacount - 1, baselineNoiseOptions, IGNORE_NON_POSITIVE_DATA, baselineNoiseStats)
         End If
     End Function
 
     Public Function ComputeNoiseLevelInPeakVicinity(intDatacount As Integer, SICScanNumbers() As Integer, sngData() As Single,
-                                                    ByRef udtSICPeak As udtSICStatsPeakType,
+                                                    sicPeak As clsSICStatsPeak,
                                                     baselineNoiseOptions As clsBaselineNoiseOptions) As Boolean
 
         Const NOISE_ESTIMATE_DATACOUNT_MINIMUM = 5
@@ -865,8 +867,7 @@ Public Class clsMASICPeakFinder
         Dim blnShiftLeft As Boolean
 
         ' Initialize udtBaselineNoiseStats
-        InitializeBaselineNoiseStats(
-          udtSICPeak.BaselineNoiseStats,
+        sicPeak.BaselineNoiseStats = InitializeBaselineNoiseStats(
           baselineNoiseOptions.MinimumBaselineNoiseLevel,
           eNoiseThresholdModes.MeanOfDataInPeakVicinity)
 
@@ -877,9 +878,9 @@ Public Class clsMASICPeakFinder
         ' Estimate FWHM since it is sometimes not yet known when this function is called
         ' The reason it's not yet know is that the final FWHM value is computed using baseline corrected intensity data, but
         '  the whole purpose of this function is to compute the baseline level
-        udtSICPeak.FWHMScanWidth = ComputeFWHM(SICScanNumbers, sngData, udtSICPeak, False)
-        intPeakWidthBaseScans = ComputeWidthAtBaseUsingFWHM(udtSICPeak, SICScanNumbers, 4)
-        intPeakWidthPoints = ConvertScanWidthToPoints(intPeakWidthBaseScans, udtSICPeak, SICScanNumbers)
+        sicPeak.FWHMScanWidth = ComputeFWHM(SICScanNumbers, sngData, sicPeak, False)
+        intPeakWidthBaseScans = ComputeWidthAtBaseUsingFWHM(sicPeak, SICScanNumbers, 4)
+        intPeakWidthPoints = ConvertScanWidthToPoints(intPeakWidthBaseScans, sicPeak, SICScanNumbers)
 
         intPeakHalfWidthPoints = CInt(Math.Round(intPeakWidthPoints / 1.5, 0))
 
@@ -889,22 +890,22 @@ Public Class clsMASICPeakFinder
         End If
 
         ' Copy the peak base indices
-        intIndexBaseLeft = udtSICPeak.IndexBaseLeft
-        intIndexBaseRight = udtSICPeak.IndexBaseRight
+        intIndexBaseLeft = sicPeak.IndexBaseLeft
+        intIndexBaseRight = sicPeak.IndexBaseRight
 
         ' Define IndexStart and IndexEnd, making sure that intPeakHalfWidthPoints is no larger than NOISE_ESTIMATE_DATACOUNT_MAXIMUM
         intIndexStart = intIndexBaseLeft - Math.Min(intPeakHalfWidthPoints, NOISE_ESTIMATE_DATACOUNT_MAXIMUM)
-        intIndexEnd = udtSICPeak.IndexBaseRight + Math.Min(intPeakHalfWidthPoints, NOISE_ESTIMATE_DATACOUNT_MAXIMUM)
+        intIndexEnd = sicPeak.IndexBaseRight + Math.Min(intPeakHalfWidthPoints, NOISE_ESTIMATE_DATACOUNT_MAXIMUM)
 
         If intIndexStart < 0 Then intIndexStart = 0
         If intIndexEnd >= intDatacount Then intIndexEnd = intDatacount - 1
 
         ' Compare intIndexStart to udtSICPeak.PreviousPeakFWHMPointRight
         ' If it is less than .PreviousPeakFWHMPointRight, then update accordingly
-        If intIndexStart < udtSICPeak.PreviousPeakFWHMPointRight AndAlso
-           udtSICPeak.PreviousPeakFWHMPointRight < udtSICPeak.IndexMax Then
+        If intIndexStart < sicPeak.PreviousPeakFWHMPointRight AndAlso
+           sicPeak.PreviousPeakFWHMPointRight < sicPeak.IndexMax Then
             ' Update intIndexStart to be at PreviousPeakFWHMPointRight
-            intIndexStart = udtSICPeak.PreviousPeakFWHMPointRight
+            intIndexStart = sicPeak.PreviousPeakFWHMPointRight
 
             If intIndexStart < 0 Then intIndexStart = 0
 
@@ -915,9 +916,9 @@ Public Class clsMASICPeakFinder
                 If blnShiftLeft Then
                     If intIndexStart > 0 Then intIndexStart -= 1
                 Else
-                    If intIndexBaseLeft < udtSICPeak.IndexMax Then intIndexBaseLeft += 1
+                    If intIndexBaseLeft < sicPeak.IndexMax Then intIndexBaseLeft += 1
                 End If
-                If intIndexStart <= 0 AndAlso intIndexBaseLeft >= udtSICPeak.IndexMax Then
+                If intIndexStart <= 0 AndAlso intIndexBaseLeft >= sicPeak.IndexMax Then
                     Exit Do
                 Else
                     blnShiftLeft = Not blnShiftLeft
@@ -927,9 +928,9 @@ Public Class clsMASICPeakFinder
 
         ' Compare intIndexEnd to udtSICPeak.NextPeakFWHMPointLeft
         ' If it is greater than .NextPeakFWHMPointLeft, then update accordingly
-        If intIndexEnd >= udtSICPeak.NextPeakFWHMPointLeft AndAlso
-           udtSICPeak.NextPeakFWHMPointLeft > udtSICPeak.IndexMax Then
-            intIndexEnd = udtSICPeak.NextPeakFWHMPointLeft
+        If intIndexEnd >= sicPeak.NextPeakFWHMPointLeft AndAlso
+           sicPeak.NextPeakFWHMPointLeft > sicPeak.IndexMax Then
+            intIndexEnd = sicPeak.NextPeakFWHMPointLeft
 
             If intIndexEnd >= intDatacount Then intIndexEnd = intDatacount - 1
 
@@ -938,11 +939,11 @@ Public Class clsMASICPeakFinder
             blnShiftLeft = False
             Do While intIndexEnd - intIndexBaseRight + 1 < NOISE_ESTIMATE_DATACOUNT_MINIMUM
                 If blnShiftLeft Then
-                    If intIndexBaseRight > udtSICPeak.IndexMax Then intIndexBaseRight -= 1
+                    If intIndexBaseRight > sicPeak.IndexMax Then intIndexBaseRight -= 1
                 Else
                     If intIndexEnd < intDatacount - 1 Then intIndexEnd += 1
                 End If
-                If intIndexBaseRight <= udtSICPeak.IndexMax AndAlso intIndexEnd >= intDatacount - 1 Then
+                If intIndexBaseRight <= sicPeak.IndexMax AndAlso intIndexEnd >= intDatacount - 1 Then
                     Exit Do
                 Else
                     blnShiftLeft = Not blnShiftLeft
@@ -950,21 +951,23 @@ Public Class clsMASICPeakFinder
             Loop
         End If
 
-        With udtSICPeak
-            blnSuccess = ComputeAverageNoiseLevelExcludingRegion(
-              intDatacount, sngData,
-              intIndexStart, intIndexEnd,
-              intIndexBaseLeft, intIndexBaseRight,
-              baselineNoiseOptions, .BaselineNoiseStats)
+        blnSuccess = ComputeAverageNoiseLevelExcludingRegion(
+          intDatacount, sngData,
+          intIndexStart, intIndexEnd,
+          intIndexBaseLeft, intIndexBaseRight,
+          baselineNoiseOptions, sicPeak.BaselineNoiseStats)
 
-            ' Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
-            With .BaselineNoiseStats
-                If .NoiseLevel < Math.Max(1, baselineNoiseOptions.MinimumBaselineNoiseLevel) Then
-                    .NoiseLevel = Math.Max(1, baselineNoiseOptions.MinimumBaselineNoiseLevel)
-                    .NoiseStDev = 0                             ' Set this to 0 since we have overridden .NoiseLevel
-                End If
-            End With
-        End With
+        ' Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
+        If sicPeak.BaselineNoiseStats.NoiseLevel < Math.Max(1, baselineNoiseOptions.MinimumBaselineNoiseLevel) Then
+            Dim udtNoiseStats = sicPeak.BaselineNoiseStats
+
+            udtNoiseStats.NoiseLevel = Math.Max(1, baselineNoiseOptions.MinimumBaselineNoiseLevel)
+
+            ' Set this to 0 since we have overridden .NoiseLevel
+            udtNoiseStats.NoiseStDev = 0
+
+            sicPeak.BaselineNoiseStats = udtNoiseStats
+        End If
 
 
         Return blnSuccess
@@ -979,14 +982,14 @@ Public Class clsMASICPeakFinder
     ''' <param name="intSICDataCount"></param>
     ''' <param name="SICScanNumbers"></param>
     ''' <param name="SICData"></param>
-    ''' <param name="udtSICPeak"></param>
+    ''' <param name="sicPeak"></param>
     ''' <param name="intFragScanNumber"></param>
     ''' <returns></returns>
     Public Function ComputeParentIonIntensity(
       intSICDataCount As Integer,
       SICScanNumbers() As Integer,
       SICData() As Single,
-      ByRef udtSICPeak As udtSICStatsPeakType,
+      sicPeak As clsSICStatsPeak,
       intFragScanNumber As Integer) As Boolean
 
         Dim intX1, intX2 As Integer
@@ -996,33 +999,33 @@ Public Class clsMASICPeakFinder
 
         Try
             ' Lookup the scan number and intensity of the SIC scan at udtSICPeak.Indexobserved
-            intX1 = SICScanNumbers(udtSICPeak.IndexObserved)
-            sngY1 = SICData(udtSICPeak.IndexObserved)
+            intX1 = SICScanNumbers(sicPeak.IndexObserved)
+            sngY1 = SICData(sicPeak.IndexObserved)
 
             If intX1 = intFragScanNumber - 1 Then
                 ' The fragmentation scan was the next scan after the SIC scan the data was observed in
                 ' We can use sngY1 for .ParentIonIntensity
-                udtSICPeak.ParentIonIntensity = sngY1
+                sicPeak.ParentIonIntensity = sngY1
             ElseIf intX1 >= intFragScanNumber Then
                 ' The fragmentation scan has the same scan number as the SIC scan just before it, or the SIC scan is greater than the fragmentation scan
                 ' This shouldn't normally happen, but we'll account for the possibility anyway
                 ' If the data file only has MS spectra and no MS/MS spectra, and if the parent ion is a custom M/Z value, then this code will be reached
-                udtSICPeak.ParentIonIntensity = sngY1
+                sicPeak.ParentIonIntensity = sngY1
             Else
                 ' We need to perform some interpolation to determine .ParentIonIntensity
                 ' Lookup the scan number and intensity of the next SIC scan
-                If udtSICPeak.IndexObserved < intSICDataCount - 1 Then
-                    intX2 = SICScanNumbers(udtSICPeak.IndexObserved + 1)
-                    sngY2 = SICData(udtSICPeak.IndexObserved + 1)
+                If sicPeak.IndexObserved < intSICDataCount - 1 Then
+                    intX2 = SICScanNumbers(sicPeak.IndexObserved + 1)
+                    sngY2 = SICData(sicPeak.IndexObserved + 1)
 
-                    blnSuccess = InterpolateY(udtSICPeak.ParentIonIntensity, intX1, intX2, sngY1, sngY2, intFragScanNumber - 1)
+                    blnSuccess = InterpolateY(sicPeak.ParentIonIntensity, intX1, intX2, sngY1, sngY2, intFragScanNumber - 1)
                     If Not blnSuccess Then
                         ' Interpolation failed; use sngY1
-                        udtSICPeak.ParentIonIntensity = sngY1
+                        sicPeak.ParentIonIntensity = sngY1
                     End If
                 Else
                     ' Cannot interpolate; we'll have to use sngY1 as .ParentIonIntensity
-                    udtSICPeak.ParentIonIntensity = sngY1
+                    sicPeak.ParentIonIntensity = sngY1
                 End If
             End If
 
@@ -1037,7 +1040,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeSICPeakArea(SICScanNumbers() As Integer, SICData() As Single, ByRef udtSICPeak As udtSICStatsPeakType) As Boolean
+    Private Function ComputeSICPeakArea(SICScanNumbers As IList(Of Integer), SICData As IList(Of Single), sicPeak As clsSICStatsPeak) As Boolean
         ' The calling function must populate udtSICPeak.IndexMax, udtSICPeak.IndexBaseLeft, and udtSICPeak.IndexBaseRight
 
         Dim intAreaDataCount As Integer
@@ -1063,19 +1066,19 @@ Public Class clsMASICPeakFinder
             ' When copying, assure that the first and last points have an intensity of 0
 
             ' We're reserving extra space in case we need to prepend or append a minimum value
-            ReDim intScanNumbers(udtSICPeak.IndexBaseRight - udtSICPeak.IndexBaseLeft + 2)
-            ReDim sngIntensities(udtSICPeak.IndexBaseRight - udtSICPeak.IndexBaseLeft + 2)
+            ReDim intScanNumbers(sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + 2)
+            ReDim sngIntensities(sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + 2)
 
             ' Define an intensity threshold of 5% of MaximumIntensity
             ' If the peak data is not flanked by points <= sngIntensityThreshold, then we'll add them
-            sngIntensityThreshold = CSng(SICData(udtSICPeak.IndexMax) * 0.05)
+            sngIntensityThreshold = CSng(SICData(sicPeak.IndexMax) * 0.05)
 
             ' Estimate the average scan interval between each data point
-            intAvgScanInterval = CInt(Math.Round(ComputeAvgScanInterval(SICScanNumbers, udtSICPeak.IndexBaseLeft, udtSICPeak.IndexBaseRight), 0))
+            intAvgScanInterval = CInt(Math.Round(ComputeAvgScanInterval(SICScanNumbers, sicPeak.IndexBaseLeft, sicPeak.IndexBaseRight), 0))
 
-            If SICData(udtSICPeak.IndexBaseLeft) > sngIntensityThreshold Then
+            If SICData(sicPeak.IndexBaseLeft) > sngIntensityThreshold Then
                 ' Prepend an intensity data point of sngIntensityThreshold, with a scan number intAvgScanInterval less than the first scan number for the actual peak data
-                intScanNumbers(0) = SICScanNumbers(udtSICPeak.IndexBaseLeft) - intAvgScanInterval
+                intScanNumbers(0) = SICScanNumbers(sicPeak.IndexBaseLeft) - intAvgScanInterval
                 sngIntensities(0) = sngIntensityThreshold
                 'sngIntensitiesSmoothed(0) = sngIntensityThreshold
                 intAreaDataBaseIndex = 1
@@ -1084,19 +1087,19 @@ Public Class clsMASICPeakFinder
             End If
 
             ' Populate intScanNumbers() and sngIntensities()
-            For intDataIndex = udtSICPeak.IndexBaseLeft To udtSICPeak.IndexBaseRight
-                intIndexPointer = intDataIndex - udtSICPeak.IndexBaseLeft + intAreaDataBaseIndex
+            For intDataIndex = sicPeak.IndexBaseLeft To sicPeak.IndexBaseRight
+                intIndexPointer = intDataIndex - sicPeak.IndexBaseLeft + intAreaDataBaseIndex
                 intScanNumbers(intIndexPointer) = SICScanNumbers(intDataIndex)
                 sngIntensities(intIndexPointer) = SICData(intDataIndex)
                 'sngIntensitiesSmoothed(intIndexPointer) = udtSmoothedYDataSubset.Data(intDataIndex - udtSmoothedYDataSubset.DataStartIndex)
                 'If sngIntensitiesSmoothed(intIndexPointer) < 0 Then sngIntensitiesSmoothed(intIndexPointer) = 0
             Next
-            intAreaDataCount = udtSICPeak.IndexBaseRight - udtSICPeak.IndexBaseLeft + 1 + intAreaDataBaseIndex
+            intAreaDataCount = sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + 1 + intAreaDataBaseIndex
 
-            If SICData(udtSICPeak.IndexBaseRight) > sngIntensityThreshold Then
+            If SICData(sicPeak.IndexBaseRight) > sngIntensityThreshold Then
                 ' Append an intensity data point of sngIntensityThreshold, with a scan number intAvgScanInterval more than the last scan number for the actual peak data
-                intDataIndex = udtSICPeak.IndexBaseRight - udtSICPeak.IndexBaseLeft + intAreaDataBaseIndex + 1
-                intScanNumbers(intDataIndex) = SICScanNumbers(udtSICPeak.IndexBaseRight) + intAvgScanInterval
+                intDataIndex = sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + intAreaDataBaseIndex + 1
+                intScanNumbers(intDataIndex) = SICScanNumbers(sicPeak.IndexBaseRight) + intAvgScanInterval
                 sngIntensities(intDataIndex) = sngIntensityThreshold
                 intAreaDataCount += 1
                 'sngIntensitiesSmoothed(intDataIndex) = sngIntensityThreshold
@@ -1105,16 +1108,18 @@ Public Class clsMASICPeakFinder
             ' Compute the area
             ' Note that we're using real data for this and not smoothed data
             ' Also note that we're using raw data for the peak area (not baseline corrected values)
-            udtSICPeak.Area = 0
+            Dim peakArea As Single = 0
             For intDataIndex = 0 To intAreaDataCount - 2
                 ' Use the Trapezoid area formula to compute the area slice to add to udtSICPeak.Area
                 ' Area = 0.5 * DeltaX * (Y1 + Y2)
                 intScanDelta = intScanNumbers(intDataIndex + 1) - intScanNumbers(intDataIndex)
-                udtSICPeak.Area += CSng(0.5 * intScanDelta * (sngIntensities(intDataIndex) + sngIntensities(intDataIndex + 1)))
+                peakArea += CSng(0.5 * intScanDelta * (sngIntensities(intDataIndex) + sngIntensities(intDataIndex + 1)))
             Next
 
-            If udtSICPeak.Area < 0 Then
-                udtSICPeak.Area = 0
+            If peakArea < 0 Then
+                sicPeak.Area = 0
+            Else
+                sicPeak.Area = peakArea
             End If
 
         Catch ex As Exception
@@ -1126,7 +1131,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeAvgScanInterval(intScanData() As Integer, intDataIndexStart As Integer, intDataIndexEnd As Integer) As Single
+    Private Function ComputeAvgScanInterval(intScanData As IList(Of Integer), intDataIndexStart As Integer, intDataIndexEnd As Integer) As Single
 
         Dim sngScansPerPoint As Single
 
@@ -1148,9 +1153,9 @@ Public Class clsMASICPeakFinder
 
     Private Function ComputeStatisticalMomentsStats(
       intSICDataCount As Integer,
-      SICScanNumbers() As Integer, SICData() As Single,
-      ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType,
-      ByRef udtSICPeak As udtSICStatsPeakType) As Boolean
+      SICScanNumbers As IList(Of Integer), SICData As IList(Of Single),
+      smoothedYDataSubset As clsSmoothedYDataSubset,
+      sicPeak As clsSICStatsPeak) As Boolean
 
         ' The calling function must populate udtSICPeak.IndexMax, udtSICPeak.IndexBaseLeft, and udtSICPeak.IndexBaseRight
         ' Returns True if success; false if an error or less than 3 usable data points
@@ -1196,22 +1201,26 @@ Public Class clsMASICPeakFinder
 
         Try
             ' Initialize to default values
-            With udtSICPeak.StatisticalMoments
-                Try
-                    If udtSICPeak.IndexMax >= 0 AndAlso udtSICPeak.IndexMax < intDataCount Then
-                        .CenterOfMassScan = SICScanNumbers(udtSICPeak.IndexMax)
-                    End If
-                Catch ex As Exception
-                    ' Ignore errors here
-                End Try
-                .Area = 0
-                .StDev = 0
-                .Skew = 0
-                .KSStat = 0
-                .DataCountUsed = 0
-            End With
 
-            intDataCount = udtSICPeak.IndexBaseRight - udtSICPeak.IndexBaseLeft + 1
+            Dim statMomentsData = New clsStatisticalMoments() With {
+                .Area = 0,
+                .StDev = 0,
+                .Skew = 0,
+                .KSStat = 0,
+                .DataCountUsed = 0
+            }
+
+            Try
+                If sicPeak.IndexMax >= 0 AndAlso sicPeak.IndexMax < intDataCount Then
+                    statMomentsData.CenterOfMassScan = SICScanNumbers(sicPeak.IndexMax)
+                End If
+            Catch ex As Exception
+                ' Ignore errors here
+            End Try
+
+            sicPeak.StatisticalMoments = statMomentsData
+
+            intDataCount = sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + 1
             If intDataCount < 1 Then
                 ' Do not continue if less than one point across the peak
                 Return False
@@ -1235,13 +1244,13 @@ Public Class clsMASICPeakFinder
 
             If USE_SMOOTHED_DATA Then
                 intDataCount = 0
-                For intDataIndex = udtSICPeak.IndexBaseLeft To udtSICPeak.IndexBaseRight
-                    intSmoothedDataPointer = intDataIndex - udtSmoothedYDataSubset.DataStartIndex
-                    If intSmoothedDataPointer >= 0 AndAlso intSmoothedDataPointer < udtSmoothedYDataSubset.DataCount Then
+                For intDataIndex = sicPeak.IndexBaseLeft To sicPeak.IndexBaseRight
+                    intSmoothedDataPointer = intDataIndex - smoothedYDataSubset.DataStartIndex
+                    If intSmoothedDataPointer >= 0 AndAlso intSmoothedDataPointer < smoothedYDataSubset.DataCount Then
                         intScanNumbers(intDataCount) = SICScanNumbers(intDataIndex)
                         sngIntensities(intDataCount) = BaselineAdjustIntensity(
-                          udtSmoothedYDataSubset.Data(intSmoothedDataPointer),
-                          udtSICPeak.BaselineNoiseStats.NoiseLevel,
+                          smoothedYDataSubset.Data(intSmoothedDataPointer),
+                          sicPeak.BaselineNoiseStats.NoiseLevel,
                           ALLOW_NEGATIVE_VALUES)
 
                         If sngIntensities(intDataCount) > sngMaximumBaselineAdjustedIntensity Then
@@ -1253,11 +1262,11 @@ Public Class clsMASICPeakFinder
                 Next
             Else
                 intDataCount = 0
-                For intDataIndex = udtSICPeak.IndexBaseLeft To udtSICPeak.IndexBaseRight
+                For intDataIndex = sicPeak.IndexBaseLeft To sicPeak.IndexBaseRight
                     intScanNumbers(intDataCount) = SICScanNumbers(intDataIndex)
                     sngIntensities(intDataCount) = BaselineAdjustIntensity(
                       SICData(intDataIndex),
-                      udtSICPeak.BaselineNoiseStats.NoiseLevel,
+                      sicPeak.BaselineNoiseStats.NoiseLevel,
                       ALLOW_NEGATIVE_VALUES)
 
                     If sngIntensities(intDataCount) > sngMaximumBaselineAdjustedIntensity Then
@@ -1363,21 +1372,21 @@ Public Class clsMASICPeakFinder
             If blnUseRawDataAroundMaximum OrElse intDataCount < intMinimumDataCount Then
                 ' Populate intScanNumbers() and sngIntensities() with the five data points centered around udtSICPeak.IndexMax
                 If USE_SMOOTHED_DATA Then
-                    intValidDataIndexLeft = udtSICPeak.IndexMax - CInt(Math.Floor(intMinimumDataCount / 2))
+                    intValidDataIndexLeft = sicPeak.IndexMax - CInt(Math.Floor(intMinimumDataCount / 2))
                     If intValidDataIndexLeft < 0 Then intValidDataIndexLeft = 0
                     intDataCount = 0
                     For intDataIndex = intValidDataIndexLeft To Math.Min(intValidDataIndexLeft + intMinimumDataCount - 1, intSICDataCount - 1)
-                        intSmoothedDataPointer = intDataIndex - udtSmoothedYDataSubset.DataStartIndex
-                        If intSmoothedDataPointer >= 0 AndAlso intSmoothedDataPointer < udtSmoothedYDataSubset.DataCount Then
-                            If udtSmoothedYDataSubset.Data(intSmoothedDataPointer) > 0 Then
+                        intSmoothedDataPointer = intDataIndex - smoothedYDataSubset.DataStartIndex
+                        If intSmoothedDataPointer >= 0 AndAlso intSmoothedDataPointer < smoothedYDataSubset.DataCount Then
+                            If smoothedYDataSubset.Data(intSmoothedDataPointer) > 0 Then
                                 intScanNumbers(intDataCount) = SICScanNumbers(intDataIndex)
-                                sngIntensities(intDataCount) = udtSmoothedYDataSubset.Data(intSmoothedDataPointer)
+                                sngIntensities(intDataCount) = smoothedYDataSubset.Data(intSmoothedDataPointer)
                                 intDataCount += 1
                             End If
                         End If
                     Next
                 Else
-                    intValidDataIndexLeft = udtSICPeak.IndexMax - CInt(Math.Floor(intMinimumDataCount / 2))
+                    intValidDataIndexLeft = sicPeak.IndexMax - CInt(Math.Floor(intMinimumDataCount / 2))
                     If intValidDataIndexLeft < 0 Then intValidDataIndexLeft = 0
                     intDataCount = 0
                     For intDataIndex = intValidDataIndexLeft To Math.Min(intValidDataIndexLeft + intMinimumDataCount - 1, intSICDataCount - 1)
@@ -1462,24 +1471,23 @@ Public Class clsMASICPeakFinder
 
             If dblArea <= 0 Then
                 ' Cannot compute the center of mass; use the scan at .IndexMax instead
-                With udtSICPeak
-                    intIndexPointer = .IndexMax - .IndexBaseLeft
-                    If intIndexPointer >= 0 AndAlso intIndexPointer < intScanNumbers.Length Then
-                        dblCenterOfMassDecimal = intScanNumbers(intIndexPointer)
-                    End If
-                    .StatisticalMoments.CenterOfMassScan = CInt(Math.Round(dblCenterOfMassDecimal, 0))
-                    .StatisticalMoments.DataCountUsed = 1
-                End With
+
+                intIndexPointer = sicPeak.IndexMax - sicPeak.IndexBaseLeft
+                If intIndexPointer >= 0 AndAlso intIndexPointer < intScanNumbers.Length Then
+                    dblCenterOfMassDecimal = intScanNumbers(intIndexPointer)
+                End If
+
+                statMomentsData.CenterOfMassScan = CInt(Math.Round(dblCenterOfMassDecimal, 0))
+                statMomentsData.DataCountUsed = 1
+
             Else
                 ' Area is positive; compute the center of mass
-                With udtSICPeak
-                    dblCenterOfMassDecimal = dblMoment1Sum / dblArea + intScanNumbers(0)
-                    With .StatisticalMoments
-                        .Area = CSng(Math.Min(Single.MaxValue, dblArea))
-                        .CenterOfMassScan = CInt(Math.Round(dblCenterOfMassDecimal, 0))
-                        .DataCountUsed = intDataCount
-                    End With
-                End With
+
+                dblCenterOfMassDecimal = dblMoment1Sum / dblArea + intScanNumbers(0)
+
+                statMomentsData.Area = CSng(Math.Min(Single.MaxValue, dblArea))
+                statMomentsData.CenterOfMassScan = CInt(Math.Round(dblCenterOfMassDecimal, 0))
+                statMomentsData.DataCountUsed = intDataCount
 
                 ' For the second moment (m2), need to sum: (ScanNumber - m1)^2 * Intensity
                 ' For the third moment (m3), need to sum: (ScanNumber - m1)^3 * Intensity
@@ -1511,38 +1519,37 @@ Public Class clsMASICPeakFinder
                     End If
                 Next
 
-                With udtSICPeak.StatisticalMoments
-                    .StDev = CSng(Math.Sqrt(dblMoment2Sum / dblArea))
+                statMomentsData.StDev = CSng(Math.Sqrt(dblMoment2Sum / dblArea))
 
-                    ' dblThirdMoment = dblMoment3Sum / dblArea
-                    ' skew = dblThirdMoment / sigma^3
-                    ' skew = (dblMoment3Sum / dblArea) / sigma^3
-                    If .StDev > 0 Then
-                        .Skew = CSng((dblMoment3Sum / dblArea) / (.StDev ^ 3))
-                        If Math.Abs(.Skew) < 0.0001 Then
-                            .Skew = 0
-                        End If
-                    Else
-                        .Skew = 0
+                ' dblThirdMoment = dblMoment3Sum / dblArea
+                ' skew = dblThirdMoment / sigma^3
+                ' skew = (dblMoment3Sum / dblArea) / sigma^3
+                If statMomentsData.StDev > 0 Then
+                    statMomentsData.Skew = CSng((dblMoment3Sum / dblArea) / (statMomentsData.StDev ^ 3))
+                    If Math.Abs(statMomentsData.Skew) < 0.0001 Then
+                        statMomentsData.Skew = 0
                     End If
-                End With
+                Else
+                    statMomentsData.Skew = 0
+                End If
+
             End If
 
             Const blnUseStatMomentsStats = True
             Dim peakMean As Single
             Dim peakStDev As Double
 
-            With udtSICPeak.StatisticalMoments
-                If blnUseStatMomentsStats Then
-                    peakMean = .CenterOfMassScan
-                    peakStDev = .StDev
-                Else
-                    peakMean = SICScanNumbers(udtSICPeak.IndexMax)
-                    ' FWHM / 2.35482 = FWHM / (2 * Sqrt(2 * Ln(2)))
-                    peakStDev = udtSICPeak.FWHMScanWidth / 2.35482
-                End If
-                .KSStat = CSng(ComputeKSStatistic(intDataCount, intScanNumbers, sngIntensities, peakMean, peakStDev))
-            End With
+
+            If blnUseStatMomentsStats Then
+                peakMean = statMomentsData.CenterOfMassScan
+                peakStDev = statMomentsData.StDev
+            Else
+                peakMean = SICScanNumbers(sicPeak.IndexMax)
+                ' FWHM / 2.35482 = FWHM / (2 * Sqrt(2 * Ln(2)))
+                peakStDev = sicPeak.FWHMScanWidth / 2.35482
+            End If
+            statMomentsData.KSStat = CSng(ComputeKSStatistic(intDataCount, intScanNumbers, sngIntensities, peakMean, peakStDev))
+
 
         Catch ex As Exception
             LogErrors("clsMASICPeakFinder->ComputeStatisticalMomentsStats", "Error computing statistical momements", ex, True, False, True)
@@ -1573,7 +1580,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="intIndexEnd"></param>
     ''' <param name="baselineNoiseOptions"></param>
     ''' <param name="blnIgnoreNonPositiveData"></param>
-    ''' <param name="udtBaselineNoiseStats"></param>
+    ''' <param name="baselineNoiseStats"></param>
     ''' <returns>Returns True if success, False if error (or no data in sngData)</returns>
     ''' <remarks>
     ''' Replaces values of 0 with the minimum positive value in sngData()
@@ -1582,7 +1589,7 @@ Public Class clsMASICPeakFinder
     Public Function ComputeTrimmedNoiseLevel(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
                                              baselineNoiseOptions As clsBaselineNoiseOptions,
                                              blnIgnoreNonPositiveData As Boolean,
-                                             ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType) As Boolean
+                                             <Out()> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         Dim intDataSortedCount As Integer
         Dim sngDataSorted() As Single           ' Note: You cannot use sngDataSorted.Length to determine the length of the array; use intIndexStart and intIndexEnd to find the limits
@@ -1595,8 +1602,8 @@ Public Class clsMASICPeakFinder
 
         Dim intCountSummed As Integer
 
-        ' Initialize udtBaselineNoiseStats
-        InitializeBaselineNoiseStats(udtBaselineNoiseStats, baselineNoiseOptions.MinimumBaselineNoiseLevel, baselineNoiseOptions.BaselineNoiseMode)
+        ' Initialize baselineNoiseStats
+        baselineNoiseStats = InitializeBaselineNoiseStats(baselineNoiseOptions.MinimumBaselineNoiseLevel, baselineNoiseOptions.BaselineNoiseMode)
 
         If sngData Is Nothing OrElse intIndexEnd - intIndexStart < 0 Then
             Return False
@@ -1683,28 +1690,25 @@ Public Class clsMASICPeakFinder
                 If intCountSummed > 0 Then
                     ' Compute the average
                     ' Note that intCountSummed will be used below in the variance computation
-                    With udtBaselineNoiseStats
-                        .NoiseLevel = CSng(dblSum / intCountSummed)
-                        .PointsUsed = intCountSummed
-                    End With
+                    baselineNoiseStats.NoiseLevel = CSng(dblSum / intCountSummed)
+                    baselineNoiseStats.PointsUsed = intCountSummed
 
                     If intCountSummed > 1 Then
                         ' Compute the variance
                         dblSum = 0
                         For intIndex = 0 To intIndexEnd
-                            dblSum += (sngDataSorted(intIndex) - udtBaselineNoiseStats.NoiseLevel) ^ 2
+                            dblSum += (sngDataSorted(intIndex) - baselineNoiseStats.NoiseLevel) ^ 2
                         Next
-                        udtBaselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(dblSum / (intCountSummed - 1)))
+                        baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(dblSum / (intCountSummed - 1)))
                     Else
-                        udtBaselineNoiseStats.NoiseStDev = 0
+                        baselineNoiseStats.NoiseStDev = 0
                     End If
                 Else
                     ' No data to average; define the noise level to be the minimum intensity
-                    With udtBaselineNoiseStats
-                        .NoiseLevel = sngDataSorted(0)
-                        .NoiseStDev = 0
-                        .PointsUsed = 1
-                    End With
+                    baselineNoiseStats.NoiseLevel = sngDataSorted(0)
+                    baselineNoiseStats.NoiseStDev = 0
+                    baselineNoiseStats.PointsUsed = 1
+
                 End If
 
             Case eNoiseThresholdModes.TrimmedMedianByAbundance
@@ -1730,7 +1734,7 @@ Public Class clsMASICPeakFinder
 
                 If intIndexEnd Mod 2 = 0 Then
                     ' Even value
-                    udtBaselineNoiseStats.NoiseLevel = sngDataSorted(CInt(intIndexEnd / 2))
+                    baselineNoiseStats.NoiseLevel = sngDataSorted(CInt(intIndexEnd / 2))
                 Else
                     ' Odd value; average the values on either side of intIndexEnd/2
                     intIndex = CInt((intIndexEnd - 1) / 2)
@@ -1741,24 +1745,22 @@ Public Class clsMASICPeakFinder
                     If intIndex = intDataSortedCount Then intIndex = intDataSortedCount - 1
                     dblSum += sngDataSorted(intIndex)
 
-                    udtBaselineNoiseStats.NoiseLevel = CSng(dblSum / 2.0)
+                    baselineNoiseStats.NoiseLevel = CSng(dblSum / 2.0)
                 End If
 
                 ' Compute the variance
                 dblSum = 0
                 For intIndex = 0 To intIndexEnd
-                    dblSum += (sngDataSorted(intIndex) - udtBaselineNoiseStats.NoiseLevel) ^ 2
+                    dblSum += (sngDataSorted(intIndex) - baselineNoiseStats.NoiseLevel) ^ 2
                 Next
 
-                With udtBaselineNoiseStats
-                    intCountSummed = intIndexEnd + 1
-                    If intCountSummed > 0 Then
-                        .NoiseStDev = CSng(Math.Sqrt(dblSum / (intCountSummed - 1)))
-                    Else
-                        .NoiseStDev = 0
-                    End If
-                    .PointsUsed = intCountSummed
-                End With
+                intCountSummed = intIndexEnd + 1
+                If intCountSummed > 0 Then
+                    baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(dblSum / (intCountSummed - 1)))
+                Else
+                    baselineNoiseStats.NoiseStDev = 0
+                End If
+                baselineNoiseStats.PointsUsed = intCountSummed
             Case Else
                 ' Unknown mode
                 LogErrors("clsMASICPeakFinder->ComputeTrimmedNoiseLevel",
@@ -1768,12 +1770,14 @@ Public Class clsMASICPeakFinder
         End Select
 
         ' Assure that .NoiseLevel is >= .MinimumBaselineNoiseLevel
-        With udtBaselineNoiseStats
-            If .NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso baselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
-                .NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel
-                .NoiseStDev = 0                             ' Set this to 0 since we have overridden .NoiseLevel
-            End If
-        End With
+        If baselineNoiseStats.NoiseLevel < baselineNoiseOptions.MinimumBaselineNoiseLevel AndAlso
+           baselineNoiseOptions.MinimumBaselineNoiseLevel > 0 Then
+
+            baselineNoiseStats.NoiseLevel = baselineNoiseOptions.MinimumBaselineNoiseLevel
+
+            ' Set this to 0 since we have overridden .NoiseLevel
+            baselineNoiseStats.NoiseStDev = 0
+        End If
 
         Return True
 
@@ -1782,20 +1786,20 @@ Public Class clsMASICPeakFinder
     ''' <summary>
     ''' Computes the width of the peak (in scans) using the FWHM value in udtSICPeak
     ''' </summary>
-    ''' <param name="udtSICPeak"></param>
+    ''' <param name="sicPeak"></param>
     ''' <param name="SICScanNumbers"></param>
     ''' <param name="SigmaValueForBase"></param>
     ''' <returns></returns>
     Private Shared Function ComputeWidthAtBaseUsingFWHM(
-      ByRef udtSICPeak As udtSICStatsPeakType,
-      SICScanNumbers() As Integer,
+      sicPeak As clsSICStatsPeak,
+      SICScanNumbers As IList(Of Integer),
       SigmaValueForBase As Short) As Integer
 
         Dim intPeakWidthFullScans As Integer
 
         Try
-            intPeakWidthFullScans = SICScanNumbers(udtSICPeak.IndexBaseRight) - SICScanNumbers(udtSICPeak.IndexBaseLeft) + 1
-            Return ComputeWidthAtBaseUsingFWHM(udtSICPeak.FWHMScanWidth, intPeakWidthFullScans, SigmaValueForBase)
+            intPeakWidthFullScans = SICScanNumbers(sicPeak.IndexBaseRight) - SICScanNumbers(sicPeak.IndexBaseLeft) + 1
+            Return ComputeWidthAtBaseUsingFWHM(sicPeak.FWHMScanWidth, intPeakWidthFullScans, SigmaValueForBase)
         Catch ex As Exception
             Return 0
         End Try
@@ -1846,17 +1850,17 @@ Public Class clsMASICPeakFinder
     ''' Convert from intPeakWidthFullScans to points; estimate number of scans per point to get this
     ''' </summary>
     ''' <param name="intPeakWidthBaseScans"></param>
-    ''' <param name="udtSICPeak"></param>
+    ''' <param name="sicPeak"></param>
     ''' <param name="SICScanNumbers"></param>
     ''' <returns></returns>
     Private Function ConvertScanWidthToPoints(
       intPeakWidthBaseScans As Integer,
-      ByRef udtSICPeak As udtSICStatsPeakType,
-      SICScanNumbers() As Integer) As Integer
+      sicPeak As clsSICStatsPeak,
+      SICScanNumbers As IList(Of Integer)) As Integer
 
         Dim sngScansPerPoint As Single
 
-        sngScansPerPoint = ComputeAvgScanInterval(SICScanNumbers, udtSICPeak.IndexBaseLeft, udtSICPeak.IndexBaseRight)
+        sngScansPerPoint = ComputeAvgScanInterval(SICScanNumbers, sicPeak.IndexBaseLeft, sicPeak.IndexBaseRight)
         Return CInt(Math.Round(intPeakWidthBaseScans / sngScansPerPoint, 0))
 
     End Function
@@ -1901,7 +1905,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="intPreviousPeakFWHMPointRight">Output</param>
     ''' <param name="intNextPeakFWHMPointLeft">Output</param>
     ''' <param name="intShoulderCount">Output</param>
-    ''' <param name="udtSmoothedYDataSubset">Output</param>
+    ''' <param name="smoothedYDataSubset">Output</param>
     ''' <param name="blnSIMDataPresent"></param>
     ''' <param name="sicPeakFinderOptions"></param>
     ''' <param name="sngSICNoiseThresholdIntensity"></param>
@@ -1913,15 +1917,15 @@ Public Class clsMASICPeakFinder
     ''' <returns>Returns True if a valid peak is found in sngIntensityData(), otherwise false</returns>
     Private Function FindPeaks(
       intDataCount As Integer,
-      intScanNumbers() As Integer,
-      sngIntensityData() As Single,
+      intScanNumbers As IList(Of Integer),
+      sngIntensityData As IList(Of Single),
       ByRef intPeakIndexStart As Integer,
       ByRef intPeakIndexEnd As Integer,
       ByRef intPeakLocationIndex As Integer,
       ByRef intPreviousPeakFWHMPointRight As Integer,
       ByRef intNextPeakFWHMPointLeft As Integer,
       ByRef intShoulderCount As Integer,
-      ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType,
+      <Out()> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
       blnSIMDataPresent As Boolean,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
       sngSICNoiseThresholdIntensity As Single,
@@ -1931,6 +1935,8 @@ Public Class clsMASICPeakFinder
         Const SMOOTHED_DATA_PADDING_COUNT = 2
 
         Dim blnValidPeakFound As Boolean
+
+        smoothedYDataSubset = New clsSmoothedYDataSubset()
 
         Try
             Dim objPeakDetector As New clsPeakDetection()
@@ -1945,6 +1951,7 @@ Public Class clsMASICPeakFinder
                 intPeakIndexStart = 0
                 intPeakIndexEnd = 0
                 intPeakLocationIndex = 0
+
                 Return False
             End If
 
@@ -2088,42 +2095,29 @@ Public Class clsMASICPeakFinder
                     ' Copy the smoothed Y data for the peak into udtSmoothedYDataSubset.Data()
                     ' Include some data to the left and right of the peak start and end
                     ' Additionally, be sure the smoothed data includes the data around the most intense data point in sngIntensityData
-                    udtSmoothedYDataSubset.DataStartIndex = intPeakIndexStart - SMOOTHED_DATA_PADDING_COUNT
-                    Dim intSmoothedYDataEndIndex = intPeakIndexEnd + SMOOTHED_DATA_PADDING_COUNT
+                    Dim smoothedYDataStartIndex = intPeakIndexStart - SMOOTHED_DATA_PADDING_COUNT
+                    Dim smoothedYDataEndIndex = intPeakIndexEnd + SMOOTHED_DATA_PADDING_COUNT
 
                     ' Make sure the maximum intensity point is included (with padding on either side)
-                    If intIndexMaxIntensity - SMOOTHED_DATA_PADDING_COUNT < udtSmoothedYDataSubset.DataStartIndex Then
-                        udtSmoothedYDataSubset.DataStartIndex = intIndexMaxIntensity - SMOOTHED_DATA_PADDING_COUNT
+                    If intIndexMaxIntensity - SMOOTHED_DATA_PADDING_COUNT < smoothedYDataStartIndex Then
+                        smoothedYDataStartIndex = intIndexMaxIntensity - SMOOTHED_DATA_PADDING_COUNT
                     End If
 
-                    If intIndexMaxIntensity + SMOOTHED_DATA_PADDING_COUNT > intSmoothedYDataEndIndex Then
-                        intSmoothedYDataEndIndex = intIndexMaxIntensity + SMOOTHED_DATA_PADDING_COUNT
+                    If intIndexMaxIntensity + SMOOTHED_DATA_PADDING_COUNT > smoothedYDataEndIndex Then
+                        smoothedYDataEndIndex = intIndexMaxIntensity + SMOOTHED_DATA_PADDING_COUNT
                     End If
 
                     ' Make sure the indices aren't out of range
-                    If udtSmoothedYDataSubset.DataStartIndex < 0 Then
-                        udtSmoothedYDataSubset.DataStartIndex = 0
+                    If smoothedYDataStartIndex < 0 Then
+                        smoothedYDataStartIndex = 0
                     End If
 
-                    If intSmoothedYDataEndIndex >= intDataCount Then
-                        intSmoothedYDataEndIndex = intDataCount - 1
+                    If smoothedYDataEndIndex >= intDataCount Then
+                        smoothedYDataEndIndex = intDataCount - 1
                     End If
 
-                    ' Copy the smoothed data into sngSmoothedYData
-                    With udtSmoothedYDataSubset
-                        .DataCount = intSmoothedYDataEndIndex - .DataStartIndex + 1
-
-                        If .DataCount > .Data.Length Then
-                            ReDim .Data(.DataCount - 1)
-                        Else
-                            Array.Clear(.Data, 0, .Data.Length)
-                        End If
-
-                        For intIndex = .DataStartIndex To intSmoothedYDataEndIndex
-                            .Data(intIndex - .DataStartIndex) = CSng(Math.Min(peakData.SmoothedYData(intIndex), Single.MaxValue))
-                        Next
-
-                    End With
+                    ' Copy the smoothed data into smoothedYDataSubset
+                    smoothedYDataSubset = New clsSmoothedYDataSubset(peakData.SmoothedYData, smoothedYDataStartIndex, smoothedYDataEndIndex)
 
                     ' Copy the PeakLocs and PeakEdges into peakDataSaved since we're going to call FindPeaksWork again and the data will get overwritten
                     Dim peakDataSaved = peakData.Clone(True)
@@ -2295,7 +2289,7 @@ Public Class clsMASICPeakFinder
 
     Private Function FindPeaksWork(
       objPeakDetector As clsPeakDetection,
-      intScanNumbers() As Integer,
+      intScanNumbers As IList(Of Integer),
       peaksContainer As clsPeaksContainer,
       blnSIMDataPresent As Boolean,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
@@ -2699,11 +2693,11 @@ Public Class clsMASICPeakFinder
     Public Sub FindPotentialPeakArea(
       intSICDataCount As Integer,
       SICData() As Single,
-      <Out()> ByRef udtSICPotentialAreaStats As udtSICPotentialAreaStatsType,
+      <Out()> ByRef potentialAreaStats As clsSICPotentialAreaStats,
       sicPeakFinderOptions As clsSICPeakFinderOptions)
 
         ' This function computes the potential peak area for a given SIC
-        '  and stores in udtSICPotentialAreaStats.MinimumPotentialPeakArea
+        '  and stores in potentialAreaStats.MinimumPotentialPeakArea
         ' However, the summed intensity is not used if the number of points >= .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
 
         ' Note: You cannot use SICData.Length to determine the length of the array; use intDataCount
@@ -2778,11 +2772,10 @@ Public Class clsMASICPeakFinder
             dblMinimumPotentialPeakArea = 1
         End If
 
-        udtSICPotentialAreaStats = New udtSICPotentialAreaStatsType()
-        With udtSICPotentialAreaStats
-            .MinimumPotentialPeakArea = dblMinimumPotentialPeakArea
+        potentialAreaStats = New clsSICPotentialAreaStats() With {
+            .MinimumPotentialPeakArea = dblMinimumPotentialPeakArea,
             .PeakCountBasisForMinimumPotentialArea = intPeakCountBasisForMinimumPotentialArea
-        End With
+        }
 
     End Sub
 
@@ -2790,11 +2783,11 @@ Public Class clsMASICPeakFinder
       intSICDataCount As Integer,
       SICScanNumbers() As Integer,
       SICData() As Single,
-      ByRef udtSICPotentialAreaStatsForPeak As udtSICPotentialAreaStatsType,
-      ByRef udtSICPeak As udtSICStatsPeakType,
-      ByRef udtSmoothedYDataSubset As udtSmoothedYDataSubsetType,
+      <Out()> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
+      sicPeak As clsSICStatsPeak,
+      <Out()> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
-      ByRef udtSICPotentialAreaStatsForRegion As udtSICPotentialAreaStatsType,
+      potentialAreaStatsForRegion As clsSICPotentialAreaStats,
       blnReturnClosestPeak As Boolean,
       blnSIMDataPresent As Boolean,
       blnRecomputeNoiseLevel As Boolean) As Boolean
@@ -2811,22 +2804,25 @@ Public Class clsMASICPeakFinder
 
         Dim blnSuccess As Boolean
 
+        potentialAreaStatsForPeak = New clsSICPotentialAreaStats()
+        smoothedYDataSubset = New clsSmoothedYDataSubset()
+
         Try
             ' Compute the potential peak area for this SIC
-            FindPotentialPeakArea(intSICDataCount, SICData, udtSICPotentialAreaStatsForPeak, sicPeakFinderOptions)
+            FindPotentialPeakArea(intSICDataCount, SICData, potentialAreaStatsForPeak, sicPeakFinderOptions)
 
             ' See if the potential peak area for this SIC is lower than the values for the Region
             ' If so, then update the region values with this peak's values
-            With udtSICPotentialAreaStatsForPeak
+            With potentialAreaStatsForPeak
                 If .MinimumPotentialPeakArea > 1 AndAlso .PeakCountBasisForMinimumPotentialArea >= MINIMUM_PEAK_WIDTH Then
-                    If .PeakCountBasisForMinimumPotentialArea > udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
-                        udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
-                        udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
+                    If .PeakCountBasisForMinimumPotentialArea > potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
+                        potentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
+                        potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
                     Else
-                        If .MinimumPotentialPeakArea < udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea AndAlso
-                           .PeakCountBasisForMinimumPotentialArea >= udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
-                            udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
-                            udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
+                        If .MinimumPotentialPeakArea < potentialAreaStatsForRegion.MinimumPotentialPeakArea AndAlso
+                           .PeakCountBasisForMinimumPotentialArea >= potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
+                            potentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
+                            potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
                         End If
                     End If
                 End If
@@ -2835,32 +2831,32 @@ Public Class clsMASICPeakFinder
             If SICData Is Nothing OrElse SICData.Length = 0 OrElse intSICDataCount <= 0 Then
                 ' Either .SICData is nothing or no SIC data exists
                 ' Cannot find peaks for this parent ion
-                With udtSICPeak
-                    .IndexObserved = 0
-                    .IndexBaseLeft = .IndexObserved
-                    .IndexBaseRight = .IndexObserved
-                    .IndexMax = .IndexObserved
-                    .ParentIonIntensity = 0
-                    .PreviousPeakFWHMPointRight = 0
-                    .NextPeakFWHMPointLeft = 0
-                End With
+
+                sicPeak.IndexObserved = 0
+                sicPeak.IndexBaseLeft = sicPeak.IndexObserved
+                sicPeak.IndexBaseRight = sicPeak.IndexObserved
+                sicPeak.IndexMax = sicPeak.IndexObserved
+                sicPeak.ParentIonIntensity = 0
+                sicPeak.PreviousPeakFWHMPointRight = 0
+                sicPeak.NextPeakFWHMPointLeft = 0
+
+                smoothedYDataSubset = New clsSmoothedYDataSubset()
             Else
 
-                With udtSICPeak
-                    ' Initialize the following to the entire range of the SICData
-                    .IndexBaseLeft = 0
-                    .IndexBaseRight = intSICDataCount - 1
 
-                    ' Initialize .IndexMax to .IndexObserved (which should have been defined by the calling function)
-                    .IndexMax = .IndexObserved
-                    If .IndexMax < 0 OrElse .IndexMax >= intSICDataCount Then
-                        LogErrors("clsMasicPeakFinder->FindSICPeakAndArea", "Unexpected .IndexMax value", Nothing, True, False)
-                        .IndexMax = 0
-                    End If
+                ' Initialize the following to the entire range of the SICData
+                sicPeak.IndexBaseLeft = 0
+                sicPeak.IndexBaseRight = intSICDataCount - 1
 
-                    .PreviousPeakFWHMPointRight = .IndexBaseLeft
-                    .NextPeakFWHMPointLeft = .IndexBaseRight
-                End With
+                ' Initialize .IndexMax to .IndexObserved (which should have been defined by the calling function)
+                sicPeak.IndexMax = sicPeak.IndexObserved
+                If sicPeak.IndexMax < 0 OrElse sicPeak.IndexMax >= intSICDataCount Then
+                    LogErrors("clsMasicPeakFinder->FindSICPeakAndArea", "Unexpected .IndexMax value", Nothing, True, False)
+                    sicPeak.IndexMax = 0
+                End If
+
+                sicPeak.PreviousPeakFWHMPointRight = sicPeak.IndexBaseLeft
+                sicPeak.NextPeakFWHMPointLeft = sicPeak.IndexBaseRight
 
                 If blnRecomputeNoiseLevel Then
                     ' Compute the Noise Threshold for this SIC
@@ -2870,30 +2866,30 @@ Public Class clsMASICPeakFinder
                     blnSuccess = ComputeNoiseLevelForSICData(
                       intSICDataCount, SICData,
                       sicPeakFinderOptions.SICBaselineNoiseOptions,
-                      udtSICPeak.BaselineNoiseStats)
+                      sicPeak.BaselineNoiseStats)
                 End If
 
 
                 ' Use a peak-finder algorithm to find the peak closest to .Peak.IndexMax
                 ' Note that .Peak.IndexBaseLeft, .Peak.IndexBaseRight, and .Peak.IndexMax are passed ByRef and get updated by FindPeaks
-                With udtSICPeak
+                With sicPeak
                     blnSuccess = FindPeaks(intSICDataCount, SICScanNumbers, SICData, .IndexBaseLeft, .IndexBaseRight, .IndexMax,
                       .PreviousPeakFWHMPointRight, .NextPeakFWHMPointLeft, .ShoulderCount,
-                      udtSmoothedYDataSubset, blnSIMDataPresent, sicPeakFinderOptions,
-                      udtSICPeak.BaselineNoiseStats.NoiseLevel,
-                      udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea,
+                      smoothedYDataSubset, blnSIMDataPresent, sicPeakFinderOptions,
+                                           sicPeak.BaselineNoiseStats.NoiseLevel,
+                      potentialAreaStatsForRegion.MinimumPotentialPeakArea,
                       blnReturnClosestPeak)
                 End With
 
                 If blnSuccess Then
                     ' Update the maximum peak intensity (required prior to call to ComputeNoiseLevelInPeakVicinity and call to ComputeSICPeakArea)
-                    udtSICPeak.MaxIntensityValue = SICData(udtSICPeak.IndexMax)
+                    sicPeak.MaxIntensityValue = SICData(sicPeak.IndexMax)
 
                     If blnRecomputeNoiseLevel Then
-                        ' Update the value for udtSICPotentialAreaStatsForPeak.SICNoiseThresholdIntensity based on the data around the peak
+                        ' Update the value for potentialAreaStatsForPeak.SICNoiseThresholdIntensity based on the data around the peak
                         blnSuccess = ComputeNoiseLevelInPeakVicinity(
                           intSICDataCount, SICScanNumbers,
-                          SICData, udtSICPeak,
+                          SICData, sicPeak,
                           sicPeakFinderOptions.SICBaselineNoiseOptions)
                     End If
 
@@ -2921,48 +2917,45 @@ Public Class clsMASICPeakFinder
                     ' If smoothing was enabled, then see if the smoothed value is larger than udtSICPeak.MaxIntensityValue
                     ' If it is, then use the smoothed value for udtSICPeak.MaxIntensityValue
                     If sicPeakFinderOptions.UseSavitzkyGolaySmooth OrElse sicPeakFinderOptions.UseButterworthSmooth Then
-                        intDataIndex = udtSICPeak.IndexMax - udtSmoothedYDataSubset.DataStartIndex
-                        If intDataIndex >= 0 AndAlso Not udtSmoothedYDataSubset.Data Is Nothing AndAlso
-                           intDataIndex < udtSmoothedYDataSubset.DataCount Then
+                        intDataIndex = sicPeak.IndexMax - smoothedYDataSubset.DataStartIndex
+                        If intDataIndex >= 0 AndAlso Not smoothedYDataSubset.Data Is Nothing AndAlso
+                           intDataIndex < smoothedYDataSubset.DataCount Then
                             ' Possibly use the intensity of the smoothed data as the peak intensity
-                            sngIntensityCompare = udtSmoothedYDataSubset.Data(intDataIndex)
-                            If sngIntensityCompare > udtSICPeak.MaxIntensityValue Then
-                                udtSICPeak.MaxIntensityValue = sngIntensityCompare
+                            sngIntensityCompare = smoothedYDataSubset.Data(intDataIndex)
+                            If sngIntensityCompare > sicPeak.MaxIntensityValue Then
+                                sicPeak.MaxIntensityValue = sngIntensityCompare
                             End If
                         End If
                     End If
 
                     ' Compute the signal to noise ratio for the peak
-                    With udtSICPeak
-                        .SignalToNoiseRatio = ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
-                    End With
+                    sicPeak.SignalToNoiseRatio = ComputeSignalToNoise(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel)
 
                     ' Compute the Full Width at Half Max (FWHM) value, this time subtracting the noise level from the baseline
-                    udtSICPeak.FWHMScanWidth = ComputeFWHM(SICScanNumbers, SICData, udtSICPeak, True)
+                    sicPeak.FWHMScanWidth = ComputeFWHM(SICScanNumbers, SICData, sicPeak, True)
 
                     ' Compute the Area (this function uses .FWHMScanWidth and therefore needs to be called after ComputeFWHM)
-                    blnSuccess = ComputeSICPeakArea(SICScanNumbers, SICData, udtSICPeak)
+                    blnSuccess = ComputeSICPeakArea(SICScanNumbers, SICData, sicPeak)
 
                     ' Compute the Statistical Moments values
-                    ComputeStatisticalMomentsStats(intSICDataCount, SICScanNumbers, SICData, udtSmoothedYDataSubset, udtSICPeak)
+                    ComputeStatisticalMomentsStats(intSICDataCount, SICScanNumbers, SICData, smoothedYDataSubset, sicPeak)
 
                 Else
                     ' No peak found
-                    With udtSICPeak
-                        .MaxIntensityValue = SICData(udtSICPeak.IndexMax)
-                        .IndexBaseLeft = .IndexMax
-                        .IndexBaseRight = .IndexMax
-                        .FWHMScanWidth = 1
 
-                        ' Assign the intensity of the peak at the observed maximum to the area
-                        .Area = .MaxIntensityValue
+                    sicPeak.MaxIntensityValue = SICData(sicPeak.IndexMax)
+                    sicPeak.IndexBaseLeft = sicPeak.IndexMax
+                    sicPeak.IndexBaseRight = sicPeak.IndexMax
+                    sicPeak.FWHMScanWidth = 1
 
-                        .SignalToNoiseRatio = ComputeSignalToNoise(.MaxIntensityValue, .BaselineNoiseStats.NoiseLevel)
-                    End With
+                    ' Assign the intensity of the peak at the observed maximum to the area
+                    sicPeak.Area = sicPeak.MaxIntensityValue
+
+                    sicPeak.SignalToNoiseRatio = ComputeSignalToNoise(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel)
+
                 End If
 
             End If
-
 
             blnSuccess = True
 
@@ -3046,17 +3039,28 @@ Public Class clsMASICPeakFinder
 
     End Function
 
+    Public Shared Function InitializeBaselineNoiseStats(
+      sngMinimumBaselineNoiseLevel As Single,
+      eNoiseThresholdMode As eNoiseThresholdModes) As clsBaselineNoiseStats
+
+        Dim baselineNoiseStats = New clsBaselineNoiseStats() With {
+            .NoiseLevel = sngMinimumBaselineNoiseLevel,
+            .NoiseStDev = 0,
+            .PointsUsed = 0,
+            .NoiseThresholdModeUsed = eNoiseThresholdMode
+        }
+
+        Return baselineNoiseStats
+
+    End Function
+
+    <Obsolete("Use the version that retrns udtBaselineNoiseStatsType")>
     Public Shared Sub InitializeBaselineNoiseStats(
-      ByRef udtBaselineNoiseStats As udtBaselineNoiseStatsType,
+      ByRef baselineNoiseStats As clsBaselineNoiseStats,
       sngMinimumBaselineNoiseLevel As Single,
       eNoiseThresholdMode As eNoiseThresholdModes)
 
-        With udtBaselineNoiseStats
-            .NoiseLevel = sngMinimumBaselineNoiseLevel
-            .NoiseStDev = 0
-            .PointsUsed = 0
-            .NoiseThresholdModeUsed = eNoiseThresholdMode
-        End With
+        baselineNoiseStats = InitializeBaselineNoiseStats(sngMinimumBaselineNoiseLevel, eNoiseThresholdMode)
 
     End Sub
 
@@ -3064,16 +3068,16 @@ Public Class clsMASICPeakFinder
     ''' Determines the X value that corresponds to sngTargetY by interpolating the line between (X1, Y1) and (X2, Y2)
     ''' </summary>
     ''' <param name="sngInterpolatedXValue"></param>
-    ''' <param name="X1"></param>
-    ''' <param name="X2"></param>
-    ''' <param name="Y1"></param>
-    ''' <param name="Y2"></param>
+    ''' <param name="x1"></param>
+    ''' <param name="x2"></param>
+    ''' <param name="y1"></param>
+    ''' <param name="y2"></param>
     ''' <param name="sngTargetY"></param>
     ''' <returns>Returns True on success, false on error</returns>
     Private Function InterpolateX(
       <Out()> ByRef sngInterpolatedXValue As Single,
-      X1 As Integer, X2 As Integer,
-      Y1 As Single, Y2 As Single,
+      x1 As Integer, x2 As Integer,
+      y1 As Single, y2 As Single,
       sngTargetY As Single) As Boolean
 
         Dim sngDeltaY As Single
@@ -3081,13 +3085,13 @@ Public Class clsMASICPeakFinder
         Dim intDeltaX As Integer
         Dim sngTargetX As Single
 
-        sngDeltaY = Y2 - Y1                                 ' This is y-two minus y-one
-        sngFraction = (sngTargetY - Y1) / sngDeltaY
-        intDeltaX = X2 - X1                                 ' This is x-two minus x-one
+        sngDeltaY = y2 - y1                                 ' This is y-two minus y-one
+        sngFraction = (sngTargetY - y1) / sngDeltaY
+        intDeltaX = x2 - x1                                 ' This is x-two minus x-one
 
-        sngTargetX = sngFraction * intDeltaX + X1
+        sngTargetX = sngFraction * intDeltaX + x1
 
-        If Math.Abs(sngTargetX - X1) >= 0 AndAlso Math.Abs(sngTargetX - X2) >= 0 Then
+        If Math.Abs(sngTargetX - x1) >= 0 AndAlso Math.Abs(sngTargetX - x2) >= 0 Then
             sngInterpolatedXValue = sngTargetX
             Return True
         Else
@@ -3166,13 +3170,13 @@ Public Class clsMASICPeakFinder
 
     Public Function LookupNoiseStatsUsingSegments(
       intScanIndexObserved As Integer,
-      udtBaselineNoiseStatSegments() As udtBaselineNoiseStatSegmentsType) As udtBaselineNoiseStatsType
+      noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As clsBaselineNoiseStats
 
         Dim intNoiseSegmentIndex As Integer
         Dim intIndexSegmentA As Integer
         Dim intIndexSegmentB As Integer
 
-        Dim udtBaselineNoiseStats As udtBaselineNoiseStatsType
+        Dim baselineNoiseStats As clsBaselineNoiseStats = Nothing
         Dim intSegmentMidPointA As Integer
         Dim intSegmentMidPointB As Integer
         Dim blnMatchFound As Boolean
@@ -3181,97 +3185,100 @@ Public Class clsMASICPeakFinder
         Dim dblFractionFromSegmentA As Double
 
         Try
-            If udtBaselineNoiseStatSegments Is Nothing OrElse udtBaselineNoiseStatSegments.Length < 1 Then
-                InitializeBaselineNoiseStats(
-                  udtBaselineNoiseStats,
+            If noiseStatsSegments Is Nothing OrElse noiseStatsSegments.Count < 1 Then
+                baselineNoiseStats = InitializeBaselineNoiseStats(
                   GetDefaultNoiseThresholdOptions().MinimumBaselineNoiseLevel,
                   eNoiseThresholdModes.DualTrimmedMeanByAbundance)
 
-                Return udtBaselineNoiseStats
+                Return baselineNoiseStats
+            End If
+
+            If noiseStatsSegments.Count <= 1 Then
+                Return noiseStatsSegments.First().BaselineNoiseStats
             End If
 
             ' First, initialize to the first segment
-            udtBaselineNoiseStats = udtBaselineNoiseStatSegments(0).BaselineNoiseStats
+            baselineNoiseStats = noiseStatsSegments.First().BaselineNoiseStats.Clone()
 
-            If udtBaselineNoiseStatSegments.Length > 1 Then
-                ' Initialize intIndexSegmentA and intIndexSegmentB to 0, indicating no extrapolation needed
-                intIndexSegmentA = 0
-                intIndexSegmentB = 0
-                blnMatchFound = False                ' Next, see if intScanIndexObserved matches any of the segments (provided more than one segment exists)
-                For intNoiseSegmentIndex = 0 To udtBaselineNoiseStatSegments.Length - 1
-                    With udtBaselineNoiseStatSegments(intNoiseSegmentIndex)
-                        If intScanIndexObserved >= .SegmentIndexStart AndAlso intScanIndexObserved <= .SegmentIndexEnd Then
-                            intSegmentMidPointA = .SegmentIndexStart + CInt((.SegmentIndexEnd - .SegmentIndexStart) / 2)
-                            blnMatchFound = True
-                        End If
-                    End With
+            ' Initialize intIndexSegmentA and intIndexSegmentB to 0, indicating no extrapolation needed
+            intIndexSegmentA = 0
+            intIndexSegmentB = 0
+            blnMatchFound = False                ' Next, see if intScanIndexObserved matches any of the segments (provided more than one segment exists)
+            For intNoiseSegmentIndex = 0 To noiseStatsSegments.Count - 1
+                Dim current = noiseStatsSegments(intNoiseSegmentIndex)
 
-                    If blnMatchFound Then
-                        udtBaselineNoiseStats = udtBaselineNoiseStatSegments(intNoiseSegmentIndex).BaselineNoiseStats
+                If intScanIndexObserved >= current.SegmentIndexStart AndAlso intScanIndexObserved <= current.SegmentIndexEnd Then
+                    intSegmentMidPointA = current.SegmentIndexStart + CInt((current.SegmentIndexEnd - current.SegmentIndexStart) / 2)
+                    blnMatchFound = True
+                End If
 
-                        If intScanIndexObserved < intSegmentMidPointA Then
-                            If intNoiseSegmentIndex > 0 Then
-                                ' Need to Interpolate using this segment and the next one
-                                intIndexSegmentA = intNoiseSegmentIndex - 1
-                                intIndexSegmentB = intNoiseSegmentIndex
+                If blnMatchFound Then
+                    baselineNoiseStats = current.BaselineNoiseStats.Clone()
 
-                                ' Copy intSegmentMidPointA to intSegmentMidPointB since the current segment is actually segment B
-                                ' Define intSegmentMidPointA
-                                intSegmentMidPointB = intSegmentMidPointA
-                                With udtBaselineNoiseStatSegments(intNoiseSegmentIndex - 1)
-                                    intSegmentMidPointA = .SegmentIndexStart + CInt((.SegmentIndexEnd - .SegmentIndexStart) / 2)
-                                End With
+                    If intScanIndexObserved < intSegmentMidPointA Then
+                        If intNoiseSegmentIndex > 0 Then
+                            ' Need to Interpolate using this segment and the next one
+                            intIndexSegmentA = intNoiseSegmentIndex - 1
+                            intIndexSegmentB = intNoiseSegmentIndex
 
-                            Else
-                                ' intScanIndexObserved occurs before the midpoint, but we're in the first segment; no need to Interpolate
-                            End If
-                        ElseIf intScanIndexObserved > intSegmentMidPointA Then
-                            If intNoiseSegmentIndex < udtBaselineNoiseStatSegments.Length - 1 Then
-                                ' Need to Interpolate using this segment and the one before it
-                                intIndexSegmentA = intNoiseSegmentIndex
-                                intIndexSegmentB = intNoiseSegmentIndex + 1
+                            ' Copy intSegmentMidPointA to intSegmentMidPointB since the current segment is actually segment B
+                            ' Define intSegmentMidPointA
+                            intSegmentMidPointB = intSegmentMidPointA
+                            Dim previous = noiseStatsSegments(intNoiseSegmentIndex - 1)
+                            intSegmentMidPointA = previous.SegmentIndexStart + CInt((previous.SegmentIndexEnd - previous.SegmentIndexStart) / 2)
 
-                                ' Note: intSegmentMidPointA is already defined since the current segment is segment A
-                                ' Define intSegmentMidPointB
-                                With udtBaselineNoiseStatSegments(intNoiseSegmentIndex + 1)
-                                    intSegmentMidPointB = .SegmentIndexStart + CInt((.SegmentIndexEnd - .SegmentIndexStart) / 2)
-                                End With
-
-                            Else
-                                ' intScanIndexObserved occurs after the midpoint, but we're in the last segment; no need to Interpolate
-                            End If
                         Else
-                            ' intScanIndexObserved occurs at the midpoint; no need to Interpolate
+                            ' intScanIndexObserved occurs before the midpoint, but we're in the first segment; no need to Interpolate
                         End If
+                    ElseIf intScanIndexObserved > intSegmentMidPointA Then
+                        If intNoiseSegmentIndex < noiseStatsSegments.Count - 1 Then
+                            ' Need to Interpolate using this segment and the one before it
+                            intIndexSegmentA = intNoiseSegmentIndex
+                            intIndexSegmentB = intNoiseSegmentIndex + 1
 
-                        If intIndexSegmentA <> intIndexSegmentB Then
-                            ' Interpolate between the two segments
-                            dblFractionFromSegmentB = CDbl(intScanIndexObserved - intSegmentMidPointA) /
-                                                      CDbl(intSegmentMidPointB - intSegmentMidPointA)
-                            If dblFractionFromSegmentB < 0 Then
-                                dblFractionFromSegmentB = 0
-                            ElseIf dblFractionFromSegmentB > 1 Then
-                                dblFractionFromSegmentB = 1
-                            End If
+                            ' Note: intSegmentMidPointA is already defined since the current segment is segment A
+                            ' Define intSegmentMidPointB
+                            Dim nextSegment = noiseStatsSegments(intNoiseSegmentIndex + 1)
 
-                            dblFractionFromSegmentA = 1 - dblFractionFromSegmentB
+                            intSegmentMidPointB = nextSegment.SegmentIndexStart + CInt((nextSegment.SegmentIndexEnd - nextSegment.SegmentIndexStart) / 2)
 
-                            ' Compute the weighted average values
-                            With udtBaselineNoiseStatSegments(intIndexSegmentA).BaselineNoiseStats
-                                udtBaselineNoiseStats.NoiseLevel = CSng(.NoiseLevel * dblFractionFromSegmentA + udtBaselineNoiseStatSegments(intIndexSegmentB).BaselineNoiseStats.NoiseLevel * dblFractionFromSegmentB)
-                                udtBaselineNoiseStats.NoiseStDev = CSng(.NoiseStDev * dblFractionFromSegmentA + udtBaselineNoiseStatSegments(intIndexSegmentB).BaselineNoiseStats.NoiseStDev * dblFractionFromSegmentB)
-                                udtBaselineNoiseStats.PointsUsed = CInt(.PointsUsed * dblFractionFromSegmentA + udtBaselineNoiseStatSegments(intIndexSegmentB).BaselineNoiseStats.PointsUsed * dblFractionFromSegmentB)
-                            End With
+                        Else
+                            ' intScanIndexObserved occurs after the midpoint, but we're in the last segment; no need to Interpolate
                         End If
-                        Exit For
+                    Else
+                        ' intScanIndexObserved occurs at the midpoint; no need to Interpolate
                     End If
-                Next
-            End If
+
+                    If intIndexSegmentA <> intIndexSegmentB Then
+                        ' Interpolate between the two segments
+                        dblFractionFromSegmentB = CDbl(intScanIndexObserved - intSegmentMidPointA) /
+                                                  CDbl(intSegmentMidPointB - intSegmentMidPointA)
+                        If dblFractionFromSegmentB < 0 Then
+                            dblFractionFromSegmentB = 0
+                        ElseIf dblFractionFromSegmentB > 1 Then
+                            dblFractionFromSegmentB = 1
+                        End If
+
+                        dblFractionFromSegmentA = 1 - dblFractionFromSegmentB
+
+                        ' Compute the weighted average values
+                        Dim segmentA = noiseStatsSegments(intIndexSegmentA).BaselineNoiseStats
+                        Dim segmentB = noiseStatsSegments(intIndexSegmentB).BaselineNoiseStats
+
+                        baselineNoiseStats.NoiseLevel = CSng(segmentA.NoiseLevel * dblFractionFromSegmentA + segmentB.NoiseLevel * dblFractionFromSegmentB)
+                        baselineNoiseStats.NoiseStDev = CSng(segmentA.NoiseStDev * dblFractionFromSegmentA + segmentB.NoiseStDev * dblFractionFromSegmentB)
+                        baselineNoiseStats.PointsUsed = CInt(segmentA.PointsUsed * dblFractionFromSegmentA + segmentB.PointsUsed * dblFractionFromSegmentB)
+
+                    End If
+                    Exit For
+                End If
+            Next
+
         Catch ex As Exception
             ' Ignore Errors
         End Try
 
-        Return udtBaselineNoiseStats
+        Return baselineNoiseStats
 
     End Function
 

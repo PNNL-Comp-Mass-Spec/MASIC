@@ -194,18 +194,21 @@ Public Class clsScanTracking
 
         Const IGNORE_NON_POSITIVE_DATA = True
 
-        MASICPeakFinder.clsMASICPeakFinder.InitializeBaselineNoiseStats(scanInfo.BaselineNoiseStats, 0, noiseThresholdOptions.BaselineNoiseMode)
+        scanInfo.BaselineNoiseStats = clsMASICPeakFinder.InitializeBaselineNoiseStats(0, noiseThresholdOptions.BaselineNoiseMode)
 
-        If noiseThresholdOptions.BaselineNoiseMode = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold Then
-            Dim noiseStats = scanInfo.BaselineNoiseStats
-
-            noiseStats.NoiseLevel = noiseThresholdOptions.BaselineNoiseLevelAbsolute
-            noiseStats.PointsUsed = 1
-
-            scanInfo.BaselineNoiseStats = noiseStats
+        If noiseThresholdOptions.BaselineNoiseMode = clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold Then
+            scanInfo.BaselineNoiseStats.NoiseLevel = noiseThresholdOptions.BaselineNoiseLevelAbsolute
+            scanInfo.BaselineNoiseStats.PointsUsed = 1
         Else
             If objMSSpectrum.IonCount > 0 Then
-                mPeakFinder.ComputeTrimmedNoiseLevel(objMSSpectrum.IonsIntensity, 0, objMSSpectrum.IonCount - 1, noiseThresholdOptions, IGNORE_NON_POSITIVE_DATA, scanInfo.BaselineNoiseStats)
+                Dim newBaselineNoiseStats As clsBaselineNoiseStats = Nothing
+
+                mPeakFinder.ComputeTrimmedNoiseLevel(
+                    objMSSpectrum.IonsIntensity, 0, objMSSpectrum.IonCount - 1,
+                    noiseThresholdOptions, IGNORE_NON_POSITIVE_DATA,
+                    newBaselineNoiseStats)
+
+                scanInfo.BaselineNoiseStats = newBaselineNoiseStats
             End If
         End If
 

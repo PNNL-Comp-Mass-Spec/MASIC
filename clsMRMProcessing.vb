@@ -113,9 +113,10 @@ Public Class clsMRMProcessing
                                 If Not blnMatchFound Then
                                     ' Entry is not yet present; add it
 
-                                    Dim newSRMItem = New udtSRMListType
-                                    newSRMItem.ParentIonMZ = mrmInfoForHash.ParentIonMZ
-                                    newSRMItem.CentralMass = mrmInfoForHash.MRMMassList(intMRMMassIndex).CentralMass
+                                    Dim newSRMItem = New udtSRMListType() With {
+                                        .ParentIonMZ = mrmInfoForHash.ParentIonMZ,
+                                        .CentralMass = mrmInfoForHash.MRMMassList(intMRMMassIndex).CentralMass
+                                    }
 
                                     srmList.Add(newSRMItem)
                                 End If
@@ -528,22 +529,7 @@ Public Class clsMRMProcessing
             sicDetails.Reset()
             sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan
 
-            ' Reserve room in udtSmoothedYData and udtSmoothedYDataSubset
-            Dim udtSmoothedYData As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-            Dim udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-
-            With udtSmoothedYData
-                .DataCount = 0
-                ReDim .Data(scanList.FragScans.Count)
-            End With
-
-            With udtSmoothedYDataSubset
-                .DataCount = 0
-                ReDim .Data(scanList.FragScans.Count)
-            End With
-
-            Dim udtBaselineNoiseStatSegments() As MASICPeakFinder.clsMASICPeakFinder.udtBaselineNoiseStatSegmentsType
-            ReDim udtBaselineNoiseStatSegments(0)
+            Dim noiseStatsSegments = New List(Of clsBaselineNoiseStatsSegment)
 
             For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
 
@@ -557,7 +543,7 @@ Public Class clsMRMProcessing
                 Dim dblMRMDaughterMZ = scanList.ParentIons(intParentIonIndex).MRMDaughterMZ
                 Dim dblSearchToleranceHalfWidth = scanList.ParentIons(intParentIonIndex).MRMToleranceHalfWidth
 
-                ' Reset sicDetails 
+                ' Reset sicDetails
                 sicDetails.SICData.Clear()
 
                 ' Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
@@ -606,7 +592,7 @@ Public Class clsMRMProcessing
                                                                           sicDetails.SICDataCount - 1,
                                                                           mOptions.SICOptions.SICPeakFinderOptions.
                                                                              SICBaselineNoiseOptions,
-                                                                          udtBaselineNoiseStatSegments)
+                                                                          noiseStatsSegments)
 
                 If Not blnSuccess Then
                     SetLocalErrorCode(eMasicErrorCodes.FindSICPeaksError, True)
@@ -614,8 +600,7 @@ Public Class clsMRMProcessing
                 End If
 
                 ' Initialize the peak
-                scanList.ParentIons(intParentIonIndex).SICStats.Peak =
-                    New MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
+                scanList.ParentIons(intParentIonIndex).SICStats.Peak = New clsSICStatsPeak()
 
                 Dim sicIntensities = sicDetails.SICIntensities
 
@@ -629,31 +614,32 @@ Public Class clsMRMProcessing
                     End If
                 Next
 
-                Dim udtSICPotentialAreaStatsInFullSIC As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+                Dim potentialAreaStatsInFullSIC As clsSICPotentialAreaStats = Nothing
 
                 ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
                 peakFinder.FindPotentialPeakArea(sicDetails.SICDataCount, sicIntensities,
-                                                 udtSICPotentialAreaStatsInFullSIC,
+                                                 potentialAreaStatsInFullSIC,
                                                  mOptions.SICOptions.SICPeakFinderOptions)
 
                 ' Update .BaselineNoiseStats in scanList.ParentIons(intParentIonIndex).SICStats.Peak
                 scanList.ParentIons(intParentIonIndex).SICStats.Peak.BaselineNoiseStats =
                     peakFinder.LookupNoiseStatsUsingSegments(
                         scanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved,
-                        udtBaselineNoiseStatSegments)
+                        noiseStatsSegments)
+
+                Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
 
                 With scanList.ParentIons(intParentIonIndex)
 
                     ' Clear udtSICPotentialAreaStatsForPeak
-                    .SICStats.SICPotentialAreaStatsForPeak =
-                        New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+                    .SICStats.SICPotentialAreaStatsForPeak = New clsSICPotentialAreaStats()
 
                     blnSuccess = peakFinder.FindSICPeakAndArea(sicDetails.SICDataCount, sicDetails.SICScanNumbers,
                                                                sicIntensities,
                                                                .SICStats.SICPotentialAreaStatsForPeak,
-                                                               .SICStats.Peak, udtSmoothedYDataSubset,
+                                                               .SICStats.Peak, smoothedYDataSubset,
                                                                mOptions.SICOptions.SICPeakFinderOptions,
-                                                               udtSICPotentialAreaStatsInFullSIC, False,
+                                                               potentialAreaStatsInFullSIC, False,
                                                                scanList.SIMDataPresent, False)
 
 
@@ -671,7 +657,7 @@ Public Class clsMRMProcessing
                 mDataOutputHandler.SaveSICDataToText(mOptions.SICOptions, scanList, intParentIonIndex, sicDetails)
 
                 ' Save the stats for this SIC to the XML file
-                xmlResultsWriter.SaveDataToXML(scanList, intParentIonIndex, sicDetails, udtSmoothedYDataSubset,
+                xmlResultsWriter.SaveDataToXML(scanList, intParentIonIndex, sicDetails, smoothedYDataSubset,
                                                mDataOutputHandler)
 
                 intParentIonsProcessed += 1

@@ -21,19 +21,14 @@ Public Class clsSICProcessing
     Private Function CreateMZLookupList(
       masicOptions As clsMASICOptions,
       scanList As clsScanList,
-      ByRef udtMZBinList() As clsDataObjects.udtMZBinListType,
-      ByRef intParentIonIndices() As Integer,
       blnProcessSIMScans As Boolean,
-      intSIMIndex As Integer) As Boolean
+      intSIMIndex As Integer) As List(Of clsMzBinInfo)
 
         Dim intParentIonIndex As Integer
-        Dim intMZListCount As Integer
 
         Dim blnIncludeParentIon As Boolean
 
-        intMZListCount = 0
-        ReDim udtMZBinList(scanList.ParentIonInfoCount - 1)
-        ReDim intParentIonIndices(scanList.ParentIonInfoCount - 1)
+        Dim mzBinList = New List(Of clsMzBinInfo)(scanList.ParentIonInfoCount - 1)
 
         Dim sicOptions = masicOptions.SICOptions
 
@@ -66,31 +61,28 @@ Public Class clsSICProcessing
             End If
 
             If blnIncludeParentIon Then
-                udtMZBinList(intMZListCount).MZ = scanList.ParentIons(intParentIonIndex).MZ
+                Dim newMzBin = New clsMzBinInfo() With {
+                    .MZ = scanList.ParentIons(intParentIonIndex).MZ,
+                    .ParentIonIndex = intParentIonIndex
+                }
+
                 If scanList.ParentIons(intParentIonIndex).CustomSICPeak Then
-                    udtMZBinList(intMZListCount).MZTolerance = scanList.ParentIons(intParentIonIndex).CustomSICPeakMZToleranceDa
-                    udtMZBinList(intMZListCount).MZToleranceIsPPM = False
+                    newMzBin.MZTolerance = scanList.ParentIons(intParentIonIndex).CustomSICPeakMZToleranceDa
+                    newMzBin.MZToleranceIsPPM = False
                 Else
-                    udtMZBinList(intMZListCount).MZTolerance = sicOptions.SICTolerance
-                    udtMZBinList(intMZListCount).MZToleranceIsPPM = sicOptions.SICToleranceIsPPM
+                    newMzBin.MZTolerance = sicOptions.SICTolerance
+                    newMzBin.MZToleranceIsPPM = sicOptions.SICToleranceIsPPM
                 End If
-                intParentIonIndices(intMZListCount) = intParentIonIndex
-                intMZListCount += 1
+
+                mzBinList.Add(newMzBin)
+
             End If
         Next
 
-        If intMZListCount > 0 Then
-            If intMZListCount < scanList.ParentIonInfoCount Then
-                ReDim Preserve udtMZBinList(intMZListCount - 1)
-                ReDim Preserve intParentIonIndices(intMZListCount - 1)
-            End If
+        ' Sort mzBinList by m/z
+        Dim sortedMzBins = (From item In mzBinList Select item Order By item.MZ).ToList()
 
-            ' Sort udtMZBinList ascending and sort intParentIonIndices in parallel
-            Array.Sort(udtMZBinList, intParentIonIndices, New clsMZBinListComparer())
-            Return True
-        Else
-            Return False
-        End If
+        Return sortedMzBins
 
     End Function
 
@@ -135,19 +127,17 @@ Public Class clsSICProcessing
             ' Create an array of m/z values in scanList.ParentIons, then sort by m/z
             ' Next, step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
 
-            Dim udtMZBinList() As clsDataObjects.udtMZBinListType = Nothing
-
-            Dim intParentIonIndices() As Integer = Nothing
             Dim intSIMIndex As Integer
             Dim intSIMIndexMax As Integer
 
             ' First process the non SIM, non MRM scans
             ' If this file only has MRM scans, then CreateMZLookupList will return False
-            If CreateMZLookupList(masicOptions, scanList, udtMZBinList, intParentIonIndices, False, 0) Then
+            Dim mzBinList = CreateMZLookupList(masicOptions, scanList, False, 0)
+            If mzBinList.Count > 0 Then
+
                 blnSuccess = ProcessMZList(scanList, objSpectraCache, masicOptions,
                                            dataOutputHandler, xmlResultsWriter,
-                                           udtMZBinList, intParentIonIndices,
-                                           False, 0, intParentIonsProcessed)
+                                           mzBinList, False, 0, intParentIonsProcessed)
             End If
 
             If blnSuccess And Not masicOptions.CustomSICList.LimitSearchToCustomMZList Then
@@ -166,11 +156,14 @@ Public Class clsSICProcessing
 
                 ' Now process each SIM Scan type
                 For intSIMIndex = 0 To intSIMIndexMax
-                    If CreateMZLookupList(masicOptions, scanList, udtMZBinList, intParentIonIndices, True, intSIMIndex) Then
-                        blnSuccess = ProcessMZList(scanList, objSpectraCache, masicOptions,
+
+                    Dim mzBinListSIM = CreateMZLookupList(masicOptions, scanList, True, intSIMIndex)
+
+                    If mzBinListSIM.Count > 0 Then
+
+                        ProcessMZList(scanList, objSpectraCache, masicOptions,
                                                    dataOutputHandler, xmlResultsWriter,
-                                                   udtMZBinList, intParentIonIndices,
-                                                   True, intSIMIndex, intParentIonsProcessed)
+                                                   mzBinListSIM, True, intSIMIndex, intParentIonsProcessed)
                     End If
                 Next
             End If
@@ -194,15 +187,15 @@ Public Class clsSICProcessing
 
     Private Function ExtractSICDetailsFromFullSIC(
       intMZIndexWork As Integer,
-      ByRef udtMZSearchChunk() As clsDataObjects.udtMZSearchInfoType,
+      baselineNoiseStatSegments As List(Of MASICPeakFinder.clsBaselineNoiseStatsSegment),
       intFullSICDataCount As Integer,
-      ByRef intFullSICScanIndices(,) As Integer,
-      ByRef sngFullSICIntensities(,) As Single,
-      ByRef dblFullSICMasses(,) As Double,
+      intFullSICScanIndices(,) As Integer,
+      sngFullSICIntensities(,) As Single,
+      dblFullSICMasses(,) As Double,
       scanList As clsScanList,
       intScanIndexObservedInFullSIC As Integer,
       sicDetails As clsSICDetails,
-      ByRef udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType,
+      <Out()> ByRef sicPeak As MASICPeakFinder.clsSICStatsPeak,
       masicOptions As clsMASICOptions,
       scanNumScanConverter As clsScanNumScanTimeConversion,
       blnCustomSICPeak As Boolean,
@@ -221,11 +214,10 @@ Public Class clsSICProcessing
         Dim sicOptions = masicOptions.SICOptions
 
         ' Initialize the peak
-        udtSICPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
-
-        ' Update .BaselineNoiseStats in udtSICPeak
-        udtSICPeak.BaselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(
-            intScanIndexObservedInFullSIC, udtMZSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
+        sicPeak = New MASICPeakFinder.clsSICStatsPeak() With {
+            .BaselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(
+              intScanIndexObservedInFullSIC, baselineNoiseStatSegments)
+        }
 
         ' Initialize the values for the maximum width of the SIC peak; these might get altered for custom SIC values
         Dim sngMaxSICPeakWidthMinutesBackward = sicOptions.MaxSICPeakWidthMinutesBackward
@@ -322,7 +314,7 @@ Public Class clsSICProcessing
                     If intScanIndexStart > 0 AndAlso Not blnLeftDone Then
                         If sngFullSICIntensities(intMZIndexWork, intScanIndexStart) < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum OrElse
                            sngFullSICIntensities(intMZIndexWork, intScanIndexStart) < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * sngMaximumIntensity OrElse
-                           sngFullSICIntensities(intMZIndexWork, intScanIndexStart) < udtSICPeak.BaselineNoiseStats.NoiseLevel Then
+                           sngFullSICIntensities(intMZIndexWork, intScanIndexStart) < sicPeak.BaselineNoiseStats.NoiseLevel Then
                             If intScanIndexBelowThresholdLeft < 0 Then
                                 intScanIndexBelowThresholdLeft = intScanIndexStart
                             Else
@@ -382,7 +374,7 @@ Public Class clsSICProcessing
                     If intScanIndexEnd < intFullSICDataCount - 1 AndAlso Not blnRightDone Then
                         If sngFullSICIntensities(intMZIndexWork, intScanIndexEnd) < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum OrElse
                            sngFullSICIntensities(intMZIndexWork, intScanIndexEnd) < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * sngMaximumIntensity OrElse
-                           sngFullSICIntensities(intMZIndexWork, intScanIndexEnd) < udtSICPeak.BaselineNoiseStats.NoiseLevel Then
+                           sngFullSICIntensities(intMZIndexWork, intScanIndexEnd) < sicPeak.BaselineNoiseStats.NoiseLevel Then
                             If intScanIndexBelowThresholdRight < 0 Then
                                 intScanIndexBelowThresholdRight = intScanIndexEnd
                             Else
@@ -459,7 +451,7 @@ Public Class clsSICProcessing
                 .SICScanType = clsScanList.eScanTypeConstants.SurveyScan
                 .SICData.Clear()
 
-                udtSICPeak.IndexObserved = 0
+                sicPeak.IndexObserved = 0
                 For intScanIndex = intScanIndexStart To intScanIndexEnd
                     If intFullSICScanIndices(intMZIndexWork, intScanIndex) >= 0 Then
                         .AddData(scanList.SurveyScans(intFullSICScanIndices(intMZIndexWork, intScanIndex)).ScanNumber,
@@ -468,7 +460,7 @@ Public Class clsSICProcessing
                                  intFullSICScanIndices(intMZIndexWork, intScanIndex))
 
                         If intScanIndex = intScanIndexObservedInFullSIC Then
-                            udtSICPeak.IndexObserved = .SICDataCount - 1
+                            sicPeak.IndexObserved = .SICDataCount - 1
                         End If
                     Else
                         ' This shouldn't happen
@@ -490,21 +482,18 @@ Public Class clsSICProcessing
       masicOptions As clsMASICOptions,
       dataOutputHandler As clsDataOutput,
       xmlResultsWriter As clsXMLResultsWriter,
-      ByRef udtMZBinList() As clsDataObjects.udtMZBinListType,
-      ByRef intParentIonIndices() As Integer,
+      mzBinList As IReadOnlyList(Of clsMzBinInfo),
       blnProcessSIMScans As Boolean,
       intSIMIndex As Integer,
       ByRef intParentIonsProcessed As Integer) As Boolean
 
         ' Step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
-        ' Note that udtMZBinList() and intParentIonIndices() are parallel arrays, with udtMZBinList() sorted on ascending m/z
+        ' Note that mzBinList and intParentIonIndices() are parallel arrays, with mzBinList() sorted on ascending m/z
         Const MAX_RAW_DATA_MEMORY_USAGE_MB = 50
 
         Dim intMaxMZCountInChunk As Integer
 
-        ' Ranges from 0 to intMZSearchChunkCount-1
-        Dim intMZSearchChunkCount As Integer
-        Dim udtMZSearchChunk() As clsDataObjects.udtMZSearchInfoType
+        Dim mzSearchChunks = New List(Of clsMzSearchInfo)
 
         Dim blnParentIonUpdated() As Boolean
 
@@ -519,16 +508,13 @@ Public Class clsSICProcessing
                 intMaxMZCountInChunk = 1
             End If
 
-            If intMaxMZCountInChunk > udtMZBinList.Length Then
-                intMaxMZCountInChunk = udtMZBinList.Length
+            If intMaxMZCountInChunk > mzBinList.Count Then
+                intMaxMZCountInChunk = mzBinList.Count
             End If
             If intMaxMZCountInChunk < 1 Then intMaxMZCountInChunk = 1
 
-            ' Reserve room in dblSearchMZs
-            ReDim udtMZSearchChunk(intMaxMZCountInChunk - 1)
-
             ' Reserve room in blnParentIonUpdated
-            ReDim blnParentIonUpdated(intParentIonIndices.Length - 1)
+            ReDim blnParentIonUpdated(mzBinList.Count - 1)
 
         Catch ex As Exception
             ReportError("ProcessMZList", "Error reserving memory for the m/z chunks", ex, True, True, clsMASIC.eMasicErrorCodes.CreateSICsError)
@@ -543,58 +529,63 @@ Public Class clsSICProcessing
             Dim scanNumScanConverter As New clsScanNumScanTimeConversion()
             RegisterEvents(scanNumScanConverter)
 
-            intMZSearchChunkCount = 0
+            Dim parentIonIndices = (From item In mzBinList Select item.ParentIonIndex).ToList()
+
             Dim intMZIndex = 0
-            Do While intMZIndex < udtMZBinList.Length
+            Do While intMZIndex < mzBinList.Count
 
                 '---------------------------------------------------------
                 ' Find the next group of m/z values to use, starting with intMZIndex
                 '---------------------------------------------------------
-                With udtMZSearchChunk(intMZSearchChunkCount)
-                    ' Initially set the MZIndexStart to intMZIndex
-                    .MZIndexStart = intMZIndex
 
-                    ' Look for adjacent m/z values within udtMZBinList(.MZIndexStart).MZToleranceDa / 2
-                    '  of the m/z value that starts this group
-                    ' Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
-                    .MZTolerance = udtMZBinList(.MZIndexStart).MZTolerance
-                    .MZToleranceIsPPM = udtMZBinList(.MZIndexStart).MZToleranceIsPPM
+                ' Initially set the MZIndexStart to intMZIndex
 
-                    Dim dblMZToleranceDa As Double
-                    If .MZToleranceIsPPM Then
-                        dblMZToleranceDa = clsUtilities.PPMToMass(.MZTolerance, udtMZBinList(.MZIndexStart).MZ)
+                ' Look for adjacent m/z values within udtMZBinList(.MZIndexStart).MZToleranceDa / 2
+                '  of the m/z value that starts this group
+                ' Only group m/z values with the same udtMZBinList().MZTolerance and udtMZBinList().MZToleranceIsPPM values
+
+                Dim mzSearchChunk = New clsMzSearchInfo() With {
+                    .MZIndexStart = intMZIndex,
+                    .MZTolerance = mzBinList(intMZIndex).MZTolerance,
+                    .MZToleranceIsPPM = mzBinList(intMZIndex).MZToleranceIsPPM
+                }
+
+                Dim dblMZToleranceDa As Double
+                If mzSearchChunk.MZToleranceIsPPM Then
+                    dblMZToleranceDa = clsUtilities.PPMToMass(mzSearchChunk.MZTolerance, mzBinList(mzSearchChunk.MZIndexStart).MZ)
+                Else
+                    dblMZToleranceDa = mzSearchChunk.MZTolerance
+                End If
+
+                Do While intMZIndex < mzBinList.Count - 2 AndAlso
+                     Math.Abs(mzBinList(intMZIndex + 1).MZTolerance - mzSearchChunk.MZTolerance) < Double.Epsilon AndAlso
+                         mzBinList(intMZIndex + 1).MZToleranceIsPPM = mzSearchChunk.MZToleranceIsPPM AndAlso
+                         mzBinList(intMZIndex + 1).MZ - mzBinList(mzSearchChunk.MZIndexStart).MZ <= dblMZToleranceDa / 2
+                    intMZIndex += 1
+                Loop
+                mzSearchChunk.MZIndexEnd = intMZIndex
+
+                If mzSearchChunk.MZIndexEnd = mzSearchChunk.MZIndexStart Then
+                    mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexEnd
+                    mzSearchChunk.SearchMZ = mzBinList(mzSearchChunk.MZIndexStart).MZ
+                Else
+                    ' Determine the median m/z of the members in the m/z group
+                    If (mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) Mod 2 = 0 Then
+                        ' Odd number of points; use the m/z value of the midpoint
+                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + CInt((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / 2)
+                        mzSearchChunk.SearchMZ = mzBinList(mzSearchChunk.MZIndexMidpoint).MZ
                     Else
-                        dblMZToleranceDa = .MZTolerance
+                        ' Even number of points; average the values on either side of (.mzIndexEnd - .mzIndexStart / 2)
+                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + CInt(Math.Floor((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / 2))
+                        mzSearchChunk.SearchMZ = (mzBinList(mzSearchChunk.MZIndexMidpoint).MZ + mzBinList(mzSearchChunk.MZIndexMidpoint + 1).MZ) / 2
                     End If
+                End If
 
-                    Do While intMZIndex < udtMZBinList.Length - 2 AndAlso
-                     Math.Abs(udtMZBinList(intMZIndex + 1).MZTolerance - .MZTolerance) < Double.Epsilon AndAlso
-                     udtMZBinList(intMZIndex + 1).MZToleranceIsPPM = .MZToleranceIsPPM AndAlso
-                     udtMZBinList(intMZIndex + 1).MZ - udtMZBinList(.MZIndexStart).MZ <= dblMZToleranceDa / 2
-                        intMZIndex += 1
-                    Loop
-                    .MZIndexEnd = intMZIndex
 
-                    If .MZIndexEnd = .MZIndexStart Then
-                        .MZIndexMidpoint = .MZIndexEnd
-                        .SearchMZ = udtMZBinList(.MZIndexStart).MZ
-                    Else
-                        ' Determine the median m/z of the members in the m/z group
-                        If (.MZIndexEnd - .MZIndexStart) Mod 2 = 0 Then
-                            ' Odd number of points; use the m/z value of the midpoint
-                            .MZIndexMidpoint = .MZIndexStart + CInt((.MZIndexEnd - .MZIndexStart) / 2)
-                            .SearchMZ = udtMZBinList(.MZIndexMidpoint).MZ
-                        Else
-                            ' Even number of points; average the values on either side of (.mzIndexEnd - .mzIndexStart / 2)
-                            .MZIndexMidpoint = .MZIndexStart + CInt(Math.Floor((.MZIndexEnd - .MZIndexStart) / 2))
-                            .SearchMZ = (udtMZBinList(.MZIndexMidpoint).MZ + udtMZBinList(.MZIndexMidpoint + 1).MZ) / 2
-                        End If
-                    End If
+                mzSearchChunks.Add(mzSearchChunk)
 
-                End With
-                intMZSearchChunkCount += 1
 
-                If intMZSearchChunkCount >= intMaxMZCountInChunk OrElse intMZIndex = udtMZBinList.Length - 1 Then
+                If mzSearchChunks.Count >= intMaxMZCountInChunk OrElse intMZIndex = mzBinList.Count - 1 Then
 
                     '---------------------------------------------------------
                     ' Reached intMaxMZCountInChunk m/z value
@@ -606,9 +597,8 @@ Public Class clsSICProcessing
                         scanList,
                         dataAggregation, dataOutputHandler, xmlResultsWriter,
                         objSpectraCache, scanNumScanConverter,
-                        intMZSearchChunkCount,
-                        udtMZSearchChunk,
-                        intParentIonIndices,
+                        mzSearchChunks,
+                        parentIonIndices,
                         blnProcessSIMScans,
                         intSIMIndex,
                         blnParentIonUpdated,
@@ -618,8 +608,8 @@ Public Class clsSICProcessing
                         Return False
                     End If
 
-                    ' Reset intMZSearchChunkCount to 0
-                    intMZSearchChunkCount = 0
+                    ' Clear mzSearchChunks
+                    mzSearchChunks.Clear()
 
                 End If
 
@@ -647,15 +637,12 @@ Public Class clsSICProcessing
       xmlResultsWriter As clsXMLResultsWriter,
       objSpectraCache As clsSpectraCache,
       scanNumScanConverter As clsScanNumScanTimeConversion,
-      intMZSearchChunkCount As Integer,
-      udtMZSearchChunk() As clsDataObjects.udtMZSearchInfoType,
-      intParentIonIndices As Integer(),
+      mzSearchChunk As IReadOnlyList(Of clsMzSearchInfo),
+      parentIonIndices As IList(Of Integer),
       blnProcessSIMScans As Boolean,
       intSIMIndex As Integer,
-      blnParentIonUpdated() As Boolean,
+      blnParentIonUpdated As IList(Of Boolean),
       ByRef intParentIonsProcessed As Integer) As Boolean
-
-        Const DATA_COUNT_MEMORY_RESERVE = 200
 
         ' The following are 2D arrays, ranging from 0 to intMZSearchChunkCount-1 in the first dimension and 0 to .SurveyScans.Count - 1 in the second dimension
         ' We could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
@@ -668,25 +655,22 @@ Public Class clsSICProcessing
         Dim sngFullSICIntensities1D() As Single
 
         ' Reserve room in intFullSICScanIndices for at most intMaxMZCountInChunk values and .SurveyScans.Count scans
-        ReDim intFullSICDataCount(intMZSearchChunkCount - 1)
-        ReDim intFullSICScanIndices(intMZSearchChunkCount - 1, scanList.SurveyScans.Count - 1)
-        ReDim sngFullSICIntensities(intMZSearchChunkCount - 1, scanList.SurveyScans.Count - 1)
-        ReDim dblFullSICMasses(intMZSearchChunkCount - 1, scanList.SurveyScans.Count - 1)
+        ReDim intFullSICDataCount(mzSearchChunk.Count - 1)
+        ReDim intFullSICScanIndices(mzSearchChunk.Count - 1, scanList.SurveyScans.Count - 1)
+        ReDim sngFullSICIntensities(mzSearchChunk.Count - 1, scanList.SurveyScans.Count - 1)
+        ReDim dblFullSICMasses(mzSearchChunk.Count - 1, scanList.SurveyScans.Count - 1)
 
         ReDim sngFullSICIntensities1D(scanList.SurveyScans.Count - 1)
 
 
         ' Initialize .MaximumIntensity and .ScanIndexMax
         ' Additionally, reset intFullSICDataCount() and, for safety, set intFullSICScanIndices() to -1
-        For intMZIndexWork = 0 To intMZSearchChunkCount - 1
-            With udtMZSearchChunk(intMZIndexWork)
-                .MaximumIntensity = 0
-                .ScanIndexMax = 0
-            End With
+        For mzIndexWork = 0 To mzSearchChunk.Count - 1
+            mzSearchChunk(mzIndexWork).ResetMaxIntensity()
 
-            intFullSICDataCount(intMZIndexWork) = 0
+            intFullSICDataCount(mzIndexWork) = 0
             For intSurveyScanIndex = 0 To scanList.SurveyScans.Count - 1
-                intFullSICScanIndices(intMZIndexWork, intSurveyScanIndex) = -1
+                intFullSICScanIndices(mzIndexWork, intSurveyScanIndex) = -1
             Next
         Next
 
@@ -719,50 +703,46 @@ Public Class clsSICProcessing
 
             Dim intPoolIndex As Integer
 
-            If _
-                Not _
-                objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intSurveyScanIndex).ScanNumber,
-                                                       intPoolIndex) Then
+            If Not objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(intSurveyScanIndex).ScanNumber, intPoolIndex) Then
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
                 Return False
             End If
 
-            For intMZIndexWork = 0 To intMZSearchChunkCount - 1
-                With udtMZSearchChunk(intMZIndexWork)
-                    Dim dblMZToleranceDa As Double
+            For mzIndexWork = 0 To mzSearchChunk.Count - 1
 
-                    If .MZToleranceIsPPM Then
-                        dblMZToleranceDa = clsUtilities.PPMToMass(.MZTolerance, .SearchMZ)
-                    Else
-                        dblMZToleranceDa = .MZTolerance
-                    End If
+                Dim current = mzSearchChunk(mzIndexWork)
 
-                    Dim intIonMatchCount As Integer
-                    Dim dblClosestMZ As Double
+                Dim dblMZToleranceDa As Double
 
-                    Dim sngIonSum = dataAggregation.AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex),
-                                                                         .SearchMZ, dblMZToleranceDa,
+                If current.MZToleranceIsPPM Then
+                    dblMZToleranceDa = clsUtilities.PPMToMass(current.MZTolerance, current.SearchMZ)
+                Else
+                    dblMZToleranceDa = current.MZTolerance
+                End If
+
+                Dim intIonMatchCount As Integer
+                Dim dblClosestMZ As Double
+
+                Dim sngIonSum = dataAggregation.AggregateIonsInRange(objSpectraCache.SpectraPool(intPoolIndex),
+                                                                         current.SearchMZ, dblMZToleranceDa,
                                                                          intIonMatchCount, dblClosestMZ, False)
 
-                    Dim intDataIndex = intFullSICDataCount(intMZIndexWork)
-                    intFullSICScanIndices(intMZIndexWork, intDataIndex) = intSurveyScanIndex
-                    sngFullSICIntensities(intMZIndexWork, intDataIndex) = sngIonSum
+                Dim intDataIndex = intFullSICDataCount(mzIndexWork)
+                intFullSICScanIndices(mzIndexWork, intDataIndex) = intSurveyScanIndex
+                sngFullSICIntensities(mzIndexWork, intDataIndex) = sngIonSum
 
-                    If _
-                        sngIonSum < Single.Epsilon AndAlso
-                        masicOptions.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
-                        sngFullSICIntensities(intMZIndexWork, intDataIndex) =
-                            scanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
-                    End If
+                If sngIonSum < Single.Epsilon AndAlso masicOptions.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData Then
+                    sngFullSICIntensities(mzIndexWork, intDataIndex) = scanList.SurveyScans(intSurveyScanIndex).MinimumPositiveIntensity
+                End If
 
-                    dblFullSICMasses(intMZIndexWork, intDataIndex) = dblClosestMZ
-                    If sngIonSum > .MaximumIntensity Then
-                        .MaximumIntensity = sngIonSum
-                        .ScanIndexMax = intDataIndex
-                    End If
+                dblFullSICMasses(mzIndexWork, intDataIndex) = dblClosestMZ
+                If sngIonSum > current.MaximumIntensity Then
+                    current.MaximumIntensity = sngIonSum
+                    current.ScanIndexMax = intDataIndex
+                End If
 
-                    intFullSICDataCount(intMZIndexWork) += 1
-                End With
+                intFullSICDataCount(mzIndexWork) += 1
+
             Next
 
             If intSurveyScanIndex Mod 100 = 0 Then
@@ -788,11 +768,11 @@ Public Class clsSICProcessing
         ' Compute the noise level in sngFullSICIntensities() for each m/z in udtMZSearchChunk
         ' Also, find the peaks for each m/z in udtMZSearchChunk and retain the largest peak found
         '---------------------------------------------------------
-        For intMZIndexWork = 0 To intMZSearchChunkCount - 1
+        For intMZIndexWork = 0 To mzSearchChunk.Count - 1
 
             ' Use this for debugging
-            If Math.Abs(udtMZSearchChunk(intMZIndexWork).SearchMZ - DebugMZToFind) < 0.1 Then
-                Dim intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart
+            If Math.Abs(mzSearchChunk(intMZIndexWork).SearchMZ - DebugMZToFind) < 0.1 Then
+                Dim intParentIonIndexPointer = mzSearchChunk(intMZIndexWork).MZIndexStart
             End If
 
             ' Copy the data for this m/z into sngFullSICIntensities1D()
@@ -801,55 +781,46 @@ Public Class clsSICProcessing
             Next
 
             ' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
-            Dim blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1, masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, udtMZSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
+            Dim blnSuccess = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(
+                sngFullSICIntensities1D, 0, intFullSICDataCount(intMZIndexWork) - 1,
+                masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions,
+                mzSearchChunk(intMZIndexWork).BaselineNoiseStatSegments)
 
             If Not blnSuccess Then
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, True)
                 Return False
             End If
 
-            Dim udtSICPotentialAreaStatsInFullSIC As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+            Dim potentialAreaStatsInFullSIC As MASICPeakFinder.clsSICPotentialAreaStats = Nothing
 
             ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
             mMASICPeakFinder.FindPotentialPeakArea(
                 intFullSICDataCount(intMZIndexWork),
                 sngFullSICIntensities1D,
-                udtSICPotentialAreaStatsInFullSIC,
+                potentialAreaStatsInFullSIC,
                 masicOptions.SICOptions.SICPeakFinderOptions)
 
-            ' Clear udtSICPotentialAreaStatsForPeak
-            Dim udtSICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+            Dim potentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats = Nothing
 
-            Dim intScanIndexObservedInFullSIC = udtMZSearchChunk(intMZIndexWork).ScanIndexMax
+            Dim intScanIndexObservedInFullSIC = mzSearchChunk(intMZIndexWork).ScanIndexMax
 
             ' Initialize sicDetails
-            Dim sicDetails = New clsSICDetails()
-            sicDetails.SICScanType = clsScanList.eScanTypeConstants.SurveyScan
+            Dim sicDetails = New clsSICDetails() With {
+                .SICScanType = clsScanList.eScanTypeConstants.SurveyScan
+            }
 
-            Dim udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
+            Dim sicPeak As MASICPeakFinder.clsSICStatsPeak = Nothing
 
             ' Populate sicDetails using the data centered around the highest intensity in intFullSICIntensities
             ' Note that this function will update udtSICPeak.IndexObserved
             blnSuccess = ExtractSICDetailsFromFullSIC(
-                intMZIndexWork, udtMZSearchChunk,
+                intMZIndexWork, mzSearchChunk(intMZIndexWork).BaselineNoiseStatSegments,
                 intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses,
                 scanList, intScanIndexObservedInFullSIC,
-                sicDetails, udtSICPeak,
+                sicDetails, sicPeak,
                 masicOptions, scanNumScanConverter, False, 0)
 
-            Dim udtSmoothedYData As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-            Dim udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-
-            ' Reserve room in udtSmoothedYData and udtSmoothedYDataSubset
-            With udtSmoothedYData
-                .DataCount = 0
-                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
-            End With
-
-            With udtSmoothedYDataSubset
-                .DataCount = 0
-                ReDim .Data(DATA_COUNT_MEMORY_RESERVE)
-            End With
+            Dim smoothedYDataSubset As MASICPeakFinder.clsSmoothedYDataSubset = Nothing
 
             Dim mzIndexSICScanNumbers = sicDetails.SICScanNumbers
             Dim mzIndexSICIntensities = sicDetails.SICIntensities
@@ -858,9 +829,9 @@ Public Class clsSICProcessing
             ' Find the largest peak in the SIC for this m/z
             Dim blnLargestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
                 sicDetails.SICDataCount, mzIndexSICScanNumbers, mzIndexSICIntensities,
-                udtSICPotentialAreaStatsForPeak, udtSICPeak,
-                udtSmoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
-                udtSICPotentialAreaStatsInFullSIC,
+                potentialAreaStatsForPeak, sicPeak,
+                smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
+                potentialAreaStatsInFullSIC,
                 True, scanList.SIMDataPresent, False)
 
             If blnLargestPeakFound Then
@@ -869,37 +840,37 @@ Public Class clsSICProcessing
                 ' If it is, then assign the stats of the largest peak to the given parent ion
                 '--------------------------------------------------------
 
-                For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
+                For intParentIonIndexPointer = mzSearchChunk(intMZIndexWork).MZIndexStart To mzSearchChunk(intMZIndexWork).MZIndexEnd
                     ' Use this for debugging
-                    If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
+                    If parentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
                         intScanIndexObservedInFullSIC = -1
                     End If
 
                     Dim blnStorePeakInParentIon = False
-                    If scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
+                    If scanList.ParentIons(parentIonIndices(intParentIonIndexPointer)).CustomSICPeak Then Continue For
 
                     ' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
-                    With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
-                        If .SurveyScanIndex >= mzIndexSICIndices(udtSICPeak.IndexBaseLeft) AndAlso
-                           .SurveyScanIndex <= mzIndexSICIndices(udtSICPeak.IndexBaseRight) Then
+                    With scanList.ParentIons(parentIonIndices(intParentIonIndexPointer))
+                        If .SurveyScanIndex >= mzIndexSICIndices(sicPeak.IndexBaseLeft) AndAlso
+                           .SurveyScanIndex <= mzIndexSICIndices(sicPeak.IndexBaseRight) Then
 
                             blnStorePeakInParentIon = True
                         End If
                     End With
 
                     If blnStorePeakInParentIon Then
-                        blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer),
+                        blnSuccess = StorePeakInParentIon(scanList, parentIonIndices(intParentIonIndexPointer),
                                                           sicDetails, mzIndexSICScanNumbers, mzIndexSICIntensities, mzIndexSICIndices,
-                                                          udtSICPotentialAreaStatsForPeak, udtSICPeak, True)
+                                                          potentialAreaStatsForPeak, sicPeak, True)
 
                         ' Possibly save the stats for this SIC to the SICData file
                         dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
-                                                            intParentIonIndices(intParentIonIndexPointer), sicDetails)
+                                                            parentIonIndices(intParentIonIndexPointer), sicDetails)
 
                         ' Save the stats for this SIC to the XML file
                         xmlResultsWriter.SaveDataToXML(scanList,
-                                                       intParentIonIndices(intParentIonIndexPointer), sicDetails,
-                                                       udtSmoothedYDataSubset, dataOutputHandler)
+                                                       parentIonIndices(intParentIonIndexPointer), sicDetails,
+                                                       smoothedYDataSubset, dataOutputHandler)
 
                         blnParentIonUpdated(intParentIonIndexPointer) = True
                         intParentIonsProcessed += 1
@@ -914,17 +885,19 @@ Public Class clsSICProcessing
             ' Now step through the parent ions and process those that were not updated using udtSICPeak
             ' For each, search for the closest peak in sngSICIntensity
             '--------------------------------------------------------
-            For intParentIonIndexPointer = udtMZSearchChunk(intMZIndexWork).MZIndexStart To udtMZSearchChunk(intMZIndexWork).MZIndexEnd
+            For intParentIonIndexPointer = mzSearchChunk(intMZIndexWork).MZIndexStart To mzSearchChunk(intMZIndexWork).MZIndexEnd
 
                 If blnParentIonUpdated(intParentIonIndexPointer) Then Continue For
 
-                If intParentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
+                If parentIonIndices(intParentIonIndexPointer) = DebugParentIonIndexToFind Then
                     intScanIndexObservedInFullSIC = -1
                 End If
 
-                With scanList.ParentIons(intParentIonIndices(intParentIonIndexPointer))
+                Dim smoothedYDataSubsetInSearchChunk As MASICPeakFinder.clsSmoothedYDataSubset = Nothing
+
+                With scanList.ParentIons(parentIonIndices(intParentIonIndexPointer))
                     ' Clear udtSICPotentialAreaStatsForPeak
-                    .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+                    .SICStats.SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsSICPotentialAreaStats()
 
                     ' Record the index in the Full SIC that the parent ion mass was first observed
                     ' Search for .SurveyScanIndex in intFullSICScanIndices
@@ -945,7 +918,7 @@ Public Class clsSICProcessing
                     ' Populate udtSICDetails using the data centered around intScanIndexObservedInFullSIC
                     ' Note that this function will update udtSICPeak.IndexObserved
                     blnSuccess = ExtractSICDetailsFromFullSIC(
-                        intMZIndexWork, udtMZSearchChunk,
+                        intMZIndexWork, mzSearchChunk(intMZIndexWork).BaselineNoiseStatSegments,
                         intFullSICDataCount(intMZIndexWork), intFullSICScanIndices, sngFullSICIntensities, dblFullSICMasses,
                         scanList, intScanIndexObservedInFullSIC,
                         sicDetails, .SICStats.Peak,
@@ -960,24 +933,24 @@ Public Class clsSICProcessing
                     blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(
                         sicDetails.SICDataCount, sicScanNumbers, sicIntensities,
                         .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak,
-                        udtSmoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
-                        udtSICPotentialAreaStatsInFullSIC,
+                        smoothedYDataSubsetInSearchChunk, masicOptions.SICOptions.SICPeakFinderOptions,
+                        potentialAreaStatsInFullSIC,
                         Not .CustomSICPeak, scanList.SIMDataPresent, False)
 
 
-                    blnSuccess = StorePeakInParentIon(scanList, intParentIonIndices(intParentIonIndexPointer),
+                    blnSuccess = StorePeakInParentIon(scanList, parentIonIndices(intParentIonIndexPointer),
                                                       sicDetails, sicScanNumbers, sicIntensities, sicIndices,
                                                       .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
                 End With
 
                 ' Possibly save the stats for this SIC to the SICData file
                 dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
-                                                    intParentIonIndices(intParentIonIndexPointer), sicDetails)
+                                                    parentIonIndices(intParentIonIndexPointer), sicDetails)
 
                 ' Save the stats for this SIC to the XML file
                 xmlResultsWriter.SaveDataToXML(scanList,
-                                               intParentIonIndices(intParentIonIndexPointer), sicDetails,
-                                               udtSmoothedYDataSubset, dataOutputHandler)
+                                               parentIonIndices(intParentIonIndexPointer), sicDetails,
+                                               smoothedYDataSubsetInSearchChunk, dataOutputHandler)
 
                 blnParentIonUpdated(intParentIonIndexPointer) = True
                 intParentIonsProcessed += 1
@@ -1026,8 +999,8 @@ Public Class clsSICProcessing
       sicScanNumbers As Integer(),
       sicIntensities As Single(),
       sicScanIndices As Integer(),
-      ByRef udtSICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType,
-      ByRef udtSICPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType,
+      potentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats,
+      sicPeak As MASICPeakFinder.clsSICStatsPeak,
       blnPeakIsValid As Boolean) As Boolean
 
 
@@ -1074,8 +1047,8 @@ Public Class clsSICProcessing
 
                 With .SICStats
 
-                    .SICPotentialAreaStatsForPeak = udtSICPotentialAreaStatsForPeak
-                    .Peak = udtSICPeak
+                    .SICPotentialAreaStatsForPeak = potentialAreaStatsForPeak
+                    .Peak = sicPeak
 
                     .ScanTypeForPeakIndices = sicDetails.SICScanType
                     If blnProcessingMRMPeak Then
@@ -1118,7 +1091,7 @@ Public Class clsSICProcessing
                     End If
 
                     If blnProcessingMRMPeak Then
-                        udtSICPeak.ParentIonIntensity = 0
+                        sicPeak.ParentIonIntensity = 0
                     Else
                         ' Determine the value for .ParentIonIntensity
                         blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(
@@ -1178,25 +1151,5 @@ Public Class clsSICProcessing
         Return blnSuccess
 
     End Function
-
-    Protected Class clsMZBinListComparer
-        Implements IComparer
-
-        Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
-            Dim udtMZBinListA As clsDataObjects.udtMZBinListType
-            Dim udtMZBinListB As clsDataObjects.udtMZBinListType
-
-            udtMZBinListA = DirectCast(x, clsDataObjects.udtMZBinListType)
-            udtMZBinListB = DirectCast(y, clsDataObjects.udtMZBinListType)
-
-            If udtMZBinListA.MZ > udtMZBinListB.MZ Then
-                Return 1
-            ElseIf udtMZBinListA.MZ < udtMZBinListB.MZ Then
-                Return -1
-            Else
-                Return 0
-            End If
-        End Function
-    End Class
 
 End Class
