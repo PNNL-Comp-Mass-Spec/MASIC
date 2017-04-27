@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
@@ -164,7 +164,7 @@
     <Compile Include="clsSICDetails.vb" />
     <Compile Include="clsSICStats.vb" />
     <Compile Include="DataOutput\clsOutputFileHandles.vb" />
-    <Compile Include="clsEventNotifier.vb" />
+    <Compile Include="clsMasicEventNotifier.vb" />
     <Compile Include="clsProcessingStats.vb" />
     <Compile Include="clsRawDataExportOptions.vb" />
     <Compile Include="clsReporterIonInfo.vb" />
