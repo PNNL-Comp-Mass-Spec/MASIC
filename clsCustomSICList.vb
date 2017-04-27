@@ -1,4 +1,6 @@
-﻿Public Class clsCustomSICList
+﻿Imports PRISM
+
+Public Class clsCustomSICList
     Inherits clsEventNotifier
 
 #Region "Constants and Enums"
@@ -88,8 +90,7 @@
             For Each customMzSearchValue In CustomMZSearchValues
 
                 ' Add a new parent ion entry to .ParentIons() for this custom MZ value
-                Dim currentParentIon = New clsParentIonInfo()
-                currentParentIon.MZ = customMzSearchValue.MZ
+                Dim currentParentIon = New clsParentIonInfo(customMzSearchValue.MZ)
 
                 If customMzSearchValue.ScanOrAcqTimeCenter < Single.Epsilon Then
                     ' Set the SurveyScanIndex to the center of the analysis
@@ -246,11 +247,11 @@
                 Continue For
             End If
 
-            Dim mzSearchSpec = New clsCustomMZSearchSpec(targetMz)
-
-            mzSearchSpec.MZToleranceDa = 0
-            mzSearchSpec.ScanOrAcqTimeCenter = 0         ' Set to 0 to indicate that the entire file should be searched
-            mzSearchSpec.ScanOrAcqTimeTolerance = 0
+            Dim mzSearchSpec = New clsCustomMZSearchSpec(targetMz) With {
+                .MZToleranceDa = 0,
+                .ScanOrAcqTimeCenter = 0,                 ' Set to 0 to indicate that the entire file should be searched
+                .ScanOrAcqTimeTolerance = 0
+            }
 
             If lstScanCenters.Count > intIndex Then
                 If clsUtilities.IsNumber(lstScanCenters(intIndex)) Then

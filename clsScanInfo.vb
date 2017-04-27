@@ -109,7 +109,7 @@ Public Class clsScanInfo
     Public Sub New()
         MRMScanType = MRMScanTypeConstants.NotMRM
 
-        FragScanInfo = New clsFragScanInfo()
+        FragScanInfo = New clsFragScanInfo(0)
         MRMScanInfo = New clsMRMScanInfo()
 
         ExtendedHeaderInfo = New Dictionary(Of Integer, String)

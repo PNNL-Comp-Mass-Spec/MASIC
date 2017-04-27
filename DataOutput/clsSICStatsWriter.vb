@@ -8,11 +8,12 @@ Namespace DataOutput
 
         Private Function GetFakeParentIonForFragScan(scanList As clsScanList, fragScanIndex As Integer) As clsParentIonInfo
 
-            Dim newParentIon = New clsParentIonInfo()
+
             Dim currentFragScan = scanList.FragScans(fragScanIndex)
 
-            newParentIon.MZ = currentFragScan.BasePeakIonMZ
-            newParentIon.SurveyScanIndex = 0
+            Dim newParentIon = New clsParentIonInfo(currentFragScan.BasePeakIonMZ) With {
+                .SurveyScanIndex = 0
+            }
 
             ' Find the previous MS1 scan that occurs before the frag scan
             Dim surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1
@@ -44,8 +45,7 @@ Namespace DataOutput
             End If
 
             If newParentIon.SurveyScanIndex < scanList.SurveyScans.Count Then
-                newParentIon.OptimalPeakApexScanNumber =
-                scanList.SurveyScans(newParentIon.SurveyScanIndex).ScanNumber
+                newParentIon.OptimalPeakApexScanNumber = scanList.SurveyScans(newParentIon.SurveyScanIndex).ScanNumber
             Else
                 newParentIon.OptimalPeakApexScanNumber = surveyScanNumberAbsolute
             End If

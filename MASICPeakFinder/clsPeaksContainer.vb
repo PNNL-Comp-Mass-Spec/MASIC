@@ -2,19 +2,19 @@
 
 Public Class clsPeaksContainer
 
-    Public OriginalPeakLocationIndex As Integer
+    Public Property OriginalPeakLocationIndex As Integer
 
-    Public SourceDataCount As Integer
+    Public Property SourceDataCount As Integer
     Public XData() As Double
     Public YData() As Double
     Public SmoothedYData() As Double
 
-    Public Peaks As List(Of clsPeakInfo)
+    Public Property Peaks As List(Of clsPeakInfo)
 
-    Public PeakWidthPointsMinimum As Integer
-    Public MaxAllowedUpwardSpikeFractionMax As Single
-    Public BestPeakIndex As Integer
-    Public BestPeakArea As Single
+    Public Property PeakWidthPointsMinimum As Integer
+    Public Property MaxAllowedUpwardSpikeFractionMax As Single
+    Public Property BestPeakIndex As Integer
+    Public Property BestPeakArea As Single
 
     Public Sub New()
         Peaks = New List(Of clsPeakInfo)
