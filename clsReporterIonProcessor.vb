@@ -261,8 +261,8 @@ Public Class clsReporterIonProcessor
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       currentScan As clsScanInfo,
-      srOutFile As StreamWriter,
-      reporterIons As clsReporterIonInfo(),
+      srOutFile As TextWriter,
+      reporterIons As IList(Of clsReporterIonInfo),
       cColDelimiter As Char,
       blnSaveUncorrectedIntensities As Boolean,
       saveObservedMasses As Boolean)
@@ -294,9 +294,9 @@ Public Class clsReporterIonProcessor
         End If
 
         ' Initialize the arrays used to track the observed reporter ion values
-        ReDim sngReporterIntensities(reporterIons.Length - 1)
-        ReDim sngReporterIntensitiesCorrected(reporterIons.Length - 1)
-        ReDim dblClosestMZ(reporterIons.Length - 1)
+        ReDim sngReporterIntensities(reporterIons.Count - 1)
+        ReDim sngReporterIntensitiesCorrected(reporterIons.Count - 1)
+        ReDim dblClosestMZ(reporterIons.Count - 1)
 
         ' Initialize the output variables
         Dim dataColumns = New List(Of String) From {
@@ -321,7 +321,7 @@ Public Class clsReporterIonProcessor
         ' Find the reporter ion intensities
         ' Also keep track of the closest m/z for each reporter ion
         ' Note that we're using the maximum intensity in the range (not the sum)
-        For intReporterIonIndex = 0 To reporterIons.Length - 1
+        For intReporterIonIndex = 0 To reporterIons.Count - 1
 
             Dim intIonmatchcount As Integer
 
@@ -350,7 +350,7 @@ Public Class clsReporterIonProcessor
 
             ' Find each reporter ion in ftLabelData
 
-            For intReporterIonIndex = 0 To reporterIons.Length - 1
+            For intReporterIonIndex = 0 To reporterIons.Count - 1
                 Dim mzToFind = reporterIons(intReporterIonIndex).MZ
                 Dim mzToleranceDa = reporterIons(intReporterIonIndex).MZToleranceDa
                 Dim highestIntensity = 0.0
@@ -403,7 +403,7 @@ Public Class clsReporterIonProcessor
                 ' Make sure at least one of two of the points in sngReporterIntensitiesCorrected() is non-zero
                 ' If not, then no correction can be applied
                 Dim intPositiveCount = 0
-                For intReporterIonIndex = 0 To reporterIons.Length - 1
+                For intReporterIonIndex = 0 To reporterIons.Count - 1
                     If sngReporterIntensitiesCorrected(intReporterIonIndex) > 0 Then
                         intPositiveCount += 1
                     End If
@@ -424,7 +424,7 @@ Public Class clsReporterIonProcessor
         Dim dblPctChangeSum As Double = 0
         Dim dblOriginalIntensitySum As Double = 0
 
-        For intReporterIonIndex = 0 To reporterIons.Length - 1
+        For intReporterIonIndex = 0 To reporterIons.Count - 1
 
             If Not reporterIons(intReporterIonIndex).ContaminantIon Then
                 ' Update the PctChange variables and the IntensityMax variable only if this is not a Contaminant Ion
