@@ -110,6 +110,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsBaselineNoiseOptions.vb" />
+    <Compile Include="clsBaselineNoiseStats.vb" />
+    <Compile Include="clsBaselineNoiseStatsSegment.vb" />
     <Compile Include="clsMASICPeakFinder.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -119,6 +121,10 @@
     <Compile Include="clsPeakInfo.vb" />
     <Compile Include="clsPeaksContainer.vb" />
     <Compile Include="clsSICPeakFinderOptions.vb" />
+    <Compile Include="clsSICPotentialAreaStats.vb" />
+    <Compile Include="clsSICStatsPeak.vb" />
+    <Compile Include="clsSmoothedYDataSubset.vb" />
+    <Compile Include="clsStatisticalMoments.vb" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
