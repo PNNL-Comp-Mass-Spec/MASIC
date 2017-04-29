@@ -2216,11 +2216,15 @@ Public Class frmBrowser
             If chkFixXRange.Checked And intXRangeHalfWidth > 0 Then
                 mSpectrum.SetAutoscaleXAxis(False)
                 mSpectrum.SetRangeX(sicStats.ScanNumberMaxIntensity - intXRangeHalfWidth, sicStats.ScanNumberMaxIntensity + intXRangeHalfWidth)
+            Else
+                mSpectrum.SetAutoscaleXAxis(True)
             End If
 
             If chkFixYRange.Checked And sngYRange > 0 Then
                 mSpectrum.SetAutoscaleYAxis(False)
                 mSpectrum.SetRangeY(0, CDbl(sngYRange))
+            Else
+                mSpectrum.SetAutoscaleYAxis(True)
             End If
 
         Catch ex As Exception
