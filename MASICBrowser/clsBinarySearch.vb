@@ -1,5 +1,5 @@
 ﻿
-Imports System.IO
+Imports System.Collections.Generic
 
 ''' <summary>
 ''' This class can be used to search a list of values for the value closest to the search value
@@ -16,7 +16,7 @@ Public Class clsBinarySearch
     End Enum
 
     Public Shared Function BinarySearchFindNearest(
-      intArrayToSearch() As Integer, intItemToSearchFor As Integer, intDataCount As Integer,
+      intArrayToSearch As IList(Of Integer), intItemToSearchFor As Integer, intDataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through intArrayToSearch() for intItemToSearchFor, returning
         '  the index of the item if found
@@ -32,8 +32,8 @@ Public Class clsBinarySearch
             If intArrayToSearch Is Nothing Then Return -1
 
             intIndexFirst = 0
-            If intDataCount > intArrayToSearch.Length Then
-                intDataCount = intArrayToSearch.Length
+            If intDataCount > intArrayToSearch.Count Then
+                intDataCount = intArrayToSearch.Count
             End If
             intIndexLast = intDataCount - 1
 
@@ -136,7 +136,7 @@ Public Class clsBinarySearch
     End Function
 
     Public Shared Function BinarySearchFindNearest(
-      sngArrayToSearch() As Single, sngItemToSearchFor As Single, intDataCount As Integer,
+      sngArrayToSearch As IList(Of Single), sngItemToSearchFor As Single, intDataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through sngArrayToSearch() for sngItemToSearchFor, returning
         '  the index of the item if found
@@ -152,8 +152,8 @@ Public Class clsBinarySearch
             If sngArrayToSearch Is Nothing Then Return -1
 
             intIndexFirst = 0
-            If intDataCount > sngArrayToSearch.Length Then
-                intDataCount = sngArrayToSearch.Length
+            If intDataCount > sngArrayToSearch.Count Then
+                intDataCount = sngArrayToSearch.Count
             End If
             intIndexLast = intDataCount - 1
 
@@ -256,7 +256,7 @@ Public Class clsBinarySearch
     End Function
 
     Public Shared Function BinarySearchFindNearest(
-      dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer,
+      dblArrayToSearch As IList(Of Double), dblItemToSearchFor As Double, intDataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
         ' Looks through dblArrayToSearch() for dblItemToSearchFor, returning
         '  the index of the item if found
@@ -272,8 +272,8 @@ Public Class clsBinarySearch
             If dblArrayToSearch Is Nothing Then Return -1
 
             intIndexFirst = 0
-            If intDataCount > dblArrayToSearch.Length Then
-                intDataCount = dblArrayToSearch.Length
+            If intDataCount > dblArrayToSearch.Count Then
+                intDataCount = dblArrayToSearch.Count
             End If
             intIndexLast = intDataCount - 1
 
