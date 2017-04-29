@@ -11,7 +11,7 @@ namespace MagnitudeConcavityPeakFinder
         {
             var peakFinder = new PeakDetector();
 
-            string dataFilePath = @"..\..\Examples\Scan12543.txt";
+            var dataFilePath = @"..\..\Examples\Scan12543.txt";
 
             peakFinder.TestPeakFinder(dataFilePath);
 

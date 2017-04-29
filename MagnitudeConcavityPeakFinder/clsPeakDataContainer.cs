@@ -62,7 +62,7 @@ namespace MagnitudeConcavityPeakFinder
             mXData = new double[xyData.Count];
             mYData = new double[xyData.Count];
 
-            for (int i = 0; i < xyData.Count; i++)
+            for (var i = 0; i < xyData.Count; i++)
             {
                 mXData[i] = xyData[i].Key;
                 mYData[i] = xyData[i].Value;
@@ -78,7 +78,7 @@ namespace MagnitudeConcavityPeakFinder
             mXData = new double[dataCount];
             mYData = new double[dataCount];
 
-            for (int i = 0; i < dataCount; i++)
+            for (var i = 0; i < dataCount; i++)
             {
                 mXData[i] = xData[i];
                 mYData[i] = yData[i];

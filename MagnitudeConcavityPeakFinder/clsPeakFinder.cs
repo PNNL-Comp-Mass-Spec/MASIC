@@ -58,13 +58,13 @@ namespace MagnitudeConcavityPeakFinder
             if (xValsZeroBased == null || xValsZeroBased.Length == 0)
                 return 0;
 
-            int segmentCount = endIndex - startIndex + 1;
+            var segmentCount = endIndex - startIndex + 1;
 
             var segmentX = new double[segmentCount];
             var segmentY = new double[segmentCount];
 
             // Copy the desired segment of data from xVals to segmentX and yVals to segmentY
-            for (int i = startIndex; i <= endIndex; i++)
+            for (var i = startIndex; i <= endIndex; i++)
             {
                 segmentX[i - startIndex] = xValsZeroBased[i];
                 segmentY[i - startIndex] = yValsZeroBased[i];
@@ -121,16 +121,16 @@ namespace MagnitudeConcavityPeakFinder
             try
             {
 
-                int sourceDataCount = xValsZeroBased.Length;
+                var sourceDataCount = xValsZeroBased.Length;
                 if (sourceDataCount <= 0)
                     return detectedPeaks;
 
                 // The mid point width is the minimum width divided by 2, rounded down
-                int peakHalfWidth = Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 2.0));
+                var peakHalfWidth = Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 2.0));
 
                 // Find the maximum intensity in the source data
                 double maximumIntensity = 0;
-                for (int dataIndex = 0; dataIndex <= sourceDataCount - 1; dataIndex++)
+                for (var dataIndex = 0; dataIndex <= sourceDataCount - 1; dataIndex++)
                 {
                     if (yValsZeroBased[dataIndex] > maximumIntensity)
                     {
@@ -138,7 +138,7 @@ namespace MagnitudeConcavityPeakFinder
                     }
                 }
 
-                double intensityThreshold = maximumIntensity * (peakDetectIntensityThresholdPercentageOfMaximum / 100.0);
+                var intensityThreshold = maximumIntensity * (peakDetectIntensityThresholdPercentageOfMaximum / 100.0);
                 if (intensityThreshold < intensityThresholdAbsoluteMinimum)
                 {
                     intensityThreshold = intensityThresholdAbsoluteMinimum;
@@ -166,10 +166,10 @@ namespace MagnitudeConcavityPeakFinder
                     peakWidthPointsMinimum = 1;
 
                 // We'll start looking for peaks halfway into intPeakWidthPointsMinimum
-                int indexFirst = peakHalfWidth;
-                int indexLast = sourceDataCount - 1 - peakHalfWidth;
+                var indexFirst = peakHalfWidth;
+                var indexLast = sourceDataCount - 1 - peakHalfWidth;
 
-                for (int dataIndex = indexFirst; dataIndex <= indexLast; dataIndex++)
+                for (var dataIndex = indexFirst; dataIndex <= indexLast; dataIndex++)
                 {
                     if (firstDerivative[dataIndex] > 0 & firstDerivative[dataIndex + 1] < 0)
                     {
@@ -243,8 +243,8 @@ namespace MagnitudeConcavityPeakFinder
                 return;
             }
 
-            int thisPeakStartIndex = peak.LeftEdge;
-            int thisPeakEndIndex = peak.RightEdge;
+            var thisPeakStartIndex = peak.LeftEdge;
+            var thisPeakEndIndex = peak.RightEdge;
 
             if (thisPeakStartIndex < 0)
             {
@@ -258,12 +258,12 @@ namespace MagnitudeConcavityPeakFinder
                 thisPeakEndIndex = sourceDataCount - 1;
             }
 
-            int thisPeakWidthInPoints = thisPeakEndIndex - thisPeakStartIndex + 1;
+            var thisPeakWidthInPoints = thisPeakEndIndex - thisPeakStartIndex + 1;
             var xValsForArea = new double[thisPeakWidthInPoints];
             var yValsForArea = new double[thisPeakWidthInPoints];
 
 
-            for (int areaValsCopyIndex = thisPeakStartIndex; areaValsCopyIndex <= thisPeakEndIndex; areaValsCopyIndex++)
+            for (var areaValsCopyIndex = thisPeakStartIndex; areaValsCopyIndex <= thisPeakEndIndex; areaValsCopyIndex++)
             {
                 xValsForArea[areaValsCopyIndex - thisPeakStartIndex] = xValsZeroBased[areaValsCopyIndex];
                 yValsForArea[areaValsCopyIndex - thisPeakStartIndex] = yValsZeroBased[areaValsCopyIndex];
@@ -394,7 +394,7 @@ namespace MagnitudeConcavityPeakFinder
             {
                 sigma = 0;
             }
-            int widthInPoints = Convert.ToInt32(Math.Ceiling(peakWidthInSigma * sigma));
+            var widthInPoints = Convert.ToInt32(Math.Ceiling(peakWidthInSigma * sigma));
 
             if (widthInPoints > 4 * sourceDataCount)
             {
@@ -432,7 +432,7 @@ namespace MagnitudeConcavityPeakFinder
             // Finds the area under the curve, using trapezoidal integration
 
             double area = 0;
-            for (int i = 0; i <= dataPointCount - 2; i++)
+            for (var i = 0; i <= dataPointCount - 2; i++)
             {
                 // Area of a trapezoid (turned on its side) is:
                 //   0.5 * d * (h1 + h2)
@@ -469,7 +469,7 @@ namespace MagnitudeConcavityPeakFinder
             firstDerivative = new double[sourceDataCount];
             secondDerivative = new double[sourceDataCount];
 
-            for (int startIndex = 0;
+            for (var startIndex = 0;
                 startIndex <= sourceDataCount - peakWidthPointsMinimum - 1;
                 startIndex++)
             {
@@ -488,7 +488,7 @@ namespace MagnitudeConcavityPeakFinder
                 LeastSquaresFit(segmentX, segmentY, out coefficients, POLYNOMIAL_ORDER);
 
                 // Compute the dblFirstDerivative at the midpoint
-                int midPointIndex = startIndex + peakWidthMidPoint;
+                var midPointIndex = startIndex + peakWidthMidPoint;
                 firstDerivative[midPointIndex] = 2 * coefficients[2] * xVals[midPointIndex] + coefficients[1];
                 secondDerivative[midPointIndex] = 2 * coefficients[2];
 
@@ -504,17 +504,17 @@ namespace MagnitudeConcavityPeakFinder
         {
             // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
             // Define the maximum allowed peak apex shift to be 33% of intPeakWidthPointsMinimum
-            int dataIndexCheckStart = peak.LocationIndex - Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 3.0));
+            var dataIndexCheckStart = peak.LocationIndex - Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 3.0));
             if (dataIndexCheckStart < 0)
                 dataIndexCheckStart = 0;
 
-            int dataIndexCheckEnd = peak.LocationIndex + Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 3.0));
+            var dataIndexCheckEnd = peak.LocationIndex + Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 3.0));
             if (dataIndexCheckEnd > sourceDataCount - 1)
                 dataIndexCheckEnd = sourceDataCount - 1;
 
-            double maximumIntensity = yValsZeroBased[peak.LocationIndex];
+            var maximumIntensity = yValsZeroBased[peak.LocationIndex];
             
-            for (int dataIndexCheck = dataIndexCheckStart;
+            for (var dataIndexCheck = dataIndexCheckStart;
                  dataIndexCheck <= dataIndexCheckEnd;
                  dataIndexCheck++)
             {
@@ -583,14 +583,14 @@ namespace MagnitudeConcavityPeakFinder
             var CoVar = new double[udtEquationTerms.Length, udtEquationTerms.Length];
             var PFuncVal = new double[udtEquationTerms.Length];
 
-            for (int i = 0; i <= DataX.Length - 1; i++)
+            for (var i = 0; i <= DataX.Length - 1; i++)
             {
                 GetLVals(DataX[i], udtEquationTerms, ref PFuncVal);
 
-                double ym = DataY[i];
-                for (int L = 0; L <= udtEquationTerms.Length - 1; L++)
+                var ym = DataY[i];
+                for (var L = 0; L <= udtEquationTerms.Length - 1; L++)
                 {
-                    for (int m = 0; m <= L; m++)
+                    for (var m = 0; m <= L; m++)
                     {
                         CoVar[L, m] += PFuncVal[L] * PFuncVal[m];
                     }
@@ -598,9 +598,9 @@ namespace MagnitudeConcavityPeakFinder
                 }
             }
 
-            for (int j = 1; j <= udtEquationTerms.Length - 1; j++)
+            for (var j = 1; j <= udtEquationTerms.Length - 1; j++)
             {
-                for (int k = 0; k <= j - 1; k++)
+                for (var k = 0; k <= j - 1; k++)
                 {
                     CoVar[k, j] = CoVar[j, k];
                 }
@@ -608,7 +608,7 @@ namespace MagnitudeConcavityPeakFinder
 
             if (GaussJordan(ref CoVar, udtEquationTerms.Length, ref Beta))
             {
-                for (int L = 0; L <= udtEquationTerms.Length - 1; L++)
+                for (var L = 0; L <= udtEquationTerms.Length - 1; L++)
                 {
                     udtEquationTerms[L].ParamResult = Beta[L];
                 }
@@ -617,7 +617,7 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             // Error fitting; clear coefficients
-            for (int L = 0; L <= udtEquationTerms.Length - 1; L++)
+            for (var L = 0; L <= udtEquationTerms.Length - 1; L++)
             {
                 udtEquationTerms[L].ParamResult = 0;
             }
@@ -645,7 +645,7 @@ namespace MagnitudeConcavityPeakFinder
                 PFuncVal = new double[udtEquationTerms.Length];
 
             //f = "1,X,Log(X),Log10(X),Exp(X),Sin(X),Cos(X),Tan(X),ATAN(X)"
-            for (int i = 0; i <= udtEquationTerms.Length - 1; i++)
+            for (var i = 0; i <= udtEquationTerms.Length - 1; i++)
             {
                 var udtTerm = udtEquationTerms[i];
                 double v = 0;
@@ -730,20 +730,20 @@ namespace MagnitudeConcavityPeakFinder
             var indxr = new int[termCount];
             var ipiv = new int[termCount];
 
-            int icol = 0;
-            int irow = 0;         
+            var icol = 0;
+            var irow = 0;         
 
             try
             {
                 double Dum;
-                for (int i = 0; i <= termCount - 1; i++)
+                for (var i = 0; i <= termCount - 1; i++)
                 {
                     double Big = 0;
-                    for (int j = 0; j <= termCount - 1; j++)
+                    for (var j = 0; j <= termCount - 1; j++)
                     {
                         if (ipiv[j] != 1)
                         {
-                            for (int k = 0; k <= termCount - 1; k++)
+                            for (var k = 0; k <= termCount - 1; k++)
                             {
                                 if (ipiv[k] == 0)
                                 {
@@ -761,7 +761,7 @@ namespace MagnitudeConcavityPeakFinder
                     ipiv[icol] += 1;
                     if (irow != icol)
                     {
-                        for (int L = 0; L <= termCount - 1; L++)
+                        for (var L = 0; L <= termCount - 1; L++)
                         {
                             Dum = A[irow, L];
                             A[irow, L] = A[icol, L];
@@ -780,21 +780,21 @@ namespace MagnitudeConcavityPeakFinder
                         return false;
                     }
 
-                    double PivInv = 1 / A[icol, icol];
+                    var PivInv = 1 / A[icol, icol];
                     A[icol, icol] = 1;
-                    for (int L = 0; L <= termCount - 1; L++)
+                    for (var L = 0; L <= termCount - 1; L++)
                     {
                         A[icol, L] *= PivInv;
                     }
 
                     b[icol] *= PivInv;
-                    for (int ll = 0; ll <= termCount - 1; ll++)
+                    for (var ll = 0; ll <= termCount - 1; ll++)
                     {
                         if (ll != icol)
                         {
                             Dum = A[ll, icol];
                             A[ll, icol] = 0;
-                            for (int L = 0; L <= termCount - 1; L++)
+                            for (var L = 0; L <= termCount - 1; L++)
                             {
                                 A[ll, L] -= A[icol, L] * Dum;
                             }
@@ -803,11 +803,11 @@ namespace MagnitudeConcavityPeakFinder
                     }
                 }
 
-                for (int L = termCount - 1; L >= 0; L += -1)
+                for (var L = termCount - 1; L >= 0; L += -1)
                 {
                     if (indxr[L] != indxc[L])
                     {
-                        for (int k = 0; k <= termCount - 1; k++)
+                        for (var k = 0; k <= termCount - 1; k++)
                         {
                             Dum = A[k, indxr[L]];
                             A[k, indxr[L]] = A[k, indxc[L]];

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace MagnitudeConcavityPeakFinder
 {
@@ -80,7 +78,7 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             // Copy the data into sortedData
-            int dataSortedCount = indexEnd - indexStart + 1;
+            var dataSortedCount = indexEnd - indexStart + 1;
             var sortedData = new double[dataSortedCount];
 
             if (indexStart == 0)
@@ -102,7 +100,7 @@ namespace MagnitudeConcavityPeakFinder
             {
                 // Remove data with a value <= 0
 
-                int validDataCount = 0;
+                var validDataCount = 0;
                 for (var intIndex = 0; intIndex <= dataSortedCount - 1; intIndex++)
                 {
                     if (sortedData[intIndex] > 0)
@@ -190,7 +188,7 @@ namespace MagnitudeConcavityPeakFinder
                         //Find the median of the data that has intensity values less than
                         //  Minimum + udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
 
-                        double dblIntensityThreshold = sortedData[0] +
+                        var dblIntensityThreshold = sortedData[0] +
                                                        udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
                                                        (sortedData[dataSortedCount - 1] -
                                                         sortedData[0]);
@@ -270,7 +268,7 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         private static int ComputeTrimmedMeanByCount(
-            double[] sortedData,
+            IList<double> sortedData,
             int dataSortedCount,
             udtBaselineNoiseOptionsType udtBaselineNoiseOptions,
             out int indexEnd,
@@ -296,7 +294,7 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         private int ComputeTrimmedMeanByAbundance(
-            double[] sortedData,
+            IList<double> sortedData,
             int dataSortedCount,
             udtBaselineNoiseOptionsType udtBaselineNoiseOptions,
             out int indexEnd,
@@ -305,12 +303,12 @@ namespace MagnitudeConcavityPeakFinder
             // Average the data that has intensity values less than
             //  Minimum + udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
 
-            double dblIntensityThreshold = sortedData[0] +
+            var dblIntensityThreshold = sortedData[0] +
                                            udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
                                            (sortedData[dataSortedCount - 1] - sortedData[0]);
 
             // Initialize countSummed to intDataSortedCount for now, in case all data is within the intensity threshold
-            int countSummed = dataSortedCount;
+            var countSummed = dataSortedCount;
 
             summedIntensity = 0;
             for (var intIndex = 0; intIndex <= dataSortedCount - 1; intIndex++)
@@ -356,12 +354,12 @@ namespace MagnitudeConcavityPeakFinder
         /// <param name="sortedData"></param>
         /// <returns>The minimum positive value</returns>
         /// <remarks>Asumes sortedData[] is sorted ascending</remarks>
-        private double ReplaceSortedDataWithMinimumPositiveValue(int dataCount, double[] sortedData)
+        private double ReplaceSortedDataWithMinimumPositiveValue(int dataCount, IList<double> sortedData)
         {
             // Find the minimum positive value in sortedData
             // Since it's sorted, we can stop at the first non-zero value
 
-            int indexFirstPositiveValue = -1;
+            var indexFirstPositiveValue = -1;
             double minimumPositiveValue = 0;
             for (var intIndex = 0; intIndex <= dataCount - 1; intIndex++)
             {
