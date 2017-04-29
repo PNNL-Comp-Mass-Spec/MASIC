@@ -111,6 +111,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="clsBinarySearch.vb" />
+    <Compile Include="clsParentIonStats.vb" />
+    <Compile Include="clsSICStats.vb" />
     <Compile Include="frmBrowser.vb">
       <SubType>Form</SubType>
     </Compile>

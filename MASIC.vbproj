@@ -160,7 +160,6 @@
     <Compile Include="clsDatabaseAccess.vb" />
     <Compile Include="clsMzBinInfo.vb" />
     <Compile Include="clsMzSearchInfo.vb" />
-    <Compile Include="clsSICData.vb" />
     <Compile Include="clsSICDetails.vb" />
     <Compile Include="clsSICStats.vb" />
     <Compile Include="DataOutput\clsOutputFileHandles.vb" />

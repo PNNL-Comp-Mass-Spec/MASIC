@@ -825,13 +825,10 @@ Public Class clsSICProcessing
 
             Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
 
-            Dim mzIndexSICScanNumbers = sicDetails.SICScanNumbers
-            Dim mzIndexSICIntensities = sicDetails.SICIntensities
-            Dim mzIndexSICIndices = sicDetails.SICScanIndices
 
             ' Find the largest peak in the SIC for this m/z
             Dim blnLargestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
-                sicDetails.SICDataCount, mzIndexSICScanNumbers, mzIndexSICIntensities,
+                sicDetails.SICData,
                 potentialAreaStatsForPeak, sicPeak,
                 smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
                 potentialAreaStatsInFullSIC,
@@ -842,6 +839,8 @@ Public Class clsSICProcessing
                 ' Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
                 ' If it is, then assign the stats of the largest peak to the given parent ion
                 '--------------------------------------------------------
+
+                Dim mzIndexSICIndices = sicDetails.SICScanIndices
 
                 For intParentIonIndexPointer = mzSearchChunk(intMZIndexWork).MZIndexStart To mzSearchChunk(intMZIndexWork).MZIndexEnd
                     ' Use this for debugging
@@ -863,7 +862,7 @@ Public Class clsSICProcessing
 
                     If blnStorePeakInParentIon Then
                         blnSuccess = StorePeakInParentIon(scanList, parentIonIndices(intParentIonIndexPointer),
-                                                          sicDetails, mzIndexSICScanNumbers, mzIndexSICIntensities, mzIndexSICIndices,
+                                                          sicDetails,
                                                           potentialAreaStatsForPeak, sicPeak, True)
 
                         ' Possibly save the stats for this SIC to the SICData file
@@ -928,13 +927,8 @@ Public Class clsSICProcessing
                         masicOptions, scanNumScanConverter,
                         .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
 
-
-                    Dim sicScanNumbers = sicDetails.SICScanNumbers
-                    Dim sicIntensities = sicDetails.SICIntensities
-                    Dim sicIndices = sicDetails.SICScanIndices
-
                     blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(
-                        sicDetails.SICDataCount, sicScanNumbers, sicIntensities,
+                        sicDetails.SICData,
                         .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak,
                         smoothedYDataSubsetInSearchChunk, masicOptions.SICOptions.SICPeakFinderOptions,
                         potentialAreaStatsInFullSIC,
@@ -942,7 +936,7 @@ Public Class clsSICProcessing
 
 
                     blnSuccess = StorePeakInParentIon(scanList, parentIonIndices(intParentIonIndexPointer),
-                                                      sicDetails, sicScanNumbers, sicIntensities, sicIndices,
+                                                      sicDetails,
                                                       .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, blnSuccess)
                 End With
 
@@ -999,12 +993,13 @@ Public Class clsSICProcessing
       scanList As clsScanList,
       intParentIonIndex As Integer,
       sicDetails As clsSICDetails,
-      sicScanNumbers As Integer(),
-      sicIntensities As Single(),
-      sicScanIndices As Integer(),
       potentialAreaStatsForPeak As clsSICPotentialAreaStats,
       sicPeak As clsSICStatsPeak,
       blnPeakIsValid As Boolean) As Boolean
+
+        ' sicIntensities
+        ' sicScanIndices is sicDetails.SICScanIndices
+
 
 
         Dim intDataIndex As Integer
@@ -1016,8 +1011,7 @@ Public Class clsSICProcessing
 
         Try
 
-            Dim sicDataCount = sicDetails.SICDataCount
-            If sicDataCount = 0 Then
+            If sicDetails.SICDataCount = 0 Then
                 ' Either .SICData is nothing or no SIC data exists
                 ' Cannot find peaks for this parent ion
                 With scanList.ParentIons(intParentIonIndex).SICStats
@@ -1032,11 +1026,7 @@ Public Class clsSICProcessing
                 Return True
             End If
 
-            If sicDataCount <> sicScanNumbers.Count OrElse
-               sicDataCount <> sicIntensities.Count OrElse
-               sicDataCount <> sicScanIndices.Count Then
-                Throw New Exception("SIC Data arrays have conflicting lengths; likely a code bug")
-            End If
+            Dim sicData = sicDetails.SICData
 
             With scanList.ParentIons(intParentIonIndex)
                 intScanIndexObserved = .SurveyScanIndex
@@ -1071,7 +1061,7 @@ Public Class clsSICProcessing
                         ' Search for intScanIndexObserved in sicScanIndices()
                         .Peak.IndexObserved = -1
                         For intDataIndex = 0 To sicDetails.SICDataCount - 1
-                            If sicScanIndices(intDataIndex) = intScanIndexObserved Then
+                            If sicData(intDataIndex).ScanIndex = intScanIndexObserved Then
                                 .Peak.IndexObserved = intDataIndex
                                 Exit For
                             End If
@@ -1098,9 +1088,7 @@ Public Class clsSICProcessing
                     Else
                         ' Determine the value for .ParentIonIntensity
                         blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(
-                            sicScanNumbers.Length,
-                            sicScanNumbers,
-                            sicIntensities,
+                            sicData,
                             .Peak,
                             intFragScanNumber)
                     End If
@@ -1108,17 +1096,17 @@ Public Class clsSICProcessing
                     If blnPeakIsValid Then
                         ' Record the survey scan indices of the peak max, start, and end
                         ' Note that .ScanTypeForPeakIndices was set earlier in this function
-                        .PeakScanIndexMax = sicScanIndices(.Peak.IndexMax)
-                        .PeakScanIndexStart = sicScanIndices(.Peak.IndexBaseLeft)
-                        .PeakScanIndexEnd = sicScanIndices(.Peak.IndexBaseRight)
+                        .PeakScanIndexMax = sicData(.Peak.IndexMax).ScanIndex
+                        .PeakScanIndexStart = sicData(.Peak.IndexBaseLeft).ScanIndex
+                        .PeakScanIndexEnd = sicData(.Peak.IndexBaseRight).ScanIndex
                     Else
                         ' No peak found
-                        .PeakScanIndexMax = sicScanIndices(.Peak.IndexMax)
+                        .PeakScanIndexMax = sicData(.Peak.IndexMax).ScanIndex
                         .PeakScanIndexStart = .PeakScanIndexMax
                         .PeakScanIndexEnd = .PeakScanIndexMax
 
                         With .Peak
-                            .MaxIntensityValue = sicIntensities(.IndexMax)
+                            .MaxIntensityValue = sicData(.IndexMax).Intensity
                             .IndexBaseLeft = .IndexMax
                             .IndexBaseRight = .IndexMax
                             .FWHMScanWidth = 1
@@ -1134,10 +1122,11 @@ Public Class clsSICProcessing
             ' Update .OptimalPeakApexScanNumber
             ' Note that a valid peak will typically have .IndexBaseLeft or .IndexBaseRight different from .IndexMax
             With scanList.ParentIons(intParentIonIndex)
+                Dim scanIndexPointer = sicData(.SICStats.Peak.IndexMax).ScanIndex
                 If blnProcessingMRMPeak Then
-                    .OptimalPeakApexScanNumber = scanList.FragScans(sicScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+                    .OptimalPeakApexScanNumber = scanList.FragScans(scanIndexPointer).ScanNumber
                 Else
-                    .OptimalPeakApexScanNumber = scanList.SurveyScans(sicScanIndices(.SICStats.Peak.IndexMax)).ScanNumber
+                    .OptimalPeakApexScanNumber = scanList.SurveyScans(scanIndexPointer).ScanNumber
                 End If
 
             End With

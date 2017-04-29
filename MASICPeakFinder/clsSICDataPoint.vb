@@ -14,4 +14,9 @@
         Mass = dblMass
         ScanIndex = index
     End Sub
+
+    Public Overrides Function ToString() As String
+        Return String.Format("{0:F0} at {1:F2} m/z in scan {2}", Intensity, Mass, ScanNumber)
+    End Function
+
 End Class

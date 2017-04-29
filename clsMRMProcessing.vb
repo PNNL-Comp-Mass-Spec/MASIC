@@ -544,7 +544,7 @@ Public Class clsMRMProcessing
                 Dim dblMRMDaughterMZ = scanList.ParentIons(intParentIonIndex).MRMDaughterMZ
                 Dim dblSearchToleranceHalfWidth = scanList.ParentIons(intParentIonIndex).MRMToleranceHalfWidth
 
-                ' Reset sicDetails
+                ' Reset SICData
                 sicDetails.SICData.Clear()
 
                 ' Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
@@ -603,14 +603,13 @@ Public Class clsMRMProcessing
                 ' Initialize the peak
                 scanList.ParentIons(intParentIonIndex).SICStats.Peak = New clsSICStatsPeak()
 
-                Dim sicIntensities = sicDetails.SICIntensities
-
                 ' Find the data point with the maximum intensity
                 Dim sngMaximumIntensity As Single = 0
                 scanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved = 0
                 For intScanIndex = 0 To sicDetails.SICDataCount - 1
-                    If sicIntensities(intScanIndex) > sngMaximumIntensity Then
-                        sngMaximumIntensity = sicIntensities(intScanIndex)
+                    Dim intensity = sicDetails.SICIntensities(intScanIndex)
+                    If intensity > sngMaximumIntensity Then
+                        sngMaximumIntensity = intensity
                         scanList.ParentIons(intParentIonIndex).SICStats.Peak.IndexObserved = intScanIndex
                     End If
                 Next
@@ -618,7 +617,7 @@ Public Class clsMRMProcessing
                 Dim potentialAreaStatsInFullSIC As clsSICPotentialAreaStats = Nothing
 
                 ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
-                peakFinder.FindPotentialPeakArea(sicDetails.SICDataCount, sicIntensities,
+                peakFinder.FindPotentialPeakArea(sicDetails.SICData,
                                                  potentialAreaStatsInFullSIC,
                                                  mOptions.SICOptions.SICPeakFinderOptions)
 
@@ -635,8 +634,7 @@ Public Class clsMRMProcessing
                     ' Clear udtSICPotentialAreaStatsForPeak
                     .SICStats.SICPotentialAreaStatsForPeak = New clsSICPotentialAreaStats()
 
-                    blnSuccess = peakFinder.FindSICPeakAndArea(sicDetails.SICDataCount, sicDetails.SICScanNumbers,
-                                                               sicIntensities,
+                    blnSuccess = peakFinder.FindSICPeakAndArea(sicDetails.SICData,
                                                                .SICStats.SICPotentialAreaStatsForPeak,
                                                                .SICStats.Peak, smoothedYDataSubset,
                                                                mOptions.SICOptions.SICPeakFinderOptions,
@@ -645,8 +643,6 @@ Public Class clsMRMProcessing
 
 
                     blnSuccess = sicProcessor.StorePeakInParentIon(scanList, intParentIonIndex, sicDetails,
-                                                                   sicDetails.SICScanNumbers, sicIntensities,
-                                                                   sicDetails.SICScanIndices,
                                                                    .SICStats.SICPotentialAreaStatsForPeak,
                                                                    .SICStats.Peak, blnSuccess)
                 End With

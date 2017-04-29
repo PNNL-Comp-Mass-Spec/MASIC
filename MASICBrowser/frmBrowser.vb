@@ -24,14 +24,24 @@
 ' this computer software.
 
 Imports System.Collections.Generic
+Imports System.ComponentModel
 Imports System.IO
+Imports System.Runtime.InteropServices
+Imports System.Timers
+Imports System.Xml
+Imports DataFilter
+Imports MASICPeakFinder
 Imports PNNLOmics.Utilities
 Imports OxyDataPlotter
+Imports OxyPlot
+Imports PRISM
+Imports ProgressFormNET
+Imports SharedVBNetRoutines
 
 Public Class frmBrowser
     Inherits Form
 
-    Private Const PROGRAM_DATE As String = "April 4, 2017"
+    Private Const PROGRAM_DATE As String = "April 27, 2017"
 
 #Region "Windows Form Designer generated code"
 
@@ -46,6 +56,7 @@ Public Class frmBrowser
 
         'Add any initialization after the InitializeComponent() call
         InitializeControls()
+
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -1064,55 +1075,6 @@ Public Class frmBrowser
         ParentIons = 3
     End Enum
 
-    Protected Enum eScanTypeConstants
-        SurveyScan = 0
-        FragScan = 1
-    End Enum
-
-#End Region
-
-#Region "Structures"
-    Public Structure udtSICStatsType
-        Public Peak As MASICPeakFinder.clsMASICPeakFinder.udtSICStatsPeakType
-
-        Public SICPeakWidthFullScans As Integer
-        Public ScanNumberMaxIntensity As Integer                   ' Scan number of the peak Apex
-
-        Public SICPotentialAreaStatsForPeak As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
-
-        Public SICSmoothedYDataIndexStart As Integer
-        Public SICSmoothedYData() As Single
-
-    End Structure
-
-
-    Private Structure udtParentIonStatsType
-        Public Index As Integer
-        Public MZ As Double
-        Public SurveyScanNumber As Integer              ' Scan number of the survey scan
-        Public FragScanObserved As Integer              ' Scan number of the fragmentation scan
-        Public FragScanTime As Single
-        Public OptimalPeakApexScanNumber As Integer     ' Optimal peak apex scan number (if parent ion was combined with another parent ion due to similar m/z)
-        Public OptimalPeakApexTime As Single
-        Public CustomSICPeak As Boolean
-        Public CustomSICPeakComment As String
-
-        Public DataCount As Integer
-        Public SICScanType As eScanTypeConstants
-
-        Public SICScans() As Integer
-        Public SICData() As Single                      ' Intensity data, parallel with SICScans()
-        Public SICMassData() As Single                  ' Masses, parallel with SICScans()
-
-        Public SICIntensityMax As Single                ' Maximum intensity in SICData()
-
-        Public SICStats As udtSICStatsType              ' Contains the smoothed SIC data plus the details on the peak identified in the SIC (including its baseline noise stats)
-
-        Public SimilarFragScanCount As Integer
-        Public SimilarFragScanList() As Integer         ' List of scan numbers at which this m/z was chosen for fragmentation; the range of scans checked will be from SICScans(0) to SICScans(DataCount)
-        Public SimilarFragScanPlottingIntensity() As Single
-    End Structure
-
 #End Region
 
 #Region "Properties"
@@ -1121,29 +1083,28 @@ Public Class frmBrowser
 
 #Region "Classwide Variables"
 
-    Private mSpectrum As OxyDataPlotter.Spectrum
+    Private mSpectrum As Spectrum
 
-    Private mParentIonCount As Integer
-    Private mParentIonStats() As udtParentIonStatsType          ' 0-based array, ranging from 0 to mParentIonCount-1
+    Private mParentIonStats As List(Of clsParentIonStats)
 
     Private mMsMsResults As DataSet
 
-    Private mSICPeakFinderOptions As MASICPeakFinder.clsSICPeakFinderOptions
+    Private mSICPeakFinderOptions As clsSICPeakFinderOptions
 
-    Private mParentIonPointerArrayCount As Integer          ' Could be less than mParentIonCount if filtering the data
-    Private mParentIonPointerArray() As Integer             ' Pointer array used for de-referencing cboParentIon.SelectedItem to mParentIonStats()
+    Private mParentIonPointerArrayCount As Integer          ' Could be less than mParentIonStats.Count if filtering the data
+    Private mParentIonPointerArray() As Integer             ' Pointer array used for de-referencing cboParentIon.SelectedItem to mParentIonStats
 
     Private mAutoStepEnabled As Boolean
     Private mAutoStepIntervalMsec As Integer
 
     Private mLastUpdate As DateTime
-    Private mMASICPeakFinder As MASICPeakFinder.clsMASICPeakFinder
+    Private mMASICPeakFinder As clsMASICPeakFinder
 
-    Private mFileLoadTimer As Timer
+    Private mFileLoadTimer As System.Windows.Forms.Timer
 
 #End Region
 
-    Private Sub AutoOpenMsMsResults(strMASICFilePath As String, ByRef objProgress As ProgressFormNET.frmProgress)
+    Private Sub AutoOpenMsMsResults(strMASICFilePath As String, ByRef objProgress As frmProgress)
         ' Look for a corresponding Synopsis or First hits file in the same folder as strMASICFilePath
 
         Dim ioFolderInfo As New DirectoryInfo(Path.GetDirectoryName(strMASICFilePath))
@@ -1210,7 +1171,7 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Sub DisplaySICStats(intParentIonIndex As Integer, ByRef udtSICStats As udtSICStatsType)
+    Private Sub DisplaySICStats(intParentIonIndex As Integer, <Out()> ByRef sicStats As clsSICStats)
         ' udtSICStats will be populated with either the original SIC stats found by MASIC or with the
         '  updated SIC stats if chkUsePeakFinder is Checked
         ' Also, if re-smooth data is enabled, then the SIC data will be re-smoothed
@@ -1225,7 +1186,7 @@ Public Class frmBrowser
 
         UpdateSICPeakFinderOptions()
 
-        If intParentIonIndex >= 0 And intParentIonIndex < mParentIonCount Then
+        If intParentIonIndex >= 0 And intParentIonIndex < mParentIonStats.Count Then
             If optUseButterworthSmooth.Checked Then
                 eSmoothMode = eSmoothModeConstants.Butterworth
             ElseIf optUseSavitzkyGolaySmooth.Checked Then
@@ -1234,7 +1195,7 @@ Public Class frmBrowser
                 eSmoothMode = eSmoothModeConstants.DoNotReSmooth
             End If
 
-            blnValidPeakFound = UpdateSICStats(intParentIonIndex, chkUsePeakFinder.Checked, eSmoothMode, udtSICStats)
+            blnValidPeakFound = UpdateSICStats(intParentIonIndex, chkUsePeakFinder.Checked, eSmoothMode, sicStats)
 
             ' Display the SIC and SIC Peak stats
             With mParentIonStats(intParentIonIndex)
@@ -1247,70 +1208,68 @@ Public Class frmBrowser
                 End If
             End With
 
-            With udtSICStats
-
-                If blnValidPeakFound Then
-                    strStats &= ControlChars.NewLine & "Center of mass: " & .Peak.StatisticalMoments.CenterOfMassScan.ToString
-                    If chkShowBaselineCorrectedStats.Checked Then
-                        sngIntensityToDisplay = MASICPeakFinder.clsMASICPeakFinder.BaselineAdjustIntensity(.Peak, False)
-                        sngAreaToDisplay = MASICPeakFinder.clsMASICPeakFinder.BaselineAdjustArea(.Peak, mParentIonStats(intParentIonIndex).SICStats.SICPeakWidthFullScans, False)
-                    Else
-                        sngIntensityToDisplay = .Peak.MaxIntensityValue
-                        sngAreaToDisplay = .Peak.Area
-                    End If
-                    strStats &= ControlChars.NewLine & "Intensity: " & StringUtilities.ValueToString(sngIntensityToDisplay, 4)
-                    strStats &= ControlChars.NewLine & "Area: " & StringUtilities.ValueToString(sngAreaToDisplay, 4)
-                    strStats &= ControlChars.NewLine & "FWHM: " & .Peak.FWHMScanWidth.ToString
+            If blnValidPeakFound Then
+                strStats &= ControlChars.NewLine & "Center of mass: " & sicStats.Peak.StatisticalMoments.CenterOfMassScan.ToString
+                If chkShowBaselineCorrectedStats.Checked Then
+                    sngIntensityToDisplay = clsMASICPeakFinder.BaselineAdjustIntensity(sicStats.Peak, False)
+                    sngAreaToDisplay = clsMASICPeakFinder.BaselineAdjustArea(sicStats.Peak, mParentIonStats(intParentIonIndex).SICStats.SICPeakWidthFullScans, False)
                 Else
-                    strStats &= ControlChars.NewLine & "Could not find a valid SIC peak"
+                    sngIntensityToDisplay = sicStats.Peak.MaxIntensityValue
+                    sngAreaToDisplay = sicStats.Peak.Area
+                End If
+                strStats &= ControlChars.NewLine & "Intensity: " & StringUtilities.ValueToString(sngIntensityToDisplay, 4)
+                strStats &= ControlChars.NewLine & "Area: " & StringUtilities.ValueToString(sngAreaToDisplay, 4)
+                strStats &= ControlChars.NewLine & "FWHM: " & sicStats.Peak.FWHMScanWidth.ToString
+            Else
+                strStats &= ControlChars.NewLine & "Could not find a valid SIC peak"
+            End If
+
+            If mParentIonStats(intParentIonIndex).CustomSICPeak Then
+                strStats &= ControlChars.NewLine & "Custom SIC: " & mParentIonStats(intParentIonIndex).CustomSICPeakComment
+            End If
+
+            txtStats1.Text = strStats
+
+            strStats = "m/z: " & mParentIonStats(intParentIonIndex).MZ
+            If blnValidPeakFound Then
+                With sicStats.Peak.StatisticalMoments
+                    strStats &= ControlChars.NewLine & "Peak StDev: " & StringUtilities.ValueToString(.StDev, 3)
+                    strStats &= ControlChars.NewLine & "Peak Skew: " & StringUtilities.ValueToString(.Skew, 4)
+                    strStats &= ControlChars.NewLine & "Peak KSStat: " & StringUtilities.ValueToString(.KSStat, 4)
+                    strStats &= ControlChars.NewLine & "Data Count Used: " & .DataCountUsed
+                End With
+
+                If sicStats.Peak.SignalToNoiseRatio >= 3 Then
+                    strStats &= ControlChars.NewLine & "S/N: " & Math.Round(sicStats.Peak.SignalToNoiseRatio, 0).ToString
+                Else
+                    strStats &= ControlChars.NewLine & "S/N: " & StringUtilities.ValueToString(sicStats.Peak.SignalToNoiseRatio, 4)
                 End If
 
-                If mParentIonStats(intParentIonIndex).CustomSICPeak Then
-                    strStats &= ControlChars.NewLine & "Custom SIC: " & mParentIonStats(intParentIonIndex).CustomSICPeakComment
-                End If
+                With sicStats.Peak.BaselineNoiseStats
+                    strStats &= ControlChars.NewLine & "Noise level: " & StringUtilities.ValueToString(.NoiseLevel, 4)
+                    strStats &= ControlChars.NewLine & "Noise StDev: " & StringUtilities.ValueToString(.NoiseStDev, 3)
+                    strStats &= ControlChars.NewLine & "Points used: " & .PointsUsed.ToString
+                    strStats &= ControlChars.NewLine & "Noise Mode Used: " & .NoiseThresholdModeUsed.ToString
+                End With
 
-                txtStats1.Text = strStats
+            End If
+            txtStats2.Text = strStats
 
-                strStats = "m/z: " & mParentIonStats(intParentIonIndex).MZ
-                If blnValidPeakFound Then
-                    With .Peak.StatisticalMoments
-                        strStats &= ControlChars.NewLine & "Peak StDev: " & StringUtilities.ValueToString(.StDev, 3)
-                        strStats &= ControlChars.NewLine & "Peak Skew: " & StringUtilities.ValueToString(.Skew, 4)
-                        strStats &= ControlChars.NewLine & "Peak KSStat: " & StringUtilities.ValueToString(.KSStat, 4)
-                        strStats &= ControlChars.NewLine & "Data Count Used: " & .DataCountUsed
-                    End With
-
-                    If .Peak.SignalToNoiseRatio >= 3 Then
-                        strStats &= ControlChars.NewLine & "S/N: " & Math.Round(.Peak.SignalToNoiseRatio, 0).ToString
-                    Else
-                        strStats &= ControlChars.NewLine & "S/N: " & StringUtilities.ValueToString(.Peak.SignalToNoiseRatio, 4)
-                    End If
-
-                    With .Peak.BaselineNoiseStats
-                        strStats &= ControlChars.NewLine & "Noise level: " & StringUtilities.ValueToString(.NoiseLevel, 4)
-                        strStats &= ControlChars.NewLine & "Noise StDev: " & StringUtilities.ValueToString(.NoiseStDev, 3)
-                        strStats &= ControlChars.NewLine & "Points used: " & .PointsUsed.ToString
-                        strStats &= ControlChars.NewLine & "Noise Mode Used: " & .NoiseThresholdModeUsed.ToString
-                    End With
-
-                End If
-                txtStats2.Text = strStats
-
-                txtStats3.Text = LookupSequenceForParentIonIndex(intParentIonIndex)
-            End With
-
+            txtStats3.Text = LookupSequenceForParentIonIndex(intParentIonIndex)
         Else
             txtStats1.Text = "Invalid parent ion index: " & intParentIonIndex.ToString
             txtStats2.Text = String.Empty
             txtStats3.Text = String.Empty
+            sicStats = New clsSICStats()
         End If
 
     End Sub
 
     Private Sub DisplaySICStatsForSelectedParentIon()
-        Dim udtSICStats = New udtSICStatsType
+        Dim sicStats As clsSICStats = Nothing
+
         If mParentIonPointerArrayCount > 0 Then
-            DisplaySICStats(mParentIonPointerArray(lstParentIonData.SelectedIndex), udtSICStats)
+            DisplaySICStats(mParentIonPointerArray(lstParentIonData.SelectedIndex), sicStats)
         End If
     End Sub
     Private Sub EnableDisableControls()
@@ -1335,14 +1294,18 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Sub FindMinimumPotentialPeakAreaInRegion(intParentIonIndexStart As Integer, intParentIonIndexEnd As Integer, ByRef udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType)
+    Private Sub FindMinimumPotentialPeakAreaInRegion(
+      intParentIonIndexStart As Integer,
+      intParentIonIndexEnd As Integer,
+      potentialAreaStatsForRegion As clsSICPotentialAreaStats)
+
         ' This function finds the minimum potential peak area in the parent ions between
         '  intParentIonIndexStart and intParentIonIndexEnd
         ' However, the summed intensity is not used if the number of points >= .SICNoiseThresholdIntensity is less than Minimum_Peak_Width
 
         Dim intParentIonIndex As Integer
 
-        With udtSICPotentialAreaStatsForRegion
+        With potentialAreaStatsForRegion
             .MinimumPotentialPeakArea = Double.MaxValue
             .PeakCountBasisForMinimumPotentialArea = 0
         End With
@@ -1355,23 +1318,23 @@ Public Class frmBrowser
                     ' Need to compute the minimum potential peak area for intParentIonIndex
 
                     ' Compute the potential peak area for this SIC
-                    mMASICPeakFinder.FindPotentialPeakArea(.DataCount, .SICData, .SICStats.SICPotentialAreaStatsForPeak, mSICPeakFinderOptions)
+                    mMASICPeakFinder.FindPotentialPeakArea(.SICData, .SICStats.SICPotentialAreaStatsForPeak, mSICPeakFinderOptions)
                 End If
 
 
                 With .SICStats.SICPotentialAreaStatsForPeak
 
-                    If .MinimumPotentialPeakArea > 0 And .PeakCountBasisForMinimumPotentialArea >= MASICPeakFinder.clsMASICPeakFinder.MINIMUM_PEAK_WIDTH Then
-                        If .PeakCountBasisForMinimumPotentialArea > udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
+                    If .MinimumPotentialPeakArea > 0 And .PeakCountBasisForMinimumPotentialArea >= clsMASICPeakFinder.MINIMUM_PEAK_WIDTH Then
+                        If .PeakCountBasisForMinimumPotentialArea > potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
                             ' The non valid peak count value is larger than the one associated with the current
                             '  minimum potential peak area; update the minimum peak area to dblPotentialPeakArea
-                            udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
-                            udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
+                            potentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
+                            potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
                         Else
-                            If .MinimumPotentialPeakArea < udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea And
-                               .PeakCountBasisForMinimumPotentialArea >= udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
-                                udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
-                                udtSICPotentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
+                            If .MinimumPotentialPeakArea < potentialAreaStatsForRegion.MinimumPotentialPeakArea And
+                               .PeakCountBasisForMinimumPotentialArea >= potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea Then
+                                potentialAreaStatsForRegion.MinimumPotentialPeakArea = .MinimumPotentialPeakArea
+                                potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = .PeakCountBasisForMinimumPotentialArea
                             End If
                         End If
                     End If
@@ -1379,89 +1342,91 @@ Public Class frmBrowser
             End With
         Next
 
-        If udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea > Double.MaxValue - 1 Then
-            udtSICPotentialAreaStatsForRegion.MinimumPotentialPeakArea = 1
+        If potentialAreaStatsForRegion.MinimumPotentialPeakArea > Double.MaxValue - 1 Then
+            potentialAreaStatsForRegion.MinimumPotentialPeakArea = 1
         End If
 
     End Sub
 
-    Private Function FindSICPeakAndAreaForParentIon(intParentIonIndex As Integer, ByRef udtSICStats As udtSICStatsType) As Boolean
+    Private Function FindSICPeakAndAreaForParentIon(intParentIonIndex As Integer, sicStats As clsSICStats) As Boolean
 
         Dim intIndex As Integer
         Dim intParentIonIndexStart As Integer
 
-        Dim udtSICPotentialAreaStatsForRegion As MASICPeakFinder.clsMASICPeakFinder.udtSICPotentialAreaStatsType
+        Dim sicPotentialAreaStatsForRegion = New clsSICPotentialAreaStats()
         Dim blnReturnClosestPeak As Boolean
 
-        Dim udtSmoothedYDataSubset As MASICPeakFinder.clsMASICPeakFinder.udtSmoothedYDataSubsetType
-
-        ReDim udtSmoothedYDataSubset.Data(100)
-        udtSmoothedYDataSubset.DataCount = 0
-
         Dim blnRecomputeNoiseLevel As Boolean
-        Dim blnSuccess As Boolean
 
         Try
             ' Determine the minimum potential peak area in the last 500 scans
             intParentIonIndexStart = intParentIonIndex - 500
             If intParentIonIndexStart < 0 Then intParentIonIndexStart = 0
-            FindMinimumPotentialPeakAreaInRegion(intParentIonIndexStart, intParentIonIndex, udtSICPotentialAreaStatsForRegion)
+            FindMinimumPotentialPeakAreaInRegion(intParentIonIndexStart, intParentIonIndex, sicPotentialAreaStatsForRegion)
 
-            With mParentIonStats(intParentIonIndex)
-                blnReturnClosestPeak = Not .CustomSICPeak
+            Dim parentIon = mParentIonStats(intParentIonIndex)
 
-                ' Look for .SurveyScanNumber in .SICScans in order to populate udtSICStats.Peak.IndexObserved
-                If udtSICStats.Peak.IndexObserved = 0 Then
-                    For intIndex = 0 To .DataCount - 1
-                        If .SICScans(intIndex) = .SurveyScanNumber Then
-                            udtSICStats.Peak.IndexObserved = intIndex
-                        End If
-                    Next
-                End If
+            blnReturnClosestPeak = Not parentIon.CustomSICPeak
 
-                ' Determine the value for .ParentIonIntensity
-                blnSuccess = mMASICPeakFinder.ComputeParentIonIntensity(.DataCount, .SICScans, .SICData, udtSICStats.Peak, .FragScanObserved)
-
-                If .SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
-                    blnRecomputeNoiseLevel = False
-                Else
-                    blnRecomputeNoiseLevel = True
-                    ' Note: We cannot use DualTrimmedMeanByAbundance since we don't have access to the full-length SICs
-                    If mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
-                        mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance
+            ' Look for .SurveyScanNumber in .SICScans in order to populate sicStats.Peak.IndexObserved
+            If sicStats.Peak.IndexObserved = 0 Then
+                For intIndex = 0 To parentIon.SICData.Count - 1
+                    If parentIon.SICData(intIndex).ScanNumber = parentIon.SurveyScanNumber Then
+                        sicStats.Peak.IndexObserved = intIndex
                     End If
-                End If
-                blnSuccess = mMASICPeakFinder.FindSICPeakAndArea(.DataCount, .SICScans, .SICData, .SICStats.SICPotentialAreaStatsForPeak, udtSICStats.Peak,
-                                                                 udtSmoothedYDataSubset, mSICPeakFinderOptions,
-                                                                 udtSICPotentialAreaStatsForRegion,
-                                                                 blnReturnClosestPeak, False, blnRecomputeNoiseLevel)
-            End With
+                Next
+            End If
 
-            ' Copy the data out of udtSmoothedYDataSubset and into udtSICStats.SICSmoothedYData
-            With udtSmoothedYDataSubset
-                If udtSICStats.SICSmoothedYData.Length <> .DataCount Then
-                    ReDim udtSICStats.SICSmoothedYData(.DataCount - 1)
-                End If
-                Array.Copy(.Data, udtSICStats.SICSmoothedYData, .DataCount)
+            ' Determine the value for .ParentIonIntensity
+            mMASICPeakFinder.ComputeParentIonIntensity(parentIon.SICData, sicStats.Peak, parentIon.FragScanObserved)
 
-                udtSICStats.SICSmoothedYDataIndexStart = .DataStartIndex
+            If parentIon.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
+                blnRecomputeNoiseLevel = False
+            Else
+                blnRecomputeNoiseLevel = True
+                ' Note: We cannot use DualTrimmedMeanByAbundance since we don't have access to the full-length SICs
+                If mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
+                    mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance
+                End If
+            End If
+
+            Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
+
+            mMASICPeakFinder.FindSICPeakAndArea(parentIon.SICData, sicStats.SICPotentialAreaStatsForPeak, sicStats.Peak,
+                                                smoothedYDataSubset, mSICPeakFinderOptions,
+                                                sicPotentialAreaStatsForRegion,
+                                                blnReturnClosestPeak, False, blnRecomputeNoiseLevel)
+
+
+            ' Copy the data out of smoothedYDataSubset and into sicStats.SICSmoothedYData
+            With smoothedYDataSubset
+                sicStats.SICSmoothedYData.Clear()
+
+                For Each dataPoint In parentIon.SICData
+                    sicStats.SICSmoothedYData.Add(dataPoint.Intensity)
+                Next
+
+                sicStats.SICSmoothedYDataIndexStart = .DataStartIndex
             End With
 
             Try
                 ' Update the two computed values
-                With udtSICStats
-                    .SICPeakWidthFullScans = mParentIonStats(intParentIonIndex).SICScans(.Peak.IndexBaseRight) - mParentIonStats(intParentIonIndex).SICScans(.Peak.IndexBaseLeft) + 1
-                    .ScanNumberMaxIntensity = mParentIonStats(intParentIonIndex).SICScans(.Peak.IndexMax)
+                With sicStats
+                    .SICPeakWidthFullScans = mParentIonStats(intParentIonIndex).SICData(.Peak.IndexBaseRight).ScanNumber -
+                                             mParentIonStats(intParentIonIndex).SICData(.Peak.IndexBaseLeft).ScanNumber + 1
+
+                    .ScanNumberMaxIntensity = mParentIonStats(intParentIonIndex).SICData(.Peak.IndexMax).ScanNumber
                 End With
             Catch ex As Exception
                 ' Index out of range; ignore the error
             End Try
+
+            Return True
+
         Catch ex As Exception
             MessageBox.Show("Error in FindSICPeakAndAreaForParentIon: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-            blnSuccess = False
+            Return False
         End Try
-
-        Return blnSuccess
 
     End Function
 
@@ -1475,161 +1440,126 @@ Public Class frmBrowser
 
         Const DEFAULT_INTENSITY As Single = 1
 
-        Dim intParentIonIndex As Integer
-        Dim intIndexCompare As Integer
-
-        Dim intFragIndex As Integer
-
-        Dim intScanIndex As Integer
-        Dim intMatchIndex As Integer
-
-        Dim dblParentIonMZ As Double
-        Dim intScanStart As Integer
-        Dim intScanEnd As Integer
-
-        Dim intSimilarFragScanCount As Integer
-        Dim intSimilarFragScans() As Integer
-
-        Dim sngInterpolatedYValue As Single
-
-        Dim blnAddScan As Boolean
-        Dim blnSuccess As Boolean
-
-
         Try
-            If mParentIonStats Is Nothing OrElse mParentIonStats.Length = 0 Then
+            If mParentIonStats Is Nothing OrElse mParentIonStats.Count = 0 Then
                 Exit Sub
             End If
 
-            ' Initially reserve space for 4 similar frag scan entries
-            intSimilarFragScanCount = 0
-            ReDim intSimilarFragScans(3)
+            Dim intSimilarFragScans = New List(Of Integer)
 
-            For intParentIonIndex = 0 To mParentIonCount - 1
+            For intParentIonIndex = 0 To mParentIonStats.Count - 1
 
-                If mParentIonStats(intParentIonIndex).DataCount <= 0 Then
-                    mParentIonStats(intParentIonIndex).SimilarFragScanCount = 0
-                    ReDim mParentIonStats(intParentIonIndex).SimilarFragScanList(0)
-                    ReDim mParentIonStats(intParentIonIndex).SimilarFragScanPlottingIntensity(0)
-                Else
+                Dim currentParentIon = mParentIonStats(intParentIonIndex)
+                currentParentIon.SimilarFragScans.Clear()
 
-                    With mParentIonStats(intParentIonIndex)
-                        dblParentIonMZ = .MZ
-                        intScanStart = .SICScans(0)
-                        intScanEnd = .SICScans(.DataCount - 1)
+                If currentParentIon.SICData.Count = 0 Then
+                    Continue For
+                End If
 
-                        mParentIonStats(intParentIonIndex).SimilarFragScanCount = 0
+                Dim dblParentIonMZ = currentParentIon.MZ
+                Dim intScanStart = currentParentIon.SICData.First().ScanNumber
+                Dim intScanEnd = currentParentIon.SICData.Last().ScanNumber
 
-                        ' Always store this parent ion's fragmentation scan in intSimilarFragScans
-                        ' Note that it's possible for .FragScanObserved to be outside the range of intScanStart and intScanEnd
-                        ' We'll allow this, but won't be able to properly determine the abundance value to use for .SimilarFragScanPlottingIntensity()
-                        intSimilarFragScans(0) = .FragScanObserved
-                        intSimilarFragScanCount = 1
+                currentParentIon.SimilarFragScans.Clear()
 
-                    End With
+                ' Always store this parent ion's fragmentation scan in intSimilarFragScans
+                ' Note that it's possible for .FragScanObserved to be outside the range of intScanStart and intScanEnd
+                ' We'll allow this, but won't be able to properly determine the abundance value to use for .SimilarFragScanPlottingIntensity()
+                intSimilarFragScans.Clear()
+                intSimilarFragScans.Add(currentParentIon.FragScanObserved)
 
-                    ' Step through the parent ions and look for others with a similar m/z and a fragmentation scan
-                    '   between intScanStart and intScanEnd
+                ' Step through the parent ions and look for others with a similar m/z and a fragmentation scan
+                '   between intScanStart and intScanEnd
 
-                    For intIndexCompare = 0 To mParentIonCount - 1
-                        With mParentIonStats(intIndexCompare)
-                            If intIndexCompare <> intParentIonIndex AndAlso
-                               (.FragScanObserved >= intScanStart AndAlso .FragScanObserved <= intScanEnd) Then
+                For intIndexCompare = 0 To mParentIonStats.Count - 1
+                    With mParentIonStats(intIndexCompare)
+                        If intIndexCompare <> intParentIonIndex AndAlso
+                           (.FragScanObserved >= intScanStart AndAlso .FragScanObserved <= intScanEnd) Then
 
-                                If Math.Abs(.MZ - dblParentIonMZ) <= dblSimilarMZTolerance Then
-                                    ' Similar parent ion m/z found
+                            If Math.Abs(.MZ - dblParentIonMZ) <= dblSimilarMZTolerance Then
+                                ' Similar parent ion m/z found
 
-                                    If intSimilarFragScanCount >= intSimilarFragScans.Length Then
-                                        ReDim Preserve intSimilarFragScans(intSimilarFragScans.Length * 2 - 1)
-                                    End If
-
-                                    intSimilarFragScans(intSimilarFragScanCount) = .FragScanObserved
-                                    intSimilarFragScanCount += 1
-                                End If
+                                intSimilarFragScans.Add(.FragScanObserved)
                             End If
-                        End With
-                    Next
-
-                    With mParentIonStats(intParentIonIndex)
-
-                        If intSimilarFragScanCount > 0 Then
-                            ' Sort the data in intSimilarFragScans
-                            Array.Sort(intSimilarFragScans, 0, intSimilarFragScanCount)
-
-                            ' Copy the sorted data into .SimilarFragScanList
-                            ' When copying, make sure we don't have any duplicates
-                            ' Also, populate SimilarFragScanPlottingIntensity
-                            ReDim .SimilarFragScanList(intSimilarFragScanCount - 1)
-                            ReDim .SimilarFragScanPlottingIntensity(intSimilarFragScanCount - 1)
-
-                            intFragIndex = 0
-                            Do While intFragIndex < intSimilarFragScanCount
-                                blnAddScan = True
-                                If .SimilarFragScanCount > 0 Then
-                                    If intSimilarFragScans(intFragIndex) = .SimilarFragScanList(.SimilarFragScanCount - 1) Then
-                                        blnAddScan = False
-                                    End If
-                                End If
-
-                                If blnAddScan Then
-                                    .SimilarFragScanList(.SimilarFragScanCount) = intSimilarFragScans(intFragIndex)
-
-                                    ' Look for intSimilarFragScans(intFragIndex) in .SICScans() then use the corresponding
-                                    '  intensity value in .SICData()
-
-                                    intMatchIndex = clsBinarySearch.BinarySearchFindNearest(.SICScans, intSimilarFragScans(intFragIndex), .DataCount, clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint)
-
-                                    If intMatchIndex < 0 Then
-                                        ' Match not found; find the closest match via brute-force searching
-                                        intMatchIndex = -1
-                                        For intScanIndex = 0 To .DataCount - 2
-                                            If .SICScans(intScanIndex) <= intSimilarFragScans(intFragIndex) AndAlso
-                                               .SICScans(intScanIndex + 1) >= intSimilarFragScans(intFragIndex) Then
-                                                intMatchIndex = intScanIndex
-                                                Exit For
-                                            End If
-                                        Next
-                                    End If
-
-                                    If intMatchIndex >= 0 Then
-
-                                        If intMatchIndex < .DataCount - 1 Then
-                                            If intSimilarFragScans(intFragIndex) <= .SICScans(intMatchIndex) Then
-                                                ' Frag scan is at or before the first scan number in .SICData()
-                                                ' Use the intensity at .SICData(0)
-                                                sngInterpolatedYValue = .SICData(0)
-                                            Else
-                                                blnSuccess = InterpolateY(sngInterpolatedYValue, .SICScans(intMatchIndex), .SICScans(intMatchIndex + 1), .SICData(intMatchIndex), .SICData(intMatchIndex + 1), intSimilarFragScans(intFragIndex))
-                                            End If
-                                        Else
-                                            ' Frag scan is at or after the last scan number in .SICData()
-                                            ' Use the last data point in .SICData()
-                                            sngInterpolatedYValue = .SICData(.DataCount - 1)
-                                        End If
-
-                                        If Not blnSuccess Then
-                                            sngInterpolatedYValue = DEFAULT_INTENSITY
-                                        End If
-
-                                        .SimilarFragScanPlottingIntensity(.SimilarFragScanCount) = sngInterpolatedYValue
-                                    Else
-                                        .SimilarFragScanPlottingIntensity(.SimilarFragScanCount) = DEFAULT_INTENSITY
-                                    End If
-
-                                    .SimilarFragScanCount += 1
-                                End If
-
-                                intFragIndex += 1
-                            Loop
-
-                        Else
-                            .SimilarFragScanCount = 0
-                            ReDim .SimilarFragScanList(0)
-                            ReDim .SimilarFragScanPlottingIntensity(0)
                         End If
                     End With
+                Next
 
+                If intSimilarFragScans.Count = 0 Then
+                    Continue For
                 End If
+
+                ' Sort the data in intSimilarFragScans
+                intSimilarFragScans.Sort()
+
+                ' Copy the sorted data into .SimilarFragScans
+                ' When copying, make sure we don't have any duplicates
+                ' Also, populate SimilarFragScanPlottingIntensity
+
+                Dim scanNumbers = (From item In currentParentIon.SICData Select item.ScanNumber).ToList()
+
+                For Each similarFragScan In intSimilarFragScans
+
+                    If currentParentIon.SimilarFragScans.Count > 0 Then
+                        If similarFragScan = currentParentIon.SimilarFragScans.Last().ScanNumber Then
+                            Continue For
+                        End If
+                    End If
+
+                    ' Look for similarFragScan in .SICScans() then use the corresponding
+                    '  intensity value in .SICData()
+
+                    Dim intMatchIndex = clsBinarySearch.BinarySearchFindNearest(scanNumbers,
+                                                                                similarFragScan,
+                                                                                scanNumbers.Count,
+                                                                                clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint)
+
+                    If intMatchIndex < 0 Then
+                        ' Match not found; find the closest match via brute-force searching
+                        intMatchIndex = -1
+                        For intScanIndex = 0 To scanNumbers.Count - 2
+                            If scanNumbers(intScanIndex) <= similarFragScan AndAlso
+                               scanNumbers(intScanIndex + 1) >= similarFragScan Then
+                                intMatchIndex = intScanIndex
+                                Exit For
+                            End If
+                        Next
+                    End If
+
+                    Dim sngInterpolatedYValue = DEFAULT_INTENSITY
+
+                    If intMatchIndex >= 0 Then
+
+                        If intMatchIndex < scanNumbers.Count - 1 Then
+                            If similarFragScan <= currentParentIon.SICData(intMatchIndex).ScanNumber Then
+                                ' Frag scan is at or before the first scan number in .SICData()
+                                ' Use the intensity at .SICData(0)
+                                sngInterpolatedYValue = currentParentIon.SICData(0).Intensity
+                            Else
+                                Dim blnSuccess = InterpolateY(
+                                    sngInterpolatedYValue,
+                                    currentParentIon.SICData(intMatchIndex).ScanNumber,
+                                    currentParentIon.SICData(intMatchIndex + 1).ScanNumber,
+                                    currentParentIon.SICData(intMatchIndex).Intensity,
+                                    currentParentIon.SICData(intMatchIndex + 1).Intensity,
+                                    similarFragScan)
+
+                                If Not blnSuccess Then
+                                    sngInterpolatedYValue = DEFAULT_INTENSITY
+                                End If
+                            End If
+                        Else
+                            ' Frag scan is at or after the last scan number in .SICData()
+                            ' Use the last data point in .SICData()
+                            sngInterpolatedYValue = currentParentIon.SICData.Last().Intensity
+                        End If
+                    End If
+
+                    Dim newDataPoint = New clsSICDataPoint(similarFragScan, sngInterpolatedYValue, 0)
+                    currentParentIon.SimilarFragScans.Add(newDataPoint)
+
+                Next
+
             Next
 
         Catch ex As Exception
@@ -1674,8 +1604,11 @@ Public Class frmBrowser
     End Function
 
     Private Sub InitializeControls()
-        mMASICPeakFinder = New MASICPeakFinder.clsMASICPeakFinder
-        mSICPeakFinderOptions = MASICPeakFinder.clsMASICPeakFinder.GetDefaultSICPeakFinderOptions
+        mMASICPeakFinder = New clsMASICPeakFinder
+        mSICPeakFinderOptions = clsMASICPeakFinder.GetDefaultSICPeakFinderOptions
+
+
+        mParentIonStats = New List(Of clsParentIonStats)
 
         InitializeMsMsResultsStorage()
         PopulateComboBoxes()
@@ -1694,7 +1627,7 @@ Public Class frmBrowser
         txtStats3.Visible = False
         PositionControls()
 
-        mFileLoadTimer = New Timer()
+        mFileLoadTimer = New System.Windows.Forms.Timer()
 
         AddHandler mFileLoadTimer.Tick, AddressOf mFileLoadTimer_Tick
 
@@ -1713,16 +1646,16 @@ Public Class frmBrowser
         dtDataTable = New DataTable(TABLE_NAME_MSMSRESULTS)
 
         ' Add the columns to the datatable
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SCAN)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_CHARGE)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_MH)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_XCORR)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_DELTACN)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_DELTACN2)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_RANKSP)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_RANKXC)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_PARENTIONINDEX)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SCAN)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_CHARGE)
+        ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_MH)
+        ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_XCORR)
+        ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_DELTACN)
+        ADONetRoutines.AppendColumnSingleToTable(dtDataTable, COL_NAME_DELTACN2)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_RANKSP)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_RANKXC)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_PARENTIONINDEX)
 
         ' Define a primary key
         With dtDataTable
@@ -1742,8 +1675,8 @@ Public Class frmBrowser
         dtDataTable = New DataTable(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
         ' Add the columns to the datatable
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnStringToTable(dtDataTable, COL_NAME_PROTEIN)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID)
+        ADONetRoutines.AppendColumnStringToTable(dtDataTable, COL_NAME_PROTEIN)
 
         ' Define a primary key
         With dtDataTable
@@ -1768,8 +1701,8 @@ Public Class frmBrowser
         dtDataTable = New DataTable(TABLE_NAME_SEQUENCES)
 
         ' Add the columns to the datatable
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID, 0, True, True, True)
-        SharedVBNetRoutines.ADONetRoutines.AppendColumnStringToTable(dtDataTable, COL_NAME_SEQUENCE)
+        ADONetRoutines.AppendColumnIntegerToTable(dtDataTable, COL_NAME_SEQUENCEID, 0, True, True, True)
+        ADONetRoutines.AppendColumnStringToTable(dtDataTable, COL_NAME_SEQUENCE)
 
         ' Define a primary key
         With dtDataTable
@@ -1786,7 +1719,7 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Function InterpolateY(ByRef sngInterpolatedYValue As Single, X1 As Integer, X2 As Integer, Y1 As Single, Y2 As Single, intTargetX As Integer) As Boolean
+    Private Function InterpolateY(<Out()> ByRef sngInterpolatedYValue As Single, X1 As Integer, X2 As Integer, Y1 As Single, Y2 As Single, intTargetX As Integer) As Boolean
         ' Checks if X1 or X2 is less than intTargetX
         ' If it is, then determines the Y value that corresponds to intTargetX by interpolating the line between (X1, Y1) and (X2, Y2)
         '
@@ -1814,13 +1747,15 @@ Public Class frmBrowser
                     Return True
                 Else
                     Debug.Assert(False, "TargetY is not between Y1 and Y2; this shouldn't happen (frmBrowser->InterpolateY)")
+                    sngInterpolatedYValue = 0
                     Return False
                 End If
 
             End If
-        Else
-            Return False
         End If
+
+        sngInterpolatedYValue = 0
+        Return False
 
     End Function
 
@@ -1842,7 +1777,7 @@ Public Class frmBrowser
                     End If
 
                     strResponse = InputBox("Enter the scan number to jump to: ", "Jump to Scan", intScanNumberToFind.ToString)
-                    If SharedVBNetRoutines.VBNetRoutines.IsNumber(strResponse) Then
+                    If VBNetRoutines.IsNumber(strResponse) Then
                         intScanNumberToFind = CInt(strResponse)
                     End If
                 End If
@@ -2004,7 +1939,7 @@ Public Class frmBrowser
         End If
     End Sub
 
-    Private Sub PlotData(intIndexToPlot As Integer, ByRef udtSICStats As udtSICStatsType)
+    Private Sub PlotData(intIndexToPlot As Integer, sicStats As clsSICStats)
         ' intIndexToPlot points to an entry in mParentIonStats()
 
         ' We plot the data as two different series to allow for different coloring
@@ -2015,48 +1950,50 @@ Public Class frmBrowser
         Dim dblXDataSeries4(), dblYDataSeries4() As Double          ' Holds the smoothed SIC data
 
         Try
-            If intIndexToPlot < 0 Or intIndexToPlot >= mParentIonCount Then Return
+            If intIndexToPlot < 0 Or intIndexToPlot >= mParentIonStats.Count Then Return
 
             Me.Cursor = Cursors.WaitCursor
 
             If mSpectrum Is Nothing Then
-                mSpectrum = New OxyDataPlotter.Spectrum()
+                mSpectrum = New Spectrum()
                 mSpectrum.SetSpectrumFormWindowCaption("Selected Ion Chromatogram")
             End If
 
             mSpectrum.RemoveAllAnnotations()
 
-            If mParentIonStats(intIndexToPlot).DataCount <= 0 Then Return
+            Dim currentParentIon = mParentIonStats(intIndexToPlot)
+
+            If currentParentIon.SICData.Count = 0 Then Return
 
             intDataCountSeries1 = 0
             intDataCountSeries2 = 0
-            intDataCountSeries3 = mParentIonStats(intIndexToPlot).SimilarFragScanCount
+            intDataCountSeries3 = currentParentIon.SimilarFragScans.Count
             intDataCountSeries4 = 0
 
-            With mParentIonStats(intIndexToPlot)
-                ReDim dblXDataSeries1(.DataCount + 3)   ' Need extra room for potential zero padding
-                ReDim dblYDataSeries1(.DataCount + 3)
+            With currentParentIon
+                ReDim dblXDataSeries1(.SICData.Count + 3)   ' Need extra room for potential zero padding
+                ReDim dblYDataSeries1(.SICData.Count + 3)
 
-                ReDim dblXDataSeries2(.DataCount + 3)
-                ReDim dblYDataSeries2(.DataCount + 3)
+                ReDim dblXDataSeries2(.SICData.Count + 3)
+                ReDim dblYDataSeries2(.SICData.Count + 3)
 
-                ReDim dblXDataSeries3(.SimilarFragScanCount - 1)
-                ReDim dblYDataSeries3(.SimilarFragScanCount - 1)
+                ReDim dblXDataSeries3(.SimilarFragScans.Count - 1)
+                ReDim dblYDataSeries3(.SimilarFragScans.Count - 1)
 
-                ReDim dblXDataSeries4(.DataCount)
-                ReDim dblYDataSeries4(.DataCount)
+                ReDim dblXDataSeries4(.SICData.Count)
+                ReDim dblYDataSeries4(.SICData.Count)
             End With
 
             Dim blnZeroEdgeSeries1 As Boolean
 
-            If udtSICStats.Peak.IndexBaseLeft = 0 Then
+            If sicStats.Peak.IndexBaseLeft = 0 Then
                 ' Zero pad Series 1
-                dblXDataSeries1(0) = mParentIonStats(intIndexToPlot).SICScans(0)
+                dblXDataSeries1(0) = currentParentIon.SICData(0).ScanNumber
                 dblYDataSeries1(0) = 0
                 intDataCountSeries1 += 1
 
                 ' Zero pad Series 2
-                dblXDataSeries2(0) = mParentIonStats(intIndexToPlot).SICScans(0)
+                dblXDataSeries2(0) = currentParentIon.SICData(0).ScanNumber
                 dblYDataSeries2(0) = 0
                 intDataCountSeries2 += 1
 
@@ -2067,44 +2004,46 @@ Public Class frmBrowser
             Dim dblScanObservedIntensity As Double = 0
 
             ' Initialize this to the maximum intensity, in case .OptimalPeakApexScanNumber is out of range
-            Dim dblOptimalPeakApexIntensity As Double = mParentIonStats(intIndexToPlot).SICIntensityMax
+            Dim dblOptimalPeakApexIntensity As Double = currentParentIon.SICIntensityMax
 
             Dim intSmoothedYDataIndexStart As Integer
             Dim dblSmoothedYData() As Double
 
-            If udtSICStats.SICSmoothedYData Is Nothing OrElse udtSICStats.SICSmoothedYData.Length = 0 Then
+            If sicStats.SICSmoothedYData Is Nothing OrElse sicStats.SICSmoothedYData.Count = 0 Then
                 intSmoothedYDataIndexStart = 0
                 ReDim dblSmoothedYData(-1)
             Else
-                intSmoothedYDataIndexStart = udtSICStats.SICSmoothedYDataIndexStart
+                intSmoothedYDataIndexStart = sicStats.SICSmoothedYDataIndexStart
 
-                ReDim dblSmoothedYData(udtSICStats.SICSmoothedYData.Length - 1)
-                udtSICStats.SICSmoothedYData.CopyTo(dblSmoothedYData, 0)
+                ReDim dblSmoothedYData(sicStats.SICSmoothedYData.Count - 1)
+                For intIndex = 0 To sicStats.SICSmoothedYData.Count - 1
+                    dblSmoothedYData(intIndex) = sicStats.SICSmoothedYData(intIndex)
+                Next
             End If
 
             ' Populate Series 3 with the similar frag scan values
-            For intIndex = 0 To mParentIonStats(intIndexToPlot).SimilarFragScanCount - 1
-                dblXDataSeries3(intIndex) = mParentIonStats(intIndexToPlot).SimilarFragScanList(intIndex)
-                dblYDataSeries3(intIndex) = mParentIonStats(intIndexToPlot).SimilarFragScanPlottingIntensity(intIndex)
+            For intIndex = 0 To currentParentIon.SimilarFragScans.Count - 1
+                dblXDataSeries3(intIndex) = currentParentIon.SimilarFragScans(intIndex).ScanNumber
+                dblYDataSeries3(intIndex) = currentParentIon.SimilarFragScans(intIndex).Intensity
             Next
 
-            For intIndex = 0 To mParentIonStats(intIndexToPlot).DataCount - 1
+            For intIndex = 0 To currentParentIon.SICData.Count - 1
                 Dim sngInterpolatedYValue As Single
 
-                If intIndex < mParentIonStats(intIndexToPlot).DataCount - 1 Then
-                    With mParentIonStats(intIndexToPlot)
-                        If .SICScans(intIndex) <= .FragScanObserved And .SICScans(intIndex + 1) >= .FragScanObserved Then
+                If intIndex < currentParentIon.SICData.Count - 1 Then
+                    With currentParentIon
+                        If .SICData(intIndex).ScanNumber <= .FragScanObserved And .SICData(intIndex + 1).ScanNumber >= .FragScanObserved Then
                             ' Use the survey scan data to calculate the appropriate intensity for the Frag Scan cursor
 
-                            If InterpolateY(sngInterpolatedYValue, .SICScans(intIndex), .SICScans(intIndex + 1), .SICData(intIndex), .SICData(intIndex + 1), .FragScanObserved) Then
+                            If InterpolateY(sngInterpolatedYValue, .SICData(intIndex).ScanNumber, .SICData(intIndex + 1).ScanNumber, .SICData(intIndex).Intensity, .SICData(intIndex + 1).Intensity, .FragScanObserved) Then
                                 dblScanObservedIntensity = sngInterpolatedYValue
                             End If
                         End If
 
-                        If .SICScans(intIndex) <= .OptimalPeakApexScanNumber And .SICScans(intIndex + 1) >= .OptimalPeakApexScanNumber Then
+                        If .SICData(intIndex).ScanNumber <= .OptimalPeakApexScanNumber And .SICData(intIndex + 1).ScanNumber >= .OptimalPeakApexScanNumber Then
                             ' Use the survey scan data to calculate the appropriate intensity for the Optimal Peak Apex Scan cursor
 
-                            If InterpolateY(sngInterpolatedYValue, .SICScans(intIndex), .SICScans(intIndex + 1), .SICData(intIndex), .SICData(intIndex + 1), .OptimalPeakApexScanNumber) Then
+                            If InterpolateY(sngInterpolatedYValue, .SICData(intIndex).ScanNumber, .SICData(intIndex + 1).ScanNumber, .SICData(intIndex).Intensity, .SICData(intIndex + 1).Intensity, .OptimalPeakApexScanNumber) Then
                                 dblOptimalPeakApexIntensity = sngInterpolatedYValue
                             End If
                         End If
@@ -2112,54 +2051,54 @@ Public Class frmBrowser
 
                 End If
 
-                If intIndex >= udtSICStats.Peak.IndexBaseLeft And intIndex <= udtSICStats.Peak.IndexBaseRight Then
+                If intIndex >= sicStats.Peak.IndexBaseLeft And intIndex <= sicStats.Peak.IndexBaseRight Then
                     If intIndex > 0 And Not blnZeroEdgeSeries1 Then
                         ' Zero pad Series 1
-                        dblXDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICScans(intIndex)
-                        dblYDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICData(intIndex)
+                        dblXDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex).ScanNumber
+                        dblYDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex).Intensity
                         intDataCountSeries1 += 1
 
-                        dblXDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICScans(intIndex)
+                        dblXDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex).ScanNumber
                         dblYDataSeries1(intDataCountSeries1) = 0
                         intDataCountSeries1 += 1
 
                         ' Zero pad Series 2
-                        dblXDataSeries2(intDataCountSeries2) = mParentIonStats(intIndexToPlot).SICScans(intIndex)
+                        dblXDataSeries2(intDataCountSeries2) = currentParentIon.SICData(intIndex).ScanNumber
                         dblYDataSeries2(intDataCountSeries2) = 0
                         intDataCountSeries2 += 1
 
                         blnZeroEdgeSeries1 = True
                     End If
 
-                    dblXDataSeries2(intDataCountSeries2) = mParentIonStats(intIndexToPlot).SICScans(intIndex)
-                    dblYDataSeries2(intDataCountSeries2) = mParentIonStats(intIndexToPlot).SICData(intIndex)
+                    dblXDataSeries2(intDataCountSeries2) = currentParentIon.SICData(intIndex).ScanNumber
+                    dblYDataSeries2(intDataCountSeries2) = currentParentIon.SICData(intIndex).Intensity
                     intDataCountSeries2 += 1
                 Else
                     If intIndex > 0 And blnZeroEdgeSeries1 Then
                         ' Zero pad Series 2
-                        dblXDataSeries2(intDataCountSeries2) = mParentIonStats(intIndexToPlot).SICScans(intIndex - 1)
+                        dblXDataSeries2(intDataCountSeries2) = currentParentIon.SICData(intIndex - 1).ScanNumber
                         dblYDataSeries2(intDataCountSeries2) = 0
                         intDataCountSeries2 += 1
 
                         ' Zero pad Series 1
-                        dblXDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICScans(intIndex - 1)
+                        dblXDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex - 1).ScanNumber
                         dblYDataSeries1(intDataCountSeries1) = 0
                         intDataCountSeries1 += 1
 
-                        dblXDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICScans(intIndex - 1)
-                        dblYDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICData(intIndex - 1)
+                        dblXDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex - 1).ScanNumber
+                        dblYDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex - 1).Intensity
                         intDataCountSeries1 += 1
                         blnZeroEdgeSeries1 = False
                     End If
 
-                    dblXDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICScans(intIndex)
-                    dblYDataSeries1(intDataCountSeries1) = mParentIonStats(intIndexToPlot).SICData(intIndex)
+                    dblXDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex).ScanNumber
+                    dblYDataSeries1(intDataCountSeries1) = currentParentIon.SICData(intIndex).Intensity
                     intDataCountSeries1 += 1
                 End If
 
                 If intIndex >= intSmoothedYDataIndexStart AndAlso Not dblSmoothedYData Is Nothing AndAlso
                    intIndex - intSmoothedYDataIndexStart < dblSmoothedYData.Length Then
-                    dblXDataSeries4(intDataCountSeries4) = mParentIonStats(intIndexToPlot).SICScans(intIndex)
+                    dblXDataSeries4(intDataCountSeries4) = currentParentIon.SICData(intIndex).ScanNumber
                     dblYDataSeries4(intDataCountSeries4) = dblSmoothedYData(intIndex - intSmoothedYDataIndexStart)
                     intDataCountSeries4 += 1
                 End If
@@ -2184,10 +2123,10 @@ Public Class frmBrowser
 
             Dim strCaption As String
 
-            If udtSICStats.Peak.ShoulderCount = 1 Then
+            If sicStats.Peak.ShoulderCount = 1 Then
                 strCaption = "SIC Data Peak (1 shoulder peak)"
-            ElseIf udtSICStats.Peak.ShoulderCount > 1 Then
-                strCaption = "SIC Data Peak (" & udtSICStats.Peak.ShoulderCount & " shoulder peaks)"
+            ElseIf sicStats.Peak.ShoulderCount > 1 Then
+                strCaption = "SIC Data Peak (" & sicStats.Peak.ShoulderCount & " shoulder peaks)"
             Else
                 strCaption = "SIC Data Peak"
             End If
@@ -2196,7 +2135,7 @@ Public Class frmBrowser
             strCaption = "Similar Frag scans"
             mSpectrum.SetDataXvsY(3, dblXDataSeries3, dblYDataSeries3, intDataCountSeries3, ctlOxyPlotControl.SeriesPlotMode.Points, strCaption)
 
-            If chkShowSmoothedData.Checked Then
+            If chkShowSmoothedData.Checked AndAlso dblXDataSeries4.Length > 0 Then
                 mSpectrum.SetDataXvsY(4, dblXDataSeries4, dblYDataSeries4, intDataCountSeries4, ctlOxyPlotControl.SeriesPlotMode.Lines, "Smoothed data")
             Else
                 Do While mSpectrum.GetSeriesCount >= 4
@@ -2204,36 +2143,41 @@ Public Class frmBrowser
                 Loop
             End If
 
-            mSpectrum.SetSeriesLineStyle(1, OxyPlot.LineStyle.Automatic)
-            mSpectrum.SetSeriesLineStyle(2, OxyPlot.LineStyle.Automatic)
-            mSpectrum.SetSeriesLineStyle(4, OxyPlot.LineStyle.Automatic)
+            Dim actualSeriesCount = mSpectrum.GetSeriesCount()
 
-            mSpectrum.SetSeriesPointStyle(1, OxyPlot.MarkerType.Diamond)
-            mSpectrum.SetSeriesPointStyle(2, OxyPlot.MarkerType.Square)
-            mSpectrum.SetSeriesPointStyle(3, OxyPlot.MarkerType.Circle)
-            mSpectrum.SetSeriesPointStyle(4, OxyPlot.MarkerType.None)
+            mSpectrum.SetSeriesLineStyle(1, LineStyle.Automatic)
+            mSpectrum.SetSeriesLineStyle(2, LineStyle.Automatic)
 
-            mSpectrum.SetSeriesColor(1, System.Drawing.Color.Blue)
-            mSpectrum.SetSeriesColor(2, System.Drawing.Color.Red)
-            mSpectrum.SetSeriesColor(3, System.Drawing.Color.FromArgb(255, 20, 210, 20))
-            mSpectrum.SetSeriesColor(4, System.Drawing.Color.Purple)
+            mSpectrum.SetSeriesPointStyle(1, MarkerType.Diamond)
+            mSpectrum.SetSeriesPointStyle(2, MarkerType.Square)
+            mSpectrum.SetSeriesPointStyle(3, MarkerType.Circle)
+
+            mSpectrum.SetSeriesColor(1, Color.Blue)
+            mSpectrum.SetSeriesColor(2, Color.Red)
+            mSpectrum.SetSeriesColor(3, Color.FromArgb(255, 20, 210, 20))
 
             mSpectrum.SetSeriesLineWidth(1, 1)
             mSpectrum.SetSeriesLineWidth(2, 2)
-            mSpectrum.SetSeriesLineWidth(4, 2)
 
             mSpectrum.SetSeriesPointSize(3, 7)
+
+            If actualSeriesCount > 3 Then
+                mSpectrum.SetSeriesLineStyle(4, LineStyle.Automatic)
+                mSpectrum.SetSeriesPointStyle(4, MarkerType.None)
+                mSpectrum.SetSeriesColor(4, Color.Purple)
+                mSpectrum.SetSeriesLineWidth(4, 2)
+            End If
 
             Dim arrowLengthPixels = 15
             Dim captionOffsetDirection As ctlOxyPlotControl.CaptionOffsetDirection
 
-            If mParentIonStats(intIndexToPlot).FragScanObserved <= mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber Then
+            If currentParentIon.FragScanObserved <= currentParentIon.OptimalPeakApexScanNumber Then
                 captionOffsetDirection = ctlOxyPlotControl.CaptionOffsetDirection.TopLeft
             Else
                 captionOffsetDirection = ctlOxyPlotControl.CaptionOffsetDirection.TopRight
             End If
 
-            Dim fragScanObserved = mParentIonStats(intIndexToPlot).FragScanObserved
+            Dim fragScanObserved = currentParentIon.FragScanObserved
 
             Const seriesToUse = 0
             mSpectrum.SetAnnotationForDataPoint(fragScanObserved, dblScanObservedIntensity, "MS2",
@@ -2241,19 +2185,19 @@ Public Class frmBrowser
 
             If mnuEditShowOptimalPeakApexCursor.Checked Then
                 mSpectrum.SetAnnotationForDataPoint(
-                    mParentIonStats(intIndexToPlot).OptimalPeakApexScanNumber, dblOptimalPeakApexIntensity, "Peak",
+                    currentParentIon.OptimalPeakApexScanNumber, dblOptimalPeakApexIntensity, "Peak",
                     2, ctlOxyPlotControl.CaptionOffsetDirection.TopLeft, arrowLengthPixels)
             End If
 
             Dim intXRangeHalfWidth As Integer
-            If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFixXRange.Text) Then
+            If VBNetRoutines.IsNumber(txtFixXRange.Text) Then
                 intXRangeHalfWidth = CInt(CInt(txtFixXRange.Text) / 2)
             Else
                 intXRangeHalfWidth = 0
             End If
 
             Dim sngYRange As Single
-            If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFixYRange.Text) Then
+            If VBNetRoutines.IsNumber(txtFixYRange.Text) Then
                 sngYRange = CSng(txtFixYRange.Text)
             Else
                 sngYRange = 0
@@ -2271,7 +2215,7 @@ Public Class frmBrowser
 
             If chkFixXRange.Checked And intXRangeHalfWidth > 0 Then
                 mSpectrum.SetAutoscaleXAxis(False)
-                mSpectrum.SetRangeX(udtSICStats.ScanNumberMaxIntensity - intXRangeHalfWidth, udtSICStats.ScanNumberMaxIntensity + intXRangeHalfWidth)
+                mSpectrum.SetRangeX(sicStats.ScanNumberMaxIntensity - intXRangeHalfWidth, sicStats.ScanNumberMaxIntensity + intXRangeHalfWidth)
             End If
 
             If chkFixYRange.Checked And sngYRange > 0 Then
@@ -2280,7 +2224,7 @@ Public Class frmBrowser
             End If
 
         Catch ex As Exception
-            Dim sTrace = PRISM.clsStackTraceFormatter.GetExceptionStackTraceMultiLine(ex)
+            Dim sTrace = clsStackTraceFormatter.GetExceptionStackTraceMultiLine(ex)
             MessageBox.Show("Error in PlotData: " & ex.Message & ControlChars.CrLf & sTrace, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         Finally
             Me.Cursor = Cursors.Default
@@ -2339,7 +2283,7 @@ Public Class frmBrowser
         Dim htFragScanToIndex As New Hashtable
         Dim objRow As DataRow
 
-        For intIndex = 0 To mParentIonCount - 1
+        For intIndex = 0 To mParentIonStats.Count - 1
             If Not htFragScanToIndex.ContainsKey(mParentIonStats(intIndex).FragScanObserved) Then
                 htFragScanToIndex.Add(mParentIonStats(intIndex).FragScanObserved, intIndex)
             End If
@@ -2416,7 +2360,7 @@ Public Class frmBrowser
         Dim blnValidParentIon As Boolean
 
         Dim dblPercentComplete As Double
-        Dim strErrorLog As String
+        Dim errorMessages = New List(Of String)
 
         Dim sngSICToleranceDa As Single
         Dim sngSimilarIonMZToleranceHalfWidth As Single
@@ -2447,29 +2391,29 @@ Public Class frmBrowser
 
         Dim strSICScanType As String
 
+        Dim expectedSicDataCount As Integer = 0
+
         If Not File.Exists(strFilePath) Then
             Exit Sub
         End If
 
         ' Initialize the progress form
-        Dim objProgress As ProgressFormNET.frmProgress
-        objProgress = New ProgressFormNET.frmProgress
+        Dim objProgress As frmProgress
+        objProgress = New frmProgress
 
         Try
 
             ' Initialize the stream reader and the XML Text Reader
             srDataFile = New StreamReader(strFilePath)
-            Using objXMLReader = New Xml.XmlTextReader(srDataFile)
+            Using objXMLReader = New XmlTextReader(srDataFile)
 
-                strErrorLog = String.Empty
 
-                objProgress.InitializeProgressForm("Reading file " & ControlChars.NewLine & SharedVBNetRoutines.VBNetRoutines.CompactPathString(strFilePath, 40), 0, 1, True)
+                objProgress.InitializeProgressForm("Reading file " & ControlChars.NewLine & VBNetRoutines.CompactPathString(strFilePath, 40), 0, 1, True)
                 objProgress.Show()
                 Application.DoEvents()
 
-                ' Initialize mParentIonStats, initially reserving space for 5000 items
-                mParentIonCount = 0
-                ReDim mParentIonStats(4999)
+                ' Initialize mParentIonStats
+                mParentIonStats.Clear()
 
                 eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.UnknownFile
                 blnValidParentIon = False
@@ -2477,10 +2421,10 @@ Public Class frmBrowser
                 Do While objXMLReader.Read()
 
                     XMLTextReaderSkipWhitespace(objXMLReader)
-                    If Not objXMLReader.ReadState = Xml.ReadState.Interactive Then Exit Do
+                    If Not objXMLReader.ReadState = ReadState.Interactive Then Exit Do
 
                     If objXMLReader.Depth < 2 Then
-                        If objXMLReader.NodeType = Xml.XmlNodeType.Element Then
+                        If objXMLReader.NodeType = XmlNodeType.Element Then
                             Select Case objXMLReader.Name
                                 Case "ParentIon"
                                     eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.ParentIons
@@ -2499,26 +2443,23 @@ Public Class frmBrowser
 
                                         strIndexInXMLFile = objXMLReader.GetAttribute("Index")
 
-                                        If mParentIonStats.Length = mParentIonCount Then
-                                            ReDim Preserve mParentIonStats(mParentIonStats.Length * 2 - 1)
-                                        End If
-
-                                        With mParentIonStats(mParentIonCount)
-                                            .Index = Integer.Parse(strIndexInXMLFile)
-                                            .MZ = 0
+                                        Dim newParentIon = New clsParentIonStats With {
+                                            .Index = Integer.Parse(strIndexInXMLFile),
+                                            .MZ = 0,
                                             .SICIntensityMax = 0
-                                            With .SICStats
-                                                .SICPeakWidthFullScans = 0
-                                                With .Peak
-                                                    .IndexBaseLeft = -1
-                                                    .IndexBaseRight = -1
-                                                    .MaxIntensityValue = 0
-                                                    .ShoulderCount = 0
-                                                End With
+                                        }
+
+                                        With newParentIon.SICStats
+                                            .SICPeakWidthFullScans = 0
+                                            With .Peak
+                                                .IndexBaseLeft = -1
+                                                .IndexBaseRight = -1
+                                                .MaxIntensityValue = 0
+                                                .ShoulderCount = 0
                                             End With
-                                            .DataCount = 0
                                         End With
-                                        mParentIonCount += 1
+
+                                        mParentIonStats.Add(newParentIon)
                                         blnValidParentIon = True
 
                                         ' Update the progress bar
@@ -2532,7 +2473,7 @@ Public Class frmBrowser
                                         ' Advance to the next tag
                                         objXMLReader.Read()
                                         XMLTextReaderSkipWhitespace(objXMLReader)
-                                        If Not objXMLReader.ReadState = Xml.ReadState.Interactive Then Exit Do
+                                        If Not objXMLReader.ReadState = ReadState.Interactive Then Exit Do
 
                                     Else
                                         ' Attribute isn't present; skip this parent ion
@@ -2551,169 +2492,170 @@ Public Class frmBrowser
                                 Case "ProcessingStats"
                                     objXMLReader.Skip()
                             End Select
-                        ElseIf objXMLReader.NodeType = Xml.XmlNodeType.EndElement Then
+                        ElseIf objXMLReader.NodeType = XmlNodeType.EndElement Then
                             If objXMLReader.Name = "ParentIon" Then
                                 If blnValidParentIon Then
                                     ' End element found for the current parent ion
 
-                                    With mParentIonStats(mParentIonCount - 1)
-                                        ' Split apart the value list variables
+                                    Dim currentParentIon = mParentIonStats.Last()
 
-                                        .SICScans(0) = intScanStart
-                                        ' strScanIntervals contains the intervals from each scan to the next
-                                        ' If the interval is <=9, then it is stored as a number
-                                        ' For intervals between 10 and 35, uses letters A to Z
-                                        ' For intervals between 36 and 61, uses letters A to Z
-                                        If Not strScanIntervals Is Nothing Then
-                                            For intCharIndex = 1 To strScanIntervals.Length - 1
-                                                If Char.IsNumber(strScanIntervals.Chars(intCharIndex)) Then
-                                                    intInterval = CInt(strScanIntervals.Substring(intCharIndex, 1))
+                                    ' Split apart the value list variables
+
+                                    Dim sicScans = New List(Of Integer)
+                                    Dim sicIntensities = New List(Of Single)
+                                    Dim sicMasses = New List(Of Double)
+
+                                    sicScans.Add(intScanStart)
+
+                                    ' strScanIntervals contains the intervals from each scan to the next
+                                    ' If the interval is <=9, then it is stored as a number
+                                    ' For intervals between 10 and 35, uses letters A to Z
+                                    ' For intervals between 36 and 61, uses letters A to Z
+                                    If Not strScanIntervals Is Nothing Then
+                                        For intCharIndex = 1 To strScanIntervals.Length - 1
+                                            If Char.IsNumber(strScanIntervals.Chars(intCharIndex)) Then
+                                                intInterval = CInt(strScanIntervals.Substring(intCharIndex, 1))
+                                            Else
+                                                If Char.IsUpper(strScanIntervals.Chars(intCharIndex)) Then
+                                                    ' Uppercase letter
+                                                    intInterval = Asc(strScanIntervals.Chars(intCharIndex)) - 55
+                                                ElseIf Char.IsLower(strScanIntervals.Chars(intCharIndex)) Then
+                                                    ' Lowercase letter
+                                                    intInterval = Asc(strScanIntervals.Chars(intCharIndex)) - 61
                                                 Else
-                                                    If Char.IsUpper(strScanIntervals.Chars(intCharIndex)) Then
-                                                        ' Uppercase letter
-                                                        intInterval = Asc(strScanIntervals.Chars(intCharIndex)) - 55
-                                                    ElseIf Char.IsLower(strScanIntervals.Chars(intCharIndex)) Then
-                                                        ' Lowercase letter
-                                                        intInterval = Asc(strScanIntervals.Chars(intCharIndex)) - 61
-                                                    Else
-                                                        ' Not a letter or a number; unknown interval (use 1)
-                                                        intInterval = 1
-                                                    End If
-
+                                                    ' Not a letter or a number; unknown interval (use 1)
+                                                    intInterval = 1
                                                 End If
-                                                .SICScans(intCharIndex) = .SICScans(intCharIndex - 1) + intInterval
-                                            Next
-                                        Else
-                                            If strErrorLog.Length < 1024 Then
-                                                strErrorLog &= "Missing 'SICScanInterval' node for parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
+
                                             End If
-                                        End If
+
+                                            sicScans.Add(sicScans(intCharIndex - 1) + intInterval)
+                                        Next
+                                    Else
+                                        errorMessages.Add("Missing 'SICScanInterval' node for parent ion '" & strIndexInXMLFile & "'")
+                                    End If
 
 
-                                        ' Split apart the Intensity data list using the delimiters in strDelimList
-                                        If Not strIntensityDataList Is Nothing Then
-                                            strValueList = strIntensityDataList.Trim.Split(strDelimList)
-                                            For intIndex = 0 To strValueList.Length - 1
-                                                If intIndex >= .DataCount Then
-                                                    If strErrorLog.Length < 1024 Then
-                                                        strErrorLog &= "Too many intensity data points found in parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                                    End If
-                                                    Exit For
-                                                End If
-                                                If SharedVBNetRoutines.VBNetRoutines.IsNumber(strValueList(intIndex)) Then
-                                                    .SICData(intIndex) = CSng(strValueList(intIndex))
-                                                Else
-                                                    .SICData(intIndex) = 0
-                                                End If
-                                            Next
-                                        Else
-                                            If strErrorLog.Length < 1024 Then
-                                                strErrorLog &= "Missing 'IntensityDataList' node for parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
+                                    ' Split apart the Intensity data list using the delimiters in strDelimList
+                                    If Not strIntensityDataList Is Nothing Then
+                                        strValueList = strIntensityDataList.Trim.Split(strDelimList)
+                                        For intIndex = 0 To strValueList.Length - 1
+                                            If VBNetRoutines.IsNumber(strValueList(intIndex)) Then
+                                                sicIntensities.Add(CSng(strValueList(intIndex)))
+                                            Else
+                                                sicIntensities.Add(0)
                                             End If
-                                        End If
+                                        Next
+                                    Else
+                                        errorMessages.Add("Missing 'IntensityDataList' node for parent ion '" & strIndexInXMLFile & "'")
+                                    End If
 
-                                        ' Split apart the Mass data list using the delimiters in strDelimList
-                                        If Not strMassDataList Is Nothing Then
-                                            strValueList = strMassDataList.Trim.Split(strDelimList)
-                                            For intIndex = 0 To strValueList.Length - 1
-                                                If intIndex >= .DataCount Then
-                                                    If strErrorLog.Length < 1024 Then
-                                                        strErrorLog &= "Too many mass data points found in parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                                    End If
-                                                    Exit For
-                                                End If
-                                                If SharedVBNetRoutines.VBNetRoutines.IsNumber(strValueList(intIndex)) Then
-                                                    .SICMassData(intIndex) = CSng(strValueList(intIndex))
-                                                Else
-                                                    .SICMassData(intIndex) = 0
-                                                End If
-                                            Next
-                                        Else
-                                            If strErrorLog.Length < 1024 Then
-                                                strErrorLog &= "Missing 'IntensityDataList' node for parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
+                                    ' Split apart the Mass data list using the delimiters in strDelimList
+                                    If Not strMassDataList Is Nothing Then
+                                        strValueList = strMassDataList.Trim.Split(strDelimList)
+                                        For intIndex = 0 To strValueList.Length - 1
+                                            If VBNetRoutines.IsNumber(strValueList(intIndex)) Then
+                                                sicMasses.Add(CDbl(strValueList(intIndex)))
+                                            Else
+                                                sicMasses.Add(0)
                                             End If
+                                        Next
+                                    Else
+                                        errorMessages.Add("Missing 'IntensityDataList' node for parent ion '" & strIndexInXMLFile & "'")
+                                    End If
+
+                                    For intIndex = 0 To sicScans.Count - 1
+
+                                        If intIndex = sicIntensities.Count Then
+                                            Exit For
                                         End If
 
-
-                                        ' Split apart the smoothed Y data using the delimiters in strDelimList
-                                        If Not strSmoothedYDataList Is Nothing Then
-                                            strValueList = strSmoothedYDataList.Trim.Split(strDelimList)
-
-                                            For intIndex = 0 To strValueList.Length - 1
-                                                If intIndex >= .DataCount Then
-                                                    If strErrorLog.Length < 1024 Then
-                                                        strErrorLog &= "Too many intensity data points found in parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                                    End If
-                                                    Exit For
-                                                End If
-                                                If SharedVBNetRoutines.VBNetRoutines.IsNumber(strValueList(intIndex)) Then
-                                                    .SICStats.SICSmoothedYData(intIndex) = CSng(strValueList(intIndex))
-                                                    blnSmoothedDataFound = True
-                                                Else
-                                                    .SICStats.SICSmoothedYData(intIndex) = 0
-                                                End If
-                                            Next
-
-                                            ReDim Preserve .SICStats.SICSmoothedYData(Math.Min(strValueList.Length, .DataCount) - 1)
-                                        Else
-                                            ' No smoothed Y data; that's OK
-                                            ReDim .SICStats.SICSmoothedYData(-1)
+                                        Dim massValue As Double = 0
+                                        If intIndex < sicMasses.Count Then
+                                            massValue = sicMasses(intIndex)
                                         End If
 
-                                        ' Update the peak stats variables
-                                        For intIndex = 0 To .DataCount - 1
-                                            If .SICData(intIndex) > .SICIntensityMax Then
-                                                .SICIntensityMax = .SICData(intIndex)
+                                        Dim newDataPoint = New clsSICDataPoint(sicScans(intIndex), sicIntensities(intIndex), massValue)
+                                        currentParentIon.SICData.Add(newDataPoint)
+                                    Next
+
+                                    If sicIntensities.Count > sicScans.Count Then
+                                        errorMessages.Add("Too many intensity data points found in parent ion '" & strIndexInXMLFile & "'")
+                                    End If
+
+                                    If sicMasses.Count > sicScans.Count Then
+                                        errorMessages.Add("Too many mass data points found in parent ion '" & strIndexInXMLFile & "'")
+                                    End If
+
+                                    Dim sicData = currentParentIon.SICData
+
+                                    If expectedSicDataCount > 0 AndAlso expectedSicDataCount <> currentParentIon.SICData.Count Then
+                                        errorMessages.Add("Actual SICDataCount (" & currentParentIon.SICData.Count & ") did not match expected count (" & expectedSicDataCount & ")")
+                                    End If
+
+                                    ' Split apart the smoothed Y data using the delimiters in strDelimList
+                                    If Not strSmoothedYDataList Is Nothing Then
+                                        strValueList = strSmoothedYDataList.Trim.Split(strDelimList)
+
+                                        For intIndex = 0 To strValueList.Length - 1
+                                            If intIndex >= sicData.Count Then
+                                                errorMessages.Add("Too many intensity data points found in parent ion '" & strIndexInXMLFile & "'")
+                                                Exit For
+                                            End If
+                                            If VBNetRoutines.IsNumber(strValueList(intIndex)) Then
+                                                currentParentIon.SICStats.SICSmoothedYData.Add(CSng(strValueList(intIndex)))
+                                                blnSmoothedDataFound = True
+                                            Else
+                                                currentParentIon.SICStats.SICSmoothedYData.Add(0)
                                             End If
                                         Next
 
-                                        If .SICStats.Peak.IndexBaseLeft < 0 Then
-                                            .SICStats.Peak.IndexBaseLeft = 0
+                                    Else
+                                        ' No smoothed Y data; that's OK
+                                    End If
+
+                                    ' Update the peak stats variables
+                                    currentParentIon.SICIntensityMax = (From item In sicData Select item.Intensity).Max()
+
+                                    If currentParentIon.SICStats.Peak.IndexBaseLeft < 0 Then
+                                        currentParentIon.SICStats.Peak.IndexBaseLeft = 0
+                                    Else
+                                        If currentParentIon.SICStats.Peak.IndexBaseLeft < sicData.Count Then
+                                            If intPeakScanStart <> sicData(currentParentIon.SICStats.Peak.IndexBaseLeft).ScanNumber Then
+                                                errorMessages.Add("PeakScanStart does not agree with SICPeakIndexStart for parent ion ' " & strIndexInXMLFile & "'")
+                                            End If
                                         Else
-                                            If .SICStats.Peak.IndexBaseLeft < .SICScans.Length Then
-                                                If intPeakScanStart <> .SICScans(.SICStats.Peak.IndexBaseLeft) Then
-                                                    If strErrorLog.Length < 1024 Then
-                                                        strErrorLog &= "PeakScanStart does not agree with SICPeakIndexStart for parent ion ' " & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                                    End If
-                                                End If
-                                            Else
-                                                If strErrorLog.Length < 1024 Then
-                                                    strErrorLog &= ".SICStats.Peak.IndexBaseLeft is larger than .SICScans.Length for parent ion ' " & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                                End If
-                                            End If
+                                            errorMessages.Add(".SICStats.Peak.IndexBaseLeft is larger than .SICScans.Length for parent ion ' " & strIndexInXMLFile & "'")
                                         End If
+                                    End If
 
-                                        If .SICStats.Peak.IndexBaseRight < 0 Then
-                                            .SICStats.Peak.IndexBaseRight = .DataCount - 1
+                                    If currentParentIon.SICStats.Peak.IndexBaseRight < 0 Then
+                                        currentParentIon.SICStats.Peak.IndexBaseRight = sicData.Count - 1
+                                    Else
+                                        If currentParentIon.SICStats.Peak.IndexBaseRight < sicData.Count Then
+                                            If intPeakScanEnd <> sicData(currentParentIon.SICStats.Peak.IndexBaseRight).ScanNumber Then
+                                                errorMessages.Add("PeakScanEnd does not agree with SICPeakIndexEnd for parent ion ' " & strIndexInXMLFile & "'")
+                                            End If
                                         Else
-                                            If .SICStats.Peak.IndexBaseRight < .SICScans.Length Then
-                                                If intPeakScanEnd <> .SICScans(.SICStats.Peak.IndexBaseRight) Then
-                                                    If strErrorLog.Length < 1024 Then
-                                                        strErrorLog &= "PeakScanEnd does not agree with SICPeakIndexEnd for parent ion ' " & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                                    End If
-                                                End If
-                                            Else
-                                                If strErrorLog.Length < 1024 Then
-                                                    strErrorLog &= ".SICStats.Peak.IndexBaseRight is larger than .SICScans.Length for parent ion ' " & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                                End If
-                                            End If
+                                            errorMessages.Add(".SICStats.Peak.IndexBaseRight is larger than .SICScans.Length for parent ion ' " & strIndexInXMLFile & "'")
+                                        End If
+                                    End If
+
+                                    If currentParentIon.SICStats.Peak.IndexBaseRight < sicData.Count AndAlso
+                                       currentParentIon.SICStats.Peak.IndexBaseLeft < sicData.Count Then
+                                        currentParentIon.SICStats.SICPeakWidthFullScans = sicData(currentParentIon.SICStats.Peak.IndexBaseRight).ScanNumber - sicData(currentParentIon.SICStats.Peak.IndexBaseLeft).ScanNumber + 1
+                                    End If
+
+                                    If Not blnBaselineNoiseStatsFound Then
+                                        ' Compute the Noise Threshold for this SIC
+                                        ' Note: We cannot use DualTrimmedMeanByAbundance since we don't have access to the full-length SICs
+                                        If mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
+                                            mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance
                                         End If
 
-                                        If .SICStats.Peak.IndexBaseRight < .SICScans.Length And .SICStats.Peak.IndexBaseLeft < .SICScans.Length Then
-                                            .SICStats.SICPeakWidthFullScans = .SICScans(.SICStats.Peak.IndexBaseRight) - .SICScans(.SICStats.Peak.IndexBaseLeft) + 1
-                                        End If
+                                        mMASICPeakFinder.ComputeNoiseLevelInPeakVicinity(sicData, currentParentIon.SICStats.Peak, mSICPeakFinderOptions.SICBaselineNoiseOptions)
+                                    End If
 
-                                        If Not blnBaselineNoiseStatsFound Then
-                                            ' Compute the Noise Threshold for this SIC
-                                            ' Note: We cannot use DualTrimmedMeanByAbundance since we don't have access to the full-length SICs
-                                            If mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance Then
-                                                mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance
-                                            End If
-
-                                            mMASICPeakFinder.ComputeNoiseLevelInPeakVicinity(.DataCount, .SICScans, .SICData, .SICStats.Peak, mSICPeakFinderOptions.SICBaselineNoiseOptions)
-                                        End If
-
-                                    End With
 
                                 End If
                                 blnValidParentIon = False
@@ -2721,7 +2663,7 @@ Public Class frmBrowser
                         End If
                     End If
 
-                    If eCurrentXMLDataFileSection <> eCurrentXMLDataFileSectionConstants.UnknownFile AndAlso objXMLReader.NodeType = Xml.XmlNodeType.Element Then
+                    If eCurrentXMLDataFileSection <> eCurrentXMLDataFileSectionConstants.UnknownFile AndAlso objXMLReader.NodeType = XmlNodeType.Element Then
                         Select Case eCurrentXMLDataFileSection
                             Case eCurrentXMLDataFileSectionConstants.Options
                                 Try
@@ -2751,7 +2693,7 @@ Public Class frmBrowser
                             Case eCurrentXMLDataFileSectionConstants.ParentIons
                                 If blnValidParentIon Then
                                     Try
-                                        With mParentIonStats(mParentIonCount - 1)
+                                        With mParentIonStats(mParentIonStats.Count - 1)
                                             Select Case objXMLReader.Name
                                                 Case "MZ"
                                                     .MZ = Math.Round(CDbl(XMLTextReaderGetInnerText(objXMLReader)), 6)
@@ -2773,9 +2715,9 @@ Public Class frmBrowser
                                                 Case "SICScanType"
                                                     strSICScanType = XMLTextReaderGetInnerText(objXMLReader)
                                                     If strSICScanType.ToLower = "fragscan" Then
-                                                        .SICScanType = eScanTypeConstants.FragScan
+                                                        .SICScanType = clsParentIonStats.eScanTypeConstants.FragScan
                                                     Else
-                                                        .SICScanType = eScanTypeConstants.SurveyScan
+                                                        .SICScanType = clsParentIonStats.eScanTypeConstants.SurveyScan
                                                     End If
                                                 Case "PeakScanStart"
                                                     intPeakScanStart = CInt(XMLTextReaderGetInnerText(objXMLReader))
@@ -2805,7 +2747,7 @@ Public Class frmBrowser
                                                 Case "PeakBaselinePointsUsed"
                                                     .SICStats.Peak.BaselineNoiseStats.PointsUsed = CInt(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "NoiseThresholdModeUsed"
-                                                    .SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = CType(XMLTextReaderGetInnerText(objXMLReader), MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
+                                                    .SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = CType(XMLTextReaderGetInnerText(objXMLReader), clsMASICPeakFinder.eNoiseThresholdModes)
 
                                                 Case "StatMomentsArea"
                                                     .SICStats.Peak.StatisticalMoments.Area = CSng(XMLTextReaderGetInnerText(objXMLReader))
@@ -2831,27 +2773,15 @@ Public Class frmBrowser
 
                                                 Case "SICDataCount"
                                                     strValue = XMLTextReaderGetInnerText(objXMLReader)
-                                                    If SharedVBNetRoutines.VBNetRoutines.IsNumber(strValue) Then
-                                                        .DataCount = CInt(strValue)
+                                                    If VBNetRoutines.IsNumber(strValue) Then
+                                                        expectedSicDataCount = CInt(strValue)
                                                     Else
-                                                        .DataCount = 0
-                                                    End If
-
-                                                    If .DataCount > 0 Then
-                                                        ' Initialize the .SIC Arrays
-                                                        ReDim .SICScans(.DataCount - 1)
-                                                        ReDim .SICData(.DataCount - 1)
-                                                        ReDim .SICMassData(.DataCount - 1)
-                                                        ReDim .SICStats.SICSmoothedYData(.DataCount - 1)
-                                                    Else
-                                                        ReDim .SICScans(-1)
-                                                        ReDim .SICData(-1)
-                                                        ReDim .SICMassData(-1)
+                                                        expectedSicDataCount = 0
                                                     End If
 
                                                 Case "SICSmoothedYDataIndexStart"
                                                     strValue = XMLTextReaderGetInnerText(objXMLReader)
-                                                    If SharedVBNetRoutines.VBNetRoutines.IsNumber(strValue) Then
+                                                    If VBNetRoutines.IsNumber(strValue) Then
                                                         .SICStats.SICSmoothedYDataIndexStart = CInt(strValue)
                                                     Else
                                                         .SICStats.SICSmoothedYDataIndexStart = 0
@@ -2868,9 +2798,7 @@ Public Class frmBrowser
                                         End With
                                     Catch ex As Exception
                                         ' Error parsing value from the ParentIon data
-                                        If strErrorLog.Length < 1024 Then
-                                            strErrorLog &= "Error parsing value for parent ion '" & strIndexInXMLFile & "'" & ControlChars.NewLine
-                                        End If
+                                        errorMessages.Add("Error parsing value for parent ion '" & strIndexInXMLFile & "'")
                                         blnValidParentIon = False
                                     End Try
                                 End If
@@ -2880,13 +2808,6 @@ Public Class frmBrowser
                 Loop
 
             End Using
-
-            ' Shrink mParentIonStats
-            If mParentIonCount > 0 Then
-                ReDim Preserve mParentIonStats(mParentIonCount - 1)
-            Else
-                ReDim mParentIonStats(-1)
-            End If
 
             ' For each parent ion, find the other nearby parent ions with similar m/z values
             ' Use the tolerance specified by sngSimilarIonMZToleranceHalfWidth, though with a minimum value of 0.1
@@ -2920,8 +2841,8 @@ Public Class frmBrowser
                 End If
 
                 ' Inform the user if any errors occurred
-                If strErrorLog.Length > 0 Then
-                    MessageBox.Show(strErrorLog, "Invalid Lines", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                If errorMessages.Count > 0 Then
+                    MessageBox.Show(String.Join(ControlChars.NewLine, errorMessages.Take(15)), "Invalid Lines", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End If
 
                 ' Sort the data
@@ -2950,7 +2871,7 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Sub ReadMsMsSearchEngineResults(strFilePath As String, ByRef objProgress As ProgressFormNET.frmProgress)
+    Private Sub ReadMsMsSearchEngineResults(strFilePath As String, ByRef objProgress As frmProgress)
 
         Dim ioStream As FileStream
         Dim chSepChars = New Char() {ControlChars.Tab}
@@ -2974,7 +2895,7 @@ Public Class frmBrowser
             Using fsInFile = New StreamReader(ioStream)
 
                 If objProgress Is Nothing Then
-                    objProgress = New ProgressFormNET.frmProgress
+                    objProgress = New frmProgress
                     blnCreatedNewProgressForm = True
                 End If
 
@@ -3067,24 +2988,24 @@ Public Class frmBrowser
         Dim intParentIonIndex As Integer
         Dim blnValidPeakFound As Boolean
 
-        Dim udtSICStats = New udtSICStatsType
+        Dim sicStats As clsSICStats = Nothing
 
-        Dim objProgress As New ProgressFormNET.frmProgress
+        Dim objProgress As New frmProgress
 
         Try
             cmdRedoSICPeakFindingAllData.Enabled = False
 
-            objProgress.InitializeProgressForm("Repeating SIC peak finding ", 0, mParentIonCount, True)
+            objProgress.InitializeProgressForm("Repeating SIC peak finding ", 0, mParentIonStats.Count, True)
             objProgress.Show()
             Application.DoEvents()
 
             UpdateSICPeakFinderOptions()
 
-            For intParentIonIndex = 0 To mParentIonCount - 1
-                blnValidPeakFound = UpdateSICStats(intParentIonIndex, True, SMOOTH_MODE, udtSICStats)
+            For intParentIonIndex = 0 To mParentIonStats.Count - 1
+                blnValidPeakFound = UpdateSICStats(intParentIonIndex, True, SMOOTH_MODE, sicStats)
 
                 If blnValidPeakFound Then
-                    mParentIonStats(intParentIonIndex).SICStats = udtSICStats
+                    mParentIonStats(intParentIonIndex).SICStats = sicStats
                 End If
 
                 objProgress.UpdateProgressBar(intParentIonIndex + 1)
@@ -3155,25 +3076,25 @@ Public Class frmBrowser
                 SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortOrder", cboSortOrder.SelectedIndex.ToString())
                 SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortDescending", chkSortDescending.Checked.ToString())
 
-                If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFixXRange.Text) Then
+                If VBNetRoutines.IsNumber(txtFixXRange.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", CInt(txtFixXRange.Text).ToString())
                 End If
-                If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFixYRange.Text) Then
+                If VBNetRoutines.IsNumber(txtFixYRange.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", CLng(txtFixYRange.Text).ToString())
                 End If
-                If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtMinimumSignalToNoise.Text) Then
+                If VBNetRoutines.IsNumber(txtMinimumSignalToNoise.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", CSng(txtMinimumSignalToNoise.Text).ToString())
                 End If
-                If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtMinimumIntensity.Text) Then
+                If VBNetRoutines.IsNumber(txtMinimumIntensity.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", CInt(txtMinimumIntensity.Text).ToString())
                 End If
-                If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFilterByMZ.Text) Then
+                If VBNetRoutines.IsNumber(txtFilterByMZ.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", CSng(txtFilterByMZ.Text).ToString())
                 End If
-                If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFilterByMZTol.Text) Then
+                If VBNetRoutines.IsNumber(txtFilterByMZTol.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", CSng(txtFilterByMZTol.Text).ToString())
                 End If
-                If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtAutoStep.Text) Then
+                If VBNetRoutines.IsNumber(txtAutoStep.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", CInt(txtAutoStep.Text).ToString())
                 End If
 
@@ -3303,7 +3224,7 @@ Public Class frmBrowser
         Dim sngMZFilter, sngMZFilterTol As Single
         Dim sngMinimumSN As Single
 
-        If mParentIonCount <= 0 Then
+        If mParentIonStats.Count <= 0 Then
             ReDim mParentIonPointerArray(-1)
             Exit Sub
         End If
@@ -3317,8 +3238,8 @@ Public Class frmBrowser
         End Try
 
         mParentIonPointerArrayCount = 0
-        ReDim mParentIonPointerArray(mParentIonCount - 1)
-        ReDim dblSortKeys(mParentIonCount - 1)
+        ReDim mParentIonPointerArray(mParentIonStats.Count - 1)
+        ReDim dblSortKeys(mParentIonStats.Count - 1)
 
         If cboSortOrder.SelectedIndex >= 0 And cboSortOrder.SelectedIndex < SORT_ORDER_MODE_COUNT Then
             eSortMode = CType(cboSortOrder.SelectedIndex, eSortOrderConstants)
@@ -3326,14 +3247,14 @@ Public Class frmBrowser
             eSortMode = eSortOrderConstants.SortByScanPeakCenter
         End If
 
-        If chkFilterByIntensity.Checked AndAlso SharedVBNetRoutines.VBNetRoutines.IsNumber(txtMinimumIntensity.Text) Then
+        If chkFilterByIntensity.Checked AndAlso VBNetRoutines.IsNumber(txtMinimumIntensity.Text) Then
             sngMinimumIntensity = CSng(txtMinimumIntensity.Text)
         Else
             sngMinimumIntensity = Single.MinValue
         End If
 
-        If chkFilterByMZ.Checked AndAlso SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFilterByMZ.Text) AndAlso
-           SharedVBNetRoutines.VBNetRoutines.IsNumber(txtFilterByMZTol.Text) Then
+        If chkFilterByMZ.Checked AndAlso VBNetRoutines.IsNumber(txtFilterByMZ.Text) AndAlso
+           VBNetRoutines.IsNumber(txtFilterByMZTol.Text) Then
             sngMZFilter = Math.Abs(CSng(txtFilterByMZ.Text))
             sngMZFilterTol = Math.Abs(CSng(txtFilterByMZTol.Text))
         Else
@@ -3341,7 +3262,7 @@ Public Class frmBrowser
             sngMZFilterTol = Single.MaxValue
         End If
 
-        If chkFilterBySignalToNoise.Checked AndAlso SharedVBNetRoutines.VBNetRoutines.IsNumber(txtMinimumSignalToNoise.Text) Then
+        If chkFilterBySignalToNoise.Checked AndAlso VBNetRoutines.IsNumber(txtMinimumSignalToNoise.Text) Then
             sngMinimumSN = CSng(txtMinimumSignalToNoise.Text)
         Else
             sngMinimumSN = Single.MinValue
@@ -3349,7 +3270,7 @@ Public Class frmBrowser
 
         Select Case eSortMode
             Case eSortOrderConstants.SortByPeakIndex
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3359,7 +3280,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByScanPeakCenter
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3369,7 +3290,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByScanOptimalPeakCenter
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3379,7 +3300,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByMz
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3389,7 +3310,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByPeakSignalToNoise
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3399,31 +3320,31 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByBaselineCorrectedPeakIntensity
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
                             With mParentIonStats(intIndex).SICStats
-                                dblSortKeys(mParentIonPointerArrayCount) = MASICPeakFinder.clsMASICPeakFinder.BaselineAdjustIntensity(.Peak, True)
+                                dblSortKeys(mParentIonPointerArrayCount) = clsMASICPeakFinder.BaselineAdjustIntensity(.Peak, True)
                             End With
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
                 Next
             Case eSortOrderConstants.SortByBaselineCorrectedPeakArea
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
                             With mParentIonStats(intIndex).SICStats
-                                dblSortKeys(mParentIonPointerArrayCount) = MASICPeakFinder.clsMASICPeakFinder.BaselineAdjustArea(.Peak, .SICPeakWidthFullScans, True)
+                                dblSortKeys(mParentIonPointerArrayCount) = clsMASICPeakFinder.BaselineAdjustArea(.Peak, .SICPeakWidthFullScans, True)
                             End With
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
                 Next
             Case eSortOrderConstants.SortByPeakWidth
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3434,7 +3355,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortBySICIntensityMax
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3450,7 +3371,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByPeakIntensity
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3460,7 +3381,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByPeakArea
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3470,7 +3391,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByFragScanToOptimalLocDistance
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3481,7 +3402,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByPeakCenterToOptimalLocDistance
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3492,7 +3413,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByShoulderCount
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3503,7 +3424,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByParentIonIntensity
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3513,7 +3434,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByPeakSkew
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3523,7 +3444,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByKSStat
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3533,7 +3454,7 @@ Public Class frmBrowser
                     End With
                 Next
             Case eSortOrderConstants.SortByBaselineNoiseLevel
-                For intIndex = 0 To mParentIonCount - 1
+                For intIndex = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(intIndex)
                         If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, sngMinimumIntensity, sngMinimumSN, sngMZFilter, sngMZFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = intIndex
@@ -3545,7 +3466,7 @@ Public Class frmBrowser
 
         End Select
 
-        If mParentIonPointerArrayCount < mParentIonCount Then
+        If mParentIonPointerArrayCount < mParentIonStats.Count Then
             ReDim Preserve dblSortKeys(mParentIonPointerArrayCount - 1)
             ReDim Preserve mParentIonPointerArray(mParentIonPointerArrayCount - 1)
         End If
@@ -3625,7 +3546,7 @@ Public Class frmBrowser
             mAutoStepEnabled = False
             cmdAutoStep.Text = "&Auto Step"
         Else
-            If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtAutoStep.Text) Then
+            If VBNetRoutines.IsNumber(txtAutoStep.Text) Then
                 mAutoStepIntervalMsec = CInt(txtAutoStep.Text)
             Else
                 txtAutoStep.Text = "150"
@@ -3672,11 +3593,11 @@ Public Class frmBrowser
             If optUseSavitzkyGolaySmooth.Checked Then
                 .UseButterworthSmooth = False
                 .UseSavitzkyGolaySmooth = True
-                .SavitzkyGolayFilterOrder = CShort(SharedVBNetRoutines.VBNetRoutines.ParseTextboxValueInt(txtSavitzkyGolayFilterOrder, "", False, 0))
+                .SavitzkyGolayFilterOrder = CShort(VBNetRoutines.ParseTextboxValueInt(txtSavitzkyGolayFilterOrder, "", False, 0))
             Else
                 .UseButterworthSmooth = True
                 .UseSavitzkyGolaySmooth = False
-                .ButterworthSamplingFrequency = SharedVBNetRoutines.VBNetRoutines.ParseTextboxValueSng(txtButterworthSamplingFrequency, "", False, 0.25)
+                .ButterworthSamplingFrequency = VBNetRoutines.ParseTextboxValueSng(txtButterworthSamplingFrequency, "", False, 0.25)
             End If
             ''.ButterworthSamplingFrequencyDoubledForSIMData =
 
@@ -3691,14 +3612,18 @@ Public Class frmBrowser
         End With
     End Sub
 
-    Private Function UpdateSICStats(intParentIonIndex As Integer, blnRepeatPeakFinding As Boolean, eSmoothMode As eSmoothModeConstants, ByRef udtSICStats As udtSICStatsType) As Boolean
+    Private Function UpdateSICStats(
+      intParentIonIndex As Integer,
+      blnRepeatPeakFinding As Boolean,
+      eSmoothMode As eSmoothModeConstants,
+      <Out()> ByRef sicStats As clsSICStats) As Boolean
+
         ' Copy the original SIC stats found by MASIC into udtSICStats
         ' This also includes the original smoothed data
 
-        Dim objFilter As DataFilter.clsDataFilter
+        Dim objFilter As clsDataFilter
 
         Dim intIndex As Integer
-        Dim dblSmoothedYData() As Double
 
         Dim blnValidPeakFound As Boolean
 
@@ -3712,58 +3637,61 @@ Public Class frmBrowser
         ' We have to separately copy SICSmoothedYData() otherwise VB.NET keeps
         '  the array linked in both mParentIonStats().SICStats and udtSICStats
         With mParentIonStats(intParentIonIndex)
-            udtSICStats = .SICStats
+            sicStats = .SICStats
             With .SICStats
-                ReDim udtSICStats.SICSmoothedYData(.SICSmoothedYData.Length - 1)
-                .SICSmoothedYData.CopyTo(udtSICStats.SICSmoothedYData, 0)
+                sicStats.SICSmoothedYData.Clear()
+                For Each dataPoint In .SICSmoothedYData
+                    sicStats.SICSmoothedYData.Add(dataPoint)
+                Next
             End With
         End With
 
         If eSmoothMode <> eSmoothModeConstants.DoNotReSmooth Then
             ' Re-smooth the data
-            objFilter = New DataFilter.clsDataFilter
+            objFilter = New clsDataFilter()
 
-            With mParentIonStats(intParentIonIndex)
-                udtSICStats.SICSmoothedYDataIndexStart = 0
-                ReDim dblSmoothedYData(.SICData.Length - 1)
+            Dim currentParentIon = mParentIonStats(intParentIonIndex)
 
-                .SICData.CopyTo(dblSmoothedYData, 0)
+            sicStats.SICSmoothedYDataIndexStart = 0
 
-                If eSmoothMode = eSmoothModeConstants.SavitzkyGolay Then
-                    ' Resmooth using a Savitzy Golay filter
+            Dim intensities = (From item In currentParentIon.SICData Select CDbl(item.Intensity)).ToArray()
 
-                    intSavitzkyGolayFilterOrder = SharedVBNetRoutines.VBNetRoutines.ParseTextboxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " should be an even number between 0 and 20; assuming 0", False, 0)
-                    intPeakWidthsPointsMinimum = SharedVBNetRoutines.VBNetRoutines.ParseTextboxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text & " should be a positive integer; assuming 6", False, 6)
+            If eSmoothMode = eSmoothModeConstants.SavitzkyGolay Then
+                ' Resmooth using a Savitzy Golay filter
 
-                    intFilterThirdWidth = CInt(Math.Floor(intPeakWidthsPointsMinimum / 3))
-                    If intFilterThirdWidth > 3 Then intFilterThirdWidth = 3
+                intSavitzkyGolayFilterOrder = VBNetRoutines.ParseTextboxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " should be an even number between 0 and 20; assuming 0", False, 0)
+                intPeakWidthsPointsMinimum = VBNetRoutines.ParseTextboxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text & " should be a positive integer; assuming 6", False, 6)
 
-                    ' Make sure intFilterThirdWidth is Odd
-                    If intFilterThirdWidth Mod 2 = 0 Then
-                        intFilterThirdWidth -= 1
-                    End If
+                intFilterThirdWidth = CInt(Math.Floor(intPeakWidthsPointsMinimum / 3))
+                If intFilterThirdWidth > 3 Then intFilterThirdWidth = 3
 
-                    ' Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
-                    ' Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-                    objFilter.SavitzkyGolayFilter(dblSmoothedYData, 0, CInt(Math.Min(.SICData.Length, .DataCount)) - 1, intFilterThirdWidth, intFilterThirdWidth, CShort(intSavitzkyGolayFilterOrder), True)
-
-                Else
-                    ' Assume eSmoothMode = eSmoothModeConstants.Butterworth
-                    sngSamplingFrequency = SharedVBNetRoutines.VBNetRoutines.ParseTextboxValueSng(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " should be a number between 0.01 and 0.99; assuming 0.2", False, 0.2)
-                    objFilter.ButterworthFilter(dblSmoothedYData, 0, CInt(Math.Min(.SICData.Length, .DataCount)) - 1, sngSamplingFrequency)
+                ' Make sure intFilterThirdWidth is Odd
+                If intFilterThirdWidth Mod 2 = 0 Then
+                    intFilterThirdWidth -= 1
                 End If
 
-                ' Copy the smoothed data into udtSICStats.SICSmoothedYData
-                ReDim udtSICStats.SICSmoothedYData(dblSmoothedYData.Length - 1)
-                For intIndex = 0 To dblSmoothedYData.Length - 1
-                    udtSICStats.SICSmoothedYData(intIndex) = CSng(dblSmoothedYData(intIndex))
-                Next
-            End With
+                ' Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
+                ' Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
+                objFilter.SavitzkyGolayFilter(intensities, 0, currentParentIon.SICData.Count - 1, intFilterThirdWidth, intFilterThirdWidth, CShort(intSavitzkyGolayFilterOrder), True)
+
+            Else
+                ' Assume eSmoothMode = eSmoothModeConstants.Butterworth
+                sngSamplingFrequency = VBNetRoutines.ParseTextboxValueSng(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " should be a number between 0.01 and 0.99; assuming 0.2", False, 0.2)
+                objFilter.ButterworthFilter(intensities, 0, currentParentIon.SICData.Count - 1, sngSamplingFrequency)
+            End If
+
+            ' Copy the smoothed data into udtSICStats.SICSmoothedYData
+            sicStats.SICSmoothedYData.Clear()
+
+            For intIndex = 0 To intensities.Length - 1
+                sicStats.SICSmoothedYData.Add(CSng(intensities(intIndex)))
+            Next
+
         End If
 
         If blnRepeatPeakFinding Then
             ' Repeat the finding of the peak in the SIC
-            blnValidPeakFound = FindSICPeakAndAreaForParentIon(intParentIonIndex, udtSICStats)
+            blnValidPeakFound = FindSICPeakAndAreaForParentIon(intParentIonIndex, sicStats)
         Else
             blnValidPeakFound = True
         End If
@@ -3773,112 +3701,112 @@ Public Class frmBrowser
     End Function
 
     Private Sub UpdateStatsAndPlot()
-        Dim udtSICStats = New udtSICStatsType
+        Dim sicStats As clsSICStats = Nothing
         If mParentIonPointerArrayCount > 0 Then
-            DisplaySICStats(mParentIonPointerArray(lstParentIonData.SelectedIndex), udtSICStats)
-            PlotData(mParentIonPointerArray(lstParentIonData.SelectedIndex), udtSICStats)
+            DisplaySICStats(mParentIonPointerArray(lstParentIonData.SelectedIndex), sicStats)
+            PlotData(mParentIonPointerArray(lstParentIonData.SelectedIndex), sicStats)
         End If
     End Sub
 
-    Private Function XMLTextReaderGetInnerText(ByRef objXMLReader As Xml.XmlTextReader) As String
+    Private Function XMLTextReaderGetInnerText(ByRef objXMLReader As XmlTextReader) As String
         Dim strValue As String = String.Empty
         Dim blnSuccess As Boolean
 
-        If objXMLReader.NodeType = Xml.XmlNodeType.Element Then
+        If objXMLReader.NodeType = XmlNodeType.Element Then
             ' Advance the reader so that we can read the value
             blnSuccess = objXMLReader.Read()
         Else
             blnSuccess = True
         End If
 
-        If blnSuccess AndAlso Not objXMLReader.NodeType = Xml.XmlNodeType.Whitespace And objXMLReader.HasValue Then
+        If blnSuccess AndAlso Not objXMLReader.NodeType = XmlNodeType.Whitespace And objXMLReader.HasValue Then
             strValue = objXMLReader.Value
         End If
 
         Return strValue
     End Function
 
-    Private Sub XMLTextReaderSkipWhitespace(ByRef objXMLReader As Xml.XmlTextReader)
-        If objXMLReader.NodeType = Xml.XmlNodeType.Whitespace Then
+    Private Sub XMLTextReaderSkipWhitespace(ByRef objXMLReader As XmlTextReader)
+        If objXMLReader.NodeType = XmlNodeType.Whitespace Then
             ' Whitspace; read the next node
             objXMLReader.Read()
         End If
     End Sub
 
 #Region "Checkboxes"
-    Private Sub chkFilterByIntensity_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkFilterByIntensity.CheckedChanged
+    Private Sub chkFilterByIntensity_CheckedChanged(sender As Object, e As EventArgs) Handles chkFilterByIntensity.CheckedChanged
         SortData()
     End Sub
 
-    Private Sub chkFilterByMZ_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkFilterByMZ.CheckedChanged
+    Private Sub chkFilterByMZ_CheckedChanged(sender As Object, e As EventArgs) Handles chkFilterByMZ.CheckedChanged
         SortData()
     End Sub
 
-    Private Sub chkFilterBySignalToNoise_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkFilterBySignalToNoise.CheckedChanged
+    Private Sub chkFilterBySignalToNoise_CheckedChanged(sender As Object, e As EventArgs) Handles chkFilterBySignalToNoise.CheckedChanged
         SortData()
     End Sub
 
-    Private Sub chkFixXRange_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkFixXRange.CheckedChanged
+    Private Sub chkFixXRange_CheckedChanged(sender As Object, e As EventArgs) Handles chkFixXRange.CheckedChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub chkFixYRange_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkFixYRange.CheckedChanged
+    Private Sub chkFixYRange_CheckedChanged(sender As Object, e As EventArgs) Handles chkFixYRange.CheckedChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub cmdRedoSICPeakFindingAllData_Click(sender As System.Object, e As EventArgs) Handles cmdRedoSICPeakFindingAllData.Click
+    Private Sub cmdRedoSICPeakFindingAllData_Click(sender As Object, e As EventArgs) Handles cmdRedoSICPeakFindingAllData.Click
         RedoSICPeakFindingAllData()
     End Sub
 
-    Private Sub chkShowBaselineCorrectedStats_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkShowBaselineCorrectedStats.CheckedChanged
+    Private Sub chkShowBaselineCorrectedStats_CheckedChanged(sender As Object, e As EventArgs) Handles chkShowBaselineCorrectedStats.CheckedChanged
         DisplaySICStatsForSelectedParentIon()
     End Sub
 
-    Private Sub chkSortDescending_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkSortDescending.CheckedChanged
+    Private Sub chkSortDescending_CheckedChanged(sender As Object, e As EventArgs) Handles chkSortDescending.CheckedChanged
         SortData()
     End Sub
 
-    Private Sub chkShowSmoothedData_CheckedChanged(sender As System.Object, e As EventArgs)
+    Private Sub chkShowSmoothedData_CheckedChanged(sender As Object, e As EventArgs)
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub chkUsePeakFinder_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkUsePeakFinder.CheckedChanged
+    Private Sub chkUsePeakFinder_CheckedChanged(sender As Object, e As EventArgs) Handles chkUsePeakFinder.CheckedChanged
         UpdateStatsAndPlot()
     End Sub
 #End Region
 
 #Region "Command Buttons"
-    Private Sub cmdAutoStep_Click(sender As System.Object, e As EventArgs) Handles cmdAutoStep.Click
+    Private Sub cmdAutoStep_Click(sender As Object, e As EventArgs) Handles cmdAutoStep.Click
         ToggleAutoStep()
     End Sub
 
-    Private Sub cmdNext_Click(sender As System.Object, e As EventArgs) Handles cmdNext.Click
+    Private Sub cmdNext_Click(sender As Object, e As EventArgs) Handles cmdNext.Click
         NavigateScanList(True)
     End Sub
 
-    Private Sub cmdPrevious_Click(sender As System.Object, e As EventArgs) Handles cmdPrevious.Click
+    Private Sub cmdPrevious_Click(sender As Object, e As EventArgs) Handles cmdPrevious.Click
         NavigateScanList(False)
     End Sub
 
-    Private Sub cmdSelectFile_Click(sender As System.Object, e As EventArgs) Handles cmdSelectFile.Click
+    Private Sub cmdSelectFile_Click(sender As Object, e As EventArgs) Handles cmdSelectFile.Click
         SelectMASICInputFile()
     End Sub
 
-    Private Sub cmdJump_Click(sender As System.Object, e As EventArgs) Handles cmdJump.Click
+    Private Sub cmdJump_Click(sender As Object, e As EventArgs) Handles cmdJump.Click
         JumpToScan()
     End Sub
 #End Region
 
 #Region "ListBoxes and Comboboxes"
-    Private Sub lstParentIonData_SelectedIndexChanged(sender As System.Object, e As EventArgs) Handles lstParentIonData.SelectedIndexChanged
+    Private Sub lstParentIonData_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstParentIonData.SelectedIndexChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub cboSICsTypeFilter_SelectedIndexChanged(sender As System.Object, e As EventArgs) Handles cboSICsTypeFilter.SelectedIndexChanged
+    Private Sub cboSICsTypeFilter_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSICsTypeFilter.SelectedIndexChanged
         SortData()
     End Sub
 
-    Private Sub cboSortOrder_SelectedIndexChanged(sender As System.Object, e As EventArgs) Handles cboSortOrder.SelectedIndexChanged
+    Private Sub cboSortOrder_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSortOrder.SelectedIndexChanged
         DefineDefaultSortDirection()
         SortData()
         lstParentIonData.Focus()
@@ -3887,17 +3815,17 @@ Public Class frmBrowser
 #End Region
 
 #Region "Option buttons"
-    Private Sub optDoNotResmooth_CheckedChanged(sender As System.Object, e As EventArgs) Handles optDoNotResmooth.CheckedChanged
+    Private Sub optDoNotResmooth_CheckedChanged(sender As Object, e As EventArgs) Handles optDoNotResmooth.CheckedChanged
         EnableDisableControls()
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub optUseButterworthSmooth_CheckedChanged(sender As System.Object, e As EventArgs) Handles optUseButterworthSmooth.CheckedChanged
+    Private Sub optUseButterworthSmooth_CheckedChanged(sender As Object, e As EventArgs) Handles optUseButterworthSmooth.CheckedChanged
         EnableDisableControls()
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub optUseSavitzkyGolaySmooth_CheckedChanged(sender As System.Object, e As EventArgs) Handles optUseSavitzkyGolaySmooth.CheckedChanged
+    Private Sub optUseSavitzkyGolaySmooth_CheckedChanged(sender As Object, e As EventArgs) Handles optUseSavitzkyGolaySmooth.CheckedChanged
         EnableDisableControls()
         UpdateStatsAndPlot()
     End Sub
@@ -3905,10 +3833,10 @@ Public Class frmBrowser
 
 #Region "Textboxes"
 
-    Private Sub txtAutoStep_TextChanged(sender As System.Object, e As EventArgs) Handles txtAutoStep.TextChanged
+    Private Sub txtAutoStep_TextChanged(sender As Object, e As EventArgs) Handles txtAutoStep.TextChanged
         Dim intNewInterval As Integer
 
-        If SharedVBNetRoutines.VBNetRoutines.IsNumber(txtAutoStep.Text) Then
+        If VBNetRoutines.IsNumber(txtAutoStep.Text) Then
             intNewInterval = CInt(txtAutoStep.Text)
             If intNewInterval < 10 Then intNewInterval = 10
             mAutoStepIntervalMsec = intNewInterval
@@ -3916,83 +3844,83 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Sub txtAutoStep_Validating(sender As System.Object, e As ComponentModel.CancelEventArgs) Handles txtAutoStep.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtAutoStep, 10, 9999, 150)
+    Private Sub txtAutoStep_Validating(sender As Object, e As CancelEventArgs) Handles txtAutoStep.Validating
+        VBNetRoutines.ValidateTextboxInt(txtAutoStep, 10, 9999, 150)
     End Sub
 
-    Private Sub txtButterworthSamplingFrequency_TextChanged(sender As System.Object, e As EventArgs) Handles txtButterworthSamplingFrequency.TextChanged
+    Private Sub txtButterworthSamplingFrequency_TextChanged(sender As Object, e As EventArgs) Handles txtButterworthSamplingFrequency.TextChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub txtButterworthSamplingFrequency_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtButterworthSamplingFrequency.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxSng(txtButterworthSamplingFrequency, 0.01, 0.99, 0.2)
+    Private Sub txtButterworthSamplingFrequency_Validating(sender As Object, e As CancelEventArgs) Handles txtButterworthSamplingFrequency.Validating
+        VBNetRoutines.ValidateTextboxSng(txtButterworthSamplingFrequency, 0.01, 0.99, 0.2)
     End Sub
 
     Private Sub txtFilterByMZ_Leave(sender As Object, e As EventArgs) Handles txtFilterByMZ.Leave
         If chkFilterByMZ.Checked Then SortData()
     End Sub
 
-    Private Sub txtFilterByMZ_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtFilterByMZ.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtFilterByMZ, 0, 100000, 540)
+    Private Sub txtFilterByMZ_Validating(sender As Object, e As CancelEventArgs) Handles txtFilterByMZ.Validating
+        VBNetRoutines.ValidateTextboxInt(txtFilterByMZ, 0, 100000, 540)
     End Sub
 
     Private Sub txtFilterByMZTol_Leave(sender As Object, e As EventArgs) Handles txtFilterByMZTol.Leave
         If chkFilterByMZ.Checked Then SortData()
     End Sub
 
-    Private Sub txtFilterByMZTol_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtFilterByMZTol.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxSng(txtFilterByMZTol, 0, 100000, 0.2)
+    Private Sub txtFilterByMZTol_Validating(sender As Object, e As CancelEventArgs) Handles txtFilterByMZTol.Validating
+        VBNetRoutines.ValidateTextboxSng(txtFilterByMZTol, 0, 100000, 0.2)
     End Sub
 
-    Private Sub txtFixXRange_TextChanged(sender As System.Object, e As EventArgs) Handles txtFixXRange.TextChanged
+    Private Sub txtFixXRange_TextChanged(sender As Object, e As EventArgs) Handles txtFixXRange.TextChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub txtFixXRange_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtFixXRange.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtFixXRange, 3, 500000, 100)
+    Private Sub txtFixXRange_Validating(sender As Object, e As CancelEventArgs) Handles txtFixXRange.Validating
+        VBNetRoutines.ValidateTextboxInt(txtFixXRange, 3, 500000, 100)
     End Sub
 
-    Private Sub txtFixYRange_TextChanged(sender As System.Object, e As EventArgs) Handles txtFixYRange.TextChanged
+    Private Sub txtFixYRange_TextChanged(sender As Object, e As EventArgs) Handles txtFixYRange.TextChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub txtFixYRange_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtFixYRange.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxSng(txtFixYRange, 10, Long.MaxValue, 5000000)
+    Private Sub txtFixYRange_Validating(sender As Object, e As CancelEventArgs) Handles txtFixYRange.Validating
+        VBNetRoutines.ValidateTextboxSng(txtFixYRange, 10, Long.MaxValue, 5000000)
     End Sub
 
     Private Sub txtMinimumIntensity_Leave(sender As Object, e As EventArgs) Handles txtMinimumIntensity.Leave
         If chkFilterByIntensity.Checked Then SortData()
     End Sub
 
-    Private Sub txtMinimumIntensity_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtMinimumIntensity.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtMinimumIntensity, 0, 1000000000, 1000000)
+    Private Sub txtMinimumIntensity_Validating(sender As Object, e As CancelEventArgs) Handles txtMinimumIntensity.Validating
+        VBNetRoutines.ValidateTextboxInt(txtMinimumIntensity, 0, 1000000000, 1000000)
     End Sub
 
     Private Sub txtMinimumSignalToNoise_Leave(sender As Object, e As EventArgs) Handles txtMinimumSignalToNoise.Leave
         If chkFilterBySignalToNoise.Checked Then SortData()
     End Sub
 
-    Private Sub txtMinimumSignalToNoise_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtMinimumSignalToNoise.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtMinimumSignalToNoise, 0, 10000, 2)
+    Private Sub txtMinimumSignalToNoise_Validating(sender As Object, e As CancelEventArgs) Handles txtMinimumSignalToNoise.Validating
+        VBNetRoutines.ValidateTextboxInt(txtMinimumSignalToNoise, 0, 10000, 2)
     End Sub
 
-    Private Sub txtPeakWidthPointsMinimum_TextChanged(sender As System.Object, e As EventArgs) Handles txtPeakWidthPointsMinimum.TextChanged
+    Private Sub txtPeakWidthPointsMinimum_TextChanged(sender As Object, e As EventArgs) Handles txtPeakWidthPointsMinimum.TextChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub txtPeakWidthPointsMinimum_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtPeakWidthPointsMinimum.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtPeakWidthPointsMinimum, 2, 100000, 6)
+    Private Sub txtPeakWidthPointsMinimum_Validating(sender As Object, e As CancelEventArgs) Handles txtPeakWidthPointsMinimum.Validating
+        VBNetRoutines.ValidateTextboxInt(txtPeakWidthPointsMinimum, 2, 100000, 6)
     End Sub
 
-    Private Sub txtSavitzkyGolayFilterOrder_TextChanged(sender As System.Object, e As EventArgs) Handles txtSavitzkyGolayFilterOrder.TextChanged
+    Private Sub txtSavitzkyGolayFilterOrder_TextChanged(sender As Object, e As EventArgs) Handles txtSavitzkyGolayFilterOrder.TextChanged
         UpdateStatsAndPlot()
     End Sub
 
-    Private Sub txtSavitzkyGolayFilterOrder_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtSavitzkyGolayFilterOrder.Validating
-        SharedVBNetRoutines.VBNetRoutines.ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
+    Private Sub txtSavitzkyGolayFilterOrder_Validating(sender As Object, e As CancelEventArgs) Handles txtSavitzkyGolayFilterOrder.Validating
+        VBNetRoutines.ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
     End Sub
 
-    Private Sub txtStats1_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtStats1.KeyPress
+    Private Sub txtStats1_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtStats1.KeyPress
         If Char.IsControl(e.KeyChar) Then
             Select Case Asc(e.KeyChar)
                 Case 3
@@ -4008,7 +3936,7 @@ Public Class frmBrowser
         End If
     End Sub
 
-    Private Sub txtStats2_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtStats2.KeyPress
+    Private Sub txtStats2_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtStats2.KeyPress
         If Char.IsControl(e.KeyChar) Then
             Select Case Asc(e.KeyChar)
                 Case 3
@@ -4024,7 +3952,7 @@ Public Class frmBrowser
         End If
     End Sub
 
-    Private Sub txStats3_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtStats3.KeyPress
+    Private Sub txStats3_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtStats3.KeyPress
         If Char.IsControl(e.KeyChar) Then
             Select Case Asc(e.KeyChar)
                 Case 3
@@ -4043,28 +3971,28 @@ Public Class frmBrowser
 #End Region
 
 #Region "Menubar"
-    Private Sub mnuHelpAbout_Click(sender As System.Object, e As EventArgs) Handles mnuHelpAbout.Click
+    Private Sub mnuHelpAbout_Click(sender As Object, e As EventArgs) Handles mnuHelpAbout.Click
         ShowAboutBox()
     End Sub
 
-    Private Sub mnuEditShowOptimalPeakApexCursor_Click(sender As System.Object, e As EventArgs) Handles mnuEditShowOptimalPeakApexCursor.Click
+    Private Sub mnuEditShowOptimalPeakApexCursor_Click(sender As Object, e As EventArgs) Handles mnuEditShowOptimalPeakApexCursor.Click
         mnuEditShowOptimalPeakApexCursor.Checked = Not mnuEditShowOptimalPeakApexCursor.Checked
     End Sub
 
-    Private Sub mnuFileSelectMASICInputFile_Click(sender As System.Object, e As EventArgs) Handles mnuFileSelectMASICInputFile.Click
+    Private Sub mnuFileSelectMASICInputFile_Click(sender As Object, e As EventArgs) Handles mnuFileSelectMASICInputFile.Click
         SelectMASICInputFile()
     End Sub
 
-    Private Sub mnuFileSelectMSMSSearchResultsFile_Click(sender As System.Object, e As EventArgs) Handles mnuFileSelectMSMSSearchResultsFile.Click
+    Private Sub mnuFileSelectMSMSSearchResultsFile_Click(sender As Object, e As EventArgs) Handles mnuFileSelectMSMSSearchResultsFile.Click
         SelectMsMsSearchResultsInputFile()
     End Sub
 
-    Private Sub mnuFileExit_Click(sender As System.Object, e As EventArgs) Handles mnuFileExit.Click
+    Private Sub mnuFileExit_Click(sender As Object, e As EventArgs) Handles mnuFileExit.Click
         Me.Close()
     End Sub
 #End Region
 
-    Private Sub frmBrowser_Closing(sender As Object, e As ComponentModel.CancelEventArgs) Handles MyBase.Closing
+    Private Sub frmBrowser_Closing(sender As Object, e As CancelEventArgs) Handles MyBase.Closing
         RegSaveSettings()
     End Sub
 
@@ -4072,7 +4000,7 @@ Public Class frmBrowser
         ' Note that InitializeControls() is called in Sub New()
     End Sub
 
-    Private Sub tmrAutoStep_Elapsed(sender As Object, e As Timers.ElapsedEventArgs) Handles tmrAutoStep.Elapsed
+    Private Sub tmrAutoStep_Elapsed(sender As Object, e As ElapsedEventArgs) Handles tmrAutoStep.Elapsed
         If mAutoStepEnabled Then CheckAutoStep()
     End Sub
 

@@ -1,4 +1,6 @@
-﻿Public Class clsSICDetails
+﻿Imports MASICPeakFinder
+
+Public Class clsSICDetails
 
     ''' <summary>
     ''' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
