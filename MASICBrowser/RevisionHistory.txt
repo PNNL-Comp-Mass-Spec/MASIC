@@ -1,5 +1,8 @@
 MASIC Browser Change Log
 
+Version 1.1.6328; April 29, 2017
+	- Converted numerous structs into classes
+
 Version 1.1.6303; April 4, 2017
 	- Updated OxyDataPlotter.dll
 
@@ -43,7 +46,7 @@ Version 1.0.3033; April 21, 2008
 Version 1.0.2277; March 27, 2006
 	- Removed the maximum window size constraint
 
-Verison 1.0.2215; January 24, 2006
+Version 1.0.2215; January 24, 2006
 	- Updated to new version of CWSpectrumDLLNET.dll
 		- Supports defining the plot window's caption via code
 
