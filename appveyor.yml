@@ -1,0 +1,12 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+before_build:
+- cmd: nuget.exe restore MASIC_BuildAll.sln
+build:
+  project: MASIC_BuildAll.sln
+  verbosity: minimal
+test:
+  categories:
+    except:
+    - DatabaseNamedUser
+    - DatabaseIntegrated
