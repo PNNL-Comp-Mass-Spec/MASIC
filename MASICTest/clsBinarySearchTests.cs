@@ -38,9 +38,9 @@ namespace MASICTest
                 // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
                 var outputFolderPath = GetOutputFolderPath();
-                var outputFilePath = Path.Combine(outputFolderPath, "BinarySearch_Test_Int_" + eMissingDataMode + ".txt");
+                var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Int_" + eMissingDataMode + ".txt"));
 
-                using (var srOutFile = new StreamWriter(outputFilePath, false))
+                using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
 
                     srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
@@ -103,7 +103,7 @@ namespace MASICTest
 
                 }
 
-                Console.WriteLine("Test complete; see file " + outputFilePath);
+                Console.WriteLine("Test complete; see file " + outputFile.FullName);
 
             }
             catch (Exception ex)
@@ -139,9 +139,9 @@ namespace MASICTest
                 // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
                 var outputFolderPath = GetOutputFolderPath();
-                var outputFilePath = Path.Combine(outputFolderPath, "BinarySearch_Test_Double_" + eMissingDataMode + ".txt");
+                var outputFile = new FileInfo(Path.Combine(outputFolderPath, "BinarySearch_Test_Double_" + eMissingDataMode + ".txt"));
 
-                using (var srOutFile = new StreamWriter(outputFilePath, false))
+                using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
 
                     srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
@@ -210,7 +210,7 @@ namespace MASICTest
 
                 }
 
-                Console.WriteLine("Test complete; see file " + outputFilePath);
+                Console.WriteLine("Test complete; see file " + outputFile.FullName);
 
                 var entryAssembly = System.Reflection.Assembly.GetExecutingAssembly();
 
