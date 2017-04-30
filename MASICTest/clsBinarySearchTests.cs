@@ -223,7 +223,7 @@ namespace MASICTest
                 Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " + ex.Message);
             }
         }
-       
+
         private string GetOutputFolderPath()
         {
             try
@@ -236,9 +236,10 @@ namespace MASICTest
                 if (defaultOutputFolder.Parent != null && defaultOutputFolder.Parent.Exists)
                 {
                     defaultOutputFolder.Create();
+                    return defaultOutputFolder.FullName;
                 }
-                return defaultOutputFolder.FullName;
 
+                return ".";
 
             }
             catch (Exception ex)
