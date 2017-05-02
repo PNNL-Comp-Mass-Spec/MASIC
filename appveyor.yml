@@ -10,3 +10,6 @@ test:
     except:
     - DatabaseNamedUser
     - DatabaseIntegrated
+artifacts:
+- path: bin\*
+- path: MASICBrowser\bin\*
