@@ -11,5 +11,7 @@ test:
     - DatabaseNamedUser
     - DatabaseIntegrated
 artifacts:
-- path: bin\*
-- path: MASICBrowser\bin\*
+- path: bin
+  name: MASIC
+- path: MASICBrowser\bin
+  name: MASICBrowser
