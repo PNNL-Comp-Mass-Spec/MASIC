@@ -2713,7 +2713,6 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    <Obsolete("Use the version that takes a List(Of clsSICDataPoint")>
     Public Sub FindPotentialPeakArea(
        intDataCount As Integer,
        SICIntensities() As Single,
