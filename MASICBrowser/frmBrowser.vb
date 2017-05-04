@@ -31,7 +31,6 @@ Imports System.Timers
 Imports System.Xml
 Imports DataFilter
 Imports MASICPeakFinder
-Imports PNNLOmics.Utilities
 Imports OxyDataPlotter
 Imports OxyPlot
 Imports PRISM

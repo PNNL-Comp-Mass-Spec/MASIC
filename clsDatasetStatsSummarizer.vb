@@ -17,7 +17,7 @@ Option Strict On
 '
 Imports System.Text
 Imports System.Xml
-Imports PNNLOmics.Utilities
+Imports PRISM
 Imports SpectraTypeClassifier
 
 Public Class clsDatasetStatsSummarizer

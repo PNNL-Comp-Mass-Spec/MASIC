@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports MASIC.clsMASIC
-Imports PNNLOmics.Utilities
+Imports PRISM
 
 Namespace DataOutput
     Public Class clsSICStatsWriter

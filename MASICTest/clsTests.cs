@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using MASIC;
 using NUnit.Framework;
-using PNNLOmics.Utilities;
 using PRISM;
 using ThermoRawFileReader;
 

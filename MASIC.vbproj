@@ -94,9 +94,6 @@
       <Name>NetCDFReader</Name>
       <HintPath>lib\NetCDFReader.dll</HintPath>
     </Reference>
-    <Reference Include="PNNLOmics">
-      <HintPath>Lib\PNNLOmics.dll</HintPath>
-    </Reference>
     <Reference Include="ProgressFormNET">
       <Name>ProgressFormNET</Name>
       <HintPath>lib\ProgressFormNET.dll</HintPath>
