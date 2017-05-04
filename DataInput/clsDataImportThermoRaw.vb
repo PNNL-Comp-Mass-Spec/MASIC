@@ -577,11 +577,8 @@ Namespace DataInput
                     .IonCount = scanInfo.IonCountRaw
                 }
 
-                If objMSSpectrum.IonCount = 0 Then
-                    Return False
-                End If
-
                 strLastKnownLocation = "Redim IonsMz and IonsIntensity to length " & objMSSpectrum.IonCount
+
                 ReDim objMSSpectrum.IonsMZ(objMSSpectrum.IonCount - 1)
                 ReDim objMSSpectrum.IonsIntensity(objMSSpectrum.IonCount - 1)
 
@@ -601,30 +598,30 @@ Namespace DataInput
                     If scanInfo.TotalIonIntensity < Single.Epsilon Then
                         scanInfo.TotalIonIntensity = CSng(Math.Min(dblTIC, Single.MaxValue))
                     End If
-
-                    Dim blnDiscardLowIntensityDataWork As Boolean
-                    Dim blnCompressSpectraDataWork As Boolean
-
-                    If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
-                        blnDiscardLowIntensityDataWork = blnDiscardLowIntensityData
-                        blnCompressSpectraDataWork = blnCompressSpectraData
-                    Else
-                        blnDiscardLowIntensityDataWork = False
-                        blnCompressSpectraDataWork = False
-                    End If
-
-                    strLastKnownLocation = "Call ProcessAndStoreSpectrum"
-                    mScanTracking.ProcessAndStoreSpectrum(
-                        scanInfo, Me,
-                        objSpectraCache, objMSSpectrum,
-                        noiseThresholdOptions,
-                        blnDiscardLowIntensityDataWork,
-                        blnCompressSpectraDataWork,
-                        dblMSDataResolution,
-                        blnKeepRawSpectrum)
                 Else
                     scanInfo.TotalIonIntensity = 0
                 End If
+
+                Dim blnDiscardLowIntensityDataWork As Boolean
+                Dim blnCompressSpectraDataWork As Boolean
+
+                If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
+                    blnDiscardLowIntensityDataWork = blnDiscardLowIntensityData
+                    blnCompressSpectraDataWork = blnCompressSpectraData
+                Else
+                    blnDiscardLowIntensityDataWork = False
+                    blnCompressSpectraDataWork = False
+                End If
+
+                strLastKnownLocation = "Call ProcessAndStoreSpectrum"
+                mScanTracking.ProcessAndStoreSpectrum(
+                    scanInfo, Me,
+                    objSpectraCache, objMSSpectrum,
+                    noiseThresholdOptions,
+                    blnDiscardLowIntensityDataWork,
+                    blnCompressSpectraDataWork,
+                    dblMSDataResolution,
+                    blnKeepRawSpectrum)
 
             Catch ex As Exception
                 ReportError("Error in LoadSpectraForFinniganDataFile (LastKnownLocation: " & strLastKnownLocation & ")", ex, eMasicErrorCodes.InputFileDataReadError)
