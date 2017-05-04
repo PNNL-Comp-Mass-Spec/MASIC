@@ -18,7 +18,7 @@ Imports SharedVBNetRoutines
 
 Module modMain
 
-    Public Const PROGRAM_DATE As String = "April 27, 2017"
+    Public Const PROGRAM_DATE As String = "April 29, 2017"
 
     Private mInputFilePath As String
 
