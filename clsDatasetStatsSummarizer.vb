@@ -10,9 +10,9 @@ Option Strict On
 ' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
 ' Website: http://panomics.pnnl.gov/ or http://omics.pnl.gov
 ' -------------------------------------------------------------------------------
-' 
+'
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at 
+' in compliance with the License.  You may obtain a copy of the License at
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
 Imports System.Text
@@ -512,11 +512,11 @@ Public Class clsDatasetStatsSummarizer
             ' objDSInfo.Formatting = System.Xml.Formatting.Indented
             ' objDSInfo.Indentation = 2
 
-            ' However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16) 
-            '  since this is the only character encoding used in the .NET Framework for String values, 
-            '  and thus you'll see the attribute encoding="utf-16" in the opening XML declaration 
-            ' The alternative is to use a MemoryStream.  Here, the stream encoding is set by the XmlWriter 
-            '  and so you see the attribute encoding="utf-8" in the opening XML declaration encoding 
+            ' However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16)
+            '  since this is the only character encoding used in the .NET Framework for String values,
+            '  and thus you'll see the attribute encoding="utf-16" in the opening XML declaration
+            ' The alternative is to use a MemoryStream.  Here, the stream encoding is set by the XmlWriter
+            '  and so you see the attribute encoding="utf-8" in the opening XML declaration encoding
             '  (since we used objXMLSettings.Encoding = System.Encoding.UTF8)
             '
             Dim objMemStream = New MemoryStream()
