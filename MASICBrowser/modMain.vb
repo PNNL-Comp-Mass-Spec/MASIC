@@ -122,12 +122,12 @@ Module modMain
 
     Public Sub ShowGUI()
 
-        System.Windows.Forms.Application.EnableVisualStyles()
-        System.Windows.Forms.Application.DoEvents()
+        Application.EnableVisualStyles()
+        Application.DoEvents()
 
         Dim masicBrowser = New frmBrowser()
 
-        if Not String.IsNullOrWhiteSpace(mInputFilePath) then
+        If Not String.IsNullOrWhiteSpace(mInputFilePath) Then
             masicBrowser.FileToAutoLoad = mInputFilePath
         End If
         masicBrowser.ShowDialog()
@@ -158,7 +158,7 @@ Module modMain
             Console.WriteLine()
 
             ' Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
-            Threading.Thread.Sleep(750)
+            Thread.Sleep(750)
 
         Catch ex As Exception
             ShowErrorMessage("Error displaying the program syntax: " & ex.Message)

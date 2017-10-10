@@ -1099,7 +1099,7 @@ Public Class frmBrowser
     Private mLastUpdate As DateTime
     Private mMASICPeakFinder As clsMASICPeakFinder
 
-    Private mFileLoadTimer As System.Windows.Forms.Timer
+    Private mFileLoadTimer As Windows.Forms.Timer
 
 #End Region
 
@@ -1626,7 +1626,7 @@ Public Class frmBrowser
         txtStats3.Visible = False
         PositionControls()
 
-        mFileLoadTimer = New System.Windows.Forms.Timer()
+        mFileLoadTimer = New Windows.Forms.Timer()
 
         AddHandler mFileLoadTimer.Tick, AddressOf mFileLoadTimer_Tick
 
