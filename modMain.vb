@@ -106,7 +106,7 @@ Public Module modMain
         ' Returns 0 if no error, error code if an error
 
         Dim objParseCommandLine As New clsParseCommandLine
-        Dim blnProceed As Boolean
+        Dim proceed As Boolean
 
         mInputFilePath = String.Empty
         mOutputFolderPath = String.Empty
@@ -120,9 +120,9 @@ Public Module modMain
         mLogFilePath = String.Empty
 
         Try
-            blnProceed = False
+            proceed = False
             If objParseCommandLine.ParseCommandLine Then
-                If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then blnProceed = True
+                If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then proceed = True
             End If
 
             If (objParseCommandLine.ParameterCount + objParseCommandLine.NonSwitchParameterCount = 0) And Not objParseCommandLine.NeedToShowHelp Then
@@ -130,7 +130,7 @@ Public Module modMain
                 Return 0
             End If
 
-            If Not blnProceed OrElse objParseCommandLine.NeedToShowHelp OrElse mInputFilePath.Length = 0 Then
+            If Not proceed OrElse objParseCommandLine.NeedToShowHelp OrElse mInputFilePath.Length = 0 Then
                 ShowProgramHelp()
                 Return -1
             End If
@@ -161,26 +161,26 @@ Public Module modMain
 
             End If
 
-            Dim intReturnCode As Integer
+            Dim returnCode As Integer
 
             If mRecurseFolders Then
                 If mMASIC.ProcessFilesAndRecurseFolders(mInputFilePath, mOutputFolderPath, mOutputFolderAlternatePath, mRecreateFolderHierarchyInAlternatePath, mParameterFilePath, mRecurseFoldersMaxLevels) Then
-                    intReturnCode = 0
+                    returnCode = 0
                 Else
-                    intReturnCode = mMASIC.ErrorCode
+                    returnCode = mMASIC.ErrorCode
                 End If
             Else
                 If mMASIC.ProcessFilesWildcard(mInputFilePath, mOutputFolderPath, mParameterFilePath) Then
-                    intReturnCode = 0
+                    returnCode = 0
                 Else
-                    intReturnCode = mMASIC.ErrorCode
-                    If intReturnCode <> 0 AndAlso Not mQuietMode Then
+                    returnCode = mMASIC.ErrorCode
+                    If returnCode <> 0 AndAlso Not mQuietMode Then
                         Console.WriteLine("Error while processing: " & mMASIC.GetErrorMessage())
                     End If
                 End If
             End If
 
-            Return intReturnCode
+            Return returnCode
 
         Catch ex As Exception
             ShowErrorMessage("Error occurred in modMain->Main: " & Environment.NewLine & ex.Message)
@@ -194,13 +194,13 @@ Public Module modMain
 
     End Function
 
-    Private Sub DisplayProgressPercent(intPercentComplete As Integer, blnAddCarriageReturn As Boolean)
-        If blnAddCarriageReturn Then
+    Private Sub DisplayProgressPercent(percentComplete As Integer, addCarriageReturn As Boolean)
+        If addCarriageReturn Then
             Console.WriteLine()
         End If
-        If intPercentComplete > 100 Then intPercentComplete = 100
-        Console.Write("Processing: " & intPercentComplete.ToString() & "% ")
-        If blnAddCarriageReturn Then
+        If percentComplete > 100 Then percentComplete = 100
+        Console.Write("Processing: " & percentComplete.ToString() & "% ")
+        If addCarriageReturn Then
             Console.WriteLine()
         End If
     End Sub
@@ -222,7 +222,7 @@ Public Module modMain
     Private Function SetOptionsUsingCommandLineParameters(objParseCommandLine As clsParseCommandLine) As Boolean
         ' Returns True if no problems; otherwise, returns false
 
-        Dim strValue As String = String.Empty
+        Dim value As String = String.Empty
         Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "LogFolder", "Q"}
         Dim intValue As Integer
 
@@ -236,49 +236,49 @@ Public Module modMain
 
                 ' Query objParseCommandLine to see if various parameters are present
                 With objParseCommandLine
-                    If .RetrieveValueForParameter("I", strValue) Then
-                        mInputFilePath = strValue
+                    If .RetrieveValueForParameter("I", value) Then
+                        mInputFilePath = value
                     ElseIf .NonSwitchParameterCount > 0 Then
                         ' Treat the first non-switch parameter as the input file
                         mInputFilePath = .RetrieveNonSwitchParameter(0)
                     End If
 
-                    If .RetrieveValueForParameter("O", strValue) Then mOutputFolderPath = strValue
-                    If .RetrieveValueForParameter("P", strValue) Then mParameterFilePath = strValue
-                    If .RetrieveValueForParameter("D", strValue) Then
-                        If Not IsNumeric(strValue) AndAlso Not strValue Is Nothing Then
+                    If .RetrieveValueForParameter("O", value) Then mOutputFolderPath = value
+                    If .RetrieveValueForParameter("P", value) Then mParameterFilePath = value
+                    If .RetrieveValueForParameter("D", value) Then
+                        If Not IsNumeric(value) AndAlso Not value Is Nothing Then
                             ' Assume the user specified a dataset number lookup file (comma or tab delimited file specifying the dataset number for each input file)
-                            mDatasetLookupFilePath = strValue
+                            mDatasetLookupFilePath = value
                             mDatasetNumber = 0
                         Else
-                            mDatasetNumber = CInt(strValue)
+                            mDatasetNumber = CInt(value)
                         End If
                     End If
 
-                    If .RetrieveValueForParameter("S", strValue) Then
+                    If .RetrieveValueForParameter("S", value) Then
                         mRecurseFolders = True
-                        If Integer.TryParse(strValue, intValue) Then
+                        If Integer.TryParse(value, intValue) Then
                             mRecurseFoldersMaxLevels = intValue
                         End If
                     End If
-                    If .RetrieveValueForParameter("A", strValue) Then mOutputFolderAlternatePath = strValue
+                    If .RetrieveValueForParameter("A", value) Then mOutputFolderAlternatePath = value
                     If .IsParameterPresent("R") Then mRecreateFolderHierarchyInAlternatePath = True
 
-                    If .RetrieveValueForParameter("L", strValue) Then
+                    If .RetrieveValueForParameter("L", value) Then
                         mLogMessagesToFile = True
-                        If Not String.IsNullOrEmpty(strValue) Then
-                            mLogFilePath = strValue.Trim(""""c)
+                        If Not String.IsNullOrEmpty(value) Then
+                            mLogFilePath = value.Trim(""""c)
                         End If
                     End If
 
-                    If .RetrieveValueForParameter("SF", strValue) Then
-                        mMASICStatusFilename = strValue
+                    If .RetrieveValueForParameter("SF", value) Then
+                        mMASICStatusFilename = value
                     End If
 
-                    If .RetrieveValueForParameter("LogFolder", strValue) Then
+                    If .RetrieveValueForParameter("LogFolder", value) Then
                         mLogMessagesToFile = True
-                        If Not String.IsNullOrEmpty(strValue) Then
-                            mLogFolderPath = strValue
+                        If Not String.IsNullOrEmpty(value) Then
+                            mLogFolderPath = value
                         End If
                     End If
                     If .IsParameterPresent("Q") Then mQuietMode = True

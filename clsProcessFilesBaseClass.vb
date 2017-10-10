@@ -215,11 +215,11 @@ Public MustInherit Class clsProcessFilesBaseClass
         Return ProcessFilesWildcard(strInputFilePath, strOutputFolderPath, String.Empty)
     End Function
 
-    Public Function ProcessFilesWildcard(strInputFilePath As String, strOutputFolderPath As String, strParameterFilePath As String) As Boolean
-        Return ProcessFilesWildcard(strInputFilePath, strOutputFolderPath, strParameterFilePath, True)
+    Public Function ProcessFilesWildcard(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String) As Boolean
+        Return ProcessFilesWildcard(strInputFilePath, strOutputFolderPath, parameterFilePath, True)
     End Function
 
-    Public Function ProcessFilesWildcard(strInputFilePath As String, strOutputFolderPath As String, strParameterFilePath As String, blnResetErrorCode As Boolean) As Boolean
+    Public Function ProcessFilesWildcard(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String, blnResetErrorCode As Boolean) As Boolean
         ' Returns True if success, False if failure
 
         Dim blnSuccess As Boolean
@@ -267,7 +267,7 @@ Public MustInherit Class clsProcessFilesBaseClass
                 For Each ioFileMatch As FileInfo In ioFolderInfo.GetFiles(strInputFilePath)
                     intMatchCount += 1
 
-                    blnSuccess = ProcessFile(ioFileMatch.FullName, strOutputFolderPath, strParameterFilePath, blnResetErrorCode)
+                    blnSuccess = ProcessFile(ioFileMatch.FullName, strOutputFolderPath, parameterFilePath, blnResetErrorCode)
 
                     If mAbortProcessing Then
                         Exit For
@@ -291,7 +291,7 @@ Public MustInherit Class clsProcessFilesBaseClass
                 End If
 
             Else
-                blnSuccess = ProcessFile(strInputFilePath, strOutputFolderPath, strParameterFilePath, blnResetErrorCode)
+                blnSuccess = ProcessFile(strInputFilePath, strOutputFolderPath, parameterFilePath, blnResetErrorCode)
             End If
 
         Catch ex As Exception
@@ -311,12 +311,12 @@ Public MustInherit Class clsProcessFilesBaseClass
         Return ProcessFile(strInputFilePath, strOutputFolderPath, String.Empty)
     End Function
 
-    Public Function ProcessFile(strInputFilePath As String, strOutputFolderPath As String, strParameterFilePath As String) As Boolean
-        Return ProcessFile(strInputFilePath, strOutputFolderPath, strParameterFilePath, True)
+    Public Function ProcessFile(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String) As Boolean
+        Return ProcessFile(strInputFilePath, strOutputFolderPath, parameterFilePath, True)
     End Function
 
     ' Main function for processing a single file
-    Public MustOverride Function ProcessFile(strInputFilePath As String, strOutputFolderPath As String, strParameterFilePath As String, blnResetErrorCode As Boolean) As Boolean
+    Public MustOverride Function ProcessFile(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String, blnResetErrorCode As Boolean) As Boolean
 
     Public Function ProcessFilesAndRecurseFolders(strInputFolderPath As String) As Boolean
         Return ProcessFilesAndRecurseFolders(strInputFolderPath, String.Empty, String.Empty)
@@ -326,28 +326,28 @@ Public MustInherit Class clsProcessFilesBaseClass
         Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strParameterFilePath As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty, False, strParameterFilePath)
+    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, parameterFilePath As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty, False, parameterFilePath)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strParameterFilePath As String, strExtensionsToParse() As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty, False, strParameterFilePath, 0, strExtensionsToParse)
+    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, parameterFilePath As String, strExtensionsToParse() As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty, False, parameterFilePath, 0, strExtensionsToParse)
     End Function
 
     Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean) As Boolean
         Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, String.Empty)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, strParameterFilePath As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, strParameterFilePath, 0)
+    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, parameterFilePath, 0)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, strParameterFilePath As String, intRecurseFoldersMaxLevels As Integer) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, strParameterFilePath, intRecurseFoldersMaxLevels, GetDefaultExtensionsToParse())
+    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String, intRecurseFoldersMaxLevels As Integer) As Boolean
+        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, parameterFilePath, intRecurseFoldersMaxLevels, GetDefaultExtensionsToParse())
     End Function
 
     ' Main function for processing files in a folder (and subfolders)
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, strParameterFilePath As String, intRecurseFoldersMaxLevels As Integer, strExtensionsToParse() As String) As Boolean
+    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String, intRecurseFoldersMaxLevels As Integer, strExtensionsToParse() As String) As Boolean
         ' Calls ProcessFiles for all files in strInputFilePathOrFolder and below having an extension listed in strExtensionsToParse()
         ' The extensions should be of the form ".TXT" or ".RAW" (i.e. a period then the extension)
         ' If any of the extensions is "*" or ".*" then all files will be processed
@@ -421,7 +421,7 @@ Public MustInherit Class clsProcessFilesBaseClass
                 ' Call RecurseFoldersWork
                 Const intRecursionLevel = 1
                 blnSuccess = RecurseFoldersWork(strInputFolderPath, strInputFilePathOrFolder, strOutputFolderName,
-                  strParameterFilePath, strOutputFolderAlternatePath,
+                  parameterFilePath, strOutputFolderAlternatePath,
                   blnRecreateFolderHierarchyInAlternatePath, strExtensionsToParse,
                   intFileProcessCount, intFileProcessFailCount,
                   intRecursionLevel, intRecurseFoldersMaxLevels)
@@ -441,7 +441,7 @@ Public MustInherit Class clsProcessFilesBaseClass
     End Function
 
     Private Function RecurseFoldersWork(strInputFolderPath As String, strFileNameMatch As String, strOutputFolderName As String,
-       strParameterFilePath As String, strOutputFolderAlternatePath As String,
+       parameterFilePath As String, strOutputFolderAlternatePath As String,
        blnRecreateFolderHierarchyInAlternatePath As Boolean, strExtensionsToParse() As String,
        ByRef intFileProcessCount As Integer, ByRef intFileProcessFailCount As Integer,
        intRecursionLevel As Integer, intRecurseFoldersMaxLevels As Integer) As Boolean
@@ -518,7 +518,7 @@ Public MustInherit Class clsProcessFilesBaseClass
 
                 For intExtensionIndex = 0 To strExtensionsToParse.Length - 1
                     If blnProcessAllExtensions OrElse ioFileMatch.Extension.ToUpper() = strExtensionsToParse(intExtensionIndex) Then
-                        blnSuccess = ProcessFile(ioFileMatch.FullName, strOutputFolderPathToUse, strParameterFilePath, True)
+                        blnSuccess = ProcessFile(ioFileMatch.FullName, strOutputFolderPathToUse, parameterFilePath, True)
                         If Not blnSuccess Then
                             intFileProcessFailCount += 1
                             blnSuccess = True
@@ -545,7 +545,7 @@ Public MustInherit Class clsProcessFilesBaseClass
                 ' Call this function for each of the subfolders of ioInputFolderInfo
                 For Each ioSubFolderInfo As DirectoryInfo In ioInputFolderInfo.GetDirectories()
                     blnSuccess = RecurseFoldersWork(ioSubFolderInfo.FullName, strFileNameMatch, strOutputFolderName,
-                      strParameterFilePath, strOutputFolderAlternatePath,
+                      parameterFilePath, strOutputFolderAlternatePath,
                       blnRecreateFolderHierarchyInAlternatePath, strExtensionsToParse,
                       intFileProcessCount, intFileProcessFailCount,
                       intRecursionLevel + 1, intRecurseFoldersMaxLevels)

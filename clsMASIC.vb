@@ -1254,15 +1254,14 @@ Public Class clsMASIC
 
     ' Main processing function
     Public Overloads Overrides Function ProcessFile(
-      strInputFilePath As String,
-      strOutputFolderPath As String,
-      strParameterFilePath As String,
+      inputFilePath As String,
+      outputFolderPath As String,
+      parameterFilePath As String,
       blnResetErrorCode As Boolean) As Boolean
 
         Dim ioFileInfo As FileInfo
 
-        Dim blnSuccess, blnDoNotProcess As Boolean
-        Dim blnKeepRawMSSpectra As Boolean
+        Dim success, blnDoNotProcess As Boolean
 
         Dim strInputFilePathFull As String = String.Empty
         Dim strInputFileName As String = String.Empty
@@ -1273,7 +1272,7 @@ Public Class clsMASIC
             SetLocalErrorCode(eMasicErrorCodes.NoError)
         End If
 
-        mOptions.OutputFolderPath = strOutputFolderPath
+        mOptions.OutputFolderPath = outputFolderPath
 
         mSubtaskProcessingStepPct = 0
         UpdateProcessingStep(eProcessingStepConstants.NewTask, True)
@@ -1283,9 +1282,9 @@ Public Class clsMASIC
 
         UpdateStatusFile(True)
 
-        If Not mOptions.LoadParameterFileSettings(strParameterFilePath) Then
+        If Not mOptions.LoadParameterFileSettings(parameterFilePath, inputFilePath) Then
             MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
-            mStatusMessage = "Parameter file load error: " & strParameterFilePath
+            mStatusMessage = "Parameter file load error: " & parameterFilePath
 
             If MyBase.ShowMessages Then
                 MessageBox.Show(mStatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -1312,8 +1311,8 @@ Public Class clsMASIC
                 RegisterEvents(sicListReader)
 
                 LogMessage("ProcessFile: Reading custom SIC values file: " & mOptions.CustomSICList.CustomSICListFileName)
-                blnSuccess = sicListReader.LoadCustomSICListFromFile(mOptions.CustomSICList.CustomSICListFileName)
-                If Not blnSuccess Then
+                success = sicListReader.LoadCustomSICListFromFile(mOptions.CustomSICList.CustomSICListFileName)
+                If Not success Then
                     SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues)
                     Exit Try
                 End If
@@ -1321,40 +1320,40 @@ Public Class clsMASIC
 
             mOptions.ReporterIons.UpdateMZIntensityFilterIgnoreRange()
 
-            LogMessage("Source data file: " & strInputFilePath)
+            LogMessage("Source data file: " & inputFilePath)
 
-            If strInputFilePath Is Nothing OrElse strInputFilePath.Length = 0 Then
+            If inputFilePath Is Nothing OrElse inputFilePath.Length = 0 Then
                 ShowErrorMessage("Input file name is empty")
                 MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidInputFilePath)
                 Exit Try
             End If
 
 
-            mStatusMessage = "Parsing " & Path.GetFileName(strInputFilePath)
+            mStatusMessage = "Parsing " & Path.GetFileName(inputFilePath)
             Console.WriteLine()
             ShowMessage(mStatusMessage)
 
-            blnSuccess = CleanupFilePaths(strInputFilePath, strOutputFolderPath)
-            mOptions.OutputFolderPath = strOutputFolderPath
+            success = CleanupFilePaths(inputFilePath, outputFolderPath)
+            mOptions.OutputFolderPath = outputFolderPath
 
-            If blnSuccess Then
+            If success Then
                 Dim dbAccessor = New clsDatabaseAccess(mOptions)
                 RegisterEvents(dbAccessor)
 
-                mOptions.SICOptions.DatasetNumber = dbAccessor.LookupDatasetNumber(strInputFilePath, mOptions.DatasetLookupFilePath, mOptions.SICOptions.DatasetNumber)
+                mOptions.SICOptions.DatasetNumber = dbAccessor.LookupDatasetNumber(inputFilePath, mOptions.DatasetLookupFilePath, mOptions.SICOptions.DatasetNumber)
 
                 If Me.LocalErrorCode <> eMasicErrorCodes.NoError Then
                     If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetNumber OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
                         ' Ignore this error
                         Me.SetLocalErrorCode(eMasicErrorCodes.NoError)
-                        blnSuccess = True
+                        success = True
                     Else
-                        blnSuccess = False
+                        success = False
                     End If
                 End If
             End If
 
-            If Not blnSuccess Then
+            If Not success Then
                 If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.FilePathError)
                 Exit Try
             End If
@@ -1371,24 +1370,24 @@ Public Class clsMASIC
                 '---------------------------------------------------------
 
                 ' Obtain the full path to the input file
-                ioFileInfo = New FileInfo(strInputFilePath)
+                ioFileInfo = New FileInfo(inputFilePath)
                 strInputFilePathFull = ioFileInfo.FullName
 
-                LogMessage("Checking for existing results in the output path: " & strOutputFolderPath)
+                LogMessage("Checking for existing results in the output path: " & outputFolderPath)
 
-                blnDoNotProcess = dataOutputHandler.CheckForExistingResults(strInputFilePathFull, strOutputFolderPath, mOptions)
+                blnDoNotProcess = dataOutputHandler.CheckForExistingResults(strInputFilePathFull, outputFolderPath, mOptions)
 
                 If blnDoNotProcess Then
                     LogMessage("Existing results found; data will not be reprocessed")
                 End If
 
             Catch ex As Exception
-                blnSuccess = False
+                success = False
                 LogErrors("ProcessFile", "Error checking for existing results file", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
             End Try
 
             If blnDoNotProcess Then
-                blnSuccess = True
+                success = True
                 Exit Try
             End If
 
@@ -1398,15 +1397,15 @@ Public Class clsMASIC
                 '---------------------------------------------------------
 
                 ' The following should work for testing access permissions, but it doesn't
-                'Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, strOutputFolderPath)
+                'Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputFolderPath)
                 '' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
                 'objFilePermissionTest.Demand()
                 'objFilePermissionTest.Assert()
 
-                LogMessage("Checking for write permission in the output path: " & strOutputFolderPath)
+                LogMessage("Checking for write permission in the output path: " & outputFolderPath)
 
                 Dim strOutputFileTestPath As String
-                strOutputFileTestPath = Path.Combine(strOutputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
+                strOutputFileTestPath = Path.Combine(outputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
 
                 Using fsOutFileTest As New StreamWriter(strOutputFileTestPath, False)
                     fsOutFileTest.WriteLine("Test")
@@ -1417,11 +1416,11 @@ Public Class clsMASIC
                 File.Delete(strOutputFileTestPath)
 
             Catch ex As Exception
-                blnSuccess = False
-                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & strOutputFolderPath, ex, True, False, eMasicErrorCodes.FileIOPermissionsError)
+                success = False
+                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & outputFolderPath, ex, True, False, eMasicErrorCodes.FileIOPermissionsError)
             End Try
 
-            If Not blnSuccess Then
+            If Not success Then
                 SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError)
                 Exit Try
             End If
@@ -1574,7 +1573,7 @@ Public Class clsMASIC
                 ' Record that the file is finished loading
                 mProcessingStats.FileLoadEndTime = DateTime.UtcNow
 
-                If Not blnSuccess Then
+                If Not success Then
                     If mStatusMessage Is Nothing OrElse mStatusMessage.Length = 0 Then
                         mStatusMessage = "Unable to parse file; unknown error"
                     Else
@@ -1602,7 +1601,7 @@ Public Class clsMASIC
                         If .ParentIonInfoCount <> .ParentIons.Length Then ReDim Preserve .ParentIons(.ParentIonInfoCount - 1)
                     End With
                 Catch ex As Exception
-                    blnSuccess = False
+                    success = False
                     LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
                     Exit Try
                 End Try
@@ -1850,7 +1849,7 @@ Public Class clsMASIC
             End Using
 
         Catch ex As Exception
-            blnSuccess = False
+            success = False
             LogErrors("ProcessFile", "Error in ProcessFile", ex, True, False, eMasicErrorCodes.UnspecifiedError)
         Finally
 
@@ -1882,8 +1881,8 @@ Public Class clsMASIC
             If blnDoNotProcess Then
                 mStatusMessage = "Existing valid results were found; processing was not repeated."
                 ShowMessage(mStatusMessage)
-            ElseIf blnSuccess Then
-                mStatusMessage = "Processing complete.  Results can be found in folder: " & strOutputFolderPath
+            ElseIf success Then
+                mStatusMessage = "Processing complete.  Results can be found in folder: " & outputFolderPath
                 ShowMessage(mStatusMessage)
             Else
                 If Me.LocalErrorCode = eMasicErrorCodes.NoError Then
@@ -1909,28 +1908,28 @@ Public Class clsMASIC
                 LogMessage("ProcessingStats: UncCache Event Count = " & .UnCacheEventCount.ToString())
             End With
 
-            If blnSuccess Then
+            If success Then
                 LogMessage("Processing complete")
             Else
                 LogMessage("Processing ended in error")
             End If
 
         Catch ex As Exception
-            blnSuccess = False
+            success = False
             LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, True, False, eMasicErrorCodes.UnspecifiedError)
         End Try
 
-        If blnSuccess Then
+        If success Then
             mOptions.SICOptions.DatasetNumber += 1
         End If
 
-        If blnSuccess Then
+        If success Then
             UpdateProcessingStep(eProcessingStepConstants.Complete, True)
         Else
             UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
         End If
 
-        Return blnSuccess
+        Return success
 
     End Function
 
@@ -1953,9 +1952,10 @@ Public Class clsMASIC
         AddHandler oClass.UpdateBaseClassErrorCodeEvent, AddressOf UpdateBaseClassErrorCodeEventHandler
         AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
     End Sub
+
     <Obsolete("Use Options.SaveParameterFileSettings")>
-    Public Function SaveParameterFileSettings(strParameterFilePath As String) As Boolean
-        Dim success = mOptions.SaveParameterFileSettings(strParameterFilePath)
+    Public Function SaveParameterFileSettings(parameterFilePath As String) As Boolean
+        Dim success = mOptions.SaveParameterFileSettings(parameterFilePath)
         Return success
     End Function
 
@@ -2168,45 +2168,41 @@ Public Class clsMASIC
                 Dim strTempPath = Path.Combine(GetAppFolderPath(), "Temp_" & mOptions.MASICStatusFilename)
                 Dim strPath = Path.Combine(GetAppFolderPath(), mOptions.MASICStatusFilename)
 
-                Using objXMLOut = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
+                Using writer = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
 
-                    objXMLOut.Formatting = Xml.Formatting.Indented
-                    objXMLOut.Indentation = 2
+                    writer.Formatting = Xml.Formatting.Indented
+                    writer.Indentation = 2
 
-                    objXMLOut.WriteStartDocument(True)
-                    objXMLOut.WriteComment("MASIC processing status")
+                    writer.WriteStartDocument(True)
+                    writer.WriteComment("MASIC processing status")
 
                     'Write the beginning of the "Root" element.
-                    objXMLOut.WriteStartElement("Root")
+                    writer.WriteStartElement("Root")
 
-                    objXMLOut.WriteStartElement("General")
-                    objXMLOut.WriteElementString("LastUpdate", DateTime.Now.ToString())
-                    objXMLOut.WriteElementString("ProcessingStep", mProcessingStep.ToString())
-                    objXMLOut.WriteElementString("Progress", Math.Round(mProgressPercentComplete, 2).ToString())
-                    objXMLOut.WriteElementString("Error", GetErrorMessage())
-                    objXMLOut.WriteEndElement()
+                    writer.WriteStartElement("General")
+                    writer.WriteElementString("LastUpdate", DateTime.Now.ToString())
+                    writer.WriteElementString("ProcessingStep", mProcessingStep.ToString())
+                    writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2))
+                    writer.WriteElementString("Error", GetErrorMessage())
+                    writer.WriteEndElement()
 
-                    objXMLOut.WriteStartElement("Statistics")
-                    objXMLOut.WriteElementString("FreeMemoryMB", Math.Round(GetFreeMemoryMB, 1).ToString())
-                    objXMLOut.WriteElementString("MemoryUsageMB", Math.Round(GetProcessMemoryUsageMB, 1).ToString())
-                    objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(mProcessingStats.PeakMemoryUsageMB, 1).ToString())
+                    writer.WriteStartElement("Statistics")
+                    writer.WriteElementString("FreeMemoryMB", StringUtilities.DblToString(GetFreeMemoryMB(), 1))
+                    writer.WriteElementString("MemoryUsageMB", StringUtilities.DblToString(GetProcessMemoryUsageMB, 1))
+                    writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(mProcessingStats.PeakMemoryUsageMB, 1))
 
                     With mProcessingStats
-                        objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
-                        objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
+                        writer.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
+                        writer.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
                     End With
 
-                    objXMLOut.WriteElementString("ProcessingTimeSec", Math.Round(GetTotalProcessingTimeSec(), 2).ToString())
-                    objXMLOut.WriteEndElement()
+                    writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 2))
+                    writer.WriteEndElement()
 
-                    objXMLOut.WriteEndElement()  'End the "Root" element.
-                    objXMLOut.WriteEndDocument() 'End the document
+                    writer.WriteEndElement()  'End the "Root" element.
+                    writer.WriteEndDocument() 'End the document
 
                 End Using
-
-                GC.Collect()
-                GC.WaitForPendingFinalizers()
-                Application.DoEvents()
 
                 'Copy the temporary file to the real one
                 File.Copy(strTempPath, strPath, True)

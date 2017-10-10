@@ -18,7 +18,7 @@ Public Class clsMASICOptions
 #Region "Classwide Variables"
 
     ''' <summary>
-    ''' Set options through the Property Functions or by passing strParameterFilePath to ProcessFile()
+    ''' Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
     ''' </summary>
     Public ReadOnly Property SICOptions As clsSICOptions
 
@@ -686,21 +686,21 @@ Public Class clsMASICOptions
 
     End Function
 
-    Public Function SaveParameterFileSettings(strParameterFilePath As String) As Boolean
+    Public Function SaveParameterFileSettings(parameterFilePath As String) As Boolean
 
         Dim objSettingsFile As New XmlSettingsFileAccessor
 
         Try
 
-            If strParameterFilePath Is Nothing OrElse strParameterFilePath.Length = 0 Then
+            If parameterFilePath Is Nothing OrElse parameterFilePath.Length = 0 Then
                 ' No parameter file specified; unable to save
                 ReportError("Empty parameter file path sent to SaveParameterFileSettings")
                 Return False
             End If
 
             ' Pass True to .LoadSettings() here so that newly made Xml files will have the correct capitalization
-            If Not objSettingsFile.LoadSettings(strParameterFilePath, True) Then
-                ReportError("LoadSettings returned false while initializing " & strParameterFilePath)
+            If Not objSettingsFile.LoadSettings(parameterFilePath, True) Then
+                ReportError("LoadSettings returned false while initializing " & parameterFilePath)
                 Return False
             End If
 
