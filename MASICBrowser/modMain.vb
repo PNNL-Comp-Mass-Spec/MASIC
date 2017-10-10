@@ -19,7 +19,7 @@ Imports PRISM
 
 Module modMain
 
-    Public Const PROGRAM_DATE As String = "April 29, 2017"
+    Public Const PROGRAM_DATE As String = "October 10, 2017"
 
     Private mInputFilePath As String
 
@@ -63,7 +63,6 @@ Module modMain
     Private Function GetAppPath() As String
         Return Assembly.GetExecutingAssembly().Location
     End Function
-
 
     ''' <summary>
     ''' Returns the .NET assembly version followed by the program date

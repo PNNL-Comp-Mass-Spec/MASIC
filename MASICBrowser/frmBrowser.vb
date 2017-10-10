@@ -40,7 +40,7 @@ Imports SharedVBNetRoutines
 Public Class frmBrowser
     Inherits Form
 
-    Private Const PROGRAM_DATE As String = "May 3, 2017"
+    Private Const PROGRAM_DATE As String = "October 10, 2017"
 
 #Region "Windows Form Designer generated code"
 
