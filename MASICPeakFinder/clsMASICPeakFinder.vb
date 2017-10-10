@@ -58,28 +58,28 @@ Public Class clsMASICPeakFinder
 #End Region
 
 #Region "Properties"
-    Public ReadOnly Property ProgramDate() As String
+    Public ReadOnly Property ProgramDate As String
         Get
             Return PROGRAM_DATE
         End Get
     End Property
 
-    Public ReadOnly Property ProgramVersion() As String
+    Public ReadOnly Property ProgramVersion As String
         Get
             Return GetVersionForExecutingAssembly()
         End Get
     End Property
 
-    Public Property ShowMessages() As Boolean
+    Public Property ShowMessages As Boolean
         Get
             Return mShowMessages
         End Get
-        Set(Value As Boolean)
+        Set
             mShowMessages = Value
         End Set
     End Property
 
-    Public ReadOnly Property StatusMessage() As String
+    Public ReadOnly Property StatusMessage As String
         Get
             Return mStatusMessage
         End Get

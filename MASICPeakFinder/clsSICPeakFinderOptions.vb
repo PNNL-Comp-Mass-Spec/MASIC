@@ -11,9 +11,9 @@
         Get
             Return mIntensityThresholdFractionMax
         End Get
-        Set(value As Single)
-            If value < 0 Or value > 1 Then value = 0.01
-            mIntensityThresholdFractionMax = value
+        Set
+            If Value < 0 Or Value > 1 Then Value = 0.01
+            mIntensityThresholdFractionMax = Value
         End Set
     End Property
 
@@ -35,9 +35,9 @@
         Get
             Return mMaxDistanceScansNoOverlap
         End Get
-        Set(value As Integer)
-            If value < 0 Or value > 10000 Then value = 0
-            mMaxDistanceScansNoOverlap = value
+        Set
+            If Value < 0 Or Value > 10000 Then Value = 0
+            mMaxDistanceScansNoOverlap = Value
         End Set
     End Property
     ''' <summary>
@@ -49,9 +49,9 @@
         Get
             Return mMaxAllowedUpwardSpikeFractionMax
         End Get
-        Set(value As Single)
-            If value < 0 Or value > 1 Then value = 0.2
-            mMaxAllowedUpwardSpikeFractionMax = value
+        Set
+            If Value < 0 Or Value > 1 Then Value = 0.2
+            mMaxAllowedUpwardSpikeFractionMax = Value
         End Set
     End Property
 
@@ -64,9 +64,9 @@
         Get
             Return mInitialPeakWidthScansScaler
         End Get
-        Set(value As Single)
-            If value < 0.001 Or value > 1000 Then value = 0.5
-            mInitialPeakWidthScansScaler = value
+        Set
+            If Value < 0.001 Or Value > 1000 Then Value = 0.5
+            mInitialPeakWidthScansScaler = Value
         End Set
     End Property
     ''' <summary>
@@ -78,9 +78,9 @@
         Get
             Return mInitialPeakWidthScansMaximum
         End Get
-        Set(value As Integer)
-            If value < 3 Or value > 1000 Then value = 6
-            mInitialPeakWidthScansMaximum = value
+        Set
+            If Value < 3 Or Value > 1000 Then Value = 6
+            mInitialPeakWidthScansMaximum = Value
         End Set
     End Property
     Public Property FindPeaksOnSmoothedData As Boolean
@@ -112,16 +112,16 @@
         Get
             Return mSavitzkyGolayFilterOrder
         End Get
-        Set(value As Short)
+        Set
 
             ' Polynomial order should be between 0 and 6
-            If value < 0 Or value > 6 Then value = 0
+            If Value < 0 Or Value > 6 Then Value = 0
 
             ' Polynomial order should be even
-            If value Mod 2 <> 0 Then value -= CShort(1)
-            If value < 0 Then value = 0
+            If Value Mod 2 <> 0 Then Value -= CShort(1)
+            If Value < 0 Then Value = 0
 
-            mSavitzkyGolayFilterOrder = value
+            mSavitzkyGolayFilterOrder = Value
         End Set
     End Property
 
