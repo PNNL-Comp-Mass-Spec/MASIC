@@ -3,6 +3,7 @@ Option Strict On
 Imports System.Threading
 Imports PRISM
 Imports ProgressFormNET
+
 ' See clsMASIC for a program description
 '
 ' -------------------------------------------------------------------------------
@@ -29,7 +30,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "May 3, 2017"
+    Public Const PROGRAM_DATE As String = "October 10, 2017"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
