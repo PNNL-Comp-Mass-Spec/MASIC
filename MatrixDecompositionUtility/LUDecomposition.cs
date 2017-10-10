@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MatrixDecompositionUtility
 {
@@ -16,17 +17,17 @@ namespace MatrixDecompositionUtility
             // Solve, to get X = B Inverse A
 
             // First invert matrix A
-            this.ludcmp(MatrixA, n, indx);
+            ludcmp(MatrixA, n, indx);
 
             // Now multiply inverted A by B
-            this.lubksb(MatrixA, n, indx, MatrixB);
+            lubksb(MatrixA, n, indx, MatrixB);
 
             // Return the results
             return MatrixB;
         }
 
         // Linear equation solution, back substitution
-        private void lubksb(double[,] a, int n, int[] indx, double[] b) {
+        private void lubksb(double[,] a, int n, IReadOnlyList<int> indx, IList<double> b) {
             int i;
             int j;
             double sum;
@@ -57,7 +58,7 @@ namespace MatrixDecompositionUtility
         }
 
         // Linear equation solution, LU decomposition
-        private void ludcmp(double[,] a, int n, int[] indx) {
+        private void ludcmp(double[,] a, int n, IList<int> indx) {
             int j;
             double big;
             var imax = 0;
@@ -133,7 +134,7 @@ namespace MatrixDecompositionUtility
             }
         }
 
-        private void printData(double[,] a, int n, int[] indx, double[] b) {
+        private void printData(double[,] a, int n, IReadOnlyList<int> indx, IReadOnlyList<double> b) {
             for (var i = 0; i < n; i++) {
                 for (var m = 0; m < n; m++) {
                     Console.Write("{0}\t", a[i, m]);
