@@ -26,11 +26,11 @@ Public Class clsCustomSICList
             If mCustomSICListFileName Is Nothing Then Return String.Empty
             Return mCustomSICListFileName
         End Get
-        Set(value As String)
-            If value Is Nothing Then
+        Set
+            If Value Is Nothing Then
                 mCustomSICListFileName = String.Empty
             Else
-                mCustomSICListFileName = value.Trim()
+                mCustomSICListFileName = Value.Trim()
             End If
         End Set
     End Property

@@ -52,22 +52,22 @@
 
     Public ReadOnly Property ReporterIonList As List(Of clsReporterIonInfo)
 
-    Public Property ReporterIonStatsEnabled() As Boolean
+    Public Property ReporterIonStatsEnabled As Boolean
 
-    Public Property ReporterIonApplyAbundanceCorrection() As Boolean
+    Public Property ReporterIonApplyAbundanceCorrection As Boolean
 
-    Public Property ReporterIonITraq4PlexCorrectionFactorType() As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
+    Public Property ReporterIonITraq4PlexCorrectionFactorType As clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex
 
     ''' <summary>
     ''' This is ignored if mReporterIonApplyAbundanceCorrection is False
     ''' </summary>
-    Public Property ReporterIonSaveUncorrectedIntensities() As Boolean
+    Public Property ReporterIonSaveUncorrectedIntensities As Boolean
 
-    Public Property ReporterIonMassMode() As eReporterIonMassModeConstants
+    Public Property ReporterIonMassMode As eReporterIonMassModeConstants
         Get
             Return mReporterIonMassMode
         End Get
-        Set(Value As eReporterIonMassModeConstants)
+        Set
             SetReporterIonMassMode(Value)
         End Set
     End Property
@@ -75,14 +75,14 @@
     ''' <summary>
     ''' When true, observed m/z values of the reporter ions will be included in the _ReporterIons.txt file
     ''' </summary>
-    Public Property ReporterIonSaveObservedMasses() As Boolean
+    Public Property ReporterIonSaveObservedMasses As Boolean
 
-    Public Property ReporterIonToleranceDaDefault() As Double
+    Public Property ReporterIonToleranceDaDefault As Double
         Get
             If mReporterIonToleranceDaDefault < Double.Epsilon Then mReporterIonToleranceDaDefault = REPORTER_ION_TOLERANCE_DA_DEFAULT
             Return mReporterIonToleranceDaDefault
         End Get
-        Set(Value As Double)
+        Set
             If Value < Double.Epsilon Then Value = REPORTER_ION_TOLERANCE_DA_DEFAULT
             mReporterIonToleranceDaDefault = Value
         End Set

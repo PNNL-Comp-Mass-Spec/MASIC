@@ -47,13 +47,13 @@ Public Class clsITraqIntensityCorrection
 
 #Region "Properties"
 
-    Public ReadOnly Property ITraqMode() As clsReporterIons.eReporterIonMassModeConstants
+    Public ReadOnly Property ITraqMode As clsReporterIons.eReporterIonMassModeConstants
         Get
             Return mITraqMode
         End Get
     End Property
 
-    Public ReadOnly Property ITraq4PlexCorrectionFactorType() As eCorrectionFactorsiTRAQ4Plex
+    Public ReadOnly Property ITraq4PlexCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex
         Get
             Return mITraq4PlexCorrectionFactorType
         End Get

@@ -64,73 +64,73 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
 
 #Region "Interface Functions"
 
-    Public Property AbortProcessing() As Boolean
+    Public Property AbortProcessing As Boolean
         Get
             Return mAbortProcessing
         End Get
-        Set(Value As Boolean)
+        Set
             mAbortProcessing = Value
         End Set
     End Property
 
-    Public ReadOnly Property FileVersion() As String
+    Public ReadOnly Property FileVersion As String
         Get
             Return GetVersionForExecutingAssembly()
         End Get
     End Property
 
-    Public ReadOnly Property FileDate() As String
+    Public ReadOnly Property FileDate As String
         Get
             Return mFileDate
         End Get
     End Property
 
-    Public Property LogFilePath() As String
+    Public Property LogFilePath As String
         Get
             Return mLogFilePath
         End Get
-        Set(value As String)
-            If value Is Nothing Then value = String.Empty
-            mLogFilePath = value
+        Set
+            If Value Is Nothing Then Value = String.Empty
+            mLogFilePath = Value
         End Set
     End Property
 
-    Public Property LogFolderPath() As String
+    Public Property LogFolderPath As String
         Get
             Return mLogFolderPath
         End Get
-        Set(value As String)
-            mLogFolderPath = value
+        Set
+            mLogFolderPath = Value
         End Set
     End Property
 
-    Public Property LogMessagesToFile() As Boolean
+    Public Property LogMessagesToFile As Boolean
         Get
             Return mLogMessagesToFile
         End Get
-        Set(value As Boolean)
-            mLogMessagesToFile = value
+        Set
+            mLogMessagesToFile = Value
         End Set
     End Property
 
-    Public Overridable ReadOnly Property ProgressStepDescription() As String
+    Public Overridable ReadOnly Property ProgressStepDescription As String
         Get
             Return mProgressStepDescription
         End Get
     End Property
 
     ' ProgressPercentComplete ranges from 0 to 100, but can contain decimal percentage values
-    Public ReadOnly Property ProgressPercentComplete() As Single
+    Public ReadOnly Property ProgressPercentComplete As Single
         Get
             Return CType(Math.Round(mProgressPercentComplete, 2), Single)
         End Get
     End Property
 
-    Public Property ShowMessages() As Boolean
+    Public Property ShowMessages As Boolean
         Get
             Return mShowMessages
         End Get
-        Set(Value As Boolean)
+        Set
             mShowMessages = Value
         End Set
     End Property

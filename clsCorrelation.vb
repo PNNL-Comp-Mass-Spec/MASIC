@@ -54,76 +54,76 @@ Public Class clsCorrelation
 
 #Region "Property Interface Functions"
 
-    Public Property BinStartX() As Single
+    Public Property BinStartX As Single
         Get
             Return mBinningOptions.StartX
         End Get
-        Set(Value As Single)
+        Set
             mBinningOptions.StartX = Value
         End Set
     End Property
 
-    Public Property BinEndX() As Single
+    Public Property BinEndX As Single
         Get
             Return mBinningOptions.EndX
         End Get
-        Set(Value As Single)
+        Set
             mBinningOptions.EndX = Value
         End Set
     End Property
 
-    Public Property BinSize() As Single
+    Public Property BinSize As Single
         Get
             Return mBinningOptions.BinSize
         End Get
-        Set(Value As Single)
+        Set
             If Value <= 0 Then Value = 1
             mBinningOptions.BinSize = Value
         End Set
     End Property
 
-    Public Property BinnedDataIntensityPrecisionPercent() As Single
+    Public Property BinnedDataIntensityPrecisionPercent As Single
         Get
             Return mBinningOptions.IntensityPrecisionPercent
         End Get
-        Set(Value As Single)
+        Set
             If Value < 0 Or Value > 100 Then Value = 1
             mBinningOptions.IntensityPrecisionPercent = Value
         End Set
     End Property
 
-    Public Property NoiseThresholdIntensity() As Single
+    Public Property NoiseThresholdIntensity As Single
         Get
             Return mNoiseThresholdIntensity
         End Get
-        Set(Value As Single)
+        Set
             mNoiseThresholdIntensity = Value
         End Set
     End Property
 
-    Public Property NormalizeBinnedData() As Boolean
+    Public Property NormalizeBinnedData As Boolean
         Get
             Return mBinningOptions.Normalize
         End Get
-        Set(Value As Boolean)
+        Set
             mBinningOptions.Normalize = Value
         End Set
     End Property
 
-    Public Property SumAllIntensitiesForBin() As Boolean
+    Public Property SumAllIntensitiesForBin As Boolean
         Get
             Return mBinningOptions.SumAllIntensitiesForBin
         End Get
-        Set(Value As Boolean)
+        Set
             mBinningOptions.SumAllIntensitiesForBin = Value
         End Set
     End Property
 
-    Public Property MaximumBinCount() As Integer
+    Public Property MaximumBinCount As Integer
         Get
             Return mBinningOptions.MaximumBinCount
         End Get
-        Set(Value As Integer)
+        Set
             If Value < 2 Then Value = 10
             If Value > 1000000 Then Value = 1000000
             mBinningOptions.MaximumBinCount = Value

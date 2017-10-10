@@ -72,12 +72,12 @@ Public MustInherit Class clsProcessFilesBaseClass
         Get
             Return mIgnoreErrorsWhenUsingWildcardMatching
         End Get
-        Set(value As Boolean)
-            mIgnoreErrorsWhenUsingWildcardMatching = value
+        Set
+            mIgnoreErrorsWhenUsingWildcardMatching = Value
         End Set
     End Property
 
-    Public ReadOnly Property ErrorCode() As eProcessFilesErrorCodes
+    Public ReadOnly Property ErrorCode As eProcessFilesErrorCodes
         Get
             Return mErrorCode
         End Get

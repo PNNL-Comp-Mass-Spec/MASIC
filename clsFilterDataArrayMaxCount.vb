@@ -34,45 +34,45 @@ Public Class clsFilterDataArrayMaxCount
     Public Event ProgressChanged(ProgressVal As Single)
 
 #Region "Properties"
-    Public Property MaximumDataCountToLoad() As Integer
+    Public Property MaximumDataCountToLoad As Integer
         Get
             Return mMaximumDataCountToKeep
         End Get
-        Set(value As Integer)
-            mMaximumDataCountToKeep = value
+        Set
+            mMaximumDataCountToKeep = Value
         End Set
     End Property
 
-    Public ReadOnly Property Progress() As Single
+    Public ReadOnly Property Progress As Single
         Get
             Return mProgress
         End Get
     End Property
 
-    Public Property SkipDataPointFlag() As Single
+    Public Property SkipDataPointFlag As Single
         Get
             Return mSkipDataPointFlag
         End Get
-        Set(value As Single)
-            mSkipDataPointFlag = value
+        Set
+            mSkipDataPointFlag = Value
         End Set
     End Property
 
-    Public Property TotalIntensityPercentageFilterEnabled() As Boolean
+    Public Property TotalIntensityPercentageFilterEnabled As Boolean
         Get
             Return mTotalIntensityPercentageFilterEnabled
         End Get
-        Set(value As Boolean)
-            mTotalIntensityPercentageFilterEnabled = value
+        Set
+            mTotalIntensityPercentageFilterEnabled = Value
         End Set
     End Property
 
-    Public Property TotalIntensityPercentageFilter() As Single
+    Public Property TotalIntensityPercentageFilter As Single
         Get
             Return mTotalIntensityPercentageFilter
         End Get
-        Set(value As Single)
-            mTotalIntensityPercentageFilter = value
+        Set
+            mTotalIntensityPercentageFilter = Value
         End Set
     End Property
 #End Region

@@ -149,7 +149,7 @@ Public Class clsMASICOptions
 
     End Function
 
-    Public ReadOnly Property StatusLogKeyNameFilterList() As SortedSet(Of String)
+    Public ReadOnly Property StatusLogKeyNameFilterList As SortedSet(Of String)
 
     ''' <summary>
     ''' Returns the contents of StatusLogKeyNameFilterList

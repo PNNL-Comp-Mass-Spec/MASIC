@@ -86,43 +86,43 @@ Public Class clsSpectraCache
 
 #End Region
 
-    Public ReadOnly Property CacheEventCount() As Integer
+    Public ReadOnly Property CacheEventCount As Integer
         Get
             Return mCacheEventCount
         End Get
     End Property
 
-    Public ReadOnly Property CacheFileNameBase() As String
+    Public ReadOnly Property CacheFileNameBase As String
         Get
             Return mCacheFileNameBase
         End Get
     End Property
 
-    Public Property CacheFolderPath() As String
+    Public Property CacheFolderPath As String
         Get
             Return mCacheOptions.FolderPath
         End Get
-        Set(Value As String)
+        Set
             mCacheOptions.FolderPath = Value
         End Set
     End Property
 
     <Obsolete("Legacy parameter; no longer used")>
-    Public Property CacheMaximumMemoryUsageMB() As Single
+    Public Property CacheMaximumMemoryUsageMB As Single
         Get
             Return mCacheOptions.MaximumMemoryUsageMB
         End Get
-        Set(Value As Single)
+        Set
             mCacheOptions.MaximumMemoryUsageMB = Value
         End Set
     End Property
 
     <Obsolete("Legacy parameter; no longer used")>
-    Public Property CacheMinimumFreeMemoryMB() As Single
+    Public Property CacheMinimumFreeMemoryMB As Single
         Get
             Return mCacheOptions.MinimumFreeMemoryMB
         End Get
-        Set(Value As Single)
+        Set
             If mCacheOptions.MinimumFreeMemoryMB < 10 Then
                 mCacheOptions.MinimumFreeMemoryMB = 10
             End If
@@ -130,28 +130,28 @@ Public Class clsSpectraCache
         End Set
     End Property
 
-    Public Property CacheSpectraToRetainInMemory() As Integer
+    Public Property CacheSpectraToRetainInMemory As Integer
         Get
             Return mCacheOptions.SpectraToRetainInMemory
         End Get
-        Set(Value As Integer)
+        Set
             If Value < 100 Then Value = 100
             mCacheOptions.SpectraToRetainInMemory = Value
         End Set
     End Property
 
-    Public Property DiskCachingAlwaysDisabled() As Boolean
+    Public Property DiskCachingAlwaysDisabled As Boolean
         Get
             Return mCacheOptions.DiskCachingAlwaysDisabled
         End Get
-        Set(Value As Boolean)
+        Set
             mCacheOptions.DiskCachingAlwaysDisabled = Value
         End Set
     End Property
 
     Public Property ShowMessages As Boolean
 
-    Public ReadOnly Property UnCacheEventCount() As Integer
+    Public ReadOnly Property UnCacheEventCount As Integer
         Get
             Return mUnCacheEventCount
         End Get

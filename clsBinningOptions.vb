@@ -10,18 +10,18 @@
         Get
             Return mBinSize
         End Get
-        Set(value As Single)
-            If value <= 0 Then value = 1
-            mBinSize = value
+        Set
+            If Value <= 0 Then Value = 1
+            mBinSize = Value
         End Set
     End Property
     Public Property IntensityPrecisionPercent As Single
         Get
             Return mIntensityPrecisionPercent
         End Get
-        Set(value As Single)
-            If value < 0 Or value > 100 Then value = 1
-            mIntensityPrecisionPercent = value
+        Set
+            If Value < 0 Or Value > 100 Then Value = 1
+            mIntensityPrecisionPercent = Value
         End Set
     End Property
 
@@ -37,10 +37,10 @@
         Get
             Return mMaximumBinCount
         End Get
-        Set(value As Integer)
-            If value < 2 Then value = 10
-            If value > 1000000 Then value = 1000000
-            mMaximumBinCount = value
+        Set
+            If Value < 2 Then Value = 10
+            If Value > 1000000 Then Value = 1000000
+            mMaximumBinCount = Value
         End Set
     End Property
 

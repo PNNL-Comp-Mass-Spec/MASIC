@@ -35,8 +35,8 @@ Public Class clsSICOptions
                 Return SICTolerance
             End If
         End Get
-        Set(value As Double)
-            SetSICTolerance(value, False)
+        Set
+            SetSICTolerance(Value, False)
         End Set
     End Property
     ''' <summary>
@@ -93,9 +93,9 @@ Public Class clsSICOptions
         Get
             Return mMaxSICPeakWidthMinutesBackward
         End Get
-        Set(value As Single)
-            If value < 0 Or value > 10000 Then value = 5
-            mMaxSICPeakWidthMinutesBackward = value
+        Set
+            If Value < 0 Or Value > 10000 Then Value = 5
+            mMaxSICPeakWidthMinutesBackward = Value
         End Set
     End Property
 
@@ -106,9 +106,9 @@ Public Class clsSICOptions
         Get
             Return mMaxSICPeakWidthMinutesForward
         End Get
-        Set(value As Single)
-            If value < 0 Or value > 10000 Then value = 5
-            mMaxSICPeakWidthMinutesForward = value
+        Set
+            If Value < 0 Or Value > 10000 Then Value = 5
+            mMaxSICPeakWidthMinutesForward = Value
         End Set
     End Property
     Public Property SICPeakFinderOptions As MASICPeakFinder.clsSICPeakFinderOptions
@@ -125,9 +125,9 @@ Public Class clsSICOptions
         Get
             Return mSimilarIonMZToleranceHalfWidth
         End Get
-        Set(value As Single)
-            If value < 0.001 Or value > 100 Then value = 0.1
-            mSimilarIonMZToleranceHalfWidth = value
+        Set
+            If Value < 0.001 Or Value > 100 Then Value = 0.1
+            mSimilarIonMZToleranceHalfWidth = Value
         End Set
     End Property
 
@@ -139,9 +139,9 @@ Public Class clsSICOptions
         Get
             Return mSimilarIonToleranceHalfWidthMinutes
         End Get
-        Set(value As Single)
-            If value < 0 Or value > 100000 Then value = 5
-            mSimilarIonToleranceHalfWidthMinutes = value
+        Set
+            If Value < 0 Or Value > 100000 Then Value = 5
+            mSimilarIonToleranceHalfWidthMinutes = Value
         End Set
     End Property
 
@@ -152,9 +152,9 @@ Public Class clsSICOptions
         Get
             Return mSpectrumSimilarityMinimum
         End Get
-        Set(value As Single)
-            If value < 0 Or value > 1 Then value = 0.8
-            mSpectrumSimilarityMinimum = value
+        Set
+            If Value < 0 Or Value > 1 Then Value = 0.8
+            mSpectrumSimilarityMinimum = Value
         End Set
     End Property
 #End Region

@@ -109,24 +109,24 @@ Public Class clsDatasetStatsSummarizer
 
 #Region "Properties"
 
-    Public Property DatasetStatsSummaryFileName() As String
+    Public Property DatasetStatsSummaryFileName As String
         Get
             Return mDatasetStatsSummaryFileName
         End Get
-        Set(value As String)
-            If Not value Is Nothing Then
-                mDatasetStatsSummaryFileName = value
+        Set
+            If Not Value Is Nothing Then
+                mDatasetStatsSummaryFileName = Value
             End If
         End Set
     End Property
 
-    Public ReadOnly Property ErrorMessage() As String
+    Public ReadOnly Property ErrorMessage As String
         Get
             Return mErrorMessage
         End Get
     End Property
 
-    Public ReadOnly Property FileDate() As String
+    Public ReadOnly Property FileDate As String
         Get
             FileDate = mFileDate
         End Get

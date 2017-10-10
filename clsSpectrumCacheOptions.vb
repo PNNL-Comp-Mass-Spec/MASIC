@@ -16,9 +16,9 @@
         Get
             Return mSpectraToRetainInMemory
         End Get
-        Set(value As Integer)
-            If value < 100 Then value = 100
-            mSpectraToRetainInMemory = value
+        Set
+            If Value < 100 Then Value = 100
+            mSpectraToRetainInMemory = Value
         End Set
     End Property
 
