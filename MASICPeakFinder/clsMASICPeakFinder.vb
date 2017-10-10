@@ -319,7 +319,7 @@ Public Class clsMASICPeakFinder
     Public Function ComputeDualTrimmedNoiseLevelTTest(
       sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
       baselineNoiseOptions As clsBaselineNoiseOptions,
-      <Out()> ByRef noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As Boolean
+      <Out> ByRef noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As Boolean
 
         noiseStatsSegments = New List(Of clsBaselineNoiseStatsSegment)
 
@@ -437,7 +437,7 @@ Public Class clsMASICPeakFinder
     ''' </remarks>
     Public Function ComputeDualTrimmedNoiseLevel(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
                                                  baselineNoiseOptions As clsBaselineNoiseOptions,
-                                                 <Out()> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
+                                                 <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         ' Initialize udtBaselineNoiseStats
         baselineNoiseStats = InitializeBaselineNoiseStats(
@@ -824,7 +824,7 @@ Public Class clsMASICPeakFinder
     ''' <remarks>Updates udtBaselineNoiseStats with the baseline noise level</remarks>
     Public Function ComputeNoiseLevelForSICData(intDataCount As Integer, sngData() As Single,
                                                 baselineNoiseOptions As clsBaselineNoiseOptions,
-                                                <Out()> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
+                                                <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         Const IGNORE_NON_POSITIVE_DATA = False
 
@@ -1602,7 +1602,7 @@ Public Class clsMASICPeakFinder
     Public Function ComputeTrimmedNoiseLevel(sngData() As Single, intIndexStart As Integer, intIndexEnd As Integer,
                                              baselineNoiseOptions As clsBaselineNoiseOptions,
                                              blnIgnoreNonPositiveData As Boolean,
-                                             <Out()> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
+                                             <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         Dim intDataSortedCount As Integer
         Dim sngDataSorted() As Single           ' Note: You cannot use sngDataSorted.Length to determine the length of the array; use intIndexStart and intIndexEnd to find the limits
@@ -1946,7 +1946,7 @@ Public Class clsMASICPeakFinder
       ByRef intPreviousPeakFWHMPointRight As Integer,
       ByRef intNextPeakFWHMPointLeft As Integer,
       ByRef intShoulderCount As Integer,
-      <Out()> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
+      <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
       simDataPresent As Boolean,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
       sngSICNoiseThresholdIntensity As Single,
@@ -2716,7 +2716,7 @@ Public Class clsMASICPeakFinder
     Public Sub FindPotentialPeakArea(
        intDataCount As Integer,
        SICIntensities() As Single,
-       <Out()> ByRef potentialAreaStats As clsSICPotentialAreaStats,
+       <Out> ByRef potentialAreaStats As clsSICPotentialAreaStats,
        sicPeakFinderOptions As clsSICPeakFinderOptions)
 
         Dim sicData = New List(Of clsSICDataPoint)
@@ -2730,7 +2730,7 @@ Public Class clsMASICPeakFinder
 
     Public Sub FindPotentialPeakArea(
       sicData As IList(Of clsSICDataPoint),
-      <Out()> ByRef potentialAreaStats As clsSICPotentialAreaStats,
+      <Out> ByRef potentialAreaStats As clsSICPotentialAreaStats,
       sicPeakFinderOptions As clsSICPeakFinderOptions)
 
         ' This function computes the potential peak area for a given SIC
@@ -2835,9 +2835,9 @@ Public Class clsMASICPeakFinder
         intDataCount As Integer,
         SICScanNumbers() As Integer,
         SICIntensities() As Single,
-        <Out()> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
-        <Out()> ByRef sicPeak As clsSICStatsPeak,
-        <Out()> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
+        <Out> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
+        sicPeak As clsSICStatsPeak,
+        <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
         sicPeakFinderOptions As clsSICPeakFinderOptions,
         potentialAreaStatsForRegion As clsSICPotentialAreaStats,
         returnClosestsPeak As Boolean,
@@ -2872,9 +2872,9 @@ Public Class clsMASICPeakFinder
     ''' <returns></returns>
     Public Function FindSICPeakAndArea(
       sicData As List(Of clsSICDataPoint),
-      <Out()> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
+      <Out> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
       sicPeak As clsSICStatsPeak,
-      <Out()> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
+      <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
       potentialAreaStatsForRegion As clsSICPotentialAreaStats,
       returnClosestsPeak As Boolean,
@@ -3163,7 +3163,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="sngTargetY"></param>
     ''' <returns>Returns True on success, false on error</returns>
     Private Function InterpolateX(
-      <Out()> ByRef sngInterpolatedXValue As Single,
+      <Out> ByRef sngInterpolatedXValue As Single,
       x1 As Integer, x2 As Integer,
       y1 As Single, y2 As Single,
       sngTargetY As Single) As Boolean
@@ -3201,7 +3201,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="sngXValToInterpolate"></param>
     ''' <returns></returns>
     Private Function InterpolateY(
-      <Out()> ByRef sngInterpolatedIntensity As Single,
+      <Out> ByRef sngInterpolatedIntensity As Single,
       X1 As Integer, X2 As Integer,
       Y1 As Single, Y2 As Single,
       sngXValToInterpolate As Single) As Boolean
@@ -3422,7 +3422,7 @@ Public Class clsMASICPeakFinder
       dblStDev1 As Double, dblStDev2 As Double,
       intCount1 As Integer, intCount2 As Integer,
       eConfidenceLevel As eTTestConfidenceLevelConstants,
-      <Out()> ByRef TCalculated As Double) As Boolean
+      <Out> ByRef TCalculated As Double) As Boolean
 
         ' To use the t-test you must use sample variance values, not population variance values
         ' Note: Variance_Sample = Sum((x-mean)^2) / (count-1)
