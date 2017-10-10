@@ -56,19 +56,6 @@ Public Module modMain
     Private mLastProgressReportTime As DateTime
     Private mLastProgressReportValue As Integer
 
-    Private Function GetMemoryUsage() As Single
-
-        Dim sngMemoryUsageMB As Single
-
-        ' Obtain a handle to the current process
-        Dim objProcess = Process.GetCurrentProcess()
-
-        ' The WorkingSet is the total physical memory usage
-        sngMemoryUsageMB = CSng(objProcess.WorkingSet64() / 1024 / 1024)
-        Return sngMemoryUsageMB
-
-    End Function
-
     ''Private Sub InitializeTraceLogFile(strUserDefinedLogFilePath As String)
     ''    Dim strTraceFilePath As String
 
