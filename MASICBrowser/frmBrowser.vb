@@ -2365,7 +2365,6 @@ Public Class frmBrowser
         Dim dblPercentComplete As Double
         Dim errorMessages = New List(Of String)
 
-        Dim sngSICToleranceDa As Single
         Dim sngSimilarIonMZToleranceHalfWidth As Single
         Dim blnFindPeaksOnSmoothedData As Boolean
         Dim blnUseButterworthSmooth, blnUseSavitzkyGolaySmooth As Boolean
@@ -2394,7 +2393,7 @@ Public Class frmBrowser
 
         Dim strSICScanType As String
 
-        Dim expectedSicDataCount As Integer = 0
+        Dim expectedSicDataCount = 0
 
         If Not File.Exists(strFilePath) Then
             Exit Sub
@@ -2671,8 +2670,6 @@ Public Class frmBrowser
                             Case eCurrentXMLDataFileSectionConstants.Options
                                 Try
                                     Select Case objXMLReader.Name
-                                        Case "SICToleranceDa"
-                                            sngSICToleranceDa = Single.Parse(XMLTextReaderGetInnerText(objXMLReader))
                                         Case "SimilarIonMZToleranceHalfWidth"
                                             sngSimilarIonMZToleranceHalfWidth = Single.Parse(XMLTextReaderGetInnerText(objXMLReader))
                                         Case "FindPeaksOnSmoothedData"
