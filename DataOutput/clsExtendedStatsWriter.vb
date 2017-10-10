@@ -402,7 +402,7 @@ Namespace DataOutput
 
         End Function
 
-        Private Function TryGetExtendedHeaderInfoValue(keyName As String, <Out()> ByRef headerIndex As Integer) As Boolean
+        Private Function TryGetExtendedHeaderInfoValue(keyName As String, <Out> ByRef headerIndex As Integer) As Boolean
 
             Dim query = (From item In mExtendedHeaderNameMap Where item.Key = keyName Select item.Value).ToList()
             headerIndex = 0

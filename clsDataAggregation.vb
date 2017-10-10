@@ -24,8 +24,8 @@ Public Class clsDataAggregation
       objMSSpectrum As clsMSSpectrum,
       dblSearchMZ As Double,
       dblSearchToleranceHalfWidth As Double,
-      <Out()> ByRef intIonMatchCount As Integer,
-      <Out()> ByRef dblClosestMZ As Double,
+      <Out> ByRef intIonMatchCount As Integer,
+      <Out> ByRef dblClosestMZ As Double,
       blnReturnMax As Boolean) As Single
 
         intIonMatchCount = 0
@@ -74,8 +74,8 @@ Public Class clsDataAggregation
       currentScan As clsScanInfo,
       dblMZStart As Double,
       dblMZEnd As Double,
-      <Out()> ByRef dblBestMatchMZ As Double,
-      <Out()> ByRef sngMatchIntensity As Single) As Boolean
+      <Out> ByRef dblBestMatchMZ As Double,
+      <Out> ByRef sngMatchIntensity As Single) As Boolean
 
         ' Searches currentScan.IonsMZ for the maximum value between dblMZStart and dblMZEnd
         ' If a match is found, then updates dblBestMatchMZ to the m/z of the match, updates sngMatchIntensity to its intensity,
@@ -114,8 +114,8 @@ Public Class clsDataAggregation
       intIonCount As Integer,
       dblMZStart As Double,
       dblMZEnd As Double,
-      <Out()> ByRef dblBestMatchMZ As Double,
-      <Out()> ByRef sngMatchIntensity As Single) As Boolean
+      <Out> ByRef dblBestMatchMZ As Double,
+      <Out> ByRef sngMatchIntensity As Single) As Boolean
 
         ' Searches dblMZList for the maximum value between dblMZStart and dblMZEnd
         ' If a match is found, then updates dblBestMatchMZ to the m/z of the match, updates sngMatchIntensity to its intensity,
@@ -168,8 +168,8 @@ Public Class clsDataAggregation
       intDataCount As Integer,
       dblSearchValue As Double,
       dblToleranceHalfWidth As Double,
-      <Out()> ByRef intMatchIndexStart As Integer,
-      <Out()> ByRef intMatchIndexEnd As Integer) As Boolean
+      <Out> ByRef intMatchIndexStart As Integer,
+      <Out> ByRef intMatchIndexEnd As Integer) As Boolean
 
         ' Searches DataDouble for dblSearchValue with a tolerance of +/-dblToleranceHalfWidth
         ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd

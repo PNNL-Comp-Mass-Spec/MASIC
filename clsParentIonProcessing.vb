@@ -485,7 +485,7 @@ Public Class clsParentIonProcessing
       intSpectrumIndex As Integer,
       dblSearchMZ As Double,
       dblToleranceMZ As Double,
-      <Out()> ByRef dblBestMatchMZ As Double) As Boolean
+      <Out> ByRef dblBestMatchMZ As Double) As Boolean
 
         Dim intPoolIndex As Integer
         Dim blnSuccess As Boolean
@@ -521,7 +521,7 @@ Public Class clsParentIonProcessing
       intIonCount As Integer,
       dblSearchMZ As Double,
       dblToleranceMZ As Double,
-      <Out()> ByRef dblBestMatchMZ As Double) As Boolean
+      <Out> ByRef dblBestMatchMZ As Double) As Boolean
 
         ' Searches dblMZList for the closest match to dblSearchMZ within tolerance dblBestMatchMZ
         ' If a match is found, then updates dblBestMatchMZ to the m/z of the match and returns True

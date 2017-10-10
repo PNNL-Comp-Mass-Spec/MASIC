@@ -72,7 +72,7 @@ Namespace DataOutput
         Private Sub PopulateScanListPointerArray(
           surveyScans As IList(Of clsScanInfo),
           intSurveyScanCount As Integer,
-          <Out()> ByRef intScanListArray() As Integer)
+          <Out> ByRef intScanListArray() As Integer)
 
             Dim intIndex As Integer
 

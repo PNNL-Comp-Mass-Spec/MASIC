@@ -203,9 +203,9 @@ Public Class clsCorrelation
     Public Function BinData(
       sngXData() As Single,
       sngYData() As Single,
-      <Out()> ByRef sngBinnedYData() As Single,
-      <Out()> ByRef sngBinnedOffsetYData() As Single,
-      <Out()> ByRef intBinCount As Integer) As Boolean
+      <Out> ByRef sngBinnedYData() As Single,
+      <Out> ByRef sngBinnedOffsetYData() As Single,
+      <Out> ByRef intBinCount As Integer) As Boolean
 
         ' Bins the data in sngXData() according to sngStartBinXValue and sngBinSize
         ' Returns the binned data in sngBinnedYData() and sngBinnedOffsetYData()
@@ -396,9 +396,9 @@ Public Class clsCorrelation
 
     Private Sub CorrelPearson(
       sngDataList1 As IList(Of Single), sngDataList2 As IList(Of Single),
-      <Out()> ByRef RValue As Single,
-      <Out()> ByRef ProbOfSignificance As Single,
-      <Out()> ByRef FishersZ As Single)
+      <Out> ByRef RValue As Single,
+      <Out> ByRef ProbOfSignificance As Single,
+      <Out> ByRef FishersZ As Single)
 
         ' Performs a Pearson correlation (aka linear correlation) of the two lists
         ' The lists must have the same number of data points in each and should be 0-based arrays
@@ -466,9 +466,9 @@ Public Class clsCorrelation
     Private Sub CorrelKendall(
       sngDataList1 As IList(Of Single),
       sngDataList2 As IList(Of Single),
-      <Out()> ByRef KendallsTau As Single,
-      <Out()> ByRef Z As Single,
-      <Out()> ByRef ProbOfSignificance As Single)
+      <Out> ByRef KendallsTau As Single,
+      <Out> ByRef Z As Single,
+      <Out> ByRef ProbOfSignificance As Single)
 
         ' Performs a Kendall correlation (aka linear correlation) of the two lists
         ' The lists must have the same number of data points in each and should be 0-based arrays
@@ -530,11 +530,11 @@ Public Class clsCorrelation
     Private Sub CorrelSpearman(
       sngDataList1() As Single,
       sngDataList2() As Single,
-      <Out()> ByRef DiffInRanks As Single,
-      <Out()> ByRef ZD As Single,
-      <Out()> ByRef ProbOfSignificance As Single,
-      <Out()> ByRef RS As Single,
-      <Out()> ByRef ProbRS As Single)
+      <Out> ByRef DiffInRanks As Single,
+      <Out> ByRef ZD As Single,
+      <Out> ByRef ProbOfSignificance As Single,
+      <Out> ByRef RS As Single,
+      <Out> ByRef ProbRS As Single)
 
         ' Performs a Spearman correlation of the two lists
         ' The lists must have the same number of data points in each and should be 0-based arrays
@@ -607,7 +607,7 @@ Public Class clsCorrelation
 
     End Sub
 
-    Private Sub CRank(n As Integer, w As IList(Of Single), <Out()> ByRef s As Single)
+    Private Sub CRank(n As Integer, w As IList(Of Single), <Out> ByRef s As Single)
 
         ' Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including midranking of ties,
         ' and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
@@ -701,7 +701,7 @@ Public Class clsCorrelation
     End Function
 
     <Obsolete("Use GetDefaultBinningOptions, which returns an instance of clsBinningOptions")>
-    Public Shared Sub InitializeBinningOptions(<Out()> ByRef binningOptions As clsBinningOptions)
+    Public Shared Sub InitializeBinningOptions(<Out> ByRef binningOptions As clsBinningOptions)
         binningOptions = GetDefaultBinningOptions()
     End Sub
 

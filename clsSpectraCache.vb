@@ -497,7 +497,7 @@ Public Class clsSpectraCache
     ''' <param name="intScanNumber">Scan number to load</param>
     ''' <param name="intTargetPoolIndex">Output: index in the array that contains the given spectrum</param>
     ''' <returns>True if successfully uncached, false if an error</returns>
-    Private Function UnCacheSpectrum(intScanNumber As Integer, <Out()> ByRef intTargetPoolIndex As Integer) As Boolean
+    Private Function UnCacheSpectrum(intScanNumber As Integer, <Out> ByRef intTargetPoolIndex As Integer) As Boolean
 
         Dim blnSuccess As Boolean
         intTargetPoolIndex = GetNextAvailablePoolIndex()
@@ -689,7 +689,7 @@ Public Class clsSpectraCache
     ''' <param name="intScanNumber">Scan number to load</param>
     ''' <param name="intPoolIndex">Output: index in the array that contains the given spectrum; -1 if no match</param>
     ''' <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
-    Public Function ValidateSpectrumInPool(intScanNumber As Integer, <Out()> ByRef intPoolIndex As Integer) As Boolean
+    Public Function ValidateSpectrumInPool(intScanNumber As Integer, <Out> ByRef intPoolIndex As Integer) As Boolean
 
         Dim blnSuccess As Boolean
 

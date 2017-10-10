@@ -291,7 +291,7 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
     ''' <param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
     ''' <return>The function returns the name of the "value" attribute as a String.</return>
-    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As String, <Out()> Optional ByRef valueNotPresent As Boolean = False) As String
+    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As String, <Out> Optional ByRef valueNotPresent As Boolean = False) As String
         Dim strResult As String = String.Empty
         Dim sectionNameInFile As String
         Dim keyNameInFile As String
@@ -328,7 +328,7 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
     ''' <param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
     ''' <return>The function returns boolean True if the "value" attribute is "true".  Otherwise, returns boolean False.</return>
-    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Boolean, <Out()> Optional ByRef valueNotPresent As Boolean = False) As Boolean
+    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Boolean, <Out> Optional ByRef valueNotPresent As Boolean = False) As Boolean
         Dim strResult As String
         Dim blnNotFound = False
 
@@ -354,7 +354,7 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
     ''' <param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
     ''' <return>The function returns the name of the "value" attribute as a Short.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Short, <Out()> Optional ByRef valueNotPresent As Boolean = False) As Short
+    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Short, <Out> Optional ByRef valueNotPresent As Boolean = False) As Short
         Dim strResult As String
         Dim blnNotFound = False
         Dim intValue As Short
@@ -392,7 +392,7 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
     ''' <param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
     ''' <return>The function returns the name of the "value" attribute as an Integer.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Integer, <Out()> Optional ByRef valueNotPresent As Boolean = False) As Integer
+    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Integer, <Out> Optional ByRef valueNotPresent As Boolean = False) As Integer
         Dim strResult As String
         Dim blnNotFound = False
         Dim intValue As Integer
@@ -430,7 +430,7 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
     ''' <param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
     ''' <return>The function returns the name of the "value" attribute as a Long.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Long, <Out()> Optional ByRef valueNotPresent As Boolean = False) As Int64
+    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Long, <Out> Optional ByRef valueNotPresent As Boolean = False) As Int64
         Dim strResult As String
         Dim blnNotFound = False
         Dim intValue As Int64
@@ -468,7 +468,7 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
     ''' <param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
     ''' <return>The function returns the name of the "value" attribute as a Single.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Single, <Out()> Optional ByRef valueNotPresent As Boolean = False) As Single
+    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Single, <Out> Optional ByRef valueNotPresent As Boolean = False) As Single
         Dim strResult As String
         Dim blnNotFound = False
         Dim sngValue As Single
@@ -506,7 +506,7 @@ Public Class XmlSettingsFileAccessor
     ''' <param name="valueIfMissing">Value to return if "sectionName" or "keyName" is missing.</param>
     ''' <param name="valueNotPresent">Set to True if "sectionName" or "keyName" is missing.  Returned ByRef.</param>
     ''' <return>The function returns the name of the "value" attribute as a Double.  If "value" is "true" returns -1.  If "value" is "false" returns 0.</return>
-    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Double, <Out()> Optional ByRef valueNotPresent As Boolean = False) As Double
+    Public Function GetParam(sectionName As String, keyName As String, valueIfMissing As Double, <Out> Optional ByRef valueNotPresent As Boolean = False) As Double
         Dim strResult As String
         Dim blnNotFound = False
         Dim dblValue As Double
@@ -1422,7 +1422,7 @@ Public Class XmlSettingsFileAccessor
         Private Function ParseLineManualCheckTag(
           strLine As String,
           strTagTofind As String,
-          <Out()> ByRef strTagValue As String) As Boolean
+          <Out> ByRef strTagValue As String) As Boolean
 
             Dim intMatchIndex As Integer
             Dim intNextMatchIndex As Integer

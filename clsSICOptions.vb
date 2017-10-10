@@ -169,7 +169,7 @@ Public Class clsSICOptions
         Return GetSICTolerance(blnToleranceIsPPM)
     End Function
 
-    Public Function GetSICTolerance(<Out()> ByRef blnSICToleranceIsPPM As Boolean) As Double
+    Public Function GetSICTolerance(<Out> ByRef blnSICToleranceIsPPM As Boolean) As Double
         blnSICToleranceIsPPM = SICToleranceIsPPM
         Return SICTolerance
     End Function

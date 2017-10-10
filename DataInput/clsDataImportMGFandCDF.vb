@@ -547,7 +547,7 @@ Namespace DataInput
           surveyScans As IList(Of clsScanInfo),
           intLastSurveyScanIndex As Integer,
           intFragScanNumber As Integer,
-          <Out()> ByRef intFragScanIteration As Integer) As Single
+          <Out> ByRef intFragScanIteration As Integer) As Single
 
             ' Examine the scan numbers in surveyScans, starting at intLastSurveyScanIndex, to find the survey scans on either side of intFragScanNumber
             ' Interpolate the retention time that corresponds to intFragScanNumber

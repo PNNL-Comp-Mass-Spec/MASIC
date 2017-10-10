@@ -195,7 +195,7 @@ Public Class clsSICProcessing
       scanList As clsScanList,
       intScanIndexObservedInFullSIC As Integer,
       sicDetails As clsSICDetails,
-      <Out()> ByRef sicPeak As clsSICStatsPeak,
+      <Out> ByRef sicPeak As clsSICStatsPeak,
       masicOptions As clsMASICOptions,
       scanNumScanConverter As clsScanNumScanTimeConversion,
       blnCustomSICPeak As Boolean,

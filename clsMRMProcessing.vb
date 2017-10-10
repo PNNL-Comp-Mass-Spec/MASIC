@@ -51,8 +51,8 @@ Public Class clsMRMProcessing
 
     Private Function DetermineMRMSettings(
       scanList As clsScanList,
-      <Out()> ByRef mrmSettings As List(Of clsMRMScanInfo),
-      <Out()> ByRef srmList As List(Of udtSRMListType)) As Boolean
+      <Out> ByRef mrmSettings As List(Of clsMRMScanInfo),
+      <Out> ByRef srmList As List(Of udtSRMListType)) As Boolean
 
         ' Returns true if this dataset has MRM data and if it is parsed successfully
         ' Returns false if the dataset does not have MRM data, or if an error occurs
