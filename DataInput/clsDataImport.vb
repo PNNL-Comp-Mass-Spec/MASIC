@@ -290,7 +290,7 @@ Namespace DataInput
             objScanStatsEntry.ElutionTime = currentScan.ScanTime.ToString("0.0000")
             objScanStatsEntry.TotalIonIntensity = StringUtilities.ValueToString(currentScan.TotalIonIntensity, 5)
             objScanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(currentScan.BasePeakIonIntensity, 5)
-            objScanStatsEntry.BasePeakMZ = Math.Round(currentScan.BasePeakIonMZ, 4).ToString
+            objScanStatsEntry.BasePeakMZ = StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
 
             ' Base peak signal to noise ratio
             objScanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(currentScan.BasePeakIonIntensity, currentScan.BaselineNoiseStats.NoiseLevel), 4)

@@ -1,4 +1,5 @@
-﻿Imports ThermoRawFileReader
+﻿Imports PRISM
+Imports ThermoRawFileReader
 
 Public Class clsUnused
     Inherits clsMasicEventNotifier
@@ -387,12 +388,12 @@ Public Class clsUnused
         For intScanIndex = 0 To intScanCount - 1
             With scanList(intScanIndex)
                 If blnSaveTIC Then
-                    srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString() & cColDelimiter &
-                          Math.Round(.TotalIonIntensity, 2).ToString())
+                    srOutFile.WriteLine(StringUtilities.DblToString(.ScanTime, 5) & cColDelimiter &
+                                        StringUtilities.DblToString(.TotalIonIntensity, 2))
                 Else
-                    srOutFile.WriteLine(Math.Round(.ScanTime, 5).ToString() & cColDelimiter &
-                          Math.Round(.BasePeakIonIntensity, 2).ToString() & cColDelimiter &
-                          Math.Round(.BasePeakIonMZ, 4).ToString())
+                    srOutFile.WriteLine(StringUtilities.DblToString(.ScanTime, 5) & cColDelimiter &
+                                        StringUtilities.DblToString(.BasePeakIonIntensity, 2) & cColDelimiter &
+                                        StringUtilities.DblToString(.BasePeakIonMZ, 4))
                 End If
 
             End With

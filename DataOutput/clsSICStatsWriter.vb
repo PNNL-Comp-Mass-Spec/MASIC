@@ -237,7 +237,7 @@ Namespace DataOutput
             dataValues.Add(sicOptions.DatasetNumber.ToString())            ' Dataset number
             dataValues.Add(intParentIonIndex.ToString())                   ' Parent Ion Index
 
-            dataValues.Add(Math.Round(parentIon.MZ, 4).ToString())         ' MZ
+            dataValues.Add(StringUtilities.DblToString(parentIon.MZ, 4))   ' MZ
 
             dataValues.Add(intSurveyScanNumber.ToString())                 ' Survey scan number
 
@@ -309,9 +309,9 @@ Namespace DataOutput
             dataValues.Add(StringUtilities.ValueToString(interferenceScore, 4))     ' Interference Score
 
             If blnIncludeScanTimesInSICStatsFile Then
-                dataValues.Add(Math.Round(sngSurveyScanTime, 5).ToString())         ' SurveyScanTime
-                dataValues.Add(Math.Round(fragScanTime, 5).ToString())              ' FragScanTime
-                dataValues.Add(Math.Round(optimalPeakApexScanTime, 5).ToString())   ' OptimalPeakApexScanTime
+                dataValues.Add(StringUtilities.DblToString(sngSurveyScanTime, 5))         ' SurveyScanTime
+                dataValues.Add(StringUtilities.DblToString(fragScanTime, 5))              ' FragScanTime
+                dataValues.Add(StringUtilities.DblToString(optimalPeakApexScanTime, 5))   ' OptimalPeakApexScanTime
             End If
 
             srOutfile.WriteLine(String.Join(cColDelimiter, dataValues))

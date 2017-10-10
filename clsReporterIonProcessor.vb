@@ -1,5 +1,6 @@
 ﻿Imports MASIC.clsMASIC
 Imports MASIC.DataOutput
+Imports PRISM
 Imports ThermoRawFileReader
 
 Public Class clsReporterIonProcessor
@@ -300,12 +301,12 @@ Public Class clsReporterIonProcessor
 
         ' Initialize the output variables
         Dim dataColumns = New List(Of String) From {
-            sicOptions.DatasetNumber.ToString(),
-            currentScan.ScanNumber.ToString(),
-            currentScan.FragScanInfo.CollisionMode,
-            Math.Round(dblParentIonMZ, 2).ToString(),
-            Math.Round(currentScan.BasePeakIonIntensity, 2).ToString(),
-            Math.Round(currentScan.BasePeakIonMZ, 4).ToString()
+                sicOptions.DatasetNumber.ToString(),
+                currentScan.ScanNumber.ToString(),
+                currentScan.FragScanInfo.CollisionMode,
+                StringUtilities.DblToString(dblParentIonMZ, 2),
+                StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2),
+                StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
         }
 
         Dim reporterIntensityList = New List(Of String)
@@ -450,16 +451,16 @@ Public Class clsReporterIonProcessor
                 ' Append the reporter ion intensity to strReporterIntensityList
                 ' We skip contaminant ions, unless blnSaveUncorrectedIntensities is True, then we include them
 
-                reporterIntensityList.Add(Math.Round(sngReporterIntensitiesCorrected(intReporterIonIndex), 2).ToString())
+                reporterIntensityList.Add(StringUtilities.DblToString(sngReporterIntensitiesCorrected(intReporterIonIndex), 2))
 
                 If saveObservedMasses Then
                     ' Append the observed reporter mass value to strObsMZList
-                    obsMZList.Add(Math.Round(dblClosestMZ(intReporterIonIndex), 3).ToString())
+                    obsMZList.Add(StringUtilities.DblToString(dblClosestMZ(intReporterIonIndex), 3))
                 End If
 
                 If blnSaveUncorrectedIntensities Then
                     ' Append the original, uncorrected intensity value
-                    uncorrectedIntensityList.Add(Math.Round(sngReporterIntensities(intReporterIonIndex), 2).ToString())
+                    uncorrectedIntensityList.Add(StringUtilities.DblToString(sngReporterIntensities(intReporterIonIndex), 2))
                 End If
 
                 If includeFtmsColumns Then
@@ -471,9 +472,9 @@ Public Class clsReporterIonProcessor
                         ftmsResolution.Add("")
                         ' ftmsLabelDataMz.Add("")
                     Else
-                        ftmsSignalToNoise.Add(Math.Round(reporterIons(intReporterIonIndex).SignalToNoise, 2).ToString())
-                        ftmsResolution.Add(Math.Round(reporterIons(intReporterIonIndex).Resolution, 2).ToString())
-                        ' ftmsLabelDataMz.Add(Math.Round(reporterIons(intReporterIonIndex).LabelDataMZ, 4).ToString())
+                        ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons(intReporterIonIndex).SignalToNoise, 2))
+                        ftmsResolution.Add(StringUtilities.DblToString(reporterIons(intReporterIonIndex).Resolution, 2))
+                        ' ftmsLabelDataMz.Add(StringUtilities.DblToString(reporterIons(intReporterIonIndex).LabelDataMZ, 4))
                     End If
 
                 End If
@@ -491,14 +492,14 @@ Public Class clsReporterIonProcessor
         End If
 
         ' Append the maximum reporter ion intensity then the individual reporter ion intensities
-        dataColumns.Add(Math.Round(sngReporterIntensityMax, 2).ToString())
+        dataColumns.Add(StringUtilities.DblToString(sngReporterIntensityMax, 2))
         dataColumns.AddRange(reporterIntensityList)
 
         ' Append the weighted average percent intensity correction
         If sngWeightedAvgPctIntensityCorrection < Single.Epsilon Then
             dataColumns.Add("0")
         Else
-            dataColumns.Add(Math.Round(sngWeightedAvgPctIntensityCorrection, 1).ToString())
+            dataColumns.Add(StringUtilities.DblToString(sngWeightedAvgPctIntensityCorrection, 1))
         End If
 
         If saveObservedMasses Then

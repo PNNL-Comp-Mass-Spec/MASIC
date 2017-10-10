@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports PRISM
 
 Namespace DataOutput
 
@@ -656,7 +657,7 @@ Namespace DataOutput
                     strPrefix = sicOptions.DatasetNumber.ToString() & ControlChars.Tab &
                        intParentIonIndex.ToString() & ControlChars.Tab &
                        intFragScanIndex.ToString() & ControlChars.Tab &
-                       Math.Round(scanList.ParentIons(intParentIonIndex).MZ, 4).ToString() & ControlChars.Tab
+                       StringUtilities.DblToString(scanList.ParentIons(intParentIonIndex).MZ, 4) & ControlChars.Tab
 
                     If sicDetails.SICDataCount = 0 Then
                         ' Nothing to write

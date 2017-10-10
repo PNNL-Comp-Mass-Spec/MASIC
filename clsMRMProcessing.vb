@@ -2,6 +2,7 @@
 Imports MASIC.clsMASIC
 Imports MASIC.DataOutput
 Imports MASICPeakFinder
+Imports PRISM
 Imports ThermoRawFileReader
 
 Public Class clsMRMProcessing
@@ -441,7 +442,7 @@ Public Class clsMRMProcessing
 
         intNonZeroCount = 0
         strOutLine = intScanFirst.ToString() & cColDelimiter &
-         Math.Round(sngScanTimeFirst, 5).ToString
+                     StringUtilities.DblToString(sngScanTimeFirst, 5)
 
         ' Construct a tab-delimited list of the values
         ' At the same time, clear the arrays

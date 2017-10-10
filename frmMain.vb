@@ -24,6 +24,7 @@ Option Strict On
 
 Imports MASIC.DataInput
 Imports MASICPeakFinder.clsMASICPeakFinder
+Imports PRISM
 Imports SharedVBNetRoutines.VBNetRoutines
 Imports ShFolderBrowser.FolderBrowser
 
@@ -1079,7 +1080,7 @@ Public Class frmMain
 
                     If blnSuccess Then
                         ' Grab the status message, but insert a carriage return directly after "in folder:"
-                        System.Windows.Forms.MessageBox.Show(.StatusMessage.Replace("in folder:", "in folder:" & ControlChars.NewLine) & ControlChars.NewLine & "Elapsed time: " & Math.Round(DateTime.UtcNow.Subtract(dtStartTime).TotalSeconds, 2).ToString() & " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        MessageBox.Show(.StatusMessage.Replace("in folder:", "in folder:" & ControlChars.NewLine) & ControlChars.NewLine & "Elapsed time: " & StringUtilities.DblToString(DateTime.UtcNow.Subtract(dtStartTime).TotalSeconds, 2) & " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information)
                     Else
                         System.Windows.Forms.MessageBox.Show("Error analyzing input file with MASIC: " & ControlChars.NewLine & .GetErrorMessage() & ControlChars.NewLine & .StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                     End If
@@ -1200,7 +1201,7 @@ Public Class frmMain
                 Dim blnSICToleranceIsPPM As Boolean
                 Dim dblSICTolerance = .SICOptions.GetSICTolerance(blnSICToleranceIsPPM)
 
-                txtSICTolerance.Text = Math.Round(dblSICTolerance, 6).ToString()
+                txtSICTolerance.Text = StringUtilities.DblToString(dblSICTolerance, 6)
                 If blnSICToleranceIsPPM Then
                     optSICTolerancePPM.Checked = True
                 Else
@@ -1304,7 +1305,7 @@ Public Class frmMain
 
             With masicOptions.ReporterIons
                 ' Reporter ion options
-                txtReporterIonMZToleranceDa.Text = Math.Round(.ReporterIonToleranceDaDefault, 6).ToString()
+                txtReporterIonMZToleranceDa.Text = StringUtilities.DblToString(.ReporterIonToleranceDaDefault, 6)
 
                 cboReporterIonMassMode.SelectedIndex = .ReporterIonMassMode
 

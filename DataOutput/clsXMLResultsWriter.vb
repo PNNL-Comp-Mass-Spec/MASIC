@@ -108,7 +108,7 @@ Namespace DataOutput
 
                     strLastGoodLoc = "With scanList.ParentIons(intParentIonIndex)"
                     With scanList.ParentIons(intParentIonIndex)
-                        objXMLOut.WriteElementString("MZ", Math.Round(.MZ, 4).ToString())
+                        objXMLOut.WriteElementString("MZ", StringUtilities.DblToString(.MZ, 4))
 
                         If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < scanList.SurveyScans.Count Then
                             objXMLOut.WriteElementString("SurveyScanNumber", scanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString())
@@ -261,13 +261,13 @@ Namespace DataOutput
                                     If sicDetails.SICDataCount > 0 Then
                                         For Each dataPoint In sicDetails.SICData
                                             If dataPoint.Intensity > 0 Then
-                                                sbIntensityDataList.Append(Math.Round(dataPoint.Intensity, 1).ToString() & ",")
+                                                sbIntensityDataList.Append(StringUtilities.DblToString(dataPoint.Intensity, 1) & ",")
                                             Else
                                                 sbIntensityDataList.Append(","c)     ' Do not output any number if the intensity is 0
                                             End If
 
                                             If dataPoint.Mass > 0 Then
-                                                sbMassDataList.Append(Math.Round(dataPoint.Mass, 3).ToString() & ",")
+                                                sbMassDataList.Append(StringUtilities.DblToString(dataPoint.Mass, 3) & ",")
                                             Else
                                                 sbMassDataList.Append(","c)     ' Do not output any number if the mass is 0
                                             End If
@@ -398,8 +398,9 @@ Namespace DataOutput
                 End With
 
                 With processingStats
-                    objXMLOut.WriteElementString("PeakMemoryUsageMB", Math.Round(.PeakMemoryUsageMB, 2).ToString())
-                    objXMLOut.WriteElementString("TotalProcessingTimeSeconds", Math.Round(processingTimeSec - .TotalProcessingTimeAtStart, 2).ToString())
+                    objXMLOut.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(.PeakMemoryUsageMB, 2))
+                    Dim effectiveSeconds = processingTimeSec - .TotalProcessingTimeAtStart
+                    objXMLOut.WriteElementString("TotalProcessingTimeSeconds", StringUtilities.DblToString(effectiveSeconds, 2))
                 End With
                 objXMLOut.WriteEndElement()
 
