@@ -56,14 +56,6 @@ Public Class clsMASIC
         mOptions.InitializeVariables()
         RegisterEvents(mOptions)
 
-        Try
-            mFreeMemoryPerformanceCounter = New PerformanceCounter("Memory", "Available MBytes") With {
-                .ReadOnly = True
-            }
-        Catch ex As Exception
-            LogErrors("InitializeVariables", "Error instantiating the Memory->'Available MBytes' performance counter", ex, False, False, eMasicErrorCodes.NoError)
-        End Try
-
     End Sub
 
 #Region "Constants and Enums"
@@ -136,8 +128,6 @@ Public Class clsMASIC
 
     Private mLocalErrorCode As eMasicErrorCodes
     Private mStatusMessage As String
-
-    Private mFreeMemoryPerformanceCounter As PerformanceCounter
 
 #End Region
 
@@ -1421,11 +1411,9 @@ Public Class clsMASIC
     Private Function GetFreeMemoryMB() As Single
         ' Returns the amount of free memory, in MB
 
-        If mFreeMemoryPerformanceCounter Is Nothing Then
-            Return 0
-        Else
-            Return mFreeMemoryPerformanceCounter.NextValue()
-        End If
+        Dim freeMemoryMB = PRISM.SystemInfo.GetFreeMemoryMB()
+
+        Return freeMemoryMB
 
     End Function
 
@@ -2280,15 +2268,6 @@ Public Class clsMASIC
 
         End If
 
-    End Sub
-
-    Protected Overrides Sub Finalize()
-        If Not mFreeMemoryPerformanceCounter Is Nothing Then
-            mFreeMemoryPerformanceCounter.Close()
-            mFreeMemoryPerformanceCounter = Nothing
-        End If
-
-        MyBase.Finalize()
     End Sub
 
 #Region "Event Handlers"
