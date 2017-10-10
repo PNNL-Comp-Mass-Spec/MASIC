@@ -217,33 +217,41 @@ Public Class clsMASICOptions
 
     End Sub
 
-    Public Function LoadParameterFileSettings(strParameterFilePath As String) As Boolean
+    Public Function LoadParameterFileSettings(parameterFilePath As String, Optional instrumentDataFilePath As String = "") As Boolean
 
         Try
 
-            If strParameterFilePath Is Nothing OrElse strParameterFilePath.Length = 0 Then
+            If String.IsNullOrWhiteSpace(parameterFilePath) Then
                 ' No parameter file specified; nothing to load
                 ReportMessage("Parameter file not specified -- will use default settings")
                 Return True
             Else
-                ReportMessage("Loading parameter file: " & strParameterFilePath)
+                ReportMessage("Loading parameter file: " & parameterFilePath)
             End If
 
 
-            If Not File.Exists(strParameterFilePath) Then
-                ' See if strParameterFilePath points to a file in the same directory as the application
-                strParameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(strParameterFilePath))
-                If Not File.Exists(strParameterFilePath) Then
-                    ReportError("Parameter file not found: " & strParameterFilePath)
-                    Return False
+            If Not File.Exists(parameterFilePath) Then
+                ' See if parameterFilePath points to a file in the same directory as the application
+                parameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(parameterFilePath))
+                If Not File.Exists(parameterFilePath) Then
+                    If Not String.IsNullOrWhiteSpace(instrumentDataFilePath) Then
+                        ' Also look in the same directory as the instrument data file
+                        Dim instrumentDataqFile = New FileInfo(instrumentDataFilePath)
+                        parameterFilePath = Path.Combine(instrumentDataqFile.DirectoryName, Path.GetFileName(parameterFilePath))
+                    End If
+
+                    If Not File.Exists(parameterFilePath) Then
+                        ReportError("Parameter file not found: " & parameterFilePath)
+                        Return False
+                    End If
                 End If
             End If
 
             Dim objSettingsFile = New XmlSettingsFileAccessor()
 
             ' Pass False to .LoadSettings() here to turn off case sensitive matching
-            If Not objSettingsFile.LoadSettings(strParameterFilePath, False) Then
-                ReportError("Error calling objSettingsFile.LoadSettings for " & strParameterFilePath, eMasicErrorCodes.InputFileDataReadError)
+            If Not objSettingsFile.LoadSettings(parameterFilePath, False) Then
+                ReportError("Error calling objSettingsFile.LoadSettings for " & parameterFilePath, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End If
 
@@ -401,7 +409,7 @@ Public Class clsMASICOptions
                 If Not .SectionPresent(XML_SECTION_SIC_OPTIONS) Then
                     Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS &
                                           ControlChars.Quote & "> was not found in the parameter file: " &
-                                          strParameterFilePath
+                                          parameterFilePath
                     ReportError(strErrorMessage)
                     Return False
                 Else
@@ -583,7 +591,7 @@ Public Class clsMASICOptions
                 If Not .SectionPresent(XML_SECTION_BINNING_OPTIONS) Then
                     Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote &
                                           XML_SECTION_BINNING_OPTIONS & ControlChars.Quote &
-                                          "> was not found in the parameter file: " & strParameterFilePath
+                                          "> was not found in the parameter file: " & parameterFilePath
                     ReportError(strErrorMessage)
 
                     SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
