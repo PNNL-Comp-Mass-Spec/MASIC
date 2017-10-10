@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.8.6492; October 10, 2017
+	- Make clsSpectraCache Disposable, replacing bug-prone use of Finalize
+	- Use additional methods in PRISM.dll
+
 Version 2.8.6332; May 3, 2017
 	- Restore behavior of including scans with no data in _ScanStats.txt and other scan-info files
 		- GetScanData in ThermoRawFileReader is used to retrieve the m/z and intensity values for a scan
