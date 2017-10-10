@@ -1,7 +1,8 @@
 ﻿Imports System.Collections.Generic
 Imports System.IO
 Imports System.Reflection
-Imports SharedVBNetRoutines
+Imports System.Threading
+Imports PRISM
 
 ' -------------------------------------------------------------------------------
 ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
@@ -111,33 +112,12 @@ Module modMain
 
     End Function
 
-    Private Sub ShowErrorMessage(strMessage As String)
-        Dim strSeparator = "------------------------------------------------------------------------------"
-
-        Console.WriteLine()
-        Console.WriteLine(strSeparator)
-        Console.WriteLine(strMessage)
-        Console.WriteLine(strSeparator)
-        Console.WriteLine()
-
+    Private Sub ShowErrorMessage(message As String)
+        ConsoleMsgUtils.ShowError(message)
     End Sub
 
-    Private Sub ShowErrorMessage(strTitle As String, items As List(Of String))
-        Dim strSeparator = "------------------------------------------------------------------------------"
-        Dim strMessage As String
-
-        Console.WriteLine()
-        Console.WriteLine(strSeparator)
-        Console.WriteLine(strTitle)
-        strMessage = strTitle & ":"
-
-        For Each item As String In items
-            Console.WriteLine("   " + item)
-            strMessage &= " " & item
-        Next
-        Console.WriteLine(strSeparator)
-        Console.WriteLine()
-
+    Private Sub ShowErrorMessage(title As String, errorMessages As IEnumerable(Of String))
+        ConsoleMsgUtils.ShowErrors(title, errorMessages)
     End Sub
 
     Public Sub ShowGUI()
