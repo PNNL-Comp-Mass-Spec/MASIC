@@ -7,16 +7,16 @@ Imports System.Runtime.InteropServices
 ''' </summary>
 Public Class clsSpectraCache
     Inherits clsMasicEventNotifier
+    Implements IDisposable
 
     Public Sub New(cacheOptions As clsSpectrumCacheOptions)
         mCacheOptions = cacheOptions
         InitializeVariables()
     End Sub
 
-    Protected Overrides Sub Finalize()
+    Public Sub Dispose() Implements IDisposable.Dispose
         ClosePageFile()
         DeleteSpectrumCacheFiles()
-        MyBase.Finalize()
     End Sub
 
 #Region "Constants and Enums"

@@ -1432,420 +1432,422 @@ Public Class clsMASIC
 
             InitializeMemoryManagementOptions(mProcessingStats)
 
-            Dim objSpectraCache = New clsSpectraCache(mOptions.CacheOptions) With {
+            Using objSpectraCache = New clsSpectraCache(mOptions.CacheOptions) With {
                 .ShowMessages = MyBase.ShowMessages,
                 .DiskCachingAlwaysDisabled = mOptions.CacheOptions.DiskCachingAlwaysDisabled,
                 .CacheFolderPath = mOptions.CacheOptions.FolderPath,
                 .CacheSpectraToRetainInMemory = mOptions.CacheOptions.SpectraToRetainInMemory
             }
-            RegisterEvents(objSpectraCache)
+                RegisterEvents(objSpectraCache)
 
-            objSpectraCache.InitializeSpectraPool()
+                objSpectraCache.InitializeSpectraPool()
 
-            Dim datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType
+                Dim datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType
 
-            Dim scanList = New clsScanList()
-            RegisterEvents(scanList)
+                Dim scanList = New clsScanList()
+                RegisterEvents(scanList)
 
-            Dim parentIonProcessor = New clsParentIonProcessing(mOptions.ReporterIons)
-            RegisterEvents(parentIonProcessor)
+                Dim parentIonProcessor = New clsParentIonProcessing(mOptions.ReporterIons)
+                RegisterEvents(parentIonProcessor)
 
-            Dim scanTracking = New clsScanTracking(mOptions.ReporterIons, mMASICPeakFinder)
-            RegisterEvents(scanTracking)
+                Dim scanTracking = New clsScanTracking(mOptions.ReporterIons, mMASICPeakFinder)
+                RegisterEvents(scanTracking)
 
-            Dim dataImporterBase As DataInput.clsDataImport = Nothing
+                Dim dataImporterBase As DataInput.clsDataImport = Nothing
 
-            Try
-
-                '---------------------------------------------------------
-                ' Define strInputFileName (which is referenced several times below)
-                '---------------------------------------------------------
-                strInputFileName = Path.GetFileName(strInputFilePathFull)
-
-                '---------------------------------------------------------
-                ' Create the _ScanStats.txt file
-                '---------------------------------------------------------
-                dataOutputHandler.OpenOutputFileHandles(strInputFileName, strOutputFolderPath, mOptions.IncludeHeadersInExportFile)
-
-                '---------------------------------------------------------
-                ' Read the mass spectra from the input data file
-                '---------------------------------------------------------
-
-                UpdateProcessingStep(eProcessingStepConstants.ReadDataFile)
-                SetSubtaskProcessingStepPct(0)
-                UpdatePeakMemoryUsage()
-                mStatusMessage = String.Empty
-
-                If mOptions.SkipSICAndRawDataProcessing Then
-                    mOptions.ExportRawDataOnly = False
-                End If
-
-                blnKeepRawMSSpectra = Not mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly
-
-                mOptions.SICOptions.ValidateSICOptions()
-
-                Select Case Path.GetExtension(strInputFilePath).ToUpper()
-                    Case DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()
-
-                        ' Open the .Raw file and obtain the scan information
-
-                        Dim dataImporter = New DataInput.clsDataImportThermoRaw(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                        RegisterDataImportEvents(dataImporter)
-                        dataImporterBase = dataImporter
-
-                        blnSuccess = dataImporter.ExtractScanInfoFromXcaliburDataFile(
-                          strInputFilePathFull,
-                          scanList, objSpectraCache, dataOutputHandler,
-                          blnKeepRawMSSpectra,
-                          Not mOptions.SkipMSMSProcessing)
-
-                        datasetFileInfo = dataImporter.DatasetFileInfo
-
-                    Case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper(),
-                         DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper()
-
-                        ' Open the .mzXML file and obtain the scan information
-
-                        Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                        RegisterDataImportEvents(dataImporter)
-                        dataImporterBase = dataImporter
-
-                        blnSuccess = dataImporter.ExtractScanInfoFromMZXMLDataFile(
-                          strInputFilePathFull,
-                          scanList, objSpectraCache, dataOutputHandler,
-                          blnKeepRawMSSpectra,
-                          Not mOptions.SkipMSMSProcessing)
-
-                        datasetFileInfo = dataImporter.DatasetFileInfo
-
-                    Case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper(),
-                         DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper()
-
-                        ' Open the .mzData file and obtain the scan information
-
-                        Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                        RegisterDataImportEvents(dataImporter)
-                        dataImporterBase = dataImporter
-
-                        blnSuccess = dataImporter.ExtractScanInfoFromMZDataFile(
-                          strInputFilePathFull,
-                          scanList, objSpectraCache, dataOutputHandler,
-                          blnKeepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
-
-                        datasetFileInfo = dataImporter.DatasetFileInfo
-
-                    Case DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper(),
-                         DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper()
-
-                        ' Open the .MGF and .CDF files to obtain the scan information
-
-                        Dim dataImporter = New DataInput.clsDataImportMGFandCDF(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                        RegisterDataImportEvents(dataImporter)
-                        dataImporterBase = dataImporter
-
-                        blnSuccess = dataImporter.ExtractScanInfoFromMGFandCDF(
-                          strInputFilePathFull,
-                          scanList, objSpectraCache, dataOutputHandler,
-                          blnKeepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
-
-                        datasetFileInfo = dataImporter.DatasetFileInfo
-
-                    Case Else
-                        mStatusMessage = "Unknown file extension: " & Path.GetExtension(strInputFilePathFull)
-                        SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension)
-                        blnSuccess = False
-
-                        ' Instantiate this object to avoid a warning below about the object potentially not being initialized
-                        ' In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
-                        datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
-                End Select
-
-                If Not blnSuccess Then
-                    If mLocalErrorCode = eMasicErrorCodes.NoParentIonsFoundInInputFile AndAlso String.IsNullOrWhiteSpace(mStatusMessage) Then
-                        mStatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range"
-                    End If
-                    SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, True)
-                End If
-            Catch ex As Exception
-                blnSuccess = False
-                LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, True, True, eMasicErrorCodes.InputFileDataReadError)
-            End Try
-
-            ' Record that the file is finished loading
-            mProcessingStats.FileLoadEndTime = DateTime.UtcNow
-
-            If Not blnSuccess Then
-                If mStatusMessage Is Nothing OrElse mStatusMessage.Length = 0 Then
-                    mStatusMessage = "Unable to parse file; unknown error"
-                Else
-                    mStatusMessage = "Unable to parse file: " & mStatusMessage
-                End If
-
-                If MyBase.ShowMessages Then
-                    MessageBox.Show(mStatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                    LogMessage(mStatusMessage, eMessageTypeConstants.ErrorMsg)
-                Else
-                    MyBase.ShowErrorMessage(mStatusMessage)
-                End If
-                Exit Try
-            End If
-
-            Try
-                ' Make sure the arrays in scanList range from 0 to the Count-1
-                With scanList
-                    If .MasterScanOrderCount <> .MasterScanOrder.Length Then
-                        ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
-                        ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
-                        ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
-                    End If
-
-                    If .ParentIonInfoCount <> .ParentIons.Length Then ReDim Preserve .ParentIons(.ParentIonInfoCount - 1)
-                End With
-            Catch ex As Exception
-                blnSuccess = False
-                LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
-                Exit Try
-            End Try
-
-            Dim bpiWriter = New DataOutput.clsBPIWriter()
-            RegisterEvents(bpiWriter)
-
-            Try
-                '---------------------------------------------------------
-                ' Save the BPIs and TICs
-                '---------------------------------------------------------
-
-                UpdateProcessingStep(eProcessingStepConstants.SaveBPI)
-                UpdateOverallProgress("Processing Data for " & strInputFileName)
-                SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk")
-                UpdatePeakMemoryUsage()
-
-                If mOptions.SkipSICAndRawDataProcessing OrElse Not mOptions.ExportRawDataOnly Then
-                    LogMessage("ProcessFile: Call SaveBPIs")
-                    bpiWriter.SaveBPIs(scanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
-                End If
-
-                '---------------------------------------------------------
-                ' Close the ScanStats file handle
-                '---------------------------------------------------------
                 Try
-                    LogMessage("ProcessFile: Close outputFileHandles.ScanStats")
 
-                    dataOutputHandler.OutputFileHandles.CloseScanStats()
+                    '---------------------------------------------------------
+                    ' Define strInputFileName (which is referenced several times below)
+                    '---------------------------------------------------------
+                    strInputFileName = Path.GetFileName(strInputFilePathFull)
 
+                    '---------------------------------------------------------
+                    ' Create the _ScanStats.txt file
+                    '---------------------------------------------------------
+                    dataOutputHandler.OpenOutputFileHandles(strInputFileName, strOutputFolderPath, mOptions.IncludeHeadersInExportFile)
+
+                    '---------------------------------------------------------
+                    ' Read the mass spectra from the input data file
+                    '---------------------------------------------------------
+
+                    UpdateProcessingStep(eProcessingStepConstants.ReadDataFile)
+                    SetSubtaskProcessingStepPct(0)
+                    UpdatePeakMemoryUsage()
+                    mStatusMessage = String.Empty
+
+                    If mOptions.SkipSICAndRawDataProcessing Then
+                        mOptions.ExportRawDataOnly = False
+                    End If
+
+                    blnKeepRawMSSpectra = Not mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly
+
+                    mOptions.SICOptions.ValidateSICOptions()
+
+                    Select Case Path.GetExtension(strInputFilePath).ToUpper()
+                        Case DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()
+
+                            ' Open the .Raw file and obtain the scan information
+
+                            Dim dataImporter = New DataInput.clsDataImportThermoRaw(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                            RegisterDataImportEvents(dataImporter)
+                            dataImporterBase = dataImporter
+
+                            blnSuccess = dataImporter.ExtractScanInfoFromXcaliburDataFile(
+                              strInputFilePathFull,
+                              scanList, objSpectraCache, dataOutputHandler,
+                              blnKeepRawMSSpectra,
+                              Not mOptions.SkipMSMSProcessing)
+
+                            datasetFileInfo = dataImporter.DatasetFileInfo
+
+                        Case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper(),
+                             DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper()
+
+                            ' Open the .mzXML file and obtain the scan information
+
+                            Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                            RegisterDataImportEvents(dataImporter)
+                            dataImporterBase = dataImporter
+
+                            blnSuccess = dataImporter.ExtractScanInfoFromMZXMLDataFile(
+                              strInputFilePathFull,
+                              scanList, objSpectraCache, dataOutputHandler,
+                              blnKeepRawMSSpectra,
+                              Not mOptions.SkipMSMSProcessing)
+
+                            datasetFileInfo = dataImporter.DatasetFileInfo
+
+                        Case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper(),
+                             DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper()
+
+                            ' Open the .mzData file and obtain the scan information
+
+                            Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                            RegisterDataImportEvents(dataImporter)
+                            dataImporterBase = dataImporter
+
+                            blnSuccess = dataImporter.ExtractScanInfoFromMZDataFile(
+                              strInputFilePathFull,
+                              scanList, objSpectraCache, dataOutputHandler,
+                              blnKeepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
+
+                            datasetFileInfo = dataImporter.DatasetFileInfo
+
+                        Case DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper(),
+                             DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper()
+
+                            ' Open the .MGF and .CDF files to obtain the scan information
+
+                            Dim dataImporter = New DataInput.clsDataImportMGFandCDF(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                            RegisterDataImportEvents(dataImporter)
+                            dataImporterBase = dataImporter
+
+                            blnSuccess = dataImporter.ExtractScanInfoFromMGFandCDF(
+                              strInputFilePathFull,
+                              scanList, objSpectraCache, dataOutputHandler,
+                              blnKeepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
+
+                            datasetFileInfo = dataImporter.DatasetFileInfo
+
+                        Case Else
+                            mStatusMessage = "Unknown file extension: " & Path.GetExtension(strInputFilePathFull)
+                            SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension)
+                            blnSuccess = False
+
+                            ' Instantiate this object to avoid a warning below about the object potentially not being initialized
+                            ' In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
+                            datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
+                    End Select
+
+                    If Not blnSuccess Then
+                        If mLocalErrorCode = eMasicErrorCodes.NoParentIonsFoundInInputFile AndAlso String.IsNullOrWhiteSpace(mStatusMessage) Then
+                            mStatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range"
+                        End If
+                        SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, True)
+                    End If
                 Catch ex As Exception
-                    ' Ignore errors here
+                    blnSuccess = False
+                    LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, True, True, eMasicErrorCodes.InputFileDataReadError)
                 End Try
 
-                '---------------------------------------------------------
-                ' Create the DatasetInfo XML file
-                '---------------------------------------------------------
+                ' Record that the file is finished loading
+                mProcessingStats.FileLoadEndTime = DateTime.UtcNow
 
-                LogMessage("ProcessFile: Create DatasetInfo File")
-                dataOutputHandler.CreateDatasetInfoFile(strInputFileName, strOutputFolderPath, scanTracking, datasetFileInfo)
-
-                If mOptions.SkipSICAndRawDataProcessing Then
-                    LogMessage("ProcessFile: Skipping SIC Processing")
-
-                    SetDefaultPeakLocValues(scanList)
-                Else
-
-                    '---------------------------------------------------------
-                    ' Optionally, export the raw mass spectra data
-                    '---------------------------------------------------------
-                    If mOptions.RawDataExportOptions.ExportEnabled Then
-                        Dim rawDataExporter = New DataOutput.clsSpectrumDataWriter(bpiWriter, mOptions)
-                        RegisterEvents(rawDataExporter)
-
-                        rawDataExporter.ExportRawDataToDisk(scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                If Not blnSuccess Then
+                    If mStatusMessage Is Nothing OrElse mStatusMessage.Length = 0 Then
+                        mStatusMessage = "Unable to parse file; unknown error"
+                    Else
+                        mStatusMessage = "Unable to parse file: " & mStatusMessage
                     End If
 
-                    If mOptions.ReporterIons.ReporterIonStatsEnabled Then
-                        ' Look for Reporter Ions in the Fragmentation spectra
-
-                        Dim reporterionProcessor = New clsReporterIonProcessor(mOptions)
-                        RegisterEvents(reporterionProcessor)
-                        reporterionProcessor.FindReporterIons(scanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
+                    If MyBase.ShowMessages Then
+                        MessageBox.Show(mStatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                        LogMessage(mStatusMessage, eMessageTypeConstants.ErrorMsg)
+                    Else
+                        MyBase.ShowErrorMessage(mStatusMessage)
                     End If
+                    Exit Try
+                End If
 
-                    Dim mrmProcessor = New clsMRMProcessing(mOptions, dataOutputHandler)
-                    RegisterEvents(mrmProcessor)
-
-                    '---------------------------------------------------------
-                    ' If MRM data is present, then save the MRM values to disk
-                    '---------------------------------------------------------
-                    If scanList.MRMDataPresent Then
-
-                        If blnSuccess Then
-                            mrmProcessor.ExportMRMDataToDisk(scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                Try
+                    ' Make sure the arrays in scanList range from 0 to the Count-1
+                    With scanList
+                        If .MasterScanOrderCount <> .MasterScanOrder.Length Then
+                            ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
+                            ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
+                            ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
                         End If
+
+                        If .ParentIonInfoCount <> .ParentIons.Length Then ReDim Preserve .ParentIons(.ParentIonInfoCount - 1)
+                    End With
+                Catch ex As Exception
+                    blnSuccess = False
+                    LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+                    Exit Try
+                End Try
+
+                Dim bpiWriter = New DataOutput.clsBPIWriter()
+                RegisterEvents(bpiWriter)
+
+                Try
+                    '---------------------------------------------------------
+                    ' Save the BPIs and TICs
+                    '---------------------------------------------------------
+
+                    UpdateProcessingStep(eProcessingStepConstants.SaveBPI)
+                    UpdateOverallProgress("Processing Data for " & strInputFileName)
+                    SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk")
+                    UpdatePeakMemoryUsage()
+
+                    If mOptions.SkipSICAndRawDataProcessing OrElse Not mOptions.ExportRawDataOnly Then
+                        LogMessage("ProcessFile: Call SaveBPIs")
+                        bpiWriter.SaveBPIs(scanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
                     End If
 
+                    '---------------------------------------------------------
+                    ' Close the ScanStats file handle
+                    '---------------------------------------------------------
+                    Try
+                        LogMessage("ProcessFile: Close outputFileHandles.ScanStats")
 
-                    If Not mOptions.ExportRawDataOnly Then
+                        dataOutputHandler.OutputFileHandles.CloseScanStats()
+
+                    Catch ex As Exception
+                        ' Ignore errors here
+                    End Try
+
+                    '---------------------------------------------------------
+                    ' Create the DatasetInfo XML file
+                    '---------------------------------------------------------
+
+                    LogMessage("ProcessFile: Create DatasetInfo File")
+                    dataOutputHandler.CreateDatasetInfoFile(strInputFileName, strOutputFolderPath, scanTracking, datasetFileInfo)
+
+                    If mOptions.SkipSICAndRawDataProcessing Then
+                        LogMessage("ProcessFile: Skipping SIC Processing")
+
+                        SetDefaultPeakLocValues(scanList)
+                    Else
 
                         '---------------------------------------------------------
-                        ' Add the custom SIC values to scanList
+                        ' Optionally, export the raw mass spectra data
                         '---------------------------------------------------------
-                        mOptions.CustomSICList.AddCustomSICValues(scanList, mOptions.SICOptions.SICTolerance,
-                                           mOptions.SICOptions.SICToleranceIsPPM, mOptions.CustomSICList.ScanOrAcqTimeTolerance)
+                        If mOptions.RawDataExportOptions.ExportEnabled Then
+                            Dim rawDataExporter = New DataOutput.clsSpectrumDataWriter(bpiWriter, mOptions)
+                            RegisterEvents(rawDataExporter)
+
+                            rawDataExporter.ExportRawDataToDisk(scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                        End If
+
+                        If mOptions.ReporterIons.ReporterIonStatsEnabled Then
+                            ' Look for Reporter Ions in the Fragmentation spectra
+
+                            Dim reporterionProcessor = New clsReporterIonProcessor(mOptions)
+                            RegisterEvents(reporterionProcessor)
+                            reporterionProcessor.FindReporterIons(scanList, objSpectraCache, strInputFilePathFull, strOutputFolderPath)
+                        End If
+
+                        Dim mrmProcessor = New clsMRMProcessing(mOptions, dataOutputHandler)
+                        RegisterEvents(mrmProcessor)
+
+                        '---------------------------------------------------------
+                        ' If MRM data is present, then save the MRM values to disk
+                        '---------------------------------------------------------
+                        If scanList.MRMDataPresent Then
+
+                            If blnSuccess Then
+                                mrmProcessor.ExportMRMDataToDisk(scanList, objSpectraCache, strInputFileName, strOutputFolderPath)
+                            End If
+                        End If
 
 
-                        '---------------------------------------------------------
-                        ' Possibly create the Tab-separated values SIC details output file
-                        '---------------------------------------------------------
-                        If mOptions.WriteDetailedSICDataFile Then
-                            blnSuccess = dataOutputHandler.InitializeSICDetailsTextFile(strInputFilePathFull, strOutputFolderPath)
+                        If Not mOptions.ExportRawDataOnly Then
+
+                            '---------------------------------------------------------
+                            ' Add the custom SIC values to scanList
+                            '---------------------------------------------------------
+                            mOptions.CustomSICList.AddCustomSICValues(scanList, mOptions.SICOptions.SICTolerance,
+                                               mOptions.SICOptions.SICToleranceIsPPM, mOptions.CustomSICList.ScanOrAcqTimeTolerance)
+
+
+                            '---------------------------------------------------------
+                            ' Possibly create the Tab-separated values SIC details output file
+                            '---------------------------------------------------------
+                            If mOptions.WriteDetailedSICDataFile Then
+                                blnSuccess = dataOutputHandler.InitializeSICDetailsTextFile(strInputFilePathFull, strOutputFolderPath)
+                                If Not blnSuccess Then
+                                    SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
+                                    Exit Try
+                                End If
+                            End If
+
+                            '---------------------------------------------------------
+                            ' Create the XML output file
+                            '---------------------------------------------------------
+                            blnSuccess = xmlResultsWriter.XMLOutputFileInitialize(strInputFilePathFull, strOutputFolderPath, dataOutputHandler, scanList, objSpectraCache, mOptions.SICOptions, mOptions.BinningOptions)
                             If Not blnSuccess Then
                                 SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
                                 Exit Try
                             End If
+
+                            '---------------------------------------------------------
+                            ' Create the SICs
+                            ' For each one, find the peaks and make an entry to the XML output file
+                            '---------------------------------------------------------
+
+                            UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks)
+                            SetSubtaskProcessingStepPct(0)
+                            UpdatePeakMemoryUsage()
+
+                            LogMessage("ProcessFile: Call CreateParentIonSICs")
+                            Dim sicProcessor = New clsSICProcessing(mMASICPeakFinder, mrmProcessor)
+                            RegisterEvents(sicProcessor)
+
+                            blnSuccess = sicProcessor.CreateParentIonSICs(scanList, objSpectraCache, mOptions, dataOutputHandler, sicProcessor, xmlResultsWriter)
+
+                            If Not blnSuccess Then
+                                SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
+                                Exit Try
+                            End If
+
                         End If
 
-                        '---------------------------------------------------------
-                        ' Create the XML output file
-                        '---------------------------------------------------------
-                        blnSuccess = xmlResultsWriter.XMLOutputFileInitialize(strInputFilePathFull, strOutputFolderPath, dataOutputHandler, scanList, objSpectraCache, mOptions.SICOptions, mOptions.BinningOptions)
-                        If Not blnSuccess Then
-                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
-                            Exit Try
+
+                        If Not (mOptions.SkipMSMSProcessing OrElse mOptions.ExportRawDataOnly) Then
+
+                            '---------------------------------------------------------
+                            ' Find Similar Parent Ions
+                            '---------------------------------------------------------
+
+                            UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons)
+                            SetSubtaskProcessingStepPct(0)
+                            UpdatePeakMemoryUsage()
+
+                            LogMessage("ProcessFile: Call FindSimilarParentIons")
+                            blnSuccess = parentIonProcessor.FindSimilarParentIons(scanList, objSpectraCache, mOptions, dataImporterBase, intSimilarParentIonUpdateCount)
+
+                            If Not blnSuccess Then
+                                SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
+                                Exit Try
+                            End If
                         End If
 
+                    End If
+
+                    If mOptions.WriteExtendedStats AndAlso Not mOptions.ExportRawDataOnly Then
                         '---------------------------------------------------------
-                        ' Create the SICs
-                        ' For each one, find the peaks and make an entry to the XML output file
+                        ' Save Extended Scan Stats Files
                         '---------------------------------------------------------
 
-                        UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks)
+                        UpdateProcessingStep(eProcessingStepConstants.SaveExtendedScanStatsFiles)
                         SetSubtaskProcessingStepPct(0)
                         UpdatePeakMemoryUsage()
 
-                        LogMessage("ProcessFile: Call CreateParentIonSICs")
-                        Dim sicProcessor = New clsSICProcessing(mMASICPeakFinder, mrmProcessor)
-                        RegisterEvents(sicProcessor)
-
-                        blnSuccess = sicProcessor.CreateParentIonSICs(scanList, objSpectraCache, mOptions, dataOutputHandler, sicProcessor, xmlResultsWriter)
+                        LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
+                        blnSuccess = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
+                            scanList, strInputFileName, strOutputFolderPath, mOptions.IncludeHeadersInExportFile)
 
                         If Not blnSuccess Then
-                            SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
+                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
                             Exit Try
                         End If
-
                     End If
 
 
-                    If Not (mOptions.SkipMSMSProcessing OrElse mOptions.ExportRawDataOnly) Then
+                    '---------------------------------------------------------
+                    ' Save SIC Stats Flat File
+                    '---------------------------------------------------------
+
+                    UpdateProcessingStep(eProcessingStepConstants.SaveSICStatsFlatFile)
+                    SetSubtaskProcessingStepPct(0)
+                    UpdatePeakMemoryUsage()
+
+                    If Not mOptions.ExportRawDataOnly Then
+
+                        Dim sicStatsWriter = New DataOutput.clsSICStatsWriter()
+                        RegisterEvents(sicStatsWriter)
+
+                        LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
+                        blnSuccess = sicStatsWriter.SaveSICStatsFlatFile(scanList, strInputFileName, strOutputFolderPath, mOptions, dataOutputHandler)
+
+                        If Not blnSuccess Then
+                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
+                            Exit Try
+                        End If
+                    End If
+
+
+                    UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles)
+                    SetSubtaskProcessingStepPct(0)
+                    UpdatePeakMemoryUsage()
+
+                    If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) Then
 
                         '---------------------------------------------------------
-                        ' Find Similar Parent Ions
+                        ' Write processing stats to the XML output file
                         '---------------------------------------------------------
 
-                        UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons)
+                        LogMessage("ProcessFile: Call FinalizeXMLFile")
+                        Dim processingTimeSec = GetTotalProcessingTimeSec()
+                        blnSuccess = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, objSpectraCache,
+                                                                            mProcessingStats, processingTimeSec)
+
+                    End If
+
+                    '---------------------------------------------------------
+                    ' Close any open output files
+                    '---------------------------------------------------------
+                    dataOutputHandler.OutputFileHandles.CloseAll()
+
+                    '---------------------------------------------------------
+                    ' Save a text file containing the headers used in the text files
+                    '---------------------------------------------------------
+                    If Not mOptions.IncludeHeadersInExportFile Then
+                        LogMessage("ProcessFile: Call SaveHeaderGlossary")
+                        dataOutputHandler.SaveHeaderGlossary(scanList, strInputFileName, strOutputFolderPath)
+                    End If
+
+                    If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) AndAlso intSimilarParentIonUpdateCount > 0 Then
+                        '---------------------------------------------------------
+                        ' Reopen the XML file and update the entries for those ions in scanList that had their
+                        ' Optimal peak apex scan numbers updated
+                        '---------------------------------------------------------
+
+                        UpdateProcessingStep(eProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues)
                         SetSubtaskProcessingStepPct(0)
                         UpdatePeakMemoryUsage()
 
-                        LogMessage("ProcessFile: Call FindSimilarParentIons")
-                        blnSuccess = parentIonProcessor.FindSimilarParentIons(scanList, objSpectraCache, mOptions, dataImporterBase, intSimilarParentIonUpdateCount)
-
-                        If Not blnSuccess Then
-                            SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
-                            Exit Try
-                        End If
+                        LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries")
+                        xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, strInputFileName, strOutputFolderPath)
                     End If
 
-                End If
+                Catch ex As Exception
+                    blnSuccess = False
+                    LogErrors("ProcessFile", "Error creating or writing to the output file in folder: " & strOutputFolderPath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+                End Try
 
-                If mOptions.WriteExtendedStats AndAlso Not mOptions.ExportRawDataOnly Then
-                    '---------------------------------------------------------
-                    ' Save Extended Scan Stats Files
-                    '---------------------------------------------------------
-
-                    UpdateProcessingStep(eProcessingStepConstants.SaveExtendedScanStatsFiles)
-                    SetSubtaskProcessingStepPct(0)
-                    UpdatePeakMemoryUsage()
-
-                    LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
-                    blnSuccess = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
-                        scanList, strInputFileName, strOutputFolderPath, mOptions.IncludeHeadersInExportFile)
-
-                    If Not blnSuccess Then
-                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
-                        Exit Try
-                    End If
-                End If
-
-
-                '---------------------------------------------------------
-                ' Save SIC Stats Flat File
-                '---------------------------------------------------------
-
-                UpdateProcessingStep(eProcessingStepConstants.SaveSICStatsFlatFile)
-                SetSubtaskProcessingStepPct(0)
-                UpdatePeakMemoryUsage()
-
-                If Not mOptions.ExportRawDataOnly Then
-
-                    Dim sicStatsWriter = New DataOutput.clsSICStatsWriter()
-                    RegisterEvents(sicStatsWriter)
-
-                    LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
-                    blnSuccess = sicStatsWriter.SaveSICStatsFlatFile(scanList, strInputFileName, strOutputFolderPath, mOptions, dataOutputHandler)
-
-                    If Not blnSuccess Then
-                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
-                        Exit Try
-                    End If
-                End If
-
-
-                UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles)
-                SetSubtaskProcessingStepPct(0)
-                UpdatePeakMemoryUsage()
-
-                If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) Then
-
-                    '---------------------------------------------------------
-                    ' Write processing stats to the XML output file
-                    '---------------------------------------------------------
-
-                    LogMessage("ProcessFile: Call FinalizeXMLFile")
-                    Dim processingTimeSec = GetTotalProcessingTimeSec()
-                    blnSuccess = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, objSpectraCache,
-                                                                        mProcessingStats, processingTimeSec)
-
-                End If
-
-                '---------------------------------------------------------
-                ' Close any open output files
-                '---------------------------------------------------------
-                dataOutputHandler.OutputFileHandles.CloseAll()
-
-                '---------------------------------------------------------
-                ' Save a text file containing the headers used in the text files
-                '---------------------------------------------------------
-                If Not mOptions.IncludeHeadersInExportFile Then
-                    LogMessage("ProcessFile: Call SaveHeaderGlossary")
-                    dataOutputHandler.SaveHeaderGlossary(scanList, strInputFileName, strOutputFolderPath)
-                End If
-
-                If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) AndAlso intSimilarParentIonUpdateCount > 0 Then
-                    '---------------------------------------------------------
-                    ' Reopen the XML file and update the entries for those ions in scanList that had their
-                    ' Optimal peak apex scan numbers updated
-                    '---------------------------------------------------------
-
-                    UpdateProcessingStep(eProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues)
-                    SetSubtaskProcessingStepPct(0)
-                    UpdatePeakMemoryUsage()
-
-                    LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries")
-                    xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, strInputFileName, strOutputFolderPath)
-                End If
-
-            Catch ex As Exception
-                blnSuccess = False
-                LogErrors("ProcessFile", "Error creating or writing to the output file in folder: " & strOutputFolderPath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
-            End Try
+            End Using
 
         Catch ex As Exception
             blnSuccess = False
