@@ -26,19 +26,19 @@ Module modMain
         ' Returns 0 if no error, error code if an error
 
         Dim objParseCommandLine As New clsParseCommandLine()
-        Dim blnProceed As Boolean
+        Dim proceed As Boolean
 
         mInputFilePath = String.Empty
 
         Try
-            blnProceed = False
+            proceed = False
             If objParseCommandLine.ParseCommandLine Then
-                If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then blnProceed = True
+                If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then proceed = True
             ElseIf Not objParseCommandLine.NeedToShowHelp Then
-                blnProceed = True
+                proceed = True
             End If
 
-            If objParseCommandLine.NeedToShowHelp OrElse Not blnProceed Then
+            If objParseCommandLine.NeedToShowHelp OrElse Not proceed Then
                 ShowProgramHelp()
                 Return -1
             End If
@@ -78,21 +78,21 @@ Module modMain
     Private Function SetOptionsUsingCommandLineParameters(objParseCommandLine As clsParseCommandLine) As Boolean
         ' Returns True if no problems; otherwise, returns false
 
-        Dim strValue As String = String.Empty
-        Dim lstValidParameters = New List(Of String) From {"I"}
+        Dim value As String = String.Empty
+        Dim validParameters = New List(Of String) From {"I"}
 
         Try
             ' Make sure no invalid parameters are present
-            If objParseCommandLine.InvalidParametersPresent(lstValidParameters) Then
+            If objParseCommandLine.InvalidParametersPresent(validParameters) Then
                 ShowErrorMessage("Invalid commmand line parameters",
-                  (From item In objParseCommandLine.InvalidParameters(lstValidParameters) Select "/" + item).ToList())
+                  (From item In objParseCommandLine.InvalidParameters(validParameters) Select "/" + item).ToList())
                 Return False
             Else
 
                 ' Query objParseCommandLine to see if various parameters are present
                 With objParseCommandLine
-                    If .RetrieveValueForParameter("I", strValue) Then
-                        mInputFilePath = strValue
+                    If .RetrieveValueForParameter("I", value) Then
+                        mInputFilePath = value
                     ElseIf .NonSwitchParameterCount > 0 Then
                         ' Treat the first non-switch parameter as the input file
                         mInputFilePath = .RetrieveNonSwitchParameter(0)
