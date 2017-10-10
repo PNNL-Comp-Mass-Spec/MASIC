@@ -100,7 +100,7 @@ Public Class frmMain
     ''' <summary>
     ''' Log messages, including warnings and errors, with the newest message at the top
     ''' </summary>
-    Private mLogMessages As List(Of String)
+    Private ReadOnly mLogMessages As List(Of String)
 
 #End Region
 
@@ -267,14 +267,14 @@ Public Class frmMain
         ' Returns true if the CUSTOM_SIC_VALUES_DATATABLE is empty or if it was cleared
         ' Returns false if the user is queried about clearing and they do not click Yes
 
-        Dim eResult As System.Windows.Forms.DialogResult
+        Dim eResult As DialogResult
         Dim blnSuccess As Boolean
 
         blnSuccess = False
         With mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATATABLE)
             If .Rows.Count > 0 Then
                 If blnConfirmReplaceExistingResults Then
-                    eResult = System.Windows.Forms.MessageBox.Show("Are you sure you want to clear the Custom SIC list?", "Clear Custom SICs", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+                    eResult = MessageBox.Show("Are you sure you want to clear the Custom SIC list?", "Clear Custom SICs", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
                 End If
 
                 If eResult = DialogResult.Yes OrElse Not blnConfirmReplaceExistingResults Then
@@ -291,11 +291,11 @@ Public Class frmMain
 
     Private Function ConfirmPaths() As Boolean
         If txtInputFilePath.TextLength = 0 Then
-            System.Windows.Forms.MessageBox.Show("Please define an input file path", "Missing Value", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Please define an input file path", "Missing Value", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             txtInputFilePath.Focus()
             Return False
         ElseIf txtOutputFolderPath.TextLength = 0 Then
-            System.Windows.Forms.MessageBox.Show("Please define an output folder path", "Missing Value", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Please define an output folder path", "Missing Value", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             txtOutputFolderPath.Focus()
             Return False
         Else
@@ -511,7 +511,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub frmMain_Resize(sender As Object, e As System.EventArgs) Handles MyBase.Resize
+    Private Sub frmMain_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         CatchUnrequestedHeightChange()
     End Sub
 
@@ -562,7 +562,7 @@ Public Class frmMain
 
         Dim strFilePath As String
 
-        Dim objOpenFile As New System.Windows.Forms.OpenFileDialog
+        Dim objOpenFile As New OpenFileDialog
 
         strFilePath = mXmlSettingsFilePath
 
@@ -615,7 +615,7 @@ Public Class frmMain
 
             Dim success = objMasic.LoadParameterFileSettings(strFilePath)
             If Not success Then
-                System.Windows.Forms.MessageBox.Show("LoadParameterFileSettings returned false for: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                MessageBox.Show("LoadParameterFileSettings returned false for: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End If
 
             ResetToDefaults(False, objMasic)
@@ -658,19 +658,19 @@ Public Class frmMain
                     mPreferredInputFileExtension = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
 
                 Catch ex As Exception
-                    System.Windows.Forms.MessageBox.Show("Invalid parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    MessageBox.Show("Invalid parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End Try
             End With
 
         Catch ex As Exception
-            System.Windows.Forms.MessageBox.Show("Error loading settings from file: " & strFilePath & "; " & ControlChars.NewLine &
+            MessageBox.Show("Error loading settings from file: " & strFilePath & "; " & ControlChars.NewLine &
              ex.Message & ";" & ControlChars.NewLine, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
 
     End Sub
 
     Private Sub IniFileSaveDefaultOptions()
-        Dim eResponse As System.Windows.Forms.DialogResult
+        Dim eResponse As DialogResult
 
         eResponse = MessageBox.Show("Save the current options as defaults?", "Save Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
         If eResponse = DialogResult.Yes Then
@@ -683,7 +683,7 @@ Public Class frmMain
 
         Dim strFilePath As String
 
-        Dim objSaveFile As New System.Windows.Forms.SaveFileDialog
+        Dim objSaveFile As New SaveFileDialog
 
         strFilePath = mXmlSettingsFilePath
 
@@ -767,13 +767,13 @@ Public Class frmMain
                     .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
 
                 Catch ex As Exception
-                    System.Windows.Forms.MessageBox.Show("Error storing parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    MessageBox.Show("Error storing parameter in settings file: " & Path.GetFileName(strFilePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End Try
 
                 .SaveSettings()
             End With
         Catch ex As Exception
-            System.Windows.Forms.MessageBox.Show("Error saving settings to file: " & strFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error saving settings to file: " & strFilePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
 
 
@@ -852,11 +852,11 @@ Public Class frmMain
             Return
         End If
 
-        If Not objData.GetDataPresent(System.Windows.Forms.DataFormats.StringFormat, True) Then
+        If Not objData.GetDataPresent(DataFormats.StringFormat, True) Then
             Return
         End If
 
-        Dim strData = CType(objData.GetData(System.Windows.Forms.DataFormats.StringFormat, True), String)
+        Dim strData = CType(objData.GetData(DataFormats.StringFormat, True), String)
 
         ' Split strData on carriage return or line feed characters
         ' Lines that end in CrLf will give two separate lines; one with with the text, and one blank; that's OK
@@ -957,7 +957,7 @@ Public Class frmMain
                 strMessage = intRowsAlreadyPresent.ToString() & " rows of thresholds were"
             End If
 
-            System.Windows.Forms.MessageBox.Show(strMessage & " already present in the table; duplicate rows are not allowed.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show(strMessage & " already present in the table; duplicate rows are not allowed.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End If
 
         If intRowsSkipped > 0 Then
@@ -968,7 +968,7 @@ Public Class frmMain
                 strMessage = intRowsSkipped.ToString() & " rows were skipped because they"
             End If
 
-            System.Windows.Forms.MessageBox.Show(strMessage & " didn't contain two columns of numeric data.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show(strMessage & " didn't contain two columns of numeric data.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End If
 
     End Sub
@@ -1066,7 +1066,7 @@ Public Class frmMain
                 Application.DoEvents()
 
                 With mMasic
-                    System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+                    Cursor.Current = Cursors.WaitCursor
                     mWorking = True
                     cmdStartProcessing.Enabled = False
                     Application.DoEvents()
@@ -1076,18 +1076,18 @@ Public Class frmMain
                     strOutputFolderPath = txtOutputFolderPath.Text
                     blnSuccess = .ProcessFile(txtInputFilePath.Text, strOutputFolderPath)
 
-                    System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+                    Cursor.Current = Cursors.Default
 
                     If blnSuccess Then
                         ' Grab the status message, but insert a carriage return directly after "in folder:"
                         MessageBox.Show(.StatusMessage.Replace("in folder:", "in folder:" & ControlChars.NewLine) & ControlChars.NewLine & "Elapsed time: " & StringUtilities.DblToString(DateTime.UtcNow.Subtract(dtStartTime).TotalSeconds, 2) & " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information)
                     Else
-                        System.Windows.Forms.MessageBox.Show("Error analyzing input file with MASIC: " & ControlChars.NewLine & .GetErrorMessage() & ControlChars.NewLine & .StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                        MessageBox.Show("Error analyzing input file with MASIC: " & ControlChars.NewLine & .GetErrorMessage() & ControlChars.NewLine & .StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                     End If
                 End With
 
             Catch ex As Exception
-                System.Windows.Forms.MessageBox.Show("Error in frmMain->ProcessFileUsingMASIC: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                MessageBox.Show("Error in frmMain->ProcessFileUsingMASIC: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Finally
                 If Not mProgressForm Is Nothing Then
                     mProgressForm.HideForm()
@@ -1112,11 +1112,11 @@ Public Class frmMain
 
     Private Sub ResetToDefaults(blnConfirm As Boolean, Optional ByRef objMasic As clsMASIC = Nothing)
 
-        Dim eResponse As System.Windows.Forms.DialogResult
+        Dim eResponse As DialogResult
         Dim blnExistingMasicObjectUsed As Boolean
 
         If blnConfirm Then
-            eResponse = System.Windows.Forms.MessageBox.Show("Are you sure you want to reset all settings to their default values?", "Reset to Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+            eResponse = MessageBox.Show("Are you sure you want to reset all settings to their default values?", "Reset to Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
             If eResponse <> DialogResult.Yes Then Exit Sub
         End If
 
@@ -1137,7 +1137,7 @@ Public Class frmMain
             End If
         Catch ex As Exception
             If blnConfirm Then
-                System.Windows.Forms.MessageBox.Show("Exception occurred while validating txtOutputFolderPath.Text: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                MessageBox.Show("Exception occurred while validating txtOutputFolderPath.Text: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End If
         End Try
 
@@ -1345,7 +1345,7 @@ Public Class frmMain
 
         Catch ex As Exception
             If blnConfirm Then
-                System.Windows.Forms.MessageBox.Show("Error resetting values to defaults: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                MessageBox.Show("Error resetting values to defaults: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End If
         End Try
 
@@ -1356,7 +1356,7 @@ Public Class frmMain
     End Sub
 
     Private Sub SelectDatasetLookupFile()
-        Dim objOpenFile As New System.Windows.Forms.OpenFileDialog
+        Dim objOpenFile As New OpenFileDialog
 
         With objOpenFile
             .AddExtension = True
@@ -1392,7 +1392,7 @@ Public Class frmMain
 
     Private Sub SelectCustomSICFile()
 
-        Dim objOpenFile As New System.Windows.Forms.OpenFileDialog
+        Dim objOpenFile As New OpenFileDialog
         Dim strExtension As String
 
         With objOpenFile
@@ -1445,7 +1445,7 @@ Public Class frmMain
 
     Private Sub SelectInputFile()
 
-        Dim objOpenFile As New System.Windows.Forms.OpenFileDialog
+        Dim objOpenFile As New OpenFileDialog
         Dim strExtension As String
 
         With objOpenFile
@@ -1557,7 +1557,7 @@ Public Class frmMain
     End Sub
 
     Private Sub SetToolTips()
-        Dim objToolTipControl As New System.Windows.Forms.ToolTip
+        Dim objToolTipControl As New ToolTip
 
         With objToolTipControl
             .SetToolTip(txtDatasetNumber, "The dataset number is included as the first column in the output file.")
@@ -1587,7 +1587,7 @@ Public Class frmMain
         strMessage &= "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" & ControlChars.NewLine
         strMessage &= "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." & ControlChars.NewLine & ControlChars.NewLine
 
-        strMessage &= "This is version " & System.Windows.Forms.Application.ProductVersion & " (" & PROGRAM_DATE & "). "
+        strMessage &= "This is version " & Application.ProductVersion & " (" & PROGRAM_DATE & "). "
         strMessage &= "Using MASIC PeakFinder DLL version " & mMasic.MASICPeakFinderDllVersion & ControlChars.NewLine & ControlChars.NewLine
 
         strMessage &= "E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com" & ControlChars.NewLine
@@ -1605,16 +1605,16 @@ Public Class frmMain
         strMessage &= "SOFTWARE.  This notice including this sentence must appear on any copies of "
         strMessage &= "this computer software." & ControlChars.NewLine
 
-        System.Windows.Forms.MessageBox.Show(strMessage, "About", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        MessageBox.Show(strMessage, "About", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
     End Sub
 
     Private Sub UpdateCustomSICDataGridTableStyle()
-        Dim tsCustomSICValues As System.Windows.Forms.DataGridTableStyle
+        Dim tsCustomSICValues As DataGridTableStyle
         Dim blnTimeTolerance As Boolean
 
         ' Define the PM Thresholds table style
-        tsCustomSICValues = New System.Windows.Forms.DataGridTableStyle
+        tsCustomSICValues = New DataGridTableStyle
 
         ' Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATATABLE will cause this style to be used with that table
         With tsCustomSICValues
@@ -1945,7 +1945,7 @@ Public Class frmMain
             masicOptions.CustomSICList.SetCustomSICListValues(eScanType, sngScanOrAcqTimeTolerance, mzSearchSpecs)
 
         Catch ex As Exception
-            System.Windows.Forms.MessageBox.Show("Error applying setting to clsMASIC: " & ControlChars.NewLine & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            MessageBox.Show("Error applying setting to clsMASIC: " & ControlChars.NewLine & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
 
         Return Not blnError
@@ -1954,15 +1954,15 @@ Public Class frmMain
 
     Private Function ValidateSettings(ByRef objMasic As clsMASIC) As Boolean
 
-        Dim eResponse As System.Windows.Forms.DialogResult
+        Dim eResponse As DialogResult
 
         If objMasic.Options.ReporterIons.ReporterIonMassMode <> clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
             If objMasic.Options.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes Then
                 ' Make sure the tolerance is less than 0.03 Da; if not, warn the user
                 If objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault > 0.03 Then
-                    eResponse = System.Windows.Forms.MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be less than 0.03 m/z when using 'iTraq8 for High Res MS/MS' reporter ions.  It is currently " & objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") & " m/z.  If using a low resolution instrument, you should choose the 'iTraq 8 for Low Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+                    eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be less than 0.03 m/z when using 'iTraq8 for High Res MS/MS' reporter ions.  It is currently " & objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") & " m/z.  If using a low resolution instrument, you should choose the 'iTraq 8 for Low Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
 
-                    If eResponse <> System.Windows.Forms.DialogResult.Yes Then
+                    If eResponse <> DialogResult.Yes Then
                         Return False
                     End If
                 End If
@@ -1970,9 +1970,9 @@ Public Class frmMain
             ElseIf objMasic.Options.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes Then
                 ' Make sure the tolerance is at least 0.1 Da; if not, warn the user
                 If objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault < 0.1 Then
-                    eResponse = System.Windows.Forms.MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be at least 0.1 m/z when using 'iTraq8 for Low Res MS/MS' reporter ions.  It is currently " & objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") & " m/z. If using a high resolution instrument, you should choose the 'iTraq 8 for High Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+                    eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be at least 0.1 m/z when using 'iTraq8 for Low Res MS/MS' reporter ions.  It is currently " & objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") & " m/z. If using a high resolution instrument, you should choose the 'iTraq 8 for High Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
 
-                    If eResponse <> System.Windows.Forms.DialogResult.Yes Then
+                    If eResponse <> DialogResult.Yes Then
                         Return False
                     End If
                 End If
@@ -1987,307 +1987,307 @@ Public Class frmMain
 
 #Region "Combobox Handlers"
 
-    Private Sub cboMassSpectraNoiseThresholdMode_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cboMassSpectraNoiseThresholdMode.SelectedIndexChanged
+    Private Sub cboMassSpectraNoiseThresholdMode_SelectedIndexChanged(sender As System.Object, e As EventArgs) Handles cboMassSpectraNoiseThresholdMode.SelectedIndexChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub cboSICNoiseThresholdMode_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cboSICNoiseThresholdMode.SelectedIndexChanged
+    Private Sub cboSICNoiseThresholdMode_SelectedIndexChanged(sender As System.Object, e As EventArgs) Handles cboSICNoiseThresholdMode.SelectedIndexChanged
         EnableDisableControls()
     End Sub
 #End Region
 
 #Region "Button Handlers"
-    Private Sub cmdClearAllRangeFilters_Click(sender As System.Object, e As System.EventArgs) Handles cmdClearAllRangeFilters.Click
+    Private Sub cmdClearAllRangeFilters_Click(sender As System.Object, e As EventArgs) Handles cmdClearAllRangeFilters.Click
         ClearAllRangeFilters()
     End Sub
 
-    Private Sub cmdClearCustomSICList_Click(sender As System.Object, e As System.EventArgs) Handles cmdClearCustomSICList.Click
+    Private Sub cmdClearCustomSICList_Click(sender As System.Object, e As EventArgs) Handles cmdClearCustomSICList.Click
         ClearCustomSICList(True)
     End Sub
 
-    Private Sub cmdCustomSICValuesPopulate_Click(sender As System.Object, e As System.EventArgs) Handles cmdCustomSICValuesPopulate.Click
+    Private Sub cmdCustomSICValuesPopulate_Click(sender As System.Object, e As EventArgs) Handles cmdCustomSICValuesPopulate.Click
         AutoPopulateCustomSICValues(True)
     End Sub
 
-    Private Sub cmdPasteCustomSICList_Click(sender As System.Object, e As System.EventArgs) Handles cmdPasteCustomSICList.Click
+    Private Sub cmdPasteCustomSICList_Click(sender As System.Object, e As EventArgs) Handles cmdPasteCustomSICList.Click
         PasteCustomSICValues(False)
     End Sub
 
-    Private Sub cmdStartProcessing_Click(sender As System.Object, e As System.EventArgs) Handles cmdStartProcessing.Click
+    Private Sub cmdStartProcessing_Click(sender As System.Object, e As EventArgs) Handles cmdStartProcessing.Click
         ProcessFileUsingMASIC()
     End Sub
 
-    Private Sub cmdSelectDatasetLookupFile_Click(sender As System.Object, e As System.EventArgs) Handles cmdSelectDatasetLookupFile.Click
+    Private Sub cmdSelectDatasetLookupFile_Click(sender As System.Object, e As EventArgs) Handles cmdSelectDatasetLookupFile.Click
         SelectDatasetLookupFile()
     End Sub
 
-    Private Sub cmdSelectCustomSICFile_Click(sender As System.Object, e As System.EventArgs) Handles cmdSelectCustomSICFile.Click
+    Private Sub cmdSelectCustomSICFile_Click(sender As System.Object, e As EventArgs) Handles cmdSelectCustomSICFile.Click
         SelectCustomSICFile()
     End Sub
 
-    Private Sub cmdSelectFile_Click(sender As System.Object, e As System.EventArgs) Handles cmdSelectFile.Click
+    Private Sub cmdSelectFile_Click(sender As System.Object, e As EventArgs) Handles cmdSelectFile.Click
         SelectInputFile()
     End Sub
 
-    Private Sub cmdSelectOutputFolder_Click(sender As System.Object, e As System.EventArgs) Handles cmdSelectOutputFolder.Click
+    Private Sub cmdSelectOutputFolder_Click(sender As System.Object, e As EventArgs) Handles cmdSelectOutputFolder.Click
         SelectOutputFolder()
     End Sub
 
-    Private Sub cmdSetConnectionStringToPNNLServer_Click(sender As System.Object, e As System.EventArgs) Handles cmdSetConnectionStringToPNNLServer.Click
+    Private Sub cmdSetConnectionStringToPNNLServer_Click(sender As System.Object, e As EventArgs) Handles cmdSetConnectionStringToPNNLServer.Click
         SetConnectionStringToPNNLServer()
     End Sub
 #End Region
 
 #Region "Checkbox Events"
-    Private Sub chkExportRawDataOnly_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkExportRawDataOnly.CheckedChanged
+    Private Sub chkExportRawDataOnly_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkExportRawDataOnly.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub chkSkipMSMSProcessing_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkSkipMSMSProcessing.CheckedChanged
+    Private Sub chkSkipMSMSProcessing_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkSkipMSMSProcessing.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub chkSkipSICAndRawDataProcessing_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkSkipSICAndRawDataProcessing.CheckedChanged
+    Private Sub chkSkipSICAndRawDataProcessing_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkSkipSICAndRawDataProcessing.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub chkExportRawSpectraData_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkExportRawSpectraData.CheckedChanged
+    Private Sub chkExportRawSpectraData_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkExportRawSpectraData.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub chkExportRawDataIncludeMSMS_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkExportRawDataIncludeMSMS.CheckedChanged
+    Private Sub chkExportRawDataIncludeMSMS_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkExportRawDataIncludeMSMS.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub chkSaveExtendedStatsFile_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkSaveExtendedStatsFile.CheckedChanged
+    Private Sub chkSaveExtendedStatsFile_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkSaveExtendedStatsFile.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub chkReporterIonStatsEnabled_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkReporterIonStatsEnabled.CheckedChanged
+    Private Sub chkReporterIonStatsEnabled_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkReporterIonStatsEnabled.CheckedChanged
         AutoToggleReporterIonStatsMode()
     End Sub
 
-    Private Sub chkSaveExtendedStatsFileIncludeStatusLog_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkSaveExtendedStatsFileIncludeStatusLog.CheckedChanged
+    Private Sub chkSaveExtendedStatsFileIncludeStatusLog_CheckedChanged(sender As System.Object, e As EventArgs) Handles chkSaveExtendedStatsFileIncludeStatusLog.CheckedChanged
         EnableDisableControls()
     End Sub
 
 #End Region
 
 #Region "Radio Button Events"
-    Private Sub optUseButterworthSmooth_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUseButterworthSmooth.CheckedChanged
+    Private Sub optUseButterworthSmooth_CheckedChanged(sender As System.Object, e As EventArgs) Handles optUseButterworthSmooth.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub optUseSavitzkyGolaySmooth_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUseSavitzkyGolaySmooth.CheckedChanged
+    Private Sub optUseSavitzkyGolaySmooth_CheckedChanged(sender As System.Object, e As EventArgs) Handles optUseSavitzkyGolaySmooth.CheckedChanged
         EnableDisableControls()
     End Sub
 
-    Private Sub optCustomSICScanToleranceAbsolute_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optCustomSICScanToleranceAbsolute.CheckedChanged
+    Private Sub optCustomSICScanToleranceAbsolute_CheckedChanged(sender As System.Object, e As EventArgs) Handles optCustomSICScanToleranceAbsolute.CheckedChanged
         UpdateCustomSICDataGridTableStyle()
     End Sub
 
-    Private Sub optCustomSICScanToleranceRelative_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optCustomSICScanToleranceRelative.CheckedChanged
+    Private Sub optCustomSICScanToleranceRelative_CheckedChanged(sender As System.Object, e As EventArgs) Handles optCustomSICScanToleranceRelative.CheckedChanged
         UpdateCustomSICDataGridTableStyle()
     End Sub
 
-    Private Sub optCustomSICScanToleranceAcqTime_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optCustomSICScanToleranceAcqTime.CheckedChanged
+    Private Sub optCustomSICScanToleranceAcqTime_CheckedChanged(sender As System.Object, e As EventArgs) Handles optCustomSICScanToleranceAcqTime.CheckedChanged
         UpdateCustomSICDataGridTableStyle()
     End Sub
 #End Region
 
 #Region "Textbox Events"
-    Private Sub txtMassSpectraNoiseThresholdIntensity_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMassSpectraNoiseThresholdIntensity.KeyPress
+    Private Sub txtMassSpectraNoiseThresholdIntensity_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtMassSpectraNoiseThresholdIntensity.KeyPress
         TextBoxKeyPressHandler(txtMassSpectraNoiseThresholdIntensity, e, True, True)
     End Sub
 
-    Private Sub txtMassSpectraNoiseFractionLowIntensityDataToAverage_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMassSpectraNoiseFractionLowIntensityDataToAverage.KeyPress
+    Private Sub txtMassSpectraNoiseFractionLowIntensityDataToAverage_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtMassSpectraNoiseFractionLowIntensityDataToAverage.KeyPress
         TextBoxKeyPressHandler(txtMassSpectraNoiseFractionLowIntensityDataToAverage, e, True, True)
     End Sub
 
-    Private Sub txtBinnedDataIntensityPrecisionPct_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtBinnedDataIntensityPrecisionPct.KeyPress
+    Private Sub txtBinnedDataIntensityPrecisionPct_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtBinnedDataIntensityPrecisionPct.KeyPress
         TextBoxKeyPressHandler(txtBinnedDataIntensityPrecisionPct, e, True, True)
     End Sub
 
-    Private Sub txtBinSize_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtBinSize.KeyPress
+    Private Sub txtBinSize_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtBinSize.KeyPress
         TextBoxKeyPressHandler(txtBinSize, e, True, True)
     End Sub
 
-    Private Sub txtBinStartX_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtBinStartX.KeyPress
+    Private Sub txtBinStartX_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtBinStartX.KeyPress
         TextBoxKeyPressHandler(txtBinStartX, e, True, True)
     End Sub
 
-    Private Sub txtBinEndX_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtBinEndX.KeyPress
+    Private Sub txtBinEndX_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtBinEndX.KeyPress
         TextBoxKeyPressHandler(txtBinEndX, e, True, True)
     End Sub
 
-    Private Sub txtButterworthSamplingFrequency_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtButterworthSamplingFrequency.KeyPress
+    Private Sub txtButterworthSamplingFrequency_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtButterworthSamplingFrequency.KeyPress
         TextBoxKeyPressHandler(txtButterworthSamplingFrequency, e, True, True)
     End Sub
 
-    Private Sub txtButterworthSamplingFrequency_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles txtButterworthSamplingFrequency.Validating
+    Private Sub txtButterworthSamplingFrequency_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtButterworthSamplingFrequency.Validating
         ValidateTextboxSng(txtButterworthSamplingFrequency, 0.01, 0.99, 0.25)
     End Sub
 
-    Private Sub txtCustomSICFileDescription_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtCustomSICFileDescription.KeyDown
+    Private Sub txtCustomSICFileDescription_KeyDown(sender As Object, e As KeyEventArgs) Handles txtCustomSICFileDescription.KeyDown
         If e.KeyCode = Keys.A AndAlso e.Control = True Then
             txtCustomSICFileDescription.SelectAll()
         End If
     End Sub
 
-    Private Sub txtCustomSICFileName_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtCustomSICFileName.TextChanged
+    Private Sub txtCustomSICFileName_TextChanged(sender As System.Object, e As EventArgs) Handles txtCustomSICFileName.TextChanged
         EnableDisableCustomSICValueGrid()
     End Sub
 
-    Private Sub txtCustomSICScanOrAcqTimeTolerance_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtCustomSICScanOrAcqTimeTolerance.KeyPress
+    Private Sub txtCustomSICScanOrAcqTimeTolerance_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtCustomSICScanOrAcqTimeTolerance.KeyPress
         TextBoxKeyPressHandler(txtCustomSICScanOrAcqTimeTolerance, e, True, True)
     End Sub
 
-    Private Sub txtDatasetNumber_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtDatasetNumber.KeyPress
+    Private Sub txtDatasetNumber_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtDatasetNumber.KeyPress
         TextBoxKeyPressHandler(txtDatasetNumber, e, True, False)
     End Sub
 
-    Private Sub txtExportRawDataIntensityMinimum_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtExportRawDataIntensityMinimum.KeyPress
+    Private Sub txtExportRawDataIntensityMinimum_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtExportRawDataIntensityMinimum.KeyPress
         TextBoxKeyPressHandler(txtExportRawDataIntensityMinimum, e, True, True)
     End Sub
 
-    Private Sub txtExportRawDataMaxIonCountPerScan_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtExportRawDataMaxIonCountPerScan.KeyPress
+    Private Sub txtExportRawDataMaxIonCountPerScan_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtExportRawDataMaxIonCountPerScan.KeyPress
         TextBoxKeyPressHandler(txtExportRawDataMaxIonCountPerScan, e)
     End Sub
 
-    Private Sub txtExportRawDataSignalToNoiseRatioMinimum_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtExportRawDataSignalToNoiseRatioMinimum.KeyPress
+    Private Sub txtExportRawDataSignalToNoiseRatioMinimum_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtExportRawDataSignalToNoiseRatioMinimum.KeyPress
         TextBoxKeyPressHandler(txtExportRawDataSignalToNoiseRatioMinimum, e, True, True)
     End Sub
 
-    Private Sub txtInitialPeakWidthScansMaximum_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtInitialPeakWidthScansMaximum.KeyPress
+    Private Sub txtInitialPeakWidthScansMaximum_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtInitialPeakWidthScansMaximum.KeyPress
         TextBoxKeyPressHandler(txtInitialPeakWidthScansMaximum, e)
     End Sub
 
-    Private Sub txtInitialPeakWidthScansScaler_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtInitialPeakWidthScansScaler.KeyPress
+    Private Sub txtInitialPeakWidthScansScaler_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtInitialPeakWidthScansScaler.KeyPress
         TextBoxKeyPressHandler(txtInitialPeakWidthScansScaler, e)
     End Sub
 
-    Private Sub txtIntensityThresholdAbsoluteMinimum_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtIntensityThresholdAbsoluteMinimum.KeyPress
+    Private Sub txtIntensityThresholdAbsoluteMinimum_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtIntensityThresholdAbsoluteMinimum.KeyPress
         TextBoxKeyPressHandler(txtIntensityThresholdAbsoluteMinimum, e, True, True)
     End Sub
 
-    Private Sub txtIntensityThresholdFractionMax_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtIntensityThresholdFractionMax.KeyPress
+    Private Sub txtIntensityThresholdFractionMax_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtIntensityThresholdFractionMax.KeyPress
         TextBoxKeyPressHandler(txtIntensityThresholdFractionMax, e, True, True)
     End Sub
 
-    Private Sub txtMaxAllowedUpwardSpikeFractionMax_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMaxAllowedUpwardSpikeFractionMax.KeyPress
+    Private Sub txtMaxAllowedUpwardSpikeFractionMax_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtMaxAllowedUpwardSpikeFractionMax.KeyPress
         TextBoxKeyPressHandler(txtMaxAllowedUpwardSpikeFractionMax, e, True, True)
     End Sub
 
-    Private Sub txtMaxDistanceScansNoOverlap_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMaxDistanceScansNoOverlap.KeyPress
+    Private Sub txtMaxDistanceScansNoOverlap_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtMaxDistanceScansNoOverlap.KeyPress
         TextBoxKeyPressHandler(txtMaxDistanceScansNoOverlap, e)
     End Sub
 
-    Private Sub txtMaximumBinCount_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMaximumBinCount.KeyPress
+    Private Sub txtMaximumBinCount_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtMaximumBinCount.KeyPress
         TextBoxKeyPressHandler(txtMaximumBinCount, e)
     End Sub
 
-    Private Sub txtMaxPeakWidthMinutesBackward_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMaxPeakWidthMinutesBackward.KeyPress
+    Private Sub txtMaxPeakWidthMinutesBackward_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtMaxPeakWidthMinutesBackward.KeyPress
         TextBoxKeyPressHandler(txtMaxPeakWidthMinutesBackward, e, True, True)
     End Sub
 
-    Private Sub txtMaxPeakWidthMinutesForward_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMaxPeakWidthMinutesForward.KeyPress
+    Private Sub txtMaxPeakWidthMinutesForward_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtMaxPeakWidthMinutesForward.KeyPress
         TextBoxKeyPressHandler(txtMaxPeakWidthMinutesForward, e, True, True)
     End Sub
 
-    Private Sub txtSICNoiseThresholdIntensity_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtSICNoiseThresholdIntensity.KeyPress
+    Private Sub txtSICNoiseThresholdIntensity_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtSICNoiseThresholdIntensity.KeyPress
         TextBoxKeyPressHandler(txtSICNoiseThresholdIntensity, e, True, True)
     End Sub
 
-    Private Sub txtSICNoiseFractionLowIntensityDataToAverage_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtSICNoiseFractionLowIntensityDataToAverage.KeyPress
+    Private Sub txtSICNoiseFractionLowIntensityDataToAverage_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtSICNoiseFractionLowIntensityDataToAverage.KeyPress
         TextBoxKeyPressHandler(txtSICNoiseFractionLowIntensityDataToAverage, e, True, True)
     End Sub
 
-    Private Sub txtSavitzkyGolayFilterOrder_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtSavitzkyGolayFilterOrder.KeyPress
+    Private Sub txtSavitzkyGolayFilterOrder_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtSavitzkyGolayFilterOrder.KeyPress
         TextBoxKeyPressHandler(txtSavitzkyGolayFilterOrder, e)
     End Sub
 
-    Private Sub txtSavitzkyGolayFilterOrder_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles txtSavitzkyGolayFilterOrder.Validating
+    Private Sub txtSavitzkyGolayFilterOrder_Validating(sender As Object, e As ComponentModel.CancelEventArgs) Handles txtSavitzkyGolayFilterOrder.Validating
         ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
     End Sub
 
-    Private Sub txtSICTolerance_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtSICTolerance.KeyPress
+    Private Sub txtSICTolerance_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtSICTolerance.KeyPress
         TextBoxKeyPressHandler(txtSICTolerance, e, True, True)
     End Sub
 
-    Private Sub txtSimilarIonMZToleranceHalfWidth_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtSimilarIonMZToleranceHalfWidth.KeyPress
+    Private Sub txtSimilarIonMZToleranceHalfWidth_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtSimilarIonMZToleranceHalfWidth.KeyPress
         TextBoxKeyPressHandler(txtSimilarIonMZToleranceHalfWidth, e, True, True)
     End Sub
 
-    Private Sub txtSimilarIonToleranceHalfWidthMinutes_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtSimilarIonToleranceHalfWidthMinutes.KeyPress
+    Private Sub txtSimilarIonToleranceHalfWidthMinutes_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtSimilarIonToleranceHalfWidthMinutes.KeyPress
         TextBoxKeyPressHandler(txtSimilarIonToleranceHalfWidthMinutes, e, True, True)
     End Sub
 
-    Private Sub txtSpectrumSimilarityMinimum_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtSpectrumSimilarityMinimum.KeyPress
+    Private Sub txtSpectrumSimilarityMinimum_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtSpectrumSimilarityMinimum.KeyPress
         TextBoxKeyPressHandler(txtSpectrumSimilarityMinimum, e, True, True)
     End Sub
 
-    Private Sub txtScanEnd_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtScanEnd.KeyPress
+    Private Sub txtScanEnd_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtScanEnd.KeyPress
         TextBoxKeyPressHandler(txtScanEnd, e, True, False)
     End Sub
 
-    Private Sub txtScanStart_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtScanStart.KeyPress
+    Private Sub txtScanStart_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtScanStart.KeyPress
         TextBoxKeyPressHandler(txtScanStart, e, True, False)
     End Sub
 
-    Private Sub txtTimeEnd_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtTimeEnd.KeyPress
+    Private Sub txtTimeEnd_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtTimeEnd.KeyPress
         TextBoxKeyPressHandler(txtTimeEnd, e, True, True)
     End Sub
 
-    Private Sub txtTimeStart_KeyPress(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtTimeStart.KeyPress
+    Private Sub txtTimeStart_KeyPress(sender As System.Object, e As KeyPressEventArgs) Handles txtTimeStart.KeyPress
         TextBoxKeyPressHandler(txtTimeStart, e, True, True)
     End Sub
 #End Region
 
 #Region "Menu Handlers"
-    Private Sub mnuFileSelectInputFile_Click(sender As System.Object, e As System.EventArgs) Handles mnuFileSelectInputFile.Click
+    Private Sub mnuFileSelectInputFile_Click(sender As System.Object, e As EventArgs) Handles mnuFileSelectInputFile.Click
         SelectInputFile()
     End Sub
 
-    Private Sub mnuFileSelectOutputFolder_Click(sender As System.Object, e As System.EventArgs) Handles mnuFileSelectOutputFolder.Click
+    Private Sub mnuFileSelectOutputFolder_Click(sender As System.Object, e As EventArgs) Handles mnuFileSelectOutputFolder.Click
         SelectOutputFolder()
     End Sub
 
-    Private Sub mnuFileLoadOptions_Click(sender As System.Object, e As System.EventArgs) Handles mnuFileLoadOptions.Click
+    Private Sub mnuFileLoadOptions_Click(sender As System.Object, e As EventArgs) Handles mnuFileLoadOptions.Click
         IniFileLoadOptions(False)
     End Sub
 
-    Private Sub mnuFileSaveOptions_Click(sender As System.Object, e As System.EventArgs) Handles mnuFileSaveOptions.Click
+    Private Sub mnuFileSaveOptions_Click(sender As System.Object, e As EventArgs) Handles mnuFileSaveOptions.Click
         IniFileSaveOptions()
     End Sub
 
-    Private Sub mnuFileExit_Click(sender As System.Object, e As System.EventArgs) Handles mnuFileExit.Click
+    Private Sub mnuFileExit_Click(sender As System.Object, e As EventArgs) Handles mnuFileExit.Click
         Me.Close()
     End Sub
 
-    Private Sub mnuEditProcessFile_Click(sender As System.Object, e As System.EventArgs) Handles mnuEditProcessFile.Click
+    Private Sub mnuEditProcessFile_Click(sender As System.Object, e As EventArgs) Handles mnuEditProcessFile.Click
         ProcessFileUsingMASIC()
     End Sub
 
-    Private Sub mnuEditResetOptions_Click(sender As System.Object, e As System.EventArgs) Handles mnuEditResetOptions.Click
+    Private Sub mnuEditResetOptions_Click(sender As System.Object, e As EventArgs) Handles mnuEditResetOptions.Click
         ResetToDefaults(True)
     End Sub
 
-    Private Sub mnuEditSaveDefaultOptions_Click(sender As System.Object, e As System.EventArgs) Handles mnuEditSaveDefaultOptions.Click
+    Private Sub mnuEditSaveDefaultOptions_Click(sender As System.Object, e As EventArgs) Handles mnuEditSaveDefaultOptions.Click
         IniFileSaveDefaultOptions()
     End Sub
 
-    Private Sub mnuHelpAbout_Click(sender As System.Object, e As System.EventArgs) Handles mnuHelpAbout.Click
+    Private Sub mnuHelpAbout_Click(sender As System.Object, e As EventArgs) Handles mnuHelpAbout.Click
         ShowAboutBox()
     End Sub
 
 #End Region
 
 #Region "Form and Masic Class Events"
-    Private Sub frmMain_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
+    Private Sub frmMain_Load(sender As System.Object, e As EventArgs) Handles MyBase.Load
         ' Note that InitializeControls() is called in Sub New()
     End Sub
 
-    Private Sub frmMain_Closing(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
+    Private Sub frmMain_Closing(sender As Object, e As ComponentModel.CancelEventArgs) Handles MyBase.Closing
         IniFileSaveOptions(GetSettingsFilePath(), True)
     End Sub
 
@@ -2332,7 +2332,7 @@ Public Class frmMain
     End Sub
 #End Region
 
-    Private Sub cboReporterIonMassMode_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cboReporterIonMassMode.SelectedIndexChanged
+    Private Sub cboReporterIonMassMode_SelectedIndexChanged(sender As System.Object, e As EventArgs) Handles cboReporterIonMassMode.SelectedIndexChanged
         AutoToggleReporterIonStatsEnabled()
     End Sub
 End Class
