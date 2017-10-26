@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.8.6507; October 25, 2017
+	- Updated ThermoRawFileReader.dll that hides events with an empty event name
+	- clsProcessFilesOrFoldersBase now inherits clsEventNotifier, resulting in new event signatures
+
 Version 2.8.6492; October 10, 2017
 	- Make clsSpectraCache Disposable, replacing bug-prone use of Finalize
 	- Use additional methods in PRISM.dll
