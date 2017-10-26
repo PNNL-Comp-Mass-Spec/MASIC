@@ -901,21 +901,21 @@
             <remarks>We do not parse mass information out for Full Neutral Loss scans</remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.ExtractParentIonMZFromFilterText(System.String,System.Double@)">
-            <summary>
-            Parse out the parent ion from filterText
-            </summary>
-            <param name="filterText"></param>
-            <param name="parentIonMz">Parent ion m/z (output)</param>
-            <returns>True if success</returns>
-            <remarks>If multiple parent ion m/z values are listed then parentIonMz will have the last one.  However, if the filter text contains "Full msx" then parentIonMz will have the first parent ion listed</remarks>
-            <remarks>
-            This was created for use in other programs that only need the parent ion m/z, and no other functions from ThermoRawFileReader.
-            Other projects that use this:
-                 PHRPReader
+             <summary>
+             Parse out the parent ion from filterText
+             </summary>
+             <param name="filterText"></param>
+             <param name="parentIonMz">Parent ion m/z (output)</param>
+             <returns>True if success</returns>
+             <remarks>If multiple parent ion m/z values are listed then parentIonMz will have the last one.  However, if the filter text contains "Full msx" then parentIonMz will have the first parent ion listed</remarks>
+             <remarks>
+             This was created for use in other programs that only need the parent ion m/z, and no other functions from ThermoRawFileReader.
+             Other projects that use this:
+                  PHRPReader
             
-            To copy this, take the code from this function, plus the regex strings <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_NONMSX_REGEX"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_MSX_REGEX"/>,
-            with their uses in <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyNonMsx"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyMsx"/>
-            </remarks>
+             To copy this, take the code from this function, plus the regex strings <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_NONMSX_REGEX"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.PARENTION_ONLY_MSX_REGEX"/>,
+             with their uses in <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyNonMsx"/> and <see cref="F:ThermoRawFileReader.XRawFileIO.mFindParentIonOnlyMsx"/>
+             </remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.ExtractParentIonMZFromFilterText(System.String,System.Double@,System.Int32@,System.String@)">
             <summary>
@@ -1223,11 +1223,13 @@
             <summary>
             Scan event data
             </summary>
+            <remarks>Ignores scan events with a blank or null event name</remarks>
         </member>
         <member name="F:ThermoRawFileReader.clsScanInfo.mStatusLog">
             <summary>
             Status Log data
             </summary>
+            <remarks>Includes blank events that separate log sections</remarks>
         </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.CacheDateUTC">
             <summary>
@@ -1390,12 +1392,12 @@
             <remarks></remarks>
         </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.NumChannels">
-            <summary>
+             <summary>
             
-            </summary>
-            <value></value>
-            <returns></returns>
-            <remarks></remarks>
+             </summary>
+             <value></value>
+             <returns></returns>
+             <remarks></remarks>
         </member>
         <member name="P:ThermoRawFileReader.clsScanInfo.UniformTime">
             <summary>
@@ -1459,7 +1461,7 @@
         </member>
         <member name="M:ThermoRawFileReader.clsScanInfo.StoreScanEvents(System.String[],System.String[])">
             <summary>
-            Store this scan's scan events using a parallel string arrays
+            Store this scan's scan events using parallel string arrays
             </summary>
             <param name="eventNames"></param>
             <param name="eventValues"></param>
@@ -1467,7 +1469,7 @@
         </member>
         <member name="M:ThermoRawFileReader.clsScanInfo.StoreStatusLog(System.String[],System.String[])">
             <summary>
-            Store this scan's scan events using a parallel string arrays
+            Store this scan's log messages using parallel string arrays
             </summary>
             <param name="logNames"></param>
             <param name="logValues"></param>

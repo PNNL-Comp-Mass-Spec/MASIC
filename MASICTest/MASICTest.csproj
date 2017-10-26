@@ -54,7 +54,7 @@
       <Version>3.6.1</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>1.0.4</Version>
+      <Version>2.4.39</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
