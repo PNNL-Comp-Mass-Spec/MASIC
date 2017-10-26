@@ -772,8 +772,8 @@ Namespace DataInput
 
                         Dim extendedHeaderID = dataOutputHandler.ExtendedStatsWriter.GetExtendedHeaderInfoIdByName(statusEntry.Key)
 
-                        ' Add or update the value for intIDValue
-                        scanInfo.ExtendedHeaderInfo(extendedHeaderID) = statusEntry.Value
+                        ' Add or update the value for extendedHeaderID
+                        scanInfo.ExtendedHeaderInfo(extendedHeaderID) = statusEntry.Value.Trim()
 
                     End If
 
