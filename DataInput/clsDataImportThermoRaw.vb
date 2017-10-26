@@ -11,10 +11,14 @@ Namespace DataInput
         Private Const SCAN_EVENT_MONOISOTOPIC_MZ = "Monoisotopic M/Z"
         Private Const SCAN_EVENT_MS2_ISOLATION_WIDTH = "MS2 Isolation Width"
 
+        Private Const PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
+
         Private ReadOnly mInterferenceCalculator As InterferenceCalculator
 
         Private ReadOnly mCachedPrecursorIons As List(Of InterDetect.Peak)
         Private mCachedPrecursorScan As Integer
+
+        Private mPrecursorNotFoundCount As Integer
 
         ''' <summary>
         ''' Constructor
@@ -31,10 +35,15 @@ Namespace DataInput
             MyBase.New(masicOptions, peakFinder, parentIonProcessor, scanTracking)
 
             mInterferenceCalculator = New InterferenceCalculator()
-            RegisterEvents(mInterferenceCalculator)
+
+            AddHandler mInterferenceCalculator.StatusEvent, AddressOf OnStatusEvent
+            AddHandler mInterferenceCalculator.ErrorEvent, AddressOf OnErrorEvent
+            AddHandler mInterferenceCalculator.WarningEvent, AddressOf InterferenceWarningEventHandler
 
             mCachedPrecursorIons = New List(Of InterDetect.Peak)
             mCachedPrecursorScan = 0
+
+            mPrecursorNotFoundCount = 0
 
         End Sub
 
@@ -144,6 +153,8 @@ Namespace DataInput
             AddHandler xcaliburAccessor.ReportWarning, AddressOf mXcaliburAccessor_ReportWarning
 
             Dim strIOMode = "Xraw"
+
+            mPrecursorNotFoundCount = 0
 
             ' Assume success for now
             Dim blnSuccess = True
@@ -299,6 +310,16 @@ Namespace DataInput
                 ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
                 ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
                 ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
+
+                If mPrecursorNotFoundCount > PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
+                    Dim precursorMissingPct As Double
+                    If scanList.FragScans.Count > 0 Then
+                        precursorMissingPct = mPrecursorNotFoundCount / CDbl(scanList.FragScans.Count) * 100
+                    End If
+
+                    OnWarningEvent(String.Format("Could not determine the precursor for {0:F1}% of the MS2 spectra ({1} / {2} scans)",
+                                                 precursorMissingPct, mPrecursorNotFoundCount, scanList.FragScans.Count))
+                End If
 
             Catch ex As Exception
                 Console.WriteLine(ex.StackTrace)
@@ -742,7 +763,13 @@ Namespace DataInput
                         blnSaveItem = True
                     End If
 
+                    If String.IsNullOrWhiteSpace(statusEntry.Key) OrElse statusEntry.Key = ChrW(1) Then
+                        ' Name is null; skip it
+                        blnSaveItem = False
+                    End If
+
                     If blnSaveItem Then
+
                         Dim extendedHeaderID = dataOutputHandler.ExtendedStatsWriter.GetExtendedHeaderInfoIdByName(statusEntry.Key)
 
                         ' Add or update the value for intIDValue
@@ -799,6 +826,17 @@ Namespace DataInput
             Return ionCount
 
         End Function
+
+        Private Sub InterferenceWarningEventHandler(message As String)
+            If (message.StartsWith("Did not find the precursor for")) Then
+                mPrecursorNotFoundCount += 1
+                If mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
+                    OnWarningEvent(message)
+                End If
+            Else
+                OnWarningEvent(message)
+            End If
+        End Sub
 
         Private Sub mXcaliburAccessor_ReportError(strMessage As String)
             Console.WriteLine(strMessage)
