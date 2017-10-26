@@ -1080,7 +1080,7 @@ Public Class clsMASIC
 #End Region
 
     Public Overrides Sub AbortProcessingNow()
-        mAbortProcessing = True
+        AbortProcessing = True
         mOptions.AbortProcessing = True
     End Sub
 
@@ -1919,7 +1919,7 @@ Public Class clsMASIC
 
             dataOutputHandler.OutputFileHandles.CloseAll()
 
-            If mAbortProcessing AndAlso MyBase.ShowMessages Then
+            If AbortProcessing AndAlso MyBase.ShowMessages Then
                 MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
         End Try
@@ -2110,7 +2110,7 @@ Public Class clsMASIC
         Static LastFileWriteTime As DateTime = DateTime.UtcNow
 
         If Math.Abs(subtaskPercentComplete) < Single.Epsilon Then
-            mAbortProcessing = False
+            AbortProcessing = False
             RaiseEvent ProgressResetKeypressAbort()
             blnRaiseEvent = True
         End If
@@ -2276,9 +2276,7 @@ Public Class clsMASIC
         LogMessage(message)
     End Sub
 
-    Private Sub ErrorEventHandler(
-      message As String,
-      ex As Exception)
+    Private Sub ErrorEventHandler(message As String, ex As Exception)
         LogErrors("", message, ex)
     End Sub
 

@@ -27,25 +27,29 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
 #End Region
 
 #Region "Classwide Variables"
-    Protected mShowMessages As Boolean = True
 
     Protected mFileDate As String
-    Protected mAbortProcessing As Boolean
 
-    Protected mLogMessagesToFile As Boolean
     Protected mLogFileUsesDateStamp As Boolean = True
     Protected mLogFilePath As String
     Protected mLogFile As StreamWriter
 
     ' This variable is updated when CleanupFilePaths() is called
     Protected mOutputFolderPath As String
-    Protected mLogFolderPath As String          ' If blank, then mOutputFolderPath will be used; if mOutputFolderPath is also blank, then the log is created in the same folder as the executing assembly
+
+    Private mLastMessage As String = String.Empty
+    Private mLastReportTime As DateTime = DateTime.UtcNow
+    Private mLastErrorShown As DateTime = DateTime.MinValue
 
     Public Event ProgressReset()
     Public Event ProgressComplete()
 
     Protected mProgressStepDescription As String
-    Protected mProgressPercentComplete As Single        ' Ranges from 0 to 100, but can contain decimal percentage values
+
+    ''' <summary>
+    ''' Percent complete, value between 0 and 100, but can contain decimal percentage values
+    ''' </summary>
+    Protected mProgressPercentComplete As Single
 
     ''' <summary>
     ''' Keys in this dictionary are the log type and message (separated by an underscore), values are the most recent time the string was logged
@@ -60,13 +64,6 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
 #Region "Interface Functions"
 
     Public Property AbortProcessing As Boolean
-        Get
-            Return mAbortProcessing
-        End Get
-        Set
-            mAbortProcessing = Value
-        End Set
-    End Property
 
     Public ReadOnly Property FileVersion As String
         Get
@@ -90,23 +87,16 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
         End Set
     End Property
 
+    ''' <summary>
+    ''' Log folder path (ignored if LogFilePath is rooted)
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' If blank, mOutputFolderPath will be used; if mOutputFolderPath is also blank, the log is created in the same folder as the executing assembly
+    ''' </remarks>
     Public Property LogFolderPath As String
-        Get
-            Return mLogFolderPath
-        End Get
-        Set
-            mLogFolderPath = Value
-        End Set
-    End Property
 
     Public Property LogMessagesToFile As Boolean
-        Get
-            Return mLogMessagesToFile
-        End Get
-        Set
-            mLogMessagesToFile = Value
-        End Set
-    End Property
 
     Public Overridable ReadOnly Property ProgressStepDescription As String
         Get
@@ -114,21 +104,17 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
         End Get
     End Property
 
-    ' ProgressPercentComplete ranges from 0 to 100, but can contain decimal percentage values
+    ''' <summary>
+    ''' Percent complete, value between 0 and 100, but can contain decimal percentage values
+    ''' </summary>
+    ''' <returns></returns>
     Public ReadOnly Property ProgressPercentComplete As Single
         Get
             Return CType(Math.Round(mProgressPercentComplete, 2), Single)
         End Get
     End Property
 
-    Public Property ShowMessages As Boolean
-        Get
-            Return mShowMessages
-        End Get
-        Set
-            mShowMessages = Value
-        End Set
-    End Property
+    Public Property ShowMessages As Boolean = True
 
 #End Region
 
@@ -140,17 +126,17 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
         mProgressStepDescription = String.Empty
 
         mOutputFolderPath = String.Empty
-        mLogFolderPath = String.Empty
+        LogFolderPath = String.Empty
         mLogFilePath = String.Empty
 
-        mLogDataCache = New Dictionary(Of String, DateTime)        
+        mLogDataCache = New Dictionary(Of String, DateTime)
     End Sub
 
     Public Overridable Sub AbortProcessingNow()
-        mAbortProcessing = True
+        AbortProcessing = True
     End Sub
 
-    Protected MustOverride Sub CleanupPaths(ByRef strInputFileOrFolderPath As String, ByRef strOutputFolderPath As String)
+    Protected MustOverride Sub CleanupPaths(ByRef inputFileOrFolderPath As String, ByRef outputFolderPath As String)
 
     Public Sub CloseLogFileNow()
         If Not mLogFile Is Nothing Then
@@ -162,36 +148,35 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
         End If
     End Sub
 
-
     ''' <summary>
     ''' Verifies that the specified .XML settings file exists in the user's local settings folder
     ''' </summary>
-    ''' <param name="strApplicationName">Application name</param>
-    ''' <param name="strSettingsFileName">Settings file name</param>
+    ''' <param name="applicationName">Application name</param>
+    ''' <param name="settingsFileName">Settings file name</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Shared Function CreateSettingsFileIfMissing(strApplicationName As String, strSettingsFileName As String) As Boolean
-        Dim strSettingsFilePathLocal As String = GetSettingsFilePathLocal(strApplicationName, strSettingsFileName)
+    Public Shared Function CreateSettingsFileIfMissing(applicationName As String, settingsFileName As String) As Boolean
+        Dim settingsFilePathLocal = GetSettingsFilePathLocal(applicationName, settingsFileName)
 
-        Return CreateSettingsFileIfMissing(strSettingsFilePathLocal)
+        Return CreateSettingsFileIfMissing(settingsFilePathLocal)
 
     End Function
 
     ''' <summary>
     ''' Verifies that the specified .XML settings file exists in the user's local settings folder
     ''' </summary>
-    ''' <param name="strSettingsFilePathLocal">Full path to the local settings file, for example C:\Users\username\AppData\Roaming\AppName\SettingsFileName.xml</param>
+    ''' <param name="settingsFilePathLocal">Full path to the local settings file, for example C:\Users\username\AppData\Roaming\AppName\SettingsFileName.xml</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Shared Function CreateSettingsFileIfMissing(strSettingsFilePathLocal As String) As Boolean
+    Public Shared Function CreateSettingsFileIfMissing(settingsFilePathLocal As String) As Boolean
 
         Try
-            If Not File.Exists(strSettingsFilePathLocal) Then
+            If Not File.Exists(settingsFilePathLocal) Then
                 Dim fiMasterSettingsFile As FileInfo
-                fiMasterSettingsFile = New FileInfo(Path.Combine(GetAppFolderPath(), Path.GetFileName(strSettingsFilePathLocal)))
+                fiMasterSettingsFile = New FileInfo(Path.Combine(GetAppFolderPath(), Path.GetFileName(settingsFilePathLocal)))
 
                 If fiMasterSettingsFile.Exists Then
-                    fiMasterSettingsFile.CopyTo(strSettingsFilePathLocal)
+                    fiMasterSettingsFile.CopyTo(settingsFilePathLocal)
                 End If
             End If
 
@@ -209,21 +194,20 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
     ''' </summary>
     ''' <remarks></remarks>
     Public Shared Sub GarbageCollectNow()
-        Const intMaxWaitTimeMSec = 1000
-        GarbageCollectNow(intMaxWaitTimeMSec)
+        Const maxWaitTimeMSec = 1000
+        GarbageCollectNow(maxWaitTimeMSec)
     End Sub
 
     ''' <summary>
     ''' Perform garbage collection
     ''' </summary>
-    ''' <param name="intMaxWaitTimeMSec"></param>
+    ''' <param name="maxWaitTimeMSec"></param>
     ''' <remarks></remarks>
-    Public Shared Sub GarbageCollectNow(intMaxWaitTimeMSec As Integer)
+    Public Shared Sub GarbageCollectNow(maxWaitTimeMSec As Integer)
         Const THREAD_SLEEP_TIME_MSEC = 100
 
-        Dim intTotalThreadWaitTimeMsec As Integer
-        If intMaxWaitTimeMSec < 100 Then intMaxWaitTimeMSec = 100
-        If intMaxWaitTimeMSec > 5000 Then intMaxWaitTimeMSec = 5000
+        If maxWaitTimeMSec < 100 Then maxWaitTimeMSec = 100
+        If maxWaitTimeMSec > 5000 Then maxWaitTimeMSec = 5000
 
         Thread.Sleep(100)
 
@@ -231,10 +215,10 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
             Dim gcThread As New Thread(AddressOf GarbageCollectWaitForGC)
             gcThread.Start()
 
-            intTotalThreadWaitTimeMsec = 0
-            While gcThread.IsAlive AndAlso intTotalThreadWaitTimeMsec < intMaxWaitTimeMSec
+            Dim totalThreadWaitTimeMsec = 0
+            While gcThread.IsAlive AndAlso totalThreadWaitTimeMsec < maxWaitTimeMSec
                 Thread.Sleep(THREAD_SLEEP_TIME_MSEC)
-                intTotalThreadWaitTimeMsec += THREAD_SLEEP_TIME_MSEC
+                totalThreadWaitTimeMsec += THREAD_SLEEP_TIME_MSEC
             End While
             If gcThread.IsAlive Then gcThread.Abort()
 
@@ -244,40 +228,35 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
 
     End Sub
 
-    Protected Shared Sub GarbageCollectWaitForGC()
-        Try
-            GC.Collect()
-            GC.WaitForPendingFinalizers()
-        Catch
-            ' Ignore errors here
-        End Try
+    Private Shared Sub GarbageCollectWaitForGC()
+        clsProgRunner.GarbageCollectNow()
     End Sub
 
     ''' <summary>
     ''' Returns the full path to the folder into which this application should read/write settings file information
     ''' </summary>
-    ''' <param name="strAppName"></param>
+    ''' <param name="appName"></param>
     ''' <returns></returns>
     ''' <remarks>For example, C:\Users\username\AppData\Roaming\AppName</remarks>
-    Public Shared Function GetAppDataFolderPath(strAppName As String) As String
-        Dim strAppDataFolder As String
+    Public Shared Function GetAppDataFolderPath(appName As String) As String
+        Dim appDataFolder As String
 
-        If String.IsNullOrWhiteSpace(strAppName) Then
-            strAppName = String.Empty
+        If String.IsNullOrWhiteSpace(appName) Then
+            appName = String.Empty
         End If
 
         Try
-            strAppDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), strAppName)
-            If Not Directory.Exists(strAppDataFolder) Then
-                Directory.CreateDirectory(strAppDataFolder)
+            appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName)
+            If Not Directory.Exists(appDataFolder) Then
+                Directory.CreateDirectory(appDataFolder)
             End If
 
         Catch ex As Exception
             ' Error creating the folder, revert to using the system Temp folder
-            strAppDataFolder = Path.GetTempPath()
+            appDataFolder = Path.GetTempPath()
         End Try
 
-        Return strAppDataFolder
+        Return appDataFolder
 
     End Function
 
@@ -303,51 +282,51 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
     ''' <summary>
     ''' Returns the .NET assembly version followed by the program date
     ''' </summary>
-    ''' <param name="strProgramDate"></param>
+    ''' <param name="programDate"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Shared Function GetAppVersion(strProgramDate As String) As String
-        Return Assembly.GetExecutingAssembly().GetName().Version.ToString() & " (" & strProgramDate & ")"
+    Public Shared Function GetAppVersion(programDate As String) As String
+        Return Assembly.GetExecutingAssembly().GetName().Version.ToString() & " (" & programDate & ")"
     End Function
 
     Public MustOverride Function GetErrorMessage() As String
 
     Private Function GetVersionForExecutingAssembly() As String
 
-        Dim strVersion As String
+        Dim version As String
 
         Try
-            strVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString()
+            version = Assembly.GetExecutingAssembly().GetName().Version.ToString()
         Catch ex As Exception
-            strVersion = "??.??.??.??"
+            version = "??.??.??.??"
         End Try
 
-        Return strVersion
+        Return version
 
     End Function
 
     ''' <summary>
     ''' Returns the full path to this application's local settings file
     ''' </summary>
-    ''' <param name="strApplicationName"></param>
-    ''' <param name="strSettingsFileName"></param>
+    ''' <param name="applicationName"></param>
+    ''' <param name="settingsFileName"></param>
     ''' <returns></returns>
     ''' <remarks>For example, C:\Users\username\AppData\Roaming\AppName\SettingsFileName.xml</remarks>
-    Public Shared Function GetSettingsFilePathLocal(strApplicationName As String, strSettingsFileName As String) As String
-        Return Path.Combine(GetAppDataFolderPath(strApplicationName), strSettingsFileName)
+    Public Shared Function GetSettingsFilePathLocal(applicationName As String, settingsFileName As String) As String
+        Return Path.Combine(GetAppDataFolderPath(applicationName), settingsFileName)
     End Function
 
-    Protected Sub HandleException(strBaseMessage As String, ex As Exception)
-        If String.IsNullOrWhiteSpace(strBaseMessage) Then
-            strBaseMessage = "Error"
+    Protected Sub HandleException(baseMessage As String, ex As Exception)
+        If String.IsNullOrWhiteSpace(baseMessage) Then
+            baseMessage = "Error"
         End If
 
         If ShowMessages Then
             ' Note that ShowErrorMessage() will call LogMessage()
-            ShowErrorMessage(strBaseMessage & ": " & ex.Message, True)
+            ShowErrorMessage(baseMessage & ": " & ex.Message)
         Else
-            LogMessage(strBaseMessage & ": " & ex.Message, eMessageTypeConstants.ErrorMsg)
-            Throw New Exception(strBaseMessage, ex)
+            LogMessage(baseMessage & ": " & ex.Message, eMessageTypeConstants.ErrorMsg)
+            Throw New Exception(baseMessage, ex)
         End If
 
     End Sub
@@ -538,17 +517,17 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
             ' Sort by date
             lstDates.Sort()
 
-            Dim intThresholdIndex = CInt(Math.Floor(mLogDataCache.Count - MAX_LOGDATA_CACHE_SIZE * 0.8))
-            If intThresholdIndex < 0 Then intThresholdIndex = 0
+            Dim thresholdIndex = CInt(Math.Floor(mLogDataCache.Count - MAX_LOGDATA_CACHE_SIZE * 0.8))
+            If thresholdIndex < 0 Then thresholdIndex = 0
 
-            Dim dtThreshold = lstDates(intThresholdIndex)
+            Dim threshold = lstDates(thresholdIndex)
 
             ' Construct a list of keys to be removed
-            Dim lstKeys As List(Of String) = (From entry In mLogDataCache Where entry.Value <= dtThreshold Select entry.Key).ToList()
+            Dim lstKeys As List(Of String) = (From entry In mLogDataCache Where entry.Value <= threshold Select entry.Key).ToList()
 
             ' Remove each of the keys
-            For Each strKey In lstKeys
-                mLogDataCache.Remove(strKey)
+            For Each key In lstKeys
+                mLogDataCache.Remove(key)
             Next
 
         Catch ex As Exception
@@ -556,40 +535,45 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
         End Try
     End Sub
 
-
-    Private Sub UpdateLogDataCache(strLogFilePath As String, dtDateThresholdToStore As DateTime)
-        Static dtLastErrorShown As DateTime = DateTime.UtcNow.AddSeconds(-60)
+    Private Sub UpdateLogDataCache(dateThresholdToStore As DateTime)
 
         Dim reParseLine = New Regex("^([^\t]+)\t([^\t]+)\t(.+)", RegexOptions.Compiled)
 
         Try
             mLogDataCache.Clear()
 
-            Using srLogFile = New StreamReader(New FileStream(strLogFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            Using srLogFile = New StreamReader(New FileStream(LogFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 While Not srLogFile.EndOfStream
-                    Dim strLineIn = srLogFile.ReadLine()
-                    Dim reMatch = reParseLine.Match(strLineIn)
+                    Dim lineIn = srLogFile.ReadLine()
+                    If String.IsNullOrEmpty(lineIn) Then
+                        Continue While
+                    End If
 
-                    If reMatch.Success Then
-                        Dim dtLogTime As DateTime
-                        If DateTime.TryParse(reMatch.Groups(1).Value, dtLogTime) Then
-                            dtLogTime = dtLogTime.ToUniversalTime()
-                            If dtLogTime >= dtDateThresholdToStore Then
-                                Dim strKey As String = reMatch.Groups(2).Value & "_" & reMatch.Groups(3).Value
+                    Dim reMatch = reParseLine.Match(lineIn)
 
-                                Try
-                                    If mLogDataCache.ContainsKey(strKey) Then
-                                        mLogDataCache(strKey) = dtLogTime
-                                    Else
-                                        mLogDataCache.Add(strKey, dtLogTime)
-                                    End If
-                                Catch ex As Exception
-                                    ' Ignore errors here
-                                End Try
+                    If Not reMatch.Success Then
+                        Continue While
+                    End If
 
-                            End If
+                    Dim logTime As DateTime
+                    If DateTime.TryParse(reMatch.Groups(1).Value, logTime) Then
+                        logTime = logTime.ToUniversalTime()
+                        If logTime >= dateThresholdToStore Then
+                            Dim key As String = reMatch.Groups(2).Value & "_" & reMatch.Groups(3).Value
+
+                            Try
+                                If mLogDataCache.ContainsKey(key) Then
+                                    mLogDataCache(key) = logTime
+                                Else
+                                    mLogDataCache.Add(key, logTime)
+                                End If
+                            Catch ex As Exception
+                                ' Ignore errors here
+                            End Try
+
                         End If
                     End If
+
                 End While
             End Using
 
@@ -598,8 +582,8 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
             End If
 
         Catch ex As Exception
-            If DateTime.UtcNow.Subtract(dtLastErrorShown).TotalSeconds > 10 Then
-                dtLastErrorShown = DateTime.UtcNow
+            If DateTime.UtcNow.Subtract(mLastErrorShown).TotalSeconds > 10 Then
+                mLastErrorShown = DateTime.UtcNow
                 Console.WriteLine("Error caching the log file: " & ex.Message)
             End If
 
@@ -607,18 +591,18 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
 
     End Sub
 
-    Protected Sub UpdateProgress(strProgressStepDescription As String)
-        UpdateProgress(strProgressStepDescription, mProgressPercentComplete)
+    Protected Sub UpdateProgress(description As String)
+        UpdateProgress(description, mProgressPercentComplete)
     End Sub
 
     Protected Sub UpdateProgress(sngPercentComplete As Single)
         UpdateProgress(ProgressStepDescription, sngPercentComplete)
     End Sub
 
-    Protected Sub UpdateProgress(strProgressStepDescription As String, sngPercentComplete As Single)
-        Dim blnDescriptionChanged = Not String.Equals(strProgressStepDescription, mProgressStepDescription)
+    Protected Sub UpdateProgress(description As String, sngPercentComplete As Single)
+        Dim descriptionChanged = Not String.Equals(description, mProgressStepDescription)
 
-        mProgressStepDescription = String.Copy(strProgressStepDescription)
+        mProgressStepDescription = String.Copy(description)
         If sngPercentComplete < 0 Then
             sngPercentComplete = 0
         ElseIf sngPercentComplete > 100 Then
@@ -626,7 +610,7 @@ Public MustInherit Class clsProcessFilesOrFoldersBase
         End If
         mProgressPercentComplete = sngPercentComplete
 
-        If blnDescriptionChanged Then
+        If descriptionChanged Then
             If mProgressPercentComplete < Single.Epsilon Then
                 LogMessage(mProgressStepDescription.Replace(Environment.NewLine, "; "))
             Else

@@ -21,8 +21,8 @@ Public MustInherit Class clsProcessFilesBaseClass
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub New()
-        mFileDate = "October 17, 2013"
-        mErrorCode = eProcessFilesErrorCodes.NoError
+        mFileDate = "October 25, 2017"
+        ErrorCode = eProcessFilesErrorCodes.NoError
     End Sub
 
 #Region "Constants and Enums"
@@ -53,10 +53,6 @@ Public MustInherit Class clsProcessFilesBaseClass
     ''    End Get
     ''End Property
 
-    Private mErrorCode As eProcessFilesErrorCodes
-
-    Protected mIgnoreErrorsWhenUsingWildcardMatching As Boolean
-
 
 #End Region
 
@@ -69,94 +65,80 @@ Public MustInherit Class clsProcessFilesBaseClass
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property IgnoreErrorsWhenUsingWildcardMatching As Boolean
-        Get
-            Return mIgnoreErrorsWhenUsingWildcardMatching
-        End Get
-        Set
-            mIgnoreErrorsWhenUsingWildcardMatching = Value
-        End Set
-    End Property
 
-    Public ReadOnly Property ErrorCode As eProcessFilesErrorCodes
-        Get
-            Return mErrorCode
-        End Get
-    End Property
+    ''' <summary>
+    ''' Error code reflecting processing outcome
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ErrorCode As eProcessFilesErrorCodes
 
 #End Region
 
-    Protected Overrides Sub CleanupPaths(ByRef strInputFileOrFolderPath As String, ByRef strOutputFolderPath As String)
-        CleanupFilePaths(strInputFileOrFolderPath, strOutputFolderPath)
+    Protected Overrides Sub CleanupPaths(ByRef inputFileOrFolderPath As String, ByRef outputFolderPath As String)
+        CleanupFilePaths(inputFileOrFolderPath, outputFolderPath)
     End Sub
 
-    Protected Function CleanupFilePaths(ByRef strInputFilePath As String, ByRef strOutputFolderPath As String) As Boolean
+    Protected Function CleanupFilePaths(ByRef inputFilePath As String, ByRef outputFolderPath As String) As Boolean
         ' Returns True if success, False if failure
 
-        Dim ioFileInfo As FileInfo
-        Dim ioFolder As DirectoryInfo
-        Dim blnSuccess As Boolean
-
         Try
-            ' Make sure strInputFilePath points to a valid file
-            ioFileInfo = New FileInfo(strInputFilePath)
+            ' Make sure inputFilePath points to a valid file
+            Dim ioFileInfo = New FileInfo(inputFilePath)
 
             If Not ioFileInfo.Exists Then
                 If ShowMessages Then
-                    ShowErrorMessage("Input file not found: " & strInputFilePath)
+                    ShowErrorMessage("Input file not found: " & inputFilePath)
                 Else
-                    LogMessage("Input file not found: " & strInputFilePath, eMessageTypeConstants.ErrorMsg)
+                    LogMessage("Input file not found: " & inputFilePath, eMessageTypeConstants.ErrorMsg)
                 End If
 
-                mErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
-                blnSuccess = False
-            Else
-                If String.IsNullOrWhiteSpace(strOutputFolderPath) Then
-                    ' Define strOutputFolderPath based on strInputFilePath
-                    strOutputFolderPath = ioFileInfo.DirectoryName
-                End If
-
-                ' Make sure strOutputFolderPath points to a folder
-                ioFolder = New DirectoryInfo(strOutputFolderPath)
-
-                If Not ioFolder.Exists() Then
-                    ' strOutputFolderPath points to a non-existent folder; attempt to create it
-                    ioFolder.Create()
-                End If
-
-                mOutputFolderPath = String.Copy(ioFolder.FullName)
-
-                blnSuccess = True
+                ErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
+                Return False
             End If
+
+            If String.IsNullOrWhiteSpace(outputFolderPath) Then
+                ' Define outputFolderPath based on inputFilePath
+                outputFolderPath = ioFileInfo.DirectoryName
+            End If
+
+            ' Make sure outputFolderPath points to a folder
+            Dim outputFolder = New DirectoryInfo(outputFolderPath)
+
+            If Not outputFolder.Exists() Then
+                ' outputFolderPath points to a non-existent folder; attempt to create it
+                outputFolder.Create()
+            End If
+
+            mOutputFolderPath = String.Copy(outputFolder.FullName)
+
+            Return True
+
 
         Catch ex As Exception
             HandleException("Error cleaning up the file paths", ex)
             Return False
         End Try
 
-        Return blnSuccess
     End Function
 
-    Protected Function CleanupInputFilePath(ByRef strInputFilePath As String) As Boolean
+    Protected Function CleanupInputFilePath(ByRef inputFilePath As String) As Boolean
         ' Returns True if success, False if failure
 
-        Dim ioFileInfo As FileInfo
-        Dim blnSuccess As Boolean
-
         Try
-            ' Make sure strInputFilePath points to a valid file
-            ioFileInfo = New FileInfo(strInputFilePath)
+            ' Make sure inputFilePath points to a valid file
+            Dim inputFile = New FileInfo(inputFilePath)
 
-            If Not ioFileInfo.Exists Then
+            If Not inputFile.Exists Then
                 If ShowMessages Then
-                    ShowErrorMessage("Input file not found: " & strInputFilePath)
+                    ShowErrorMessage("Input file not found: " & inputFilePath)
                 Else
-                    LogMessage("Input file not found: " & strInputFilePath, eMessageTypeConstants.ErrorMsg)
+                    LogMessage("Input file not found: " & inputFilePath, eMessageTypeConstants.ErrorMsg)
                 End If
 
-                mErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
-                blnSuccess = False
+                ErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
+                Return False
             Else
-                blnSuccess = True
+                Return True
             End If
 
         Catch ex As Exception
@@ -164,126 +146,117 @@ Public MustInherit Class clsProcessFilesBaseClass
             Return False
         End Try
 
-        Return blnSuccess
     End Function
 
     Protected Function GetBaseClassErrorMessage() As String
         ' Returns String.Empty if no error
 
-        Dim strErrorMessage As String
+        Dim errorMessage As String
 
         Select Case ErrorCode
             Case eProcessFilesErrorCodes.NoError
-                strErrorMessage = String.Empty
+                errorMessage = String.Empty
             Case eProcessFilesErrorCodes.InvalidInputFilePath
-                strErrorMessage = "Invalid input file path"
+                errorMessage = "Invalid input file path"
             Case eProcessFilesErrorCodes.InvalidOutputFolderPath
-                strErrorMessage = "Invalid output folder path"
+                errorMessage = "Invalid output folder path"
             Case eProcessFilesErrorCodes.ParameterFileNotFound
-                strErrorMessage = "Parameter file not found"
+                errorMessage = "Parameter file not found"
             Case eProcessFilesErrorCodes.InvalidParameterFile
-                strErrorMessage = "Invalid parameter file"
+                errorMessage = "Invalid parameter file"
             Case eProcessFilesErrorCodes.FilePathError
-                strErrorMessage = "General file path error"
+                errorMessage = "General file path error"
             Case eProcessFilesErrorCodes.LocalizedError
-                strErrorMessage = "Localized error"
+                errorMessage = "Localized error"
             Case eProcessFilesErrorCodes.UnspecifiedError
-                strErrorMessage = "Unspecified error"
+                errorMessage = "Unspecified error"
             Case Else
                 ' This shouldn't happen
-                strErrorMessage = "Unknown error state"
+                errorMessage = "Unknown error state"
         End Select
 
-        Return strErrorMessage
+        Return errorMessage
 
     End Function
 
     Public Overridable Function GetDefaultExtensionsToParse() As String()
-        Dim strExtensionsToParse(0) As String
+        Dim extensionsToParse(0) As String
 
-        strExtensionsToParse(0) = ".*"
+        extensionsToParse(0) = ".*"
 
-        Return strExtensionsToParse
+        Return extensionsToParse
 
     End Function
 
-    Public Function ProcessFilesWildcard(strInputFolderPath As String) As Boolean
-        Return ProcessFilesWildcard(strInputFolderPath, String.Empty, String.Empty)
+    Public Function ProcessFilesWildcard(inputFolderPath As String) As Boolean
+        Return ProcessFilesWildcard(inputFolderPath, String.Empty, String.Empty)
     End Function
 
-    Public Function ProcessFilesWildcard(strInputFilePath As String, strOutputFolderPath As String) As Boolean
-        Return ProcessFilesWildcard(strInputFilePath, strOutputFolderPath, String.Empty)
+    Public Function ProcessFilesWildcard(inputFilePath As String, outputFolderPath As String) As Boolean
+        Return ProcessFilesWildcard(inputFilePath, outputFolderPath, String.Empty)
     End Function
 
-    Public Function ProcessFilesWildcard(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String) As Boolean
-        Return ProcessFilesWildcard(strInputFilePath, strOutputFolderPath, parameterFilePath, True)
+    Public Function ProcessFilesWildcard(inputFilePath As String, outputFolderPath As String, parameterFilePath As String) As Boolean
+        Return ProcessFilesWildcard(inputFilePath, outputFolderPath, parameterFilePath, True)
     End Function
 
-    Public Function ProcessFilesWildcard(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String, blnResetErrorCode As Boolean) As Boolean
+    Public Function ProcessFilesWildcard(inputFilePath As String, outputFolderPath As String, parameterFilePath As String, resetErrorCode As Boolean) As Boolean
         ' Returns True if success, False if failure
 
-        Dim blnSuccess As Boolean
-        Dim intMatchCount As Integer
-
-        Dim strCleanPath As String
-        Dim strInputFolderPath As String
-
-        Dim ioFileInfo As FileInfo
-        Dim ioFolderInfo As DirectoryInfo
-
-        mAbortProcessing = False
-        blnSuccess = True
+        AbortProcessing = False
+        Dim success = True
         Try
             ' Possibly reset the error code
-            If blnResetErrorCode Then mErrorCode = eProcessFilesErrorCodes.NoError
+            If resetErrorCode Then ErrorCode = eProcessFilesErrorCodes.NoError
 
-            If Not String.IsNullOrWhiteSpace(strOutputFolderPath) Then
+            If Not String.IsNullOrWhiteSpace(outputFolderPath) Then
                 ' Update the cached output folder path
-                mOutputFolderPath = String.Copy(strOutputFolderPath)
+                mOutputFolderPath = String.Copy(outputFolderPath)
             End If
 
-            ' See if strInputFilePath contains a wildcard (* or ?)
-            If Not strInputFilePath Is Nothing AndAlso (strInputFilePath.Contains("*") Or strInputFilePath.Contains("?")) Then
+            ' See if inputFilePath contains a wildcard (* or ?)
+            If Not inputFilePath Is Nothing AndAlso (inputFilePath.Contains("*") Or inputFilePath.Contains("?")) Then
                 ' Obtain a list of the matching  files
 
-                ' Copy the path into strCleanPath and replace any * or ? characters with _
-                strCleanPath = strInputFilePath.Replace("*", "_")
-                strCleanPath = strCleanPath.Replace("?", "_")
+                ' Copy the path into cleanPath and replace any * or ? characters with _
+                Dim cleanPath = inputFilePath.Replace("*", "_")
+                cleanPath = cleanPath.Replace("?", "_")
 
-                ioFileInfo = New FileInfo(strCleanPath)
+                Dim ioFileInfo = New FileInfo(cleanPath)
+                Dim inputFolderPath As String
                 If ioFileInfo.Directory.Exists Then
-                    strInputFolderPath = ioFileInfo.DirectoryName
+                    inputFolderPath = ioFileInfo.DirectoryName
                 Else
                     ' Use the directory that has the .exe file
-                    strInputFolderPath = GetAppFolderPath()
+                    inputFolderPath = GetAppFolderPath()
                 End If
 
-                ioFolderInfo = New DirectoryInfo(strInputFolderPath)
+                Dim ioFolderInfo = New DirectoryInfo(inputFolderPath)
 
-                ' Remove any directory information from strInputFilePath
-                strInputFilePath = Path.GetFileName(strInputFilePath)
+                ' Remove any directory information from inputFilePath
+                inputFilePath = Path.GetFileName(inputFilePath)
 
-                intMatchCount = 0
-                For Each ioFileMatch As FileInfo In ioFolderInfo.GetFiles(strInputFilePath)
-                    intMatchCount += 1
+                Dim matchCount = 0
+                For Each ioFileMatch As FileInfo In ioFolderInfo.GetFiles(inputFilePath)
+                    matchCount += 1
 
-                    blnSuccess = ProcessFile(ioFileMatch.FullName, strOutputFolderPath, parameterFilePath, blnResetErrorCode)
+                    success = ProcessFile(ioFileMatch.FullName, outputFolderPath, parameterFilePath, resetErrorCode)
 
-                    If mAbortProcessing Then
+                    If AbortProcessing Then
                         Exit For
-                    ElseIf Not blnSuccess AndAlso Not mIgnoreErrorsWhenUsingWildcardMatching Then
+                    ElseIf Not success AndAlso Not IgnoreErrorsWhenUsingWildcardMatching Then
                         Exit For
                     End If
-                    If intMatchCount Mod 100 = 0 Then Console.Write(".")
+                    If matchCount Mod 100 = 0 Then Console.Write(".")
 
                 Next ioFileMatch
 
-                If intMatchCount = 0 Then
-                    If mErrorCode = eProcessFilesErrorCodes.NoError Then
+                If matchCount = 0 Then
+                    If ErrorCode = eProcessFilesErrorCodes.NoError Then
                         If ShowMessages Then
-                            ShowErrorMessage("No match was found for the input file path: " & strInputFilePath)
+                            ShowErrorMessage("No match was found for the input file path: " & inputFilePath)
                         Else
-                            LogMessage("No match was found for the input file path: " & strInputFilePath, eMessageTypeConstants.ErrorMsg)
+                            LogMessage("No match was found for the input file path: " & inputFilePath, eMessageTypeConstants.ErrorMsg)
                         End If
                     End If
                 Else
@@ -291,7 +264,7 @@ Public MustInherit Class clsProcessFilesBaseClass
                 End If
 
             Else
-                blnSuccess = ProcessFile(strInputFilePath, strOutputFolderPath, parameterFilePath, blnResetErrorCode)
+                success = ProcessFile(inputFilePath, outputFolderPath, parameterFilePath, resetErrorCode)
             End If
 
         Catch ex As Exception
@@ -299,268 +272,264 @@ Public MustInherit Class clsProcessFilesBaseClass
             Return False
         End Try
 
-        Return blnSuccess
+        Return success
 
     End Function
 
-    Public Function ProcessFile(strInputFilePath As String) As Boolean
-        Return ProcessFile(strInputFilePath, String.Empty, String.Empty)
+    Public Function ProcessFile(inputFilePath As String) As Boolean
+        Return ProcessFile(inputFilePath, String.Empty, String.Empty)
     End Function
 
-    Public Function ProcessFile(strInputFilePath As String, strOutputFolderPath As String) As Boolean
-        Return ProcessFile(strInputFilePath, strOutputFolderPath, String.Empty)
+    Public Function ProcessFile(inputFilePath As String, outputFolderPath As String) As Boolean
+        Return ProcessFile(inputFilePath, outputFolderPath, String.Empty)
     End Function
 
-    Public Function ProcessFile(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String) As Boolean
-        Return ProcessFile(strInputFilePath, strOutputFolderPath, parameterFilePath, True)
+    Public Function ProcessFile(inputFilePath As String, outputFolderPath As String, parameterFilePath As String) As Boolean
+        Return ProcessFile(inputFilePath, outputFolderPath, parameterFilePath, True)
     End Function
 
     ' Main function for processing a single file
-    Public MustOverride Function ProcessFile(strInputFilePath As String, strOutputFolderPath As String, parameterFilePath As String, blnResetErrorCode As Boolean) As Boolean
+    Public MustOverride Function ProcessFile(inputFilePath As String, outputFolderPath As String, parameterFilePath As String, resetErrorCode As Boolean) As Boolean
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFolderPath As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFolderPath, String.Empty, String.Empty)
+    Public Function ProcessFilesAndRecurseFolders(inputFolderPath As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(inputFolderPath, String.Empty, String.Empty)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty)
+    Public Function ProcessFilesAndRecurseFolders(inputFilePathOrFolder As String, outputFolderName As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(inputFilePathOrFolder, outputFolderName, String.Empty)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, parameterFilePath As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty, False, parameterFilePath)
+    Public Function ProcessFilesAndRecurseFolders(inputFilePathOrFolder As String, outputFolderName As String, parameterFilePath As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(inputFilePathOrFolder, outputFolderName, String.Empty, False, parameterFilePath)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, parameterFilePath As String, strExtensionsToParse() As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, String.Empty, False, parameterFilePath, 0, strExtensionsToParse)
+    Public Function ProcessFilesAndRecurseFolders(inputFilePathOrFolder As String, outputFolderName As String, parameterFilePath As String, extensionsToParse() As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(inputFilePathOrFolder, outputFolderName, String.Empty, False, parameterFilePath, 0, extensionsToParse)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, String.Empty)
+    Public Function ProcessFilesAndRecurseFolders(inputFilePathOrFolder As String, outputFolderName As String, outputFolderAlternatePath As String, recreateFolderHierarchyInAlternatePath As Boolean) As Boolean
+        Return ProcessFilesAndRecurseFolders(inputFilePathOrFolder, outputFolderName, outputFolderAlternatePath, recreateFolderHierarchyInAlternatePath, String.Empty)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, parameterFilePath, 0)
+    Public Function ProcessFilesAndRecurseFolders(inputFilePathOrFolder As String, outputFolderName As String, outputFolderAlternatePath As String, recreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String) As Boolean
+        Return ProcessFilesAndRecurseFolders(inputFilePathOrFolder, outputFolderName, outputFolderAlternatePath, recreateFolderHierarchyInAlternatePath, parameterFilePath, 0)
     End Function
 
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String, intRecurseFoldersMaxLevels As Integer) As Boolean
-        Return ProcessFilesAndRecurseFolders(strInputFilePathOrFolder, strOutputFolderName, strOutputFolderAlternatePath, blnRecreateFolderHierarchyInAlternatePath, parameterFilePath, intRecurseFoldersMaxLevels, GetDefaultExtensionsToParse())
+    Public Function ProcessFilesAndRecurseFolders(inputFilePathOrFolder As String, outputFolderName As String, outputFolderAlternatePath As String, recreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String, recurseFoldersMaxLevels As Integer) As Boolean
+        Return ProcessFilesAndRecurseFolders(inputFilePathOrFolder, outputFolderName, outputFolderAlternatePath, recreateFolderHierarchyInAlternatePath, parameterFilePath, recurseFoldersMaxLevels, GetDefaultExtensionsToParse())
     End Function
 
     ' Main function for processing files in a folder (and subfolders)
-    Public Function ProcessFilesAndRecurseFolders(strInputFilePathOrFolder As String, strOutputFolderName As String, strOutputFolderAlternatePath As String, blnRecreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String, intRecurseFoldersMaxLevels As Integer, strExtensionsToParse() As String) As Boolean
-        ' Calls ProcessFiles for all files in strInputFilePathOrFolder and below having an extension listed in strExtensionsToParse()
+    Public Function ProcessFilesAndRecurseFolders(inputFilePathOrFolder As String, outputFolderName As String, outputFolderAlternatePath As String, recreateFolderHierarchyInAlternatePath As Boolean, parameterFilePath As String, recurseFoldersMaxLevels As Integer, extensionsToParse() As String) As Boolean
+        ' Calls ProcessFiles for all files in inputFilePathOrFolder and below having an extension listed in extensionsToParse()
         ' The extensions should be of the form ".TXT" or ".RAW" (i.e. a period then the extension)
         ' If any of the extensions is "*" or ".*" then all files will be processed
-        ' If strInputFilePathOrFolder contains a filename with a wildcard (* or ?), then that information will be 
+        ' If inputFilePathOrFolder contains a filename with a wildcard (* or ?), then that information will be
         '  used to filter the files that are processed
-        ' If intRecurseFoldersMaxLevels is <=0 then we recurse infinitely
+        ' If recurseFoldersMaxLevels is <=0 then we recurse infinitely
 
-        Dim strCleanPath As String
-        Dim strInputFolderPath As String
-
-        Dim ioFileInfo As FileInfo
-        Dim ioFolderInfo As DirectoryInfo
-
-        Dim blnSuccess As Boolean
-        Dim intFileProcessCount, intFileProcessFailCount As Integer
-
-        ' Examine strInputFilePathOrFolder to see if it contains a filename; if not, assume it points to a folder
+        ' Examine inputFilePathOrFolder to see if it contains a filename; if not, assume it points to a folder
         ' First, see if it contains a * or ?
         Try
-            If Not strInputFilePathOrFolder Is Nothing AndAlso (strInputFilePathOrFolder.Contains("*") Or strInputFilePathOrFolder.Contains("?")) Then
-                ' Copy the path into strCleanPath and replace any * or ? characters with _
-                strCleanPath = strInputFilePathOrFolder.Replace("*", "_")
-                strCleanPath = strCleanPath.Replace("?", "_")
+            Dim inputFolderPath As String
 
-                ioFileInfo = New FileInfo(strCleanPath)
+            If String.IsNullOrWhiteSpace(inputFilePathOrFolder) Then
+                inputFolderPath = String.Empty
+            ElseIf inputFilePathOrFolder.Contains("*") OrElse inputFilePathOrFolder.Contains("?") Then
+                ' Copy the path into cleanPath and replace any * or ? characters with _
+                Dim cleanPath = inputFilePathOrFolder.Replace("*", "_")
+                cleanPath = cleanPath.Replace("?", "_")
+
+                Dim ioFileInfo = New FileInfo(cleanPath)
                 If ioFileInfo.Directory.Exists Then
-                    strInputFolderPath = ioFileInfo.DirectoryName
+                    inputFolderPath = ioFileInfo.DirectoryName
                 Else
                     ' Use the directory that has the .exe file
-                    strInputFolderPath = GetAppFolderPath()
+                    inputFolderPath = GetAppFolderPath()
                 End If
 
-                ' Remove any directory information from strInputFilePath
-                strInputFilePathOrFolder = Path.GetFileName(strInputFilePathOrFolder)
+                ' Remove any directory information from inputFilePath
+                inputFilePathOrFolder = Path.GetFileName(inputFilePathOrFolder)
 
             Else
-                ioFolderInfo = New DirectoryInfo(strInputFilePathOrFolder)
-                If ioFolderInfo.Exists Then
-                    strInputFolderPath = ioFolderInfo.FullName
-                    strInputFilePathOrFolder = "*"
+                Dim inputfolder = New DirectoryInfo(inputFilePathOrFolder)
+                If inputfolder.Exists Then
+                    inputFolderPath = inputfolder.FullName
+                    inputFilePathOrFolder = "*"
                 Else
-                    If ioFolderInfo.Parent.Exists Then
-                        strInputFolderPath = ioFolderInfo.Parent.FullName
-                        strInputFilePathOrFolder = Path.GetFileName(strInputFilePathOrFolder)
+                    If Not inputfolder.Parent Is Nothing AndAlso inputfolder.Parent.Exists Then
+                        inputFolderPath = inputfolder.Parent.FullName
+                        inputFilePathOrFolder = Path.GetFileName(inputFilePathOrFolder)
                     Else
                         ' Unable to determine the input folder path
-                        strInputFolderPath = String.Empty
+                        inputFolderPath = String.Empty
                     End If
                 End If
             End If
 
-            If Not String.IsNullOrWhiteSpace(strInputFolderPath) Then
-
-                ' Validate the output folder path
-                If Not String.IsNullOrWhiteSpace(strOutputFolderAlternatePath) Then
-                    Try
-                        ioFolderInfo = New DirectoryInfo(strOutputFolderAlternatePath)
-                        If Not ioFolderInfo.Exists Then ioFolderInfo.Create()
-                    Catch ex As Exception
-                        mErrorCode = eProcessFilesErrorCodes.InvalidOutputFolderPath
-                        ShowErrorMessage("Error validating the alternate output folder path in ProcessFilesAndRecurseFolders:" & ex.Message)
-                        Return False
-                    End Try
-                End If
-
-                ' Initialize some parameters
-                mAbortProcessing = False
-                intFileProcessCount = 0
-                intFileProcessFailCount = 0
-
-                ' Call RecurseFoldersWork
-                Const intRecursionLevel = 1
-                blnSuccess = RecurseFoldersWork(strInputFolderPath, strInputFilePathOrFolder, strOutputFolderName,
-                  parameterFilePath, strOutputFolderAlternatePath,
-                  blnRecreateFolderHierarchyInAlternatePath, strExtensionsToParse,
-                  intFileProcessCount, intFileProcessFailCount,
-                  intRecursionLevel, intRecurseFoldersMaxLevels)
-
-            Else
-                mErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
+            If String.IsNullOrWhiteSpace(inputFolderPath) Then
+                ErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
                 Return False
             End If
+
+            ' Validate the output folder path
+            If Not String.IsNullOrWhiteSpace(outputFolderAlternatePath) Then
+                Try
+                    Dim ioFolderInfo = New DirectoryInfo(outputFolderAlternatePath)
+                    If Not ioFolderInfo.Exists Then ioFolderInfo.Create()
+                Catch ex As Exception
+                    ErrorCode = eProcessFilesErrorCodes.InvalidOutputFolderPath
+                    ShowErrorMessage(
+                        "Error validating the alternate output folder path in ProcessFilesAndRecurseFolders:" &
+                        ex.Message)
+                    Return False
+                End Try
+            End If
+
+            ' Initialize some parameters
+            AbortProcessing = False
+            Dim fileProcessCount = 0
+            Dim fileProcessFailCount = 0
+
+            ' Call RecurseFoldersWork
+            Const recursionLevel = 1
+            Dim success = RecurseFoldersWork(inputFolderPath, inputFilePathOrFolder, outputFolderName,
+                                             parameterFilePath, outputFolderAlternatePath,
+                                             recreateFolderHierarchyInAlternatePath, extensionsToParse,
+                                             fileProcessCount, fileProcessFailCount, recursionLevel,
+                                             recurseFoldersMaxLevels)
+
+            Return success
+
 
         Catch ex As Exception
             HandleException("Error in ProcessFilesAndRecurseFolders", ex)
             Return False
         End Try
 
-        Return blnSuccess
-
     End Function
 
-    Private Function RecurseFoldersWork(strInputFolderPath As String, strFileNameMatch As String, strOutputFolderName As String,
-       parameterFilePath As String, strOutputFolderAlternatePath As String,
-       blnRecreateFolderHierarchyInAlternatePath As Boolean, strExtensionsToParse() As String,
-       ByRef intFileProcessCount As Integer, ByRef intFileProcessFailCount As Integer,
-       intRecursionLevel As Integer, intRecurseFoldersMaxLevels As Integer) As Boolean
-        ' If intRecurseFoldersMaxLevels is <=0 then we recurse infinitely
+    Private Function RecurseFoldersWork(inputFolderPath As String, fileNameMatch As String, outputFolderName As String,
+       parameterFilePath As String, outputFolderAlternatePath As String,
+       recreateFolderHierarchyInAlternatePath As Boolean, extensionsToParse As IList(Of String),
+       ByRef fileProcessCount As Integer, ByRef fileProcessFailCount As Integer,
+       recursionLevel As Integer, recurseFoldersMaxLevels As Integer) As Boolean
+        ' If recurseFoldersMaxLevels is <=0 then we recurse infinitely
 
         Dim ioInputFolderInfo As DirectoryInfo
 
-        Dim intExtensionIndex As Integer
-        Dim blnProcessAllExtensions As Boolean
+        Dim extensionIndex As Integer
+        Dim processAllExtensions As Boolean
 
-        Dim strOutputFolderPathToUse As String
-        Dim blnSuccess As Boolean
+        Dim outputFolderPathToUse As String
+        Dim success As Boolean
 
         Try
-            ioInputFolderInfo = New DirectoryInfo(strInputFolderPath)
+            ioInputFolderInfo = New DirectoryInfo(inputFolderPath)
         Catch ex As Exception
             ' Input folder path error
             HandleException("Error in RecurseFoldersWork", ex)
-            mErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
+            ErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
             Return False
         End Try
 
         Try
-            If Not String.IsNullOrWhiteSpace(strOutputFolderAlternatePath) Then
-                If blnRecreateFolderHierarchyInAlternatePath Then
-                    strOutputFolderAlternatePath = Path.Combine(strOutputFolderAlternatePath, ioInputFolderInfo.Name)
+            If Not String.IsNullOrWhiteSpace(outputFolderAlternatePath) Then
+                If recreateFolderHierarchyInAlternatePath Then
+                    outputFolderAlternatePath = Path.Combine(outputFolderAlternatePath, ioInputFolderInfo.Name)
                 End If
-                strOutputFolderPathToUse = Path.Combine(strOutputFolderAlternatePath, strOutputFolderName)
+                outputFolderPathToUse = Path.Combine(outputFolderAlternatePath, outputFolderName)
             Else
-                strOutputFolderPathToUse = strOutputFolderName
+                outputFolderPathToUse = outputFolderName
             End If
         Catch ex As Exception
             ' Output file path error
             HandleException("Error in RecurseFoldersWork", ex)
-            mErrorCode = eProcessFilesErrorCodes.InvalidOutputFolderPath
+            ErrorCode = eProcessFilesErrorCodes.InvalidOutputFolderPath
             Return False
         End Try
 
         Try
-            ' Validate strExtensionsToParse()
-            For intExtensionIndex = 0 To strExtensionsToParse.Length - 1
-                If strExtensionsToParse(intExtensionIndex) Is Nothing Then
-                    strExtensionsToParse(intExtensionIndex) = String.Empty
+            ' Validate extensionsToParse()
+            For extensionIndex = 0 To extensionsToParse.Count - 1
+                If extensionsToParse(extensionIndex) Is Nothing Then
+                    extensionsToParse(extensionIndex) = String.Empty
                 Else
-                    If Not strExtensionsToParse(intExtensionIndex).StartsWith(".") Then
-                        strExtensionsToParse(intExtensionIndex) = "." & strExtensionsToParse(intExtensionIndex)
+                    If Not extensionsToParse(extensionIndex).StartsWith(".") Then
+                        extensionsToParse(extensionIndex) = "." & extensionsToParse(extensionIndex)
                     End If
 
-                    If strExtensionsToParse(intExtensionIndex) = ".*" Then
-                        blnProcessAllExtensions = True
+                    If extensionsToParse(extensionIndex) = ".*" Then
+                        processAllExtensions = True
                         Exit For
                     Else
-                        strExtensionsToParse(intExtensionIndex) = strExtensionsToParse(intExtensionIndex).ToUpper()
+                        extensionsToParse(extensionIndex) = extensionsToParse(extensionIndex).ToUpper()
                     End If
                 End If
-            Next
+            Next extensionIndex
         Catch ex As Exception
             HandleException("Error in RecurseFoldersWork", ex)
-            mErrorCode = eProcessFilesErrorCodes.UnspecifiedError
+            ErrorCode = eProcessFilesErrorCodes.UnspecifiedError
             Return False
         End Try
 
         Try
-            If Not String.IsNullOrWhiteSpace(strOutputFolderPathToUse) Then
+            If Not String.IsNullOrWhiteSpace(outputFolderPathToUse) Then
                 ' Update the cached output folder path
-                mOutputFolderPath = String.Copy(strOutputFolderPathToUse)
+                mOutputFolderPath = String.Copy(outputFolderPathToUse)
             End If
 
-            ShowMessage("Examining " & strInputFolderPath)
+            ShowMessage("Examining " & inputFolderPath)
 
             ' Process any matching files in this folder
-            blnSuccess = True
-            For Each ioFileMatch As FileInfo In ioInputFolderInfo.GetFiles(strFileNameMatch)
+            success = True
+            For Each ioFileMatch As FileInfo In ioInputFolderInfo.GetFiles(fileNameMatch)
 
-                For intExtensionIndex = 0 To strExtensionsToParse.Length - 1
-                    If blnProcessAllExtensions OrElse ioFileMatch.Extension.ToUpper() = strExtensionsToParse(intExtensionIndex) Then
-                        blnSuccess = ProcessFile(ioFileMatch.FullName, strOutputFolderPathToUse, parameterFilePath, True)
-                        If Not blnSuccess Then
-                            intFileProcessFailCount += 1
-                            blnSuccess = True
+                For extensionIndex = 0 To extensionsToParse.Count - 1
+                    If processAllExtensions OrElse ioFileMatch.Extension.ToUpper() = extensionsToParse(extensionIndex) Then
+                        success = ProcessFile(ioFileMatch.FullName, outputFolderPathToUse, parameterFilePath, True)
+                        If Not success Then
+                            fileProcessFailCount += 1
+                            success = True
                         Else
-                            intFileProcessCount += 1
+                            fileProcessCount += 1
                         End If
                         Exit For
                     End If
 
-                    If mAbortProcessing Then Exit For
+                    If AbortProcessing Then Exit For
 
-                Next
+                Next extensionIndex
             Next ioFileMatch
         Catch ex As Exception
             HandleException("Error in RecurseFoldersWork", ex)
-            mErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
+            ErrorCode = eProcessFilesErrorCodes.InvalidInputFilePath
             Return False
         End Try
 
-        If Not mAbortProcessing Then
-            ' If intRecurseFoldersMaxLevels is <=0 then we recurse infinitely
-            '  otherwise, compare intRecursionLevel to intRecurseFoldersMaxLevels
-            If intRecurseFoldersMaxLevels <= 0 OrElse intRecursionLevel <= intRecurseFoldersMaxLevels Then
+        If Not AbortProcessing Then
+            ' If recurseFoldersMaxLevels is <=0 then we recurse infinitely
+            '  otherwise, compare recursionLevel to recurseFoldersMaxLevels
+            If recurseFoldersMaxLevels <= 0 OrElse recursionLevel <= recurseFoldersMaxLevels Then
                 ' Call this function for each of the subfolders of ioInputFolderInfo
                 For Each ioSubFolderInfo As DirectoryInfo In ioInputFolderInfo.GetDirectories()
-                    blnSuccess = RecurseFoldersWork(ioSubFolderInfo.FullName, strFileNameMatch, strOutputFolderName,
-                      parameterFilePath, strOutputFolderAlternatePath,
-                      blnRecreateFolderHierarchyInAlternatePath, strExtensionsToParse,
-                      intFileProcessCount, intFileProcessFailCount,
-                      intRecursionLevel + 1, intRecurseFoldersMaxLevels)
+                    success = RecurseFoldersWork(ioSubFolderInfo.FullName, fileNameMatch, outputFolderName,
+                      parameterFilePath, outputFolderAlternatePath,
+                      recreateFolderHierarchyInAlternatePath, extensionsToParse,
+                      fileProcessCount, fileProcessFailCount,
+                      recursionLevel + 1, recurseFoldersMaxLevels)
 
-                    If Not blnSuccess Then Exit For
+                    If Not success Then Exit For
                 Next ioSubFolderInfo
             End If
         End If
 
-        Return blnSuccess
+        Return success
 
     End Function
 
     Protected Sub SetBaseClassErrorCode(eNewErrorCode As eProcessFilesErrorCodes)
-        mErrorCode = eNewErrorCode
+        ErrorCode = eNewErrorCode
     End Sub
 
     '' The following functions should be placed in any derived class
@@ -570,8 +539,8 @@ Public MustInherit Class clsProcessFilesBaseClass
     ''    SetLocalErrorCode(eNewErrorCode, False)
     ''End Sub
 
-    ''Private Sub SetLocalErrorCode(eNewErrorCode As eDerivedClassErrorCodes, blnLeaveExistingErrorCodeUnchanged As Boolean)
-    ''    If blnLeaveExistingErrorCodeUnchanged AndAlso mLocalErrorCode <> eDerivedClassErrorCodes.NoError Then
+    ''Private Sub SetLocalErrorCode(eNewErrorCode As eDerivedClassErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
+    ''    If leaveExistingErrorCodeUnchanged AndAlso mLocalErrorCode <> eDerivedClassErrorCodes.NoError Then
     ''        ' An error code is already defined; do not change it
     ''    Else
     ''        mLocalErrorCode = eNewErrorCode
