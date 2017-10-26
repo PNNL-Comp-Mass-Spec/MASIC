@@ -1101,11 +1101,12 @@ Public Class frmMain
     End Sub
 
     Private Sub RegisterEvents(oClass As clsMASIC)
-        AddHandler oClass.MessageEvent, AddressOf MessageEventHandler
+        AddHandler oClass.StatusEvent, AddressOf StatusEventHandler
+        AddHandler oClass.DebugEvent, AddressOf DebugEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
         AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
 
-        AddHandler oClass.ProgressChanged, AddressOf MASIC_ProgressChanged
+        AddHandler oClass.ProgressUpdate, AddressOf MASIC_ProgressUpdate
         AddHandler oClass.ProgressResetKeypressAbort, AddressOf MASIC_ProgressResetKeypressAbort
         AddHandler oClass.ProgressSubtaskChanged, AddressOf MASIC_ProgressSubtaskChanged
     End Sub
@@ -2291,7 +2292,7 @@ Public Class frmMain
         IniFileSaveOptions(GetSettingsFilePath(), True)
     End Sub
 
-    Private Sub MASIC_ProgressChanged(taskDescription As String, percentComplete As Single)
+    Private Sub MASIC_ProgressUpdate(taskDescription As String, percentComplete As Single)
         If Not mProgressForm Is Nothing Then
             mProgressForm.UpdateCurrentTask(mMasic.ProgressStepDescription)
             mProgressForm.UpdateProgressBar(percentComplete)
@@ -2319,16 +2320,23 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub MessageEventHandler(message As String)
+    Private Sub StatusEventHandler(message As String)
         AppendToLog(EventLogEntryType.Information, message)
+        Console.WriteLine(message)
     End Sub
 
-    Private Sub ErrorEventHandler(message As String)
+    Private Sub DebugEventHandler(message As String)
+        ConsoleMsgUtils.ShowDebug(message)
+    End Sub
+
+    Private Sub ErrorEventHandler(message As String, ex As Exception)
         AppendToLog(EventLogEntryType.Error, message)
+        ConsoleMsgUtils.ShowError(message, ex)
     End Sub
 
     Private Sub WarningEventHandler(message As String)
         AppendToLog(EventLogEntryType.Warning, message)
+        ConsoleMsgUtils.ShowWarning(message)
     End Sub
 #End Region
 

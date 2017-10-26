@@ -30,7 +30,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "October 10, 2017"
+    Public Const PROGRAM_DATE As String = "October 25, 2017"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -198,11 +198,12 @@ Public Module modMain
     End Function
 
     Private Sub RegisterEvents(oClass As clsMASIC)
-        'AddHandler oClass.MessageEvent, AddressOf MessageEventHandler
-        'AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
-        'AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
+        AddHandler oClass.StatusEvent, AddressOf StatusEventHandler
+        AddHandler oClass.DebugEvent, AddressOf DebugEventHandler
+        AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
+        AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
 
-        AddHandler oClass.ProgressChanged, AddressOf ProgressChangedHandler
+        AddHandler oClass.ProgressUpdate, AddressOf ProgressUpdateHandler
         AddHandler oClass.ProgressResetKeypressAbort, AddressOf ProgressResetKeypressAbortHandler
         AddHandler oClass.ProgressSubtaskChanged, AddressOf ProgressSubtaskChangedHandler
     End Sub
@@ -283,8 +284,8 @@ Public Module modMain
 
     End Function
 
-    Private Sub ShowErrorMessage(message As String)
-        ConsoleMsgUtils.ShowError(message)
+    Private Sub ShowErrorMessage(message As String, Optional ex As Exception = Nothing)
+        ConsoleMsgUtils.ShowError(message, ex)
     End Sub
 
     Private Sub ShowErrorMessage(title As String, errorMessages As IEnumerable(Of String))
@@ -354,7 +355,7 @@ Public Module modMain
 
     End Sub
 
-    Private Sub ProgressChangedHandler(taskDescription As String, percentComplete As Single)
+    Private Sub ProgressUpdateHandler(taskDescription As String, percentComplete As Single)
         Const PERCENT_REPORT_INTERVAL = 25
         Const PROGRESS_DOT_INTERVAL_MSEC = 250
 
@@ -400,6 +401,22 @@ Public Module modMain
             End If
             Application.DoEvents()
         End If
+    End Sub
+
+    Private Sub StatusEventHandler(message As String)
+        Console.WriteLine(message)
+    End Sub
+
+    Private Sub DebugEventHandler(message As String)
+        ConsoleMsgUtils.ShowDebug(message)
+    End Sub
+
+    Private Sub ErrorEventHandler(message As String, ex As Exception)
+        ShowErrorMessage(message, ex)
+    End Sub
+
+    Private Sub WarningEventHandler(message As String)
+        ConsoleMsgUtils.ShowWarning(message)
     End Sub
 
 End Module
