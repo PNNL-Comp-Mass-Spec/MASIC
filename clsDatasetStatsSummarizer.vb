@@ -95,7 +95,6 @@ Public Class clsDatasetStatsSummarizer
     Public DatasetFileInfo As udtDatasetFileInfoType
     Public SampleInfo As udtSampleInfoType
 
-    Private WithEvents mSpectraTypeClassifier As clsSpectrumTypeClassifier
     Private mDatasetSummaryStatsUpToDate As Boolean
     Private mDatasetSummaryStats As clsDatasetSummaryStats
 
@@ -163,8 +162,6 @@ Public Class clsDatasetStatsSummarizer
         Me.SampleInfo.Clear()
 
         mDatasetSummaryStatsUpToDate = False
-
-        mSpectraTypeClassifier.Reset()
 
     End Sub
 
@@ -473,21 +470,14 @@ Public Class clsDatasetStatsSummarizer
             End If
 
             Dim objSummaryStats As clsDatasetSummaryStats
-            Dim includeCentroidStats As Boolean
 
             If objScanStats Is mDatasetScanStats Then
                 objSummaryStats = GetDatasetSummaryStats()
-                If mSpectraTypeClassifier.TotalSpectra > 0 Then
-                    includeCentroidStats = True
-                End If
-
             Else
                 objSummaryStats = New clsDatasetSummaryStats()
 
                 ' Parse the data in objScanStats to compute the bulk values
                 Me.ComputeScanStatsSummary(objScanStats, objSummaryStats)
-
-                includeCentroidStats = False
             End If
 
             Dim objXMLSettings = New XmlWriterSettings()
@@ -576,36 +566,6 @@ Public Class clsDatasetStatsSummarizer
             objDSInfo.WriteElementString("EndTime", udtDatasetFileInfo.AcqTimeEnd.ToString("yyyy-MM-dd hh:mm:ss tt"))
 
             objDSInfo.WriteElementString("FileSizeBytes", udtDatasetFileInfo.FileSizeBytes.ToString())
-
-            If includeCentroidStats Then
-                Dim centroidedMS1Spectra = mSpectraTypeClassifier.CentroidedMS1Spectra
-                Dim centroidedMSnSpectra = mSpectraTypeClassifier.CentroidedMSnSpectra
-
-                Dim centroidedMS1SpectraClassifiedAsProfile = mSpectraTypeClassifier.CentroidedMS1SpectraClassifiedAsProfile
-                Dim centroidedMSnSpectraClassifiedAsProfile = mSpectraTypeClassifier.CentroidedMSnSpectraClassifiedAsProfile
-
-                Dim totalMS1Spectra = mSpectraTypeClassifier.TotalMS1Spectra
-                Dim totalMSnSpectra = mSpectraTypeClassifier.TotalMSnSpectra
-
-                If totalMS1Spectra + totalMSnSpectra = 0 Then
-                    ' None of the spectra had MSLevel 1 or MSLevel 2
-                    ' This shouldn't normally be the case; nevertheless, we'll report the totals, regardless of MSLevel, using the MS1 elements
-                    centroidedMS1Spectra = mSpectraTypeClassifier.CentroidedSpectra()
-                    totalMS1Spectra = mSpectraTypeClassifier.TotalSpectra()
-                End If
-
-                objDSInfo.WriteElementString("ProfileScanCountMS1", (totalMS1Spectra - centroidedMS1Spectra).ToString())
-                objDSInfo.WriteElementString("ProfileScanCountMS2", (totalMSnSpectra - centroidedMSnSpectra).ToString())
-
-                objDSInfo.WriteElementString("CentroidScanCountMS1", centroidedMS1Spectra.ToString())
-                objDSInfo.WriteElementString("CentroidScanCountMS2", centroidedMSnSpectra.ToString())
-
-                If centroidedMS1SpectraClassifiedAsProfile > 0 OrElse centroidedMSnSpectraClassifiedAsProfile > 0 Then
-                    objDSInfo.WriteElementString("CentroidMS1ScansClassifiedAsProfile", centroidedMS1SpectraClassifiedAsProfile.ToString())
-                    objDSInfo.WriteElementString("CentroidMS2ScansClassifiedAsProfile", centroidedMSnSpectraClassifiedAsProfile.ToString())
-                End If
-
-            End If
 
             objDSInfo.WriteEndElement()       ' AcquisitionInfo
 
@@ -764,7 +724,6 @@ Public Class clsDatasetStatsSummarizer
         mErrorMessage = String.Empty
 
         mMedianUtils = New clsMedianUtilities()
-        mSpectraTypeClassifier = New clsSpectrumTypeClassifier
 
         ClearCachedData()
     End Sub
@@ -915,10 +874,6 @@ Public Class clsDatasetStatsSummarizer
         Return blnSuccess
 
     End Function
-
-    Private Sub mSpectraTypeClassifier_ErrorEvent(Message As String) Handles mSpectraTypeClassifier.ErrorEvent
-        ReportError("Error in SpectraTypeClassifier: " & Message)
-    End Sub
 
 End Class
 
