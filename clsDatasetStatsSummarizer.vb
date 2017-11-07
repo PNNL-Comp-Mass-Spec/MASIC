@@ -21,6 +21,7 @@ Imports PRISM
 Imports SpectraTypeClassifier
 
 Public Class clsDatasetStatsSummarizer
+    Inherits clsEventNotifier
 
 #Region "Constants and Enums"
     Public Const SCANTYPE_STATS_SEPCHAR As String = "::###::"
@@ -98,12 +99,8 @@ Public Class clsDatasetStatsSummarizer
     Private mDatasetSummaryStatsUpToDate As Boolean
     Private mDatasetSummaryStats As clsDatasetSummaryStats
 
-    Private mMedianUtils As clsMedianUtilities
+    Private ReadOnly mMedianUtils As clsMedianUtilities
 
-#End Region
-
-#Region "Events"
-    Public Event ErrorEvent(message As String)
 #End Region
 
 #Region "Properties"
@@ -134,7 +131,10 @@ Public Class clsDatasetStatsSummarizer
 #End Region
 
     Public Sub New()
-        mFileDate = "January 13, 2016"
+        mFileDate = "November 7, 2017"
+
+        mMedianUtils = New clsMedianUtilities()
+
         InitializeLocalVariables()
     End Sub
 
@@ -195,7 +195,7 @@ Public Class clsDatasetStatsSummarizer
         Try
 
             If objScanStats Is Nothing Then
-                ReportError("objScanStats is Nothing; unable to continue")
+                ReportError("objScanStats is Nothing; unable to continue in ComputeScanStatsSummary")
                 Return False
             Else
                 mErrorMessage = ""
@@ -723,14 +723,12 @@ Public Class clsDatasetStatsSummarizer
     Private Sub InitializeLocalVariables()
         mErrorMessage = String.Empty
 
-        mMedianUtils = New clsMedianUtilities()
-
         ClearCachedData()
     End Sub
 
-    Private Sub ReportError(message As String)
+    Private Sub ReportError(message As String, Optional ex As Exception = Nothing)
         mErrorMessage = String.Copy(message)
-        RaiseEvent ErrorEvent(mErrorMessage)
+        OnErrorEvent(mErrorMessage, ex)
     End Sub
 
     ''' <summary>
@@ -867,7 +865,7 @@ Public Class clsDatasetStatsSummarizer
             blnSuccess = True
 
         Catch ex As Exception
-            ReportError("Error in UpdateDatasetStatsTextFile: " & ex.Message)
+            ReportError("Error in UpdateDatasetStatsTextFile: " & ex.Message, ex)
             blnSuccess = False
         End Try
 
