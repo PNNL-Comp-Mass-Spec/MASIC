@@ -149,8 +149,7 @@ Namespace DataInput
 
             ' Use Xraw to read the .Raw files
             Dim xcaliburAccessor = New XRawFileIO()
-            AddHandler xcaliburAccessor.ReportError, AddressOf mXcaliburAccessor_ReportError
-            AddHandler xcaliburAccessor.ReportWarning, AddressOf mXcaliburAccessor_ReportWarning
+            RegisterEvents(xcaliburAccessor)
 
             Dim strIOMode = "Xraw"
 
@@ -836,16 +835,6 @@ Namespace DataInput
             Else
                 OnWarningEvent(message)
             End If
-        End Sub
-
-        Private Sub mXcaliburAccessor_ReportError(strMessage As String)
-            Console.WriteLine(strMessage)
-            ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
-        End Sub
-
-        Private Sub mXcaliburAccessor_ReportWarning(strMessage As String)
-            Console.WriteLine(strMessage)
-            ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
         End Sub
 
     End Class

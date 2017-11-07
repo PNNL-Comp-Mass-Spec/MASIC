@@ -41,10 +41,9 @@ Public Class clsReporterIonProcessor
 
             ' Use Xraw to read the .Raw files
             Dim xcaliburAccessor = New XRawFileIO()
-            Dim includeFtmsColumns = False
+            RegisterEvents(xcaliburAccessor)
 
-            AddHandler xcaliburAccessor.ReportError, AddressOf mXcaliburAccessor_ReportError
-            AddHandler xcaliburAccessor.ReportWarning, AddressOf mXcaliburAccessor_ReportWarning
+            Dim includeFtmsColumns = False
 
             If strInputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()) Then
 
@@ -522,16 +521,6 @@ Public Class clsReporterIonProcessor
 
         srOutFile.WriteLine(String.Join(cColDelimiter, dataColumns))
 
-    End Sub
-
-    Private Sub mXcaliburAccessor_ReportError(strMessage As String)
-        Console.WriteLine(strMessage)
-        ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
-    End Sub
-
-    Private Sub mXcaliburAccessor_ReportWarning(strMessage As String)
-        Console.WriteLine(strMessage)
-        ReportError(strMessage, eMasicErrorCodes.InputFileDataReadError)
     End Sub
 
     Protected Class clsReportIonInfoComparer
