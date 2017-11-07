@@ -30,7 +30,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "October 25, 2017"
+    Public Const PROGRAM_DATE As String = "November 7, 2017"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -124,7 +124,7 @@ Public Module modMain
             End If
 
             mMASIC = New clsMASIC()
-            RegisterEvents(mMASIC)
+            RegisterMasicEvents(mMASIC)
 
             mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath
             mMASIC.Options.SICOptions.DatasetNumber = mDatasetNumber
@@ -194,14 +194,18 @@ Public Module modMain
     End Sub
 
     Private Function GetAppVersion() As String
-        Return clsProcessFilesBaseClass.GetAppVersion(PROGRAM_DATE)
+        Return clsProcessFilesOrFoldersBase.GetAppVersion(PROGRAM_DATE)
     End Function
 
-    Private Sub RegisterEvents(oClass As clsMASIC)
+    Private Sub RegisterEvents(oClass As clsEventNotifier)
         AddHandler oClass.StatusEvent, AddressOf StatusEventHandler
         AddHandler oClass.DebugEvent, AddressOf DebugEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
         AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
+    End Sub
+
+    Private Sub RegisterMasicEvents(oClass As clsMASIC)
+        RegisterEvents(oClass)
 
         AddHandler oClass.ProgressUpdate, AddressOf ProgressUpdateHandler
         AddHandler oClass.ProgressResetKeypressAbort, AddressOf ProgressResetKeypressAbortHandler
