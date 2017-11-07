@@ -42,7 +42,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "October 10, 2017"
+        MyBase.mFileDate = "November 7, 2017"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
@@ -1999,7 +1999,7 @@ Public Class clsMASIC
         AddHandler oClass.ProgressUpdate, AddressOf ProgressUpdateHandler
     End Sub
 
-    Private Sub RegisterEvents(oClass As clsMasicEventNotifier)
+    Private Overloads Sub RegisterEvents(oClass As clsMasicEventNotifier)
         RegisterEventsBase(oClass)
 
         AddHandler oClass.UpdateCacheStatsEvent, AddressOf UpdatedCacheStatsEventHandler
