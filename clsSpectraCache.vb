@@ -158,61 +158,61 @@ Public Class clsSpectraCache
     End Property
 
     Public Function AddSpectrumToPool(
-       objMSSpectrum As clsMSSpectrum,
-       intScanNumber As Integer) As Boolean
+       spectrum As clsMSSpectrum,
+       scanNumber As Integer) As Boolean
 
         ' Adds objMSSpectrum to the spectrum pool
-        ' Returns the index of the spectrum in the pool in intTargetPoolIndex
-
-        Dim blnSuccess As Boolean
+        ' Returns the index of the spectrum in the pool in targetPoolIndex
 
         Try
-            Dim intTargetPoolIndex As Integer
+            Dim targetPoolIndex As Integer
 
-            If mSpectrumIndexInPool.Contains(intScanNumber) Then
+            If mSpectrumIndexInPool.Contains(scanNumber) Then
                 ' Replace the spectrum data with objMSSpectrum
-                intTargetPoolIndex = CInt(mSpectrumIndexInPool(intScanNumber))
+                targetPoolIndex = CInt(mSpectrumIndexInPool(scanNumber))
             Else
                 ' Need to add the spectrum
-                intTargetPoolIndex = GetNextAvailablePoolIndex()
-                mSpectrumIndexInPool.Add(intScanNumber, intTargetPoolIndex)
+                targetPoolIndex = GetNextAvailablePoolIndex()
+                mSpectrumIndexInPool.Add(scanNumber, targetPoolIndex)
             End If
 
-            ValidateMemoryAllocation(SpectraPool(intTargetPoolIndex), objMSSpectrum.IonCount)
+            ValidateMemoryAllocation(SpectraPool(targetPoolIndex), spectrum.IonCount)
 
-            With SpectraPool(intTargetPoolIndex)
-                .ScanNumber = objMSSpectrum.ScanNumber
-                If .ScanNumber <> intScanNumber Then
-                    .ScanNumber = intScanNumber
+            With SpectraPool(targetPoolIndex)
+                .ScanNumber = spectrum.ScanNumber
+                If .ScanNumber <> scanNumber Then
+                    .ScanNumber = scanNumber
                 End If
 
-                .IonCount = objMSSpectrum.IonCount
+                .IonCount = spectrum.IonCount
             End With
 
-            Array.Copy(objMSSpectrum.IonsMZ, SpectraPool(intTargetPoolIndex).IonsMZ, objMSSpectrum.IonCount)
-            Array.Copy(objMSSpectrum.IonsIntensity, SpectraPool(intTargetPoolIndex).IonsIntensity, objMSSpectrum.IonCount)
+            Array.Copy(spectrum.IonsMZ, SpectraPool(targetPoolIndex).IonsMZ, spectrum.IonCount)
+            Array.Copy(spectrum.IonsIntensity, SpectraPool(targetPoolIndex).IonsIntensity, spectrum.IonCount)
 
-            SpectraPoolInfo(intTargetPoolIndex).CacheState = eCacheStateConstants.NeverCached
+            SpectraPoolInfo(targetPoolIndex).CacheState = eCacheStateConstants.NeverCached
 
-            blnSuccess = True
+            Return True
         Catch ex As Exception
             ReportError(ex.Message, ex)
+            Return False
         End Try
 
-        Return blnSuccess
     End Function
 
-    Private Sub CacheSpectrum(intPoolIndexToCache As Integer)
-        ' Returns True if already cached or if successfully cached
-        ' Returns False if an error
-
-        Dim intIndex As Integer
-        Dim intScanNumber As Integer
-
-        If SpectraPoolInfo(intPoolIndexToCache).CacheState = eCacheStateConstants.UnusedSlot Then
+    ''' <summary>
+    ''' Cache the spectrum at the given pool index
+    ''' </summary>
+    ''' <param name="poolIndexToCache"></param>
+    ''' <return>
+    ''' True if already cached or if successfully cached
+    ''' False if an error
+    ''' </return>
+    Private Sub CacheSpectrum(poolIndexToCache As Integer)
+        If SpectraPoolInfo(poolIndexToCache).CacheState = eCacheStateConstants.UnusedSlot Then
             ' Nothing to do; slot is already empty
         Else
-            If SpectraPoolInfo(intPoolIndexToCache).CacheState = eCacheStateConstants.LoadedFromCache Then
+            If SpectraPoolInfo(poolIndexToCache).CacheState = eCacheStateConstants.LoadedFromCache Then
                 ' Already cached previously, simply reset the slot
             Else
 
@@ -220,50 +220,51 @@ Public Class clsSpectraCache
 
                 If ValidatePageFileIO(True) Then
                     ' See if the given spectrum is already present in the page file
-                    intScanNumber = SpectraPool(intPoolIndexToCache).ScanNumber
-                    If mSpectrumByteOffset.Contains(intScanNumber) Then
+                    Dim scanNumber = SpectraPool(poolIndexToCache).ScanNumber
+                    If mSpectrumByteOffset.Contains(scanNumber) Then
                         ' Page file already contains the given scan; do not re-write
                     Else
+                        Dim initialOffset = mPageFileWriter.BaseStream.Position
+
                         ' Write the spectrum to the page file
                         ' Record the current offset in the hashtable
-                        mSpectrumByteOffset.Add(intScanNumber, mPageFileWriter.BaseStream.Position)
+                        mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position)
 
-                        With SpectraPool(intPoolIndexToCache)
-                            ' Write the scan number
-                            mPageFileWriter.Write(intScanNumber)
+                                With SpectraPool(poolIndexToCache)
+                                    ' Write the scan number
+                                    mPageFileWriter.Write(scanNumber)
 
-                            ' Write the ion count
-                            mPageFileWriter.Write(.IonCount)
+                                    ' Write the ion count
+                                    mPageFileWriter.Write(.IonCount)
 
-                            ' Write the m/z values
-                            For intIndex = 0 To .IonCount - 1
-                                mPageFileWriter.Write(.IonsMZ(intIndex))
-                            Next
+                                    ' Write the m/z values
+                                    For index = 0 To .IonCount - 1
+                                        mPageFileWriter.Write(.IonsMZ(index))
+                                    Next
 
-                            ' Write the intensity values
-                            For intIndex = 0 To .IonCount - 1
-                                mPageFileWriter.Write(.IonsIntensity(intIndex))
-                            Next
-                        End With
+                                    ' Write the intensity values
+                                    For index = 0 To .IonCount - 1
+                                        mPageFileWriter.Write(.IonsIntensity(index))
+                                    Next
+                                End With
 
-                        ' Write four blank bytes (not really necessary, but adds a little padding between spectra)
-                        mPageFileWriter.Write(0)
-
+                                ' Write four blank bytes (not really necessary, but adds a little padding between spectra)
+                                mPageFileWriter.Write(0)
                     End If
                 End If
 
             End If
 
-            ' Remove intScanNumber from mSpectrumIndexInPool
-            mSpectrumIndexInPool.Remove(SpectraPool(intPoolIndexToCache).ScanNumber)
+            ' Remove the spectrum from mSpectrumIndexInPool
+            mSpectrumIndexInPool.Remove(SpectraPool(poolIndexToCache).ScanNumber)
 
             ' Reset .ScanNumber, .IonCount, and .CacheState
-            With SpectraPool(intPoolIndexToCache)
+            With SpectraPool(poolIndexToCache)
                 .ScanNumber = 0
                 .IonCount = 0
             End With
 
-            SpectraPoolInfo(intPoolIndexToCache).CacheState = eCacheStateConstants.UnusedSlot
+            SpectraPoolInfo(poolIndexToCache).CacheState = eCacheStateConstants.UnusedSlot
 
             mCacheEventCount += 1
 
@@ -274,22 +275,23 @@ Public Class clsSpectraCache
 
     Public Sub ClosePageFile()
 
-        Dim blnGarbageCollect As Boolean
 
         Try
+            Dim garbageCollect As Boolean
+
             If Not mPageFileReader Is Nothing Then
                 mPageFileReader.Close()
                 mPageFileReader = Nothing
-                blnGarbageCollect = True
+                garbageCollect = True
             End If
 
             If Not mPageFileWriter Is Nothing Then
                 mPageFileWriter.Close()
                 mPageFileWriter = Nothing
-                blnGarbageCollect = True
+                garbageCollect = True
             End If
 
-            If blnGarbageCollect Then
+            If garbageCollect Then
                 GC.Collect()
                 GC.WaitForPendingFinalizers()
                 Threading.Thread.Sleep(500)
@@ -311,8 +313,6 @@ Public Class clsSpectraCache
         ' Constructs the full path for the given spectrum file
         ' Returns String.empty if unable to validate the cached spectrum folder
 
-        Dim strFileName As String
-
         If Not ValidateCachedSpectrumFolder() Then
             Return String.Empty
         End If
@@ -324,9 +324,9 @@ Public Class clsSpectraCache
             mCacheFileNameBase = SPECTRUM_CACHE_FILE_PREFIX & DateTime.UtcNow.Hour & DateTime.UtcNow.Minute & DateTime.UtcNow.Second & DateTime.UtcNow.Millisecond & objRand.Next(1, 9999)
         End If
 
-        strFileName = mCacheFileNameBase & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & ".bin"
+        Dim fileName = mCacheFileNameBase & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & ".bin"
 
-        Return Path.Combine(mCacheOptions.FolderPath, strFileName)
+        Return Path.Combine(mCacheOptions.FolderPath, fileName)
 
     End Function
 
@@ -338,19 +338,19 @@ Public Class clsSpectraCache
 
         Try
             ' Delete the cached files for this instance of clsMasic
-            Dim strFilePathMatch = ConstructCachedSpectrumPath()
+            Dim filePathMatch = ConstructCachedSpectrumPath()
 
-            Dim intCharIndex = strFilePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal)
-            If intCharIndex < 0 Then
-                ReportError("intCharIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles")
+            Dim charIndex = filePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal)
+            If charIndex < 0 Then
+                ReportError("charIndex was less than 0; this is unexpected in DeleteSpectrumCacheFiles")
                 Return
             End If
 
-            strFilePathMatch = strFilePathMatch.Substring(0, intCharIndex)
-            Dim strFiles = Directory.GetFiles(mCacheOptions.FolderPath, Path.GetFileName(strFilePathMatch) & "*")
+            filePathMatch = filePathMatch.Substring(0, charIndex)
+            Dim files = Directory.GetFiles(mCacheOptions.FolderPath, Path.GetFileName(filePathMatch) & "*")
 
-            For intIndex = 0 To strFiles.Length - 1
-                File.Delete(strFiles(intIndex))
+            For index = 0 To files.Length - 1
+                File.Delete(files(index))
             Next
 
         Catch ex As Exception
@@ -360,12 +360,12 @@ Public Class clsSpectraCache
 
         ' Now look for old spectrum cache files
         Try
-            Dim strFilePathMatch = SPECTRUM_CACHE_FILE_PREFIX & "*" & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & "*"
+            Dim filePathMatch = SPECTRUM_CACHE_FILE_PREFIX & "*" & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & "*"
 
             Dim objFolder = New DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())))
 
             If Not objFolder Is Nothing Then
-                For Each objFile In objFolder.GetFiles(strFilePathMatch)
+                For Each objFile In objFolder.GetFiles(filePathMatch)
                     If objFile.LastWriteTimeUtc < dtFileDateTolerance Then
                         objFile.Delete()
                     End If
@@ -377,32 +377,30 @@ Public Class clsSpectraCache
 
     End Sub
 
-    Private Sub ExpandSpectraPool(intNewPoolLength As Integer)
-        Dim intCurrentPoolLength As Integer
-        Dim intIndex As Integer
+    Private Sub ExpandSpectraPool(newPoolLength As Integer)
 
-        intCurrentPoolLength = Math.Min(mMaximumPoolLength, SpectraPool.Length)
-        mMaximumPoolLength = intNewPoolLength
+        Dim currentPoolLength = Math.Min(mMaximumPoolLength, SpectraPool.Length)
+        mMaximumPoolLength = newPoolLength
 
-        If intNewPoolLength > intCurrentPoolLength Then
+        If newPoolLength > currentPoolLength Then
             ReDim Preserve SpectraPool(mMaximumPoolLength - 1)
             ReDim Preserve SpectraPoolInfo(mMaximumPoolLength - 1)
 
-            For intIndex = intCurrentPoolLength To mMaximumPoolLength - 1
-                SpectraPool(intIndex) = New clsMSSpectrum
-                SpectraPoolInfo(intIndex).CacheState = eCacheStateConstants.UnusedSlot
+            For index = currentPoolLength To mMaximumPoolLength - 1
+                SpectraPool(index) = New clsMSSpectrum
+                SpectraPoolInfo(index).CacheState = eCacheStateConstants.UnusedSlot
             Next
         End If
 
     End Sub
 
     Private Function GetNextAvailablePoolIndex() As Integer
-        Dim intNextPoolIndex As Integer
+        Dim nextPoolIndex As Integer
 
         ' Need to cache the spectrum stored at mNextAvailablePoolIndex
         CacheSpectrum(mNextAvailablePoolIndex)
 
-        intNextPoolIndex = mNextAvailablePoolIndex
+        nextPoolIndex = mNextAvailablePoolIndex
 
         mNextAvailablePoolIndex += 1
         If mNextAvailablePoolIndex >= mMaximumPoolLength Then
@@ -418,12 +416,11 @@ Public Class clsSpectraCache
             End If
         End If
 
-        Return intNextPoolIndex
+        Return nextPoolIndex
 
     End Function
 
     Public Sub InitializeSpectraPool()
-        Dim intIndex As Integer
 
         mMaximumPoolLength = mCacheOptions.SpectraToRetainInMemory
         If mMaximumPoolLength < 1 Then mMaximumPoolLength = 1
@@ -461,9 +458,9 @@ Public Class clsSpectraCache
         End If
 
         ' Note: Resetting spectra all the way to SpectraPool.Length, even if SpectraPool.Length is > mMaximumPoolLength
-        For intIndex = 0 To SpectraPool.Length - 1
-            SpectraPool(intIndex) = New clsMSSpectrum
-            SpectraPoolInfo(intIndex).CacheState = eCacheStateConstants.UnusedSlot
+        For index = 0 To SpectraPool.Length - 1
+            SpectraPool(index) = New clsMSSpectrum
+            SpectraPoolInfo(index).CacheState = eCacheStateConstants.UnusedSlot
         Next
 
     End Sub
@@ -494,23 +491,23 @@ Public Class clsSpectraCache
     ''' <summary>
     ''' Load the spectrum from disk and cache in SpectraPool
     ''' </summary>
-    ''' <param name="intScanNumber">Scan number to load</param>
-    ''' <param name="intTargetPoolIndex">Output: index in the array that contains the given spectrum</param>
+    ''' <param name="scanNumber">Scan number to load</param>
+    ''' <param name="targetPoolIndex">Output: index in the array that contains the given spectrum</param>
     ''' <returns>True if successfully uncached, false if an error</returns>
-    Private Function UnCacheSpectrum(intScanNumber As Integer, <Out> ByRef intTargetPoolIndex As Integer) As Boolean
+    Private Function UnCacheSpectrum(scanNumber As Integer, <Out> ByRef targetPoolIndex As Integer) As Boolean
 
-        Dim blnSuccess As Boolean
-        intTargetPoolIndex = GetNextAvailablePoolIndex()
+        Dim success As Boolean
+        targetPoolIndex = GetNextAvailablePoolIndex()
 
         ' Uncache the spectrum from disk
-        Dim blnReturnBlankSpectrum = False
+        Dim returnBlankSpectrum = False
 
         ' All of the spectra are stored in one large file
         If ValidatePageFileIO(False) Then
             ' Lookup the byte offset for the given spectrum
 
-            If mSpectrumByteOffset.Contains(intScanNumber) Then
-                Dim lngByteOffset As Int64 = CType(mSpectrumByteOffset.Item(intScanNumber), Long)
+            If mSpectrumByteOffset.Contains(scanNumber) Then
+                Dim lngByteOffset = CType(mSpectrumByteOffset.Item(scanNumber), Long)
 
                 ' Make sure all previous spectra are flushed to disk
                 mPageFileWriter.Flush()
@@ -518,64 +515,64 @@ Public Class clsSpectraCache
                 ' Read the spectrum from the page file
                 mPageFileReader.BaseStream.Seek(lngByteOffset, SeekOrigin.Begin)
 
-                Dim intScanNumberInCacheFile = mPageFileReader.ReadInt32()
-                Dim intIonCount = mPageFileReader.ReadInt32()
-                ValidateMemoryAllocation(SpectraPool(intTargetPoolIndex), intIonCount)
+                Dim scanNumberInCacheFile = mPageFileReader.ReadInt32()
+                Dim ionCount = mPageFileReader.ReadInt32()
+                ValidateMemoryAllocation(SpectraPool(targetPoolIndex), ionCount)
 
-                With SpectraPool(intTargetPoolIndex)
-                    .ScanNumber = intScanNumber
+                With SpectraPool(targetPoolIndex)
+                    .ScanNumber = scanNumber
 
-                    If (intScanNumberInCacheFile <> .ScanNumber) Then
+                    If (scanNumberInCacheFile <> .ScanNumber) Then
                         ReportWarning("Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum")
                     End If
 
-                    .IonCount = intIonCount
-                    For intIndex = 0 To .IonCount - 1
-                        .IonsMZ(intIndex) = mPageFileReader.ReadDouble()
+                    .IonCount = ionCount
+                    For index = 0 To .IonCount - 1
+                        .IonsMZ(index) = mPageFileReader.ReadDouble()
                     Next
 
-                    For intIndex = 0 To .IonCount - 1
-                        .IonsIntensity(intIndex) = mPageFileReader.ReadSingle()
+                    For index = 0 To .IonCount - 1
+                        .IonsIntensity(index) = mPageFileReader.ReadSingle()
                     Next
 
                 End With
 
-                blnSuccess = True
+                success = True
 
             Else
-                blnReturnBlankSpectrum = True
+                returnBlankSpectrum = True
             End If
         Else
-            blnReturnBlankSpectrum = True
+            returnBlankSpectrum = True
         End If
 
-        If blnReturnBlankSpectrum Then
+        If returnBlankSpectrum Then
             ' Scan not found; create a new, blank mass spectrum
             ' Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
-            If SpectraPool(intTargetPoolIndex) Is Nothing Then
-                SpectraPool(intTargetPoolIndex) = New clsMSSpectrum()
+            If SpectraPool(targetPoolIndex) Is Nothing Then
+                SpectraPool(targetPoolIndex) = New clsMSSpectrum()
             End If
 
-            With SpectraPool(intTargetPoolIndex)
-                .ScanNumber = intScanNumber
+            With SpectraPool(targetPoolIndex)
+                .ScanNumber = scanNumber
                 .IonCount = 0
             End With
-            blnSuccess = True
+            success = True
         End If
 
-        If Not blnSuccess Then
+        If Not success Then
             Return False
         End If
 
-        SpectraPoolInfo(intTargetPoolIndex).CacheState = eCacheStateConstants.LoadedFromCache
+        SpectraPoolInfo(targetPoolIndex).CacheState = eCacheStateConstants.LoadedFromCache
 
-        If mSpectrumIndexInPool.Contains(intScanNumber) Then
-            mSpectrumIndexInPool.Item(intScanNumber) = intTargetPoolIndex
+        If mSpectrumIndexInPool.Contains(scanNumber) Then
+            mSpectrumIndexInPool.Item(scanNumber) = targetPoolIndex
         Else
-            mSpectrumIndexInPool.Add(intScanNumber, intTargetPoolIndex)
+            mSpectrumIndexInPool.Add(scanNumber, targetPoolIndex)
         End If
 
-        If Not blnReturnBlankSpectrum Then mUnCacheEventCount += 1
+        If Not returnBlankSpectrum Then mUnCacheEventCount += 1
 
         Return True
 
@@ -618,26 +615,24 @@ Public Class clsSpectraCache
 
     End Function
 
-    Private Sub ValidateMemoryAllocation(objMSSpectrum As clsMSSpectrum, intIonCount As Integer)
+    Private Sub ValidateMemoryAllocation(spectrum As clsMSSpectrum, ionCount As Integer)
 
-        Dim intAllocationAmount As Integer
+        With spectrum
+            If .IonsMZ.Length < ionCount Then
+                ' Find the next largest multiple of DEFAULT_SPECTRUM_ION_COUNT that is larger than ionCount
 
-        With objMSSpectrum
-            If .IonsMZ.Length < intIonCount Then
-                ' Find the next largest multiple of DEFAULT_SPECTRUM_ION_COUNT that is larger than intIonCount
-
-                intAllocationAmount = .IonsMZ.Length
-                Do While intAllocationAmount < intIonCount
-                    intAllocationAmount += DEFAULT_SPECTRUM_ION_COUNT
+                Dim allocationAmount = .IonsMZ.Length
+                Do While allocationAmount < ionCount
+                    allocationAmount += DEFAULT_SPECTRUM_ION_COUNT
                 Loop
 
-                ReDim .IonsMZ(intAllocationAmount - 1)
-                ReDim .IonsIntensity(intAllocationAmount - 1)
+                ReDim .IonsMZ(allocationAmount - 1)
+                ReDim .IonsIntensity(allocationAmount - 1)
             End If
         End With
     End Sub
 
-    Private Function ValidatePageFileIO(blnCreateIfUninitialized As Boolean) As Boolean
+    Private Function ValidatePageFileIO(createIfUninitialized As Boolean) As Boolean
         ' Validates that we can read and write from a Page file
         ' Opens the page file reader and writer if not yet opened
 
@@ -645,17 +640,16 @@ Public Class clsSpectraCache
             Return True
         End If
 
-        If Not blnCreateIfUninitialized Then
+        If Not createIfUninitialized Then
             Return False
         End If
 
         Try
             ' Construct the page file path
-            Dim strCacheFilePath = ConstructCachedSpectrumPath()
+            Dim cacheFilePath = ConstructCachedSpectrumPath()
 
             ' Initialize the binary writer and create the file
-            Dim fsWrite = New FileStream(strCacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)
-            mPageFileWriter = New BinaryWriter(fsWrite)
+            mPageFileWriter = New BinaryWriter(New FileStream(cacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
 
             ' Write a header line
             mPageFileWriter.Write(
@@ -663,15 +657,13 @@ Public Class clsSpectraCache
                 DateTime.Now.ToLongTimeString())
 
             ' Add 64 bytes of white space
-            ' ReSharper disable once RedundantAssignment
-            For intIndex = 0 To 63
+            For index = 0 To 63
                 mPageFileWriter.Write(Byte.MinValue)
             Next
             mPageFileWriter.Flush()
 
             ' Initialize the binary reader
-            Dim fsRead = New FileStream(strCacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-            mPageFileReader = New BinaryReader(fsRead)
+            mPageFileReader = New BinaryReader(New FileStream(cacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 
             Return True
 
@@ -683,28 +675,26 @@ Public Class clsSpectraCache
     End Function
 
     ''' <summary>
-    ''' Make sure the spectrum given by intScanNumber is present in FragScanSpectra
+    ''' Make sure the spectrum given by scanNumber is present in FragScanSpectra
     ''' When doing this, update the Pool Access History with this scan number to assure it doesn't get purged from the pool anytime soon
     ''' </summary>
-    ''' <param name="intScanNumber">Scan number to load</param>
-    ''' <param name="intPoolIndex">Output: index in the array that contains the given spectrum; -1 if no match</param>
+    ''' <param name="scanNumber">Scan number to load</param>
+    ''' <param name="poolIndex">Output: index in the array that contains the given spectrum; -1 if no match</param>
     ''' <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
-    Public Function ValidateSpectrumInPool(intScanNumber As Integer, <Out> ByRef intPoolIndex As Integer) As Boolean
-
-        Dim blnSuccess As Boolean
+    Public Function ValidateSpectrumInPool(scanNumber As Integer, <Out> ByRef poolIndex As Integer) As Boolean
 
         Try
-            If mSpectrumIndexInPool.Contains(intScanNumber) Then
-                intPoolIndex = CInt(mSpectrumIndexInPool(intScanNumber))
+            If mSpectrumIndexInPool.Contains(scanNumber) Then
+                poolIndex = CInt(mSpectrumIndexInPool(scanNumber))
                 Return True
             End If
 
             ' Need to load the spectrum
-            blnSuccess = UnCacheSpectrum(intScanNumber, intPoolIndex)
-            Return blnSuccess
+            Dim success = UnCacheSpectrum(scanNumber, poolIndex)
+            Return success
         Catch ex As Exception
             ReportError(ex.Message, ex)
-            intPoolIndex = -1
+            poolIndex = -1
             Return False
         End Try
 
