@@ -209,6 +209,8 @@ Public Class clsSpectraCache
     ''' False if an error
     ''' </return>
     Private Sub CacheSpectrum(poolIndexToCache As Integer)
+        Const MAX_RETRIES = 3
+
         If SpectraPoolInfo(poolIndexToCache).CacheState = eCacheStateConstants.UnusedSlot Then
             ' Nothing to do; slot is already empty
         Else
@@ -230,6 +232,9 @@ Public Class clsSpectraCache
                         ' Record the current offset in the hashtable
                         mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position)
 
+                        Dim retryCount = MAX_RETRIES
+                        Do While retryCount >= 0
+                            Try
                                 With SpectraPool(poolIndexToCache)
                                     ' Write the scan number
                                     mPageFileWriter.Write(scanNumber)
@@ -250,6 +255,26 @@ Public Class clsSpectraCache
 
                                 ' Write four blank bytes (not really necessary, but adds a little padding between spectra)
                                 mPageFileWriter.Write(0)
+
+                                Exit Do
+
+                            Catch ex As Exception
+                                retryCount -= 1
+                                Dim message = String.Format("Error caching scan {0}: {1}", scanNumber, ex.Message)
+                                If retryCount >= 0 Then
+                                    OnWarningEvent(message)
+
+                                    ' Wait 2, 4, or 8 seconds, then try again
+                                    Dim sleepSeconds = Math.Pow(2, MAX_RETRIES - retryCount)
+                                    Threading.Thread.Sleep(CInt(sleepSeconds * 1000))
+
+                                    mPageFileWriter.BaseStream.Seek(initialOffset, SeekOrigin.Begin)
+                                Else
+                                    Throw New Exception(message, ex)
+                                End If
+                            End Try
+                        Loop
+
                     End If
                 End If
 
