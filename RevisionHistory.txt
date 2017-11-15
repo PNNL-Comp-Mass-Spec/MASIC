@@ -1,6 +1,9 @@
 MASIC Change Log
 
-Vesrion 2.8.6520; November 7, 2017
+Version 2.8.6527; November 14, 2017
+	- Retry appending to the spectrum cache
+
+Version 2.8.6520; November 7, 2017
 	- Updated ThermoRawFileReader.dll and SpectraTypeClassifier.dll
 
 Version 2.8.6507; October 25, 2017
