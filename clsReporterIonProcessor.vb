@@ -269,7 +269,7 @@ Public Class clsReporterIonProcessor
 
         Const USE_MAX_ABUNDANCE_IN_WINDOW = True
 
-        Static objITraqIntensityCorrector As New clsITraqIntensityCorrection(
+        Static intensityCorrector As New clsITraqIntensityCorrection(
             clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes,
             clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
 
@@ -391,11 +391,11 @@ Public Class clsReporterIonProcessor
                mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes OrElse
                mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes Then
 
-                ' Correct the reporter ion intensities using the ITraq Intensity Corrector class
+                ' Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 
-                If objITraqIntensityCorrector.ITraqMode <> mOptions.ReporterIons.ReporterIonMassMode OrElse
-                   objITraqIntensityCorrector.ITraq4PlexCorrectionFactorType <> mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType Then
-                    objITraqIntensityCorrector.UpdateITraqMode(
+                If intensityCorrector.ReporterIonMode <> mOptions.ReporterIons.ReporterIonMassMode OrElse
+                   intensityCorrector.ITraq4PlexCorrectionFactorType <> mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType Then
+                    intensityCorrector.UpdateITraqMode(
                         mOptions.ReporterIons.ReporterIonMassMode,
                         mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
                 End If
@@ -409,8 +409,9 @@ Public Class clsReporterIonProcessor
                     End If
                 Next
 
+                ' Apply the correction if 2 or more points are non-zero
                 If intPositiveCount >= 2 Then
-                    objITraqIntensityCorrector.ApplyCorrection(sngReporterIntensitiesCorrected)
+                    intensityCorrector.ApplyCorrection(sngReporterIntensitiesCorrected)
                 End If
 
             End If
