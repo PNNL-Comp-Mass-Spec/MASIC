@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.8.6626; February 21, 2018
+	- Add reporter ion intensity correction for TMT10 and TMT11
+	- Update masses for TMT10 to match TMT11
+
 Version 2.8.6527; November 14, 2017
 	- Retry appending to the spectrum cache
 

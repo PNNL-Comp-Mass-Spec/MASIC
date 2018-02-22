@@ -2,7 +2,7 @@
 
 ' This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
 ' It supports 4-plex and 8-plex iTraq
-' It also supports TMT10
+' It also supports TMT10 and TMT11
 '
 ' The isotopic distribution weights are provided by the iTraq or TMT manufacturer
 '
@@ -219,7 +219,7 @@ Public Class clsITraqIntensityCorrection
     ''' <param name="debugShowMatrixTable">When true, show a table of the coefficients at the console</param>
     Private Sub InitializeCoefficients(debugShowMatrixTable As Boolean)
 
-        ' iTraq labels
+        ' iTraq reporter ions
         Dim udtIsoPct113 As udtIsotopeContributionType
         Dim udtIsoPct114 As udtIsotopeContributionType
         Dim udtIsoPct115 As udtIsotopeContributionType
@@ -230,7 +230,7 @@ Public Class clsITraqIntensityCorrection
         Dim udtIsoPct120 As udtIsotopeContributionType
         Dim udtIsoPct121 As udtIsotopeContributionType
 
-        ' TMT labels
+        ' TMT reporter ions
         Dim udtIsoPct126 As udtIsotopeContributionType
         Dim udtIsoPct127N As udtIsotopeContributionType
         Dim udtIsoPct127C As udtIsotopeContributionType

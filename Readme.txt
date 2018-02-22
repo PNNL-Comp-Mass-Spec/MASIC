@@ -1,6 +1,7 @@
 MASIC (MS/MS Automated Selected Ion Chromatogram Generator)
 
 == Overview ==
+
 MASIC generates selected ion chromatograms (SICs) for all of the parent ions 
 chosen for fragmentation in an LC-MS/MS analysis.  The SICs are generated 
 using the LC-MS data, then each SIC is processed using a peak finding 
@@ -18,6 +19,7 @@ http://www.ncbi.nlm.nih.gov/pubmed/?term=18440872
 
 
 == Installation ==
+
 Double click the MASIC_installer.msi file to install.  The program
 shortcut can be found at Start Menu -> Programs -> PAST Toolkit -> MASIC
 The MASIC browser shortcut can be found at PAST Toolkit -> MASIC Browser
@@ -30,6 +32,7 @@ When installing enable both features:
 
 
 == Custom SIC Values ==
+
 You can optionally define custom values to instruct MASIC to create SICs of
 specific m/z values centered around a certain time point in the input file.
 You can define the custom values via three methods:
@@ -86,6 +89,7 @@ or in the XML parameter file.
 
 
 == Reporter Ions ==
+
 Enable the "Generate Reporter Ion Stats" option to instruct MASIC to look 
 for standard reporter ion masses and to save their observed intensities in
 file _ReporterIons.txt.  Supported reporter ion modes are:
@@ -97,11 +101,17 @@ file _ReporterIons.txt.  Supported reporter ion modes are:
 	Mode 6, ITraq 8 (low res): same ions as Mode 5, but corrects for contamination from the immonium ion at 120.08131
 	Mode 7, PCGalnaz: 300.13 and 503.21 m/z
 	Mode 8, HemeCFragment: 616.1767 and 617.1845
-	Mode 9, LycAcetFragment: 126.09134 and 127.094695   
-	Mode 10, OGlcNAc: 204.0872, 300.13079, and 503.21017 
-
+	Mode 9, LycAcetFragment: 126.09134 and 127.094695
+	Mode 10, TMT 10: 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137790, 130.134825, 130.141145, 131.138180
+	Mode 11, OGlcNAc: 204.0872, 300.13079, and 503.21017
+	Mode 12, Fracking Amine 20160217: 157.089, 170.097, and 234.059
+	Mode 13, FSFACustomCarbonyl
+	Mode 14, FSFACustomCarboxylic
+	Mode 15, FSFACustomHydroxyl
+	Mode 16, TMT 11: 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137790, 130.134825, 130.141145, 131.138180, 131.144499
 
 == MRM Data ==
+
 When processing Thermo-Finnigan MRM data files, a file named _MRMSettings.txt 
 will be created listing the parent and daughter m/z values monitored via 
 selected reaction monitoring.  You can optionally export detailed MRM 
@@ -115,6 +125,7 @@ given parent m/z to daughter m/z transition being monitored.
 
 
 == IonCountRaw vs. IonCount ==
+
 In the ScanStats file, IonCountRaw is the number MASIC m/z values present in 
 each spectrum.  IonCount is the number of points that MASIC keeps in memory and 
 examines when creating SICs.  For LTQ-FT data with scans containing lots of high 
@@ -123,7 +134,6 @@ within ~0.05 m/z (thus, combine 1000.05 and 1000.052 as simply 1000.051).
 Additionally, for scans with a lot of low quality, low intensity data, MASIC 
 discards the low intensity data.  The IonCount value would let you see which 
 scans MASIC is discarding some data, for whatever reason.
-
 
 -------------------------------------------------------------------------------
 Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
@@ -136,19 +146,6 @@ Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
 Licensed under the Apache License, Version 2.0; you may not use this file except 
 in compliance with the License.  You may obtain a copy of the License at 
 http://www.apache.org/licenses/LICENSE-2.0
-
-All publications that utilize this software should provide appropriate 
-acknowledgement to PNNL website. However, if the software is extended or modified, 
-then any subsequent publications should include a more extensive statement, 
-using this text or a similar variant: 
- Portions of this research were supported by the NIH National Center for 
- Research Resources (Grant RR018522), the W.R. Wiley Environmental Molecular 
- Science Laboratory (a national scientific user facility sponsored by the U.S. 
- Department of Energy's Office of Biological and Environmental Research and 
- located at PNNL), and the National Institute of Allergy and Infectious Diseases 
- (NIH/DHHS through interagency agreement Y1-AI-4894-01). PNNL is operated by 
- Battelle Memorial Institute for the U.S. Department of Energy under 
- contract DE-AC05-76RL0 1830. 
 
 Notice: This computer software was prepared by Battelle Memorial Institute, 
 hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the 
