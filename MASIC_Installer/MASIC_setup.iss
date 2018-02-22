@@ -14,13 +14,12 @@ WelcomeLabel2=This will install [name/ver] on your computer.
 [Files]
 Source: ..\bin\MASIC.exe                      ; DestDir: {app}
 Source: ..\bin\MASIC.pdb                      ; DestDir: {app}
-Source: ..\bin\alglibnet2.dll                 ; DestDir: {app}
 Source: ..\bin\DataFilter.dll                 ; DestDir: {app}
+Source: ..\bin\InterDetect.dll                ; DestDir: {app}
 Source: ..\bin\MASICPeakFinder.dll            ; DestDir: {app}
 Source: ..\bin\MatrixDecompositionUtility.dll ; DestDir: {app}
 Source: ..\bin\MSDataFileReader.dll           ; DestDir: {app}
 Source: ..\bin\NetCDFReader.dll               ; DestDir: {app}
-Source: ..\bin\PNNLOmics.dll                  ; DestDir: {app}
 Source: ..\bin\PRISM.dll                      ; DestDir: {app}
 Source: ..\bin\ProgressFormNET.dll            ; DestDir: {app}
 Source: ..\bin\SavGolCS.dll                   ; DestDir: {app}
@@ -33,7 +32,6 @@ Source: ..\MASICBrowser\bin\MASICBrowser.exe          ; DestDir: {app}
 Source: ..\MASICBrowser\bin\OxyDataPlotter.dll        ; DestDir: {app}
 Source: ..\MASICBrowser\bin\OxyPlot.dll               ; DestDir: {app}
 Source: ..\MASICBrowser\bin\OxyPlot.WindowsForms.dll  ; DestDir: {app}
-Source: ..\MASICBrowser\bin\PNNLOmics.dll             ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Svg.dll                   ; DestDir: {app}
 
 Source: ..\Readme.txt                            ; DestDir: {app}
