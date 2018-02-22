@@ -389,7 +389,9 @@ Public Class clsReporterIonProcessor
 
             If mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ OrElse
                mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes OrElse
-               mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes Then
+               mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes OrElse
+               mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ OrElse
+               mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ Then
 
                 ' Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 
@@ -400,8 +402,7 @@ Public Class clsReporterIonProcessor
                         mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
                 End If
 
-                ' Make sure at least one of two of the points in sngReporterIntensitiesCorrected() is non-zero
-                ' If not, then no correction can be applied
+                ' Count the number of non-zero data points in sngReporterIntensitiesCorrected()
                 Dim intPositiveCount = 0
                 For intReporterIonIndex = 0 To reporterIons.Count - 1
                     If sngReporterIntensitiesCorrected(intReporterIonIndex) > 0 Then

@@ -1,9 +1,10 @@
 ﻿Option Strict On
 
-' This class corrects the intensities of iTraq data, based on the expected overlapping isotopic distributions
+' This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
 ' It supports 4-plex and 8-plex iTraq
+' It also supports TMT10
 '
-' The isotopic distribution weights were provided by Feng Yang (and originally came from the iTraq manufacturer)
+' The isotopic distribution weights are provided by the iTraq or TMT manufacturer
 '
 ' There are two options for the iTRAQ 4-plex weights:
 '   eCorrectionFactorsiTRAQ4Plex.ABSciex
@@ -16,6 +17,8 @@ Public Class clsITraqIntensityCorrection
     Private Const FOUR_PLEX_MATRIX_LENGTH As Integer = 4
     Private Const EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH As Integer = 8
     Private Const EIGHT_PLEX_LOW_RES_MATRIX_LENGTH As Integer = 9
+    Private Const TEN_PLEX_TMT_MATRIX_LENGTH As Integer = 10
+    Private Const ELEVEN_PLEX_TMT_MATRIX_LENGTH As Integer = 11
 
     Public Enum eCorrectionFactorsiTRAQ4Plex
         ABSciex = 0
@@ -167,6 +170,10 @@ Public Class clsITraqIntensityCorrection
                 Return EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH
             Case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes
                 Return EIGHT_PLEX_LOW_RES_MATRIX_LENGTH
+            Case clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ
+                Return TEN_PLEX_TMT_MATRIX_LENGTH
+            Case clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ
+                Return ELEVEN_PLEX_TMT_MATRIX_LENGTH
             Case Else
                 Throw New ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " & eReporterIonMode.ToString())
         End Select
@@ -189,6 +196,18 @@ Public Class clsITraqIntensityCorrection
         Dim udtIsoPct120 As udtIsotopeContributionType
         Dim udtIsoPct121 As udtIsotopeContributionType
 
+        ' TMT labels
+        Dim udtIsoPct126 As udtIsotopeContributionType
+        Dim udtIsoPct127N As udtIsotopeContributionType
+        Dim udtIsoPct127C As udtIsotopeContributionType
+        Dim udtIsoPct128N As udtIsotopeContributionType
+        Dim udtIsoPct128C As udtIsotopeContributionType
+        Dim udtIsoPct129N As udtIsotopeContributionType
+        Dim udtIsoPct129C As udtIsotopeContributionType
+        Dim udtIsoPct130N As udtIsotopeContributionType
+        Dim udtIsoPct130C As udtIsotopeContributionType
+        Dim udtIsoPct131N As udtIsotopeContributionType
+        Dim udtIsoPct131C As udtIsotopeContributionType
 
         Dim matrixSize = GetMatrixLength(mReporterIonMode)
         Dim maxIndex = matrixSize - 1
@@ -281,7 +300,7 @@ Public Class clsITraqIntensityCorrection
                 '  7     0       0       0       0       0       0       0     0.9211
 
 
-                ReDim mCoeffs(intMatrixSize - 1, intMatrixSize - 1)
+                ReDim mCoeffs(maxIndex, maxIndex)
 
                 mCoeffs(0, 0) = udtIsoPct113.Zero
                 mCoeffs(0, 1) = udtIsoPct114.Minus1
@@ -314,6 +333,7 @@ Public Class clsITraqIntensityCorrection
                 mCoeffs(5, 4) = udtIsoPct117.Plus1
                 mCoeffs(5, 5) = udtIsoPct118.Zero
                 mCoeffs(5, 6) = udtIsoPct119.Minus1
+                mCoeffs(5, 7) = 0
 
                 mCoeffs(6, 4) = udtIsoPct117.Plus2
                 mCoeffs(6, 5) = udtIsoPct118.Plus1
@@ -403,6 +423,105 @@ Public Class clsITraqIntensityCorrection
                 mCoeffs(8, 7) = udtIsoPct120.Plus1
                 mCoeffs(8, 8) = udtIsoPct121.Zero
 
+            Case clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ, clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ
+
+                ' 10-plex TMT and 11-plex TMT, isotope contribution table for High Res MS/MS
+                ' Source percentages provided by Thermo
+
+                udtIsoPct126 = DefineIsotopeContribution(0, 0, 95.1, 4.9, 0)
+                udtIsoPct127N = DefineIsotopeContribution(0, 0.2, 94, 5.8, 0)
+                udtIsoPct127C = DefineIsotopeContribution(0, 0.3, 94.9, 4.8, 0)
+                udtIsoPct128N = DefineIsotopeContribution(0, 0.3, 96.1, 3.6, 0)
+                udtIsoPct128C = DefineIsotopeContribution(0, 0.6, 95.5, 3.9, 0)
+                udtIsoPct129N = DefineIsotopeContribution(0, 0.8, 96.2, 3, 0)
+                udtIsoPct129C = DefineIsotopeContribution(0, 1.3, 95.8, 2.9, 0)
+                udtIsoPct130N = DefineIsotopeContribution(0, 1.4, 93, 2.3, 3.3)
+                udtIsoPct130C = DefineIsotopeContribution(0, 1.7, 96.1, 2.2, 0)
+                udtIsoPct131N = DefineIsotopeContribution(0.2, 2, 95.6, 2.2, 0)
+                udtIsoPct131C = DefineIsotopeContribution(0, 2.6, 94.5, 2.9, 0)
+
+
+                ' Goal is to generate this matrix (10-plex will not have the final row or final column)
+                '        0       1       2       3       4       5       6       7       8       9      10
+                '      ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------
+                '  0   0.951   0.002     0       0       0       0       0       0       0       0       0
+                '  1   0.049   0.940   0.003     0       0       0       0       0       0       0       0
+                '  2     0     0.058   0.949   0.003     0       0       0       0       0       0       0
+                '  3     0       0     0.048   0.961   0.006     0       0       0       0       0       0
+                '  4     0       0       0     0.036   0.955   0.008     0       0       0       0       0
+                '  5     0       0       0       0     0.039   0.962   0.013     0       0       0       0
+                '  6     0       0       0       0       0     0.030   0.958   0.014     0       0       0
+                '  7     0       0       0       0       0       0     0.029   0.930   0.017   0.002     0
+                '  8     0       0       0       0       0       0       0     0.023   0.961   0.020     0
+                '  9     0       0       0       0       0       0       0     0.033   0.022   0.956   0.026
+                '  10    0       0       0       0       0       0       0       0       0     0.022   0.945
+
+                ReDim mCoeffs(maxIndex, maxIndex)
+
+                mCoeffs(0, 0) = udtIsoPct126.Zero
+                mCoeffs(0, 1) = udtIsoPct127N.Minus1
+                mCoeffs(0, 2) = udtIsoPct127C.Minus2
+
+                mCoeffs(1, 0) = udtIsoPct126.Plus1
+                mCoeffs(1, 1) = udtIsoPct127N.Zero
+                mCoeffs(1, 2) = udtIsoPct127C.Minus1
+                mCoeffs(1, 3) = udtIsoPct128N.Minus2
+
+                mCoeffs(2, 0) = udtIsoPct126.Plus2
+                mCoeffs(2, 1) = udtIsoPct127N.Plus1
+                mCoeffs(2, 2) = udtIsoPct127C.Zero
+                mCoeffs(2, 3) = udtIsoPct128N.Minus1
+                mCoeffs(2, 4) = udtIsoPct128C.Minus2
+
+                mCoeffs(3, 1) = udtIsoPct127N.Plus2
+                mCoeffs(3, 2) = udtIsoPct127C.Plus1
+                mCoeffs(3, 3) = udtIsoPct128N.Zero
+                mCoeffs(3, 4) = udtIsoPct128C.Minus1
+                mCoeffs(3, 5) = udtIsoPct129N.Minus2
+
+                mCoeffs(4, 2) = udtIsoPct127C.Plus2
+                mCoeffs(4, 3) = udtIsoPct128N.Plus1
+                mCoeffs(4, 4) = udtIsoPct128C.Zero
+                mCoeffs(4, 5) = udtIsoPct129N.Minus1
+                mCoeffs(4, 6) = udtIsoPct129C.Minus2
+
+                mCoeffs(5, 3) = udtIsoPct128N.Plus2
+                mCoeffs(5, 4) = udtIsoPct128C.Plus1
+                mCoeffs(5, 5) = udtIsoPct129N.Zero
+                mCoeffs(5, 6) = udtIsoPct129C.Minus1
+                mCoeffs(5, 7) = udtIsoPct130N.Minus2
+
+                mCoeffs(6, 4) = udtIsoPct128C.Plus2
+                mCoeffs(6, 5) = udtIsoPct129N.Plus1
+                mCoeffs(6, 6) = udtIsoPct129C.Zero
+                mCoeffs(6, 7) = udtIsoPct130N.Minus1
+                mCoeffs(6, 8) = udtIsoPct130C.Minus2
+
+                mCoeffs(7, 5) = udtIsoPct129N.Plus2
+                mCoeffs(7, 6) = udtIsoPct129C.Plus1
+                mCoeffs(7, 7) = udtIsoPct130N.Zero
+                mCoeffs(7, 8) = udtIsoPct130C.Minus1
+                mCoeffs(7, 9) = udtIsoPct131N.Minus2
+
+                mCoeffs(8, 6) = udtIsoPct129C.Plus2
+                mCoeffs(8, 7) = udtIsoPct130N.Plus1
+                mCoeffs(8, 8) = udtIsoPct130C.Zero
+                mCoeffs(8, 9) = udtIsoPct131N.Minus1
+                If maxIndex >= 10 Then
+                    mCoeffs(8, 10) = udtIsoPct131C.Minus2
+                End If
+
+                mCoeffs(9, 7) = udtIsoPct130N.Plus2
+                mCoeffs(9, 8) = udtIsoPct130C.Plus1
+                mCoeffs(9, 9) = udtIsoPct131N.Zero
+                If maxIndex >= 10 Then
+                    mCoeffs(9, 10) = udtIsoPct131C.Minus1
+
+                    mCoeffs(10, 8) = udtIsoPct130C.Plus2
+                    mCoeffs(10, 9) = udtIsoPct131N.Plus1
+                    mCoeffs(10, 10) = udtIsoPct131C.Zero
+                End If
+
             Case Else
                 Throw New Exception("Invalid reporter ion mode in IntensityCorrection.InitializeCoefficients")
         End Select
@@ -436,7 +555,10 @@ Public Class clsITraqIntensityCorrection
 
                 End If
 
-                Console.Write("  " & i.ToString() & "  ")
+                Dim indexSpacer As String
+                If i < 10 Then indexSpacer = "  " Else indexSpacer = " "
+
+                Console.Write("  " & i.ToString() & indexSpacer)
                 For j = 0 To maxIndex
                     If Math.Abs(mCoeffs(i, j)) < Single.Epsilon Then
                         Console.Write("   0    ")
