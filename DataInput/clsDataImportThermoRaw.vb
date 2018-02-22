@@ -1,5 +1,4 @@
-﻿Imports InterDetect
-Imports MASIC.clsMASIC
+﻿Imports MASIC.clsMASIC
 Imports ThermoRawFileReader
 
 Namespace DataInput
@@ -13,7 +12,7 @@ Namespace DataInput
 
         Private Const PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
 
-        Private ReadOnly mInterferenceCalculator As InterferenceCalculator
+        Private ReadOnly mInterferenceCalculator As InterDetect.InterferenceCalculator
 
         Private ReadOnly mCachedPrecursorIons As List(Of InterDetect.Peak)
         Private mCachedPrecursorScan As Integer
@@ -34,7 +33,7 @@ Namespace DataInput
           scanTracking As clsScanTracking)
             MyBase.New(masicOptions, peakFinder, parentIonProcessor, scanTracking)
 
-            mInterferenceCalculator = New InterferenceCalculator()
+            mInterferenceCalculator = New InterDetect.InterferenceCalculator()
 
             AddHandler mInterferenceCalculator.StatusEvent, AddressOf OnStatusEvent
             AddHandler mInterferenceCalculator.ErrorEvent, AddressOf OnErrorEvent
@@ -126,7 +125,7 @@ Namespace DataInput
                 parentIonMz = mz
             End If
 
-            Dim oPrecursorInfo = New PrecursorInfo(parentIonMz, isolationWidth, chargeState) With {
+            Dim oPrecursorInfo = New InterDetect.PrecursorInfo(parentIonMz, isolationWidth, chargeState) With {
                 .ScanNumber = precursorScanNumber
             }
 
