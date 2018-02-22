@@ -42,7 +42,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "November 14, 2017"
+        MyBase.mFileDate = "February 21, 2018"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
@@ -1412,7 +1412,7 @@ Public Class clsMASIC
     Private Function GetFreeMemoryMB() As Single
         ' Returns the amount of free memory, in MB
 
-        Dim freeMemoryMB = PRISM.SystemInfo.GetFreeMemoryMB()
+        Dim freeMemoryMB = SystemInfo.GetFreeMemoryMB()
 
         Return freeMemoryMB
 
@@ -2125,7 +2125,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub UpdateOverallProgress()
-        UpdateOverallProgress(MyBase.mProgressStepDescription)
+        UpdateOverallProgress(ProgressStepDescription)
     End Sub
 
     Private Sub UpdateOverallProgress(strProgressStepDescription As String)
