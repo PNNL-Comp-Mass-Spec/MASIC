@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
@@ -192,10 +192,6 @@
     <Compile Include="clsScanTracking.vb" />
     <Compile Include="clsSICOptions.vb" />
     <Compile Include="clsParentIonInfo.vb" />
-    <Compile Include="clsProcessFilesBaseClass.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clsProcessFilesOrFoldersBase.vb" />
     <Compile Include="clsReporterIons.vb" />
     <Compile Include="clsScanInfo.vb" />
     <Compile Include="clsScanList.vb" />
@@ -242,7 +238,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library">
-      <Version>2.4.44</Version>
+      <Version>2.4.74</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

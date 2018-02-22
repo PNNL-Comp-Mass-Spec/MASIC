@@ -36,7 +36,7 @@ Imports MASIC.DataOutput
 Imports PRISM
 
 Public Class clsMASIC
-    Inherits clsProcessFilesBaseClass
+    Inherits FileProcessor.ProcessFilesBase
 
     ''' <summary>
     ''' Constructor

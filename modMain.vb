@@ -194,10 +194,10 @@ Public Module modMain
     End Sub
 
     Private Function GetAppVersion() As String
-        Return clsProcessFilesOrFoldersBase.GetAppVersion(PROGRAM_DATE)
+        Return PRISM.FileProcessor.ProcessFilesOrFoldersBase.GetAppVersion(PROGRAM_DATE)
     End Function
 
-    Private Sub RegisterEvents(oClass As clsEventNotifier)
+    Private Sub RegisterEvents(oClass As PRISM.clsEventNotifier)
         AddHandler oClass.StatusEvent, AddressOf StatusEventHandler
         AddHandler oClass.DebugEvent, AddressOf DebugEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
@@ -289,11 +289,11 @@ Public Module modMain
     End Function
 
     Private Sub ShowErrorMessage(message As String, Optional ex As Exception = Nothing)
-        ConsoleMsgUtils.ShowError(message, ex)
+        PRISM.ConsoleMsgUtils.ShowError(message, ex)
     End Sub
 
     Private Sub ShowErrorMessage(title As String, errorMessages As IEnumerable(Of String))
-        ConsoleMsgUtils.ShowErrors(title, errorMessages)
+        PRISM.ConsoleMsgUtils.ShowErrors(title, errorMessages)
     End Sub
 
     Public Sub ShowGUI()
@@ -318,7 +318,7 @@ Public Module modMain
             Console.WriteLine("This program will read a Finnigan LCQ .RAW file or Agilent LC/MSD .CDF/.MGF file combo and create a selected ion chromatogram (SIC) for each parent ion.")
             Console.WriteLine()
 
-            Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(clsProcessFilesBaseClass.GetAppPath()))
+            Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(PRISM.FileProcessor.ProcessFilesBase.GetAppPath()))
             Console.WriteLine(" /I:InputFilePath.raw [/O:OutputFolderPath]")
             Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath] ")
             Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputFolderPath] [/R]")
@@ -412,7 +412,7 @@ Public Module modMain
     End Sub
 
     Private Sub DebugEventHandler(message As String)
-        ConsoleMsgUtils.ShowDebug(message)
+        PRISM.ConsoleMsgUtils.ShowDebug(message)
     End Sub
 
     Private Sub ErrorEventHandler(message As String, ex As Exception)
@@ -420,7 +420,7 @@ Public Module modMain
     End Sub
 
     Private Sub WarningEventHandler(message As String)
-        ConsoleMsgUtils.ShowWarning(message)
+        PRISM.ConsoleMsgUtils.ShowWarning(message)
     End Sub
 
 End Module

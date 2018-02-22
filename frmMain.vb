@@ -25,6 +25,7 @@ Option Strict On
 Imports MASIC.DataInput
 Imports MASICPeakFinder.clsMASICPeakFinder
 Imports PRISM
+Imports PRISM.FileProcessor
 Imports SharedVBNetRoutines.VBNetRoutines
 Imports ShFolderBrowser.FolderBrowser
 
@@ -554,7 +555,7 @@ Public Class frmMain
     End Function
 
     Private Function GetSettingsFilePath() As String
-        Return clsProcessFilesBaseClass.GetSettingsFilePathLocal("MASIC", XML_SETTINGS_FILE_NAME)
+        Return ProcessFilesBase.GetSettingsFilePathLocal("MASIC", XML_SETTINGS_FILE_NAME)
     End Function
 
     Private Sub IniFileLoadOptions(blnUpdateIOPaths As Boolean)
@@ -583,10 +584,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(strFilePath).ToString
                 Catch
-                    .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
                 End Try
             Else
-                .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
             End If
 
             If File.Exists(strFilePath) Then
@@ -652,7 +653,7 @@ Public Class frmMain
                     End If
 
                     If txtOutputFolderPath.TextLength = 0 Then
-                        txtOutputFolderPath.Text = clsProcessFilesBaseClass.GetAppFolderPath()
+                        txtOutputFolderPath.Text = ProcessFilesBase.GetAppFolderPath()
                     End If
 
                     mPreferredInputFileExtension = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
@@ -704,10 +705,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(strFilePath).ToString
                 Catch
-                    .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
                 End Try
             Else
-                .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
             End If
 
             If File.Exists(strFilePath) Then
@@ -790,7 +791,7 @@ Public Class frmMain
         DefineOverviewText()
 
         mXmlSettingsFilePath = GetSettingsFilePath()
-        clsProcessFilesBaseClass.CreateSettingsFileIfMissing(mXmlSettingsFilePath)
+        ProcessFilesBase.CreateSettingsFileIfMissing(mXmlSettingsFilePath)
 
         mPreferredInputFileExtension = ".Raw"
 
@@ -1134,7 +1135,7 @@ Public Class frmMain
         ' File Paths and Import Options
         Try
             If txtOutputFolderPath.TextLength = 0 OrElse Not Directory.Exists(txtOutputFolderPath.Text) Then
-                txtOutputFolderPath.Text = clsProcessFilesBaseClass.GetAppFolderPath()
+                txtOutputFolderPath.Text = ProcessFilesBase.GetAppFolderPath()
             End If
         Catch ex As Exception
             If blnConfirm Then
@@ -1375,10 +1376,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString
                 Catch
-                    .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
                 End Try
             Else
-                .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
             End If
 
             .Title = "Select dataset lookup file"
@@ -1428,10 +1429,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString
                 Catch
-                    .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
                 End Try
             Else
-                .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
             End If
 
             .Title = "Select custom SIC values file"
@@ -1494,10 +1495,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString
                 Catch
-                    .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
                 End Try
             Else
-                .InitialDirectory = clsProcessFilesBaseClass.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
             End If
 
             .Title = "Select input file"

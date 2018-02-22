@@ -16,6 +16,7 @@ Imports System.Runtime.InteropServices
 ' http://www.apache.org/licenses/LICENSE-2.0
 '
 Public Class clsMASICPeakFinder
+    Inherits PRISM.clsEventNotifier
 
 #Region "Constants and Enums"
     Public PROGRAM_DATE As String = "April 29, 2017"
@@ -3220,38 +3221,20 @@ Public Class clsMASICPeakFinder
     End Function
 
     Private Sub LogErrors(
-      strSource As String,
-      strMessage As String,
+      source As String,
+      message As String,
       ex As Exception,
-      Optional blnAllowInformUser As Boolean = True,
-      Optional blnAllowThrowingException As Boolean = True,
-      Optional blnLogLocalOnly As Boolean = True)
+      Optional allowThrowingException As Boolean = True)
 
-        Dim strMessageWithoutCRLF As String
+        Dim messageWithoutCRLF As String
 
-        mStatusMessage = String.Copy(strMessage)
+        mStatusMessage = String.Copy(message)
 
-        strMessageWithoutCRLF = mStatusMessage.Replace(ControlChars.NewLine, "; ")
+        messageWithoutCRLF = mStatusMessage.Replace(ControlChars.NewLine, "; ")
 
-        If ex Is Nothing Then
-            ex = New Exception("Error")
-        Else
-            If Not ex.Message Is Nothing AndAlso ex.Message.Length > 0 Then
-                strMessageWithoutCRLF &= "; " & ex.Message
-            End If
-        End If
+        OnErrorEvent(source & ": " & messageWithoutCRLF, ex)
 
-        Trace.WriteLine(DateTime.Now().ToLongTimeString & "; " & strMessageWithoutCRLF, strSource)
-        Console.WriteLine(DateTime.Now().ToLongTimeString & "; " & strMessageWithoutCRLF, strSource)
-
-        If Not mErrorLogger Is Nothing Then
-            mErrorLogger.PostError(strMessageWithoutCRLF, ex, blnLogLocalOnly)
-        End If
-
-        If mShowMessages AndAlso blnAllowInformUser Then
-            System.Windows.Forms.MessageBox.Show(mStatusMessage & ControlChars.NewLine & ex.Message, "Error",
-                                                 System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation)
-        ElseIf blnAllowThrowingException Then
+        If allowThrowingException Then
             Throw New Exception(mStatusMessage, ex)
         End If
     End Sub
