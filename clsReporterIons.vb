@@ -146,16 +146,16 @@
                 ' TMT 10-plex Isobaric tags (from Thermo), aka TMT10
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                reporterIons.Add(New clsReporterIonInfo(126.127725))
-                reporterIons.Add(New clsReporterIonInfo(127.12476))         ' 127N
-                reporterIons.Add(New clsReporterIonInfo(127.131079))        ' 127C
-                reporterIons.Add(New clsReporterIonInfo(128.128114))        ' 128N
-                reporterIons.Add(New clsReporterIonInfo(128.134433))        ' 128C
-                reporterIons.Add(New clsReporterIonInfo(129.131468))        ' 129N
-                reporterIons.Add(New clsReporterIonInfo(129.137787))        ' 129C
-                reporterIons.Add(New clsReporterIonInfo(130.134822))        ' 130N
-                reporterIons.Add(New clsReporterIonInfo(130.141141))        ' 130C
-                reporterIons.Add(New clsReporterIonInfo(131.138176))        ' 131N
+                reporterIons.Add(New clsReporterIonInfo(126.1277261))
+                reporterIons.Add(New clsReporterIonInfo(127.124761))         ' 127N
+                reporterIons.Add(New clsReporterIonInfo(127.1310809))        ' 127C
+                reporterIons.Add(New clsReporterIonInfo(128.1281158))        ' 128N
+                reporterIons.Add(New clsReporterIonInfo(128.1344357))        ' 128C
+                reporterIons.Add(New clsReporterIonInfo(129.1314706))        ' 129N
+                reporterIons.Add(New clsReporterIonInfo(129.1377905))        ' 129C
+                reporterIons.Add(New clsReporterIonInfo(130.1348254))        ' 130N
+                reporterIons.Add(New clsReporterIonInfo(130.1411453))        ' 130C
+                reporterIons.Add(New clsReporterIonInfo(131.1381802))        ' 131N
 
             Case eReporterIonMassModeConstants.TMTElevenMZ
                 ' TMT 11-plex Isobaric tags (from Thermo), aka TMT11
