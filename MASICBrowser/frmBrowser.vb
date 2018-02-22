@@ -1099,6 +1099,8 @@ Public Class frmBrowser
     Private mLastUpdate As DateTime
     Private mMASICPeakFinder As clsMASICPeakFinder
 
+    Private mLastErrorNotification As DateTime
+
     Private mFileLoadTimer As Windows.Forms.Timer
 
 #End Region
@@ -1603,9 +1605,10 @@ Public Class frmBrowser
     End Function
 
     Private Sub InitializeControls()
-        mMASICPeakFinder = New clsMASICPeakFinder
-        mSICPeakFinderOptions = clsMASICPeakFinder.GetDefaultSICPeakFinderOptions
+        mMASICPeakFinder = New clsMASICPeakFinder()
+        AddHandler mMASICPeakFinder.ErrorEvent, AddressOf MASICPeakFinderErrorHandler
 
+        mSICPeakFinderOptions = clsMASICPeakFinder.GetDefaultSICPeakFinderOptions
 
         mParentIonStats = New List(Of clsParentIonStats)
 
@@ -4014,6 +4017,13 @@ Public Class frmBrowser
 
             txtDataFilePath.Text = FileToAutoLoad
             ReadDataFileXMLTextReader(txtDataFilePath.Text)
+        End If
+    End Sub
+
+    Private Sub MASICPeakFinderErrorHandler(message As String, ex As Exception)
+        If DateTime.UtcNow.Subtract(mLastErrorNotification).TotalSeconds > 5 Then
+            mLastErrorNotification = DateTime.UtcNow
+            MessageBox.Show("MASICPeakFinder error: " & message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End If
     End Sub
 

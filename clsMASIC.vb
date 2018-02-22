@@ -51,6 +51,7 @@ Public Class clsMASIC
         InitializeMemoryManagementOptions(mProcessingStats)
 
         mMASICPeakFinder = New MASICPeakFinder.clsMASICPeakFinder()
+        RegisterEvents(mMASICPeakFinder)
 
         mOptions = New clsMASICOptions(Me.FileVersion(), mMASICPeakFinder.ProgramVersion)
         mOptions.InitializeVariables()
