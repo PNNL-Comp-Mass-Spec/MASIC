@@ -171,7 +171,7 @@
                 reporterIons.Add(New clsReporterIonInfo(130.1348254))        ' 130N
                 reporterIons.Add(New clsReporterIonInfo(130.1411453))        ' 130C
                 reporterIons.Add(New clsReporterIonInfo(131.1381802))        ' 131N
-                reporterIons.Add(New clsReporterIonInfo(131.144999))         ' 131C
+                reporterIons.Add(New clsReporterIonInfo(131.144499))        ' 131C
 
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
 
