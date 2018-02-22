@@ -1344,7 +1344,7 @@ Public Class clsMASIC
     End Function
 
 
-    Public Overrides Function GetDefaultExtensionsToParse() As String()
+    Public Overrides Function GetDefaultExtensionsToParse() As IList(Of String)
         Return DataInput.clsDataImport.GetDefaultExtensionsToParse()
     End Function
 

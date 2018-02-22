@@ -245,17 +245,17 @@ Namespace DataInput
 
         End Sub
 
-        Public Shared Function GetDefaultExtensionsToParse() As String()
-            Dim strExtensionsToParse(5) As String
+        Public Shared Function GetDefaultExtensionsToParse() As IList(Of String)
+            Dim extensionsToParse = New List(Of String) From {
+                FINNIGAN_RAW_FILE_EXTENSION,
+                MZ_XML_FILE_EXTENSION1,
+                MZ_XML_FILE_EXTENSION2,
+                MZ_DATA_FILE_EXTENSION1,
+                MZ_DATA_FILE_EXTENSION2,
+                AGILENT_MSMS_FILE_EXTENSION
+            }
 
-            strExtensionsToParse(0) = FINNIGAN_RAW_FILE_EXTENSION
-            strExtensionsToParse(1) = MZ_XML_FILE_EXTENSION1
-            strExtensionsToParse(2) = MZ_XML_FILE_EXTENSION2
-            strExtensionsToParse(3) = MZ_DATA_FILE_EXTENSION1
-            strExtensionsToParse(4) = MZ_DATA_FILE_EXTENSION2
-            strExtensionsToParse(5) = AGILENT_MSMS_FILE_EXTENSION
-
-            Return strExtensionsToParse
+            Return extensionsToParse
 
         End Function
 
