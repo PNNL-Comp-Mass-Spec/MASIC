@@ -106,7 +106,13 @@ Public Class clsITraqIntensityCorrection
         End If
     End Sub
 
-    Public Function ApplyCorrection(ByRef sngReporterIonIntensites() As Single) As Boolean
+    ''' <summary>
+    ''' Apply the correction factors to the reporter ions
+    ''' </summary>
+    ''' <param name="reporterIonIntensites"></param>
+    ''' <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
+    ''' <returns></returns>
+    Public Function ApplyCorrection(ByRef reporterIonIntensites() As Single, Optional debugShowIntensities As Boolean = False) As Boolean
 
         Dim dblOriginalIntensities() As Double
         Dim intDataCount As Integer = reporterIonIntensites.Count - 1
@@ -127,7 +133,13 @@ Public Class clsITraqIntensityCorrection
 
     End Function
 
-    Public Function ApplyCorrection(dblReporterIonIntensites() As Double) As Boolean
+    ''' <summary>
+    ''' Apply the correction factors to the reporter ions
+    ''' </summary>
+    ''' <param name="reporterIonIntensites"></param>
+    ''' <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
+    ''' <returns></returns>
+    Public Function ApplyCorrection(reporterIonIntensites() As Double, Optional debugShowIntensities As Boolean = False) As Boolean
 
         Dim matrixSize = GetMatrixLength(mReporterIonMode)
         Dim iTraqMode = clsReporterIons.GetReporterIonModeDescription(mReporterIonMode)
@@ -152,9 +164,31 @@ Public Class clsITraqIntensityCorrection
         ' Now update dblReporterIonIntensites
         For index = 0 To matrixSize - 1
             If reporterIonIntensites(index) > 0 Then
+                Dim newIntensity As Double
+                If correctedIntensities(index) < 0 Then
+                    newIntensity = 0
                 Else
-                    dblReporterIonIntensites(intIndex) = dblCorrectedIntensities(intIndex)
+                    newIntensity = correctedIntensities(index)
                 End If
+
+                If debugShowIntensities Then
+                    ' Compute percent change vs. the maximum reporter ion intensity
+                    Dim percentChange = (newIntensity - reporterIonIntensites(index)) / maxIntensity * 100
+                    Dim percentChangeRounded = CInt(Math.Round(percentChange, 0))
+
+                    Dim visualPercentChange As String
+                    If percentChangeRounded > 0 Then
+                        visualPercentChange = New String("+"c, percentChangeRounded)
+                    ElseIf percentChangeRounded < 0 Then
+                        visualPercentChange = New String("-"c, -percentChangeRounded)
+                    Else
+                        visualPercentChange = ""
+                    End If
+
+                    Console.WriteLine("{0,-8} {1,-10:0.0} {2,-12:0.0}{3,7:0.0}%   {4}", index, reporterIonIntensites(index), newIntensity, percentChange, visualPercentChange)
+                End If
+
+                reporterIonIntensites(index) = newIntensity
             End If
         Next
 
