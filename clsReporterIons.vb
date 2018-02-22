@@ -132,7 +132,7 @@
                 reporterIons.Add(New clsReporterIonInfo(127.1316))
 
             Case eReporterIonMassModeConstants.TMTSixMZ
-                ' TMT sixplex Isobaric tags (from Thermo), aka TMT6
+                ' TMT 6-plex Isobaric tags (from Thermo), aka TMT6
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 '                                                           ' Old values:
                 reporterIons.Add(New clsReporterIonInfo(126.127725))        ' 126.1283
@@ -146,31 +146,31 @@
                 ' TMT 10-plex Isobaric tags (from Thermo), aka TMT10
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                reporterIons.Add(New clsReporterIonInfo(126.1277261))
-                reporterIons.Add(New clsReporterIonInfo(127.124761))         ' 127N
-                reporterIons.Add(New clsReporterIonInfo(127.1310809))        ' 127C
-                reporterIons.Add(New clsReporterIonInfo(128.1281158))        ' 128N
-                reporterIons.Add(New clsReporterIonInfo(128.1344357))        ' 128C
-                reporterIons.Add(New clsReporterIonInfo(129.1314706))        ' 129N
-                reporterIons.Add(New clsReporterIonInfo(129.1377905))        ' 129C
-                reporterIons.Add(New clsReporterIonInfo(130.1348254))        ' 130N
-                reporterIons.Add(New clsReporterIonInfo(130.1411453))        ' 130C
-                reporterIons.Add(New clsReporterIonInfo(131.1381802))        ' 131N
+                reporterIons.Add(New clsReporterIonInfo(126.127726))
+                reporterIons.Add(New clsReporterIonInfo(127.124761))        ' 127N
+                reporterIons.Add(New clsReporterIonInfo(127.131081))        ' 127C
+                reporterIons.Add(New clsReporterIonInfo(128.128116))        ' 128N
+                reporterIons.Add(New clsReporterIonInfo(128.134436))        ' 128C
+                reporterIons.Add(New clsReporterIonInfo(129.131471))        ' 129N
+                reporterIons.Add(New clsReporterIonInfo(129.137790))        ' 129C
+                reporterIons.Add(New clsReporterIonInfo(130.134825))        ' 130N
+                reporterIons.Add(New clsReporterIonInfo(130.141145))        ' 130C
+                reporterIons.Add(New clsReporterIonInfo(131.138180))        ' 131N
 
             Case eReporterIonMassModeConstants.TMTElevenMZ
                 ' TMT 11-plex Isobaric tags (from Thermo), aka TMT11
                 ' These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                 ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                reporterIons.Add(New clsReporterIonInfo(126.1277261))        '
-                reporterIons.Add(New clsReporterIonInfo(127.124761))         ' 127N
-                reporterIons.Add(New clsReporterIonInfo(127.1310809))        ' 127C
-                reporterIons.Add(New clsReporterIonInfo(128.1281158))        ' 128N
-                reporterIons.Add(New clsReporterIonInfo(128.1344357))        ' 128C
-                reporterIons.Add(New clsReporterIonInfo(129.1314706))        ' 129N
-                reporterIons.Add(New clsReporterIonInfo(129.1377905))        ' 129C
-                reporterIons.Add(New clsReporterIonInfo(130.1348254))        ' 130N
-                reporterIons.Add(New clsReporterIonInfo(130.1411453))        ' 130C
-                reporterIons.Add(New clsReporterIonInfo(131.1381802))        ' 131N
+                reporterIons.Add(New clsReporterIonInfo(126.127726))        '
+                reporterIons.Add(New clsReporterIonInfo(127.124761))        ' 127N
+                reporterIons.Add(New clsReporterIonInfo(127.131081))        ' 127C
+                reporterIons.Add(New clsReporterIonInfo(128.128116))        ' 128N
+                reporterIons.Add(New clsReporterIonInfo(128.134436))        ' 128C
+                reporterIons.Add(New clsReporterIonInfo(129.131471))        ' 129N
+                reporterIons.Add(New clsReporterIonInfo(129.137790))        ' 129C
+                reporterIons.Add(New clsReporterIonInfo(130.134825))        ' 130N
+                reporterIons.Add(New clsReporterIonInfo(130.141145))        ' 130C
+                reporterIons.Add(New clsReporterIonInfo(131.138180))        ' 131N
                 reporterIons.Add(New clsReporterIonInfo(131.144499))        ' 131C
 
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
