@@ -3,6 +3,7 @@ Option Strict On
 Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Runtime.InteropServices
+
 ' -------------------------------------------------------------------------------
 ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
 ' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
@@ -19,7 +20,7 @@ Public Class clsMASICPeakFinder
     Inherits PRISM.clsEventNotifier
 
 #Region "Constants and Enums"
-    Public PROGRAM_DATE As String = "April 29, 2017"
+    Public PROGRAM_DATE As String = "February 21, 2018"
 
     Public Const MINIMUM_PEAK_WIDTH As Integer = 3                         ' Width in points
 
@@ -46,11 +47,13 @@ Public Class clsMASICPeakFinder
 
 #Region "Classwide Variables"
     Private mStatusMessage As String
-    ' TTest Significance Table:
-    ' Confidence Levels and critical values:
-    ' 80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
-    ' 1.886, 2.920, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598
 
+    ''' <summary>
+    ''' TTest Significance Table.
+    ''' Confidence Levels and critical values:
+    '''  80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
+    '''  1.886, 2.920, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598
+    ''' </summary>
     Private ReadOnly TTestConfidenceLevels As Single() = New Single() {1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598}
 
 #End Region
@@ -2184,7 +2187,6 @@ Public Class clsMASICPeakFinder
                     ' Note that the peaks in peakDataSaved are not necessarily ordered by increasing index,
                     '  thus the need for an exhaustive search
 
-                    Dim intAdjacentIndex = -1       ' Initially assign an invalid index
                     Dim intSmallestIndexDifference = sicData.Count + 1
                     For intPeakIndexCompare = 0 To peakDataSaved.Peaks.Count - 1
                         Dim comparisonPeak = peakDataSaved.Peaks(intPeakIndexCompare)
@@ -2218,14 +2220,12 @@ Public Class clsMASICPeakFinder
                                 If intPeakIndexStart - intComparisonPeakEdgeIndex <= intSmallestIndexDifference Then
                                     intPreviousPeakFWHMPointRight = intComparisonPeakEdgeIndex
                                     intSmallestIndexDifference = intPeakIndexStart - intComparisonPeakEdgeIndex
-                                    intAdjacentIndex = intPeakIndexCompare
                                 End If
                             End If
                         End If
                     Next
 
                     ' Search through peakDataSaved to find the closest peak to the right of this peak
-                    intAdjacentIndex = peakDataSaved.Peaks.Count    ' Initially assign an invalid index
                     intSmallestIndexDifference = sicData.Count + 1
                     For intPeakIndexCompare = peakDataSaved.Peaks.Count - 1 To 0 Step -1
                         Dim comparisonPeak = peakDataSaved.Peaks(intPeakIndexCompare)
@@ -2260,7 +2260,6 @@ Public Class clsMASICPeakFinder
                                 If intComparisonPeakEdgeIndex - intPeakIndexEnd <= intSmallestIndexDifference Then
                                     intNextPeakFWHMPointLeft = intComparisonPeakEdgeIndex
                                     intSmallestIndexDifference = intComparisonPeakEdgeIndex - intPeakIndexEnd
-                                    intAdjacentIndex = intPeakIndexCompare
                                 End If
                             End If
                         End If
