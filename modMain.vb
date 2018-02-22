@@ -1,7 +1,6 @@
 Option Strict On
 
 Imports System.Threading
-Imports PRISM
 Imports ProgressFormNET
 
 ' See clsMASIC for a program description
@@ -30,7 +29,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "November 14, 2017"
+    Public Const PROGRAM_DATE As String = "February 21, 2018"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -93,7 +92,7 @@ Public Module modMain
     Public Function Main() As Integer
         ' Returns 0 if no error, error code if an error
 
-        Dim objParseCommandLine As New clsParseCommandLine
+        Dim commandLineParser As New PRISM.clsParseCommandLine
         Dim proceed As Boolean
 
         mInputFilePath = String.Empty
@@ -109,16 +108,16 @@ Public Module modMain
 
         Try
             proceed = False
-            If objParseCommandLine.ParseCommandLine Then
-                If SetOptionsUsingCommandLineParameters(objParseCommandLine) Then proceed = True
+            If commandLineParser.ParseCommandLine Then
+                If SetOptionsUsingCommandLineParameters(commandLineParser) Then proceed = True
             End If
 
-            If (objParseCommandLine.ParameterCount + objParseCommandLine.NonSwitchParameterCount = 0) And Not objParseCommandLine.NeedToShowHelp Then
+            If (commandLineParser.ParameterCount + commandLineParser.NonSwitchParameterCount = 0) And Not commandLineParser.NeedToShowHelp Then
                 ShowGUI()
                 Return 0
             End If
 
-            If Not proceed OrElse objParseCommandLine.NeedToShowHelp OrElse mInputFilePath.Length = 0 Then
+            If Not proceed OrElse commandLineParser.NeedToShowHelp OrElse mInputFilePath.Length = 0 Then
                 ShowProgramHelp()
                 Return -1
             End If
@@ -211,7 +210,7 @@ Public Module modMain
         AddHandler oClass.ProgressSubtaskChanged, AddressOf ProgressSubtaskChangedHandler
     End Sub
 
-    Private Function SetOptionsUsingCommandLineParameters(objParseCommandLine As clsParseCommandLine) As Boolean
+    Private Function SetOptionsUsingCommandLineParameters(commandLineParser As PRISM.clsParseCommandLine) As Boolean
         ' Returns True if no problems; otherwise, returns false
 
         Dim value As String = String.Empty
@@ -220,14 +219,14 @@ Public Module modMain
 
         Try
             ' Make sure no invalid parameters are present
-            If objParseCommandLine.InvalidParametersPresent(lstValidParameters) Then
+            If commandLineParser.InvalidParametersPresent(lstValidParameters) Then
                 ShowErrorMessage("Invalid commmand line parameters",
-                  (From item In objParseCommandLine.InvalidParameters(lstValidParameters) Select "/" + item).ToList())
+                  (From item In commandLineParser.InvalidParameters(lstValidParameters) Select "/" + item).ToList())
                 Return False
             Else
 
-                ' Query objParseCommandLine to see if various parameters are present
-                With objParseCommandLine
+                ' Query commandLineParser to see if various parameters are present
+                With commandLineParser
                     If .RetrieveValueForParameter("I", value) Then
                         mInputFilePath = value
                     ElseIf .NonSwitchParameterCount > 0 Then
