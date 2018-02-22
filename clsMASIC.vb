@@ -1336,7 +1336,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("FindSICsAndWriteOutput", "Error saving results to: " & outputFolderPath, ex, True, True, eMasicErrorCodes.OutputFileWriteError)
+            LogErrors("FindSICsAndWriteOutput", "Error saving results to: " & outputFolderPath, ex, True, eMasicErrorCodes.OutputFileWriteError)
         End Try
 
         Return success
@@ -1586,7 +1586,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+            LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, True, eMasicErrorCodes.InputFileDataReadError)
             dataImporterBase = Nothing
         End Try
 
@@ -1603,7 +1603,6 @@ Public Class clsMASIC
       strSource As String,
       strMessage As String,
       ex As Exception,
-      Optional blnAllowInformUser As Boolean = True,
       Optional blnAllowThrowingException As Boolean = True,
       Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
 
@@ -1632,9 +1631,7 @@ Public Class clsMASIC
             SetLocalErrorCode(eNewErrorCode, True)
         End If
 
-        If MyBase.ShowMessages AndAlso blnAllowInformUser Then
-            MessageBox.Show(mOptions.StatusMessage & ControlChars.NewLine & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-        ElseIf blnAllowThrowingException Then
+        If blnAllowThrowingException Then
             Throw New Exception(mOptions.StatusMessage, ex)
         End If
     End Sub
@@ -1669,10 +1666,6 @@ Public Class clsMASIC
         If Not mOptions.LoadParameterFileSettings(parameterFilePath, inputFilePath) Then
             MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
             mStatusMessage = "Parameter file load error: " & parameterFilePath
-
-            If MyBase.ShowMessages Then
-                MessageBox.Show(mStatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-            End If
 
             MyBase.ShowErrorMessage(mStatusMessage)
 
@@ -1764,7 +1757,7 @@ Public Class clsMASIC
 
             Catch ex As Exception
                 success = False
-                LogErrors("ProcessFile", "Error checking for existing results file", ex, True, True, eMasicErrorCodes.InputFileDataReadError)
+                LogErrors("ProcessFile", "Error checking for existing results file", ex, True, eMasicErrorCodes.InputFileDataReadError)
             End Try
 
             If blnDoNotProcess Then
@@ -1798,7 +1791,7 @@ Public Class clsMASIC
 
             Catch ex As Exception
                 success = False
-                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & outputFolderPath, ex, True, False, eMasicErrorCodes.FileIOPermissionsError)
+                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & outputFolderPath, ex, False, eMasicErrorCodes.FileIOPermissionsError)
             End Try
 
             If Not success Then
@@ -1817,7 +1810,6 @@ Public Class clsMASIC
             '---------------------------------------------------------
 
             Using objSpectraCache = New clsSpectraCache(mOptions.CacheOptions) With {
-                .ShowMessages = MyBase.ShowMessages,
                 .DiskCachingAlwaysDisabled = mOptions.CacheOptions.DiskCachingAlwaysDisabled,
                 .CacheFolderPath = mOptions.CacheOptions.FolderPath,
                 .CacheSpectraToRetainInMemory = mOptions.CacheOptions.SpectraToRetainInMemory
@@ -1863,12 +1855,7 @@ Public Class clsMASIC
                         mStatusMessage = "Unable to parse file: " & mStatusMessage
                     End If
 
-                    If MyBase.ShowMessages Then
-                        MessageBox.Show(mStatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                        LogMessage(mStatusMessage, eMessageTypeConstants.ErrorMsg)
-                    Else
-                        MyBase.ShowErrorMessage(mStatusMessage)
-                    End If
+                    ShowErrorMessage(mStatusMessage)
                     Exit Try
                 End If
 
@@ -1885,7 +1872,7 @@ Public Class clsMASIC
                     End With
                 Catch ex As Exception
                     success = False
-                    LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+                    LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, False, eMasicErrorCodes.UnspecifiedError)
                     Exit Try
                 End Try
 
@@ -1904,7 +1891,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("ProcessFile", "Error in ProcessFile", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+            LogErrors("ProcessFile", "Error in ProcessFile", ex, False, eMasicErrorCodes.UnspecifiedError)
         Finally
 
             ' Record the final processing stats (before the output file handles are closed)
@@ -1918,10 +1905,6 @@ Public Class clsMASIC
             '---------------------------------------------------------
 
             dataOutputHandler.OutputFileHandles.CloseAll()
-
-            If AbortProcessing AndAlso MyBase.ShowMessages Then
-                MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            End If
         End Try
 
         Try
@@ -1970,7 +1953,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, True, False, eMasicErrorCodes.UnspecifiedError)
+            LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, False, eMasicErrorCodes.UnspecifiedError)
         End Try
 
         If success Then
@@ -2061,7 +2044,7 @@ Public Class clsMASIC
                 End With
             Next
         Catch ex As Exception
-            LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex, True, False)
+            LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex, False)
         End Try
 
     End Sub

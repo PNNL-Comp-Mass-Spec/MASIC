@@ -149,8 +149,6 @@ Public Class clsSpectraCache
         End Set
     End Property
 
-    Public Property ShowMessages As Boolean
-
     Public ReadOnly Property UnCacheEventCount As Integer
         Get
             Return mUnCacheEventCount

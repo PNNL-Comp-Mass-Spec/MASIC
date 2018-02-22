@@ -1047,7 +1047,6 @@ Public Class frmMain
         If Not mWorking AndAlso ConfirmPaths() Then
             Try
 
-                mMasic.ShowMessages = True
                 txtLogMessages.ResetText()
 
                 ' Configure settings
@@ -1078,6 +1077,10 @@ Public Class frmMain
                     blnSuccess = .ProcessFile(txtInputFilePath.Text, strOutputFolderPath)
 
                     Cursor.Current = Cursors.Default
+
+                    If .Options.AbortProcessing Then
+                        MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    End If
 
                     If blnSuccess Then
                         ' Grab the status message, but insert a carriage return directly after "in folder:"

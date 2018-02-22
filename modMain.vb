@@ -133,13 +133,12 @@ Public Module modMain
                 mMASIC.Options.MASICStatusFilename = mMASICStatusFilename
             End If
 
-            mMASIC.ShowMessages = Not mQuietMode
             mMASIC.LogMessagesToFile = mLogMessagesToFile
             mMASIC.LogFilePath = mLogFilePath
             mMASIC.LogFolderPath = mLogFolderPath
 
-            If mMASIC.ShowMessages Then
-                mProgressForm = New frmProgress
+            If Not mQuietMode Then
+                mProgressForm = New frmProgress()
 
                 mProgressForm.InitializeProgressForm("Parsing " & Path.GetFileName(mInputFilePath), 0, 100, False, True)
                 mProgressForm.InitializeSubtask("", 0, 100, False)

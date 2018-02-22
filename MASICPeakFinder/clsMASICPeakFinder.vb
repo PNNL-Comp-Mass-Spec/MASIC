@@ -45,10 +45,7 @@ Public Class clsMASICPeakFinder
 #End Region
 
 #Region "Classwide Variables"
-    Private mShowMessages As Boolean
     Private mStatusMessage As String
-    Private mErrorLogger As PRISM.ILogger
-
     ' TTest Significance Table:
     ' Confidence Levels and critical values:
     ' 80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
@@ -71,15 +68,6 @@ Public Class clsMASICPeakFinder
         End Get
     End Property
 
-    Public Property ShowMessages As Boolean
-        Get
-            Return mShowMessages
-        End Get
-        Set
-            mShowMessages = Value
-        End Set
-    End Property
-
     Public ReadOnly Property StatusMessage As String
         Get
             Return mStatusMessage
@@ -92,12 +80,6 @@ Public Class clsMASICPeakFinder
     ''' </summary>
     Public Sub New()
         mStatusMessage = String.Empty
-        mShowMessages = False
-    End Sub
-
-    Public Sub AttachErrorLogger(objLogger As PRISM.ILogger, intDebugLevel As Integer)
-        If Not mErrorLogger Is Nothing Then Exit Sub
-        mErrorLogger = objLogger
     End Sub
 
     ''' <summary>
@@ -688,7 +670,7 @@ Public Class clsMASICPeakFinder
             End If
 
         Catch ex As Exception
-            LogErrors("clsMASICPeakFinder->ComputeFWHM", "Error finding FWHM", ex, True, False, True)
+            LogErrors("clsMASICPeakFinder->ComputeFWHM", "Error finding FWHM", ex, False)
             intFWHMScans = 0
         End Try
 
@@ -1163,7 +1145,7 @@ Public Class clsMASICPeakFinder
             End If
 
         Catch ex As Exception
-            LogErrors("clsMASICPeakFinder->ComputeSICPeakArea", "Error computing area", ex, True, False, True)
+            LogErrors("clsMASICPeakFinder->ComputeSICPeakArea", "Error computing area", ex, False)
             Return False
         End Try
 
@@ -1566,7 +1548,7 @@ Public Class clsMASICPeakFinder
 
 
         Catch ex As Exception
-            LogErrors("clsMASICPeakFinder->ComputeStatisticalMomentsStats", "Error computing statistical momements", ex, True, False, True)
+            LogErrors("clsMASICPeakFinder->ComputeStatisticalMomentsStats", "Error computing statistical momements", ex, False)
             Return False
         End Try
 
@@ -1779,7 +1761,7 @@ Public Class clsMASICPeakFinder
                 ' Unknown mode
                 LogErrors("clsMASICPeakFinder->ComputeTrimmedNoiseLevel",
                           "Unknown Noise Threshold Mode encountered: " & baselineNoiseOptions.BaselineNoiseMode.ToString,
-                          Nothing, True, False)
+                          Nothing, False)
                 Return False
         End Select
 
@@ -2075,7 +2057,7 @@ Public Class clsMASICPeakFinder
                       blnTestingMinimumPeakWidth, returnClosestsPeak)
 
                 Catch ex As Exception
-                    LogErrors("clsMASICPeakFinder->FindPeaks", "Error calling FindPeaksWork", ex, True, True, True)
+                    LogErrors("clsMASICPeakFinder->FindPeaks", "Error calling FindPeaksWork", ex, True)
                     blnValidPeakFound = False
                     Exit Do
                 End Try
@@ -2303,7 +2285,7 @@ Public Class clsMASICPeakFinder
             Loop While Not blnValidPeakFound
 
         Catch ex As Exception
-            LogErrors("clsMASICPeakFinder->FindPeaks", "Error in FindPeaks", ex, True, False, True)
+            LogErrors("clsMASICPeakFinder->FindPeaks", "Error in FindPeaks", ex, False)
             blnValidPeakFound = False
         End Try
 
@@ -2433,13 +2415,13 @@ Public Class clsMASICPeakFinder
                 ' Make sure intPeakLocationIndex is between intPeakIndexStart and intPeakIndexEnd
                 If intPeakIndexStart > intPeakLocationIndex Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWork",
-                              "intPeakIndexStart is > intPeakLocationIndex; this is probably a programming error", Nothing, True, False)
+                              "intPeakIndexStart is > intPeakLocationIndex; this is probably a programming error", Nothing, False)
                     intPeakIndexStart = intPeakLocationIndex
                 End If
 
                 If intPeakIndexEnd < intPeakLocationIndex Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWork",
-                              "intPeakIndexEnd is < intPeakLocationIndex; this is probably a programming error", Nothing, True, False)
+                              "intPeakIndexEnd is < intPeakLocationIndex; this is probably a programming error", Nothing, False)
                     intPeakIndexEnd = intPeakLocationIndex
                 End If
 
@@ -2664,7 +2646,7 @@ Public Class clsMASICPeakFinder
                   peaksContainer.SourceDataCount - 1, sngButterWorthFrequency)
                 If Not blnSuccess Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData",
-                              "Error with the Butterworth filter" & strErrorMessage, Nothing, True, False)
+                              "Error with the Butterworth filter" & strErrorMessage, Nothing, False)
                     Return False
                 Else
                     ' Data was smoothed
@@ -2699,7 +2681,7 @@ Public Class clsMASICPeakFinder
 
                 If Not blnSuccess Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData",
-                              "Error with the Savitzky-Golay filter: " & strErrorMessage, Nothing, True, False)
+                              "Error with the Savitzky-Golay filter: " & strErrorMessage, Nothing, False)
                     Return False
                 Else
                     ' Data was smoothed
@@ -2939,7 +2921,7 @@ Public Class clsMASICPeakFinder
                 ' Initialize .IndexMax to .IndexObserved (which should have been defined by the calling function)
                 sicPeak.IndexMax = sicPeak.IndexObserved
                 If sicPeak.IndexMax < 0 OrElse sicPeak.IndexMax >= sicData.Count Then
-                    LogErrors("clsMasicPeakFinder->FindSICPeakAndArea", "Unexpected .IndexMax value", Nothing, True, False)
+                    LogErrors("clsMasicPeakFinder->FindSICPeakAndArea", "Unexpected .IndexMax value", Nothing, False)
                     sicPeak.IndexMax = 0
                 End If
 
@@ -3049,7 +3031,7 @@ Public Class clsMASICPeakFinder
             blnSuccess = True
 
         Catch ex As Exception
-            LogErrors("clsMASICPeakFinder->FindSICPeakAndArea", "Error finding SIC peaks and their areas", ex, True, False, True)
+            LogErrors("clsMASICPeakFinder->FindSICPeakAndArea", "Error finding SIC peaks and their areas", ex, False)
             blnSuccess = False
         End Try
 
@@ -3184,7 +3166,7 @@ Public Class clsMASICPeakFinder
             sngInterpolatedXValue = sngTargetX
             Return True
         Else
-            LogErrors("clsMasicPeakFinder->InterpolateX", "TargetX is not between X1 and X2; this shouldn't happen", Nothing, True, False)
+            LogErrors("clsMasicPeakFinder->InterpolateX", "TargetX is not between X1 and X2; this shouldn't happen", Nothing, False)
             sngInterpolatedXValue = 0
             Return False
         End If
