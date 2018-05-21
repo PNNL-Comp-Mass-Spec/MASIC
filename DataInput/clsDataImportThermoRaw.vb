@@ -10,6 +10,8 @@ Namespace DataInput
         Private Const SCAN_EVENT_MONOISOTOPIC_MZ = "Monoisotopic M/Z"
         Private Const SCAN_EVENT_MS2_ISOLATION_WIDTH = "MS2 Isolation Width"
 
+        Private Const ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
+
         Private Const PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
 
         Private ReadOnly mInterferenceCalculator As InterDetect.InterferenceCalculator
@@ -17,6 +19,7 @@ Namespace DataInput
         Private ReadOnly mCachedPrecursorIons As List(Of InterDetect.Peak)
         Private mCachedPrecursorScan As Integer
 
+        Private mIsolationWidthNotFoundCount As Integer
         Private mPrecursorNotFoundCount As Integer
 
         ''' <summary>
@@ -42,6 +45,7 @@ Namespace DataInput
             mCachedPrecursorIons = New List(Of InterDetect.Peak)
             mCachedPrecursorScan = 0
 
+            mIsolationWidthNotFoundCount = 0
             mPrecursorNotFoundCount = 0
 
         End Sub
@@ -88,8 +92,19 @@ Namespace DataInput
             End If
 
             If Not scanInfo.TryGetScanEvent(SCAN_EVENT_MS2_ISOLATION_WIDTH, isolationWidthText, True) Then
-                ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
-                              "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                If scanInfo.MRMScanType = MRMScanTypeConstants.SRM Then
+                    ' SRM data files don't have the MS2 Isolation Width event
+                    Return 0
+                End If
+
+                mIsolationWidthNotFoundCount += 1
+                If mIsolationWidthNotFoundCount <= ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW Then
+                    ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
+                                  "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                ElseIf mIsolationWidthNotFoundCount Mod 5000 = 0 Then
+                    ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
+                                  "for " & mIsolationWidthNotFoundCount & " scans")
+                End If
                 Return 0
             End If
 
@@ -152,6 +167,7 @@ Namespace DataInput
 
             Dim strIOMode = "Xraw"
 
+            mIsolationWidthNotFoundCount = 0
             mPrecursorNotFoundCount = 0
 
             ' Assume success for now
