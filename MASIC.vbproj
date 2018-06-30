@@ -220,6 +220,7 @@
     </Compile>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -238,7 +239,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library">
-      <Version>2.4.82</Version>
+      <Version>2.4.89</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
