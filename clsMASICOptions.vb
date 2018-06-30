@@ -357,8 +357,7 @@ Public Class clsMASICOptions
                     Dim eReporterIonITraq4PlexCorrectionFactorType = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS,
                                                                                      "ReporterIonITraq4PlexCorrectionFactorType",
                                                                                      CInt(ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)),
-                                                                           clsITraqIntensityCorrection.
-                            eCorrectionFactorsiTRAQ4Plex)
+                                                                           clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)
 
                     ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
                         eReporterIonITraq4PlexCorrectionFactorType

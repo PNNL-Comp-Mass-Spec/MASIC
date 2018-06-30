@@ -10,13 +10,13 @@ Imports ProgressFormNET
 ' Program started October 11, 2003
 ' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
 
-' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
-' Website: http://omics.pnl.gov/ or http://www.sysbio.org/resources/staff/ or http://panomics.pnnl.gov/
+' E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
+' Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
 ' -------------------------------------------------------------------------------
 '
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
 ' in compliance with the License.  You may obtain a copy of the License at
-' http://www.apache.org/licenses/LICENSE-2.0
+' https://www.apache.org/licenses/LICENSE-2.0
 '
 ' Notice: This computer software was prepared by Battelle Memorial Institute,
 ' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
@@ -29,7 +29,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "February 21, 2018"
+    Public Const PROGRAM_DATE As String = "June 30, 2018"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -344,8 +344,8 @@ Public Module modMain
 
             Console.WriteLine()
 
-            Console.WriteLine("E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com")
-            Console.WriteLine("Website: http://omics.pnl.gov/ or http://panomics.pnnl.gov/")
+            Console.WriteLine("E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov")
+            Console.WriteLine("Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/")
             Console.WriteLine()
 
             ' Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
