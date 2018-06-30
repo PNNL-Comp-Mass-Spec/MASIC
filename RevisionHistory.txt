@@ -1,6 +1,6 @@
 MASIC Change Log
 
-Version 2.8.6715; May 21, 201
+Version 2.8.6715; May 21, 2018
 	- Allow for scan event "MS2 Isolation Width" to be missing for SRM scans
 
 Version 2.8.6626; February 21, 2018
