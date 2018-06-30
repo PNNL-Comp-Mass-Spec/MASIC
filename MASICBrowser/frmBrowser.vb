@@ -6,13 +6,13 @@
 ' Program started October 17, 2003
 ' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
 
-' E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com
-' Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/
+' E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
+' Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
 ' -------------------------------------------------------------------------------
 '
 ' Licensed under the Apache License, Version 2.0; you may not use this file except
 ' in compliance with the License.  You may obtain a copy of the License at
-' http://www.apache.org/licenses/LICENSE-2.0
+' https://www.apache.org/licenses/LICENSE-2.0
 '
 ' Notice: This computer software was prepared by Battelle Memorial Institute,
 ' hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
@@ -3195,12 +3195,12 @@ Public Class frmBrowser
         message.Add("This is version " & Application.ProductVersion & " (" & PROGRAM_DATE & ")")
         message.Add("")
 
-        message.Add("E-mail: matthew.monroe@pnnl.gov or matt@alchemistmatt.com")
-        message.Add("Website: http://panomics.pnnl.gov/ or http://www.sysbio.org/resources/staff/")
+        message.Add("E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov")
+        message.Add("Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/")
         message.Add("")
 
         message.Add("Licensed under the Apache License, Version 2.0; you may not use this file except in compliance with the License. ")
-        message.Add("You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0")
+        message.Add("You may obtain a copy of the License at https://www.apache.org/licenses/LICENSE-2.0")
         message.Add("")
 
         message.Add("Notice: This computer software was prepared by Battelle Memorial Institute, " &
