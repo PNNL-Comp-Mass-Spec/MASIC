@@ -26,6 +26,7 @@ Source: ..\bin\SavGolCS.dll                   ; DestDir: {app}
 Source: ..\bin\SharedVBNetRoutines.dll        ; DestDir: {app}
 Source: ..\bin\ShFolderBrowser.dll            ; DestDir: {app}
 Source: ..\bin\SpectraTypeClassifier.dll      ; DestDir: {app}
+Source: ..\bin\System.Threading.Tasks.Dataflow.dll ; DestDir: {app}
 Source: ..\bin\ThermoRawFileReader.dll        ; DestDir: {app}
 
 Source: ..\MASICBrowser\bin\MASICBrowser.exe          ; DestDir: {app}
@@ -34,7 +35,7 @@ Source: ..\MASICBrowser\bin\OxyPlot.dll               ; DestDir: {app}
 Source: ..\MASICBrowser\bin\OxyPlot.WindowsForms.dll  ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Svg.dll                   ; DestDir: {app}
 
-Source: ..\Readme.txt                            ; DestDir: {app}
+Source: ..\Readme.md                             ; DestDir: {app}
 Source: ..\RevisionHistory.txt                   ; DestDir: {app}
 Source: Images\delete_16x.ico                    ; DestDir: {app}
                                                 
