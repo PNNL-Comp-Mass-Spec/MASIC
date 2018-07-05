@@ -610,27 +610,27 @@ Public Class clsITraqIntensityCorrection
     ''' <summary>
     ''' Given a set of isotope correction values
     ''' </summary>
-    ''' <param name="Minus2"></param>
-    ''' <param name="Minus1"></param>
-    ''' <param name="Zero"></param>
-    ''' <param name="Plus1"></param>
-    ''' <param name="Plus2"></param>
+    ''' <param name="minus2">Value between 0 and 100, but typically close to 0</param>
+    ''' <param name="minus1">Value between 0 and 100, but typically close to 0</param>
+    ''' <param name="zero">Value between 0 and 100, but typically close to 98</param>
+    ''' <param name="plus1">Value between 0 and 100, but typically close to 0</param>
+    ''' <param name="plus2">Value between 0 and 100, but typically close to 0</param>
     ''' <returns></returns>
-    ''' <remarks></remarks>
-    Private Function DefineIsotopeContribution(Minus2 As Single,
-                                               Minus1 As Single,
-                                               Zero As Single,
-                                               Plus1 As Single,
-                                               Plus2 As Single) As udtIsotopeContributionType
+    ''' <remarks>The values should sum to 100; however, if zero (aka the the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
+    Private Function DefineIsotopeContribution(minus2 As Single,
+                                               minus1 As Single,
+                                               zero As Single,
+                                               plus1 As Single,
+                                               plus2 As Single) As udtIsotopeContributionType
 
         Dim udtIsotopePct As udtIsotopeContributionType
 
         With udtIsotopePct
-            .Minus2 = Minus2
-            .Minus1 = Minus1
-            .Zero = Zero
-            .Plus1 = Plus1
-            .Plus2 = Plus2
+            .Minus2 = minus2
+            .Minus1 = minus1
+            .Zero = zero
+            .Plus1 = plus1
+            .Plus2 = plus2
         End With
 
         Return udtIsotopePct
