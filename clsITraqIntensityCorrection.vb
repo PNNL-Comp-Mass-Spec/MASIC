@@ -260,7 +260,7 @@ Public Class clsITraqIntensityCorrection
                     udtIsoPct116 = DefineIsotopeContribution(0, 3, 92.4, 4.5, 0.1)
                     udtIsoPct117 = DefineIsotopeContribution(0.1, 4, 92.3, 3.5, 0.1)
 
-                Else
+                ElseIf mITraq4PlexCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.BroadInstitute Then
 
                     ' 4-plex ITraq, isotope contribution table
                     ' Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
@@ -269,7 +269,8 @@ Public Class clsITraqIntensityCorrection
                     udtIsoPct115 = DefineIsotopeContribution(0, 0.9, 94.6, 4.5, 0)
                     udtIsoPct116 = DefineIsotopeContribution(0, 0.9, 95.7, 3.4, 0)
                     udtIsoPct117 = DefineIsotopeContribution(0, 1.4, 98.6, 0, 0)
-
+                Else
+                    Throw New ArgumentOutOfRangeException(NameOf(mITraq4PlexCorrectionFactorType), "Unrecognized value for the iTRAQ 4 plex correction type")
                 End If
 
                 ' Goal is to generate either of these two matrices (depending on mITraq4PlexCorrectionFactorType):
@@ -626,6 +627,15 @@ Public Class clsITraqIntensityCorrection
                                                plus2 As Single) As udtIsotopeContributionType
 
         Dim udtIsotopePct As udtIsotopeContributionType
+
+        If Math.Abs(zero) < Single.Epsilon Or zero < 0 Then
+            zero = 100 - minus2 - minus1 - plus1 - plus2
+        End If
+
+        Dim sum = minus2 + minus1 + zero + plus1 + plus2
+        If Math.Abs(100 - sum) > 0.05 Then
+            Throw New Exception(String.Format("Parameters for DefineIsotopeContribution should add up to 100; current sum is {0:F1}", sum))
+        End If
 
         With udtIsotopePct
             .Minus2 = minus2
