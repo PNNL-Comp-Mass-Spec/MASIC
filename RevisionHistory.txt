@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.8.6760; July 5, 2018
+	- Update the TMT 11 reporter ion correction matrix
+
 Version 2.8.6715; May 21, 2018
 	- Allow for scan event "MS2 Isolation Width" to be missing for SRM scans
 
