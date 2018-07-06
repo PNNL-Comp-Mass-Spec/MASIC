@@ -50,13 +50,6 @@ Public Class clsITraqIntensityCorrection
 
 #Region "Properties"
 
-    '<Obsolete("Use ReporterIonMode")>
-    'Public ReadOnly Property ITraqMode As clsReporterIons.eReporterIonMassModeConstants
-    '    Get
-    '        Return mReporterIonMode
-    '    End Get
-    'End Property
-
     Public ReadOnly Property ReporterIonMode As clsReporterIons.eReporterIonMassModeConstants
         Get
             Return mReporterIonMode
@@ -73,20 +66,20 @@ Public Class clsITraqIntensityCorrection
     ''' <summary>
     ''' Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
     ''' </summary>
-    ''' <param name="eITraqMode">iTRAQ mode</param>
+    ''' <param name="eReporterIonMode">iTRAQ or TMT mode</param>
     ''' <remarks></remarks>
-    Public Sub New(eITraqMode As clsReporterIons.eReporterIonMassModeConstants)
-        Me.New(eITraqMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
+    Public Sub New(eReporterIonMode As clsReporterIons.eReporterIonMassModeConstants)
+        Me.New(eReporterIonMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
     End Sub
 
     ''' <summary>
     ''' Constructor
     ''' </summary>
-    ''' <param name="eITraqMode">iTRAQ mode</param>
+    ''' <param name="eReporterIonMode">iTRAQ or TMT mode</param>
     ''' <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
-    ''' <remarks>The iTraqCorrectionFactorType parameter is only used if eITraqMode is ITraqFourMZ</remarks>
-    Public Sub New(eITraqMode As clsReporterIons.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
-        mReporterIonMode = eITraqMode
+    ''' <remarks>The iTraqCorrectionFactorType parameter is only used if eReporterIonMode is ITraqFourMZ</remarks>
+    Public Sub New(eReporterIonMode As clsReporterIons.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
+        mReporterIonMode = eReporterIonMode
         mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType
 
         mMatrixUtility = New MatrixDecompositionUtility.LUDecomposition()
@@ -94,13 +87,22 @@ Public Class clsITraqIntensityCorrection
         InitializeCoefficients(False)
     End Sub
 
-    Public Sub UpdateITraqMode(eITraqMode As clsReporterIons.eReporterIonMassModeConstants)
-        UpdateITraqMode(eITraqMode, mITraq4PlexCorrectionFactorType)
+    ''' <summary>
+    ''' Change the reporter ion mode
+    ''' </summary>
+    ''' <param name="eReporterIonMode"></param>
+    Public Sub UpdateReporterIonMode(eReporterIonMode As clsReporterIons.eReporterIonMassModeConstants)
+        UpdateReporterIonMode(eReporterIonMode, mITraq4PlexCorrectionFactorType)
     End Sub
 
-    Public Sub UpdateITraqMode(eITraqMode As clsReporterIons.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
-        If mReporterIonMode <> eITraqMode OrElse mITraq4PlexCorrectionFactorType <> iTraqCorrectionFactorType Then
-            mReporterIonMode = eITraqMode
+    ''' <summary>
+    ''' Change the reporter ion mode
+    ''' </summary>
+    ''' <param name="eReporterIonMode"></param>
+    ''' <param name="iTraqCorrectionFactorType"></param>
+    Public Sub UpdateReporterIonMode(eReporterIonMode As clsReporterIons.eReporterIonMassModeConstants, iTraqCorrectionFactorType As eCorrectionFactorsiTRAQ4Plex)
+        If mReporterIonMode <> eReporterIonMode OrElse mITraq4PlexCorrectionFactorType <> iTraqCorrectionFactorType Then
+            mReporterIonMode = eReporterIonMode
             mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType
             InitializeCoefficients(False)
         End If
@@ -142,11 +144,11 @@ Public Class clsITraqIntensityCorrection
     Public Function ApplyCorrection(reporterIonIntensites() As Double, Optional debugShowIntensities As Boolean = False) As Boolean
 
         Dim matrixSize = GetMatrixLength(mReporterIonMode)
-        Dim iTraqMode = clsReporterIons.GetReporterIonModeDescription(mReporterIonMode)
+        Dim eReporterIonMode = clsReporterIons.GetReporterIonModeDescription(mReporterIonMode)
 
         If reporterIonIntensites.Length <> matrixSize Then
             Throw New InvalidOperationException("Length of ReporterIonIntensites array must be " & matrixSize.ToString() &
-                                                " when using the " & iTraqMode & " mode")
+                                                " when using the " & eReporterIonMode & " mode")
         End If
 
         Dim correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensites)

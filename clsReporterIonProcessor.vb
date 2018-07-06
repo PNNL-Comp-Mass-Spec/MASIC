@@ -397,7 +397,7 @@ Public Class clsReporterIonProcessor
 
                 If intensityCorrector.ReporterIonMode <> mOptions.ReporterIons.ReporterIonMassMode OrElse
                    intensityCorrector.ITraq4PlexCorrectionFactorType <> mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType Then
-                    intensityCorrector.UpdateITraqMode(
+                    intensityCorrector.UpdateReporterIonMode(
                         mOptions.ReporterIons.ReporterIonMassMode,
                         mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
                 End If
