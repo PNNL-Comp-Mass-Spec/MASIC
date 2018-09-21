@@ -2230,7 +2230,7 @@ Public Class frmBrowser
             End If
 
         Catch ex As Exception
-            Dim sTrace = clsStackTraceFormatter.GetExceptionStackTraceMultiLine(ex)
+            Dim sTrace = StackTraceFormatter.GetExceptionStackTraceMultiLine(ex)
             MessageBox.Show("Error in PlotData: " & ex.Message & ControlChars.CrLf & sTrace, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         Finally
             Me.Cursor = Cursors.Default

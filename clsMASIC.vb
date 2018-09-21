@@ -1625,7 +1625,7 @@ Public Class clsMASIC
         ShowErrorMessage(strSource & ": " & strMessageWithoutCRLF, True)
 
         If Not ex Is Nothing Then
-            Console.WriteLine(clsStackTraceFormatter.GetExceptionStackTraceMultiLine(ex))
+            Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex))
         End If
 
         If Not eNewErrorCode = eMasicErrorCodes.NoError Then
@@ -1976,7 +1976,7 @@ Public Class clsMASIC
         AddHandler dataImporter.UpdateMemoryUsageEvent, AddressOf UpdateMemoryUsageEventHandler
     End Sub
 
-    Private Sub RegisterEventsBase(oClass As clsEventNotifier)
+    Private Sub RegisterEventsBase(oClass As EventNotifier)
         AddHandler oClass.StatusEvent, AddressOf MessageEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
         AddHandler oClass.WarningEvent, AddressOf WarningEventHandler

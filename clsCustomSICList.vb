@@ -1,7 +1,7 @@
 ﻿Imports PRISM
 
 Public Class clsCustomSICList
-    Inherits clsEventNotifier
+    Inherits EventNotifier
 
 #Region "Constants and Enums"
 

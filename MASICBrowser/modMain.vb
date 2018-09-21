@@ -19,7 +19,7 @@ Imports PRISM
 
 Module modMain
 
-    Public Const PROGRAM_DATE As String = "June 30, 2018"
+    Public Const PROGRAM_DATE As String = "September 20, 2018"
 
     Private mInputFilePath As String
 
@@ -84,7 +84,7 @@ Module modMain
         Try
             ' Make sure no invalid parameters are present
             If objParseCommandLine.InvalidParametersPresent(validParameters) Then
-                ShowErrorMessage("Invalid commmand line parameters",
+                ShowErrorMessage("Invalid command line parameters",
                   (From item In objParseCommandLine.InvalidParameters(validParameters) Select "/" + item).ToList())
                 Return False
             Else

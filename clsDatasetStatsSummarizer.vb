@@ -21,7 +21,7 @@ Imports PRISM
 Imports SpectraTypeClassifier
 
 Public Class clsDatasetStatsSummarizer
-    Inherits clsEventNotifier
+    Inherits EventNotifier
 
 #Region "Constants and Enums"
     Public Const SCANTYPE_STATS_SEPCHAR As String = "::###::"

@@ -29,7 +29,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "July 5, 2018"
+    Public Const PROGRAM_DATE As String = "September 20, 2018"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -195,7 +195,7 @@ Public Module modMain
         Return PRISM.FileProcessor.ProcessFilesOrFoldersBase.GetAppVersion(PROGRAM_DATE)
     End Function
 
-    Private Sub RegisterEvents(oClass As PRISM.clsEventNotifier)
+    Private Sub RegisterEvents(oClass As PRISM.EventNotifier)
         AddHandler oClass.StatusEvent, AddressOf StatusEventHandler
         AddHandler oClass.DebugEvent, AddressOf DebugEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
@@ -220,7 +220,7 @@ Public Module modMain
         Try
             ' Make sure no invalid parameters are present
             If commandLineParser.InvalidParametersPresent(lstValidParameters) Then
-                ShowErrorMessage("Invalid commmand line parameters",
+                ShowErrorMessage("Invalid command line parameters",
                   (From item In commandLineParser.InvalidParameters(lstValidParameters) Select "/" + item).ToList())
                 Return False
             Else

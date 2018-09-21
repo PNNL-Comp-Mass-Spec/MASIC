@@ -1,7 +1,7 @@
 ﻿Imports MASIC.clsMASIC
 
 Public MustInherit Class clsMasicEventNotifier
-    Inherits PRISM.clsEventNotifier
+    Inherits PRISM.EventNotifier
 
     Private mLastPercentComplete As Short = 0
 

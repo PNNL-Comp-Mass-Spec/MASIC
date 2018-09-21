@@ -8,7 +8,7 @@ using ThermoRawFileReader;
 namespace MASICTest
 {
     [TestFixture]
-    public class clsTests : clsEventNotifier
+    public class clsTests : EventNotifier
     {
 
         [Test]

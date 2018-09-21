@@ -13,7 +13,7 @@ Imports PRISM
 ''' They have since been ported to VB.NET
 ''' </summary>
 Public Class clsCorrelation
-    Inherits clsEventNotifier
+    Inherits EventNotifier
 
 #Region "Classwide variables"
     Private ReadOnly mCoefficients As Double()

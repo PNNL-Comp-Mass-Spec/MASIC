@@ -2,7 +2,7 @@
 Imports PRISM
 
 Public Class clsDataAggregation
-    Inherits clsEventNotifier
+    Inherits EventNotifier
 
     ''' <summary>
     ''' When blnReturnMax is false, determine the sum of the data within the search mass tolerance

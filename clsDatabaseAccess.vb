@@ -42,7 +42,7 @@ Public Class clsDatabaseAccess
         If Not mOptions.DatabaseConnectionString Is Nothing AndAlso mOptions.DatabaseConnectionString.Length > 0 Then
             ' Attempt to lookup the dataset number in the database
             Try
-                Dim objDBTools = New PRISM.clsDBTools(mOptions.DatabaseConnectionString)
+                Dim objDBTools = New PRISM.DBTools(mOptions.DatabaseConnectionString)
 
                 Dim blnQueryingSingleDataset = False
 

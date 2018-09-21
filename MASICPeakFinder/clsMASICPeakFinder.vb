@@ -17,7 +17,7 @@ Imports System.Runtime.InteropServices
 ' https://www.apache.org/licenses/LICENSE-2.0
 '
 Public Class clsMASICPeakFinder
-    Inherits PRISM.clsEventNotifier
+    Inherits PRISM.EventNotifier
 
 #Region "Constants and Enums"
     Public PROGRAM_DATE As String = "February 21, 2018"

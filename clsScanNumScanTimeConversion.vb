@@ -1,7 +1,7 @@
 ﻿Imports PRISM
 
 Public Class clsScanNumScanTimeConversion
-    Inherits clsEventNotifier
+    Inherits EventNotifier
 
     ''' <summary>
     ''' Returns the index of the scan closest to sngScanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
