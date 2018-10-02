@@ -52,10 +52,10 @@ Public Class clsSICDetails
         SICData = New List(Of clsSICDataPoint)
     End Sub
 
-    Public Function AddData(scanNumber As Integer, intensity As Single, mass As Double, scanIndex As Integer) As Integer
+    Public Sub AddData(scanNumber As Integer, intensity As Single, mass As Double, scanIndex As Integer)
         Dim dataPoint = New clsSICDataPoint(scanNumber, intensity, mass, scanIndex)
         SICData.Add(dataPoint)
-    End Function
+    End Sub
 
     Public Sub Reset()
         SICData.Clear()
