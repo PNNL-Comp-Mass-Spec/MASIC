@@ -13,9 +13,9 @@ Imports PRISM
 ' Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
 ' -------------------------------------------------------------------------------
 '
-' Licensed under the Apache License, Version 2.0; you may not use this file except
+' Licensed under the 2-Clause BSD License; you may Not use this file except
 ' in compliance with the License.  You may obtain a copy of the License at
-' https://www.apache.org/licenses/LICENSE-2.0
+' https://opensource.org/licenses/BSD-2-Clause
 
 Module modMain
 
