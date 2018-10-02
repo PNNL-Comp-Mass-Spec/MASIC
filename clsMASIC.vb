@@ -1613,7 +1613,11 @@ Public Class clsMASIC
         End If
 
         ' Show the message and log to the clsProcessFilesBaseClass logger
-        ShowErrorMessage(strSource & ": " & strMessageWithoutCRLF, True)
+        If String.IsNullOrEmpty(strSource) Then
+            ShowErrorMessage(strMessageWithoutCRLF, True)
+        Else
+            ShowErrorMessage(strSource & ": " & strMessageWithoutCRLF, True)
+        End If
 
         If Not ex Is Nothing Then
             Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex))
