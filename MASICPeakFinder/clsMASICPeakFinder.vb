@@ -34,6 +34,7 @@ Public Class clsMASICPeakFinder
     End Enum
 
     Public Enum eTTestConfidenceLevelConstants
+        ' ReSharper disable UnusedMember.Global
         Conf80Pct = 0
         Conf90Pct = 1
         Conf95Pct = 2
@@ -42,6 +43,7 @@ Public Class clsMASICPeakFinder
         Conf99_5Pct = 5
         Conf99_8Pct = 6
         Conf99_9Pct = 7
+        ' ReSharper restore UnusedMember.Global
     End Enum
 #End Region
 
@@ -59,6 +61,7 @@ Public Class clsMASICPeakFinder
 #End Region
 
 #Region "Properties"
+    ' ReSharper disable once UnusedMember.Global
     Public ReadOnly Property ProgramDate As String
         Get
             Return PROGRAM_DATE
@@ -71,6 +74,7 @@ Public Class clsMASICPeakFinder
         End Get
     End Property
 
+    ' ReSharper disable once UnusedMember.Global
     Public ReadOnly Property StatusMessage As String
         Get
             Return mStatusMessage
@@ -85,6 +89,7 @@ Public Class clsMASICPeakFinder
         mStatusMessage = String.Empty
     End Sub
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Compute an updated peak area by adjusting for the baseline
     ''' </summary>
@@ -122,6 +127,7 @@ Public Class clsMASICPeakFinder
         End If
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     Public Shared Function BaselineAdjustIntensity(sicPeak As clsSICStatsPeak, blnAllowNegativeValues As Boolean) As Single
         Return BaselineAdjustIntensity(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel, blnAllowNegativeValues)
     End Function
@@ -681,6 +687,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     Public Sub TestComputeKSStat()
         Dim ScanAtApex As Integer
         Dim FWHM As Single

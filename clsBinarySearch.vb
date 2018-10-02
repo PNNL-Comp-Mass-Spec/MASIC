@@ -253,6 +253,7 @@ Public Class clsBinarySearch
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     Public Shared Function BinarySearchFindNearest(
       dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer

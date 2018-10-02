@@ -25,7 +25,11 @@ Public Class clsDatasetStatsSummarizer
 
 #Region "Constants and Enums"
     Public Const SCANTYPE_STATS_SEPCHAR As String = "::###::"
+
+    ' ReSharper disable once UnusedMember.Global
     Public Const DATASET_INFO_FILE_SUFFIX As String = "_DatasetInfo.xml"
+
+    ' ReSharper disable once UnusedMember.Global
     Public Const DEFAULT_DATASET_STATS_FILENAME As String = "MSFileInfo_DatasetStats.txt"
 #End Region
 
@@ -105,6 +109,7 @@ Public Class clsDatasetStatsSummarizer
 
 #Region "Properties"
 
+    ' ReSharper disable once UnusedMember.Global
     Public Property DatasetStatsSummaryFileName As String
         Get
             Return mDatasetStatsSummaryFileName
@@ -138,6 +143,7 @@ Public Class clsDatasetStatsSummarizer
         InitializeLocalVariables()
     End Sub
 
+    ' ReSharper disable once UnusedMember.Global
     Public Sub AddDatasetScan(objScanStats As clsScanStatsEntry)
 
         mDatasetScanStats.Add(objScanStats)
@@ -314,6 +320,7 @@ Public Class clsDatasetStatsSummarizer
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Creates an XML file summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
     ''' </summary>
@@ -374,6 +381,7 @@ Public Class clsDatasetStatsSummarizer
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
     ''' Auto-determines the dataset name using Me.DatasetFileInfo.DatasetName
@@ -384,6 +392,7 @@ Public Class clsDatasetStatsSummarizer
         Return CreateDatasetInfoXML(Me.DatasetFileInfo.DatasetName, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
     ''' </summary>
@@ -394,7 +403,7 @@ Public Class clsDatasetStatsSummarizer
         Return CreateDatasetInfoXML(strDatasetName, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
-
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Creates XML summarizing the data in objScanStats and udtDatasetFileInfo
     ''' Auto-determines the dataset name using udtDatasetFileInfo.DatasetName
@@ -410,6 +419,7 @@ Public Class clsDatasetStatsSummarizer
         Return CreateDatasetInfoXML(udtDatasetFileInfo.DatasetName, objScanStats, udtDatasetFileInfo)
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Creates XML summarizing the data in objScanStats, udtDatasetFileInfo, and udtSampleInfo
     ''' Auto-determines the dataset name using udtDatasetFileInfo.DatasetName
@@ -611,6 +621,7 @@ Public Class clsDatasetStatsSummarizer
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
     ''' </summary>
@@ -731,6 +742,7 @@ Public Class clsDatasetStatsSummarizer
         OnErrorEvent(mErrorMessage, ex)
     End Sub
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Updates the scan type information for the specified scan number
     ''' </summary>
@@ -763,6 +775,7 @@ Public Class clsDatasetStatsSummarizer
 
     End Function
 
+    ' ReSharper disable once UnusedMember.Global
     ''' <summary>
     ''' Updates a tab-delimited text file, adding a new line summarizing the data stored in this class (in mDatasetScanStats and Me.DatasetFileInfo)
     ''' </summary>
