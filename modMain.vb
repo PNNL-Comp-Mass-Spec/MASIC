@@ -22,7 +22,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "September 20, 2018"
+    Public Const PROGRAM_DATE As String = "October 1, 2018"
 
     Private mInputFilePath As String
     Private mOutputFolderPath As String             ' Optional
@@ -306,10 +306,13 @@ Public Module modMain
 
         Try
 
-            Console.WriteLine("This program will read a Finnigan LCQ .RAW file or Agilent LC/MSD .CDF/.MGF file combo and create a selected ion chromatogram (SIC) for each parent ion.")
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "This program will read a Thermo LCQ .RAW file or Agilent LC/MSD .CDF/.MGF file combo " &
+                "and create a selected ion chromatogram (SIC) for each parent ion."))
+
             Console.WriteLine()
 
-            Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(PRISM.FileProcessor.ProcessFilesBase.GetAppPath()))
+            Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(ProcessFilesBase.GetAppPath()))
             Console.WriteLine(" /I:InputFilePath.raw [/O:OutputFolderPath]")
             Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath] ")
             Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputFolderPath] [/R]")
@@ -317,19 +320,34 @@ Public Module modMain
             Console.WriteLine()
 
             Console.WriteLine("The input file path can contain the wildcard character *")
-            Console.WriteLine("The output folder name is optional.  If omitted, the output files will be created in the same folder as the input file.  If included, then a subfolder is created with the name OutputFolderName.")
-            Console.WriteLine("The param file switch is optional.  If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used.")
             Console.WriteLine()
-            Console.WriteLine("The /D switch can be used to specify the dataset number of the input file; if omitted, 0 will be used")
-            Console.WriteLine("Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S)")
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "The output folder name is optional. " &
+                "If omitted, the output files will be created in the same folder as the input file. " &
+                "If included, then a subfolder is created with the name OutputFolderName."))
+
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "The param file switch is optional. " &
+                "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used."))
+
             Console.WriteLine()
-            Console.WriteLine("Use /S to process all valid files in the input folder and subfolders. Include a number after /S (like /S:2) to limit the level of subfolders to examine.")
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "The /D switch can be used to specify the dataset number of the input file; if omitted, 0 will be used"))
+
+            Console.WriteLine()
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S)"))
+            Console.WriteLine()
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "Use /S to process all valid files in the input folder and subfolders. " &
+                "Include a number after /S (like /S:2) to limit the level of subfolders to examine."))
+
             Console.WriteLine("When using /S, you can redirect the output of the results using /A.")
-            Console.WriteLine("When using /S, you can use /R to re-create the input folder hierarchy in the alternate output folder (if defined).")
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("When using /S, you can use /R to re-create the input folder hierarchy in the alternate output folder (if defined)."))
             Console.WriteLine()
-            Console.WriteLine("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file.")
-            Console.WriteLine("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME & ").")
-            Console.WriteLine("The optional /Q switch will suppress all error messages.")
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file."))
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME & ")."))
+            Console.WriteLine("The optional /Q switch will prevent the progress window from being shown")
             Console.WriteLine()
 
             Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003")
