@@ -1152,9 +1152,9 @@ Public Class clsMASIC
                 If mOptions.ReporterIons.ReporterIonStatsEnabled Then
                     ' Look for Reporter Ions in the Fragmentation spectra
 
-                    Dim reporterionProcessor = New clsReporterIonProcessor(mOptions)
-                    RegisterEvents(reporterionProcessor)
-                    reporterionProcessor.FindReporterIons(scanList, objSpectraCache, strInputFilePathFull, outputFolderPath)
+                    Dim reporterIonProcessor = New clsReporterIonProcessor(mOptions)
+                    RegisterEvents(reporterIonProcessor)
+                    reporterIonProcessor.FindReporterIons(scanList, objSpectraCache, strInputFilePathFull, outputFolderPath)
                 End If
 
                 Dim mrmProcessor = New clsMRMProcessing(mOptions, dataOutputHandler)
