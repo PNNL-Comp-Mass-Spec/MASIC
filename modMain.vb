@@ -1,6 +1,8 @@
 Option Strict On
 
 Imports System.Threading
+Imports PRISM
+Imports PRISM.FileProcessor
 Imports ProgressFormNET
 
 ' See clsMASIC for a program description
@@ -83,7 +85,7 @@ Public Module modMain
     Public Function Main() As Integer
         ' Returns 0 if no error, error code if an error
 
-        Dim commandLineParser As New PRISM.clsParseCommandLine
+        Dim commandLineParser As New clsParseCommandLine
         Dim proceed As Boolean
 
         mInputFilePath = String.Empty
@@ -183,10 +185,10 @@ Public Module modMain
     End Sub
 
     Private Function GetAppVersion() As String
-        Return PRISM.FileProcessor.ProcessFilesOrFoldersBase.GetAppVersion(PROGRAM_DATE)
+        Return ProcessFilesOrFoldersBase.GetAppVersion(PROGRAM_DATE)
     End Function
 
-    Private Sub RegisterEvents(oClass As PRISM.EventNotifier)
+    Private Sub RegisterEvents(oClass As EventNotifier)
         AddHandler oClass.StatusEvent, AddressOf StatusEventHandler
         AddHandler oClass.DebugEvent, AddressOf DebugEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
@@ -201,7 +203,7 @@ Public Module modMain
         AddHandler oClass.ProgressSubtaskChanged, AddressOf ProgressSubtaskChangedHandler
     End Sub
 
-    Private Function SetOptionsUsingCommandLineParameters(commandLineParser As PRISM.clsParseCommandLine) As Boolean
+    Private Function SetOptionsUsingCommandLineParameters(commandLineParser As clsParseCommandLine) As Boolean
         ' Returns True if no problems; otherwise, returns false
 
         Dim value As String = String.Empty
@@ -278,11 +280,11 @@ Public Module modMain
     End Function
 
     Private Sub ShowErrorMessage(message As String, Optional ex As Exception = Nothing)
-        PRISM.ConsoleMsgUtils.ShowError(message, ex)
+        ConsoleMsgUtils.ShowError(message, ex)
     End Sub
 
     Private Sub ShowErrorMessage(title As String, errorMessages As IEnumerable(Of String))
-        PRISM.ConsoleMsgUtils.ShowErrors(title, errorMessages)
+        ConsoleMsgUtils.ShowErrors(title, errorMessages)
     End Sub
 
     Public Sub ShowGUI()
@@ -401,7 +403,7 @@ Public Module modMain
     End Sub
 
     Private Sub DebugEventHandler(message As String)
-        PRISM.ConsoleMsgUtils.ShowDebug(message)
+        ConsoleMsgUtils.ShowDebug(message)
     End Sub
 
     Private Sub ErrorEventHandler(message As String, ex As Exception)
@@ -409,7 +411,7 @@ Public Module modMain
     End Sub
 
     Private Sub WarningEventHandler(message As String)
-        PRISM.ConsoleMsgUtils.ShowWarning(message)
+        ConsoleMsgUtils.ShowWarning(message)
     End Sub
 
 End Module
