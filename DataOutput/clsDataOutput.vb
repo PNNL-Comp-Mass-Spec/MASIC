@@ -477,9 +477,10 @@ Namespace DataOutput
                     Return True
                 End If
 
-                ReportError("objDatasetStatsSummarizer.CreateDatasetInfoFil, error from DataStatsSummarizer: " + objDatasetStatsSummarizer.ErrorMessage,
+                ReportError("objDatasetStatsSummarizer.CreateDatasetInfoFile, error from DataStatsSummarizer: " + objDatasetStatsSummarizer.ErrorMessage,
                             New Exception("DataStatsSummarizer error " & objDatasetStatsSummarizer.ErrorMessage))
 
+                Return False
             Catch ex As Exception
                 ReportError("Error creating dataset info file", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
