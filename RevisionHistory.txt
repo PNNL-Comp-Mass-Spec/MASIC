@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 2.8.6848; October 1, 2018
+	- Add reporter ion mode Acetylation
+		- Looks for 126.091 m/z and 143.118 m/z
+
 Version 2.8.6760; July 5, 2018
 	- Update the TMT 11 reporter ion correction matrix
 

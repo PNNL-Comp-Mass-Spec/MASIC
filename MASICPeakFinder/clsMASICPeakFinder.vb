@@ -20,7 +20,7 @@ Public Class clsMASICPeakFinder
     Inherits PRISM.EventNotifier
 
 #Region "Constants and Enums"
-    Public PROGRAM_DATE As String = "February 21, 2018"
+    Public PROGRAM_DATE As String = "October 1, 2018"
 
     Public Const MINIMUM_PEAK_WIDTH As Integer = 3                         ' Width in points
 
