@@ -24,6 +24,7 @@
         FSFACustomCarboxylic = 14
         FSFACustomHydroxyl = 15
         TMTElevenMZ = 16
+        Acetylation = 17
     End Enum
 
 #End Region
@@ -250,6 +251,12 @@
                 reporterIons.Add(New clsReporterIonInfo(151.063))
                 reporterIons.Add(New clsReporterIonInfo(166.087))
 
+
+            Case eReporterIonMassModeConstants.Acetylation
+                ' Reporter ions for peptides with acetylated lysine residues
+                reporterIons.Add(New clsReporterIonInfo(126.09134))
+                reporterIons.Add(New clsReporterIonInfo(143.11789))
+
             Case Else
                 ' Includes eReporterIonMassModeConstants.CustomOrNone
                 reporterIons.Clear()
@@ -300,6 +307,8 @@
                 Return "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)"
             Case eReporterIonMassModeConstants.FSFACustomHydroxyl
                 Return "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)"
+            Case eReporterIonMassModeConstants.Acetylation
+                Return "Acetylated K (126.091 and 143.118 m/z)"
             Case Else
                 Return "Unknown mode"
         End Select

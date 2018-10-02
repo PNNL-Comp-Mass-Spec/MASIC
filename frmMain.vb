@@ -1015,6 +1015,7 @@ Public Class frmMain
                 .Insert(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic")
                 .Insert(clsReporterIons.eReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl")
                 .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C")
+                .Insert(clsReporterIons.eReporterIonMassModeConstants.Acetylation, "Acetylated K")
 
 
             End With
