@@ -671,16 +671,16 @@ Public Class clsDatasetStatsSummarizer
                 For Each objScanStatsEntry As clsScanStatsEntry In objScanStats
 
                     sbLineOut.Clear()
-                    sbLineOut.Append(intDatasetID.ToString() & ControlChars.Tab)                          ' Dataset number (aka Dataset ID)
-                    sbLineOut.Append(objScanStatsEntry.ScanNumber.ToString() & ControlChars.Tab)          ' Scan number
+                    sbLineOut.Append(intDatasetID.ToString() & ControlChars.Tab)                        ' Dataset number (aka Dataset ID)
+                    sbLineOut.Append(objScanStatsEntry.ScanNumber.ToString() & ControlChars.Tab)        ' Scan number
                     sbLineOut.Append(objScanStatsEntry.ElutionTime & ControlChars.Tab)                  ' Scan time (minutes)
-                    sbLineOut.Append(objScanStatsEntry.ScanType.ToString() & ControlChars.Tab)            ' Scan type (1 for MS, 2 for MS2, etc.)
+                    sbLineOut.Append(objScanStatsEntry.ScanType.ToString() & ControlChars.Tab)          ' Scan type (1 for MS, 2 for MS2, etc.)
                     sbLineOut.Append(objScanStatsEntry.TotalIonIntensity & ControlChars.Tab)            ' Total ion intensity
                     sbLineOut.Append(objScanStatsEntry.BasePeakIntensity & ControlChars.Tab)            ' Base peak ion intensity
                     sbLineOut.Append(objScanStatsEntry.BasePeakMZ & ControlChars.Tab)                   ' Base peak ion m/z
                     sbLineOut.Append(objScanStatsEntry.BasePeakSignalToNoiseRatio & ControlChars.Tab)   ' Base peak signal to noise ratio
-                    sbLineOut.Append(objScanStatsEntry.IonCount.ToString() & ControlChars.Tab)            ' Number of peaks (aka ions) in the spectrum
-                    sbLineOut.Append(objScanStatsEntry.IonCountRaw.ToString() & ControlChars.Tab)         ' Number of peaks (aka ions) in the spectrum prior to any filtering
+                    sbLineOut.Append(objScanStatsEntry.IonCount.ToString() & ControlChars.Tab)          ' Number of peaks (aka ions) in the spectrum
+                    sbLineOut.Append(objScanStatsEntry.IonCountRaw.ToString() & ControlChars.Tab)       ' Number of peaks (aka ions) in the spectrum prior to any filtering
                     sbLineOut.Append(objScanStatsEntry.ScanTypeName)                                    ' Scan type name
 
                     swOutFile.WriteLine(sbLineOut.ToString())

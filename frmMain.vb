@@ -597,7 +597,7 @@ Public Class frmMain
 
         Try
 
-            ' Utilize clsMASIC's built-in LoadParameters function, then call ResetToDefaults
+            ' Utilize MASIC's built-in LoadParameters function, then call ResetToDefaults
             Dim objMasic = New clsMASIC()
 
             Dim success = objMasic.LoadParameterFileSettings(strFilePath)

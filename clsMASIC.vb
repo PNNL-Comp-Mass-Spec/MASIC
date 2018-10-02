@@ -6,7 +6,7 @@ Option Strict On
 '   a BPI for the fragmentation scans, an XML file containing the SIC data
 '   for each parent ion, and a "flat file" ready for import into the database
 '   containing summaries of the SIC data statistics
-' Supported file types are Finnigan .Raw files (LCQ, LTQ, LTQ-FT),
+' Supported file types are Thermo .Raw files (LCQ, LTQ, LTQ-FT),
 '   Agilent Ion Trap (.MGF and .CDF files), and mzXML files
 
 ' -------------------------------------------------------------------------------

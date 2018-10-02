@@ -1023,7 +1023,7 @@ Public Class clsMASICPeakFinder
         Dim blnSuccess As Boolean
 
         Try
-            ' Lookup the scan number and intensity of the SIC scan at udtSICPeak.Indexobserved
+            ' Lookup the scan number and intensity of the SIC scan at udtSICPeak.IndexObserved
             intX1 = sicData(sicPeak.IndexObserved).ScanNumber
             sngY1 = sicData(sicPeak.IndexObserved).Intensity
 
@@ -1304,7 +1304,7 @@ Public Class clsMASICPeakFinder
                 blnUseRawDataAroundMaximum = True
             Else
                 ' Remove the contiguous data from the left that is < sngIntensityThreshold, retaining one point < sngIntensityThreshold
-                ' Due to the algorithm used to find the contiguous data cenetered around the peak maximum, this will typically have no effect
+                ' Due to the algorithm used to find the contiguous data centered around the peak maximum, this will typically have no effect
                 intValidDataIndexLeft = 0
                 Do While intValidDataIndexLeft < intDataCount - 1 AndAlso sngIntensities(intValidDataIndexLeft + 1) < sngIntensityThreshold
                     intValidDataIndexLeft += 1
@@ -1316,7 +1316,7 @@ Public Class clsMASICPeakFinder
                 Else
                     If intValidDataIndexLeft > 0 Then
                         ' Shrink the array to remove the values at the beginning that are < sngIntensityThreshold, retaining one point < sngIntensityThreshold
-                        ' Due to the algorithm used to find the contiguous data cenetered around the peak maximum, this code will typically never be reached
+                        ' Due to the algorithm used to find the contiguous data centered around the peak maximum, this code will typically never be reached
                         For intDataIndex = intValidDataIndexLeft To intDataCount - 1
                             Dim intIndexPointer = intDataIndex - intValidDataIndexLeft
                             intScanNumbers(intIndexPointer) = intScanNumbers(intDataIndex)
@@ -1326,7 +1326,7 @@ Public Class clsMASICPeakFinder
                     End If
 
                     ' Remove the contiguous data from the right that is < sngIntensityThreshold, retaining one point < sngIntensityThreshold
-                    ' Due to the algorithm used to find the contiguous data cenetered around the peak maximum, this will typically have no effect
+                    ' Due to the algorithm used to find the contiguous data centered around the peak maximum, this will typically have no effect
                     intValidDataIndexRight = intDataCount - 1
                     Do While intValidDataIndexRight > 0 AndAlso sngIntensities(intValidDataIndexRight - 1) < sngIntensityThreshold
                         intValidDataIndexRight -= 1
@@ -1334,7 +1334,7 @@ Public Class clsMASICPeakFinder
 
                     If intValidDataIndexRight < intDataCount - 1 Then
                         ' Shrink the array to remove the values at the end that are < sngIntensityThreshold, retaining one point < sngIntensityThreshold
-                        ' Due to the algorithm used to find the contiguous data cenetered around the peak maximum, this code will typically never be reached
+                        ' Due to the algorithm used to find the contiguous data centered around the peak maximum, this code will typically never be reached
                         intDataCount = intValidDataIndexRight + 1
                     End If
 
@@ -1400,7 +1400,7 @@ Public Class clsMASICPeakFinder
             End If
 
             ' Step through sngIntensities and interpolate across gaps with intensities of 0
-            ' Due to the algorithm used to find the contiguous data cenetered around the peak maximum, this will typically have no effect
+            ' Due to the algorithm used to find the contiguous data centered around the peak maximum, this will typically have no effect
             Dim pointIndex = 1
             Do While pointIndex < intDataCount - 1
                 If sngIntensities(pointIndex) <= 0 Then
@@ -1438,9 +1438,10 @@ Public Class clsMASICPeakFinder
                 dblArea += 0.5 * intScanDelta * (sngIntensities(intDataIndex) + sngIntensities(intDataIndex + 1))
             Next
 
-            ' For the first moment (m1), need to sum: intensity times scan number
-            ' For each of the moments, need to subtract intScanNumbers(0) from the scan numbers since statistical moments calcs are skewed if the first X value is not zero
-            ' When ScanDelta is > 1, then need to interpolate
+            ' For the first moment (m1), need to sum: intensity times scan number.
+            ' For each of the moments, need to subtract intScanNumbers(0) from the scan numbers since
+            ' statistical moments calculations are skewed if the first X value is not zero.
+            ' When ScanDelta is > 1, then need to interpolate.
 
             Dim dblMoment1Sum = (intScanNumbers(0) - intScanNumbers(0)) * sngIntensities(0)
             For intDataIndex = 1 To intDataCount - 1
@@ -1551,7 +1552,7 @@ Public Class clsMASICPeakFinder
 
 
         Catch ex As Exception
-            LogErrors("clsMASICPeakFinder->ComputeStatisticalMomentsStats", "Error computing statistical momements", ex, False)
+            LogErrors("clsMASICPeakFinder->ComputeStatisticalMomentsStats", "Error computing statistical moments", ex, False)
             Return False
         End Try
 
@@ -2128,7 +2129,7 @@ Public Class clsMASICPeakFinder
                     ' Copy the smoothed data into smoothedYDataSubset
                     smoothedYDataSubset = New clsSmoothedYDataSubset(peakData.SmoothedYData, smoothedYDataStartIndex, smoothedYDataEndIndex)
 
-                    ' Copy the PeakLocs and PeakEdges into peakDataSaved since we're going to call FindPeaksWork again and the data will get overwritten
+                    ' Copy the peak location info into peakDataSaved since we're going to call FindPeaksWork again and the data will get overwritten
                     Dim peakDataSaved = peakData.Clone(True)
 
                     If peakData.PeakWidthPointsMinimum <> MINIMUM_PEAK_WIDTH Then
@@ -2183,7 +2184,7 @@ Public Class clsMASICPeakFinder
                     ' Populate intPreviousPeakFWHMPointRight and intNextPeakFWHMPointLeft
                     Dim sngAdjacentPeakIntensityThreshold = sicData(intPeakLocationIndex).Intensity / 3
 
-                    ' Search through peakDataSaved to find the closest peak (with a signficant intensity) to the left of this peak
+                    ' Search through peakDataSaved to find the closest peak (with a significant intensity) to the left of this peak
                     ' Note that the peaks in peakDataSaved are not necessarily ordered by increasing index,
                     '  thus the need for an exhaustive search
 
@@ -2197,11 +2198,11 @@ Public Class clsMASICPeakFinder
                             If sicData(comparisonPeak.PeakLocation).Intensity >= sngAdjacentPeakIntensityThreshold Then
                                 ' Yes, the intensity is large enough
 
-                                ' Initialize intComparisonPeakedgeIndex to the right edge of the adjacent peak
+                                ' Initialize intComparisonPeakEdgeIndex to the right edge of the adjacent peak
                                 intComparisonPeakEdgeIndex = comparisonPeak.RightEdge
 
                                 ' Find the first point in the adjacent peak that is at least 50% of the maximum in the adjacent peak
-                                ' Store that point in intComparisonPeakedgeIndex
+                                ' Store that point in intComparisonPeakEdgeIndex
                                 sngTargetIntensity = sicData(comparisonPeak.PeakLocation).Intensity / 2
                                 For intDataIndex = intComparisonPeakEdgeIndex To comparisonPeak.PeakLocation Step -1
                                     If sicData(intDataIndex).Intensity >= sngTargetIntensity Then
@@ -2241,7 +2242,7 @@ Public Class clsMASICPeakFinder
                                 intComparisonPeakEdgeIndex = comparisonPeak.LeftEdge
 
                                 ' Find the first point in the adjacent peak that is at least 50% of the maximum in the adjacent peak
-                                ' Store that point in intComparisonPeakedgeIndex
+                                ' Store that point in intComparisonPeakEdgeIndex
                                 sngTargetIntensity = sicData(comparisonPeak.PeakLocation).Intensity / 2
                                 For intDataIndex = intComparisonPeakEdgeIndex To comparisonPeak.PeakLocation
                                     If sicData(intDataIndex).Intensity >= sngTargetIntensity Then
@@ -2963,7 +2964,7 @@ Public Class clsMASICPeakFinder
                           sicPeakFinderOptions.SICBaselineNoiseOptions)
                     End If
 
-                    '' ' Compute the trimmed median of the data in SICData (replacing nonpositive values with the minimum)
+                    '' ' Compute the trimmed median of the data in SICData (replacing non positive values with the minimum)
                     '' ' If the median is less than udtSICPeak.BaselineNoiseStats.NoiseLevel then update udtSICPeak.BaselineNoiseStats.NoiseLevel
                     ''udtNoiseOptionsOverride = sicPeakFinderOptions.SICBaselineNoiseOptions
                     ''With udtNoiseOptionsOverride

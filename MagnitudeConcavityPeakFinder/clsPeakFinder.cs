@@ -238,7 +238,7 @@ namespace MagnitudeConcavityPeakFinder
             if (peak.PeakWidth == 1)
             {
                 // I don't think this can happen
-                // Just in case, we'll set the area equal to the peak intensity 
+                // Just in case, we'll set the area equal to the peak intensity
                 peak.Area = yValsZeroBased[peak.LocationIndex];
                 return;
             }
@@ -448,12 +448,12 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         private void FitSegments (
-            double[] xVals, 
-            double[] yVals, 
+            double[] xVals,
+            double[] yVals,
             int sourceDataCount,
-            int peakWidthPointsMinimum, 
+            int peakWidthPointsMinimum,
             int peakWidthMidPoint,
-            out double[] firstDerivative, 
+            out double[] firstDerivative,
             out double[] secondDerivative)
         {
             // xVals() and yVals() are zero-based arrays
@@ -513,7 +513,7 @@ namespace MagnitudeConcavityPeakFinder
                 dataIndexCheckEnd = sourceDataCount - 1;
 
             var maximumIntensity = yValsZeroBased[peak.LocationIndex];
-            
+
             for (var dataIndexCheck = dataIndexCheckStart;
                  dataIndexCheck <= dataIndexCheckEnd;
                  dataIndexCheck++)
@@ -624,7 +624,7 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="X"></param>
         /// <param name="udtEquationTerms"></param>
@@ -718,7 +718,7 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         private bool GaussJordan(
-            ref double[,] A, 
+            ref double[,] A,
             int termCount,
             ref double[] b)
         {
@@ -731,7 +731,7 @@ namespace MagnitudeConcavityPeakFinder
             var ipiv = new int[termCount];
 
             var icol = 0;
-            var irow = 0;         
+            var irow = 0;
 
             try
             {

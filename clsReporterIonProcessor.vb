@@ -119,7 +119,7 @@ Public Class clsReporterIonProcessor
                 For Each reporterIon In reporterIons
 
                     If Not reporterIon.ContaminantIon OrElse blnSaveUncorrectedIntensities Then
-                        ' Contruct the reporter ion intensity header
+                        ' Construct the reporter ion intensity header
                         ' We skip contaminant ions, unless blnSaveUncorrectedIntensities is True, then we include them
 
                         Dim mzValue As String
@@ -138,7 +138,7 @@ Public Class clsReporterIonProcessor
                         Try
                             reporterIonMZsUnique.Add(mzValue)
                         Catch ex As Exception
-                            ' Error updating the sortedset;
+                            ' Error updating the SortedSet;
                             ' this shouldn't happen based on the .ContainsKey test above
                         End Try
 
