@@ -48,7 +48,7 @@ Public Class frmMain
 
     Private Const XML_SETTINGS_FILE_NAME As String = "MASICParameters.xml"
 
-    Private Const CUSTOM_SIC_VALUES_DATATABLE As String = "PeakMatchingThresholds"
+    Private Const CUSTOM_SIC_VALUES_DATA_TABLE As String = "PeakMatchingThresholds"
 
     Private Const COL_NAME_MZ As String = "MZ"
     Private Const COL_NAME_MZ_TOLERANCE As String = "MZToleranceDa"
@@ -113,7 +113,7 @@ Public Class frmMain
 
         Dim myDataRow As DataRow
 
-        With mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATATABLE)
+        With mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE)
 
             For Each myDataRow In .Rows
                 With myDataRow
@@ -251,14 +251,14 @@ Public Class frmMain
     End Sub
 
     Private Function ClearCustomSICList(blnConfirmReplaceExistingResults As Boolean) As Boolean
-        ' Returns true if the CUSTOM_SIC_VALUES_DATATABLE is empty or if it was cleared
+        ' Returns true if the CUSTOM_SIC_VALUES_DATA_TABLE is empty or if it was cleared
         ' Returns false if the user is queried about clearing and they do not click Yes
 
         Dim eResult As DialogResult
         Dim blnSuccess As Boolean
 
         blnSuccess = False
-        With mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATATABLE)
+        With mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE)
             If .Rows.Count > 0 Then
                 If blnConfirmReplaceExistingResults Then
                     eResult = MessageBox.Show("Are you sure you want to clear the Custom SIC list?", "Clear Custom SICs", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
@@ -791,10 +791,10 @@ Public Class frmMain
 
     Private Sub InitializeCustomSICDataGrid()
 
-        ' Make the Peak Matching Thresholds datatable
-        Dim dtCustomSICValues = New DataTable(CUSTOM_SIC_VALUES_DATATABLE)
+        ' Make the Peak Matching Thresholds data table
+        Dim dtCustomSICValues = New DataTable(CUSTOM_SIC_VALUES_DATA_TABLE)
 
-        ' Add the columns to the datatable
+        ' Add the columns to the data table
         ADONetRoutines.AppendColumnDoubleToTable(dtCustomSICValues, COL_NAME_MZ)
         ADONetRoutines.AppendColumnDoubleToTable(dtCustomSICValues, COL_NAME_MZ_TOLERANCE)
         ADONetRoutines.AppendColumnDoubleToTable(dtCustomSICValues, COL_NAME_SCAN_CENTER)
@@ -808,7 +808,7 @@ Public Class frmMain
         End With
 
         ' Instantiate the dataset
-        mCustomSICValuesDataset = New DataSet(CUSTOM_SIC_VALUES_DATATABLE)
+        mCustomSICValuesDataset = New DataSet(CUSTOM_SIC_VALUES_DATA_TABLE)
 
         ' Add the new DataTable to the DataSet.
         mCustomSICValuesDataset.Tables.Add(dtCustomSICValues)
@@ -816,7 +816,7 @@ Public Class frmMain
         ' Bind the DataSet to the DataGrid
         With dgCustomSICValues
             .DataSource = mCustomSICValuesDataset
-            .DataMember = CUSTOM_SIC_VALUES_DATATABLE
+            .DataMember = CUSTOM_SIC_VALUES_DATA_TABLE
         End With
 
         ' Update the grid's table style
@@ -1599,9 +1599,9 @@ Public Class frmMain
         ' Define the PM Thresholds table style
         tsCustomSICValues = New DataGridTableStyle
 
-        ' Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATATABLE will cause this style to be used with that table
+        ' Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATA_TABLE will cause this style to be used with that table
         With tsCustomSICValues
-            .MappingName = CUSTOM_SIC_VALUES_DATATABLE
+            .MappingName = CUSTOM_SIC_VALUES_DATA_TABLE
             .AllowSorting = True
             .ColumnHeadersVisible = True
             .RowHeadersVisible = True
@@ -1887,10 +1887,10 @@ Public Class frmMain
 
             Dim mzSearchSpecs = New List(Of clsCustomMZSearchSpec)
 
-            ' Only use the data in table CUSTOM_SIC_VALUES_DATATABLE if the CustomSicFileName is empty
+            ' Only use the data in table CUSTOM_SIC_VALUES_DATA_TABLE if the CustomSicFileName is empty
             If String.IsNullOrWhiteSpace(strCustomSICFileName) Then
 
-                For Each myDataRow As DataRow In mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATATABLE).Rows
+                For Each myDataRow As DataRow In mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE).Rows
                     With myDataRow
                         If IsNumeric(.Item(0)) And IsNumeric(.Item(1)) Then
 

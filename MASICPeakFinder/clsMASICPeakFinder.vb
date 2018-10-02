@@ -850,8 +850,8 @@ Public Class clsMASICPeakFinder
       sicPeak As clsSICStatsPeak,
       baselineNoiseOptions As clsBaselineNoiseOptions) As Boolean
 
-        Const NOISE_ESTIMATE_DATACOUNT_MINIMUM = 5
-        Const NOISE_ESTIMATE_DATACOUNT_MAXIMUM = 100
+        Const NOISE_ESTIMATE_DATA_COUNT_MINIMUM = 5
+        Const NOISE_ESTIMATE_DATA_COUNT_MAXIMUM = 100
 
         Dim intIndexStart As Integer
         Dim intIndexEnd As Integer
@@ -885,18 +885,18 @@ Public Class clsMASICPeakFinder
 
         intPeakHalfWidthPoints = CInt(Math.Round(intPeakWidthPoints / 1.5, 0))
 
-        ' Make sure that intPeakHalfWidthPoints is at least NOISE_ESTIMATE_DATACOUNT_MINIMUM
-        If intPeakHalfWidthPoints < NOISE_ESTIMATE_DATACOUNT_MINIMUM Then
-            intPeakHalfWidthPoints = NOISE_ESTIMATE_DATACOUNT_MINIMUM
+        ' Make sure that intPeakHalfWidthPoints is at least NOISE_ESTIMATE_DATA_COUNT_MINIMUM
+        If intPeakHalfWidthPoints < NOISE_ESTIMATE_DATA_COUNT_MINIMUM Then
+            intPeakHalfWidthPoints = NOISE_ESTIMATE_DATA_COUNT_MINIMUM
         End If
 
         ' Copy the peak base indices
         intIndexBaseLeft = sicPeak.IndexBaseLeft
         intIndexBaseRight = sicPeak.IndexBaseRight
 
-        ' Define IndexStart and IndexEnd, making sure that intPeakHalfWidthPoints is no larger than NOISE_ESTIMATE_DATACOUNT_MAXIMUM
-        intIndexStart = intIndexBaseLeft - Math.Min(intPeakHalfWidthPoints, NOISE_ESTIMATE_DATACOUNT_MAXIMUM)
-        intIndexEnd = sicPeak.IndexBaseRight + Math.Min(intPeakHalfWidthPoints, NOISE_ESTIMATE_DATACOUNT_MAXIMUM)
+        ' Define IndexStart and IndexEnd, making sure that intPeakHalfWidthPoints is no larger than NOISE_ESTIMATE_DATA_COUNT_MAXIMUM
+        intIndexStart = intIndexBaseLeft - Math.Min(intPeakHalfWidthPoints, NOISE_ESTIMATE_DATA_COUNT_MAXIMUM)
+        intIndexEnd = sicPeak.IndexBaseRight + Math.Min(intPeakHalfWidthPoints, NOISE_ESTIMATE_DATA_COUNT_MAXIMUM)
 
         If intIndexStart < 0 Then intIndexStart = 0
         If intIndexEnd >= sicData.Count Then intIndexEnd = sicData.Count - 1
@@ -913,7 +913,7 @@ Public Class clsMASICPeakFinder
             ' If not enough points, then alternately shift intIndexStart to the left 1 point and
             '  intIndexBaseLeft to the right one point until we do have enough points
             blnShiftLeft = True
-            Do While intIndexBaseLeft - intIndexStart + 1 < NOISE_ESTIMATE_DATACOUNT_MINIMUM
+            Do While intIndexBaseLeft - intIndexStart + 1 < NOISE_ESTIMATE_DATA_COUNT_MINIMUM
                 If blnShiftLeft Then
                     If intIndexStart > 0 Then intIndexStart -= 1
                 Else
@@ -938,7 +938,7 @@ Public Class clsMASICPeakFinder
             ' If not enough points, then alternately shift intIndexEnd to the right 1 point and
             '  intIndexBaseRight to the left one point until we do have enough points
             blnShiftLeft = False
-            Do While intIndexEnd - intIndexBaseRight + 1 < NOISE_ESTIMATE_DATACOUNT_MINIMUM
+            Do While intIndexEnd - intIndexBaseRight + 1 < NOISE_ESTIMATE_DATA_COUNT_MINIMUM
                 If blnShiftLeft Then
                     If intIndexBaseRight > sicPeak.IndexMax Then intIndexBaseRight -= 1
                 Else
@@ -1920,7 +1920,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="sicPeakFinderOptions"></param>
     ''' <param name="sngSICNoiseThresholdIntensity"></param>
     ''' <param name="dblMinimumPotentialPeakArea"></param>
-    ''' <param name="returnClosestsPeak">
+    ''' <param name="returnClosestPeak">
     ''' When true, intPeakLocationIndex should be populated with the "best guess" location of the peak in the intScanNumbers() and sngIntensityData() arrays
     ''' The peak closest to intPeakLocationIndex will be the chosen peak, even if it is not the most intense peak found
     ''' </param>
@@ -1938,7 +1938,7 @@ Public Class clsMASICPeakFinder
       sicPeakFinderOptions As clsSICPeakFinderOptions,
       sngSICNoiseThresholdIntensity As Single,
       dblMinimumPotentialPeakArea As Double,
-      returnClosestsPeak As Boolean) As Boolean
+      returnClosestPeak As Boolean) As Boolean
 
         Const SMOOTHED_DATA_PADDING_COUNT = 2
 
@@ -2058,7 +2058,7 @@ Public Class clsMASICPeakFinder
                     blnValidPeakFound = FindPeaksWork(
                       objPeakDetector, scanNumbers, peakData,
                       simDataPresent, sicPeakFinderOptions,
-                      blnTestingMinimumPeakWidth, returnClosestsPeak)
+                      blnTestingMinimumPeakWidth, returnClosestPeak)
 
                 Catch ex As Exception
                     LogErrors("clsMASICPeakFinder->FindPeaks", "Error calling FindPeaksWork", ex, True)
@@ -2142,7 +2142,7 @@ Public Class clsMASICPeakFinder
                         blnValidPeakFound = FindPeaksWork(
                           objPeakDetector, scanNumbers, peakData,
                           simDataPresent, sicPeakFinderOptions,
-                          True, returnClosestsPeak)
+                          True, returnClosestPeak)
 
                         If blnValidPeakFound Then
                             intShoulderCount = 0
@@ -2300,12 +2300,12 @@ Public Class clsMASICPeakFinder
       simDataPresent As Boolean,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
       blnTestingMinimumPeakWidth As Boolean,
-      returnClosestsPeak As Boolean) As Boolean
+      returnClosestPeak As Boolean) As Boolean
 
         ' Returns True if a valid peak is found; otherwise, returns false
-        ' When returnClosestsPeak is True, then a valid peak is one that contains peaksContainer.OriginalPeakLocationIndex
-        ' When returnClosestsPeak is False, then stores the index of the most intense peak in peaksContainer.BestPeakIndex
-        ' All of the identified peaks are returned in peaksContainer.PeakLocs(), regardless of whether they are valid or not
+        ' When returnClosestPeak is True, then a valid peak is one that contains peaksContainer.OriginalPeakLocationIndex
+        ' When returnClosestPeak is False, then stores the index of the most intense peak in peaksContainer.BestPeakIndex
+        ' All of the identified peaks are returned in peaksContainer.Peaks(), regardless of whether they are valid or not
 
         Dim intFoundPeakIndex As Integer
 
@@ -2370,7 +2370,7 @@ Public Class clsMASICPeakFinder
                 peaksContainer.Peaks.Add(newPeak)
 
             Else
-                If returnClosestsPeak Then
+                If returnClosestPeak Then
                     ' Make sure one of the peaks is within 1 of the original peak location
                     blnSuccess = False
                     For intFoundPeakIndex = 0 To peaksContainer.Peaks.Count - 1
@@ -2558,7 +2558,7 @@ Public Class clsMASICPeakFinder
                 Loop
 
                 peakItem.PeakIsValid = True
-                If returnClosestsPeak Then
+                If returnClosestPeak Then
                     ' If peaksContainer.OriginalPeakLocationIndex is not between intPeakIndexStart and intPeakIndexEnd, then check
                     '  if the scan number for peaksContainer.OriginalPeakLocationIndex is within .MaxDistanceScansNoOverlap scans of
                     '  either of the peak edges; if not, then mark the peak as invalid since it does not contain the
@@ -2810,7 +2810,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="smoothedYDataSubset"></param>
     ''' <param name="sicPeakFinderOptions"></param>
     ''' <param name="potentialAreaStatsForRegion"></param>
-    ''' <param name="returnClosestsPeak"></param>
+    ''' <param name="returnClosestPeak"></param>
     ''' <param name="simDataPresent">True if Select Ion Monitoring data is present</param>
     ''' <param name="recomputeNoiseLevel"></param>
     <Obsolete("Use the version that takes a List(Of clsSICDataPoint")>
@@ -2823,7 +2823,7 @@ Public Class clsMASICPeakFinder
         <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
         sicPeakFinderOptions As clsSICPeakFinderOptions,
         potentialAreaStatsForRegion As clsSICPotentialAreaStats,
-        returnClosestsPeak As Boolean,
+        returnClosestPeak As Boolean,
         simDataPresent As Boolean,
         recomputeNoiseLevel As Boolean) As Boolean
 
@@ -2837,7 +2837,7 @@ Public Class clsMASICPeakFinder
                                   potentialAreaStatsForPeak, sicPeak,
                                   smoothedYDataSubset, sicPeakFinderOptions,
                                   potentialAreaStatsForRegion,
-                                  returnClosestsPeak, simDataPresent, recomputeNoiseLevel)
+                                  returnClosestPeak, simDataPresent, recomputeNoiseLevel)
     End Function
 
     ''' <summary>
@@ -2849,7 +2849,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="smoothedYDataSubset"></param>
     ''' <param name="sicPeakFinderOptions"></param>
     ''' <param name="potentialAreaStatsForRegion"></param>
-    ''' <param name="returnClosestsPeak"></param>
+    ''' <param name="returnClosestPeak"></param>
     ''' <param name="simDataPresent">True if Select Ion Monitoring data is present</param>
     ''' <param name="recomputeNoiseLevel"></param>
     ''' <returns></returns>
@@ -2860,7 +2860,7 @@ Public Class clsMASICPeakFinder
       <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
       potentialAreaStatsForRegion As clsSICPotentialAreaStats,
-      returnClosestsPeak As Boolean,
+      returnClosestPeak As Boolean,
       simDataPresent As Boolean,
       recomputeNoiseLevel As Boolean) As Boolean
 
@@ -2950,7 +2950,7 @@ Public Class clsMASICPeakFinder
                       smoothedYDataSubset, simDataPresent, sicPeakFinderOptions,
                                            sicPeak.BaselineNoiseStats.NoiseLevel,
                       potentialAreaStatsForRegion.MinimumPotentialPeakArea,
-                      returnClosestsPeak)
+                      returnClosestPeak)
                 End With
 
                 If blnSuccess Then

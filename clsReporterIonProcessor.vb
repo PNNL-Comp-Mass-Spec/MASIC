@@ -323,7 +323,7 @@ Public Class clsReporterIonProcessor
         ' Note that we're using the maximum intensity in the range (not the sum)
         For intReporterIonIndex = 0 To reporterIons.Count - 1
 
-            Dim intIonmatchcount As Integer
+            Dim intIonMatchCount As Integer
 
             With reporterIons(intReporterIonIndex)
                 ' Search for the reporter ion MZ in this mass spectrum
@@ -331,7 +331,7 @@ Public Class clsReporterIonProcessor
                     objSpectraCache.SpectraPool(intPoolIndex),
                     .MZ,
                     .MZToleranceDa,
-                    intIonmatchcount,
+                    intIonMatchCount,
                     dblClosestMZ(intReporterIonIndex),
                     USE_MAX_ABUNDANCE_IN_WINDOW)
 
