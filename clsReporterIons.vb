@@ -205,10 +205,13 @@
 
             Case eReporterIonMassModeConstants.PCGalnaz
 
+                ' ReSharper disable CommentTypo
+
                 ' Custom reporter ions for Josh Alfaro
                 reporterIons.Add(New clsReporterIonInfo(204.0871934))     ' C8H14NO5
                 reporterIons.Add(New clsReporterIonInfo(300.130787))      ' C11H18N5O5
                 reporterIons.Add(New clsReporterIonInfo(503.2101566))     ' C19H31N6O10
+
 
             Case eReporterIonMassModeConstants.HemeCFragment
 
@@ -251,6 +254,7 @@
                 reporterIons.Add(New clsReporterIonInfo(151.063))
                 reporterIons.Add(New clsReporterIonInfo(166.087))
 
+                ' ReSharper restore CommentTypo
 
             Case eReporterIonMassModeConstants.Acetylation
                 ' Reporter ions for peptides with acetylated lysine residues

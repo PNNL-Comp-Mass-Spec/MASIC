@@ -383,9 +383,14 @@ Public Class clsITraqIntensityCorrection
             Case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes
 
                 ' 8-plex ITraq, isotope contribution table for Low Res MS/MS
+
+                ' ReSharper disable CommentTypo
+
                 ' Source percentages come from page 664 in:
                 '  Vaudel, M., Sickmann, A., and L. Martens. "Peptide and protein quantification: A map of the minefield",
                 '  Proteomics 2010, 10, 650-670.
+
+                ' ReSharper restore CommentTypo
 
                 udtIsoPct113 = DefineIsotopeContribution(0, 0, 92.89, 6.89, 0.22)
                 udtIsoPct114 = DefineIsotopeContribution(0, 0.94, 93.01, 5.9, 0.16)
