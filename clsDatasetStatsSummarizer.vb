@@ -136,7 +136,7 @@ Public Class clsDatasetStatsSummarizer
 #End Region
 
     Public Sub New()
-        mFileDate = "October 1, 2018"
+        mFileDate = "October 16, 2018"
 
         mMedianUtils = New clsMedianUtilities()
 
