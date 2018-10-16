@@ -1328,7 +1328,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("FindSICsAndWriteOutput", "Error saving results to: " & outputFolderPath, ex, True, eMasicErrorCodes.OutputFileWriteError)
+            LogErrors("FindSICsAndWriteOutput", "Error saving results to: " & outputFolderPath, ex, eMasicErrorCodes.OutputFileWriteError)
         End Try
 
         Return success
@@ -1578,7 +1578,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, True, eMasicErrorCodes.InputFileDataReadError)
+            LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError)
             dataImporterBase = Nothing
         End Try
 
@@ -1595,7 +1595,6 @@ Public Class clsMASIC
       strSource As String,
       strMessage As String,
       ex As Exception,
-      Optional blnAllowThrowingException As Boolean = True,
       Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
 
         Dim strMessageWithoutCRLF As String
@@ -1627,9 +1626,6 @@ Public Class clsMASIC
             SetLocalErrorCode(eNewErrorCode, True)
         End If
 
-        If blnAllowThrowingException Then
-            Throw New Exception(mOptions.StatusMessage, ex)
-        End If
     End Sub
 
     ' Main processing function
@@ -1753,7 +1749,7 @@ Public Class clsMASIC
 
             Catch ex As Exception
                 success = False
-                LogErrors("ProcessFile", "Error checking for existing results file", ex, True, eMasicErrorCodes.InputFileDataReadError)
+                LogErrors("ProcessFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError)
             End Try
 
             If blnDoNotProcess Then
@@ -1787,7 +1783,7 @@ Public Class clsMASIC
 
             Catch ex As Exception
                 success = False
-                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & outputFolderPath, ex, False, eMasicErrorCodes.FileIOPermissionsError)
+                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & outputFolderPath, ex, eMasicErrorCodes.FileIOPermissionsError)
             End Try
 
             If Not success Then
@@ -1868,7 +1864,7 @@ Public Class clsMASIC
                     End With
                 Catch ex As Exception
                     success = False
-                    LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, False, eMasicErrorCodes.UnspecifiedError)
+                    LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, eMasicErrorCodes.UnspecifiedError)
                     Exit Try
                 End Try
 
@@ -1887,7 +1883,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("ProcessFile", "Error in ProcessFile", ex, False, eMasicErrorCodes.UnspecifiedError)
+            LogErrors("ProcessFile", "Error in ProcessFile", ex, eMasicErrorCodes.UnspecifiedError)
         Finally
 
             ' Record the final processing stats (before the output file handles are closed)
@@ -1949,7 +1945,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, False, eMasicErrorCodes.UnspecifiedError)
+            LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, eMasicErrorCodes.UnspecifiedError)
         End Try
 
         If success Then
@@ -2040,7 +2036,7 @@ Public Class clsMASIC
                 End With
             Next
         Catch ex As Exception
-            LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex, False)
+            LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex)
         End Try
 
     End Sub
