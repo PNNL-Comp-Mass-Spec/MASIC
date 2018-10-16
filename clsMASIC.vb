@@ -1345,8 +1345,8 @@ Public Class clsMASIC
 
         Dim strErrorMessage As String
 
-        If MyBase.ErrorCode = eProcessFilesErrorCodes.LocalizedError OrElse
-           MyBase.ErrorCode = eProcessFilesErrorCodes.NoError Then
+        If MyBase.ErrorCode = ProcessFilesErrorCodes.LocalizedError OrElse
+           MyBase.ErrorCode = ProcessFilesErrorCodes.NoError Then
             Select Case mLocalErrorCode
                 Case eMasicErrorCodes.NoError
                     strErrorMessage = String.Empty
@@ -1660,13 +1660,13 @@ Public Class clsMASIC
         UpdateStatusFile(True)
 
         If Not mOptions.LoadParameterFileSettings(parameterFilePath, inputFilePath) Then
-            MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
+            MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile)
             mStatusMessage = "Parameter file load error: " & parameterFilePath
 
             MyBase.ShowErrorMessage(mStatusMessage)
 
-            If MyBase.ErrorCode = eProcessFilesErrorCodes.NoError Then
-                MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
+            If MyBase.ErrorCode = ProcessFilesErrorCodes.NoError Then
+                MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile)
             End If
             UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
 
@@ -1697,7 +1697,7 @@ Public Class clsMASIC
 
             If inputFilePath Is Nothing OrElse inputFilePath.Length = 0 Then
                 ShowErrorMessage("Input file name is empty")
-                MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidInputFilePath)
+                MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidInputFilePath)
                 Exit Try
             End If
 
@@ -1727,7 +1727,7 @@ Public Class clsMASIC
             End If
 
             If Not success Then
-                If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.FilePathError)
+                If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.FilePathError)
                 Exit Try
             End If
 
@@ -2059,11 +2059,11 @@ Public Class clsMASIC
             mLocalErrorCode = eNewErrorCode
 
             If eNewErrorCode = eMasicErrorCodes.NoError Then
-                If MyBase.ErrorCode = eProcessFilesErrorCodes.LocalizedError Then
-                    MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.NoError)
+                If MyBase.ErrorCode = ProcessFilesErrorCodes.LocalizedError Then
+                    MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.NoError)
                 End If
             Else
-                MyBase.SetBaseClassErrorCode(eProcessFilesErrorCodes.LocalizedError)
+                MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.LocalizedError)
             End If
         End If
 
@@ -2198,8 +2198,8 @@ Public Class clsMASIC
             LastFileWriteTime = DateTime.UtcNow
 
             Try
-                Dim strTempPath = Path.Combine(GetAppFolderPath(), "Temp_" & mOptions.MASICStatusFilename)
-                Dim strPath = Path.Combine(GetAppFolderPath(), mOptions.MASICStatusFilename)
+                Dim strTempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" & mOptions.MASICStatusFilename)
+                Dim strPath = Path.Combine(GetAppDirectoryPath(), mOptions.MASICStatusFilename)
 
                 Using writer = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
 
@@ -2260,7 +2260,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub WarningEventHandler(message As String)
-        LogMessage(message, eMessageTypeConstants.Warning)
+        LogMessage(message, MessageTypeConstants.Warning)
     End Sub
 
     ''' <summary>
@@ -2282,7 +2282,7 @@ Public Class clsMASIC
         mProcessingStats.UnCacheEventCount = unCacheEventCount
     End Sub
 
-    Private Sub UpdateBaseClassErrorCodeEventHandler(eErrorCode As eProcessFilesErrorCodes)
+    Private Sub UpdateBaseClassErrorCodeEventHandler(eErrorCode As ProcessFilesErrorCodes)
         SetBaseClassErrorCode(eErrorCode)
     End Sub
 

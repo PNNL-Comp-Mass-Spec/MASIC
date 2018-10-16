@@ -232,7 +232,7 @@ Public Class clsMASICOptions
 
             If Not File.Exists(parameterFilePath) Then
                 ' See if parameterFilePath points to a file in the same directory as the application
-                parameterFilePath = Path.Combine(GetAppFolderPath(), Path.GetFileName(parameterFilePath))
+                parameterFilePath = Path.Combine(GetAppDirectoryPath(), Path.GetFileName(parameterFilePath))
                 If Not File.Exists(parameterFilePath) Then
                     If Not String.IsNullOrWhiteSpace(instrumentDataFilePath) Then
                         ' Also look in the same directory as the instrument data file
@@ -593,7 +593,7 @@ Public Class clsMASICOptions
                                           "> was not found in the parameter file: " & parameterFilePath
                     ReportError(strErrorMessage)
 
-                    SetBaseClassErrorCode(eProcessFilesErrorCodes.InvalidParameterFile)
+                    SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile)
                     Return False
                 Else
                     BinningOptions.StartX = .GetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX",

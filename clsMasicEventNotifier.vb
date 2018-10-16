@@ -18,7 +18,7 @@ Public MustInherit Class clsMasicEventNotifier
     ''' Update the code associated with an error
     ''' </summary>
     ''' <param name="eNewErrorCode"></param>
-    Public Event UpdateBaseClassErrorCodeEvent(eNewErrorCode As eProcessFilesErrorCodes)
+    Public Event UpdateBaseClassErrorCodeEvent(eNewErrorCode As ProcessFilesErrorCodes)
 
     ''' <summary>
     ''' Update the code associated with an error
@@ -33,7 +33,7 @@ Public MustInherit Class clsMasicEventNotifier
         RaiseEvent UpdateCacheStatsEvent(cacheEventCount, unCacheEventCount)
     End Sub
 
-    Private Sub OnUpdateBaseClassErrorCode(eNewErrorCode As eProcessFilesErrorCodes)
+    Private Sub OnUpdateBaseClassErrorCode(eNewErrorCode As ProcessFilesErrorCodes)
         RaiseEvent UpdateBaseClassErrorCodeEvent(eNewErrorCode)
     End Sub
 
@@ -90,7 +90,7 @@ Public MustInherit Class clsMasicEventNotifier
         OnWarningEvent(message)
     End Sub
 
-    Protected Sub SetBaseClassErrorCode(eNewErrorCode As eProcessFilesErrorCodes)
+    Protected Sub SetBaseClassErrorCode(eNewErrorCode As ProcessFilesErrorCodes)
         OnUpdateBaseClassErrorCode(eNewErrorCode)
     End Sub
 
@@ -126,7 +126,7 @@ Public MustInherit Class clsMasicEventNotifier
         OnUpdateCacheStats(cacheEventCount, unCacheEventCount)
     End Sub
 
-    Private Sub UpdateBaseClassErrorCodeEventHandler(eErrorCode As eProcessFilesErrorCodes)
+    Private Sub UpdateBaseClassErrorCodeEventHandler(eErrorCode As ProcessFilesErrorCodes)
         SetBaseClassErrorCode(eErrorCode)
     End Sub
 

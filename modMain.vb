@@ -185,7 +185,7 @@ Public Module modMain
     End Sub
 
     Private Function GetAppVersion() As String
-        Return ProcessFilesOrFoldersBase.GetAppVersion(PROGRAM_DATE)
+        Return ProcessFilesOrDirectoriesBase.GetAppVersion(PROGRAM_DATE)
     End Function
 
     Private Sub RegisterEvents(oClass As EventNotifier)

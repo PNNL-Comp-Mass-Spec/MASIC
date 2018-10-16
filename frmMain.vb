@@ -570,10 +570,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(strFilePath).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
             If File.Exists(strFilePath) Then
@@ -639,7 +639,7 @@ Public Class frmMain
                     End If
 
                     If txtOutputFolderPath.TextLength = 0 Then
-                        txtOutputFolderPath.Text = ProcessFilesBase.GetAppFolderPath()
+                        txtOutputFolderPath.Text = ProcessFilesBase.GetAppDirectoryPath()
                     End If
 
                     mPreferredInputFileExtension = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
@@ -691,10 +691,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(strFilePath).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
             If File.Exists(strFilePath) Then
@@ -1125,7 +1125,7 @@ Public Class frmMain
         ' File Paths and Import Options
         Try
             If txtOutputFolderPath.TextLength = 0 OrElse Not Directory.Exists(txtOutputFolderPath.Text) Then
-                txtOutputFolderPath.Text = ProcessFilesBase.GetAppFolderPath()
+                txtOutputFolderPath.Text = ProcessFilesBase.GetAppDirectoryPath()
             End If
         Catch ex As Exception
             If blnConfirm Then
@@ -1366,10 +1366,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
             .Title = "Select dataset lookup file"
@@ -1419,10 +1419,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
             .Title = "Select custom SIC values file"
@@ -1485,10 +1485,10 @@ Public Class frmMain
                 Try
                     .InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppFolderPath()
+                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
             .Title = "Select input file"
