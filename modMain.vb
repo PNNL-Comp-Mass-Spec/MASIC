@@ -22,23 +22,23 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "October 2, 2018"
+    Public Const PROGRAM_DATE As String = "October 16, 2018"
 
     Private mInputFilePath As String
-    Private mOutputFolderPath As String             ' Optional
-    Private mParameterFilePath As String            ' Optional
-    Private mOutputFolderAlternatePath As String                ' Optional
-    Private mRecreateFolderHierarchyInAlternatePath As Boolean  ' Optional
+    Private mOutputDirectoryPath As String              ' Optional
+    Private mParameterFilePath As String                ' Optional
+    Private mOutputDirectoryAlternatePath As String                ' Optional
+    Private mRecreateDirectoryHierarchyInAlternatePath As Boolean  ' Optional
 
-    Private mDatasetLookupFilePath As String        ' Optional
+    Private mDatasetLookupFilePath As String            ' Optional
     Private mDatasetNumber As Integer
 
-    Private mRecurseFolders As Boolean
-    Private mRecurseFoldersMaxLevels As Integer
+    Private mRecurseDirectories As Boolean
+    Private mMaxLevelsToRecurse As Integer
 
     Private mLogMessagesToFile As Boolean
     Private mLogFilePath As String = String.Empty
-    Private mLogFolderPath As String = String.Empty
+    Private mLogDirectoryPath As String = String.Empty
 
     Private mMASICStatusFilename As String = String.Empty
     Private mQuietMode As Boolean
@@ -89,11 +89,11 @@ Public Module modMain
         Dim proceed As Boolean
 
         mInputFilePath = String.Empty
-        mOutputFolderPath = String.Empty
+        mOutputDirectoryPath = String.Empty
         mParameterFilePath = String.Empty
 
-        mRecurseFolders = False
-        mRecurseFoldersMaxLevels = 0
+        mRecurseDirectories = False
+        mMaxLevelsToRecurse = 0
 
         mQuietMode = False
         mLogMessagesToFile = False
@@ -127,7 +127,7 @@ Public Module modMain
 
             mMASIC.LogMessagesToFile = mLogMessagesToFile
             mMASIC.LogFilePath = mLogFilePath
-            mMASIC.LogFolderPath = mLogFolderPath
+            mMASIC.LogDirectoryPath = mLogDirectoryPath
 
             If Not mQuietMode Then
                 mProgressForm = New frmProgress()
@@ -142,14 +142,16 @@ Public Module modMain
 
             Dim returnCode As Integer
 
-            If mRecurseFolders Then
-                If mMASIC.ProcessFilesAndRecurseFolders(mInputFilePath, mOutputFolderPath, mOutputFolderAlternatePath, mRecreateFolderHierarchyInAlternatePath, mParameterFilePath, mRecurseFoldersMaxLevels) Then
+            If mRecurseDirectories Then
+                If mMASIC.ProcessFilesAndRecurseDirectories(mInputFilePath, mOutputDirectoryPath,
+                                                            mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath,
+                                                            mParameterFilePath, mMaxLevelsToRecurse) Then
                     returnCode = 0
                 Else
                     returnCode = mMASIC.ErrorCode
                 End If
             Else
-                If mMASIC.ProcessFilesWildcard(mInputFilePath, mOutputFolderPath, mParameterFilePath) Then
+                If mMASIC.ProcessFilesWildcard(mInputFilePath, mOutputDirectoryPath, mParameterFilePath) Then
                     returnCode = 0
                 Else
                     returnCode = mMASIC.ErrorCode
@@ -207,7 +209,7 @@ Public Module modMain
         ' Returns True if no problems; otherwise, returns false
 
         Dim value As String = String.Empty
-        Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "LogFolder", "Q"}
+        Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "LogDir", "LogFolder", "Q"}
         Dim intValue As Integer
 
         Try
@@ -227,7 +229,7 @@ Public Module modMain
                         mInputFilePath = .RetrieveNonSwitchParameter(0)
                     End If
 
-                    If .RetrieveValueForParameter("O", value) Then mOutputFolderPath = value
+                    If .RetrieveValueForParameter("O", value) Then mOutputDirectoryPath = value
                     If .RetrieveValueForParameter("P", value) Then mParameterFilePath = value
                     If .RetrieveValueForParameter("D", value) Then
                         If Not IsNumeric(value) AndAlso Not value Is Nothing Then
@@ -240,13 +242,13 @@ Public Module modMain
                     End If
 
                     If .RetrieveValueForParameter("S", value) Then
-                        mRecurseFolders = True
+                        mRecurseDirectories = True
                         If Integer.TryParse(value, intValue) Then
-                            mRecurseFoldersMaxLevels = intValue
+                            mMaxLevelsToRecurse = intValue
                         End If
                     End If
-                    If .RetrieveValueForParameter("A", value) Then mOutputFolderAlternatePath = value
-                    If .IsParameterPresent("R") Then mRecreateFolderHierarchyInAlternatePath = True
+                    If .RetrieveValueForParameter("A", value) Then mOutputDirectoryAlternatePath = value
+                    If .IsParameterPresent("R") Then mRecreateDirectoryHierarchyInAlternatePath = True
 
                     If .RetrieveValueForParameter("L", value) Then
                         mLogMessagesToFile = True
@@ -259,10 +261,17 @@ Public Module modMain
                         mMASICStatusFilename = value
                     End If
 
+                    If .RetrieveValueForParameter("LogDir", value) Then
+                        mLogMessagesToFile = True
+                        If Not String.IsNullOrEmpty(value) Then
+                            mLogDirectoryPath = value
+                        End If
+                    End If
+
                     If .RetrieveValueForParameter("LogFolder", value) Then
                         mLogMessagesToFile = True
                         If Not String.IsNullOrEmpty(value) Then
-                            mLogFolderPath = value
+                            mLogDirectoryPath = value
                         End If
                     End If
                     If .IsParameterPresent("Q") Then mQuietMode = True
@@ -313,18 +322,18 @@ Public Module modMain
             Console.WriteLine()
 
             Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(ProcessFilesBase.GetAppPath()))
-            Console.WriteLine(" /I:InputFilePath.raw [/O:OutputFolderPath]")
+            Console.WriteLine(" /I:InputFilePath.raw [/O:OutputDirectoryPath]")
             Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath] ")
-            Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputFolderPath] [/R]")
-            Console.WriteLine(" [/L:[LogFilePath]] [/LogFolder:LogFolderPath] [/SF:StatusFileName] [/Q]")
+            Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]")
+            Console.WriteLine(" [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]")
             Console.WriteLine()
 
             Console.WriteLine("The input file path can contain the wildcard character *")
             Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                "The output folder name is optional. " &
-                "If omitted, the output files will be created in the same folder as the input file. " &
-                "If included, then a subfolder is created with the name OutputFolderName."))
+                "The output directory name is optional. " &
+                "If omitted, the output files will be created in the same directory as the input file. " &
+                "If included, then a subdirectory is created with the name OutputDirectoryName."))
 
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                 "The param file switch is optional. " &
@@ -339,11 +348,11 @@ Public Module modMain
                 "Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S)"))
             Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                "Use /S to process all valid files in the input folder and subfolders. " &
-                "Include a number after /S (like /S:2) to limit the level of subfolders to examine."))
+                "Use /S to process all valid files in the input directory and subdirectories. " &
+                "Include a number after /S (like /S:2) to limit the level of subdirectories to examine."))
 
             Console.WriteLine("When using /S, you can redirect the output of the results using /A.")
-            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("When using /S, you can use /R to re-create the input folder hierarchy in the alternate output folder (if defined)."))
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("When using /S, you can use /R to re-create the input directory hierarchy in the alternate output directory (if defined)."))
             Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file."))
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME & ")."))
