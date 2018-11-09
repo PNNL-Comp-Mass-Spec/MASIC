@@ -135,37 +135,44 @@ Namespace DataOutput
 
         End Function
 
+        ''' <summary>
+        ''' Looks through surveyScans and fragScans for ExtendedHeaderInfo values that are constant across all scans
+        ''' </summary>
+        ''' <param name="nonConstantHeaderIDs">Output: the ID values of the header values that are not constant</param>
+        ''' <param name="surveyScans"></param>
+        ''' <param name="fragScans"></param>
+        ''' <param name="cColDelimiter"></param>
+        ''' <returns>
+        ''' String that is a newline separated list of header values that are constant, tab delimited, and their constant values, also tab delimited
+        ''' Each line is in the form ParameterName_ColumnDelimiter_ParameterValue
+        ''' </returns>
+        ''' <remarks>mExtendedHeaderNameMap is updated so that constant header values are removed from it</remarks>
         Public Function ExtractConstantExtendedHeaderValues(
-          ByRef intNonConstantHeaderIDs() As Integer,
+          <Out> ByRef nonConstantHeaderIDs As List(Of Integer),
           surveyScans As IList(Of clsScanInfo),
           fragScans As IList(Of clsScanInfo),
           cColDelimiter As Char) As String
 
-            ' Looks through surveyScans and fragScans for ExtendedHeaderInfo values that are constant across all scans
-            ' Returns a string containing the header values that are constant, tab delimited, and their constant values, also tab delimited
-            ' intNonConstantHeaderIDs() returns the ID values of the header values that are not constant
-            ' mExtendedHeaderNameMap is updated so that constant header values are removed from it
-
             Dim cTrimChars = New Char() {":"c, " "c}
 
-            Dim intNonConstantCount As Integer
+            Dim value As String = String.Empty
 
-            Dim strValue As String = String.Empty
+            ' Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
+            Dim consolidatedValuesByID As Dictionary(Of Integer, String)
 
-            Dim htConsolidatedValues As Dictionary(Of Integer, String)
+            Dim constantHeaderIDs = New List(Of Integer)
 
-            Dim intConstantHeaderIDs() As Integer
+            Dim scanFilterTextHeaderID As Integer
 
-            Dim intScanFilterTextHeaderID As Integer
+            nonConstantHeaderIDs = New List(Of Integer)
 
             If mExtendedHeaderNameMap.Count = 0 Then
                 Return String.Empty
             End If
 
-            ' Initialize this for now; it will get re-dimmed below if any constant values are found
-            ReDim intNonConstantHeaderIDs(mExtendedHeaderNameMap.Count - 1)
-            For intIndex = 0 To mExtendedHeaderNameMap.Count - 1
-                intNonConstantHeaderIDs(intIndex) = intIndex
+            ' Initialize nonConstantHeaderIDs
+            For i = 0 To mExtendedHeaderNameMap.Count - 1
+                nonConstantHeaderIDs.Add(i)
             Next
 
             If Not mOptions.ConsolidateConstantExtendedHeaderValues Then
@@ -174,38 +181,38 @@ Namespace DataOutput
             End If
 
             If surveyScans.Count > 0 Then
-                htConsolidatedValues = DeepCopyHeaderInfoDictionary(surveyScans(0).ExtendedHeaderInfo)
+                consolidatedValuesByID = DeepCopyHeaderInfoDictionary(surveyScans(0).ExtendedHeaderInfo)
             ElseIf fragScans.Count > 0 Then
-                htConsolidatedValues = DeepCopyHeaderInfoDictionary(fragScans(0).ExtendedHeaderInfo)
+                consolidatedValuesByID = DeepCopyHeaderInfoDictionary(fragScans(0).ExtendedHeaderInfo)
             Else
                 Return String.Empty
             End If
 
-            If htConsolidatedValues Is Nothing Then
+            If consolidatedValuesByID Is Nothing Then
                 Return String.Empty
             End If
 
             ' Look for "Scan Filter Text" in mExtendedHeaderNameMap
-            If TryGetExtendedHeaderInfoValue(EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, intScanFilterTextHeaderID) Then
+            If TryGetExtendedHeaderInfoValue(EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, scanFilterTextHeaderID) Then
                 ' Match found
 
-                ' Now look for and remove the HeaderID value from htConsolidatedValues to prevent the scan filter text from being included in the consolidated values file
-                If htConsolidatedValues.ContainsKey(intScanFilterTextHeaderID) Then
-                    htConsolidatedValues.Remove(intScanFilterTextHeaderID)
+                ' Now look for and remove the HeaderID value from consolidatedValuesByID to prevent the scan filter text from being included in the consolidated values file
+                If consolidatedValuesByID.ContainsKey(scanFilterTextHeaderID) Then
+                    consolidatedValuesByID.Remove(scanFilterTextHeaderID)
                 End If
             End If
 
             ' Examine the values in .ExtendedHeaderInfo() in the survey scans and compare them
-            ' to the values in htConsolidatedValues, looking to see if they match
+            ' to the values in consolidatedValuesByID, looking to see if they match
             For Each surveyScan In surveyScans
                 If Not surveyScan.ExtendedHeaderInfo Is Nothing Then
                     For Each dataItem In surveyScan.ExtendedHeaderInfo
-                        If htConsolidatedValues.TryGetValue(dataItem.Key, strValue) Then
-                            If String.Equals(strValue, dataItem.Value) Then
+                        If consolidatedValuesByID.TryGetValue(dataItem.Key, value) Then
+                            If String.Equals(value, dataItem.Value) Then
                                 ' Value matches; nothing to do
                             Else
-                                ' Value differs; remove key from htConsolidatedValues
-                                htConsolidatedValues.Remove(dataItem.Key)
+                                ' Value differs; remove the key from consolidatedValuesByID
+                                consolidatedValuesByID.Remove(dataItem.Key)
                             End If
                         End If
                     Next
@@ -213,61 +220,57 @@ Namespace DataOutput
             Next
 
             ' Examine the values in .ExtendedHeaderInfo() in the frag scans and compare them
-            ' to the values in htConsolidatedValues, looking to see if they match
+            ' to the values in consolidatedValuesByID, looking to see if they match
             For Each fragScan In fragScans
                 If Not fragScan.ExtendedHeaderInfo Is Nothing Then
                     For Each item In fragScan.ExtendedHeaderInfo
-                        If htConsolidatedValues.TryGetValue(item.Key, strValue) Then
-                            If String.Equals(strValue, item.Value) Then
+                        If consolidatedValuesByID.TryGetValue(item.Key, value) Then
+                            If String.Equals(value, item.Value) Then
                                 ' Value matches; nothing to do
                             Else
-                                ' Value differs; remove key from htConsolidatedValues
-                                htConsolidatedValues.Remove(item.Key)
+                                ' Value differs; remove key from consolidatedValuesByID
+                                consolidatedValuesByID.Remove(item.Key)
                             End If
                         End If
                     Next
                 End If
             Next
 
-            If htConsolidatedValues Is Nothing OrElse htConsolidatedValues.Count = 0 Then
+            If consolidatedValuesByID Is Nothing OrElse consolidatedValuesByID.Count = 0 Then
                 Return String.Empty
             End If
 
-            ' Populate strConsolidatedValues with the values in htConsolidatedValues,
+            ' Populate consolidatedValueList with the values in consolidatedValuesByID,
             '  separating each header and value with a tab and separating each pair of values with a NewLine character
-            ' Need to first populate intConstantHeaderIDs with the ID values and sort the list so that the values are
-            '  stored in strConsolidatedValueList in the correct order
 
-            Dim strConsolidatedValueList = "Setting" & cColDelimiter & "Value" & ControlChars.NewLine
+            ' Need to first populate constantHeaderIDs with the ID values and sort the list so that the values are
+            '  stored in consolidatedValueList in the correct order
 
-            ReDim intConstantHeaderIDs(htConsolidatedValues.Count - 1)
+            Dim consolidatedValueList = New List(Of String) From {
+                "Setting" & cColDelimiter & "Value"
+            }
 
-            Dim targetIndex = 0
-            For Each item In htConsolidatedValues
-                intConstantHeaderIDs(targetIndex) = item.Key
-                targetIndex += 1
+            For Each item In consolidatedValuesByID
+                constantHeaderIDs.Add(item.Key)
             Next
 
-            Array.Sort(intConstantHeaderIDs)
+            Dim keysToRemove = New List(Of String)
 
-            Dim htKeysToRemove = New List(Of String)
-
-            For headerIndex = 0 To intConstantHeaderIDs.Length - 1
+            For Each headerId In (From item In constantHeaderIDs Order By item Select item)
 
                 For Each item In mExtendedHeaderNameMap
-                    If item.Value = intConstantHeaderIDs(headerIndex) Then
-                        strConsolidatedValueList &= item.Key.TrimEnd(cTrimChars) & cColDelimiter
-                        strConsolidatedValueList &= htConsolidatedValues(intConstantHeaderIDs(headerIndex)) & ControlChars.NewLine
-                        htKeysToRemove.Add(item.Key)
+                    If item.Value = headerId Then
+                        consolidatedValueList.Add(item.Key.TrimEnd(cTrimChars) & cColDelimiter & consolidatedValuesByID(headerId))
+                        keysToRemove.Add(item.Key)
                         Exit For
                     End If
                 Next
             Next
 
-            ' Remove the elements from mExtendedHeaderNameMap that were included in strConsolidatedValueList;
+            ' Remove the elements from mExtendedHeaderNameMap that were included in consolidatedValueList;
             '  we couldn't remove these above since that would invalidate the iHeaderEnum enumerator
 
-            For Each keyName In htKeysToRemove
+            For Each keyName In keysToRemove
                 For headerIndex = 0 To mExtendedHeaderNameMap.Count - 1
                     If mExtendedHeaderNameMap(headerIndex).Key = keyName Then
                         mExtendedHeaderNameMap.RemoveAt(headerIndex)
@@ -276,18 +279,14 @@ Namespace DataOutput
                 Next
             Next
 
-            ReDim intNonConstantHeaderIDs(mExtendedHeaderNameMap.Count - 1)
-            intNonConstantCount = 0
+            nonConstantHeaderIDs.Clear()
 
-            ' Populate intNonConstantHeaderIDs with the ID values in mExtendedHeaderNameMap
+            ' Populate nonConstantHeaderIDs with the ID values in mExtendedHeaderNameMap
             For Each item In mExtendedHeaderNameMap
-                intNonConstantHeaderIDs(intNonConstantCount) = item.Value
-                intNonConstantCount += 1
+                nonConstantHeaderIDs.Add(item.Value)
             Next
 
-            Array.Sort(intNonConstantHeaderIDs)
-
-            Return strConsolidatedValueList
+            Return String.Join(ControlChars.NewLine, consolidatedValueList)
 
         End Function
 
@@ -329,15 +328,15 @@ Namespace DataOutput
 
             Const cColDelimiter As Char = ControlChars.Tab
 
-            Dim intNonConstantHeaderIDs() As Integer = Nothing
+            Dim nonConstantHeaderIDs As List(Of Integer) = Nothing
 
             Try
                 UpdateProgress(0, "Saving extended scan stats to flat file")
 
-                strExtendedConstantHeaderOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile)
-                strExtendedNonConstantHeaderOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
+                extendedConstantHeaderOutputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile)
+                extendedNonConstantHeaderOutputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
 
-                ReportMessage("Saving extended scan stats flat file to disk: " & Path.GetFileName(strExtendedNonConstantHeaderOutputFilePath))
+                ReportMessage("Saving extended scan stats flat file to disk: " & Path.GetFileName(extendedNonConstantHeaderOutputFilePath))
 
                 If mExtendedHeaderNameMap.Count = 0 Then
                     ' No extended stats to write; exit the function
@@ -346,31 +345,31 @@ Namespace DataOutput
 
                 ' Lookup extended stats values that are constants for all scans
                 ' The following will also remove the constant header values from mExtendedHeaderNameMap
-                Dim strConstantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(intNonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter)
-                If strConstantExtendedHeaderValues Is Nothing Then strConstantExtendedHeaderValues = String.Empty
+                Dim constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter)
+                If constantExtendedHeaderValues Is Nothing Then constantExtendedHeaderValues = String.Empty
 
                 ' Write the constant extended stats values to a text file
-                Using srOutFile = New StreamWriter(strExtendedConstantHeaderOutputFilePath, False)
-                    srOutFile.WriteLine(strConstantExtendedHeaderValues)
+                Using writer = New StreamWriter(extendedConstantHeaderOutputFilePath, False)
+                    writer.WriteLine(constantExtendedHeaderValues)
                 End Using
 
                 ' Now open another output file for the non-constant extended stats
-                Using srOutFile = New StreamWriter(strExtendedNonConstantHeaderOutputFilePath, False)
+                Using writer = New StreamWriter(extendedNonConstantHeaderOutputFilePath, False)
 
-                    If blnIncludeHeaders Then
-                        Dim strOutLine = ConstructExtendedStatsHeaders(cColDelimiter)
-                        srOutFile.WriteLine(strOutLine)
+                    If includeHeaders Then
+                        Dim headerNames = ConstructExtendedStatsHeaders()
+                        writer.WriteLine(String.Join(cColDelimiter, headerNames))
                     End If
 
-                    For intScanIndex = 0 To scanList.MasterScanOrderCount - 1
+                    For scanIndex = 0 To scanList.MasterScanOrderCount - 1
 
-                        Dim currentScan = GetScanByMasterScanIndex(scanList, intScanIndex)
+                        Dim currentScan = GetScanByMasterScanIndex(scanList, scanIndex)
 
-                        Dim strOutLine = ConcatenateExtendedStats(intNonConstantHeaderIDs, mOptions.SICOptions.DatasetNumber, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo, cColDelimiter)
-                        srOutFile.WriteLine(strOutLine)
+                        Dim dataValues As IEnumerable(Of String) = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetNumber, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo)
+                        writer.WriteLine(String.Join(cColDelimiter, dataValues))
 
-                        If intScanIndex Mod 100 = 0 Then
-                            UpdateProgress(CShort(intScanIndex / (scanList.MasterScanOrderCount - 1) * 100))
+                        If scanIndex Mod 100 = 0 Then
+                            UpdateProgress(CShort(scanIndex / (scanList.MasterScanOrderCount - 1) * 100))
                         End If
                     Next
 

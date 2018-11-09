@@ -181,22 +181,17 @@ Public Class clsDatasetStatsSummarizer
     Public Function ComputeScanStatsSummary(objScanStats As List(Of clsScanStatsEntry),
                                             ByRef objSummaryStats As clsDatasetSummaryStats) As Boolean
 
-        Dim intScanStatsCount As Integer
         Dim objEntry As clsScanStatsEntry
 
-        Dim strScanTypeKey As String
+        Dim scanTypeKey As String
 
-        Dim dblTICListMS() As Double
-        Dim intTICListMSCount = 0
+        Dim ticListMS = New List(Of Double)
 
-        Dim dblTICListMSn() As Double
-        Dim intTICListMSnCount = 0
+        Dim ticListMSn = New List(Of Double)
 
-        Dim dblBPIListMS() As Double
-        Dim intBPIListMSCount = 0
+        Dim bpiListMS = New List(Of Double)
 
-        Dim dblBPIListMSn() As Double
-        Dim intBPIListMSnCount = 0
+        Dim bpiListMSn = New List(Of Double)
 
         Try
 
@@ -207,21 +202,12 @@ Public Class clsDatasetStatsSummarizer
                 mErrorMessage = ""
             End If
 
-            intScanStatsCount = objScanStats.Count
-
             ' Initialize objSummaryStats
             If objSummaryStats Is Nothing Then
                 objSummaryStats = New clsDatasetSummaryStats
             Else
                 objSummaryStats.Clear()
             End If
-
-            ' Initialize the TIC and BPI List arrays
-            ReDim dblTICListMS(intScanStatsCount - 1)
-            ReDim dblBPIListMS(intScanStatsCount - 1)
-
-            ReDim dblTICListMSn(intScanStatsCount - 1)
-            ReDim dblBPIListMSn(intScanStatsCount - 1)
 
             For Each objEntry In objScanStats
 
@@ -230,30 +216,30 @@ Public Class clsDatasetStatsSummarizer
                     ComputeScanStatsUpdateDetails(objEntry,
                                                   objSummaryStats.ElutionTimeMax,
                                                   objSummaryStats.MSnStats,
-                                                  dblTICListMSn, intTICListMSnCount,
-                                                  dblBPIListMSn, intBPIListMSnCount)
+                                                  ticListMSn,
+                                                  bpiListMSn)
                 Else
                     ' MS spectrum
                     ComputeScanStatsUpdateDetails(objEntry,
                                                   objSummaryStats.ElutionTimeMax,
                                                   objSummaryStats.MSStats,
-                                                  dblTICListMS, intTICListMSCount,
-                                                  dblBPIListMS, intBPIListMSCount)
+                                                  ticListMS,
+                                                  bpiListMS)
                 End If
 
-                strScanTypeKey = objEntry.ScanTypeName & SCANTYPE_STATS_SEPCHAR & objEntry.ScanFilterText
-                If objSummaryStats.objScanTypeStats.ContainsKey(strScanTypeKey) Then
-                    objSummaryStats.objScanTypeStats.Item(strScanTypeKey) += 1
+                scanTypeKey = objEntry.ScanTypeName & SCANTYPE_STATS_SEPCHAR & objEntry.ScanFilterText
+                If objSummaryStats.objScanTypeStats.ContainsKey(scanTypeKey) Then
+                    objSummaryStats.objScanTypeStats.Item(scanTypeKey) += 1
                 Else
-                    objSummaryStats.objScanTypeStats.Add(strScanTypeKey, 1)
+                    objSummaryStats.objScanTypeStats.Add(scanTypeKey, 1)
                 End If
             Next
 
-            objSummaryStats.MSStats.TICMedian = ComputeMedian(dblTICListMS, intTICListMSCount)
-            objSummaryStats.MSStats.BPIMedian = ComputeMedian(dblBPIListMS, intBPIListMSCount)
+            objSummaryStats.MSStats.TICMedian = mMedianUtils.Median(ticListMS)
+            objSummaryStats.MSStats.BPIMedian = mMedianUtils.Median(bpiListMS)
 
-            objSummaryStats.MSnStats.TICMedian = ComputeMedian(dblTICListMSn, intTICListMSnCount)
-            objSummaryStats.MSnStats.BPIMedian = ComputeMedian(dblBPIListMSn, intBPIListMSnCount)
+            objSummaryStats.MSnStats.TICMedian = mMedianUtils.Median(ticListMSn)
+            objSummaryStats.MSnStats.BPIMedian = mMedianUtils.Median(bpiListMSn)
 
             Return True
 
@@ -266,59 +252,42 @@ Public Class clsDatasetStatsSummarizer
 
     Private Sub ComputeScanStatsUpdateDetails(
                                               ByRef objScanStats As clsScanStatsEntry,
-                                              ByRef dblElutionTimeMax As Double,
+                                              ByRef elutionTimeMax As Double,
                                               ByRef udtSummaryStatDetails As clsDatasetSummaryStats.udtSummaryStatDetailsType,
-                                              ByRef dblTICList() As Double,
-                                              ByRef intTICListCount As Integer,
-                                              ByRef dblBPIList() As Double,
-                                              ByRef intBPIListCount As Integer)
+                                              ByRef ticList As List(Of Double),
+                                              ByRef bpiList As List(Of Double))
 
-        Dim dblElutionTime As Double
-        Dim dblTIC As Double
-        Dim dblBPI As Double
+        Dim elutionTime As Double
+        Dim totalIonCurrent As Double
+        Dim basePeakIntensity As Double
 
         If objScanStats.ElutionTime <> Nothing AndAlso objScanStats.ElutionTime.Length > 0 Then
-            If Double.TryParse(objScanStats.ElutionTime, dblElutionTime) Then
-                If dblElutionTime > dblElutionTimeMax Then
-                    dblElutionTimeMax = dblElutionTime
+            If Double.TryParse(objScanStats.ElutionTime, elutionTime) Then
+                If elutionTime > elutionTimeMax Then
+                    elutionTimeMax = elutionTime
                 End If
             End If
         End If
 
-        If Double.TryParse(objScanStats.TotalIonIntensity, dblTIC) Then
-            If dblTIC > udtSummaryStatDetails.TICMax Then
-                udtSummaryStatDetails.TICMax = dblTIC
+        If Double.TryParse(objScanStats.TotalIonIntensity, totalIonCurrent) Then
+            If totalIonCurrent > udtSummaryStatDetails.TICMax Then
+                udtSummaryStatDetails.TICMax = totalIonCurrent
             End If
 
-            dblTICList(intTICListCount) = dblTIC
-            intTICListCount += 1
+            ticList.Add(totalIonCurrent)
         End If
 
-        If Double.TryParse(objScanStats.BasePeakIntensity, dblBPI) Then
-            If dblBPI > udtSummaryStatDetails.BPIMax Then
-                udtSummaryStatDetails.BPIMax = dblBPI
+        If Double.TryParse(objScanStats.BasePeakIntensity, basePeakIntensity) Then
+            If basePeakIntensity > udtSummaryStatDetails.BPIMax Then
+                udtSummaryStatDetails.BPIMax = basePeakIntensity
             End If
 
-            dblBPIList(intBPIListCount) = dblBPI
-            intBPIListCount += 1
+            bpiList.Add(basePeakIntensity)
         End If
 
         udtSummaryStatDetails.ScanCount += 1
 
     End Sub
-
-    Private Function ComputeMedian(ByRef dblList() As Double, intItemCount As Integer) As Double
-
-        Dim lstData = New List(Of Double)(intItemCount)
-        For i = 0 To intItemCount - 1
-            lstData.Add(dblList(i))
-        Next
-
-        Dim dblMedian1 = mMedianUtils.Median(lstData)
-
-        Return dblMedian1
-
-    End Function
 
     ' ReSharper disable once UnusedMember.Global
     ''' <summary>
