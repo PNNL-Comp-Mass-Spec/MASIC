@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports PRISM
 
 Public Class clsMASICOptions
     Inherits clsMasicEventNotifier
