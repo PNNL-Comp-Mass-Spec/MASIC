@@ -1,5 +1,4 @@
-﻿Imports System.Collections.Generic
-
+﻿
 Public Class clsSICStats
     Public Property Peak As MASICPeakFinder.clsSICStatsPeak
 

@@ -14,7 +14,6 @@
 ' in compliance with the License.  You may obtain a copy of the License at
 ' https://opensource.org/licenses/BSD-2-Clause
 
-Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Runtime.InteropServices

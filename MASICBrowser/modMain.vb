@@ -1,5 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports System.IO
+﻿Imports System.IO
 Imports System.Reflection
 Imports System.Threading
 Imports PRISM

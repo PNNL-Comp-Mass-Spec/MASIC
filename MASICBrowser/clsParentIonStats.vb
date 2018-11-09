@@ -1,5 +1,4 @@
-﻿Imports System.Collections.Generic
-Imports MASICPeakFinder
+﻿Imports MASICPeakFinder
 
 Public Class clsParentIonStats
     Public Enum eScanTypeConstants
