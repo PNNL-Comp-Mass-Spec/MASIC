@@ -196,7 +196,7 @@ Public Class clsMRMProcessing
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       strInputFileName As String,
-      strOutputFolderPath As String) As Boolean
+      outputDirectoryPath As String) As Boolean
 
         Dim mrmSettings As List(Of clsMRMScanInfo) = Nothing
         Dim srmList As List(Of udtSRMListType) = Nothing

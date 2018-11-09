@@ -22,7 +22,7 @@ Namespace DataOutput
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
           strInputFileName As String,
-          strOutputFolderPath As String) As Boolean
+          outputDirectoryPath As String) As Boolean
 
             Dim strOutputFilePath = "??"
 

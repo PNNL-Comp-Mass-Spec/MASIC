@@ -319,8 +319,8 @@ Namespace DataOutput
         Public Function SaveExtendedScanStatsFiles(
           scanList As clsScanList,
           strInputFileName As String,
-          strOutputFolderPath As String,
           blnIncludeHeaders As Boolean) As Boolean
+          outputDirectoryPath As String,
 
             ' Writes out a flat file containing the extended scan stats
 

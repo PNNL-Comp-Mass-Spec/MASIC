@@ -25,13 +25,14 @@ Public Class clsReporterIonProcessor
     ''' <param name="objSpectraCache"></param>
     ''' <param name="strInputFilePathFull">Full path to the input file</param>
     ''' <param name="strOutputFolderPath"></param>
+    ''' <param name="outputDirectoryPath"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function FindReporterIons(
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       strInputFilePathFull As String,
-      strOutputFolderPath As String) As Boolean
+      outputDirectoryPath As String) As Boolean
 
         Const cColDelimiter As Char = ControlChars.Tab
 
@@ -87,7 +88,7 @@ Public Class clsReporterIonProcessor
 
             outputFilePath = clsDataOutput.ConstructOutputFilePath(
                 Path.GetFileName(strInputFilePathFull),
-                strOutputFolderPath,
+                outputDirectoryPath,
                 clsDataOutput.eOutputFileTypeConstants.ReporterIonsFile)
 
             Using srOutFile = New StreamWriter(outputFilePath)

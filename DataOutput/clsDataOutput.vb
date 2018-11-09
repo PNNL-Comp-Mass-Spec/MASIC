@@ -64,7 +64,7 @@ Namespace DataOutput
 
         Public Function CheckForExistingResults(
           strInputFilePathFull As String,
-          strOutputFolderPath As String,
+          outputDirectoryPath As String,
           masicOptions As clsMASICOptions) As Boolean
 
             ' Returns True if existing results already exist for the given input file path, SIC Options, and Binning options
@@ -575,8 +575,8 @@ Namespace DataOutput
 
         Public Sub OpenOutputFileHandles(
           strInputFileName As String,
-          strOutputFolderPath As String,
           blnWriteHeaders As Boolean)
+          outputDirectoryPath As String,
 
             Dim strOutputFilePath As String
 

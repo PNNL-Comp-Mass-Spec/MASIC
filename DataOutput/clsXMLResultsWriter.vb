@@ -425,7 +425,7 @@ Namespace DataOutput
 
         Public Function XMLOutputFileInitialize(
           strInputFilePathFull As String,
-          strOutputFolderPath As String,
+          outputDirectoryPath As String,
           dataOutputHandler As clsDataOutput,
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
@@ -637,7 +637,7 @@ Namespace DataOutput
         Public Function XmlOutputFileUpdateEntries(
           scanList As clsScanList,
           strInputFileName As String,
-          strOutputFolderPath As String) As Boolean
+          outputDirectoryPath As String) As Boolean
 
 
             Const PARENT_ION_TAG_START_LCASE = "<parention"     ' Note: this needs to be lowercase

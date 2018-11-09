@@ -10,7 +10,7 @@ Namespace DataOutput
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
           strInputFilePathFull As String,
-          strOutputFolderPath As String) As Boolean
+          outputDirectoryPath As String) As Boolean
 
             ' This function creates an ICR-2LS compatible .TIC file (using only the MS1 scans), plus
             ' two Decon2LS compatible .CSV files (one for the MS1 scans and one for the MS2, MS3, etc. scans)

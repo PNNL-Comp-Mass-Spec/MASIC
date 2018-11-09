@@ -55,7 +55,18 @@ Public Class clsMASICOptions
     ''' </summary>
     Public Property ExportRawDataOnly As Boolean
 
+    Public Property OutputDirectoryPath As String
+
+    <Obsolete("Use OutputDirectoryPath")>
     Public Property OutputFolderPath As String
+        Get
+            Return OutputDirectoryPath
+        End Get
+        Set
+            OutputDirectoryPath = Value
+        End Set
+    End Property
+
 
     Public Property WriteDetailedSICDataFile As Boolean
     Public Property WriteMSMethodFile As Boolean

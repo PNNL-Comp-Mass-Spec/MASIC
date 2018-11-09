@@ -1077,8 +1077,8 @@ Public Class clsMASIC
     End Sub
 
     Private Function FindSICsAndWriteOutput(
-      strInputFilePathFull As String,
-      outputFolderPath As String,
+      inputFilePathFull As String,
+      outputDirectoryPath As String,
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       dataOutputHandler As clsDataOutput,
@@ -1110,7 +1110,7 @@ Public Class clsMASIC
 
             If mOptions.SkipSICAndRawDataProcessing OrElse Not mOptions.ExportRawDataOnly Then
                 LogMessage("ProcessFile: Call SaveBPIs")
-                bpiWriter.SaveBPIs(scanList, objSpectraCache, strInputFilePathFull, outputFolderPath)
+                bpiWriter.SaveBPIs(scanList, objSpectraCache, inputFilePathFull, outputDirectoryPath)
             End If
 
             '---------------------------------------------------------
@@ -1130,7 +1130,7 @@ Public Class clsMASIC
             '---------------------------------------------------------
 
             LogMessage("ProcessFile: Create DatasetInfo File")
-            dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputFolderPath, scanTracking, datasetFileInfo)
+            dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputDirectoryPath, scanTracking, datasetFileInfo)
 
             If mOptions.SkipSICAndRawDataProcessing Then
                 LogMessage("ProcessFile: Skipping SIC Processing")
@@ -1146,7 +1146,7 @@ Public Class clsMASIC
                     Dim rawDataExporter = New clsSpectrumDataWriter(bpiWriter, mOptions)
                     RegisterEvents(rawDataExporter)
 
-                    rawDataExporter.ExportRawDataToDisk(scanList, objSpectraCache, inputFileName, outputFolderPath)
+                    rawDataExporter.ExportRawDataToDisk(scanList, objSpectraCache, inputFileName, outputDirectoryPath)
                 End If
 
                 If mOptions.ReporterIons.ReporterIonStatsEnabled Then
@@ -1154,7 +1154,7 @@ Public Class clsMASIC
 
                     Dim reporterIonProcessor = New clsReporterIonProcessor(mOptions)
                     RegisterEvents(reporterIonProcessor)
-                    reporterIonProcessor.FindReporterIons(scanList, objSpectraCache, strInputFilePathFull, outputFolderPath)
+                    reporterIonProcessor.FindReporterIons(scanList, objSpectraCache, inputFilePathFull, outputDirectoryPath)
                 End If
 
                 Dim mrmProcessor = New clsMRMProcessing(mOptions, dataOutputHandler)
@@ -1164,7 +1164,7 @@ Public Class clsMASIC
                 ' If MRM data is present, then save the MRM values to disk
                 '---------------------------------------------------------
                 If scanList.MRMDataPresent Then
-                    mrmProcessor.ExportMRMDataToDisk(scanList, objSpectraCache, inputFileName, outputFolderPath)
+                    mrmProcessor.ExportMRMDataToDisk(scanList, objSpectraCache, inputFileName, outputDirectoryPath)
                 End If
 
                 If Not mOptions.ExportRawDataOnly Then
@@ -1180,7 +1180,7 @@ Public Class clsMASIC
                     ' Possibly create the Tab-separated values SIC details output file
                     '---------------------------------------------------------
                     If mOptions.WriteDetailedSICDataFile Then
-                        success = dataOutputHandler.InitializeSICDetailsTextFile(strInputFilePathFull, outputFolderPath)
+                        success = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath)
                         If Not success Then
                             SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
                             Exit Try
@@ -1190,7 +1190,7 @@ Public Class clsMASIC
                     '---------------------------------------------------------
                     ' Create the XML output file
                     '---------------------------------------------------------
-                    success = xmlResultsWriter.XMLOutputFileInitialize(strInputFilePathFull, outputFolderPath, dataOutputHandler, scanList, objSpectraCache, mOptions.SICOptions, mOptions.BinningOptions)
+                    success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, objSpectraCache, mOptions.SICOptions, mOptions.BinningOptions)
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
                         Exit Try
@@ -1250,7 +1250,7 @@ Public Class clsMASIC
 
                 LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
                 success = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
-                    scanList, inputFileName, outputFolderPath, mOptions.IncludeHeadersInExportFile)
+                    scanList, inputFileName, outputDirectoryPath, mOptions.IncludeHeadersInExportFile)
 
                 If Not success Then
                     SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
@@ -1273,7 +1273,7 @@ Public Class clsMASIC
                 RegisterEvents(sicStatsWriter)
 
                 LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
-                success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputFolderPath, mOptions, dataOutputHandler)
+                success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, mOptions, dataOutputHandler)
 
                 If Not success Then
                     SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
@@ -1309,7 +1309,7 @@ Public Class clsMASIC
             '---------------------------------------------------------
             If Not mOptions.IncludeHeadersInExportFile Then
                 LogMessage("ProcessFile: Call SaveHeaderGlossary")
-                dataOutputHandler.SaveHeaderGlossary(scanList, inputFileName, outputFolderPath)
+                dataOutputHandler.SaveHeaderGlossary(scanList, inputFileName, outputDirectoryPath)
             End If
 
             If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) AndAlso intSimilarParentIonUpdateCount > 0 Then
@@ -1323,12 +1323,12 @@ Public Class clsMASIC
                 UpdatePeakMemoryUsage()
 
                 LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries")
-                xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, inputFileName, outputFolderPath)
+                xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, inputFileName, outputDirectoryPath)
             End If
 
         Catch ex As Exception
             success = False
-            LogErrors("FindSICsAndWriteOutput", "Error saving results to: " & outputFolderPath, ex, eMasicErrorCodes.OutputFileWriteError)
+            LogErrors("FindSICsAndWriteOutput", "Error saving results to: " & outputDirectoryPath, ex, eMasicErrorCodes.OutputFileWriteError)
         End Try
 
         Return success
@@ -1450,7 +1450,7 @@ Public Class clsMASIC
 
     Private Function LoadData(
       strInputFilePathFull As String,
-      outputFolderPath As String,
+      outputDirectoryPath As String,
       dataOutputHandler As clsDataOutput,
       parentIonProcessor As clsParentIonProcessing,
       scanTracking As clsScanTracking,
@@ -1473,7 +1473,7 @@ Public Class clsMASIC
             '---------------------------------------------------------
             ' Create the _ScanStats.txt file
             '---------------------------------------------------------
-            dataOutputHandler.OpenOutputFileHandles(inputFileName, outputFolderPath, mOptions.IncludeHeadersInExportFile)
+            dataOutputHandler.OpenOutputFileHandles(inputFileName, outputDirectoryPath, mOptions.IncludeHeadersInExportFile)
 
             '---------------------------------------------------------
             ' Read the mass spectra from the input data file
@@ -1631,7 +1631,7 @@ Public Class clsMASIC
     ' Main processing function
     Public Overloads Overrides Function ProcessFile(
       inputFilePath As String,
-      outputFolderPath As String,
+      outputDirectoryPath As String,
       parameterFilePath As String,
       blnResetErrorCode As Boolean) As Boolean
 
@@ -1645,7 +1645,7 @@ Public Class clsMASIC
             SetLocalErrorCode(eMasicErrorCodes.NoError)
         End If
 
-        mOptions.OutputFolderPath = outputFolderPath
+        mOptions.OutputDirectoryPath = outputDirectoryPath
 
         mSubtaskProcessingStepPct = 0
         UpdateProcessingStep(eProcessingStepConstants.NewTask, True)
@@ -1702,8 +1702,8 @@ Public Class clsMASIC
             Console.WriteLine()
             ShowMessage(mStatusMessage)
 
-            success = CleanupFilePaths(inputFilePath, outputFolderPath)
-            mOptions.OutputFolderPath = outputFolderPath
+            success = CleanupFilePaths(inputFilePath, outputDirectoryPath)
+            mOptions.OutputDirectoryPath = outputDirectoryPath
 
             If success Then
                 Dim dbAccessor = New clsDatabaseAccess(mOptions)
@@ -1739,9 +1739,9 @@ Public Class clsMASIC
                 ioFileInfo = New FileInfo(inputFilePath)
                 strInputFilePathFull = ioFileInfo.FullName
 
-                LogMessage("Checking for existing results in the output path: " & outputFolderPath)
+                LogMessage("Checking for existing results in the output path: " & outputDirectoryPath)
 
-                blnDoNotProcess = dataOutputHandler.CheckForExistingResults(strInputFilePathFull, outputFolderPath, mOptions)
+                doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, mOptions)
 
                 If blnDoNotProcess Then
                     LogMessage("Existing results found; data will not be reprocessed")
@@ -1763,12 +1763,12 @@ Public Class clsMASIC
                 '---------------------------------------------------------
 
                 ' The following should work for testing access permissions, but it doesn't
-                'Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputFolderPath)
+                'Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
                 '' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
                 'objFilePermissionTest.Demand()
                 'objFilePermissionTest.Assert()
 
-                LogMessage("Checking for write permission in the output path: " & outputFolderPath)
+                LogMessage("Checking for write permission in the output path: " & outputDirectoryPath)
 
                 Dim strOutputFileTestPath As String
                 strOutputFileTestPath = Path.Combine(outputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
@@ -1783,7 +1783,7 @@ Public Class clsMASIC
 
             Catch ex As Exception
                 success = False
-                LogErrors("ProcessFile", "The current user does not have write permission for the output folder: " & outputFolderPath, ex, eMasicErrorCodes.FileIOPermissionsError)
+                LogErrors("ProcessFile", "The current user does not have write permission for the output directory: " & outputDirectoryPath, ex, eMasicErrorCodes.FileIOPermissionsError)
             End Try
 
             If Not success Then
@@ -1911,7 +1911,7 @@ Public Class clsMASIC
                 mStatusMessage = "Existing valid results were found; processing was not repeated."
                 ShowMessage(mStatusMessage)
             ElseIf success Then
-                mStatusMessage = "Processing complete.  Results can be found in folder: " & outputFolderPath
+                mStatusMessage = "Processing complete.  Results can be found in folder: " & outputDirectoryPath
                 ShowMessage(mStatusMessage)
             Else
                 If Me.LocalErrorCode = eMasicErrorCodes.NoError Then

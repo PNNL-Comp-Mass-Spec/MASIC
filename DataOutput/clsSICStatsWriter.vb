@@ -91,7 +91,7 @@ Namespace DataOutput
         Public Function SaveSICStatsFlatFile(
           scanList As clsScanList,
           strInputFileName As String,
-          strOutputFolderPath As String,
+          outputDirectoryPath As String,
           masicOptions As clsMASICOptions,
           dataOutputHandler As clsDataOutput) As Boolean
 
