@@ -109,7 +109,6 @@
     <Compile Include="clsDatabaseAccess.vb" />
     <Compile Include="clsDatasetStatsSummarizer.vb" />
     <Compile Include="clsFilterDataArrayMaxCount.vb" />
-    <Compile Include="clsFinniganExtendedStats.vb" />
     <Compile Include="clsFragScanInfo.vb" />
     <Compile Include="clsITraqIntensityCorrection.vb" />
     <Compile Include="clsMASIC.vb" />
@@ -138,9 +137,7 @@
     <Compile Include="clsSICStats.vb" />
     <Compile Include="clsSpectraCache.vb" />
     <Compile Include="clsSpectrumCacheOptions.vb" />
-    <Compile Include="clsUnused.vb" />
     <Compile Include="clsUtilities.vb" />
-    <Compile Include="clsXmlSettingsFileAccessor.vb" />
     <Compile Include="DataInput\clsCustomSICListReader.vb" />
     <Compile Include="DataInput\clsDataImport.vb" />
     <Compile Include="DataInput\clsDataImportMGFandCDF.vb" />
