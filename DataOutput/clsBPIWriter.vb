@@ -74,6 +74,7 @@ Namespace DataOutput
           strOutputFilePath As String)
 
             Dim scansWritten = 0
+            Dim lastStatus = DateTime.UtcNow
 
             Using srScanInfoOutfile = New StreamWriter(strOutputFilePath)
 
@@ -86,7 +87,13 @@ Namespace DataOutput
 
                     If scansWritten Mod 250 = 0 Then
                         UpdateCacheStats(objSpectraCache)
+
+                        If DateTime.UtcNow.Subtract(lastStatus).TotalSeconds >= 30 Then
+                            lastStatus = DateTime.UtcNow
+                            ReportMessage(String.Format("  {0} / {1} scans processed", scansWritten, scanList.Count))
+                        End If
                     End If
+
                     scansWritten += 1
                 Next
 
