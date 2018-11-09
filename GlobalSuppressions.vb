@@ -1,7 +1,7 @@
 ﻿
-' This file is used by Code Analysis to maintain SuppressMessage 
+' This file is used by Code Analysis to maintain SuppressMessage
 ' attributes that are applied to this project.
-' Project-level suppressions either have no target or are given 
+' Project-level suppressions either have no target or are given
 ' a specific target and scoped to a namespace, type, member, etc.
 
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="type", Target:="~T:MASIC.clsSICDetails")>
@@ -35,7 +35,7 @@
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.cmdSelectCustomSICFile_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.cmdSelectDatasetLookupFile_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.cmdSelectFile_Click(System.Object,System.EventArgs)")>
-<Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.cmdSelectOutputFolder_Click(System.Object,System.EventArgs)")>
+<Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.cmdSelectOutputDirectory_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.cmdSetConnectionStringToPNNLServer_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.cmdStartProcessing_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.frmMain_Closing(System.Object,System.ComponentModel.CancelEventArgs)")>
@@ -48,7 +48,7 @@
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.mnuFileLoadOptions_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.mnuFileSaveOptions_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.mnuFileSelectInputFile_Click(System.Object,System.EventArgs)")>
-<Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.mnuFileSelectOutputFolder_Click(System.Object,System.EventArgs)")>
+<Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.mnuFileSelectOutputDirectory_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.mnuHelpAbout_Click(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.optCustomSICScanToleranceAbsolute_CheckedChanged(System.Object,System.EventArgs)")>
 <Assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification:="<Pending>", Scope:="member", Target:="~M:MASIC.frmMain.optCustomSICScanToleranceAcqTime_CheckedChanged(System.Object,System.EventArgs)")>
