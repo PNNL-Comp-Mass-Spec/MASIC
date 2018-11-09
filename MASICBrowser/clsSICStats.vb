@@ -21,4 +21,9 @@ Public Class clsSICStats
         SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsSICPotentialAreaStats()
         SICSmoothedYData = New List(Of Single)
     End Sub
+
+    Public Overrides Function ToString() As String
+        Return "Peak at index " & Peak.IndexMax & ", area " & Peak.Area
+    End Function
+
 End Class
