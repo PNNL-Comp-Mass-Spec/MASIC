@@ -220,8 +220,8 @@
             <summary>
             Duplicate the MRM info
             </summary>
-            <param name="udtSource"></param>
-            <param name="udtTarget"></param>
+            <param name="source"></param>
+            <param name="target"></param>
         </member>
         <member name="M:ThermoRawFileReader.MRMInfo.InitializeMRMInfo">
             <summary>
@@ -233,7 +233,7 @@
             <summary>
             Get an initialized MRMInfo object
             </summary>
-            <param name="udtMRMInfo"></param>
+            <param name="mrmInfo"></param>
             <param name="initialMassCountCapacity"></param>
         </member>
         <member name="T:ThermoRawFileReader.udtScanHeaderInfoType">
@@ -293,7 +293,7 @@
         </member>
         <member name="F:ThermoRawFileReader.udtScanHeaderInfoType.BasePeakMZ">
             <summary>
-            Mase Peak m/z
+            Base Peak m/z
             </summary>
         </member>
         <member name="F:ThermoRawFileReader.udtScanHeaderInfoType.BasePeakIntensity">
