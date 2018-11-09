@@ -23,28 +23,28 @@ Public Class clsDatabaseAccess
     End Sub
 
     Public Function LookupDatasetNumber(
-      strInputFilePath As String,
-      strDatasetLookupFilePath As String,
-      intDefaultDatasetNumber As Integer) As Integer
+      inputFilePath As String,
+      datasetLookupFilePath As String,
+      defaultDatasetNumber As Integer) As Integer
 
         ' First tries to poll the database for the dataset number
         ' If this doesn't work, then looks for the dataset name in mDatasetLookupFilePath
 
-        ' Initialize intNewDatasetNumber and strFileNameCompare
-        Dim strFileNameCompare = Path.GetFileNameWithoutExtension(strInputFilePath).ToUpper()
-        Dim intNewDatasetNumber = intDefaultDatasetNumber
+        ' Initialize newDatasetNumber and fileNameCompare
+        Dim fileNameCompare = Path.GetFileNameWithoutExtension(inputFilePath).ToUpper()
+        Dim newDatasetNumber = defaultDatasetNumber
 
-        Dim strAvoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " &
+        Dim avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " &
             "'Dataset Info Query SQL' entries on the Advanced tab."
 
-        Dim blnDatasetFoundInDB = False
+        Dim datasetFoundInDB = False
 
         If Not mOptions.DatabaseConnectionString Is Nothing AndAlso mOptions.DatabaseConnectionString.Length > 0 Then
             ' Attempt to lookup the dataset number in the database
             Try
                 Dim objDBTools = New PRISM.DBTools(mOptions.DatabaseConnectionString)
 
-                Dim blnQueryingSingleDataset = False
+                Dim queryingSingleDataset = False
 
                 For iteration = 1 To 2
 
@@ -57,10 +57,10 @@ Public Class clsDatabaseAccess
                     If sqlQuery.ToUpper().StartsWith("SELECT DATASET") Then
                         ' Add a where clause to the query
                         If iteration = 1 Then
-                            sqlQuery &= " WHERE Dataset = '" & strFileNameCompare & "'"
-                            blnQueryingSingleDataset = True
+                            sqlQuery &= " WHERE Dataset = '" & fileNameCompare & "'"
+                            queryingSingleDataset = True
                         Else
-                            sqlQuery &= " WHERE Dataset Like '" & strFileNameCompare & "%'"
+                            sqlQuery &= " WHERE Dataset Like '" & fileNameCompare & "%'"
                         End If
                     End If
 
@@ -69,13 +69,13 @@ Public Class clsDatabaseAccess
                     Dim success = objDBTools.GetQueryResults(sqlQuery, lstResults, "LookupDatasetNumber")
                     If success Then
 
-                        ' Find the row in the datatable that matches strFileNameCompare
+                        ' Find the row in the lstResults that matches fileNameCompare
                         For Each datasetItem In lstResults
-                            If String.Equals(datasetItem(0), strFileNameCompare, StringComparison.InvariantCultureIgnoreCase) Then
+                            If String.Equals(datasetItem(0), fileNameCompare, StringComparison.InvariantCultureIgnoreCase) Then
                                 ' Match found
                                 Try
-                                    If Integer.TryParse(datasetItem(1), intNewDatasetNumber) Then
-                                        blnDatasetFoundInDB = True
+                                    If Integer.TryParse(datasetItem(1), newDatasetNumber) Then
+                                        datasetFoundInDB = True
                                     End If
 
                                 Catch ex As Exception
@@ -84,18 +84,18 @@ Public Class clsDatabaseAccess
                                     Catch ex2 As Exception
                                         ReportError("Error converting column 2 from the dataset report to a dataset ID", ex, eMasicErrorCodes.InvalidDatasetNumber)
                                     End Try
-                                    blnDatasetFoundInDB = False
+                                    datasetFoundInDB = False
                                 End Try
                                 Exit For
                             End If
                         Next
 
-                        If Not blnDatasetFoundInDB AndAlso lstResults.Count > 0 Then
+                        If Not datasetFoundInDB AndAlso lstResults.Count > 0 Then
 
                             Try
-                                If blnQueryingSingleDataset OrElse lstResults.First().Item(0).StartsWith(strFileNameCompare) Then
-                                    Integer.TryParse(lstResults.First().Item(1), intNewDatasetNumber)
-                                    blnDatasetFoundInDB = True
+                                If queryingSingleDataset OrElse lstResults.First().Item(0).StartsWith(fileNameCompare) Then
+                                    Integer.TryParse(lstResults.First().Item(1), newDatasetNumber)
+                                    datasetFoundInDB = True
                                 End If
 
                             Catch ex As Exception
@@ -106,47 +106,44 @@ Public Class clsDatabaseAccess
 
                     End If
 
-                    If blnDatasetFoundInDB Then
+                    If datasetFoundInDB Then
                         Exit For
                     End If
                 Next
 
             Catch ex2 As NullReferenceException
-                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, eMasicErrorCodes.InvalidDatasetNumber)
-                blnDatasetFoundInDB = False
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, eMasicErrorCodes.InvalidDatasetNumber)
+                datasetFoundInDB = False
             Catch ex As Exception
-                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & strAvoidErrorMessage, ex, eMasicErrorCodes.InvalidDatasetNumber)
-                blnDatasetFoundInDB = False
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, ex, eMasicErrorCodes.InvalidDatasetNumber)
+                datasetFoundInDB = False
             End Try
         End If
 
-        If Not blnDatasetFoundInDB AndAlso Not String.IsNullOrWhiteSpace(strDatasetLookupFilePath) Then
+        If Not datasetFoundInDB AndAlso Not String.IsNullOrWhiteSpace(datasetLookupFilePath) Then
 
             ' Lookup the dataset number in the dataset lookup file
 
-            Dim strLineIn As String
-            Dim strSplitLine() As String
-
-            Dim strDelimList = New Char() {" "c, ","c, ControlChars.Tab}
+            Dim delimiterList = New Char() {" "c, ","c, ControlChars.Tab}
 
             Try
-                Using srInFile = New StreamReader(strDatasetLookupFilePath)
-                    Do While Not srInFile.EndOfStream
-                        strLineIn = srInFile.ReadLine
-                        If strLineIn Is Nothing Then Continue Do
+                Using reader = New StreamReader(datasetLookupFilePath)
+                    Do While Not reader.EndOfStream
+                        Dim dataLine = reader.ReadLine()
+                        If dataLine Is Nothing Then Continue Do
 
-                        If strLineIn.Length < strFileNameCompare.Length Then Continue Do
+                        If dataLine.Length < fileNameCompare.Length Then Continue Do
 
-                        If strLineIn.Substring(0, strFileNameCompare.Length).ToUpper() <> strFileNameCompare Then Continue Do
+                        If dataLine.Substring(0, fileNameCompare.Length).ToUpper() <> fileNameCompare Then Continue Do
 
-                        strSplitLine = strLineIn.Split(strDelimList)
-                        If strSplitLine.Length < 2 Then Continue Do
+                        Dim dataValues = dataLine.Split(delimiterList)
+                        If dataValues.Length < 2 Then Continue Do
 
-                        If clsUtilities.IsNumber(strSplitLine(1)) Then
-                            intNewDatasetNumber = CInt(strSplitLine(1))
+                        If clsUtilities.IsNumber(dataValues(1)) Then
+                            newDatasetNumber = CInt(dataValues(1))
                             Exit Do
                         Else
-                            ReportWarning("Invalid dataset number: " & strSplitLine(1))
+                            ReportWarning("Invalid dataset number: " & dataValues(1))
                             Exit Do
                         End If
 
@@ -159,7 +156,7 @@ Public Class clsDatabaseAccess
 
         End If
 
-        Return intNewDatasetNumber
+        Return newDatasetNumber
 
     End Function
 

@@ -134,7 +134,10 @@ Public Class clsMASIC
 
 #End Region
 
+    ' ReSharper disable UnusedMember.Global
+
 #Region "Processing Options and File Path Interface Functions"
+
     <Obsolete("Use Property Options")>
     Public Property DatabaseConnectionString As String
         Get
@@ -505,18 +508,18 @@ Public Class clsMASIC
 
     <Obsolete("Use Property Options.SICOptions.GetSICTolerance")>
     Public Function GetSICTolerance() As Double
-        Dim blnToleranceIsPPM As Boolean
-        Return mOptions.SICOptions.GetSICTolerance(blnToleranceIsPPM)
+        Dim toleranceIsPPM As Boolean
+        Return mOptions.SICOptions.GetSICTolerance(toleranceIsPPM)
     End Function
 
     <Obsolete("Use Property Options.SICOptions.GetSICTolerance")>
-    Public Function GetSICTolerance(<Out> ByRef blnSICToleranceIsPPM As Boolean) As Double
-        Return mOptions.SICOptions.GetSICTolerance(blnSICToleranceIsPPM)
+    Public Function GetSICTolerance(<Out> ByRef toleranceIsPPM As Boolean) As Double
+        Return mOptions.SICOptions.GetSICTolerance(toleranceIsPPM)
     End Function
 
     <Obsolete("Use Property Options.SICOptions.SetSICTolerance")>
-    Public Sub SetSICTolerance(dblSICTolerance As Double, blnSICToleranceIsPPM As Boolean)
-        mOptions.SICOptions.SetSICTolerance(dblSICTolerance, blnSICToleranceIsPPM)
+    Public Sub SetSICTolerance(sicTolerance As Double, toleranceIsPPM As Boolean)
+        mOptions.SICOptions.SetSICTolerance(sicTolerance, toleranceIsPPM)
     End Sub
 
     <Obsolete("Use Property Options")>
@@ -1071,6 +1074,8 @@ Public Class clsMASIC
 
 #End Region
 
+    ' ReSharper restore UnusedMember.Global
+
     Public Overrides Sub AbortProcessingNow()
         AbortProcessing = True
         mOptions.AbortProcessing = True
@@ -1089,8 +1094,8 @@ Public Class clsMASIC
       ) As Boolean
 
         Dim success = True
-        Dim inputFileName = Path.GetFileName(strInputFilePathFull)
-        Dim intSimilarParentIonUpdateCount As Integer
+        Dim inputFileName = Path.GetFileName(inputFilePathFull)
+        Dim similarParentIonUpdateCount As Integer
 
         Try
             Dim bpiWriter = New clsBPIWriter()
@@ -1229,7 +1234,7 @@ Public Class clsMASIC
                     UpdatePeakMemoryUsage()
 
                     LogMessage("ProcessFile: Call FindSimilarParentIons")
-                    success = parentIonProcessor.FindSimilarParentIons(scanList, objSpectraCache, mOptions, dataImporterBase, intSimilarParentIonUpdateCount)
+                    success = parentIonProcessor.FindSimilarParentIons(scanList, objSpectraCache, mOptions, dataImporterBase, similarParentIonUpdateCount)
 
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
@@ -1312,7 +1317,7 @@ Public Class clsMASIC
                 dataOutputHandler.SaveHeaderGlossary(scanList, inputFileName, outputDirectoryPath)
             End If
 
-            If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) AndAlso intSimilarParentIonUpdateCount > 0 Then
+            If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) AndAlso similarParentIonUpdateCount > 0 Then
                 '---------------------------------------------------------
                 ' Reopen the XML file and update the entries for those ions in scanList that had their
                 ' Optimal peak apex scan numbers updated
@@ -1335,7 +1340,6 @@ Public Class clsMASIC
 
     End Function
 
-
     Public Overrides Function GetDefaultExtensionsToParse() As IList(Of String)
         Return DataInput.clsDataImport.GetDefaultExtensionsToParse()
     End Function
@@ -1343,60 +1347,60 @@ Public Class clsMASIC
     Public Overrides Function GetErrorMessage() As String
         ' Returns String.Empty if no error
 
-        Dim strErrorMessage As String
+        Dim errorMessage As String
 
         If MyBase.ErrorCode = ProcessFilesErrorCodes.LocalizedError OrElse
            MyBase.ErrorCode = ProcessFilesErrorCodes.NoError Then
             Select Case mLocalErrorCode
                 Case eMasicErrorCodes.NoError
-                    strErrorMessage = String.Empty
+                    errorMessage = String.Empty
                 Case eMasicErrorCodes.InvalidDatasetLookupFilePath
-                    strErrorMessage = "Invalid dataset lookup file path"
+                    errorMessage = "Invalid dataset lookup file path"
                 Case eMasicErrorCodes.UnknownFileExtension
-                    strErrorMessage = "Unknown file extension"
+                    errorMessage = "Unknown file extension"
                 Case eMasicErrorCodes.InputFileAccessError
-                    strErrorMessage = "Input file access error"
+                    errorMessage = "Input file access error"
                 Case eMasicErrorCodes.InvalidDatasetNumber
-                    strErrorMessage = "Invalid dataset number"
+                    errorMessage = "Invalid dataset number"
                 Case eMasicErrorCodes.CreateSICsError
-                    strErrorMessage = "Create SIC's error"
+                    errorMessage = "Create SIC's error"
                 Case eMasicErrorCodes.FindSICPeaksError
-                    strErrorMessage = "Error finding SIC peaks"
+                    errorMessage = "Error finding SIC peaks"
                 Case eMasicErrorCodes.InvalidCustomSICValues
-                    strErrorMessage = "Invalid custom SIC values"
+                    errorMessage = "Invalid custom SIC values"
                 Case eMasicErrorCodes.NoParentIonsFoundInInputFile
-                    strErrorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)"
+                    errorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)"
                 Case eMasicErrorCodes.NoSurveyScansFoundInInputFile
-                    strErrorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)"
+                    errorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)"
                 Case eMasicErrorCodes.FindSimilarParentIonsError
-                    strErrorMessage = "Find similar parent ions error"
+                    errorMessage = "Find similar parent ions error"
                 Case eMasicErrorCodes.FindSimilarParentIonsError
-                    strErrorMessage = "Find similar parent ions error"
+                    errorMessage = "Find similar parent ions error"
                 Case eMasicErrorCodes.InputFileDataReadError
-                    strErrorMessage = "Error reading data from input file"
+                    errorMessage = "Error reading data from input file"
                 Case eMasicErrorCodes.OutputFileWriteError
-                    strErrorMessage = "Error writing data to output file"
+                    errorMessage = "Error writing data to output file"
                 Case eMasicErrorCodes.FileIOPermissionsError
-                    strErrorMessage = "File IO Permissions Error"
+                    errorMessage = "File IO Permissions Error"
                 Case eMasicErrorCodes.ErrorCreatingSpectrumCacheFolder
-                    strErrorMessage = "Error creating spectrum cache folder"
+                    errorMessage = "Error creating spectrum cache folder"
                 Case eMasicErrorCodes.ErrorCachingSpectrum
-                    strErrorMessage = "Error caching spectrum"
+                    errorMessage = "Error caching spectrum"
                 Case eMasicErrorCodes.ErrorUncachingSpectrum
-                    strErrorMessage = "Error uncaching spectrum"
+                    errorMessage = "Error uncaching spectrum"
                 Case eMasicErrorCodes.ErrorDeletingCachedSpectrumFiles
-                    strErrorMessage = "Error deleting cached spectrum files"
+                    errorMessage = "Error deleting cached spectrum files"
                 Case eMasicErrorCodes.UnspecifiedError
-                    strErrorMessage = "Unspecified localized error"
+                    errorMessage = "Unspecified localized error"
                 Case Else
                     ' This shouldn't happen
-                    strErrorMessage = "Unknown error state"
+                    errorMessage = "Unknown error state"
             End Select
         Else
-            strErrorMessage = MyBase.GetBaseClassErrorMessage()
+            errorMessage = MyBase.GetBaseClassErrorMessage()
         End If
 
-        Return strErrorMessage
+        Return errorMessage
 
     End Function
 
@@ -1449,7 +1453,7 @@ Public Class clsMASIC
     End Sub
 
     Private Function LoadData(
-      strInputFilePathFull As String,
+      inputFilePathFull As String,
       outputDirectoryPath As String,
       dataOutputHandler As clsDataOutput,
       parentIonProcessor As clsParentIonProcessing,
@@ -1468,7 +1472,7 @@ Public Class clsMASIC
             '---------------------------------------------------------
             ' Define inputFileName (which is referenced several times below)
             '---------------------------------------------------------
-            Dim inputFileName = Path.GetFileName(strInputFilePathFull)
+            Dim inputFileName = Path.GetFileName(inputFilePathFull)
 
             '---------------------------------------------------------
             ' Create the _ScanStats.txt file
@@ -1488,7 +1492,7 @@ Public Class clsMASIC
                 mOptions.ExportRawDataOnly = False
             End If
 
-            Dim blnKeepRawMSSpectra = Not mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly
+            Dim keepRawMSSpectra = Not mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly
 
             mOptions.SICOptions.ValidateSICOptions()
 
@@ -1502,9 +1506,9 @@ Public Class clsMASIC
                     dataImporterBase = dataImporter
 
                     success = dataImporter.ExtractScanInfoFromXcaliburDataFile(
-                      strInputFilePathFull,
+                      inputFilePathFull,
                       scanList, objSpectraCache, dataOutputHandler,
-                      blnKeepRawMSSpectra,
+                      keepRawMSSpectra,
                       Not mOptions.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
@@ -1519,9 +1523,9 @@ Public Class clsMASIC
                     dataImporterBase = dataImporter
 
                     success = dataImporter.ExtractScanInfoFromMZXMLDataFile(
-                      strInputFilePathFull,
+                      inputFilePathFull,
                       scanList, objSpectraCache, dataOutputHandler,
-                      blnKeepRawMSSpectra,
+                      keepRawMSSpectra,
                       Not mOptions.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
@@ -1536,9 +1540,9 @@ Public Class clsMASIC
                     dataImporterBase = dataImporter
 
                     success = dataImporter.ExtractScanInfoFromMZDataFile(
-                      strInputFilePathFull,
+                      inputFilePathFull,
                       scanList, objSpectraCache, dataOutputHandler,
-                      blnKeepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
+                      keepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
@@ -1552,14 +1556,14 @@ Public Class clsMASIC
                     dataImporterBase = dataImporter
 
                     success = dataImporter.ExtractScanInfoFromMGFandCDF(
-                      strInputFilePathFull,
+                      inputFilePathFull,
                       scanList, objSpectraCache, dataOutputHandler,
-                      blnKeepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
+                      keepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
                 Case Else
-                    mStatusMessage = "Unknown file extension: " & Path.GetExtension(strInputFilePathFull)
+                    mStatusMessage = "Unknown file extension: " & Path.GetExtension(inputFilePathFull)
                     SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension)
                     success = False
 
@@ -1578,7 +1582,7 @@ Public Class clsMASIC
 
         Catch ex As Exception
             success = False
-            LogErrors("ProcessFile", "Error accessing input data file: " & strInputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError)
+            LogErrors("ProcessFile", "Error accessing input data file: " & inputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError)
             dataImporterBase = Nothing
         End Try
 
@@ -1592,30 +1596,30 @@ Public Class clsMASIC
     End Function
 
     Private Sub LogErrors(
-      strSource As String,
-      strMessage As String,
+      source As String,
+      message As String,
       ex As Exception,
       Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
 
-        Dim strMessageWithoutCRLF As String
+        Dim messageWithoutCRLF As String
 
-        mOptions.StatusMessage = strMessage
+        mOptions.StatusMessage = message
 
-        strMessageWithoutCRLF = mOptions.StatusMessage.Replace(ControlChars.NewLine, "; ")
+        messageWithoutCRLF = mOptions.StatusMessage.Replace(ControlChars.NewLine, "; ")
 
         If ex Is Nothing Then
             ex = New Exception("Error")
         Else
-            If Not ex.Message Is Nothing AndAlso ex.Message.Length > 0 AndAlso Not strMessage.Contains(ex.Message) Then
-                strMessageWithoutCRLF &= "; " & ex.Message
+            If Not ex.Message Is Nothing AndAlso ex.Message.Length > 0 AndAlso Not message.Contains(ex.Message) Then
+                messageWithoutCRLF &= "; " & ex.Message
             End If
         End If
 
         ' Show the message and log to the clsProcessFilesBaseClass logger
-        If String.IsNullOrEmpty(strSource) Then
-            ShowErrorMessage(strMessageWithoutCRLF, True)
+        If String.IsNullOrEmpty(source) Then
+            ShowErrorMessage(messageWithoutCRLF, True)
         Else
-            ShowErrorMessage(strSource & ": " & strMessageWithoutCRLF, True)
+            ShowErrorMessage(source & ": " & messageWithoutCRLF, True)
         End If
 
         If Not ex Is Nothing Then
@@ -1628,20 +1632,27 @@ Public Class clsMASIC
 
     End Sub
 
-    ' Main processing function
+    ''' <summary>
+    ''' Main processing function
+    ''' </summary>
+    ''' <param name="inputFilePath"></param>
+    ''' <param name="outputDirectoryPath"></param>
+    ''' <param name="parameterFilePath"></param>
+    ''' <param name="resetErrorCode"></param>
+    ''' <returns></returns>
     Public Overloads Overrides Function ProcessFile(
       inputFilePath As String,
       outputDirectoryPath As String,
       parameterFilePath As String,
-      blnResetErrorCode As Boolean) As Boolean
+      resetErrorCode As Boolean) As Boolean
 
-        Dim ioFileInfo As FileInfo
+        Dim inputFileInfo As FileInfo
 
-        Dim success, blnDoNotProcess As Boolean
+        Dim success, doNotProcess As Boolean
 
-        Dim strInputFilePathFull As String = String.Empty
+        Dim inputFilePathFull As String = String.Empty
 
-        If blnResetErrorCode Then
+        If resetErrorCode Then
             SetLocalErrorCode(eMasicErrorCodes.NoError)
         End If
 
@@ -1736,14 +1747,14 @@ Public Class clsMASIC
                 '---------------------------------------------------------
 
                 ' Obtain the full path to the input file
-                ioFileInfo = New FileInfo(inputFilePath)
-                strInputFilePathFull = ioFileInfo.FullName
+                inputFileInfo = New FileInfo(inputFilePath)
+                inputFilePathFull = inputFileInfo.FullName
 
                 LogMessage("Checking for existing results in the output path: " & outputDirectoryPath)
 
                 doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, mOptions)
 
-                If blnDoNotProcess Then
+                If doNotProcess Then
                     LogMessage("Existing results found; data will not be reprocessed")
                 End If
 
@@ -1752,7 +1763,7 @@ Public Class clsMASIC
                 LogErrors("ProcessFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError)
             End Try
 
-            If blnDoNotProcess Then
+            If doNotProcess Then
                 success = True
                 Exit Try
             End If
@@ -1770,16 +1781,15 @@ Public Class clsMASIC
 
                 LogMessage("Checking for write permission in the output path: " & outputDirectoryPath)
 
-                Dim strOutputFileTestPath As String
-                strOutputFileTestPath = Path.Combine(outputFolderPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
+                Dim outputFileTestPath As String = Path.Combine(outputDirectoryPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
 
-                Using fsOutFileTest As New StreamWriter(strOutputFileTestPath, False)
+                Using fsOutFileTest As New StreamWriter(outputFileTestPath, False)
                     fsOutFileTest.WriteLine("Test")
                 End Using
 
                 ' Wait 250 msec, then delete the file
                 Threading.Thread.Sleep(250)
-                File.Delete(strOutputFileTestPath)
+                File.Delete(outputFileTestPath)
 
             Catch ex As Exception
                 success = False
@@ -1827,8 +1837,8 @@ Public Class clsMASIC
                 ' Load the mass spectral data
                 '---------------------------------------------------------
 
-                success = LoadData(strInputFilePathFull,
-                                   outputFolderPath,
+                success = LoadData(inputFilePathFull,
+                                   outputDirectoryPath,
                                    dataOutputHandler,
                                    parentIonProcessor,
                                    scanTracking,
@@ -1874,7 +1884,7 @@ Public Class clsMASIC
                     '---------------------------------------------------------
 
                     success = FindSICsAndWriteOutput(
-                        strInputFilePathFull, outputFolderPath,
+                        inputFilePathFull, outputDirectoryPath,
                         scanList, objSpectraCache, dataOutputHandler, scanTracking,
                         datasetFileInfo, parentIonProcessor, dataImporterBase)
                 End If
@@ -1907,7 +1917,7 @@ Public Class clsMASIC
             LogMessage("ProcessFile: Processing nearly complete")
 
             Console.WriteLine()
-            If blnDoNotProcess Then
+            If doNotProcess Then
                 mStatusMessage = "Existing valid results were found; processing was not repeated."
                 ShowMessage(mStatusMessage)
             ElseIf success Then
@@ -1982,6 +1992,8 @@ Public Class clsMASIC
         AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
     End Sub
 
+    ' ReSharper disable UnusedMember.Global
+
     <Obsolete("Use Options.SaveParameterFileSettings")>
     Public Function SaveParameterFileSettings(parameterFilePath As String) As Boolean
         Dim success = mOptions.SaveParameterFileSettings(parameterFilePath)
@@ -1989,13 +2001,13 @@ Public Class clsMASIC
     End Function
 
     <Obsolete("Use Options.ReporterIons.SetReporterIons")>
-    Public Sub SetReporterIons(dblReporterIonMZList() As Double)
-        mOptions.ReporterIons.SetReporterIons(dblReporterIonMZList)
+    Public Sub SetReporterIons(reporterIonMZList() As Double)
+        mOptions.ReporterIons.SetReporterIons(reporterIonMZList)
     End Sub
 
     <Obsolete("Use Options.ReporterIons.SetReporterIons")>
-    Public Sub SetReporterIons(dblReporterIonMZList() As Double, dblMZToleranceDa As Double)
-        mOptions.ReporterIons.SetReporterIons(dblReporterIonMZList, dblMZToleranceDa)
+    Public Sub SetReporterIons(reporterIonMZList() As Double, mzToleranceDa As Double)
+        mOptions.ReporterIons.SetReporterIons(reporterIonMZList, mzToleranceDa)
     End Sub
 
     <Obsolete("Use Options.ReporterIons.SetReporterIons")>
@@ -2011,27 +2023,29 @@ Public Class clsMASIC
     <Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")>
     Public Sub SetReporterIonMassMode(
       eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants,
-      dblMZToleranceDa As Double)
+      mzToleranceDa As Double)
 
-        mOptions.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode, dblMZToleranceDa)
+        mOptions.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode, mzToleranceDa)
 
     End Sub
 
+    ' ReSharper restore UnusedMember.Global
+
     Private Sub SetDefaultPeakLocValues(scanList As clsScanList)
 
-        Dim intParentIonIndex As Integer
-        Dim intScanIndexObserved As Integer
+        Dim parentIonIndex As Integer
+        Dim scanIndexObserved As Integer
 
         Try
-            For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
-                With scanList.ParentIons(intParentIonIndex)
-                    intScanIndexObserved = .SurveyScanIndex
+            For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+                With scanList.ParentIons(parentIonIndex)
+                    scanIndexObserved = .SurveyScanIndex
 
                     With .SICStats
                         .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan
-                        .PeakScanIndexStart = intScanIndexObserved
-                        .PeakScanIndexEnd = intScanIndexObserved
-                        .PeakScanIndexMax = intScanIndexObserved
+                        .PeakScanIndexStart = scanIndexObserved
+                        .PeakScanIndexEnd = scanIndexObserved
+                        .PeakScanIndexMax = scanIndexObserved
                     End With
                 End With
             Next
@@ -2047,9 +2061,9 @@ Public Class clsMASIC
 
     Private Sub SetLocalErrorCode(
       eNewErrorCode As eMasicErrorCodes,
-      blnLeaveExistingErrorCodeUnchanged As Boolean)
+      leaveExistingErrorCodeUnchanged As Boolean)
 
-        If blnLeaveExistingErrorCodeUnchanged AndAlso mLocalErrorCode <> eMasicErrorCodes.NoError Then
+        If leaveExistingErrorCodeUnchanged AndAlso mLocalErrorCode <> eMasicErrorCodes.NoError Then
             ' An error code is already defined; do not change it
         Else
             mLocalErrorCode = eNewErrorCode
@@ -2081,21 +2095,21 @@ Public Class clsMASIC
     Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single, forceUpdate As Boolean)
         Const MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250
 
-        Dim blnRaiseEvent As Boolean
+        Dim raiseEventNow As Boolean
         Static LastFileWriteTime As DateTime = DateTime.UtcNow
 
         If Math.Abs(subtaskPercentComplete) < Single.Epsilon Then
             AbortProcessing = False
             RaiseEvent ProgressResetKeypressAbort()
-            blnRaiseEvent = True
+            raiseEventNow = True
         End If
 
         If Math.Abs(subtaskPercentComplete - mSubtaskProcessingStepPct) > Single.Epsilon Then
-            blnRaiseEvent = True
+            raiseEventNow = True
             mSubtaskProcessingStepPct = subtaskPercentComplete
         End If
 
-        If forceUpdate OrElse blnRaiseEvent OrElse
+        If forceUpdate OrElse raiseEventNow OrElse
             DateTime.UtcNow.Subtract(LastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS Then
             LastFileWriteTime = DateTime.UtcNow
 
@@ -2109,9 +2123,9 @@ Public Class clsMASIC
     ''' Update subtask progress and description
     ''' </summary>
     ''' <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-    ''' <param name="strSubtaskDescription"></param>
-    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single, strSubtaskDescription As String)
-        mSubtaskDescription = strSubtaskDescription
+    ''' <param name="message"></param>
+    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single, message As String)
+        mSubtaskDescription = message
         SetSubtaskProcessingStepPct(subtaskPercentComplete, True)
     End Sub
 
@@ -2119,7 +2133,7 @@ Public Class clsMASIC
         UpdateOverallProgress(ProgressStepDescription)
     End Sub
 
-    Private Sub UpdateOverallProgress(strProgressStepDescription As String)
+    Private Sub UpdateOverallProgress(message As String)
 
         ' Update the processing progress, storing the value in mProgressPercentComplete
 
@@ -2135,69 +2149,69 @@ Public Class clsMASIC
         'Cancelled = 99
         'Complete = 100
 
-        Dim sngWeightingFactors() As Single
+        Dim weightingFactors() As Single
 
         If mOptions.SkipMSMSProcessing Then
-            ' Step                              0   1     2     3  4   5      6      7      8
-            sngWeightingFactors = New Single() {0, 0.97, 0.002, 0, 0, 0.001, 0.025, 0.001, 0.001}            ' The sum of these factors should be 1.00
+            ' Step                           0   1     2     3  4   5      6      7      8
+            weightingFactors = New Single() {0, 0.97, 0.002, 0, 0, 0.001, 0.025, 0.001, 0.001}            ' The sum of these factors should be 1.00
         Else
-            ' Step                              0   1      2      3     4     5      6      7      8
-            sngWeightingFactors = New Single() {0, 0.194, 0.003, 0.65, 0.09, 0.001, 0.006, 0.001, 0.055}     ' The sum of these factors should be 1.00
+            ' Step                           0   1      2      3     4     5      6      7      8
+            weightingFactors = New Single() {0, 0.194, 0.003, 0.65, 0.09, 0.001, 0.006, 0.001, 0.055}     ' The sum of these factors should be 1.00
         End If
 
-        Dim intCurrentStep, intIndex As Integer
-        Dim sngOverallPctCompleted As Single
+        Dim currentStep, index As Integer
+        Dim overallPctCompleted As Single
 
         Try
-            intCurrentStep = mProcessingStep
-            If intCurrentStep >= sngWeightingFactors.Length Then intCurrentStep = sngWeightingFactors.Length - 1
+            currentStep = mProcessingStep
+            If currentStep >= weightingFactors.Length Then currentStep = weightingFactors.Length - 1
 
-            sngOverallPctCompleted = 0
-            For intIndex = 0 To intCurrentStep - 1
-                sngOverallPctCompleted += sngWeightingFactors(intIndex) * 100
+            overallPctCompleted = 0
+            For index = 0 To currentStep - 1
+                overallPctCompleted += weightingFactors(index) * 100
             Next
 
-            sngOverallPctCompleted += sngWeightingFactors(intCurrentStep) * mSubtaskProcessingStepPct
+            overallPctCompleted += weightingFactors(currentStep) * mSubtaskProcessingStepPct
 
-            mProgressPercentComplete = sngOverallPctCompleted
+            mProgressPercentComplete = overallPctCompleted
 
         Catch ex As Exception
             LogErrors("UpdateOverallProgress", "Bug in UpdateOverallProgress", ex)
         End Try
 
-        MyBase.UpdateProgress(strProgressStepDescription, mProgressPercentComplete)
+        MyBase.UpdateProgress(message, mProgressPercentComplete)
     End Sub
 
     Private Sub UpdatePeakMemoryUsage()
 
-        Dim sngMemoryUsageMB As Single
+        Dim memoryUsageMB As Single
 
-        sngMemoryUsageMB = GetProcessMemoryUsageMB()
-        If sngMemoryUsageMB > mProcessingStats.PeakMemoryUsageMB Then
-            mProcessingStats.PeakMemoryUsageMB = sngMemoryUsageMB
+        memoryUsageMB = GetProcessMemoryUsageMB()
+        If memoryUsageMB > mProcessingStats.PeakMemoryUsageMB Then
+            mProcessingStats.PeakMemoryUsageMB = memoryUsageMB
         End If
 
     End Sub
 
-    Private Sub UpdateProcessingStep(eNewProcessingStep As eProcessingStepConstants, Optional blnForceStatusFileUpdate As Boolean = False)
+    Private Sub UpdateProcessingStep(eNewProcessingStep As eProcessingStepConstants, Optional forceStatusFileUpdate As Boolean = False)
 
         mProcessingStep = eNewProcessingStep
-        UpdateStatusFile(blnForceStatusFileUpdate)
+        UpdateStatusFile(forceStatusFileUpdate)
 
     End Sub
 
-    Private Sub UpdateStatusFile(Optional blnForceUpdate As Boolean = False)
+    Private Sub UpdateStatusFile(Optional forceUpdate As Boolean = False)
 
         Static LastFileWriteTime As DateTime = DateTime.UtcNow
 
-        If blnForceUpdate OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS Then
+        If forceUpdate OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS Then
             LastFileWriteTime = DateTime.UtcNow
 
             Try
-                Dim strTempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" & mOptions.MASICStatusFilename)
-                Dim strPath = Path.Combine(GetAppDirectoryPath(), mOptions.MASICStatusFilename)
+                Dim tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" & mOptions.MASICStatusFilename)
+                Dim statusFilePath = Path.Combine(GetAppDirectoryPath(), mOptions.MASICStatusFilename)
 
-                Using writer = New Xml.XmlTextWriter(strTempPath, Text.Encoding.UTF8)
+                Using writer = New Xml.XmlTextWriter(tempPath, Text.Encoding.UTF8)
 
                     writer.Formatting = Xml.Formatting.Indented
                     writer.Indentation = 2
@@ -2234,8 +2248,8 @@ Public Class clsMASIC
                 End Using
 
                 'Copy the temporary file to the real one
-                File.Copy(strTempPath, strPath, True)
-                File.Delete(strTempPath)
+                File.Copy(tempPath, statusFilePath, True)
+                File.Delete(tempPath)
 
             Catch ex As Exception
                 ' Ignore any errors

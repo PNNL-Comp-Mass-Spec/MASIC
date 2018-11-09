@@ -4,31 +4,31 @@ Public Class clsScanNumScanTimeConversion
     Inherits EventNotifier
 
     ''' <summary>
-    ''' Returns the index of the scan closest to sngScanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
+    ''' Returns the index of the scan closest to scanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
     ''' </summary>
     ''' <param name="scanList"></param>
-    ''' <param name="sngScanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
-    ''' <param name="eScanType">Specifies what type of value value sngScanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
+    ''' <param name="scanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
+    ''' <param name="eScanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Private Function FindNearestScanNumIndex(
       scanList As clsScanList,
-      sngScanOrAcqTime As Single,
+      scanOrAcqTime As Single,
       eScanType As clsCustomSICList.eCustomSICScanTypeConstants) As Integer
 
         Try
-            Dim intScanIndexMatch As Integer
+            Dim scanIndexMatch As Integer
 
             If eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Or eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Relative Then
-                Dim intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, sngScanOrAcqTime, eScanType, False)
-                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, intAbsoluteScanNumber, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+                Dim absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, False)
+                scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, absoluteScanNumber, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
             Else
                 ' eScanType = eCustomSICScanTypeConstants.AcquisitionTime
                 ' Find the closest match in scanList.MasterScanTimeList
-                intScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanTimeList, sngScanOrAcqTime, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
+                scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanTimeList, scanOrAcqTime, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
             End If
 
-            Return intScanIndexMatch
+            Return scanIndexMatch
 
         Catch ex As Exception
             OnErrorEvent("Error in FindNearestScanNumIndex", ex)
@@ -39,40 +39,40 @@ Public Class clsScanNumScanTimeConversion
 
     Public Function FindNearestSurveyScanIndex(
       scanList As clsScanList,
-      sngScanOrAcqTime As Single,
+      scanOrAcqTime As Single,
       eScanType As clsCustomSICList.eCustomSICScanTypeConstants) As Integer
 
-        ' Finds the index of the survey scan closest to sngScanOrAcqTime
-        ' Note that sngScanOrAcqTime can be absolute, relative, or AcquisitionTime; eScanType specifies which it is
+        ' Finds the index of the survey scan closest to scanOrAcqTime
+        ' Note that scanOrAcqTime can be absolute, relative, or AcquisitionTime; eScanType specifies which it is
 
         Try
-            Dim intSurveyScanIndexMatch = -1
-            Dim intScanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, sngScanOrAcqTime, eScanType, False)
+            Dim surveyScanIndexMatch = -1
+            Dim scanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, False)
 
-            For intIndex = 0 To scanList.SurveyScans.Count - 1
-                If scanList.SurveyScans(intIndex).ScanNumber >= intScanNumberToFind Then
-                    intSurveyScanIndexMatch = intIndex
-                    If scanList.SurveyScans(intIndex).ScanNumber <> intScanNumberToFind AndAlso intIndex < scanList.SurveyScans.Count - 1 Then
+            For index = 0 To scanList.SurveyScans.Count - 1
+                If scanList.SurveyScans(index).ScanNumber >= scanNumberToFind Then
+                    surveyScanIndexMatch = index
+                    If scanList.SurveyScans(index).ScanNumber <> scanNumberToFind AndAlso index < scanList.SurveyScans.Count - 1 Then
                         ' Didn't find an exact match; determine which survey scan is closer
-                        If Math.Abs(scanList.SurveyScans(intIndex + 1).ScanNumber - intScanNumberToFind) <
-                           Math.Abs(scanList.SurveyScans(intIndex).ScanNumber - intScanNumberToFind) Then
-                            intSurveyScanIndexMatch += 1
+                        If Math.Abs(scanList.SurveyScans(index + 1).ScanNumber - scanNumberToFind) <
+                           Math.Abs(scanList.SurveyScans(index).ScanNumber - scanNumberToFind) Then
+                            surveyScanIndexMatch += 1
                         End If
                     End If
                     Exit For
                 End If
             Next
 
-            If intSurveyScanIndexMatch < 0 Then
+            If surveyScanIndexMatch < 0 Then
                 ' Match not found; return either the first or the last survey scan
                 If scanList.SurveyScans.Count > 0 Then
-                    intSurveyScanIndexMatch = scanList.SurveyScans.Count - 1
+                    surveyScanIndexMatch = scanList.SurveyScans.Count - 1
                 Else
-                    intSurveyScanIndexMatch = 0
+                    surveyScanIndexMatch = 0
                 End If
             End If
 
-            Return intSurveyScanIndexMatch
+            Return surveyScanIndexMatch
         Catch ex As Exception
             OnErrorEvent("Error in FindNearestSurveyScanIndex", ex)
             Return 0
@@ -84,72 +84,71 @@ Public Class clsScanNumScanTimeConversion
     ''' Converts a scan number of acquisition time to an actual scan number
     ''' </summary>
     ''' <param name="scanList"></param>
-    ''' <param name="sngScanOrAcqTime">Value to convert</param>
+    ''' <param name="scanOrAcqTime">Value to convert</param>
     ''' <param name="eScanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
-    ''' <param name="blnConvertingRangeOrTolerance">True when converting a range</param>
+    ''' <param name="convertingRangeOrTolerance">True when converting a range</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function ScanOrAcqTimeToAbsolute(
       scanList As clsScanList,
-      sngScanOrAcqTime As Single,
+      scanOrAcqTime As Single,
       eScanType As clsCustomSICList.eCustomSICScanTypeConstants,
-      blnConvertingRangeOrTolerance As Boolean) As Integer
+      convertingRangeOrTolerance As Boolean) As Integer
 
         Try
-            Dim intAbsoluteScanNumber As Integer
+            Dim absoluteScanNumber As Integer
 
             Select Case eScanType
                 Case clsCustomSICList.eCustomSICScanTypeConstants.Absolute
-                    ' sngScanOrAcqTime is an absolute scan number (or range of scan numbers)
+                    ' scanOrAcqTime is an absolute scan number (or range of scan numbers)
                     ' No conversion needed; simply return the value
-                    intAbsoluteScanNumber = CInt(sngScanOrAcqTime)
+                    absoluteScanNumber = CInt(scanOrAcqTime)
 
                 Case clsCustomSICList.eCustomSICScanTypeConstants.Relative
-                    ' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
+                    ' scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
                     ' Use the total range of scan numbers
                     With scanList
                         If .MasterScanOrderCount > 0 Then
-                            Dim intTotalScanRange = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
+                            Dim totalScanRange = .MasterScanNumList(.MasterScanOrderCount - 1) - .MasterScanNumList(0)
 
-                            intAbsoluteScanNumber = CInt(sngScanOrAcqTime * intTotalScanRange + .MasterScanNumList(0))
+                            absoluteScanNumber = CInt(scanOrAcqTime * totalScanRange + .MasterScanNumList(0))
                         Else
-                            intAbsoluteScanNumber = 0
+                            absoluteScanNumber = 0
                         End If
                     End With
 
                 Case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
-                    ' sngScanOrAcqTime is an elution time value
-                    ' If blnConvertingRangeOrTolerance = False, then look for the scan that is nearest to sngScanOrAcqTime
-                    ' If blnConvertingRangeOrTolerance = True, then Convert sngScanOrAcqTime to a relative scan range and then
+                    ' scanOrAcqTime is an elution time value
+                    ' If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
+                    ' If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
                     '   call this function again with that relative time
 
-                    If blnConvertingRangeOrTolerance Then
+                    If convertingRangeOrTolerance Then
 
-                        Dim sngTotalRunTime = scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1) - scanList.MasterScanTimeList(0)
-                        If sngTotalRunTime < 0.1 Then
-                            sngTotalRunTime = 1
+                        Dim totalRunTime = scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1) - scanList.MasterScanTimeList(0)
+                        If totalRunTime < 0.1 Then
+                            totalRunTime = 1
                         End If
 
-                        Dim sngRelativeTime = sngScanOrAcqTime / sngTotalRunTime
+                        Dim relativeTime = scanOrAcqTime / totalRunTime
 
-
-                        intAbsoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, sngRelativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, True)
+                        absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, True)
                     Else
-                        Dim intMasterScanIndex = FindNearestScanNumIndex(scanList, sngScanOrAcqTime, eScanType)
-                        If intMasterScanIndex >= 0 AndAlso scanList.MasterScanOrderCount > 0 Then
-                            intAbsoluteScanNumber = scanList.MasterScanNumList(intMasterScanIndex)
+                        Dim masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType)
+                        If masterScanIndex >= 0 AndAlso scanList.MasterScanOrderCount > 0 Then
+                            absoluteScanNumber = scanList.MasterScanNumList(masterScanIndex)
                         End If
                     End If
 
 
                 Case Else
                     ' Unknown type; assume absolute scan number
-                    intAbsoluteScanNumber = CInt(sngScanOrAcqTime)
+                    absoluteScanNumber = CInt(scanOrAcqTime)
             End Select
 
 
-            Return intAbsoluteScanNumber
+            Return absoluteScanNumber
         Catch ex As Exception
             OnErrorEvent("Error in clsMasic->ScanOrAcqTimeToAbsolute", ex)
             Return 0
@@ -159,63 +158,63 @@ Public Class clsScanNumScanTimeConversion
 
     Public Function ScanOrAcqTimeToScanTime(
       scanList As clsScanList,
-      sngScanOrAcqTime As Single,
+      scanOrAcqTime As Single,
       eScanType As clsCustomSICList.eCustomSICScanTypeConstants,
-      blnConvertingRangeOrTolerance As Boolean) As Single
+      convertingRangeOrTolerance As Boolean) As Single
 
         Try
-            Dim sngComputedScanTime As Single
+            Dim computedScanTime As Single
 
             Select Case eScanType
                 Case clsCustomSICList.eCustomSICScanTypeConstants.Absolute
-                    ' sngScanOrAcqTime is an absolute scan number (or range of scan numbers)
+                    ' scanOrAcqTime is an absolute scan number (or range of scan numbers)
 
-                    ' If blnConvertingRangeOrTolerance = False, then look for the scan that is nearest to sngScanOrAcqTime
-                    ' If blnConvertingRangeOrTolerance = True, then Convert sngScanOrAcqTime to a relative scan range and then
+                    ' If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
+                    ' If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
                     '   call this function again with that relative time
 
-                    If blnConvertingRangeOrTolerance Then
-                        Dim intTotalScans As Integer
-                        intTotalScans = scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1) - scanList.MasterScanNumList(0)
-                        If intTotalScans < 1 Then
-                            intTotalScans = 1
+                    If convertingRangeOrTolerance Then
+                        Dim totalScans As Integer
+                        totalScans = scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1) - scanList.MasterScanNumList(0)
+                        If totalScans < 1 Then
+                            totalScans = 1
                         End If
 
-                        Dim sngRelativeTime = sngScanOrAcqTime / intTotalScans
+                        Dim relativeTime = scanOrAcqTime / totalScans
 
-                        sngComputedScanTime = ScanOrAcqTimeToScanTime(scanList, sngRelativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, True)
+                        computedScanTime = ScanOrAcqTimeToScanTime(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, True)
                     Else
-                        Dim intMasterScanIndex = FindNearestScanNumIndex(scanList, sngScanOrAcqTime, eScanType)
-                        If intMasterScanIndex >= 0 AndAlso scanList.MasterScanOrderCount > 0 Then
-                            sngComputedScanTime = scanList.MasterScanTimeList(intMasterScanIndex)
+                        Dim masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType)
+                        If masterScanIndex >= 0 AndAlso scanList.MasterScanOrderCount > 0 Then
+                            computedScanTime = scanList.MasterScanTimeList(masterScanIndex)
                         End If
                     End If
 
                 Case clsCustomSICList.eCustomSICScanTypeConstants.Relative
-                    ' sngScanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
+                    ' scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
 
                     ' Use the total range of scan times
                     With scanList
                         If .MasterScanOrderCount > 0 Then
-                            Dim sngTotalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
+                            Dim totalRunTime = .MasterScanTimeList(.MasterScanOrderCount - 1) - .MasterScanTimeList(0)
 
-                            sngComputedScanTime = CSng(sngScanOrAcqTime * sngTotalRunTime + .MasterScanTimeList(0))
+                            computedScanTime = CSng(scanOrAcqTime * totalRunTime + .MasterScanTimeList(0))
                         Else
-                            sngComputedScanTime = 0
+                            computedScanTime = 0
                         End If
                     End With
 
                 Case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
-                    ' sngScanOrAcqTime is an elution time value (or elution time range)
+                    ' scanOrAcqTime is an elution time value (or elution time range)
                     ' No conversion needed; simply return the value
-                    sngComputedScanTime = sngScanOrAcqTime
+                    computedScanTime = scanOrAcqTime
 
                 Case Else
                     ' Unknown type; assume already a scan time
-                    sngComputedScanTime = sngScanOrAcqTime
+                    computedScanTime = scanOrAcqTime
             End Select
 
-            Return sngComputedScanTime
+            Return computedScanTime
         Catch ex As Exception
             OnErrorEvent("Error in clsMasic->ScanOrAcqTimeToScanTime", ex)
             Return 0

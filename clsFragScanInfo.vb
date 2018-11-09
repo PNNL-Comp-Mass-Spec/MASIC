@@ -36,10 +36,10 @@
     ''' <summary>
     ''' Constructor
     ''' </summary>
-    Public Sub New(dblParentIonMz As Double)
+    Public Sub New(parentIonMzValue As Double)
         ' -1 means undefined; only used for fragmentation scans
         ParentIonInfoIndex = -1
-        ParentIonMz = dblParentIonMz
+        ParentIonMz = parentIonMzValue
     End Sub
 
     Public Overrides Function ToString() As String

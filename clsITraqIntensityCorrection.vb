@@ -116,17 +116,17 @@ Public Class clsITraqIntensityCorrection
     ''' <returns></returns>
     Public Function ApplyCorrection(ByRef reporterIonIntensities() As Single, Optional debugShowIntensities As Boolean = False) As Boolean
 
-        Dim dblOriginalIntensities() As Double
-        Dim intDataCount As Integer = reporterIonIntensities.Count - 1
+        Dim originalIntensities() As Double
+        Dim dataCount As Integer = reporterIonIntensities.Count - 1
 
-        ReDim dblOriginalIntensities(intDataCount)
-        For intIndex = 0 To intDataCount
-            dblOriginalIntensities(intIndex) = reporterIonIntensities(intIndex)
+        ReDim originalIntensities(dataCount)
+        For index = 0 To dataCount
+            originalIntensities(index) = reporterIonIntensities(index)
         Next
 
-        If ApplyCorrection(dblOriginalIntensities, debugShowIntensities) Then
-            For intIndex = 0 To intDataCount
-                reporterIonIntensities(intIndex) = CSng(dblOriginalIntensities(intIndex))
+        If ApplyCorrection(originalIntensities, debugShowIntensities) Then
+            For index = 0 To dataCount
+                reporterIonIntensities(index) = CSng(originalIntensities(index))
             Next
             Return True
         Else
@@ -163,7 +163,7 @@ Public Class clsITraqIntensityCorrection
             Console.WriteLine("{0,-8} {1,-10} {2,-12}  {3}", "Index", "Intensity", "NewIntensity", "% Change")
         End If
 
-        ' Now update dblReporterIonIntensities
+        ' Now update reporterIonIntensities
         For index = 0 To matrixSize - 1
             If reporterIonIntensities(index) > 0 Then
                 Dim newIntensity As Double
@@ -667,7 +667,7 @@ Public Class clsITraqIntensityCorrection
     ''' <param name="plus1">Value between 0 and 100, but typically close to 0</param>
     ''' <param name="plus2">Value between 0 and 100, but typically close to 0</param>
     ''' <returns></returns>
-    ''' <remarks>The values should sum to 100; however, if zero (aka the the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
+    ''' <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
     Private Function DefineIsotopeContribution(minus2 As Single,
                                                minus1 As Single,
                                                zero As Single,

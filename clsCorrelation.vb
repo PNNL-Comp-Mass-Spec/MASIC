@@ -201,28 +201,28 @@ Public Class clsCorrelation
     End Function
 
     Public Function BinData(
-      sngXData() As Single,
-      sngYData() As Single,
-      <Out> ByRef sngBinnedYData() As Single,
-      <Out> ByRef sngBinnedOffsetYData() As Single,
-      <Out> ByRef intBinCount As Integer) As Boolean
+      xData() As Single,
+      yData() As Single,
+      <Out> ByRef binnedYData() As Single,
+      <Out> ByRef binnedOffsetYData() As Single,
+      <Out> ByRef binCount As Integer) As Boolean
 
-        ' Bins the data in sngXData() according to sngStartBinXValue and sngBinSize
-        ' Returns the binned data in sngBinnedYData() and sngBinnedOffsetYData()
-        ' The difference between the two is that the StartX value is offset by 50% of the bin size when populating sngBinnedOffsetYData()
+        ' Bins the data in xData() according to startBinXValue and binSize
+        ' Returns the binned data in binnedYData() and binnedOffsetYData()
+        ' The difference between the two is that the StartX value is offset by 50% of the bin size when populating binnedOffsetYData()
         '
         ' Returns True if successful, false otherwise
 
-        Dim intDataCount As Integer
+        Dim dataCount As Integer
 
-        Dim sngBin2Offset As Single
+        Dim bin2Offset As Single
 
         Try
-            intDataCount = sngXData.Length
-            If intDataCount <= 0 Then
-                ReDim sngBinnedYData(-1)
-                ReDim sngBinnedOffsetYData(-1)
-                intBinCount = 0
+            dataCount = xData.Length
+            If dataCount <= 0 Then
+                ReDim binnedYData(-1)
+                ReDim binnedOffsetYData(-1)
+                binCount = 0
                 Return False
             End If
 
@@ -230,31 +230,31 @@ Public Class clsCorrelation
                 If .BinSize <= 0 Then .BinSize = 1
                 If .StartX >= .EndX Then .EndX = .StartX + .BinSize * 10
 
-                intBinCount = CInt((.EndX - .StartX) / .BinSize - 1)
-                If intBinCount < 1 Then intBinCount = 1
+                binCount = CInt((.EndX - .StartX) / .BinSize - 1)
+                If binCount < 1 Then binCount = 1
 
-                If intBinCount > .MaximumBinCount Then
+                If binCount > .MaximumBinCount Then
                     .BinSize = (.EndX - .StartX) / .MaximumBinCount
-                    intBinCount = CInt((.EndX - .StartX) / .BinSize - 1)
+                    binCount = CInt((.EndX - .StartX) / .BinSize - 1)
                 End If
-                sngBin2Offset = .BinSize / 2
+                bin2Offset = .BinSize / 2
 
-                ReDim sngBinnedYData(intBinCount - 1)
-                ReDim sngBinnedOffsetYData(intBinCount - 1)
+                ReDim binnedYData(binCount - 1)
+                ReDim binnedOffsetYData(binCount - 1)
 
             End With
 
-            ' Fill sngBinnedYData()
-            BinDataWork(sngXData, sngYData, intDataCount, sngBinnedYData, intBinCount, mBinningOptions, 0)
+            ' Fill binnedYData()
+            BinDataWork(xData, yData, dataCount, binnedYData, binCount, mBinningOptions, 0)
 
-            ' Fill sngBinnedOffsetYData(), using a StartX of sngStartBinXValue + sngBin2Offset
-            BinDataWork(sngXData, sngYData, intDataCount, sngBinnedOffsetYData, intBinCount, mBinningOptions, sngBin2Offset)
+            ' Fill binnedOffsetYData(), using a StartX of startBinXValue + bin2Offset
+            BinDataWork(xData, yData, dataCount, binnedOffsetYData, binCount, mBinningOptions, bin2Offset)
 
         Catch ex As Exception
             OnErrorEvent("BinData: " & ex.Message, ex)
-            ReDim sngBinnedYData(-1)
-            ReDim sngBinnedOffsetYData(-1)
-            intBinCount = 0
+            ReDim binnedYData(-1)
+            ReDim binnedOffsetYData(-1)
+            binCount = 0
             Return False
         End Try
 
@@ -262,34 +262,34 @@ Public Class clsCorrelation
 
     End Function
 
-    Private Sub BinDataWork(sngXData As IList(Of Single), sngYData As IList(Of Single), intDataCount As Integer,
-                            sngBinnedYData As IList(Of Single), intBinCount As Integer, binningOptions As clsBinningOptions, sngOffset As Single)
+    Private Sub BinDataWork(xData As IList(Of Single), yData As IList(Of Single), dataCount As Integer,
+                            binnedYData As IList(Of Single), binCount As Integer, binningOptions As clsBinningOptions, offset As Single)
 
-        Dim intIndex As Integer
-        Dim intBinNumber As Integer
+        Dim index As Integer
+        Dim binNumber As Integer
 
-        Dim sngMaximumIntensity As Single
-        Dim sngIntensityQuantizationValue As Single
+        Dim maximumIntensity As Single
+        Dim intensityQuantizationValue As Single
 
         Try
 
-            sngMaximumIntensity = Single.MinValue
-            For intIndex = 0 To intDataCount - 1
-                If sngYData(intIndex) >= mNoiseThresholdIntensity Then
-                    intBinNumber = ValueToBinNumber(sngXData(intIndex), binningOptions.StartX + sngOffset, binningOptions.BinSize)
-                    If intBinNumber >= 0 And intBinNumber < intBinCount Then
+            maximumIntensity = Single.MinValue
+            For index = 0 To dataCount - 1
+                If yData(index) >= mNoiseThresholdIntensity Then
+                    binNumber = ValueToBinNumber(xData(index), binningOptions.StartX + offset, binningOptions.BinSize)
+                    If binNumber >= 0 And binNumber < binCount Then
                         If binningOptions.SumAllIntensitiesForBin Then
                             ' Add this ion's intensity to the bin intensity
-                            sngBinnedYData(intBinNumber) += sngYData(intIndex)
+                            binnedYData(binNumber) += yData(index)
                         Else
                             ' Only change the bin's intensity if this ion's intensity is larger than the bin's intensity
                             ' If it is, then set the bin intensity to equal the ion's intensity
-                            If sngYData(intIndex) > sngBinnedYData(intBinNumber) Then
-                                sngBinnedYData(intBinNumber) = sngYData(intIndex)
+                            If yData(index) > binnedYData(binNumber) Then
+                                binnedYData(binNumber) = yData(index)
                             End If
                         End If
-                        If sngBinnedYData(intBinNumber) > sngMaximumIntensity Then
-                            sngMaximumIntensity = sngBinnedYData(intBinNumber)
+                        If binnedYData(binNumber) > maximumIntensity Then
+                            maximumIntensity = binnedYData(binNumber)
                         End If
                     Else
                         ' Bin is Out of range; ignore the value
@@ -297,26 +297,26 @@ Public Class clsCorrelation
                 End If
             Next
 
-            If Not sngMaximumIntensity > Single.MinValue Then sngMaximumIntensity = 0
+            If Not maximumIntensity > Single.MinValue Then maximumIntensity = 0
 
             If binningOptions.IntensityPrecisionPercent > 0 Then
-                ' Quantize the intensities to .IntensityPrecisionPercent of sngMaximumIntensity
-                sngIntensityQuantizationValue = binningOptions.IntensityPrecisionPercent / 100 * sngMaximumIntensity
-                If sngIntensityQuantizationValue <= 0 Then sngIntensityQuantizationValue = 1
-                If sngIntensityQuantizationValue > 1 Then sngIntensityQuantizationValue = CSng(Math.Round(sngIntensityQuantizationValue, 0))
+                ' Quantize the intensities to .IntensityPrecisionPercent of maximumIntensity
+                intensityQuantizationValue = binningOptions.IntensityPrecisionPercent / 100 * maximumIntensity
+                If intensityQuantizationValue <= 0 Then intensityQuantizationValue = 1
+                If intensityQuantizationValue > 1 Then intensityQuantizationValue = CSng(Math.Round(intensityQuantizationValue, 0))
 
-                For intIndex = 0 To intBinCount - 1
-                    If Math.Abs(sngBinnedYData(intIndex)) > Single.Epsilon Then
-                        sngBinnedYData(intIndex) = CSng(Math.Round(sngBinnedYData(intIndex) / sngIntensityQuantizationValue, 0)) * sngIntensityQuantizationValue
+                For index = 0 To binCount - 1
+                    If Math.Abs(binnedYData(index)) > Single.Epsilon Then
+                        binnedYData(index) = CSng(Math.Round(binnedYData(index) / intensityQuantizationValue, 0)) * intensityQuantizationValue
                     End If
                 Next
 
             End If
 
-            If binningOptions.Normalize And sngMaximumIntensity > 0 Then
-                For intIndex = 0 To intBinCount - 1
-                    If Math.Abs(sngBinnedYData(intIndex)) > Single.Epsilon Then
-                        sngBinnedYData(intIndex) /= sngMaximumIntensity * 100
+            If binningOptions.Normalize And maximumIntensity > 0 Then
+                For index = 0 To binCount - 1
+                    If Math.Abs(binnedYData(index)) > Single.Epsilon Then
+                        binnedYData(index) /= maximumIntensity * 100
                     End If
                 Next
             End If
@@ -327,7 +327,7 @@ Public Class clsCorrelation
 
     End Sub
 
-    Public Function Correlate(sngDataList1() As Single, sngDataList2() As Single, eCorrelationMethod As cmCorrelationMethodConstants) As Single
+    Public Function Correlate(dataList1() As Single, dataList2() As Single, eCorrelationMethod As cmCorrelationMethodConstants) As Single
         ' Finds the correlation value between the two lists of data
         ' The lists must have the same number of data points
         ' If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, then the correlation value returned will be 0
@@ -337,16 +337,16 @@ Public Class clsCorrelation
         '
         ' Note: If necessary, use the BinData function before calling this function to bin the data
 
-        Dim intIndex As Integer
-        Dim intDataCount As Integer
-        Dim intNonZeroDataCount As Integer
+        Dim index As Integer
+        Dim dataCount As Integer
+        Dim nonZeroDataCount As Integer
 
         Dim RValue As Single, ProbOfSignificance As Single, FishersZ As Single
         Dim DiffInRanks As Single, ZD As Single, RS As Single, ProbRS As Single
         Dim KendallsTau As Single, Z As Single
 
-        ''        Dim sngDataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
-        ''        Dim sngDataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
+        ''        Dim dataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
+        ''        Dim dataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
 
         Try
 
@@ -354,34 +354,34 @@ Public Class clsCorrelation
             RS = 0
             KendallsTau = 0
 
-            intDataCount = sngDataList1.Length
-            If sngDataList2.Length <> sngDataList1.Length Then
+            dataCount = dataList1.Length
+            If dataList2.Length <> dataList1.Length Then
                 Return -1
             End If
 
             ' Determine the number of non-zero data points in the two spectra
-            intNonZeroDataCount = 0
-            For intIndex = 0 To intDataCount - 1
-                If sngDataList1(intIndex) > 0 Then intNonZeroDataCount += 1
+            nonZeroDataCount = 0
+            For index = 0 To dataCount - 1
+                If dataList1(index) > 0 Then nonZeroDataCount += 1
             Next
-            If intNonZeroDataCount < MIN_NON_ZERO_ION_COUNT Then Return 0
+            If nonZeroDataCount < MIN_NON_ZERO_ION_COUNT Then Return 0
 
-            intNonZeroDataCount = 0
-            For intIndex = 0 To intDataCount - 1
-                If sngDataList2(intIndex) > 0 Then intNonZeroDataCount += 1
+            nonZeroDataCount = 0
+            For index = 0 To dataCount - 1
+                If dataList2(index) > 0 Then nonZeroDataCount += 1
             Next
-            If intNonZeroDataCount < MIN_NON_ZERO_ION_COUNT Then Return 0
+            If nonZeroDataCount < MIN_NON_ZERO_ION_COUNT Then Return 0
 
 
             Select Case eCorrelationMethod
                 Case cmCorrelationMethodConstants.Pearson
-                    CorrelPearson(sngDataList1, sngDataList2, RValue, ProbOfSignificance, FishersZ)
+                    CorrelPearson(dataList1, dataList2, RValue, ProbOfSignificance, FishersZ)
                     Return RValue
                 Case cmCorrelationMethodConstants.Spearman
-                    CorrelSpearman(sngDataList1, sngDataList2, DiffInRanks, ZD, ProbOfSignificance, RS, ProbRS)
+                    CorrelSpearman(dataList1, dataList2, DiffInRanks, ZD, ProbOfSignificance, RS, ProbRS)
                     Return RS
                 Case cmCorrelationMethodConstants.Kendall
-                    CorrelKendall(sngDataList1, sngDataList2, KendallsTau, Z, ProbOfSignificance)
+                    CorrelKendall(dataList1, dataList2, KendallsTau, Z, ProbOfSignificance)
                     Return KendallsTau
                 Case Else
                     Return -1
@@ -395,7 +395,7 @@ Public Class clsCorrelation
     End Function
 
     Private Sub CorrelPearson(
-      sngDataList1 As IList(Of Single), sngDataList2 As IList(Of Single),
+      dataList1 As IList(Of Single), dataList2 As IList(Of Single),
       <Out> ByRef RValue As Single,
       <Out> ByRef ProbOfSignificance As Single,
       <Out> ByRef FishersZ As Single)
@@ -426,25 +426,25 @@ Public Class clsCorrelation
         ProbOfSignificance = 0
         FishersZ = 0
 
-        n = sngDataList1.Count
-        If n <> sngDataList2.Count Then
-            Throw New Exception("sngDataList1 and sngDataList2 must be arrays of the same length")
+        n = dataList1.Count
+        If n <> dataList2.Count Then
+            Throw New Exception("dataList1 and dataList2 must be arrays of the same length")
             n = 0
         End If
         If n <= 0 Then Exit Sub
 
         ' Find the means
         For j = 0 To n - 1
-            ax += sngDataList1(j)
-            ay += sngDataList2(j)
+            ax += dataList1(j)
+            ay += dataList2(j)
         Next j
         ax /= n
         ay /= n
 
         ' Compute the correlation coefficient
         For j = 0 To n - 1
-            xt = sngDataList1(j) - ax
-            yt = sngDataList2(j) - ay
+            xt = dataList1(j) - ax
+            yt = dataList2(j) - ay
             sxx += xt * xt
             syy += yt * yt
             sxy += xt * yt
@@ -464,8 +464,8 @@ Public Class clsCorrelation
     End Sub
 
     Private Sub CorrelKendall(
-      sngDataList1 As IList(Of Single),
-      sngDataList2 As IList(Of Single),
+      dataList1 As IList(Of Single),
+      dataList2 As IList(Of Single),
       <Out> ByRef KendallsTau As Single,
       <Out> ByRef Z As Single,
       <Out> ByRef ProbOfSignificance As Single)
@@ -492,17 +492,17 @@ Public Class clsCorrelation
         Z = 0
         ProbOfSignificance = 0
 
-        n = sngDataList1.Count
-        If n <> sngDataList2.Count Then
-            Throw New Exception("sngDataList1 and sngDataList2 must be arrays of the same length")
+        n = dataList1.Count
+        If n <> dataList2.Count Then
+            Throw New Exception("dataList1 and dataList2 must be arrays of the same length")
             n = 0
         End If
         If n <= 0 Then Exit Sub
 
         For j = 0 To n - 2
             For k = j + 1 To n - 1
-                a1 = sngDataList1(j) - sngDataList1(k)
-                a2 = sngDataList2(j) - sngDataList2(k)
+                a1 = dataList1(j) - dataList1(k)
+                a2 = dataList2(j) - dataList2(k)
                 aa = a1 * a2
                 If Math.Abs(aa) > Double.Epsilon Then
                     n1 += 1
@@ -528,8 +528,8 @@ Public Class clsCorrelation
     End Sub
 
     Private Sub CorrelSpearman(
-      sngDataList1() As Single,
-      sngDataList2() As Single,
+      dataList1() As Single,
+      dataList2() As Single,
       <Out> ByRef DiffInRanks As Single,
       <Out> ByRef ZD As Single,
       <Out> ByRef ProbOfSignificance As Single,
@@ -541,7 +541,7 @@ Public Class clsCorrelation
         '
         ' Code from Numerical Recipes in C
 
-        ' Note: sngDataList1 and sngDataList2 are re-ordered by this function; thus, they are passed ByVal
+        ' Note: dataList1 and dataList2 are re-ordered by this function; thus, they are passed ByVal
 
         ' Given two data arrays, data1[0..n-1] and data2[0..n-1], this routine returns their sum-squared
         ' difference of ranks as D, the number of standard deviations by which D deviates from its null hypothesis
@@ -563,24 +563,24 @@ Public Class clsCorrelation
         RS = 0
         ProbRS = 0
 
-        n = sngDataList1.Length
-        If n <> sngDataList2.Length Then
-            Throw New Exception("sngDataList1 and sngDataList2 must be arrays of the same length")
+        n = dataList1.Length
+        If n <> dataList2.Length Then
+            Throw New Exception("dataList1 and dataList2 must be arrays of the same length")
             n = 0
         End If
         If n <= 0 Then Exit Sub
 
-        ' Sort sngDataList1, sorting sngDataList2 parallel to it
-        Array.Sort(sngDataList1, sngDataList2)
-        CRank(n, sngDataList1, sf)
+        ' Sort dataList1, sorting dataList2 parallel to it
+        Array.Sort(dataList1, dataList2)
+        CRank(n, dataList1, sf)
 
-        ' Sort sngDataList2, sorting sngDataList1 parallel to it
-        Array.Sort(sngDataList2, sngDataList1)
-        CRank(n, sngDataList2, sg)
+        ' Sort dataList2, sorting dataList1 parallel to it
+        Array.Sort(dataList2, dataList1)
+        CRank(n, dataList2, sg)
 
         DiffInRanksWork = 0.0
         For j = 0 To n - 1
-            DiffInRanksWork += SquareNum(sngDataList1(j) - sngDataList2(j))
+            DiffInRanksWork += SquareNum(dataList1(j) - dataList2(j))
         Next j
         DiffInRanks = CSng(DiffInRanksWork)
 
@@ -709,12 +709,12 @@ Public Class clsCorrelation
         mBinningOptions = binningOptions
     End Sub
 
-    Private Function SquareNum(dblNum As Double) As Double
+    Private Function SquareNum(value As Double) As Double
 
-        If Math.Abs(dblNum) < Double.Epsilon Then
+        If Math.Abs(value) < Double.Epsilon Then
             Return 0
         Else
-            Return dblNum * dblNum
+            Return value * value
         End If
 
     End Function

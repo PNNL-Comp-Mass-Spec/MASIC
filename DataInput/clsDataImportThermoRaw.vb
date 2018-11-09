@@ -53,7 +53,7 @@ Namespace DataInput
         Private Function ComputeInterference(xcaliburAccessor As XRawFileIO, scanInfo As ThermoRawFileReader.clsScanInfo, precursorScanNumber As Integer) As Double
 
             If Math.Abs(scanInfo.ParentIonMZ) < Single.Epsilon Then
-                ReportWarning("Parent ion m/z is 0; cannot compute inteference for scan " & scanInfo.ScanNumber)
+                ReportWarning("Parent ion m/z is 0; cannot compute interference for scan " & scanInfo.ScanNumber)
                 Return 0
             End If
 
@@ -100,7 +100,7 @@ Namespace DataInput
                 mIsolationWidthNotFoundCount += 1
                 If mIsolationWidthNotFoundCount <= ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW Then
                     ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
-                                  "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                                  "cannot compute interference for scan " & scanInfo.ScanNumber)
                 ElseIf mIsolationWidthNotFoundCount Mod 5000 = 0 Then
                     ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
                                   "for " & mIsolationWidthNotFoundCount & " scans")
@@ -110,7 +110,7 @@ Namespace DataInput
 
             If Not Double.TryParse(isolationWidthText, isolationWidth) Then
                 ReportWarning("MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & ") was non-numeric (" & isolationWidthText & "); " &
-                              "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                              "cannot compute interference for scan " & scanInfo.ScanNumber)
                 Return 0
             End If
 
@@ -125,7 +125,7 @@ Namespace DataInput
                 If (Not scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText, True)) Then
 
                     ReportWarning("Could not determine the parent ion m/z value (" & SCAN_EVENT_MONOISOTOPIC_MZ & "); " &
-                                  "cannot compute inteference for scan " & scanInfo.ScanNumber)
+                                  "cannot compute interference for scan " & scanInfo.ScanNumber)
                     Return 0
                 End If
 
@@ -151,58 +151,58 @@ Namespace DataInput
         End Function
 
         Public Function ExtractScanInfoFromXcaliburDataFile(
-          strFilePath As String,
+          filePath As String,
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
           dataOutputHandler As DataOutput.clsDataOutput,
-          blnKeepRawSpectra As Boolean,
-          blnKeepMSMSSpectra As Boolean) As Boolean
+          keepRawSpectra As Boolean,
+          keepMSMSSpectra As Boolean) As Boolean
 
             ' Returns True if Success, False if failure
-            ' Note: This function assumes strFilePath exists
+            ' Note: This function assumes filePath exists
 
             ' Use Xraw to read the .Raw files
             Dim xcaliburAccessor = New XRawFileIO()
             RegisterEvents(xcaliburAccessor)
 
-            Dim strIOMode = "Xraw"
+            Dim ioMode = "Xraw"
 
             mIsolationWidthNotFoundCount = 0
             mPrecursorNotFoundCount = 0
 
             ' Assume success for now
-            Dim blnSuccess = True
+            Dim success = True
 
             Try
                 Console.Write("Reading Xcalibur data file ")
                 ReportMessage("Reading Xcalibur data file")
 
-                UpdateProgress(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(strFilePath))
+                UpdateProgress(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(filePath))
 
                 ' Obtain the full path to the file
-                Dim ioFileInfo = New FileInfo(strFilePath)
-                Dim strInputFileFullPath = ioFileInfo.FullName
+                Dim rawFileInfo = New FileInfo(filePath)
+                Dim inputFileFullPath = rawFileInfo.FullName
 
                 xcaliburAccessor.LoadMSMethodInfo = mOptions.WriteMSMethodFile
                 xcaliburAccessor.LoadMSTuneInfo = mOptions.WriteMSTuneFile
 
                 ' Open a handle to the data file
-                If Not xcaliburAccessor.OpenRawFile(strInputFileFullPath) Then
-                    ReportError("Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor.OpenRawFile returned False)")
+                If Not xcaliburAccessor.OpenRawFile(inputFileFullPath) Then
+                    ReportError("Error opening input data file: " & inputFileFullPath & " (xcaliburAccessor.OpenRawFile returned False)")
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
 
                 If xcaliburAccessor Is Nothing Then
-                    ReportError("Error opening input data file: " & strInputFileFullPath & " (xcaliburAccessor is Nothing)")
+                    ReportError("Error opening input data file: " & inputFileFullPath & " (xcaliburAccessor is Nothing)")
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
 
-                Dim intDatasetID = mOptions.SICOptions.DatasetNumber
+                Dim datasetID = mOptions.SICOptions.DatasetNumber
                 Dim sicOptions = mOptions.SICOptions
 
-                blnSuccess = UpdateDatasetFileStats(ioFileInfo, intDatasetID, xcaliburAccessor)
+                success = UpdateDatasetFileStats(rawFileInfo, datasetID, xcaliburAccessor)
 
                 Dim metadataWriter = New DataOutput.clsThermoMetadataWriter()
                 RegisterEvents(metadataWriter)
@@ -215,17 +215,17 @@ Namespace DataInput
                     metadataWriter.SaveMSTuneFile(xcaliburAccessor, dataOutputHandler)
                 End If
 
-                Dim intScanCount = xcaliburAccessor.GetNumScans()
+                Dim scanCount = xcaliburAccessor.GetNumScans()
 
-                If intScanCount <= 0 Then
+                If scanCount <= 0 Then
                     ' No scans found
-                    ReportError("No scans found in the input file: " & strFilePath)
+                    ReportError("No scans found in the input file: " & filePath)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
 
-                Dim intScanStart = xcaliburAccessor.FileInfo.ScanStart
-                Dim intScanEnd = xcaliburAccessor.FileInfo.ScanEnd
+                Dim scanStart = xcaliburAccessor.FileInfo.ScanStart
+                Dim scanEnd = xcaliburAccessor.FileInfo.ScanEnd
 
                 With sicOptions
                     If .ScanRangeStart > 0 And .ScanRangeEnd = 0 Then
@@ -233,37 +233,37 @@ Namespace DataInput
                     End If
 
                     If .ScanRangeStart >= 0 AndAlso .ScanRangeEnd > .ScanRangeStart Then
-                        intScanStart = Math.Max(intScanStart, .ScanRangeStart)
-                        intScanEnd = Math.Min(intScanEnd, .ScanRangeEnd)
+                        scanStart = Math.Max(scanStart, .ScanRangeStart)
+                        scanEnd = Math.Min(scanEnd, .ScanRangeEnd)
                     End If
                 End With
 
-                UpdateProgress("Reading Xcalibur data with " & strIOMode & " (" & intScanCount.ToString() & " scans)" & ControlChars.NewLine & Path.GetFileName(strFilePath))
-                ReportMessage("Reading Xcalibur data with " & strIOMode & "; Total scan count: " & intScanCount.ToString())
-                Dim dtLastLogTime = DateTime.UtcNow
+                UpdateProgress("Reading Xcalibur data with " & ioMode & " (" & scanCount.ToString() & " scans)" & ControlChars.NewLine & Path.GetFileName(filePath))
+                ReportMessage("Reading Xcalibur data with " & ioMode & "; Total scan count: " & scanCount.ToString())
+                Dim lastLogTime = DateTime.UtcNow
 
                 ' Pre-reserve memory for the maximum number of scans that might be loaded
-                ' Re-dimming after loading each scan is extremly slow and uses additional memory
-                scanList.Initialize(intScanEnd - intScanStart + 1, intScanEnd - intScanStart + 1)
-                Dim intLastNonZoomSurveyScanIndex = -1
+                ' Re-dimming after loading each scan is extremely slow and uses additional memory
+                scanList.Initialize(scanEnd - scanStart + 1, scanEnd - scanStart + 1)
+                Dim lastNonZoomSurveyScanIndex = -1
 
                 Dim htSIMScanMapping = New Dictionary(Of String, Integer)
                 scanList.SIMDataPresent = False
                 scanList.MRMDataPresent = False
 
-                For intScanNumber = intScanStart To intScanEnd
+                For scanNumber = scanStart To scanEnd
 
                     Dim thermoScanInfo As ThermoRawFileReader.clsScanInfo = Nothing
 
-                    blnSuccess = xcaliburAccessor.GetScanInfo(intScanNumber, thermoScanInfo)
+                    success = xcaliburAccessor.GetScanInfo(scanNumber, thermoScanInfo)
 
-                    If Not blnSuccess Then
+                    If Not success Then
                         ' GetScanInfo returned false
-                        ReportWarning("xcaliburAccessor.GetScanInfo returned false for scan " & intScanNumber.ToString() & "; aborting read")
+                        ReportWarning("xcaliburAccessor.GetScanInfo returned false for scan " & scanNumber.ToString() & "; aborting read")
                         Exit For
                     End If
 
-                    If mScanTracking.CheckScanInRange(intScanNumber, thermoScanInfo.RetentionTime, sicOptions) Then
+                    If mScanTracking.CheckScanInRange(scanNumber, thermoScanInfo.RetentionTime, sicOptions) Then
 
                         If thermoScanInfo.ParentIonMZ > 0 AndAlso Math.Abs(mOptions.ParentIonDecoyMassDa) > 0 Then
                             thermoScanInfo.ParentIonMZ += mOptions.ParentIonDecoyMassDa
@@ -273,26 +273,26 @@ Namespace DataInput
                         ' If yes, determine the scan number of the survey scan
                         If thermoScanInfo.MSLevel <= 1 Then
                             ' Survey Scan
-                            blnSuccess = ExtractXcaliburSurveyScan(xcaliburAccessor,
+                            success = ExtractXcaliburSurveyScan(xcaliburAccessor,
                                scanList, objSpectraCache, dataOutputHandler, sicOptions,
-                               blnKeepRawSpectra, thermoScanInfo, htSIMScanMapping,
-                               intLastNonZoomSurveyScanIndex, intScanNumber)
+                               keepRawSpectra, thermoScanInfo, htSIMScanMapping,
+                               lastNonZoomSurveyScanIndex, scanNumber)
 
                         Else
 
                             ' Fragmentation Scan
-                            blnSuccess = ExtractXcaliburFragmentationScan(xcaliburAccessor,
+                            success = ExtractXcaliburFragmentationScan(xcaliburAccessor,
                                scanList, objSpectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
-                               blnKeepRawSpectra, blnKeepMSMSSpectra, thermoScanInfo,
-                               intLastNonZoomSurveyScanIndex, intScanNumber)
+                               keepRawSpectra, keepMSMSSpectra, thermoScanInfo,
+                               lastNonZoomSurveyScanIndex, scanNumber)
 
                         End If
 
                     End If
 
-                    If intScanCount > 0 Then
-                        If intScanNumber Mod 10 = 0 Then
-                            UpdateProgress(CShort(intScanNumber / intScanCount * 100))
+                    If scanCount > 0 Then
+                        If scanNumber Mod 10 = 0 Then
+                            UpdateProgress(CShort(scanNumber / scanCount * 100))
                         End If
                     Else
                         UpdateProgress(0)
@@ -304,11 +304,11 @@ Namespace DataInput
                         Exit For
                     End If
 
-                    If intScanNumber Mod 100 = 0 Then
-                        If DateTime.UtcNow.Subtract(dtLastLogTime).TotalSeconds >= 10 OrElse intScanNumber Mod 500 = 0 Then
-                            ReportMessage("Reading scan: " & intScanNumber.ToString())
+                    If scanNumber Mod 100 = 0 Then
+                        If DateTime.UtcNow.Subtract(lastLogTime).TotalSeconds >= 10 OrElse scanNumber Mod 500 = 0 Then
+                            ReportMessage("Reading scan: " & scanNumber.ToString())
                             Console.Write(".")
-                            dtLastLogTime = DateTime.UtcNow
+                            lastLogTime = DateTime.UtcNow
                         End If
 
                         ' Call the garbage collector every 100 spectra
@@ -346,7 +346,7 @@ Namespace DataInput
             ' Close the handle to the data file
             xcaliburAccessor.CloseRawFile()
 
-            Return blnSuccess
+            Return success
 
         End Function
 
@@ -356,14 +356,14 @@ Namespace DataInput
           objSpectraCache As clsSpectraCache,
           dataOutputHandler As DataOutput.clsDataOutput,
           sicOptions As clsSICOptions,
-          blnKeepRawSpectra As Boolean,
+          keepRawSpectra As Boolean,
           thermoScanInfo As ThermoRawFileReader.clsScanInfo,
           htSIMScanMapping As IDictionary(Of String, Integer),
-          ByRef intLastNonZoomSurveyScanIndex As Integer,
-          intScanNumber As Integer) As Boolean
+          ByRef lastNonZoomSurveyScanIndex As Integer,
+          scanNumber As Integer) As Boolean
 
             Dim scanInfo = New clsScanInfo() With {
-                .ScanNumber = intScanNumber,
+                .ScanNumber = scanNumber,
                 .ScanTime = CSng(thermoScanInfo.RetentionTime),
                 .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
                 .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
@@ -389,14 +389,14 @@ Namespace DataInput
 
             If scanInfo.SIMScan Then
                 scanList.SIMDataPresent = True
-                Dim strSIMKey = scanInfo.LowMass & "_" & scanInfo.HighMass
+                Dim simKey = scanInfo.LowMass & "_" & scanInfo.HighMass
                 Dim simIndex As Integer
 
-                If htSIMScanMapping.TryGetValue(strSIMKey, simIndex) Then
+                If htSIMScanMapping.TryGetValue(simKey, simIndex) Then
                     scanInfo.SIMIndex = simIndex
                 Else
                     scanInfo.SIMIndex = htSIMScanMapping.Count
-                    htSIMScanMapping.Add(strSIMKey, htSIMScanMapping.Count)
+                    htSIMScanMapping.Add(simKey, htSIMScanMapping.Count)
                 End If
             End If
 
@@ -418,30 +418,30 @@ Namespace DataInput
             scanList.SurveyScans.Add(scanInfo)
 
             If Not scanInfo.ZoomScan Then
-                intLastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1
+                lastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1
             End If
 
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1)
 
-            Dim dblMSDataResolution As Double
+            Dim msDataResolution As Double
 
             If sicOptions.SICToleranceIsPPM Then
                 ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
                 ' However, if the lowest m/z value is < 100, then use 100 m/z
                 If thermoScanInfo.LowMass < 100 Then
-                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
+                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
                         sicOptions.CompressToleranceDivisorForPPM
                 Else
-                    dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, thermoScanInfo.LowMass) /
+                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, thermoScanInfo.LowMass) /
                         sicOptions.CompressToleranceDivisorForPPM
                 End If
             Else
-                dblMSDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
+                msDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
             End If
 
-            ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            Dim blnSuccess = LoadSpectraForFinniganDataFile(xcaliburAccessor, objSpectraCache, intScanNumber, scanInfo, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, dblMSDataResolution, blnKeepRawSpectra)
-            If Not blnSuccess Then Return False
+            ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+            Dim success = LoadSpectraForFinniganDataFile(xcaliburAccessor, objSpectraCache, scanNumber, scanInfo, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, msDataResolution, keepRawSpectra)
+            If Not success Then Return False
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
 
@@ -456,16 +456,16 @@ Namespace DataInput
           dataOutputHandler As DataOutput.clsDataOutput,
           sicOptions As clsSICOptions,
           binningOptions As clsBinningOptions,
-          blnKeepRawSpectra As Boolean,
-          blnKeepMSMSSpectra As Boolean,
+          keepRawSpectra As Boolean,
+          keepMSMSSpectra As Boolean,
           thermoScanInfo As ThermoRawFileReader.clsScanInfo,
-          ByRef intLastNonZoomSurveyScanIndex As Integer,
-          intScanNumber As Integer) As Boolean
+          ByRef lastNonZoomSurveyScanIndex As Integer,
+          scanNumber As Integer) As Boolean
 
             ' Note that MinimumPositiveIntensity will be determined in LoadSpectraForFinniganDataFile
 
             Dim scanInfo = New clsScanInfo() With {
-                .ScanNumber = intScanNumber,
+                .ScanNumber = scanNumber,
                 .ScanTime = CSng(thermoScanInfo.RetentionTime),
                 .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
                 .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
@@ -504,7 +504,7 @@ Namespace DataInput
 
                 If scanList.SurveyScans.Count = 0 Then
                     ' Need to add a "fake" survey scan that we can map this parent ion to
-                    intLastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
+                    lastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
                 End If
             Else
                 scanInfo.MRMScanInfo.MRMMassCount = 0
@@ -535,34 +535,34 @@ Namespace DataInput
 
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
 
-            ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            Dim dblMSDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
+            ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+            Dim msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
 
-            Dim blnSuccess = LoadSpectraForFinniganDataFile(
+            Dim success = LoadSpectraForFinniganDataFile(
               xcaliburAccessor,
               objSpectraCache,
-              intScanNumber,
+              scanNumber,
               scanInfo,
               sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
               DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
               sicOptions.CompressMSMSSpectraData,
-              dblMSDataResolution,
-              blnKeepRawSpectra And blnKeepMSMSSpectra)
+              msDataResolution,
+              keepRawSpectra AndAlso keepMSMSSpectra)
 
-            If Not blnSuccess Then Return False
+            If Not success Then Return False
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetNumber)
 
             If thermoScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
             Else
                 ' This is an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanInfo.MRMScanInfo, objSpectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanInfo.MRMScanInfo, objSpectraCache, sicOptions)
             End If
 
-            If intLastNonZoomSurveyScanIndex >= 0 Then
-                Dim precursorScanNumber = scanList.SurveyScans(intLastNonZoomSurveyScanIndex).ScanNumber
+            If lastNonZoomSurveyScanIndex >= 0 Then
+                Dim precursorScanNumber = scanList.SurveyScans(lastNonZoomSurveyScanIndex).ScanNumber
 
                 ' Compute the interference of the parent ion in the MS1 spectrum for this frag scan
                 scanInfo.FragScanInfo.InteferenceScore = ComputeInterference(xcaliburAccessor, thermoScanInfo, precursorScanNumber)
@@ -575,31 +575,31 @@ Namespace DataInput
         Private Function LoadSpectraForFinniganDataFile(
           objXcaliburAccessor As XRawFileIO,
           objSpectraCache As clsSpectraCache,
-          intScanNumber As Integer,
+          scanNumber As Integer,
           scanInfo As clsScanInfo,
           noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
-          blnDiscardLowIntensityData As Boolean,
-          blnCompressSpectraData As Boolean,
-          dblMSDataResolution As Double,
-          blnKeepRawSpectrum As Boolean) As Boolean
+          discardLowIntensityData As Boolean,
+          compressSpectraData As Boolean,
+          msDataResolution As Double,
+          keepRawSpectrum As Boolean) As Boolean
 
-            Dim dblMzList() As Double = Nothing
-            Dim dblIntensityList() As Double = Nothing
+            Dim mzList() As Double = Nothing
+            Dim intensityList() As Double = Nothing
 
-            Dim strLastKnownLocation = "Start"
+            Dim lastKnownLocation = "Start"
 
             Try
 
                 ' Load the ions for this scan
 
-                strLastKnownLocation = "objXcaliburAccessor.GetScanData for scan " & intScanNumber
+                lastKnownLocation = "objXcaliburAccessor.GetScanData for scan " & scanNumber
 
                 ' Retrieve the m/z and intensity values for the given scan
-                ' We retrieve the profile-mode data, since that's required for determing spectrum noise
-                scanInfo.IonCountRaw = objXcaliburAccessor.GetScanData(intScanNumber, dblMzList, dblIntensityList)
+                ' We retrieve the profile-mode data, since that's required for determining spectrum noise
+                scanInfo.IonCountRaw = objXcaliburAccessor.GetScanData(scanNumber, mzList, intensityList)
 
                 If scanInfo.IonCountRaw > 0 Then
-                    Dim ionCountVerified = VerifyDataSorted(intScanNumber, scanInfo.IonCountRaw, dblMzList, dblIntensityList)
+                    Dim ionCountVerified = VerifyDataSorted(scanNumber, scanInfo.IonCountRaw, mzList, intensityList)
                     If ionCountVerified <> scanInfo.IonCountRaw Then
                         scanInfo.IonCountRaw = ionCountVerified
                     End If
@@ -608,58 +608,58 @@ Namespace DataInput
                 scanInfo.IonCount = scanInfo.IonCountRaw
 
                 Dim objMSSpectrum As New clsMSSpectrum() With {
-                    .ScanNumber = intScanNumber,
+                    .ScanNumber = scanNumber,
                     .IonCount = scanInfo.IonCountRaw
                 }
 
-                strLastKnownLocation = "Redim IonsMz and IonsIntensity to length " & objMSSpectrum.IonCount
+                lastKnownLocation = "Resize IonsMz and IonsIntensity to length " & objMSSpectrum.IonCount
 
                 ReDim objMSSpectrum.IonsMZ(objMSSpectrum.IonCount - 1)
                 ReDim objMSSpectrum.IonsIntensity(objMSSpectrum.IonCount - 1)
 
                 ' Copy the intensity data; and compute the total scan intensity
-                Dim dblTIC As Double = 0
-                For intIonIndex = 0 To scanInfo.IonCountRaw - 1
-                    objMSSpectrum.IonsMZ(intIonIndex) = dblMzList(intIonIndex)
-                    objMSSpectrum.IonsIntensity(intIonIndex) = CSng(dblIntensityList(intIonIndex))
-                    dblTIC += dblIntensityList(intIonIndex)
+                Dim totalIonIntensity As Double = 0
+                For ionIndex = 0 To scanInfo.IonCountRaw - 1
+                    objMSSpectrum.IonsMZ(ionIndex) = mzList(ionIndex)
+                    objMSSpectrum.IonsIntensity(ionIndex) = CSng(intensityList(ionIndex))
+                    totalIonIntensity += intensityList(ionIndex)
                 Next
 
                 ' Determine the minimum positive intensity in this scan
-                strLastKnownLocation = "Call mMASICPeakFinder.FindMinimumPositiveValue"
+                lastKnownLocation = "Call mMASICPeakFinder.FindMinimumPositiveValue"
                 scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(scanInfo.IonCountRaw, objMSSpectrum.IonsIntensity, 0)
 
                 If objMSSpectrum.IonCount > 0 Then
                     If scanInfo.TotalIonIntensity < Single.Epsilon Then
-                        scanInfo.TotalIonIntensity = CSng(Math.Min(dblTIC, Single.MaxValue))
+                        scanInfo.TotalIonIntensity = CSng(Math.Min(totalIonIntensity, Single.MaxValue))
                     End If
                 Else
                     scanInfo.TotalIonIntensity = 0
                 End If
 
-                Dim blnDiscardLowIntensityDataWork As Boolean
-                Dim blnCompressSpectraDataWork As Boolean
+                Dim discardLowIntensityDataWork As Boolean
+                Dim compressSpectraDataWork As Boolean
 
                 If scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
-                    blnDiscardLowIntensityDataWork = blnDiscardLowIntensityData
-                    blnCompressSpectraDataWork = blnCompressSpectraData
+                    discardLowIntensityDataWork = discardLowIntensityData
+                    compressSpectraDataWork = compressSpectraData
                 Else
-                    blnDiscardLowIntensityDataWork = False
-                    blnCompressSpectraDataWork = False
+                    discardLowIntensityDataWork = False
+                    compressSpectraDataWork = False
                 End If
 
-                strLastKnownLocation = "Call ProcessAndStoreSpectrum"
+                lastKnownLocation = "Call ProcessAndStoreSpectrum"
                 mScanTracking.ProcessAndStoreSpectrum(
                     scanInfo, Me,
                     objSpectraCache, objMSSpectrum,
                     noiseThresholdOptions,
-                    blnDiscardLowIntensityDataWork,
-                    blnCompressSpectraDataWork,
-                    dblMSDataResolution,
-                    blnKeepRawSpectrum)
+                    discardLowIntensityDataWork,
+                    compressSpectraDataWork,
+                    msDataResolution,
+                    keepRawSpectrum)
 
             Catch ex As Exception
-                ReportError("Error in LoadSpectraForFinniganDataFile (LastKnownLocation: " & strLastKnownLocation & ")", ex, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in LoadSpectraForFinniganDataFile (LastKnownLocation: " & lastKnownLocation & ")", ex, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End Try
 
@@ -668,33 +668,33 @@ Namespace DataInput
         End Function
 
         Protected Overloads Function UpdateDatasetFileStats(
-          ioFileInfo As FileInfo,
-          intDatasetID As Integer,
+          rawFileInfo As FileInfo,
+          datasetID As Integer,
           ByRef objXcaliburAccessor As XRawFileIO) As Boolean
 
             Dim scanInfo = New ThermoRawFileReader.clsScanInfo(0)
 
-            Dim intScanEnd As Integer
-            Dim blnSuccess As Boolean
+            Dim scanEnd As Integer
+            Dim success As Boolean
 
             ' Read the file info from the file system
-            blnSuccess = MyBase.UpdateDatasetFileStats(ioFileInfo, intDatasetID)
+            success = UpdateDatasetFileStats(rawFileInfo, datasetID)
 
-            If Not blnSuccess Then Return False
+            If Not success Then Return False
 
             ' Read the file info using the Xcalibur Accessor
             Try
                 mDatasetFileInfo.AcqTimeStart = objXcaliburAccessor.FileInfo.CreationDate
             Catch ex As Exception
                 ' Read error
-                blnSuccess = False
+                success = False
             End Try
 
-            If blnSuccess Then
+            If success Then
                 Try
                     ' Look up the end scan time then compute .AcqTimeEnd
-                    intScanEnd = objXcaliburAccessor.FileInfo.ScanEnd
-                    objXcaliburAccessor.GetScanInfo(intScanEnd, scanInfo)
+                    scanEnd = objXcaliburAccessor.FileInfo.ScanEnd
+                    objXcaliburAccessor.GetScanInfo(scanEnd, scanInfo)
 
                     With mDatasetFileInfo
                         .AcqTimeEnd = .AcqTimeStart.AddMinutes(scanInfo.RetentionTime)
@@ -710,22 +710,22 @@ Namespace DataInput
                 End Try
             End If
 
-            Return blnSuccess
+            Return success
 
         End Function
 
         Private Sub StoreExtendedHeaderInfo(
           dataOutputHandler As DataOutput.clsDataOutput,
           scanInfo As clsScanInfo,
-          strEntryName As String,
-          strEntryValue As String)
+          entryName As String,
+          entryValue As String)
 
-            If strEntryValue Is Nothing Then
-                strEntryValue = String.Empty
+            If entryValue Is Nothing Then
+                entryValue = String.Empty
             End If
 
             Dim statusEntries = New List(Of KeyValuePair(Of String, String)) From {
-                New KeyValuePair(Of String, String)(strEntryName, strEntryValue)
+                New KeyValuePair(Of String, String)(entryName, entryValue)
             }
 
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, statusEntries)
@@ -746,15 +746,15 @@ Namespace DataInput
           statusEntries As IReadOnlyCollection(Of KeyValuePair(Of String, String)),
           keyNameFilterList As IReadOnlyCollection(Of String))
 
-            Dim blnFilterItems As Boolean
-            Dim blnSaveItem As Boolean
+            Dim filterItems As Boolean
+            Dim saveItem As Boolean
 
             Try
                 If (statusEntries Is Nothing) Then Exit Sub
 
                 If Not keyNameFilterList Is Nothing AndAlso keyNameFilterList.Count > 0 Then
                     If keyNameFilterList.Any(Function(item) item.Length > 0) Then
-                        blnFilterItems = True
+                        filterItems = True
                     End If
                 End If
 
@@ -764,25 +764,25 @@ Namespace DataInput
                         Continue For
                     End If
 
-                    If blnFilterItems Then
-                        blnSaveItem = False
+                    If filterItems Then
+                        saveItem = False
 
                         For Each item In keyNameFilterList
                             If statusEntry.Key.ToLower().Contains(item.ToLower()) Then
-                                blnSaveItem = True
+                                saveItem = True
                                 Exit For
                             End If
                         Next
                     Else
-                        blnSaveItem = True
+                        saveItem = True
                     End If
 
                     If String.IsNullOrWhiteSpace(statusEntry.Key) OrElse statusEntry.Key = ChrW(1) Then
                         ' Name is null; skip it
-                        blnSaveItem = False
+                        saveItem = False
                     End If
 
-                    If blnSaveItem Then
+                    If saveItem Then
 
                         Dim extendedHeaderID = dataOutputHandler.ExtendedStatsWriter.GetExtendedHeaderInfoIdByName(statusEntry.Key)
 
@@ -822,12 +822,12 @@ Namespace DataInput
 
             Dim sortRequired = False
 
-            For intIndex = 1 To ionCount - 1
+            For index = 1 To ionCount - 1
                 ' Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z,
                 ' we have observed a few cases in certain scans of certain datasets that points with
                 ' similar m/z values are swapped and ths slightly out of order
                 ' The following if statement checks for this
-                If (mzList(intIndex) < mzList(intIndex - 1)) Then
+                If (mzList(index) < mzList(index - 1)) Then
                     sortRequired = True
                     Exit For
                 End If

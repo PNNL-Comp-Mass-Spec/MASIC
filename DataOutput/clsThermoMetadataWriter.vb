@@ -9,45 +9,45 @@ Namespace DataOutput
           objXcaliburAccessor As XRawFileIO,
           dataOutputHandler As clsDataOutput) As Boolean
 
-            Dim intInstMethodCount As Integer
-            Dim strOutputFilePath = "?undefinedfile?"
+            Dim instMethodCount As Integer
+            Dim outputFilePath = "?UndefinedFile?"
 
             Try
-                intInstMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count
+                instMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count
             Catch ex As Exception
                 ReportError("Error looking up InstMethod length in objXcaliburAccessor.FileInfo", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
             Try
-                For intIndex = 0 To intInstMethodCount - 1
+                For index = 0 To instMethodCount - 1
 
-                    Dim strMethodNum As String
-                    If intIndex = 0 And objXcaliburAccessor.FileInfo.InstMethods.Count = 1 Then
-                        strMethodNum = String.Empty
+                    Dim methodNum As String
+                    If index = 0 And objXcaliburAccessor.FileInfo.InstMethods.Count = 1 Then
+                        methodNum = String.Empty
                     Else
-                        strMethodNum = (intIndex + 1).ToString.Trim
+                        methodNum = (index + 1).ToString.Trim
                     End If
 
-                    strOutputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase & strMethodNum & ".txt"
+                    outputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase & methodNum & ".txt"
 
-                    Using srOutfile = New StreamWriter(strOutputFilePath, False)
+                    Using writer = New StreamWriter(outputFilePath, False)
 
                         With objXcaliburAccessor.FileInfo
-                            srOutfile.WriteLine("Instrument model: " & .InstModel)
-                            srOutfile.WriteLine("Instrument name: " & .InstName)
-                            srOutfile.WriteLine("Instrument description: " & .InstrumentDescription)
-                            srOutfile.WriteLine("Instrument serial number: " & .InstSerialNumber)
-                            srOutfile.WriteLine()
+                            writer.WriteLine("Instrument model: " & .InstModel)
+                            writer.WriteLine("Instrument name: " & .InstName)
+                            writer.WriteLine("Instrument description: " & .InstrumentDescription)
+                            writer.WriteLine("Instrument serial number: " & .InstSerialNumber)
+                            writer.WriteLine()
 
-                            srOutfile.WriteLine(objXcaliburAccessor.FileInfo.InstMethods(intIndex))
+                            writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods(index))
                         End With
 
                     End Using
                 Next
 
             Catch ex As Exception
-                ReportError("Error writing the MS Method to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the MS Method to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -61,36 +61,36 @@ Namespace DataOutput
 
             Const cColDelimiter As Char = ControlChars.Tab
 
-            Dim intTuneMethodCount As Integer
-            Dim strOutputFilePath = "?undefinedfile?"
+            Dim tuneMethodCount As Integer
+            Dim outputFilePath = "?UndefinedFile?"
 
             Try
-                intTuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count
+                tuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count
             Catch ex As Exception
                 ReportError("Error looking up TuneMethods length in objXcaliburAccessor.FileInfo", ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
             Try
-                For intIndex = 0 To intTuneMethodCount - 1
+                For index = 0 To tuneMethodCount - 1
 
-                    Dim strTuneInfoNum As String
-                    If intIndex = 0 And objXcaliburAccessor.FileInfo.TuneMethods.Count = 1 Then
-                        strTuneInfoNum = String.Empty
+                    Dim tuneInfoNum As String
+                    If index = 0 And objXcaliburAccessor.FileInfo.TuneMethods.Count = 1 Then
+                        tuneInfoNum = String.Empty
                     Else
-                        strTuneInfoNum = (intIndex + 1).ToString.Trim
+                        tuneInfoNum = (index + 1).ToString.Trim
                     End If
-                    strOutputFilePath = dataOutputHandler.OutputFileHandles.MSTuneFilePathBase & strTuneInfoNum & ".txt"
+                    outputFilePath = dataOutputHandler.OutputFileHandles.MSTuneFilePathBase & tuneInfoNum & ".txt"
 
-                    Using srOutfile = New StreamWriter(strOutputFilePath, False)
+                    Using writer = New StreamWriter(outputFilePath, False)
 
-                        srOutfile.WriteLine("Category" & cColDelimiter & "Name" & cColDelimiter & "Value")
+                        writer.WriteLine("Category" & cColDelimiter & "Name" & cColDelimiter & "Value")
 
-                        With objXcaliburAccessor.FileInfo.TuneMethods(intIndex)
+                        With objXcaliburAccessor.FileInfo.TuneMethods(index)
                             For Each setting As udtTuneMethodSetting In .Settings
-                                srOutfile.WriteLine(setting.Category & cColDelimiter & setting.Name & cColDelimiter & setting.Value)
+                                writer.WriteLine(setting.Category & cColDelimiter & setting.Name & cColDelimiter & setting.Value)
                             Next
-                            srOutfile.WriteLine()
+                            writer.WriteLine()
                         End With
 
                     End Using
@@ -98,7 +98,7 @@ Namespace DataOutput
                 Next
 
             Catch ex As Exception
-                ReportError("Error writing the MS Tune Settings to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the MS Tune Settings to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

@@ -63,29 +63,29 @@ Namespace DataOutput
         End Sub
 
         Public Function CheckForExistingResults(
-          strInputFilePathFull As String,
+          inputFilePathFull As String,
           outputDirectoryPath As String,
           masicOptions As clsMASICOptions) As Boolean
 
             ' Returns True if existing results already exist for the given input file path, SIC Options, and Binning options
 
-            Dim strFilePathToCheck As String
+            Dim filePathToCheck As String
 
             Dim sicOptionsCompare = New clsSICOptions()
             Dim binningOptionsCompare = New clsBinningOptions
 
-            Dim blnValidExistingResultsFound As Boolean
+            Dim validExistingResultsFound As Boolean
 
-            Dim lngSourceFileSizeBytes As Int64
-            Dim strSourceFilePathCheck As String = String.Empty
-            Dim strMASICVersion As String = String.Empty
-            Dim strMASICPeakFinderDllVersion As String = String.Empty
-            Dim strSourceFileDateTimeCheck As String = String.Empty
-            Dim dtSourceFileDateTime As Date
+            Dim sourceFileSizeBytes As Int64
+            Dim sourceFilePathCheck As String = String.Empty
+            Dim masicVersion As String = String.Empty
+            Dim masicPeakFinderDllVersion As String = String.Empty
+            Dim sourceFileDateTimeCheck As String = String.Empty
+            Dim sourceFileDateTime As Date
 
-            Dim blnSkipMSMSProcessing As Boolean
+            Dim skipMSMSProcessing As Boolean
 
-            blnValidExistingResultsFound = False
+            validExistingResultsFound = False
             Try
                 ' Don't even look for the XML file if mSkipSICAndRawDataProcessing = True
                 If masicOptions.SkipSICAndRawDataProcessing Then
@@ -93,10 +93,10 @@ Namespace DataOutput
                 End If
 
                 ' Obtain the output XML filename
-                strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.XMLFile)
+                filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.XMLFile)
 
                 ' See if the file exists
-                If File.Exists(strFilePathToCheck) Then
+                If File.Exists(filePathToCheck) Then
 
                     If masicOptions.FastExistingXMLFileTest Then
                         ' XML File found; do not check the settings or version to see if they match the current ones
@@ -104,172 +104,171 @@ Namespace DataOutput
                     End If
 
                     ' Open the XML file and look for the "ProcessingComplete" node
-                    Dim objXMLDoc = New Xml.XmlDocument
+                    Dim xmlDoc = New Xml.XmlDocument
                     Try
-                        objXMLDoc.Load(strFilePathToCheck)
+                        xmlDoc.Load(filePathToCheck)
                     Catch ex As Exception
                         ' Invalid XML file; do not continue
                         Return False
                     End Try
 
                     ' If we get here, the file opened successfully
-                    Dim objRootElement As Xml.XmlElement = objXMLDoc.DocumentElement
+                    Dim rootElement As Xml.XmlElement = xmlDoc.DocumentElement
 
-                    If objRootElement.Name = "SICData" Then
+                    If rootElement.Name = "SICData" Then
                         ' See if the ProcessingComplete node has a value of True
-                        Dim objMatchingNodeList = objRootElement.GetElementsByTagName("ProcessingComplete")
-                        If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
-                        If objMatchingNodeList.Item(0).InnerText.ToLower <> "true" Then Exit Try
+                        Dim matchingNodeList = rootElement.GetElementsByTagName("ProcessingComplete")
+                        If matchingNodeList Is Nothing OrElse matchingNodeList.Count <> 1 Then Exit Try
+                        If matchingNodeList.Item(0).InnerText.ToLower <> "true" Then Exit Try
 
                         ' Read the ProcessingSummary and populate
-                        objMatchingNodeList = objRootElement.GetElementsByTagName("ProcessingSummary")
-                        If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
+                        matchingNodeList = rootElement.GetElementsByTagName("ProcessingSummary")
+                        If matchingNodeList Is Nothing OrElse matchingNodeList.Count <> 1 Then Exit Try
 
-                        For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
+                        For Each valueNode As Xml.XmlNode In matchingNodeList(0).ChildNodes
                             With sicOptionsCompare
-                                Select Case objValueNode.Name
-                                    Case "DatasetNumber" : .DatasetNumber = CInt(objValueNode.InnerText)
-                                    Case "SourceFilePath" : strSourceFilePathCheck = objValueNode.InnerText
-                                    Case "SourceFileDateTime" : strSourceFileDateTimeCheck = objValueNode.InnerText
-                                    Case "SourceFileSizeBytes" : lngSourceFileSizeBytes = CLng(objValueNode.InnerText)
-                                    Case "MASICVersion" : strMASICVersion = objValueNode.InnerText
-                                    Case "MASICPeakFinderDllVersion" : strMASICPeakFinderDllVersion = objValueNode.InnerText
-                                    Case "SkipMSMSProcessing" : blnSkipMSMSProcessing = CBool(objValueNode.InnerText)
+                                Select Case valueNode.Name
+                                    Case "DatasetNumber" : .DatasetNumber = CInt(valueNode.InnerText)
+                                    Case "SourceFilePath" : sourceFilePathCheck = valueNode.InnerText
+                                    Case "SourceFileDateTime" : sourceFileDateTimeCheck = valueNode.InnerText
+                                    Case "SourceFileSizeBytes" : sourceFileSizeBytes = CLng(valueNode.InnerText)
+                                    Case "MASICVersion" : masicVersion = valueNode.InnerText
+                                    Case "MASICPeakFinderDllVersion" : masicPeakFinderDllVersion = valueNode.InnerText
+                                    Case "SkipMSMSProcessing" : skipMSMSProcessing = CBool(valueNode.InnerText)
                                 End Select
                             End With
-                        Next objValueNode
+                        Next valueNode
 
-                        If strMASICVersion Is Nothing Then strMASICVersion = String.Empty
-                        If strMASICPeakFinderDllVersion Is Nothing Then strMASICPeakFinderDllVersion = String.Empty
+                        If masicVersion Is Nothing Then masicVersion = String.Empty
+                        If masicPeakFinderDllVersion Is Nothing Then masicPeakFinderDllVersion = String.Empty
 
                         ' Check if the MASIC version matches
-                        If strMASICVersion <> masicOptions.MASICVersion() Then Exit Try
+                        If masicVersion <> masicOptions.MASICVersion() Then Exit Try
 
-                        If strMASICPeakFinderDllVersion <> masicOptions.PeakFinderVersion Then Exit Try
+                        If masicPeakFinderDllVersion <> masicOptions.PeakFinderVersion Then Exit Try
 
                         ' Check the dataset number
                         If sicOptionsCompare.DatasetNumber <> masicOptions.SICOptions.DatasetNumber Then Exit Try
 
-                        ' Check the filename in strSourceFilePathCheck
-                        If Path.GetFileName(strSourceFilePathCheck) <> Path.GetFileName(strInputFilePathFull) Then Exit Try
+                        ' Check the filename in sourceFilePathCheck
+                        If Path.GetFileName(sourceFilePathCheck) <> Path.GetFileName(inputFilePathFull) Then Exit Try
 
                         ' Check if the source file stats match
-                        Dim ioFileInfo As New FileInfo(strInputFilePathFull)
-                        dtSourceFileDateTime = ioFileInfo.LastWriteTime()
-                        If strSourceFileDateTimeCheck <> (dtSourceFileDateTime.ToShortDateString() & " " & dtSourceFileDateTime.ToShortTimeString()) Then Exit Try
-                        If lngSourceFileSizeBytes <> ioFileInfo.Length Then Exit Try
+                        Dim inputFileInfo As New FileInfo(inputFilePathFull)
+                        sourceFileDateTime = inputFileInfo.LastWriteTime()
+                        If sourceFileDateTimeCheck <> (sourceFileDateTime.ToShortDateString() & " " & sourceFileDateTime.ToShortTimeString()) Then Exit Try
+                        If sourceFileSizeBytes <> inputFileInfo.Length Then Exit Try
 
-                        ' Check that blnSkipMSMSProcessing matches
-                        If blnSkipMSMSProcessing <> masicOptions.SkipMSMSProcessing Then Exit Try
+                        ' Check that skipMSMSProcessing matches
+                        If skipMSMSProcessing <> masicOptions.SkipMSMSProcessing Then Exit Try
 
                         ' Read the ProcessingOptions and populate
-                        objMatchingNodeList = objRootElement.GetElementsByTagName("ProcessingOptions")
-                        If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
+                        matchingNodeList = rootElement.GetElementsByTagName("ProcessingOptions")
+                        If matchingNodeList Is Nothing OrElse matchingNodeList.Count <> 1 Then Exit Try
 
-                        For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
+                        For Each valueNode As Xml.XmlNode In matchingNodeList(0).ChildNodes
                             With sicOptionsCompare
-                                Select Case objValueNode.Name
-                                    Case "SICToleranceDa" : .SICTolerance = CDbl(objValueNode.InnerText)            ' Legacy name
-                                    Case "SICTolerance" : .SICTolerance = CDbl(objValueNode.InnerText)
-                                    Case "SICToleranceIsPPM" : .SICToleranceIsPPM = CBool(objValueNode.InnerText)
-                                    Case "RefineReportedParentIonMZ" : .RefineReportedParentIonMZ = CBool(objValueNode.InnerText)
-                                    Case "ScanRangeEnd" : .ScanRangeEnd = CInt(objValueNode.InnerText)
-                                    Case "ScanRangeStart" : .ScanRangeStart = CInt(objValueNode.InnerText)
-                                    Case "RTRangeEnd" : .RTRangeEnd = CSng(objValueNode.InnerText)
-                                    Case "RTRangeStart" : .RTRangeStart = CSng(objValueNode.InnerText)
+                                Select Case valueNode.Name
+                                    Case "SICToleranceDa" : .SICTolerance = CDbl(valueNode.InnerText)            ' Legacy name
+                                    Case "SICTolerance" : .SICTolerance = CDbl(valueNode.InnerText)
+                                    Case "SICToleranceIsPPM" : .SICToleranceIsPPM = CBool(valueNode.InnerText)
+                                    Case "RefineReportedParentIonMZ" : .RefineReportedParentIonMZ = CBool(valueNode.InnerText)
+                                    Case "ScanRangeEnd" : .ScanRangeEnd = CInt(valueNode.InnerText)
+                                    Case "ScanRangeStart" : .ScanRangeStart = CInt(valueNode.InnerText)
+                                    Case "RTRangeEnd" : .RTRangeEnd = CSng(valueNode.InnerText)
+                                    Case "RTRangeStart" : .RTRangeStart = CSng(valueNode.InnerText)
 
-                                    Case "CompressMSSpectraData" : .CompressMSSpectraData = CBool(objValueNode.InnerText)
-                                    Case "CompressMSMSSpectraData" : .CompressMSMSSpectraData = CBool(objValueNode.InnerText)
+                                    Case "CompressMSSpectraData" : .CompressMSSpectraData = CBool(valueNode.InnerText)
+                                    Case "CompressMSMSSpectraData" : .CompressMSMSSpectraData = CBool(valueNode.InnerText)
 
-                                    Case "CompressToleranceDivisorForDa" : .CompressToleranceDivisorForDa = CDbl(objValueNode.InnerText)
-                                    Case "CompressToleranceDivisorForPPM" : .CompressToleranceDivisorForPPM = CDbl(objValueNode.InnerText)
+                                    Case "CompressToleranceDivisorForDa" : .CompressToleranceDivisorForDa = CDbl(valueNode.InnerText)
+                                    Case "CompressToleranceDivisorForPPM" : .CompressToleranceDivisorForPPM = CDbl(valueNode.InnerText)
 
-                                    Case "MaxSICPeakWidthMinutesBackward" : .MaxSICPeakWidthMinutesBackward = CSng(objValueNode.InnerText)
-                                    Case "MaxSICPeakWidthMinutesForward" : .MaxSICPeakWidthMinutesForward = CSng(objValueNode.InnerText)
+                                    Case "MaxSICPeakWidthMinutesBackward" : .MaxSICPeakWidthMinutesBackward = CSng(valueNode.InnerText)
+                                    Case "MaxSICPeakWidthMinutesForward" : .MaxSICPeakWidthMinutesForward = CSng(valueNode.InnerText)
 
-                                    Case "ReplaceSICZeroesWithMinimumPositiveValueFromMSData" : .ReplaceSICZeroesWithMinimumPositiveValueFromMSData = CBool(objValueNode.InnerText)
-                                    Case "SaveSmoothedData" : .SaveSmoothedData = CBool(objValueNode.InnerText)
+                                    Case "ReplaceSICZeroesWithMinimumPositiveValueFromMSData" : .ReplaceSICZeroesWithMinimumPositiveValueFromMSData = CBool(valueNode.InnerText)
+                                    Case "SaveSmoothedData" : .SaveSmoothedData = CBool(valueNode.InnerText)
 
-                                    Case "SimilarIonMZToleranceHalfWidth" : .SimilarIonMZToleranceHalfWidth = CSng(objValueNode.InnerText)
-                                    Case "SimilarIonToleranceHalfWidthMinutes" : .SimilarIonToleranceHalfWidthMinutes = CSng(objValueNode.InnerText)
-                                    Case "SpectrumSimilarityMinimum" : .SpectrumSimilarityMinimum = CSng(objValueNode.InnerText)
+                                    Case "SimilarIonMZToleranceHalfWidth" : .SimilarIonMZToleranceHalfWidth = CSng(valueNode.InnerText)
+                                    Case "SimilarIonToleranceHalfWidthMinutes" : .SimilarIonToleranceHalfWidthMinutes = CSng(valueNode.InnerText)
+                                    Case "SpectrumSimilarityMinimum" : .SpectrumSimilarityMinimum = CSng(valueNode.InnerText)
                                     Case Else
                                         With .SICPeakFinderOptions
-                                            Select Case objValueNode.Name
-                                                Case "IntensityThresholdFractionMax" : .IntensityThresholdFractionMax = CSng(objValueNode.InnerText)
-                                                Case "IntensityThresholdAbsoluteMinimum" : .IntensityThresholdAbsoluteMinimum = CSng(objValueNode.InnerText)
+                                            Select Case valueNode.Name
+                                                Case "IntensityThresholdFractionMax" : .IntensityThresholdFractionMax = CSng(valueNode.InnerText)
+                                                Case "IntensityThresholdAbsoluteMinimum" : .IntensityThresholdAbsoluteMinimum = CSng(valueNode.InnerText)
 
-                                                Case "SICNoiseThresholdMode" : .SICBaselineNoiseOptions.BaselineNoiseMode = CType(objValueNode.InnerText, MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
-                                                Case "SICNoiseThresholdIntensity" : .SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = CSng(objValueNode.InnerText)
+                                                Case "SICNoiseThresholdMode" : .SICBaselineNoiseOptions.BaselineNoiseMode = CType(valueNode.InnerText, MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
+                                                Case "SICNoiseThresholdIntensity" : .SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = CSng(valueNode.InnerText)
                                                 Case "SICNoiseFractionLowIntensityDataToAverage"
-                                                    .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = CSng(objValueNode.InnerText)
-                                                Case "SICNoiseMinimumSignalToNoiseRatio" : .SICBaselineNoiseOptions.MinimumSignalToNoiseRatio =
-                                                        CSng(objValueNode.InnerText)
+                                                    .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = CSng(valueNode.InnerText)
+                                                Case "SICNoiseMinimumSignalToNoiseRatio" : .SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = CSng(valueNode.InnerText)
 
-                                                Case "MaxDistanceScansNoOverlap" : .MaxDistanceScansNoOverlap = CInt(objValueNode.InnerText)
-                                                Case "MaxAllowedUpwardSpikeFractionMax" : .MaxAllowedUpwardSpikeFractionMax = CSng(objValueNode.InnerText)
-                                                Case "InitialPeakWidthScansScaler" : .InitialPeakWidthScansScaler = CSng(objValueNode.InnerText)
-                                                Case "InitialPeakWidthScansMaximum" : .InitialPeakWidthScansMaximum = CInt(objValueNode.InnerText)
+                                                Case "MaxDistanceScansNoOverlap" : .MaxDistanceScansNoOverlap = CInt(valueNode.InnerText)
+                                                Case "MaxAllowedUpwardSpikeFractionMax" : .MaxAllowedUpwardSpikeFractionMax = CSng(valueNode.InnerText)
+                                                Case "InitialPeakWidthScansScaler" : .InitialPeakWidthScansScaler = CSng(valueNode.InnerText)
+                                                Case "InitialPeakWidthScansMaximum" : .InitialPeakWidthScansMaximum = CInt(valueNode.InnerText)
 
-                                                Case "FindPeaksOnSmoothedData" : .FindPeaksOnSmoothedData = CBool(objValueNode.InnerText)
-                                                Case "SmoothDataRegardlessOfMinimumPeakWidth" : .SmoothDataRegardlessOfMinimumPeakWidth = CBool(objValueNode.InnerText)
-                                                Case "UseButterworthSmooth" : .UseButterworthSmooth = CBool(objValueNode.InnerText)
-                                                Case "ButterworthSamplingFrequency" : .ButterworthSamplingFrequency = CSng(objValueNode.InnerText)
-                                                Case "ButterworthSamplingFrequencyDoubledForSIMData" : .ButterworthSamplingFrequencyDoubledForSIMData = CBool(objValueNode.InnerText)
+                                                Case "FindPeaksOnSmoothedData" : .FindPeaksOnSmoothedData = CBool(valueNode.InnerText)
+                                                Case "SmoothDataRegardlessOfMinimumPeakWidth" : .SmoothDataRegardlessOfMinimumPeakWidth = CBool(valueNode.InnerText)
+                                                Case "UseButterworthSmooth" : .UseButterworthSmooth = CBool(valueNode.InnerText)
+                                                Case "ButterworthSamplingFrequency" : .ButterworthSamplingFrequency = CSng(valueNode.InnerText)
+                                                Case "ButterworthSamplingFrequencyDoubledForSIMData" : .ButterworthSamplingFrequencyDoubledForSIMData = CBool(valueNode.InnerText)
 
-                                                Case "UseSavitzkyGolaySmooth" : .UseSavitzkyGolaySmooth = CBool(objValueNode.InnerText)
-                                                Case "SavitzkyGolayFilterOrder" : .SavitzkyGolayFilterOrder = CShort(objValueNode.InnerText)
+                                                Case "UseSavitzkyGolaySmooth" : .UseSavitzkyGolaySmooth = CBool(valueNode.InnerText)
+                                                Case "SavitzkyGolayFilterOrder" : .SavitzkyGolayFilterOrder = CShort(valueNode.InnerText)
 
-                                                Case "MassSpectraNoiseThresholdMode" : .MassSpectraNoiseThresholdOptions.BaselineNoiseMode = CType(objValueNode.InnerText, MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
-                                                Case "MassSpectraNoiseThresholdIntensity" : .MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = CSng(objValueNode.InnerText)
-                                                Case "MassSpectraNoiseFractionLowIntensityDataToAverage" : .MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = CSng(objValueNode.InnerText)
-                                                Case "MassSpectraNoiseMinimumSignalToNoiseRatio" : .MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = CSng(objValueNode.InnerText)
+                                                Case "MassSpectraNoiseThresholdMode" : .MassSpectraNoiseThresholdOptions.BaselineNoiseMode = CType(valueNode.InnerText, MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
+                                                Case "MassSpectraNoiseThresholdIntensity" : .MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = CSng(valueNode.InnerText)
+                                                Case "MassSpectraNoiseFractionLowIntensityDataToAverage" : .MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = CSng(valueNode.InnerText)
+                                                Case "MassSpectraNoiseMinimumSignalToNoiseRatio" : .MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = CSng(valueNode.InnerText)
                                             End Select
                                         End With
                                 End Select
                             End With
-                        Next objValueNode
+                        Next valueNode
 
                         ' Read the BinningOptions and populate
-                        objMatchingNodeList = objRootElement.GetElementsByTagName("BinningOptions")
-                        If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then Exit Try
+                        matchingNodeList = rootElement.GetElementsByTagName("BinningOptions")
+                        If matchingNodeList Is Nothing OrElse matchingNodeList.Count <> 1 Then Exit Try
 
-                        For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
+                        For Each valueNode As Xml.XmlNode In matchingNodeList(0).ChildNodes
                             With binningOptionsCompare
-                                Select Case objValueNode.Name
-                                    Case "BinStartX" : .StartX = CSng(objValueNode.InnerText)
-                                    Case "BinEndX" : .EndX = CSng(objValueNode.InnerText)
-                                    Case "BinSize" : .BinSize = CSng(objValueNode.InnerText)
-                                    Case "MaximumBinCount" : .MaximumBinCount = CInt(objValueNode.InnerText)
+                                Select Case valueNode.Name
+                                    Case "BinStartX" : .StartX = CSng(valueNode.InnerText)
+                                    Case "BinEndX" : .EndX = CSng(valueNode.InnerText)
+                                    Case "BinSize" : .BinSize = CSng(valueNode.InnerText)
+                                    Case "MaximumBinCount" : .MaximumBinCount = CInt(valueNode.InnerText)
 
-                                    Case "IntensityPrecisionPercent" : .IntensityPrecisionPercent = CSng(objValueNode.InnerText)
-                                    Case "Normalize" : .Normalize = CBool(objValueNode.InnerText)
-                                    Case "SumAllIntensitiesForBin" : .SumAllIntensitiesForBin = CBool(objValueNode.InnerText)
+                                    Case "IntensityPrecisionPercent" : .IntensityPrecisionPercent = CSng(valueNode.InnerText)
+                                    Case "Normalize" : .Normalize = CBool(valueNode.InnerText)
+                                    Case "SumAllIntensitiesForBin" : .SumAllIntensitiesForBin = CBool(valueNode.InnerText)
                                 End Select
                             End With
-                        Next objValueNode
+                        Next valueNode
 
                         ' Read the CustomSICValues and populate
 
                         Dim customSICListCompare = New clsCustomSICList()
 
-                        objMatchingNodeList = objRootElement.GetElementsByTagName("CustomSICValues")
-                        If objMatchingNodeList Is Nothing OrElse objMatchingNodeList.Count <> 1 Then
+                        matchingNodeList = rootElement.GetElementsByTagName("CustomSICValues")
+                        If matchingNodeList Is Nothing OrElse matchingNodeList.Count <> 1 Then
                             ' Custom values not defined; that's OK
                         Else
-                            For Each objValueNode As Xml.XmlNode In objMatchingNodeList(0).ChildNodes
+                            For Each valueNode As Xml.XmlNode In matchingNodeList(0).ChildNodes
                                 With customSICListCompare
-                                    Select Case objValueNode.Name
-                                        Case "MZList" : .RawTextMZList = objValueNode.InnerText
-                                        Case "MZToleranceDaList" : .RawTextMZToleranceDaList = objValueNode.InnerText
-                                        Case "ScanCenterList" : .RawTextScanOrAcqTimeCenterList = objValueNode.InnerText
-                                        Case "ScanToleranceList" : .RawTextScanOrAcqTimeToleranceList = objValueNode.InnerText
-                                        Case "ScanTolerance" : .ScanOrAcqTimeTolerance = CSng(objValueNode.InnerText)
+                                    Select Case valueNode.Name
+                                        Case "MZList" : .RawTextMZList = valueNode.InnerText
+                                        Case "MZToleranceDaList" : .RawTextMZToleranceDaList = valueNode.InnerText
+                                        Case "ScanCenterList" : .RawTextScanOrAcqTimeCenterList = valueNode.InnerText
+                                        Case "ScanToleranceList" : .RawTextScanOrAcqTimeToleranceList = valueNode.InnerText
+                                        Case "ScanTolerance" : .ScanOrAcqTimeTolerance = CSng(valueNode.InnerText)
                                         Case "ScanType"
-                                            .ScanToleranceType = masicOptions.GetScanToleranceTypeFromText(objValueNode.InnerText)
+                                            .ScanToleranceType = masicOptions.GetScanToleranceTypeFromText(valueNode.InnerText)
                                     End Select
                                 End With
-                            Next objValueNode
+                            Next valueNode
                         End If
 
                         Dim sicOptions = masicOptions.SICOptions
@@ -315,13 +314,13 @@ Namespace DataOutput
                              clsUtilities.ValuesMatch(.SimilarIonMZToleranceHalfWidth, sicOptions.SimilarIonMZToleranceHalfWidth) AndAlso
                              clsUtilities.ValuesMatch(.SimilarIonToleranceHalfWidthMinutes, sicOptions.SimilarIonToleranceHalfWidthMinutes) AndAlso
                              clsUtilities.ValuesMatch(.SpectrumSimilarityMinimum, sicOptions.SpectrumSimilarityMinimum) Then
-                                blnValidExistingResultsFound = True
+                                validExistingResultsFound = True
                             Else
-                                blnValidExistingResultsFound = False
+                                validExistingResultsFound = False
                             End If
                         End With
 
-                        If blnValidExistingResultsFound Then
+                        If validExistingResultsFound Then
                             ' Check if the binning options match
                             Dim binningOptions = masicOptions.BinningOptions
 
@@ -334,14 +333,14 @@ Namespace DataOutput
                                  .Normalize = binningOptions.Normalize AndAlso
                                  .SumAllIntensitiesForBin = binningOptions.SumAllIntensitiesForBin Then
 
-                                    blnValidExistingResultsFound = True
+                                    validExistingResultsFound = True
                                 Else
-                                    blnValidExistingResultsFound = False
+                                    validExistingResultsFound = False
                                 End If
                             End With
                         End If
 
-                        If blnValidExistingResultsFound Then
+                        If validExistingResultsFound Then
                             ' Check if the Custom MZ options match
                             With customSICListCompare
                                 If .RawTextMZList = masicOptions.CustomSICList.RawTextMZList AndAlso
@@ -351,112 +350,113 @@ Namespace DataOutput
                                    clsUtilities.ValuesMatch(.ScanOrAcqTimeTolerance, masicOptions.CustomSICList.ScanOrAcqTimeTolerance) AndAlso
                                    .ScanToleranceType = masicOptions.CustomSICList.ScanToleranceType Then
 
-                                    blnValidExistingResultsFound = True
+                                    validExistingResultsFound = True
                                 Else
-                                    blnValidExistingResultsFound = False
+                                    validExistingResultsFound = False
                                 End If
                             End With
                         End If
 
-                        If blnValidExistingResultsFound Then
+                        If validExistingResultsFound Then
                             ' All of the options match, make sure the other output files exist
-                            blnValidExistingResultsFound = False
+                            validExistingResultsFound = False
 
-                            strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsFlatFile)
-                            If Not File.Exists(strFilePathToCheck) Then Exit Try
+                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile)
+                            If Not File.Exists(filePathToCheck) Then Exit Try
 
-                            strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.SICStatsFlatFile)
-                            If Not File.Exists(strFilePathToCheck) Then Exit Try
+                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.SICStatsFlatFile)
+                            If Not File.Exists(filePathToCheck) Then Exit Try
 
-                            strFilePathToCheck = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.BPIFile)
-                            If Not File.Exists(strFilePathToCheck) Then Exit Try
+                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.BPIFile)
+                            If Not File.Exists(filePathToCheck) Then Exit Try
 
-                            blnValidExistingResultsFound = True
+                            validExistingResultsFound = True
                         End If
                     End If
                 End If
             Catch ex As Exception
                 ReportError("There may be a programming error in CheckForExistingResults", ex)
-                blnValidExistingResultsFound = False
+                validExistingResultsFound = False
             End Try
 
-            Return blnValidExistingResultsFound
+            Return validExistingResultsFound
 
         End Function
 
         Public Shared Function ConstructOutputFilePath(
-          strInputFileName As String,
-          strOutputFolderPath As String,
+          inputFileName As String,
+          outputDirectoryPath As String,
           eFileType As eOutputFileTypeConstants,
-          Optional intFragTypeNumber As Integer = 1) As String
+          Optional fragTypeNumber As Integer = 1) As String
 
-            Dim strOutputFilePath As String
+            Dim outputFilePath As String
 
-            strOutputFilePath = Path.Combine(strOutputFolderPath, Path.GetFileNameWithoutExtension(strInputFileName))
+            outputFilePath = Path.Combine(outputDirectoryPath, Path.GetFileNameWithoutExtension(inputFileName))
             Select Case eFileType
                 Case eOutputFileTypeConstants.XMLFile
-                    strOutputFilePath &= "_SICs.xml"
+                    outputFilePath &= "_SICs.xml"
                 Case eOutputFileTypeConstants.ScanStatsFlatFile
-                    strOutputFilePath &= "_ScanStats.txt"
+                    outputFilePath &= "_ScanStats.txt"
                 Case eOutputFileTypeConstants.ScanStatsExtendedFlatFile
-                    strOutputFilePath &= "_ScanStatsEx.txt"
+                    outputFilePath &= "_ScanStatsEx.txt"
                 Case eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile
-                    strOutputFilePath &= "_ScanStatsConstant.txt"
+                    outputFilePath &= "_ScanStatsConstant.txt"
                 Case eOutputFileTypeConstants.SICStatsFlatFile
-                    strOutputFilePath &= "_SICstats.txt"
+                    ' ReSharper disable once StringLiteralTypo
+                    outputFilePath &= "_SICstats.txt"
                 Case eOutputFileTypeConstants.BPIFile
-                    strOutputFilePath &= "_BPI.txt"
+                    outputFilePath &= "_BPI.txt"
                 Case eOutputFileTypeConstants.FragBPIFile
-                    strOutputFilePath &= "_Frag" & intFragTypeNumber.ToString() & "_BPI.txt"
+                    outputFilePath &= "_Frag" & fragTypeNumber.ToString() & "_BPI.txt"
                 Case eOutputFileTypeConstants.TICFile
-                    strOutputFilePath &= "_TIC.txt"
+                    outputFilePath &= "_TIC.txt"
                 Case eOutputFileTypeConstants.ICRToolsBPIChromatogramByScan
-                    strOutputFilePath &= "_BPI_Scan.tic"
+                    outputFilePath &= "_BPI_Scan.tic"
                 Case eOutputFileTypeConstants.ICRToolsBPIChromatogramByTime
-                    strOutputFilePath &= "_BPI_Time.tic"
+                    outputFilePath &= "_BPI_Time.tic"
                 Case eOutputFileTypeConstants.ICRToolsTICChromatogramByScan
-                    strOutputFilePath &= "_TIC_Scan.tic"
+                    outputFilePath &= "_TIC_Scan.tic"
                 Case eOutputFileTypeConstants.ICRToolsFragTICChromatogramByScan
-                    strOutputFilePath &= "_TIC_MSMS_Scan.tic"
+                    outputFilePath &= "_TIC_MSMS_Scan.tic"
                 Case eOutputFileTypeConstants.DeconToolsMSChromatogramFile
-                    strOutputFilePath &= "_MS_scans.csv"
+                    outputFilePath &= "_MS_scans.csv"
                 Case eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile
-                    strOutputFilePath &= "_MSMS_scans.csv"
+                    outputFilePath &= "_MSMS_scans.csv"
                 Case eOutputFileTypeConstants.PEKFile
-                    strOutputFilePath &= ".pek"
+                    outputFilePath &= ".pek"
                 Case eOutputFileTypeConstants.HeaderGlossary
-                    strOutputFilePath = Path.Combine(strOutputFolderPath, "Header_Glossary_Readme.txt")
+                    outputFilePath = Path.Combine(outputDirectoryPath, "Header_Glossary_Readme.txt")
                 Case eOutputFileTypeConstants.DeconToolsIsosFile
-                    strOutputFilePath &= "_isos.csv"
+                    outputFilePath &= "_isos.csv"
                 Case eOutputFileTypeConstants.DeconToolsScansFile
-                    strOutputFilePath &= "_scans.csv"
+                    outputFilePath &= "_scans.csv"
                 Case eOutputFileTypeConstants.MSMethodFile
-                    strOutputFilePath &= "_MSMethod"
+                    outputFilePath &= "_MSMethod"
                 Case eOutputFileTypeConstants.MSTuneFile
-                    strOutputFilePath &= "_MSTuneSettings"
+                    outputFilePath &= "_MSTuneSettings"
                 Case eOutputFileTypeConstants.ReporterIonsFile
-                    strOutputFilePath &= "_ReporterIons.txt"
+                    outputFilePath &= "_ReporterIons.txt"
                 Case eOutputFileTypeConstants.MRMSettingsFile
-                    strOutputFilePath &= "_MRMSettings.txt"
+                    outputFilePath &= "_MRMSettings.txt"
                 Case eOutputFileTypeConstants.MRMDatafile
-                    strOutputFilePath &= "_MRMData.txt"
+                    outputFilePath &= "_MRMData.txt"
                 Case eOutputFileTypeConstants.MRMCrosstabFile
-                    strOutputFilePath &= "_MRMCrosstab.txt"
+                    outputFilePath &= "_MRMCrosstab.txt"
                 Case eOutputFileTypeConstants.DatasetInfoFile
-                    strOutputFilePath &= "_DatasetInfo.xml"
+                    outputFilePath &= "_DatasetInfo.xml"
                 Case eOutputFileTypeConstants.SICDataFile
-                    strOutputFilePath &= "_SICdata.txt"
+                    outputFilePath &= "_SICdata.txt"
                 Case Else
                     Throw New ArgumentOutOfRangeException(NameOf(eFileType), "Unknown Output File Type found in clsDataOutput.ConstructOutputFilePath")
             End Select
 
-            Return strOutputFilePath
+            Return outputFilePath
 
         End Function
 
         Public Function CreateDatasetInfoFile(
-          strInputFileName As String,
-          strOutputFolderPath As String,
+          inputFileName As String,
+          outputDirectoryPath As String,
           scanTracking As clsScanTracking,
           datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType) As Boolean
 
@@ -464,21 +464,21 @@ Namespace DataOutput
             udtSampleInfo.Clear()
 
             Try
-                Dim strDatasetName = Path.GetFileNameWithoutExtension(strInputFileName)
-                Dim strDatasetInfoFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DatasetInfoFile)
+                Dim datasetName = Path.GetFileNameWithoutExtension(inputFileName)
+                Dim datasetInfoFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.DatasetInfoFile)
 
-                Dim objDatasetStatsSummarizer = New clsDatasetStatsSummarizer()
+                Dim datasetStatsSummarizer = New clsDatasetStatsSummarizer()
 
-                Dim blnSuccess = objDatasetStatsSummarizer.CreateDatasetInfoFile(
-                  strDatasetName, strDatasetInfoFilePath,
+                Dim success = datasetStatsSummarizer.CreateDatasetInfoFile(
+                  datasetName, datasetInfoFilePath,
                   scanTracking.ScanStats, datasetFileInfo, udtSampleInfo)
 
-                If blnSuccess Then
+                If success Then
                     Return True
                 End If
 
-                ReportError("objDatasetStatsSummarizer.CreateDatasetInfoFile, error from DataStatsSummarizer: " + objDatasetStatsSummarizer.ErrorMessage,
-                            New Exception("DataStatsSummarizer error " & objDatasetStatsSummarizer.ErrorMessage))
+                ReportError("datasetStatsSummarizer.CreateDatasetInfoFile, error from DataStatsSummarizer: " + datasetStatsSummarizer.ErrorMessage,
+                            New Exception("DataStatsSummarizer error " & datasetStatsSummarizer.ErrorMessage))
 
                 Return False
             Catch ex As Exception
@@ -544,16 +544,16 @@ Namespace DataOutput
         End Function
 
         Public Function InitializeSICDetailsTextFile(
-          strInputFilePathFull As String,
-          strOutputFolderPath As String) As Boolean
+          inputFilePathFull As String,
+          outputDirectoryPath As String) As Boolean
 
-            Dim strOutputFilePath As String = String.Empty
+            Dim outputFilePath As String = String.Empty
 
             Try
 
-                strOutputFilePath = ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, eOutputFileTypeConstants.SICDataFile)
+                outputFilePath = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.SICDataFile)
 
-                OutputFileHandles.SICDataFile = New StreamWriter(New FileStream(strOutputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                OutputFileHandles.SICDataFile = New StreamWriter(New FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
 
                 ' Write the header line
                 OutputFileHandles.SICDataFile.WriteLine("Dataset" & ControlChars.Tab &
@@ -565,7 +565,7 @@ Namespace DataOutput
                  "Intensity")
 
             Catch ex As Exception
-                ReportError("Error initializing the XML output file: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error initializing the XML output file: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -574,59 +574,59 @@ Namespace DataOutput
         End Function
 
         Public Sub OpenOutputFileHandles(
-          strInputFileName As String,
-          blnWriteHeaders As Boolean)
+          inputFileName As String,
           outputDirectoryPath As String,
+          writeHeaders As Boolean)
 
-            Dim strOutputFilePath As String
+            Dim outputFilePath As String
 
             With OutputFileHandles
 
                 ' Scan Stats file
-                strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ScanStatsFlatFile)
-                .ScanStats = New StreamWriter(strOutputFilePath, False)
-                If blnWriteHeaders Then .ScanStats.WriteLine(GetHeadersForOutputFile(Nothing, eOutputFileTypeConstants.ScanStatsFlatFile))
+                outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile)
+                .ScanStats = New StreamWriter(outputFilePath, False)
+                If writeHeaders Then .ScanStats.WriteLine(GetHeadersForOutputFile(Nothing, eOutputFileTypeConstants.ScanStatsFlatFile))
 
-                .MSMethodFilePathBase = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MSMethodFile)
-                .MSTuneFilePathBase = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.MSTuneFile)
+                .MSMethodFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSMethodFile)
+                .MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSTuneFile)
             End With
 
         End Sub
 
         Public Function SaveHeaderGlossary(
           scanList As clsScanList,
-          strInputFileName As String,
-          strOutputFolderPath As String) As Boolean
+          inputFileName As String,
+          outputDirectoryPath As String) As Boolean
 
-            Dim strOutputFilePath = "?undefinedfile?"
+            Dim outputFilePath = "?UndefinedFile?"
 
             Try
-                strOutputFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.HeaderGlossary)
-                ReportMessage("Saving Header Glossary to " & Path.GetFileName(strOutputFilePath))
+                outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.HeaderGlossary)
+                ReportMessage("Saving Header Glossary to " & Path.GetFileName(outputFilePath))
 
-                Using srOutFile = New StreamWriter(strOutputFilePath, False)
+                Using writer = New StreamWriter(outputFilePath, False)
 
                     ' ScanStats
-                    srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) & ":")
-                    srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsFlatFile))
-                    srOutFile.WriteLine()
+                    writer.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) & ":")
+                    writer.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsFlatFile))
+                    writer.WriteLine()
 
                     ' SICStats
-                    srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.SICStatsFlatFile) & ":")
-                    srOutFile.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile))
-                    srOutFile.WriteLine()
+                    writer.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.SICStatsFlatFile) & ":")
+                    writer.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile))
+                    writer.WriteLine()
 
                     ' ScanStatsExtended
-                    Dim strHeaders = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
-                    If Not String.IsNullOrWhiteSpace(strHeaders) Then
-                        srOutFile.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) & ":")
-                        srOutFile.WriteLine(strHeaders)
+                    Dim headers = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile)
+                    If Not String.IsNullOrWhiteSpace(headers) Then
+                        writer.WriteLine(ConstructOutputFilePath(String.Empty, String.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) & ":")
+                        writer.WriteLine(headers)
                     End If
 
                 End Using
 
             Catch ex As Exception
-                ReportError("Error writing the Header Glossary to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the Header Glossary to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -637,12 +637,12 @@ Namespace DataOutput
         Public Function SaveSICDataToText(
           sicOptions As clsSICOptions,
           scanList As clsScanList,
-          intParentIonIndex As Integer,
+          parentIonIndex As Integer,
           sicDetails As clsSICDetails) As Boolean
 
 
-            Dim intFragScanIndex As Integer
-            Dim strPrefix As String
+            Dim fragScanIndex As Integer
+            Dim prefix As String
 
             Try
 
@@ -652,20 +652,20 @@ Namespace DataOutput
 
                 ' Write the detailed SIC values for the given parent ion to the text file
 
-                For intFragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndexCount - 1
 
                     ' "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
-                    strPrefix = sicOptions.DatasetNumber.ToString() & ControlChars.Tab &
-                       intParentIonIndex.ToString() & ControlChars.Tab &
-                       intFragScanIndex.ToString() & ControlChars.Tab &
-                       StringUtilities.DblToString(scanList.ParentIons(intParentIonIndex).MZ, 4) & ControlChars.Tab
+                    prefix = sicOptions.DatasetNumber.ToString() & ControlChars.Tab &
+                       parentIonIndex.ToString() & ControlChars.Tab &
+                       fragScanIndex.ToString() & ControlChars.Tab &
+                       StringUtilities.DblToString(scanList.ParentIons(parentIonIndex).MZ, 4) & ControlChars.Tab
 
                     If sicDetails.SICDataCount = 0 Then
                         ' Nothing to write
-                        OutputFileHandles.SICDataFile.WriteLine(strPrefix & "0" & ControlChars.Tab & "0" & ControlChars.Tab & "0")
+                        OutputFileHandles.SICDataFile.WriteLine(prefix & "0" & ControlChars.Tab & "0" & ControlChars.Tab & "0")
                     Else
                         For Each dataPoint In sicDetails.SICData
-                            OutputFileHandles.SICDataFile.WriteLine(strPrefix &
+                            OutputFileHandles.SICDataFile.WriteLine(prefix &
                                                                     dataPoint.ScanNumber & ControlChars.Tab &
                                                                     dataPoint.Mass & ControlChars.Tab &
                                                                     dataPoint.Intensity)

@@ -89,8 +89,8 @@ Public Class clsScanTracking
         Do While index < objMSSpectrum.IonCount
             If objMSSpectrum.IonsIntensity(index) < Single.Epsilon Then
                 Dim countCombined = 0
-                For intComparisonIndex = index + 1 To objMSSpectrum.IonCount - 1
-                    If objMSSpectrum.IonsIntensity(intComparisonIndex) < Single.Epsilon Then
+                For comparisonIndex = index + 1 To objMSSpectrum.IonCount - 1
+                    If objMSSpectrum.IonsIntensity(comparisonIndex) < Single.Epsilon Then
                         countCombined += 1
                     Else
                         Exit For
@@ -149,16 +149,16 @@ Public Class clsScanTracking
                 Dim pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(objMSSpectrum.IonsMZ(index), mzIgnoreRangeStart, mzIgnoreRangeEnd)
 
                 If Not pointInIgnoreRange Then
-                    For intComparisonIndex = index + 1 To objMSSpectrum.IonCount - 1
-                        If clsUtilities.CheckPointInMZIgnoreRange(objMSSpectrum.IonsMZ(intComparisonIndex), mzIgnoreRangeStart, mzIgnoreRangeEnd) Then
+                    For comparisonIndex = index + 1 To objMSSpectrum.IonCount - 1
+                        If clsUtilities.CheckPointInMZIgnoreRange(objMSSpectrum.IonsMZ(comparisonIndex), mzIgnoreRangeStart, mzIgnoreRangeEnd) Then
                             ' Reached the ignore range; do not allow to be combined with the current data point
                             Exit For
                         End If
 
-                        If objMSSpectrum.IonsMZ(intComparisonIndex) - objMSSpectrum.IonsMZ(index) < msDataResolution Then
-                            If objMSSpectrum.IonsIntensity(intComparisonIndex) > objMSSpectrum.IonsIntensity(index) Then
-                                objMSSpectrum.IonsIntensity(index) = objMSSpectrum.IonsIntensity(intComparisonIndex)
-                                bestMz = objMSSpectrum.IonsMZ(intComparisonIndex)
+                        If objMSSpectrum.IonsMZ(comparisonIndex) - objMSSpectrum.IonsMZ(index) < msDataResolution Then
+                            If objMSSpectrum.IonsIntensity(comparisonIndex) > objMSSpectrum.IonsIntensity(index) Then
+                                objMSSpectrum.IonsIntensity(index) = objMSSpectrum.IonsIntensity(comparisonIndex)
+                                bestMz = objMSSpectrum.IonsMZ(comparisonIndex)
                             End If
                             countCombined += 1
                         Else

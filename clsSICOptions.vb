@@ -40,7 +40,7 @@ Public Class clsSICOptions
         End Set
     End Property
     ''' <summary>
-    ''' If True, then will look through the m/z values in the parent ion spectrum data to find the closest match 
+    ''' If True, then will look through the m/z values in the parent ion spectrum data to find the closest match
     ''' (within SICToleranceDa / sicOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
     ''' </summary>
     Public Property RefineReportedParentIonMZ As Boolean
@@ -59,7 +59,7 @@ Public Class clsSICOptions
 
     ''' <summary>
     ''' If true, then combines data points that have similar m/z values (within tolerance) when loading
-    ''' Tolerance is sicOptions.SICToleranceDa / sicOptions.CompressToleranceDivisorForDa 
+    ''' Tolerance is sicOptions.SICToleranceDa / sicOptions.CompressToleranceDivisorForDa
     ''' (or divided by sicOptions.CompressToleranceDivisorForPPM if sicOptions.SICToleranceIsPPM=True)
     ''' </summary>
     Public Property CompressMSSpectraData As Boolean
@@ -71,7 +71,7 @@ Public Class clsSICOptions
     Public Property CompressMSMSSpectraData As Boolean
 
     ''' <summary>
-    ''' When compressing spectra, sicOptions.SICTolerance and binningOptions.BinSize will be divided by this value 
+    ''' When compressing spectra, sicOptions.SICTolerance and binningOptions.BinSize will be divided by this value
     ''' to determine the resolution to compress the data to
     ''' </summary>
     Public Property CompressToleranceDivisorForDa As Double
@@ -82,8 +82,8 @@ Public Class clsSICOptions
     Public Property CompressToleranceDivisorForPPM As Double
 
     ' The SIC is extended left and right until:
-    '      1) the SIC intensity falls below IntensityThresholdAbsoluteMinimum, 
-    '      2) the SIC intensity falls below the maximum value observed times IntensityThresholdFractionMax, 
+    '      1) the SIC intensity falls below IntensityThresholdAbsoluteMinimum,
+    '      2) the SIC intensity falls below the maximum value observed times IntensityThresholdFractionMax,
     '   or 3) the distance exceeds MaxSICPeakWidthMinutesBackward or MaxSICPeakWidthMinutesForward
 
     ''' <summary>
@@ -165,12 +165,12 @@ Public Class clsSICOptions
 #End Region
 
     Public Function GetSICTolerance() As Double
-        Dim blnToleranceIsPPM As Boolean
-        Return GetSICTolerance(blnToleranceIsPPM)
+        Dim toleranceIsPPM As Boolean
+        Return GetSICTolerance(toleranceIsPPM)
     End Function
 
-    Public Function GetSICTolerance(<Out> ByRef blnSICToleranceIsPPM As Boolean) As Double
-        blnSICToleranceIsPPM = SICToleranceIsPPM
+    Public Function GetSICTolerance(<Out> ByRef toleranceIsPPM As Boolean) As Double
+        toleranceIsPPM = SICToleranceIsPPM
         Return SICTolerance
     End Function
 
@@ -212,15 +212,15 @@ Public Class clsSICOptions
         SpectrumSimilarityMinimum = 0.8
     End Sub
 
-    Public Sub SetSICTolerance(dblSICTolerance As Double, blnSICToleranceIsPPM As Boolean)
-        SICToleranceIsPPM = blnSICToleranceIsPPM
+    Public Sub SetSICTolerance(toleranceValue As Double, toleranceIsPPM As Boolean)
+        SICToleranceIsPPM = toleranceIsPPM
 
         If SICToleranceIsPPM Then
-            If dblSICTolerance < 0 Or dblSICTolerance > 1000000 Then dblSICTolerance = 100
+            If toleranceValue < 0 Or toleranceValue > 1000000 Then toleranceValue = 100
         Else
-            If dblSICTolerance < 0 Or dblSICTolerance > 10000 Then dblSICTolerance = 0.6
+            If toleranceValue < 0 Or toleranceValue > 10000 Then toleranceValue = 0.6
         End If
-        SICTolerance = dblSICTolerance
+        SICTolerance = toleranceValue
     End Sub
 
     Public Sub ValidateSICOptions()

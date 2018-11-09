@@ -61,6 +61,7 @@ Public Class clsCustomSICList
 #Region "Classwide variables"
     Private mCustomSICListFileName As String
 #End Region
+
     ''' <summary>
     ''' Constructor
     ''' </summary>
@@ -70,12 +71,12 @@ Public Class clsCustomSICList
 
     Public Sub AddCustomSICValues(
       scanList As clsScanList,
-      dblDefaultSICTolerance As Double,
-      blnSICToleranceIsPPM As Boolean,
-      sngDefaultScanOrAcqTimeTolerance As Single)
+      defaultSICTolerance As Double,
+      sicToleranceIsPPM As Boolean,
+      defaultScanOrAcqTimeTolerance As Single)
 
-        Dim intScanOrAcqTimeSumCount = 0
-        Dim sngScanOrAcqTimeSumForAveraging As Single = 0
+        Dim scanOrAcqTimeSumCount = 0
+        Dim scanOrAcqTimeSumForAveraging As Single = 0
 
         Try
             If CustomMZSearchValues.Count = 0 Then
@@ -144,18 +145,18 @@ Public Class clsCustomSICList
                 currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = customMzSearchValue.ScanOrAcqTimeTolerance
 
                 If currentParentIon.CustomSICPeakMZToleranceDa < Double.Epsilon Then
-                    If blnSICToleranceIsPPM Then
-                        currentParentIon.CustomSICPeakMZToleranceDa = clsUtilities.PPMToMass(dblDefaultSICTolerance, currentParentIon.MZ)
+                    If sicToleranceIsPPM Then
+                        currentParentIon.CustomSICPeakMZToleranceDa = clsUtilities.PPMToMass(defaultSICTolerance, currentParentIon.MZ)
                     Else
-                        currentParentIon.CustomSICPeakMZToleranceDa = dblDefaultSICTolerance
+                        currentParentIon.CustomSICPeakMZToleranceDa = defaultSICTolerance
                     End If
                 End If
 
                 If currentParentIon.CustomSICPeakScanOrAcqTimeTolerance < Single.Epsilon Then
-                    currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = sngDefaultScanOrAcqTimeTolerance
+                    currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance
                 Else
-                    sngScanOrAcqTimeSumForAveraging += currentParentIon.CustomSICPeakScanOrAcqTimeTolerance
-                    intScanOrAcqTimeSumCount += 1
+                    scanOrAcqTimeSumForAveraging += currentParentIon.CustomSICPeakScanOrAcqTimeTolerance
+                    scanOrAcqTimeSumCount += 1
                 End If
 
 
@@ -175,10 +176,10 @@ Public Class clsCustomSICList
 
             Next
 
-            If intScanOrAcqTimeSumCount = CustomMZSearchValues.Count AndAlso sngScanOrAcqTimeSumForAveraging > 0 Then
+            If scanOrAcqTimeSumCount = CustomMZSearchValues.Count AndAlso scanOrAcqTimeSumForAveraging > 0 Then
                 ' All of the entries had a custom scan or acq time tolerance defined
                 ' Update mScanOrAcqTimeTolerance to the average of the values
-                ScanOrAcqTimeTolerance = CSng(Math.Round(sngScanOrAcqTimeSumForAveraging / intScanOrAcqTimeSumCount, 4))
+                ScanOrAcqTimeTolerance = CSng(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4))
             End If
 
         Catch ex As Exception
@@ -206,28 +207,28 @@ Public Class clsCustomSICList
     End Sub
 
     Public Function ParseCustomSICList(
-      strMZList As String,
-      strMZToleranceDaList As String,
-      strScanCenterList As String,
-      strScanToleranceList As String,
-      strScanCommentList As String) As Boolean
+      mzList As String,
+      mzToleranceDaList As String,
+      scanCenterList As String,
+      scanToleranceList As String,
+      scanCommentList As String) As Boolean
 
-        Dim strDelimList = New Char() {","c, ControlChars.Tab}
+        Dim delimiters = New Char() {","c, ControlChars.Tab}
 
         ' Trim any trailing tab characters
-        strMZList = strMZList.TrimEnd(ControlChars.Tab)
-        strMZToleranceDaList = strMZToleranceDaList.TrimEnd(ControlChars.Tab)
-        strScanCenterList = strScanCenterList.TrimEnd(ControlChars.Tab)
-        strScanCommentList = strScanCommentList.TrimEnd(strDelimList)
+        mzList = mzList.TrimEnd(ControlChars.Tab)
+        mzToleranceDaList = mzToleranceDaList.TrimEnd(ControlChars.Tab)
+        scanCenterList = scanCenterList.TrimEnd(ControlChars.Tab)
+        scanCommentList = scanCommentList.TrimEnd(delimiters)
 
-        Dim lstMZs = strMZList.Split(strDelimList).ToList()
-        Dim lstMZToleranceDa = strMZToleranceDaList.Split(strDelimList).ToList()
-        Dim lstScanCenters = strScanCenterList.Split(strDelimList).ToList()
-        Dim lstScanTolerances = strScanToleranceList.Split(strDelimList).ToList()
+        Dim lstMZs = mzList.Split(delimiters).ToList()
+        Dim lstMZToleranceDa = mzToleranceDaList.Split(delimiters).ToList()
+        Dim lstScanCenters = scanCenterList.Split(delimiters).ToList()
+        Dim lstScanTolerances = scanToleranceList.Split(delimiters).ToList()
         Dim lstScanComments As List(Of String)
 
-        If strScanCommentList.Length > 0 Then
-            lstScanComments = strScanCommentList.Split(strDelimList).ToList()
+        If scanCommentList.Length > 0 Then
+            lstScanComments = scanCommentList.Split(delimiters).ToList()
         Else
             lstScanComments = New List(Of String)
         End If
@@ -239,11 +240,11 @@ Public Class clsCustomSICList
             Return True
         End If
 
-        For intIndex = 0 To lstMZs.Count - 1
+        For index = 0 To lstMZs.Count - 1
 
             Dim targetMz As Double
 
-            If Not Double.TryParse(lstMZs(intIndex), targetMz) Then
+            If Not Double.TryParse(lstMZs(index), targetMz) Then
                 Continue For
             End If
 
@@ -253,36 +254,36 @@ Public Class clsCustomSICList
                 .ScanOrAcqTimeTolerance = 0
             }
 
-            If lstScanCenters.Count > intIndex Then
-                If clsUtilities.IsNumber(lstScanCenters(intIndex)) Then
+            If lstScanCenters.Count > index Then
+                If clsUtilities.IsNumber(lstScanCenters(index)) Then
                     If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-                        mzSearchSpec.ScanOrAcqTimeCenter = CInt(lstScanCenters(intIndex))
+                        mzSearchSpec.ScanOrAcqTimeCenter = CInt(lstScanCenters(index))
                     Else
                         ' Includes .Relative and .AcquisitionTime
-                        mzSearchSpec.ScanOrAcqTimeCenter = CSng(lstScanCenters(intIndex))
+                        mzSearchSpec.ScanOrAcqTimeCenter = CSng(lstScanCenters(index))
                     End If
                 End If
             End If
 
-            If lstScanTolerances.Count > intIndex Then
-                If clsUtilities.IsNumber(lstScanTolerances(intIndex)) Then
+            If lstScanTolerances.Count > index Then
+                If clsUtilities.IsNumber(lstScanTolerances(index)) Then
                     If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-                        mzSearchSpec.ScanOrAcqTimeTolerance = CInt(lstScanTolerances(intIndex))
+                        mzSearchSpec.ScanOrAcqTimeTolerance = CInt(lstScanTolerances(index))
                     Else
                         ' Includes .Relative and .AcquisitionTime
-                        mzSearchSpec.ScanOrAcqTimeTolerance = CSng(lstScanTolerances(intIndex))
+                        mzSearchSpec.ScanOrAcqTimeTolerance = CSng(lstScanTolerances(index))
                     End If
                 End If
             End If
 
-            If lstMZToleranceDa.Count > intIndex Then
-                If clsUtilities.IsNumber(lstMZToleranceDa(intIndex)) Then
-                    mzSearchSpec.MZToleranceDa = CDbl(lstMZToleranceDa(intIndex))
+            If lstMZToleranceDa.Count > index Then
+                If clsUtilities.IsNumber(lstMZToleranceDa(index)) Then
+                    mzSearchSpec.MZToleranceDa = CDbl(lstMZToleranceDa(index))
                 End If
             End If
 
-            If lstScanComments.Count > intIndex Then
-                mzSearchSpec.Comment = lstScanComments(intIndex)
+            If lstScanComments.Count > index Then
+                mzSearchSpec.Comment = lstScanComments(index)
             Else
                 mzSearchSpec.Comment = String.Empty
             End If
@@ -318,28 +319,28 @@ Public Class clsCustomSICList
     <Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")>
     Public Function SetCustomSICListValues(
       eScanType As eCustomSICScanTypeConstants,
-      dblMZToleranceDa As Double,
-      sngScanOrAcqTimeTolerance As Single,
-      dblMZList() As Double,
-      dblMZToleranceList() As Double,
-      sngScanOrAcqTimeCenterList() As Single,
-      sngScanOrAcqTimeToleranceList() As Single,
-      strScanComments() As String) As Boolean
+      mzToleranceDa As Double,
+      scanOrAcqTimeToleranceValue As Single,
+      mzList() As Double,
+      mzToleranceList() As Double,
+      scanOrAcqTimeCenterList() As Single,
+      scanOrAcqTimeToleranceList() As Single,
+      scanComments() As String) As Boolean
 
-        ' Returns True if sucess
+        ' Returns True if success
 
-        Dim intIndex As Integer
+        Dim index As Integer
 
-        If dblMZToleranceList.Length > 0 AndAlso dblMZToleranceList.Length <> dblMZList.Length Then
+        If mzToleranceList.Length > 0 AndAlso mzToleranceList.Length <> mzList.Length Then
             ' Invalid Custom SIC comment list; number of entries doesn't match
             Return False
-        ElseIf sngScanOrAcqTimeCenterList.Length > 0 AndAlso sngScanOrAcqTimeCenterList.Length <> dblMZList.Length Then
+        ElseIf scanOrAcqTimeCenterList.Length > 0 AndAlso scanOrAcqTimeCenterList.Length <> mzList.Length Then
             ' Invalid Custom SIC scan center list; number of entries doesn't match
             Return False
-        ElseIf sngScanOrAcqTimeToleranceList.Length > 0 AndAlso sngScanOrAcqTimeToleranceList.Length <> dblMZList.Length Then
+        ElseIf scanOrAcqTimeToleranceList.Length > 0 AndAlso scanOrAcqTimeToleranceList.Length <> mzList.Length Then
             ' Invalid Custom SIC scan center list; number of entries doesn't match
             Return False
-        ElseIf strScanComments.Length > 0 AndAlso strScanComments.Length <> dblMZList.Length Then
+        ElseIf scanComments.Length > 0 AndAlso scanComments.Length <> mzList.Length Then
             ' Invalid Custom SIC comment list; number of entries doesn't match
             Return False
         End If
@@ -348,38 +349,38 @@ Public Class clsCustomSICList
 
         ScanToleranceType = eScanType
 
-        ' This value is used if sngScanOrAcqTimeToleranceList is blank or for any entries in sngScanOrAcqTimeToleranceList() that are zero
-        ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance
+        ' This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
+        ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue
 
-        If dblMZList.Length = 0 Then
+        If mzList.Length = 0 Then
             Return True
         End If
 
-        For intIndex = 0 To dblMZList.Length - 1
+        For index = 0 To mzList.Length - 1
 
-            Dim mzSearchSpec = New clsCustomMZSearchSpec(dblMZList(intIndex))
+            Dim mzSearchSpec = New clsCustomMZSearchSpec(mzList(index))
             With mzSearchSpec
 
-                If dblMZToleranceList.Length > intIndex AndAlso dblMZToleranceList(intIndex) > 0 Then
-                    .MZToleranceDa = dblMZToleranceList(intIndex)
+                If mzToleranceList.Length > index AndAlso mzToleranceList(index) > 0 Then
+                    .MZToleranceDa = mzToleranceList(index)
                 Else
-                    .MZToleranceDa = dblMZToleranceDa
+                    .MZToleranceDa = mzToleranceDa
                 End If
 
-                If sngScanOrAcqTimeCenterList.Length > intIndex Then
-                    .ScanOrAcqTimeCenter = sngScanOrAcqTimeCenterList(intIndex)
+                If scanOrAcqTimeCenterList.Length > index Then
+                    .ScanOrAcqTimeCenter = scanOrAcqTimeCenterList(index)
                 Else
                     .ScanOrAcqTimeCenter = 0         ' Set to 0 to indicate that the entire file should be searched
                 End If
 
-                If sngScanOrAcqTimeToleranceList.Length > intIndex AndAlso sngScanOrAcqTimeToleranceList(intIndex) > 0 Then
-                    .ScanOrAcqTimeTolerance = sngScanOrAcqTimeToleranceList(intIndex)
+                If scanOrAcqTimeToleranceList.Length > index AndAlso scanOrAcqTimeToleranceList(index) > 0 Then
+                    .ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceList(index)
                 Else
-                    .ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance
+                    .ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue
                 End If
 
-                If strScanComments.Length > 0 AndAlso strScanComments.Length > intIndex Then
-                    .Comment = strScanComments(intIndex)
+                If scanComments.Length > 0 AndAlso scanComments.Length > index Then
+                    .Comment = scanComments(index)
                 Else
                     .Comment = String.Empty
                 End If
@@ -397,7 +398,7 @@ Public Class clsCustomSICList
 
     Public Function SetCustomSICListValues(
       eScanType As eCustomSICScanTypeConstants,
-      sngScanOrAcqTimeTolerance As Single,
+      scanOrAcqTimeToleranceValue As Single,
       mzSearchSpecs As List(Of clsCustomMZSearchSpec)) As Boolean
 
         ' Returns True if success
@@ -406,8 +407,8 @@ Public Class clsCustomSICList
 
         ScanToleranceType = eScanType
 
-        ' This value is used if sngScanOrAcqTimeToleranceList is blank or for any entries in sngScanOrAcqTimeToleranceList() that are zero
-        ScanOrAcqTimeTolerance = sngScanOrAcqTimeTolerance
+        ' This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
+        ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue
 
         If mzSearchSpecs.Count = 0 Then
             Return True
@@ -433,18 +434,18 @@ Public Class clsCustomSICList
         ' Check whether all of the values are between 0 and 1
         ' If they are, then auto-switch .ScanToleranceType to "Relative"
 
-        Dim intCountBetweenZeroAndOne = 0
-        Dim intCountOverOne = 0
+        Dim countBetweenZeroAndOne = 0
+        Dim countOverOne = 0
 
         For Each customMzValue In CustomMZSearchValues
             If customMzValue.ScanOrAcqTimeCenter > 1 Then
-                intCountOverOne += 1
+                countOverOne += 1
             Else
-                intCountBetweenZeroAndOne += 1
+                countBetweenZeroAndOne += 1
             End If
         Next
 
-        If intCountOverOne = 0 And intCountBetweenZeroAndOne > 0 Then
+        If countOverOne = 0 And countBetweenZeroAndOne > 0 Then
             If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
                 ' No values were greater than 1 but at least one value is between 0 and 1
                 ' Change the ScanToleranceType mode from Absolute to Relative
@@ -452,7 +453,7 @@ Public Class clsCustomSICList
             End If
         End If
 
-        If intCountOverOne > 0 And intCountBetweenZeroAndOne = 0 Then
+        If countOverOne > 0 And countBetweenZeroAndOne = 0 Then
             If ScanToleranceType = eCustomSICScanTypeConstants.Relative Then
                 ' The ScanOrAcqTimeCenter values cannot be relative
                 ' Change the ScanToleranceType mode from Relative to Absolute

@@ -71,57 +71,57 @@ Namespace DataOutput
 
         Private Sub PopulateScanListPointerArray(
           surveyScans As IList(Of clsScanInfo),
-          intSurveyScanCount As Integer,
-          <Out> ByRef intScanListArray() As Integer)
+          surveyScanCount As Integer,
+          <Out> ByRef scanListArray() As Integer)
 
-            Dim intIndex As Integer
+            Dim index As Integer
 
-            If intSurveyScanCount > 0 Then
-                ReDim intScanListArray(intSurveyScanCount - 1)
+            If surveyScanCount > 0 Then
+                ReDim scanListArray(surveyScanCount - 1)
 
-                For intIndex = 0 To intSurveyScanCount - 1
-                    intScanListArray(intIndex) = surveyScans(intIndex).ScanNumber
+                For index = 0 To surveyScanCount - 1
+                    scanListArray(index) = surveyScans(index).ScanNumber
                 Next
             Else
-                ReDim intScanListArray(0)
+                ReDim scanListArray(0)
             End If
 
         End Sub
 
         Public Function SaveSICStatsFlatFile(
           scanList As clsScanList,
-          strInputFileName As String,
+          inputFileName As String,
           outputDirectoryPath As String,
           masicOptions As clsMASICOptions,
           dataOutputHandler As clsDataOutput) As Boolean
 
             ' Writes out a flat file containing identified peaks and statistics
 
-            Dim strOutputFilePath As String = String.Empty
+            Dim outputFilePath As String = String.Empty
 
             Const cColDelimiter As Char = ControlChars.Tab
 
-            Dim intScanListArray() As Integer = Nothing
+            Dim scanListArray() As Integer = Nothing
 
-            ' Populate intScanListArray with the scan numbers in scanList.SurveyScans
-            PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScans.Count, intScanListArray)
+            ' Populate scanListArray with the scan numbers in scanList.SurveyScans
+            PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScans.Count, scanListArray)
 
             Try
 
                 UpdateProgress(0, "Saving SIC data to flat file")
 
-                strOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile)
-                ReportMessage("Saving SIC flat file to disk: " & Path.GetFileName(strOutputFilePath))
+                outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile)
+                ReportMessage("Saving SIC flat file to disk: " & Path.GetFileName(outputFilePath))
 
-                Using srOutfile = New StreamWriter(strOutputFilePath, False)
+                Using writer = New StreamWriter(outputFilePath, False)
 
                     ' Write the SIC stats to the output file
                     ' The file is tab delimited
 
-                    Dim blnIncludeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile
+                    Dim includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile
 
                     If masicOptions.IncludeHeadersInExportFile Then
-                        srOutfile.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
+                        writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
                     End If
 
                     If scanList.SurveyScans.Count = 0 AndAlso scanList.ParentIonInfoCount = 0 Then
@@ -129,30 +129,30 @@ Namespace DataOutput
                         For fragScanIndex = 0 To scanList.FragScans.Count - 1
 
                             Dim fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex)
-                            Dim intParentIonIndex = 0
+                            Dim parentIonIndex = 0
 
                             Dim surveyScanNumber As Integer
                             Dim surveyScanTime As Single
 
-                            WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, masicOptions.SICOptions, scanList,
-                                                   fakeParentIon, intParentIonIndex, surveyScanNumber, surveyScanTime,
-                                                   0, blnIncludeScanTimesInSICStatsFile)
+                            WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList,
+                                                   fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
+                                                   0, includeScanTimesInSICStatsFile)
                         Next
                     Else
 
-                        For intParentIonIndex = 0 To scanList.ParentIonInfoCount - 1
-                            Dim blnIncludeParentIon As Boolean
+                        For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+                            Dim includeParentIon As Boolean
 
                             If masicOptions.CustomSICList.LimitSearchToCustomMZList Then
-                                blnIncludeParentIon = scanList.ParentIons(intParentIonIndex).CustomSICPeak
+                                includeParentIon = scanList.ParentIons(parentIonIndex).CustomSICPeak
                             Else
-                                blnIncludeParentIon = True
+                                includeParentIon = True
                             End If
 
-                            If blnIncludeParentIon Then
-                                For fragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
+                            If includeParentIon Then
+                                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndexCount - 1
 
-                                    Dim parentIon = scanList.ParentIons(intParentIonIndex)
+                                    Dim parentIon = scanList.ParentIons(parentIonIndex)
                                     Dim surveyScanNumber As Integer
                                     Dim surveyScanTime As Single
 
@@ -164,16 +164,16 @@ Namespace DataOutput
                                         surveyScanTime = 0
                                     End If
 
-                                    WriteSICStatsFlatFileEntry(srOutfile, cColDelimiter, masicOptions.SICOptions, scanList,
-                                                           parentIon, intParentIonIndex, surveyScanNumber, surveyScanTime,
-                                                           fragScanIndex, blnIncludeScanTimesInSICStatsFile)
+                                    WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList,
+                                                           parentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
+                                                           fragScanIndex, includeScanTimesInSICStatsFile)
 
                                 Next
                             End If
 
                             If scanList.ParentIonInfoCount > 1 Then
-                                If intParentIonIndex Mod 100 = 0 Then
-                                    UpdateProgress(CShort(intParentIonIndex / (scanList.ParentIonInfoCount - 1) * 100))
+                                If parentIonIndex Mod 100 = 0 Then
+                                    UpdateProgress(CShort(parentIonIndex / (scanList.ParentIonInfoCount - 1) * 100))
                                 End If
                             Else
                                 UpdateProgress(1)
@@ -190,7 +190,7 @@ Namespace DataOutput
 
             Catch ex As Exception
                 Console.WriteLine(ex.StackTrace)
-                ReportError("Error writing the Peak Stats to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the Peak Stats to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -200,15 +200,15 @@ Namespace DataOutput
 
         Private Function ScanNumberToScanTime(
           scanList As clsScanList,
-          intScanNumber As Integer) As Single
+          scanNumber As Integer) As Single
 
-            Dim surveyScanMatches = (From item In scanList.SurveyScans Where item.ScanNumber = intScanNumber Select item).ToList()
+            Dim surveyScanMatches = (From item In scanList.SurveyScans Where item.ScanNumber = scanNumber Select item).ToList()
 
             If surveyScanMatches.Count > 0 Then
                 Return surveyScanMatches.First.ScanTime
             End If
 
-            Dim fragScanMatches = (From item In scanList.FragScans Where item.ScanNumber = intScanNumber Select item).ToList()
+            Dim fragScanMatches = (From item In scanList.FragScans Where item.ScanNumber = scanNumber Select item).ToList()
             If fragScanMatches.Count > 0 Then
                 Return fragScanMatches.First.ScanTime
             End If
@@ -218,34 +218,34 @@ Namespace DataOutput
         End Function
 
         Private Sub WriteSICStatsFlatFileEntry(
-          srOutfile As StreamWriter,
+          sicStatsWriter As StreamWriter,
           cColDelimiter As Char,
           sicOptions As clsSICOptions,
           scanList As clsScanList,
           parentIon As clsParentIonInfo,
-          intParentIonIndex As Integer,
-          intSurveyScanNumber As Integer,
-          sngSurveyScanTime As Single,
-          intFragScanIndex As Integer,
-          blnIncludeScanTimesInSICStatsFile As Boolean)
+          parentIonIndex As Integer,
+          surveyScanNumber As Integer,
+          surveyScanTime As Single,
+          fragScanIndex As Integer,
+          includeScanTimesInSICStatsFile As Boolean)
 
             Dim dataValues = New List(Of String)
 
             Dim fragScanTime As Single = 0
             Dim optimalPeakApexScanTime As Single = 0
 
-            dataValues.Add(sicOptions.DatasetNumber.ToString())            ' Dataset number
-            dataValues.Add(intParentIonIndex.ToString())                   ' Parent Ion Index
+            dataValues.Add(sicOptions.DatasetNumber.ToString())             ' Dataset number
+            dataValues.Add(parentIonIndex.ToString())                       ' Parent Ion Index
 
-            dataValues.Add(StringUtilities.DblToString(parentIon.MZ, 4))   ' MZ
+            dataValues.Add(StringUtilities.DblToString(parentIon.MZ, 4))    ' MZ
 
-            dataValues.Add(intSurveyScanNumber.ToString())                 ' Survey scan number
+            dataValues.Add(surveyScanNumber.ToString())                     ' Survey scan number
 
             Dim interferenceScore As Double
 
-            If intFragScanIndex < scanList.FragScans.Count Then
-                dataValues.Add(scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).ScanNumber.ToString())  ' Fragmentation scan number
-                interferenceScore = scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).FragScanInfo.InteferenceScore
+            If fragScanIndex < scanList.FragScans.Count Then
+                dataValues.Add(scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).ScanNumber.ToString())  ' Fragmentation scan number
+                interferenceScore = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).FragScanInfo.InteferenceScore
             Else
                 dataValues.Add("0")    ' Fragmentation scan does not exist
                 interferenceScore = 0
@@ -253,9 +253,9 @@ Namespace DataOutput
 
             dataValues.Add(parentIon.OptimalPeakApexScanNumber.ToString())                ' Optimal peak apex scan number
 
-            If blnIncludeScanTimesInSICStatsFile Then
-                If intFragScanIndex < scanList.FragScans.Count Then
-                    fragScanTime = scanList.FragScans(parentIon.FragScanIndices(intFragScanIndex)).ScanTime
+            If includeScanTimesInSICStatsFile Then
+                If fragScanIndex < scanList.FragScans.Count Then
+                    fragScanTime = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).ScanTime
                 Else
                     fragScanTime = 0                ' Fragmentation scan does not exist
                 End If
@@ -308,13 +308,13 @@ Namespace DataOutput
 
             dataValues.Add(StringUtilities.ValueToString(interferenceScore, 4))     ' Interference Score
 
-            If blnIncludeScanTimesInSICStatsFile Then
-                dataValues.Add(StringUtilities.DblToString(sngSurveyScanTime, 5))         ' SurveyScanTime
+            If includeScanTimesInSICStatsFile Then
+                dataValues.Add(StringUtilities.DblToString(surveyScanTime, 5))         ' SurveyScanTime
                 dataValues.Add(StringUtilities.DblToString(fragScanTime, 5))              ' FragScanTime
                 dataValues.Add(StringUtilities.DblToString(optimalPeakApexScanTime, 5))   ' OptimalPeakApexScanTime
             End If
 
-            srOutfile.WriteLine(String.Join(cColDelimiter, dataValues))
+            sicStatsWriter.WriteLine(String.Join(cColDelimiter, dataValues))
 
         End Sub
 

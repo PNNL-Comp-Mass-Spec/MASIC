@@ -13,112 +13,117 @@ Public Class clsBinarySearch
         ReturnNextPoint = 2
     End Enum
 
+    ''' <summary>
+    ''' Looks through arrayToSearch for itemToSearchFor
+    ''' </summary>
+    ''' <param name="arrayToSearch"></param>
+    ''' <param name="itemToSearchFor"></param>
+    ''' <param name="dataCount"></param>
+    ''' <param name="eMissingDataMode"></param>
+    ''' <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+    ''' <remarks>Assumes arrayToSearch is already sorted</remarks>
     Public Shared Function BinarySearchFindNearest(
-      intArrayToSearch() As Integer, intItemToSearchFor As Integer, intDataCount As Integer,
+      arrayToSearch As IList(Of Integer), itemToSearchFor As Integer, dataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
-        ' Looks through intArrayToSearch() for intItemToSearchFor, returning
-        '  the index of the item if found
-        ' If not found, returns the index of the closest match, based on eMissingDataMode
-        ' Assumes intArrayToSearch() is already sorted
 
-        Dim intIndexFirst As Integer, intIndexLast As Integer
-        Dim intMidIndex As Integer
-        Dim intCurrentFirst As Integer, intCurrentLast As Integer
-        Dim intMatchIndex As Integer
+        Dim indexFirst As Integer, indexLast As Integer
+        Dim midIndex As Integer
+        Dim currentFirst As Integer, currentLast As Integer
+        Dim matchIndex As Integer
 
         Try
-            If intArrayToSearch Is Nothing Then Return -1
+            If arrayToSearch Is Nothing Then Return -1
 
-            intIndexFirst = 0
-            If intDataCount > intArrayToSearch.Length Then
-                intDataCount = intArrayToSearch.Length
+            indexFirst = 0
+            If dataCount > arrayToSearch.Count Then
+                dataCount = arrayToSearch.Count
             End If
-            intIndexLast = intDataCount - 1
+            indexLast = dataCount - 1
 
-            intCurrentFirst = intIndexFirst
-            intCurrentLast = intIndexLast
+            currentFirst = indexFirst
+            currentLast = indexLast
 
-            If intCurrentFirst > intCurrentLast Then
+            If currentFirst > currentLast Then
                 ' Invalid indices were provided
-                intMatchIndex = -1
-            ElseIf intCurrentFirst = intCurrentLast Then
+                matchIndex = -1
+            ElseIf currentFirst = currentLast Then
                 ' Search space is only one element long; simply return that element's index
-                intMatchIndex = intCurrentFirst
+                matchIndex = currentFirst
             Else
-                intMidIndex = (intCurrentFirst + intCurrentLast) \ 2            ' Note: Using Integer division
-                If intMidIndex < intCurrentFirst Then intMidIndex = intCurrentFirst
+                midIndex = (currentFirst + currentLast) \ 2            ' Note: Using Integer division
+                If midIndex < currentFirst Then midIndex = currentFirst
 
-                Do While intCurrentFirst <= intCurrentLast AndAlso intArrayToSearch(intMidIndex) <> intItemToSearchFor
-                    If intItemToSearchFor < intArrayToSearch(intMidIndex) Then
+                Do While currentFirst <= currentLast AndAlso arrayToSearch(midIndex) <> itemToSearchFor
+                    If itemToSearchFor < arrayToSearch(midIndex) Then
                         ' Search the lower half
-                        intCurrentLast = intMidIndex - 1
-                    ElseIf intItemToSearchFor > intArrayToSearch(intMidIndex) Then
+                        currentLast = midIndex - 1
+                    ElseIf itemToSearchFor > arrayToSearch(midIndex) Then
                         ' Search the upper half
-                        intCurrentFirst = intMidIndex + 1
+                        currentFirst = midIndex + 1
                     End If
 
                     ' Compute the new mid point
-                    intMidIndex = (intCurrentFirst + intCurrentLast) \ 2
-                    If intMidIndex < intCurrentFirst Then
-                        intMidIndex = intCurrentFirst
-                        If intMidIndex > intCurrentLast Then
-                            intMidIndex = intCurrentLast
+                    midIndex = (currentFirst + currentLast) \ 2
+                    If midIndex < currentFirst Then
+                        midIndex = currentFirst
+                        If midIndex > currentLast Then
+                            midIndex = currentLast
                         End If
                         Exit Do
                     End If
                 Loop
 
-                intMatchIndex = -1
+                matchIndex = -1
                 ' See if an exact match has been found
-                If intMidIndex >= intCurrentFirst AndAlso intMidIndex <= intCurrentLast Then
-                    If intArrayToSearch(intMidIndex) = intItemToSearchFor Then
-                        intMatchIndex = intMidIndex
+                If midIndex >= currentFirst AndAlso midIndex <= currentLast Then
+                    If arrayToSearch(midIndex) = itemToSearchFor Then
+                        matchIndex = midIndex
                     End If
                 End If
 
-                If intMatchIndex = -1 Then
+                If matchIndex = -1 Then
                     If eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint Then
                         ' No exact match; find the nearest match
-                        If intArrayToSearch(intMidIndex) < intItemToSearchFor Then
-                            If intMidIndex < intIndexLast Then
-                                If Math.Abs(intArrayToSearch(intMidIndex) - intItemToSearchFor) <=
-                                   Math.Abs(intArrayToSearch(intMidIndex + 1) - intItemToSearchFor) Then
-                                    intMatchIndex = intMidIndex
+                        If arrayToSearch(midIndex) < itemToSearchFor Then
+                            If midIndex < indexLast Then
+                                If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) <=
+                                   Math.Abs(arrayToSearch(midIndex + 1) - itemToSearchFor) Then
+                                    matchIndex = midIndex
                                 Else
-                                    intMatchIndex = intMidIndex + 1
+                                    matchIndex = midIndex + 1
                                 End If
                             Else
-                                intMatchIndex = intIndexLast
+                                matchIndex = indexLast
                             End If
                         Else
-                            ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
-                            If intMidIndex > intIndexFirst Then
-                                If Math.Abs(intArrayToSearch(intMidIndex - 1) - intItemToSearchFor) <=
-                                   Math.Abs(intArrayToSearch(intMidIndex) - intItemToSearchFor) Then
-                                    intMatchIndex = intMidIndex - 1
+                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
+                            If midIndex > indexFirst Then
+                                If Math.Abs(arrayToSearch(midIndex - 1) - itemToSearchFor) <=
+                                   Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) Then
+                                    matchIndex = midIndex - 1
                                 Else
-                                    intMatchIndex = intMidIndex
+                                    matchIndex = midIndex
                                 End If
                             Else
-                                intMatchIndex = intIndexFirst
+                                matchIndex = indexFirst
                             End If
                         End If
                     Else
                         ' No exact match; return the previous point or the next point
-                        If intArrayToSearch(intMidIndex) < intItemToSearchFor Then
+                        If arrayToSearch(midIndex) < itemToSearchFor Then
                             If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                intMatchIndex = intMidIndex + 1
-                                If intMatchIndex > intIndexLast Then intMatchIndex = intIndexLast
+                                matchIndex = midIndex + 1
+                                If matchIndex > indexLast Then matchIndex = indexLast
                             Else
-                                intMatchIndex = intMidIndex
+                                matchIndex = midIndex
                             End If
                         Else
-                            ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
+                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
                             If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                intMatchIndex = intMidIndex
+                                matchIndex = midIndex
                             Else
-                                intMatchIndex = intMidIndex - 1
-                                If intMatchIndex < intIndexFirst Then intMatchIndex = intIndexFirst
+                                matchIndex = midIndex - 1
+                                If matchIndex < indexFirst Then matchIndex = indexFirst
                             End If
                         End If
                     End If
@@ -126,119 +131,124 @@ Public Class clsBinarySearch
             End If
 
         Catch ex As Exception
-            intMatchIndex = -1
+            matchIndex = -1
         End Try
 
-        Return intMatchIndex
+        Return matchIndex
 
     End Function
 
+    ''' <summary>
+    ''' Looks through arrayToSearch for itemToSearchFor
+    ''' </summary>
+    ''' <param name="arrayToSearch"></param>
+    ''' <param name="itemToSearchFor"></param>
+    ''' <param name="dataCount"></param>
+    ''' <param name="eMissingDataMode"></param>
+    ''' <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+    ''' <remarks>Assumes arrayToSearch is already sorted</remarks>
     Public Shared Function BinarySearchFindNearest(
-      sngArrayToSearch() As Single, sngItemToSearchFor As Single, intDataCount As Integer,
+      arrayToSearch As IList(Of Single), itemToSearchFor As Single, dataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
-        ' Looks through sngArrayToSearch() for sngItemToSearchFor, returning
-        '  the index of the item if found
-        ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
-        ' Assumes sngArrayToSearch() is already sorted
 
-        Dim intIndexFirst As Integer, intIndexLast As Integer
-        Dim intMidIndex As Integer
-        Dim intCurrentFirst As Integer, intCurrentLast As Integer
-        Dim intMatchIndex As Integer
+        Dim indexFirst As Integer, indexLast As Integer
+        Dim midIndex As Integer
+        Dim currentFirst As Integer, currentLast As Integer
+        Dim matchIndex As Integer
 
         Try
-            If sngArrayToSearch Is Nothing Then Return -1
+            If arrayToSearch Is Nothing Then Return -1
 
-            intIndexFirst = 0
-            If intDataCount > sngArrayToSearch.Length Then
-                intDataCount = sngArrayToSearch.Length
+            indexFirst = 0
+            If dataCount > arrayToSearch.Count Then
+                dataCount = arrayToSearch.Count
             End If
-            intIndexLast = intDataCount - 1
+            indexLast = dataCount - 1
 
-            intCurrentFirst = intIndexFirst
-            intCurrentLast = intIndexLast
+            currentFirst = indexFirst
+            currentLast = indexLast
 
-            If intCurrentFirst > intCurrentLast Then
+            If currentFirst > currentLast Then
                 ' Invalid indices were provided
-                intMatchIndex = -1
-            ElseIf intCurrentFirst = intCurrentLast Then
+                matchIndex = -1
+            ElseIf currentFirst = currentLast Then
                 ' Search space is only one element long; simply return that element's index
-                intMatchIndex = intCurrentFirst
+                matchIndex = currentFirst
             Else
-                intMidIndex = (intCurrentFirst + intCurrentLast) \ 2            ' Note: Using Integer division
-                If intMidIndex < intCurrentFirst Then intMidIndex = intCurrentFirst
+                midIndex = (currentFirst + currentLast) \ 2            ' Note: Using Integer division
+                If midIndex < currentFirst Then midIndex = currentFirst
 
-                Do While intCurrentFirst <= intCurrentLast AndAlso Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) > Single.Epsilon
-                    If sngItemToSearchFor < sngArrayToSearch(intMidIndex) Then
+                Do While currentFirst <= currentLast AndAlso Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) > Single.Epsilon
+                    If itemToSearchFor < arrayToSearch(midIndex) Then
                         ' Search the lower half
-                        intCurrentLast = intMidIndex - 1
-                    ElseIf sngItemToSearchFor > sngArrayToSearch(intMidIndex) Then
+                        currentLast = midIndex - 1
+                    ElseIf itemToSearchFor > arrayToSearch(midIndex) Then
                         ' Search the upper half
-                        intCurrentFirst = intMidIndex + 1
+                        currentFirst = midIndex + 1
                     End If
 
                     ' Compute the new mid point
-                    intMidIndex = (intCurrentFirst + intCurrentLast) \ 2
-                    If intMidIndex < intCurrentFirst Then
-                        intMidIndex = intCurrentFirst
-                        If intMidIndex > intCurrentLast Then
-                            intMidIndex = intCurrentLast
+                    midIndex = (currentFirst + currentLast) \ 2
+                    If midIndex < currentFirst Then
+                        midIndex = currentFirst
+                        If midIndex > currentLast Then
+                            midIndex = currentLast
                         End If
                         Exit Do
                     End If
                 Loop
 
-                intMatchIndex = -1
+                matchIndex = -1
                 ' See if an exact match has been found
-                If intMidIndex >= intCurrentFirst AndAlso intMidIndex <= intCurrentLast Then
-                    If Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) < Single.Epsilon Then
-                        intMatchIndex = intMidIndex
+                If midIndex >= currentFirst AndAlso midIndex <= currentLast Then
+                    If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) < Single.Epsilon Then
+                        matchIndex = midIndex
                     End If
                 End If
 
-                If intMatchIndex = -1 Then
+                If matchIndex = -1 Then
                     If eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint Then
                         ' No exact match; find the nearest match
-                        If sngArrayToSearch(intMidIndex) < sngItemToSearchFor Then
-                            If intMidIndex < intIndexLast Then
-                                If Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) <=
-                                   Math.Abs(sngArrayToSearch(intMidIndex + 1) - sngItemToSearchFor) Then
-                                    intMatchIndex = intMidIndex
+                        If arrayToSearch(midIndex) < itemToSearchFor Then
+                            If midIndex < indexLast Then
+                                If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) <=
+                                   Math.Abs(arrayToSearch(midIndex + 1) - itemToSearchFor) Then
+                                    matchIndex = midIndex
                                 Else
-                                    intMatchIndex = intMidIndex + 1
+                                    matchIndex = midIndex + 1
                                 End If
                             Else
-                                intMatchIndex = intIndexLast
+                                matchIndex = indexLast
                             End If
                         Else
-                            ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
-                            If intMidIndex > intIndexFirst Then
-                                If Math.Abs(sngArrayToSearch(intMidIndex - 1) - sngItemToSearchFor) <=
-                                   Math.Abs(sngArrayToSearch(intMidIndex) - sngItemToSearchFor) Then
-                                    intMatchIndex = intMidIndex - 1
+                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
+                            If midIndex > indexFirst Then
+                                If Math.Abs(arrayToSearch(midIndex - 1) - itemToSearchFor) <=
+                                   Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) Then
+                                    matchIndex = midIndex - 1
                                 Else
-                                    intMatchIndex = intMidIndex
+                                    matchIndex = midIndex
                                 End If
                             Else
-                                intMatchIndex = intIndexFirst
+                                matchIndex = indexFirst
                             End If
                         End If
                     Else
                         ' No exact match; return the previous point or the next point
-                        If sngArrayToSearch(intMidIndex) < sngItemToSearchFor Then
+                        If arrayToSearch(midIndex) < itemToSearchFor Then
                             If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                intMatchIndex = intMidIndex + 1
-                                If intMatchIndex > intIndexLast Then intMatchIndex = intIndexLast
+                                matchIndex = midIndex + 1
+                                If matchIndex > indexLast Then matchIndex = indexLast
                             Else
-                                intMatchIndex = intMidIndex
+                                matchIndex = midIndex
                             End If
                         Else
-                            ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
+                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
                             If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                intMatchIndex = intMidIndex
+                                matchIndex = midIndex
                             Else
-                                intMatchIndex = intMidIndex - 1
-                                If intMatchIndex < intIndexFirst Then intMatchIndex = intIndexFirst
+                                matchIndex = midIndex - 1
+                                If matchIndex < indexFirst Then matchIndex = indexFirst
                             End If
                         End If
                     End If
@@ -246,120 +256,125 @@ Public Class clsBinarySearch
             End If
 
         Catch ex As Exception
-            intMatchIndex = -1
+            matchIndex = -1
         End Try
 
-        Return intMatchIndex
+        Return matchIndex
 
     End Function
 
     ' ReSharper disable once UnusedMember.Global
+    ''' <summary>
+    ''' Looks through arrayToSearch for itemToSearchFor
+    ''' </summary>
+    ''' <param name="arrayToSearch"></param>
+    ''' <param name="itemToSearchFor"></param>
+    ''' <param name="dataCount"></param>
+    ''' <param name="eMissingDataMode"></param>
+    ''' <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+    ''' <remarks>Assumes arrayToSearch is already sorted</remarks>
     Public Shared Function BinarySearchFindNearest(
-      dblArrayToSearch() As Double, dblItemToSearchFor As Double, intDataCount As Integer,
+      arrayToSearch As IList(Of Double), itemToSearchFor As Double, dataCount As Integer,
       Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
-        ' Looks through dblArrayToSearch() for dblItemToSearchFor, returning
-        '  the index of the item if found
-        ' If not found, returns the index of the closest match, returning the next highest if blnReturnNextHighestIfMissing = True, or the next lowest if blnReturnNextHighestIfMissing = false
-        ' Assumes dblArrayToSearch() is already sorted
 
-        Dim intIndexFirst As Integer, intIndexLast As Integer
-        Dim intMidIndex As Integer
-        Dim intCurrentFirst As Integer, intCurrentLast As Integer
-        Dim intMatchIndex As Integer
+        Dim indexFirst As Integer, indexLast As Integer
+        Dim midIndex As Integer
+        Dim currentFirst As Integer, currentLast As Integer
+        Dim matchIndex As Integer
 
         Try
-            If dblArrayToSearch Is Nothing Then Return -1
+            If arrayToSearch Is Nothing Then Return -1
 
-            intIndexFirst = 0
-            If intDataCount > dblArrayToSearch.Length Then
-                intDataCount = dblArrayToSearch.Length
+            indexFirst = 0
+            If dataCount > arrayToSearch.Count Then
+                dataCount = arrayToSearch.Count
             End If
-            intIndexLast = intDataCount - 1
+            indexLast = dataCount - 1
 
-            intCurrentFirst = intIndexFirst
-            intCurrentLast = intIndexLast
+            currentFirst = indexFirst
+            currentLast = indexLast
 
-            If intCurrentFirst > intCurrentLast Then
+            If currentFirst > currentLast Then
                 ' Invalid indices were provided
-                intMatchIndex = -1
-            ElseIf intCurrentFirst = intCurrentLast Then
+                matchIndex = -1
+            ElseIf currentFirst = currentLast Then
                 ' Search space is only one element long; simply return that element's index
-                intMatchIndex = intCurrentFirst
+                matchIndex = currentFirst
             Else
-                intMidIndex = (intCurrentFirst + intCurrentLast) \ 2            ' Note: Using Integer division
-                If intMidIndex < intCurrentFirst Then intMidIndex = intCurrentFirst
+                midIndex = (currentFirst + currentLast) \ 2            ' Note: Using Integer division
+                If midIndex < currentFirst Then midIndex = currentFirst
 
-                Do While intCurrentFirst <= intCurrentLast AndAlso Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) > Single.Epsilon
-                    If dblItemToSearchFor < dblArrayToSearch(intMidIndex) Then
+                Do While currentFirst <= currentLast AndAlso Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) > Single.Epsilon
+                    If itemToSearchFor < arrayToSearch(midIndex) Then
                         ' Search the lower half
-                        intCurrentLast = intMidIndex - 1
-                    ElseIf dblItemToSearchFor > dblArrayToSearch(intMidIndex) Then
+                        currentLast = midIndex - 1
+                    ElseIf itemToSearchFor > arrayToSearch(midIndex) Then
                         ' Search the upper half
-                        intCurrentFirst = intMidIndex + 1
+                        currentFirst = midIndex + 1
                     End If
 
                     ' Compute the new mid point
-                    intMidIndex = (intCurrentFirst + intCurrentLast) \ 2
-                    If intMidIndex < intCurrentFirst Then
-                        intMidIndex = intCurrentFirst
-                        If intMidIndex > intCurrentLast Then
-                            intMidIndex = intCurrentLast
+                    midIndex = (currentFirst + currentLast) \ 2
+                    If midIndex < currentFirst Then
+                        midIndex = currentFirst
+                        If midIndex > currentLast Then
+                            midIndex = currentLast
                         End If
                         Exit Do
                     End If
                 Loop
 
-                intMatchIndex = -1
+                matchIndex = -1
                 ' See if an exact match has been found
-                If intMidIndex >= intCurrentFirst AndAlso intMidIndex <= intCurrentLast Then
-                    If Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) < Double.Epsilon Then
-                        intMatchIndex = intMidIndex
+                If midIndex >= currentFirst AndAlso midIndex <= currentLast Then
+                    If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) < Double.Epsilon Then
+                        matchIndex = midIndex
                     End If
                 End If
 
-                If intMatchIndex = -1 Then
+                If matchIndex = -1 Then
                     If eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint Then
                         ' No exact match; find the nearest match
-                        If dblArrayToSearch(intMidIndex) < dblItemToSearchFor Then
-                            If intMidIndex < intIndexLast Then
-                                If Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) <=
-                                   Math.Abs(dblArrayToSearch(intMidIndex + 1) - dblItemToSearchFor) Then
-                                    intMatchIndex = intMidIndex
+                        If arrayToSearch(midIndex) < itemToSearchFor Then
+                            If midIndex < indexLast Then
+                                If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) <=
+                                   Math.Abs(arrayToSearch(midIndex + 1) - itemToSearchFor) Then
+                                    matchIndex = midIndex
                                 Else
-                                    intMatchIndex = intMidIndex + 1
+                                    matchIndex = midIndex + 1
                                 End If
                             Else
-                                intMatchIndex = intIndexLast
+                                matchIndex = indexLast
                             End If
                         Else
-                            ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
-                            If intMidIndex > intIndexFirst Then
-                                If Math.Abs(dblArrayToSearch(intMidIndex - 1) - dblItemToSearchFor) <=
-                                   Math.Abs(dblArrayToSearch(intMidIndex) - dblItemToSearchFor) Then
-                                    intMatchIndex = intMidIndex - 1
+                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
+                            If midIndex > indexFirst Then
+                                If Math.Abs(arrayToSearch(midIndex - 1) - itemToSearchFor) <=
+                                   Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) Then
+                                    matchIndex = midIndex - 1
                                 Else
-                                    intMatchIndex = intMidIndex
+                                    matchIndex = midIndex
                                 End If
                             Else
-                                intMatchIndex = intIndexFirst
+                                matchIndex = indexFirst
                             End If
                         End If
                     Else
                         ' No exact match; return the previous point or the next point
-                        If dblArrayToSearch(intMidIndex) < dblItemToSearchFor Then
+                        If arrayToSearch(midIndex) < itemToSearchFor Then
                             If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                intMatchIndex = intMidIndex + 1
-                                If intMatchIndex > intIndexLast Then intMatchIndex = intIndexLast
+                                matchIndex = midIndex + 1
+                                If matchIndex > indexLast Then matchIndex = indexLast
                             Else
-                                intMatchIndex = intMidIndex
+                                matchIndex = midIndex
                             End If
                         Else
-                            ' ArrayToSearch(intMidIndex) >= ItemToSearchFor
+                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
                             If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                intMatchIndex = intMidIndex
+                                matchIndex = midIndex
                             Else
-                                intMatchIndex = intMidIndex - 1
-                                If intMatchIndex < intIndexFirst Then intMatchIndex = intIndexFirst
+                                matchIndex = midIndex - 1
+                                If matchIndex < indexFirst Then matchIndex = indexFirst
                             End If
                         End If
                     End If
@@ -368,10 +383,10 @@ Public Class clsBinarySearch
             End If
 
         Catch ex As Exception
-            intMatchIndex = -1
+            matchIndex = -1
         End Try
 
-        Return intMatchIndex
+        Return matchIndex
 
     End Function
 

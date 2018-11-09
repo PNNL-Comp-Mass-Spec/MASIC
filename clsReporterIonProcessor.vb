@@ -23,15 +23,14 @@ Public Class clsReporterIonProcessor
     ''' </summary>
     ''' <param name="scanList"></param>
     ''' <param name="objSpectraCache"></param>
-    ''' <param name="strInputFilePathFull">Full path to the input file</param>
-    ''' <param name="strOutputFolderPath"></param>
+    ''' <param name="inputFilePathFull">Full path to the input file</param>
     ''' <param name="outputDirectoryPath"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function FindReporterIons(
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
-      strInputFilePathFull As String,
+      inputFilePathFull As String,
       outputDirectoryPath As String) As Boolean
 
         Const cColDelimiter As Char = ControlChars.Tab
@@ -46,7 +45,7 @@ Public Class clsReporterIonProcessor
 
             Dim includeFtmsColumns = False
 
-            If strInputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()) Then
+            If inputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()) Then
 
                 ' Processing a thermo .Raw file
                 ' Check whether any of the frag scans has IsFTMS true
@@ -64,7 +63,7 @@ Public Class clsReporterIonProcessor
                 Next
 
                 If includeFtmsColumns Then
-                    xcaliburAccessor.OpenRawFile(strInputFilePathFull)
+                    xcaliburAccessor.OpenRawFile(inputFilePathFull)
                 End If
 
             End If
@@ -87,11 +86,11 @@ Public Class clsReporterIonProcessor
             Array.Sort(reporterIons, New clsReportIonInfoComparer())
 
             outputFilePath = clsDataOutput.ConstructOutputFilePath(
-                Path.GetFileName(strInputFilePathFull),
+                Path.GetFileName(inputFilePathFull),
                 outputDirectoryPath,
                 clsDataOutput.eOutputFileTypeConstants.ReporterIonsFile)
 
-            Using srOutFile = New StreamWriter(outputFilePath)
+            Using writer = New StreamWriter(outputFilePath)
 
                 ' Write the file headers
                 Dim reporterIonMZsUnique = New SortedSet(Of String)
@@ -111,7 +110,7 @@ Public Class clsReporterIonProcessor
                 Dim ftmsResolution = New List(Of String)
                 ' Dim ftmsLabelDataMz = New List(Of String)
 
-                Dim blnSaveUncorrectedIntensities As Boolean =
+                Dim saveUncorrectedIntensities As Boolean =
                     mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection AndAlso mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities
 
                 Dim dataAggregation = New clsDataAggregation()
@@ -119,9 +118,9 @@ Public Class clsReporterIonProcessor
 
                 For Each reporterIon In reporterIons
 
-                    If Not reporterIon.ContaminantIon OrElse blnSaveUncorrectedIntensities Then
+                    If Not reporterIon.ContaminantIon OrElse saveUncorrectedIntensities Then
                         ' Construct the reporter ion intensity header
-                        ' We skip contaminant ions, unless blnSaveUncorrectedIntensities is True, then we include them
+                        ' We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
 
                         Dim mzValue As String
                         If (mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ OrElse
@@ -149,7 +148,7 @@ Public Class clsReporterIonProcessor
                         ' This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
                         obsMZHeaders.Add("Ion_" & mzValue & "_ObsMZ")
 
-                        ' This string will be included in the header line if blnSaveUncorrectedIntensities is true
+                        ' This string will be included in the header line if saveUncorrectedIntensities is true
                         uncorrectedIntensityHeaders.Add("Ion_" & mzValue & "_OriginalIntensity")
 
                         ' This string will be included in the header line if includeFtmsColumns is true
@@ -169,7 +168,7 @@ Public Class clsReporterIonProcessor
                     headerColumns.AddRange(obsMZHeaders)
                 End If
 
-                If blnSaveUncorrectedIntensities Then
+                If saveUncorrectedIntensities Then
                     headerColumns.AddRange(uncorrectedIntensityHeaders)
                 End If
 
@@ -183,7 +182,7 @@ Public Class clsReporterIonProcessor
                 End If
 
                 ' Write the headers to the output file, separated by tabs
-                srOutFile.WriteLine(String.Join(cColDelimiter, headerColumns))
+                writer.WriteLine(String.Join(cColDelimiter, headerColumns))
 
                 UpdateProgress(0, "Searching for reporter ions")
 
@@ -202,10 +201,10 @@ Public Class clsReporterIonProcessor
                         scanList,
                         objSpectraCache,
                         scanList.FragScans(scanPointer),
-                        srOutFile,
+                        writer,
                         reporterIons,
                         cColDelimiter,
-                        blnSaveUncorrectedIntensities,
+                        saveUncorrectedIntensities,
                         mOptions.ReporterIons.ReporterIonSaveObservedMasses)
 
                     If scanList.MasterScanOrderCount > 1 Then
@@ -239,7 +238,7 @@ Public Class clsReporterIonProcessor
 
     ''' <summary>
     ''' Looks for the reporter ion m/z values, +/- a tolerance
-    ''' Calls AggregateIonsInRange with blnReturnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
+    ''' Calls AggregateIonsInRange with returnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
     ''' </summary>
     ''' <param name="xcaliburAccessor"></param>
     ''' <param name="dataAggregation"></param>
@@ -248,10 +247,10 @@ Public Class clsReporterIonProcessor
     ''' <param name="scanList"></param>
     ''' <param name="objSpectraCache"></param>
     ''' <param name="currentScan"></param>
-    ''' <param name="srOutFile"></param>
+    ''' <param name="writer"></param>
     ''' <param name="reporterIons"></param>
     ''' <param name="cColDelimiter"></param>
-    ''' <param name="blnSaveUncorrectedIntensities"></param>
+    ''' <param name="saveUncorrectedIntensities"></param>
     ''' <param name="saveObservedMasses"></param>
     ''' <remarks></remarks>
     Private Sub FindReporterIonsWork(
@@ -262,10 +261,10 @@ Public Class clsReporterIonProcessor
       scanList As clsScanList,
       objSpectraCache As clsSpectraCache,
       currentScan As clsScanInfo,
-      srOutFile As TextWriter,
+      writer As TextWriter,
       reporterIons As IList(Of clsReporterIonInfo),
       cColDelimiter As Char,
-      blnSaveUncorrectedIntensities As Boolean,
+      saveUncorrectedIntensities As Boolean,
       saveObservedMasses As Boolean)
 
         Const USE_MAX_ABUNDANCE_IN_WINDOW = True
@@ -274,39 +273,39 @@ Public Class clsReporterIonProcessor
             clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes,
             clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
 
-        Dim sngReporterIntensities() As Single
-        Dim sngReporterIntensitiesCorrected() As Single
-        Dim dblClosestMZ() As Double
+        Dim reporterIntensities() As Single
+        Dim reporterIntensitiesCorrected() As Single
+        Dim closestMZ() As Double
 
         ' The following will be a value between 0 and 100
         ' Using Absolute Value of percent change to avoid averaging both negative and positive values
-        Dim dblParentIonMZ As Double
+        Dim parentIonMZ As Double
 
         If currentScan.FragScanInfo.ParentIonInfoIndex >= 0 AndAlso currentScan.FragScanInfo.ParentIonInfoIndex < scanList.ParentIons.Count Then
-            dblParentIonMZ = scanList.ParentIons(currentScan.FragScanInfo.ParentIonInfoIndex).MZ
+            parentIonMZ = scanList.ParentIons(currentScan.FragScanInfo.ParentIonInfoIndex).MZ
         Else
-            dblParentIonMZ = 0
+            parentIonMZ = 0
         End If
 
-        Dim intPoolIndex As Integer
-        If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
+        Dim poolIndex As Integer
+        If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
             SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
             Exit Sub
         End If
 
         ' Initialize the arrays used to track the observed reporter ion values
-        ReDim sngReporterIntensities(reporterIons.Count - 1)
-        ReDim sngReporterIntensitiesCorrected(reporterIons.Count - 1)
-        ReDim dblClosestMZ(reporterIons.Count - 1)
+        ReDim reporterIntensities(reporterIons.Count - 1)
+        ReDim reporterIntensitiesCorrected(reporterIons.Count - 1)
+        ReDim closestMZ(reporterIons.Count - 1)
 
         ' Initialize the output variables
         Dim dataColumns = New List(Of String) From {
-                sicOptions.DatasetNumber.ToString(),
-                currentScan.ScanNumber.ToString(),
-                currentScan.FragScanInfo.CollisionMode,
-                StringUtilities.DblToString(dblParentIonMZ, 2),
-                StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2),
-                StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
+            sicOptions.DatasetNumber.ToString(),
+            currentScan.ScanNumber.ToString(),
+            currentScan.FragScanInfo.CollisionMode,
+            StringUtilities.DblToString(parentIonMZ, 2),
+            StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2),
+            StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
         }
 
         Dim reporterIntensityList = New List(Of String)
@@ -317,23 +316,23 @@ Public Class clsReporterIonProcessor
         Dim ftmsResolution = New List(Of String)
         ' Dim ftmsLabelDataMz = New List(Of String)
 
-        Dim sngReporterIntensityMax As Single = 0
+        Dim reporterIntensityMax As Single = 0
 
         ' Find the reporter ion intensities
         ' Also keep track of the closest m/z for each reporter ion
         ' Note that we're using the maximum intensity in the range (not the sum)
-        For intReporterIonIndex = 0 To reporterIons.Count - 1
+        For reporterIonIndex = 0 To reporterIons.Count - 1
 
-            Dim intIonMatchCount As Integer
+            Dim ionMatchCount As Integer
 
-            With reporterIons(intReporterIonIndex)
+            With reporterIons(reporterIonIndex)
                 ' Search for the reporter ion MZ in this mass spectrum
-                sngReporterIntensities(intReporterIonIndex) = dataAggregation.AggregateIonsInRange(
-                    objSpectraCache.SpectraPool(intPoolIndex),
+                reporterIntensities(reporterIonIndex) = dataAggregation.AggregateIonsInRange(
+                    objSpectraCache.SpectraPool(poolIndex),
                     .MZ,
                     .MZToleranceDa,
-                    intIonMatchCount,
-                    dblClosestMZ(intReporterIonIndex),
+                    ionMatchCount,
+                    closestMZ(reporterIonIndex),
                     USE_MAX_ABUNDANCE_IN_WINDOW)
 
                 .SignalToNoise = 0
@@ -351,9 +350,9 @@ Public Class clsReporterIonProcessor
 
             ' Find each reporter ion in ftLabelData
 
-            For intReporterIonIndex = 0 To reporterIons.Count - 1
-                Dim mzToFind = reporterIons(intReporterIonIndex).MZ
-                Dim mzToleranceDa = reporterIons(intReporterIonIndex).MZToleranceDa
+            For reporterIonIndex = 0 To reporterIons.Count - 1
+                Dim mzToFind = reporterIons(reporterIonIndex).MZ
+                Dim mzToleranceDa = reporterIons(reporterIonIndex).MZToleranceDa
                 Dim highestIntensity = 0.0
                 Dim udtBestMatch = New udtFTLabelInfoType()
                 Dim matchFound = False
@@ -375,16 +374,16 @@ Public Class clsReporterIonProcessor
                 Next
 
                 If matchFound Then
-                    reporterIons(intReporterIonIndex).SignalToNoise = udtBestMatch.SignalToNoise
-                    reporterIons(intReporterIonIndex).Resolution = udtBestMatch.Resolution
-                    reporterIons(intReporterIonIndex).LabelDataMZ = udtBestMatch.Mass
+                    reporterIons(reporterIonIndex).SignalToNoise = udtBestMatch.SignalToNoise
+                    reporterIons(reporterIonIndex).Resolution = udtBestMatch.Resolution
+                    reporterIons(reporterIonIndex).LabelDataMZ = udtBestMatch.Mass
                 End If
 
             Next
         End If
 
-        ' Populate sngReporterIntensitiesCorrected with the data in sngReporterIntensities
-        Array.Copy(sngReporterIntensities, sngReporterIntensitiesCorrected, sngReporterIntensities.Length)
+        ' Populate reporterIntensitiesCorrected with the data in reporterIntensities
+        Array.Copy(reporterIntensities, reporterIntensitiesCorrected, reporterIntensities.Length)
 
         If mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection Then
 
@@ -403,17 +402,17 @@ Public Class clsReporterIonProcessor
                         mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
                 End If
 
-                ' Count the number of non-zero data points in sngReporterIntensitiesCorrected()
-                Dim intPositiveCount = 0
-                For intReporterIonIndex = 0 To reporterIons.Count - 1
-                    If sngReporterIntensitiesCorrected(intReporterIonIndex) > 0 Then
-                        intPositiveCount += 1
+                ' Count the number of non-zero data points in reporterIntensitiesCorrected()
+                Dim positiveCount = 0
+                For reporterIonIndex = 0 To reporterIons.Count - 1
+                    If reporterIntensitiesCorrected(reporterIonIndex) > 0 Then
+                        positiveCount += 1
                     End If
                 Next
 
                 ' Apply the correction if 2 or more points are non-zero
-                If intPositiveCount >= 2 Then
-                    intensityCorrector.ApplyCorrection(sngReporterIntensitiesCorrected)
+                If positiveCount >= 2 Then
+                    intensityCorrector.ApplyCorrection(reporterIntensitiesCorrected)
                 End If
 
             End If
@@ -424,59 +423,59 @@ Public Class clsReporterIonProcessor
         ' Will also compute the percent change in intensities
 
         ' Initialize the variables used to compute the weighted average percent change
-        Dim dblPctChangeSum As Double = 0
-        Dim dblOriginalIntensitySum As Double = 0
+        Dim pctChangeSum As Double = 0
+        Dim originalIntensitySum As Double = 0
 
-        For intReporterIonIndex = 0 To reporterIons.Count - 1
+        For reporterIonIndex = 0 To reporterIons.Count - 1
 
-            If Not reporterIons(intReporterIonIndex).ContaminantIon Then
+            If Not reporterIons(reporterIonIndex).ContaminantIon Then
                 ' Update the PctChange variables and the IntensityMax variable only if this is not a Contaminant Ion
 
-                dblOriginalIntensitySum += sngReporterIntensities(intReporterIonIndex)
+                originalIntensitySum += reporterIntensities(reporterIonIndex)
 
-                If sngReporterIntensities(intReporterIonIndex) > 0 Then
-                    ' Compute the percent change, then update dblPctChangeSum
-                    Dim dblPctChange =
-                        (sngReporterIntensitiesCorrected(intReporterIonIndex) - sngReporterIntensities(intReporterIonIndex)) /
-                        sngReporterIntensities(intReporterIonIndex)
+                If reporterIntensities(reporterIonIndex) > 0 Then
+                    ' Compute the percent change, then update pctChangeSum
+                    Dim pctChange =
+                        (reporterIntensitiesCorrected(reporterIonIndex) - reporterIntensities(reporterIonIndex)) /
+                        reporterIntensities(reporterIonIndex)
 
                     ' Using Absolute Value here to prevent negative changes from cancelling out positive changes
-                    dblPctChangeSum += Math.Abs(dblPctChange * sngReporterIntensities(intReporterIonIndex))
+                    pctChangeSum += Math.Abs(pctChange * reporterIntensities(reporterIonIndex))
                 End If
 
-                If sngReporterIntensitiesCorrected(intReporterIonIndex) > sngReporterIntensityMax Then
-                    sngReporterIntensityMax = sngReporterIntensitiesCorrected(intReporterIonIndex)
+                If reporterIntensitiesCorrected(reporterIonIndex) > reporterIntensityMax Then
+                    reporterIntensityMax = reporterIntensitiesCorrected(reporterIonIndex)
                 End If
             End If
 
-            If Not reporterIons(intReporterIonIndex).ContaminantIon OrElse blnSaveUncorrectedIntensities Then
-                ' Append the reporter ion intensity to strReporterIntensityList
-                ' We skip contaminant ions, unless blnSaveUncorrectedIntensities is True, then we include them
+            If Not reporterIons(reporterIonIndex).ContaminantIon OrElse saveUncorrectedIntensities Then
+                ' Append the reporter ion intensity to reporterIntensityList
+                ' We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
 
-                reporterIntensityList.Add(StringUtilities.DblToString(sngReporterIntensitiesCorrected(intReporterIonIndex), 2))
+                reporterIntensityList.Add(StringUtilities.DblToString(reporterIntensitiesCorrected(reporterIonIndex), 2))
 
                 If saveObservedMasses Then
-                    ' Append the observed reporter mass value to strObsMZList
-                    obsMZList.Add(StringUtilities.DblToString(dblClosestMZ(intReporterIonIndex), 3))
+                    ' Append the observed reporter mass value to obsMZList
+                    obsMZList.Add(StringUtilities.DblToString(closestMZ(reporterIonIndex), 3))
                 End If
 
-                If blnSaveUncorrectedIntensities Then
+                If saveUncorrectedIntensities Then
                     ' Append the original, uncorrected intensity value
-                    uncorrectedIntensityList.Add(StringUtilities.DblToString(sngReporterIntensities(intReporterIonIndex), 2))
+                    uncorrectedIntensityList.Add(StringUtilities.DblToString(reporterIntensities(reporterIonIndex), 2))
                 End If
 
                 If includeFtmsColumns Then
-                    If Math.Abs(reporterIons(intReporterIonIndex).SignalToNoise) < Single.Epsilon AndAlso
-                       Math.Abs(reporterIons(intReporterIonIndex).Resolution) < Single.Epsilon AndAlso
-                       Math.Abs(reporterIons(intReporterIonIndex).LabelDataMZ) < Single.Epsilon Then
+                    If Math.Abs(reporterIons(reporterIonIndex).SignalToNoise) < Single.Epsilon AndAlso
+                       Math.Abs(reporterIons(reporterIonIndex).Resolution) < Single.Epsilon AndAlso
+                       Math.Abs(reporterIons(reporterIonIndex).LabelDataMZ) < Single.Epsilon Then
                         ' A match was not found in the label data; display blanks (not zeroes)
                         ftmsSignalToNoise.Add("")
                         ftmsResolution.Add("")
                         ' ftmsLabelDataMz.Add("")
                     Else
-                        ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons(intReporterIonIndex).SignalToNoise, 2))
-                        ftmsResolution.Add(StringUtilities.DblToString(reporterIons(intReporterIonIndex).Resolution, 2))
-                        ' ftmsLabelDataMz.Add(StringUtilities.DblToString(reporterIons(intReporterIonIndex).LabelDataMZ, 4))
+                        ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).SignalToNoise, 2))
+                        ftmsResolution.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).Resolution, 2))
+                        ' ftmsLabelDataMz.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).LabelDataMZ, 4))
                     End If
 
                 End If
@@ -486,29 +485,29 @@ Public Class clsReporterIonProcessor
         Next
 
         ' Compute the weighted average percent intensity correction value
-        Dim sngWeightedAvgPctIntensityCorrection As Single
-        If dblOriginalIntensitySum > 0 Then
-            sngWeightedAvgPctIntensityCorrection = CSng(dblPctChangeSum / dblOriginalIntensitySum * 100)
+        Dim weightedAvgPctIntensityCorrection As Single
+        If originalIntensitySum > 0 Then
+            weightedAvgPctIntensityCorrection = CSng(pctChangeSum / originalIntensitySum * 100)
         Else
-            sngWeightedAvgPctIntensityCorrection = 0
+            weightedAvgPctIntensityCorrection = 0
         End If
 
         ' Append the maximum reporter ion intensity then the individual reporter ion intensities
-        dataColumns.Add(StringUtilities.DblToString(sngReporterIntensityMax, 2))
+        dataColumns.Add(StringUtilities.DblToString(reporterIntensityMax, 2))
         dataColumns.AddRange(reporterIntensityList)
 
         ' Append the weighted average percent intensity correction
-        If sngWeightedAvgPctIntensityCorrection < Single.Epsilon Then
+        If weightedAvgPctIntensityCorrection < Single.Epsilon Then
             dataColumns.Add("0")
         Else
-            dataColumns.Add(StringUtilities.DblToString(sngWeightedAvgPctIntensityCorrection, 1))
+            dataColumns.Add(StringUtilities.DblToString(weightedAvgPctIntensityCorrection, 1))
         End If
 
         If saveObservedMasses Then
             dataColumns.AddRange(obsMZList)
         End If
 
-        If blnSaveUncorrectedIntensities Then
+        If saveUncorrectedIntensities Then
             dataColumns.AddRange(uncorrectedIntensityList)
         End If
 
@@ -522,7 +521,7 @@ Public Class clsReporterIonProcessor
             'End If
         End If
 
-        srOutFile.WriteLine(String.Join(cColDelimiter, dataColumns))
+        writer.WriteLine(String.Join(cColDelimiter, dataColumns))
 
     End Sub
 

@@ -135,5 +135,4 @@ Public MustInherit Class clsMasicEventNotifier
     End Sub
 #End Region
 
-
 End Class

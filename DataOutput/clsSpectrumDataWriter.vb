@@ -21,32 +21,32 @@ Namespace DataOutput
         Public Function ExportRawDataToDisk(
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
-          strInputFileName As String,
+          inputFileName As String,
           outputDirectoryPath As String) As Boolean
 
-            Dim strOutputFilePath = "??"
+            Dim outputFilePath = "??"
 
             Try
-                Dim srDataOutfile As StreamWriter
-                Dim srScanInfoOutFile As StreamWriter
+                Dim dataWriter As StreamWriter
+                Dim scanInfoWriter As StreamWriter
 
                 Select Case mOptions.RawDataExportOptions.FileFormat
                     Case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile
-                        strOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.PEKFile)
-                        srDataOutfile = New StreamWriter(strOutputFilePath)
-                        srScanInfoOutFile = Nothing
+                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.PEKFile)
+                        dataWriter = New StreamWriter(outputFilePath)
+                        scanInfoWriter = Nothing
 
                     Case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile
-                        strOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsIsosFile)
+                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsIsosFile)
 
-                        Dim strOutputFilePath2 = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsScansFile)
+                        Dim outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsScansFile)
 
-                        srDataOutfile = New StreamWriter(strOutputFilePath)
-                        srScanInfoOutFile = New StreamWriter(strOutputFilePath2)
+                        dataWriter = New StreamWriter(outputFilePath)
+                        scanInfoWriter = New StreamWriter(outputFilePath2)
 
                         ' Write the file headers
-                        mBPIWriter.WriteDecon2LSIsosFileHeaders(srDataOutfile)
-                        mBPIWriter.WriteDecon2LSScanFileHeaders(srScanInfoOutFile)
+                        mBPIWriter.WriteDecon2LSIsosFileHeaders(dataWriter)
+                        mBPIWriter.WriteDecon2LSScanFileHeaders(scanInfoWriter)
 
                     Case Else
                         ' Unknown format
@@ -54,7 +54,7 @@ Namespace DataOutput
                         Return False
                 End Select
 
-                Dim intSpectrumExportCount = 0
+                Dim spectrumExportCount = 0
 
                 If Not mOptions.RawDataExportOptions.IncludeMSMS AndAlso mOptions.RawDataExportOptions.RenumberScans Then
                     mOptions.RawDataExportOptions.RenumberScans = True
@@ -64,20 +64,20 @@ Namespace DataOutput
 
                 UpdateProgress(0, "Exporting raw data")
 
-                For intMasterOrderIndex = 0 To scanList.MasterScanOrderCount - 1
-                    Dim intScanPointer = scanList.MasterScanOrder(intMasterOrderIndex).ScanIndexPointer
-                    If scanList.MasterScanOrder(intMasterOrderIndex).ScanType = clsScanList.eScanTypeConstants.SurveyScan Then
-                        SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, scanList.SurveyScans(intScanPointer), objSpectraCache, strInputFileName, False, intSpectrumExportCount)
+                For masterOrderIndex = 0 To scanList.MasterScanOrderCount - 1
+                    Dim scanPointer = scanList.MasterScanOrder(masterOrderIndex).ScanIndexPointer
+                    If scanList.MasterScanOrder(masterOrderIndex).ScanType = clsScanList.eScanTypeConstants.SurveyScan Then
+                        SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.SurveyScans(scanPointer), objSpectraCache, inputFileName, False, spectrumExportCount)
                     Else
                         If mOptions.RawDataExportOptions.IncludeMSMS OrElse
-                          Not scanList.FragScans(intScanPointer).MRMScanType = ThermoRawFileReader.MRMScanTypeConstants.NotMRM Then
+                          Not scanList.FragScans(scanPointer).MRMScanType = ThermoRawFileReader.MRMScanTypeConstants.NotMRM Then
                             ' Either we're writing out MS/MS data or this is an MRM scan
-                            SaveRawDatatoDiskWork(srDataOutfile, srScanInfoOutFile, scanList.FragScans(intScanPointer), objSpectraCache, strInputFileName, True, intSpectrumExportCount)
+                            SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.FragScans(scanPointer), objSpectraCache, inputFileName, True, spectrumExportCount)
                         End If
                     End If
 
                     If scanList.MasterScanOrderCount > 1 Then
-                        UpdateProgress(CShort(intMasterOrderIndex / (scanList.MasterScanOrderCount - 1) * 100))
+                        UpdateProgress(CShort(masterOrderIndex / (scanList.MasterScanOrderCount - 1) * 100))
                     Else
                         UpdateProgress(0)
                     End If
@@ -89,13 +89,13 @@ Namespace DataOutput
                     End If
                 Next
 
-                If Not srDataOutfile Is Nothing Then srDataOutfile.Close()
-                If Not srScanInfoOutFile Is Nothing Then srScanInfoOutFile.Close()
+                If Not dataWriter Is Nothing Then dataWriter.Close()
+                If Not scanInfoWriter Is Nothing Then scanInfoWriter.Close()
 
                 Return True
 
             Catch ex As Exception
-                ReportError("Error writing the raw spectra data to: " & strOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the raw spectra data to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -103,118 +103,118 @@ Namespace DataOutput
 
 
         Private Sub SaveCSVFilesToDiskWork(
-          srDataOutFile As StreamWriter,
-          srScanInfoOutfile As StreamWriter,
+          dataWriter As StreamWriter,
+          scanInfoWriter As StreamWriter,
           currentScan As clsScanInfo,
           objSpectraCache As clsSpectraCache,
-          blnFragmentationScan As Boolean,
-          ByRef intSpectrumExportCount As Integer)
+          fragmentationScan As Boolean,
+          ByRef spectrumExportCount As Integer)
 
-            Dim intPoolIndex As Integer
-            Dim intScanNumber As Integer
-            Dim sngBaselineNoiseLevel As Single
+            Dim poolIndex As Integer
+            Dim scanNumber As Integer
+            Dim baselineNoiseLevel As Single
 
-            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
+            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                 Exit Sub
             End If
 
-            intSpectrumExportCount += 1
+            spectrumExportCount += 1
 
             With currentScan
                 ' First, write an entry to the "_scans.csv" file
 
                 If mOptions.RawDataExportOptions.RenumberScans Then
-                    intScanNumber = intSpectrumExportCount
+                    scanNumber = spectrumExportCount
                 Else
-                    intScanNumber = .ScanNumber
+                    scanNumber = .ScanNumber
                 End If
 
-                Dim intMSLevel As Integer
-                If blnFragmentationScan Then
-                    intMSLevel = .FragScanInfo.MSLevel
+                Dim msLevel As Integer
+                If fragmentationScan Then
+                    msLevel = .FragScanInfo.MSLevel
                 Else
-                    intMSLevel = 1
+                    msLevel = 1
                 End If
 
-                Dim intNumIsotopicSignatures = 0
-                Dim intNumPeaks = objSpectraCache.SpectraPool(intPoolIndex).IonCount
+                Dim numIsotopicSignatures = 0
+                Dim numPeaks = objSpectraCache.SpectraPool(poolIndex).IonCount
 
-                sngBaselineNoiseLevel = .BaselineNoiseStats.NoiseLevel
-                If sngBaselineNoiseLevel < 1 Then sngBaselineNoiseLevel = 1
+                baselineNoiseLevel = .BaselineNoiseStats.NoiseLevel
+                If baselineNoiseLevel < 1 Then baselineNoiseLevel = 1
 
                 ' Old Column Order:
-                ''strLineOut = intScanNumber.ToString() & "," &
+                ''lineOut = scanNumber.ToString() & "," &
                 ''             .ScanTime.ToString("0.0000") &
-                ''             intMSLevel & "," &
-                ''             intNumIsotopicSignatures & "," &
-                ''             intNumPeaks & "," &
+                ''             msLevel & "," &
+                ''             numIsotopicSignatures & "," &
+                ''             numPeaks & "," &
                 ''             .TotalIonIntensity.ToString() & "," &
                 ''             .BasePeakIonMZ & "," &
                 ''             .BasePeakIonIntensity & "," &
-                ''             sngTimeDomainIntensity & "," &
-                ''             sngPeakIntensityThreshold & "," &
-                ''             sngPeptideIntensityThreshold
+                ''             timeDomainIntensity & "," &
+                ''             peakIntensityThreshold & "," &
+                ''             peptideIntensityThreshold
 
-                mBPIWriter.WriteDecon2LSScanFileEntry(srScanInfoOutfile, currentScan, intScanNumber, intMSLevel, intNumPeaks, intNumIsotopicSignatures)
+                mBPIWriter.WriteDecon2LSScanFileEntry(scanInfoWriter, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures)
             End With
 
 
-            With objSpectraCache.SpectraPool(intPoolIndex)
+            With objSpectraCache.SpectraPool(poolIndex)
                 ' Now write an entry to the "_isos.csv" file
 
                 If .IonCount > 0 Then
-                    ' Populate sngIntensities and intPointerArray()
+                    ' Populate intensities and pointerArray()
 
-                    Dim sngIntensities() As Single
-                    Dim intPointerArray() As Integer
+                    Dim intensities() As Single
+                    Dim pointerArray() As Integer
 
-                    ReDim sngIntensities(.IonCount - 1)
-                    ReDim intPointerArray(.IonCount - 1)
-                    For intIonIndex = 0 To .IonCount - 1
-                        sngIntensities(intIonIndex) = .IonsIntensity(intIonIndex)
-                        intPointerArray(intIonIndex) = intIonIndex
+                    ReDim intensities(.IonCount - 1)
+                    ReDim pointerArray(.IonCount - 1)
+                    For ionIndex = 0 To .IonCount - 1
+                        intensities(ionIndex) = .IonsIntensity(ionIndex)
+                        pointerArray(ionIndex) = ionIndex
                     Next
 
-                    ' Sort intPointerArray() based on the intensities in sngIntensities
-                    Array.Sort(sngIntensities, intPointerArray)
+                    ' Sort pointerArray() based on the intensities in intensities
+                    Array.Sort(intensities, pointerArray)
 
-                    Dim intStartIndex As Integer
+                    Dim startIndex As Integer
                     If mOptions.RawDataExportOptions.MaxIonCountPerScan > 0 Then
-                        ' Possibly limit the number of ions to intMaxIonCount
-                        intStartIndex = .IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan
-                        If intStartIndex < 0 Then intStartIndex = 0
+                        ' Possibly limit the number of ions to maxIonCount
+                        startIndex = .IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan
+                        If startIndex < 0 Then startIndex = 0
                     Else
-                        intStartIndex = 0
+                        startIndex = 0
                     End If
 
                     ' Define the minimum data point intensity value
-                    Dim sngMinimumIntensityCurrentScan = .IonsIntensity(intPointerArray(intStartIndex))
+                    Dim minimumIntensityCurrentScan = .IonsIntensity(pointerArray(startIndex))
 
                     ' Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
-                    sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum)
+                    minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum)
 
-                    ' If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update sngMinimumIntensityCurrentScan
+                    ' If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
                     If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0 Then
-                        sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio)
+                        minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio)
                     End If
 
-                    For intIonIndex = 0 To .IonCount - 1
-                        If .IonsIntensity(intIonIndex) >= sngMinimumIntensityCurrentScan Then
+                    For ionIndex = 0 To .IonCount - 1
+                        If .IonsIntensity(ionIndex) >= minimumIntensityCurrentScan Then
 
-                            Dim intCharge = 1
-                            Dim sngFit = 0
-                            Dim dblMass = clsUtilities.ConvoluteMass(.IonsMZ(intIonIndex), 1, 0)
-                            Dim sngFWHM = 0
-                            Dim sngSignalToNoise = .IonsIntensity(intIonIndex) / sngBaselineNoiseLevel
-                            Dim sngMonoisotopicAbu = -10
-                            Dim sngMonoPlus2Abu = -10
+                            Dim charge = 1
+                            Dim isoFit = 0
+                            Dim mass = clsUtilities.ConvoluteMass(.IonsMZ(ionIndex), 1, 0)
+                            Dim peakFWHM = 0
+                            Dim signalToNoise = .IonsIntensity(ionIndex) / baselineNoiseLevel
+                            Dim monoisotopicAbu = -10
+                            Dim monoPlus2Abu = -10
 
                             mBPIWriter.WriteDecon2LSIsosFileEntry(
-                              srDataOutFile, intScanNumber, intCharge,
-                              .IonsIntensity(intIonIndex), .IonsMZ(intIonIndex),
-                              sngFit, dblMass, dblMass, dblMass,
-                              sngFWHM, sngSignalToNoise, sngMonoisotopicAbu, sngMonoPlus2Abu)
+                              dataWriter, scanNumber, charge,
+                              .IonsIntensity(ionIndex), .IonsMZ(ionIndex),
+                              isoFit, mass, mass, mass,
+                              peakFWHM, signalToNoise, monoisotopicAbu, monoPlus2Abu)
 
                         End If
                     Next
@@ -225,131 +225,131 @@ Namespace DataOutput
         End Sub
 
         Private Sub SavePEKFileToDiskWork(
-          srOutFile As StreamWriter,
+          writer As TextWriter,
           currentScan As clsScanInfo,
           objSpectraCache As clsSpectraCache,
-          strInputFileName As String,
-          blnFragmentationScan As Boolean,
-          ByRef intSpectrumExportCount As Integer)
+          inputFileName As String,
+          fragmentationScan As Boolean,
+          ByRef spectrumExportCount As Integer)
 
-            Dim intPoolIndex As Integer
-            Dim intExportCount = 0
+            Dim poolIndex As Integer
+            Dim exportCount = 0
 
-            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
+            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                 Exit Sub
             End If
 
-            intSpectrumExportCount += 1
+            spectrumExportCount += 1
 
             With currentScan
 
-                srOutFile.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString())          ' Store the base peak ion intensity as the time domain signal level value
+                writer.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString())          ' Store the base peak ion intensity as the time domain signal level value
 
-                srOutFile.WriteLine("MASIC " & mOptions.MASICVersion)                     ' Software version
-                Dim strLineOut = "MS/MS-based PEK file"
+                writer.WriteLine("MASIC " & mOptions.MASICVersion)                     ' Software version
+                Dim dataLine = "MS/MS-based PEK file"
                 If mOptions.RawDataExportOptions.IncludeMSMS Then
-                    strLineOut &= " (includes both survey scans and fragmentation spectra)"
+                    dataLine &= " (includes both survey scans and fragmentation spectra)"
                 Else
-                    strLineOut &= " (includes only survey scans)"
+                    dataLine &= " (includes only survey scans)"
                 End If
-                srOutFile.WriteLine(strLineOut)
+                writer.WriteLine(dataLine)
 
-                Dim intScanNumber As Integer
+                Dim scanNumber As Integer
                 If mOptions.RawDataExportOptions.RenumberScans Then
-                    intScanNumber = intSpectrumExportCount
+                    scanNumber = spectrumExportCount
                 Else
-                    intScanNumber = .ScanNumber
+                    scanNumber = .ScanNumber
                 End If
-                strLineOut = "Filename: " & strInputFileName & "." & intScanNumber.ToString("00000")
-                srOutFile.WriteLine(strLineOut)
+                dataLine = "Filename: " & inputFileName & "." & scanNumber.ToString("00000")
+                writer.WriteLine(dataLine)
 
-                If blnFragmentationScan Then
-                    srOutFile.WriteLine("ScanType: Fragmentation Scan")
+                If fragmentationScan Then
+                    writer.WriteLine("ScanType: Fragmentation Scan")
                 Else
-                    srOutFile.WriteLine("ScanType: Survey Scan")
+                    writer.WriteLine("ScanType: Survey Scan")
                 End If
 
-                srOutFile.WriteLine("Charge state mass transform results:")
-                srOutFile.WriteLine("First CS,    Number of CS,   Abundance,   Mass,   Standard deviation")
+                writer.WriteLine("Charge state mass transform results:")
+                writer.WriteLine("First CS,    Number of CS,   Abundance,   Mass,   Standard deviation")
             End With
 
-            With objSpectraCache.SpectraPool(intPoolIndex)
+            With objSpectraCache.SpectraPool(poolIndex)
 
                 If .IonCount > 0 Then
-                    ' Populate sngIntensities and intPointerArray()
-                    Dim sngIntensities() As Single
-                    Dim intPointerArray() As Integer
+                    ' Populate intensities and pointerArray()
+                    Dim intensities() As Single
+                    Dim pointerArray() As Integer
 
-                    ReDim sngIntensities(.IonCount - 1)
-                    ReDim intPointerArray(.IonCount - 1)
-                    For intIonIndex = 0 To .IonCount - 1
-                        sngIntensities(intIonIndex) = .IonsIntensity(intIonIndex)
-                        intPointerArray(intIonIndex) = intIonIndex
+                    ReDim intensities(.IonCount - 1)
+                    ReDim pointerArray(.IonCount - 1)
+                    For ionIndex = 0 To .IonCount - 1
+                        intensities(ionIndex) = .IonsIntensity(ionIndex)
+                        pointerArray(ionIndex) = ionIndex
                     Next
 
-                    ' Sort intPointerArray() based on the intensities in sngIntensities
-                    Array.Sort(sngIntensities, intPointerArray)
+                    ' Sort pointerArray() based on the intensities in intensities
+                    Array.Sort(intensities, pointerArray)
 
-                    Dim intStartIndex As Integer
+                    Dim startIndex As Integer
 
                     If mOptions.RawDataExportOptions.MaxIonCountPerScan > 0 Then
-                        ' Possibly limit the number of ions to intMaxIonCount
-                        intStartIndex = .IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan
-                        If intStartIndex < 0 Then intStartIndex = 0
+                        ' Possibly limit the number of ions to maxIonCount
+                        startIndex = .IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan
+                        If startIndex < 0 Then startIndex = 0
                     Else
-                        intStartIndex = 0
+                        startIndex = 0
                     End If
 
                     ' Define the minimum data point intensity value
-                    Dim sngMinimumIntensityCurrentScan = .IonsIntensity(intPointerArray(intStartIndex))
+                    Dim minimumIntensityCurrentScan = .IonsIntensity(pointerArray(startIndex))
 
                     ' Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
-                    sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum)
+                    minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum)
 
-                    ' If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update sngMinimumIntensityCurrentScan
+                    ' If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
                     If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0 Then
-                        sngMinimumIntensityCurrentScan = Math.Max(sngMinimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio)
+                        minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio)
                     End If
 
-                    intExportCount = 0
-                    For intIonIndex = 0 To .IonCount - 1
-                        If .IonsIntensity(intIonIndex) >= sngMinimumIntensityCurrentScan Then
-                            Dim strLineOut =
+                    exportCount = 0
+                    For ionIndex = 0 To .IonCount - 1
+                        If .IonsIntensity(ionIndex) >= minimumIntensityCurrentScan Then
+                            Dim dataLine =
                                 "1" & ControlChars.Tab &
                                 "1" & ControlChars.Tab &
-                                .IonsIntensity(intIonIndex) & ControlChars.Tab &
-                                .IonsMZ(intIonIndex) & ControlChars.Tab &
+                                .IonsIntensity(ionIndex) & ControlChars.Tab &
+                                .IonsMZ(ionIndex) & ControlChars.Tab &
                                 "0"
 
-                            srOutFile.WriteLine(strLineOut)
-                            intExportCount += 1
+                            writer.WriteLine(dataLine)
+                            exportCount += 1
                         End If
                     Next
                 End If
 
-                srOutFile.WriteLine("Number of peaks in spectrum = " & .IonCount.ToString())
-                srOutFile.WriteLine("Number of isotopic distributions detected = " & intExportCount.ToString())
-                srOutFile.WriteLine()
+                writer.WriteLine("Number of peaks in spectrum = " & .IonCount.ToString())
+                writer.WriteLine("Number of isotopic distributions detected = " & exportCount.ToString())
+                writer.WriteLine()
 
             End With
 
         End Sub
 
-        Private Sub SaveRawDatatoDiskWork(
-          srDataOutFile As StreamWriter,
-          srScanInfoOutfile As StreamWriter,
+        Private Sub SaveRawDataToDiskWork(
+          dataWriter As StreamWriter,
+          scanInfoWriter As StreamWriter,
           currentScan As clsScanInfo,
           objSpectraCache As clsSpectraCache,
-          strInputFileName As String,
-          blnFragmentationScan As Boolean,
-          ByRef intSpectrumExportCount As Integer)
+          inputFileName As String,
+          fragmentationScan As Boolean,
+          ByRef spectrumExportCount As Integer)
 
             Select Case mOptions.RawDataExportOptions.FileFormat
                 Case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile
-                    SavePEKFileToDiskWork(srDataOutFile, currentScan, objSpectraCache, strInputFileName, blnFragmentationScan, intSpectrumExportCount)
+                    SavePEKFileToDiskWork(dataWriter, currentScan, objSpectraCache, inputFileName, fragmentationScan, spectrumExportCount)
                 Case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile
-                    SaveCSVFilesToDiskWork(srDataOutFile, srScanInfoOutfile, currentScan, objSpectraCache, blnFragmentationScan, intSpectrumExportCount)
+                    SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, objSpectraCache, fragmentationScan, spectrumExportCount)
                 Case Else
                     ' Unknown format
                     ' This code should never be reached

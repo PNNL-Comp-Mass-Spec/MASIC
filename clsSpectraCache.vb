@@ -357,7 +357,7 @@ Public Class clsSpectraCache
         ' Looks for and deletes the spectrum cache files created by this instance of MASIC
         ' Additionally, looks for and deletes spectrum cache files with modification dates more than SPECTRUM_CACHE_MAX_FILE_AGE_HOURS from the present
 
-        Dim dtFileDateTolerance = DateTime.UtcNow.Subtract(New TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0))
+        Dim fileDateTolerance = DateTime.UtcNow.Subtract(New TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0))
 
         Try
             ' Delete the cached files for this instance of clsMasic
@@ -389,7 +389,7 @@ Public Class clsSpectraCache
 
             If Not objFolder Is Nothing Then
                 For Each objFile In objFolder.GetFiles(filePathMatch)
-                    If objFile.LastWriteTimeUtc < dtFileDateTolerance Then
+                    If objFile.LastWriteTimeUtc < fileDateTolerance Then
                         objFile.Delete()
                     End If
                 Next objFile
@@ -530,13 +530,13 @@ Public Class clsSpectraCache
             ' Lookup the byte offset for the given spectrum
 
             If mSpectrumByteOffset.Contains(scanNumber) Then
-                Dim lngByteOffset = CType(mSpectrumByteOffset.Item(scanNumber), Long)
+                Dim byteOffset = CType(mSpectrumByteOffset.Item(scanNumber), Long)
 
                 ' Make sure all previous spectra are flushed to disk
                 mPageFileWriter.Flush()
 
                 ' Read the spectrum from the page file
-                mPageFileReader.BaseStream.Seek(lngByteOffset, SeekOrigin.Begin)
+                mPageFileReader.BaseStream.Seek(byteOffset, SeekOrigin.Begin)
 
                 Dim scanNumberInCacheFile = mPageFileReader.ReadInt32()
                 Dim ionCount = mPageFileReader.ReadInt32()

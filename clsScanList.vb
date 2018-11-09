@@ -81,10 +81,10 @@ Public Class clsScanList
     End Sub
 
     Public Function AddFakeSurveyScan() As Integer
-        Const intScanNumber = 0
-        Const sngScanTime As Single = 0
+        Const scanNumber = 0
+        Const scanTime As Single = 0
 
-        Return AddFakeSurveyScan(intScanNumber, sngScanTime)
+        Return AddFakeSurveyScan(scanNumber, scanTime)
     End Function
 
     ''' <summary>
@@ -99,34 +99,34 @@ Public Class clsScanList
 
         Dim surveyScan = GetFakeSurveyScan(scanNumber, scanTime)
 
-        Dim intSurveyScanIndex = SurveyScans.Count
+        Dim surveyScanIndex = SurveyScans.Count
 
         SurveyScans.Add(surveyScan)
 
-        AddMasterScanEntry(eScanTypeConstants.SurveyScan, intSurveyScanIndex)
+        AddMasterScanEntry(eScanTypeConstants.SurveyScan, surveyScanIndex)
 
-        Return intSurveyScanIndex
+        Return surveyScanIndex
     End Function
 
-    Public Sub AddMasterScanEntry(eScanType As eScanTypeConstants, intScanIndex As Integer)
+    Public Sub AddMasterScanEntry(eScanType As eScanTypeConstants, scanIndex As Integer)
         ' Adds a new entry to .MasterScanOrder using an existing entry in SurveyScans() or FragScans()
 
         If eScanType = eScanTypeConstants.SurveyScan Then
-            If SurveyScans.Count > 0 AndAlso intScanIndex < SurveyScans.Count Then
-                AddMasterScanEntry(eScanType, intScanIndex, SurveyScans(intScanIndex).ScanNumber, SurveyScans(intScanIndex).ScanTime)
+            If SurveyScans.Count > 0 AndAlso scanIndex < SurveyScans.Count Then
+                AddMasterScanEntry(eScanType, scanIndex, SurveyScans(scanIndex).ScanNumber, SurveyScans(scanIndex).ScanTime)
             Else
                 ' This code shouldn't normally be reached
-                ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Survey ScanIndex {intScanIndex}: index is out of range")
-                AddMasterScanEntry(eScanType, intScanIndex, 0, 0)
+                ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Survey ScanIndex {scanIndex}: index is out of range")
+                AddMasterScanEntry(eScanType, scanIndex, 0, 0)
             End If
 
         ElseIf eScanType = eScanTypeConstants.FragScan Then
-            If FragScans.Count > 0 AndAlso intScanIndex < FragScans.Count Then
-                AddMasterScanEntry(eScanType, intScanIndex, FragScans(intScanIndex).ScanNumber, FragScans(intScanIndex).ScanTime)
+            If FragScans.Count > 0 AndAlso scanIndex < FragScans.Count Then
+                AddMasterScanEntry(eScanType, scanIndex, FragScans(scanIndex).ScanNumber, FragScans(scanIndex).ScanTime)
             Else
                 ' This code shouldn't normally be reached
-                AddMasterScanEntry(eScanType, intScanIndex, 0, 0)
-                ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Frag ScanIndex {intScanIndex}: index is out of range")
+                AddMasterScanEntry(eScanType, scanIndex, 0, 0)
+                ReportMessage($"Error in AddMasterScanEntry for ScanType {eScanType}, Frag ScanIndex {scanIndex}: index is out of range")
             End If
 
         Else
@@ -138,9 +138,9 @@ Public Class clsScanList
 
     Public Sub AddMasterScanEntry(
        eScanType As eScanTypeConstants,
-       intScanIndex As Integer,
-       intScanNumber As Integer,
-       sngScanTime As Single)
+       scanIndex As Integer,
+       scanNumber As Integer,
+       scanTime As Single)
 
         Dim initialScanCount = MasterScanOrderCount
 
@@ -155,10 +155,10 @@ Public Class clsScanList
         End If
 
         MasterScanOrder(initialScanCount).ScanType = eScanType
-        MasterScanOrder(initialScanCount).ScanIndexPointer = intScanIndex
+        MasterScanOrder(initialScanCount).ScanIndexPointer = scanIndex
 
-        MasterScanNumList(initialScanCount) = intScanNumber
-        MasterScanTimeList(initialScanCount) = sngScanTime
+        MasterScanNumList(initialScanCount) = scanNumber
+        MasterScanTimeList(initialScanCount) = scanTime
 
         MasterScanOrderCount += 1
 
@@ -192,30 +192,30 @@ Public Class clsScanList
     End Function
 
     Public Sub Initialize(
-      intSurveyScanCountToAllocate As Integer,
-      intFragScanCountToAllocate As Integer)
+      surveyScanCountToAllocate As Integer,
+      fragScanCountToAllocate As Integer)
 
-        Dim intMasterScanOrderCountToAllocate As Integer
-        Dim intIndex As Integer
+        Dim masterScanOrderCountToAllocate As Integer
+        Dim index As Integer
 
-        If intSurveyScanCountToAllocate < 1 Then intSurveyScanCountToAllocate = 1
-        If intFragScanCountToAllocate < 1 Then intFragScanCountToAllocate = 1
+        If surveyScanCountToAllocate < 1 Then surveyScanCountToAllocate = 1
+        If fragScanCountToAllocate < 1 Then fragScanCountToAllocate = 1
 
-        intMasterScanOrderCountToAllocate = intSurveyScanCountToAllocate + intFragScanCountToAllocate
+        masterScanOrderCountToAllocate = surveyScanCountToAllocate + fragScanCountToAllocate
 
         SurveyScans.Clear()
 
         FragScans.Clear()
 
         MasterScanOrderCount = 0
-        ReDim MasterScanOrder(intMasterScanOrderCountToAllocate - 1)
-        ReDim MasterScanNumList(intMasterScanOrderCountToAllocate - 1)
-        ReDim MasterScanTimeList(intMasterScanOrderCountToAllocate - 1)
+        ReDim MasterScanOrder(masterScanOrderCountToAllocate - 1)
+        ReDim MasterScanNumList(masterScanOrderCountToAllocate - 1)
+        ReDim MasterScanTimeList(masterScanOrderCountToAllocate - 1)
 
         ParentIonInfoCount = 0
-        ReDim ParentIons(intFragScanCountToAllocate - 1)
-        For intIndex = 0 To intFragScanCountToAllocate - 1
-            ParentIons(intIndex) = New clsParentIonInfo(0)
+        ReDim ParentIons(fragScanCountToAllocate - 1)
+        For index = 0 To fragScanCountToAllocate - 1
+            ParentIons(index) = New clsParentIonInfo(0)
         Next
 
     End Sub

@@ -38,9 +38,9 @@ Namespace DataOutput
                     Continue For
                 End If
 
-                Dim dblValue As Double
-                If Double.TryParse(value, dblValue) Then
-                    If Math.Abs(dblValue) < Double.Epsilon Then
+                Dim parsedValue As Double
+                If Double.TryParse(value, parsedValue) Then
+                    If Math.Abs(parsedValue) < Double.Epsilon Then
                         Continue For
                     End If
                 End If
@@ -58,7 +58,7 @@ Namespace DataOutput
 
         Public Function SaveDataToXML(
           scanList As clsScanList,
-          intParentIonIndex As Integer,
+          parentIonIndex As Integer,
           sicDetails As clsSICDetails,
           smoothedYDataSubset As MASICPeakFinder.clsSmoothedYDataSubset,
           dataOutputHandler As clsDataOutput) As Boolean
@@ -66,9 +66,9 @@ Namespace DataOutput
             ' Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
             Dim SICDataScanIntervals() As Byte
 
-            Dim strLastGoodLoc = "Start"
-            Dim blnIntensityDataListWritten As Boolean
-            Dim blnMassDataList As Boolean
+            Dim lastGoodLoc = "Start"
+            Dim intensityDataListWritten As Boolean
+            Dim massDataList As Boolean
 
             Try
                 ' Populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
@@ -79,11 +79,11 @@ Namespace DataOutput
                     ReDim SICDataScanIntervals(sicDetails.SICDataCount - 1)
                     Dim sicScanNumbers = sicDetails.SICScanNumbers
 
-                    For intScanIndex = 1 To sicDetails.SICDataCount - 1
-                        Dim intScanDelta = sicScanNumbers(intScanIndex) - sicScanNumbers(intScanIndex - 1)
+                    For scanIndex = 1 To sicDetails.SICDataCount - 1
+                        Dim scanDelta = sicScanNumbers(scanIndex) - sicScanNumbers(scanIndex - 1)
                         ' When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
                         ' However, for MRM data, field size can be much larger
-                        SICDataScanIntervals(intScanIndex) = CByte(Math.Min(Byte.MaxValue, intScanDelta))
+                        SICDataScanIntervals(scanIndex) = CByte(Math.Min(Byte.MaxValue, scanDelta))
                     Next
                 End If
 
@@ -99,15 +99,15 @@ Namespace DataOutput
                 Dim sicScanIndices = sicDetails.SICScanIndices
 
                 ' Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
-                For intFragScanIndex = 0 To scanList.ParentIons(intParentIonIndex).FragScanIndexCount - 1
-                    strLastGoodLoc = "intFragScanIndex=" & intFragScanIndex.ToString
+                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndexCount - 1
+                    lastGoodLoc = "fragScanIndex=" & fragScanIndex.ToString
 
                     objXMLOut.WriteStartElement("ParentIon")
-                    objXMLOut.WriteAttributeString("Index", intParentIonIndex.ToString())             ' Parent ion Index
-                    objXMLOut.WriteAttributeString("FragScanIndex", intFragScanIndex.ToString())      ' Frag Scan Index
+                    objXMLOut.WriteAttributeString("Index", parentIonIndex.ToString())             ' Parent ion Index
+                    objXMLOut.WriteAttributeString("FragScanIndex", fragScanIndex.ToString())      ' Frag Scan Index
 
-                    strLastGoodLoc = "With scanList.ParentIons(intParentIonIndex)"
-                    With scanList.ParentIons(intParentIonIndex)
+                    lastGoodLoc = "With scanList.ParentIons(parentIonIndex)"
+                    With scanList.ParentIons(parentIonIndex)
                         objXMLOut.WriteElementString("MZ", StringUtilities.DblToString(.MZ, 4))
 
                         If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < scanList.SurveyScans.Count Then
@@ -116,14 +116,14 @@ Namespace DataOutput
                             objXMLOut.WriteElementString("SurveyScanNumber", "-1")
                         End If
 
-                        strLastGoodLoc = "Write FragScanNumber"
+                        lastGoodLoc = "Write FragScanNumber"
 
                         Dim interferenceScore As Double
 
-                        If intFragScanIndex < scanList.FragScans.Count Then
-                            objXMLOut.WriteElementString("FragScanNumber", scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanNumber.ToString())
-                            objXMLOut.WriteElementString("FragScanTime", scanList.FragScans(.FragScanIndices(intFragScanIndex)).ScanTime.ToString())
-                            interferenceScore = scanList.FragScans(.FragScanIndices(intFragScanIndex)).FragScanInfo.InteferenceScore
+                        If fragScanIndex < scanList.FragScans.Count Then
+                            objXMLOut.WriteElementString("FragScanNumber", scanList.FragScans(.FragScanIndices(fragScanIndex)).ScanNumber.ToString())
+                            objXMLOut.WriteElementString("FragScanTime", scanList.FragScans(.FragScanIndices(fragScanIndex)).ScanTime.ToString())
+                            interferenceScore = scanList.FragScans(.FragScanIndices(fragScanIndex)).FragScanInfo.InteferenceScore
                         Else
                             ' Fragmentation scan does not exist
                             objXMLOut.WriteElementString("FragScanNumber", "0")
@@ -142,7 +142,7 @@ Namespace DataOutput
                             objXMLOut.WriteElementString("CustomSICPeakScanToleranceType", mOptions.CustomSICList.ScanToleranceType.ToString())
                         End If
 
-                        strLastGoodLoc = "With .SICStats"
+                        lastGoodLoc = "With .SICStats"
                         With .SICStats
                             With .Peak
                                 If sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then
@@ -192,7 +192,7 @@ Namespace DataOutput
 
                             If mOptions.UseBase64DataEncoding Then
                                 ' Save scan interval list as base-64 encoded strings
-                                strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICScanIntervals"
+                                lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICScanIntervals"
                                 SaveDataToXMLEncodeArray(objXMLOut, "SICScanIntervals", SICDataScanIntervals)
                             Else
                                 ' Save scan interval list as long list of numbers
@@ -202,25 +202,25 @@ Namespace DataOutput
                                 '   For intervals between 10 and 35, uses letters A to Z
                                 '   For intervals between 36 and 61, uses letters A to Z
 
-                                strLastGoodLoc = "Populate strScanIntervalList"
-                                Dim strScanIntervalList = String.Empty
+                                lastGoodLoc = "Populate scanIntervalList"
+                                Dim scanIntervalList = String.Empty
                                 If Not SICDataScanIntervals Is Nothing Then
-                                    For intScanIntervalIndex = 0 To sicDetails.SICDataCount - 1
-                                        If SICDataScanIntervals(intScanIntervalIndex) <= 9 Then
-                                            strScanIntervalList &= SICDataScanIntervals(intScanIntervalIndex)
-                                        ElseIf SICDataScanIntervals(intScanIntervalIndex) <= 35 Then
-                                            strScanIntervalList &= Chr(SICDataScanIntervals(intScanIntervalIndex) + 55)     ' 55 = -10 + 65
-                                        ElseIf SICDataScanIntervals(intScanIntervalIndex) <= 61 Then
-                                            strScanIntervalList &= Chr(SICDataScanIntervals(intScanIntervalIndex) + 61)     ' 61 = -36 + 97
+                                    For scanIntervalIndex = 0 To sicDetails.SICDataCount - 1
+                                        If SICDataScanIntervals(scanIntervalIndex) <= 9 Then
+                                            scanIntervalList &= SICDataScanIntervals(scanIntervalIndex)
+                                        ElseIf SICDataScanIntervals(scanIntervalIndex) <= 35 Then
+                                            scanIntervalList &= Chr(SICDataScanIntervals(scanIntervalIndex) + 55)     ' 55 = -10 + 65
+                                        ElseIf SICDataScanIntervals(scanIntervalIndex) <= 61 Then
+                                            scanIntervalList &= Chr(SICDataScanIntervals(scanIntervalIndex) + 61)     ' 61 = -36 + 97
                                         Else
-                                            strScanIntervalList &= "z"
+                                            scanIntervalList &= "z"
                                         End If
                                     Next
                                 End If
-                                objXMLOut.WriteElementString("SICScanIntervals", strScanIntervalList)
+                                objXMLOut.WriteElementString("SICScanIntervals", scanIntervalList)
                             End If
 
-                            strLastGoodLoc = "Write SICPeakIndexStart"
+                            lastGoodLoc = "Write SICPeakIndexStart"
                             objXMLOut.WriteElementString("SICPeakIndexStart", .Peak.IndexBaseLeft.ToString())
                             objXMLOut.WriteElementString("SICPeakIndexEnd", .Peak.IndexBaseRight.ToString())
                             objXMLOut.WriteElementString("SICDataCount", sicDetails.SICDataCount.ToString())
@@ -233,10 +233,10 @@ Namespace DataOutput
 
                                 ' Save intensity and mass data lists as base-64 encoded strings
                                 ' Note that these field names are purposely different than the DataList names used below for comma separated lists
-                                strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
+                                lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
                                 SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", sicDetails.SICIntensities)
 
-                                strLastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
+                                lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
                                 SaveDataToXMLEncodeArray(objXMLOut, "SICMassData", sicDetails.SICMassesAsFloat)
 
                                 If mOptions.SICOptions.SaveSmoothedData Then
@@ -250,11 +250,11 @@ Namespace DataOutput
                             Else
                                 ' Save intensity and mass data lists as tab-delimited text list
 
-                                blnIntensityDataListWritten = False
-                                blnMassDataList = False
+                                intensityDataListWritten = False
+                                massDataList = False
 
                                 Try
-                                    strLastGoodLoc = "Populate sbIntensityDataList"
+                                    lastGoodLoc = "Populate sbIntensityDataList"
                                     sbIntensityDataList.Length = 0
                                     sbMassDataList.Length = 0
 
@@ -282,19 +282,19 @@ Namespace DataOutput
                                     End If
 
                                     objXMLOut.WriteElementString("IntensityDataList", sbIntensityDataList.ToString())
-                                    blnIntensityDataListWritten = True
+                                    intensityDataListWritten = True
 
                                     objXMLOut.WriteElementString("MassDataList", sbMassDataList.ToString())
-                                    blnMassDataList = True
+                                    massDataList = True
 
                                 Catch ex As OutOfMemoryException
                                     ' Ignore the exception if this is an Out of Memory exception
 
-                                    If Not blnIntensityDataListWritten Then
+                                    If Not intensityDataListWritten Then
                                         objXMLOut.WriteElementString("IntensityDataList", "")
                                     End If
 
-                                    If Not blnMassDataList Then
+                                    If Not massDataList Then
                                         objXMLOut.WriteElementString("MassDataList", "")
                                     End If
 
@@ -302,12 +302,12 @@ Namespace DataOutput
 
                                 If mOptions.SICOptions.SaveSmoothedData Then
                                     Try
-                                        strLastGoodLoc = "Populate sbPeakYDataSmoothed"
+                                        lastGoodLoc = "Populate sbPeakYDataSmoothed"
                                         sbPeakYDataSmoothed.Length = 0
 
                                         If Not smoothedYDataSubset.Data Is Nothing AndAlso smoothedYDataSubset.DataCount > 0 Then
-                                            For intIndex = 0 To smoothedYDataSubset.DataCount - 1
-                                                sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data(intIndex)).ToString() & ",")
+                                            For index = 0 To smoothedYDataSubset.DataCount - 1
+                                                sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data(index)).ToString() & ",")
                                             Next
 
                                             ' Trim the trailing comma
@@ -331,7 +331,7 @@ Namespace DataOutput
                 Next
 
             Catch ex As Exception
-                ReportError("Error writing the XML data to the output file; Last good location: " & strLastGoodLoc, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the XML data to the output file; Last good location: " & lastGoodLoc, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -341,19 +341,19 @@ Namespace DataOutput
 
         Private Sub SaveDataToXMLEncodeArray(
           objXMLOut As Xml.XmlTextWriter,
-          strElementName As String,
+          elementName As String,
           dataArray() As Byte)
 
-            Dim intPrecisionBits As Integer
-            Dim strDataTypeName As String = String.Empty
+            Dim precisionBits As Integer
+            Dim dataTypeName As String = String.Empty
 
-            Dim strEncodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, intPrecisionBits, strDataTypeName)
+            Dim encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, precisionBits, dataTypeName)
 
             With objXMLOut
-                .WriteStartElement(strElementName)
-                .WriteAttributeString("precision", intPrecisionBits.ToString())        ' Store the precision, in bits
-                .WriteAttributeString("type", strDataTypeName)
-                .WriteString(strEncodedValues)
+                .WriteStartElement(elementName)
+                .WriteAttributeString("precision", precisionBits.ToString())        ' Store the precision, in bits
+                .WriteAttributeString("type", dataTypeName)
+                .WriteString(encodedValues)
                 .WriteEndElement()
             End With
 
@@ -361,19 +361,19 @@ Namespace DataOutput
 
         Private Sub SaveDataToXMLEncodeArray(
           objXMLOut As Xml.XmlTextWriter,
-          strElementName As String,
+          elementName As String,
           dataArray() As Single)
 
-            Dim intPrecisionBits As Integer
-            Dim strDataTypeName As String = String.Empty
+            Dim precisionBits As Integer
+            Dim dataTypeName As String = String.Empty
 
-            Dim strEncodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, intPrecisionBits, strDataTypeName)
+            Dim encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, precisionBits, dataTypeName)
 
             With objXMLOut
-                .WriteStartElement(strElementName)
-                .WriteAttributeString("precision", intPrecisionBits.ToString())        ' Store the precision, in bits
-                .WriteAttributeString("type", strDataTypeName)
-                .WriteString(strEncodedValues)
+                .WriteStartElement(elementName)
+                .WriteAttributeString("precision", precisionBits.ToString())        ' Store the precision, in bits
+                .WriteAttributeString("type", dataTypeName)
+                .WriteString(encodedValues)
                 .WriteEndElement()
             End With
 
@@ -424,7 +424,7 @@ Namespace DataOutput
         End Function
 
         Public Function XMLOutputFileInitialize(
-          strInputFilePathFull As String,
+          inputFilePathFull As String,
           outputDirectoryPath As String,
           dataOutputHandler As clsDataOutput,
           scanList As clsScanList,
@@ -432,13 +432,13 @@ Namespace DataOutput
           sicOptions As clsSICOptions,
           binningOptions As clsBinningOptions) As Boolean
 
-            Dim strXMLOutputFilePath = String.Empty
+            Dim xmlOutputFilePath = String.Empty
 
             Try
 
-                strXMLOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFilePathFull, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
+                xmlOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
 
-                dataOutputHandler.OutputFileHandles.XMLFileForSICs = New Xml.XmlTextWriter(strXMLOutputFilePath, Text.Encoding.UTF8)
+                dataOutputHandler.OutputFileHandles.XMLFileForSICs = New Xml.XmlTextWriter(xmlOutputFilePath, Text.Encoding.UTF8)
                 Dim objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
 
                 With objXMLOut
@@ -451,23 +451,23 @@ Namespace DataOutput
 
                 objXMLOut.WriteStartElement("ProcessingSummary")
                 objXMLOut.WriteElementString("DatasetNumber", sicOptions.DatasetNumber.ToString())
-                objXMLOut.WriteElementString("SourceFilePath", strInputFilePathFull)
+                objXMLOut.WriteElementString("SourceFilePath", inputFilePathFull)
 
-                Dim strLastModTime As String
-                Dim strFileSizeBytes As String
+                Dim lastModTimeText As String
+                Dim fileSizeBytes As String
 
                 Try
-                    Dim ioFileInfo = New FileInfo(strInputFilePathFull)
-                    Dim dtLastModTime = ioFileInfo.LastWriteTime()
-                    strLastModTime = dtLastModTime.ToShortDateString() & " " & dtLastModTime.ToShortTimeString()
-                    strFileSizeBytes = ioFileInfo.Length.ToString()
+                    Dim inputFileInfo = New FileInfo(inputFilePathFull)
+                    Dim lastModTime = inputFileInfo.LastWriteTime()
+                    lastModTimeText = lastModTime.ToShortDateString() & " " & lastModTime.ToShortTimeString()
+                    fileSizeBytes = inputFileInfo.Length.ToString()
                 Catch ex As Exception
-                    strLastModTime = String.Empty
-                    strFileSizeBytes = "0"
+                    lastModTimeText = String.Empty
+                    fileSizeBytes = "0"
                 End Try
 
-                objXMLOut.WriteElementString("SourceFileDateTime", strLastModTime)
-                objXMLOut.WriteElementString("SourceFileSizeBytes", strFileSizeBytes)
+                objXMLOut.WriteElementString("SourceFileDateTime", lastModTimeText)
+                objXMLOut.WriteElementString("SourceFileSizeBytes", fileSizeBytes)
 
                 objXMLOut.WriteElementString("MASICProcessingDate", DateTime.Now.ToShortDateString() & " " & DateTime.Now.ToLongTimeString())
                 objXMLOut.WriteElementString("MASICVersion", mOptions.MASICVersion)
@@ -590,7 +590,7 @@ Namespace DataOutput
 
 
             Catch ex As Exception
-                ReportError("Error initializing the XML output file: " & strXMLOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error initializing the XML output file: " & xmlOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -599,44 +599,44 @@ Namespace DataOutput
         End Function
 
         Private Sub XmlOutputFileReplaceSetting(
-          srOutFile As StreamWriter,
-          strLineIn As String,
-          strXMLElementName As String,
-          intNewValueToSave As Integer)
+          writer As TextWriter,
+          lineIn As String,
+          xmlElementName As String,
+          newValueToSave As Integer)
 
-            ' strXMLElementName should be the properly capitalized element name and should not start with "<"
+            ' xmlElementName should be the properly capitalized element name and should not start with "<"
 
-            Dim strWork As String
-            Dim intCharIndex As Integer
-            Dim intCurrentValue As Integer
+            Dim work As String
+            Dim charIndex As Integer
+            Dim currentValue As Integer
 
-            ' Need to add two since strXMLElementName doesn't include "<" at the beginning
-            strWork = strLineIn.Trim.ToLower.Substring(strXMLElementName.Length + 2)
+            ' Need to add two since xmlElementName doesn't include "<" at the beginning
+            work = lineIn.Trim.ToLower().Substring(xmlElementName.Length + 2)
 
             ' Look for the "<" after the number
-            intCharIndex = strWork.IndexOf("<", StringComparison.Ordinal)
-            If intCharIndex > 0 Then
+            charIndex = work.IndexOf("<", StringComparison.Ordinal)
+            If charIndex > 0 Then
                 ' Isolate the number
-                strWork = strWork.Substring(0, intCharIndex)
-                If clsUtilities.IsNumber(strWork) Then
-                    intCurrentValue = CInt(strWork)
+                work = work.Substring(0, charIndex)
+                If clsUtilities.IsNumber(work) Then
+                    currentValue = CInt(work)
 
-                    If intNewValueToSave <> intCurrentValue Then
-                        strLineIn = "  <" & strXMLElementName & ">"
-                        strLineIn &= intNewValueToSave.ToString
-                        strLineIn &= "</" & strXMLElementName & ">"
+                    If newValueToSave <> currentValue Then
+                        lineIn = "  <" & xmlElementName & ">"
+                        lineIn &= newValueToSave.ToString
+                        lineIn &= "</" & xmlElementName & ">"
 
                     End If
                 End If
             End If
 
-            srOutFile.WriteLine(strLineIn)
+            writer.WriteLine(lineIn)
 
         End Sub
 
         Public Function XmlOutputFileUpdateEntries(
           scanList As clsScanList,
-          strInputFileName As String,
+          inputFileName As String,
           outputDirectoryPath As String) As Boolean
 
 
@@ -646,47 +646,47 @@ Namespace DataOutput
             Const OPTIMAL_PEAK_APEX_TAG_NAME = "OptimalPeakApexScanNumber"
             Const PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME = "PeakApexOverrideParentIonIndex"
 
-            Dim strXMLReadFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
+            Dim xmlReadFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
 
-            Dim strXMLOutputFilePath = Path.Combine(strOutputFolderPath, "__temp__MASICOutputFile.xml")
+            Dim xmlOutputFilePath = Path.Combine(outputDirectoryPath, "__temp__MASICOutputFile.xml")
 
             Try
                 ' Wait 2 seconds before reopening the file, to make sure the handle is closed
                 Threading.Thread.Sleep(2000)
 
-                If Not File.Exists(strXMLReadFilePath) Then
+                If Not File.Exists(xmlReadFilePath) Then
                     ' XML file not found, exit the function
                     Return True
                 End If
 
-                Using srInFile = New StreamReader(strXMLReadFilePath),
-                  srOutFile = New StreamWriter(strXMLOutputFilePath, False)
+                Using reader = New StreamReader(xmlReadFilePath),
+                  writer = New StreamWriter(xmlOutputFilePath, False)
 
                     UpdateProgress(0, "Updating XML file with optimal peak apex values")
 
-                    Dim intParentIonIndex = -1
-                    Dim intParentIonsProcessed = 0
-                    Do While Not srInFile.EndOfStream
-                        Dim strLineIn = srInFile.ReadLine()
-                        If strLineIn Is Nothing Then Continue Do
+                    Dim parentIonIndex = -1
+                    Dim parentIonsProcessed = 0
+                    Do While Not reader.EndOfStream
+                        Dim dataLine = reader.ReadLine()
+                        If dataLine Is Nothing Then Continue Do
 
-                        Dim strLineInTrimmedAndLower = strLineIn.Trim.ToLower()
+                        Dim dataLineLCase = dataLine.Trim().ToLower()
 
-                        If strLineInTrimmedAndLower.StartsWith(PARENT_ION_TAG_START_LCASE) Then
-                            Dim intCharIndex = strLineInTrimmedAndLower.IndexOf(INDEX_ATTRIBUTE_LCASE, StringComparison.CurrentCultureIgnoreCase)
-                            If intCharIndex > 0 Then
-                                Dim strWork = strLineInTrimmedAndLower.Substring(intCharIndex + INDEX_ATTRIBUTE_LCASE.Length + 1)
-                                intCharIndex = strWork.IndexOf(ControlChars.Quote)
-                                If intCharIndex > 0 Then
-                                    strWork = strWork.Substring(0, intCharIndex)
-                                    If clsUtilities.IsNumber(strWork) Then
-                                        intParentIonIndex = CInt(strWork)
-                                        intParentIonsProcessed += 1
+                        If dataLineLCase.StartsWith(PARENT_ION_TAG_START_LCASE) Then
+                            Dim charIndex = dataLineLCase.IndexOf(INDEX_ATTRIBUTE_LCASE, StringComparison.CurrentCultureIgnoreCase)
+                            If charIndex > 0 Then
+                                Dim work = dataLineLCase.Substring(charIndex + INDEX_ATTRIBUTE_LCASE.Length + 1)
+                                charIndex = work.IndexOf(ControlChars.Quote)
+                                If charIndex > 0 Then
+                                    work = work.Substring(0, charIndex)
+                                    If clsUtilities.IsNumber(work) Then
+                                        parentIonIndex = CInt(work)
+                                        parentIonsProcessed += 1
 
                                         ' Update progress
                                         If scanList.ParentIonInfoCount > 1 Then
-                                            If intParentIonsProcessed Mod 100 = 0 Then
-                                                UpdateProgress(CShort(intParentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
+                                            If parentIonsProcessed Mod 100 = 0 Then
+                                                UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
                                             End If
                                         Else
                                             UpdateProgress(0)
@@ -701,18 +701,18 @@ Namespace DataOutput
                                 End If
                             End If
 
-                            srOutFile.WriteLine(strLineIn)
+                            writer.WriteLine(dataLine)
 
-                        ElseIf strLineInTrimmedAndLower.StartsWith("<" & OPTIMAL_PEAK_APEX_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
-                            If intParentIonIndex < scanList.ParentIonInfoCount Then
-                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, OPTIMAL_PEAK_APEX_TAG_NAME, scanList.ParentIons(intParentIonIndex).OptimalPeakApexScanNumber)
+                        ElseIf dataLineLCase.StartsWith("<" & OPTIMAL_PEAK_APEX_TAG_NAME.ToLower) AndAlso parentIonIndex >= 0 Then
+                            If parentIonIndex < scanList.ParentIonInfoCount Then
+                                XmlOutputFileReplaceSetting(writer, dataLine, OPTIMAL_PEAK_APEX_TAG_NAME, scanList.ParentIons(parentIonIndex).OptimalPeakApexScanNumber)
                             End If
-                        ElseIf strLineInTrimmedAndLower.StartsWith("<" & PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME.ToLower) AndAlso intParentIonIndex >= 0 Then
-                            If intParentIonIndex < scanList.ParentIonInfoCount Then
-                                XmlOutputFileReplaceSetting(srOutFile, strLineIn, PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME, scanList.ParentIons(intParentIonIndex).PeakApexOverrideParentIonIndex)
+                        ElseIf dataLineLCase.StartsWith("<" & PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME.ToLower) AndAlso parentIonIndex >= 0 Then
+                            If parentIonIndex < scanList.ParentIonInfoCount Then
+                                XmlOutputFileReplaceSetting(writer, dataLine, PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME, scanList.ParentIons(parentIonIndex).PeakApexOverrideParentIonIndex)
                             End If
                         Else
-                            srOutFile.WriteLine(strLineIn)
+                            writer.WriteLine(dataLine)
                         End If
 
                     Loop
@@ -723,17 +723,17 @@ Namespace DataOutput
                     ' Wait 2 seconds, then delete the original file and rename the temp one to the original one
                     Threading.Thread.Sleep(2000)
 
-                    If File.Exists(strXMLOutputFilePath) Then
-                        If File.Exists(strXMLReadFilePath) Then
-                            File.Delete(strXMLReadFilePath)
+                    If File.Exists(xmlOutputFilePath) Then
+                        If File.Exists(xmlReadFilePath) Then
+                            File.Delete(xmlReadFilePath)
                             Threading.Thread.Sleep(500)
                         End If
 
-                        File.Move(strXMLOutputFilePath, strXMLReadFilePath)
+                        File.Move(xmlOutputFilePath, xmlReadFilePath)
                     End If
 
                 Catch ex As Exception
-                    ReportError("Error renaming XML output file from temp name to: " & strXMLReadFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                    ReportError("Error renaming XML output file from temp name to: " & xmlReadFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                     Return False
                 End Try
 
@@ -741,7 +741,7 @@ Namespace DataOutput
                 System.Windows.Forms.Application.DoEvents()
 
             Catch ex As Exception
-                ReportError("Error updating the XML output file: " & strXMLReadFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error updating the XML output file: " & xmlReadFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 

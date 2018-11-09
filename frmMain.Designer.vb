@@ -30,7 +30,7 @@ Partial Class frmMain
         Me.MainMenuControl = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem()
         Me.mnuFileSelectInputFile = New System.Windows.Forms.MenuItem()
-        Me.mnuFileSelectOutputFolder = New System.Windows.Forms.MenuItem()
+        Me.mnuFileSelectOutputDirectory = New System.Windows.Forms.MenuItem()
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem()
         Me.mnuFileLoadOptions = New System.Windows.Forms.MenuItem()
         Me.mnuFileSaveOptions = New System.Windows.Forms.MenuItem()
@@ -209,10 +209,10 @@ Partial Class frmMain
         Me.chkSkipMSMSProcessing = New System.Windows.Forms.CheckBox()
         Me.chkSkipSICAndRawDataProcessing = New System.Windows.Forms.CheckBox()
         Me.chkExportRawDataOnly = New System.Windows.Forms.CheckBox()
-        Me.fraOutputFolderPath = New System.Windows.Forms.GroupBox()
+        Me.fraOutputDirectoryPath = New System.Windows.Forms.GroupBox()
         Me.cmdStartProcessing = New System.Windows.Forms.Button()
-        Me.cmdSelectOutputFolder = New System.Windows.Forms.Button()
-        Me.txtOutputFolderPath = New System.Windows.Forms.TextBox()
+        Me.cmdSelectOutputDirectory = New System.Windows.Forms.Button()
+        Me.txtOutputDirectoryPath = New System.Windows.Forms.TextBox()
         Me.TabPageLog = New System.Windows.Forms.TabPage()
         Me.txtLogMessages = New System.Windows.Forms.TextBox()
         Me.fraInputFilePath.SuspendLayout()
@@ -243,7 +243,7 @@ Partial Class frmMain
         Me.fraAdditionalInfoFiles.SuspendLayout()
         Me.fraDatasetLookupInfo.SuspendLayout()
         Me.fraMemoryConservationOptions.SuspendLayout()
-        Me.fraOutputFolderPath.SuspendLayout()
+        Me.fraOutputDirectoryPath.SuspendLayout()
         Me.TabPageLog.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -285,7 +285,7 @@ Partial Class frmMain
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectInputFile, Me.mnuFileSelectOutputFolder, Me.mnuFileSep1, Me.mnuFileLoadOptions, Me.mnuFileSaveOptions, Me.mnuFileSep2, Me.mnuFileExit})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectInputFile, Me.mnuFileSelectOutputDirectory, Me.mnuFileSep1, Me.mnuFileLoadOptions, Me.mnuFileSaveOptions, Me.mnuFileSep2, Me.mnuFileExit})
         Me.mnuFile.Text = "&File"
         '
         'mnuFileSelectInputFile
@@ -293,10 +293,10 @@ Partial Class frmMain
         Me.mnuFileSelectInputFile.Index = 0
         Me.mnuFileSelectInputFile.Text = "&Select Input File ..."
         '
-        'mnuFileSelectOutputFolder
+        'mnuFileSelectOutputDirectory
         '
-        Me.mnuFileSelectOutputFolder.Index = 1
-        Me.mnuFileSelectOutputFolder.Text = "Select Output &Folder ..."
+        Me.mnuFileSelectOutputDirectory.Index = 1
+        Me.mnuFileSelectOutputDirectory.Text = "Select Output &Directory ..."
         '
         'mnuFileSep1
         '
@@ -1922,19 +1922,19 @@ Partial Class frmMain
         Me.chkExportRawDataOnly.TabIndex = 2
         Me.chkExportRawDataOnly.Text = "Export Raw Data Only (No SICs)"
         '
-        'fraOutputFolderPath
+        'fraOutputDirectoryPath
         '
-        Me.fraOutputFolderPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.fraOutputDirectoryPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.fraOutputFolderPath.Controls.Add(Me.cmdStartProcessing)
-        Me.fraOutputFolderPath.Controls.Add(Me.cmdSelectOutputFolder)
-        Me.fraOutputFolderPath.Controls.Add(Me.txtOutputFolderPath)
-        Me.fraOutputFolderPath.Location = New System.Drawing.Point(10, 92)
-        Me.fraOutputFolderPath.Name = "fraOutputFolderPath"
-        Me.fraOutputFolderPath.Size = New System.Drawing.Size(885, 102)
-        Me.fraOutputFolderPath.TabIndex = 1
-        Me.fraOutputFolderPath.TabStop = False
-        Me.fraOutputFolderPath.Text = "Output Folder Path"
+        Me.fraOutputDirectoryPath.Controls.Add(Me.cmdStartProcessing)
+        Me.fraOutputDirectoryPath.Controls.Add(Me.cmdSelectOutputDirectory)
+        Me.fraOutputDirectoryPath.Controls.Add(Me.txtOutputDirectoryPath)
+        Me.fraOutputDirectoryPath.Location = New System.Drawing.Point(10, 92)
+        Me.fraOutputDirectoryPath.Name = "fraOutputDirectoryPath"
+        Me.fraOutputDirectoryPath.Size = New System.Drawing.Size(885, 102)
+        Me.fraOutputDirectoryPath.TabIndex = 1
+        Me.fraOutputDirectoryPath.TabStop = False
+        Me.fraOutputDirectoryPath.Text = "Output Folder Path"
         '
         'cmdStartProcessing
         '
@@ -1944,22 +1944,22 @@ Partial Class frmMain
         Me.cmdStartProcessing.TabIndex = 2
         Me.cmdStartProcessing.Text = "Start &Processing"
         '
-        'cmdSelectOutputFolder
+        'cmdSelectOutputDirectory
         '
-        Me.cmdSelectOutputFolder.Location = New System.Drawing.Point(10, 28)
-        Me.cmdSelectOutputFolder.Name = "cmdSelectOutputFolder"
-        Me.cmdSelectOutputFolder.Size = New System.Drawing.Size(96, 44)
-        Me.cmdSelectOutputFolder.TabIndex = 0
-        Me.cmdSelectOutputFolder.Text = "Select F&older"
+        Me.cmdSelectOutputDirectory.Location = New System.Drawing.Point(10, 28)
+        Me.cmdSelectOutputDirectory.Name = "cmdSelectOutputDirectory"
+        Me.cmdSelectOutputDirectory.Size = New System.Drawing.Size(96, 44)
+        Me.cmdSelectOutputDirectory.TabIndex = 0
+        Me.cmdSelectOutputDirectory.Text = "Select &Directory"
         '
-        'txtOutputFolderPath
+        'txtOutputDirectoryPath
         '
-        Me.txtOutputFolderPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.txtOutputDirectoryPath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOutputFolderPath.Location = New System.Drawing.Point(125, 30)
-        Me.txtOutputFolderPath.Name = "txtOutputFolderPath"
-        Me.txtOutputFolderPath.Size = New System.Drawing.Size(741, 22)
-        Me.txtOutputFolderPath.TabIndex = 1
+        Me.txtOutputDirectoryPath.Location = New System.Drawing.Point(125, 30)
+        Me.txtOutputDirectoryPath.Name = "txtOutputDirectoryPath"
+        Me.txtOutputDirectoryPath.Size = New System.Drawing.Size(741, 22)
+        Me.txtOutputDirectoryPath.TabIndex = 1
         '
         'TabPageLog
         '
@@ -1987,7 +1987,7 @@ Partial Class frmMain
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(904, 585)
-        Me.Controls.Add(Me.fraOutputFolderPath)
+        Me.Controls.Add(Me.fraOutputDirectoryPath)
         Me.Controls.Add(Me.tbsOptions)
         Me.Controls.Add(Me.fraInputFilePath)
         Me.Menu = Me.MainMenuControl
@@ -2040,8 +2040,8 @@ Partial Class frmMain
         Me.fraDatasetLookupInfo.ResumeLayout(False)
         Me.fraDatasetLookupInfo.PerformLayout()
         Me.fraMemoryConservationOptions.ResumeLayout(False)
-        Me.fraOutputFolderPath.ResumeLayout(False)
-        Me.fraOutputFolderPath.PerformLayout()
+        Me.fraOutputDirectoryPath.ResumeLayout(False)
+        Me.fraOutputDirectoryPath.PerformLayout()
         Me.TabPageLog.ResumeLayout(False)
         Me.TabPageLog.PerformLayout()
         Me.ResumeLayout(False)
@@ -2065,16 +2065,16 @@ Partial Class frmMain
     Friend WithEvents cmdPasteCustomSICList As System.Windows.Forms.Button
     Friend WithEvents TabPageCustomSICOptions As System.Windows.Forms.TabPage
     Friend WithEvents fraCustomSICControls As System.Windows.Forms.GroupBox
-    Friend WithEvents mnuFileSelectOutputFolder As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSelectOutputDirectory As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileLoadOptions As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSaveOptions As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileExit As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectInputFile As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSep2 As System.Windows.Forms.MenuItem
-    Friend WithEvents fraOutputFolderPath As System.Windows.Forms.GroupBox
-    Friend WithEvents cmdSelectOutputFolder As System.Windows.Forms.Button
-    Friend WithEvents txtOutputFolderPath As System.Windows.Forms.TextBox
+    Friend WithEvents fraOutputDirectoryPath As System.Windows.Forms.GroupBox
+    Friend WithEvents cmdSelectOutputDirectory As System.Windows.Forms.Button
+    Friend WithEvents txtOutputDirectoryPath As System.Windows.Forms.TextBox
     Friend WithEvents mnuEditProcessFile As System.Windows.Forms.MenuItem
     Friend WithEvents TabPageMasicExportOptions As System.Windows.Forms.TabPage
     Friend WithEvents TabPageSICOptions As System.Windows.Forms.TabPage

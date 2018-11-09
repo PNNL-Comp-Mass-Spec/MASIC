@@ -17,19 +17,19 @@ Namespace DataInput
         End Sub
 
         Public Function ExtractScanInfoFromMZXMLDataFile(
-          strFilePath As String,
+          filePath As String,
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
           dataOutputHandler As clsDataOutput,
-          blnKeepRawSpectra As Boolean,
-          blnKeepMSMSSpectra As Boolean) As Boolean
+          keepRawSpectra As Boolean,
+          keepMSMSSpectra As Boolean) As Boolean
 
             Dim objXMLReader As clsMSDataFileReaderBaseClass
 
             Try
                 objXMLReader = New clsMzXMLFileReader
-                Return ExtractScanInfoFromMSXMLDataFile(strFilePath, objXMLReader, scanList, objSpectraCache,
-                                                    dataOutputHandler, blnKeepRawSpectra, blnKeepMSMSSpectra)
+                Return ExtractScanInfoFromMSXMLDataFile(filePath, objXMLReader, scanList, objSpectraCache,
+                                                        dataOutputHandler, keepRawSpectra, keepMSMSSpectra)
 
             Catch ex As Exception
                 ReportError("Error in ExtractScanInfoFromMZXMLDataFile", ex, eMasicErrorCodes.InputFileDataReadError)
@@ -39,20 +39,20 @@ Namespace DataInput
         End Function
 
         Public Function ExtractScanInfoFromMZDataFile(
-          strFilePath As String,
+          filePath As String,
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
           dataOutputHandler As clsDataOutput,
-          blnKeepRawSpectra As Boolean,
-          blnKeepMSMSSpectra As Boolean) As Boolean
+          keepRawSpectra As Boolean,
+          keepMSMSSpectra As Boolean) As Boolean
 
             Dim objXMLReader As clsMSDataFileReaderBaseClass
 
             Try
                 objXMLReader = New clsMzDataFileReader
-                Return ExtractScanInfoFromMSXMLDataFile(strFilePath, objXMLReader, scanList, objSpectraCache,
-                                                    dataOutputHandler,
-                                                    blnKeepRawSpectra, blnKeepMSMSSpectra)
+                Return ExtractScanInfoFromMSXMLDataFile(filePath, objXMLReader, scanList, objSpectraCache,
+                                                        dataOutputHandler,
+                                                        keepRawSpectra, keepMSMSSpectra)
 
             Catch ex As Exception
                 ReportError("Error in ExtractScanInfoFromMZDataFile", ex, eMasicErrorCodes.InputFileDataReadError)
@@ -62,39 +62,39 @@ Namespace DataInput
         End Function
 
         Private Function ExtractScanInfoFromMSXMLDataFile(
-          strFilePath As String,
+          filePath As String,
           objXMLReader As clsMSDataFileReaderBaseClass,
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
           dataOutputHandler As clsDataOutput,
-          blnKeepRawSpectra As Boolean,
-          blnKeepMSMSSpectra As Boolean) As Boolean
+          keepRawSpectra As Boolean,
+          keepMSMSSpectra As Boolean) As Boolean
 
             ' Returns True if Success, False if failure
-            ' Note: This function assumes strFilePath exists
+            ' Note: This function assumes filePath exists
 
-            Dim intWarnCount = 0
-            Dim blnSuccess As Boolean
+            Dim warnCount = 0
+            Dim success As Boolean
 
             Try
                 Console.Write("Reading MSXml data file ")
                 ReportMessage("Reading MSXml data file")
 
-                UpdateProgress(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(strFilePath))
+                UpdateProgress(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(filePath))
 
                 ' Obtain the full path to the file
-                Dim ioFileInfo = New FileInfo(strFilePath)
-                Dim strInputFileFullPath = ioFileInfo.FullName
+                Dim msXmlFileInfo = New FileInfo(filePath)
+                Dim inputFileFullPath = msXmlFileInfo.FullName
 
-                Dim intDatasetID = mOptions.SICOptions.DatasetNumber
+                Dim datasetID = mOptions.SICOptions.DatasetNumber
                 Dim sicOptions = mOptions.SICOptions
 
-                blnSuccess = UpdateDatasetFileStats(ioFileInfo, intDatasetID)
+                success = UpdateDatasetFileStats(msXmlFileInfo, datasetID)
                 mDatasetFileInfo.ScanCount = 0
 
                 ' Open a handle to the data file
-                If Not objXMLReader.OpenFile(strInputFileFullPath) Then
-                    ReportError("Error opening input data file: " & strInputFileFullPath)
+                If Not objXMLReader.OpenFile(inputFileFullPath) Then
+                    ReportError("Error opening input data file: " & inputFileFullPath)
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     Return False
                 End If
@@ -103,24 +103,24 @@ Namespace DataInput
                 ' Thus, initially reserve space for 1000 scans
 
                 scanList.Initialize(1000, 1000)
-                Dim intLastSurveyScanIndex = -1
-                Dim intLastSurveyScanIndexInMasterSeqOrder = -1
-                Dim intLastNonZoomSurveyScanIndex = -1
+                Dim lastSurveyScanIndex = -1
+                Dim lastSurveyScanIndexInMasterSeqOrder = -1
+                Dim lastNonZoomSurveyScanIndex = -1
 
-                Dim blnScanFound As Boolean
+                Dim scanFound As Boolean
                 Dim scansOutOfRange = 0
 
                 scanList.SIMDataPresent = False
                 scanList.MRMDataPresent = False
 
-                UpdateProgress("Reading XML data" & ControlChars.NewLine & Path.GetFileName(strFilePath))
-                ReportMessage("Reading XML data from " & strFilePath)
+                UpdateProgress("Reading XML data" & ControlChars.NewLine & Path.GetFileName(filePath))
+                ReportMessage("Reading XML data from " & filePath)
 
                 Do
                     Dim objSpectrumInfo As clsSpectrumInfo = Nothing
-                    blnScanFound = objXMLReader.ReadNextSpectrum(objSpectrumInfo)
+                    scanFound = objXMLReader.ReadNextSpectrum(objSpectrumInfo)
 
-                    If Not blnScanFound Then Continue Do
+                    If Not scanFound Then Continue Do
 
                     mDatasetFileInfo.ScanCount += 1
 
@@ -140,12 +140,12 @@ Namespace DataInput
                     If mScanTracking.CheckScanInRange(objSpectrumInfo.ScanNumber, objSpectrumInfo.RetentionTimeMin, mOptions.SICOptions) Then
                         ExtractScanInfoWork(scanList, objSpectraCache, dataOutputHandler,
                                             sicOptions, objMSSpectrum, objSpectrumInfo,
-                                            intLastSurveyScanIndex,
-                                            intLastSurveyScanIndexInMasterSeqOrder,
-                                            intLastNonZoomSurveyScanIndex,
-                                            intWarnCount,
-                                            blnKeepRawSpectra,
-                                            blnKeepMSMSSpectra)
+                                            lastSurveyScanIndex,
+                                            lastSurveyScanIndexInMasterSeqOrder,
+                                            lastNonZoomSurveyScanIndex,
+                                            warnCount,
+                                            keepRawSpectra,
+                                            keepMSMSSpectra)
                     Else
                         scansOutOfRange += 1
                     End If
@@ -165,7 +165,7 @@ Namespace DataInput
                     End If
 
 
-                Loop While blnScanFound
+                Loop While scanFound
 
                 ' Shrink the memory usage of the scanList arrays
                 ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
@@ -175,17 +175,17 @@ Namespace DataInput
                 If scanList.MasterScanOrderCount <= 0 Then
                     ' No scans found
                     If scansOutOfRange > 0 Then
-                        ReportWarning("None of the spectra in the input file was within the specified scan number and/or scan time range: " & strFilePath)
+                        ReportWarning("None of the spectra in the input file was within the specified scan number and/or scan time range: " & filePath)
                         SetLocalErrorCode(eMasicErrorCodes.NoParentIonsFoundInInputFile)
                     Else
-                        ReportError("No scans found in the input file: " & strFilePath)
+                        ReportError("No scans found in the input file: " & filePath)
                         SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
                     End If
 
                     Return False
                 End If
 
-                blnSuccess = True
+                success = True
 
                 Console.WriteLine()
 
@@ -205,7 +205,7 @@ Namespace DataInput
                 End Try
             End If
 
-            Return blnSuccess
+            Return success
 
         End Function
 
@@ -216,26 +216,26 @@ Namespace DataInput
           sicOptions As clsSICOptions,
           objMSSpectrum As clsMSSpectrum,
           objSpectrumInfo As clsSpectrumInfo,
-          ByRef intLastSurveyScanIndex As Integer,
-          ByRef intLastSurveyScanIndexInMasterSeqOrder As Integer,
-          ByRef intLastNonZoomSurveyScanIndex As Integer,
-          ByRef intWarnCount As Integer,
-          blnKeepRawSpectra As Boolean,
-          blnKeepMSMSSpectra As Boolean)
+          ByRef lastSurveyScanIndex As Integer,
+          ByRef lastSurveyScanIndexInMasterSeqOrder As Integer,
+          ByRef lastNonZoomSurveyScanIndex As Integer,
+          ByRef warnCount As Integer,
+          keepRawSpectra As Boolean,
+          keepMSMSSpectra As Boolean)
 
-            Dim blnIsMzXML As Boolean
+            Dim isMzXML As Boolean
             Dim eMRMScanType As MRMScanTypeConstants
 
             ' ReSharper disable once NotAccessedVariable
-            Dim dblMSDataResolution As Double
+            Dim msDataResolution As Double
 
             Dim objMZXmlSpectrumInfo As clsSpectrumInfoMzXML = Nothing
 
             If TypeOf (objSpectrumInfo) Is clsSpectrumInfoMzXML Then
                 objMZXmlSpectrumInfo = CType(objSpectrumInfo, clsSpectrumInfoMzXML)
-                blnIsMzXML = True
+                isMzXML = True
             Else
-                blnIsMzXML = False
+                isMzXML = False
             End If
 
             ' Determine if this was an MS/MS scan
@@ -277,27 +277,27 @@ Namespace DataInput
 
                 scanList.SurveyScans.Add(newSurveyScan)
 
-                UpdateMSXmlScanType(newSurveyScan, objSpectrumInfo.MSLevel, "MS", blnIsMzXML, objMZXmlSpectrumInfo)
+                UpdateMSXmlScanType(newSurveyScan, objSpectrumInfo.MSLevel, "MS", isMzXML, objMZXmlSpectrumInfo)
 
-                intLastSurveyScanIndex = scanList.SurveyScans.Count - 1
+                lastSurveyScanIndex = scanList.SurveyScans.Count - 1
 
-                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex)
-                intLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1
+                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex)
+                lastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1
 
                 If mOptions.SICOptions.SICToleranceIsPPM Then
                     ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
                     ' However, if the lowest m/z value is < 100, then use 100 m/z
                     If objSpectrumInfo.mzRangeStart < 100 Then
-                        dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM
+                        msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM
                     Else
-                        dblMSDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, objSpectrumInfo.mzRangeStart) / sicOptions.CompressToleranceDivisorForPPM
+                        msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, objSpectrumInfo.mzRangeStart) / sicOptions.CompressToleranceDivisorForPPM
                     End If
                 Else
-                    dblMSDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
+                    msDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
                 End If
 
 
-                ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+                ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
                 StoreMzXmlSpectrum(
                     objMSSpectrum,
                     newSurveyScan,
@@ -306,7 +306,7 @@ Namespace DataInput
                     DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
                     sicOptions.CompressMSSpectraData,
                     sicOptions.SimilarIonMZToleranceHalfWidth / sicOptions.CompressToleranceDivisorForDa,
-                    blnKeepRawSpectra)
+                    keepRawSpectra)
 
                 SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
                                   clsScanList.eScanTypeConstants.SurveyScan, newSurveyScan, sicOptions.DatasetNumber)
@@ -329,7 +329,7 @@ Namespace DataInput
                     .BasePeakIonIntensity = objSpectrumInfo.BasePeakIntensity
 
                     ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
-                    .FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - intLastSurveyScanIndexInMasterSeqOrder
+                    .FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - lastSurveyScanIndexInMasterSeqOrder
                     .FragScanInfo.MSLevel = objSpectrumInfo.MSLevel
 
                     .TotalIonIntensity = CSng(Math.Min(objSpectrumInfo.TotalIonCurrent, Single.MaxValue))
@@ -346,7 +346,7 @@ Namespace DataInput
 
                 End With
 
-                UpdateMSXmlScanType(newFragScan, objSpectrumInfo.MSLevel, "MSn", blnIsMzXML, objMZXmlSpectrumInfo)
+                UpdateMSXmlScanType(newFragScan, objSpectrumInfo.MSLevel, "MSn", isMzXML, objMZXmlSpectrumInfo)
 
                 eMRMScanType = newFragScan.MRMScanType
                 If Not eMRMScanType = MRMScanTypeConstants.NotMRM Then
@@ -370,13 +370,13 @@ Namespace DataInput
                                 ' The data is likely MRM and not SRM
                                 ' We cannot currently handle data like this
                                 ' (would need to examine the mass values  and find the clumps of data to infer the transitions present)
-                                intWarnCount += 1
-                                If intWarnCount <= 5 Then
+                                warnCount += 1
+                                If warnCount <= 5 Then
                                     ReportError("Warning: m/z range for SRM scan " & objSpectrumInfo.ScanNumber & " is " &
                                                 (objSpectrumInfo.mzRangeEnd - objSpectrumInfo.mzRangeStart).ToString("0.0") &
                                                 " m/z; this is likely a MRM scan, but MASIC doesn't support inferring the " &
                                                 "MRM transition masses from the observed m/z values.  Results will likely not be meaningful")
-                                    If intWarnCount = 5 Then
+                                    If warnCount = 5 Then
                                         ReportMessage("Additional m/z range warnings will not be shown")
                                     End If
                                 End If
@@ -398,7 +398,7 @@ Namespace DataInput
 
                     If scanList.SurveyScans.Count = 0 Then
                         ' Need to add a "fake" survey scan that we can map this parent ion to
-                        intLastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
+                        lastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
                     End If
                 Else
                     newFragScan.MRMScanInfo.MRMMassCount = 0
@@ -414,7 +414,7 @@ Namespace DataInput
 
                 scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
 
-                ' Note: Even if blnKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+                ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
                 StoreMzXmlSpectrum(
                     objMSSpectrum,
                     newFragScan,
@@ -423,18 +423,18 @@ Namespace DataInput
                     DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
                     sicOptions.CompressMSMSSpectraData,
                     mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa,
-                    blnKeepRawSpectra And blnKeepMSMSSpectra)
+                    keepRawSpectra AndAlso keepMSMSSpectra)
 
                 SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
                                   clsScanList.eScanTypeConstants.FragScan, newFragScan, sicOptions.DatasetNumber)
 
                 If eMRMScanType = MRMScanTypeConstants.NotMRM Then
                     ' This is not an MRM scan
-                    mParentIonProcessor.AddUpdateParentIons(scanList, intLastSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
+                    mParentIonProcessor.AddUpdateParentIons(scanList, lastSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
                                                             scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
                 Else
                     ' This is an MRM scan
-                    mParentIonProcessor.AddUpdateParentIons(scanList, intLastNonZoomSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
+                    mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
                                                             newFragScan.MRMScanInfo, objSpectraCache, sicOptions)
                 End If
 
@@ -446,10 +446,10 @@ Namespace DataInput
           scanInfo As clsScanInfo,
           objSpectraCache As clsSpectraCache,
           noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
-          blnDiscardLowIntensityData As Boolean,
-          blnCompressSpectraData As Boolean,
-          dblMSDataResolution As Double,
-          blnKeepRawSpectrum As Boolean)
+          discardLowIntensityData As Boolean,
+          compressSpectraData As Boolean,
+          msDataResolution As Double,
+          keepRawSpectrum As Boolean)
 
             Try
 
@@ -468,13 +468,13 @@ Namespace DataInput
                 If scanInfo.IonCount > 0 Then
                     With scanInfo
                         ' Confirm the total scan intensity stored in the mzXML file
-                        Dim sngTotalIonIntensity As Single = 0
-                        For intIonIndex = 0 To objMSSpectrum.IonCount - 1
-                            sngTotalIonIntensity += objMSSpectrum.IonsIntensity(intIonIndex)
+                        Dim totalIonIntensity As Single = 0
+                        For ionIndex = 0 To objMSSpectrum.IonCount - 1
+                            totalIonIntensity += objMSSpectrum.IonsIntensity(ionIndex)
                         Next
 
                         If .TotalIonIntensity < Single.Epsilon Then
-                            .TotalIonIntensity = sngTotalIonIntensity
+                            .TotalIonIntensity = totalIonIntensity
                         End If
 
                     End With
@@ -483,10 +483,10 @@ Namespace DataInput
                         scanInfo, Me,
                         objSpectraCache, objMSSpectrum,
                         noiseThresholdOptions,
-                        blnDiscardLowIntensityData,
-                        blnCompressSpectraData,
-                        dblMSDataResolution,
-                        blnKeepRawSpectrum)
+                        discardLowIntensityData,
+                        compressSpectraData,
+                        msDataResolution,
+                        keepRawSpectrum)
                 Else
                     scanInfo.TotalIonIntensity = 0
                 End If
@@ -499,16 +499,16 @@ Namespace DataInput
 
         Private Sub UpdateMSXmlScanType(
           scanInfo As clsScanInfo,
-          intMSLevel As Integer,
-          strDefaultScanType As String,
-          blnIsMzXML As Boolean,
+          msLevel As Integer,
+          defaultScanType As String,
+          isMzXML As Boolean,
           ByRef objMZXmlSpectrumInfo As clsSpectrumInfoMzXML)
 
-            If Not blnIsMzXML Then
+            If Not isMzXML Then
                 ' Not a .mzXML file
                 ' Use the defaults
                 scanInfo.ScanHeaderText = String.Empty
-                scanInfo.ScanTypeName = strDefaultScanType
+                scanInfo.ScanTypeName = defaultScanType
                 Return
 
             End If
@@ -523,8 +523,8 @@ Namespace DataInput
 
                 With scanInfo
                     ' Now populate .SIMScan, .MRMScanType and .ZoomScan
-                    Dim intMSLevelFromFilter As Integer
-                    XRawFileIO.ValidateMSScan(.ScanHeaderText, intMSLevelFromFilter, .SIMScan, .MRMScanType, .ZoomScan)
+                    Dim msLevelFromFilter As Integer
+                    XRawFileIO.ValidateMSScan(.ScanHeaderText, msLevelFromFilter, .SIMScan, .MRMScanType, .ZoomScan)
                 End With
                 Return
 
@@ -534,12 +534,12 @@ Namespace DataInput
             scanInfo.ScanTypeName = objMZXmlSpectrumInfo.ScanType
 
             If String.IsNullOrEmpty(scanInfo.ScanTypeName) Then
-                scanInfo.ScanTypeName = strDefaultScanType
+                scanInfo.ScanTypeName = defaultScanType
             Else
                 ' Possibly update .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromFinniganScanFilterText()
                 Select Case scanInfo.ScanTypeName.ToLower()
                     Case clsSpectrumInfoMzXML.ScanTypeNames.Full.ToLower()
-                        If intMSLevel <= 1 Then
+                        If msLevel <= 1 Then
                             scanInfo.ScanTypeName = "MS"
                         Else
                             scanInfo.ScanTypeName = "MSn"

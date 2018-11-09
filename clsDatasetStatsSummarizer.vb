@@ -324,35 +324,35 @@ Public Class clsDatasetStatsSummarizer
     ''' <summary>
     ''' Creates an XML file summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
-    ''' <param name="strDatasetInfoFilePath">File path to write the XML to</param>
+    ''' <param name="datasetName">Dataset Name</param>
+    ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoFile(
-                                          strDatasetName As String,
-                                          strDatasetInfoFilePath As String) As Boolean
+                                          datasetName As String,
+                                          datasetInfoFilePath As String) As Boolean
 
-        Return CreateDatasetInfoFile(strDatasetName, strDatasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
+        Return CreateDatasetInfoFile(datasetName, datasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
     ''' <summary>
     ''' Creates an XML file summarizing the data in objScanStats and udtDatasetFileInfo
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
-    ''' <param name="strDatasetInfoFilePath">File path to write the XML to</param>
+    ''' <param name="datasetName">Dataset Name</param>
+    ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
     ''' <param name="udtDatasetFileInfo">Dataset Info</param>
     ''' <param name="udtSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoFile(
-                                          strDatasetName As String,
-                                          strDatasetInfoFilePath As String,
+                                          datasetName As String,
+                                          datasetInfoFilePath As String,
                                           ByRef objScanStats As List(Of clsScanStatsEntry),
                                           ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
                                           ByRef udtSampleInfo As udtSampleInfoType) As Boolean
 
-        Dim blnSuccess As Boolean
+        Dim success As Boolean
 
         Try
             If objScanStats Is Nothing Then
@@ -364,20 +364,20 @@ Public Class clsDatasetStatsSummarizer
 
             ' If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, then we would have to use System.Encoding.Unicode
             ' However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
-            Using swOutFile = New StreamWriter(New FileStream(strDatasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8)
+            Using writer = New StreamWriter(New FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8)
 
-                swOutFile.WriteLine(CreateDatasetInfoXML(strDatasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo))
+                writer.WriteLine(CreateDatasetInfoXML(datasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo))
 
             End Using
 
-            blnSuccess = True
+            success = True
 
         Catch ex As Exception
             ReportError("Error in CreateDatasetInfoFile: " & ex.Message)
-            blnSuccess = False
+            success = False
         End Try
 
-        Return blnSuccess
+        Return success
 
     End Function
 
@@ -396,11 +396,11 @@ Public Class clsDatasetStatsSummarizer
     ''' <summary>
     ''' Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
+    ''' <param name="datasetName">Dataset Name</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
-    Public Function CreateDatasetInfoXML(strDatasetName As String) As String
-        Return CreateDatasetInfoXML(strDatasetName, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
+    Public Function CreateDatasetInfoXML(datasetName As String) As String
+        Return CreateDatasetInfoXML(datasetName, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
     ' ReSharper disable once UnusedMember.Global
@@ -440,32 +440,32 @@ Public Class clsDatasetStatsSummarizer
     ''' <summary>
     ''' Creates XML summarizing the data in objScanStats and udtDatasetFileInfo
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
+    ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
     ''' <param name="udtDatasetFileInfo">Dataset Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
-                                         strDatasetName As String,
+                                         datasetName As String,
                                          ByRef objScanStats As List(Of clsScanStatsEntry),
                                          ByRef udtDatasetFileInfo As udtDatasetFileInfoType) As String
 
         Dim udtSampleInfo = New udtSampleInfoType()
         udtSampleInfo.Clear()
 
-        Return CreateDatasetInfoXML(strDatasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo)
+        Return CreateDatasetInfoXML(datasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo)
     End Function
 
     ''' <summary>
     ''' Creates XML summarizing the data in objScanStats and udtDatasetFileInfo
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
+    ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
     ''' <param name="udtDatasetFileInfo">Dataset Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
-                                         strDatasetName As String,
+                                         datasetName As String,
                                          objScanStats As List(Of clsScanStatsEntry),
                                          ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
                                          ByRef udtSampleInfo As udtSampleInfoType) As String
@@ -527,32 +527,32 @@ Public Class clsDatasetStatsSummarizer
             'Write the beginning of the "Root" element.
             objDSInfo.WriteStartElement("DatasetInfo")
 
-            objDSInfo.WriteElementString("Dataset", strDatasetName)
+            objDSInfo.WriteElementString("Dataset", datasetName)
 
             objDSInfo.WriteStartElement("ScanTypes")
 
             Dim objEnum = objSummaryStats.objScanTypeStats.GetEnumerator()
             Do While objEnum.MoveNext
 
-                Dim strScanType = objEnum.Current.Key
-                Dim intIndexMatch = strScanType.IndexOf(SCANTYPE_STATS_SEPCHAR, StringComparison.Ordinal)
-                Dim strScanFilterText As String
+                Dim scanType = objEnum.Current.Key
+                Dim indexMatch = scanType.IndexOf(SCANTYPE_STATS_SEPCHAR, StringComparison.Ordinal)
+                Dim scanFilterText As String
 
-                If intIndexMatch >= 0 Then
-                    strScanFilterText = strScanType.Substring(intIndexMatch + SCANTYPE_STATS_SEPCHAR.Length)
-                    If intIndexMatch > 0 Then
-                        strScanType = strScanType.Substring(0, intIndexMatch)
+                If indexMatch >= 0 Then
+                    scanFilterText = scanType.Substring(indexMatch + SCANTYPE_STATS_SEPCHAR.Length)
+                    If indexMatch > 0 Then
+                        scanType = scanType.Substring(0, indexMatch)
                     Else
-                        strScanType = String.Empty
+                        scanType = String.Empty
                     End If
                 Else
-                    strScanFilterText = String.Empty
+                    scanFilterText = String.Empty
                 End If
 
                 objDSInfo.WriteStartElement("ScanType")
                 objDSInfo.WriteAttributeString("ScanCount", objEnum.Current.Value.ToString())
-                objDSInfo.WriteAttributeString("ScanFilterText", FixNull(strScanFilterText))
-                objDSInfo.WriteString(strScanType)
+                objDSInfo.WriteAttributeString("ScanFilterText", FixNull(scanFilterText))
+                objDSInfo.WriteString(scanType)
                 objDSInfo.WriteEndElement()     ' ScanType
             Loop
 
@@ -607,10 +607,10 @@ Public Class clsDatasetStatsSummarizer
 
             ' Now Rewind the memory stream and output as a string
             objMemStream.Position = 0
-            Dim srStreamReader = New StreamReader(objMemStream)
+            Dim reader = New StreamReader(objMemStream)
 
             ' Return the XML as text
-            Return srStreamReader.ReadToEnd()
+            Return reader.ReadToEnd()
 
         Catch ex As Exception
             ReportError("Error in CreateDatasetInfoXML: " & ex.Message)
@@ -625,39 +625,36 @@ Public Class clsDatasetStatsSummarizer
     ''' <summary>
     ''' Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
-    ''' <param name="strScanStatsFilePath">File path to write the text file to</param>
+    ''' <param name="datasetName">Dataset Name</param>
+    ''' <param name="scanStatsFilePath">File path to write the text file to</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateScanStatsFile(
-                                        strDatasetName As String,
-                                        strScanStatsFilePath As String) As Boolean
+                                        datasetName As String,
+                                        scanStatsFilePath As String) As Boolean
 
-        Return CreateScanStatsFile(strDatasetName, strScanStatsFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
+        Return CreateScanStatsFile(datasetName, scanStatsFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
     ''' <summary>
     ''' Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
-    ''' <param name="strScanStatsFilePath">File path to write the text file to</param>
+    ''' <param name="datasetName">Dataset Name</param>
+    ''' <param name="scanStatsFilePath">File path to write the text file to</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
     ''' <param name="udtDatasetFileInfo">Dataset Info</param>
     ''' <param name="udtSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateScanStatsFile(
-                                        strDatasetName As String,
-                                        strScanStatsFilePath As String,
+                                        datasetName As String,
+                                        scanStatsFilePath As String,
                                         objScanStats As List(Of clsScanStatsEntry),
                                         ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
                                         ByRef udtSampleInfo As udtSampleInfoType) As Boolean
 
 
-        Dim intDatasetID = 0
-        Dim sbLineOut = New StringBuilder
-
-        Dim blnSuccess As Boolean
+        Dim datasetID = 0
 
         Try
             If objScanStats Is Nothing Then
@@ -700,23 +697,20 @@ Public Class clsDatasetStatsSummarizer
 
             End Using
 
-
-            blnSuccess = True
+            Return True
 
         Catch ex As Exception
             ReportError("Error in CreateScanStatsFile: " & ex.Message)
-            blnSuccess = False
+            Return False
         End Try
-
-        Return blnSuccess
 
     End Function
 
-    Private Function FixNull(strText As String) As String
-        If String.IsNullOrEmpty(strText) Then
+    Private Function FixNull(item As String) As String
+        If String.IsNullOrEmpty(item) Then
             Return String.Empty
         Else
-            Return strText
+            Return item
         End If
     End Function
 
@@ -746,32 +740,32 @@ Public Class clsDatasetStatsSummarizer
     ''' <summary>
     ''' Updates the scan type information for the specified scan number
     ''' </summary>
-    ''' <param name="intScanNumber"></param>
-    ''' <param name="intScanType"></param>
-    ''' <param name="strScanTypeName"></param>
+    ''' <param name="scanNumber"></param>
+    ''' <param name="scanType"></param>
+    ''' <param name="scanTypeName"></param>
     ''' <returns>True if the scan was found and updated; otherwise false</returns>
     ''' <remarks></remarks>
     Public Function UpdateDatasetScanType(
-                                          intScanNumber As Integer,
-                                          intScanType As Integer,
-                                          strScanTypeName As String) As Boolean
+                                          scanNumber As Integer,
+                                          scanType As Integer,
+                                          scanTypeName As String) As Boolean
 
-        Dim intIndex As Integer
-        Dim blnMatchFound As Boolean
+        Dim index As Integer
+        Dim matchFound As Boolean
 
-        ' Look for scan intScanNumber in mDatasetScanStats
-        For intIndex = 0 To mDatasetScanStats.Count - 1
-            If mDatasetScanStats(intIndex).ScanNumber = intScanNumber Then
-                mDatasetScanStats(intIndex).ScanType = intScanType
-                mDatasetScanStats(intIndex).ScanTypeName = strScanTypeName
+        ' Look for scan scanNumber in mDatasetScanStats
+        For index = 0 To mDatasetScanStats.Count - 1
+            If mDatasetScanStats(index).ScanNumber = scanNumber Then
+                mDatasetScanStats(index).ScanType = scanType
+                mDatasetScanStats(index).ScanTypeName = scanTypeName
                 mDatasetSummaryStatsUpToDate = False
 
-                blnMatchFound = True
+                matchFound = True
                 Exit For
             End If
         Next
 
-        Return blnMatchFound
+        Return matchFound
 
     End Function
 
@@ -779,41 +773,37 @@ Public Class clsDatasetStatsSummarizer
     ''' <summary>
     ''' Updates a tab-delimited text file, adding a new line summarizing the data stored in this class (in mDatasetScanStats and Me.DatasetFileInfo)
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
-    ''' <param name="strDatasetInfoFilePath">File path to write the XML to</param>
+    ''' <param name="datasetName">Dataset Name</param>
+    ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function UpdateDatasetStatsTextFile(
-                                               strDatasetName As String,
-                                               strDatasetInfoFilePath As String) As Boolean
+                                               datasetName As String,
+                                               datasetInfoFilePath As String) As Boolean
 
-        Return UpdateDatasetStatsTextFile(strDatasetName, strDatasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
+        Return UpdateDatasetStatsTextFile(datasetName, datasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
     ''' <summary>
     ''' Updates a tab-delimited text file, adding a new line summarizing the data in objScanStats and udtDatasetFileInfo
     ''' </summary>
-    ''' <param name="strDatasetName">Dataset Name</param>
-    ''' <param name="strDatasetStatsFilePath">Tab-delimited file to create/update</param>
+    ''' <param name="datasetName">Dataset Name</param>
+    ''' <param name="datasetStatsFilePath">Tab-delimited file to create/update</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
     ''' <param name="udtDatasetFileInfo">Dataset Info</param>
     ''' <param name="udtSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function UpdateDatasetStatsTextFile(
-                                               strDatasetName As String,
-                                               strDatasetStatsFilePath As String,
+                                               datasetName As String,
+                                               datasetStatsFilePath As String,
                                                objScanStats As List(Of clsScanStatsEntry),
                                                ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
                                                ByRef udtSampleInfo As udtSampleInfoType) As Boolean
 
-        Dim blnWriteHeaders As Boolean
-
-        Dim strLineOut As String
+        Dim writeHeaders As Boolean
 
         Dim objSummaryStats As clsDatasetSummaryStats
-
-        Dim blnSuccess As Boolean
 
         Try
 
@@ -833,8 +823,8 @@ Public Class clsDatasetStatsSummarizer
                 Me.ComputeScanStatsSummary(objScanStats, objSummaryStats)
             End If
 
-            If Not File.Exists(strDatasetStatsFilePath) Then
-                blnWriteHeaders = True
+            If Not File.Exists(datasetStatsFilePath) Then
+                writeHeaders = True
             End If
 
             ' Create or open the output file
@@ -875,14 +865,12 @@ Public Class clsDatasetStatsSummarizer
 
             End Using
 
-            blnSuccess = True
+            Return True
 
         Catch ex As Exception
             ReportError("Error in UpdateDatasetStatsTextFile: " & ex.Message, ex)
-            blnSuccess = False
+            Return False
         End Try
-
-        Return blnSuccess
 
     End Function
 

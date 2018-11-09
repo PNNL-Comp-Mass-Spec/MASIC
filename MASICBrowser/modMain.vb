@@ -19,7 +19,7 @@ Imports PRISM
 
 Module modMain
 
-    Public Const PROGRAM_DATE As String = "October 16, 2018"
+    Public Const PROGRAM_DATE As String = "November 8, 2018"
 
     Private mInputFilePath As String
 
@@ -67,11 +67,11 @@ Module modMain
     ''' <summary>
     ''' Returns the .NET assembly version followed by the program date
     ''' </summary>
-    ''' <param name="strProgramDate"></param>
+    ''' <param name="programDate"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function GetAppVersion(strProgramDate As String) As String
-        Return Assembly.GetExecutingAssembly().GetName().Version.ToString() & " (" & strProgramDate & ")"
+    Private Function GetAppVersion(programDate As String) As String
+        Return Assembly.GetExecutingAssembly().GetName().Version.ToString() & " (" & programDate & ")"
     End Function
 
 

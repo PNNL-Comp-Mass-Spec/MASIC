@@ -71,15 +71,15 @@
     ''' <summary>
     ''' Constructor
     ''' </summary>
-    ''' <param name="dblParentIonMz">Parent ion m/z value</param>
-    Public Sub New(dblParentIonMz As Double)
+    ''' <param name="parentIonMz">Parent ion m/z value</param>
+    Public Sub New(parentIonMz As Double)
         ReDim FragScanIndices(0)
-        mParentIonMz = dblParentIonMz
+        mParentIonMz = parentIonMz
         SICStats = New clsSICStats()
     End Sub
 
-    Public Sub UpdateMz(dblParentIonMz As Double)
-        mParentIonMz = dblParentIonMz
+    Public Sub UpdateMz(parentIonMz As Double)
+        mParentIonMz = parentIonMz
     End Sub
 
     Public Overrides Function ToString() As String

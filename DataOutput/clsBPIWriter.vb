@@ -9,7 +9,7 @@ Namespace DataOutput
         Public Function SaveBPIs(
           scanList As clsScanList,
           objSpectraCache As clsSpectraCache,
-          strInputFilePathFull As String,
+          inputFilePathFull As String,
           outputDirectoryPath As String) As Boolean
 
             ' This function creates an ICR-2LS compatible .TIC file (using only the MS1 scans), plus
@@ -20,38 +20,38 @@ Namespace DataOutput
             Dim currentFilePath = "_MS_scans.csv"
 
             Try
-                Dim intBPIStepCount = 3
+                Dim bpiStepCount = 3
 
                 UpdateProgress(0, "Saving chromatograms to disk")
-                Dim intStepsCompleted = 0
+                Dim stepsCompleted = 0
 
-                Dim strInputFileName = Path.GetFileName(strInputFilePathFull)
+                Dim inputFileName = Path.GetFileName(inputFilePathFull)
 
                 ' Disabled in April 2015 since not used
                 '' First, write a true TIC file (in ICR-2LS format)
-                'strOutputFilePath = clsDataOutput.ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
-                'LogMessage("Saving ICR Tools TIC to " & Path.GetFileName(strOutputFilePath))
+                'outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
+                'LogMessage("Saving ICR Tools TIC to " & Path.GetFileName(outputFilePath))
 
-                'SaveICRToolsChromatogramByScan(scanList.SurveyScans, scanList.SurveyScans.Count, strOutputFilePath, False, True, strInputFilePathFull)
+                'SaveICRToolsChromatogramByScan(scanList.SurveyScans, scanList.SurveyScans.Count, outputFilePath, False, True, inputFilePathFull)
 
-                intStepsCompleted += 1
-                UpdateProgress(CShort(intStepsCompleted / intBPIStepCount * 100))
+                stepsCompleted += 1
+                UpdateProgress(CShort(stepsCompleted / bpiStepCount * 100))
 
 
                 ' Second, write an MS-based _scans.csv file (readable with Decon2LS)
-                Dim msScansFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSChromatogramFile)
+                Dim msScansFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.DeconToolsMSChromatogramFile)
                 currentFilePath = String.Copy(msScansFilePath)
 
                 ReportMessage("Saving Decon2LS MS Chromatogram File to " & Path.GetFileName(msScansFilePath))
 
                 SaveDecon2LSChromatogram(scanList.SurveyScans, objSpectraCache, msScansFilePath)
 
-                intStepsCompleted += 1
-                UpdateProgress(CShort(intStepsCompleted / intBPIStepCount * 100))
+                stepsCompleted += 1
+                UpdateProgress(CShort(stepsCompleted / bpiStepCount * 100))
 
 
                 ' Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
-                Dim msmsScansFilePath = ConstructOutputFilePath(strInputFileName, strOutputFolderPath, eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile)
+                Dim msmsScansFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile)
                 currentFilePath = String.Copy(msmsScansFilePath)
 
                 ReportMessage("Saving Decon2LS MSMS Chromatogram File to " & Path.GetFileName(msmsScansFilePath))
@@ -69,21 +69,21 @@ Namespace DataOutput
         End Function
 
         Private Sub SaveDecon2LSChromatogram(
-          scanList As IList(Of clsScanInfo),
+          scanList As IEnumerable(Of clsScanInfo),
           objSpectraCache As clsSpectraCache,
-          strOutputFilePath As String)
+          outputFilePath As String)
 
             Dim scansWritten = 0
             Dim lastStatus = DateTime.UtcNow
 
-            Using srScanInfoOutfile = New StreamWriter(strOutputFilePath)
+            Using writer = New StreamWriter(outputFilePath)
 
                 ' Write the file headers
-                WriteDecon2LSScanFileHeaders(srScanInfoOutfile)
+                WriteDecon2LSScanFileHeaders(writer)
 
                 ' Step through the scans and write each one
                 For Each scanItem In scanList
-                    WriteDecon2LSScanFileEntry(srScanInfoOutfile, scanItem, objSpectraCache)
+                    WriteDecon2LSScanFileEntry(writer, scanItem, objSpectraCache)
 
                     If scansWritten Mod 250 = 0 Then
                         UpdateCacheStats(objSpectraCache)
@@ -105,99 +105,103 @@ Namespace DataOutput
         Private Sub SaveICRToolsChromatogramByScan(
           masicOptions As clsMASICOptions,
           scanList As IList(Of clsScanInfo),
-          intScanCount As Integer,
-          strOutputFilePath As String,
-          blnSaveElutionTimeInsteadOfScan As Boolean,
-          blnSaveTICInsteadOfBPI As Boolean,
-          strInputFilePathFull As String)
+          scanCount As Integer,
+          outputFilePath As String,
+          saveElutionTimeInsteadOfScan As Boolean,
+          saveTICInsteadOfBPI As Boolean,
+          inputFilePathFull As String)
 
-            Using srOutFile = New StreamWriter(strOutputFilePath)
+            Using writer = New StreamWriter(outputFilePath)
+
+                ' ReSharper disable StringLiteralTypo
 
                 ' Write the Header text
-                srOutFile.WriteLine("ICR-2LS Data File (GA Anderson & JE Bruce); output from MASIC by Matthew E Monroe")
-                srOutFile.WriteLine("Version " & masicOptions.MASICVersion)
-                srOutFile.WriteLine("FileName:")
-                If blnSaveTICInsteadOfBPI Then
-                    srOutFile.WriteLine("title:" & Path.GetFileName(strInputFilePathFull) & " TIC")
-                    srOutFile.WriteLine("Ytitle:Amplitude (TIC)")
+                writer.WriteLine("ICR-2LS Data File (GA Anderson & JE Bruce); output from MASIC by Matthew E Monroe")
+                writer.WriteLine("Version " & masicOptions.MASICVersion)
+                writer.WriteLine("FileName:")
+                If saveTICInsteadOfBPI Then
+                    writer.WriteLine("title:" & Path.GetFileName(inputFilePathFull) & " TIC")
+                    writer.WriteLine("Ytitle:Amplitude (TIC)")
                 Else
-                    srOutFile.WriteLine("title:" & Path.GetFileName(strInputFilePathFull) & " BPI")
-                    srOutFile.WriteLine("Ytitle:Amplitude (BPI)")
+                    writer.WriteLine("title:" & Path.GetFileName(inputFilePathFull) & " BPI")
+                    writer.WriteLine("Ytitle:Amplitude (BPI)")
                 End If
 
-                If blnSaveElutionTimeInsteadOfScan Then
-                    srOutFile.WriteLine("Xtitle:Time (Minutes)")
+                If saveElutionTimeInsteadOfScan Then
+                    writer.WriteLine("Xtitle:Time (Minutes)")
                 Else
-                    srOutFile.WriteLine("Xtitle:Scan #")
+                    writer.WriteLine("Xtitle:Scan #")
                 End If
 
-                srOutFile.WriteLine("Comment:")
-                srOutFile.WriteLine("LCQfilename: " & strInputFilePathFull)
-                srOutFile.WriteLine()
-                srOutFile.WriteLine("CommentEnd")
-                srOutFile.WriteLine("FileType: 5 ")
-                srOutFile.WriteLine(" ValidTypes:1=Time,2=Freq,3=Mass;4=TimeSeriesWithCalibrationFn;5=XYPairs")
-                srOutFile.WriteLine("DataType: 3 ")
-                srOutFile.WriteLine(" ValidTypes:1=Integer,no header,2=Floats,Sun Extrel,3=Floats with header,4=Excite waveform")
-                srOutFile.WriteLine("Appodization: 0")
-                srOutFile.WriteLine(" ValidFunctions:0=Square,1=Parzen,2=Hanning,3=Welch")
-                srOutFile.WriteLine("ZeroFills: 0 ")
+                writer.WriteLine("Comment:")
+                writer.WriteLine("LCQfilename: " & inputFilePathFull)
+                writer.WriteLine()
+                writer.WriteLine("CommentEnd")
+                writer.WriteLine("FileType: 5 ")
+                writer.WriteLine(" ValidTypes:1=Time,2=Freq,3=Mass;4=TimeSeriesWithCalibrationFn;5=XYPairs")
+                writer.WriteLine("DataType: 3 ")
+                writer.WriteLine(" ValidTypes:1=Integer,no header,2=Floats,Sun Extrel,3=Floats with header,4=Excite waveform")
+                writer.WriteLine("Appodization: 0")
+                writer.WriteLine(" ValidFunctions:0=Square,1=Parzen,2=Hanning,3=Welch")
+                writer.WriteLine("ZeroFills: 0 ")
 
-                ' Since we're using XY pairs, the buffer length needs to be two times intScanCount
-                Dim intBufferLength = intScanCount * 2
-                If intBufferLength < 1 Then intBufferLength = 1
+                ' Since we're using XY pairs, the buffer length needs to be two times scanCount
+                Dim bufferLength = scanCount * 2
+                If bufferLength < 1 Then bufferLength = 1
 
-                srOutFile.WriteLine("NumberOfSamples: " & intBufferLength.ToString() & " ")
-                srOutFile.WriteLine("SampleRate: 1 ")
-                srOutFile.WriteLine("LowMassFreq: 0 ")
-                srOutFile.WriteLine("FreqShift: 0 ")
-                srOutFile.WriteLine("NumberSegments: 0 ")
-                srOutFile.WriteLine("MaxPoint: 0 ")
-                srOutFile.WriteLine("CalType: 0 ")
-                srOutFile.WriteLine("CalA: 108205311.2284 ")
-                srOutFile.WriteLine("CalB:-1767155067.018 ")
-                srOutFile.WriteLine("CalC: 29669467490280 ")
-                srOutFile.WriteLine("Intensity: 0 ")
-                srOutFile.WriteLine("CurrentXmin: 0 ")
-                If intScanCount > 0 Then
-                    If blnSaveElutionTimeInsteadOfScan Then
-                        srOutFile.WriteLine("CurrentXmax: " & scanList(intScanCount - 1).ScanTime.ToString() & " ")
+                writer.WriteLine("NumberOfSamples: " & bufferLength.ToString() & " ")
+                writer.WriteLine("SampleRate: 1 ")
+                writer.WriteLine("LowMassFreq: 0 ")
+                writer.WriteLine("FreqShift: 0 ")
+                writer.WriteLine("NumberSegments: 0 ")
+                writer.WriteLine("MaxPoint: 0 ")
+                writer.WriteLine("CalType: 0 ")
+                writer.WriteLine("CalA: 108205311.2284 ")
+                writer.WriteLine("CalB:-1767155067.018 ")
+                writer.WriteLine("CalC: 29669467490280 ")
+                writer.WriteLine("Intensity: 0 ")
+                writer.WriteLine("CurrentXmin: 0 ")
+                If scanCount > 0 Then
+                    If saveElutionTimeInsteadOfScan Then
+                        writer.WriteLine("CurrentXmax: " & scanList(scanCount - 1).ScanTime.ToString() & " ")
                     Else
-                        srOutFile.WriteLine("CurrentXmax: " & scanList(intScanCount - 1).ScanNumber.ToString() & " ")
+                        writer.WriteLine("CurrentXmax: " & scanList(scanCount - 1).ScanNumber.ToString() & " ")
                     End If
                 Else
-                    srOutFile.WriteLine("CurrentXmax: 0")
+                    writer.WriteLine("CurrentXmax: 0")
                 End If
 
-                srOutFile.WriteLine("Tags:")
-                srOutFile.WriteLine("TagsEnd")
-                srOutFile.WriteLine("End")
+                writer.WriteLine("Tags:")
+                writer.WriteLine("TagsEnd")
+                writer.WriteLine("End")
+
+                ' ReSharper restore StringLiteralTypo
 
             End Using
 
             ' Wait 500 msec, then re-open the file using Binary IO
             Threading.Thread.Sleep(500)
 
-            Using srBinaryOut = New BinaryWriter(New FileStream(strOutputFilePath, FileMode.Append))
+            Using writer = New BinaryWriter(New FileStream(outputFilePath, FileMode.Append))
 
                 ' Write an Escape character (Byte 1B)
-                srBinaryOut.Write(CByte(27))
+                writer.Write(CByte(27))
 
-                For intScanIndex = 0 To intScanCount - 1
-                    With scanList(intScanIndex)
+                For scanIndex = 0 To scanCount - 1
+                    With scanList(scanIndex)
                         ' Note: Using CSng to assure that we write out single precision numbers
                         ' .TotalIonIntensity and .BasePeakIonIntensity are actually already singles
 
-                        If blnSaveElutionTimeInsteadOfScan Then
-                            srBinaryOut.Write(CSng(.ScanTime))
+                        If saveElutionTimeInsteadOfScan Then
+                            writer.Write(CSng(.ScanTime))
                         Else
-                            srBinaryOut.Write(CSng(.ScanNumber))
+                            writer.Write(CSng(.ScanNumber))
                         End If
 
-                        If blnSaveTICInsteadOfBPI Then
-                            srBinaryOut.Write(CSng(.TotalIonIntensity))
+                        If saveTICInsteadOfBPI Then
+                            writer.Write(CSng(.TotalIonIntensity))
                         Else
-                            srBinaryOut.Write(CSng(.BasePeakIonIntensity))
+                            writer.Write(CSng(.BasePeakIonIntensity))
                         End If
 
                     End With
@@ -253,31 +257,31 @@ Namespace DataOutput
         End Sub
 
         Private Sub WriteDecon2LSScanFileEntry(
-          srScanInfoOutFile As StreamWriter,
+          writer As StreamWriter,
           currentScan As clsScanInfo,
           objSpectraCache As clsSpectraCache)
 
-            Dim intNumPeaks As Integer
+            Dim numPeaks As Integer
 
             If objSpectraCache Is Nothing Then
-                intNumPeaks = 0
+                numPeaks = 0
             Else
-                Dim intPoolIndex As Integer
-                If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, intPoolIndex) Then
+                Dim poolIndex As Integer
+                If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                     SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                     Exit Sub
                 End If
-                intNumPeaks = objSpectraCache.SpectraPool(intPoolIndex).IonCount
+                numPeaks = objSpectraCache.SpectraPool(poolIndex).IonCount
             End If
 
-            Dim intScanNumber = currentScan.ScanNumber
+            Dim scanNumber = currentScan.ScanNumber
 
-            Dim intMSLevel = currentScan.FragScanInfo.MSLevel
-            If intMSLevel < 1 Then intMSLevel = 1
+            Dim msLevel = currentScan.FragScanInfo.MSLevel
+            If msLevel < 1 Then msLevel = 1
 
-            Dim intNumIsotopicSignatures = 0
+            Dim numIsotopicSignatures = 0
 
-            WriteDecon2LSScanFileEntry(srScanInfoOutFile, currentScan, intScanNumber, intMSLevel, intNumPeaks, intNumIsotopicSignatures)
+            WriteDecon2LSScanFileEntry(writer, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures)
 
         End Sub
 

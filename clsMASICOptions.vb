@@ -75,14 +75,14 @@ Public Class clsMASICOptions
     Public Property WriteExtendedStats As Boolean
 
     ''' <summary>
-    ''' When enabled, the the scan filter text will also be included in the extended stats file
+    ''' When enabled, the scan filter text will also be included in the extended stats file
     ''' (e.g. ITMS + c NSI Full ms [300.00-2000.00] or ITMS + c NSI d Full ms2 756.98@35.00 [195.00-2000.00])
     ''' </summary>
     Public Property WriteExtendedStatsIncludeScanFilterText As Boolean
 
     ''' <summary>
     ''' Adds a large number of additional columns with information like voltage, current, temperature, pressure, and gas flow rate
-    ''' If StatusLogKeyNameFilterList contains any entries, then only the entries matching the specs in StatusLogKeyNameFilterList will be saved
+    ''' If StatusLogKeyNameFilterList contains any entries, only the entries matching the specs in StatusLogKeyNameFilterList will be saved
     ''' </summary>
     Public Property WriteExtendedStatsStatusLog As Boolean
 
@@ -123,10 +123,10 @@ Public Class clsMASICOptions
     ''' <summary>
     ''' Constructor
     ''' </summary>
-    Public Sub New(strMasicVersion As String, strPeakFinderVersion As String)
+    Public Sub New(masicVersionInfo As String, peakFinderVersionInfo As String)
 
-        MASICVersion = strMasicVersion
-        PeakFinderVersion = strPeakFinderVersion
+        MASICVersion = masicVersionInfo
+        PeakFinderVersion = peakFinderVersionInfo
 
         CacheOptions = New clsSpectrumCacheOptions()
 
@@ -144,15 +144,15 @@ Public Class clsMASICOptions
         StatusLogKeyNameFilterList = New SortedSet(Of String)
     End Sub
 
-    Public Function GetScanToleranceTypeFromText(strScanType As String) As clsCustomSICList.eCustomSICScanTypeConstants
+    Public Function GetScanToleranceTypeFromText(scanType As String) As clsCustomSICList.eCustomSICScanTypeConstants
 
-        If strScanType Is Nothing Then strScanType = String.Empty
-        Dim strScanTypeTrimmed = strScanType.Trim()
+        If scanType Is Nothing Then scanType = String.Empty
+        Dim scanTypeTrimmed = scanType.Trim()
 
-        If String.Equals(strScanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase) Then
+        If String.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase) Then
             Return clsCustomSICList.eCustomSICScanTypeConstants.Relative
 
-        ElseIf String.Equals(strScanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME, StringComparison.InvariantCultureIgnoreCase) Then
+        ElseIf String.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME, StringComparison.InvariantCultureIgnoreCase) Then
             Return clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
         Else
             ' Assume absolute
@@ -161,17 +161,22 @@ Public Class clsMASICOptions
 
     End Function
 
+    ''' <summary>
+    ''' When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
+    ''' Use this property to filter the items written in the StatusLog file to only include the entries in this list
+    ''' </summary>
+    ''' <returns></returns>
     Public ReadOnly Property StatusLogKeyNameFilterList As SortedSet(Of String)
 
     ''' <summary>
     ''' Returns the contents of StatusLogKeyNameFilterList
     ''' </summary>
-    ''' <param name="blnCommaSeparatedList">When true, then returns a comma separated list; when false, returns separates items with CrLf</param>
+    ''' <param name="commaSeparatedList">When true, returns a comma separated list; when false, returns a Newline separated list</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function GetStatusLogKeyNameFilterListAsText(blnCommaSeparatedList As Boolean) As String
+    Public Function GetStatusLogKeyNameFilterListAsText(commaSeparatedList As Boolean) As String
 
-        If blnCommaSeparatedList Then
+        If commaSeparatedList Then
             Return String.Join(ControlChars.NewLine, StatusLogKeyNameFilterList)
         Else
             Return String.Join(", ", StatusLogKeyNameFilterList)
@@ -248,8 +253,8 @@ Public Class clsMASICOptions
                 If Not File.Exists(parameterFilePath) Then
                     If Not String.IsNullOrWhiteSpace(instrumentDataFilePath) Then
                         ' Also look in the same directory as the instrument data file
-                        Dim instrumentDataqFile = New FileInfo(instrumentDataFilePath)
-                        parameterFilePath = Path.Combine(instrumentDataqFile.DirectoryName, Path.GetFileName(parameterFilePath))
+                        Dim instrumentDataFile = New FileInfo(instrumentDataFilePath)
+                        parameterFilePath = Path.Combine(instrumentDataFile.DirectoryName, Path.GetFileName(parameterFilePath))
                     End If
 
                     If Not File.Exists(parameterFilePath) Then
@@ -332,10 +337,9 @@ Public Class clsMASICOptions
                                                             "WriteExtendedStatsStatusLog",
                                                             WriteExtendedStatsStatusLog)
 
-                    Dim strFilterList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList",
-                                                  String.Empty)
-                    If Not strFilterList Is Nothing AndAlso strFilterList.Length > 0 Then
-                        SetStatusLogKeyNameFilterList(strFilterList, ","c)
+                    Dim filterList = .GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", String.Empty)
+                    If Not filterList Is Nothing AndAlso filterList.Length > 0 Then
+                        SetStatusLogKeyNameFilterList(filterList, ","c)
                     End If
 
                     ConsolidateConstantExtendedHeaderValues = .GetParam(XML_SECTION_EXPORT_OPTIONS,
@@ -393,8 +397,7 @@ Public Class clsMASICOptions
                     RawDataExportOptions.FileFormat = CType(.GetParam(XML_SECTION_EXPORT_OPTIONS,
                                                                       "ExportRawDataFileFormat",
                                                                       CInt(RawDataExportOptions.FileFormat)),
-                                                            clsRawDataExportOptions.
-                                                                eExportRawDataFileFormatConstants)
+                                                            clsRawDataExportOptions.eExportRawDataFileFormatConstants)
 
                     RawDataExportOptions.IncludeMSMS = .GetParam(XML_SECTION_EXPORT_OPTIONS,
                                                                  "ExportRawDataIncludeMSMS",
@@ -418,33 +421,33 @@ Public Class clsMASICOptions
                 End If
 
                 If Not .SectionPresent(XML_SECTION_SIC_OPTIONS) Then
-                    Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS &
-                                          ControlChars.Quote & "> was not found in the parameter file: " &
-                                          parameterFilePath
-                    ReportError(strErrorMessage)
+                    Dim errorMessage = "The node '<section name=" & ControlChars.Quote & XML_SECTION_SIC_OPTIONS &
+                                       ControlChars.Quote & "> was not found in the parameter file: " &
+                                       parameterFilePath
+                    ReportError(errorMessage)
                     Return False
                 Else
                     ' SIC Options
                     ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
 
-                    Dim blnNotPresent As Boolean
+                    Dim notPresent As Boolean
 
                     ' Preferentially use "SICTolerance", if it is present
-                    Dim dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance",
-                                                    SICOptions.GetSICTolerance(), blnNotPresent)
+                    Dim sicTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance",
+                                                    SICOptions.GetSICTolerance(), notPresent)
 
-                    If blnNotPresent Then
+                    If notPresent Then
                         ' Check for "SICToleranceDa", which is a legacy setting
-                        dblSICTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa",
-                                                    SICOptions.SICToleranceDa, blnNotPresent)
+                        sicTolerance = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa",
+                                                    SICOptions.SICToleranceDa, notPresent)
 
-                        If Not blnNotPresent Then
-                            SICOptions.SetSICTolerance(dblSICTolerance, False)
+                        If Not notPresent Then
+                            SICOptions.SetSICTolerance(sicTolerance, False)
                         End If
                     Else
-                        Dim blnSICToleranceIsPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", False)
+                        Dim sicToleranceIsPPM = .GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", False)
 
-                        SICOptions.SetSICTolerance(dblSICTolerance, blnSICToleranceIsPPM)
+                        SICOptions.SetSICTolerance(sicTolerance, sicToleranceIsPPM)
                     End If
 
                     SICOptions.RefineReportedParentIonMZ = .GetParam(XML_SECTION_SIC_OPTIONS,
@@ -496,9 +499,7 @@ Public Class clsMASICOptions
                     ' Peak Finding Options
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode =
                         CType(.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode",
-                                        CInt(
-                                            SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.
-                                           BaselineNoiseMode)),
+                                        CInt(SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode)),
                               MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)
 
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute =
@@ -600,10 +601,10 @@ Public Class clsMASICOptions
 
                 ' Binning Options
                 If Not .SectionPresent(XML_SECTION_BINNING_OPTIONS) Then
-                    Dim strErrorMessage = "The node '<section name=" & ControlChars.Quote &
+                    Dim errorMessage = "The node '<section name=" & ControlChars.Quote &
                                           XML_SECTION_BINNING_OPTIONS & ControlChars.Quote &
                                           "> was not found in the parameter file: " & parameterFilePath
-                    ReportError(strErrorMessage)
+                    ReportError(errorMessage)
 
                     SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile)
                     Return False
@@ -651,18 +652,18 @@ Public Class clsMASICOptions
                                                                                "LimitSearchToCustomMZList",
                                                                                CustomSICList.LimitSearchToCustomMZList)
 
-            Dim strScanType = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", String.Empty)
-            Dim strScanTolerance = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", String.Empty)
+            Dim scanType = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", String.Empty)
+            Dim scanTolerance = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", String.Empty)
 
             With CustomSICList
-                .ScanToleranceType = GetScanToleranceTypeFromText(strScanType)
+                .ScanToleranceType = GetScanToleranceTypeFromText(scanType)
 
-                If strScanTolerance.Length > 0 AndAlso clsUtilities.IsNumber(strScanTolerance) Then
+                If scanTolerance.Length > 0 AndAlso clsUtilities.IsNumber(scanTolerance) Then
                     If .ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
-                        .ScanOrAcqTimeTolerance = CInt(strScanTolerance)
+                        .ScanOrAcqTimeTolerance = CInt(scanTolerance)
                     Else
                         ' Includes .Relative and .AcquisitionTime
-                        .ScanOrAcqTimeTolerance = CSng(strScanTolerance)
+                        .ScanOrAcqTimeTolerance = CSng(scanTolerance)
                     End If
                 Else
                     .ScanOrAcqTimeTolerance = 0
@@ -679,23 +680,23 @@ Public Class clsMASICOptions
 
                 Return True
             Else
-                Dim strMZList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Empty)
-                Dim strMZToleranceDaList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                                    "MZToleranceDaList", String.Empty)
+                Dim mzList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", String.Empty)
+                Dim mzToleranceDaList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                                 "MZToleranceDaList", String.Empty)
 
-                Dim strScanCenterList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList",
+                Dim scanCenterList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList",
                                                                  String.Empty)
-                Dim strScanToleranceList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                                    "ScanToleranceList", String.Empty)
+                Dim scanToleranceList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                                 "ScanToleranceList", String.Empty)
 
-                Dim strScanCommentList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                                  "ScanCommentList", String.Empty)
+                Dim scanCommentList = objSettingsFile.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
+                                                               "ScanCommentList", String.Empty)
 
-                Dim blnSuccess = CustomSICList.ParseCustomSICList(strMZList, strMZToleranceDaList,
-                                                                  strScanCenterList, strScanToleranceList,
-                                                                  strScanCommentList)
+                Dim success = CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
+                                                               scanCenterList, scanToleranceList,
+                                                               scanCommentList)
 
-                Return blnSuccess
+                Return success
             End If
 
         Catch ex As Exception
@@ -785,10 +786,10 @@ Public Class clsMASICOptions
                 ' "SICToleranceDa" is a legacy parameter.  If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
                 .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa.ToString("0.0000"))
 
-                Dim blnSICToleranceIsPPM As Boolean
-                Dim dblSICTolerance = SICOptions.GetSICTolerance(blnSICToleranceIsPPM)
-                .SetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", dblSICTolerance.ToString("0.0000"))
-                .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", blnSICToleranceIsPPM.ToString())
+                Dim sicToleranceIsPPM As Boolean
+                Dim sicTolerance = SICOptions.GetSICTolerance(sicToleranceIsPPM)
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", sicTolerance.ToString("0.0000"))
+                .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", sicToleranceIsPPM.ToString())
 
                 .SetParam(XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", SICOptions.RefineReportedParentIonMZ)
                 .SetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart", SICOptions.ScanRangeStart)
@@ -878,8 +879,8 @@ Public Class clsMASICOptions
 
             End With
 
-            ' Construct the strRawText strings using mCustomSICList
-            Dim blnScanCommentsDefined = False
+            ' Construct the rawText strings using mCustomSICList
+            Dim scanCommentsDefined = False
 
             Dim lstMzValues = New List(Of String)
             Dim lstMzTolerances = New List(Of String)
@@ -899,7 +900,7 @@ Public Class clsMASICOptions
                         lstComments.Add(String.Empty)
                     Else
                         If .Comment.Length > 0 Then
-                            blnScanCommentsDefined = True
+                            scanCommentsDefined = True
                         End If
                         lstComments.Add(.Comment)
                     End If
@@ -913,7 +914,7 @@ Public Class clsMASICOptions
             objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", String.Join(ControlChars.Tab, lstScanCenters))
             objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", String.Join(ControlChars.Tab, lstScanTolerances))
 
-            If blnScanCommentsDefined Then
+            If scanCommentsDefined Then
                 objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Join(ControlChars.Tab, lstComments))
             Else
                 objSettingsFile.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", String.Empty)
@@ -947,12 +948,17 @@ Public Class clsMASICOptions
 
     End Function
 
-    Public Sub SetStatusLogKeyNameFilterList(strMatchSpecList() As String)
+    ''' <summary>
+    ''' When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
+    ''' Use this method to filter the items written in the StatusLog file to only include the entries in matchSpecList
+    ''' </summary>
+    ''' <param name="matchSpecList"></param>
+    Public Sub SetStatusLogKeyNameFilterList(matchSpecList As List(Of String))
         Try
             StatusLogKeyNameFilterList.Clear()
 
-            If Not strMatchSpecList Is Nothing Then
-                Dim query = (From item In strMatchSpecList Select item).Distinct()
+            If Not matchSpecList Is Nothing Then
+                Dim query = (From item In matchSpecList Select item).Distinct()
                 For Each item In query
                     StatusLogKeyNameFilterList.Add(item)
                 Next
@@ -962,37 +968,28 @@ Public Class clsMASICOptions
         End Try
     End Sub
 
-    Public Sub SetStatusLogKeyNameFilterList(strMatchSpecList As String, chDelimiter As Char)
-        Dim strItems() As String
-        Dim intIndex As Integer
-        Dim intTargetIndex As Integer
+    Public Sub SetStatusLogKeyNameFilterList(matchSpecList As String, chDelimiter As Char)
 
         Try
             ' Split on the user-specified delimiter, plus also CR and LF
-            strItems = strMatchSpecList.Split(New Char() {chDelimiter, ControlChars.Cr, ControlChars.Lf})
+            Dim items = matchSpecList.Split(New Char() {chDelimiter, ControlChars.Cr, ControlChars.Lf}).ToList()
 
-            If strItems.Length > 0 Then
+            Dim validatedItems = New List(Of String)
 
-                ' Make sure no blank entries are present in strItems
-                intTargetIndex = 0
-                For intIndex = 0 To strItems.Length - 1
-                    strItems(intIndex) = strItems(intIndex).Trim
-                    If strItems(intIndex).Length > 0 Then
-                        If intTargetIndex <> intIndex Then
-                            strItems(intTargetIndex) = String.Copy(strItems(intIndex))
-                        End If
-                        intTargetIndex += 1
+            If items.Count > 0 Then
+
+                ' Populate validatedItems using any non-blank entries in items
+                For Each item In items
+                    Dim trimmedItem = item.Trim()
+                    If trimmedItem.Length > 0 Then
+                        validatedItems.Add(trimmedItem)
                     End If
                 Next
 
-                If intTargetIndex < strItems.Length Then
-                    ReDim Preserve strItems(intTargetIndex - 1)
-                End If
-
-                SetStatusLogKeyNameFilterList(strItems)
+                SetStatusLogKeyNameFilterList(validatedItems)
             End If
         Catch ex As Exception
-            ' Error parsing strMatchSpecList
+            ' Error parsing matchSpecList
             ' Ignore errors here
         End Try
     End Sub

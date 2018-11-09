@@ -76,75 +76,75 @@ Namespace DataInput
 
         Public Sub DiscardDataBelowNoiseThreshold(
           objMSSpectrum As clsMSSpectrum,
-          sngNoiseThresholdIntensity As Single,
-          dblMZIgnoreRangeStart As Double,
-          dblMZIgnoreRangeEnd As Double,
+          noiseThresholdIntensity As Single,
+          mzIgnoreRangeStart As Double,
+          mzIgnoreRangeEnd As Double,
           noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions)
 
-            Dim intIonCountNew As Integer
-            Dim intIonIndex As Integer
-            Dim blnPointPassesFilter As Boolean
+            Dim ionCountNew As Integer
+            Dim ionIndex As Integer
+            Dim pointPassesFilter As Boolean
 
             Try
                 With objMSSpectrum
                     Select Case noiseThresholdOptions.BaselineNoiseMode
                         Case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold
                             If noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0 Then
-                                intIonCountNew = 0
-                                For intIonIndex = 0 To .IonCount - 1
+                                ionCountNew = 0
+                                For ionIndex = 0 To .IonCount - 1
 
-                                    blnPointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(.IonsMZ(intIonIndex), dblMZIgnoreRangeStart, dblMZIgnoreRangeEnd)
+                                    pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(.IonsMZ(ionIndex), mzIgnoreRangeStart, mzIgnoreRangeEnd)
 
-                                    If Not blnPointPassesFilter Then
+                                    If Not pointPassesFilter Then
                                         ' Check the point's intensity against .BaselineNoiseLevelAbsolute
-                                        If .IonsIntensity(intIonIndex) >= noiseThresholdOptions.BaselineNoiseLevelAbsolute Then
-                                            blnPointPassesFilter = True
+                                        If .IonsIntensity(ionIndex) >= noiseThresholdOptions.BaselineNoiseLevelAbsolute Then
+                                            pointPassesFilter = True
                                         End If
                                     End If
 
-                                    If blnPointPassesFilter Then
-                                        .IonsMZ(intIonCountNew) = .IonsMZ(intIonIndex)
-                                        .IonsIntensity(intIonCountNew) = .IonsIntensity(intIonIndex)
-                                        intIonCountNew += 1
+                                    If pointPassesFilter Then
+                                        .IonsMZ(ionCountNew) = .IonsMZ(ionIndex)
+                                        .IonsIntensity(ionCountNew) = .IonsIntensity(ionIndex)
+                                        ionCountNew += 1
                                     End If
 
                                 Next
                             Else
-                                intIonCountNew = .IonCount
+                                ionCountNew = .IonCount
                             End If
                         Case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance,
                       MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount,
                       MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance
                             If noiseThresholdOptions.MinimumSignalToNoiseRatio > 0 Then
-                                intIonCountNew = 0
-                                For intIonIndex = 0 To .IonCount - 1
+                                ionCountNew = 0
+                                For ionIndex = 0 To .IonCount - 1
 
-                                    blnPointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(.IonsMZ(intIonIndex), dblMZIgnoreRangeStart, dblMZIgnoreRangeEnd)
+                                    pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(.IonsMZ(ionIndex), mzIgnoreRangeStart, mzIgnoreRangeEnd)
 
-                                    If Not blnPointPassesFilter Then
+                                    If Not pointPassesFilter Then
                                         ' Check the point's intensity against .BaselineNoiseLevelAbsolute
-                                        If MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(.IonsIntensity(intIonIndex), sngNoiseThresholdIntensity) >= noiseThresholdOptions.MinimumSignalToNoiseRatio Then
-                                            blnPointPassesFilter = True
+                                        If MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(.IonsIntensity(ionIndex), noiseThresholdIntensity) >= noiseThresholdOptions.MinimumSignalToNoiseRatio Then
+                                            pointPassesFilter = True
                                         End If
                                     End If
 
-                                    If blnPointPassesFilter Then
-                                        .IonsMZ(intIonCountNew) = .IonsMZ(intIonIndex)
-                                        .IonsIntensity(intIonCountNew) = .IonsIntensity(intIonIndex)
-                                        intIonCountNew += 1
+                                    If pointPassesFilter Then
+                                        .IonsMZ(ionCountNew) = .IonsMZ(ionIndex)
+                                        .IonsIntensity(ionCountNew) = .IonsIntensity(ionIndex)
+                                        ionCountNew += 1
                                     End If
 
                                 Next
                             Else
-                                intIonCountNew = .IonCount
+                                ionCountNew = .IonCount
                             End If
                         Case Else
                             ReportError("Unknown BaselineNoiseMode encountered in DiscardDataBelowNoiseThreshold: " &
                                     noiseThresholdOptions.BaselineNoiseMode.ToString())
                     End Select
 
-                    If intIonCountNew < .IonCount Then
-                        .IonCount = intIonCountNew
+                    If ionCountNew < .IonCount Then
+                        .IonCount = ionCountNew
                     End If
                 End With
             Catch ex As Exception
@@ -155,92 +155,92 @@ Namespace DataInput
 
         Public Sub DiscardDataToLimitIonCount(
           objMSSpectrum As clsMSSpectrum,
-          dblMZIgnoreRangeStart As Double,
-          dblMZIgnoreRangeEnd As Double,
-          intMaxIonCountToRetain As Integer)
+          mzIgnoreRangeStart As Double,
+          mzIgnoreRangeEnd As Double,
+          maxIonCountToRetain As Integer)
 
-            Dim intIonCountNew As Integer
-            Dim intIonIndex As Integer
-            Dim blnPointPassesFilter As Boolean
+            Dim ionCountNew As Integer
+            Dim ionIndex As Integer
+            Dim pointPassesFilter As Boolean
 
-            ' When this is true, then will write a text file of the mass spectrum before before and after it is filtered
+            ' When this is true, then will write a text file of the mass spectrum before and after it is filtered
             ' Used for debugging
-            Dim blnWriteDebugData As Boolean
-            Dim srOutFile As StreamWriter = Nothing
+            Dim writeDebugData As Boolean
+            Dim writer As StreamWriter = Nothing
 
             Try
 
                 With objMSSpectrum
 
-                    If objMSSpectrum.IonCount > intMaxIonCountToRetain Then
+                    If objMSSpectrum.IonCount > maxIonCountToRetain Then
                         Dim objFilterDataArray = New clsFilterDataArrayMaxCount() With {
-                            .MaximumDataCountToLoad = intMaxIonCountToRetain,
+                            .MaximumDataCountToLoad = maxIonCountToRetain,
                             .TotalIntensityPercentageFilterEnabled = False
                         }
 
-                        blnWriteDebugData = False
-                        If blnWriteDebugData Then
-                            srOutFile = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputFolderPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString() & "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
-                            srOutFile.WriteLine("m/z" & ControlChars.Tab & "Intensity")
+                        writeDebugData = False
+                        If writeDebugData Then
+                            writer = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString() & "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
+                            writer.WriteLine("m/z" & ControlChars.Tab & "Intensity")
                         End If
 
                         ' Store the intensity values in objFilterDataArray
-                        For intIonIndex = 0 To .IonCount - 1
-                            objFilterDataArray.AddDataPoint(.IonsIntensity(intIonIndex), intIonIndex)
-                            If blnWriteDebugData Then
-                                srOutFile.WriteLine(.IonsMZ(intIonIndex) & ControlChars.Tab & .IonsIntensity(intIonIndex))
+                        For ionIndex = 0 To .IonCount - 1
+                            objFilterDataArray.AddDataPoint(.IonsIntensity(ionIndex), ionIndex)
+                            If writeDebugData Then
+                                writer.WriteLine(.IonsMZ(ionIndex) & ControlChars.Tab & .IonsIntensity(ionIndex))
                             End If
                         Next
 
-                        If blnWriteDebugData Then
-                            srOutFile.Close()
+                        If writeDebugData Then
+                            writer.Close()
                         End If
 
 
                         ' Call .FilterData, which will determine which data points to keep
                         objFilterDataArray.FilterData()
 
-                        intIonCountNew = 0
-                        For intIonIndex = 0 To .IonCount - 1
+                        ionCountNew = 0
+                        For ionIndex = 0 To .IonCount - 1
 
-                            blnPointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(.IonsMZ(intIonIndex), dblMZIgnoreRangeStart, dblMZIgnoreRangeEnd)
+                            pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(.IonsMZ(ionIndex), mzIgnoreRangeStart, mzIgnoreRangeEnd)
 
-                            If Not blnPointPassesFilter Then
+                            If Not pointPassesFilter Then
                                 ' See if the point's intensity is negative
-                                If objFilterDataArray.GetAbundanceByIndex(intIonIndex) >= 0 Then
-                                    blnPointPassesFilter = True
+                                If objFilterDataArray.GetAbundanceByIndex(ionIndex) >= 0 Then
+                                    pointPassesFilter = True
                                 End If
                             End If
 
-                            If blnPointPassesFilter Then
-                                .IonsMZ(intIonCountNew) = .IonsMZ(intIonIndex)
-                                .IonsIntensity(intIonCountNew) = .IonsIntensity(intIonIndex)
-                                intIonCountNew += 1
+                            If pointPassesFilter Then
+                                .IonsMZ(ionCountNew) = .IonsMZ(ionIndex)
+                                .IonsIntensity(ionCountNew) = .IonsIntensity(ionIndex)
+                                ionCountNew += 1
                             End If
 
                         Next
                     Else
-                        intIonCountNew = .IonCount
+                        ionCountNew = .IonCount
                     End If
 
-                    If intIonCountNew < .IonCount Then
-                        .IonCount = intIonCountNew
+                    If ionCountNew < .IonCount Then
+                        .IonCount = ionCountNew
                     End If
 
-                    If blnWriteDebugData Then
-                        srOutFile = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputFolderPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString() & "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
-                        srOutFile.WriteLine("m/z" & ControlChars.Tab & "Intensity")
+                    If writeDebugData Then
+                        Using postFilterWriter = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString() & "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
+                            postFilterWriter.WriteLine("m/z" & ControlChars.Tab & "Intensity")
 
-                        ' Store the intensity values in objFilterDataArray
-                        For intIonIndex = 0 To .IonCount - 1
-                            srOutFile.WriteLine(.IonsMZ(intIonIndex) & ControlChars.Tab & .IonsIntensity(intIonIndex))
-                        Next
-                        srOutFile.Close()
+                            ' Store the intensity values in objFilterDataArray
+                            For ionIndex = 0 To .IonCount - 1
+                                postFilterWriter.WriteLine(.IonsMZ(ionIndex) & ControlChars.Tab & .IonsIntensity(ionIndex))
+                            Next
+                        End Using
                     End If
 
                 End With
             Catch ex As Exception
-                ReportError("Error limiting the number of data points to " & intMaxIonCountToRetain, ex, eMasicErrorCodes.UnspecifiedError)
+                ReportError("Error limiting the number of data points to " & maxIonCountToRetain, ex, eMasicErrorCodes.UnspecifiedError)
             End Try
 
         End Sub
@@ -260,10 +260,10 @@ Namespace DataInput
         End Function
 
         Protected Sub SaveScanStatEntry(
-          swOutFile As StreamWriter,
+          writer As StreamWriter,
           eScanType As clsScanList.eScanTypeConstants,
           currentScan As clsScanInfo,
-          intDatasetNumber As Integer)
+          datasetNumber As Integer)
 
             Const cColDelimiter As Char = ControlChars.Tab
 
@@ -300,40 +300,40 @@ Namespace DataInput
 
             mScanTracking.ScanStats.Add(objScanStatsEntry)
 
-            swOutFile.WriteLine(
-          intDatasetNumber.ToString() & cColDelimiter &                    ' Dataset number
-          objScanStatsEntry.ScanNumber.ToString() & cColDelimiter &        ' Scan number
-          objScanStatsEntry.ElutionTime & cColDelimiter &                ' Scan time (minutes)
-          objScanStatsEntry.ScanType.ToString() & cColDelimiter &          ' Scan type (1 for MS, 2 for MS2, etc.)
-          objScanStatsEntry.TotalIonIntensity & cColDelimiter &          ' Total ion intensity
-          objScanStatsEntry.BasePeakIntensity & cColDelimiter &          ' Base peak ion intensity
-          objScanStatsEntry.BasePeakMZ & cColDelimiter &                 ' Base peak ion m/z
-          objScanStatsEntry.BasePeakSignalToNoiseRatio & cColDelimiter & ' Base peak signal to noise ratio
-          objScanStatsEntry.IonCount.ToString() & cColDelimiter &          ' Number of peaks (aka ions) in the spectrum
-          objScanStatsEntry.IonCountRaw.ToString() & cColDelimiter &       ' Number of peaks (aka ions) in the spectrum prior to any filtering
-          objScanStatsEntry.ScanTypeName)                                ' Scan type name
+            writer.WriteLine(
+              datasetNumber.ToString() & cColDelimiter &                    ' Dataset number
+              objScanStatsEntry.ScanNumber.ToString() & cColDelimiter &        ' Scan number
+              objScanStatsEntry.ElutionTime & cColDelimiter &                ' Scan time (minutes)
+              objScanStatsEntry.ScanType.ToString() & cColDelimiter &          ' Scan type (1 for MS, 2 for MS2, etc.)
+              objScanStatsEntry.TotalIonIntensity & cColDelimiter &          ' Total ion intensity
+              objScanStatsEntry.BasePeakIntensity & cColDelimiter &          ' Base peak ion intensity
+              objScanStatsEntry.BasePeakMZ & cColDelimiter &                 ' Base peak ion m/z
+              objScanStatsEntry.BasePeakSignalToNoiseRatio & cColDelimiter & ' Base peak signal to noise ratio
+              objScanStatsEntry.IonCount.ToString() & cColDelimiter &          ' Number of peaks (aka ions) in the spectrum
+              objScanStatsEntry.IonCountRaw.ToString() & cColDelimiter &       ' Number of peaks (aka ions) in the spectrum prior to any filtering
+              objScanStatsEntry.ScanTypeName)                                ' Scan type name
 
         End Sub
 
         Protected Function UpdateDatasetFileStats(
-          ioFileInfo As FileInfo,
-          intDatasetID As Integer) As Boolean
+          dataFileInfo As FileInfo,
+          datasetID As Integer) As Boolean
 
             Try
-                If Not ioFileInfo.Exists Then Return False
+                If Not dataFileInfo.Exists Then Return False
 
                 ' Record the file size and Dataset ID
                 With mDatasetFileInfo
-                    .FileSystemCreationTime = ioFileInfo.CreationTime
-                    .FileSystemModificationTime = ioFileInfo.LastWriteTime
+                    .FileSystemCreationTime = dataFileInfo.CreationTime
+                    .FileSystemModificationTime = dataFileInfo.LastWriteTime
 
                     .AcqTimeStart = .FileSystemModificationTime
                     .AcqTimeEnd = .FileSystemModificationTime
 
-                    .DatasetID = intDatasetID
-                    .DatasetName = Path.GetFileNameWithoutExtension(ioFileInfo.Name)
-                    .FileExtension = ioFileInfo.Extension
-                    .FileSizeBytes = ioFileInfo.Length
+                    .DatasetID = datasetID
+                    .DatasetName = Path.GetFileNameWithoutExtension(dataFileInfo.Name)
+                    .FileExtension = dataFileInfo.Extension
+                    .FileSizeBytes = dataFileInfo.Length
 
                     .ScanCount = 0
                 End With

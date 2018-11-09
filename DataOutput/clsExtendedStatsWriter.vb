@@ -291,24 +291,24 @@ Namespace DataOutput
 
         End Function
 
-        Private Function GetScanByMasterScanIndex(scanList As clsScanList, intMasterScanIndex As Integer) As clsScanInfo
+        Private Function GetScanByMasterScanIndex(scanList As clsScanList, masterScanIndex As Integer) As clsScanInfo
             Dim currentScan = New clsScanInfo()
             If Not scanList.MasterScanOrder Is Nothing Then
-                If intMasterScanIndex < 0 Then
-                    intMasterScanIndex = 0
-                ElseIf intMasterScanIndex >= scanList.MasterScanOrderCount Then
-                    intMasterScanIndex = scanList.MasterScanOrderCount - 1
+                If masterScanIndex < 0 Then
+                    masterScanIndex = 0
+                ElseIf masterScanIndex >= scanList.MasterScanOrderCount Then
+                    masterScanIndex = scanList.MasterScanOrderCount - 1
                 End If
 
-                Select Case scanList.MasterScanOrder(intMasterScanIndex).ScanType
+                Select Case scanList.MasterScanOrder(masterScanIndex).ScanType
                     Case clsScanList.eScanTypeConstants.SurveyScan
                         ' Survey scan
-                        currentScan = scanList.SurveyScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                        currentScan = scanList.SurveyScans(scanList.MasterScanOrder(masterScanIndex).ScanIndexPointer)
                     Case clsScanList.eScanTypeConstants.FragScan
                         ' Frag Scan
-                        currentScan = scanList.FragScans(scanList.MasterScanOrder(intMasterScanIndex).ScanIndexPointer)
+                        currentScan = scanList.FragScans(scanList.MasterScanOrder(masterScanIndex).ScanIndexPointer)
                     Case Else
-                        ' Unkown scan type
+                        ' Unknown scan type
                 End Select
             End If
 
@@ -318,14 +318,14 @@ Namespace DataOutput
 
         Public Function SaveExtendedScanStatsFiles(
           scanList As clsScanList,
-          strInputFileName As String,
-          blnIncludeHeaders As Boolean) As Boolean
+          inputFileName As String,
           outputDirectoryPath As String,
+          includeHeaders As Boolean) As Boolean
 
             ' Writes out a flat file containing the extended scan stats
 
-            Dim strExtendedConstantHeaderOutputFilePath As String
-            Dim strExtendedNonConstantHeaderOutputFilePath As String = String.Empty
+            Dim extendedConstantHeaderOutputFilePath As String
+            Dim extendedNonConstantHeaderOutputFilePath As String = String.Empty
 
             Const cColDelimiter As Char = ControlChars.Tab
 
@@ -377,7 +377,7 @@ Namespace DataOutput
                 End Using
 
             Catch ex As Exception
-                ReportError("Error writing the Extended Scan Stats to: " & strExtendedNonConstantHeaderOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
+                ReportError("Error writing the Extended Scan Stats to: " & extendedNonConstantHeaderOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False
             End Try
 
@@ -388,17 +388,17 @@ Namespace DataOutput
 
         Public Function GetExtendedHeaderInfoIdByName(keyName As String) As Integer
 
-            Dim intIDValue As Integer
+            Dim idValue As Integer
 
-            If TryGetExtendedHeaderInfoValue(keyName, intIDValue) Then
+            If TryGetExtendedHeaderInfoValue(keyName, idValue) Then
                 ' Match found
             Else
                 ' Match not found; add it
-                intIDValue = mExtendedHeaderNameMap.Count
-                mExtendedHeaderNameMap.Add(New KeyValuePair(Of String, Integer)(keyName, intIDValue))
+                idValue = mExtendedHeaderNameMap.Count
+                mExtendedHeaderNameMap.Add(New KeyValuePair(Of String, Integer)(keyName, idValue))
             End If
 
-            Return intIDValue
+            Return idValue
 
         End Function
 

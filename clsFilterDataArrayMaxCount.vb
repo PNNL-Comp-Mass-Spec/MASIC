@@ -86,15 +86,15 @@ Public Class clsFilterDataArrayMaxCount
         Me.Clear(InitialCapacity)
     End Sub
 
-    Public Sub AddDataPoint(sngAbundance As Single, intDataPointIndex As Integer)
+    Public Sub AddDataPoint(abundance As Single, dataPointIndex As Integer)
 
         If mDataCount >= mDataValues.Length Then
             ReDim Preserve mDataValues(CInt(Math.Floor(mDataValues.Length * 1.5)) - 1)
             ReDim Preserve mDataIndices(mDataValues.Length - 1)
         End If
 
-        mDataValues(mDataCount) = sngAbundance
-        mDataIndices(mDataCount) = intDataPointIndex
+        mDataValues(mDataCount) = abundance
+        mDataIndices(mDataCount) = dataPointIndex
 
         mDataCount += 1
     End Sub
@@ -114,9 +114,9 @@ Public Class clsFilterDataArrayMaxCount
         ReDim mDataIndices(InitialCapacity - 1)
     End Sub
 
-    Public Function GetAbundanceByIndex(intDataPointIndex As Integer) As Single
-        If intDataPointIndex >= 0 And intDataPointIndex < mDataCount Then
-            Return mDataValues(intDataPointIndex)
+    Public Function GetAbundanceByIndex(dataPointIndex As Integer) As Single
+        If dataPointIndex >= 0 And dataPointIndex < mDataCount Then
+            Return mDataValues(dataPointIndex)
         Else
             ' Invalid data point index value
             Return -1
@@ -146,15 +146,15 @@ Public Class clsFilterDataArrayMaxCount
 
         Try
 
-            Dim sngBinToSortAbundances() As Single
-            Dim intBinToSortDataIndices() As Integer
+            Dim binToSortAbundances() As Single
+            Dim binToSortDataIndices() As Integer
 
-            ReDim sngBinToSortAbundances(9)
-            ReDim intBinToSortDataIndices(9)
+            ReDim binToSortAbundances(9)
+            ReDim binToSortDataIndices(9)
 
             UpdateProgress(0)
 
-            Dim blnUseFullDataSort = False
+            Dim useFullDataSort = False
             If mDataCount = 0 Then
                 ' No data loaded
                 UpdateProgress(4 / SUBTASK_STEP_COUNT * 100.0#)
@@ -170,176 +170,176 @@ Public Class clsFilterDataArrayMaxCount
             '  (aka frequency distribution) of the abundances in mDataValues
 
             ' First, determine the maximum abundance value in mDataValues
-            Dim sngMaxAbundance = Single.MinValue
-            For intIndex = 0 To mDataCount - 1
-                If mDataValues(intIndex) > sngMaxAbundance Then
-                    sngMaxAbundance = mDataValues(intIndex)
+            Dim maxAbundance = Single.MinValue
+            For index = 0 To mDataCount - 1
+                If mDataValues(index) > maxAbundance Then
+                    maxAbundance = mDataValues(index)
                 End If
             Next
 
-            ' Round sngMaxAbundance up to the next highest integer
-            sngMaxAbundance = CLng(Math.Ceiling(sngMaxAbundance))
+            ' Round maxAbundance up to the next highest integer
+            maxAbundance = CLng(Math.Ceiling(maxAbundance))
 
             ' Now determine the histogram bin size
-            Dim dblBinSize = sngMaxAbundance / HISTOGRAM_BIN_COUNT
-            If dblBinSize < 1 Then dblBinSize = 1
+            Dim binSize = maxAbundance / HISTOGRAM_BIN_COUNT
+            If binSize < 1 Then binSize = 1
 
-            ' Initialize intHistogramData
-            Dim intBinCount = CInt(sngMaxAbundance / dblBinSize) + 1
+            ' Initialize histogramData
+            Dim binCount = CInt(maxAbundance / binSize) + 1
 
-            Dim intHistogramBinCounts() As Integer
-            Dim dblHistogramBinStartIntensity() As Double
+            Dim histogramBinCounts() As Integer
+            Dim histogramBinStartIntensity() As Double
 
-            ReDim intHistogramBinCounts(intBinCount - 1)
-            ReDim dblHistogramBinStartIntensity(intBinCount - 1)
+            ReDim histogramBinCounts(binCount - 1)
+            ReDim histogramBinStartIntensity(binCount - 1)
 
-            For intIndex = 0 To intBinCount - 1
-                dblHistogramBinStartIntensity(intIndex) = intIndex * dblBinSize
+            For index = 0 To binCount - 1
+                histogramBinStartIntensity(index) = index * binSize
             Next
 
-            ' Parse mDataValues to populate intHistogramBinCounts
-            For intIndex = 0 To mDataCount - 1
+            ' Parse mDataValues to populate histogramBinCounts
+            For index = 0 To mDataCount - 1
 
-                Dim intTargetBin As Integer
-                If mDataValues(intIndex) <= 0 Then
-                    intTargetBin = 0
+                Dim targetBin As Integer
+                If mDataValues(index) <= 0 Then
+                    targetBin = 0
                 Else
-                    intTargetBin = CInt(Math.Floor(mDataValues(intIndex) / dblBinSize))
+                    targetBin = CInt(Math.Floor(mDataValues(index) / binSize))
                 End If
 
-                If intTargetBin < intBinCount - 1 Then
-                    If mDataValues(intIndex) >= dblHistogramBinStartIntensity(intTargetBin + 1) Then
-                        intTargetBin += 1
+                If targetBin < binCount - 1 Then
+                    If mDataValues(index) >= histogramBinStartIntensity(targetBin + 1) Then
+                        targetBin += 1
                     End If
                 End If
 
-                intHistogramBinCounts(intTargetBin) += 1
+                histogramBinCounts(targetBin) += 1
 
-                If mDataValues(intIndex) < dblHistogramBinStartIntensity(intTargetBin) Then
-                    If mDataValues(intIndex) < dblHistogramBinStartIntensity(intTargetBin) - dblBinSize / 1000 Then
+                If mDataValues(index) < histogramBinStartIntensity(targetBin) Then
+                    If mDataValues(index) < histogramBinStartIntensity(targetBin) - binSize / 1000 Then
                         ' This is unexpected
-                        mDataValues(intIndex) = mDataValues(intIndex)
+                        mDataValues(index) = mDataValues(index)
                     End If
                 End If
 
-                If intIndex Mod 10000 = 0 Then
-                    UpdateProgress(CSng((0 + (intIndex + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
+                If index Mod 10000 = 0 Then
+                    UpdateProgress(CSng((0 + (index + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
                 End If
             Next
 
-            ' Now examine the frequencies in intHistogramBinCounts() to determine the minimum value to consider when sorting
-            Dim intPointTotal = 0
-            Dim intBinToSort = -1
-            For intIndex = intBinCount - 1 To 0 Step -1
-                intPointTotal = intPointTotal + intHistogramBinCounts(intIndex)
-                If intPointTotal >= mMaximumDataCountToKeep Then
-                    intBinToSort = intIndex
+            ' Now examine the frequencies in histogramBinCounts() to determine the minimum value to consider when sorting
+            Dim pointTotal = 0
+            Dim binToSort = -1
+            For index = binCount - 1 To 0 Step -1
+                pointTotal = pointTotal + histogramBinCounts(index)
+                If pointTotal >= mMaximumDataCountToKeep Then
+                    binToSort = index
                     Exit For
                 End If
             Next
 
             UpdateProgress(1 / SUBTASK_STEP_COUNT * 100.0#)
 
-            If intBinToSort >= 0 Then
-                ' Find the data with intensity >= dblHistogramBinStartIntensity(intBinToSort)
-                ' We actually only need to sort the data in bin intBinToSort
+            If binToSort >= 0 Then
+                ' Find the data with intensity >= histogramBinStartIntensity(binToSort)
+                ' We actually only need to sort the data in bin binToSort
 
-                Dim dblBinToSortAbundanceMinimum As Double = dblHistogramBinStartIntensity(intBinToSort)
-                Dim dblBinToSortAbundanceMaximum As Double = sngMaxAbundance + 1
+                Dim binToSortAbundanceMinimum As Double = histogramBinStartIntensity(binToSort)
+                Dim binToSortAbundanceMaximum As Double = maxAbundance + 1
 
-                If intBinToSort < intBinCount - 1 Then
-                    dblBinToSortAbundanceMaximum = dblHistogramBinStartIntensity(intBinToSort + 1)
+                If binToSort < binCount - 1 Then
+                    binToSortAbundanceMaximum = histogramBinStartIntensity(binToSort + 1)
                 End If
 
-                If Math.Abs(dblBinToSortAbundanceMaximum - dblBinToSortAbundanceMinimum) < Single.Epsilon Then
+                If Math.Abs(binToSortAbundanceMaximum - binToSortAbundanceMinimum) < Single.Epsilon Then
                     ' Is this code ever reached?
-                    ' If yes, then the code below won't populate sngBinToSortAbundances() and intBinToSortDataIndices() with any data
-                    blnUseFullDataSort = True
+                    ' If yes, then the code below won't populate binToSortAbundances() and binToSortDataIndices() with any data
+                    useFullDataSort = True
                 End If
 
-                Dim intBinToSortDataCount = 0
+                Dim binToSortDataCount = 0
 
-                If Not blnUseFullDataSort Then
-                    If intHistogramBinCounts(intBinToSort) > 0 Then
-                        ReDim sngBinToSortAbundances(intHistogramBinCounts(intBinToSort) - 1)
-                        ReDim intBinToSortDataIndices(intHistogramBinCounts(intBinToSort) - 1)
+                If Not useFullDataSort Then
+                    If histogramBinCounts(binToSort) > 0 Then
+                        ReDim binToSortAbundances(histogramBinCounts(binToSort) - 1)
+                        ReDim binToSortDataIndices(histogramBinCounts(binToSort) - 1)
                     Else
                         ' Is this code ever reached?
-                        blnUseFullDataSort = True
+                        useFullDataSort = True
                     End If
                 End If
 
-                If Not blnUseFullDataSort Then
-                    Dim intDataCountImplicitlyIncluded = 0
-                    For intIndex = 0 To mDataCount - 1
-                        If mDataValues(intIndex) < dblBinToSortAbundanceMinimum Then
+                If Not useFullDataSort Then
+                    Dim dataCountImplicitlyIncluded = 0
+                    For index = 0 To mDataCount - 1
+                        If mDataValues(index) < binToSortAbundanceMinimum Then
                             ' Skip this data point when re-reading the input data file
-                            mDataValues(intIndex) = mSkipDataPointFlag
-                        ElseIf mDataValues(intIndex) < dblBinToSortAbundanceMaximum Then
+                            mDataValues(index) = mSkipDataPointFlag
+                        ElseIf mDataValues(index) < binToSortAbundanceMaximum Then
                             ' Value is in the bin to sort; add to the BinToSort arrays
 
-                            If intBinToSortDataCount >= sngBinToSortAbundances.Length Then
+                            If binToSortDataCount >= binToSortAbundances.Length Then
                                 ' Need to reserve more space (this is unexpected)
-                                ReDim Preserve sngBinToSortAbundances(sngBinToSortAbundances.Length * 2 - 1)
-                                ReDim Preserve intBinToSortDataIndices(sngBinToSortAbundances.Length - 1)
+                                ReDim Preserve binToSortAbundances(binToSortAbundances.Length * 2 - 1)
+                                ReDim Preserve binToSortDataIndices(binToSortAbundances.Length - 1)
                             End If
 
-                            sngBinToSortAbundances(intBinToSortDataCount) = mDataValues(intIndex)
-                            intBinToSortDataIndices(intBinToSortDataCount) = mDataIndices(intIndex)
-                            intBinToSortDataCount += 1
+                            binToSortAbundances(binToSortDataCount) = mDataValues(index)
+                            binToSortDataIndices(binToSortDataCount) = mDataIndices(index)
+                            binToSortDataCount += 1
                         Else
-                            intDataCountImplicitlyIncluded = intDataCountImplicitlyIncluded + 1
+                            dataCountImplicitlyIncluded = dataCountImplicitlyIncluded + 1
                         End If
 
-                        If intIndex Mod 10000 = 0 Then
-                            UpdateProgress(CSng((1 + (intIndex + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
+                        If index Mod 10000 = 0 Then
+                            UpdateProgress(CSng((1 + (index + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
                         End If
                     Next
 
-                    If intBinToSortDataCount > 0 Then
-                        If intBinToSortDataCount < sngBinToSortAbundances.Length Then
-                            ReDim Preserve sngBinToSortAbundances(intBinToSortDataCount - 1)
-                            ReDim Preserve intBinToSortDataIndices(intBinToSortDataCount - 1)
+                    If binToSortDataCount > 0 Then
+                        If binToSortDataCount < binToSortAbundances.Length Then
+                            ReDim Preserve binToSortAbundances(binToSortDataCount - 1)
+                            ReDim Preserve binToSortDataIndices(binToSortDataCount - 1)
                         End If
                     Else
                         ' This code shouldn't be reached
                     End If
 
-                    If mMaximumDataCountToKeep - intDataCountImplicitlyIncluded - intBinToSortDataCount = 0 Then
+                    If mMaximumDataCountToKeep - dataCountImplicitlyIncluded - binToSortDataCount = 0 Then
                         ' No need to sort and examine the data for BinToSort since we'll ultimately include all of it
                     Else
-                        SortAndMarkPointsToSkip(sngBinToSortAbundances, intBinToSortDataIndices, intBinToSortDataCount, mMaximumDataCountToKeep - intDataCountImplicitlyIncluded, SUBTASK_STEP_COUNT)
+                        SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, mMaximumDataCountToKeep - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT)
                     End If
 
-                    ' Synchronize the data in sngBinToSortAbundances and intBinToSortDataIndices with mDataValues and mDataValues
+                    ' Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataValues
                     ' mDataValues and mDataIndices have not been sorted and therefore mDataIndices should currently be sorted ascending on "valid data point index"
-                    ' intBinToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
+                    ' binToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
 
-                    Dim intOriginalDataArrayIndex = 0
-                    For intIndex = 0 To intBinToSortDataCount - 1
-                        Do While intBinToSortDataIndices(intIndex) > mDataIndices(intOriginalDataArrayIndex)
-                            intOriginalDataArrayIndex += 1
+                    Dim originalDataArrayIndex = 0
+                    For index = 0 To binToSortDataCount - 1
+                        Do While binToSortDataIndices(index) > mDataIndices(originalDataArrayIndex)
+                            originalDataArrayIndex += 1
                         Loop
 
-                        If Math.Abs(sngBinToSortAbundances(intIndex) - mSkipDataPointFlag) < Single.Epsilon Then
-                            If mDataIndices(intOriginalDataArrayIndex) = intBinToSortDataIndices(intIndex) Then
-                                mDataValues(intOriginalDataArrayIndex) = mSkipDataPointFlag
+                        If Math.Abs(binToSortAbundances(index) - mSkipDataPointFlag) < Single.Epsilon Then
+                            If mDataIndices(originalDataArrayIndex) = binToSortDataIndices(index) Then
+                                mDataValues(originalDataArrayIndex) = mSkipDataPointFlag
                             Else
                                 ' This code shouldn't be reached
                             End If
                         End If
-                        intOriginalDataArrayIndex += 1
+                        originalDataArrayIndex += 1
 
-                        If intBinToSortDataCount < 1000 Or intBinToSortDataCount Mod 100 = 0 Then
-                            UpdateProgress(CSng((3 + (intIndex + 1) / CDbl(intBinToSortDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
+                        If binToSortDataCount < 1000 Or binToSortDataCount Mod 100 = 0 Then
+                            UpdateProgress(CSng((3 + (index + 1) / CDbl(binToSortDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
                         End If
                     Next
                 End If
             Else
-                blnUseFullDataSort = True
+                useFullDataSort = True
             End If
 
-            If blnUseFullDataSort Then
+            If useFullDataSort Then
                 ' This shouldn't normally be necessary
 
                 ' We have to sort all of the data; this can be quite slow
@@ -358,34 +358,34 @@ Public Class clsFilterDataArrayMaxCount
 
     ' This is sub uses a full sort to filter the data
     ' This will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible
-    Private Sub SortAndMarkPointsToSkip(ByRef sngAbundances() As Single, ByRef intDataIndices() As Integer, intDataCount As Integer, intMaximumDataCountInArraysToLoad As Integer, intSubtaskStepCount As Integer)
+    Private Sub SortAndMarkPointsToSkip(ByRef abundances() As Single, ByRef dataIndices() As Integer, dataCount As Integer, maximumDataCountInArraysToLoad As Integer, subtaskStepCount As Integer)
 
-        Dim intIndex As Integer
+        Dim index As Integer
 
-        If intDataCount > 0 Then
-            ' Sort sngAbundances ascending, sorting intDataIndices in parallel
-            Array.Sort(sngAbundances, intDataIndices, 0, intDataCount)
+        If dataCount > 0 Then
+            ' Sort abundances ascending, sorting dataIndices in parallel
+            Array.Sort(abundances, dataIndices, 0, dataCount)
 
-            UpdateProgress(CSng((2.333 / intSubtaskStepCount) * 100.0))
+            UpdateProgress(CSng((2.333 / subtaskStepCount) * 100.0))
 
-            ' Change the abundance values to mSkipDataPointFlag for data up to index intDataCount-intMaximumDataCountInArraysToLoad-1
-            For intIndex = 0 To intDataCount - intMaximumDataCountInArraysToLoad - 1
-                sngAbundances(intIndex) = mSkipDataPointFlag
+            ' Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
+            For index = 0 To dataCount - maximumDataCountInArraysToLoad - 1
+                abundances(index) = mSkipDataPointFlag
             Next
 
-            UpdateProgress(CSng((2.666 / intSubtaskStepCount) * 100.0#))
+            UpdateProgress(CSng((2.666 / subtaskStepCount) * 100.0#))
 
-            ' Re-sort, this time on intDataIndices with sngAbundances in parallel
-            Array.Sort(intDataIndices, sngAbundances, 0, intDataCount)
+            ' Re-sort, this time on dataIndices with abundances in parallel
+            Array.Sort(dataIndices, abundances, 0, dataCount)
 
         End If
 
-        UpdateProgress(CSng(3 / intSubtaskStepCount * 100.0#))
+        UpdateProgress(CSng(3 / subtaskStepCount * 100.0#))
 
     End Sub
 
-    Private Sub UpdateProgress(sngProgress As Single)
-        mProgress = sngProgress
+    Private Sub UpdateProgress(progressValue As Single)
+        mProgress = progressValue
 
         RaiseEvent ProgressChanged(mProgress)
     End Sub

@@ -3,8 +3,8 @@ Option Strict On
 ''' <summary>
 ''' This class can be used to search a list of values for a given value, plus or minus a given tolerance
 ''' The input list need not be sorted, since mPointerIndices() will be populated when the data is loaded,
-''' afterwhich the data array will be sorted
-''' 
+''' after which the data array will be sorted
+'''
 ''' To prevent this behavior, and save memory by not populating mPointerIndices, set mUsePointerIndexArray = False
 ''' </summary>
 Public Class clsSearchRange
@@ -54,12 +54,12 @@ Public Class clsSearchRange
         End Get
     End Property
 
-    Public ReadOnly Property OriginalIndex(intIndex As Integer) As Integer
+    Public ReadOnly Property OriginalIndex(index As Integer) As Integer
         Get
             If mPointerArrayIsValid Then
                 Try
-                    If intIndex < mPointerIndices.Length Then
-                        Return mPointerIndices(intIndex)
+                    If index < mPointerIndices.Length Then
+                        Return mPointerIndices(index)
                     Else
                         Return -1
                     End If
@@ -84,161 +84,161 @@ Public Class clsSearchRange
 
 #Region "Binary Search Range"
 
-    Private Sub BinarySearchRangeInt(intSearchValue As Integer, intToleranceHalfWidth As Integer, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
+    Private Sub BinarySearchRangeInt(searchValue As Integer, toleranceHalfWidth As Integer, ByRef matchIndexStart As Integer, ByRef matchIndexEnd As Integer)
         ' Recursive search function
 
-        Dim intIndexMidpoint As Integer
-        Dim blnLeftDone As Boolean
-        Dim blnRightDone As Boolean
-        Dim intLeftIndex As Integer
-        Dim intRightIndex As Integer
+        Dim indexMidpoint As Integer
+        Dim leftDone As Boolean
+        Dim rightDone As Boolean
+        Dim leftIndex As Integer
+        Dim rightIndex As Integer
 
-        intIndexMidpoint = (intMatchIndexStart + intMatchIndexEnd) \ 2
-        If intIndexMidpoint = intMatchIndexStart Then
+        indexMidpoint = (matchIndexStart + matchIndexEnd) \ 2
+        If indexMidpoint = matchIndexStart Then
             ' Min and Max are next to each other
-            If Math.Abs(intSearchValue - mDataInt(intMatchIndexStart)) > intToleranceHalfWidth Then intMatchIndexStart = intMatchIndexEnd
-            If Math.Abs(intSearchValue - mDataInt(intMatchIndexEnd)) > intToleranceHalfWidth Then intMatchIndexEnd = intIndexMidpoint
+            If Math.Abs(searchValue - mDataInt(matchIndexStart)) > toleranceHalfWidth Then matchIndexStart = matchIndexEnd
+            If Math.Abs(searchValue - mDataInt(matchIndexEnd)) > toleranceHalfWidth Then matchIndexEnd = indexMidpoint
             Exit Sub
         End If
 
-        If mDataInt(intIndexMidpoint) > intSearchValue + intToleranceHalfWidth Then
+        If mDataInt(indexMidpoint) > searchValue + toleranceHalfWidth Then
             ' Out of range on the right
-            intMatchIndexEnd = intIndexMidpoint
-            BinarySearchRangeInt(intSearchValue, intToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
-        ElseIf mDataInt(intIndexMidpoint) < intSearchValue - intToleranceHalfWidth Then
+            matchIndexEnd = indexMidpoint
+            BinarySearchRangeInt(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
+        ElseIf mDataInt(indexMidpoint) < searchValue - toleranceHalfWidth Then
             ' Out of range on the left
-            intMatchIndexStart = intIndexMidpoint
-            BinarySearchRangeInt(intSearchValue, intToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+            matchIndexStart = indexMidpoint
+            BinarySearchRangeInt(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
         Else
             ' Inside range; figure out the borders
-            intLeftIndex = intIndexMidpoint
+            leftIndex = indexMidpoint
             Do
-                intLeftIndex = intLeftIndex - 1
-                If intLeftIndex < intMatchIndexStart Then
-                    blnLeftDone = True
+                leftIndex = leftIndex - 1
+                If leftIndex < matchIndexStart Then
+                    leftDone = True
                 Else
-                    If Math.Abs(intSearchValue - mDataInt(intLeftIndex)) > intToleranceHalfWidth Then blnLeftDone = True
+                    If Math.Abs(searchValue - mDataInt(leftIndex)) > toleranceHalfWidth Then leftDone = True
                 End If
-            Loop While Not blnLeftDone
-            intRightIndex = intIndexMidpoint
+            Loop While Not leftDone
+            rightIndex = indexMidpoint
 
             Do
-                intRightIndex = intRightIndex + 1
-                If intRightIndex > intMatchIndexEnd Then
-                    blnRightDone = True
+                rightIndex = rightIndex + 1
+                If rightIndex > matchIndexEnd Then
+                    rightDone = True
                 Else
-                    If Math.Abs(intSearchValue - mDataInt(intRightIndex)) > intToleranceHalfWidth Then blnRightDone = True
+                    If Math.Abs(searchValue - mDataInt(rightIndex)) > toleranceHalfWidth Then rightDone = True
                 End If
-            Loop While Not blnRightDone
+            Loop While Not rightDone
 
-            intMatchIndexStart = intLeftIndex + 1
-            intMatchIndexEnd = intRightIndex - 1
+            matchIndexStart = leftIndex + 1
+            matchIndexEnd = rightIndex - 1
         End If
 
     End Sub
 
-    Private Sub BinarySearchRangeSng(sngSearchValue As Single, sngToleranceHalfWidth As Single, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
+    Private Sub BinarySearchRangeSng(searchValue As Single, toleranceHalfWidth As Single, ByRef matchIndexStart As Integer, ByRef matchIndexEnd As Integer)
         ' Recursive search function
 
-        Dim intIndexMidpoint As Integer
-        Dim blnLeftDone As Boolean
-        Dim blnRightDone As Boolean
-        Dim intLeftIndex As Integer
-        Dim intRightIndex As Integer
+        Dim indexMidpoint As Integer
+        Dim leftDone As Boolean
+        Dim rightDone As Boolean
+        Dim leftIndex As Integer
+        Dim rightIndex As Integer
 
-        intIndexMidpoint = (intMatchIndexStart + intMatchIndexEnd) \ 2
-        If intIndexMidpoint = intMatchIndexStart Then
+        indexMidpoint = (matchIndexStart + matchIndexEnd) \ 2
+        If indexMidpoint = matchIndexStart Then
             ' Min and Max are next to each other
-            If Math.Abs(sngSearchValue - mDataSingle(intMatchIndexStart)) > sngToleranceHalfWidth Then intMatchIndexStart = intMatchIndexEnd
-            If Math.Abs(sngSearchValue - mDataSingle(intMatchIndexEnd)) > sngToleranceHalfWidth Then intMatchIndexEnd = intIndexMidpoint
+            If Math.Abs(searchValue - mDataSingle(matchIndexStart)) > toleranceHalfWidth Then matchIndexStart = matchIndexEnd
+            If Math.Abs(searchValue - mDataSingle(matchIndexEnd)) > toleranceHalfWidth Then matchIndexEnd = indexMidpoint
             Exit Sub
         End If
 
-        If mDataSingle(intIndexMidpoint) > sngSearchValue + sngToleranceHalfWidth Then
+        If mDataSingle(indexMidpoint) > searchValue + toleranceHalfWidth Then
             ' Out of range on the right
-            intMatchIndexEnd = intIndexMidpoint
-            BinarySearchRangeSng(sngSearchValue, sngToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
-        ElseIf mDataSingle(intIndexMidpoint) < sngSearchValue - sngToleranceHalfWidth Then
+            matchIndexEnd = indexMidpoint
+            BinarySearchRangeSng(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
+        ElseIf mDataSingle(indexMidpoint) < searchValue - toleranceHalfWidth Then
             ' Out of range on the left
-            intMatchIndexStart = intIndexMidpoint
-            BinarySearchRangeSng(sngSearchValue, sngToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+            matchIndexStart = indexMidpoint
+            BinarySearchRangeSng(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
         Else
             ' Inside range; figure out the borders
-            intLeftIndex = intIndexMidpoint
+            leftIndex = indexMidpoint
             Do
-                intLeftIndex = intLeftIndex - 1
-                If intLeftIndex < intMatchIndexStart Then
-                    blnLeftDone = True
+                leftIndex = leftIndex - 1
+                If leftIndex < matchIndexStart Then
+                    leftDone = True
                 Else
-                    If Math.Abs(sngSearchValue - mDataSingle(intLeftIndex)) > sngToleranceHalfWidth Then blnLeftDone = True
+                    If Math.Abs(searchValue - mDataSingle(leftIndex)) > toleranceHalfWidth Then leftDone = True
                 End If
-            Loop While Not blnLeftDone
-            intRightIndex = intIndexMidpoint
+            Loop While Not leftDone
+            rightIndex = indexMidpoint
 
             Do
-                intRightIndex = intRightIndex + 1
-                If intRightIndex > intMatchIndexEnd Then
-                    blnRightDone = True
+                rightIndex = rightIndex + 1
+                If rightIndex > matchIndexEnd Then
+                    rightDone = True
                 Else
-                    If Math.Abs(sngSearchValue - mDataSingle(intRightIndex)) > sngToleranceHalfWidth Then blnRightDone = True
+                    If Math.Abs(searchValue - mDataSingle(rightIndex)) > toleranceHalfWidth Then rightDone = True
                 End If
-            Loop While Not blnRightDone
+            Loop While Not rightDone
 
-            intMatchIndexStart = intLeftIndex + 1
-            intMatchIndexEnd = intRightIndex - 1
+            matchIndexStart = leftIndex + 1
+            matchIndexEnd = rightIndex - 1
         End If
 
     End Sub
 
-    Private Sub BinarySearchRangeDbl(dblSearchValue As Double, dblToleranceHalfWidth As Double, ByRef intMatchIndexStart As Integer, ByRef intMatchIndexEnd As Integer)
+    Private Sub BinarySearchRangeDbl(searchValue As Double, toleranceHalfWidth As Double, ByRef matchIndexStart As Integer, ByRef matchIndexEnd As Integer)
         ' Recursive search function
 
-        Dim intIndexMidpoint As Integer
-        Dim blnLeftDone As Boolean
-        Dim blnRightDone As Boolean
-        Dim intLeftIndex As Integer
-        Dim intRightIndex As Integer
+        Dim indexMidpoint As Integer
+        Dim leftDone As Boolean
+        Dim rightDone As Boolean
+        Dim leftIndex As Integer
+        Dim rightIndex As Integer
 
-        intIndexMidpoint = (intMatchIndexStart + intMatchIndexEnd) \ 2
-        If intIndexMidpoint = intMatchIndexStart Then
+        indexMidpoint = (matchIndexStart + matchIndexEnd) \ 2
+        If indexMidpoint = matchIndexStart Then
             ' Min and Max are next to each other
-            If Math.Abs(dblSearchValue - mDataDouble(intMatchIndexStart)) > dblToleranceHalfWidth Then intMatchIndexStart = intMatchIndexEnd
-            If Math.Abs(dblSearchValue - mDataDouble(intMatchIndexEnd)) > dblToleranceHalfWidth Then intMatchIndexEnd = intIndexMidpoint
+            If Math.Abs(searchValue - mDataDouble(matchIndexStart)) > toleranceHalfWidth Then matchIndexStart = matchIndexEnd
+            If Math.Abs(searchValue - mDataDouble(matchIndexEnd)) > toleranceHalfWidth Then matchIndexEnd = indexMidpoint
             Exit Sub
         End If
 
-        If mDataDouble(intIndexMidpoint) > dblSearchValue + dblToleranceHalfWidth Then
+        If mDataDouble(indexMidpoint) > searchValue + toleranceHalfWidth Then
             ' Out of range on the right
-            intMatchIndexEnd = intIndexMidpoint
-            BinarySearchRangeDbl(dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
-        ElseIf mDataDouble(intIndexMidpoint) < dblSearchValue - dblToleranceHalfWidth Then
+            matchIndexEnd = indexMidpoint
+            BinarySearchRangeDbl(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
+        ElseIf mDataDouble(indexMidpoint) < searchValue - toleranceHalfWidth Then
             ' Out of range on the left
-            intMatchIndexStart = intIndexMidpoint
-            BinarySearchRangeDbl(dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+            matchIndexStart = indexMidpoint
+            BinarySearchRangeDbl(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
         Else
             ' Inside range; figure out the borders
-            intLeftIndex = intIndexMidpoint
+            leftIndex = indexMidpoint
             Do
-                intLeftIndex = intLeftIndex - 1
-                If intLeftIndex < intMatchIndexStart Then
-                    blnLeftDone = True
+                leftIndex = leftIndex - 1
+                If leftIndex < matchIndexStart Then
+                    leftDone = True
                 Else
-                    If Math.Abs(dblSearchValue - mDataDouble(intLeftIndex)) > dblToleranceHalfWidth Then blnLeftDone = True
+                    If Math.Abs(searchValue - mDataDouble(leftIndex)) > toleranceHalfWidth Then leftDone = True
                 End If
-            Loop While Not blnLeftDone
-            intRightIndex = intIndexMidpoint
+            Loop While Not leftDone
+            rightIndex = indexMidpoint
 
             Do
-                intRightIndex = intRightIndex + 1
-                If intRightIndex > intMatchIndexEnd Then
-                    blnRightDone = True
+                rightIndex = rightIndex + 1
+                If rightIndex > matchIndexEnd Then
+                    rightDone = True
                 Else
-                    If Math.Abs(dblSearchValue - mDataDouble(intRightIndex)) > dblToleranceHalfWidth Then blnRightDone = True
+                    If Math.Abs(searchValue - mDataDouble(rightIndex)) > toleranceHalfWidth Then rightDone = True
                 End If
-            Loop While Not blnRightDone
+            Loop While Not rightDone
 
-            intMatchIndexStart = intLeftIndex + 1
-            intMatchIndexEnd = intRightIndex - 1
+            matchIndexStart = leftIndex + 1
+            matchIndexEnd = rightIndex - 1
         End If
 
     End Sub
@@ -261,16 +261,16 @@ Public Class clsSearchRange
 
 #Region "Fill with Data"
 
-    Public Function FillWithData(ByRef intValues() As Integer) As Boolean
+    Public Function FillWithData(ByRef values() As Integer) As Boolean
 
-        Dim blnSuccess As Boolean
+        Dim success As Boolean
 
         Try
-            If intValues Is Nothing OrElse intValues.Length = 0 Then
-                blnSuccess = False
+            If values Is Nothing OrElse values.Length = 0 Then
+                success = False
             Else
-                ReDim mDataInt(intValues.Length - 1)
-                intValues.CopyTo(mDataInt, 0)
+                ReDim mDataInt(values.Length - 1)
+                values.CopyTo(mDataInt, 0)
 
                 If mUsePointerIndexArray Then
                     InitializePointerIndexArray(mDataInt.Length)
@@ -281,26 +281,26 @@ Public Class clsSearchRange
                 End If
 
                 mDataType = eDataTypeToUse.IntegerType
-                blnSuccess = True
+                success = True
             End If
         Catch ex As Exception
-            blnSuccess = False
+            success = False
         End Try
 
-        If blnSuccess Then ClearUnusedData()
-        Return blnSuccess
+        If success Then ClearUnusedData()
+        Return success
     End Function
 
-    Public Function FillWithData(ByRef sngValues() As Single) As Boolean
+    Public Function FillWithData(ByRef values() As Single) As Boolean
 
-        Dim blnSuccess As Boolean
+        Dim success As Boolean
 
         Try
-            If sngValues Is Nothing OrElse sngValues.Length = 0 Then
-                blnSuccess = False
+            If values Is Nothing OrElse values.Length = 0 Then
+                success = False
             Else
-                ReDim mDataSingle(sngValues.Length - 1)
-                sngValues.CopyTo(mDataSingle, 0)
+                ReDim mDataSingle(values.Length - 1)
+                values.CopyTo(mDataSingle, 0)
 
                 If mUsePointerIndexArray Then
                     InitializePointerIndexArray(mDataSingle.Length)
@@ -311,26 +311,26 @@ Public Class clsSearchRange
                 End If
 
                 mDataType = eDataTypeToUse.SingleType
-                blnSuccess = True
+                success = True
             End If
         Catch ex As Exception
-            blnSuccess = False
+            success = False
         End Try
 
-        If blnSuccess Then ClearUnusedData()
-        Return blnSuccess
+        If success Then ClearUnusedData()
+        Return success
     End Function
 
-    Public Function FillWithData(ByRef dblValues() As Double) As Boolean
+    Public Function FillWithData(ByRef values() As Double) As Boolean
 
-        Dim blnSuccess As Boolean
+        Dim success As Boolean
 
         Try
-            If dblValues Is Nothing OrElse dblValues.Length = 0 Then
-                blnSuccess = False
+            If values Is Nothing OrElse values.Length = 0 Then
+                success = False
             Else
-                ReDim mDataDouble(dblValues.Length - 1)
-                dblValues.CopyTo(mDataDouble, 0)
+                ReDim mDataDouble(values.Length - 1)
+                values.CopyTo(mDataDouble, 0)
 
                 If mUsePointerIndexArray Then
                     InitializePointerIndexArray(mDataDouble.Length)
@@ -341,176 +341,176 @@ Public Class clsSearchRange
                 End If
 
                 mDataType = eDataTypeToUse.DoubleType
-                blnSuccess = True
+                success = True
             End If
         Catch ex As Exception
-            blnSuccess = False
+            success = False
         End Try
 
-        If blnSuccess Then ClearUnusedData()
-        Return blnSuccess
+        If success Then ClearUnusedData()
+        Return success
     End Function
 #End Region
 
 
 #Region "Find Value Range"
 
-    Public Function FindValueRange(intSearchValue As Integer, intToleranceHalfWidth As Integer, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
-        ' Searches the loaded data for intSearchValue with a tolerance of +/-intToleranceHalfWidth
-        ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
+    Public Function FindValueRange(searchValue As Integer, toleranceHalfWidth As Integer, Optional ByRef matchIndexStart As Integer = 0, Optional ByRef matchIndexEnd As Integer = 0) As Boolean
+        ' Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
+        ' Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
         ' Otherwise, returns false
 
-        Dim blnMatchFound As Boolean
+        Dim matchFound As Boolean
 
         If mDataType <> eDataTypeToUse.IntegerType Then
             Select Case mDataType
                 Case eDataTypeToUse.SingleType
-                    blnMatchFound = FindValueRange(CSng(intSearchValue), CSng(intToleranceHalfWidth), intMatchIndexStart, intMatchIndexEnd)
+                    matchFound = FindValueRange(CSng(searchValue), CSng(toleranceHalfWidth), matchIndexStart, matchIndexEnd)
                 Case eDataTypeToUse.DoubleType
-                    blnMatchFound = FindValueRange(CDbl(intSearchValue), CDbl(intToleranceHalfWidth), intMatchIndexStart, intMatchIndexEnd)
+                    matchFound = FindValueRange(CDbl(searchValue), CDbl(toleranceHalfWidth), matchIndexStart, matchIndexEnd)
                 Case Else
-                    blnMatchFound = False
+                    matchFound = False
             End Select
         Else
-            intMatchIndexStart = 0
-            intMatchIndexEnd = mDataInt.Length - 1
+            matchIndexStart = 0
+            matchIndexEnd = mDataInt.Length - 1
 
             If mDataInt.Length = 0 Then
-                intMatchIndexEnd = -1
+                matchIndexEnd = -1
             ElseIf mDataInt.Length = 1 Then
-                If Math.Abs(intSearchValue - mDataInt(0)) > intToleranceHalfWidth Then
+                If Math.Abs(searchValue - mDataInt(0)) > toleranceHalfWidth Then
                     ' Only one data point, and it is not within tolerance
-                    intMatchIndexEnd = -1
+                    matchIndexEnd = -1
                 End If
             Else
-                BinarySearchRangeInt(intSearchValue, intToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+                BinarySearchRangeInt(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
             End If
 
-            If intMatchIndexStart > intMatchIndexEnd Then
-                intMatchIndexStart = -1
-                intMatchIndexEnd = -1
-                blnMatchFound = False
+            If matchIndexStart > matchIndexEnd Then
+                matchIndexStart = -1
+                matchIndexEnd = -1
+                matchFound = False
             Else
-                blnMatchFound = True
+                matchFound = True
             End If
         End If
 
-        Return blnMatchFound
+        Return matchFound
     End Function
 
-    Public Function FindValueRange(dblSearchValue As Double, dblToleranceHalfWidth As Double, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
-        ' Searches the loaded data for dblSearchValue with a tolerance of +/-dblTolerance
-        ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
+    Public Function FindValueRange(searchValue As Double, toleranceHalfWidth As Double, Optional ByRef matchIndexStart As Integer = 0, Optional ByRef matchIndexEnd As Integer = 0) As Boolean
+        ' Searches the loaded data for searchValue with a tolerance of +/-tolerance
+        ' Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
         ' Otherwise, returns false
 
-        Dim blnMatchFound As Boolean
+        Dim matchFound As Boolean
 
         If mDataType <> eDataTypeToUse.DoubleType Then
             Select Case mDataType
                 Case eDataTypeToUse.IntegerType
-                    blnMatchFound = FindValueRange(CInt(dblSearchValue), CInt(dblToleranceHalfWidth), intMatchIndexStart, intMatchIndexEnd)
+                    matchFound = FindValueRange(CInt(searchValue), CInt(toleranceHalfWidth), matchIndexStart, matchIndexEnd)
                 Case eDataTypeToUse.SingleType
-                    blnMatchFound = FindValueRange(CSng(dblSearchValue), CSng(dblToleranceHalfWidth), intMatchIndexStart, intMatchIndexEnd)
+                    matchFound = FindValueRange(CSng(searchValue), CSng(toleranceHalfWidth), matchIndexStart, matchIndexEnd)
                 Case Else
-                    blnMatchFound = False
+                    matchFound = False
             End Select
         Else
-            intMatchIndexStart = 0
-            intMatchIndexEnd = mDataDouble.Length - 1
+            matchIndexStart = 0
+            matchIndexEnd = mDataDouble.Length - 1
 
             If mDataDouble.Length = 0 Then
-                intMatchIndexEnd = -1
+                matchIndexEnd = -1
             ElseIf mDataDouble.Length = 1 Then
-                If Math.Abs(dblSearchValue - mDataDouble(0)) > dblToleranceHalfWidth Then
+                If Math.Abs(searchValue - mDataDouble(0)) > toleranceHalfWidth Then
                     ' Only one data point, and it is not within tolerance
-                    intMatchIndexEnd = -1
+                    matchIndexEnd = -1
                 End If
             Else
-                BinarySearchRangeDbl(dblSearchValue, dblToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+                BinarySearchRangeDbl(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
             End If
 
-            If intMatchIndexStart > intMatchIndexEnd Then
-                intMatchIndexStart = -1
-                intMatchIndexEnd = -1
-                blnMatchFound = False
+            If matchIndexStart > matchIndexEnd Then
+                matchIndexStart = -1
+                matchIndexEnd = -1
+                matchFound = False
             Else
-                blnMatchFound = True
+                matchFound = True
             End If
         End If
 
-        Return blnMatchFound
+        Return matchFound
     End Function
 
-    Public Function FindValueRange(sngSearchValue As Single, sngToleranceHalfWidth As Single, Optional ByRef intMatchIndexStart As Integer = 0, Optional ByRef intMatchIndexEnd As Integer = 0) As Boolean
-        ' Searches the loaded data for sngSearchValue with a tolerance of +/-sngTolerance
-        ' Returns True if a match is found; in addition, populates intMatchIndexStart and intMatchIndexEnd
+    Public Function FindValueRange(searchValue As Single, toleranceHalfWidth As Single, Optional ByRef matchIndexStart As Integer = 0, Optional ByRef matchIndexEnd As Integer = 0) As Boolean
+        ' Searches the loaded data for searchValue with a tolerance of +/-tolerance
+        ' Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
         ' Otherwise, returns false
 
-        Dim blnMatchFound As Boolean
+        Dim matchFound As Boolean
 
         If mDataType <> eDataTypeToUse.SingleType Then
             Select Case mDataType
                 Case eDataTypeToUse.IntegerType
-                    blnMatchFound = FindValueRange(CInt(sngSearchValue), CInt(sngToleranceHalfWidth), intMatchIndexStart, intMatchIndexEnd)
+                    matchFound = FindValueRange(CInt(searchValue), CInt(toleranceHalfWidth), matchIndexStart, matchIndexEnd)
                 Case eDataTypeToUse.DoubleType
-                    blnMatchFound = FindValueRange(CDbl(sngSearchValue), CDbl(sngToleranceHalfWidth), intMatchIndexStart, intMatchIndexEnd)
+                    matchFound = FindValueRange(CDbl(searchValue), CDbl(toleranceHalfWidth), matchIndexStart, matchIndexEnd)
                 Case Else
-                    blnMatchFound = False
+                    matchFound = False
             End Select
         Else
-            intMatchIndexStart = 0
-            intMatchIndexEnd = mDataSingle.Length - 1
+            matchIndexStart = 0
+            matchIndexEnd = mDataSingle.Length - 1
 
             If mDataSingle.Length = 0 Then
-                intMatchIndexEnd = -1
+                matchIndexEnd = -1
             ElseIf mDataSingle.Length = 1 Then
-                If Math.Abs(sngSearchValue - mDataSingle(0)) > sngToleranceHalfWidth Then
+                If Math.Abs(searchValue - mDataSingle(0)) > toleranceHalfWidth Then
                     ' Only one data point, and it is not within tolerance
-                    intMatchIndexEnd = -1
+                    matchIndexEnd = -1
                 End If
             Else
-                BinarySearchRangeSng(sngSearchValue, sngToleranceHalfWidth, intMatchIndexStart, intMatchIndexEnd)
+                BinarySearchRangeSng(searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd)
             End If
 
-            If intMatchIndexStart > intMatchIndexEnd Then
-                intMatchIndexStart = -1
-                intMatchIndexEnd = -1
-                blnMatchFound = False
+            If matchIndexStart > matchIndexEnd Then
+                matchIndexStart = -1
+                matchIndexEnd = -1
+                matchFound = False
             Else
-                blnMatchFound = True
+                matchFound = True
             End If
         End If
 
-        Return blnMatchFound
+        Return matchFound
     End Function
 #End Region
 
 
 #Region "Get Value by Index"
-    Public Function GetValueByIndexInt(intIndex As Integer) As Integer
+    Public Function GetValueByIndexInt(index As Integer) As Integer
         Try
-            Return CInt(GetValueByIndex(intIndex))
+            Return CInt(GetValueByIndex(index))
         Catch ex As Exception
             Return 0
         End Try
     End Function
 
-    Public Function GetValueByIndex(intIndex As Integer) As Double
+    Public Function GetValueByIndex(index As Integer) As Double
         Try
             If mDataType = eDataTypeToUse.NoDataPresent Then
                 Return 0
             Else
                 Select Case mDataType
                     Case eDataTypeToUse.IntegerType
-                        Return mDataInt(intIndex)
+                        Return mDataInt(index)
                     Case eDataTypeToUse.SingleType
-                        Return mDataSingle(intIndex)
+                        Return mDataSingle(index)
                     Case eDataTypeToUse.DoubleType
-                        Return mDataDouble(intIndex)
+                        Return mDataDouble(index)
                 End Select
             End If
         Catch ex As Exception
-            ' intIndex is probably out of range
+            ' index is probably out of range
             ' Ignore errors
         End Try
 
@@ -518,9 +518,9 @@ Public Class clsSearchRange
 
     End Function
 
-    Public Function GetValueByIndexSng(intIndex As Integer) As Single
+    Public Function GetValueByIndexSng(index As Integer) As Single
         Try
-            Return CSng(GetValueByIndex(intIndex))
+            Return CSng(GetValueByIndex(index))
         Catch ex As Exception
             Return 0
         End Try
@@ -529,30 +529,30 @@ Public Class clsSearchRange
 
 
 #Region "Get Value by Original Index"
-    Public Function GetValueByOriginalIndexInt(intIndex As Integer) As Integer
+    Public Function GetValueByOriginalIndexInt(index As Integer) As Integer
         Try
-            Return CInt(GetValueByOriginalIndex(intIndex))
+            Return CInt(GetValueByOriginalIndex(index))
         Catch ex As Exception
             Return 0
         End Try
     End Function
 
-    Public Function GetValueByOriginalIndex(intIndexOriginal As Integer) As Double
-        Dim intIndex As Integer
+    Public Function GetValueByOriginalIndex(indexOriginal As Integer) As Double
+        Dim index As Integer
 
         If Not mPointerArrayIsValid OrElse mDataType = eDataTypeToUse.NoDataPresent Then
             Return 0
         Else
             Try
-                intIndex = Array.IndexOf(mPointerIndices, intIndexOriginal)
-                If intIndex >= 0 Then
+                index = Array.IndexOf(mPointerIndices, indexOriginal)
+                If index >= 0 Then
                     Select Case mDataType
                         Case eDataTypeToUse.IntegerType
-                            Return mDataInt(mPointerIndices(intIndex))
+                            Return mDataInt(mPointerIndices(index))
                         Case eDataTypeToUse.SingleType
-                            Return mDataSingle(mPointerIndices(intIndex))
+                            Return mDataSingle(mPointerIndices(index))
                         Case eDataTypeToUse.DoubleType
-                            Return mDataDouble(mPointerIndices(intIndex))
+                            Return mDataDouble(mPointerIndices(index))
                     End Select
                 Else
                     Return 0
@@ -565,9 +565,9 @@ Public Class clsSearchRange
         Return 0
     End Function
 
-    Public Function GetValueByOriginalIndexSng(intIndex As Integer) As Single
+    Public Function GetValueByOriginalIndexSng(index As Integer) As Single
         Try
-            Return CSng(GetValueByOriginalIndex(intIndex))
+            Return CSng(GetValueByOriginalIndex(index))
         Catch ex As Exception
             Return 0
         End Try
@@ -583,17 +583,17 @@ Public Class clsSearchRange
 
     End Sub
 
-    Private Sub InitializePointerIndexArray(intLength As Integer)
-        Dim intIndex As Integer
+    Private Sub InitializePointerIndexArray(arrayLength As Integer)
+        Dim index As Integer
 
-        If intLength < 0 Then intLength = 0
-        ReDim mPointerIndices(intLength - 1)
+        If arrayLength < 0 Then arrayLength = 0
+        ReDim mPointerIndices(arrayLength - 1)
 
-        For intIndex = 0 To intLength - 1
-            mPointerIndices(intIndex) = intIndex
+        For index = 0 To arrayLength - 1
+            mPointerIndices(index) = index
         Next
 
-        If intLength > 0 Then
+        If arrayLength > 0 Then
             mPointerArrayIsValid = True
         Else
             mPointerArrayIsValid = False

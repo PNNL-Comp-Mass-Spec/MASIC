@@ -109,7 +109,7 @@
 
     Public Shared Function GetDefaultReporterIons(
       eReporterIonMassMode As eReporterIonMassModeConstants,
-      dblMZToleranceDa As Double) As List(Of clsReporterIonInfo)
+      mzToleranceDa As Double) As List(Of clsReporterIonInfo)
 
         Dim reporterIons = New List(Of clsReporterIonInfo)
 
@@ -267,7 +267,7 @@
         End Select
 
         For Each reporterIon In reporterIons
-            reporterIon.MZToleranceDa = dblMZToleranceDa
+            reporterIon.MZToleranceDa = mzToleranceDa
         Next
 
         Return reporterIons
@@ -343,14 +343,14 @@
 
     Public Sub SetReporterIonMassMode(
       eReporterIonMassMode As eReporterIonMassModeConstants,
-      dblMZToleranceDa As Double)
+      mzToleranceDa As Double)
 
         ' Note: If eReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone then nothing is changed
 
         If eReporterIonMassMode <> eReporterIonMassModeConstants.CustomOrNone Then
-            Me.ReporterIonToleranceDaDefault = dblMZToleranceDa
+            Me.ReporterIonToleranceDaDefault = mzToleranceDa
 
-            Dim reporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, dblMZToleranceDa)
+            Dim reporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, mzToleranceDa)
 
             SetReporterIons(reporterIonInfo, False)
             mReporterIonMassMode = eReporterIonMassMode
@@ -360,7 +360,7 @@
 
     Public Sub SetReporterIons(
       reporterIons As List(Of clsReporterIonInfo),
-      blnCustomReporterIons As Boolean)
+      customReporterIons As Boolean)
 
         ReporterIonList.Clear()
         If reporterIons Is Nothing OrElse reporterIons.Count = 0 Then
@@ -374,48 +374,48 @@
             ReporterIonList.Add(reporterIon)
         Next
 
-        If blnCustomReporterIons Then
+        If customReporterIons Then
             mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
         End If
 
     End Sub
 
     Public Sub SetReporterIons(
-      dblReporterIonMZList() As Double)
-        SetReporterIons(dblReporterIonMZList, REPORTER_ION_TOLERANCE_DA_DEFAULT)
+      reporterIonMZList() As Double)
+        SetReporterIons(reporterIonMZList, REPORTER_ION_TOLERANCE_DA_DEFAULT)
     End Sub
 
     Public Sub SetReporterIons(
-      dblReporterIonMZList() As Double,
-      dblMZToleranceDa As Double)
-        SetReporterIons(dblReporterIonMZList, dblMZToleranceDa, True)
+      reporterIonMZList() As Double,
+      mzToleranceDa As Double)
+        SetReporterIons(reporterIonMZList, mzToleranceDa, True)
     End Sub
 
     Public Sub SetReporterIons(
-      dblReporterIonMZList() As Double,
-      dblMZToleranceDa As Double,
-      blnCustomReporterIons As Boolean)
+      reporterIonMZList() As Double,
+      mzToleranceDa As Double,
+      customReporterIons As Boolean)
 
-        ' dblMZToleranceDa is the search tolerance (half width)
+        ' mzToleranceDa is the search tolerance (half width)
 
-        If dblMZToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM Then
-            dblMZToleranceDa = REPORTER_ION_TOLERANCE_DA_MINIMUM
+        If mzToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM Then
+            mzToleranceDa = REPORTER_ION_TOLERANCE_DA_MINIMUM
         End If
 
         ReporterIonList.Clear()
-        If dblReporterIonMZList Is Nothing OrElse dblReporterIonMZList.Length = 0 Then
+        If reporterIonMZList Is Nothing OrElse reporterIonMZList.Length = 0 Then
             mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
             Return
         End If
 
-        For Each reporterIonMZ In dblReporterIonMZList
+        For Each reporterIonMZ In reporterIonMZList
             Dim newReporterIon = New clsReporterIonInfo(reporterIonMZ)
-            newReporterIon.MZToleranceDa = dblMZToleranceDa
+            newReporterIon.MZToleranceDa = mzToleranceDa
 
             ReporterIonList.Add(newReporterIon)
         Next
 
-        If blnCustomReporterIons Then
+        If customReporterIons Then
             mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone
         End If
     End Sub
@@ -430,11 +430,11 @@
             MZIntensityFilterIgnoreRangeEnd = ReporterIonList(0).MZ + ReporterIonList(0).MZToleranceDa * 2
 
             For Each reporterIon In ReporterIonList
-                Dim dblMzStart = reporterIon.MZ - reporterIon.MZToleranceDa * 2
-                MZIntensityFilterIgnoreRangeStart = Math.Min(MZIntensityFilterIgnoreRangeStart, dblMzStart)
+                Dim mzStart = reporterIon.MZ - reporterIon.MZToleranceDa * 2
+                MZIntensityFilterIgnoreRangeStart = Math.Min(MZIntensityFilterIgnoreRangeStart, mzStart)
 
-                Dim dblMzEnd = reporterIon.MZ + reporterIon.MZToleranceDa * 2
-                MZIntensityFilterIgnoreRangeEnd = Math.Max(MZIntensityFilterIgnoreRangeEnd, dblMzEnd)
+                Dim mzEnd = reporterIon.MZ + reporterIon.MZToleranceDa * 2
+                MZIntensityFilterIgnoreRangeEnd = Math.Max(MZIntensityFilterIgnoreRangeEnd, mzEnd)
             Next
         Else
             MZIntensityFilterIgnoreRangeStart = 0
