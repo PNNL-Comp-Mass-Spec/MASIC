@@ -211,49 +211,75 @@ Namespace DataOutput
 
         End Sub
 
-        Public Sub WriteDecon2LSIsosFileHeaders(srOutFile As StreamWriter)
-            srOutFile.WriteLine("scan_num,charge,abundance,mz,fit,average_mw,monoisotopic_mw,mostabundant_mw,fwhm,signal_noise,mono_abundance,mono_plus2_abundance")
+        Public Sub WriteDecon2LSIsosFileHeaders(writer As StreamWriter)
+            ' ReSharper disable once StringLiteralTypo
+            Dim headerNames = New List(Of String) From {
+                "scan_num",
+                "charge",
+                "abundance",
+                "mz",
+                "fit",
+                "average_mw",
+                "monoisotopic_mw",
+                "mostabundant_mw",
+                "fwhm",
+                "signal_noise",
+                "mono_abundance",
+                "mono_plus2_abundance"
+            }
+
+            writer.WriteLine(String.Join(", ", headerNames))
         End Sub
 
         Public Sub WriteDecon2LSIsosFileEntry(
-          srIsosOutFile As StreamWriter,
-          intScanNumber As Integer,
-          intCharge As Integer,
-          sngIntensity As Single,
-          dblIonMZ As Double,
-          sngFit As Single,
-          dblAverageMass As Double,
-          dblMonoisotopicMass As Double,
-          dblMostAbundanctMass As Double,
-          sngFWHM As Single,
-          sngSignalToNoise As Single,
-          sngMonoisotopicAbu As Single,
-          sngMonoPlus2Abu As Single)
+          writer As StreamWriter,
+          scanNumber As Integer,
+          charge As Integer,
+          intensity As Single,
+          ionMZ As Double,
+          isoFit As Single,
+          averageMass As Double,
+          monoisotopicMass As Double,
+          mostAbundantMass As Double,
+          peakFWHM As Single,
+          signalToNoise As Single,
+          monoisotopicAbu As Single,
+          monoPlus2Abu As Single)
 
-            Dim strLineOut As String
+            Dim dataValues = New List(Of String) From {
+                scanNumber.ToString(),
+                charge.ToString(),
+                intensity.ToString(),
+                ionMZ.ToString("0.00000"),
+                isoFit.ToString(),
+                averageMass.ToString("0.00000"),
+                monoisotopicMass.ToString("0.00000"),
+                mostAbundantMass.ToString("0.00000"),
+                peakFWHM.ToString(),
+                signalToNoise.ToString(),
+                monoisotopicAbu.ToString(),
+                monoPlus2Abu.ToString()
+            }
 
-            strLineOut = intScanNumber & "," &
-             intCharge & "," &
-             sngIntensity & "," &
-             dblIonMZ.ToString("0.00000") & "," &
-             sngFit & "," &
-             dblAverageMass.ToString("0.00000") & "," &
-             dblMonoisotopicMass.ToString("0.00000") & "," &
-             dblMostAbundanctMass.ToString("0.00000") & "," &
-             sngFWHM & "," &
-             sngSignalToNoise & "," &
-             sngMonoisotopicAbu & "," &
-             sngMonoPlus2Abu
-
-            srIsosOutFile.WriteLine(strLineOut)
+            writer.WriteLine(String.Join(",", dataValues))
 
         End Sub
 
-        Public Sub WriteDecon2LSScanFileHeaders(srOutFile As StreamWriter)
-            srOutFile.WriteLine("scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped")
-
+        Public Sub WriteDecon2LSScanFileHeaders(writer As StreamWriter)
             ' Old Headers:      "scan_num,time,type,num_isotopic_signatures,num_peaks,tic,bpi_mz,bpi,time_domain_signal,peak_intensity_threshold,peptide_intensity_threshold")
 
+            Dim headerNames = New List(Of String) From {
+                "scan_num",
+                "scan_time",
+                "type",
+                "bpi",
+                "bpi_mz",
+                "tic",
+                "num_peaks",
+                "num_deisotoped"
+            }
+
+            writer.WriteLine(String.Join(", ", headerNames))
         End Sub
 
         Private Sub WriteDecon2LSScanFileEntry(
@@ -286,27 +312,25 @@ Namespace DataOutput
         End Sub
 
         Public Sub WriteDecon2LSScanFileEntry(
-          srScanInfoOutFile As StreamWriter,
+          writer As StreamWriter,
           currentScan As clsScanInfo,
-          intScanNumber As Integer,
-          intMSLevel As Integer,
-          intNumPeaks As Integer,
-          intNumIsotopicSignatures As Integer)
+          scanNumber As Integer,
+          msLevel As Integer,
+          numPeaks As Integer,
+          numIsotopicSignatures As Integer)
 
-            Dim strLineOut As String
+            Dim dataLine = New List(Of String) From {
+                scanNumber.ToString(),
+                currentScan.ScanTime.ToString("0.0000"),
+                msLevel.ToString(),
+                currentScan.BasePeakIonIntensity.ToString(),
+                currentScan.BasePeakIonMZ.ToString("0.00000"),
+                currentScan.TotalIonIntensity.ToString(),
+                numPeaks.ToString(),
+                numIsotopicSignatures.ToString()
+            }
 
-            With currentScan
-                strLineOut = intScanNumber.ToString() & "," &
-                 .ScanTime.ToString("0.0000") & "," &
-                 intMSLevel & "," &
-                 .BasePeakIonIntensity & "," &
-                 .BasePeakIonMZ.ToString("0.00000") & "," &
-                 .TotalIonIntensity.ToString() & "," &
-                 intNumPeaks & "," &
-                 intNumIsotopicSignatures
-            End With
-
-            srScanInfoOutFile.WriteLine(strLineOut)
+            writer.WriteLine(String.Join(",", dataLine))
 
         End Sub
 

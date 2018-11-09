@@ -495,52 +495,100 @@ Namespace DataOutput
         Public Function GetHeadersForOutputFile(
           scanList As clsScanList, eOutputFileType As eOutputFileTypeConstants, cColDelimiter As Char) As String
 
-            Dim strHeaders As String
-            Dim intNonConstantHeaderIDs() As Integer = Nothing
+            Dim headerNames As List(Of String)
 
             Select Case eOutputFileType
                 Case eOutputFileTypeConstants.ScanStatsFlatFile
-                    strHeaders = "Dataset" & cColDelimiter & "ScanNumber" & cColDelimiter & "ScanTime" & cColDelimiter &
-                       "ScanType" & cColDelimiter & "TotalIonIntensity" & cColDelimiter & "BasePeakIntensity" & cColDelimiter &
-                       "BasePeakMZ" & cColDelimiter & "BasePeakSignalToNoiseRatio" & cColDelimiter &
-                       "IonCount" & cColDelimiter & "IonCountRaw" & cColDelimiter & "ScanTypeName"
+                    headerNames = New List(Of String) From {
+                        "Dataset",
+                        "ScanNumber",
+                        "ScanTime",
+                        "ScanType",
+                        "TotalIonIntensity",
+                        "BasePeakIntensity",
+                        "BasePeakMZ",
+                        "BasePeakSignalToNoiseRatio",
+                        "IonCount",
+                        "IonCountRaw",
+                        "ScanTypeName"
+                    }
 
                 Case eOutputFileTypeConstants.ScanStatsExtendedFlatFile
 
                     If Not ExtendedStatsWriter.ExtendedHeaderNameCount > 0 Then
 
+                        Dim nonConstantHeaderIDs As List(Of Integer) = Nothing
+
                         ' Lookup extended stats values that are constants for all scans
                         ' The following will also remove the constant header values from htExtendedHeaderInfo
-                        ExtendedStatsWriter.ExtractConstantExtendedHeaderValues(intNonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter)
+                        ExtendedStatsWriter.ExtractConstantExtendedHeaderValues(nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter)
 
-                        strHeaders = ExtendedStatsWriter.ConstructExtendedStatsHeaders(cColDelimiter)
+                        headerNames = ExtendedStatsWriter.ConstructExtendedStatsHeaders()
                     Else
-                        strHeaders = String.Empty
+                        headerNames = New List(Of String)
                     End If
 
                 Case eOutputFileTypeConstants.SICStatsFlatFile
-                    strHeaders = "Dataset" & cColDelimiter & "ParentIonIndex" & cColDelimiter & "MZ" & cColDelimiter & "SurveyScanNumber" & cColDelimiter & "FragScanNumber" & cColDelimiter & "OptimalPeakApexScanNumber" & cColDelimiter & "PeakApexOverrideParentIonIndex" & cColDelimiter &
-                       "CustomSICPeak" & cColDelimiter & "PeakScanStart" & cColDelimiter & "PeakScanEnd" & cColDelimiter & "PeakScanMaxIntensity" & cColDelimiter &
-                       "PeakMaxIntensity" & cColDelimiter & "PeakSignalToNoiseRatio" & cColDelimiter & "FWHMInScans" & cColDelimiter & "PeakArea" & cColDelimiter & "ParentIonIntensity" & cColDelimiter &
-                       "PeakBaselineNoiseLevel" & cColDelimiter & "PeakBaselineNoiseStDev" & cColDelimiter & "PeakBaselinePointsUsed" & cColDelimiter &
-                       "StatMomentsArea" & cColDelimiter & "CenterOfMassScan" & cColDelimiter & "PeakStDev" & cColDelimiter & "PeakSkew" & cColDelimiter & "PeakKSStat" & cColDelimiter &
-                       "StatMomentsDataCountUsed" & cColDelimiter & "InterferenceScore"
+                    headerNames = New List(Of String) From {
+                        "Dataset",
+                        "ParentIonIndex",
+                        "MZ",
+                        "SurveyScanNumber",
+                        "FragScanNumber",
+                        "OptimalPeakApexScanNumber",
+                        "PeakApexOverrideParentIonIndex",
+                        "CustomSICPeak",
+                        "PeakScanStart",
+                        "PeakScanEnd",
+                        "PeakScanMaxIntensity",
+                        "PeakMaxIntensity",
+                        "PeakSignalToNoiseRatio",
+                        "FWHMInScans",
+                        "PeakArea",
+                        "ParentIonIntensity",
+                        "PeakBaselineNoiseLevel",
+                        "PeakBaselineNoiseStDev",
+                        "PeakBaselinePointsUsed",
+                        "StatMomentsArea",
+                        "CenterOfMassScan",
+                        "PeakStDev",
+                        "PeakSkew",
+                        "PeakKSStat",
+                        "StatMomentsDataCountUsed",
+                        "InterferenceScore"
+                    }
 
                     If mOptions.IncludeScanTimesInSICStatsFile Then
-                        strHeaders &= cColDelimiter & "SurveyScanTime" & cColDelimiter & "FragScanTime" & cColDelimiter & "OptimalPeakApexScanTime"
+                        headerNames.Add("SurveyScanTime")
+                        headerNames.Add("FragScanTime")
+                        headerNames.Add("OptimalPeakApexScanTime")
                     End If
 
                 Case eOutputFileTypeConstants.MRMSettingsFile
-                    strHeaders = "Parent_Index" & cColDelimiter & "Parent_MZ" & cColDelimiter & "Daughter_MZ" & cColDelimiter & "MZ_Start" & cColDelimiter & "MZ_End" & cColDelimiter & "Scan_Count"
+                    headerNames = New List(Of String) From {
+                        "Parent_Index",
+                        "Parent_MZ",
+                        "Daughter_MZ",
+                        "MZ_Start",
+                        "MZ_End",
+                        "Scan_Count"
+                    }
 
                 Case eOutputFileTypeConstants.MRMDatafile
-                    strHeaders = "Scan" & cColDelimiter & "MRM_Parent_MZ" & cColDelimiter & "MRM_Daughter_MZ" & cColDelimiter & "MRM_Daughter_Intensity"
+                    headerNames = New List(Of String) From {
+                        "Scan",
+                        "MRM_Parent_MZ",
+                        "MRM_Daughter_MZ",
+                        "MRM_Daughter_Intensity"
+                    }
 
                 Case Else
-                    strHeaders = "Unknown header column names"
+                    headerNames = New List(Of String) From {
+                        "Unknown header column names"
+                    }
             End Select
 
-            Return strHeaders
+            Return String.Join(cColDelimiter, headerNames)
         End Function
 
         Public Function InitializeSICDetailsTextFile(

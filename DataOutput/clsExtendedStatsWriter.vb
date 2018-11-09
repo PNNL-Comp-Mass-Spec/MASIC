@@ -41,86 +41,72 @@ Namespace DataOutput
         End Sub
 
         Private Function ConcatenateExtendedStats(
-          ByRef intNonConstantHeaderIDs() As Integer,
-          intDatasetID As Integer,
-          intScanNumber As Integer,
-          ExtendedHeaderInfo As IReadOnlyDictionary(Of Integer, String),
-          cColDelimiter As Char) As String
+          nonConstantHeaderIDs As IEnumerable(Of Integer),
+          datasetID As Integer,
+          scanNumber As Integer,
+          extendedHeaderInfo As IReadOnlyDictionary(Of Integer, String)) As IEnumerable(Of String)
 
-            Dim strOutLine = intDatasetID.ToString() & cColDelimiter & intScanNumber.ToString() & cColDelimiter
+            Dim dataValues = New List(Of String) From {
+                datasetID.ToString(),
+                scanNumber.ToString()
+            }
 
-            If Not ExtendedHeaderInfo Is Nothing AndAlso Not intNonConstantHeaderIDs Is Nothing Then
-                For intIndex = 0 To intNonConstantHeaderIDs.Length - 1
+            If Not extendedHeaderInfo Is Nothing AndAlso Not nonConstantHeaderIDs Is Nothing Then
 
-                    Dim strValue As String = Nothing
-                    If ExtendedHeaderInfo.TryGetValue(intNonConstantHeaderIDs(intIndex), strValue) Then
-                        If clsUtilities.IsNumber(strValue) Then
-                            If Math.Abs(Val(strValue)) < Single.Epsilon Then strValue = "0"
+                For Each headerID In (From item In nonConstantHeaderIDs Order By item Select item)
+
+                    Dim value As String = Nothing
+                    If extendedHeaderInfo.TryGetValue(headerID, value) Then
+                        If clsUtilities.IsNumber(value) Then
+                            If Math.Abs(Val(value)) < Single.Epsilon Then value = "0"
                         Else
-                            Select Case strValue
-                                Case "ff" : strValue = "Off"
-                                Case "n" : strValue = "On"
-                                Case "eady" : strValue = "Ready"""
-                                Case "cquiring" : strValue = "Acquiring"
-                                Case "oad" : strValue = "Load"
+                            ' ReSharper disable StringLiteralTypo
+                            Select Case value
+                                Case "ff" : value = "Off"
+                                Case "n" : value = "On"
+                                Case "eady" : value = "Ready"""
+                                Case "cquiring" : value = "Acquiring"
+                                Case "oad" : value = "Load"
                             End Select
+                            ' ReSharper restore StringLiteralTypo
                         End If
-                        strOutLine &= strValue & cColDelimiter
+                        dataValues.Add(value)
                     Else
-                        strOutLine &= "0" & cColDelimiter
+                        dataValues.Add("0")
                     End If
                 Next
-
-                ' remove the trailing delimiter
-                If strOutLine.Length > 0 Then
-                    strOutLine = strOutLine.TrimEnd(cColDelimiter)
-                End If
-
             End If
 
-            Return strOutLine
+            Return dataValues
 
         End Function
 
-        Public Function ConstructExtendedStatsHeaders(cColDelimiter As Char) As String
+        Public Function ConstructExtendedStatsHeaders() As List(Of String)
 
             Dim cTrimChars = New Char() {":"c, " "c}
-            Dim strHeaderNames() As String
 
-            Dim intIndex As Integer
-            Dim strHeaders As String
+            Dim headerNames = New List(Of String) From {
+                "Dataset",
+                "ScanNumber"
+            }
 
-            Dim intHeaderIDs() As Integer
-            Dim intHeaderCount As Integer
+            ' Populate headerNames
 
-            strHeaders = "Dataset" & cColDelimiter & "ScanNumber" & cColDelimiter
-
-            ' Populate strHeaders
-
-            If mExtendedHeaderNameMap.Count > 0 Then
-                ReDim strHeaderNames(mExtendedHeaderNameMap.Count - 1)
-                ReDim intHeaderIDs(mExtendedHeaderNameMap.Count - 1)
-
-                intHeaderCount = 0
-                For Each item In mExtendedHeaderNameMap
-                    strHeaderNames(intHeaderCount) = item.Key
-                    intHeaderIDs(intHeaderCount) = item.Value
-                    intHeaderCount += 1
-                Next
-
-                Array.Sort(intHeaderIDs, strHeaderNames)
-
-                For intIndex = 0 To intHeaderCount - 1
-                    strHeaders &= strHeaderNames(intIndex).TrimEnd(cTrimChars) & cColDelimiter
-                Next
-
-                ' remove the trailing delimiter
-                If strHeaders.Length > 0 Then
-                    strHeaders = strHeaders.TrimEnd(cColDelimiter)
-                End If
+            If mExtendedHeaderNameMap.Count <= 0 Then
+                Return headerNames
             End If
 
-            Return strHeaders
+            Dim headerNamesByID = New Dictionary(Of Integer, String)
+
+            For Each item In mExtendedHeaderNameMap
+                headerNamesByID.Add(item.Value, item.Key)
+            Next
+
+            For Each headerItem In (From item In headerNamesByID Order By item.Key Select item.Value)
+                headerNames.Add(headerItem.TrimEnd(cTrimChars))
+            Next
+
+            Return headerNames
 
         End Function
 

@@ -633,34 +633,43 @@ Public Class clsDatasetStatsSummarizer
                 mErrorMessage = ""
             End If
 
-            Using swOutFile = New StreamWriter(New FileStream(strScanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            Using writer = New StreamWriter(New FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
 
                 ' Write the headers
-                sbLineOut.Clear()
-                sbLineOut.Append("Dataset" & ControlChars.Tab & "ScanNumber" & ControlChars.Tab & "ScanTime" & ControlChars.Tab &
-                                 "ScanType" & ControlChars.Tab & "TotalIonIntensity" & ControlChars.Tab & "BasePeakIntensity" & ControlChars.Tab &
-                                 "BasePeakMZ" & ControlChars.Tab & "BasePeakSignalToNoiseRatio" & ControlChars.Tab &
-                                 "IonCount" & ControlChars.Tab & "IonCountRaw" & ControlChars.Tab & "ScanTypeName")
+                Dim headerNames = New List(Of String) From {
+                    "Dataset",
+                    "ScanNumber",
+                    "ScanTime",
+                    "ScanType",
+                    "TotalIonIntensity",
+                    "BasePeakIntensity",
+                    "BasePeakMZ",
+                    "BasePeakSignalToNoiseRatio",
+                    "IonCount",
+                    "IonCountRaw",
+                    "ScanTypeName"
+                }
 
-                swOutFile.WriteLine(sbLineOut.ToString())
+                writer.WriteLine(String.Join(ControlChars.Tab, headerNames))
 
+                Dim dataColumns As New List(Of String)
 
                 For Each objScanStatsEntry As clsScanStatsEntry In objScanStats
 
-                    sbLineOut.Clear()
-                    sbLineOut.Append(intDatasetID.ToString() & ControlChars.Tab)                        ' Dataset number (aka Dataset ID)
-                    sbLineOut.Append(objScanStatsEntry.ScanNumber.ToString() & ControlChars.Tab)        ' Scan number
-                    sbLineOut.Append(objScanStatsEntry.ElutionTime & ControlChars.Tab)                  ' Scan time (minutes)
-                    sbLineOut.Append(objScanStatsEntry.ScanType.ToString() & ControlChars.Tab)          ' Scan type (1 for MS, 2 for MS2, etc.)
-                    sbLineOut.Append(objScanStatsEntry.TotalIonIntensity & ControlChars.Tab)            ' Total ion intensity
-                    sbLineOut.Append(objScanStatsEntry.BasePeakIntensity & ControlChars.Tab)            ' Base peak ion intensity
-                    sbLineOut.Append(objScanStatsEntry.BasePeakMZ & ControlChars.Tab)                   ' Base peak ion m/z
-                    sbLineOut.Append(objScanStatsEntry.BasePeakSignalToNoiseRatio & ControlChars.Tab)   ' Base peak signal to noise ratio
-                    sbLineOut.Append(objScanStatsEntry.IonCount.ToString() & ControlChars.Tab)          ' Number of peaks (aka ions) in the spectrum
-                    sbLineOut.Append(objScanStatsEntry.IonCountRaw.ToString() & ControlChars.Tab)       ' Number of peaks (aka ions) in the spectrum prior to any filtering
-                    sbLineOut.Append(objScanStatsEntry.ScanTypeName)                                    ' Scan type name
+                    dataColumns.Clear()
+                    dataColumns.Add(datasetID.ToString())                           ' Dataset number (aka Dataset ID)
+                    dataColumns.Add(objScanStatsEntry.ScanNumber.ToString())        ' Scan number
+                    dataColumns.Add(objScanStatsEntry.ElutionTime)                  ' Scan time (minutes)
+                    dataColumns.Add(objScanStatsEntry.ScanType.ToString())          ' Scan type (1 for MS, 2 for MS2, etc.)
+                    dataColumns.Add(objScanStatsEntry.TotalIonIntensity)            ' Total ion intensity
+                    dataColumns.Add(objScanStatsEntry.BasePeakIntensity)            ' Base peak ion intensity
+                    dataColumns.Add(objScanStatsEntry.BasePeakMZ)                   ' Base peak ion m/z
+                    dataColumns.Add(objScanStatsEntry.BasePeakSignalToNoiseRatio)   ' Base peak signal to noise ratio
+                    dataColumns.Add(objScanStatsEntry.IonCount.ToString())          ' Number of peaks (aka ions) in the spectrum
+                    dataColumns.Add(objScanStatsEntry.IonCountRaw.ToString())       ' Number of peaks (aka ions) in the spectrum prior to any filtering
+                    dataColumns.Add(objScanStatsEntry.ScanTypeName)                 ' Scan type name
 
-                    swOutFile.WriteLine(sbLineOut.ToString())
+                    writer.WriteLine(String.Join(ControlChars.Tab, dataColumns))
 
                 Next
 
@@ -797,40 +806,44 @@ Public Class clsDatasetStatsSummarizer
             End If
 
             ' Create or open the output file
-            Using swOutFile = New StreamWriter(New FileStream(strDatasetStatsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+            Using writer = New StreamWriter(New FileStream(datasetStatsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read))
 
-                If blnWriteHeaders Then
+                If writeHeaders Then
                     ' Write the header line
-                    strLineOut = "Dataset" & ControlChars.Tab &
-                                 "ScanCount" & ControlChars.Tab &
-                                 "ScanCountMS" & ControlChars.Tab &
-                                 "ScanCountMSn" & ControlChars.Tab &
-                                 "Elution_Time_Max" & ControlChars.Tab &
-                                 "AcqTimeMinutes" & ControlChars.Tab &
-                                 "StartTime" & ControlChars.Tab &
-                                 "EndTime" & ControlChars.Tab &
-                                 "FileSizeBytes" & ControlChars.Tab &
-                                 "SampleName" & ControlChars.Tab &
-                                 "Comment1" & ControlChars.Tab &
-                                 "Comment2"
+                    Dim headerNames = New List(Of String) From {
+                        "Dataset",
+                         "ScanCount",
+                         "ScanCountMS",
+                         "ScanCountMSn",
+                         "Elution_Time_Max",
+                         "AcqTimeMinutes",
+                         "StartTime",
+                         "EndTime",
+                         "FileSizeBytes",
+                         "SampleName",
+                         "Comment1",
+                         "Comment2"
+                    }
 
-                    swOutFile.WriteLine(strLineOut)
+                    writer.WriteLine(String.Join(ControlChars.Tab, headerNames))
                 End If
 
-                strLineOut = strDatasetName & ControlChars.Tab &
-                             (objSummaryStats.MSStats.ScanCount + objSummaryStats.MSnStats.ScanCount).ToString() & ControlChars.Tab &
-                             objSummaryStats.MSStats.ScanCount.ToString() & ControlChars.Tab &
-                             objSummaryStats.MSnStats.ScanCount.ToString() & ControlChars.Tab &
-                             objSummaryStats.ElutionTimeMax.ToString() & ControlChars.Tab &
-                             udtDatasetFileInfo.AcqTimeEnd.Subtract(udtDatasetFileInfo.AcqTimeStart).TotalMinutes.ToString("0.00") & ControlChars.Tab &
-                             udtDatasetFileInfo.AcqTimeStart.ToString("yyyy-MM-dd hh:mm:ss tt") & ControlChars.Tab &
-                             udtDatasetFileInfo.AcqTimeEnd.ToString("yyyy-MM-dd hh:mm:ss tt") & ControlChars.Tab &
-                             udtDatasetFileInfo.FileSizeBytes.ToString() & ControlChars.Tab &
-                             FixNull(udtSampleInfo.SampleName) & ControlChars.Tab &
-                             FixNull(udtSampleInfo.Comment1) & ControlChars.Tab &
-                             FixNull(udtSampleInfo.Comment2)
+                Dim dataColumns = New List(Of String) From {
+                    datasetName,
+                    (objSummaryStats.MSStats.ScanCount + objSummaryStats.MSnStats.ScanCount).ToString(),
+                    objSummaryStats.MSStats.ScanCount.ToString(),
+                    objSummaryStats.MSnStats.ScanCount.ToString(),
+                    objSummaryStats.ElutionTimeMax.ToString(),
+                    udtDatasetFileInfo.AcqTimeEnd.Subtract(udtDatasetFileInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
+                    udtDatasetFileInfo.AcqTimeStart.ToString("yyyy-MM-dd hh:mm:ss tt"),
+                    udtDatasetFileInfo.AcqTimeEnd.ToString("yyyy-MM-dd hh:mm:ss tt"),
+                    udtDatasetFileInfo.FileSizeBytes.ToString(),
+                    FixNull(udtSampleInfo.SampleName),
+                    FixNull(udtSampleInfo.Comment1),
+                    FixNull(udtSampleInfo.Comment2)
+                }
 
-                swOutFile.WriteLine(strLineOut)
+                writer.WriteLine(String.Join(ControlChars.Tab, dataColumns))
 
             End Using
 
