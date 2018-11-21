@@ -645,7 +645,6 @@ Public Class clsITraqIntensityCorrection
         If debugShowMatrixTable Then
             ' Print out the matrix
             Console.WriteLine()
-            Console.WriteLine()
             Console.WriteLine("Reporter Ion Correction Matrix; mode = " & mReporterIonMode.ToString())
             For i = 0 To maxIndex
                 If i = 0 Then
@@ -713,13 +712,11 @@ Public Class clsITraqIntensityCorrection
             Throw New Exception(String.Format("Parameters for DefineIsotopeContribution should add up to 100; current sum is {0:F1}", sum))
         End If
 
-        With udtIsotopePct
-            .Minus2 = minus2
-            .Minus1 = minus1
-            .Zero = zero
-            .Plus1 = plus1
-            .Plus2 = plus2
-        End With
+        udtIsotopePct.Minus2 = minus2
+        udtIsotopePct.Minus1 = minus1
+        udtIsotopePct.Zero = zero
+        udtIsotopePct.Plus1 = plus1
+        udtIsotopePct.Plus2 = plus2
 
         Return udtIsotopePct
 
