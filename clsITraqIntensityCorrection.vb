@@ -688,7 +688,7 @@ Public Class clsITraqIntensityCorrection
     ''' </summary>
     ''' <param name="minus2">Value between 0 and 100, but typically close to 0</param>
     ''' <param name="minus1">Value between 0 and 100, but typically close to 0</param>
-    ''' <param name="zero">Value between 0 and 100, but typically close to 98</param>
+    ''' <param name="zero">Value between 0 and 100, but typically close to 98; if this is 0 or 100, it is auto-computed</param>
     ''' <param name="plus1">Value between 0 and 100, but typically close to 0</param>
     ''' <param name="plus2">Value between 0 and 100, but typically close to 0</param>
     ''' <returns></returns>
@@ -701,7 +701,10 @@ Public Class clsITraqIntensityCorrection
 
         Dim udtIsotopePct As udtIsotopeContributionType
 
-        If Math.Abs(zero) < Single.Epsilon Or zero < 0 Then
+        If Math.Abs(zero) < Single.Epsilon OrElse
+           zero < 0 OrElse
+           minus2 + minus1 + plus1 + plus2 > 0 And Math.Abs(zero - 100) < Single.Epsilon Then
+            ' Auto-compute the monoisotopic abundance
             zero = 100 - minus2 - minus1 - plus1 - plus2
         End If
 
