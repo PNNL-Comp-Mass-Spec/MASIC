@@ -496,32 +496,48 @@ Public Class clsITraqIntensityCorrection
 
                 ' TMT10plex lot A37725
                 ' TMT11plex lot TB265130
-                udtIsoPct126 = DefineIsotopeContribution(0, 0, 92.081, 7.551, 0.368)
-                udtIsoPct127N = DefineIsotopeContribution(0, 0.093, 92.593, 7.315, 0)
-                udtIsoPct127C = DefineIsotopeContribution(0, 0.468, 93.633, 5.899, 0)
-                udtIsoPct128N = DefineIsotopeContribution(0, 0.658, 93.985, 5.357, 0)
-                udtIsoPct128C = DefineIsotopeContribution(0.186, 1.484, 92.764, 5.566, 0)
-                udtIsoPct129N = DefineIsotopeContribution(0, 2.326, 93.023, 4.651, 0)
-                udtIsoPct129C = DefineIsotopeContribution(0, 2.158, 93.809, 4.034, 0)
-                udtIsoPct130N = DefineIsotopeContribution(0, 2.533, 93.809, 3.659, 0)
-                udtIsoPct130C = DefineIsotopeContribution(0, 1.628, 95.785, 2.586, 0)
-                udtIsoPct131N = DefineIsotopeContribution(0, 3.625, 92.937, 3.439, 0)
-                udtIsoPct131C = DefineIsotopeContribution(0, 3.471, 93.809, 2.72, 0)
+                'udtIsoPct126 = DefineIsotopeContribution(0, 0, 92.081, 7.551, 0.368)
+                'udtIsoPct127N = DefineIsotopeContribution(0, 0.093, 92.593, 7.315, 0)
+                'udtIsoPct127C = DefineIsotopeContribution(0, 0.468, 93.633, 5.899, 0)
+                'udtIsoPct128N = DefineIsotopeContribution(0, 0.658, 93.985, 5.357, 0)
+                'udtIsoPct128C = DefineIsotopeContribution(0.186, 1.484, 92.764, 5.566, 0)
+                'udtIsoPct129N = DefineIsotopeContribution(0, 2.326, 93.023, 4.651, 0)
+                'udtIsoPct129C = DefineIsotopeContribution(0, 2.158, 93.809, 4.034, 0)
+                'udtIsoPct130N = DefineIsotopeContribution(0, 2.533, 93.809, 3.659, 0)
+                'udtIsoPct130C = DefineIsotopeContribution(0, 1.628, 95.785, 2.586, 0)
+                'udtIsoPct131N = DefineIsotopeContribution(0, 3.625, 92.937, 3.439, 0)
+                'udtIsoPct131C = DefineIsotopeContribution(0, 3.471, 93.809, 2.72, 0)
 
-                ' Goal is to generate this matrix (10-plex will not have the final row or final column)
-                '        0       1       2       3       4       5       6       7       8       9      10
-                '      ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------
-                '  0   0.9208    0     0.0047    0     0.0019    0       0       0       0       0       0
-                '  1     0     0.9259    0     0.0066    0       0       0       0       0       0       0
-                '  2   0.0755    0     0.9363    0     0.0148    0       0       0       0       0       0
-                '  3     0     0.0732    0     0.9399    0     0.0233    0       0       0       0       0
-                '  4   0.0037    0     0.0590    0     0.9276    0     0.0216    0       0       0       0
-                '  5     0       0       0     0.0536    0     0.9302    0     0.0253    0       0       0
-                '  6     0       0       0       0     0.0557    0     0.9381    0     0.0163    0       0
-                '  7     0       0       0       0       0     0.0465    0     0.9381    0     0.0363    0
-                '  8     0       0       0       0       0       0     0.0403    0     0.9579    0     0.0347
-                '  9     0       0       0       0       0       0       0     0.0366    0     0.9294    0
-                ' 10     0       0       0       0       0       0       0       0     0.0259    0     0.9381
+
+                ' TMT10plex lot SG252258
+                ' TMT11plex lot T4259309
+                udtIsoPct126 = DefineIsotopeContribution(0, 0, 100, 7.2, 0.2)
+                udtIsoPct127N = DefineIsotopeContribution(0, 0.4, 100, 7.3, 0.2)
+                udtIsoPct127C = DefineIsotopeContribution(0, 0.5, 100, 6.3, 0)
+                udtIsoPct128N = DefineIsotopeContribution(0, 0.7, 100, 5.7, 0)
+                udtIsoPct128C = DefineIsotopeContribution(0, 1.4, 100, 5.1, 0)
+                udtIsoPct129N = DefineIsotopeContribution(0, 2.5, 100, 5, 0)
+                udtIsoPct129C = DefineIsotopeContribution(0, 2.3, 100, 4.3, 0)
+                udtIsoPct130N = DefineIsotopeContribution(0, 2.7, 100, 3.9, 0)
+                udtIsoPct130C = DefineIsotopeContribution(0.4, 2.9, 100, 3.3, 0)
+                udtIsoPct131N = DefineIsotopeContribution(0, 3.4, 100, 3.3, 0)
+                udtIsoPct131C = DefineIsotopeContribution(0, 3.7, 100, 2.9, 0)
+
+                ' Goal is to generate this matrix (11-plex will not have the final row or final column)
+                '        0       1       2       3       4       5       6       7       8       9       10
+                '      ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------
+                '  0   0.9260    0     0.0050    0       0       0       0       0       0       0       0
+                '  1     0     0.9210    0     0.0070    0       0       0       0       0       0       0
+                '  2   0.0720    0     0.9320    0     0.0140    0       0       0       0       0       0
+                '  3     0     0.0730    0     0.9360    0     0.0250    0       0       0       0       0
+                '  4   0.0020    0     0.0630    0     0.9350    0     0.0230    0     0.0040    0       0
+                '  5     0     0.0020    0     0.0570    0     0.9250    0     0.0270    0       0       0
+                '  6     0       0       0       0     0.0510    0     0.9340    0     0.0290    0       0
+                '  7     0       0       0       0       0     0.0500    0     0.9340    0     0.0340    0
+                '  8     0       0       0       0       0       0     0.0430    0     0.9340    0     0.0370
+                '  9     0       0       0       0       0       0       0     0.0390    0     0.9330    0
+                '  10    0       0       0       0       0       0       0       0     0.0330    0     0.9340
+                '
 
                 ReDim mCoeffs(maxIndex, maxIndex)
 
