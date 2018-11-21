@@ -270,7 +270,7 @@ Public Class clsReporterIonProcessor
         Const USE_MAX_ABUNDANCE_IN_WINDOW = True
 
         Static intensityCorrector As New clsITraqIntensityCorrection(
-            clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes,
+            clsReporterIons.eReporterIonMassModeConstants.CustomOrNone,
             clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
 
         Dim reporterIntensities() As Single

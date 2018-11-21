@@ -84,6 +84,10 @@ Public Class clsITraqIntensityCorrection
 
         mMatrixUtility = New MatrixDecompositionUtility.LUDecomposition()
 
+        If mReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
+            Return
+        End If
+
         InitializeCoefficients(False)
     End Sub
 
@@ -104,7 +108,7 @@ Public Class clsITraqIntensityCorrection
         If mReporterIonMode <> eReporterIonMode OrElse mITraq4PlexCorrectionFactorType <> iTraqCorrectionFactorType Then
             mReporterIonMode = eReporterIonMode
             mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType
-            InitializeCoefficients(False)
+            InitializeCoefficients(True)
         End If
     End Sub
 
