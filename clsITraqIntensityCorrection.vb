@@ -33,6 +33,11 @@ Public Class clsITraqIntensityCorrection
         Public Zero As Single
         Public Plus1 As Single
         Public Plus2 As Single
+
+        Public Overrides Function ToString() As String
+            Return String.Format("{0:F2}  {1:F2}  {2:F2}  {3:F2}  {4:F2}", Minus2, Minus1, Zero, Plus1, Plus2)
+        End Function
+
     End Structure
 #End Region
 
