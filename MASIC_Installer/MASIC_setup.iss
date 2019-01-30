@@ -26,8 +26,11 @@ Source: ..\bin\SavGolCS.dll                   ; DestDir: {app}
 Source: ..\bin\SharedVBNetRoutines.dll        ; DestDir: {app}
 Source: ..\bin\ShFolderBrowser.dll            ; DestDir: {app}
 Source: ..\bin\SpectraTypeClassifier.dll      ; DestDir: {app}
-Source: ..\bin\System.Threading.Tasks.Dataflow.dll ; DestDir: {app}
-Source: ..\bin\ThermoRawFileReader.dll        ; DestDir: {app}
+Source: ..\bin\ThermoFisher.CommonCore.BackgroundSubtraction.dll    ; DestDir: {app}
+Source: ..\bin\ThermoFisher.CommonCore.Data.dll                     ; DestDir: {app}
+Source: ..\bin\ThermoFisher.CommonCore.MassPrecisionEstimator.dll   ; DestDir: {app}
+Source: ..\bin\ThermoFisher.CommonCore.RawFileReader.dll            ; DestDir: {app}
+Source: ..\bin\ThermoRawFileReader.dll                              ; DestDir: {app}
 
 Source: ..\MASICBrowser\bin\MASICBrowser.exe          ; DestDir: {app}
 Source: ..\MASICBrowser\bin\OxyDataPlotter.dll        ; DestDir: {app}
@@ -45,6 +48,9 @@ Source: ..\docs\QC_Standards_Excerpt_SICs.xml    ; DestDir: {app}
 Source: ..\docs\CustomMZList_AcqTime.txt         ; DestDir: {app}
 Source: ..\docs\CustomMZList.txt                 ; DestDir: {app}
 Source: ..\docs\Example_Orbitrap_Data_SICs.xml   ; DestDir: {app}
+
+Source: ..\Lib\netcdf.dll                        ; DestDir: {app}
+Source: ..\Lib\RawFileReaderLicense.doc          ; DestDir: {app}
 
 [Dirs]
 Name: {commonappdata}\MASIC; Flags: uninsalwaysuninstall
