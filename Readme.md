@@ -21,16 +21,6 @@ Double click the MASIC_installer.msi file to install.\
 The program shortcut can be found at Start Menu -> Programs -> PAST Toolkit -> MASIC\
 The MASIC browser shortcut can be found at PAST Toolkit -> MASIC Browser
 
-### MSFileReader
-
-In order to process Thermo .Raw files, you must download and install the 
-MSFileReader by creating an account at https://thermo.flexnetoperations.com/control/thmo/login
-Next, login and choose "Utility Software" and look for MSFileReader 3.1 SP4 (or newer)
-
-When installing enable both features:
-* MSFileReader for 64 bit
-* MSFileReader for 32 bit
-
 ## Custom SIC Values
 
 You can optionally define custom values to instruct MASIC to create SICs of
@@ -141,8 +131,10 @@ Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/\
 
 ## License
 
-MASIC is licensed under the 2-Clause BSD License; you may not use this file except 
-in compliance with the License.  You may obtain a copy of the License at 
+MASIC is licensed under the 2-Clause BSD License; you may not use this file 
+except in compliance with the License. You may obtain a copy of the License at 
 https://opensource.org/licenses/BSD-2-Clause
 
 Copyright 2018 Battelle Memorial Institute
+
+RawFileReader reading tool. Copyright © 2016 by Thermo Fisher Scientific, Inc. All rights reserved.

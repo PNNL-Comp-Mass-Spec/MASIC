@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 2.8.6969; January 30, 2019
+	- New version of ThermoRawFileReader.dll that uses C#-based ThermoFisher.CommonCore.RawFileReader.dll
+
 Version 2.8.6848; October 1, 2018
 	- Add reporter ion mode Acetylation
 		- Looks for 126.091 m/z and 143.118 m/z
