@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<DatasetInfo>
+  <Dataset>QC_Standards_Excerpt</Dataset>
+  <ScanTypes>
+    <ScanType ScanCount="27" ScanFilterText="">MS</ScanType>
+    <ScanType ScanCount="270" ScanFilterText="">MSn</ScanType>
+  </ScanTypes>
+  <AcquisitionInfo>
+    <ScanCount>297</ScanCount>
+    <ScanCountMS>27</ScanCountMS>
+    <ScanCountMSn>270</ScanCountMSn>
+    <Elution_Time_Max>39.5167</Elution_Time_Max>
+    <AcqTimeMinutes>0.00</AcqTimeMinutes>
+    <StartTime>2006-03-24 11:42:06 AM</StartTime>
+    <EndTime>2006-03-24 11:42:06 AM</EndTime>
+    <FileSizeBytes>940496</FileSizeBytes>
+  </AcquisitionInfo>
+  <TICInfo>
+    <TIC_Max_MS>4.2783E+06</TIC_Max_MS>
+    <TIC_Max_MSn>82598</TIC_Max_MSn>
+    <BPI_Max_MS>1.5599E+06</BPI_Max_MS>
+    <BPI_Max_MSn>19510</BPI_Max_MSn>
+    <TIC_Median_MS>1.3909E+06</TIC_Median_MS>
+    <TIC_Median_MSn>3271.8</TIC_Median_MSn>
+    <BPI_Median_MS>101284</BPI_Median_MS>
+    <BPI_Median_MSn>445.82</BPI_Median_MSn>
+  </TICInfo>
+</DatasetInfo>
