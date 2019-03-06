@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<DatasetInfo>
+  <Dataset>Example_Orbitrap_Data</Dataset>
+  <ScanTypes>
+    <ScanType ScanCount="858" ScanFilterText="">CID-MSn</ScanType>
+    <ScanType ScanCount="143" ScanFilterText="">MS</ScanType>
+  </ScanTypes>
+  <AcquisitionInfo>
+    <ScanCount>1001</ScanCount>
+    <ScanCountMS>143</ScanCountMS>
+    <ScanCountMSn>858</ScanCountMSn>
+    <Elution_Time_Max>67.8798</Elution_Time_Max>
+    <AcqTimeMinutes>0.00</AcqTimeMinutes>
+    <StartTime>2017-04-01 05:20:58 PM</StartTime>
+    <EndTime>2017-04-01 05:20:58 PM</EndTime>
+    <FileSizeBytes>79522804</FileSizeBytes>
+  </AcquisitionInfo>
+  <TICInfo>
+    <TIC_Max_MS>2.5068E+09</TIC_Max_MS>
+    <TIC_Max_MSn>9.7429E+08</TIC_Max_MSn>
+    <BPI_Max_MS>3.2734E+08</BPI_Max_MS>
+    <BPI_Max_MSn>8.6405E+07</BPI_Max_MSn>
+    <TIC_Median_MS>7.9575E+08</TIC_Median_MS>
+    <TIC_Median_MSn>2.4657E+06</TIC_Median_MSn>
+    <BPI_Median_MS>5.6394E+07</BPI_Median_MS>
+    <BPI_Median_MSn>262166</BPI_Median_MSn>
+  </TICInfo>
+</DatasetInfo>
