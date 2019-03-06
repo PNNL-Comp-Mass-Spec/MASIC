@@ -32,25 +32,37 @@ Source: ..\bin\ThermoFisher.CommonCore.MassPrecisionEstimator.dll   ; DestDir: {
 Source: ..\bin\ThermoFisher.CommonCore.RawFileReader.dll            ; DestDir: {app}
 Source: ..\bin\ThermoRawFileReader.dll                              ; DestDir: {app}
 
-Source: ..\MASICBrowser\bin\MASICBrowser.exe          ; DestDir: {app}
-Source: ..\MASICBrowser\bin\OxyDataPlotter.dll        ; DestDir: {app}
-Source: ..\MASICBrowser\bin\OxyPlot.dll               ; DestDir: {app}
-Source: ..\MASICBrowser\bin\OxyPlot.WindowsForms.dll  ; DestDir: {app}
-Source: ..\MASICBrowser\bin\Svg.dll                   ; DestDir: {app}
+Source: ..\MASICBrowser\bin\MASICBrowser.exe                   ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyDataPlotter.dll                 ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyPlot.dll                        ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyPlot.WindowsForms.dll           ; DestDir: {app}
+Source: ..\MASICBrowser\bin\Svg.dll                            ; DestDir: {app}
 
-Source: ..\Readme.md                             ; DestDir: {app}
-Source: ..\RevisionHistory.txt                   ; DestDir: {app}
-Source: Images\delete_16x.ico                    ; DestDir: {app}
+Source: ..\Readme.md                                           ; DestDir: {app}
+Source: ..\RevisionHistory.txt                                 ; DestDir: {app}
+Source: Images\delete_16x.ico                                  ; DestDir: {app}
                                                 
-Source: ..\docs\MASICParameters.xml              ; DestDir: {app}
-Source: ..\docs\QC_Standards_Excerpt.mzXML       ; DestDir: {app}
-Source: ..\docs\QC_Standards_Excerpt_SICs.xml    ; DestDir: {app}
-Source: ..\docs\CustomMZList_AcqTime.txt         ; DestDir: {app}
-Source: ..\docs\CustomMZList.txt                 ; DestDir: {app}
-Source: ..\docs\Example_Orbitrap_Data_SICs.xml   ; DestDir: {app}
+Source: ..\Docs\MASICParameters.xml                            ; DestDir: {app}
+Source: ..\Docs\LTQ_Example\Default_2008-08-22.xml             ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML         ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICs.xml      ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_ScanStats.txt ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICstats.txt  ; DestDir: {app}\LTQ_Example
 
-Source: ..\Lib\netcdf.dll                        ; DestDir: {app}
-Source: ..\Lib\RawFileReaderLicense.doc          ; DestDir: {app}
+Source: ..\Docs\QExactive_Example\LTQ-FT_10ppm_2014-08-06.xml            ; DestDir: {app}\QExactive_Example
+Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt.mzXML            ; DestDir: {app}\QExactive_Example
+Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_ScanStats.txt    ; DestDir: {app}\QExactive_Example
+Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_SICs.xml         ; DestDir: {app}\QExactive_Example
+Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_SICstats.txt     ; DestDir: {app}\QExactive_Example
+
+Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICs.xml          ; DestDir: {app}\Orbitrap_Example
+Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestDir: {app}\Orbitrap_Example
+
+Source: ..\Docs\CustomMZList_AcqTime.txt                       ; DestDir: {app}
+Source: ..\Docs\CustomMZList.txt                               ; DestDir: {app}
+                                                          
+Source: ..\Lib\netcdf.dll                                      ; DestDir: {app}
+Source: ..\Lib\RawFileReaderLicense.doc                        ; DestDir: {app}
 
 [Dirs]
 Name: {commonappdata}\MASIC; Flags: uninsalwaysuninstall
