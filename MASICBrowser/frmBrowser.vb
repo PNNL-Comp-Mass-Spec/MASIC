@@ -25,12 +25,11 @@ Imports OxyDataPlotter
 Imports OxyPlot
 Imports PRISM
 Imports ProgressFormNET
-Imports SharedVBNetRoutines
 
 Public Class frmBrowser
     Inherits Form
 
-    Private Const PROGRAM_DATE As String = "January 30, 2019"
+    Private Const PROGRAM_DATE As String = "March 21, 2019"
 
 #Region "Windows Form Designer generated code"
 
@@ -1637,16 +1636,16 @@ Public Class frmBrowser
         Dim msmsResultsTable = New DataTable(TABLE_NAME_MSMS_RESULTS)
 
         ' Add the columns to the DataTable
-        ADONetRoutines.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SCAN)
-        ADONetRoutines.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_CHARGE)
-        ADONetRoutines.AppendColumnSingleToTable(msmsResultsTable, COL_NAME_MH)
-        ADONetRoutines.AppendColumnSingleToTable(msmsResultsTable, COL_NAME_XCORR)
-        ADONetRoutines.AppendColumnSingleToTable(msmsResultsTable, COL_NAME_DELTACN)
-        ADONetRoutines.AppendColumnSingleToTable(msmsResultsTable, COL_NAME_DELTACN2)
-        ADONetRoutines.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_SP)
-        ADONetRoutines.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_XC)
-        ADONetRoutines.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SEQUENCE_ID)
-        ADONetRoutines.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_PARENT_ION_INDEX)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SCAN)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_CHARGE)
+        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_MH)
+        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_XCORR)
+        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_DELTACN)
+        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_DELTACN2)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_SP)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_XC)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SEQUENCE_ID)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_PARENT_ION_INDEX)
 
         ' Define a primary key
         With msmsResultsTable
@@ -1666,8 +1665,8 @@ Public Class frmBrowser
         Dim seqToProteinMapTable = New DataTable(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
         ' Add the columns to the DataTable
-        ADONetRoutines.AppendColumnIntegerToTable(seqToProteinMapTable, COL_NAME_SEQUENCE_ID)
-        ADONetRoutines.AppendColumnStringToTable(seqToProteinMapTable, COL_NAME_PROTEIN)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(seqToProteinMapTable, COL_NAME_SEQUENCE_ID)
+        DatabaseUtils.DataTableUtils.AppendColumnStringToTable(seqToProteinMapTable, COL_NAME_PROTEIN)
 
         ' Define a primary key
         With seqToProteinMapTable
@@ -1690,8 +1689,8 @@ Public Class frmBrowser
         Dim sequenceInfoTable = New DataTable(TABLE_NAME_SEQUENCES)
 
         ' Add the columns to the DataTable
-        ADONetRoutines.AppendColumnIntegerToTable(sequenceInfoTable, COL_NAME_SEQUENCE_ID, 0, True, True, True)
-        ADONetRoutines.AppendColumnStringToTable(sequenceInfoTable, COL_NAME_SEQUENCE)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(sequenceInfoTable, COL_NAME_SEQUENCE_ID, 0, True, True, True)
+        DatabaseUtils.DataTableUtils.AppendColumnStringToTable(sequenceInfoTable, COL_NAME_SEQUENCE)
 
         ' Define a primary key
         With sequenceInfoTable
@@ -1760,7 +1759,7 @@ Public Class frmBrowser
                     End If
 
                     Dim eResponse = InputBox("Enter the scan number to jump to: ", "Jump to Scan", scanNumberToFind.ToString)
-                    If VBNetRoutines.IsNumber(eResponse) Then
+                    If DataUtils.StringToValueUtils.IsNumber(eResponse) Then
                         scanNumberToFind = CInt(eResponse)
                     End If
                 End If
@@ -2173,14 +2172,14 @@ Public Class frmBrowser
             End If
 
             Dim xRangeHalfWidth As Integer
-            If VBNetRoutines.IsNumber(txtFixXRange.Text) Then
+            If DataUtils.StringToValueUtils.IsNumber(txtFixXRange.Text) Then
                 xRangeHalfWidth = CInt(CInt(txtFixXRange.Text) / 2)
             Else
                 xRangeHalfWidth = 0
             End If
 
             Dim yRange As Single
-            If VBNetRoutines.IsNumber(txtFixYRange.Text) Then
+            If DataUtils.StringToValueUtils.IsNumber(txtFixYRange.Text) Then
                 yRange = CSng(txtFixYRange.Text)
             Else
                 yRange = 0
@@ -2390,7 +2389,7 @@ Public Class frmBrowser
               objXMLReader = New XmlTextReader(reader)
 
 
-                objProgress.InitializeProgressForm("Reading file " & ControlChars.NewLine & VBNetRoutines.CompactPathString(filePath, 40), 0, 1, True)
+                objProgress.InitializeProgressForm("Reading file " & ControlChars.NewLine & PRISM.PathUtils.CompactPathString(filePath, 40), 0, 1, True)
                 objProgress.Show()
                 Application.DoEvents()
 
@@ -2522,7 +2521,7 @@ Public Class frmBrowser
                                     If Not intensityDataList Is Nothing Then
                                         valueList = intensityDataList.Trim.Split(delimiterList)
                                         For index = 0 To valueList.Length - 1
-                                            If VBNetRoutines.IsNumber(valueList(index)) Then
+                                            If DataUtils.StringToValueUtils.IsNumber(valueList(index)) Then
                                                 sicIntensities.Add(CSng(valueList(index)))
                                             Else
                                                 sicIntensities.Add(0)
@@ -2536,7 +2535,7 @@ Public Class frmBrowser
                                     If Not massDataList Is Nothing Then
                                         valueList = massDataList.Trim.Split(delimiterList)
                                         For index = 0 To valueList.Length - 1
-                                            If VBNetRoutines.IsNumber(valueList(index)) Then
+                                            If DataUtils.StringToValueUtils.IsNumber(valueList(index)) Then
                                                 sicMasses.Add(CDbl(valueList(index)))
                                             Else
                                                 sicMasses.Add(0)
@@ -2584,7 +2583,7 @@ Public Class frmBrowser
                                                 errorMessages.Add("Too many intensity data points found in parent ion '" & indexInXMLFile & "'")
                                                 Exit For
                                             End If
-                                            If VBNetRoutines.IsNumber(valueList(index)) Then
+                                            If DataUtils.StringToValueUtils.IsNumber(valueList(index)) Then
                                                 currentParentIon.SICStats.SICSmoothedYData.Add(CSng(valueList(index)))
                                                 smoothedDataFound = True
                                             Else
@@ -2754,7 +2753,7 @@ Public Class frmBrowser
 
                                                 Case "SICDataCount"
                                                     value = XMLTextReaderGetInnerText(objXMLReader)
-                                                    If VBNetRoutines.IsNumber(value) Then
+                                                    If DataUtils.StringToValueUtils.IsNumber(value) Then
                                                         expectedSicDataCount = CInt(value)
                                                     Else
                                                         expectedSicDataCount = 0
@@ -2762,7 +2761,7 @@ Public Class frmBrowser
 
                                                 Case "SICSmoothedYDataIndexStart"
                                                     value = XMLTextReaderGetInnerText(objXMLReader)
-                                                    If VBNetRoutines.IsNumber(value) Then
+                                                    If DataUtils.StringToValueUtils.IsNumber(value) Then
                                                         .SICStats.SICSmoothedYDataIndexStart = CInt(value)
                                                     Else
                                                         .SICStats.SICSmoothedYDataIndexStart = 0
@@ -3054,25 +3053,25 @@ Public Class frmBrowser
                 SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortOrder", cboSortOrder.SelectedIndex.ToString())
                 SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortDescending", chkSortDescending.Checked.ToString())
 
-                If VBNetRoutines.IsNumber(txtFixXRange.Text) Then
+                If DataUtils.StringToValueUtils.IsNumber(txtFixXRange.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", CInt(txtFixXRange.Text).ToString())
                 End If
-                If VBNetRoutines.IsNumber(txtFixYRange.Text) Then
+                If DataUtils.StringToValueUtils.IsNumber(txtFixYRange.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", CLng(txtFixYRange.Text).ToString())
                 End If
-                If VBNetRoutines.IsNumber(txtMinimumSignalToNoise.Text) Then
+                If DataUtils.StringToValueUtils.IsNumber(txtMinimumSignalToNoise.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", CSng(txtMinimumSignalToNoise.Text).ToString())
                 End If
-                If VBNetRoutines.IsNumber(txtMinimumIntensity.Text) Then
+                If DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", CInt(txtMinimumIntensity.Text).ToString())
                 End If
-                If VBNetRoutines.IsNumber(txtFilterByMZ.Text) Then
+                If DataUtils.StringToValueUtils.IsNumber(txtFilterByMZ.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", CSng(txtFilterByMZ.Text).ToString())
                 End If
-                If VBNetRoutines.IsNumber(txtFilterByMZTol.Text) Then
+                If DataUtils.StringToValueUtils.IsNumber(txtFilterByMZTol.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", CSng(txtFilterByMZTol.Text).ToString())
                 End If
-                If VBNetRoutines.IsNumber(txtAutoStep.Text) Then
+                If DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text) Then
                     SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", CInt(txtAutoStep.Text).ToString())
                 End If
 
@@ -3225,14 +3224,14 @@ Public Class frmBrowser
             eSortMode = eSortOrderConstants.SortByScanPeakCenter
         End If
 
-        If chkFilterByIntensity.Checked AndAlso VBNetRoutines.IsNumber(txtMinimumIntensity.Text) Then
+        If chkFilterByIntensity.Checked AndAlso DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text) Then
             minimumIntensity = CSng(txtMinimumIntensity.Text)
         Else
             minimumIntensity = Single.MinValue
         End If
 
-        If chkFilterByMZ.Checked AndAlso VBNetRoutines.IsNumber(txtFilterByMZ.Text) AndAlso
-           VBNetRoutines.IsNumber(txtFilterByMZTol.Text) Then
+        If chkFilterByMZ.Checked AndAlso DataUtils.StringToValueUtils.IsNumber(txtFilterByMZ.Text) AndAlso
+           DataUtils.StringToValueUtils.IsNumber(txtFilterByMZTol.Text) Then
             mzFilter = Math.Abs(CSng(txtFilterByMZ.Text))
             mzFilterTol = Math.Abs(CSng(txtFilterByMZTol.Text))
         Else
@@ -3240,7 +3239,7 @@ Public Class frmBrowser
             mzFilterTol = Single.MaxValue
         End If
 
-        If chkFilterBySignalToNoise.Checked AndAlso VBNetRoutines.IsNumber(txtMinimumSignalToNoise.Text) Then
+        If chkFilterBySignalToNoise.Checked AndAlso DataUtils.StringToValueUtils.IsNumber(txtMinimumSignalToNoise.Text) Then
             minimumSN = CSng(txtMinimumSignalToNoise.Text)
         Else
             minimumSN = Single.MinValue
@@ -3523,7 +3522,7 @@ Public Class frmBrowser
             mAutoStepEnabled = False
             cmdAutoStep.Text = "&Auto Step"
         Else
-            If VBNetRoutines.IsNumber(txtAutoStep.Text) Then
+            If DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text) Then
                 mAutoStepIntervalMsec = CInt(txtAutoStep.Text)
             Else
                 txtAutoStep.Text = "150"
@@ -3570,11 +3569,11 @@ Public Class frmBrowser
             If optUseSavitzkyGolaySmooth.Checked Then
                 .UseButterworthSmooth = False
                 .UseSavitzkyGolaySmooth = True
-                .SavitzkyGolayFilterOrder = CShort(VBNetRoutines.ParseTextboxValueInt(txtSavitzkyGolayFilterOrder, "", False, 0))
+                .SavitzkyGolayFilterOrder = CShort(PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, "", False, 0))
             Else
                 .UseButterworthSmooth = True
                 .UseSavitzkyGolaySmooth = False
-                .ButterworthSamplingFrequency = VBNetRoutines.ParseTextboxValueSng(txtButterworthSamplingFrequency, "", False, 0.25)
+                .ButterworthSamplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, "", False, 0.25)
             End If
             ''.ButterworthSamplingFrequencyDoubledForSIMData =
 
@@ -3636,8 +3635,8 @@ Public Class frmBrowser
             If eSmoothMode = eSmoothModeConstants.SavitzkyGolay Then
                 ' Resmooth using a Savitzy Golay filter
 
-                savitzkyGolayFilterOrder = VBNetRoutines.ParseTextboxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " should be an even number between 0 and 20; assuming 0", False, 0)
-                peakWidthsPointsMinimum = VBNetRoutines.ParseTextboxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text & " should be a positive integer; assuming 6", False, 6)
+                savitzkyGolayFilterOrder = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " should be an even number between 0 and 20; assuming 0", False, 0)
+                peakWidthsPointsMinimum = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text & " should be a positive integer; assuming 6", False, 6)
 
                 filterThirdWidth = CInt(Math.Floor(peakWidthsPointsMinimum / 3))
                 If filterThirdWidth > 3 Then filterThirdWidth = 3
@@ -3653,7 +3652,7 @@ Public Class frmBrowser
 
             Else
                 ' Assume eSmoothMode = eSmoothModeConstants.Butterworth
-                samplingFrequency = VBNetRoutines.ParseTextboxValueSng(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " should be a number between 0.01 and 0.99; assuming 0.2", False, 0.2)
+                samplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " should be a number between 0.01 and 0.99; assuming 0.2", False, 0.2)
                 objFilter.ButterworthFilter(intensities, 0, currentParentIon.SICData.Count - 1, samplingFrequency)
             End If
 
@@ -3813,7 +3812,7 @@ Public Class frmBrowser
     Private Sub txtAutoStep_TextChanged(sender As Object, e As EventArgs) Handles txtAutoStep.TextChanged
         Dim newInterval As Integer
 
-        If VBNetRoutines.IsNumber(txtAutoStep.Text) Then
+        If DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text) Then
             newInterval = CInt(txtAutoStep.Text)
             If newInterval < 10 Then newInterval = 10
             mAutoStepIntervalMsec = newInterval
@@ -3822,7 +3821,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtAutoStep_Validating(sender As Object, e As CancelEventArgs) Handles txtAutoStep.Validating
-        VBNetRoutines.ValidateTextboxInt(txtAutoStep, 10, 9999, 150)
+        PRISMWin.TextBoxUtils.ValidateTextBoxInt(txtAutoStep, 10, 9999, 150)
     End Sub
 
     Private Sub txtButterworthSamplingFrequency_TextChanged(sender As Object, e As EventArgs) Handles txtButterworthSamplingFrequency.TextChanged
@@ -3830,7 +3829,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtButterworthSamplingFrequency_Validating(sender As Object, e As CancelEventArgs) Handles txtButterworthSamplingFrequency.Validating
-        VBNetRoutines.ValidateTextboxSng(txtButterworthSamplingFrequency, 0.01, 0.99, 0.2)
+        PRISMWin.TextBoxUtils.ValidateTextBoxFloat(txtButterworthSamplingFrequency, 0.01, 0.99, 0.2)
     End Sub
 
     Private Sub txtFilterByMZ_Leave(sender As Object, e As EventArgs) Handles txtFilterByMZ.Leave
@@ -3838,7 +3837,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtFilterByMZ_Validating(sender As Object, e As CancelEventArgs) Handles txtFilterByMZ.Validating
-        VBNetRoutines.ValidateTextboxInt(txtFilterByMZ, 0, 100000, 540)
+        PRISMWin.TextBoxUtils.ValidateTextBoxInt(txtFilterByMZ, 0, 100000, 540)
     End Sub
 
     Private Sub txtFilterByMZTol_Leave(sender As Object, e As EventArgs) Handles txtFilterByMZTol.Leave
@@ -3846,7 +3845,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtFilterByMZTol_Validating(sender As Object, e As CancelEventArgs) Handles txtFilterByMZTol.Validating
-        VBNetRoutines.ValidateTextboxSng(txtFilterByMZTol, 0, 100000, 0.2)
+        PRISMWin.TextBoxUtils.ValidateTextBoxFloat(txtFilterByMZTol, 0, 100000, 0.2)
     End Sub
 
     Private Sub txtFixXRange_TextChanged(sender As Object, e As EventArgs) Handles txtFixXRange.TextChanged
@@ -3854,7 +3853,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtFixXRange_Validating(sender As Object, e As CancelEventArgs) Handles txtFixXRange.Validating
-        VBNetRoutines.ValidateTextboxInt(txtFixXRange, 3, 500000, 100)
+        PRISMWin.TextBoxUtils.ValidateTextBoxInt(txtFixXRange, 3, 500000, 100)
     End Sub
 
     Private Sub txtFixYRange_TextChanged(sender As Object, e As EventArgs) Handles txtFixYRange.TextChanged
@@ -3862,7 +3861,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtFixYRange_Validating(sender As Object, e As CancelEventArgs) Handles txtFixYRange.Validating
-        VBNetRoutines.ValidateTextboxSng(txtFixYRange, 10, Long.MaxValue, 5000000)
+        PRISMWin.TextBoxUtils.ValidateTextBoxFloat(txtFixYRange, 10, Long.MaxValue, 5000000)
     End Sub
 
     Private Sub txtMinimumIntensity_Leave(sender As Object, e As EventArgs) Handles txtMinimumIntensity.Leave
@@ -3870,7 +3869,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtMinimumIntensity_Validating(sender As Object, e As CancelEventArgs) Handles txtMinimumIntensity.Validating
-        VBNetRoutines.ValidateTextboxInt(txtMinimumIntensity, 0, 1000000000, 1000000)
+        PRISMWin.TextBoxUtils.ValidateTextBoxInt(txtMinimumIntensity, 0, 1000000000, 1000000)
     End Sub
 
     Private Sub txtMinimumSignalToNoise_Leave(sender As Object, e As EventArgs) Handles txtMinimumSignalToNoise.Leave
@@ -3878,7 +3877,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtMinimumSignalToNoise_Validating(sender As Object, e As CancelEventArgs) Handles txtMinimumSignalToNoise.Validating
-        VBNetRoutines.ValidateTextboxInt(txtMinimumSignalToNoise, 0, 10000, 2)
+        PRISMWin.TextBoxUtils.ValidateTextBoxInt(txtMinimumSignalToNoise, 0, 10000, 2)
     End Sub
 
     Private Sub txtPeakWidthPointsMinimum_TextChanged(sender As Object, e As EventArgs) Handles txtPeakWidthPointsMinimum.TextChanged
@@ -3886,7 +3885,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtPeakWidthPointsMinimum_Validating(sender As Object, e As CancelEventArgs) Handles txtPeakWidthPointsMinimum.Validating
-        VBNetRoutines.ValidateTextboxInt(txtPeakWidthPointsMinimum, 2, 100000, 6)
+        PRISMWin.TextBoxUtils.ValidateTextBoxInt(txtPeakWidthPointsMinimum, 2, 100000, 6)
     End Sub
 
     Private Sub txtSavitzkyGolayFilterOrder_TextChanged(sender As Object, e As EventArgs) Handles txtSavitzkyGolayFilterOrder.TextChanged
@@ -3894,7 +3893,7 @@ Public Class frmBrowser
     End Sub
 
     Private Sub txtSavitzkyGolayFilterOrder_Validating(sender As Object, e As CancelEventArgs) Handles txtSavitzkyGolayFilterOrder.Validating
-        VBNetRoutines.ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
+        PRISMWin.TextBoxUtils.ValidateTextBoxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
     End Sub
 
     Private Sub txtStats1_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtStats1.KeyPress

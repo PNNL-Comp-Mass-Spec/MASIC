@@ -21,9 +21,9 @@ Imports MASIC.DataInput
 Imports MASICPeakFinder.clsMASICPeakFinder
 Imports PRISM
 Imports PRISM.FileProcessor
+Imports PRISMWin
+Imports PRISMWin.TextBoxUtils
 Imports ProgressFormNET
-Imports SharedVBNetRoutines
-Imports SharedVBNetRoutines.VBNetRoutines
 Imports ShFolderBrowser.FolderBrowser
 
 Public Class frmMain
@@ -285,6 +285,20 @@ Public Class frmMain
         Else
             Return True
         End If
+    End Function
+
+    Private Function CStrSafe(ByRef item As Object) As String
+        Try
+            If item Is Nothing Then
+                Return String.Empty
+            ElseIf Convert.IsDBNull(item) Then
+                Return String.Empty
+            Else
+                Return CStr(item)
+            End If
+        Catch ex As Exception
+            Return String.Empty
+        End Try
     End Function
 
     Private Sub DefineDefaultCustomSICList()
@@ -791,12 +805,12 @@ Public Class frmMain
         Dim customSICValues = New DataTable(CUSTOM_SIC_VALUES_DATA_TABLE)
 
         ' Add the columns to the data table
-        ADONetRoutines.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ)
-        ADONetRoutines.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ_TOLERANCE)
-        ADONetRoutines.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_CENTER)
-        ADONetRoutines.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_TOLERANCE)
-        ADONetRoutines.AppendColumnStringToTable(customSICValues, COL_NAME_SCAN_COMMENT, String.Empty)
-        ADONetRoutines.AppendColumnIntegerToTable(customSICValues, COL_NAME_CUSTOM_SIC_VALUE_ROW_ID, 0, True, True)
+        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ)
+        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ_TOLERANCE)
+        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_CENTER)
+        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_TOLERANCE)
+        DatabaseUtils.DataTableUtils.AppendColumnStringToTable(customSICValues, COL_NAME_SCAN_COMMENT, String.Empty)
+        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(customSICValues, COL_NAME_CUSTOM_SIC_VALUE_ROW_ID, 0, True, True)
 
         With customSICValues
             Dim PrimaryKeyColumn = New DataColumn() { .Columns(COL_NAME_CUSTOM_SIC_VALUE_ROW_ID)}
@@ -885,7 +899,7 @@ Public Class frmMain
                     scanOrAcqTime = Single.Parse(columns(1))
 
                 ElseIf columns.Length >= 3 AndAlso columns(2).Length > 0 AndAlso
-                    Not IsNumber(columns(2).Chars(0)) Then
+                    Not DataUtils.StringToValueUtils.IsNumber(columns(2).Chars(0)) Then
                     ' Assume pasted data is m/z, scan, and comment
                     mz = Double.Parse(columns(0))
                     scanOrAcqTime = Single.Parse(columns(1))
@@ -1604,27 +1618,27 @@ Public Class frmMain
             .ReadOnly = False
         End With
 
-        ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ, "Custom m/z", 90)
-        ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ_TOLERANCE, "m/z tolerance (Da)", 110)
+        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ, "Custom m/z", 90)
+        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ_TOLERANCE, "m/z tolerance (Da)", 110)
 
         timeTolerance = False
         Select Case GetCustomSICScanToleranceType()
             Case clsCustomSICList.eCustomSICScanTypeConstants.Relative
-                ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Relative Scan Number (0 to 1)", 170)
-                ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90)
+                DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Relative Scan Number (0 to 1)", 170)
+                DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90)
 
             Case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
-                ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Acq time (minutes)", 110)
-                ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Time Tolerance", 90)
+                DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Acq time (minutes)", 110)
+                DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Time Tolerance", 90)
                 timeTolerance = True
 
             Case Else
                 ' Includes eCustomSICScanTypeConstants.Absolute
-                ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Scan Number", 90)
-                ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90)
+                DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Scan Number", 90)
+                DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90)
         End Select
 
-        ADONetRoutines.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_COMMENT, "Comment", 90)
+        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_COMMENT, "Comment", 90)
 
         fraCustomSICControls.Left = dgCustomSICValues.Left + dgCustomSICValues.Width + 15
 
@@ -1676,14 +1690,14 @@ Public Class frmMain
                 .IncludeMSMS = chkExportRawDataIncludeMSMS.Checked
                 .RenumberScans = chkExportRawDataRenumberScans.Checked
 
-                .MinimumSignalToNoiseRatio = ParseTextboxValueSng(txtExportRawDataSignalToNoiseRatioMinimum,
-                                                                  lblExportRawDataSignalToNoiseRatioMinimum.Text & " must be a value", parseError)
+                .MinimumSignalToNoiseRatio = ParseTextBoxValueFloat(txtExportRawDataSignalToNoiseRatioMinimum,
+                                                                    lblExportRawDataSignalToNoiseRatioMinimum.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .MaxIonCountPerScan = ParseTextboxValueInt(txtExportRawDataMaxIonCountPerScan,
+                .MaxIonCountPerScan = ParseTextBoxValueInt(txtExportRawDataMaxIonCountPerScan,
                                                            lblExportRawDataMaxIonCountPerScan.Text & " must be an integer value", parseError)
                 If parseError Then Exit Try
-                .IntensityMinimum = ParseTextboxValueSng(txtExportRawDataIntensityMinimum,
-                                                         lblExportRawDataIntensityMinimum.Text & " must be a value", parseError)
+                .IntensityMinimum = ParseTextBoxValueFloat(txtExportRawDataIntensityMinimum,
+                                                           lblExportRawDataIntensityMinimum.Text & " must be a value", parseError)
                 If parseError Then Exit Try
             End With
 
@@ -1701,7 +1715,7 @@ Public Class frmMain
                 .ConsolidateConstantExtendedHeaderValues = chkConsolidateConstantExtendedHeaderValues.Checked
 
                 ' Dataset and Database options
-                .SICOptions.DatasetNumber = ParseTextboxValueInt(txtDatasetNumber, lblDatasetNumber.Text & " must be an integer value", parseError)
+                .SICOptions.DatasetNumber = ParseTextBoxValueInt(txtDatasetNumber, lblDatasetNumber.Text & " must be an integer value", parseError)
                 If parseError Then Exit Try
 
                 If txtDatabaseConnectionString.TextLength > 0 And txtDatasetInfoQuerySQL.TextLength > 0 Then
@@ -1725,20 +1739,20 @@ Public Class frmMain
             End With
 
             ' SIC Options
-            Dim sicTolerance = ParseTextboxValueDbl(txtSICTolerance, lblSICToleranceDa.Text & " must be a value", parseError)
+            Dim sicTolerance = ParseTextBoxValueDbl(txtSICTolerance, lblSICToleranceDa.Text & " must be a value", parseError)
             If parseError Then Exit Try
 
             With masicOptions.SICOptions
                 .SetSICTolerance(sicTolerance, optSICTolerancePPM.Checked)
 
-                .ScanRangeStart = ParseTextboxValueInt(txtScanStart, lblScanStart.Text & " must be a value", parseError)
+                .ScanRangeStart = ParseTextBoxValueInt(txtScanStart, lblScanStart.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .ScanRangeEnd = ParseTextboxValueInt(txtScanEnd, lblScanEnd.Text & " must be a value", parseError)
+                .ScanRangeEnd = ParseTextBoxValueInt(txtScanEnd, lblScanEnd.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
-                .RTRangeStart = ParseTextboxValueSng(txtTimeStart, lblTimeStart.Text & " must be a value", parseError)
+                .RTRangeStart = ParseTextBoxValueFloat(txtTimeStart, lblTimeStart.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .RTRangeEnd = ParseTextboxValueSng(txtTimeEnd, lblTimeEnd.Text & " must be a value", parseError)
+                .RTRangeEnd = ParseTextBoxValueFloat(txtTimeEnd, lblTimeEnd.Text & " must be a value", parseError)
                 If parseError Then Exit Try
             End With
 
@@ -1751,17 +1765,17 @@ Public Class frmMain
                 .CompressToleranceDivisorForDa = mCompressToleranceDivisorForDa
                 .CompressToleranceDivisorForPPM = mCompressToleranceDivisorForPPM
 
-                .MaxSICPeakWidthMinutesBackward = ParseTextboxValueSng(txtMaxPeakWidthMinutesBackward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesBackward.Text & " must be a value", parseError)
+                .MaxSICPeakWidthMinutesBackward = ParseTextBoxValueFloat(txtMaxPeakWidthMinutesBackward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesBackward.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .MaxSICPeakWidthMinutesForward = ParseTextboxValueSng(txtMaxPeakWidthMinutesForward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesForward.Text & " must be a value", parseError)
+                .MaxSICPeakWidthMinutesForward = ParseTextBoxValueFloat(txtMaxPeakWidthMinutesForward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesForward.Text & " must be a value", parseError)
                 If parseError Then Exit Try
             End With
 
             With masicOptions.SICOptions
-                .SICPeakFinderOptions.IntensityThresholdFractionMax = ParseTextboxValueSng(txtIntensityThresholdFractionMax, lblIntensityThresholdFractionMax.Text & " must be a value", parseError)
+                .SICPeakFinderOptions.IntensityThresholdFractionMax = ParseTextBoxValueFloat(txtIntensityThresholdFractionMax, lblIntensityThresholdFractionMax.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
-                .SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = ParseTextboxValueSng(txtIntensityThresholdAbsoluteMinimum, lblIntensityThresholdAbsoluteMinimum.Text & " must be a value", parseError)
+                .SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = ParseTextBoxValueFloat(txtIntensityThresholdAbsoluteMinimum, lblIntensityThresholdAbsoluteMinimum.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
                 .ReplaceSICZeroesWithMinimumPositiveValueFromMSData = chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked
@@ -1771,30 +1785,30 @@ Public Class frmMain
             With masicOptions.SICOptions.SICPeakFinderOptions
                 ' Peak Finding Options
                 .SICBaselineNoiseOptions.BaselineNoiseMode = CType(cboSICNoiseThresholdMode.SelectedIndex, eNoiseThresholdModes)
-                .SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = ParseTextboxValueSng(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text & " must be a value", parseError)
+                .SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
-                .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextboxValueSng(txtSICNoiseFractionLowIntensityDataToAverage, lblSICNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
+                .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat(txtSICNoiseFractionLowIntensityDataToAverage, lblSICNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
                 ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
                 .SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
 
-                .MaxDistanceScansNoOverlap = ParseTextboxValueInt(txtMaxDistanceScansNoOverlap, lblMaxDistanceScansNoOverlap.Text & " must be an integer value", parseError)
+                .MaxDistanceScansNoOverlap = ParseTextBoxValueInt(txtMaxDistanceScansNoOverlap, lblMaxDistanceScansNoOverlap.Text & " must be an integer value", parseError)
                 If parseError Then Exit Try
-                .MaxAllowedUpwardSpikeFractionMax = ParseTextboxValueSng(txtMaxAllowedUpwardSpikeFractionMax, lblMaxAllowedUpwardSpikeFractionMax.Text & " must be a value", parseError)
+                .MaxAllowedUpwardSpikeFractionMax = ParseTextBoxValueFloat(txtMaxAllowedUpwardSpikeFractionMax, lblMaxAllowedUpwardSpikeFractionMax.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .InitialPeakWidthScansScaler = ParseTextboxValueSng(txtInitialPeakWidthScansScaler, lblInitialPeakWidthScansScaler.Text & " must be a value", parseError)
+                .InitialPeakWidthScansScaler = ParseTextBoxValueFloat(txtInitialPeakWidthScansScaler, lblInitialPeakWidthScansScaler.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .InitialPeakWidthScansMaximum = ParseTextboxValueInt(txtInitialPeakWidthScansMaximum, lblInitialPeakWidthScansMaximum.Text & " must be an integer value", parseError)
+                .InitialPeakWidthScansMaximum = ParseTextBoxValueInt(txtInitialPeakWidthScansMaximum, lblInitialPeakWidthScansMaximum.Text & " must be an integer value", parseError)
                 If parseError Then Exit Try
 
                 .UseButterworthSmooth = optUseButterworthSmooth.Checked
-                .ButterworthSamplingFrequency = ParseTextboxValueSng(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " must be a value", parseError)
+                .ButterworthSamplingFrequency = ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
                 .UseSavitzkyGolaySmooth = optUseSavitzkyGolaySmooth.Checked
-                .SavitzkyGolayFilterOrder = CShort(ParseTextboxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " must be an integer value", parseError))
+                .SavitzkyGolayFilterOrder = CShort(ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " must be an integer value", parseError))
                 If parseError Then Exit Try
 
                 .FindPeaksOnSmoothedData = chkFindPeaksOnSmoothedData.Checked
@@ -1802,40 +1816,40 @@ Public Class frmMain
 
                 ' Mass Spectra Noise Threshold Options
                 .MassSpectraNoiseThresholdOptions.BaselineNoiseMode = CType(cboMassSpectraNoiseThresholdMode.SelectedIndex, eNoiseThresholdModes)
-                .MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = ParseTextboxValueSng(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text & " must be a value", parseError)
+                .MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
-                .MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextboxValueSng(txtMassSpectraNoiseFractionLowIntensityDataToAverage, lblMassSpectraNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
+                .MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat(txtMassSpectraNoiseFractionLowIntensityDataToAverage, lblMassSpectraNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
-                .MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = ParseTextboxValueSng(txtMassSpectraNoiseMinimumSignalToNoiseRatio, lblMassSpectraNoiseMinimumSignalToNoiseRatio.Text & " must be a value", parseError)
+                .MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = ParseTextBoxValueFloat(txtMassSpectraNoiseMinimumSignalToNoiseRatio, lblMassSpectraNoiseMinimumSignalToNoiseRatio.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
             End With
 
             With masicOptions.SICOptions
                 ' Similarity Options
-                .SimilarIonMZToleranceHalfWidth = ParseTextboxValueSng(txtSimilarIonMZToleranceHalfWidth, lblSimilarIonMZToleranceHalfWidth.Text & " must be a value", parseError)
+                .SimilarIonMZToleranceHalfWidth = ParseTextBoxValueFloat(txtSimilarIonMZToleranceHalfWidth, lblSimilarIonMZToleranceHalfWidth.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .SimilarIonToleranceHalfWidthMinutes = ParseTextboxValueInt(txtSimilarIonToleranceHalfWidthMinutes, lblSimilarIonTimeToleranceHalfWidth.Text & " must be a value", parseError)
+                .SimilarIonToleranceHalfWidthMinutes = ParseTextBoxValueInt(txtSimilarIonToleranceHalfWidthMinutes, lblSimilarIonTimeToleranceHalfWidth.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .SpectrumSimilarityMinimum = ParseTextboxValueSng(txtSpectrumSimilarityMinimum, lblSpectrumSimilarityMinimum.Text & " must be a value", parseError)
+                .SpectrumSimilarityMinimum = ParseTextBoxValueFloat(txtSpectrumSimilarityMinimum, lblSpectrumSimilarityMinimum.Text & " must be a value", parseError)
                 If parseError Then Exit Try
             End With
 
             With masicOptions.BinningOptions
 
                 ' Binning Options
-                .StartX = ParseTextboxValueSng(txtBinStartX, lblBinStartX.Text & " must be a value", parseError)
+                .StartX = ParseTextBoxValueFloat(txtBinStartX, lblBinStartX.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .EndX = ParseTextboxValueSng(txtBinEndX, lblBinEndX.Text & " must be a value", parseError)
+                .EndX = ParseTextBoxValueFloat(txtBinEndX, lblBinEndX.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .BinSize = ParseTextboxValueSng(txtBinSize, lblBinSize.Text & " must be a value", parseError)
+                .BinSize = ParseTextBoxValueFloat(txtBinSize, lblBinSize.Text & " must be a value", parseError)
                 If parseError Then Exit Try
-                .MaximumBinCount = ParseTextboxValueInt(txtMaximumBinCount, lblMaximumBinCount.Text & " must be an integer value", parseError)
+                .MaximumBinCount = ParseTextBoxValueInt(txtMaximumBinCount, lblMaximumBinCount.Text & " must be an integer value", parseError)
                 If parseError Then Exit Try
 
-                .IntensityPrecisionPercent = ParseTextboxValueSng(txtBinnedDataIntensityPrecisionPct, lblBinnedDataIntensityPrecisionPct.Text & " must be a value", parseError)
+                .IntensityPrecisionPercent = ParseTextBoxValueFloat(txtBinnedDataIntensityPrecisionPct, lblBinnedDataIntensityPrecisionPct.Text & " must be a value", parseError)
                 If parseError Then Exit Try
 
                 .Normalize = chkBinnedDataNormalize.Checked
@@ -1857,7 +1871,7 @@ Public Class frmMain
                 .ReporterIonMassMode = CType(cboReporterIonMassMode.SelectedIndex, clsReporterIons.eReporterIonMassModeConstants)
 
                 ' Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
-                .ReporterIonToleranceDaDefault = ParseTextboxValueDbl(txtReporterIonMZToleranceDa, "", parseError,
+                .ReporterIonToleranceDaDefault = ParseTextBoxValueDbl(txtReporterIonMZToleranceDa, "", parseError,
                                                                       clsReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, False)
                 .SetReporterIonMassMode(.ReporterIonMassMode, .ReporterIonToleranceDaDefault)
 
@@ -1918,7 +1932,7 @@ Public Class frmMain
                 eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
             End If
 
-            Dim scanOrAcqTimeTolerance = ParseTextboxValueSng(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text & " must be a value", parseError)
+            Dim scanOrAcqTimeTolerance = ParseTextBoxValueFloat(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text & " must be a value", parseError)
             If parseError Then Exit Try
 
             masicOptions.CustomSICList.SetCustomSICListValues(eScanType, scanOrAcqTimeTolerance, mzSearchSpecs)
@@ -2104,7 +2118,7 @@ Public Class frmMain
     End Sub
 
     Private Sub txtButterworthSamplingFrequency_Validating(sender As Object, e As CancelEventArgs) Handles txtButterworthSamplingFrequency.Validating
-        ValidateTextboxSng(txtButterworthSamplingFrequency, 0.01, 0.99, 0.25)
+        ValidateTextBoxFloat(txtButterworthSamplingFrequency, 0.01, 0.99, 0.25)
     End Sub
 
     Private Sub txtCustomSICFileDescription_KeyDown(sender As Object, e As KeyEventArgs) Handles txtCustomSICFileDescription.KeyDown

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
@@ -73,10 +73,6 @@
       <Name>ProgressFormNET</Name>
       <HintPath>..\lib\ProgressFormNET.dll</HintPath>
     </Reference>
-    <Reference Include="SharedVBNetRoutines, Version=1.0.6296.30024, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\SharedVBNetRoutines.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -134,7 +130,10 @@
       <Version>1.0.0</Version>
     </PackageReference>
     <PackageReference Include="PRISM-Library">
-      <Version>2.5.11</Version>
+      <Version>2.5.16</Version>
+    </PackageReference>
+    <PackageReference Include="PRISMWin-Library">
+      <Version>1.0.10</Version>
     </PackageReference>
     <PackageReference Include="Svg">
       <Version>2.3.0</Version>

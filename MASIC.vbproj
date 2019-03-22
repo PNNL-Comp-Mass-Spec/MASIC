@@ -62,9 +62,6 @@
     <Reference Include="ProgressFormNET">
       <HintPath>Lib\ProgressFormNET.dll</HintPath>
     </Reference>
-    <Reference Include="SharedVBNetRoutines">
-      <HintPath>Lib\SharedVBNetRoutines.dll</HintPath>
-    </Reference>
     <Reference Include="ShFolderBrowser">
       <HintPath>Lib\ShFolderBrowser.dll</HintPath>
     </Reference>
@@ -179,7 +176,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library">
-      <Version>2.5.11</Version>
+      <Version>2.5.16</Version>
+    </PackageReference>
+    <PackageReference Include="PRISMWin-Library">
+      <Version>1.0.10</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
