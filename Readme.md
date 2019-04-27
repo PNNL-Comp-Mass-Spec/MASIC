@@ -5,21 +5,36 @@ chosen for fragmentation in an LC-MS/MS analysis.  The SICs are generated
 using the LC-MS data, then each SIC is processed using a peak finding 
 algorithm to characterize the chromatographic peaks, providing peak statistics 
 including elution time of the peak apex, peak area, and peak signal/noise.
-The program can read Finnigan .Raw files, mzXML files, mzData files, or 
-.cdf/.mgf combo files.  Results are saved both as flat files (.txt) and 
-in an XML file that can be read using the accompanying graphical results 
-browser.  The browser provides a fast, graphical method for browsing the SICs 
-identified by MASIC, allowing the user to sort and filter the SIC list as desired.
+The program can read instrument data in the following formats:
+* Thermo .Raw files
+* mzML files
+* mzXML files
+* mzData files
+* .cdf/.mgf combo files
 
-The application note describing MASIC is Monroe ME et. al.
-Comput Biol Chem. 2008 Jun;32(3):215-217.  More info at
-https://www.ncbi.nlm.nih.gov/pubmed/?term=18440872
+Results are saved both as flat files (.txt) and in an XML file that can be read 
+using the accompanying graphical results browser, MASIC Browser.  The browser 
+provides a fast, graphical method for browsing the SICs identified by MASIC, 
+allowing the user to sort and filter the SIC list as desired.
+
+The application note describing MASIC is:
+Monroe ME et. al., Comput Biol Chem. 2008 Jun;32(3):215-217.  More info is on 
+[PubMed](https://www.ncbi.nlm.nih.gov/pubmed/18440872)
 
 ## Installation
 
 Double click the MASIC_installer.msi file to install.\
 The program shortcut can be found at Start Menu -> Programs -> PAST Toolkit -> MASIC\
 The MASIC browser shortcut can be found at PAST Toolkit -> MASIC Browser
+
+### Console Version
+
+The GUI version of MASIC, file MASIC.exe, includes a command line interface.
+To see the options, use `MASIC.exe /?`\
+See below for more information on the command line arguments.
+
+Alternatively, use program MASIC_Console.exe, which is a command-line only version of MASIC.
+MASIC_Console.exe can be run on Linux using [Mono](https://www.mono-project.com/download/stable/)
 
 ## Custom SIC Values
 
@@ -111,6 +126,14 @@ that presents the data in a crosstab format (aka PivotTable).  Here, each
 column in the crosstab corresponds to the intensity values over time for a 
 given parent m/z to daughter m/z transition being monitored.
 
+If you convert a MRM file to the .mzML format using the MSConvert utility in ProteoWizard, 
+you need to use command line switches `--srmAsSpectra` and `--simAsSpectra`.
+Otherwise, the PSI_Interface utility which we use to read .mzML files cannot 
+load the mass spectra data.  Example command line:
+```
+msconvert --32 --mzML --srmAsSpectra --simAsSpectra DatasetName.raw
+```
+
 ## IonCountRaw vs. IonCount
 
 In the ScanStats file, IonCountRaw is the number MASIC m/z values present in 
@@ -121,6 +144,47 @@ within ~0.05 m/z (thus, combine 1000.05 and 1000.052 as simply 1000.051).
 Additionally, for scans with a lot of low quality, low intensity data, MASIC 
 discards the low intensity data.  The IonCount value would let you see which 
 scans MASIC is discarding some data, for whatever reason.
+
+## Command Line Interface
+
+Both MASIC.exe and MASIC_Console.exe include the same command line interface.
+```
+MASIC.exe
+ /I:InputFilePath.raw [/O:OutputDirectoryPath]
+ [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath]
+ [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]
+ [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]
+```
+
+The input file path can contain the wildcard character *
+
+The output directory name is optional. If omitted, the output files will be
+created in the same directory as the input file. If included, then a subdirectory
+is created with the name OutputDirectoryName.
+
+The parameter file switch `/P` is optional. If supplied, it should point to a valid MASIC
+XML parameter file.  If omitted, defaults are used.
+
+The `/D` switch can be used to specify the dataset number of the input file; if
+omitted, 0 will be used
+
+Alternatively, a lookup file can be specified with the `/D `switch (useful if
+processing multiple files using * or `/S`)
+
+Use `/S` to process all valid files in the input directory and subdirectories.
+Include a number after `/S` (like `/S:2`) to limit the level of subdirectories to
+examine.
+* When using `/S`, you can redirect the output of the results using `/A`.
+* When using `/S`, you can use `/R` to re-create the input directory hierarchy in the
+alternate output directory (if defined).
+
+Use `/L` to specify that a log file should be created.  Use `/L:LogFilePath` to
+specify the name (or full path) for the log file.
+
+Use `/SF` to specify the name to use for the Masic Status file (default is
+MasicStatus.xml).
+
+The optional `/Q` switch will prevent the progress window from being shown (only applicable to the GUI version, MASIC.exe)
 
 ## Contacts
 
