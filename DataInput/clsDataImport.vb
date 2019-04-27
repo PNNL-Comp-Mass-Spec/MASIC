@@ -9,10 +9,15 @@ Namespace DataInput
 #Region "Constants and Enums"
 
         Public Const FINNIGAN_RAW_FILE_EXTENSION As String = ".RAW"
+
+        Public Const MZ_ML_FILE_EXTENSION As String = ".MZML"
+
         Public Const MZ_XML_FILE_EXTENSION1 As String = ".MZXML"
         Public Const MZ_XML_FILE_EXTENSION2 As String = "MZXML.XML"
+
         Public Const MZ_DATA_FILE_EXTENSION1 As String = ".MZDATA"
         Public Const MZ_DATA_FILE_EXTENSION2 As String = "MZDATA.XML"
+
         Public Const AGILENT_MSMS_FILE_EXTENSION As String = ".MGF"    ' Agilent files must have been exported to a .MGF and .CDF file pair prior to using MASIC
         Public Const AGILENT_MS_FILE_EXTENSION As String = ".CDF"
 
@@ -60,10 +65,10 @@ Namespace DataInput
         ''' <param name="peakFinder"></param>
         ''' <param name="parentIonProcessor"></param>
         Public Sub New(
-      masicOptions As clsMASICOptions,
-      peakFinder As MASICPeakFinder.clsMASICPeakFinder,
-      parentIonProcessor As clsParentIonProcessing,
-      scanTracking As clsScanTracking)
+          masicOptions As clsMASICOptions,
+          peakFinder As MASICPeakFinder.clsMASICPeakFinder,
+          parentIonProcessor As clsParentIonProcessing,
+          scanTracking As clsScanTracking)
 
             mOptions = masicOptions
             mPeakFinder = peakFinder

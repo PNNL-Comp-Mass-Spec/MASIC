@@ -1513,6 +1513,22 @@ Public Class clsMASIC
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
+                Case DataInput.clsDataImport.MZ_ML_FILE_EXTENSION.ToUpper()
+
+                    ' Open the .mzML file and obtain the scan information
+
+                    Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                    RegisterDataImportEvents(dataImporter)
+                    dataImporterBase = dataImporter
+
+                    success = dataImporter.ExtractScanInfoFromMzMLDataFile(
+                        inputFilePathFull,
+                        scanList, objSpectraCache, dataOutputHandler,
+                        keepRawMSSpectra,
+                        Not mOptions.SkipMSMSProcessing)
+
+                    datasetFileInfo = dataImporter.DatasetFileInfo
+
                 Case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper(),
                      DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper()
 

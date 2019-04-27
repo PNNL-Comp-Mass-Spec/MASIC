@@ -331,8 +331,10 @@ Public Module modMain
         Try
 
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                "This program will read a Thermo LCQ .RAW file or Agilent LC/MSD .CDF/.MGF file combo " &
-                "and create a selected ion chromatogram (SIC) for each parent ion."))
+                "This program will read a Thermo .RAW file, .mzML file, .mzXML file, or Agilent LC/MSD .CDF/.MGF file combo " &
+                "and create a selected ion chromatogram (SIC) for each parent ion. " &
+                "It also supports extracting reporter ion intensities (e.g. iTRAQ or TMT), " &
+                "and additional metadata from mass spectrometer data files."))
 
             Console.WriteLine()
 
