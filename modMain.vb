@@ -50,6 +50,7 @@ Public Module modMain
     Private mProgressForm As frmProgress
 #End If
 
+    Private mLastSubtaskProgressTime As DateTime
     Private mLastProgressReportTime As DateTime
     Private mLastProgressReportValue As Integer
 
@@ -69,6 +70,8 @@ Public Module modMain
         mQuietMode = False
         mLogMessagesToFile = False
         mLogFilePath = String.Empty
+
+        mLastSubtaskProgressTime = DateTime.UtcNow
 
         Try
             proceed = False
@@ -133,16 +136,21 @@ Public Module modMain
                     returnCode = 0
                 Else
                     returnCode = mMASIC.ErrorCode
-                    If returnCode <> 0 AndAlso Not mQuietMode Then
+                    If returnCode <> 0 Then
                         Console.WriteLine("Error while processing: " & mMASIC.GetErrorMessage())
                     End If
                 End If
+            End If
+
+            If returnCode <> 0 Then
+                PRISM.ProgRunner.SleepMilliseconds(1500)
             End If
 
             Return returnCode
 
         Catch ex As Exception
             ShowErrorMessage("Error occurred in modMain->Main: " & Environment.NewLine & ex.Message)
+            PRISM.ProgRunner.SleepMilliseconds(1500)
             Return -1
 #If GUI Then
         Finally
@@ -212,12 +220,12 @@ Public Module modMain
                     If .RetrieveValueForParameter("O", value) Then mOutputDirectoryPath = value
                     If .RetrieveValueForParameter("P", value) Then mParameterFilePath = value
                     If .RetrieveValueForParameter("D", value) Then
-                        If Not IsNumeric(value) AndAlso Not value Is Nothing Then
+                        If Integer.TryParse(value, intValue) Then
+                            mDatasetNumber = intValue
+                        ElseIf Not String.IsNullOrWhiteSpace(value) Then
                             ' Assume the user specified a dataset number lookup file (comma or tab delimited file specifying the dataset number for each input file)
                             mDatasetLookupFilePath = value
                             mDatasetNumber = 0
-                        Else
-                            mDatasetNumber = CInt(value)
                         End If
                     End If
 
@@ -365,7 +373,6 @@ Public Module modMain
     End Sub
 
     Private Sub ProgressUpdateHandler(taskDescription As String, percentComplete As Single)
-        Const PERCENT_REPORT_INTERVAL = 25
         Const PROGRESS_DOT_INTERVAL_MSEC = 250
 
 #If GUI Then
@@ -384,20 +391,16 @@ Public Module modMain
         Const PERCENT_REPORT_INTERVAL = 5
 #End If
 
+        If percentComplete >= mLastProgressReportValue Then
+            Console.WriteLine()
+            DisplayProgressPercent(mLastProgressReportValue, False)
+            Console.WriteLine()
+            mLastProgressReportValue += PERCENT_REPORT_INTERVAL
+            mLastProgressReportTime = DateTime.UtcNow
         Else
-
-            If percentComplete >= mLastProgressReportValue Then
-                If mLastProgressReportValue > 0 Then
-                    Console.WriteLine()
-                End If
-                DisplayProgressPercent(mLastProgressReportValue, False)
-                mLastProgressReportValue += PERCENT_REPORT_INTERVAL
+            If DateTime.UtcNow.Subtract(mLastProgressReportTime).TotalMilliseconds > PROGRESS_DOT_INTERVAL_MSEC Then
                 mLastProgressReportTime = DateTime.UtcNow
-            Else
-                If DateTime.UtcNow.Subtract(mLastProgressReportTime).TotalMilliseconds > PROGRESS_DOT_INTERVAL_MSEC Then
-                    mLastProgressReportTime = DateTime.UtcNow
-                    Console.Write(".")
-                End If
+                Console.Write(".")
             End If
         End If
 
@@ -423,6 +426,11 @@ Public Module modMain
         Return
         End If
 #End If
+
+        If DateTime.UtcNow.Subtract(mLastSubtaskProgressTime).TotalSeconds < 10 Then Return
+        mLastSubtaskProgressTime = DateTime.UtcNow
+
+        ConsoleMsgUtils.ShowDebug(String.Format("{0}: {1}", mMASIC.SubtaskDescription, mMASIC.SubtaskProgressPercentComplete))
 
     End Sub
 
