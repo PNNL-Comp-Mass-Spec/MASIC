@@ -16,7 +16,12 @@ Public Class clsCorrelation
     Inherits EventNotifier
 
 #Region "Classwide variables"
+
+    ''' <summary>
+    ''' Coefficients used by GammaLn
+    ''' </summary>
     Private ReadOnly mCoefficients As Double()
+
 #End Region
 
     ''' <summary>
@@ -188,7 +193,7 @@ Public Class clsCorrelation
             If (Math.Abs(x) < Double.Epsilon Or Math.Abs(x - 1.0) < Double.Epsilon) Then
                 bt = 0.0
             Else
-                bt = Math.Exp(GammLn(a + b) - GammLn(a) - GammLn(b) + a * Math.Log(x) + b * Math.Log(1.0 - x))
+                bt = Math.Exp(GammaLn(a + b) - GammaLn(a) - GammaLn(b) + a * Math.Log(x) + b * Math.Log(1.0 - x))
             End If
 
             If (x < (a + 1.0) / (a + b + 2.0)) Then
@@ -375,13 +380,13 @@ Public Class clsCorrelation
 
             Select Case eCorrelationMethod
                 Case cmCorrelationMethodConstants.Pearson
-                    CorrelPearson(dataList1, dataList2, RValue, ProbOfSignificance, FishersZ)
+                    CorrelatePearson(dataList1, dataList2, RValue, ProbOfSignificance, FishersZ)
                     Return RValue
                 Case cmCorrelationMethodConstants.Spearman
-                    CorrelSpearman(dataList1, dataList2, DiffInRanks, ZD, ProbOfSignificance, RS, ProbRS)
+                    CorrelateSpearman(dataList1, dataList2, DiffInRanks, ZD, ProbOfSignificance, RS, ProbRS)
                     Return RS
                 Case cmCorrelationMethodConstants.Kendall
-                    CorrelKendall(dataList1, dataList2, KendallsTau, Z, ProbOfSignificance)
+                    CorrelateKendall(dataList1, dataList2, KendallsTau, Z, ProbOfSignificance)
                     Return KendallsTau
                 Case Else
                     Return -1
@@ -394,7 +399,7 @@ Public Class clsCorrelation
 
     End Function
 
-    Private Sub CorrelPearson(
+    Private Sub CorrelatePearson(
       dataList1 As IList(Of Single), dataList2 As IList(Of Single),
       <Out> ByRef RValue As Single,
       <Out> ByRef ProbOfSignificance As Single,
@@ -408,8 +413,8 @@ Public Class clsCorrelation
         '  TINY is used to "regularize" the unusual case of complete correlation
         Dim TINY = 1.0E-20
 
-        ' Given two arrays x[1..n] and y[1..n], this routine computes their correlation coeffcient
-        ' r (returned as r), the signicance level at which the null hypothesis of zero correlation is
+        ' Given two arrays x[1..n] and y[1..n], this routine computes their correlation coefficient
+        ' r (returned as r), the significance level at which the null hypothesis of zero correlation is
         ' disproved (prob whose small value indicates a significant correlation), and Fisher's z (returned
         ' as z), whose value can be used in further statistical tests as described above.
 
@@ -463,7 +468,7 @@ Public Class clsCorrelation
 
     End Sub
 
-    Private Sub CorrelKendall(
+    Private Sub CorrelateKendall(
       dataList1 As IList(Of Single),
       dataList2 As IList(Of Single),
       <Out> ByRef KendallsTau As Single,
@@ -477,7 +482,7 @@ Public Class clsCorrelation
 
         ' Given data arrays data1[1..n] and data2[1..n], this program returns Kendall's tau as tau,
         ' its number of standard deviations from zero as z, and its two-sided significance level as prob.
-        ' Small values of prob indicate a significant correlation (tau positive) or anticorrelation (tau
+        ' Small values of prob indicate a significant correlation (tau positive) or anti correlation (tau
         ' negative).
 
         Dim n As Integer
@@ -527,7 +532,7 @@ Public Class clsCorrelation
 
     End Sub
 
-    Private Sub CorrelSpearman(
+    Private Sub CorrelateSpearman(
       dataList1() As Single,
       dataList2() As Single,
       <Out> ByRef DiffInRanks As Single,
@@ -548,7 +553,7 @@ Public Class clsCorrelation
         ' expected value as zd, the two-sided significance level of this deviation as probd,
         ' Spearman's rank correlation rs as rs, and the two-sided significance level of its deviation from
         ' zero as probrs. The external routine CRank is used.  A small value of either probd or probrs indicates
-        ' a significant correlation (rs positive) or anticorrelation (rs negative).
+        ' a significant correlation (rs positive) or anti correlation (rs negative).
 
         Dim n As Integer
         Dim j As Integer
@@ -609,7 +614,7 @@ Public Class clsCorrelation
 
     Private Sub CRank(n As Integer, w As IList(Of Single), <Out> ByRef s As Single)
 
-        ' Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including midranking of ties,
+        ' Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including mid-ranking of ties,
         ' and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
 
         Dim j As Integer
@@ -664,7 +669,12 @@ Public Class clsCorrelation
 
     End Function
 
-    Private Function GammLn(xx As Double) As Double
+    ''' <summary>
+    ''' Computes the natural logarithm of the Gamma Function
+    ''' </summary>
+    ''' <param name="xx"></param>
+    ''' <returns></returns>
+    Private Function GammaLn(xx As Double) As Double
         Dim x, y, tmp, ser As Double
         Dim j As Integer
 
@@ -719,20 +729,18 @@ Public Class clsCorrelation
 
     End Function
 
-    Private Function ValueToBinNumber(ThisValue As Single, StartValue As Single, BinSize As Single) As Integer
-
-        Dim WorkingValue As Single
+    Private Function ValueToBinNumber(thisValue As Single, startValue As Single, histogramBinSize As Single) As Integer
 
         ' First subtract StartValue from ThisValue
         ' For example, if StartValue is 500 and ThisValue is 500.28, then WorkingValue = 0.28
         ' Or, if StartValue is 500 and ThisValue is 530.83, then WorkingValue = 30.83
-        WorkingValue = ThisValue - StartValue
+        Dim workingValue = thisValue - startValue
 
         ' Now, dividing WorkingValue by BinSize and rounding to nearest integer
         '  actually gives the bin
         ' For example, given WorkingValue = 0.28 and BinSize = 0.1, Bin = CInt(Round(2.8,0)) = 3
         ' Or, given WorkingValue = 30.83 and BinSize = 0.1, Bin = CInt(Round(308.3,0)) = 308
-        ValueToBinNumber = CInt(Math.Round(WorkingValue / BinSize, 0))
+        ValueToBinNumber = CInt(Math.Round(WorkingValue / histogramBinSize, 0))
 
     End Function
 

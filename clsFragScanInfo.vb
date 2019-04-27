@@ -31,7 +31,7 @@
     ''' Larger is better, with a max of 1 and minimum of 0
     ''' 1 means all peaks are from the precursor
     ''' </summary>
-    Public Property InteferenceScore As Double
+    Public Property InterferenceScore As Double
 
     ''' <summary>
     ''' Constructor

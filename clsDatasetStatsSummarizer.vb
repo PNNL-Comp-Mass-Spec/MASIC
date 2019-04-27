@@ -24,7 +24,7 @@ Public Class clsDatasetStatsSummarizer
     Inherits EventNotifier
 
 #Region "Constants and Enums"
-    Public Const SCANTYPE_STATS_SEPCHAR As String = "::###::"
+    Public Const SCAN_TYPE_STATS_SEP_CHAR As String = "::###::"
 
     ' ReSharper disable once UnusedMember.Global
     Public Const DATASET_INFO_FILE_SUFFIX As String = "_DatasetInfo.xml"
@@ -227,7 +227,7 @@ Public Class clsDatasetStatsSummarizer
                                                   bpiListMS)
                 End If
 
-                scanTypeKey = objEntry.ScanTypeName & SCANTYPE_STATS_SEPCHAR & objEntry.ScanFilterText
+                scanTypeKey = objEntry.ScanTypeName & SCAN_TYPE_STATS_SEP_CHAR & objEntry.ScanFilterText
                 If objSummaryStats.objScanTypeStats.ContainsKey(scanTypeKey) Then
                     objSummaryStats.objScanTypeStats.Item(scanTypeKey) += 1
                 Else
@@ -504,11 +504,11 @@ Public Class clsDatasetStatsSummarizer
             Do While objEnum.MoveNext
 
                 Dim scanType = objEnum.Current.Key
-                Dim indexMatch = scanType.IndexOf(SCANTYPE_STATS_SEPCHAR, StringComparison.Ordinal)
+                Dim indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal)
                 Dim scanFilterText As String
 
                 If indexMatch >= 0 Then
-                    scanFilterText = scanType.Substring(indexMatch + SCANTYPE_STATS_SEPCHAR.Length)
+                    scanFilterText = scanType.Substring(indexMatch + SCAN_TYPE_STATS_SEP_CHAR.Length)
                     If indexMatch > 0 Then
                         scanType = scanType.Substring(0, indexMatch)
                     Else

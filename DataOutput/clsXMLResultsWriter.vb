@@ -123,7 +123,7 @@ Namespace DataOutput
                         If fragScanIndex < scanList.FragScans.Count Then
                             objXMLOut.WriteElementString("FragScanNumber", scanList.FragScans(.FragScanIndices(fragScanIndex)).ScanNumber.ToString())
                             objXMLOut.WriteElementString("FragScanTime", scanList.FragScans(.FragScanIndices(fragScanIndex)).ScanTime.ToString())
-                            interferenceScore = scanList.FragScans(.FragScanIndices(fragScanIndex)).FragScanInfo.InteferenceScore
+                            interferenceScore = scanList.FragScans(.FragScanIndices(fragScanIndex)).FragScanInfo.InterferenceScore
                         Else
                             ' Fragmentation scan does not exist
                             objXMLOut.WriteElementString("FragScanNumber", "0")

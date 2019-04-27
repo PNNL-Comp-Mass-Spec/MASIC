@@ -633,8 +633,11 @@ Public Class clsMASICOptions
                                                                    "DiskCachingAlwaysDisabled",
                                                                    CacheOptions.DiskCachingAlwaysDisabled)
 
-                CacheOptions.FolderPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath",
-                                                    CacheOptions.FolderPath)
+                CacheOptions.DirectoryPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath",
+                                                       CacheOptions.DirectoryPath)
+
+                CacheOptions.DirectoryPath = .GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheDirectoryPath",
+                                                    CacheOptions.DirectoryPath)
 
                 CacheOptions.SpectraToRetainInMemory = .GetParam(XML_SECTION_MEMORY_OPTIONS,
                                                                  "CacheSpectraToRetainInMemory",
@@ -874,7 +877,7 @@ Public Class clsMASICOptions
 
                 ' Memory management options
                 .SetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", CacheOptions.DiskCachingAlwaysDisabled)
-                .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", CacheOptions.FolderPath)
+                .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheDirectoryPath", CacheOptions.DirectoryPath)
                 .SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory)
 
             End With

@@ -565,7 +565,7 @@ Namespace DataInput
                 Dim precursorScanNumber = scanList.SurveyScans(lastNonZoomSurveyScanIndex).ScanNumber
 
                 ' Compute the interference of the parent ion in the MS1 spectrum for this frag scan
-                scanInfo.FragScanInfo.InteferenceScore = ComputeInterference(xcaliburAccessor, thermoScanInfo, precursorScanNumber)
+                scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(xcaliburAccessor, thermoScanInfo, precursorScanNumber)
             End If
 
             Return True

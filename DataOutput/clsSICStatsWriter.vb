@@ -218,7 +218,7 @@ Namespace DataOutput
         End Function
 
         Private Sub WriteSICStatsFlatFileEntry(
-          sicStatsWriter As StreamWriter,
+          sicStatsWriter As TextWriter,
           cColDelimiter As Char,
           sicOptions As clsSICOptions,
           scanList As clsScanList,
@@ -245,7 +245,7 @@ Namespace DataOutput
 
             If fragScanIndex < scanList.FragScans.Count Then
                 dataValues.Add(scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).ScanNumber.ToString())  ' Fragmentation scan number
-                interferenceScore = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).FragScanInfo.InteferenceScore
+                interferenceScore = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).FragScanInfo.InterferenceScore
             Else
                 dataValues.Add("0")    ' Fragmentation scan does not exist
                 interferenceScore = 0

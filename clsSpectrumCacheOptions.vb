@@ -8,9 +8,9 @@
     Public Property DiskCachingAlwaysDisabled As Boolean
 
     ''' <summary>
-    ''' Path to the cache folder (can be relative or absolute, aka rooted); if empty, then the user's AppData folder is used
+    ''' Path to the cache directory (can be relative or absolute, aka rooted); if empty, then the user's AppData directory is used
     ''' </summary>
-    Public Property FolderPath As String
+    Public Property DirectoryPath As String
 
     Public Property SpectraToRetainInMemory As Integer
         Get
@@ -39,13 +39,13 @@
 
         With defaultOptions
             DiskCachingAlwaysDisabled = .DiskCachingAlwaysDisabled
-            FolderPath = .FolderPath
+            DirectoryPath = .DirectoryPath
             SpectraToRetainInMemory = .SpectraToRetainInMemory
         End With
     End Sub
 
     Public Overrides Function ToString() As String
-        Return "Cache up to " & SpectraToRetainInMemory & " in folder " & FolderPath
+        Return "Cache up to " & SpectraToRetainInMemory & " in directory " & DirectoryPath
     End Function
 
 End Class

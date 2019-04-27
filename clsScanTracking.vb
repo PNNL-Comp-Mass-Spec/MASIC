@@ -28,10 +28,10 @@ Public Class clsScanTracking
     ''' Constructor
     ''' </summary>
     ''' <param name="reporterIons"></param>
-    ''' <param name="peakfinder"></param>
-    Public Sub New(reporterIons As clsReporterIons, peakfinder As MASICPeakFinder.clsMASICPeakFinder)
+    ''' <param name="peakFinder"></param>
+    Public Sub New(reporterIons As clsReporterIons, peakFinder As MASICPeakFinder.clsMASICPeakFinder)
         mReporterIons = reporterIons
-        mPeakFinder = peakfinder
+        mPeakFinder = peakFinder
 
         ScanStats = New List(Of clsScanStatsEntry)
     End Sub

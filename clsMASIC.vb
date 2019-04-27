@@ -89,7 +89,7 @@ Public Class clsMASIC
         InputFileDataReadError = 1024
         OutputFileWriteError = 2048
         FileIOPermissionsError = 4096
-        ErrorCreatingSpectrumCacheFolder = 8192
+        ErrorCreatingSpectrumCacheDirectory = 8192
         ErrorCachingSpectrum = 16384
         ErrorUncachingSpectrum = 32768
         ErrorDeletingCachedSpectrumFiles = 65536
@@ -1030,12 +1030,12 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property CacheFolderPath As String
+    Public Property CacheDirectoryPath As String
         Get
-            Return mOptions.CacheOptions.FolderPath
+            Return mOptions.CacheOptions.DirectoryPath
         End Get
         Set
-            mOptions.CacheOptions.FolderPath = Value
+            mOptions.CacheOptions.DirectoryPath = Value
         End Set
     End Property
 
@@ -1382,8 +1382,8 @@ Public Class clsMASIC
                     errorMessage = "Error writing data to output file"
                 Case eMasicErrorCodes.FileIOPermissionsError
                     errorMessage = "File IO Permissions Error"
-                Case eMasicErrorCodes.ErrorCreatingSpectrumCacheFolder
-                    errorMessage = "Error creating spectrum cache folder"
+                Case eMasicErrorCodes.ErrorCreatingSpectrumCacheDirectory
+                    errorMessage = "Error creating spectrum cache directory"
                 Case eMasicErrorCodes.ErrorCachingSpectrum
                     errorMessage = "Error caching spectrum"
                 Case eMasicErrorCodes.ErrorUncachingSpectrum
@@ -1522,7 +1522,7 @@ Public Class clsMASIC
                     RegisterDataImportEvents(dataImporter)
                     dataImporterBase = dataImporter
 
-                    success = dataImporter.ExtractScanInfoFromMZXMLDataFile(
+                    success = dataImporter.ExtractScanInfoFromMzXMLDataFile(
                       inputFilePathFull,
                       scanList, objSpectraCache, dataOutputHandler,
                       keepRawMSSpectra,
@@ -1539,7 +1539,7 @@ Public Class clsMASIC
                     RegisterDataImportEvents(dataImporter)
                     dataImporterBase = dataImporter
 
-                    success = dataImporter.ExtractScanInfoFromMZDataFile(
+                    success = dataImporter.ExtractScanInfoFromMzDataFile(
                       inputFilePathFull,
                       scanList, objSpectraCache, dataOutputHandler,
                       keepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
@@ -1770,7 +1770,7 @@ Public Class clsMASIC
 
             Try
                 '---------------------------------------------------------
-                ' Verify that we have write access to the output folder
+                ' Verify that we have write access to the output directory
                 '---------------------------------------------------------
 
                 ' The following should work for testing access permissions, but it doesn't
@@ -1813,7 +1813,7 @@ Public Class clsMASIC
 
             Using objSpectraCache = New clsSpectraCache(mOptions.CacheOptions) With {
                 .DiskCachingAlwaysDisabled = mOptions.CacheOptions.DiskCachingAlwaysDisabled,
-                .CacheFolderPath = mOptions.CacheOptions.FolderPath,
+                .CacheDirectoryPath = mOptions.CacheOptions.DirectoryPath,
                 .CacheSpectraToRetainInMemory = mOptions.CacheOptions.SpectraToRetainInMemory
             }
                 RegisterEvents(objSpectraCache)
@@ -1921,7 +1921,7 @@ Public Class clsMASIC
                 mStatusMessage = "Existing valid results were found; processing was not repeated."
                 ShowMessage(mStatusMessage)
             ElseIf success Then
-                mStatusMessage = "Processing complete.  Results can be found in folder: " & outputDirectoryPath
+                mStatusMessage = "Processing complete.  Results can be found in directory: " & outputDirectoryPath
                 ShowMessage(mStatusMessage)
             Else
                 If Me.LocalErrorCode = eMasicErrorCodes.NoError Then

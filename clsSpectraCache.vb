@@ -70,9 +70,9 @@ Public Class clsSpectraCache
     Private mPageFileReader As BinaryReader
     Private mPageFileWriter As BinaryWriter
 
-    Private mFolderPathValidated As Boolean
+    Private mDirectoryPathValidated As Boolean
 
-    ' Base filename for this instance of clsMasic, includes a timestamp to allow multiple instances to write to the same cache folder
+    ' Base filename for this instance of clsMasic, includes a timestamp to allow multiple instances to write to the same cache directory
     Private mCacheFileNameBase As String
 
     Private mCacheEventCount As Integer
@@ -98,12 +98,12 @@ Public Class clsSpectraCache
         End Get
     End Property
 
-    Public Property CacheFolderPath As String
+    Public Property CacheDirectoryPath As String
         Get
-            Return mCacheOptions.FolderPath
+            Return mCacheOptions.DirectoryPath
         End Get
         Set
-            mCacheOptions.FolderPath = Value
+            mCacheOptions.DirectoryPath = Value
         End Set
     End Property
 
@@ -334,9 +334,9 @@ Public Class clsSpectraCache
 
     Private Function ConstructCachedSpectrumPath() As String
         ' Constructs the full path for the given spectrum file
-        ' Returns String.empty if unable to validate the cached spectrum folder
+        ' Returns String.empty if unable to validate the cached spectrum directory
 
-        If Not ValidateCachedSpectrumFolder() Then
+        If Not ValidateCachedSpectrumDirectory() Then
             Return String.Empty
         End If
 
@@ -349,7 +349,7 @@ Public Class clsSpectraCache
 
         Dim fileName = mCacheFileNameBase & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & ".bin"
 
-        Return Path.Combine(mCacheOptions.FolderPath, fileName)
+        Return Path.Combine(mCacheOptions.DirectoryPath, fileName)
 
     End Function
 
@@ -370,7 +370,7 @@ Public Class clsSpectraCache
             End If
 
             filePathMatch = filePathMatch.Substring(0, charIndex)
-            Dim files = Directory.GetFiles(mCacheOptions.FolderPath, Path.GetFileName(filePathMatch) & "*")
+            Dim files = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(filePathMatch) & "*")
 
             For index = 0 To files.Length - 1
                 File.Delete(files(index))
@@ -385,14 +385,14 @@ Public Class clsSpectraCache
         Try
             Dim filePathMatch = SPECTRUM_CACHE_FILE_PREFIX & "*" & SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR & "*"
 
-            Dim objFolder = New DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())))
+            Dim cacheDirectory = New DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())))
 
-            If Not objFolder Is Nothing Then
-                For Each objFile In objFolder.GetFiles(filePathMatch)
-                    If objFile.LastWriteTimeUtc < fileDateTolerance Then
-                        objFile.Delete()
+            If Not cacheDirectory Is Nothing Then
+                For Each candidateFile In cacheDirectory.GetFiles(filePathMatch)
+                    If candidateFile.LastWriteTimeUtc < fileDateTolerance Then
+                        candidateFile.Delete()
                     End If
-                Next objFile
+                Next candidateFile
             End If
         Catch ex As Exception
             ReportError("Error deleting old cached spectrum files", ex)
@@ -453,7 +453,7 @@ Public Class clsSpectraCache
         mCacheEventCount = 0
         mUnCacheEventCount = 0
 
-        mFolderPathValidated = False
+        mDirectoryPathValidated = False
         mCacheFileNameBase = String.Empty
 
         ClosePageFile()
@@ -499,7 +499,7 @@ Public Class clsSpectraCache
 
         With udtCacheOptions
             .DiskCachingAlwaysDisabled = False
-            .FolderPath = Path.GetTempPath()
+            .DirectoryPath = Path.GetTempPath()
             .SpectraToRetainInMemory = 1000
         End With
 
@@ -601,35 +601,35 @@ Public Class clsSpectraCache
 
     End Function
 
-    Private Function ValidateCachedSpectrumFolder() As Boolean
+    Private Function ValidateCachedSpectrumDirectory() As Boolean
 
-        If String.IsNullOrWhiteSpace(mCacheOptions.FolderPath) Then
-            ' Need to define the spectrum caching folder path
-            mCacheOptions.FolderPath = Path.GetTempPath()
-            mFolderPathValidated = False
+        If String.IsNullOrWhiteSpace(mCacheOptions.DirectoryPath) Then
+            ' Need to define the spectrum caching directory path
+            mCacheOptions.DirectoryPath = Path.GetTempPath()
+            mDirectoryPathValidated = False
         End If
 
-        If Not mFolderPathValidated Then
+        If Not mDirectoryPathValidated Then
             Try
-                If Not Path.IsPathRooted(mCacheOptions.FolderPath) Then
-                    mCacheOptions.FolderPath = Path.Combine(Path.GetTempPath(), mCacheOptions.FolderPath)
+                If Not Path.IsPathRooted(mCacheOptions.DirectoryPath) Then
+                    mCacheOptions.DirectoryPath = Path.Combine(Path.GetTempPath(), mCacheOptions.DirectoryPath)
                 End If
 
-                If Not Directory.Exists(mCacheOptions.FolderPath) Then
-                    Directory.CreateDirectory(mCacheOptions.FolderPath)
+                If Not Directory.Exists(mCacheOptions.DirectoryPath) Then
+                    Directory.CreateDirectory(mCacheOptions.DirectoryPath)
 
-                    If Not Directory.Exists(mCacheOptions.FolderPath) Then
-                        ReportError("Error creating spectrum cache folder: " & mCacheOptions.FolderPath)
+                    If Not Directory.Exists(mCacheOptions.DirectoryPath) Then
+                        ReportError("Error creating spectrum cache directory: " & mCacheOptions.DirectoryPath)
                         Return False
                     End If
                 End If
 
-                mFolderPathValidated = True
+                mDirectoryPathValidated = True
                 Return True
 
             Catch ex As Exception
-                ' Error defining .FolderPath
-                ReportError("Error creating spectrum cache folder")
+                ' Error defining .DirectoryPath
+                ReportError("Error creating spectrum cache directory")
                 Return False
             End Try
         Else
