@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<DatasetInfo>
+  <Dataset>QC_Shew_18_02_Excerpt</Dataset>
+  <ScanTypes>
+    <ScanType ScanCount="922" ScanFilterText="">Unknown, beam-type collision-induced dissociation-MSn</ScanType>
+    <ScanType ScanCount="79" ScanFilterText="">MS</ScanType>
+  </ScanTypes>
+  <AcquisitionInfo>
+    <ScanCount>1001</ScanCount>
+    <ScanCountMS>79</ScanCountMS>
+    <ScanCountMSn>922</ScanCountMSn>
+    <Elution_Time_Max>80.5519</Elution_Time_Max>
+    <AcqTimeMinutes>0.00</AcqTimeMinutes>
+    <StartTime>2019-04-26 03:46:39 PM</StartTime>
+    <EndTime>2019-04-26 03:46:39 PM</EndTime>
+    <FileSizeBytes>7367011</FileSizeBytes>
+  </AcquisitionInfo>
+  <TICInfo>
+    <TIC_Max_MS>1.6049E+09</TIC_Max_MS>
+    <TIC_Max_MSn>4.8513E+06</TIC_Max_MSn>
+    <BPI_Max_MS>3.2724E+08</BPI_Max_MS>
+    <BPI_Max_MSn>1.0578E+06</BPI_Max_MSn>
+    <TIC_Median_MS>9.3394E+08</TIC_Median_MS>
+    <TIC_Median_MSn>118585</TIC_Median_MSn>
+    <BPI_Median_MS>3.499E+07</BPI_Median_MS>
+    <BPI_Median_MSn>21381</BPI_Median_MSn>
+  </TICInfo>
+</DatasetInfo>

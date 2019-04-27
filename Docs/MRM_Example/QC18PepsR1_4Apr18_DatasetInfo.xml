@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<DatasetInfo>
+  <Dataset>QC18PepsR1_4Apr18</Dataset>
+  <ScanTypes>
+    <ScanType ScanCount="60896" ScanFilterText="+ c NSI SRM ms2">CID-SRM</ScanType>
+  </ScanTypes>
+  <AcquisitionInfo>
+    <ScanCount>60896</ScanCount>
+    <ScanCountMS>0</ScanCountMS>
+    <ScanCountMSn>60896</ScanCountMSn>
+    <Elution_Time_Max>60.0179</Elution_Time_Max>
+    <AcqTimeMinutes>60.02</AcqTimeMinutes>
+    <StartTime>2018-04-04 10:41:00 AM</StartTime>
+    <EndTime>2018-04-04 11:41:01 AM</EndTime>
+    <FileSizeBytes>14944896</FileSizeBytes>
+  </AcquisitionInfo>
+  <TICInfo>
+    <TIC_Max_MS>0</TIC_Max_MS>
+    <TIC_Max_MSn>435829</TIC_Max_MSn>
+    <BPI_Max_MS>0</BPI_Max_MS>
+    <BPI_Max_MSn>307941</BPI_Max_MSn>
+    <TIC_Median_MS>0</TIC_Median_MS>
+    <TIC_Median_MSn>3.2981</TIC_Median_MSn>
+    <BPI_Median_MS>0</BPI_Median_MS>
+    <BPI_Median_MSn>1.0586</BPI_Median_MSn>
+  </TICInfo>
+</DatasetInfo>

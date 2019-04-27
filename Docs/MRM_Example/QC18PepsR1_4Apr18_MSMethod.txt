@@ -1,0 +1,100 @@
+Instrument model: TSQ Vantage Standard
+Instrument name: TSQ
+Instrument description: 
+Instrument serial number: TQU03410
+
+      TSQ Vantage Instrument Method
+
+Creator: LCMSOperator                   Last modified: 7/18/2016 12:16:31 PM by LCMSOperator
+
+
+TSQ MS Method Settings:
+
+Method Type: Regular Method 
+MS Run Time (min): 60.00
+Segment                      1
+Duration (min)           60.00
+Scan Events                  1
+
+Segment 1:
+Tune Method C:\Thermo\Instruments\TSQ\Methods\Current.TSQTune
+Chrom filter: Not used
+Q2 Gas Pressure: 1.5
+Syringe Pump: Off
+Scan Events:
+ 1: + c SRM Micro Scans 1, 
+     Parent    Center    Width     Time    CE   Q1 PW  Q3 PW  S-Lens
+     368.710   263.661    0.002    0.015   20   0.70   0.70  Tuned Value
+     368.710   542.332    0.002    0.015   14   0.70   0.70  Tuned Value
+     368.710   599.354    0.002    0.015   14   0.70   0.70  Tuned Value
+     427.231   510.266    0.002    0.015   11   0.70   0.70  Tuned Value
+     427.231   583.800    0.002    0.015   11   0.70   0.70  Tuned Value
+     427.231   724.397    0.002    0.015   15   0.70   0.70  Tuned Value
+     458.760   265.118    0.002    0.015   17   0.70   0.70  Tuned Value
+     458.760   511.323    0.002    0.015   16   0.70   0.70  Tuned Value
+     458.760   624.407    0.002    0.015   16   0.70   0.70  Tuned Value
+     486.778   502.312    0.002    0.015   13   0.70   0.70  Tuned Value
+     486.778   615.396    0.002    0.015   15   0.70   0.70  Tuned Value
+     486.778   728.480    0.002    0.015   15   0.70   0.70  Tuned Value
+     490.249   441.260    0.002    0.015   14   0.70   0.70  Tuned Value
+     490.249   586.323    0.002    0.015   19   0.70   0.70  Tuned Value
+     490.249   685.391    0.002    0.015   15   0.70   0.70  Tuned Value
+     490.249   881.512    0.002    0.015   18   0.70   0.70  Tuned Value
+     495.285   409.261    0.002    0.015   14   0.70   0.70  Tuned Value
+     495.285   506.330    0.002    0.015   15   0.70   0.70  Tuned Value
+     495.285   607.377    0.002    0.015   17   0.70   0.70  Tuned Value
+     514.790   383.743    0.002    0.015   14   0.70   0.70  Tuned Value
+     514.790   556.341    0.002    0.015   20   0.70   0.70  Tuned Value
+     514.790   766.478    0.002    0.015   15   0.70   0.70  Tuned Value
+     515.947   667.340    0.002    0.015   15   0.70   0.70  Tuned Value
+     515.947   723.882    0.002    0.015   14   0.70   0.70  Tuned Value
+     515.947   784.382    0.002    0.015   21   0.70   0.70  Tuned Value
+     515.947   897.466    0.002    0.015   22   0.70   0.70  Tuned Value
+     522.581   429.248    0.002    0.015   13   0.70   0.70  Tuned Value
+     522.581   560.289    0.002    0.015   13   0.70   0.70  Tuned Value
+     522.581   631.326    0.002    0.015   14   0.70   0.70  Tuned Value
+     539.626   694.880    0.002    0.015   14   0.70   0.70  Tuned Value
+     539.626   759.401    0.002    0.015   15   0.70   0.70  Tuned Value
+     539.626   824.486    0.002    0.015   22   0.70   0.70  Tuned Value
+     543.287   213.160    0.002    0.015   16   0.70   0.70  Tuned Value
+     543.287   873.413    0.002    0.015   17   0.70   0.70  Tuned Value
+     543.287   972.482    0.002    0.015   18   0.70   0.70  Tuned Value
+     589.819   510.784    0.002    0.015   19   0.70   0.70  Tuned Value
+     589.819   559.323    0.002    0.015   23   0.70   0.70  Tuned Value
+     589.819   696.382    0.002    0.015   22   0.70   0.70  Tuned Value
+     601.374   777.435    0.002    0.015   20   0.70   0.70  Tuned Value
+     601.374   890.519    0.002    0.015   20   0.70   0.70  Tuned Value
+     601.374   989.588    0.002    0.015   19   0.70   0.70  Tuned Value
+     640.342   510.266    0.002    0.015   21   0.70   0.70  Tuned Value
+     640.342   724.397    0.002    0.015   21   0.70   0.70  Tuned Value
+     640.342  1019.525    0.002    0.015   19   0.70   0.70  Tuned Value
+     640.869   540.811    0.002    0.015   15   0.70   0.70  Tuned Value
+     640.869   854.519    0.002    0.015   23   0.70   0.70  Tuned Value
+     640.869   951.572    0.002    0.015   18   0.70   0.70  Tuned Value
+     675.345   252.180    0.002    0.015   18   0.70   0.70  Tuned Value
+     675.345   519.338    0.002    0.015   20   0.70   0.70  Tuned Value
+     675.345   763.459    0.002    0.015   17   0.70   0.70  Tuned Value
+     686.368   672.370    0.002    0.015   19   0.70   0.70  Tuned Value
+     686.368   785.454    0.002    0.015   23   0.70   0.70  Tuned Value
+     686.368  1072.566    0.002    0.015   19   0.70   0.70  Tuned Value
+     734.869   345.140    0.002    0.015   28   0.70   0.70  Tuned Value
+     734.869   881.512    0.002    0.015   26   0.70   0.70  Tuned Value
+     734.869  1239.625    0.002    0.015   22   0.70   0.70  Tuned Value
+     773.417   426.270    0.002    0.015   34   0.70   0.70  Tuned Value
+     773.417   897.466    0.002    0.015   32   0.70   0.70  Tuned Value
+     773.417  1034.525    0.002    0.015   30   0.70   0.70  Tuned Value
+     774.445   794.980    0.002    0.015   17   0.70   0.70  Tuned Value
+     774.445   980.564    0.002    0.015   19   0.70   0.70  Tuned Value
+     774.445  1030.098    0.002    0.015   18   0.70   0.70  Tuned Value
+     783.368   429.248    0.002    0.015   25   0.70   0.70  Tuned Value
+     783.368   860.432    0.002    0.015   28   0.70   0.70  Tuned Value
+     783.368  1219.529    0.002    0.015   25   0.70   0.70  Tuned Value
+     849.428   671.343    0.002    0.015   24   0.70   0.70  Tuned Value
+     849.428  1131.542    0.002    0.015   28   0.70   0.70  Tuned Value
+     849.428  1341.679    0.002    0.015   25   0.70   0.70  Tuned Value
+
+Syringe pump not in use
+
+Divert Valve:  not used during run
+
+
