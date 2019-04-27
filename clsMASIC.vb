@@ -33,7 +33,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "October 16, 2018"
+        MyBase.mFileDate = "April 26, 2019"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
@@ -114,6 +114,7 @@ Public Class clsMASIC
     ''' <summary>
     ''' Percent completion for the current sub task
     ''' </summary>
+    ''' <remarks>Value between 0 and 100</remarks>
     Private mSubtaskProcessingStepPct As Single
 
     Private mSubtaskDescription As String = String.Empty
@@ -220,7 +221,11 @@ Public Class clsMASIC
         End Get
     End Property
 
-    ' Subtask progress percent complete
+    ''' <summary>
+    ''' Subtask progress percent complete
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>Value between 0 and 100</remarks>
     Public ReadOnly Property SubtaskProgressPercentComplete As Single
         Get
             Return mSubtaskProcessingStepPct

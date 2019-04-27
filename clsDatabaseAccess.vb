@@ -1,4 +1,5 @@
-﻿Imports MASIC.clsMASIC
+﻿Imports System.IO
+Imports MASIC.clsMASIC
 
 Public Class clsDatabaseAccess
     Inherits clsMasicEventNotifier
@@ -112,10 +113,10 @@ Public Class clsDatabaseAccess
                 Next
 
             Catch ex2 As NullReferenceException
-                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, eMasicErrorCodes.InvalidDatasetNumber)
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetNumber)
                 datasetFoundInDB = False
             Catch ex As Exception
-                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, ex, eMasicErrorCodes.InvalidDatasetNumber)
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetNumber)
                 datasetFoundInDB = False
             End Try
         End If
@@ -151,7 +152,7 @@ Public Class clsDatabaseAccess
                 End Using
 
             Catch ex As Exception
-                ReportError("Error reading the dataset lookup file", ex, eMasicErrorCodes.InvalidDatasetLookupFilePath)
+                ReportError("Error reading the dataset lookup file", ex, clsMASIC.eMasicErrorCodes.InvalidDatasetLookupFilePath)
             End Try
 
         End If

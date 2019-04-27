@@ -238,8 +238,9 @@ Namespace DataInput
                     End If
                 End With
 
-                UpdateProgress("Reading Xcalibur data with " & ioMode & " (" & scanCount.ToString() & " scans)" & ControlChars.NewLine & Path.GetFileName(filePath))
-                ReportMessage("Reading Xcalibur data with " & ioMode & "; Total scan count: " & scanCount.ToString())
+                UpdateProgress(String.Format("Reading Xcalibur data with {0} ({1:N0} scans){2}", ioMode, scanCount, ControlChars.NewLine & Path.GetFileName(filePath)))
+                ReportMessage(String.Format("Reading Xcalibur data with {0}; Total scan count: {1:N0}", ioMode, scanCount))
+
                 Dim lastLogTime = DateTime.UtcNow
 
                 ' Pre-reserve memory for the maximum number of scans that might be loaded
@@ -306,7 +307,7 @@ Namespace DataInput
 
                     If scanNumber Mod 100 = 0 Then
                         If DateTime.UtcNow.Subtract(lastLogTime).TotalSeconds >= 10 OrElse scanNumber Mod 500 = 0 Then
-                            ReportMessage("Reading scan: " & scanNumber.ToString())
+                            ReportMessage(String.Format("Reading scan: {0:N0}", scanNumber))
                             Console.Write(".")
                             lastLogTime = DateTime.UtcNow
                         End If

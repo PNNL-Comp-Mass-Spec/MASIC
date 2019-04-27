@@ -24,7 +24,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "March 21, 2019"
+    Public Const PROGRAM_DATE As String = "April 26, 2019"
 
     Private mInputFilePath As String
     Private mOutputDirectoryPath As String              ' Optional
@@ -351,9 +351,10 @@ Public Module modMain
                 "The output directory name is optional. " &
                 "If omitted, the output files will be created in the same directory as the input file. " &
                 "If included, then a subdirectory is created with the name OutputDirectoryName."))
+            Console.WriteLine()
 
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                "The param file switch is optional. " &
+                "The parameter file switch /P is optional. " &
                 "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used."))
 
             Console.WriteLine()
@@ -372,7 +373,9 @@ Public Module modMain
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph("When using /S, you can use /R to re-create the input directory hierarchy in the alternate output directory (if defined)."))
             Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file."))
+            Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME & ")."))
+            Console.WriteLine()
             Console.WriteLine("The optional /Q switch will prevent the progress window from being shown")
             Console.WriteLine()
 

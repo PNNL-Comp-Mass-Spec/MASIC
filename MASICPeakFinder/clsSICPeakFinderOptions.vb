@@ -40,6 +40,7 @@
             mMaxDistanceScansNoOverlap = Value
         End Set
     End Property
+
     ''' <summary>
     ''' Maximum fraction of the peak maximum that an upward spike can be to be included in the peak
     ''' </summary>
@@ -69,6 +70,7 @@
             mInitialPeakWidthScansScaler = Value
         End Set
     End Property
+
     ''' <summary>
     ''' Maximum initial peak width to allow
     ''' </summary>
@@ -83,6 +85,7 @@
             mInitialPeakWidthScansMaximum = Value
         End Set
     End Property
+
     Public Property FindPeaksOnSmoothedData As Boolean
 
     Public Property SmoothDataRegardlessOfMinimumPeakWidth As Boolean
