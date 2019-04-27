@@ -53,39 +53,6 @@ Public Module modMain
     Private mLastProgressReportTime As DateTime
     Private mLastProgressReportValue As Integer
 
-    ''Private Sub InitializeTraceLogFile(strUserDefinedLogFilePath As String)
-    ''    Dim strTraceFilePath As String
-
-    ''    Static blnTraceFileEnabled As Boolean
-
-    ''    If Not blnTraceFileEnabled Then
-    ''        Try
-    ''            If strUserDefinedLogFilePath Is Nothing Then strUserDefinedLogFilePath = String.Empty
-
-    ''            If strUserDefinedLogFilePath.Length = 0 Then
-    ''                strTraceFilePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
-    ''                strTraceFilePath = Path.Combine(strTraceFilePath, "MASIC_Log_" & System.DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss") & ".txt")
-    ''            Else
-    ''                strTraceFilePath = String.Copy(strUserDefinedLogFilePath)
-    ''            End If
-
-    ''            Trace.Listeners.Add(New TextWriterTraceListener(strTraceFilePath))
-    ''            Trace.AutoFlush = True
-
-    ''            blnTraceFileEnabled = True
-    ''        Catch ex As Exception
-    ''            If strUserDefinedLogFilePath.Length > 0 Then
-    ''                ' Error using the user-defined path
-    ''                ' Call this function using a blank string so that a default file is created
-    ''                InitializeTraceLogFile(String.Empty)
-    ''            End If
-
-    ''        End Try
-
-    ''    End If
-
-    ''End Sub
-
     Public Function Main() As Integer
         ' Returns 0 if no error, error code if an error
 
