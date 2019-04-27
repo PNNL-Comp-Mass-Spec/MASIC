@@ -738,8 +738,10 @@ Namespace DataOutput
                 End Try
 
                 UpdateProgress(100)
-                System.Windows.Forms.Application.DoEvents()
 
+#If GUI
+                System.Windows.Forms.Application.DoEvents()
+#End If
             Catch ex As Exception
                 ReportError("Error updating the XML output file: " & xmlReadFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
                 Return False

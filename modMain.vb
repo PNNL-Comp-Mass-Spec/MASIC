@@ -3,7 +3,9 @@ Option Strict On
 Imports System.Threading
 Imports PRISM
 Imports PRISM.FileProcessor
+#If GUI Then
 Imports ProgressFormNET
+#End If
 
 ' See clsMASIC for a program description
 '
@@ -44,7 +46,9 @@ Public Module modMain
     Private mQuietMode As Boolean
 
     Private mMASIC As clsMASIC
+#If GUI Then
     Private mProgressForm As frmProgress
+#End If
 
     Private mLastProgressReportTime As DateTime
     Private mLastProgressReportValue As Integer
@@ -106,7 +110,11 @@ Public Module modMain
             End If
 
             If (commandLineParser.ParameterCount + commandLineParser.NonSwitchParameterCount = 0) And Not commandLineParser.NeedToShowHelp Then
+#If GUI Then
                 ShowGUI()
+#Else
+                ShowProgramHelp()
+#End If
                 Return 0
             End If
 
@@ -130,6 +138,7 @@ Public Module modMain
             mMASIC.LogDirectoryPath = mLogDirectoryPath
 
             If Not mQuietMode Then
+#If GUI Then
                 mProgressForm = New frmProgress()
 
                 mProgressForm.InitializeProgressForm("Parsing " & Path.GetFileName(mInputFilePath), 0, 100, False, True)
@@ -137,7 +146,9 @@ Public Module modMain
                 mProgressForm.ResetKeyPressAbortProcess()
                 mProgressForm.Show()
                 Application.DoEvents()
-
+#Else
+                Console.WriteLine("Parsing " & Path.GetFileName(mInputFilePath))
+#End If
             End If
 
             Dim returnCode As Integer
@@ -166,11 +177,13 @@ Public Module modMain
         Catch ex As Exception
             ShowErrorMessage("Error occurred in modMain->Main: " & Environment.NewLine & ex.Message)
             Return -1
+#If GUI Then
         Finally
             If Not mProgressForm Is Nothing Then
                 mProgressForm.HideForm()
                 mProgressForm = Nothing
             End If
+#End If
         End Try
 
     End Function
@@ -296,6 +309,7 @@ Public Module modMain
         ConsoleMsgUtils.ShowErrors(title, errorMessages)
     End Sub
 
+#If GUI Then
     Public Sub ShowGUI()
         Dim objFormMain As frmMain
 
@@ -310,6 +324,7 @@ Public Module modMain
         objFormMain.ShowDialog()
 
     End Sub
+#End If
 
     Private Sub ShowProgramHelp()
 
@@ -381,6 +396,9 @@ Public Module modMain
         Const PERCENT_REPORT_INTERVAL = 25
         Const PROGRESS_DOT_INTERVAL_MSEC = 250
 
+#If GUI Then
+        Const PERCENT_REPORT_INTERVAL = 25
+
         If Not mProgressForm Is Nothing Then
             mProgressForm.UpdateCurrentTask(mMASIC.ProgressStepDescription)
             mProgressForm.UpdateProgressBar(percentComplete)
@@ -388,6 +406,11 @@ Public Module modMain
                 mMASIC.AbortProcessingNow()
             End If
             Application.DoEvents()
+        Return
+    End If
+#Else
+        Const PERCENT_REPORT_INTERVAL = 5
+#End If
 
         Else
 
@@ -409,12 +432,15 @@ Public Module modMain
     End Sub
 
     Private Sub ProgressResetKeypressAbortHandler()
+#If GUI Then
         If Not mProgressForm Is Nothing Then
             mProgressForm.ResetKeyPressAbortProcess()
         End If
+#End If
     End Sub
 
     Private Sub ProgressSubtaskChangedHandler()
+#If GUI Then
         If Not mProgressForm Is Nothing Then
             mProgressForm.UpdateCurrentSubTask(mMASIC.SubtaskDescription)
             mProgressForm.UpdateSubtaskProgressBar(mMASIC.SubtaskProgressPercentComplete)
@@ -422,7 +448,10 @@ Public Module modMain
                 mMASIC.AbortProcessingNow()
             End If
             Application.DoEvents()
+        Return
         End If
+#End If
+
     End Sub
 
     Private Sub StatusEventHandler(message As String)
