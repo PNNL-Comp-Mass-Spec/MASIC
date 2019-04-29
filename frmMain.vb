@@ -1300,7 +1300,7 @@ Public Class frmMain
             With masicOptions.CacheOptions
                 ' Spectrum caching options (not graphically editable)
                 mCacheOptions.DiskCachingAlwaysDisabled = .DiskCachingAlwaysDisabled
-                mCacheOptions.FolderPath = .FolderPath
+                mCacheOptions.DirectoryPath = .DirectoryPath
                 mCacheOptions.SpectraToRetainInMemory = .SpectraToRetainInMemory
 
             End With
@@ -1859,7 +1859,7 @@ Public Class frmMain
             With masicOptions.CacheOptions
                 ' Spectrum caching options
                 .DiskCachingAlwaysDisabled = mCacheOptions.DiskCachingAlwaysDisabled
-                .FolderPath = mCacheOptions.FolderPath
+                .DirectoryPath = mCacheOptions.DirectoryPath
                 .SpectraToRetainInMemory = mCacheOptions.SpectraToRetainInMemory
             End With
 

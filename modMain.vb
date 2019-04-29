@@ -24,7 +24,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "April 26, 2019"
+    Public Const PROGRAM_DATE As String = "April 29, 2019"
 
     Private mInputFilePath As String
     Private mOutputDirectoryPath As String              ' Optional
