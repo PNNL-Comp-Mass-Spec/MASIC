@@ -2577,7 +2577,7 @@ Public Class clsMASICPeakFinder
 
         Dim peakWidthPointsCompare As Integer
 
-        Dim filter As New DataFilter.clsDataFilter
+        Dim filter As New DataFilter.DataFilter
 
         ReDim peaksContainer.SmoothedYData(peaksContainer.SourceDataCount - 1)
 
@@ -2629,7 +2629,7 @@ Public Class clsMASICPeakFinder
                   peaksContainer.SmoothedYData, 0,
                   peaksContainer.SmoothedYData.Length - 1,
                   filterThirdWidth, filterThirdWidth,
-                  sicPeakFinderOptions.SavitzkyGolayFilterOrder, True, errorMessage)
+                  sicPeakFinderOptions.SavitzkyGolayFilterOrder, errorMessage, True)
 
                 If Not success Then
                     LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData",

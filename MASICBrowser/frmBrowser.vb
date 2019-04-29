@@ -3597,18 +3597,6 @@ Public Class frmBrowser
         ' Copy the original SIC stats found by MASIC into udtSICStats
         ' This also includes the original smoothed data
 
-        Dim objFilter As clsDataFilter
-
-        Dim index As Integer
-
-        Dim validPeakFound As Boolean
-
-        Dim samplingFrequency As Single
-
-        Dim savitzkyGolayFilterOrder As Integer
-        Dim peakWidthsPointsMinimum As Integer
-        Dim filterThirdWidth As Integer
-
         ' Copy the cached SICStats data into udtSICStats
         ' We have to separately copy SICSmoothedYData() otherwise VB.NET keeps
         '  the array linked in both mParentIonStats().SICStats and udtSICStats
@@ -3624,7 +3612,7 @@ Public Class frmBrowser
 
         If eSmoothMode <> eSmoothModeConstants.DoNotReSmooth Then
             ' Re-smooth the data
-            objFilter = New clsDataFilter()
+            Dim objFilter = New DataFilter.DataFilter()
 
             Dim currentParentIon = mParentIonStats(parentIonIndex)
 
@@ -3635,10 +3623,10 @@ Public Class frmBrowser
             If eSmoothMode = eSmoothModeConstants.SavitzkyGolay Then
                 ' Resmooth using a Savitzy Golay filter
 
-                savitzkyGolayFilterOrder = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " should be an even number between 0 and 20; assuming 0", False, 0)
-                peakWidthsPointsMinimum = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text & " should be a positive integer; assuming 6", False, 6)
+                Dim savitzkyGolayFilterOrder = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " should be an even number between 0 and 20; assuming 0", False, 0)
+                Dim peakWidthsPointsMinimum = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text & " should be a positive integer; assuming 6", False, 6)
 
-                filterThirdWidth = CInt(Math.Floor(peakWidthsPointsMinimum / 3))
+                Dim filterThirdWidth = CInt(Math.Floor(peakWidthsPointsMinimum / 3))
                 If filterThirdWidth > 3 Then filterThirdWidth = 3
 
                 ' Make sure filterThirdWidth is Odd
@@ -3646,13 +3634,18 @@ Public Class frmBrowser
                     filterThirdWidth -= 1
                 End If
 
+                Dim errorMessage As String = ""
+
                 ' Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
                 ' Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-                objFilter.SavitzkyGolayFilter(intensities, 0, currentParentIon.SICData.Count - 1, filterThirdWidth, filterThirdWidth, CShort(savitzkyGolayFilterOrder), True)
+                objFilter.SavitzkyGolayFilter(intensities,
+                                              0, currentParentIon.SICData.Count - 1,
+                                              filterThirdWidth, filterThirdWidth,
+                                              CShort(savitzkyGolayFilterOrder), errorMessage, True)
 
             Else
                 ' Assume eSmoothMode = eSmoothModeConstants.Butterworth
-                samplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " should be a number between 0.01 and 0.99; assuming 0.2", False, 0.2)
+                Dim samplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " should be a number between 0.01 and 0.99; assuming 0.2", False, 0.2)
                 objFilter.ButterworthFilter(intensities, 0, currentParentIon.SICData.Count - 1, samplingFrequency)
             End If
 
@@ -3667,12 +3660,11 @@ Public Class frmBrowser
 
         If repeatPeakFinding Then
             ' Repeat the finding of the peak in the SIC
-            validPeakFound = FindSICPeakAndAreaForParentIon(parentIonIndex, sicStats)
+            Dim validPeakFound = FindSICPeakAndAreaForParentIon(parentIonIndex, sicStats)
+            Return validPeakFound
         Else
-            validPeakFound = True
+            Return True
         End If
-
-        Return validPeakFound
 
     End Function
 
