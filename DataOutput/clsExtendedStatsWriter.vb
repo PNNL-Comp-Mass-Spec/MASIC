@@ -64,7 +64,7 @@ Namespace DataOutput
                             Select Case value
                                 Case "ff" : value = "Off"
                                 Case "n" : value = "On"
-                                Case "eady" : value = "Ready"""
+                                Case "eady" : value = "Ready"
                                 Case "cquiring" : value = "Acquiring"
                                 Case "oad" : value = "Load"
                             End Select
