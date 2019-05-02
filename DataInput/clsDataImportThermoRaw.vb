@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports PRISM
 Imports ThermoRawFileReader
 
 Namespace DataInput
@@ -21,6 +22,8 @@ Namespace DataInput
 
         Private mIsolationWidthNotFoundCount As Integer
         Private mPrecursorNotFoundCount As Integer
+
+        Private mBpiUpdateCount As Integer
 
         ''' <summary>
         ''' Constructor
@@ -169,6 +172,7 @@ Namespace DataInput
 
             mIsolationWidthNotFoundCount = 0
             mPrecursorNotFoundCount = 0
+            mBpiUpdateCount = 0
 
             ' Assume success for now
             Dim success = True
@@ -227,16 +231,14 @@ Namespace DataInput
                 Dim scanStart = xcaliburAccessor.FileInfo.ScanStart
                 Dim scanEnd = xcaliburAccessor.FileInfo.ScanEnd
 
-                With sicOptions
-                    If .ScanRangeStart > 0 And .ScanRangeEnd = 0 Then
-                        .ScanRangeEnd = Integer.MaxValue
-                    End If
+                If sicOptions.ScanRangeStart > 0 And sicOptions.ScanRangeEnd = 0 Then
+                    sicOptions.ScanRangeEnd = Integer.MaxValue
+                End If
 
-                    If .ScanRangeStart >= 0 AndAlso .ScanRangeEnd > .ScanRangeStart Then
-                        scanStart = Math.Max(scanStart, .ScanRangeStart)
-                        scanEnd = Math.Min(scanEnd, .ScanRangeEnd)
-                    End If
-                End With
+                If sicOptions.ScanRangeStart >= 0 AndAlso sicOptions.ScanRangeEnd > sicOptions.ScanRangeStart Then
+                    scanStart = Math.Max(scanStart, sicOptions.ScanRangeStart)
+                    scanEnd = Math.Min(scanEnd, sicOptions.ScanRangeEnd)
+                End If
 
                 UpdateProgress(String.Format("Reading Xcalibur data with {0} ({1:N0} scans){2}", ioMode, scanCount, ControlChars.NewLine & Path.GetFileName(filePath)))
                 ReportMessage(String.Format("Reading Xcalibur data with {0}; Total scan count: {1:N0}", ioMode, scanCount))
@@ -619,12 +621,37 @@ Namespace DataInput
                 ReDim objMSSpectrum.IonsIntensity(objMSSpectrum.IonCount - 1)
 
                 ' Copy the intensity data; and compute the total scan intensity
+
+                ' Also manually determine the base peak m/z and base peak intensity
+                ' Regarding BPI, comparison of data read via the ThermoRawFileReader vs.
+                ' that read from the .mzML file for dataset QC_Shew_18_02-run1_02Mar19_Arwen_18-11-02
+                ' showed that 25% of the spectra had incorrect BPI values
+
                 Dim totalIonIntensity As Double = 0
+                Dim basePeakIntensity As Double = 0
+                Dim basePeakMz As Double = 0
+
                 For ionIndex = 0 To scanInfo.IonCountRaw - 1
                     objMSSpectrum.IonsMZ(ionIndex) = mzList(ionIndex)
                     objMSSpectrum.IonsIntensity(ionIndex) = CSng(intensityList(ionIndex))
                     totalIonIntensity += intensityList(ionIndex)
+                    If intensityList(ionIndex) > basePeakIntensity Then
+                        basePeakIntensity = intensityList(ionIndex)
+                        basePeakMz = mzList(ionIndex)
+                    End If
                 Next
+
+                If Math.Abs(scanInfo.BasePeakIonMZ - basePeakMz) > 0.1 Then
+                    mBpiUpdateCount += 1
+
+                    If mBpiUpdateCount < 10 Then
+                        ConsoleMsgUtils.ShowDebug("Updating BPI in scan {0} from {1:F3} m/z to {2:F3} m/z, and BPI Intensity from {3:F0} to {4:F0}",
+                                                  scanInfo.ScanNumber, scanInfo.BasePeakIonMZ, basePeakMz, scanInfo.BasePeakIonIntensity, basePeakIntensity)
+                    End If
+
+                    scanInfo.BasePeakIonMZ = basePeakMz
+                    scanInfo.BasePeakIonIntensity = basePeakIntensity
+                End If
 
                 ' Determine the minimum positive intensity in this scan
                 lastKnownLocation = "Call mMASICPeakFinder.FindMinimumPositiveValue"
@@ -675,11 +702,8 @@ Namespace DataInput
 
             Dim scanInfo = New ThermoRawFileReader.clsScanInfo(0)
 
-            Dim scanEnd As Integer
-            Dim success As Boolean
-
             ' Read the file info from the file system
-            success = UpdateDatasetFileStats(rawFileInfo, datasetID)
+            Dim success = UpdateDatasetFileStats(rawFileInfo, datasetID)
 
             If Not success Then Return False
 
