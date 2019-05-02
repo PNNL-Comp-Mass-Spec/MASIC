@@ -22,26 +22,12 @@ Public Class clsFilterDataArrayMaxCount
     Private mDataValues() As Double
     Private mDataIndices() As Integer
 
-    Private mMaximumDataCountToKeep As Integer
-
-    Private mSkipDataPointFlag As Single
-
-    Private mTotalIntensityPercentageFilterEnabled As Boolean
-    Private mTotalIntensityPercentageFilter As Single
-
     Private mProgress As Single     ' Value between 0 and 100
 
     Public Event ProgressChanged(progressVal As Single)
 
 #Region "Properties"
     Public Property MaximumDataCountToLoad As Integer
-        Get
-            Return mMaximumDataCountToKeep
-        End Get
-        Set
-            mMaximumDataCountToKeep = Value
-        End Set
-    End Property
 
     Public ReadOnly Property Progress As Single
         Get
@@ -50,31 +36,10 @@ Public Class clsFilterDataArrayMaxCount
     End Property
 
     Public Property SkipDataPointFlag As Single
-        Get
-            Return mSkipDataPointFlag
-        End Get
-        Set
-            mSkipDataPointFlag = Value
-        End Set
-    End Property
 
     Public Property TotalIntensityPercentageFilterEnabled As Boolean
-        Get
-            Return mTotalIntensityPercentageFilterEnabled
-        End Get
-        Set
-            mTotalIntensityPercentageFilterEnabled = Value
-        End Set
-    End Property
 
     Public Property TotalIntensityPercentageFilter As Single
-        Get
-            Return mTotalIntensityPercentageFilter
-        End Get
-        Set
-            mTotalIntensityPercentageFilter = Value
-        End Set
-    End Property
 #End Region
 
     Public Sub New()
@@ -82,7 +47,7 @@ Public Class clsFilterDataArrayMaxCount
     End Sub
 
     Public Sub New(InitialCapacity As Integer)
-        mSkipDataPointFlag = DEFAULT_SKIP_DATA_POINT_FLAG
+        SkipDataPointFlag = DEFAULT_SKIP_DATA_POINT_FLAG
         Me.Clear(InitialCapacity)
     End Sub
 
@@ -100,10 +65,10 @@ Public Class clsFilterDataArrayMaxCount
     End Sub
 
     Public Sub Clear(InitialCapacity As Integer)
-        mMaximumDataCountToKeep = 400000
+        MaximumDataCountToLoad = 400000
 
-        mTotalIntensityPercentageFilterEnabled = False
-        mTotalIntensityPercentageFilter = 90
+        TotalIntensityPercentageFilterEnabled = False
+        TotalIntensityPercentageFilter = 90
 
         If InitialCapacity < 4 Then
             InitialCapacity = 4
@@ -159,7 +124,7 @@ Public Class clsFilterDataArrayMaxCount
                 ' No data loaded
                 UpdateProgress(4 / SUBTASK_STEP_COUNT * 100.0#)
                 Exit Sub
-            ElseIf mDataCount <= mMaximumDataCountToKeep Then
+            ElseIf mDataCount <= MaximumDataCountToLoad Then
                 ' Loaded less than mMaximumDataCountToKeep data points
                 ' Nothing to filter
                 UpdateProgress(4 / SUBTASK_STEP_COUNT * 100.0#)
@@ -232,7 +197,7 @@ Public Class clsFilterDataArrayMaxCount
             Dim binToSort = -1
             For index = binCount - 1 To 0 Step -1
                 pointTotal = pointTotal + histogramBinCounts(index)
-                If pointTotal >= mMaximumDataCountToKeep Then
+                If pointTotal >= MaximumDataCountToLoad Then
                     binToSort = index
                     Exit For
                 End If
@@ -274,7 +239,7 @@ Public Class clsFilterDataArrayMaxCount
                     For index = 0 To mDataCount - 1
                         If mDataValues(index) < binToSortAbundanceMinimum Then
                             ' Skip this data point when re-reading the input data file
-                            mDataValues(index) = mSkipDataPointFlag
+                            mDataValues(index) = SkipDataPointFlag
                         ElseIf mDataValues(index) < binToSortAbundanceMaximum Then
                             ' Value is in the bin to sort; add to the BinToSort arrays
 
@@ -305,10 +270,10 @@ Public Class clsFilterDataArrayMaxCount
                         ' This code shouldn't be reached
                     End If
 
-                    If mMaximumDataCountToKeep - dataCountImplicitlyIncluded - binToSortDataCount = 0 Then
+                    If MaximumDataCountToLoad - dataCountImplicitlyIncluded - binToSortDataCount = 0 Then
                         ' No need to sort and examine the data for BinToSort since we'll ultimately include all of it
                     Else
-                        SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, mMaximumDataCountToKeep - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT)
+                        SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, MaximumDataCountToLoad - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT)
                     End If
 
                     ' Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataValues
@@ -321,9 +286,9 @@ Public Class clsFilterDataArrayMaxCount
                             originalDataArrayIndex += 1
                         Loop
 
-                        If Math.Abs(binToSortAbundances(index) - mSkipDataPointFlag) < Single.Epsilon Then
+                        If Math.Abs(binToSortAbundances(index) - SkipDataPointFlag) < Single.Epsilon Then
                             If mDataIndices(originalDataArrayIndex) = binToSortDataIndices(index) Then
-                                mDataValues(originalDataArrayIndex) = mSkipDataPointFlag
+                                mDataValues(originalDataArrayIndex) = SkipDataPointFlag
                             Else
                                 ' This code shouldn't be reached
                             End If
@@ -343,7 +308,7 @@ Public Class clsFilterDataArrayMaxCount
                 ' This shouldn't normally be necessary
 
                 ' We have to sort all of the data; this can be quite slow
-                SortAndMarkPointsToSkip(mDataValues, mDataIndices, mDataCount, mMaximumDataCountToKeep, SUBTASK_STEP_COUNT)
+                SortAndMarkPointsToSkip(mDataValues, mDataIndices, mDataCount, MaximumDataCountToLoad, SUBTASK_STEP_COUNT)
             End If
 
             UpdateProgress(4 / SUBTASK_STEP_COUNT * 100.0#)
@@ -370,7 +335,7 @@ Public Class clsFilterDataArrayMaxCount
 
             ' Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
             For index = 0 To dataCount - maximumDataCountInArraysToLoad - 1
-                abundances(index) = mSkipDataPointFlag
+                abundances(index) = SkipDataPointFlag
             Next
 
             UpdateProgress(CSng((2.666 / subtaskStepCount) * 100.0#))

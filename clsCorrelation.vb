@@ -33,7 +33,7 @@ Public Class clsCorrelation
 
     Public Sub New(binningOptions As clsBinningOptions)
         mBinningOptions = binningOptions
-        mNoiseThresholdIntensity = 0
+        NoiseThresholdIntensity = 0
 
         mCoefficients = New Double() {76.180091729471457, -86.505320329416776,
                                       24.014098240830911, -1.231739572450155,
@@ -54,7 +54,6 @@ Public Class clsCorrelation
 
 #Region "Local Member Variables"
     Private mBinningOptions As clsBinningOptions
-    Private mNoiseThresholdIntensity As Single
 #End Region
 
 #Region "Property Interface Functions"
@@ -98,13 +97,6 @@ Public Class clsCorrelation
     End Property
 
     Public Property NoiseThresholdIntensity As Single
-        Get
-            Return mNoiseThresholdIntensity
-        End Get
-        Set
-            mNoiseThresholdIntensity = Value
-        End Set
-    End Property
 
     Public Property NormalizeBinnedData As Boolean
         Get
@@ -140,7 +132,7 @@ Public Class clsCorrelation
 
         Const MAX_ITERATIONS = 100
         Dim EPS = 0.0000003
-        Dim FPMIN = 1.0E-30
+        Const FPMIN = 1.0E-30
 
         Dim m, m2 As Integer
         Dim aa, c, d, del, h, qab, qam, qap As Double
@@ -280,7 +272,7 @@ Public Class clsCorrelation
 
             maximumIntensity = Single.MinValue
             For index = 0 To dataCount - 1
-                If yData(index) >= mNoiseThresholdIntensity Then
+                If yData(index) >= NoiseThresholdIntensity Then
                     binNumber = ValueToBinNumber(xData(index), binningOptions.StartX + offset, binningOptions.BinSize)
                     If binNumber >= 0 And binNumber < binCount Then
                         If binningOptions.SumAllIntensitiesForBin Then
