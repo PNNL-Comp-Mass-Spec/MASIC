@@ -46,12 +46,12 @@ Public Class clsParentIonProcessing
         ''' <summary>
         ''' Highest intensity value of the similar parent ions
         ''' </summary>
-        Public MaxIntensity As Single
+        Public MaxIntensity As Double
 
         ''' <summary>
         ''' Largest peak intensity value of the similar parent ions
         ''' </summary>
-        Public MaxPeakArea As Single
+        Public MaxPeakArea As Double
 
         ''' <summary>
         ''' Scan number of the parent ion with the highest intensity
@@ -452,7 +452,7 @@ Public Class clsParentIonProcessing
                                                           mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                                           mReporterIons.MZIntensityFilterIgnoreRangeEnd) Then
                 xData(filteredDataCount) = CSng(fragSpectrum.IonsMZ(index))
-                yData(filteredDataCount) = fragSpectrum.IonsIntensity(index)
+                yData(filteredDataCount) = CSng(fragSpectrum.IonsIntensity(index))
                 filteredDataCount += 1
             End If
         Next
@@ -590,7 +590,7 @@ Public Class clsParentIonProcessing
             ' Original m/z values, rounded to 2 decimal places
             Dim mzList() As Double
             Dim intensityPointerArray() As Integer
-            Dim intensityList() As Single
+            Dim intensityList() As Double
 
             ' Populate udtFindSimilarIonsData.MZPointerArray and mzList, plus intensityPointerArray and intensityList()
             ReDim udtFindSimilarIonsData.MZPointerArray(scanList.ParentIonInfoCount - 1)

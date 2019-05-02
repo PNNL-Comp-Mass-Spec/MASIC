@@ -2,7 +2,7 @@
 
 Public Class clsSmoothedYDataSubset
     Public ReadOnly Property DataCount As Integer
-    Public ReadOnly Property Data As Single()
+    Public ReadOnly Property Data As Double()
     Public ReadOnly Property DataStartIndex As Integer
 
     Public Sub New()
@@ -26,7 +26,7 @@ Public Class clsSmoothedYDataSubset
         ReDim Data(DataCount)
 
         For intIndex = startIndex To endIndex
-            Data(intIndex - startIndex) = CSng(Math.Min(yData(intIndex), Single.MaxValue))
+            Data(intIndex - startIndex) = Math.Min(yData(intIndex), Double.MaxValue)
         Next
 
     End Sub

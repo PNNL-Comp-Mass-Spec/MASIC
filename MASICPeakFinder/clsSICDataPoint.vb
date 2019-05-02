@@ -1,16 +1,16 @@
 ﻿Public Class clsSICDataPoint
     Public ReadOnly ScanIndex As Integer
     Public ReadOnly ScanNumber As Integer
-    Public ReadOnly Intensity As Single
+    Public ReadOnly Intensity As Double
     Public ReadOnly Mass As Double
 
-    Public Sub New(intScanNumber As Integer, sngIntensity As Single, dblMass As Double)
-        Me.New(intScanNumber, sngIntensity, dblMass, 0)
+    Public Sub New(intScanNumber As Integer, dblIntensity As Double, dblMass As Double)
+        Me.New(intScanNumber, dblIntensity, dblMass, 0)
     End Sub
 
-    Public Sub New(intScanNumber As Integer, sngIntensity As Single, dblMass As Double, index As Integer)
+    Public Sub New(intScanNumber As Integer, dblIntensity As Double, dblMass As Double, index As Integer)
         ScanNumber = intScanNumber
-        Intensity = sngIntensity
+        Intensity = dblIntensity
         Mass = dblMass
         ScanIndex = index
     End Sub

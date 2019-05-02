@@ -112,7 +112,7 @@ Namespace DataOutput
 
             Dim poolIndex As Integer
             Dim scanNumber As Integer
-            Dim baselineNoiseLevel As Single
+            Dim baselineNoiseLevel As Double
 
             If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
@@ -166,7 +166,7 @@ Namespace DataOutput
                 If .IonCount > 0 Then
                     ' Populate intensities and pointerArray()
 
-                    Dim intensities() As Single
+                    Dim intensities() As Double
                     Dim pointerArray() As Integer
 
                     ReDim intensities(.IonCount - 1)
@@ -278,7 +278,7 @@ Namespace DataOutput
 
                 If .IonCount > 0 Then
                     ' Populate intensities and pointerArray()
-                    Dim intensities() As Single
+                    Dim intensities() As Double
                     Dim pointerArray() As Integer
 
                     ReDim intensities(.IonCount - 1)

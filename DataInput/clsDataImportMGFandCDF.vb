@@ -132,7 +132,7 @@ Namespace DataInput
 
                         scanList.SurveyScans.Add(newSurveyScan)
 
-                        Dim mzData() As Single = Nothing
+                        Dim mzData() As Double = Nothing
 
                         success = objCDFReader.GetMassSpectrum(msScanIndex, mzData,
                                                               objMSSpectrum.IonsIntensity,
@@ -498,9 +498,9 @@ Namespace DataInput
 
         Private Function FindBasePeakIon(
           ByRef mzList() As Double,
-          ByRef ionIntensity() As Single,
+          ByRef ionIntensity() As Double,
           ionCount As Integer,
-          ByRef basePeakIonIntensity As Single,
+          ByRef basePeakIonIntensity As Double,
           ByRef mzMin As Double,
           ByRef mzMax As Double) As Double
 
@@ -540,16 +540,21 @@ Namespace DataInput
 
         End Function
 
-
+        ''' <summary>
+        ''' Examine the scan numbers in surveyScans, starting at lastSurveyScanIndex, to find the survey scans on either side of fragScanNumber
+        ''' Interpolate the retention time that corresponds to fragScanNumber
+        ''' Determine fragScanNumber, which is generally 1, 2, or 3, indicating if this is the 1st, 2nd, or 3rd MS/MS scan after the survey scan
+        ''' </summary>
+        ''' <param name="surveyScans"></param>
+        ''' <param name="lastSurveyScanIndex"></param>
+        ''' <param name="fragScanNumber"></param>
+        ''' <param name="fragScanIteration"></param>
+        ''' <returns>Closest elution time</returns>
         Private Function InterpolateRTandFragScanNumber(
           surveyScans As IList(Of clsScanInfo),
           lastSurveyScanIndex As Integer,
           fragScanNumber As Integer,
           <Out> ByRef fragScanIteration As Integer) As Single
-
-            ' Examine the scan numbers in surveyScans, starting at lastSurveyScanIndex, to find the survey scans on either side of fragScanNumber
-            ' Interpolate the retention time that corresponds to fragScanNumber
-            ' Determine fragScanNumber, which is generally 1, 2, or 3, indicating if this is the 1st, 2nd, or 3rd MS/MS scan after the survey scan
 
             Dim elutionTime As Single
 

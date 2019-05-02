@@ -297,7 +297,7 @@ Public Class clsMRMProcessing
                     Dim scanTimeFirst As Single
                     Dim srmIndexLast = 0
 
-                    Dim crosstabColumnValue() As Single
+                    Dim crosstabColumnValue() As Double
                     Dim crosstabColumnFlag() As Boolean
 
                     ReDim crosstabColumnValue(srmList.Count - 1)
@@ -327,7 +327,7 @@ Public Class clsMRMProcessing
                             End If
 
                             Dim closestMZ As Double
-                            Dim matchIntensity As Single
+                            Dim matchIntensity As Double
 
                             Dim matchFound = mDataAggregation.FindMaxValueInMZRange(
                                 objSpectraCache, fragScan,
@@ -425,7 +425,7 @@ Public Class clsMRMProcessing
       writer As TextWriter,
       scanFirst As Integer,
       scanTimeFirst As Single,
-      crosstabColumnValue As IList(Of Single),
+      crosstabColumnValue As IList(Of Double),
       crosstabColumnFlag As IList(Of Boolean),
       cColDelimiter As Char,
       forceWrite As Boolean)
@@ -562,7 +562,7 @@ Public Class clsMRMProcessing
 
                         ' Include this scan in the SIC for this parent ion
 
-                        Dim matchIntensity As Single
+                        Dim matchIntensity As Double
                         Dim closestMZ As Double
 
                         mDataAggregation.FindMaxValueInMZRange(objSpectraCache,
@@ -596,7 +596,7 @@ Public Class clsMRMProcessing
                 scanList.ParentIons(parentIonIndex).SICStats.Peak = New clsSICStatsPeak()
 
                 ' Find the data point with the maximum intensity
-                Dim maximumIntensity As Single = 0
+                Dim maximumIntensity As Double = 0
                 scanList.ParentIons(parentIonIndex).SICStats.Peak.IndexObserved = 0
                 For scanIndex = 0 To sicDetails.SICDataCount - 1
                     Dim intensity = sicDetails.SICIntensities(scanIndex)

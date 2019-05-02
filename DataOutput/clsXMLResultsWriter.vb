@@ -234,7 +234,7 @@ Namespace DataOutput
                                 ' Save intensity and mass data lists as base-64 encoded strings
                                 ' Note that these field names are purposely different than the DataList names used below for comma separated lists
                                 lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
-                                SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", sicDetails.SICIntensities)
+                                SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", sicDetails.SICIntensitiesAsFloat)
 
                                 lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
                                 SaveDataToXMLEncodeArray(objXMLOut, "SICMassData", sicDetails.SICMassesAsFloat)

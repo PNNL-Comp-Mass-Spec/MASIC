@@ -27,24 +27,24 @@ Public Class clsScanInfo
     Public Property ScanTypeName As String
 
     ''' <summary>
-    ''' mz of the most intense ion in this scan
+    ''' m/z of the most intense ion in this scan
     ''' </summary>
     Public Property BasePeakIonMZ As Double
 
     ''' <summary>
-    ''' intensity of the most intense ion in this scan
+    ''' Intensity of the most intense ion in this scan
     ''' </summary>
-    Public Property BasePeakIonIntensity As Single
+    Public Property BasePeakIonIntensity As Double
 
     ''' <summary>
-    ''' intensity of all of the ions for this scan
+    ''' Intensity of all of the ions for this scan
     ''' </summary>
-    Public Property TotalIonIntensity As Single
+    Public Property TotalIonIntensity As Double
 
     ''' <summary>
     ''' Minimum intensity > 0 in this scan (using profile-mode data)
     ''' </summary>
-    Public Property MinimumPositiveIntensity As Single
+    Public Property MinimumPositiveIntensity As Double
 
     ''' <summary>
     ''' True if the scan is a Zoom scan

@@ -3,12 +3,12 @@
     ''' <summary>
     ''' Typically the average of the data being sampled to determine the baseline noise estimate
     ''' </summary>
-    Public Property NoiseLevel As Single
+    Public Property NoiseLevel As Double
 
     ''' <summary>
     ''' Standard Deviation of the data used to compute the baseline estimate
     ''' </summary>
-    Public Property NoiseStDev As Single
+    Public Property NoiseStDev As Double
 
     Public Property PointsUsed As Integer
 

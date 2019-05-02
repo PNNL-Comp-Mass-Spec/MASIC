@@ -35,7 +35,7 @@ Public Class clsParentIonStats
     Public Property SICData As List(Of clsSICDataPoint)
 
     ' Maximum intensity in SICData
-    Public Property SICIntensityMax As Single
+    Public Property SICIntensityMax As Double
 
     ' Contains the smoothed SIC data plus the details on the peak identified in the SIC (including its baseline noise stats)
     Public Property SICStats As clsSICStats

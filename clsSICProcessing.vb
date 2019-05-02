@@ -188,7 +188,7 @@ Public Class clsSICProcessing
       baselineNoiseStatSegments As List(Of clsBaselineNoiseStatsSegment),
       fullSICDataCount As Integer,
       fullSICScanIndices(,) As Integer,
-      fullSICIntensities(,) As Single,
+      fullSICIntensities(,) As Double,
       fullSICMasses(,) As Double,
       scanList As clsScanList,
       scanIndexObservedInFullSIC As Integer,
@@ -207,7 +207,7 @@ Public Class clsSICProcessing
         ' Pointers to entries in fullSICScanIndices() and fullSICIntensities()
         Dim scanIndexStart As Integer, scanIndexEnd As Integer
 
-        Dim maximumIntensity As Single
+        Dim maximumIntensity As Double
 
         Dim sicOptions = masicOptions.SICOptions
 
@@ -644,12 +644,12 @@ Public Class clsSICProcessing
         ' The following are 2D arrays, ranging from 0 to mzSearchChunkCount-1 in the first dimension and 0 to .SurveyScans.Count - 1 in the second dimension
         ' We could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
         Dim fullSICScanIndices(,) As Integer     ' Pointer into .SurveyScans
-        Dim fullSICIntensities(,) As Single
+        Dim fullSICIntensities(,) As Double
         Dim fullSICMasses(,) As Double
         Dim fullSICDataCount() As Integer        ' Count of the number of valid entries in the second dimension of the above 3 arrays
 
         ' The following is a 1D array, containing the SIC intensities for a single m/z group
-        Dim fullSICIntensities1D() As Single
+        Dim fullSICIntensities1D() As Double
 
         ' Reserve room in fullSICScanIndices for at most maxMZCountInChunk values and .SurveyScans.Count scans
         ReDim fullSICDataCount(mzSearchChunk.Count - 1)

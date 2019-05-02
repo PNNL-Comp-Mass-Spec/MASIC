@@ -74,6 +74,12 @@ Public Class clsUtilities
 
     End Function
 
+    Public Shared Function CSngSafe(value As Double) As Single
+        If value > Single.MaxValue Then Return Single.MaxValue
+        If value < Single.MinValue Then Return Single.MinValue
+        Return CSng(value)
+    End Function
+
     Public Shared Function IsNumber(value As String) As Boolean
         Try
             Return Double.TryParse(value, 0)
@@ -101,6 +107,10 @@ Public Class clsUtilities
 
         Return False
 
+    End Function
+
+    Public Shared Function ValuesMatch(value1 As Double, value2 As Double) As Boolean
+        Return ValuesMatch(value1, value2, -1)
     End Function
 
     Public Shared Function ValuesMatch(value1 As Double, value2 As Double, digitsOfPrecision As Integer) As Boolean

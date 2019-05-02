@@ -369,8 +369,8 @@ Namespace DataInput
                 .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
                 .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
                 .BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
-                .BasePeakIonIntensity = Math.Min(CSng(thermoScanInfo.BasePeakIntensity), Single.MaxValue),
-                .TotalIonIntensity = Math.Min(CSng(thermoScanInfo.TotalIonCurrent), Single.MaxValue),
+                .BasePeakIonIntensity = thermoScanInfo.BasePeakIntensity,
+                .TotalIonIntensity = thermoScanInfo.TotalIonCurrent,
                 .MinimumPositiveIntensity = 0,        ' This will be determined in LoadSpectraForFinniganDataFile
                 .ZoomScan = thermoScanInfo.ZoomScan,
                 .SIMScan = thermoScanInfo.SIMScan,
@@ -471,8 +471,8 @@ Namespace DataInput
                 .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
                 .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
                 .BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
-                .BasePeakIonIntensity = Math.Min(CSng(thermoScanInfo.BasePeakIntensity), Single.MaxValue),
-                .TotalIonIntensity = Math.Min(CSng(thermoScanInfo.TotalIonCurrent), Single.MaxValue),
+                .BasePeakIonIntensity = thermoScanInfo.BasePeakIntensity,
+                .TotalIonIntensity = thermoScanInfo.TotalIonCurrent,
                 .MinimumPositiveIntensity = 0,
                 .ZoomScan = thermoScanInfo.ZoomScan,
                 .SIMScan = thermoScanInfo.SIMScan,
@@ -632,7 +632,7 @@ Namespace DataInput
 
                 If objMSSpectrum.IonCount > 0 Then
                     If scanInfo.TotalIonIntensity < Single.Epsilon Then
-                        scanInfo.TotalIonIntensity = CSng(Math.Min(totalIonIntensity, Single.MaxValue))
+                        scanInfo.TotalIonIntensity = totalIonIntensity
                     End If
                 Else
                     scanInfo.TotalIonIntensity = 0

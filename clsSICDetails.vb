@@ -15,11 +15,18 @@ Public Class clsSICDetails
         End Get
     End Property
 
-    Public ReadOnly Property SICIntensities As Single()
+    Public ReadOnly Property SICIntensities As Double()
         Get
             Return (From item In SICData Select item.Intensity).ToArray()
         End Get
     End Property
+
+    Public ReadOnly Property SICIntensitiesAsFloat As Single()
+        Get
+            Return (From item In SICData Select CSng(item.Intensity)).ToArray()
+        End Get
+    End Property
+
 
     Public ReadOnly Property SICMassesAsFloat As Single()
         Get
@@ -52,7 +59,7 @@ Public Class clsSICDetails
         SICData = New List(Of clsSICDataPoint)
     End Sub
 
-    Public Sub AddData(scanNumber As Integer, intensity As Single, mass As Double, scanIndex As Integer)
+    Public Sub AddData(scanNumber As Integer, intensity As Double, mass As Double, scanIndex As Integer)
         Dim dataPoint = New clsSICDataPoint(scanNumber, intensity, mass, scanIndex)
         SICData.Add(dataPoint)
     End Sub

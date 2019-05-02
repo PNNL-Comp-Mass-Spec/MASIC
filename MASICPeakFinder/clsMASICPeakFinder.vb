@@ -56,7 +56,7 @@ Public Class clsMASICPeakFinder
     '''  80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
     '''  1.886, 2.920, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598
     ''' </summary>
-    Private ReadOnly TTestConfidenceLevels As Single() = New Single() {1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598}
+    Private ReadOnly TTestConfidenceLevels As Double() = New Double() {1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598}
 
 #End Region
 
@@ -99,7 +99,7 @@ Public Class clsMASICPeakFinder
     ''' <returns>Adjusted peak area</returns>
     ''' <remarks>This method is used by MASIC Browser</remarks>
     Public Shared Function BaselineAdjustArea(
-      sicPeak As clsSICStatsPeak, sicPeakWidthFullScans As Integer, allowNegativeValues As Boolean) As Single
+      sicPeak As clsSICStatsPeak, sicPeakWidthFullScans As Integer, allowNegativeValues As Boolean) As Double
         ' Note, compute sicPeakWidthFullScans using:
         '  Width = sicScanNumbers(.Peak.IndexBaseRight) - sicScanNumbers(.Peak.IndexBaseLeft) + 1
 
@@ -108,11 +108,11 @@ Public Class clsMASICPeakFinder
     End Function
 
     Public Shared Function BaselineAdjustArea(
-      peakArea As Single,
-      baselineNoiseLevel As Single,
+      peakArea As Double,
+      baselineNoiseLevel As Double,
       sicPeakFWHMScans As Integer,
       sicPeakWidthFullScans As Integer,
-      allowNegativeValues As Boolean) As Single
+      allowNegativeValues As Boolean) As Double
 
         Dim widthToSubtract = ComputeWidthAtBaseUsingFWHM(sicPeakFWHMScans, sicPeakWidthFullScans, 4)
 
@@ -125,14 +125,14 @@ Public Class clsMASICPeakFinder
     End Function
 
     ' ReSharper disable once UnusedMember.Global
-    Public Shared Function BaselineAdjustIntensity(sicPeak As clsSICStatsPeak, allowNegativeValues As Boolean) As Single
+    Public Shared Function BaselineAdjustIntensity(sicPeak As clsSICStatsPeak, allowNegativeValues As Boolean) As Double
         Return BaselineAdjustIntensity(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel, allowNegativeValues)
     End Function
 
     Public Shared Function BaselineAdjustIntensity(
-      rawIntensity As Single,
-      baselineNoiseLevel As Single,
-      allowNegativeValues As Boolean) As Single
+      rawIntensity As Double,
+      baselineNoiseLevel As Double,
+      allowNegativeValues As Boolean) As Double
 
         If allowNegativeValues OrElse rawIntensity > baselineNoiseLevel Then
             Return rawIntensity - baselineNoiseLevel
@@ -166,18 +166,18 @@ Public Class clsMASICPeakFinder
             End If
 
             If useBothSides Then
-                baselineNoiseStats.NoiseLevel = CSng((sumA + sumB) / (validDataCountA + validDataCountB))
+                baselineNoiseStats.NoiseLevel = (sumA + sumB) / (validDataCountA + validDataCountB)
                 baselineNoiseStats.NoiseStDev = 0      ' We'll compute noise StDev outside this function
                 baselineNoiseStats.PointsUsed = validDataCountA + validDataCountB
             Else
                 If useLeftData Then
                     ' Use left data only
-                    baselineNoiseStats.NoiseLevel = CSng(sumA / validDataCountA)
+                    baselineNoiseStats.NoiseLevel = sumA / validDataCountA
                     baselineNoiseStats.NoiseStDev = 0
                     baselineNoiseStats.PointsUsed = validDataCountA
                 ElseIf useRightData Then
                     ' Use right data only
-                    baselineNoiseStats.NoiseLevel = CSng(sumB / validDataCountB)
+                    baselineNoiseStats.NoiseLevel = sumB / validDataCountB
                     baselineNoiseStats.NoiseStDev = 0
                     baselineNoiseStats.PointsUsed = validDataCountB
                 Else
@@ -269,7 +269,7 @@ Public Class clsMASICPeakFinder
             End If
 
             If validDataCountA + validDataCountB > 0 Then
-                baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt((sumA + sumB) / (validDataCountA + validDataCountB)))
+                baselineNoiseStats.NoiseStDev = Math.Sqrt((sumA + sumB) / (validDataCountA + validDataCountB))
             Else
                 baselineNoiseStats.NoiseStDev = 0
             End If
@@ -305,7 +305,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="noiseStatsSegments"></param>
     ''' <returns>True if success, False if error</returns>
     Public Function ComputeDualTrimmedNoiseLevelTTest(
-      dataList() As Single, indexStart As Integer, indexEnd As Integer,
+      dataList() As Double, indexStart As Integer, indexEnd As Integer,
       baselineNoiseOptions As clsBaselineNoiseOptions,
       <Out> ByRef noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As Boolean
 
@@ -423,7 +423,7 @@ Public Class clsMASICPeakFinder
     ''' Replaces values of 0 with the minimum positive value in dataList()
     ''' You cannot use dataList.Length to determine the length of the array; use indexStart and indexEnd to find the limits
     ''' </remarks>
-    Public Function ComputeDualTrimmedNoiseLevel(dataList() As Single, indexStart As Integer, indexEnd As Integer,
+    Public Function ComputeDualTrimmedNoiseLevel(dataList() As Double, indexStart As Integer, indexEnd As Integer,
                                                  baselineNoiseOptions As clsBaselineNoiseOptions,
                                                  <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
@@ -438,7 +438,7 @@ Public Class clsMASICPeakFinder
 
         ' Copy the data into dataListSorted
         Dim dataSortedCount = indexEnd - indexStart + 1
-        Dim dataListSorted() As Single
+        Dim dataListSorted() As Double
         ReDim dataListSorted(dataSortedCount - 1)
 
         For i = indexStart To indexEnd
@@ -505,7 +505,7 @@ Public Class clsMASICPeakFinder
         dataUsedCount = dataSortedIndexEnd - dataSortedIndexStart + 1
 
         If dataUsedCount > 0 Then
-            baselineNoiseStats.NoiseLevel = CSng(sum / dataUsedCount)
+            baselineNoiseStats.NoiseLevel = sum / dataUsedCount
 
             ' Compute the variance (this is a sample variance, not a population variance)
             sum = 0
@@ -514,7 +514,7 @@ Public Class clsMASICPeakFinder
             Next
 
             If dataUsedCount > 1 Then
-                baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(sum / (dataUsedCount - 1)))
+                baselineNoiseStats.NoiseStDev = Math.Sqrt(sum / (dataUsedCount - 1))
             Else
                 baselineNoiseStats.NoiseStDev = 0
             End If
@@ -549,13 +549,13 @@ Public Class clsMASICPeakFinder
         ' This function does, however, update sicPeak.IndexMax if it is not between sicPeak.IndexBaseLeft and sicPeak.IndexBaseRight
 
         Const ALLOW_NEGATIVE_VALUES = False
-        Dim fwhmScanStart, fwhmScanEnd As Single
+        Dim fwhmScanStart, fwhmScanEnd As Double
         Dim fwhmScans As Integer
 
-        Dim targetIntensity As Single
-        Dim maximumIntensity As Single
+        Dim targetIntensity As Double
+        Dim maximumIntensity As Double
 
-        Dim y1, y2 As Single
+        Dim y1, y2 As Double
 
         ' Determine the full width at half max (fwhm), in units of absolute scan number
         Try
@@ -685,12 +685,12 @@ Public Class clsMASICPeakFinder
     ' ReSharper disable once UnusedMember.Global
     Public Sub TestComputeKSStat()
         Dim scanNumbers = New Integer() {0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40}
-        Dim intensities = New Single() {2, 5, 7, 10, 11, 18, 19, 15, 8, 4, 1}
+        Dim intensities = New Double() {2, 5, 7, 10, 11, 18, 19, 15, 8, 4, 1}
 
         Dim scanAtApex = 20
-        Dim fwhm As Single = 25
+        Dim fwhm As Double = 25
 
-        Dim peakMean as Single = scanAtApex
+        Dim peakMean As Double = scanAtApex
         ' fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
 
         Dim peakStDev = fwhm / 2.35482
@@ -713,8 +713,8 @@ Public Class clsMASICPeakFinder
     Private Function ComputeKSStatistic(
       dataCount As Integer,
       xDataIn As IList(Of Integer),
-      yDataIn As IList(Of Single),
-      peakMean As Single,
+      yDataIn As IList(Of Double),
+      peakMean As Double,
       peakStDev As Double) As Double
 
         Dim xData() As Integer
@@ -799,7 +799,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="baselineNoiseStats"></param>
     ''' <returns>Returns True if success, false in an error</returns>
     ''' <remarks>Updates baselineNoiseStats with the baseline noise level</remarks>
-    Public Function ComputeNoiseLevelForSICData(dataCount As Integer, dataList() As Single,
+    Public Function ComputeNoiseLevelForSICData(dataCount As Integer, dataList() As Double,
                                                 baselineNoiseOptions As clsBaselineNoiseOptions,
                                                 <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
@@ -822,7 +822,7 @@ Public Class clsMASICPeakFinder
 
     <Obsolete("Use the version that takes a List(Of clsSICDataPoint")>
     Public Function ComputeNoiseLevelInPeakVicinity(
-      dataCount As Integer, sicScanNumbers() As Integer, sicIntensities() As Single,
+      dataCount As Integer, sicScanNumbers() As Integer, sicIntensities() As Double,
       sicPeak As clsSICStatsPeak,
       baselineNoiseOptions As clsBaselineNoiseOptions) As Boolean
 
@@ -971,7 +971,7 @@ Public Class clsMASICPeakFinder
     Public Function ComputeParentIonIntensity(
       dataCount As Integer,
       sicScanNumbers() As Integer,
-      sicIntensities() As Single,
+      sicIntensities() As Double,
       sicPeak As clsSICStatsPeak,
       fragScanNumber As Integer) As Boolean
 
@@ -1047,7 +1047,7 @@ Public Class clsMASICPeakFinder
         ' The calling function must populate sicPeak.IndexMax, sicPeak.IndexBaseLeft, and sicPeak.IndexBaseRight
 
         Dim scanNumbers() As Integer
-        Dim intensities() As Single
+        Dim intensities() As Double
 
         Try
 
@@ -1062,7 +1062,7 @@ Public Class clsMASICPeakFinder
 
             ' Define an intensity threshold of 5% of MaximumIntensity
             ' If the peak data is not flanked by points <= intensityThreshold, then we'll add them
-            Dim intensityThreshold = CSng(sicData(sicPeak.IndexMax).Intensity * 0.05)
+            Dim intensityThreshold = sicData(sicPeak.IndexMax).Intensity * 0.05
 
             ' Estimate the average scan interval between each data point
             Dim avgScanInterval = CInt(Math.Round(ComputeAvgScanInterval(sicData, sicPeak.IndexBaseLeft, sicPeak.IndexBaseRight), 0))
@@ -1101,12 +1101,12 @@ Public Class clsMASICPeakFinder
             ' Compute the area
             ' Note that we're using real data for this and not smoothed data
             ' Also note that we're using raw data for the peak area (not baseline corrected values)
-            Dim peakArea As Single = 0
+            Dim peakArea As Double = 0
             For dataIndex = 0 To areaDataCount - 2
                 ' Use the Trapezoid area formula to compute the area slice to add to sicPeak.Area
                 ' Area = 0.5 * DeltaX * (Y1 + Y2)
                 Dim scanDelta = scanNumbers(dataIndex + 1) - scanNumbers(dataIndex)
-                peakArea += CSng(0.5 * scanDelta * (intensities(dataIndex) + intensities(dataIndex + 1)))
+                peakArea += 0.5 * scanDelta * (intensities(dataIndex) + intensities(dataIndex + 1))
             Next
 
             If peakArea < 0 Then
@@ -1124,14 +1124,14 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Private Function ComputeAvgScanInterval(sicData As IList(Of clsSICDataPoint), dataIndexStart As Integer, dataIndexEnd As Integer) As Single
+    Private Function ComputeAvgScanInterval(sicData As IList(Of clsSICDataPoint), dataIndexStart As Integer, dataIndexEnd As Integer) As Double
 
-        Dim scansPerPoint As Single
+        Dim scansPerPoint As Double
 
         Try
             ' Estimate the average scan interval between each data point
             If dataIndexEnd >= dataIndexStart Then
-                scansPerPoint = CSng((sicData(dataIndexEnd).ScanNumber - sicData(dataIndexStart).ScanNumber) / (dataIndexEnd - dataIndexStart + 1))
+                scansPerPoint = (sicData(dataIndexEnd).ScanNumber - sicData(dataIndexStart).ScanNumber) / (dataIndexEnd - dataIndexStart + 1)
                 If scansPerPoint < 1 Then scansPerPoint = 1
             Else
                 scansPerPoint = 1
@@ -1194,7 +1194,7 @@ Public Class clsMASICPeakFinder
             End If
 
             Dim scanNumbers() As Integer         ' Contains values from sicData(x).ScanNumber
-            Dim intensities() As Single          ' Contains values from sicData(x).Intensity subtracted by the baseline noise level; if the result is less than 0, then will contain 0
+            Dim intensities() As Double          ' Contains values from sicData(x).Intensity subtracted by the baseline noise level; if the result is less than 0, then will contain 0
 
             ReDim scanNumbers(Math.Max(dataCount, minimumDataCount) + 1)
             ReDim intensities(scanNumbers.Length - 1)
@@ -1202,7 +1202,7 @@ Public Class clsMASICPeakFinder
 
             ' Populate scanNumbers() and intensities()
             ' Simultaneously, determine the maximum intensity
-            Dim maximumBaselineAdjustedIntensity As Single = 0
+            Dim maximumBaselineAdjustedIntensity As Double = 0
             Dim indexMaximumIntensity = 0
 
             If USE_SMOOTHED_DATA Then
@@ -1241,7 +1241,7 @@ Public Class clsMASICPeakFinder
             End If
 
             ' Define an intensity threshold of 10% of MaximumBaselineAdjustedIntensity
-            Dim intensityThreshold = CSng(maximumBaselineAdjustedIntensity * 0.1)
+            Dim intensityThreshold = maximumBaselineAdjustedIntensity * 0.1
             If intensityThreshold < 1 Then intensityThreshold = 1
 
             ' Step left from indexMaximumIntensity to find the first data point < intensityThreshold
@@ -1381,7 +1381,7 @@ Public Class clsMASICPeakFinder
 
                     ' Interpolate between pointIndex-1 and validDataIndexLeft
                     For indexPointer = pointIndex To validDataIndexLeft - 1
-                        Dim interpolatedIntensity As Single
+                        Dim interpolatedIntensity As Double
 
                         If InterpolateY(
                           interpolatedIntensity,
@@ -1422,7 +1422,7 @@ Public Class clsMASICPeakFinder
                     If intensities(dataIndex - 1) > 0 OrElse intensities(dataIndex) > 0 Then
                         For scanNumberInterpolate = scanNumbers(dataIndex - 1) + 1 To scanNumbers(dataIndex) - 1
                             ' Use InterpolateY() to fill in the scans between dataIndex-1 and dataIndex
-                            Dim interpolatedIntensity As Single
+                            Dim interpolatedIntensity As Double
                             If InterpolateY(
                               interpolatedIntensity,
                               scanNumbers(dataIndex - 1), scanNumbers(dataIndex),
@@ -1453,7 +1453,7 @@ Public Class clsMASICPeakFinder
 
                 Dim centerOfMassDecimal = moment1Sum / peakArea + scanNumbers(0)
 
-                statMomentsData.Area = CSng(Math.Min(Single.MaxValue, peakArea))
+                statMomentsData.Area = Math.Min(Double.MaxValue, peakArea)
                 statMomentsData.CenterOfMassScan = CInt(Math.Round(centerOfMassDecimal, 0))
                 statMomentsData.DataCountUsed = dataCount
 
@@ -1473,7 +1473,7 @@ Public Class clsMASICPeakFinder
                         If intensities(dataIndex - 1) > 0 OrElse intensities(dataIndex) > 0 Then
                             For scanNumberInterpolate = scanNumbers(dataIndex - 1) + 1 To scanNumbers(dataIndex) - 1
                                 ' Use InterpolateY() to fill in the scans between dataIndex-1 and dataIndex
-                                Dim interpolatedIntensity As Single
+                                Dim interpolatedIntensity As Double
                                 If InterpolateY(
                                   interpolatedIntensity,
                                   scanNumbers(dataIndex - 1), scanNumbers(dataIndex),
@@ -1488,13 +1488,13 @@ Public Class clsMASICPeakFinder
                     End If
                 Next
 
-                statMomentsData.StDev = CSng(Math.Sqrt(moment2Sum / peakArea))
+                statMomentsData.StDev = Math.Sqrt(moment2Sum / peakArea)
 
                 ' thirdMoment = moment3Sum / peakArea
                 ' skew = thirdMoment / sigma^3
                 ' skew = (moment3Sum / peakArea) / sigma^3
                 If statMomentsData.StDev > 0 Then
-                    statMomentsData.Skew = CSng((moment3Sum / peakArea) / (statMomentsData.StDev ^ 3))
+                    statMomentsData.Skew = (moment3Sum / peakArea) / (statMomentsData.StDev ^ 3)
                     If Math.Abs(statMomentsData.Skew) < 0.0001 Then
                         statMomentsData.Skew = 0
                     End If
@@ -1505,7 +1505,7 @@ Public Class clsMASICPeakFinder
             End If
 
             Const useStatMomentsStats = True
-            Dim peakMean As Single
+            Dim peakMean As Double
             Dim peakStDev As Double
 
             If useStatMomentsStats Then
@@ -1516,7 +1516,7 @@ Public Class clsMASICPeakFinder
                 ' fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
                 peakStDev = sicPeak.FWHMScanWidth / 2.35482
             End If
-            statMomentsData.KSStat = CSng(ComputeKSStatistic(dataCount, scanNumbers, intensities, peakMean, peakStDev))
+            statMomentsData.KSStat = ComputeKSStatistic(dataCount, scanNumbers, intensities, peakMean, peakStDev)
 
 
         Catch ex As Exception
@@ -1528,7 +1528,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Shared Function ComputeSignalToNoise(signal As Single, noiseThresholdIntensity As Single) As Single
+    Public Shared Function ComputeSignalToNoise(signal As Double, noiseThresholdIntensity As Double) As Double
 
         If noiseThresholdIntensity > 0 Then
             Return signal / noiseThresholdIntensity
@@ -1554,12 +1554,12 @@ Public Class clsMASICPeakFinder
     ''' Replaces values of 0 with the minimum positive value in dataList()
     ''' You cannot use dataList.Length to determine the length of the array; use dataCount
     ''' </remarks>
-    Public Function ComputeTrimmedNoiseLevel(dataList() As Single, indexStart As Integer, indexEnd As Integer,
+    Public Function ComputeTrimmedNoiseLevel(dataList() As Double, indexStart As Integer, indexEnd As Integer,
                                              baselineNoiseOptions As clsBaselineNoiseOptions,
                                              ignoreNonPositiveData As Boolean,
                                              <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
-        Dim dataListSorted() As Single           ' Note: You cannot use dataListSorted.Length to determine the length of the array; use indexStart and indexEnd to find the limits
+        Dim dataListSorted() As Double           ' Note: You cannot use dataListSorted.Length to determine the length of the array; use indexStart and indexEnd to find the limits
 
         ' Initialize baselineNoiseStats
         baselineNoiseStats = InitializeBaselineNoiseStats(baselineNoiseOptions.MinimumBaselineNoiseLevel, baselineNoiseOptions.BaselineNoiseMode)
@@ -1612,14 +1612,14 @@ Public Class clsMASICPeakFinder
         Select Case baselineNoiseOptions.BaselineNoiseMode
             Case eNoiseThresholdModes.TrimmedMeanByAbundance, eNoiseThresholdModes.TrimmedMeanByCount
 
-                dim countSummed as Integer
-                Dim sum as Double
+                Dim countSummed As Integer
+                Dim sum As Double
 
                 If baselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.TrimmedMeanByAbundance Then
                     ' Average the data that has intensity values less than
                     '  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
 
-                    Dim intensityThreshold as Double = dataListSorted(0) +
+                    Dim intensityThreshold As Double = dataListSorted(0) +
                                                        baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
                                                        (dataListSorted(dataSortedCount - 1) - dataListSorted(0))
 
@@ -1652,7 +1652,7 @@ Public Class clsMASICPeakFinder
                 If countSummed > 0 Then
                     ' Compute the average
                     ' Note that countSummed will be used below in the variance computation
-                    baselineNoiseStats.NoiseLevel = CSng(sum / countSummed)
+                    baselineNoiseStats.NoiseLevel = sum / CDbl(countSummed)
                     baselineNoiseStats.PointsUsed = countSummed
 
                     If countSummed > 1 Then
@@ -1661,7 +1661,7 @@ Public Class clsMASICPeakFinder
                         For i = 0 To indexEnd
                             sum += (dataListSorted(i) - baselineNoiseStats.NoiseLevel) ^ 2
                         Next
-                        baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(sum / (countSummed - 1)))
+                        baselineNoiseStats.NoiseStDev = Math.Sqrt(sum / CDbl(countSummed - 1))
                     Else
                         baselineNoiseStats.NoiseStDev = 0
                     End If
@@ -1679,7 +1679,7 @@ Public Class clsMASICPeakFinder
                 Else
                     'Find the median of the data that has intensity values less than
                     '  Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
-                    dim intensityThreshold as Double = dataListSorted(0) +
+                    Dim intensityThreshold As Double = dataListSorted(0) +
                                                        baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage *
                                                        (dataListSorted(dataSortedCount - 1) - dataListSorted(0))
 
@@ -1700,24 +1700,24 @@ Public Class clsMASICPeakFinder
                     ' Odd value; average the values on either side of indexEnd/2
                     Dim i = CInt((indexEnd - 1) / 2)
                     If i < 0 Then i = 0
-                    Dim sum as double = dataListSorted(i)
+                    Dim sum As Double = dataListSorted(i)
 
                     i += 1
                     If i = dataSortedCount Then i = dataSortedCount - 1
                     sum += dataListSorted(i)
 
-                    baselineNoiseStats.NoiseLevel = CSng(sum / 2.0)
+                    baselineNoiseStats.NoiseLevel = sum / 2.0
                 End If
 
                 ' Compute the variance
-                Dim varianceSum as double  = 0
+                Dim varianceSum As Double = 0
                 For i = 0 To indexEnd
                     varianceSum += (dataListSorted(i) - baselineNoiseStats.NoiseLevel) ^ 2
                 Next
 
                 Dim countSummed = indexEnd + 1
                 If countSummed > 0 Then
-                    baselineNoiseStats.NoiseStDev = CSng(Math.Sqrt(varianceSum / (countSummed - 1)))
+                    baselineNoiseStats.NoiseStDev = Math.Sqrt(varianceSum / CDbl(countSummed - 1))
                 Else
                     baselineNoiseStats.NoiseStDev = 0
                 End If
@@ -1824,7 +1824,7 @@ Public Class clsMASICPeakFinder
 
     End Function
 
-    Public Function FindMinimumPositiveValue(sicData As IList(Of clsSICDataPoint), absoluteMinimumValue As Single) As Single
+    Public Function FindMinimumPositiveValue(sicData As IList(Of clsSICDataPoint), absoluteMinimumValue As Double) As Double
 
         Dim minimumPositiveValue = (From item In sicData Where item.Intensity > 0 Select item.Intensity).Min()
 
@@ -1835,7 +1835,7 @@ Public Class clsMASICPeakFinder
         Return minimumPositiveValue
     End Function
 
-    Public Function FindMinimumPositiveValue(dataCount As Integer, dataList() As Single, absoluteMinimumValue As Single) As Single
+    Public Function FindMinimumPositiveValue(dataCount As Integer, dataList() As Double, absoluteMinimumValue As Double) As Double
         ' Note: Do not use dataList.Length to determine the length of the array; use dataCount
         ' However, if dataCount is > dataList.Length then dataList.Length-1 will be used for the maximum index to examine
 
@@ -1844,7 +1844,7 @@ Public Class clsMASICPeakFinder
         End If
 
         ' Find the minimum positive value in dataList
-        Dim minimumPositiveValue = Single.MaxValue
+        Dim minimumPositiveValue = Double.MaxValue
         For i = 0 To dataCount - 1
             If dataList(i) > 0 Then
                 If dataList(i) < minimumPositiveValue Then
@@ -1853,7 +1853,7 @@ Public Class clsMASICPeakFinder
             End If
         Next
 
-        If minimumPositiveValue >= Single.MaxValue OrElse minimumPositiveValue < absoluteMinimumValue Then
+        If minimumPositiveValue >= Double.MaxValue OrElse minimumPositiveValue < absoluteMinimumValue Then
             minimumPositiveValue = absoluteMinimumValue
         End If
 
@@ -1892,7 +1892,7 @@ Public Class clsMASICPeakFinder
       <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
       simDataPresent As Boolean,
       sicPeakFinderOptions As clsSICPeakFinderOptions,
-      sicNoiseThresholdIntensity As Single,
+      sicNoiseThresholdIntensity As Double,
       minimumPotentialPeakArea As Double,
       returnClosestPeak As Boolean) As Boolean
 
@@ -1979,7 +1979,7 @@ Public Class clsMASICPeakFinder
             If peakAreaSignalToNoise < 1 Then peakAreaSignalToNoise = 1
 
 
-            If Math.Abs(sicPeakFinderOptions.ButterworthSamplingFrequency) < Single.Epsilon Then
+            If Math.Abs(sicPeakFinderOptions.ButterworthSamplingFrequency) < Double.Epsilon Then
                 sicPeakFinderOptions.ButterworthSamplingFrequency = 0.25
             End If
 
@@ -2031,8 +2031,8 @@ Public Class clsMASICPeakFinder
 
                         Do While currentPeak.LeftEdge < sicData.Count - 1 AndAlso
                             currentPeak.LeftEdge < currentPeak.RightEdge
-                            If Math.Abs(sicData(currentPeak.LeftEdge).Intensity) < Single.Epsilon AndAlso
-                                Math.Abs(sicData(currentPeak.LeftEdge + 1).Intensity) < Single.Epsilon Then
+                            If Math.Abs(sicData(currentPeak.LeftEdge).Intensity) < Double.Epsilon AndAlso
+                                Math.Abs(sicData(currentPeak.LeftEdge + 1).Intensity) < Double.Epsilon Then
                                 currentPeak.LeftEdge += 1
                             Else
                                 Exit Do
@@ -2041,8 +2041,8 @@ Public Class clsMASICPeakFinder
 
                         Do While currentPeak.RightEdge > 0 AndAlso
                             currentPeak.RightEdge > currentPeak.LeftEdge
-                            If Math.Abs(sicData(currentPeak.RightEdge).Intensity) < Single.Epsilon AndAlso
-                                Math.Abs(sicData(currentPeak.RightEdge - 1).Intensity) < Single.Epsilon Then
+                            If Math.Abs(sicData(currentPeak.RightEdge).Intensity) < Double.Epsilon AndAlso
+                                Math.Abs(sicData(currentPeak.RightEdge - 1).Intensity) < Double.Epsilon Then
                                 currentPeak.RightEdge -= 1
                             Else
                                 Exit Do
@@ -2134,7 +2134,7 @@ Public Class clsMASICPeakFinder
 
 
                     Dim comparisonPeakEdgeIndex As Integer
-                    Dim targetIntensity As Single
+                    Dim targetIntensity As Double
                     Dim dataIndex As Integer
 
                     ' Populate previousPeakFWHMPointRight and nextPeakFWHMPointLeft
@@ -2265,7 +2265,7 @@ Public Class clsMASICPeakFinder
 
         'Dim foundPeakIndex As Integer
 
-        'Dim peakMaximum As Single
+        'Dim peakMaximum As Double
 
         '' ReSharper disable once NotAccessedVariable
         'Dim usedSmoothedDataForPeakDetection As Boolean
@@ -2540,14 +2540,14 @@ Public Class clsMASICPeakFinder
 
         ' Find the peak with the largest area that has peaksContainer.PeakIsValid = True
         peaksContainer.BestPeakIndex = -1
-        peaksContainer.BestPeakArea = Single.MinValue
+        peaksContainer.BestPeakArea = Double.MinValue
         For foundPeakIndex = 0 To peaksContainer.Peaks.Count - 1
             Dim currentPeak = peaksContainer.Peaks(foundPeakIndex)
 
             If currentPeak.PeakIsValid Then
                 If currentPeak.PeakArea > peaksContainer.BestPeakArea Then
                     peaksContainer.BestPeakIndex = foundPeakIndex
-                    peaksContainer.BestPeakArea = CSng(Math.Min(currentPeak.PeakArea, Single.MaxValue))
+                    peaksContainer.BestPeakArea = Math.Min(currentPeak.PeakArea, Double.MaxValue)
                 End If
             End If
         Next
@@ -2573,7 +2573,7 @@ Public Class clsMASICPeakFinder
         Dim filterThirdWidth As Integer
         Dim success As Boolean
 
-        Dim butterWorthFrequency As Single
+        Dim butterWorthFrequency As Double
 
         Dim peakWidthPointsCompare As Integer
 
@@ -2650,7 +2650,7 @@ Public Class clsMASICPeakFinder
 
     Public Sub FindPotentialPeakArea(
        dataCount As Integer,
-       sicIntensities() As Single,
+       sicIntensities() As Double,
        <Out> ByRef potentialAreaStats As clsSICPotentialAreaStats,
        sicPeakFinderOptions As clsSICPeakFinderOptions)
 
@@ -2674,8 +2674,8 @@ Public Class clsMASICPeakFinder
 
         ' Note: You cannot use SICData.Length to determine the length of the array; use dataCount
 
-        Dim minimumPositiveValue As Single
-        Dim intensityToUse As Single
+        Dim minimumPositiveValue As Double
+        Dim intensityToUse As Double
 
         Dim oldestIntensity As Double
         Dim potentialPeakArea, minimumPotentialPeakArea As Double
@@ -2767,7 +2767,7 @@ Public Class clsMASICPeakFinder
     Public Function FindSICPeakAndArea(
         dataCount As Integer,
         sicScanNumbers() As Integer,
-        sicIntensities() As Single,
+        sicIntensities() As Double,
         <Out> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
         sicPeak As clsSICStatsPeak,
         <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
@@ -2820,7 +2820,7 @@ Public Class clsMASICPeakFinder
         ' Set simDataPresent to True when there are large gaps in the survey scan numbers
 
         Dim dataIndex As Integer
-        Dim intensityCompare As Single
+        Dim intensityCompare As Double
 
         Dim success As Boolean
 
@@ -3060,7 +3060,7 @@ Public Class clsMASICPeakFinder
     End Function
 
     Public Shared Function InitializeBaselineNoiseStats(
-      minimumBaselineNoiseLevel As Single,
+      minimumBaselineNoiseLevel As Double,
       noiseThresholdMode As eNoiseThresholdModes) As clsBaselineNoiseStats
 
         Dim baselineNoiseStats = New clsBaselineNoiseStats() With {
@@ -3077,7 +3077,7 @@ Public Class clsMASICPeakFinder
     <Obsolete("Use the version that returns baselineNoiseStatsType")>
     Public Shared Sub InitializeBaselineNoiseStats(
       ByRef baselineNoiseStats As clsBaselineNoiseStats,
-      minimumBaselineNoiseLevel As Single,
+      minimumBaselineNoiseLevel As Double,
       noiseThresholdMode As eNoiseThresholdModes)
 
         baselineNoiseStats = InitializeBaselineNoiseStats(minimumBaselineNoiseLevel, noiseThresholdMode)
@@ -3095,13 +3095,13 @@ Public Class clsMASICPeakFinder
     ''' <param name="targetY"></param>
     ''' <returns>Returns True on success, false on error</returns>
     Private Function InterpolateX(
-      <Out> ByRef interpolatedXValue As Single,
+      <Out> ByRef interpolatedXValue As Double,
       x1 As Integer, x2 As Integer,
-      y1 As Single, y2 As Single,
-      targetY As Single) As Boolean
+      y1 As Double, y2 As Double,
+      targetY As Double) As Boolean
 
         Dim deltaY = y2 - y1                                 ' This is y-two minus y-one
-        dim ratio = (targetY - y1) / deltaY
+        Dim ratio = (targetY - y1) / deltaY
         Dim deltaX = x2 - x1                                 ' This is x-two minus x-one
 
         Dim targetX = ratio * deltaX + x1
@@ -3128,10 +3128,10 @@ Public Class clsMASICPeakFinder
     ''' <param name="xValToInterpolate"></param>
     ''' <returns></returns>
     Private Function InterpolateY(
-      <Out> ByRef interpolatedIntensity As Single,
+      <Out> ByRef interpolatedIntensity As Double,
       X1 As Integer, X2 As Integer,
-      Y1 As Single, Y2 As Single,
-      xValToInterpolate As Single) As Boolean
+      Y1 As Double, Y2 As Double,
+      xValToInterpolate As Double) As Boolean
 
         Dim scanDifference = X2 - X1
         If scanDifference <> 0 Then
@@ -3260,8 +3260,8 @@ Public Class clsMASICPeakFinder
                         Dim segmentA = noiseStatsSegments(indexSegmentA).BaselineNoiseStats
                         Dim segmentB = noiseStatsSegments(indexSegmentB).BaselineNoiseStats
 
-                        baselineNoiseStats.NoiseLevel = CSng(segmentA.NoiseLevel * fractionFromSegmentA + segmentB.NoiseLevel * fractionFromSegmentB)
-                        baselineNoiseStats.NoiseStDev = CSng(segmentA.NoiseStDev * fractionFromSegmentA + segmentB.NoiseStDev * fractionFromSegmentB)
+                        baselineNoiseStats.NoiseLevel = segmentA.NoiseLevel * fractionFromSegmentA + segmentB.NoiseLevel * fractionFromSegmentB
+                        baselineNoiseStats.NoiseStDev = segmentA.NoiseStDev * fractionFromSegmentA + segmentB.NoiseStDev * fractionFromSegmentB
                         baselineNoiseStats.PointsUsed = CInt(segmentA.PointsUsed * fractionFromSegmentA + segmentB.PointsUsed * fractionFromSegmentB)
 
                     End If
@@ -3284,9 +3284,9 @@ Public Class clsMASICPeakFinder
     ''' <param name="dataListSorted"></param>
     ''' <returns>Minimum positive value</returns>
     ''' <remarks>Assumes data in dataListSorted() is sorted ascending</remarks>
-    Private Function ReplaceSortedDataWithMinimumPositiveValue(dataCount As Integer, dataListSorted As IList(Of Single)) As Single
+    Private Function ReplaceSortedDataWithMinimumPositiveValue(dataCount As Integer, dataListSorted As IList(Of Double)) As Double
 
-        Dim minimumPositiveValue As Single
+        Dim minimumPositiveValue As Double
         Dim indexFirstPositiveValue As Integer
 
         ' Find the minimum positive value in dataListSorted

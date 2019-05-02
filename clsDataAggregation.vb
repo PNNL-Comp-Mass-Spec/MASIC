@@ -26,11 +26,11 @@ Public Class clsDataAggregation
       searchToleranceHalfWidth As Double,
       <Out> ByRef ionMatchCount As Integer,
       <Out> ByRef closestMZ As Double,
-      returnMax As Boolean) As Single
+      returnMax As Boolean) As Double
 
         ionMatchCount = 0
         closestMZ = 0
-        Dim ionSumOrMax As Single = 0
+        Dim ionSumOrMax As Double = 0
 
         Try
 
@@ -75,7 +75,7 @@ Public Class clsDataAggregation
       mzStart As Double,
       mzEnd As Double,
       <Out> ByRef bestMatchMZ As Double,
-      <Out> ByRef matchIntensity As Single) As Boolean
+      <Out> ByRef matchIntensity As Double) As Boolean
 
         ' Searches currentScan.IonsMZ for the maximum value between mzStart and mzEnd
         ' If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
@@ -113,12 +113,12 @@ Public Class clsDataAggregation
 
     Private Function FindMaxValueInMZRange(
       mzList As IList(Of Double),
-      intensityList As IList(Of Single),
+      intensityList As IList(Of Double),
       ionCount As Integer,
       mzStart As Double,
       mzEnd As Double,
       <Out> ByRef bestMatchMZ As Double,
-      <Out> ByRef matchIntensity As Single) As Boolean
+      <Out> ByRef matchIntensity As Double) As Boolean
 
         ' Searches mzList for the maximum value between mzStart and mzEnd
         ' If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
@@ -130,7 +130,7 @@ Public Class clsDataAggregation
 
         Dim dataIndex As Integer
         Dim closestMatchIndex As Integer
-        Dim highestIntensity As Single
+        Dim highestIntensity As Double
 
         Try
             closestMatchIndex = -1
@@ -164,7 +164,6 @@ Public Class clsDataAggregation
         End If
 
     End Function
-
 
     Private Function SumIonsFindValueInRange(
       ByRef dataValues() As Double,

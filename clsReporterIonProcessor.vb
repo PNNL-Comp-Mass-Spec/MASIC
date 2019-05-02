@@ -273,8 +273,8 @@ Public Class clsReporterIonProcessor
             clsReporterIons.eReporterIonMassModeConstants.CustomOrNone,
             clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
 
-        Dim reporterIntensities() As Single
-        Dim reporterIntensitiesCorrected() As Single
+        Dim reporterIntensities() As Double
+        Dim reporterIntensitiesCorrected() As Double
         Dim closestMZ() As Double
 
         ' The following will be a value between 0 and 100
@@ -316,7 +316,7 @@ Public Class clsReporterIonProcessor
         Dim ftmsResolution = New List(Of String)
         ' Dim ftmsLabelDataMz = New List(Of String)
 
-        Dim reporterIntensityMax As Single = 0
+        Dim reporterIntensityMax As Double = 0
 
         ' Find the reporter ion intensities
         ' Also keep track of the closest m/z for each reporter ion

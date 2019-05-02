@@ -81,7 +81,7 @@ Namespace DataInput
 
         Public Sub DiscardDataBelowNoiseThreshold(
           objMSSpectrum As clsMSSpectrum,
-          noiseThresholdIntensity As Single,
+          noiseThresholdIntensity As Double,
           mzIgnoreRangeStart As Double,
           mzIgnoreRangeEnd As Double,
           noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions)

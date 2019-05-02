@@ -190,7 +190,6 @@ Namespace DataOutput
                 For scanIndex = 0 To scanCount - 1
                     With scanList(scanIndex)
                         ' Note: Using CSng to assure that we write out single precision numbers
-                        ' .TotalIonIntensity and .BasePeakIonIntensity are actually already singles
 
                         If saveElutionTimeInsteadOfScan Then
                             writer.Write(CSng(.ScanTime))
@@ -199,9 +198,9 @@ Namespace DataOutput
                         End If
 
                         If saveTICInsteadOfBPI Then
-                            writer.Write(CSng(.TotalIonIntensity))
+                            writer.Write(clsUtilities.CSngSafe(.TotalIonIntensity))
                         Else
-                            writer.Write(CSng(.BasePeakIonIntensity))
+                            writer.Write(clsUtilities.CSngSafe(.BasePeakIonIntensity))
                         End If
 
                     End With
@@ -235,28 +234,28 @@ Namespace DataOutput
           writer As StreamWriter,
           scanNumber As Integer,
           charge As Integer,
-          intensity As Single,
+          intensity As Double,
           ionMZ As Double,
           isoFit As Single,
           averageMass As Double,
           monoisotopicMass As Double,
           mostAbundantMass As Double,
           peakFWHM As Single,
-          signalToNoise As Single,
+          signalToNoise As Double,
           monoisotopicAbu As Single,
           monoPlus2Abu As Single)
 
             Dim dataValues = New List(Of String) From {
                 scanNumber.ToString(),
                 charge.ToString(),
-                intensity.ToString(),
+                intensity.ToString("0.000"),
                 ionMZ.ToString("0.00000"),
                 isoFit.ToString(),
                 averageMass.ToString("0.00000"),
                 monoisotopicMass.ToString("0.00000"),
                 mostAbundantMass.ToString("0.00000"),
                 peakFWHM.ToString(),
-                signalToNoise.ToString(),
+                signalToNoise.ToString("0.000"),
                 monoisotopicAbu.ToString(),
                 monoPlus2Abu.ToString()
             }

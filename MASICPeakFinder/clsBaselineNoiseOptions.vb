@@ -8,25 +8,25 @@
     ''' Explicitly defined noise intensity
     ''' </summary>
     ''' <remarks>Only used if .BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra</remarks>
-    Public BaselineNoiseLevelAbsolute As Single
+    Public BaselineNoiseLevelAbsolute As Double
 
     ''' <summary>
     ''' Minimum signal/noise ratio
     ''' </summary>
     ''' <remarks>Typically 2 or 3 for spectra; 0 for SICs</remarks>
-    Public MinimumSignalToNoiseRatio As Single
+    Public MinimumSignalToNoiseRatio As Double
 
     ''' <summary>
     ''' If the noise threshold computed is less than this value, then this value is used to compute S/N
     ''' Additionally, this is used as the minimum intensity threshold when computing a trimmed noise level
     ''' </summary>
-    Public MinimumBaselineNoiseLevel As Single
+    Public MinimumBaselineNoiseLevel As Double
 
     ''' <summary>
     ''' Typically 0.75 for SICs, 0.5 for MS/MS spectra
     ''' Only used for eNoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
     ''' </summary>
-    Public TrimmedMeanFractionLowIntensityDataToAverage As Single
+    Public TrimmedMeanFractionLowIntensityDataToAverage As Double
 
     ''' <summary>
     ''' Typically 5; distance from the mean in standard deviation units (SqrRt(Variance)) to discard data for computing the trimmed mean

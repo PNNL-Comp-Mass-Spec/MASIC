@@ -19,7 +19,7 @@ Public Class clsFilterDataArrayMaxCount
 
 
     Private mDataCount As Integer
-    Private mDataValues() As Single
+    Private mDataValues() As Double
     Private mDataIndices() As Integer
 
     Private mMaximumDataCountToKeep As Integer
@@ -86,7 +86,7 @@ Public Class clsFilterDataArrayMaxCount
         Me.Clear(InitialCapacity)
     End Sub
 
-    Public Sub AddDataPoint(abundance As Single, dataPointIndex As Integer)
+    Public Sub AddDataPoint(abundance As Double, dataPointIndex As Integer)
 
         If mDataCount >= mDataValues.Length Then
             ReDim Preserve mDataValues(CInt(Math.Floor(mDataValues.Length * 1.5)) - 1)
@@ -114,7 +114,7 @@ Public Class clsFilterDataArrayMaxCount
         ReDim mDataIndices(InitialCapacity - 1)
     End Sub
 
-    Public Function GetAbundanceByIndex(dataPointIndex As Integer) As Single
+    Public Function GetAbundanceByIndex(dataPointIndex As Integer) As Double
         If dataPointIndex >= 0 And dataPointIndex < mDataCount Then
             Return mDataValues(dataPointIndex)
         Else
@@ -146,7 +146,7 @@ Public Class clsFilterDataArrayMaxCount
 
         Try
 
-            Dim binToSortAbundances() As Single
+            Dim binToSortAbundances() As Double
             Dim binToSortDataIndices() As Integer
 
             ReDim binToSortAbundances(9)
@@ -170,7 +170,7 @@ Public Class clsFilterDataArrayMaxCount
             '  (aka frequency distribution) of the abundances in mDataValues
 
             ' First, determine the maximum abundance value in mDataValues
-            Dim maxAbundance = Single.MinValue
+            Dim maxAbundance = Double.MinValue
             For index = 0 To mDataCount - 1
                 If mDataValues(index) > maxAbundance Then
                     maxAbundance = mDataValues(index)
@@ -358,7 +358,7 @@ Public Class clsFilterDataArrayMaxCount
 
     ' This is sub uses a full sort to filter the data
     ' This will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible
-    Private Sub SortAndMarkPointsToSkip(ByRef abundances() As Single, ByRef dataIndices() As Integer, dataCount As Integer, maximumDataCountInArraysToLoad As Integer, subtaskStepCount As Integer)
+    Private Sub SortAndMarkPointsToSkip(ByRef abundances() As Double, ByRef dataIndices() As Integer, dataCount As Integer, maximumDataCountInArraysToLoad As Integer, subtaskStepCount As Integer)
 
         Dim index As Integer
 

@@ -24,7 +24,7 @@
     ''' Intensity of the parent ion in the scan just prior to the scan in which the peptide was fragmented
     ''' If previous scan was not MS1, then interpolates between MS1 scans bracketing the MS2 scan
     ''' </summary>
-    Public Property ParentIonIntensity As Single
+    Public Property ParentIonIntensity As Double
 
     ''' <summary>
     ''' Index of the FWHM point in the previous closest peak in the SIC
@@ -42,19 +42,19 @@
     ''' <summary>
     ''' Maximum intensity of the SIC Peak -- not necessarily the maximum intensity in .SICData(); Not baseline corrected
     ''' </summary>
-    Public Property MaxIntensityValue As Single
+    Public Property MaxIntensityValue As Double
 
     ''' <summary>
     ''' Area of the SIC peak -- Equivalent to the zeroth statistical moment (m0); Not baseline corrected
     ''' </summary>
-    Public Property Area As Single
+    Public Property Area As Double
 
     ''' <summary>
     ''' Number of small peaks that are contained by the peak
     ''' </summary>
     Public Property ShoulderCount As Integer
 
-    Public Property SignalToNoiseRatio As Single
+    Public Property SignalToNoiseRatio As Double
 
     Public Property BaselineNoiseStats As clsBaselineNoiseStats
 

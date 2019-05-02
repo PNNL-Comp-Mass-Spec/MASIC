@@ -12,14 +12,14 @@ Public Class clsSICStats
 
     Public Property SICPotentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats
 
-    Public Property SICSmoothedYData As List(Of Single)
+    Public Property SICSmoothedYData As List(Of Double)
 
     Public Property SICSmoothedYDataIndexStart As Integer
 
     Public Sub New()
         Peak = New MASICPeakFinder.clsSICStatsPeak()
         SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsSICPotentialAreaStats()
-        SICSmoothedYData = New List(Of Single)
+        SICSmoothedYData = New List(Of Double)
     End Sub
 
     Public Overrides Function ToString() As String

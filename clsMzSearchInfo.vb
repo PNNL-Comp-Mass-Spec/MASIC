@@ -8,7 +8,7 @@
     Public Property MZTolerance As Double
     Public Property MZToleranceIsPPM As Boolean
 
-    Public Property MaximumIntensity As Single
+    Public Property MaximumIntensity As Double
     Public Property ScanIndexMax As Integer
 
     Public Property BaselineNoiseStatSegments As List(Of MASICPeakFinder.clsBaselineNoiseStatsSegment)

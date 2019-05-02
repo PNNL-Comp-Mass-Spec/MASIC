@@ -12,9 +12,9 @@ Public Class clsPeaksContainer
     Public Property Peaks As List(Of clsPeakInfo)
 
     Public Property PeakWidthPointsMinimum As Integer
-    Public Property MaxAllowedUpwardSpikeFractionMax As Single
+    Public Property MaxAllowedUpwardSpikeFractionMax As Double
     Public Property BestPeakIndex As Integer
-    Public Property BestPeakArea As Single
+    Public Property BestPeakArea As Double
 
     Public Sub New()
         Peaks = New List(Of clsPeakInfo)

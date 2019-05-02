@@ -608,7 +608,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property SICNoiseFractionLowIntensityDataToAverage As Single
+    Public Property SICNoiseFractionLowIntensityDataToAverage As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
         End Get
@@ -618,7 +618,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property SICNoiseMinimumSignalToNoiseRatio As Single
+    Public Property SICNoiseMinimumSignalToNoiseRatio As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio
         End Get
@@ -629,7 +629,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property SICNoiseThresholdIntensity As Single
+    Public Property SICNoiseThresholdIntensity As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute
         End Get
@@ -649,7 +649,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property MassSpectraNoiseFractionLowIntensityDataToAverage As Single
+    Public Property MassSpectraNoiseFractionLowIntensityDataToAverage As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage
         End Get
@@ -659,7 +659,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property MassSpectraNoiseMinimumSignalToNoiseRatio As Single
+    Public Property MassSpectraNoiseMinimumSignalToNoiseRatio As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio
         End Get
@@ -669,12 +669,12 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property MassSpectraNoiseThresholdIntensity As Single
+    Public Property MassSpectraNoiseThresholdIntensity As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute
         End Get
         Set
-            If Value < 0 Or Value > Single.MaxValue Then Value = 0
+            If Value < 0 Or Value > Double.MaxValue Then Value = 0
             mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Value
         End Set
     End Property
@@ -776,7 +776,7 @@ Public Class clsMASIC
 
 #Region "Peak Finding Options"
     <Obsolete("Use Property Options")>
-    Public Property IntensityThresholdAbsoluteMinimum As Single
+    Public Property IntensityThresholdAbsoluteMinimum As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum
         End Get
@@ -786,7 +786,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property IntensityThresholdFractionMax As Single
+    Public Property IntensityThresholdFractionMax As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax
         End Get
@@ -836,7 +836,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property ButterworthSamplingFrequency As Single
+    Public Property ButterworthSamplingFrequency As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency
         End Get
@@ -887,7 +887,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property MaxAllowedUpwardSpikeFractionMax As Single
+    Public Property MaxAllowedUpwardSpikeFractionMax As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
         End Get
@@ -897,7 +897,7 @@ Public Class clsMASIC
     End Property
 
     <Obsolete("Use Property Options")>
-    Public Property InitialPeakWidthScansScaler As Single
+    Public Property InitialPeakWidthScansScaler As Double
         Get
             Return mOptions.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler
         End Get

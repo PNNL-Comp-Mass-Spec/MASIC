@@ -105,16 +105,6 @@ Namespace DataInput
 
         End Function
 
-        Private Function CSngSafe(value As Double) As Single
-            If value > Single.MaxValue Then
-                Return Single.MaxValue
-            ElseIf value < Single.MinValue Then
-                Return Single.MinValue
-            Else
-                Return CSng(value)
-            End If
-        End Function
-
         Private Function ExtractScanInfoFromMSXMLDataFile(
           filePath As String,
           xmlReader As clsMSDataFileReaderBaseClass,

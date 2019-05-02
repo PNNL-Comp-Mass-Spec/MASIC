@@ -7,7 +7,7 @@
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>Value between 0 and 1; default: 0.01</remarks>
-    Public Property IntensityThresholdFractionMax As Single
+    Public Property IntensityThresholdFractionMax As Double
         Get
             Return mIntensityThresholdFractionMax
         End Get
@@ -22,7 +22,7 @@
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>Default: 0</remarks>
-    Public Property IntensityThresholdAbsoluteMinimum As Single
+    Public Property IntensityThresholdAbsoluteMinimum As Double
 
     Public Property SICBaselineNoiseOptions As clsBaselineNoiseOptions
 
@@ -46,7 +46,7 @@
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>Default: 0.20</remarks>
-    Public Property MaxAllowedUpwardSpikeFractionMax As Single
+    Public Property MaxAllowedUpwardSpikeFractionMax As Double
         Get
             Return mMaxAllowedUpwardSpikeFractionMax
         End Get
@@ -61,7 +61,7 @@
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>Default: 0.5</remarks>
-    Public Property InitialPeakWidthScansScaler As Single
+    Public Property InitialPeakWidthScansScaler As Double
         Get
             Return mInitialPeakWidthScansScaler
         End Get
@@ -97,7 +97,7 @@
     ''' <remarks>UseButterworthSmooth takes precedence over UseSavitzkyGolaySmooth</remarks>
     Public Property UseButterworthSmooth As Boolean
 
-    Public Property ButterworthSamplingFrequency As Single
+    Public Property ButterworthSamplingFrequency As Double
     Public Property ButterworthSamplingFrequencyDoubledForSIMData As Boolean
 
     ''' <summary>
@@ -134,9 +134,9 @@
 
 #Region "Classwide variables"
     Private mInitialPeakWidthScansMaximum As Integer = 30
-    Private mInitialPeakWidthScansScaler As Single = 0.5
-    Private mIntensityThresholdFractionMax As Single = 0.01
-    Private mMaxAllowedUpwardSpikeFractionMax As Single = 0.2
+    Private mInitialPeakWidthScansScaler As Double = 0.5
+    Private mIntensityThresholdFractionMax As Double = 0.01
+    Private mMaxAllowedUpwardSpikeFractionMax As Double = 0.2
     Private mMaxDistanceScansNoOverlap As Integer
     Private mSavitzkyGolayFilterOrder As Short
 #End Region

@@ -1169,8 +1169,8 @@ Public Class frmBrowser
         Dim eSmoothMode As eSmoothModeConstants
         Dim validPeakFound As Boolean
 
-        Dim intensityToDisplay As Single
-        Dim areaToDisplay As Single
+        Dim intensityToDisplay As Double
+        Dim areaToDisplay As Double
 
         Dim statDetails As String
 
@@ -1428,7 +1428,7 @@ Public Class frmBrowser
 
     Private Sub FindSimilarParentIon(similarMZTolerance As Double)
 
-        Const DEFAULT_INTENSITY As Single = 1
+        Const DEFAULT_INTENSITY As Double = 1
 
         Try
             If mParentIonStats Is Nothing OrElse mParentIonStats.Count = 0 Then
@@ -1707,16 +1707,16 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Function InterpolateY(<Out()> ByRef interpolatedYValue As Single, X1 As Integer, X2 As Integer, Y1 As Single, Y2 As Single, targetX As Integer) As Boolean
+    Private Function InterpolateY(<Out()> ByRef interpolatedYValue As Double, X1 As Integer, X2 As Integer, Y1 As Double, Y2 As Double, targetX As Integer) As Boolean
         ' Checks if X1 or X2 is less than targetX
         ' If it is, then determines the Y value that corresponds to targetX by interpolating the line between (X1, Y1) and (X2, Y2)
         '
         ' Returns True if a match is found; otherwise, returns false
 
-        Dim deltaY As Single
-        Dim fraction As Single
+        Dim deltaY As Double
+        Dim fraction As Double
         Dim deltaX As Integer
-        Dim targetY As Single
+        Dim targetY As Double
 
         If X1 < targetX Or X2 < targetX Then
             If X1 < targetX And X2 < targetX Then
@@ -2010,7 +2010,7 @@ Public Class frmBrowser
             Next
 
             For index = 0 To currentParentIon.SICData.Count - 1
-                Dim interpolatedYValue As Single
+                Dim interpolatedYValue As Double
 
                 If index < currentParentIon.SICData.Count - 1 Then
                     With currentParentIon
@@ -3459,7 +3459,7 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Function SortDataFilterCheck(peakMaxIntensityValue As Single, peakSN As Single, peakMZ As Double, minimumIntensity As Single, minimumSN As Single, mzFilter As Single, mzFilterTol As Single, isCustomSIC As Boolean) As Boolean
+    Private Function SortDataFilterCheck(peakMaxIntensityValue As Double, peakSN As Double, peakMZ As Double, minimumIntensity As Double, minimumSN As Double, mzFilter As Single, mzFilterTol As Single, isCustomSIC As Boolean) As Boolean
 
         Dim useData As Boolean
 
@@ -3634,7 +3634,7 @@ Public Class frmBrowser
                     filterThirdWidth -= 1
                 End If
 
-                Dim errorMessage As String = ""
+                Dim errorMessage = ""
 
                 ' Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
                 ' Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter

@@ -20,7 +20,7 @@ Public Class clsMSSpectrum
     ''' <summary>
     ''' 0-based array, ranging from 0 to IonCount-1; note that IonsIntensity.Length could be > IonCount, so do not use .Length to determine the data count
     ''' </summary>
-    Public IonsIntensity() As Single
+    Public IonsIntensity() As Double
 
     ''' <summary>
     ''' Constructor
