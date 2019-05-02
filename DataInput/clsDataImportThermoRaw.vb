@@ -153,7 +153,7 @@ Namespace DataInput
         Public Function ExtractScanInfoFromXcaliburDataFile(
           filePath As String,
           scanList As clsScanList,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           dataOutputHandler As DataOutput.clsDataOutput,
           keepRawSpectra As Boolean,
           keepMSMSSpectra As Boolean) As Boolean
@@ -275,7 +275,7 @@ Namespace DataInput
                         If thermoScanInfo.MSLevel <= 1 Then
                             ' Survey Scan
                             success = ExtractXcaliburSurveyScan(xcaliburAccessor,
-                               scanList, objSpectraCache, dataOutputHandler, sicOptions,
+                               scanList, spectraCache, dataOutputHandler, sicOptions,
                                keepRawSpectra, thermoScanInfo, htSIMScanMapping,
                                lastNonZoomSurveyScanIndex, scanNumber)
 
@@ -283,7 +283,7 @@ Namespace DataInput
 
                             ' Fragmentation Scan
                             success = ExtractXcaliburFragmentationScan(xcaliburAccessor,
-                               scanList, objSpectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
+                               scanList, spectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions,
                                keepRawSpectra, keepMSMSSpectra, thermoScanInfo,
                                lastNonZoomSurveyScanIndex, scanNumber)
 
@@ -299,7 +299,7 @@ Namespace DataInput
                         UpdateProgress(0)
                     End If
 
-                    UpdateCacheStats(objSpectraCache)
+                    UpdateCacheStats(spectraCache)
                     If mOptions.AbortProcessing Then
                         scanList.ProcessingIncomplete = True
                         Exit For
@@ -354,7 +354,7 @@ Namespace DataInput
         Private Function ExtractXcaliburSurveyScan(
           xcaliburAccessor As XRawFileIO,
           scanList As clsScanList,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           dataOutputHandler As DataOutput.clsDataOutput,
           sicOptions As clsSICOptions,
           keepRawSpectra As Boolean,
@@ -441,7 +441,7 @@ Namespace DataInput
             End If
 
             ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            Dim success = LoadSpectraForFinniganDataFile(xcaliburAccessor, objSpectraCache, scanNumber, scanInfo, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, msDataResolution, keepRawSpectra)
+            Dim success = LoadSpectraForFinniganDataFile(xcaliburAccessor, spectraCache, scanNumber, scanInfo, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, msDataResolution, keepRawSpectra)
             If Not success Then Return False
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
@@ -453,7 +453,7 @@ Namespace DataInput
         Private Function ExtractXcaliburFragmentationScan(
           xcaliburAccessor As XRawFileIO,
           scanList As clsScanList,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           dataOutputHandler As DataOutput.clsDataOutput,
           sicOptions As clsSICOptions,
           binningOptions As clsBinningOptions,
@@ -541,7 +541,7 @@ Namespace DataInput
 
             Dim success = LoadSpectraForFinniganDataFile(
               xcaliburAccessor,
-              objSpectraCache,
+              spectraCache,
               scanNumber,
               scanInfo,
               sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
@@ -556,10 +556,10 @@ Namespace DataInput
 
             If thermoScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanList.FragScans.Count - 1, spectraCache, sicOptions)
             Else
                 ' This is an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanInfo.MRMScanInfo, objSpectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanInfo.MRMScanInfo, spectraCache, sicOptions)
             End If
 
             If lastNonZoomSurveyScanIndex >= 0 Then
@@ -574,8 +574,8 @@ Namespace DataInput
         End Function
 
         Private Function LoadSpectraForFinniganDataFile(
-          objXcaliburAccessor As XRawFileIO,
-          objSpectraCache As clsSpectraCache,
+          xcaliburAccessor As XRawFileIO,
+          spectraCache As clsSpectraCache,
           scanNumber As Integer,
           scanInfo As clsScanInfo,
           noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
@@ -593,11 +593,11 @@ Namespace DataInput
 
                 ' Load the ions for this scan
 
-                lastKnownLocation = "objXcaliburAccessor.GetScanData for scan " & scanNumber
+                lastKnownLocation = "xcaliburAccessor.GetScanData for scan " & scanNumber
 
                 ' Retrieve the m/z and intensity values for the given scan
                 ' We retrieve the profile-mode data, since that's required for determining spectrum noise
-                scanInfo.IonCountRaw = objXcaliburAccessor.GetScanData(scanNumber, mzList, intensityList)
+                scanInfo.IonCountRaw = xcaliburAccessor.GetScanData(scanNumber, mzList, intensityList)
 
                 If scanInfo.IonCountRaw > 0 Then
                     Dim ionCountVerified = VerifyDataSorted(scanNumber, scanInfo.IonCountRaw, mzList, intensityList)
@@ -652,7 +652,7 @@ Namespace DataInput
                 lastKnownLocation = "Call ProcessAndStoreSpectrum"
                 mScanTracking.ProcessAndStoreSpectrum(
                     scanInfo, Me,
-                    objSpectraCache, objMSSpectrum,
+                    spectraCache, objMSSpectrum,
                     noiseThresholdOptions,
                     discardLowIntensityDataWork,
                     compressSpectraDataWork,
@@ -671,7 +671,7 @@ Namespace DataInput
         Protected Overloads Function UpdateDatasetFileStats(
           rawFileInfo As FileInfo,
           datasetID As Integer,
-          ByRef objXcaliburAccessor As XRawFileIO) As Boolean
+          xcaliburAccessor As XRawFileIO) As Boolean
 
             Dim scanInfo = New ThermoRawFileReader.clsScanInfo(0)
 
@@ -685,33 +685,27 @@ Namespace DataInput
 
             ' Read the file info using the Xcalibur Accessor
             Try
-                mDatasetFileInfo.AcqTimeStart = objXcaliburAccessor.FileInfo.CreationDate
+                mDatasetFileInfo.AcqTimeStart = xcaliburAccessor.FileInfo.CreationDate
             Catch ex As Exception
                 ' Read error
-                success = False
+                Return False
             End Try
 
-            If success Then
-                Try
-                    ' Look up the end scan time then compute .AcqTimeEnd
-                    scanEnd = objXcaliburAccessor.FileInfo.ScanEnd
-                    objXcaliburAccessor.GetScanInfo(scanEnd, scanInfo)
+            Try
+                ' Look up the end scan time then compute .AcqTimeEnd
+                Dim scanEnd = xcaliburAccessor.FileInfo.ScanEnd
+                xcaliburAccessor.GetScanInfo(scanEnd, scanInfo)
 
-                    With mDatasetFileInfo
-                        .AcqTimeEnd = .AcqTimeStart.AddMinutes(scanInfo.RetentionTime)
-                        .ScanCount = objXcaliburAccessor.GetNumScans()
-                    End With
+                mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanInfo.RetentionTime)
+                mDatasetFileInfo.ScanCount = xcaliburAccessor.GetNumScans()
 
-                Catch ex As Exception
-                    ' Error; use default values
-                    With mDatasetFileInfo
-                        .AcqTimeEnd = .AcqTimeStart
-                        .ScanCount = 0
-                    End With
-                End Try
-            End If
+            Catch ex As Exception
+                ' Error; use default values
+                mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart
+                mDatasetFileInfo.ScanCount = 0
+            End Try
 
-            Return success
+            Return True
 
         End Function
 

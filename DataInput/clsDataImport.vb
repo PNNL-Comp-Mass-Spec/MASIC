@@ -272,51 +272,54 @@ Namespace DataInput
 
             Const cColDelimiter As Char = ControlChars.Tab
 
-            Dim objScanStatsEntry As New clsScanStatsEntry() With {
+            Dim scanStatsEntry As New clsScanStatsEntry() With {
                 .ScanNumber = currentScan.ScanNumber
             }
 
             If eScanType = clsScanList.eScanTypeConstants.SurveyScan Then
-                objScanStatsEntry.ScanType = 1
-                objScanStatsEntry.ScanTypeName = String.Copy(currentScan.ScanTypeName)
+                scanStatsEntry.ScanType = 1
+                scanStatsEntry.ScanTypeName = String.Copy(currentScan.ScanTypeName)
             Else
                 If currentScan.FragScanInfo.MSLevel <= 1 Then
                     ' This is a fragmentation scan, so it must have a scan type of at least 2
-                    objScanStatsEntry.ScanType = 2
+                    scanStatsEntry.ScanType = 2
                 Else
                     ' .MSLevel is 2 or higher, record the actual MSLevel value
-                    objScanStatsEntry.ScanType = currentScan.FragScanInfo.MSLevel
+                    scanStatsEntry.ScanType = currentScan.FragScanInfo.MSLevel
                 End If
-                objScanStatsEntry.ScanTypeName = String.Copy(currentScan.ScanTypeName)
+                scanStatsEntry.ScanTypeName = String.Copy(currentScan.ScanTypeName)
             End If
 
-            objScanStatsEntry.ScanFilterText = currentScan.ScanHeaderText
+            scanStatsEntry.ScanFilterText = currentScan.ScanHeaderText
 
-            objScanStatsEntry.ElutionTime = currentScan.ScanTime.ToString("0.0000")
-            objScanStatsEntry.TotalIonIntensity = StringUtilities.ValueToString(currentScan.TotalIonIntensity, 5)
-            objScanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(currentScan.BasePeakIonIntensity, 5)
-            objScanStatsEntry.BasePeakMZ = StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
+            scanStatsEntry.ElutionTime = currentScan.ScanTime.ToString("0.0000")
+            scanStatsEntry.TotalIonIntensity = StringUtilities.ValueToString(currentScan.TotalIonIntensity, 5)
+            scanStatsEntry.BasePeakIntensity = StringUtilities.ValueToString(currentScan.BasePeakIonIntensity, 5)
+            scanStatsEntry.BasePeakMZ = StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
 
             ' Base peak signal to noise ratio
-            objScanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(currentScan.BasePeakIonIntensity, currentScan.BaselineNoiseStats.NoiseLevel), 4)
+            scanStatsEntry.BasePeakSignalToNoiseRatio = StringUtilities.ValueToString(MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(currentScan.BasePeakIonIntensity, currentScan.BaselineNoiseStats.NoiseLevel), 4)
 
-            objScanStatsEntry.IonCount = currentScan.IonCount
-            objScanStatsEntry.IonCountRaw = currentScan.IonCountRaw
+            scanStatsEntry.IonCount = currentScan.IonCount
+            scanStatsEntry.IonCountRaw = currentScan.IonCountRaw
 
-            mScanTracking.ScanStats.Add(objScanStatsEntry)
+            mScanTracking.ScanStats.Add(scanStatsEntry)
 
-            writer.WriteLine(
-              datasetNumber.ToString() & cColDelimiter &                    ' Dataset number
-              objScanStatsEntry.ScanNumber.ToString() & cColDelimiter &        ' Scan number
-              objScanStatsEntry.ElutionTime & cColDelimiter &                ' Scan time (minutes)
-              objScanStatsEntry.ScanType.ToString() & cColDelimiter &          ' Scan type (1 for MS, 2 for MS2, etc.)
-              objScanStatsEntry.TotalIonIntensity & cColDelimiter &          ' Total ion intensity
-              objScanStatsEntry.BasePeakIntensity & cColDelimiter &          ' Base peak ion intensity
-              objScanStatsEntry.BasePeakMZ & cColDelimiter &                 ' Base peak ion m/z
-              objScanStatsEntry.BasePeakSignalToNoiseRatio & cColDelimiter & ' Base peak signal to noise ratio
-              objScanStatsEntry.IonCount.ToString() & cColDelimiter &          ' Number of peaks (aka ions) in the spectrum
-              objScanStatsEntry.IonCountRaw.ToString() & cColDelimiter &       ' Number of peaks (aka ions) in the spectrum prior to any filtering
-              objScanStatsEntry.ScanTypeName)                                ' Scan type name
+            Dim dataColumns = New List(Of String) From {
+                datasetNumber.ToString(),                   ' Dataset number
+                scanStatsEntry.ScanNumber.ToString(),       ' Scan number
+                scanStatsEntry.ElutionTime,                 ' Scan time (minutes)
+                scanStatsEntry.ScanType.ToString(),         ' Scan type (1 for MS, 2 for MS2, etc.)
+                scanStatsEntry.TotalIonIntensity,           ' Total ion intensity
+                scanStatsEntry.BasePeakIntensity,           ' Base peak ion intensity
+                scanStatsEntry.BasePeakMZ,                  ' Base peak ion m/z
+                scanStatsEntry.BasePeakSignalToNoiseRatio,  ' Base peak signal to noise ratio
+                scanStatsEntry.IonCount.ToString(),         ' Number of peaks (aka ions) in the spectrum
+                scanStatsEntry.IonCountRaw.ToString(),      ' Number of peaks (aka ions) in the spectrum prior to any filtering
+                scanStatsEntry.ScanTypeName                 ' Scan type name
+                }
+
+            writer.WriteLine(String.Join(cColDelimiter, dataColumns))
 
         End Sub
 

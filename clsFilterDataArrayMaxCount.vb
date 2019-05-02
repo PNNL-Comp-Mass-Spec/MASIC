@@ -31,7 +31,7 @@ Public Class clsFilterDataArrayMaxCount
 
     Private mProgress As Single     ' Value between 0 and 100
 
-    Public Event ProgressChanged(ProgressVal As Single)
+    Public Event ProgressChanged(progressVal As Single)
 
 #Region "Properties"
     Public Property MaximumDataCountToLoad As Integer

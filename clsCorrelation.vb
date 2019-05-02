@@ -138,7 +138,7 @@ Public Class clsCorrelation
 
     Private Function BetaCF(a As Double, b As Double, x As Double) As Double
 
-        Dim MAXIT = 100
+        Const MAX_ITERATIONS = 100
         Dim EPS = 0.0000003
         Dim FPMIN = 1.0E-30
 
@@ -153,7 +153,7 @@ Public Class clsCorrelation
         If (Math.Abs(d) < FPMIN) Then d = FPMIN
         d = 1.0 / d
         h = d
-        For m = 1 To MAXIT
+        For m = 1 To MAX_ITERATIONS
             m2 = 2 * m
             aa = m * (b - m) * x / ((qam + m2) * (a + m2))
             d = 1.0 + aa * d
@@ -173,8 +173,8 @@ Public Class clsCorrelation
             If (Math.Abs(del - 1.0) < EPS) Then Exit For
         Next m
 
-        If (m > MAXIT) Then
-            Throw New Exception("a or b too big, or MAXIT too small in clsCorrelation->BetaCF")
+        If (m > MAX_ITERATIONS) Then
+            Throw New Exception("a or b too big, or MAX_ITERATIONS too small in clsCorrelation->BetaCF")
             Return 0
         Else
             Return h

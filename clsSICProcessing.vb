@@ -287,8 +287,8 @@ Public Class clsSICProcessing
                 maximumIntensity = -1
                 scanIndexMax = -1
                 For scanIndex = scanIndexStart To scanIndexEnd
-                    If fullSICIntensities(mZIndexWork, scanIndex) > maximumIntensity Then
-                        maximumIntensity = fullSICIntensities(mZIndexWork, scanIndex)
+                    If fullSICIntensities(mzIndexWork, scanIndex) > maximumIntensity Then
+                        maximumIntensity = fullSICIntensities(mzIndexWork, scanIndex)
                         scanIndexMax = scanIndex
                     End If
                 Next
@@ -311,9 +311,9 @@ Public Class clsSICProcessing
                 Try
                     ' Extend the SIC to the left until the threshold is reached
                     If scanIndexStart > 0 AndAlso Not leftDone Then
-                        If fullSICIntensities(mZIndexWork, scanIndexStart) < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum OrElse
-                           fullSICIntensities(mZIndexWork, scanIndexStart) < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * maximumIntensity OrElse
-                           fullSICIntensities(mZIndexWork, scanIndexStart) < sicPeak.BaselineNoiseStats.NoiseLevel Then
+                        If fullSICIntensities(mzIndexWork, scanIndexStart) < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum OrElse
+                           fullSICIntensities(mzIndexWork, scanIndexStart) < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * maximumIntensity OrElse
+                           fullSICIntensities(mzIndexWork, scanIndexStart) < sicPeak.BaselineNoiseStats.NoiseLevel Then
                             If scanIndexBelowThresholdLeft < 0 Then
                                 scanIndexBelowThresholdLeft = scanIndexStart
                             Else
