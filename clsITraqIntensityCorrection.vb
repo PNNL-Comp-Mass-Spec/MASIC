@@ -193,7 +193,7 @@ Public Class clsITraqIntensityCorrection
                     ElseIf percentChangeRounded < 0 Then
                         visualPercentChange = New String("-"c, -percentChangeRounded)
                     Else
-                        visualPercentChange = ""
+                        visualPercentChange = String.Empty
                     End If
 
                     Console.WriteLine("{0,-8} {1,-10:0.0} {2,-12:0.0}{3,7:0.0}%   {4}", index, reporterIonIntensities(index), newIntensity, percentChange, visualPercentChange)

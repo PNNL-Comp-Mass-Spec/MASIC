@@ -199,7 +199,7 @@ Public Class clsDatasetStatsSummarizer
                 ReportError("objScanStats is Nothing; unable to continue in ComputeScanStatsSummary")
                 Return False
             Else
-                mErrorMessage = ""
+                mErrorMessage = String.Empty
             End If
 
             ' Initialize objSummaryStats
@@ -328,7 +328,7 @@ Public Class clsDatasetStatsSummarizer
                 ReportError("objScanStats is Nothing; unable to continue in CreateDatasetInfoFile")
                 Return False
             Else
-                mErrorMessage = ""
+                mErrorMessage = String.Empty
             End If
 
             ' If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, then we would have to use System.Encoding.Unicode
@@ -445,7 +445,7 @@ Public Class clsDatasetStatsSummarizer
                 ReportError("objScanStats is Nothing; unable to continue in CreateDatasetInfoXML")
                 Return String.Empty
             Else
-                mErrorMessage = ""
+                mErrorMessage = String.Empty
             End If
 
             Dim objSummaryStats As clsDatasetSummaryStats
@@ -630,7 +630,7 @@ Public Class clsDatasetStatsSummarizer
                 ReportError("objScanStats is Nothing; unable to continue in CreateScanStatsFile")
                 Return False
             Else
-                mErrorMessage = ""
+                mErrorMessage = String.Empty
             End If
 
             Using writer = New StreamWriter(New FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -789,7 +789,7 @@ Public Class clsDatasetStatsSummarizer
                 ReportError("objScanStats is Nothing; unable to continue in UpdateDatasetStatsTextFile")
                 Return False
             Else
-                mErrorMessage = ""
+                mErrorMessage = String.Empty
             End If
 
             If objScanStats Is mDatasetScanStats Then

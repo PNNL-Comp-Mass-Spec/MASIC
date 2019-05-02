@@ -2287,7 +2287,7 @@ Public Class clsMASIC
     End Sub
 
     Private Sub ErrorEventHandler(message As String, ex As Exception)
-        LogErrors("", message, ex)
+        LogErrors(String.Empty, message, ex)
     End Sub
 
     Private Sub WarningEventHandler(message As String)

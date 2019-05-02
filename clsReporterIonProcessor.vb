@@ -469,9 +469,9 @@ Public Class clsReporterIonProcessor
                        Math.Abs(reporterIons(reporterIonIndex).Resolution) < Single.Epsilon AndAlso
                        Math.Abs(reporterIons(reporterIonIndex).LabelDataMZ) < Single.Epsilon Then
                         ' A match was not found in the label data; display blanks (not zeroes)
-                        ftmsSignalToNoise.Add("")
-                        ftmsResolution.Add("")
-                        ' ftmsLabelDataMz.Add("")
+                        ftmsSignalToNoise.Add(String.Empty)
+                        ftmsResolution.Add(String.Empty)
+                        ' ftmsLabelDataMz.Add(String.Empty)
                     Else
                         ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).SignalToNoise, 2))
                         ftmsResolution.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).Resolution, 2))

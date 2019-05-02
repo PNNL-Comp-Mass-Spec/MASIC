@@ -81,8 +81,8 @@ Namespace DataInput
             Dim chargeState As Integer
             Dim isolationWidth As Double
 
-            Dim chargeStateText = ""
-            Dim isolationWidthText = ""
+            Dim chargeStateText = String.Empty
+            Dim isolationWidthText = String.Empty
 
             scanInfo.TryGetScanEvent(SCAN_EVENT_CHARGE_STATE, chargeStateText, True)
             If Not String.IsNullOrWhiteSpace(chargeStateText) Then
@@ -121,7 +121,7 @@ Namespace DataInput
             Else
                 ' ThermoRawFileReader could not determine the parent ion m/z value (this is highly unlikely)
                 ' Use scan event "Monoisotopic M/Z" instead
-                Dim monoMzText = ""
+                Dim monoMzText = String.Empty
                 If (Not scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText, True)) Then
 
                     ReportWarning("Could not determine the parent ion m/z value (" & SCAN_EVENT_MONOISOTOPIC_MZ & "); " &

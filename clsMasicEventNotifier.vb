@@ -108,7 +108,7 @@ Public MustInherit Class clsMasicEventNotifier
     ''' </summary>
     ''' <param name="percentComplete"></param>
     Protected Sub UpdateProgress(percentComplete As Short)
-        OnProgressUpdate("", percentComplete)
+        OnProgressUpdate(String.Empty, percentComplete)
     End Sub
 
     Protected Sub UpdateProgress(progressMessage As String)

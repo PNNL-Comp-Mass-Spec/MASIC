@@ -589,6 +589,7 @@ Namespace DataOutput
             End Select
 
             Return String.Join(cColDelimiter, headerNames)
+
         End Function
 
         Public Function InitializeSICDetailsTextFile(

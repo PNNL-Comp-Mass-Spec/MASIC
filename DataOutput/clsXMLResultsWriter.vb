@@ -291,11 +291,11 @@ Namespace DataOutput
                                     ' Ignore the exception if this is an Out of Memory exception
 
                                     If Not intensityDataListWritten Then
-                                        objXMLOut.WriteElementString("IntensityDataList", "")
+                                        objXMLOut.WriteElementString("IntensityDataList", String.Empty)
                                     End If
 
                                     If Not massDataList Then
-                                        objXMLOut.WriteElementString("MassDataList", "")
+                                        objXMLOut.WriteElementString("MassDataList", String.Empty)
                                     End If
 
                                 End Try
@@ -318,7 +318,7 @@ Namespace DataOutput
 
                                     Catch ex As OutOfMemoryException
                                         ' Ignore the exception if this is an Out of Memory exception
-                                        objXMLOut.WriteElementString("SmoothedYDataList", "")
+                                        objXMLOut.WriteElementString("SmoothedYDataList", String.Empty)
                                     End Try
 
                                 End If
@@ -638,7 +638,6 @@ Namespace DataOutput
           scanList As clsScanList,
           inputFileName As String,
           outputDirectoryPath As String) As Boolean
-
 
             Const PARENT_ION_TAG_START_LCASE = "<parention"     ' Note: this needs to be lowercase
             Const INDEX_ATTRIBUTE_LCASE = "index="              ' Note: this needs to be lowercase
