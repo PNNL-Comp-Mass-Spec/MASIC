@@ -143,19 +143,6 @@ Namespace DataOutput
                 baselineNoiseLevel = .BaselineNoiseStats.NoiseLevel
                 If baselineNoiseLevel < 1 Then baselineNoiseLevel = 1
 
-                ' Old Column Order:
-                ''lineOut = scanNumber.ToString() & "," &
-                ''             .ScanTime.ToString("0.0000") &
-                ''             msLevel & "," &
-                ''             numIsotopicSignatures & "," &
-                ''             numPeaks & "," &
-                ''             .TotalIonIntensity.ToString() & "," &
-                ''             .BasePeakIonMZ & "," &
-                ''             .BasePeakIonIntensity & "," &
-                ''             timeDomainIntensity & "," &
-                ''             peakIntensityThreshold & "," &
-                ''             peptideIntensityThreshold
-
                 mBPIWriter.WriteDecon2LSScanFileEntry(scanInfoWriter, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures)
             End With
 

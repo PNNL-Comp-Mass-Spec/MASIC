@@ -822,7 +822,6 @@ Public Class clsSICProcessing
 
             Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
 
-
             ' Find the largest peak in the SIC for this m/z
             Dim largestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
                 sicDetails.SICData,
