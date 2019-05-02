@@ -26,8 +26,6 @@ Namespace DataInput
         Private mScansOutOfRange As Integer
         Private mWarnCount As Integer
 
-        Private ReadOnly mThermoNativeIdMatcher As Regex = New Regex("controllerType=\d+ controllerNumber=\d+ scan=\d+")
-
 #End Region
         ''' <summary>
         ''' Constructor
@@ -243,8 +241,16 @@ Namespace DataInput
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra)
 
-                Dim thermoRawFile As Boolean = False
-                ' ToDo: get this from the xmlReader
+                Dim thermoRawFile = False
+
+                For Each cvParam In xmlReader.SourceFileParams.CVParams
+                    Select Case cvParam.TermInfo.Cvid
+                        Case CV.CVID.MS_Thermo_nativeID_format
+                        Case CV.CVID.MS_Thermo_nativeID_format__combined_spectra
+                        Case CV.CVID.MS_Thermo_RAW_format
+                            thermoRawFile = True
+                    End Select
+                Next
 
                 UpdateProgress("Reading XML data" & ControlChars.NewLine & mzMLFile.Name)
                 ReportMessage("Reading XML data from " & mzMLFile.FullName)
@@ -280,6 +286,8 @@ Namespace DataInput
 
                     End While
 
+                    mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
+
                 ElseIf xmlReader.NumSpectra = 0 AndAlso xmlReader.NumChromatograms > 0 Then
                     Dim iterator = xmlReader.ReadAllChromatograms(True).GetEnumerator()
 
@@ -308,6 +316,7 @@ Namespace DataInput
                         'End If
 
                     End While
+                    mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
                 End If
 
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
@@ -754,11 +763,6 @@ Namespace DataInput
             ' Store the "filter string" in .FilterLine
             Dim filterStrings = (From item In mzMLSpectrum.CVParams Where item.TermInfo.Cvid = CV.CVID.MS_filter_string).ToList()
 
-            If mThermoNativeIdMatcher.IsMatch(mzMLSpectrum.NativeId) Then
-                ' Override thermoRawFile
-                thermoRawFile = True
-            End If
-
             If filterStrings.Count > 0 Then
                 Dim filterString = filterStrings.First().Value
 
@@ -862,15 +866,15 @@ Namespace DataInput
           datasetID As Integer,
           xmlReader As SimpleMzMLReader) As Boolean
 
-
             ' Read the file info from the file system
             Dim success = UpdateDatasetFileStats(rawFileInfo, datasetID)
 
             If Not success Then Return False
 
-            ' ToDo:
-            ' mDatasetFileInfo.AcqTimeStart = xmlReader.StartTimeStamp
-            ' mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart
+            If xmlReader.StartTimeStamp > DateTime.MinValue Then
+                mDatasetFileInfo.AcqTimeStart = xmlReader.StartTimeStamp
+                mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart
+            End If
 
             ' Note that .ScanCount and AcqTimeEnd will be updated by ExtractScanInfoFromMzMLDataFile
 
