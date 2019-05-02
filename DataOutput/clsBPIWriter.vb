@@ -322,9 +322,9 @@ Namespace DataOutput
                 scanNumber.ToString(),
                 currentScan.ScanTime.ToString("0.0000"),
                 msLevel.ToString(),
-                currentScan.BasePeakIonIntensity.ToString(),
+                currentScan.BasePeakIonIntensity.ToString("0.00000"),
                 currentScan.BasePeakIonMZ.ToString("0.00000"),
-                currentScan.TotalIonIntensity.ToString(),
+                currentScan.TotalIonIntensity.ToString("0.00000"),
                 numPeaks.ToString(),
                 numIsotopicSignatures.ToString()
             }

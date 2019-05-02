@@ -244,7 +244,7 @@ Namespace DataOutput
 
             With currentScan
 
-                writer.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString())          ' Store the base peak ion intensity as the time domain signal level value
+                writer.WriteLine("Time domain signal level:" & ControlChars.Tab & .BasePeakIonIntensity.ToString("0.000"))          ' Store the base peak ion intensity as the time domain signal level value
 
                 writer.WriteLine("MASIC " & mOptions.MASICVersion)                     ' Software version
                 Dim dataLine = "MS/MS-based PEK file"
