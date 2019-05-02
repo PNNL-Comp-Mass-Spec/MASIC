@@ -169,7 +169,11 @@ Namespace DataInput
                     Dim msSpectrum = GetNewSpectrum(spectrumInfo.DataCount)
 
                     spectrumInfo.MZList.CopyTo(msSpectrum.IonsMZ, 0)
-                    spectrumInfo.IntensityList.CopyTo(msSpectrum.IonsIntensity, 0)
+
+                    ' Copy one item at a time since spectrumInfo.IntensityList is a float but msSpectrum.IonsIntensity is a double
+                    For i = 0 To spectrumInfo.IntensityList.Count - 1
+                        msSpectrum.IonsIntensity(i) = spectrumInfo.IntensityList(i)
+                    Next
 
                     Dim percentComplete = xmlReader.ProgressPercentComplete
                     Dim extractSuccess = ExtractScanInfoCheckRange(scanList, msSpectrum, spectrumInfo, spectraCache, dataOutputHandler, percentComplete)

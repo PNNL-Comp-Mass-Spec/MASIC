@@ -633,7 +633,7 @@ Namespace DataInput
 
                 For ionIndex = 0 To scanInfo.IonCountRaw - 1
                     objMSSpectrum.IonsMZ(ionIndex) = mzList(ionIndex)
-                    objMSSpectrum.IonsIntensity(ionIndex) = CSng(intensityList(ionIndex))
+                    objMSSpectrum.IonsIntensity(ionIndex) = intensityList(ionIndex)
                     totalIonIntensity += intensityList(ionIndex)
                     If intensityList(ionIndex) > basePeakIntensity Then
                         basePeakIntensity = intensityList(ionIndex)

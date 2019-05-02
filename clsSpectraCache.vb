@@ -555,7 +555,7 @@ Public Class clsSpectraCache
                     Next
 
                     For index = 0 To .IonCount - 1
-                        .IonsIntensity(index) = mPageFileReader.ReadSingle()
+                        .IonsIntensity(index) = mPageFileReader.ReadDouble()
                     Next
 
                 End With

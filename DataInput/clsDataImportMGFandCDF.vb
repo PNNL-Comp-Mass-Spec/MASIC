@@ -366,6 +366,12 @@ Namespace DataInput
                             ReDim .IonsIntensity(.IonCount - 1)
 
                             spectrumInfo.MZList.CopyTo(.IonsMZ, 0)
+
+                            ' Copy one item at a time since spectrumInfo.IntensityList is a float but msSpectrum.IonsIntensity is a double
+                            For i = 0 To spectrumInfo.IntensityList.Count - 1
+                                .IonsIntensity(i) = spectrumInfo.IntensityList(i)
+                            Next
+
                         End With
 
                         With newFragScan
