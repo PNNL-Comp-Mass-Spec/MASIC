@@ -105,7 +105,7 @@ Namespace DataInput
                     End If
 
                     If scanNumberCorrection > 0 Then scanNumber += scanNumberCorrection
-                    Dim objMSSpectrum As New clsMSSpectrum()
+                    Dim msSpectrum As New clsMSSpectrum()
 
                     If mScanTracking.CheckScanInRange(scanNumber, scanTime, sicOptions) Then
 
@@ -135,13 +135,13 @@ Namespace DataInput
                         Dim mzData() As Double = Nothing
 
                         success = objCDFReader.GetMassSpectrum(msScanIndex, mzData,
-                                                              objMSSpectrum.IonsIntensity,
-                                                              objMSSpectrum.IonCount)
+                                                              msSpectrum.IonsIntensity,
+                                                              msSpectrum.IonCount)
 
-                        If success AndAlso objMSSpectrum.IonCount > 0 Then
-                            objMSSpectrum.ScanNumber = newSurveyScan.ScanNumber
+                        If success AndAlso msSpectrum.IonCount > 0 Then
+                            msSpectrum.ScanNumber = newSurveyScan.ScanNumber
 
-                            With objMSSpectrum
+                            With msSpectrum
                                 ReDim .IonsMZ(.IonCount - 1)
                                 mzData.CopyTo(.IonsMZ, 0)
 
@@ -163,19 +163,19 @@ Namespace DataInput
                             Dim msDataResolution As Double
 
                             With newSurveyScan
-                                .IonCount = objMSSpectrum.IonCount
+                                .IonCount = msSpectrum.IonCount
                                 .IonCountRaw = .IonCount
 
                                 ' Find the base peak ion mass and intensity
-                                .BasePeakIonMZ = FindBasePeakIon(objMSSpectrum.IonsMZ,
-                                                             objMSSpectrum.IonsIntensity,
-                                                             objMSSpectrum.IonCount, .BasePeakIonIntensity,
+                                .BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ,
+                                                             msSpectrum.IonsIntensity,
+                                                             msSpectrum.IonCount, .BasePeakIonIntensity,
                                                              mzMin, mzMax)
 
                                 ' Determine the minimum positive intensity in this scan
                                 .MinimumPositiveIntensity =
-                                mPeakFinder.FindMinimumPositiveValue(objMSSpectrum.IonCount,
-                                                                          objMSSpectrum.IonsIntensity, 0)
+                                mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount,
+                                                                          msSpectrum.IonsIntensity, 0)
                             End With
 
                             If sicOptions.SICToleranceIsPPM Then
@@ -194,7 +194,7 @@ Namespace DataInput
 
                             mScanTracking.ProcessAndStoreSpectrum(
                                 newSurveyScan, Me,
-                                objSpectraCache, objMSSpectrum,
+                                objSpectraCache, msSpectrum,
                                 sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
                                 DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
                                 sicOptions.CompressMSSpectraData,
@@ -252,20 +252,20 @@ Namespace DataInput
 
                 ' Now read the MS/MS data from the MGF file
                 Do
-                    Dim objSpectrumInfo As MSDataFileReader.clsSpectrumInfo = Nothing
-                    Dim fragScanFound = objMGFReader.ReadNextSpectrum(objSpectrumInfo)
+                    Dim spectrumInfo As MSDataFileReader.clsSpectrumInfo = Nothing
+                    Dim fragScanFound = objMGFReader.ReadNextSpectrum(spectrumInfo)
                     If Not fragScanFound Then Exit Do
 
                     mDatasetFileInfo.ScanCount += 1
 
-                    If objSpectrumInfo.ScanNumber < scanList.SurveyScans(lastSurveyScanIndex).ScanNumber Then
+                    If spectrumInfo.ScanNumber < scanList.SurveyScans(lastSurveyScanIndex).ScanNumber Then
                         ' The scan number for the current MS/MS spectrum is less than the last survey scan index scan number
                         ' This can happen, due to oddities with combining scans when creating the .MGF file
                         ' Need to decrement lastSurveyScanIndex until we find the appropriate survey scan
                         Do
                             lastSurveyScanIndex -= 1
                             If lastSurveyScanIndex = 0 Then Exit Do
-                        Loop While objSpectrumInfo.ScanNumber < scanList.SurveyScans(lastSurveyScanIndex).ScanNumber
+                        Loop While spectrumInfo.ScanNumber < scanList.SurveyScans(lastSurveyScanIndex).ScanNumber
 
                     End If
 
@@ -276,7 +276,7 @@ Namespace DataInput
                         ' If this indexing error is found, then we'll set scanNumberCorrection = 1 and apply it to all subsequent MS/MS scans;
                         '  we'll also need to correct prior MS/MS scans
                         For surveyScanIndex = lastSurveyScanIndex To scanList.SurveyScans.Count - 1
-                            If scanList.SurveyScans(surveyScanIndex).ScanNumber = objSpectrumInfo.ScanNumber Then
+                            If scanList.SurveyScans(surveyScanIndex).ScanNumber = spectrumInfo.ScanNumber Then
                                 ' Conflicting scan numbers were found
                                 scanNumberCorrection = 1
 
@@ -291,42 +291,42 @@ Namespace DataInput
 
                                 Next
                                 Exit For
-                            ElseIf scanList.SurveyScans(surveyScanIndex).ScanNumber > objSpectrumInfo.ScanNumber Then
+                            ElseIf scanList.SurveyScans(surveyScanIndex).ScanNumber > spectrumInfo.ScanNumber Then
                                 Exit For
                             End If
                         Next
                     End If
 
                     If scanNumberCorrection > 0 Then
-                        objSpectrumInfo.ScanNumber += scanNumberCorrection
-                        objSpectrumInfo.ScanNumberEnd += scanNumberCorrection
+                        spectrumInfo.ScanNumber += scanNumberCorrection
+                        spectrumInfo.ScanNumberEnd += scanNumberCorrection
                     End If
 
                     Dim fragScanIteration As Integer
 
                     scanTime = InterpolateRTandFragScanNumber(
-                    scanList.SurveyScans, lastSurveyScanIndex, objSpectrumInfo.ScanNumber, fragScanIteration)
+                    scanList.SurveyScans, lastSurveyScanIndex, spectrumInfo.ScanNumber, fragScanIteration)
 
                     ' Make sure this fragmentation scan isn't present yet in scanList.FragScans
                     ' This can occur in Agilent .MGF files if the scan is listed both singly and grouped with other MS/MS scans
                     Dim validFragScan = True
                     For Each fragScan In scanList.FragScans
 
-                        If fragScan.ScanNumber = objSpectrumInfo.ScanNumber Then
+                        If fragScan.ScanNumber = spectrumInfo.ScanNumber Then
                             ' Duplicate found
                             validFragScan = False
                             Exit For
                         End If
                     Next
 
-                    If Not (validFragScan AndAlso mScanTracking.CheckScanInRange(objSpectrumInfo.ScanNumber, scanTime, sicOptions)) Then
+                    If Not (validFragScan AndAlso mScanTracking.CheckScanInRange(spectrumInfo.ScanNumber, scanTime, sicOptions)) Then
                         Continue Do
                     End If
 
                     ' See if lastSurveyScanIndex needs to be updated
                     ' At the same time, populate .MasterScanOrder
                     Do While lastSurveyScanIndex < scanList.SurveyScans.Count - 1 AndAlso
-                             objSpectrumInfo.ScanNumber > scanList.SurveyScans(lastSurveyScanIndex + 1).ScanNumber
+                             spectrumInfo.ScanNumber > scanList.SurveyScans(lastSurveyScanIndex + 1).ScanNumber
 
                         lastSurveyScanIndex += 1
 
@@ -340,11 +340,11 @@ Namespace DataInput
                     Loop
 
                     scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count,
-                                   objSpectrumInfo.ScanNumber, CSng(scanTime))
+                                   spectrumInfo.ScanNumber, CSng(scanTime))
 
                     Dim newFragScan = New clsScanInfo()
                     With newFragScan
-                        .ScanNumber = objSpectrumInfo.ScanNumber
+                        .ScanNumber = spectrumInfo.ScanNumber
                         .ScanTime = CSng(scanTime)
                         .FragScanInfo.FragScanNumber = fragScanIteration
                         .FragScanInfo.MSLevel = 2
@@ -355,41 +355,40 @@ Namespace DataInput
                     End With
                     scanList.FragScans.Add(newFragScan)
 
-                    Dim objMSSpectrum As New clsMSSpectrum() With {
-                        .IonCount = objSpectrumInfo.DataCount
+                    Dim msSpectrum As New clsMSSpectrum() With {
+                        .IonCount = spectrumInfo.DataCount
                     }
 
-                    If objMSSpectrum.IonCount > 0 Then
-                        objMSSpectrum.ScanNumber = newFragScan.ScanNumber
-                        With objMSSpectrum
+                    If msSpectrum.IonCount > 0 Then
+                        msSpectrum.ScanNumber = newFragScan.ScanNumber
+                        With msSpectrum
                             ReDim .IonsMZ(.IonCount - 1)
                             ReDim .IonsIntensity(.IonCount - 1)
 
-                            objSpectrumInfo.MZList.CopyTo(.IonsMZ, 0)
-                            objSpectrumInfo.IntensityList.CopyTo(.IonsMZ, 0)
+                            spectrumInfo.MZList.CopyTo(.IonsMZ, 0)
                         End With
 
                         With newFragScan
-                            .IonCount = objMSSpectrum.IonCount
+                            .IonCount = msSpectrum.IonCount
                             .IonCountRaw = .IonCount
 
                             Dim mzMin As Double, mzMax As Double
 
                             ' Find the base peak ion mass and intensity
-                            .BasePeakIonMZ = FindBasePeakIon(objMSSpectrum.IonsMZ, objMSSpectrum.IonsIntensity,
-                                                         objMSSpectrum.IonCount, .BasePeakIonIntensity,
+                            .BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
+                                                         msSpectrum.IonCount, .BasePeakIonIntensity,
                                                          mzMin, mzMax)
 
                             ' Compute the total scan intensity
                             .TotalIonIntensity = 0
                             For ionIndex = 0 To .IonCount - 1
-                                .TotalIonIntensity += objMSSpectrum.IonsIntensity(ionIndex)
+                                .TotalIonIntensity += msSpectrum.IonsIntensity(ionIndex)
                             Next
 
                             ' Determine the minimum positive intensity in this scan
                             .MinimumPositiveIntensity =
-                            mPeakFinder.FindMinimumPositiveValue(objMSSpectrum.IonCount,
-                                                                      objMSSpectrum.IonsIntensity, 0)
+                            mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount,
+                                                                      msSpectrum.IonsIntensity, 0)
 
                         End With
 
@@ -398,7 +397,7 @@ Namespace DataInput
 
                         mScanTracking.ProcessAndStoreSpectrum(
                             newFragScan, Me,
-                            objSpectraCache, objMSSpectrum,
+                            objSpectraCache, msSpectrum,
                             sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
                             DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
                             sicOptions.CompressMSMSSpectraData,
@@ -413,7 +412,7 @@ Namespace DataInput
                         End With
                     End If
 
-                    mParentIonProcessor.AddUpdateParentIons(scanList, lastSurveyScanIndex, objSpectrumInfo.ParentIonMZ,
+                    mParentIonProcessor.AddUpdateParentIons(scanList, lastSurveyScanIndex, spectrumInfo.ParentIonMZ,
                                                             scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
 
                     ' Note: We need to take msScanCount * 2, in addition to adding msScanCount to lastSurveyScanIndex, since we have to read two different files
