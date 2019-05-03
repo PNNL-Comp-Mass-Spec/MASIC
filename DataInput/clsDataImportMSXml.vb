@@ -1,5 +1,4 @@
-﻿Imports System.Text.RegularExpressions
-Imports MASIC.clsMASIC
+﻿Imports MASIC.clsMASIC
 Imports MASIC.DataOutput
 Imports MASICPeakFinder
 Imports MSDataFileReader
@@ -19,6 +18,11 @@ Namespace DataInput
 
         Private mWarnCount As Integer
 
+        Private mMostRecentPrecursorScan As Integer
+
+        Private mCentroidedPrecursorIonsMz As List(Of Double) = New List(Of Double)
+        Private mCentroidedPrecursorIonsIntensity As List(Of Double) = New List(Of Double)
+
 #End Region
         ''' <summary>
         ''' Constructor
@@ -34,6 +38,153 @@ Namespace DataInput
           scanTracking As clsScanTracking)
             MyBase.New(masicOptions, peakFinder, parentIonProcessor, scanTracking)
         End Sub
+
+        Private Function ComputeInterference(
+          mzMLSpectrum As SimpleMzMLReader.SimpleSpectrum,
+          scanInfo As clsScanInfo,
+          precursorScanNumber As Integer) As Double
+
+            If precursorScanNumber <> mCachedPrecursorScan Then
+
+                If mMostRecentPrecursorScan <> precursorScanNumber Then
+                    ReportWarning(String.Format(
+                        "Most recent precursor scan is {0}, and not {1}; cannot compute interference for scan {2}",
+                        mMostRecentPrecursorScan, precursorScanNumber, scanInfo.ScanNumber))
+                    Return 0
+                End If
+
+                UpdateCachedPrecursorScan(mMostRecentPrecursorScan, mCentroidedPrecursorIonsMz, mCentroidedPrecursorIonsIntensity)
+            End If
+
+            Dim isolationWidth As Double = 0
+
+            Dim chargeState As Integer = 0
+            Dim chargeStateText = String.Empty
+
+            ' This is only used if scanInfo.FragScanInfo.ParentIonMz is zero
+            Dim monoMzText = String.Empty
+
+            Dim isolationWidthText = String.Empty
+
+            Dim isolationWindowTargetMzText = String.Empty
+            Dim isolationWindowLowerOffsetText = String.Empty
+            Dim isolationWindowUpperOffsetText = String.Empty
+
+            If mzMLSpectrum.Precursors.Count > 0 AndAlso Not mzMLSpectrum.Precursors(0).IsolationWindow Is Nothing Then
+                For Each cvParam In mzMLSpectrum.Precursors(0).IsolationWindow.CVParams
+                    Select Case cvParam.TermInfo.Cvid
+                        Case CV.CVID.MS_isolation_width_OBSOLETE
+                            isolationWidthText = cvParam.Value
+
+                        Case CV.CVID.MS_isolation_window_target_m_z
+                            isolationWindowTargetMzText = cvParam.Value
+                        Case CV.CVID.MS_isolation_window_lower_offset
+                            isolationWindowLowerOffsetText = cvParam.Value
+                        Case CV.CVID.MS_isolation_window_upper_offset
+                            isolationWindowUpperOffsetText = cvParam.Value
+
+                    End Select
+                Next
+            End If
+
+            If mzMLSpectrum.Precursors.Count > 0 AndAlso
+               Not mzMLSpectrum.Precursors(0).SelectedIons Is Nothing AndAlso
+               mzMLSpectrum.Precursors(0).SelectedIons.Count > 0 Then
+
+                For Each cvParam In mzMLSpectrum.Precursors(0).SelectedIons(0).CVParams
+                    Select Case cvParam.TermInfo.Cvid
+                        Case CV.CVID.MS_selected_ion_m_z,
+                             CV.CVID.MS_selected_precursor_m_z
+                            monoMzText = cvParam.Value
+
+                        Case CV.CVID.MS_charge_state
+                            chargeStateText = cvParam.Value
+
+                    End Select
+                Next
+
+            End If
+
+            If Not String.IsNullOrWhiteSpace(chargeStateText) Then
+                If Not Integer.TryParse(chargeStateText, chargeState) Then
+                    chargeState = 0
+                End If
+            End If
+
+            Dim isolationWidthDefined = False
+
+            If Not String.IsNullOrWhiteSpace(isolationWidthText) Then
+                If Double.TryParse(isolationWidthText, isolationWidth) Then
+                    isolationWidthDefined = True
+                End If
+            End If
+
+            If Not isolationWidthDefined AndAlso Not String.IsNullOrWhiteSpace(isolationWindowTargetMzText) Then
+                Dim isolationWindowTargetMz As Double
+                Dim isolationWindowLowerOffset As Double
+                Dim isolationWindowUpperOffset As Double
+
+                If Double.TryParse(isolationWindowTargetMzText, isolationWindowTargetMz) AndAlso
+                   Double.TryParse(isolationWindowLowerOffsetText, isolationWindowLowerOffset) AndAlso
+                   Double.TryParse(isolationWindowUpperOffsetText, isolationWindowUpperOffset) Then
+                    isolationWidth = isolationWindowLowerOffset + isolationWindowUpperOffset
+                    isolationWidthDefined = True
+                Else
+
+                    WarnIsolationWidthNotFound(
+                        scanInfo.ScanNumber,
+                        String.Format("Could not determine the MS2 isolation width; unable to parse {0}",
+                                      isolationWindowLowerOffsetText))
+                End If
+            Else
+                WarnIsolationWidthNotFound(
+                    scanInfo.ScanNumber,
+                    String.Format("Could not determine the MS2 isolation width (CVParam '{0}' not found)",
+                                  "isolation window target m/z"))
+            End If
+
+            If Not isolationWidthDefined Then
+                Return 0
+            End If
+
+            Dim parentIonMz As Double
+
+            If Math.Abs(scanInfo.FragScanInfo.ParentIonMz) > 0 Then
+                parentIonMz = scanInfo.FragScanInfo.ParentIonMz
+            Else
+                ' The mzML reader could not determine the parent ion m/z value (this is highly unlikely)
+                ' Use scan event "Monoisotopic M/Z" instead
+
+                If String.IsNullOrWhiteSpace(monoMzText) Then
+
+                    ReportWarning("Could not determine the parent ion m/z value via CV param 'selected ion m/z'" &
+                                  "cannot compute interference for scan " & scanInfo.ScanNumber)
+                    Return 0
+                End If
+
+                Dim mz As Double
+                If Not Double.TryParse(monoMzText, mz) Then
+
+                    OnWarningEvent(String.Format("Skipping scan {0} since 'selected ion m/z' was not a number:  {1}",
+                                                 scanInfo.ScanNumber, monoMzText))
+                    Return 0
+                End If
+
+                parentIonMz = mz
+            End If
+
+            If Math.Abs(parentIonMz) < Single.Epsilon Then
+                ReportWarning("Parent ion m/z is 0; cannot compute interference for scan " & scanInfo.ScanNumber)
+                Return 0
+            End If
+
+            Dim precursorInterference = ComputePrecursorInterference(
+                scanInfo.ScanNumber,
+                precursorScanNumber, parentIonMz, isolationWidth, chargeState)
+
+            Return precursorInterference
+
+        End Function
 
         Public Function ExtractScanInfoFromMzMLDataFile(
           filePath As String,
@@ -167,7 +318,11 @@ Namespace DataInput
                     Next
 
                     Dim percentComplete = xmlReader.ProgressPercentComplete
-                    Dim extractSuccess = ExtractScanInfoCheckRange(scanList, msSpectrum, spectrumInfo, spectraCache, dataOutputHandler, percentComplete)
+                    Dim nullMzMLSpectrum As SimpleMzMLReader.SimpleSpectrum = Nothing
+
+                    Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, spectrumInfo, nullMzMLSpectrum,
+                                                                   scanList, spectraCache, dataOutputHandler,
+                                                                   percentComplete, mDatasetFileInfo.ScanCount)
 
                     If Not extractSuccess Then
                         Exit While
@@ -271,7 +426,10 @@ Namespace DataInput
                         intensityList.CopyTo(msSpectrum.IonsIntensity, 0)
 
                         Dim percentComplete = scanList.MasterScanOrderCount / CDbl(xmlReader.NumSpectra) * 100
-                        Dim extractSuccess = ExtractScanInfoCheckRange(scanList, msSpectrum, spectrumInfo, spectraCache, dataOutputHandler, percentComplete)
+
+                        Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, spectrumInfo, mzMLSpectrum,
+                                                                       scanList, spectraCache, dataOutputHandler,
+                                                                       percentComplete, mDatasetFileInfo.ScanCount)
 
                         If Not extractSuccess Then
                             Exit While

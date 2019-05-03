@@ -179,7 +179,11 @@ Namespace DataInput
         ''' <param name="parentIonMz"></param>
         ''' <param name="isolationWidth"></param>
         ''' <param name="chargeState"></param>
-        ''' <returns></returns>
+        ''' <returns>
+        ''' Interference score: fraction of observed peaks that are from the precursor
+        ''' Larger Is better, with a max of 1 And minimum of 0
+        ''' 1 means all peaks are from the precursor
+        ''' </returns>
         Protected Function ComputePrecursorInterference(
           fragScanNumber As Integer,
           precursorScanNumber As Integer,
@@ -577,6 +581,7 @@ Namespace DataInput
 
         Private Sub InterferenceWarningEventHandler(message As String)
             If message.StartsWith("Did not find the precursor for") Then
+                ' The precursor ion was not found in the centroided MS1 spectrum; this happens sometimes
                 mPrecursorNotFoundCount += 1
                 If mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
                     OnWarningEvent(message)
