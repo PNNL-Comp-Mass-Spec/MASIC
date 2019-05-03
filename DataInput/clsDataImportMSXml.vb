@@ -393,9 +393,9 @@ Namespace DataInput
 
                 For Each cvParam In xmlReader.SourceFileParams.CVParams
                     Select Case cvParam.TermInfo.Cvid
-                        Case CV.CVID.MS_Thermo_nativeID_format
-                        Case CV.CVID.MS_Thermo_nativeID_format__combined_spectra
-                        Case CV.CVID.MS_Thermo_RAW_format
+                        Case CV.CVID.MS_Thermo_nativeID_format,
+                             CV.CVID.MS_Thermo_nativeID_format__combined_spectra,
+                             CV.CVID.MS_Thermo_RAW_format
                             thermoRawFile = True
                     End Select
                 Next
@@ -872,10 +872,10 @@ Namespace DataInput
 
                 For Each cvParam In precursorParams
                     Select Case cvParam.TermInfo.Cvid
-                        Case CV.CVID.MS_collision_induced_dissociation
-                        Case CV.CVID.MS_low_energy_collision_induced_dissociation
-                        Case CV.CVID.MS_in_source_collision_induced_dissociation
-                        Case CV.CVID.MS_trap_type_collision_induced_dissociation
+                        Case CV.CVID.MS_collision_induced_dissociation,
+                             CV.CVID.MS_low_energy_collision_induced_dissociation,
+                             CV.CVID.MS_in_source_collision_induced_dissociation,
+                             CV.CVID.MS_trap_type_collision_induced_dissociation
                             activationMethods.Add("CID")
 
                         Case CV.CVID.MS_plasma_desorption
