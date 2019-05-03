@@ -114,6 +114,61 @@ Namespace DataInput
 
         End Sub
 
+        ''' <summary>
+        ''' Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
+        ''' </summary>
+        ''' <param name="scanInfo"></param>
+        ''' <param name="masses"></param>
+        ''' <param name="intensities"></param>
+        ''' <param name="centroidedPrecursorIonsMz"></param>
+        ''' <param name="centroidedPrecursorIonsIntensity"></param>
+        ''' <returns></returns>
+        Protected Function CentroidData(
+           scanInfo As clsScanInfo,
+           masses As Double(),
+           intensities As Double(),
+           <Out> ByRef centroidedPrecursorIonsMz As Double(),
+           <Out> ByRef centroidedPrecursorIonsIntensity As Double()) As Boolean
+
+            Const PLACEHOLDER_RESOLUTION As Double = 10000
+
+            Try
+
+                Dim segmentedScan = ThermoFisher.CommonCore.Data.Business.SegmentedScan.FromMassesAndIntensities(masses, intensities)
+
+                Dim scanStats = New ThermoFisher.CommonCore.Data.Business.ScanStatistics With {
+                    .PacketType = 2 + (2 << 16),
+                    .ScanNumber = scanInfo.ScanNumber,
+                    .StartTime = scanInfo.ScanTime,
+                    .BasePeakIntensity = scanInfo.BasePeakIonIntensity,
+                    .BasePeakMass = scanInfo.BasePeakIonMZ,
+                    .LowMass = masses.First(),
+                    .HighMass = masses.Last(),
+                    .TIC = scanInfo.TotalIonIntensity
+                }
+
+                Dim scan = New ThermoFisher.CommonCore.Data.Business.Scan With {
+                    .MassResolution = PLACEHOLDER_RESOLUTION,
+                    .ScanType = scanInfo.ScanTypeName,
+                    .ToleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm,     ' Options are None, Amu, Mmu, Ppm
+                    .ScanStatistics = scanStats,
+                    .SegmentedScan = segmentedScan
+                }
+
+                Dim centroidScan = ThermoFisher.CommonCore.Data.Business.Scan.ToCentroid(scan)
+
+                centroidedPrecursorIonsMz = centroidScan.PreferredMasses
+                centroidedPrecursorIonsIntensity = centroidScan.PreferredIntensities
+
+                Return True
+
+            Catch ex As Exception
+                ReDim centroidedPrecursorIonsMz(0)
+                ReDim centroidedPrecursorIonsIntensity(0)
+                Return False
+            End Try
+
+        End Function
 
         ''' <summary>
         ''' Compute the interference in the region centered around parentIonMz
