@@ -396,225 +396,253 @@ Namespace DataInput
                 isMzXML = False
             End If
 
+            Dim success As Boolean
+
             ' Determine if this was an MS/MS scan
             ' If yes, determine the scan number of the survey scan
             If spectrumInfo.MSLevel <= 1 Then
                 ' Survey Scan
 
-                Dim newSurveyScan = New clsScanInfo()
-                newSurveyScan.ScanNumber = spectrumInfo.ScanNumber
-                newSurveyScan.ScanTime = spectrumInfo.RetentionTimeMin
-
-                ' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
-                newSurveyScan.ScanHeaderText = String.Empty
-
-                ' This may get updated via the call to UpdateMSXmlScanType()
-                newSurveyScan.ScanTypeName = "MS"
-
-                newSurveyScan.BasePeakIonMZ = spectrumInfo.BasePeakMZ
-                newSurveyScan.BasePeakIonIntensity = spectrumInfo.BasePeakIntensity
-
-                ' Survey scans typically lead to multiple parent ions; we do not record them here
-                newSurveyScan.FragScanInfo.ParentIonInfoIndex = -1
-                newSurveyScan.TotalIonIntensity = spectrumInfo.TotalIonCurrent
-
-                ' Determine the minimum positive intensity in this scan
-                newSurveyScan.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount, msSpectrum.IonsIntensity, 0)
-
-                ' If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
-                newSurveyScan.ZoomScan = False
-                newSurveyScan.SIMScan = False
-                newSurveyScan.MRMScanType = MRMScanTypeConstants.NotMRM
-
-                newSurveyScan.LowMass = spectrumInfo.mzRangeStart
-                newSurveyScan.HighMass = spectrumInfo.mzRangeEnd
-                newSurveyScan.IsFTMS = False
-
-                scanList.SurveyScans.Add(newSurveyScan)
-
-                UpdateMSXmlScanType(newSurveyScan, spectrumInfo.MSLevel, "MS", isMzXML, mzXmlSourceSpectrum)
-
-                mLastSurveyScanIndex = scanList.SurveyScans.Count - 1
-
-                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, mLastSurveyScanIndex)
-                mLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1
-
-                If mOptions.SICOptions.SICToleranceIsPPM Then
-                    ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
-                    ' However, if the lowest m/z value is < 100, then use 100 m/z
-                    If spectrumInfo.mzRangeStart < 100 Then
-                        msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM
-                    Else
-                        msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, spectrumInfo.mzRangeStart) / sicOptions.CompressToleranceDivisorForPPM
-                    End If
-                Else
-                    msDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
-                End If
-
-                ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-                StoreMzXmlSpectrum(
-                    msSpectrum,
-                    newSurveyScan,
-                    spectraCache,
-                    sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
-                    DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
-                    sicOptions.CompressMSSpectraData,
-                    sicOptions.SimilarIonMZToleranceHalfWidth / sicOptions.CompressToleranceDivisorForDa,
-                    mKeepRawSpectra)
-
-                SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
-                                  clsScanList.eScanTypeConstants.SurveyScan, newSurveyScan, sicOptions.DatasetNumber)
+                success = ExtractSurveyScan(scanList, spectraCache, dataOutputHandler,
+                                            spectrumInfo, msSpectrum, sicOptions,
+                                            isMzXML, mzXmlSourceSpectrum)
 
             Else
                 ' Fragmentation Scan
+                success = ExtractFragmentationScan(scanList, spectraCache, dataOutputHandler,
+                                                   spectrumInfo, msSpectrum, sicOptions,
+                                                   isMzXML, mzXmlSourceSpectrum, mzMLSpectrum)
 
-                Dim newFragScan = New clsScanInfo()
-                newFragScan.ScanNumber = spectrumInfo.ScanNumber
-                newFragScan.ScanTime = spectrumInfo.RetentionTimeMin
+            End If
 
-                ' If this is a mzXML file that was processed with ReadW, then .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
-                newFragScan.ScanHeaderText = String.Empty
+            Return success
+        End Function
 
-                ' This may get updated via the call to UpdateMSXmlScanType()
-                newFragScan.ScanTypeName = "MSn"
+        Private Function ExtractSurveyScan(
+          scanList As clsScanList,
+          spectraCache As clsSpectraCache,
+          dataOutputHandler As clsDataOutput,
+          spectrumInfo As clsSpectrumInfo,
+          msSpectrum As clsMSSpectrum,
+          sicOptions As clsSICOptions,
+          isMzXML As Boolean,
+          mzXmlSourceSpectrum As clsSpectrumInfoMzXML) As Boolean
 
-                newFragScan.BasePeakIonMZ = spectrumInfo.BasePeakMZ
-                newFragScan.BasePeakIonIntensity = spectrumInfo.BasePeakIntensity
+            Dim scanInfo = New clsScanInfo() With {
+                .ScanNumber = spectrumInfo.ScanNumber,
+                .ScanTime = spectrumInfo.RetentionTimeMin,
+                .ScanHeaderText = String.Empty,
+                .ScanTypeName = "MS",    ' This may get updated via the call to UpdateMSXmlScanType()
+                .BasePeakIonMZ = spectrumInfo.BasePeakMZ,
+                .BasePeakIonIntensity = spectrumInfo.BasePeakIntensity,
+                .TotalIonIntensity = spectrumInfo.TotalIonCurrent,
+                .MinimumPositiveIntensity = 0,
+                .ZoomScan = False,
+                .SIMScan = False,
+                .MRMScanType = MRMScanTypeConstants.NotMRM,
+                .LowMass = spectrumInfo.mzRangeStart,
+                .HighMass = spectrumInfo.mzRangeEnd,
+                .IsFTMS = False
+            }
 
-                ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
-                If mLastSurveyScanIndexInMasterSeqOrder < 0 Then
-                    ' We have not yet read a survey scan; store 1 for the fragmentation scan number
-                    newFragScan.FragScanInfo.FragScanNumber = 1
+            ' Survey scans typically lead to multiple parent ions; we do not record them here
+            scanInfo.FragScanInfo.ParentIonInfoIndex = -1
+
+            ' Determine the minimum positive intensity in this scan
+            scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount, msSpectrum.IonsIntensity, 0)
+
+            scanList.SurveyScans.Add(scanInfo)
+
+            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MS", isMzXML, mzXmlSourceSpectrum)
+
+            If Not scanInfo.ZoomScan Then
+                mLastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1
+            End If
+
+            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1)
+            mLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1
+
+            ' ReSharper disable once NotAccessedVariable
+            Dim msDataResolution As Double
+
+            If mOptions.SICOptions.SICToleranceIsPPM Then
+                ' Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by sicOptions.CompressToleranceDivisorForPPM
+                ' However, if the lowest m/z value is < 100, then use 100 m/z
+                If spectrumInfo.mzRangeStart < 100 Then
+                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM
                 Else
-                    newFragScan.FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - mLastSurveyScanIndexInMasterSeqOrder
+                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, spectrumInfo.mzRangeStart) / sicOptions.CompressToleranceDivisorForPPM
                 End If
+            Else
+                msDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
+            End If
 
-                newFragScan.FragScanInfo.MSLevel = spectrumInfo.MSLevel
+            ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+            StoreSpectrum(
+                msSpectrum,
+                scanInfo,
+                spectraCache,
+                sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
+                sicOptions.CompressMSSpectraData,
+                sicOptions.SimilarIonMZToleranceHalfWidth / sicOptions.CompressToleranceDivisorForDa,
+                mKeepRawSpectra)
 
-                newFragScan.TotalIonIntensity = spectrumInfo.TotalIonCurrent
+            If Not msSpectrum.IonsMZ Is Nothing AndAlso Not msSpectrum.IonsIntensity Is Nothing Then
+                Dim centroidedPrecursorIonsMz As Double() = Nothing
+                Dim centroidedPrecursorIonsIntensity As Double() = Nothing
 
-                ' Determine the minimum positive intensity in this scan
-                newFragScan.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount, msSpectrum.IonsIntensity, 0)
+                Dim centroidSuccess = CentroidData(scanInfo, msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
+                                                   centroidedPrecursorIonsMz, centroidedPrecursorIonsIntensity)
 
-                ' If this is a mzXML file that was processed with ReadW, then these values will get updated by UpdateMSXMLScanType
-                newFragScan.ZoomScan = False
-                newFragScan.SIMScan = False
-                newFragScan.MRMScanType = MRMScanTypeConstants.NotMRM
+                If centroidSuccess Then
+                    mMostRecentPrecursorScan = scanInfo.ScanNumber
+                    mCentroidedPrecursorIonsMz.Clear()
+                    mCentroidedPrecursorIonsIntensity.Clear()
 
-                newFragScan.MRMScanInfo.MRMMassCount = 0
+                    For i = 0 To centroidedPrecursorIonsMz.Length - 1
+                        mCentroidedPrecursorIonsMz.Add(centroidedPrecursorIonsMz(i))
+                        mCentroidedPrecursorIonsIntensity.Add(centroidedPrecursorIonsIntensity(i))
+                    Next
 
-                UpdateMSXmlScanType(newFragScan, spectrumInfo.MSLevel, "MSn", isMzXML, mzXmlSourceSpectrum)
+                End If
+            End If
 
-                eMRMScanType = newFragScan.MRMScanType
-                If Not eMRMScanType = MRMScanTypeConstants.NotMRM Then
-                    ' This is an MRM scan
-                    scanList.MRMDataPresent = True
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
 
-                    Dim scanInfo = New ThermoRawFileReader.clsScanInfo(spectrumInfo.SpectrumID) With {
-                        .FilterText = newFragScan.ScanHeaderText,
-                        .MRMScanType = eMRMScanType,
-                        .MRMInfo = New MRMInfo()
-                    }
+            Return True
 
-                    If Not String.IsNullOrEmpty(scanInfo.FilterText) Then
-                        ' Parse out the MRM_QMS or SRM information for this scan
-                        XRawFileIO.ExtractMRMMasses(scanInfo.FilterText, scanInfo.MRMScanType, scanInfo.MRMInfo)
-                    Else
-                        ' .MZRangeStart and .MZRangeEnd should be equivalent, and they should define the m/z of the MRM transition
+        End Function
 
-                        If spectrumInfo.mzRangeEnd - spectrumInfo.mzRangeStart >= 0.5 Then
-                            ' The data is likely MRM and not SRM
-                            ' We cannot currently handle data like this
-                            ' (would need to examine the mass values  and find the clumps of data to infer the transitions present)
-                            mWarnCount += 1
-                            If mWarnCount <= 5 Then
-                                ReportError("Warning: m/z range for SRM scan " & spectrumInfo.ScanNumber & " is " &
+        Private Function ExtractFragmentationScan(
+          scanList As clsScanList,
+          spectraCache As clsSpectraCache,
+          dataOutputHandler As clsDataOutput,
+          spectrumInfo As clsSpectrumInfo,
+          msSpectrum As clsMSSpectrum,
+          sicOptions As clsSICOptions,
+          isMzXML As Boolean,
+          mzXmlSourceSpectrum As clsSpectrumInfoMzXML,
+          mzMLSpectrum As SimpleMzMLReader.SimpleSpectrum) As Boolean
+
+            Dim scanInfo = New clsScanInfo(spectrumInfo.ParentIonMZ) With {
+                .ScanNumber = spectrumInfo.ScanNumber,
+                .ScanTime = spectrumInfo.RetentionTimeMin,
+                .ScanHeaderText = String.Empty,
+                .ScanTypeName = "MSn",          ' This may get updated via the call to UpdateMSXmlScanType()
+                .BasePeakIonMZ = spectrumInfo.BasePeakMZ,
+                .BasePeakIonIntensity = spectrumInfo.BasePeakIntensity,
+                .TotalIonIntensity = spectrumInfo.TotalIonCurrent,
+                .MinimumPositiveIntensity = 0,
+                .ZoomScan = False,
+                .SIMScan = False,
+                .MRMScanType = MRMScanTypeConstants.NotMRM
+            }
+
+            ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
+            If mLastSurveyScanIndexInMasterSeqOrder < 0 Then
+                ' We have not yet read a survey scan; store 1 for the fragmentation scan number
+                scanInfo.FragScanInfo.FragScanNumber = 1
+            Else
+                scanInfo.FragScanInfo.FragScanNumber = (scanList.MasterScanOrderCount - 1) - mLastSurveyScanIndexInMasterSeqOrder
+            End If
+
+            scanInfo.FragScanInfo.MSLevel = spectrumInfo.MSLevel
+
+            ' Determine the minimum positive intensity in this scan
+            scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount, msSpectrum.IonsIntensity, 0)
+
+            UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", isMzXML, mzXmlSourceSpectrum)
+
+            Dim eMRMScanType = scanInfo.MRMScanType
+            If Not eMRMScanType = MRMScanTypeConstants.NotMRM Then
+                ' This is an MRM scan
+                scanList.MRMDataPresent = True
+
+                Dim mrmScan = New ThermoRawFileReader.clsScanInfo(spectrumInfo.SpectrumID) With {
+                    .FilterText = scanInfo.ScanHeaderText,
+                    .MRMScanType = eMRMScanType,
+                    .MRMInfo = New MRMInfo()
+                }
+
+                If Not String.IsNullOrEmpty(mrmScan.FilterText) Then
+                    ' Parse out the MRM_QMS or SRM information for this scan
+                    XRawFileIO.ExtractMRMMasses(mrmScan.FilterText, mrmScan.MRMScanType, mrmScan.MRMInfo)
+                Else
+                    ' .MZRangeStart and .MZRangeEnd should be equivalent, and they should define the m/z of the MRM transition
+
+                    If spectrumInfo.mzRangeEnd - spectrumInfo.mzRangeStart >= 0.5 Then
+                        ' The data is likely MRM and not SRM
+                        ' We cannot currently handle data like this
+                        ' (would need to examine the mass values  and find the clumps of data to infer the transitions present)
+                        mWarnCount += 1
+                        If mWarnCount <= 5 Then
+                            ReportError("Warning: m/z range for SRM scan " & spectrumInfo.ScanNumber & " is " &
                                             (spectrumInfo.mzRangeEnd - spectrumInfo.mzRangeStart).ToString("0.0") &
                                             " m/z; this is likely a MRM scan, but MASIC doesn't support inferring the " &
                                             "MRM transition masses from the observed m/z values.  Results will likely not be meaningful")
-                                If mWarnCount = 5 Then
-                                    ReportMessage("Additional m/z range warnings will not be shown")
-                                End If
+                            If mWarnCount = 5 Then
+                                ReportMessage("Additional m/z range warnings will not be shown")
                             End If
                         End If
+                    End If
 
-                        Dim mrmMassRange = New udtMRMMassRangeType With {
+                    Dim mrmMassRange = New udtMRMMassRangeType With {
                             .StartMass = spectrumInfo.mzRangeStart,
                             .EndMass = spectrumInfo.mzRangeEnd
                         }
-                        mrmMassRange.CentralMass = Math.Round(mrmMassRange.StartMass + (mrmMassRange.EndMass - mrmMassRange.StartMass) / 2, 6)
-                        scanInfo.MRMInfo.MRMMassList.Add(mrmMassRange)
+                    mrmMassRange.CentralMass = Math.Round(mrmMassRange.StartMass + (mrmMassRange.EndMass - mrmMassRange.StartMass) / 2, 6)
+                    mrmScan.MRMInfo.MRMMassList.Add(mrmMassRange)
 
-                    End If
-
-                    newFragScan.MRMScanInfo = clsMRMProcessing.DuplicateMRMInfo(scanInfo.MRMInfo, spectrumInfo.ParentIonMZ)
-
-                    If scanList.SurveyScans.Count = 0 Then
-                        ' Need to add a "fake" survey scan that we can map this parent ion to
-                        mLastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
-                    End If
-                Else
-                    newFragScan.MRMScanInfo.MRMMassCount = 0
                 End If
 
-                newFragScan.LowMass = spectrumInfo.mzRangeStart
-                newFragScan.HighMass = spectrumInfo.mzRangeEnd
-                newFragScan.IsFTMS = False
+                scanInfo.MRMScanInfo = clsMRMProcessing.DuplicateMRMInfo(mrmScan.MRMInfo, spectrumInfo.ParentIonMZ)
 
-                scanList.FragScans.Add(newFragScan)
-
-                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
-
-                ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-                StoreMzXmlSpectrum(
-                    msSpectrum,
-                    newFragScan,
-                    spectraCache,
-                    sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
-                    DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
-                    sicOptions.CompressMSMSSpectraData,
-                    mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa,
-                    mKeepRawSpectra AndAlso mKeepMSMSSpectra)
-
-                SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats,
-                                  clsScanList.eScanTypeConstants.FragScan, newFragScan, sicOptions.DatasetNumber)
-
-                If eMRMScanType = MRMScanTypeConstants.NotMRM Then
-                    ' This is not an MRM scan
-                    mParentIonProcessor.AddUpdateParentIons(scanList, mLastSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                                                            scanList.FragScans.Count - 1, spectraCache, sicOptions)
-                Else
-                    ' This is an MRM scan
-                    mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                                                            newFragScan.MRMScanInfo, spectraCache, sicOptions)
+                If scanList.SurveyScans.Count = 0 Then
+                    ' Need to add a "fake" survey scan that we can map this parent ion to
+                    mLastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
                 End If
-
-            End If
-        End Sub
-
-        Private Function FinalizeScanList(scanList As clsScanList, dataFile As FileSystemInfo) As Boolean
-
-            ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
-            ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
-            ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
-
-            If scanList.MasterScanOrderCount <= 0 Then
-                ' No scans found
-                If mScansOutOfRange > 0 Then
-                    ReportWarning("None of the spectra in the input file was within the specified scan number and/or scan time range: " & dataFile.FullName)
-                    SetLocalErrorCode(eMasicErrorCodes.NoParentIonsFoundInInputFile)
-                Else
-                    ReportError("No scans found in the input file: " & dataFile.FullName)
-                    SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
-                End If
-
-                Return False
+            Else
+                scanInfo.MRMScanInfo.MRMMassCount = 0
             End If
 
-            Console.WriteLine()
+            scanInfo.LowMass = spectrumInfo.mzRangeStart
+            scanInfo.HighMass = spectrumInfo.mzRangeEnd
+            scanInfo.IsFTMS = False
 
-            ' Record the current memory usage (before we close the .mzML or .mzML file)
-            OnUpdateMemoryUsage()
+            scanList.FragScans.Add(scanInfo)
+
+            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
+
+            ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+            StoreSpectrum(
+                msSpectrum,
+                scanInfo,
+                spectraCache,
+                sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
+                sicOptions.CompressMSMSSpectraData,
+                mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa,
+                mKeepRawSpectra AndAlso mKeepMSMSSpectra)
+
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetNumber)
+
+            If eMRMScanType = MRMScanTypeConstants.NotMRM Then
+                ' This is not an MRM scan
+                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
+                                                        scanList.FragScans.Count - 1, spectraCache, sicOptions)
+            Else
+                ' This is an MRM scan
+                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
+                                                        scanInfo.MRMScanInfo, spectraCache, sicOptions)
+            End If
+
+            If mLastNonZoomSurveyScanIndex >= 0 Then
+                Dim precursorScanNumber = scanList.SurveyScans(mLastNonZoomSurveyScanIndex).ScanNumber
+
+                ' Compute the interference of the parent ion in the MS1 spectrum for this frag scan
+                scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(mzMLSpectrum, scanInfo, precursorScanNumber)
+            End If
 
             Return True
 
