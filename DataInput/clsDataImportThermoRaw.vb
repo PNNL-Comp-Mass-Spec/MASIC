@@ -13,19 +13,9 @@ Namespace DataInput
         Private Const SCAN_EVENT_MONOISOTOPIC_MZ = "Monoisotopic M/Z"
         Private Const SCAN_EVENT_MS2_ISOLATION_WIDTH = "MS2 Isolation Width"
 
-        Private Const ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
-
-        Private Const PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
-
-        Private ReadOnly mInterferenceCalculator As InterDetect.InterferenceCalculator
-
-        Private ReadOnly mCachedPrecursorIons As List(Of InterDetect.Peak)
-        Private mCachedPrecursorScan As Integer
-
-        Private mIsolationWidthNotFoundCount As Integer
-        Private mPrecursorNotFoundCount As Integer
-
         Private mBpiUpdateCount As Integer
+
+        Private ReadOnly mSIMScanMapping As Dictionary(Of String, Integer) = New Dictionary(Of String, Integer)
 
         ''' <summary>
         ''' Constructor
@@ -40,27 +30,12 @@ Namespace DataInput
           parentIonProcessor As clsParentIonProcessing,
           scanTracking As clsScanTracking)
             MyBase.New(masicOptions, peakFinder, parentIonProcessor, scanTracking)
-
-            mInterferenceCalculator = New InterDetect.InterferenceCalculator()
-
-            AddHandler mInterferenceCalculator.StatusEvent, AddressOf OnStatusEvent
-            AddHandler mInterferenceCalculator.ErrorEvent, AddressOf OnErrorEvent
-            AddHandler mInterferenceCalculator.WarningEvent, AddressOf InterferenceWarningEventHandler
-
-            mCachedPrecursorIons = New List(Of InterDetect.Peak)
-            mCachedPrecursorScan = 0
-
-            mIsolationWidthNotFoundCount = 0
-            mPrecursorNotFoundCount = 0
-
         End Sub
 
-        Private Function ComputeInterference(xcaliburAccessor As XRawFileIO, scanInfo As ThermoRawFileReader.clsScanInfo, precursorScanNumber As Integer) As Double
-
-            If Math.Abs(scanInfo.ParentIonMZ) < Single.Epsilon Then
-                ReportWarning("Parent ion m/z is 0; cannot compute interference for scan " & scanInfo.ScanNumber)
-                Return 0
-            End If
+        Private Function ComputeInterference(
+          xcaliburAccessor As XRawFileIO,
+          scanInfo As ThermoRawFileReader.clsScanInfo,
+          precursorScanNumber As Integer) As Double
 
             If precursorScanNumber <> mCachedPrecursorScan Then
 
@@ -69,18 +44,7 @@ Namespace DataInput
 
                 Dim ionCount = xcaliburAccessor.GetScanData(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity, 0, True)
 
-                mCachedPrecursorIons.Clear()
-                For index = 0 To ionCount - 1
-                    Dim newPeak = New InterDetect.Peak With {
-                        .Mz = centroidedIonsMz(index),
-                        .Abundance = centroidedIonsIntensity(index)
-                    }
-
-                    mCachedPrecursorIons.Add(newPeak)
-                Next
-
-                mCachedPrecursorScan = precursorScanNumber
-
+                UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity, ionCount)
             End If
 
             Dim chargeState As Integer
@@ -102,14 +66,10 @@ Namespace DataInput
                     Return 0
                 End If
 
-                mIsolationWidthNotFoundCount += 1
-                If mIsolationWidthNotFoundCount <= ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW Then
-                    ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
-                                  "cannot compute interference for scan " & scanInfo.ScanNumber)
-                ElseIf mIsolationWidthNotFoundCount Mod 5000 = 0 Then
-                    ReportWarning("Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & "); " &
-                                  "for " & mIsolationWidthNotFoundCount & " scans")
-                End If
+                WarnIsolationWidthNotFound(
+                    scanInfo.ScanNumber,
+                    "Could not determine the MS2 isolation width (" & SCAN_EVENT_MS2_ISOLATION_WIDTH & ")")
+
                 Return 0
             End If
 
@@ -121,13 +81,13 @@ Namespace DataInput
 
             Dim parentIonMz As Double
 
-            If scanInfo.ParentIonMZ > 0 Then
+            If Math.Abs(scanInfo.ParentIonMZ) > 0 Then
                 parentIonMz = scanInfo.ParentIonMZ
             Else
                 ' ThermoRawFileReader could not determine the parent ion m/z value (this is highly unlikely)
                 ' Use scan event "Monoisotopic M/Z" instead
                 Dim monoMzText = String.Empty
-                If (Not scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText, True)) Then
+                If Not scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText, True) Then
 
                     ReportWarning("Could not determine the parent ion m/z value (" & SCAN_EVENT_MONOISOTOPIC_MZ & "); " &
                                   "cannot compute interference for scan " & scanInfo.ScanNumber)
@@ -135,7 +95,7 @@ Namespace DataInput
                 End If
 
                 Dim mz As Double
-                If (Not Double.TryParse(monoMzText, mz)) Then
+                If Not Double.TryParse(monoMzText, mz) Then
 
                     OnWarningEvent(String.Format("Skipping scan {0} since scan event {1} was not a number: {2}",
                                                  scanInfo.ScanNumber, SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText))
@@ -145,13 +105,16 @@ Namespace DataInput
                 parentIonMz = mz
             End If
 
-            Dim oPrecursorInfo = New InterDetect.PrecursorInfo(parentIonMz, isolationWidth, chargeState) With {
-                .ScanNumber = precursorScanNumber
-            }
+            If Math.Abs(parentIonMz) < Single.Epsilon Then
+                ReportWarning("Parent ion m/z is 0; cannot compute interference for scan " & scanInfo.ScanNumber)
+                Return 0
+            End If
 
-            mInterferenceCalculator.Interference(oPrecursorInfo, mCachedPrecursorIons)
+            Dim precursorInterference = ComputePrecursorInterference(
+                scanInfo.ScanNumber,
+                precursorScanNumber, parentIonMz, isolationWidth, chargeState)
 
-            Return oPrecursorInfo.Interference
+            Return precursorInterference
 
         End Function
 
@@ -172,8 +135,6 @@ Namespace DataInput
 
             Dim ioMode = "Xraw"
 
-            mIsolationWidthNotFoundCount = 0
-            mPrecursorNotFoundCount = 0
             mBpiUpdateCount = 0
 
             ' Assume success for now
@@ -206,11 +167,10 @@ Namespace DataInput
                 End If
 
                 Dim datasetID = mOptions.SICOptions.DatasetNumber
-                Dim sicOptions = mOptions.SICOptions
 
                 success = UpdateDatasetFileStats(rawFileInfo, datasetID, xcaliburAccessor)
 
-                Dim metadataWriter = New DataOutput.clsThermoMetadataWriter()
+                Dim metadataWriter = New clsThermoMetadataWriter()
                 RegisterEvents(metadataWriter)
 
                 If mOptions.WriteMSMethodFile Then
@@ -364,10 +324,6 @@ Namespace DataInput
           spectraCache As clsSpectraCache,
           dataOutputHandler As clsDataOutput,
           sicOptions As clsSICOptions,
-          keepRawSpectra As Boolean,
-          thermoScanInfo As ThermoRawFileReader.clsScanInfo,
-          htSIMScanMapping As IDictionary(Of String, Integer),
-          ByRef lastNonZoomSurveyScanIndex As Integer,
           thermoScanInfo As ThermoRawFileReader.clsScanInfo) As Boolean
 
             Dim scanInfo = New clsScanInfo() With {
@@ -400,11 +356,11 @@ Namespace DataInput
                 Dim simKey = scanInfo.LowMass & "_" & scanInfo.HighMass
                 Dim simIndex As Integer
 
-                If htSIMScanMapping.TryGetValue(simKey, simIndex) Then
+                If mSIMScanMapping.TryGetValue(simKey, simIndex) Then
                     scanInfo.SIMIndex = simIndex
                 Else
-                    scanInfo.SIMIndex = htSIMScanMapping.Count
-                    htSIMScanMapping.Add(simKey, htSIMScanMapping.Count)
+                    scanInfo.SIMIndex = mSIMScanMapping.Count
+                    mSIMScanMapping.Add(simKey, mSIMScanMapping.Count)
                 End If
             End If
 
@@ -413,9 +369,9 @@ Namespace DataInput
 
             ' Store the collision mode and possibly the scan filter text
             scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode
-            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode)
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode)
             If mOptions.WriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText)
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText)
             End If
 
             If mOptions.WriteExtendedStatsStatusLog Then
@@ -426,7 +382,7 @@ Namespace DataInput
             scanList.SurveyScans.Add(scanInfo)
 
             If Not scanInfo.ZoomScan Then
-                lastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1
+                mLastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1
             End If
 
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1)
@@ -447,8 +403,17 @@ Namespace DataInput
                 msDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa
             End If
 
-            ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            Dim success = LoadSpectraForFinniganDataFile(xcaliburAccessor, spectraCache, scanNumber, scanInfo, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, msDataResolution, keepRawSpectra)
+            ' Note: Even if mKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+            Dim success = LoadSpectraForFinniganDataFile(
+                xcaliburAccessor,
+                spectraCache,
+                scanInfo,
+                sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
+                sicOptions.CompressMSSpectraData,
+                msDataResolution,
+                mKeepRawSpectra)
+
             If Not success Then Return False
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
@@ -464,10 +429,6 @@ Namespace DataInput
           dataOutputHandler As clsDataOutput,
           sicOptions As clsSICOptions,
           binningOptions As clsBinningOptions,
-          keepRawSpectra As Boolean,
-          keepMSMSSpectra As Boolean,
-          thermoScanInfo As ThermoRawFileReader.clsScanInfo,
-          ByRef lastNonZoomSurveyScanIndex As Integer,
           thermoScanInfo As ThermoRawFileReader.clsScanInfo) As Boolean
 
             ' Note that MinimumPositiveIntensity will be determined in LoadSpectraForFinniganDataFile
@@ -490,9 +451,6 @@ Namespace DataInput
             ' This resets for each new parent-ion scan
             scanInfo.FragScanInfo.FragScanNumber = thermoScanInfo.EventNumber - 1
 
-            ' 1 for the first MS/MS scan after the survey scan, 2 for the second one, etc.
-            scanInfo.FragScanInfo.MSLevel = thermoScanInfo.MSLevel
-
             ' The .EventNumber value is sometimes wrong; need to check for this
             ' For example, if the dataset only has MS2 scans and no parent-ion scan, .EventNumber will be 2 for every MS2 scan
             If scanList.FragScans.Count > 0 Then
@@ -504,6 +462,8 @@ Namespace DataInput
                 End If
             End If
 
+            scanInfo.FragScanInfo.MSLevel = thermoScanInfo.MSLevel
+
             If Not scanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is an MRM scan
                 scanList.MRMDataPresent = True
@@ -512,17 +472,15 @@ Namespace DataInput
 
                 If scanList.SurveyScans.Count = 0 Then
                     ' Need to add a "fake" survey scan that we can map this parent ion to
-                    lastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
+                    mLastNonZoomSurveyScanIndex = scanList.AddFakeSurveyScan()
                 End If
             Else
                 scanInfo.MRMScanInfo.MRMMassCount = 0
             End If
 
-            With scanInfo
-                .LowMass = thermoScanInfo.LowMass
-                .HighMass = thermoScanInfo.HighMass
-                .IsFTMS = thermoScanInfo.IsFTMS
-            End With
+            scanInfo.LowMass = thermoScanInfo.LowMass
+            scanInfo.HighMass = thermoScanInfo.HighMass
+            scanInfo.IsFTMS = thermoScanInfo.IsFTMS
 
             ' Store the ScanEvent values in .ExtendedHeaderInfo
             StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, thermoScanInfo.ScanEvents)
@@ -549,13 +507,12 @@ Namespace DataInput
             Dim success = LoadSpectraForFinniganDataFile(
               xcaliburAccessor,
               spectraCache,
-              scanNumber,
               scanInfo,
               sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
               DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
               sicOptions.CompressMSMSSpectraData,
               msDataResolution,
-              keepRawSpectra AndAlso keepMSMSSpectra)
+              mKeepRawSpectra AndAlso mKeepMSMSSpectra)
 
             If Not success Then Return False
 
@@ -563,14 +520,16 @@ Namespace DataInput
 
             If thermoScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanList.FragScans.Count - 1, spectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
+                                                        scanList.FragScans.Count - 1, spectraCache, sicOptions)
             Else
                 ' This is an MRM scan
-                mParentIonProcessor.AddUpdateParentIons(scanList, lastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ, scanInfo.MRMScanInfo, spectraCache, sicOptions)
+                mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
+                                                        scanInfo.MRMScanInfo, spectraCache, sicOptions)
             End If
 
-            If lastNonZoomSurveyScanIndex >= 0 Then
-                Dim precursorScanNumber = scanList.SurveyScans(lastNonZoomSurveyScanIndex).ScanNumber
+            If mLastNonZoomSurveyScanIndex >= 0 Then
+                Dim precursorScanNumber = scanList.SurveyScans(mLastNonZoomSurveyScanIndex).ScanNumber
 
                 ' Compute the interference of the parent ion in the MS1 spectrum for this frag scan
                 scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(xcaliburAccessor, thermoScanInfo, precursorScanNumber)
@@ -888,17 +847,6 @@ Namespace DataInput
             Return ionCount
 
         End Function
-
-        Private Sub InterferenceWarningEventHandler(message As String)
-            If (message.StartsWith("Did not find the precursor for")) Then
-                mPrecursorNotFoundCount += 1
-                If mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
-                    OnWarningEvent(message)
-                End If
-            Else
-                OnWarningEvent(message)
-            End If
-        End Sub
 
     End Class
 

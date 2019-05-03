@@ -16,14 +16,7 @@ Namespace DataInput
         Inherits clsDataImport
 
 #Region "Member variables"
-        Private mKeepRawSpectra As Boolean
-        Private mKeepMSMSSpectra As Boolean
 
-        Private mLastSurveyScanIndex As Integer
-        Private mLastSurveyScanIndexInMasterSeqOrder As Integer
-        Private mLastNonZoomSurveyScanIndex As Integer
-
-        Private mScansOutOfRange As Integer
         Private mWarnCount As Integer
 
 #End Region
@@ -340,19 +333,24 @@ Namespace DataInput
         End Function
 
         Private Function ExtractScanInfoCheckRange(
-          scanList As clsScanList,
           msSpectrum As clsMSSpectrum,
           spectrumInfo As clsSpectrumInfo,
+          mzMLSpectrum As SimpleMzMLReader.SimpleSpectrum,
+          scanList As clsScanList,
           spectraCache As clsSpectraCache,
           dataOutputHandler As clsDataOutput,
-          percentComplete As Double) As Boolean
+          percentComplete As Double,
+          scansRead As Integer) As Boolean
+
+            Dim success As Boolean
 
             ' No Error
             If mScanTracking.CheckScanInRange(spectrumInfo.ScanNumber, spectrumInfo.RetentionTimeMin, mOptions.SICOptions) Then
-                ExtractScanInfoWork(scanList, spectraCache, dataOutputHandler,
-                                    mOptions.SICOptions, msSpectrum, spectrumInfo)
+                success = ExtractScanInfoWork(scanList, spectraCache, dataOutputHandler,
+                                              mOptions.SICOptions, msSpectrum, spectrumInfo, mzMLSpectrum)
             Else
                 mScansOutOfRange += 1
+                success = True
             End If
 
             UpdateProgress(CShort(Math.Round(percentComplete, 0)))
@@ -364,28 +362,26 @@ Namespace DataInput
                 Return False
             End If
 
-            If (scanList.MasterScanOrderCount - 1) Mod 100 = 0 Then
-                ReportMessage("Reading scan index: " & (scanList.MasterScanOrderCount - 1).ToString())
+            If DateTime.UtcNow.Subtract(mLastLogTime).TotalSeconds >= 10 OrElse scansRead Mod 500 = 0 Then
+                ReportMessage("Reading scan: " & scansRead.ToString())
                 Console.Write(".")
+                mLastLogTime = DateTime.UtcNow
             End If
 
-            Return True
+            Return success
 
         End Function
 
-        Private Sub ExtractScanInfoWork(
+        Private Function ExtractScanInfoWork(
           scanList As clsScanList,
           spectraCache As clsSpectraCache,
           dataOutputHandler As clsDataOutput,
           sicOptions As clsSICOptions,
           msSpectrum As clsMSSpectrum,
-          spectrumInfo As clsSpectrumInfo)
+          spectrumInfo As clsSpectrumInfo,
+          mzMLSpectrum As SimpleMzMLReader.SimpleSpectrum) As Boolean
 
             Dim isMzXML As Boolean
-            Dim eMRMScanType As MRMScanTypeConstants
-
-            ' ReSharper disable once NotAccessedVariable
-            Dim msDataResolution As Double
 
             Dim mzXmlSourceSpectrum As clsSpectrumInfoMzXML = Nothing
 
@@ -820,17 +816,12 @@ Namespace DataInput
             ' Thus, initially reserve space for 1000 scans
 
             scanList.Initialize(1000, 1000)
-            mLastSurveyScanIndex = -1
+
+            InitBaseOptions(scanList, keepRawSpectra, keepMSMSSpectra)
+
             mLastSurveyScanIndexInMasterSeqOrder = -1
-            mLastNonZoomSurveyScanIndex = -1
 
-            mScansOutOfRange = 0
-
-            scanList.SIMDataPresent = False
-            scanList.MRMDataPresent = False
-
-            mKeepRawSpectra = keepRawSpectra
-            mKeepMSMSSpectra = keepMSMSSpectra
+            mMostRecentPrecursorScan = -1
 
             mWarnCount = 0
 

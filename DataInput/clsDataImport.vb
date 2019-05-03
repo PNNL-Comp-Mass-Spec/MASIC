@@ -1,4 +1,5 @@
-﻿Imports MASIC.clsMASIC
+﻿Imports System.Runtime.InteropServices
+Imports MASIC.clsMASIC
 Imports PRISM
 
 Namespace DataInput
@@ -21,6 +22,10 @@ Namespace DataInput
         Public Const AGILENT_MSMS_FILE_EXTENSION As String = ".MGF"    ' Agilent files must have been exported to a .MGF and .CDF file pair prior to using MASIC
         Public Const AGILENT_MS_FILE_EXTENSION As String = ".CDF"
 
+        Private Const ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
+
+        Protected Const PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW As Integer = 5
+
 #End Region
 
 #Region "Classwide Variables"
@@ -33,6 +38,24 @@ Namespace DataInput
         Protected ReadOnly mScanTracking As clsScanTracking
 
         Protected mDatasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType
+
+        Protected mKeepRawSpectra As Boolean
+        Protected mKeepMSMSSpectra As Boolean
+
+        Protected mLastSurveyScanIndexInMasterSeqOrder As Integer
+        Protected mLastNonZoomSurveyScanIndex As Integer
+        Protected mLastLogTime As DateTime
+
+        Private ReadOnly mInterferenceCalculator As InterDetect.InterferenceCalculator
+
+        Private ReadOnly mCachedPrecursorIons As List(Of InterDetect.Peak)
+        Protected mCachedPrecursorScan As Integer
+
+        Private mIsolationWidthNotFoundCount As Integer
+        Private mPrecursorNotFoundCount As Integer
+
+        Protected mScansOutOfRange As Integer
+
 #End Region
 
 #Region "Properties"
@@ -77,7 +100,48 @@ Namespace DataInput
 
             mDatasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
 
+            mInterferenceCalculator = New InterDetect.InterferenceCalculator()
+
+            AddHandler mInterferenceCalculator.StatusEvent, AddressOf OnStatusEvent
+            AddHandler mInterferenceCalculator.ErrorEvent, AddressOf OnErrorEvent
+            AddHandler mInterferenceCalculator.WarningEvent, AddressOf InterferenceWarningEventHandler
+
+            mCachedPrecursorIons = New List(Of InterDetect.Peak)
+            mCachedPrecursorScan = 0
+
+            mIsolationWidthNotFoundCount = 0
+            mPrecursorNotFoundCount = 0
+
         End Sub
+
+
+        ''' <summary>
+        ''' Compute the interference in the region centered around parentIonMz
+        ''' Before calling this method, call UpdateCachedPrecursorScan to store the m/z and intensity values of the precursor spectrum
+        ''' </summary>
+        ''' <param name="fragScanNumber">Used for reporting purposes</param>
+        ''' <param name="precursorScanNumber">Used for reporting purposes</param>
+        ''' <param name="parentIonMz"></param>
+        ''' <param name="isolationWidth"></param>
+        ''' <param name="chargeState"></param>
+        ''' <returns></returns>
+        Protected Function ComputePrecursorInterference(
+          fragScanNumber As Integer,
+          precursorScanNumber As Integer,
+          parentIonMz As Double,
+          isolationWidth As Double,
+          chargeState As Integer) As Double
+
+            Dim oPrecursorInfo = New InterDetect.PrecursorIntense(parentIonMz, isolationWidth, chargeState) With {
+                .PrecursorScanNumber = precursorScanNumber,
+                .ScanNumber = fragScanNumber
+            }
+
+            mInterferenceCalculator.Interference(oPrecursorInfo, mCachedPrecursorIons)
+
+            Return oPrecursorInfo.Interference
+
+        End Function
 
         Public Sub DiscardDataBelowNoiseThreshold(
           msSpectrum As clsMSSpectrum,
@@ -250,6 +314,43 @@ Namespace DataInput
 
         End Sub
 
+        Protected Function FinalizeScanList(scanList As clsScanList, dataFile As FileSystemInfo) As Boolean
+
+            ' Shrink the memory usage of the scanList arrays
+            ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
+            ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
+            ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
+
+            If scanList.MasterScanOrderCount <= 0 Then
+                ' No scans found
+                If mScansOutOfRange > 0 Then
+                    ReportWarning("None of the spectra in the input file was within the specified scan number and/or scan time range: " & dataFile.FullName)
+                    SetLocalErrorCode(eMasicErrorCodes.NoParentIonsFoundInInputFile)
+                Else
+                    ReportError("No scans found in the input file: " & dataFile.FullName)
+                    SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError)
+                End If
+
+                Return False
+            End If
+
+            If mPrecursorNotFoundCount > PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
+                Dim precursorMissingPct As Double
+                If scanList.FragScans.Count > 0 Then
+                    precursorMissingPct = mPrecursorNotFoundCount / CDbl(scanList.FragScans.Count) * 100
+                End If
+
+                OnWarningEvent(String.Format("Could not determine the precursor for {0:F1}% of the MS2 spectra ({1} / {2} scans)",
+                                             precursorMissingPct, mPrecursorNotFoundCount, scanList.FragScans.Count))
+            End If
+
+            ' Record the current memory usage
+            OnUpdateMemoryUsage()
+
+            Return True
+
+        End Function
+
         Public Shared Function GetDefaultExtensionsToParse() As IList(Of String)
             Dim extensionsToParse = New List(Of String) From {
                 FINNIGAN_RAW_FILE_EXTENSION,
@@ -263,6 +364,21 @@ Namespace DataInput
             Return extensionsToParse
 
         End Function
+
+        Protected Sub InitBaseOptions(scanList As clsScanList, keepRawSpectra As Boolean, keepMSMSSpectra As Boolean)
+
+            mLastNonZoomSurveyScanIndex = -1
+            mScansOutOfRange = 0
+
+            scanList.SIMDataPresent = False
+            scanList.MRMDataPresent = False
+
+            mKeepRawSpectra = keepRawSpectra
+            mKeepMSMSSpectra = keepMSMSSpectra
+
+            mLastLogTime = DateTime.UtcNow
+
+        End Sub
 
         Protected Sub SaveScanStatEntry(
           writer As StreamWriter,
@@ -323,6 +439,45 @@ Namespace DataInput
 
         End Sub
 
+        Protected Sub UpdateCachedPrecursorScan(
+          precursorScanNumber As Integer,
+          centroidedIonsMz As Double(),
+          centroidedIonsIntensity As Double(),
+          ionCount As Integer)
+
+            Dim mzList As New List(Of Double)
+            Dim intensityList As New List(Of Double)
+
+            For i = 0 To ionCount - 1
+                mzList.Add(centroidedIonsMz(i))
+                intensityList.Add(centroidedIonsIntensity(i))
+            Next
+
+            UpdateCachedPrecursorScan(precursorScanNumber, mzList, intensityList)
+
+        End Sub
+
+        Protected Sub UpdateCachedPrecursorScan(
+          precursorScanNumber As Integer,
+          centroidedIonsMz As List(Of Double),
+          centroidedIonsIntensity As List(Of Double))
+
+            mCachedPrecursorIons.Clear()
+
+            Dim ionCount = centroidedIonsMz.Count
+
+            For index = 0 To ionCount - 1
+                Dim newPeak = New InterDetect.Peak With {
+                    .Mz = centroidedIonsMz(index),
+                    .Abundance = centroidedIonsIntensity(index)
+                }
+
+                mCachedPrecursorIons.Add(newPeak)
+            Next
+
+            mCachedPrecursorScan = precursorScanNumber
+        End Sub
+
         Protected Function UpdateDatasetFileStats(
           dataFileInfo As FileInfo,
           datasetID As Integer) As Boolean
@@ -354,6 +509,27 @@ Namespace DataInput
 
         End Function
 
+        Protected Sub WarnIsolationWidthNotFound(scanNumber As Integer, warningMessage As String)
+            mIsolationWidthNotFoundCount += 1
+
+            If mIsolationWidthNotFoundCount <= ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW Then
+                ReportWarning(warningMessage & "; " & "cannot compute interference for scan " & scanNumber)
+            ElseIf mIsolationWidthNotFoundCount Mod 5000 = 0 Then
+                ReportWarning("Could not determine the MS2 isolation width for " & mIsolationWidthNotFoundCount & " scans")
+            End If
+
+        End Sub
+
+        Private Sub InterferenceWarningEventHandler(message As String)
+            If message.StartsWith("Did not find the precursor for") Then
+                mPrecursorNotFoundCount += 1
+                If mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
+                    OnWarningEvent(message)
+                End If
+            Else
+                OnWarningEvent(message)
+            End If
+        End Sub
     End Class
 
 End Namespace
