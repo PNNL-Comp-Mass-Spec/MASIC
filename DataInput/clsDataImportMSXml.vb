@@ -4,6 +4,7 @@ Imports MASICPeakFinder
 Imports MSDataFileReader
 Imports PSI_Interface.CV
 Imports PSI_Interface.MSData
+Imports SpectraTypeClassifier
 Imports ThermoRawFileReader
 
 Namespace DataInput
@@ -363,6 +364,7 @@ Namespace DataInput
 
 
             Dim fileOpened = False
+            Dim medianUtils = New clsMedianUtilities()
 
             Try
                 Console.Write("Reading MSXml data file ")
@@ -440,33 +442,119 @@ Namespace DataInput
                     mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
 
                 ElseIf xmlReader.NumSpectra = 0 AndAlso xmlReader.NumChromatograms > 0 Then
-                    Dim iterator = xmlReader.ReadAllChromatograms(True).GetEnumerator()
+                    Dim iterator1 = xmlReader.ReadAllChromatograms(True).GetEnumerator()
 
-                    While iterator.MoveNext()
+                    ' Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
+                    Dim scanTimeDiffMedians = New List(Of Double)
 
-                        Dim chromatogramItem = iterator.Current
-                        '                        chromatogramItem.
-                        '                        mDatasetFileInfo.ScanCount += 1
+                    ' Also keep track of elution times
+                    ' Keys in this dictionary are elution times; values are the pseudo scan number mapped to each time (initially 0)
+                    Dim elutionTimeToScanMap = New Dictionary(Of Double, Integer)
 
-                        ' ToDo: Figure this out
+                    While iterator1.MoveNext()
 
-                        'Dim spectrumInfo = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum)
+                        Dim chromatogramItem = iterator1.Current
 
-                        'Dim msSpectrum = GetNewSpectrum(spectrumInfo.DataCount)
+                        Dim isSRM As Boolean = IsSrmChromatogram(chromatogramItem)
+                        If Not isSRM Then Continue While
 
-                        'mzList.CopyTo(msSpectrum.IonsMZ, 0)
-                        'For i = 0 To msSpectrum.IonCount - 1
-                        '    msSpectrum.IonsIntensity(i) = intensityList(i)
-                        'Next
+                        ' Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
+                        Dim scanTimeDiffs = New List(Of Double)
 
-                        Dim percentComplete = scanList.MasterScanOrderCount / CDbl(xmlReader.NumChromatograms) * 100
-                        ' Dim extractSuccess = ExtractScanInfoCheckRange(scanList, msSpectrum, spectrumInfo, spectraCache, dataOutputHandler, percentComplete)
+                        Dim scanTimes = chromatogramItem.Times().ToList()
 
-                        'If Not extractSuccess Then
-                        '    Exit While
-                        'End If
+                        For i = 0 To scanTimes.Count - 1
+                            If Not elutionTimeToScanMap.ContainsKey(scanTimes(i)) Then
+                                elutionTimeToScanMap.Add(scanTimes(i), 0)
+                            End If
+
+                            If i > 0 Then
+                                Dim adjacentTimeDiff = scanTimes(i) - scanTimes(i - 1)
+                                If adjacentTimeDiff > 0 Then
+                                    scanTimeDiffs.Add(adjacentTimeDiff)
+                                End If
+                            End If
+                        Next
+
+
+                        ' First, compute the median time diff in scanTimeDiffs
+                        Dim medianScanTimeDiffThisChromatogram = medianUtils.Median(scanTimeDiffs)
+
+                        scanTimeDiffMedians.Add(medianScanTimeDiffThisChromatogram)
 
                     End While
+
+                    ' Construct a mapping between elution time and scan number
+                    ' This is a bit of a challenge since chromatogram data only tracks elution time, and not scan number
+
+                    ' First, compute the overall median time diff
+                    Dim medianScanTimeDiff = medianUtils.Median(scanTimeDiffMedians)
+                    If Math.Abs(medianScanTimeDiff) < 0.000001 Then
+                        medianScanTimeDiff = 0.000001
+                    End If
+
+                    ' Populate a dictionary mapping elution time to scan number
+                    For Each elutionTime In elutionTimeToScanMap.Keys.ToList()
+                        Dim nearestPseudoScan = CInt(Math.Floor(elutionTime / medianScanTimeDiff)) + 1
+                        elutionTimeToScanMap(elutionTime) = nearestPseudoScan
+                    Next
+
+                    ' Keys in this dictionary are scan numbers
+                    ' Values are a dictionary tracking m/z values and intensities
+                    Dim simulatedSpectraByScan = New Dictionary(Of Integer, Dictionary(Of Double, Double))
+
+                    Dim xmlReader2 = New SimpleMzMLReader(mzMLFile.FullName, False)
+                    Dim iterator2 = xmlReader2.ReadAllChromatograms(True).GetEnumerator()
+                    While iterator2.MoveNext()
+
+                        Dim chromatogramItem = iterator2.Current
+
+                        Dim isSRM As Boolean = IsSrmChromatogram(chromatogramItem)
+                        If Not isSRM Then Continue While
+
+                        Dim scanTimes = chromatogramItem.Times().ToList()
+                        Dim intensities = chromatogramItem.Intensities().ToList()
+
+                        Dim scanToStore As Integer
+
+                        For i = 0 To scanTimes.Count - 1
+                            If elutionTimeToScanMap.TryGetValue(scanTimes(i), scanToStore) Then
+                                ' Keys in this dictionary are m/z; values are intensity for the m/z
+                                Dim mzListForScan As Dictionary(Of Double, Double) = Nothing
+                                If Not simulatedSpectraByScan.TryGetValue(scanToStore, mzListForScan) Then
+                                    mzListForScan = New Dictionary(Of Double, Double)
+                                End If
+
+                                ' mzListForScan.Add(currentMz, intensities(i))
+                            End If
+                        Next
+
+                    End While
+
+
+                    ' ToDo: Implement this
+                    'Dim spectrumInfo = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum)
+
+                    'Dim msSpectrum = GetNewSpectrum(spectrumInfo.DataCount)
+
+                    'mzList.CopyTo(msSpectrum.IonsMZ, 0)
+                    'intensityList.CopyTo(msSpectrum.IonsIntensity, 0)
+
+
+                    If xmlReader.NumChromatograms > 0 Then
+                        Dim percentComplete = scanList.MasterScanOrderCount / CDbl(xmlReader.NumChromatograms) * 100
+                    End If
+
+                    'Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, spectrumInfo, nullMzMLSpectrum,
+                    '                                               scanList, spectraCache, dataOutputHandler,
+                    '                                               percentComplete, mDatasetFileInfo.ScanCount)
+
+
+                    'If Not extractSuccess Then
+                    '    Exit While
+                    'End If
+
+                    'mDatasetFileInfo.ScanCount += 1
                     mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
                 End If
 
@@ -984,6 +1072,25 @@ Namespace DataInput
             mWarnCount = 0
 
         End Sub
+
+        Private Function IsSrmChromatogram(chromatogramItem As SimpleMzMLReader.ParamData) As Boolean
+
+            If chromatogramItem.CVParams.Count > 0 Then
+                For Each item In chromatogramItem.CVParams
+                    Select Case item.TermInfo.Cvid
+                        Case CV.CVID.MS_total_ion_current_chromatogram
+                            ' Skip this chromatogram
+                            Return False
+                        Case CV.CVID.MS_selected_ion_current_chromatogram,
+                            CV.CVID.MS_selected_ion_monitoring_chromatogram,
+                            CV.CVID.MS_selected_reaction_monitoring_chromatogram
+                            Return True
+                    End Select
+                Next
+            End If
+
+            Return False
+        End Function
 
         Private Sub StoreSpectrum(
           msSpectrum As clsMSSpectrum,
