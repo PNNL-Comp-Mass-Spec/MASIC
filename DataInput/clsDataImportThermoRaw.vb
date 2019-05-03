@@ -1,4 +1,6 @@
 ﻿Imports MASIC.clsMASIC
+Imports MASIC.DataOutput
+Imports MASICPeakFinder
 Imports PRISM
 Imports ThermoRawFileReader
 
@@ -34,7 +36,7 @@ Namespace DataInput
         ''' <param name="scanTracking"></param>
         Public Sub New(
           masicOptions As clsMASICOptions,
-          peakFinder As MASICPeakFinder.clsMASICPeakFinder,
+          peakFinder As clsMASICPeakFinder,
           parentIonProcessor As clsParentIonProcessing,
           scanTracking As clsScanTracking)
             MyBase.New(masicOptions, peakFinder, parentIonProcessor, scanTracking)
@@ -157,7 +159,7 @@ Namespace DataInput
           filePath As String,
           scanList As clsScanList,
           spectraCache As clsSpectraCache,
-          dataOutputHandler As DataOutput.clsDataOutput,
+          dataOutputHandler As clsDataOutput,
           keepRawSpectra As Boolean,
           keepMSMSSpectra As Boolean) As Boolean
 
@@ -360,16 +362,16 @@ Namespace DataInput
           xcaliburAccessor As XRawFileIO,
           scanList As clsScanList,
           spectraCache As clsSpectraCache,
-          dataOutputHandler As DataOutput.clsDataOutput,
+          dataOutputHandler As clsDataOutput,
           sicOptions As clsSICOptions,
           keepRawSpectra As Boolean,
           thermoScanInfo As ThermoRawFileReader.clsScanInfo,
           htSIMScanMapping As IDictionary(Of String, Integer),
           ByRef lastNonZoomSurveyScanIndex As Integer,
-          scanNumber As Integer) As Boolean
+          thermoScanInfo As ThermoRawFileReader.clsScanInfo) As Boolean
 
             Dim scanInfo = New clsScanInfo() With {
-                .ScanNumber = scanNumber,
+                .ScanNumber = thermoScanInfo.ScanNumber,
                 .ScanTime = CSng(thermoScanInfo.RetentionTime),
                 .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
                 .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
@@ -459,19 +461,19 @@ Namespace DataInput
           xcaliburAccessor As XRawFileIO,
           scanList As clsScanList,
           spectraCache As clsSpectraCache,
-          dataOutputHandler As DataOutput.clsDataOutput,
+          dataOutputHandler As clsDataOutput,
           sicOptions As clsSICOptions,
           binningOptions As clsBinningOptions,
           keepRawSpectra As Boolean,
           keepMSMSSpectra As Boolean,
           thermoScanInfo As ThermoRawFileReader.clsScanInfo,
           ByRef lastNonZoomSurveyScanIndex As Integer,
-          scanNumber As Integer) As Boolean
+          thermoScanInfo As ThermoRawFileReader.clsScanInfo) As Boolean
 
             ' Note that MinimumPositiveIntensity will be determined in LoadSpectraForFinniganDataFile
 
-            Dim scanInfo = New clsScanInfo() With {
-                .ScanNumber = scanNumber,
+            Dim scanInfo = New clsScanInfo(thermoScanInfo.ParentIonMZ) With {
+                .ScanNumber = thermoScanInfo.ScanNumber,
                 .ScanTime = CSng(thermoScanInfo.RetentionTime),
                 .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
                 .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
@@ -527,9 +529,9 @@ Namespace DataInput
 
             ' Store the collision mode and possibly the scan filter text
             scanInfo.FragScanInfo.CollisionMode = thermoScanInfo.CollisionMode
-            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode)
+            StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_COLLISION_MODE, thermoScanInfo.CollisionMode)
             If mOptions.WriteExtendedStatsIncludeScanFilterText Then
-                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, DataOutput.clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText)
+                StoreExtendedHeaderInfo(dataOutputHandler, scanInfo, clsExtendedStatsWriter.EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, thermoScanInfo.FilterText)
             End If
 
             If mOptions.WriteExtendedStatsStatusLog Then
@@ -606,9 +608,8 @@ Namespace DataInput
         Private Function LoadSpectraForFinniganDataFile(
           xcaliburAccessor As XRawFileIO,
           spectraCache As clsSpectraCache,
-          scanNumber As Integer,
           scanInfo As clsScanInfo,
-          noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
+          noiseThresholdOptions As clsBaselineNoiseOptions,
           discardLowIntensityData As Boolean,
           compressSpectraData As Boolean,
           msDataResolution As Double,
@@ -623,14 +624,14 @@ Namespace DataInput
 
                 ' Load the ions for this scan
 
-                lastKnownLocation = "xcaliburAccessor.GetScanData for scan " & scanNumber
+                lastKnownLocation = "xcaliburAccessor.GetScanData for scan " & scanInfo.ScanNumber
 
                 ' Retrieve the m/z and intensity values for the given scan
                 ' We retrieve the profile-mode data, since that's required for determining spectrum noise
-                scanInfo.IonCountRaw = xcaliburAccessor.GetScanData(scanNumber, mzList, intensityList)
+                scanInfo.IonCountRaw = xcaliburAccessor.GetScanData(scanInfo.ScanNumber, mzList, intensityList)
 
                 If scanInfo.IonCountRaw > 0 Then
-                    Dim ionCountVerified = VerifyDataSorted(scanNumber, scanInfo.IonCountRaw, mzList, intensityList)
+                    Dim ionCountVerified = VerifyDataSorted(scanInfo.ScanNumber, scanInfo.IonCountRaw, mzList, intensityList)
                     If ionCountVerified <> scanInfo.IonCountRaw Then
                         scanInfo.IonCountRaw = ionCountVerified
                     End If
@@ -638,15 +639,15 @@ Namespace DataInput
 
                 scanInfo.IonCount = scanInfo.IonCountRaw
 
-                Dim objMSSpectrum As New clsMSSpectrum() With {
-                    .ScanNumber = scanNumber,
+                Dim msSpectrum As New clsMSSpectrum() With {
+                    .ScanNumber = scanInfo.ScanNumber,
                     .IonCount = scanInfo.IonCountRaw
                 }
 
-                lastKnownLocation = "Resize IonsMz and IonsIntensity to length " & objMSSpectrum.IonCount
+                lastKnownLocation = "Resize IonsMz and IonsIntensity to length " & msSpectrum.IonCount
 
-                ReDim objMSSpectrum.IonsMZ(objMSSpectrum.IonCount - 1)
-                ReDim objMSSpectrum.IonsIntensity(objMSSpectrum.IonCount - 1)
+                ReDim msSpectrum.IonsMZ(msSpectrum.IonCount - 1)
+                ReDim msSpectrum.IonsIntensity(msSpectrum.IonCount - 1)
 
                 ' Copy the intensity data; and compute the total scan intensity
 
@@ -660,8 +661,8 @@ Namespace DataInput
                 Dim basePeakMz As Double = 0
 
                 For ionIndex = 0 To scanInfo.IonCountRaw - 1
-                    objMSSpectrum.IonsMZ(ionIndex) = mzList(ionIndex)
-                    objMSSpectrum.IonsIntensity(ionIndex) = intensityList(ionIndex)
+                    msSpectrum.IonsMZ(ionIndex) = mzList(ionIndex)
+                    msSpectrum.IonsIntensity(ionIndex) = intensityList(ionIndex)
                     totalIonIntensity += intensityList(ionIndex)
                     If intensityList(ionIndex) > basePeakIntensity Then
                         basePeakIntensity = intensityList(ionIndex)
@@ -683,9 +684,9 @@ Namespace DataInput
 
                 ' Determine the minimum positive intensity in this scan
                 lastKnownLocation = "Call mMASICPeakFinder.FindMinimumPositiveValue"
-                scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(scanInfo.IonCountRaw, objMSSpectrum.IonsIntensity, 0)
+                scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(scanInfo.IonCountRaw, msSpectrum.IonsIntensity, 0)
 
-                If objMSSpectrum.IonCount > 0 Then
+                If msSpectrum.IonCount > 0 Then
                     If scanInfo.TotalIonIntensity < Single.Epsilon Then
                         scanInfo.TotalIonIntensity = totalIonIntensity
                     End If
@@ -707,7 +708,7 @@ Namespace DataInput
                 lastKnownLocation = "Call ProcessAndStoreSpectrum"
                 mScanTracking.ProcessAndStoreSpectrum(
                     scanInfo, Me,
-                    spectraCache, objMSSpectrum,
+                    spectraCache, msSpectrum,
                     noiseThresholdOptions,
                     discardLowIntensityDataWork,
                     compressSpectraDataWork,
@@ -762,7 +763,7 @@ Namespace DataInput
         End Function
 
         Private Sub StoreExtendedHeaderInfo(
-          dataOutputHandler As DataOutput.clsDataOutput,
+          dataOutputHandler As clsDataOutput,
           scanInfo As clsScanInfo,
           entryName As String,
           entryValue As String)
@@ -780,7 +781,7 @@ Namespace DataInput
         End Sub
 
         Private Sub StoreExtendedHeaderInfo(
-          dataOutputHandler As DataOutput.clsDataOutput,
+          dataOutputHandler As clsDataOutput,
           scanInfo As clsScanInfo,
           statusEntries As IReadOnlyCollection(Of KeyValuePair(Of String, String)))
 
@@ -788,7 +789,7 @@ Namespace DataInput
         End Sub
 
         Private Sub StoreExtendedHeaderInfo(
-          dataOutputHandler As DataOutput.clsDataOutput,
+          dataOutputHandler As clsDataOutput,
           scanInfo As clsScanInfo,
           statusEntries As IReadOnlyCollection(Of KeyValuePair(Of String, String)),
           keyNameFilterList As IReadOnlyCollection(Of String))

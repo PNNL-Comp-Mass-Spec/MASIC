@@ -80,7 +80,7 @@ Namespace DataInput
         End Sub
 
         Public Sub DiscardDataBelowNoiseThreshold(
-          objMSSpectrum As clsMSSpectrum,
+          msSpectrum As clsMSSpectrum,
           noiseThresholdIntensity As Double,
           mzIgnoreRangeStart As Double,
           mzIgnoreRangeEnd As Double,
@@ -91,7 +91,7 @@ Namespace DataInput
             Dim pointPassesFilter As Boolean
 
             Try
-                With objMSSpectrum
+                With msSpectrum
                     Select Case noiseThresholdOptions.BaselineNoiseMode
                         Case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold
                             If noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0 Then
@@ -159,7 +159,7 @@ Namespace DataInput
         End Sub
 
         Public Sub DiscardDataToLimitIonCount(
-          objMSSpectrum As clsMSSpectrum,
+          msSpectrum As clsMSSpectrum,
           mzIgnoreRangeStart As Double,
           mzIgnoreRangeEnd As Double,
           maxIonCountToRetain As Integer)
@@ -175,9 +175,9 @@ Namespace DataInput
 
             Try
 
-                With objMSSpectrum
+                With msSpectrum
 
-                    If objMSSpectrum.IonCount > maxIonCountToRetain Then
+                    If msSpectrum.IonCount > maxIonCountToRetain Then
                         Dim objFilterDataArray = New clsFilterDataArrayMaxCount() With {
                             .MaximumDataCountToLoad = maxIonCountToRetain,
                             .TotalIntensityPercentageFilterEnabled = False
@@ -185,7 +185,7 @@ Namespace DataInput
 
                         writeDebugData = False
                         If writeDebugData Then
-                            writer = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString() & "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
+                            writer = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" & msSpectrum.ScanNumber.ToString() & "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
                             writer.WriteLine("m/z" & ControlChars.Tab & "Intensity")
                         End If
 
@@ -233,7 +233,7 @@ Namespace DataInput
                     End If
 
                     If writeDebugData Then
-                        Using postFilterWriter = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" & objMSSpectrum.ScanNumber.ToString() & "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
+                        Using postFilterWriter = New StreamWriter(New FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" & msSpectrum.ScanNumber.ToString() & "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
                             postFilterWriter.WriteLine("m/z" & ControlChars.Tab & "Intensity")
 
                             ' Store the intensity values in objFilterDataArray

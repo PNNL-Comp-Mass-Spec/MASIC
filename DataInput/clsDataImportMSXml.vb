@@ -805,10 +805,11 @@ Namespace DataInput
             mKeepMSMSSpectra = keepMSMSSpectra
 
             mWarnCount = 0
+
         End Sub
 
-        Private Sub StoreMzXmlSpectrum(
-          objMSSpectrum As clsMSSpectrum,
+        Private Sub StoreSpectrum(
+          msSpectrum As clsMSSpectrum,
           scanInfo As clsScanInfo,
           spectraCache As clsSpectraCache,
           noiseThresholdOptions As clsBaselineNoiseOptions,
@@ -819,23 +820,23 @@ Namespace DataInput
 
             Try
 
-                If objMSSpectrum.IonsMZ Is Nothing OrElse objMSSpectrum.IonsIntensity Is Nothing Then
+                If msSpectrum.IonsMZ Is Nothing OrElse msSpectrum.IonsIntensity Is Nothing Then
                     scanInfo.IonCount = 0
                     scanInfo.IonCountRaw = 0
                 Else
-                    objMSSpectrum.IonCount = objMSSpectrum.IonsMZ.Length
+                    msSpectrum.IonCount = msSpectrum.IonsMZ.Length
 
-                    scanInfo.IonCount = objMSSpectrum.IonCount
+                    scanInfo.IonCount = msSpectrum.IonCount
                     scanInfo.IonCountRaw = scanInfo.IonCount
                 End If
 
-                objMSSpectrum.ScanNumber = scanInfo.ScanNumber
+                msSpectrum.ScanNumber = scanInfo.ScanNumber
 
                 If scanInfo.IonCount > 0 Then
                     ' Confirm the total scan intensity stored in the mzXML file
                     Dim totalIonIntensity As Double = 0
-                    For ionIndex = 0 To objMSSpectrum.IonCount - 1
-                        totalIonIntensity += objMSSpectrum.IonsIntensity(ionIndex)
+                    For ionIndex = 0 To msSpectrum.IonCount - 1
+                        totalIonIntensity += msSpectrum.IonsIntensity(ionIndex)
                     Next
 
                     If scanInfo.TotalIonIntensity < Single.Epsilon Then
@@ -844,7 +845,7 @@ Namespace DataInput
 
                     mScanTracking.ProcessAndStoreSpectrum(
                         scanInfo, Me,
-                        spectraCache, objMSSpectrum,
+                        spectraCache, msSpectrum,
                         noiseThresholdOptions,
                         discardLowIntensityData,
                         compressSpectraData,
@@ -855,7 +856,7 @@ Namespace DataInput
                 End If
 
             Catch ex As Exception
-                ReportError("Error in clsMasic->StoreMzXMLSpectrum ", ex)
+                ReportError("Error in clsMasic->StoreSpectrum ", ex)
             End Try
 
         End Sub
