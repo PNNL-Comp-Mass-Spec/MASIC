@@ -110,12 +110,19 @@ Public Class clsScanInfo
     Public Property BaselineNoiseStats As MASICPeakFinder.clsBaselineNoiseStats
 
     ''' <summary>
-    ''' Constructor
+    ''' Constructor for a MS1 scan
     ''' </summary>
     Public Sub New()
+        Me.New(0)
+    End Sub
+
+    ''' <summary>
+    ''' Constructor for a MS2 scan
+    ''' </summary>
+    Public Sub New(fragScanParentIonMz As Double)
         MRMScanType = MRMScanTypeConstants.NotMRM
 
-        FragScanInfo = New clsFragScanInfo(0)
+        FragScanInfo = New clsFragScanInfo(fragScanParentIonMz)
         MRMScanInfo = New clsMRMScanInfo()
 
         ExtendedHeaderInfo = New Dictionary(Of Integer, String)
