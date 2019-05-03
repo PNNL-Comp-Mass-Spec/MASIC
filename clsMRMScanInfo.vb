@@ -24,5 +24,6 @@ Public Class clsMRMScanInfo
     ''' </summary>
     Public Sub New()
         MRMMassList = New List(Of udtMRMMassRangeType)
+        ScanCount = 0
     End Sub
 End Class
