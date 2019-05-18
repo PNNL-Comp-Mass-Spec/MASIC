@@ -119,8 +119,6 @@ Public Class clsMSSpectrum
             Throw New Exception("ShrinkArrays should only be called with a length less than or equal to the current length")
         End If
 
-        ConsoleMsgUtils.ShowWarning("Need to validate the count in ShrinkArrays")
-
         Dim countToRemove = IonsMZ.Count - ionCountNew
         If countToRemove = 0 Then Exit Sub
 

@@ -17,7 +17,6 @@ Public Class clsFilterDataArrayMaxCount
     ' 4 steps in Sub FilterDataByMaxDataCountToLoad
     Private Const SUBTASK_STEP_COUNT As Integer = 4
 
-
     Private mDataCount As Integer
     Private mDataValues() As Double
     Private mDataIndices() As Integer

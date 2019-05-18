@@ -47,6 +47,10 @@ Namespace DataInput
           scanInfo As clsScanInfo,
           precursorScanNumber As Integer) As Double
 
+            If mzMLSpectrum Is Nothing Then
+                Return 0
+            End If
+
             If precursorScanNumber <> mCachedPrecursorScan Then
 
                 If mMostRecentPrecursorScan <> precursorScanNumber Then
@@ -622,6 +626,7 @@ Namespace DataInput
 
             Dim mzXmlSourceSpectrum As clsSpectrumInfoMzXML = Nothing
 
+            ' Note that both mzXML and mzML data is stored in spectrumInfo
             If TypeOf (spectrumInfo) Is clsSpectrumInfoMzXML Then
                 mzXmlSourceSpectrum = CType(spectrumInfo, clsSpectrumInfoMzXML)
                 isMzXML = True
@@ -651,6 +656,18 @@ Namespace DataInput
             Return success
         End Function
 
+        ''' <summary>
+        '''
+        ''' </summary>
+        ''' <param name="scanList"></param>
+        ''' <param name="spectraCache"></param>
+        ''' <param name="dataOutputHandler"></param>
+        ''' <param name="spectrumInfo"></param>
+        ''' <param name="msSpectrum">Tracks scan number, m/z values, and intensity values; msSpectrum.IonCount is the number of data points</param>
+        ''' <param name="sicOptions"></param>
+        ''' <param name="isMzXML"></param>
+        ''' <param name="mzXmlSourceSpectrum"></param>
+        ''' <returns></returns>
         Private Function ExtractSurveyScan(
           scanList As clsScanList,
           spectraCache As clsSpectraCache,
