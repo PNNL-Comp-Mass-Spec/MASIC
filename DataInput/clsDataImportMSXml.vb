@@ -1203,7 +1203,14 @@ Namespace DataInput
             If Not isMzXML Then
                 ' Not a .mzXML file
                 ' Use the defaults
-                scanInfo.ScanHeaderText = String.Empty
+                If String.IsNullOrWhiteSpace(scanInfo.ScanHeaderText) Then
+                    If mzXmlSourceSpectrum Is Nothing OrElse String.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine) Then
+                        scanInfo.ScanHeaderText = String.Empty
+                    Else
+                        scanInfo.ScanHeaderText = mzXmlSourceSpectrum.FilterLine
+                    End If
+                End If
+
                 scanInfo.ScanTypeName = defaultScanType
                 Return
             End If
