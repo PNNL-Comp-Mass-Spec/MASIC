@@ -1,9 +1,7 @@
 ﻿Option Strict On
 
-Imports PRISM
-
 ''' <summary>
-''' Used to track the MZ and Intensity values of a given mass spectrum
+''' Used to track the m/z and intensity values of a given mass spectrum
 ''' </summary>
 Public Class clsMSSpectrum
 
@@ -31,7 +29,7 @@ Public Class clsMSSpectrum
     Public ReadOnly IonsIntensity As List(Of Double)
 
     ''' <summary>
-    ''' Constructor
+    ''' Constructor that only sets the scan number
     ''' </summary>
     Public Sub New(intScanNumber As Integer)
         ScanNumber = intScanNumber
@@ -41,7 +39,7 @@ Public Class clsMSSpectrum
     End Sub
 
     ''' <summary>
-    ''' Constructor
+    ''' Constructor that sets the scan number and stores m/z and intensity data (float intensities)
     ''' </summary>
     Public Sub New(intScanNumber As Integer, mzList As IList(Of Double), intensityList As IList(Of Single), dataCount As Integer)
         Me.New(intScanNumber)
@@ -53,7 +51,7 @@ Public Class clsMSSpectrum
     End Sub
 
     ''' <summary>
-    ''' Constructor
+    ''' Constructor that sets the scan number and stores m/z and intensity data (double intensities)
     ''' </summary>
     Public Sub New(intScanNumber As Integer, mzList As IList(Of Double), intensityList As IList(Of Double), dataCount As Integer)
         Me.New(intScanNumber)
@@ -65,7 +63,7 @@ Public Class clsMSSpectrum
     End Sub
 
     ''' <summary>
-    ''' Clear the mz and intensity values (but leave the scan number unchanged)
+    ''' Clear the m/z and intensity values (but leave the scan number unchanged)
     ''' </summary>
     Public Sub Clear()
         IonsMZ.Clear()
@@ -73,7 +71,7 @@ Public Class clsMSSpectrum
     End Sub
 
     ''' <summary>
-    ''' Clear the mz and intensity values, and update the scan number
+    ''' Clear the m/z and intensity values, and update the scan number
     ''' </summary>
     Public Sub Clear(newScanNumber As Integer)
         IonsMZ.Clear()
