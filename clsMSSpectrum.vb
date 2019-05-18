@@ -7,21 +7,12 @@ Imports PRISM
 ''' </summary>
 Public Class clsMSSpectrum
 
-    Private mScanNumber As Integer
-
     ''' <summary>
     ''' Scan number
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>0 if not in use</remarks>
     Public Property ScanNumber As Integer
-        Get
-            Return mScanNumber
-        End Get
-        Private Set
-            mScanNumber = Value
-        End Set
-    End Property
 
     Public ReadOnly Property IonCount As Integer
         Get
@@ -111,7 +102,6 @@ Public Class clsMSSpectrum
 
         IonsIntensity.Clear()
         IonsIntensity.AddRange(spectrum.IonsIntensity)
-
     End Sub
 
     Public Sub ShrinkArrays(ionCountNew As Integer)
@@ -126,7 +116,4 @@ Public Class clsMSSpectrum
         IonsIntensity.RemoveRange(ionCountNew, countToRemove)
     End Sub
 
-    Public Sub UpdateScanNumber(newScanNumber As Integer)
-        ScanNumber = newScanNumber
-    End Sub
 End Class

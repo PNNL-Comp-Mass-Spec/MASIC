@@ -1144,7 +1144,7 @@ Namespace DataInput
                 End If
 
                 If msSpectrum.ScanNumber <> scanInfo.ScanNumber Then
-                    msSpectrum.UpdateScanNumber(scanInfo.ScanNumber)
+                    msSpectrum.ScanNumber = scanInfo.ScanNumber
                 End If
 
                 If scanInfo.IonCount > 0 Then
