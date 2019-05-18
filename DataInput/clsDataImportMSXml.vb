@@ -912,23 +912,22 @@ Namespace DataInput
           intensityList As IReadOnlyList(Of Double),
           thermoRawFile As Boolean) As clsSpectrumInfoMzXML
 
-            Dim spectrumInfo = New clsSpectrumInfoMzXML With {
+            Dim mzXmlSourceSpectrum = New clsSpectrumInfoMzXML With {
                 .SpectrumID = mzMLSpectrum.ScanNumber,
                 .ScanNumber = mzMLSpectrum.ScanNumber,
                 .RetentionTimeMin = clsUtilities.CSngSafe(mzMLSpectrum.ScanStartTime),
                 .MSLevel = mzMLSpectrum.MsLevel,
-                .TotalIonCurrent = mzMLSpectrum.TotalIonCurrent
+                .TotalIonCurrent = mzMLSpectrum.TotalIonCurrent,
+                .DataCount = mzList.Count
             }
 
-            spectrumInfo.DataCount = mzList.Count
-
-            If spectrumInfo.DataCount > 0 Then
+            If mzXmlSourceSpectrum.DataCount > 0 Then
                 Dim basePeakMz = mzList(0)
                 Dim bpi = intensityList(0)
                 Dim mzMin = basePeakMz
                 Dim mzMax = basePeakMz
 
-                For i = 0 To spectrumInfo.DataCount - 1
+                For i = 1 To mzXmlSourceSpectrum.DataCount - 1
                     If intensityList(i) > bpi Then
                         basePeakMz = mzList(i)
                         bpi = intensityList(i)
@@ -941,17 +940,17 @@ Namespace DataInput
                     End If
                 Next
 
-                spectrumInfo.BasePeakMZ = basePeakMz
-                spectrumInfo.BasePeakIntensity = clsUtilities.CSngSafe(bpi)
+                mzXmlSourceSpectrum.BasePeakMZ = basePeakMz
+                mzXmlSourceSpectrum.BasePeakIntensity = clsUtilities.CSngSafe(bpi)
 
-                spectrumInfo.mzRangeStart = clsUtilities.CSngSafe(mzMin)
-                spectrumInfo.mzRangeEnd = clsUtilities.CSngSafe(mzMax)
+                mzXmlSourceSpectrum.mzRangeStart = clsUtilities.CSngSafe(mzMin)
+                mzXmlSourceSpectrum.mzRangeEnd = clsUtilities.CSngSafe(mzMax)
             End If
 
-            If spectrumInfo.MSLevel > 1 Then
+            If mzXmlSourceSpectrum.MSLevel > 1 Then
                 Dim firstPrecursor = mzMLSpectrum.Precursors(0)
 
-                spectrumInfo.ParentIonMZ = firstPrecursor.IsolationWindow.TargetMz
+                mzXmlSourceSpectrum.ParentIonMZ = firstPrecursor.IsolationWindow.TargetMz
 
                 ' Verbose activation method description:
                 ' Dim activationMethod = firstPrecursor.ActivationMethod
@@ -1030,27 +1029,28 @@ Namespace DataInput
                     End If
                 End If
 
-                spectrumInfo.ActivationMethod = String.Join(","c, activationMethods)
+                mzXmlSourceSpectrum.ActivationMethod = String.Join(","c, activationMethods)
             End If
 
             ' Store the "filter string" in .FilterLine
+
             Dim filterStrings = (From item In mzMLSpectrum.CVParams Where item.TermInfo.Cvid = CV.CVID.MS_filter_string).ToList()
 
             If filterStrings.Count > 0 Then
                 Dim filterString = filterStrings.First().Value
 
                 If thermoRawFile Then
-                    spectrumInfo.FilterLine = XRawFileIO.MakeGenericFinniganScanFilter(filterString)
-                    spectrumInfo.ScanType = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(filterString)
+                    mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericFinniganScanFilter(filterString)
+                    mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(filterString)
                 Else
-                    spectrumInfo.FilterLine = filterString
+                    mzXmlSourceSpectrum.FilterLine = filterString
                 End If
             End If
 
             If filterStrings.Count = 0 OrElse Not thermoRawFile Then
                 Dim matchingParams = mzMLSpectrum.GetCVParamsChildOf(CV.CVID.MS_spectrum_type)
                 If matchingParams.Count > 0 Then
-                    spectrumInfo.ScanType = matchingParams.First().TermInfo.Name
+                    mzXmlSourceSpectrum.ScanType = matchingParams.First().TermInfo.Name
                 End If
             End If
 
@@ -1190,7 +1190,7 @@ Namespace DataInput
           msLevel As Integer,
           defaultScanType As String,
           isMzXML As Boolean,
-          ByRef mzXmlSourceSpectrum As clsSpectrumInfoMzXML)
+          mzXmlSourceSpectrum As clsSpectrumInfoMzXML)
 
             If Not isMzXML Then
                 ' Not a .mzXML file

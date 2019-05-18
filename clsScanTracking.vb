@@ -67,7 +67,7 @@ Public Class clsScanTracking
     End Function
 
     Private Sub CompressSpectraData(
-      objMSSpectrum As clsMSSpectrum,
+      msSpectrum As clsMSSpectrum,
       msDataResolution As Double,
       mzIgnoreRangeStart As Double,
       mzIgnoreRangeEnd As Double)
@@ -75,10 +75,10 @@ Public Class clsScanTracking
         ' First, look for blocks of data points that consecutively have an intensity value of 0
         ' For each block of data found, reduce the data to only retain the first data point and last data point in the block
         '
-        ' Next, look for data points in objMSSpectrum that are within msDataResolution units of one another (m/z units)
+        ' Next, look for data points in msSpectrum that are within msDataResolution units of one another (m/z units)
         ' If found, combine into just one data point, keeping the largest intensity and the m/z value corresponding to the largest intensity
 
-        If objMSSpectrum.IonCount <= 1 Then
+        If msSpectrum.IonCount <= 1 Then
             Return
         End If
 
@@ -86,11 +86,11 @@ Public Class clsScanTracking
         Dim targetIndex = 0
         Dim index = 0
 
-        Do While index < objMSSpectrum.IonCount
-            If objMSSpectrum.IonsIntensity(index) < Single.Epsilon Then
+        Do While index < msSpectrum.IonCount
+            If msSpectrum.IonsIntensity(index) < Single.Epsilon Then
                 Dim countCombined = 0
-                For comparisonIndex = index + 1 To objMSSpectrum.IonCount - 1
-                    If objMSSpectrum.IonsIntensity(comparisonIndex) < Single.Epsilon Then
+                For comparisonIndex = index + 1 To msSpectrum.IonCount - 1
+                    If msSpectrum.IonsIntensity(comparisonIndex) < Single.Epsilon Then
                         countCombined += 1
                     Else
                         Exit For
@@ -100,27 +100,27 @@ Public Class clsScanTracking
                 If countCombined > 1 Then
                     ' Only keep the first and last data point in the block
 
-                    objMSSpectrum.IonsMZ(targetIndex) = objMSSpectrum.IonsMZ(index)
-                    objMSSpectrum.IonsIntensity(targetIndex) = objMSSpectrum.IonsIntensity(index)
+                    msSpectrum.IonsMZ(targetIndex) = msSpectrum.IonsMZ(index)
+                    msSpectrum.IonsIntensity(targetIndex) = msSpectrum.IonsIntensity(index)
 
                     targetIndex += 1
-                    objMSSpectrum.IonsMZ(targetIndex) = objMSSpectrum.IonsMZ(index + countCombined)
-                    objMSSpectrum.IonsIntensity(targetIndex) = objMSSpectrum.IonsIntensity(index + countCombined)
+                    msSpectrum.IonsMZ(targetIndex) = msSpectrum.IonsMZ(index + countCombined)
+                    msSpectrum.IonsIntensity(targetIndex) = msSpectrum.IonsIntensity(index + countCombined)
 
                     index += countCombined
                 Else
                     ' Keep this data point since a single zero
                     If targetIndex <> index Then
-                        objMSSpectrum.IonsMZ(targetIndex) = objMSSpectrum.IonsMZ(index)
-                        objMSSpectrum.IonsIntensity(targetIndex) = objMSSpectrum.IonsIntensity(index)
+                        msSpectrum.IonsMZ(targetIndex) = msSpectrum.IonsMZ(index)
+                        msSpectrum.IonsIntensity(targetIndex) = msSpectrum.IonsIntensity(index)
                     End If
                 End If
             Else
                 ' Note: targetIndex will be the same as index until the first time that data is combined (countCombined > 0)
                 ' After that, targetIndex will always be less than index and we will thus always need to copy data
                 If targetIndex <> index Then
-                    objMSSpectrum.IonsMZ(targetIndex) = objMSSpectrum.IonsMZ(index)
-                    objMSSpectrum.IonsIntensity(targetIndex) = objMSSpectrum.IonsIntensity(index)
+                    msSpectrum.IonsMZ(targetIndex) = msSpectrum.IonsMZ(index)
+                    msSpectrum.IonsIntensity(targetIndex) = msSpectrum.IonsIntensity(index)
                 End If
             End If
 
@@ -130,7 +130,7 @@ Public Class clsScanTracking
         Loop
 
         ' Update .IonCount with the new data count
-        objMSSpectrum.ShrinkArrays(targetIndex)
+        msSpectrum.ShrinkArrays(targetIndex)
 
         ' Step through the data, consolidating data within msDataResolution
         ' Note that we're copying in place rather than making a new, duplicate array
@@ -139,26 +139,26 @@ Public Class clsScanTracking
         targetIndex = 0
         index = 0
 
-        Do While index < objMSSpectrum.IonCount
+        Do While index < msSpectrum.IonCount
             Dim countCombined = 0
-            Dim bestMz = objMSSpectrum.IonsMZ(index)
+            Dim bestMz = msSpectrum.IonsMZ(index)
 
             ' Only combine data if the first data point has a positive intensity value
-            If objMSSpectrum.IonsIntensity(index) > 0 Then
+            If msSpectrum.IonsIntensity(index) > 0 Then
 
-                Dim pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(objMSSpectrum.IonsMZ(index), mzIgnoreRangeStart, mzIgnoreRangeEnd)
+                Dim pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ(index), mzIgnoreRangeStart, mzIgnoreRangeEnd)
 
                 If Not pointInIgnoreRange Then
-                    For comparisonIndex = index + 1 To objMSSpectrum.IonCount - 1
-                        If clsUtilities.CheckPointInMZIgnoreRange(objMSSpectrum.IonsMZ(comparisonIndex), mzIgnoreRangeStart, mzIgnoreRangeEnd) Then
+                    For comparisonIndex = index + 1 To msSpectrum.IonCount - 1
+                        If clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ(comparisonIndex), mzIgnoreRangeStart, mzIgnoreRangeEnd) Then
                             ' Reached the ignore range; do not allow to be combined with the current data point
                             Exit For
                         End If
 
-                        If objMSSpectrum.IonsMZ(comparisonIndex) - objMSSpectrum.IonsMZ(index) < msDataResolution Then
-                            If objMSSpectrum.IonsIntensity(comparisonIndex) > objMSSpectrum.IonsIntensity(index) Then
-                                objMSSpectrum.IonsIntensity(index) = objMSSpectrum.IonsIntensity(comparisonIndex)
-                                bestMz = objMSSpectrum.IonsMZ(comparisonIndex)
+                        If msSpectrum.IonsMZ(comparisonIndex) - msSpectrum.IonsMZ(index) < msDataResolution Then
+                            If msSpectrum.IonsIntensity(comparisonIndex) > msSpectrum.IonsIntensity(index) Then
+                                msSpectrum.IonsIntensity(index) = msSpectrum.IonsIntensity(comparisonIndex)
+                                bestMz = msSpectrum.IonsMZ(comparisonIndex)
                             End If
                             countCombined += 1
                         Else
@@ -172,8 +172,8 @@ Public Class clsScanTracking
             ' Note: targetIndex will be the same as index until the first time that data is combined (countCombined > 0)
             ' After that, targetIndex will always be less than index and we will thus always need to copy data
             If targetIndex <> index OrElse countCombined > 0 Then
-                objMSSpectrum.IonsMZ(targetIndex) = bestMz
-                objMSSpectrum.IonsIntensity(targetIndex) = objMSSpectrum.IonsIntensity(index)
+                msSpectrum.IonsMZ(targetIndex) = bestMz
+                msSpectrum.IonsIntensity(targetIndex) = msSpectrum.IonsIntensity(index)
 
                 index += countCombined
             End If
@@ -183,13 +183,13 @@ Public Class clsScanTracking
         Loop
 
         ' Update .IonCount with the new data count
-        objMSSpectrum.ShrinkArrays(targetIndex)
+        msSpectrum.ShrinkArrays(targetIndex)
 
     End Sub
 
     Private Sub ComputeNoiseLevelForMassSpectrum(
       scanInfo As clsScanInfo,
-      objMSSpectrum As clsMSSpectrum,
+      msSpectrum As clsMSSpectrum,
       noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions)
 
         Const IGNORE_NON_POSITIVE_DATA = True
@@ -200,11 +200,11 @@ Public Class clsScanTracking
             scanInfo.BaselineNoiseStats.NoiseLevel = noiseThresholdOptions.BaselineNoiseLevelAbsolute
             scanInfo.BaselineNoiseStats.PointsUsed = 1
         Else
-            If objMSSpectrum.IonCount > 0 Then
+            If msSpectrum.IonCount > 0 Then
                 Dim newBaselineNoiseStats As clsBaselineNoiseStats = Nothing
 
                 mPeakFinder.ComputeTrimmedNoiseLevel(
-                    objMSSpectrum.IonsIntensity, 0, objMSSpectrum.IonCount - 1,
+                    msSpectrum.IonsIntensity, 0, msSpectrum.IonCount - 1,
                     noiseThresholdOptions, IGNORE_NON_POSITIVE_DATA,
                     newBaselineNoiseStats)
 
@@ -217,8 +217,8 @@ Public Class clsScanTracking
     Public Function ProcessAndStoreSpectrum(
       scanInfo As clsScanInfo,
       dataImportUtilities As DataInput.clsDataImport,
-      objSpectraCache As clsSpectraCache,
-      objMSSpectrum As clsMSSpectrum,
+      spectraCache As clsSpectraCache,
+      msSpectrum As clsMSSpectrum,
       noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
       discardLowIntensityData As Boolean,
       compressData As Boolean,
@@ -232,7 +232,7 @@ Public Class clsScanTracking
             ' Determine the noise threshold intensity for this spectrum
             ' Stored in scanInfo.BaselineNoiseStats
             lastKnownLocation = "Call ComputeNoiseLevelForMassSpectrum"
-            ComputeNoiseLevelForMassSpectrum(scanInfo, objMSSpectrum, noiseThresholdOptions)
+            ComputeNoiseLevelForMassSpectrum(scanInfo, msSpectrum, noiseThresholdOptions)
 
             If Not keepRawSpectrum Then
                 Return True
@@ -243,50 +243,50 @@ Public Class clsScanTracking
                 ' Discard data below the noise level or below the minimum S/N level
                 ' If we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
                 lastKnownLocation = "Call DiscardDataBelowNoiseThreshold"
-                dataImportUtilities.DiscardDataBelowNoiseThreshold(objMSSpectrum,
+                dataImportUtilities.DiscardDataBelowNoiseThreshold(msSpectrum,
                                                                    scanInfo.BaselineNoiseStats.NoiseLevel,
                                                                    mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                                                    mReporterIons.MZIntensityFilterIgnoreRangeEnd,
                                                                    noiseThresholdOptions)
 
-                scanInfo.IonCount = objMSSpectrum.IonCount
+                scanInfo.IonCount = msSpectrum.IonCount
             End If
 
             If compressData Then
                 lastKnownLocation = "Call CompressSpectraData"
                 ' Again, if we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
-                CompressSpectraData(objMSSpectrum, msDataResolution,
+                CompressSpectraData(msSpectrum, msDataResolution,
                                     mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                     mReporterIons.MZIntensityFilterIgnoreRangeEnd)
             End If
 
-            If objMSSpectrum.IonCount > MAX_ALLOWABLE_ION_COUNT Then
+            If msSpectrum.IonCount > MAX_ALLOWABLE_ION_COUNT Then
                 ' Do not keep more than 50,000 ions
                 lastKnownLocation = "Call DiscardDataToLimitIonCount"
                 mSpectraFoundExceedingMaxIonCount += 1
 
                 ' Display a message at the console the first 10 times we encounter spectra with over MAX_ALLOWABLE_ION_COUNT ions
                 ' In addition, display a new message every time a new max value is encountered
-                If mSpectraFoundExceedingMaxIonCount <= 10 OrElse objMSSpectrum.IonCount > mMaxIonCountReported Then
+                If mSpectraFoundExceedingMaxIonCount <= 10 OrElse msSpectrum.IonCount > mMaxIonCountReported Then
                     Console.WriteLine()
                     Console.WriteLine(
-                        "Note: Scan " & scanInfo.ScanNumber & " has " & objMSSpectrum.IonCount & " ions; " &
+                        "Note: Scan " & scanInfo.ScanNumber & " has " & msSpectrum.IonCount & " ions; " &
                         "will only retain " & MAX_ALLOWABLE_ION_COUNT & " (trimmed " &
                         mSpectraFoundExceedingMaxIonCount.ToString() & " spectra)")
 
-                    mMaxIonCountReported = objMSSpectrum.IonCount
+                    mMaxIonCountReported = msSpectrum.IonCount
                 End If
 
-                dataImportUtilities.DiscardDataToLimitIonCount(objMSSpectrum,
+                dataImportUtilities.DiscardDataToLimitIonCount(msSpectrum,
                                                                mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                                                mReporterIons.MZIntensityFilterIgnoreRangeEnd,
                                                                MAX_ALLOWABLE_ION_COUNT)
 
-                scanInfo.IonCount = objMSSpectrum.IonCount
+                scanInfo.IonCount = msSpectrum.IonCount
             End If
 
             lastKnownLocation = "Call AddSpectrumToPool"
-            Dim success = objSpectraCache.AddSpectrumToPool(objMSSpectrum, scanInfo.ScanNumber)
+            Dim success = spectraCache.AddSpectrumToPool(msSpectrum, scanInfo.ScanNumber)
 
             Return success
 
