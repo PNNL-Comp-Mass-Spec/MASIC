@@ -17,12 +17,13 @@ Namespace DataInput
 
 #Region "Member variables"
 
+        Private ReadOnly mCentroider As Centroider
         Private mWarnCount As Integer
 
         Private mMostRecentPrecursorScan As Integer
 
-        Private mCentroidedPrecursorIonsMz As List(Of Double) = New List(Of Double)
-        Private mCentroidedPrecursorIonsIntensity As List(Of Double) = New List(Of Double)
+        Private ReadOnly mCentroidedPrecursorIonsMz As List(Of Double) = New List(Of Double)
+        Private ReadOnly mCentroidedPrecursorIonsIntensity As List(Of Double) = New List(Of Double)
 
 #End Region
         ''' <summary>
@@ -38,6 +39,7 @@ Namespace DataInput
           parentIonProcessor As clsParentIonProcessing,
           scanTracking As clsScanTracking)
             MyBase.New(masicOptions, peakFinder, parentIonProcessor, scanTracking)
+            mCentroider = New Centroider()
         End Sub
 
         Private Function ComputeInterference(
@@ -720,23 +722,44 @@ Namespace DataInput
                 mKeepRawSpectra)
 
             If Not msSpectrum.IonsMZ Is Nothing AndAlso Not msSpectrum.IonsIntensity Is Nothing Then
-                Dim centroidedPrecursorIonsMz As Double() = Nothing
-                Dim centroidedPrecursorIonsIntensity As Double() = Nothing
 
-                Dim centroidSuccess = CentroidData(scanInfo, msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
-                                                   centroidedPrecursorIonsMz, centroidedPrecursorIonsIntensity)
+                If mzXmlSourceSpectrum.Centroided Then
+                    ' Data is already centroided
+                    UpdateCachedPrecursorScanData(scanInfo.ScanNumber, msSpectrum)
+                Else
+                    ' Need to centroid the data
+                    Dim sourceMzs As Double()
+                    Dim sourceIntensities As Double()
 
-                If centroidSuccess Then
-                    mMostRecentPrecursorScan = scanInfo.ScanNumber
-                    mCentroidedPrecursorIonsMz.Clear()
-                    mCentroidedPrecursorIonsIntensity.Clear()
+                    ReDim sourceMzs(msSpectrum.IonCount - 1)
+                    ReDim sourceIntensities(msSpectrum.IonCount - 1)
 
-                    For i = 0 To centroidedPrecursorIonsMz.Length - 1
-                        mCentroidedPrecursorIonsMz.Add(centroidedPrecursorIonsMz(i))
-                        mCentroidedPrecursorIonsIntensity.Add(centroidedPrecursorIonsIntensity(i))
+                    For i = 0 To msSpectrum.IonCount - 1
+                        sourceMzs(i) = msSpectrum.IonsMZ(i)
+                        sourceIntensities(i) = msSpectrum.IonsIntensity(i)
                     Next
 
+                    Dim centroidedPrecursorIonsMz As Double() = Nothing
+                    Dim centroidedPrecursorIonsIntensity As Double() = Nothing
+
+                    Dim massResolution = mCentroider.EstimateResolution(1000, 0.5, scanInfo.IsFTMS)
+
+                    Dim centroidSuccess = mCentroider.CentroidData(scanInfo, sourceMzs, sourceIntensities,
+                                                                   massResolution, centroidedPrecursorIonsMz, centroidedPrecursorIonsIntensity)
+
+                    If centroidSuccess Then
+                        mMostRecentPrecursorScan = scanInfo.ScanNumber
+                        mCentroidedPrecursorIonsMz.Clear()
+                        mCentroidedPrecursorIonsIntensity.Clear()
+
+                        For i = 0 To centroidedPrecursorIonsMz.Length - 1
+                            mCentroidedPrecursorIonsMz.Add(centroidedPrecursorIonsMz(i))
+                            mCentroidedPrecursorIonsIntensity.Add(centroidedPrecursorIonsIntensity(i))
+                        Next
+
+                    End If
                 End If
+
             End If
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
@@ -1031,7 +1054,10 @@ Namespace DataInput
                 End If
             End If
 
-            Return spectrumInfo
+            Dim centroidParams = (From item In mzMLSpectrum.CVParams Where item.TermInfo.Cvid = CV.CVID.MS_centroid_spectrum).ToList()
+            mzXmlSourceSpectrum.Centroided = centroidParams.Count > 0
+
+            Return mzXmlSourceSpectrum
         End Function
 
         Private Sub InitOptions(scanList As clsScanList,
@@ -1122,6 +1148,18 @@ Namespace DataInput
             Catch ex As Exception
                 ReportError("Error in clsMasic->StoreSpectrum ", ex)
             End Try
+
+        End Sub
+
+        Private Sub UpdateCachedPrecursorScanData(scanNumber As Integer, msSpectrum As clsMSSpectrum)
+            mMostRecentPrecursorScan = scanNumber
+            mCentroidedPrecursorIonsMz.Clear()
+            mCentroidedPrecursorIonsIntensity.Clear()
+
+            For i = 0 To msSpectrum.IonCount - 1
+                mCentroidedPrecursorIonsMz.Add(msSpectrum.IonsMZ(i))
+                mCentroidedPrecursorIonsIntensity.Add(msSpectrum.IonsIntensity(i))
+            Next
 
         End Sub
 

@@ -144,6 +144,7 @@
     <Compile Include="clsSpectraCache.vb" />
     <Compile Include="clsSpectrumCacheOptions.vb" />
     <Compile Include="clsUtilities.vb" />
+    <Compile Include="DataInput\Centroider.vb" />
     <Compile Include="DataInput\clsCustomSICListReader.vb" />
     <Compile Include="DataInput\clsDataImport.vb" />
     <Compile Include="DataInput\clsDataImportMGFandCDF.vb" />
