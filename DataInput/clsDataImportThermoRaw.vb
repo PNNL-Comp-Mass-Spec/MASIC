@@ -598,19 +598,12 @@ Namespace DataInput
 
                 scanInfo.IonCount = scanInfo.IonCountRaw
 
-                Dim msSpectrum As New clsMSSpectrum() With {
-                    .ScanNumber = scanInfo.ScanNumber,
-                    .IonCount = scanInfo.IonCountRaw
-                }
+                lastKnownLocation = "Instantiate new clsMSSpectrum"
 
-                lastKnownLocation = "Resize IonsMz and IonsIntensity to length " & msSpectrum.IonCount
+                Dim msSpectrum As New clsMSSpectrum(scanInfo.ScanNumber, mzList, intensityList, scanInfo.IonCountRaw)
 
-                ReDim msSpectrum.IonsMZ(msSpectrum.IonCount - 1)
-                ReDim msSpectrum.IonsIntensity(msSpectrum.IonCount - 1)
+                lastKnownLocation = "Manually determine the base peak m/z and base peak intensity"
 
-                ' Copy the intensity data; and compute the total scan intensity
-
-                ' Also manually determine the base peak m/z and base peak intensity
                 ' Regarding BPI, comparison of data read via the ThermoRawFileReader vs.
                 ' that read from the .mzML file for dataset QC_Shew_18_02-run1_02Mar19_Arwen_18-11-02
                 ' showed that 25% of the spectra had incorrect BPI values
@@ -620,8 +613,6 @@ Namespace DataInput
                 Dim basePeakMz As Double = 0
 
                 For ionIndex = 0 To scanInfo.IonCountRaw - 1
-                    msSpectrum.IonsMZ(ionIndex) = mzList(ionIndex)
-                    msSpectrum.IonsIntensity(ionIndex) = intensityList(ionIndex)
                     totalIonIntensity += intensityList(ionIndex)
                     If intensityList(ionIndex) > basePeakIntensity Then
                         basePeakIntensity = intensityList(ionIndex)
@@ -643,7 +634,7 @@ Namespace DataInput
 
                 ' Determine the minimum positive intensity in this scan
                 lastKnownLocation = "Call mMASICPeakFinder.FindMinimumPositiveValue"
-                scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(scanInfo.IonCountRaw, msSpectrum.IonsIntensity, 0)
+                scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0)
 
                 If msSpectrum.IonCount > 0 Then
                     If scanInfo.TotalIonIntensity < Single.Epsilon Then

@@ -159,7 +159,7 @@ Public Class clsSpectraCache
        spectrum As clsMSSpectrum,
        scanNumber As Integer) As Boolean
 
-        ' Adds objMSSpectrum to the spectrum pool
+        ' Adds spectrum to the spectrum pool
         ' Returns the index of the spectrum in the pool in targetPoolIndex
 
         Try
@@ -174,19 +174,7 @@ Public Class clsSpectraCache
                 mSpectrumIndexInPool.Add(scanNumber, targetPoolIndex)
             End If
 
-            ValidateMemoryAllocation(SpectraPool(targetPoolIndex), spectrum.IonCount)
-
-            With SpectraPool(targetPoolIndex)
-                .ScanNumber = spectrum.ScanNumber
-                If .ScanNumber <> scanNumber Then
-                    .ScanNumber = scanNumber
-                End If
-
-                .IonCount = spectrum.IonCount
-            End With
-
-            Array.Copy(spectrum.IonsMZ, SpectraPool(targetPoolIndex).IonsMZ, spectrum.IonCount)
-            Array.Copy(spectrum.IonsIntensity, SpectraPool(targetPoolIndex).IonsIntensity, spectrum.IonCount)
+            SpectraPool(targetPoolIndex).ReplaceData(spectrum, scanNumber)
 
             SpectraPoolInfo(targetPoolIndex).CacheState = eCacheStateConstants.NeverCached
 
@@ -282,10 +270,7 @@ Public Class clsSpectraCache
             mSpectrumIndexInPool.Remove(SpectraPool(poolIndexToCache).ScanNumber)
 
             ' Reset .ScanNumber, .IonCount, and .CacheState
-            With SpectraPool(poolIndexToCache)
-                .ScanNumber = 0
-                .IonCount = 0
-            End With
+            SpectraPool(poolIndexToCache).Clear(0)
 
             SpectraPoolInfo(poolIndexToCache).CacheState = eCacheStateConstants.UnusedSlot
 
@@ -410,7 +395,7 @@ Public Class clsSpectraCache
             ReDim Preserve SpectraPoolInfo(mMaximumPoolLength - 1)
 
             For index = currentPoolLength To mMaximumPoolLength - 1
-                SpectraPool(index) = New clsMSSpectrum
+                SpectraPool(index) = New clsMSSpectrum(0)
                 SpectraPoolInfo(index).CacheState = eCacheStateConstants.UnusedSlot
             Next
         End If
@@ -482,7 +467,7 @@ Public Class clsSpectraCache
 
         ' Note: Resetting spectra all the way to SpectraPool.Length, even if SpectraPool.Length is > mMaximumPoolLength
         For index = 0 To SpectraPool.Length - 1
-            SpectraPool(index) = New clsMSSpectrum
+            SpectraPool(index) = New clsMSSpectrum(0)
             SpectraPoolInfo(index).CacheState = eCacheStateConstants.UnusedSlot
         Next
 
@@ -540,25 +525,22 @@ Public Class clsSpectraCache
 
                 Dim scanNumberInCacheFile = mPageFileReader.ReadInt32()
                 Dim ionCount = mPageFileReader.ReadInt32()
-                ValidateMemoryAllocation(SpectraPool(targetPoolIndex), ionCount)
 
-                With SpectraPool(targetPoolIndex)
-                    .ScanNumber = scanNumber
+                If (scanNumberInCacheFile <> scanNumber) Then
+                    ReportWarning("Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum")
+                End If
 
-                    If (scanNumberInCacheFile <> .ScanNumber) Then
-                        ReportWarning("Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum")
-                    End If
+                Dim msSpectrum = SpectraPool(targetPoolIndex)
 
-                    .IonCount = ionCount
-                    For index = 0 To .IonCount - 1
-                        .IonsMZ(index) = mPageFileReader.ReadDouble()
-                    Next
+                msSpectrum.Clear(scanNumber)
 
-                    For index = 0 To .IonCount - 1
-                        .IonsIntensity(index) = mPageFileReader.ReadDouble()
-                    Next
+                For index = 0 To ionCount - 1
+                    msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble())
+                Next
 
-                End With
+                For index = 0 To ionCount - 1
+                    msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble())
+                Next
 
                 success = True
 
@@ -573,13 +555,11 @@ Public Class clsSpectraCache
             ' Scan not found; create a new, blank mass spectrum
             ' Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
             If SpectraPool(targetPoolIndex) Is Nothing Then
-                SpectraPool(targetPoolIndex) = New clsMSSpectrum()
+                SpectraPool(targetPoolIndex) = New clsMSSpectrum(scanNumber)
             End If
 
-            With SpectraPool(targetPoolIndex)
-                .ScanNumber = scanNumber
-                .IonCount = 0
-            End With
+            SpectraPool(targetPoolIndex).Clear()
+
             success = True
         End If
 
@@ -637,23 +617,6 @@ Public Class clsSpectraCache
         End If
 
     End Function
-
-    Private Sub ValidateMemoryAllocation(spectrum As clsMSSpectrum, ionCount As Integer)
-
-        With spectrum
-            If .IonsMZ.Length < ionCount Then
-                ' Find the next largest multiple of DEFAULT_SPECTRUM_ION_COUNT that is larger than ionCount
-
-                Dim allocationAmount = .IonsMZ.Length
-                Do While allocationAmount < ionCount
-                    allocationAmount += DEFAULT_SPECTRUM_ION_COUNT
-                Loop
-
-                ReDim .IonsMZ(allocationAmount - 1)
-                ReDim .IonsIntensity(allocationAmount - 1)
-            End If
-        End With
-    End Sub
 
     Private Function ValidatePageFileIO(createIfUninitialized As Boolean) As Boolean
         ' Validates that we can read and write from a Page file

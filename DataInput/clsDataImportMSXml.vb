@@ -59,7 +59,7 @@ Namespace DataInput
 
             Dim isolationWidth As Double = 0
 
-            Dim chargeState As Integer = 0
+            Dim chargeState = 0
             Dim chargeStateText = String.Empty
 
             ' This is only used if scanInfo.FragScanInfo.ParentIonMz is zero
@@ -309,14 +309,7 @@ Namespace DataInput
                     mDatasetFileInfo.ScanCount += 1
                     scanTimeMax = spectrumInfo.RetentionTimeMin
 
-                    Dim msSpectrum = GetNewSpectrum(spectrumInfo.DataCount)
-
-                    spectrumInfo.MZList.CopyTo(msSpectrum.IonsMZ, 0)
-
-                    ' Copy one item at a time since spectrumInfo.IntensityList is a float but msSpectrum.IonsIntensity is a double
-                    For i = 0 To spectrumInfo.IntensityList.Count - 1
-                        msSpectrum.IonsIntensity(i) = spectrumInfo.IntensityList(i)
-                    Next
+                    Dim msSpectrum = New clsMSSpectrum(spectrumInfo.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount)
 
                     Dim percentComplete = xmlReader.ProgressPercentComplete
                     Dim nullMzMLSpectrum As SimpleMzMLReader.SimpleSpectrum = Nothing
@@ -419,17 +412,14 @@ Namespace DataInput
                         Dim mzList = mzMLSpectrum.Mzs.ToList()
                         Dim intensityList = mzMLSpectrum.Intensities.ToList()
 
-                        Dim spectrumInfo = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, thermoRawFile)
-                        scanTimeMax = spectrumInfo.RetentionTimeMin
+                        Dim mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, thermoRawFile)
+                        scanTimeMax = mzXmlSourceSpectrum.RetentionTimeMin
 
-                        Dim msSpectrum = GetNewSpectrum(spectrumInfo.DataCount)
-
-                        mzList.CopyTo(msSpectrum.IonsMZ, 0)
-                        intensityList.CopyTo(msSpectrum.IonsIntensity, 0)
+                        Dim msSpectrum = New clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count)
 
                         Dim percentComplete = scanList.MasterScanOrderCount / CDbl(xmlReader.NumSpectra) * 100
 
-                        Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, spectrumInfo, mzMLSpectrum,
+                        Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
                                                                        scanList, spectraCache, dataOutputHandler,
                                                                        percentComplete, mDatasetFileInfo.ScanCount)
 
@@ -475,7 +465,6 @@ Namespace DataInput
                                 End If
                             End If
                         Next
-
 
                         ' First, compute the median time diff in scanTimeDiffs
                         Dim medianScanTimeDiffThisChromatogram = medianUtils.Median(scanTimeDiffs)
@@ -691,7 +680,7 @@ Namespace DataInput
             scanInfo.FragScanInfo.ParentIonInfoIndex = -1
 
             ' Determine the minimum positive intensity in this scan
-            scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount, msSpectrum.IonsIntensity, 0)
+            scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0)
 
             scanList.SurveyScans.Add(scanInfo)
 
@@ -792,7 +781,7 @@ Namespace DataInput
             scanInfo.FragScanInfo.MSLevel = spectrumInfo.MSLevel
 
             ' Determine the minimum positive intensity in this scan
-            scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount, msSpectrum.IonsIntensity, 0)
+            scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0)
 
             UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", isMzXML, mzXmlSourceSpectrum)
 
@@ -890,16 +879,7 @@ Namespace DataInput
 
         End Function
 
-        Private Function GetNewSpectrum(dataCount As Integer) As clsMSSpectrum
 
-            Dim msSpectrum = New clsMSSpectrum With {
-                .IonCount = dataCount
-            }
-
-            ReDim msSpectrum.IonsMZ(msSpectrum.IonCount - 1)
-            ReDim msSpectrum.IonsIntensity(msSpectrum.IonCount - 1)
-
-            Return msSpectrum
 
         End Function
 
@@ -1108,13 +1088,13 @@ Namespace DataInput
                     scanInfo.IonCount = 0
                     scanInfo.IonCountRaw = 0
                 Else
-                    msSpectrum.IonCount = msSpectrum.IonsMZ.Length
-
                     scanInfo.IonCount = msSpectrum.IonCount
                     scanInfo.IonCountRaw = scanInfo.IonCount
                 End If
 
-                msSpectrum.ScanNumber = scanInfo.ScanNumber
+                If msSpectrum.ScanNumber <> scanInfo.ScanNumber Then
+                    msSpectrum.UpdateScanNumber(scanInfo.ScanNumber)
+                End If
 
                 If scanInfo.IonCount > 0 Then
                     ' Confirm the total scan intensity stored in the mzXML file

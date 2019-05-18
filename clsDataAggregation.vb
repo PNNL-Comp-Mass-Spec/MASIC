@@ -39,7 +39,7 @@ Public Class clsDataAggregation
 
             If Not objMSSpectrum.IonsMZ Is Nothing AndAlso objMSSpectrum.IonCount > 0 Then
                 Dim indexFirst, indexLast As Integer
-                If SumIonsFindValueInRange(objMSSpectrum.IonsMZ, objMSSpectrum.IonCount, searchMZ, searchToleranceHalfWidth, indexFirst, indexLast) Then
+                If SumIonsFindValueInRange(objMSSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, indexFirst, indexLast) Then
                     For ionIndex = indexFirst To indexLast
                         If returnMax Then
                             ' Return max
@@ -166,8 +166,7 @@ Public Class clsDataAggregation
     End Function
 
     Private Function SumIonsFindValueInRange(
-      ByRef dataValues() As Double,
-      dataCount As Integer,
+      dataValues As IReadOnlyList(Of Double),
       searchValue As Double,
       toleranceHalfWidth As Double,
       <Out> ByRef matchIndexStart As Integer,
@@ -180,11 +179,11 @@ Public Class clsDataAggregation
         Dim matchFound As Boolean
 
         matchIndexStart = 0
-        matchIndexEnd = dataCount - 1
+        matchIndexEnd = dataValues.Count - 1
 
-        If dataCount = 0 Then
+        If dataValues.Count = 0 Then
             matchIndexEnd = -1
-        ElseIf dataCount = 1 Then
+        ElseIf dataValues.Count = 1 Then
             If Math.Abs(searchValue - dataValues(0)) > toleranceHalfWidth Then
                 ' Only one data point, and it is not within tolerance
                 matchIndexEnd = -1
@@ -205,7 +204,7 @@ Public Class clsDataAggregation
     End Function
 
     Private Sub SumIonsBinarySearchRangeDbl(
-      ByRef dataValues() As Double,
+      dataValues As IReadOnlyList(Of Double),
       searchValue As Double,
       toleranceHalfWidth As Double,
       ByRef matchIndexStart As Integer,

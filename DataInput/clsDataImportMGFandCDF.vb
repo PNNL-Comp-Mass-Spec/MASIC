@@ -105,11 +105,8 @@ Namespace DataInput
                     End If
 
                     If scanNumberCorrection > 0 Then scanNumber += scanNumberCorrection
-                    Dim msSpectrum As New clsMSSpectrum()
 
                     If mScanTracking.CheckScanInRange(scanNumber, scanTime, sicOptions) Then
-
-
 
                         Dim newSurveyScan = New clsScanInfo()
                         With newSurveyScan
@@ -133,31 +130,15 @@ Namespace DataInput
                         scanList.SurveyScans.Add(newSurveyScan)
 
                         Dim mzData() As Double = Nothing
+                        Dim intensityData() As Double = Nothing
+                        Dim intIonCount As Integer
 
                         success = objCDFReader.GetMassSpectrum(msScanIndex, mzData,
-                                                              msSpectrum.IonsIntensity,
-                                                              msSpectrum.IonCount)
+                                                               intensityData,
+                                                               intIonCount)
 
-                        If success AndAlso msSpectrum.IonCount > 0 Then
-                            msSpectrum.ScanNumber = newSurveyScan.ScanNumber
-
-                            With msSpectrum
-                                ReDim .IonsMZ(.IonCount - 1)
-                                mzData.CopyTo(.IonsMZ, 0)
-
-                                If .IonsMZ.GetLength(0) < .IonCount Then
-                                    ' Error with objCDFReader
-                                    ReportError("objCDFReader returned an array of data that was shorter than expected")
-                                    .IonCount = .IonsMZ.GetLength(0)
-                                End If
-
-                                If .IonsIntensity.GetLength(0) < .IonCount Then
-                                    ' Error with objCDFReader
-                                    ReportError("objCDFReader returned an array of data that was shorter than expected")
-                                    .IonCount = .IonsIntensity.GetLength(0)
-                                End If
-
-                            End With
+                        If success AndAlso intIonCount > 0 Then
+                            Dim msSpectrum As New clsMSSpectrum(scanNumber, mzData, intensityData, intIonCount)
 
                             Dim mzMin As Double, mzMax As Double
                             Dim msDataResolution As Double
@@ -169,13 +150,12 @@ Namespace DataInput
                                 ' Find the base peak ion mass and intensity
                                 .BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ,
                                                              msSpectrum.IonsIntensity,
-                                                             msSpectrum.IonCount, .BasePeakIonIntensity,
+                                                             .BasePeakIonIntensity,
                                                              mzMin, mzMax)
 
                                 ' Determine the minimum positive intensity in this scan
                                 .MinimumPositiveIntensity =
-                                mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount,
-                                                                          msSpectrum.IonsIntensity, 0)
+                                mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0)
                             End With
 
                             If sicOptions.SICToleranceIsPPM Then
@@ -355,24 +335,9 @@ Namespace DataInput
                     End With
                     scanList.FragScans.Add(newFragScan)
 
-                    Dim msSpectrum As New clsMSSpectrum() With {
-                        .IonCount = spectrumInfo.DataCount
-                    }
+                    Dim msSpectrum As New clsMSSpectrum(newFragScan.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount)
 
-                    If msSpectrum.IonCount > 0 Then
-                        msSpectrum.ScanNumber = newFragScan.ScanNumber
-                        With msSpectrum
-                            ReDim .IonsMZ(.IonCount - 1)
-                            ReDim .IonsIntensity(.IonCount - 1)
-
-                            spectrumInfo.MZList.CopyTo(.IonsMZ, 0)
-
-                            ' Copy one item at a time since spectrumInfo.IntensityList is a float but msSpectrum.IonsIntensity is a double
-                            For i = 0 To spectrumInfo.IntensityList.Count - 1
-                                .IonsIntensity(i) = spectrumInfo.IntensityList(i)
-                            Next
-
-                        End With
+                    If spectrumInfo.DataCount > 0 Then
 
                         With newFragScan
                             .IonCount = msSpectrum.IonCount
@@ -382,7 +347,7 @@ Namespace DataInput
 
                             ' Find the base peak ion mass and intensity
                             .BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
-                                                         msSpectrum.IonCount, .BasePeakIonIntensity,
+                                                          .BasePeakIonIntensity,
                                                          mzMin, mzMax)
 
                             ' Compute the total scan intensity
@@ -393,8 +358,7 @@ Namespace DataInput
 
                             ' Determine the minimum positive intensity in this scan
                             .MinimumPositiveIntensity =
-                            mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonCount,
-                                                                      msSpectrum.IonsIntensity, 0)
+                            mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0)
 
                         End With
 
@@ -502,24 +466,26 @@ Namespace DataInput
         End Function
 
         Private Function FindBasePeakIon(
-          ByRef mzList() As Double,
-          ByRef ionIntensity() As Double,
-          ionCount As Integer,
-          ByRef basePeakIonIntensity As Double,
-          ByRef mzMin As Double,
-          ByRef mzMax As Double) As Double
+          mzList As IReadOnlyList(Of Double),
+          ionIntensity As IReadOnlyList(Of Double),
+          <Out> ByRef basePeakIonIntensity As Double,
+          <Out> ByRef mzMin As Double,
+          <Out> ByRef mzMax As Double) As Double
 
             ' Finds the base peak ion
             ' Also determines the minimum and maximum m/z values in mzList
             Dim basePeakIndex As Integer
             Dim dataIndex As Integer
 
+            mzMin = 0
+            mzMax = 0
+
             Try
                 mzMin = mzList(0)
                 mzMax = mzList(0)
 
                 basePeakIndex = 0
-                For dataIndex = 0 To ionCount - 1
+                For dataIndex = 0 To mzList.Count - 1
                     If ionIntensity(dataIndex) > ionIntensity(basePeakIndex) Then
                         basePeakIndex = dataIndex
                     End If

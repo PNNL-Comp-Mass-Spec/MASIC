@@ -1,53 +1,134 @@
 ﻿Option Strict On
 
+Imports PRISM
+
 ''' <summary>
 ''' Used to track the MZ and Intensity values of a given mass spectrum
 ''' </summary>
 Public Class clsMSSpectrum
 
-    Public Const DEFAULT_SPECTRUM_ION_COUNT As Integer = 500
+    Private mScanNumber As Integer
 
-    ' 0 if not in use
+    ''' <summary>
+    ''' Scan number
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>0 if not in use</remarks>
     Public Property ScanNumber As Integer
+        Get
+            Return mScanNumber
+        End Get
+        Private Set
+            mScanNumber = Value
+        End Set
+    End Property
 
-    Public Property IonCount As Integer
+    Public ReadOnly Property IonCount As Integer
+        Get
+            Return IonsMZ.Count
+        End Get
+    End Property
 
     ''' <summary>
-    ''' 0-based array, ranging from 0 to IonCount-1; note that IonsMZ.Length could be > IonCount, so do not use .Length to determine the data count
+    ''' List of m/z's
     ''' </summary>
-    Public IonsMZ() As Double
+    Public ReadOnly IonsMZ As List(Of Double)
 
     ''' <summary>
-    ''' 0-based array, ranging from 0 to IonCount-1; note that IonsIntensity.Length could be > IonCount, so do not use .Length to determine the data count
+    ''' List of intensities
     ''' </summary>
-    Public IonsIntensity() As Double
+    Public ReadOnly IonsIntensity As List(Of Double)
 
     ''' <summary>
     ''' Constructor
     ''' </summary>
-    Public Sub New()
+    Public Sub New(intScanNumber As Integer)
+        ScanNumber = intScanNumber
 
-        ScanNumber = 0
-        IonCount = 0
-
-        ReDim IonsMZ(DEFAULT_SPECTRUM_ION_COUNT - 1)
-        ReDim IonsIntensity(DEFAULT_SPECTRUM_ION_COUNT - 1)
+        IonsMZ = New List(Of Double)
+        IonsIntensity = New List(Of Double)
     End Sub
 
-    Public Sub CopyTo(ByRef objTarget As clsMSSpectrum)
-        Me.Copy(Me, objTarget)
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
+    Public Sub New(intScanNumber As Integer, mzList As IList(Of Double), intensityList As IList(Of Single), dataCount As Integer)
+        Me.New(intScanNumber)
+
+        For i = 0 To dataCount - 1
+            IonsMZ.Add(mzList(i))
+            IonsIntensity.Add(intensityList(i))
+        Next
     End Sub
 
-    Public Sub Copy(ByRef objSource As clsMSSpectrum, ByRef objTarget As clsMSSpectrum)
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
+    Public Sub New(intScanNumber As Integer, mzList As IList(Of Double), intensityList As IList(Of Double), dataCount As Integer)
+        Me.New(intScanNumber)
 
-        objTarget.ScanNumber = objSource.ScanNumber
-        objTarget.IonCount = objSource.IonCount
-
-        ReDim objTarget.IonsMZ(objSource.IonCount - 1)
-        ReDim objTarget.IonsIntensity(objSource.IonCount - 1)
-
-        Array.Copy(objSource.IonsMZ, objTarget.IonsMZ, objSource.IonCount)
-        Array.Copy(objSource.IonsIntensity, objTarget.IonsIntensity, objSource.IonCount)
+        For i = 0 To dataCount - 1
+            IonsMZ.Add(mzList(i))
+            IonsIntensity.Add(intensityList(i))
+        Next
     End Sub
 
+    ''' <summary>
+    ''' Clear the mz and intensity values (but leave the scan number unchanged)
+    ''' </summary>
+    Public Sub Clear()
+        IonsMZ.Clear()
+        IonsIntensity.Clear()
+    End Sub
+
+    ''' <summary>
+    ''' Clear the mz and intensity values, and update the scan number
+    ''' </summary>
+    Public Sub Clear(newScanNumber As Integer)
+        IonsMZ.Clear()
+        IonsIntensity.Clear()
+        ScanNumber = newScanNumber
+    End Sub
+
+    Public Function Clone() As clsMSSpectrum
+        Return Copy(Me)
+    End Function
+
+    Public Function Copy(objSource As clsMSSpectrum) As clsMSSpectrum
+        Dim newSpectrum = New clsMSSpectrum(objSource.ScanNumber, objSource.IonsMZ, objSource.IonsIntensity, objSource.IonsMZ.Count)
+        Return newSpectrum
+    End Function
+
+    Public Sub ReplaceData(spectrum As clsMSSpectrum, scanNumberOverride As Integer)
+
+        ScanNumber = spectrum.ScanNumber
+        If ScanNumber <> scanNumberOverride Then
+            ScanNumber = scanNumberOverride
+        End If
+
+        IonsMZ.Clear()
+        IonsMZ.AddRange(spectrum.IonsMZ)
+
+        IonsIntensity.Clear()
+        IonsIntensity.AddRange(spectrum.IonsIntensity)
+
+    End Sub
+
+    Public Sub ShrinkArrays(ionCountNew As Integer)
+        If ionCountNew > IonsMZ.Count Then
+            Throw New Exception("ShrinkArrays should only be called with a length less than or equal to the current length")
+        End If
+
+        ConsoleMsgUtils.ShowWarning("Need to validate the count in ShrinkArrays")
+
+        Dim countToRemove = IonsMZ.Count - ionCountNew
+        If countToRemove = 0 Then Exit Sub
+
+        IonsMZ.RemoveRange(ionCountNew, countToRemove)
+        IonsIntensity.RemoveRange(ionCountNew, countToRemove)
+    End Sub
+
+    Public Sub UpdateScanNumber(newScanNumber As Integer)
+        ScanNumber = newScanNumber
+    End Sub
 End Class

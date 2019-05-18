@@ -305,7 +305,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="noiseStatsSegments"></param>
     ''' <returns>True if success, False if error</returns>
     Public Function ComputeDualTrimmedNoiseLevelTTest(
-      dataList() As Double, indexStart As Integer, indexEnd As Integer,
+      dataList As IReadOnlyList(Of Double), indexStart As Integer, indexEnd As Integer,
       baselineNoiseOptions As clsBaselineNoiseOptions,
       <Out> ByRef noiseStatsSegments As List(Of clsBaselineNoiseStatsSegment)) As Boolean
 
@@ -423,7 +423,7 @@ Public Class clsMASICPeakFinder
     ''' Replaces values of 0 with the minimum positive value in dataList()
     ''' You cannot use dataList.Length to determine the length of the array; use indexStart and indexEnd to find the limits
     ''' </remarks>
-    Public Function ComputeDualTrimmedNoiseLevel(dataList() As Double, indexStart As Integer, indexEnd As Integer,
+    Public Function ComputeDualTrimmedNoiseLevel(dataList As IReadOnlyList(Of Double), indexStart As Integer, indexEnd As Integer,
                                                  baselineNoiseOptions As clsBaselineNoiseOptions,
                                                  <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
@@ -799,7 +799,7 @@ Public Class clsMASICPeakFinder
     ''' <param name="baselineNoiseStats"></param>
     ''' <returns>Returns True if success, false in an error</returns>
     ''' <remarks>Updates baselineNoiseStats with the baseline noise level</remarks>
-    Public Function ComputeNoiseLevelForSICData(dataCount As Integer, dataList() As Double,
+    Public Function ComputeNoiseLevelForSICData(dataCount As Integer, dataList As IReadOnlyList(Of Double),
                                                 baselineNoiseOptions As clsBaselineNoiseOptions,
                                                 <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
@@ -1554,7 +1554,7 @@ Public Class clsMASICPeakFinder
     ''' Replaces values of 0 with the minimum positive value in dataList()
     ''' You cannot use dataList.Length to determine the length of the array; use dataCount
     ''' </remarks>
-    Public Function ComputeTrimmedNoiseLevel(dataList() As Double, indexStart As Integer, indexEnd As Integer,
+    Public Function ComputeTrimmedNoiseLevel(dataList As IReadOnlyList(Of Double), indexStart As Integer, indexEnd As Integer,
                                              baselineNoiseOptions As clsBaselineNoiseOptions,
                                              ignoreNonPositiveData As Boolean,
                                              <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
@@ -1572,13 +1572,9 @@ Public Class clsMASICPeakFinder
         Dim dataSortedCount = indexEnd - indexStart + 1
         ReDim dataListSorted(dataSortedCount - 1)
 
-        If indexStart = 0 Then
-            Array.Copy(dataList, dataListSorted, dataSortedCount)
-        Else
-            For i = indexStart To indexEnd
-                dataListSorted(i - indexStart) = dataList(i)
-            Next
-        End If
+        For i = indexStart To indexEnd
+            dataListSorted(i - indexStart) = dataList(i)
+        Next
 
         ' Sort the array
         Array.Sort(dataListSorted)
@@ -1835,12 +1831,23 @@ Public Class clsMASICPeakFinder
         Return minimumPositiveValue
     End Function
 
-    Public Function FindMinimumPositiveValue(dataCount As Integer, dataList() As Double, absoluteMinimumValue As Double) As Double
+    Public Function FindMinimumPositiveValue(dataList As IList(Of Double), absoluteMinimumValue As Double) As Double
+
+        Dim minimumPositiveValue = (From item In dataList Where item > 0 Select item).Min()
+
+        If minimumPositiveValue < absoluteMinimumValue Then
+            Return absoluteMinimumValue
+        End If
+
+        Return minimumPositiveValue
+    End Function
+
+    Public Function FindMinimumPositiveValue(dataCount As Integer, dataList As IReadOnlyList(Of Double), absoluteMinimumValue As Double) As Double
         ' Note: Do not use dataList.Length to determine the length of the array; use dataCount
         ' However, if dataCount is > dataList.Length then dataList.Length-1 will be used for the maximum index to examine
 
-        If dataCount > dataList.Length Then
-            dataCount = dataList.Length
+        If dataCount > dataList.Count Then
+            dataCount = dataList.Count
         End If
 
         ' Find the minimum positive value in dataList
@@ -2650,7 +2657,7 @@ Public Class clsMASICPeakFinder
 
     Public Sub FindPotentialPeakArea(
        dataCount As Integer,
-       sicIntensities() As Double,
+       sicIntensities As IReadOnlyList(Of Double),
        <Out> ByRef potentialAreaStats As clsSICPotentialAreaStats,
        sicPeakFinderOptions As clsSICPeakFinderOptions)
 
@@ -2862,7 +2869,6 @@ Public Class clsMASICPeakFinder
 
                 smoothedYDataSubset = New clsSmoothedYDataSubset()
             Else
-
 
                 ' Initialize the following to the entire range of the SICData
                 sicPeak.IndexBaseLeft = 0

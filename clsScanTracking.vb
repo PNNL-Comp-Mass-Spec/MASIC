@@ -130,7 +130,7 @@ Public Class clsScanTracking
         Loop
 
         ' Update .IonCount with the new data count
-        objMSSpectrum.IonCount = targetIndex
+        objMSSpectrum.ShrinkArrays(targetIndex)
 
         ' Step through the data, consolidating data within msDataResolution
         ' Note that we're copying in place rather than making a new, duplicate array
@@ -183,7 +183,7 @@ Public Class clsScanTracking
         Loop
 
         ' Update .IonCount with the new data count
-        objMSSpectrum.IonCount = targetIndex
+        objMSSpectrum.ShrinkArrays(targetIndex)
 
     End Sub
 
