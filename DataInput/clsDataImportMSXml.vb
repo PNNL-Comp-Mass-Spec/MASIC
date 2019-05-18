@@ -674,9 +674,12 @@ Namespace DataInput
                 .SIMScan = False,
                 .MRMScanType = MRMScanTypeConstants.NotMRM,
                 .LowMass = spectrumInfo.mzRangeStart,
-                .HighMass = spectrumInfo.mzRangeEnd,
-                .IsFTMS = False
+                .HighMass = spectrumInfo.mzRangeEnd
             }
+
+            If Not mzXmlSourceSpectrum Is Nothing AndAlso Not String.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine) Then
+                scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine)
+            End If
 
             ' Survey scans typically lead to multiple parent ions; we do not record them here
             scanInfo.FragScanInfo.ParentIonInfoIndex = -1
@@ -862,7 +865,7 @@ Namespace DataInput
 
             scanInfo.LowMass = spectrumInfo.mzRangeStart
             scanInfo.HighMass = spectrumInfo.mzRangeEnd
-            scanInfo.IsFTMS = False
+            scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine)
 
             scanList.FragScans.Add(scanInfo)
 
@@ -902,8 +905,13 @@ Namespace DataInput
 
         End Function
 
+        Private Function IsHighResolutionSpectrum(filterString As String) As Boolean
 
+            If filterString.IndexOf("FTMS", StringComparison.OrdinalIgnoreCase) >= 0 Then
+                Return True
+            End If
 
+            Return False
         End Function
 
         Private Function GetSpectrumInfoFromMzMLSpectrum(
