@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<DatasetInfo>
+  <Dataset>TMT_QCPool_23Jun14</Dataset>
+  <ScanTypes>
+    <ScanType ScanCount="76" ScanFilterText="">MS</ScanType>
+    <ScanType ScanCount="425" ScanFilterText="">Unknown, beam-type collision-induced dissociation-MSn</ScanType>
+  </ScanTypes>
+  <AcquisitionInfo>
+    <ScanCount>501</ScanCount>
+    <ScanCountMS>76</ScanCountMS>
+    <ScanCountMSn>425</ScanCountMSn>
+    <Elution_Time_Max>70.2085</Elution_Time_Max>
+    <AcqTimeMinutes>0.00</AcqTimeMinutes>
+    <StartTime>2019-04-26 06:49:41 PM</StartTime>
+    <EndTime>2019-04-26 06:49:41 PM</EndTime>
+    <FileSizeBytes>6478568</FileSizeBytes>
+  </AcquisitionInfo>
+  <TICInfo>
+    <TIC_Max_MS>1.4516E+10</TIC_Max_MS>
+    <TIC_Max_MSn>1.4211E+09</TIC_Max_MSn>
+    <BPI_Max_MS>1.0572E+09</BPI_Max_MS>
+    <BPI_Max_MSn>1.3469E+08</BPI_Max_MSn>
+    <TIC_Median_MS>9.9332E+09</TIC_Median_MS>
+    <TIC_Median_MSn>1.7867E+07</TIC_Median_MSn>
+    <BPI_Median_MS>5.9326E+08</BPI_Median_MS>
+    <BPI_Median_MSn>866583</BPI_Median_MSn>
+  </TICInfo>
+</DatasetInfo>
