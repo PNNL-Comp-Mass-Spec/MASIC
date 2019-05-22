@@ -701,7 +701,7 @@ Namespace DataOutput
 
                 ' Write the detailed SIC values for the given parent ion to the text file
 
-                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndexCount - 1
+                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndices.Count - 1
 
                     ' "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
                     prefix = sicOptions.DatasetNumber.ToString() & ControlChars.Tab &

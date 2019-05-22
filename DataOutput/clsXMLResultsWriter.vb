@@ -99,7 +99,7 @@ Namespace DataOutput
                 Dim sicScanIndices = sicDetails.SICScanIndices
 
                 ' Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
-                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndexCount - 1
+                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndices.Count - 1
                     lastGoodLoc = "fragScanIndex=" & fragScanIndex.ToString
 
                     objXMLOut.WriteStartElement("ParentIon")

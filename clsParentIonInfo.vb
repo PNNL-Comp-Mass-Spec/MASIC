@@ -27,14 +27,9 @@
     Public Property PeakApexOverrideParentIonIndex As Integer
 
     ''' <summary>
-    ''' Number of fragmentation scans attributable to this parent ion; normally just 1; for custom SIC values, there are no associated fragmentation scans, but we still set this value to 1
-    ''' </summary>
-    Public Property FragScanIndexCount As Integer
-
-    ''' <summary>
     ''' Pointers to entries in .FragScans(); for custom SIC values, points to the next MS2 scan that occurs after the ScanCenter search value
     ''' </summary>
-    Public FragScanIndices() As Integer
+    Public ReadOnly FragScanIndices As List(Of Integer)
 
     Public Property SICStats As clsSICStats
 
@@ -73,7 +68,7 @@
     ''' </summary>
     ''' <param name="parentIonMz">Parent ion m/z value</param>
     Public Sub New(parentIonMz As Double)
-        ReDim FragScanIndices(0)
+        FragScanIndices = New List(Of Integer)
         mParentIonMz = parentIonMz
         SICStats = New clsSICStats()
     End Sub

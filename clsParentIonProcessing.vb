@@ -215,7 +215,7 @@ Public Class clsParentIonProcessing
                     If .ParentIonInfoCount >= .ParentIons.Length Then
                         ReDim Preserve .ParentIons(.ParentIonInfoCount + 100)
                         For index = .ParentIonInfoCount To .ParentIons.Length - 1
-                            ReDim .ParentIons(index).FragScanIndices(0)
+                            .ParentIons(index) = New clsParentIonInfo(0)
                         Next
                     End If
 
@@ -224,13 +224,14 @@ Public Class clsParentIonProcessing
 
                         .SurveyScanIndex = surveyScanIndex
 
-                        .FragScanIndices(0) = fragScanIndex
-                        .FragScanIndexCount = 1
+                        .FragScanIndices.Add(fragScanIndex)
+
                         .CustomSICPeak = False
 
                         .MRMDaughterMZ = mrmDaughterMZ
                         .MRMToleranceHalfWidth = mrmToleranceHalfWidth
                     End With
+
                     .ParentIons(.ParentIonInfoCount).OptimalPeakApexScanNumber = .SurveyScans(surveyScanIndex).ScanNumber        ' Was: .FragScans(fragScanIndex).ScanNumber
                     .ParentIons(.ParentIonInfoCount).PeakApexOverrideParentIonIndex = -1
                     .FragScans(fragScanIndex).FragScanInfo.ParentIonInfoIndex = .ParentIonInfoCount
@@ -254,9 +255,7 @@ Public Class clsParentIonProcessing
             If mrmDaughterMZ < Double.Epsilon Then
                 With scanList
                     With .ParentIons(parentIonIndex)
-                        ReDim Preserve .FragScanIndices(.FragScanIndexCount)
-                        .FragScanIndices(.FragScanIndexCount) = fragScanIndex
-                        .FragScanIndexCount += 1
+                        .FragScanIndices.Add(fragScanIndex)
                     End With
                     .FragScans(fragScanIndex).FragScanInfo.ParentIonInfoIndex = parentIonIndex
                 End With
@@ -338,7 +337,7 @@ Public Class clsParentIonProcessing
                 highestSimilarityScore = 0
             Else
                 highestSimilarityScore = 0
-                For fragIndex1 = 0 To scanList.ParentIons(parentIonIndex1).FragScanIndexCount - 1
+                For fragIndex1 = 0 To scanList.ParentIons(parentIonIndex1).FragScanIndices.Count - 1
                     fragSpectrumIndex1 = scanList.ParentIons(parentIonIndex1).FragScanIndices(fragIndex1)
 
                     If Not objSpectraCache.ValidateSpectrumInPool(scanList.FragScans(fragSpectrumIndex1).ScanNumber, poolIndex1) Then
@@ -350,7 +349,7 @@ Public Class clsParentIonProcessing
                         dataImportUtilities.DiscardDataBelowNoiseThreshold(objSpectraCache.SpectraPool(poolIndex1), scanList.FragScans(fragSpectrumIndex1).BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions)
                     End If
 
-                    For fragIndex2 = 0 To scanList.ParentIons(parentIonIndex2).FragScanIndexCount - 1
+                    For fragIndex2 = 0 To scanList.ParentIons(parentIonIndex2).FragScanIndices.Count - 1
 
                         fragSpectrumIndex2 = scanList.ParentIons(parentIonIndex2).FragScanIndices(fragIndex2)
 

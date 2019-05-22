@@ -8,7 +8,6 @@ Namespace DataOutput
 
         Private Function GetFakeParentIonForFragScan(scanList As clsScanList, fragScanIndex As Integer) As clsParentIonInfo
 
-
             Dim currentFragScan = scanList.FragScans(fragScanIndex)
 
             Dim newParentIon = New clsParentIonInfo(currentFragScan.BasePeakIonMZ) With {
@@ -18,9 +17,7 @@ Namespace DataOutput
             ' Find the previous MS1 scan that occurs before the frag scan
             Dim surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1
 
-            ReDim newParentIon.FragScanIndices(0)
-            newParentIon.FragScanIndices(0) = fragScanIndex
-            newParentIon.FragScanIndexCount = 1
+            newParentIon.FragScanIndices.Add(fragScanIndex)
 
             If scanList.MasterScanOrderCount > 0 Then
                 Dim surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
@@ -150,7 +147,7 @@ Namespace DataOutput
                             End If
 
                             If includeParentIon Then
-                                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndexCount - 1
+                                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndices.Count - 1
 
                                     Dim parentIon = scanList.ParentIons(parentIonIndex)
                                     Dim surveyScanNumber As Integer

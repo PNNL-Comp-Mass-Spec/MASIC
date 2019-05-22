@@ -109,8 +109,7 @@ Public Class clsCustomSICList
                 End If
 
                 If scanList.MasterScanOrderCount = 0 Then
-                    ReDim currentParentIon.FragScanIndices(0)
-                    currentParentIon.FragScanIndices(0) = 0
+                    currentParentIon.FragScanIndices.Add(0)
                 Else
                     Dim fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
 
@@ -130,15 +129,13 @@ Public Class clsCustomSICList
                     ' This is a custom SIC-based parent ion
                     ' Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
                     ' This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
-                    ReDim currentParentIon.FragScanIndices(0)
                     If scanList.MasterScanOrder(fragScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.FragScan Then
-                        currentParentIon.FragScanIndices(0) = scanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer
+                        currentParentIon.FragScanIndices.Add(scanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer)
                     Else
-                        currentParentIon.FragScanIndices(0) = 0
+                        currentParentIon.FragScanIndices.Add(0)
                     End If
                 End If
 
-                currentParentIon.FragScanIndexCount = 1
                 currentParentIon.CustomSICPeak = True
                 currentParentIon.CustomSICPeakComment = customMzSearchValue.Comment
                 currentParentIon.CustomSICPeakMZToleranceDa = customMzSearchValue.MZToleranceDa
