@@ -430,7 +430,7 @@ Public Module modMain
         If DateTime.UtcNow.Subtract(mLastSubtaskProgressTime).TotalSeconds < 10 Then Return
         mLastSubtaskProgressTime = DateTime.UtcNow
 
-        ConsoleMsgUtils.ShowDebug("{0}: {1}", mMASIC.SubtaskDescription, mMASIC.SubtaskProgressPercentComplete)
+        ConsoleMsgUtils.ShowDebug("{0}: {1}%", mMASIC.SubtaskDescription, mMASIC.SubtaskProgressPercentComplete)
 
     End Sub
 

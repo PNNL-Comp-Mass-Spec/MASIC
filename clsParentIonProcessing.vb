@@ -148,13 +148,13 @@ Public Class clsParentIonProcessing
         Const MINIMUM_TOLERANCE_DA = 0.0001
 
         ' Checks to see if the parent ion specified by surveyScanIndex and parentIonMZ exists in .ParentIons()
-        ' If mrmDaughterMZ is > 0, then also considers that value when determining uniqueness
+        ' If mrmDaughterMZ is > 0, also considers that value when determining uniqueness
         '
-        ' If the parent ion entry already exists, then adds an entry to .FragScanIndices()
-        ' If it does not exist, then adds a new entry to .ParentIons()
+        ' If the parent ion entry already exists, adds an entry to .FragScanIndices()
+        ' If it does not exist, adds a new entry to .ParentIons()
         ' Note that typically fragScanIndex will equal scanList.FragScans.Count - 1
 
-        ' If surveyScanIndex < 0 then the first scan(s) in the file occurred before we encountered a survey scan
+        ' If surveyScanIndex < 0, the first scan(s) in the file occurred before we encountered a survey scan
         ' In this case, we cannot properly associate the fragmentation scan with a survey scan
 
         Dim parentIonIndex As Integer

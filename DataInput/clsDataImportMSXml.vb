@@ -585,7 +585,6 @@ Namespace DataInput
 
             Dim success As Boolean
 
-            ' No Error
             If mScanTracking.CheckScanInRange(spectrumInfo.ScanNumber, spectrumInfo.RetentionTimeMin, mOptions.SICOptions) Then
                 success = ExtractScanInfoWork(scanList, spectraCache, dataOutputHandler,
                                               mOptions.SICOptions, msSpectrum, spectrumInfo, mzMLSpectrum)

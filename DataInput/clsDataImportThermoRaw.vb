@@ -246,7 +246,6 @@ Namespace DataInput
 
             Dim success As Boolean
 
-            ' No Error
             If mScanTracking.CheckScanInRange(thermoScanInfo.ScanNumber, thermoScanInfo.RetentionTime, mOptions.SICOptions) Then
                 success = ExtractScanInfoWork(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
                                               mOptions.SICOptions, thermoScanInfo)
