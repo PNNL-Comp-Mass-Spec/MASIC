@@ -565,8 +565,6 @@ Namespace DataInput
                     mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
                 End If
 
-                mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
-
                 ' Shrink the memory usage of the scanList arrays
                 Dim finalizeSuccess = FinalizeScanList(scanList, mzMLFile)
 
