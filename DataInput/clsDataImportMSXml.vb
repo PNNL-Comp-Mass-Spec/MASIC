@@ -85,8 +85,10 @@ Namespace DataInput
 
                         Case CV.CVID.MS_isolation_window_target_m_z
                             isolationWindowTargetMzText = cvParam.Value
+
                         Case CV.CVID.MS_isolation_window_lower_offset
                             isolationWindowLowerOffsetText = cvParam.Value
+
                         Case CV.CVID.MS_isolation_window_upper_offset
                             isolationWindowUpperOffsetText = cvParam.Value
 
@@ -315,6 +317,11 @@ Namespace DataInput
                     mDatasetFileInfo.ScanCount += 1
                     scanTimeMax = spectrumInfo.RetentionTimeMin
 
+                    If spectrumInfo.ScanNumber > 0 AndAlso Not mScanTracking.CheckScanInRange(spectrumInfo.ScanNumber, mOptions.SICOptions) Then
+                        mScansOutOfRange += 1
+                        Continue While
+                    End If
+
                     Dim msSpectrum = New clsMSSpectrum(spectrumInfo.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount)
 
                     Dim percentComplete = xmlReader.ProgressPercentComplete
@@ -414,6 +421,11 @@ Namespace DataInput
                         Dim mzMLSpectrum = iterator.Current
 
                         mDatasetFileInfo.ScanCount += 1
+
+                        If mzMLSpectrum.ScanNumber > 0 AndAlso Not mScanTracking.CheckScanInRange(mzMLSpectrum.ScanNumber, mOptions.SICOptions) Then
+                            mScansOutOfRange += 1
+                            Continue While
+                        End If
 
                         Dim mzList = mzMLSpectrum.Mzs.ToList()
                         Dim intensityList = mzMLSpectrum.Intensities.ToList()

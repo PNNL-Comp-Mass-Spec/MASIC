@@ -201,6 +201,11 @@ Namespace DataInput
                 Dim scanCountToRead = scanEnd - scanStart + 1
                 For scanNumber = scanStart To scanEnd
 
+                    If Not mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions) Then
+                        mScansOutOfRange += 1
+                        Continue For
+                    End If
+
                     Dim thermoScanInfo As ThermoRawFileReader.clsScanInfo = Nothing
 
                     success = xcaliburAccessor.GetScanInfo(scanNumber, thermoScanInfo)

@@ -36,33 +36,50 @@ Public Class clsScanTracking
         ScanStats = New List(Of clsScanStatsEntry)
     End Sub
 
+    ''' <summary>
+    ''' Check whether the scan number is within the range specified by sicOptions
+    ''' </summary>
+    ''' <param name="scanNumber"></param>
+    ''' <param name="sicOptions"></param>
+    ''' <returns>True if filtering is disabled, or if scanNumber is within the limits</returns>
     Public Function CheckScanInRange(
       scanNumber As Integer,
-      retentionTime As Double,
       sicOptions As clsSICOptions) As Boolean
 
-        ' Returns True if filtering is disabled, or if the ScanNumber is between the scan limits
-        ' and/or the retention time is between the time limits
-
-        Dim inRange = True
-
-        With sicOptions
-            If .ScanRangeStart >= 0 AndAlso .ScanRangeEnd > .ScanRangeStart Then
-                If scanNumber < .ScanRangeStart OrElse scanNumber > .ScanRangeEnd Then
-                    inRange = False
-                End If
+        If sicOptions.ScanRangeStart >= 0 AndAlso sicOptions.ScanRangeEnd > sicOptions.ScanRangeStart Then
+            If scanNumber < sicOptions.ScanRangeStart OrElse scanNumber > sicOptions.ScanRangeEnd Then
+                Return False
             End If
+        End If
 
-            If inRange Then
-                If .RTRangeStart >= 0 AndAlso .RTRangeEnd > .RTRangeStart Then
-                    If retentionTime < .RTRangeStart OrElse retentionTime > .RTRangeEnd Then
-                        inRange = False
-                    End If
-                End If
+        Return True
+
+    End Function
+
+
+    ''' <summary>
+    ''' Check whether the scan number and elution time are within the ranges specified by sicOptions
+    ''' </summary>
+    ''' <param name="scanNumber"></param>
+    ''' <param name="elutionTime"></param>
+    ''' <param name="sicOptions"></param>
+    ''' <returns>True if filtering is disabled, or if scanNumber and elutionTime are within the limits</returns>
+    Public Function CheckScanInRange(
+      scanNumber As Integer,
+      elutionTime As Double,
+      sicOptions As clsSICOptions) As Boolean
+
+        If Not CheckScanInRange(scanNumber, sicOptions) Then
+            Return False
+        End If
+
+        If sicOptions.RTRangeStart >= 0 AndAlso sicOptions.RTRangeEnd > sicOptions.RTRangeStart Then
+            If elutionTime < sicOptions.RTRangeStart OrElse elutionTime > sicOptions.RTRangeEnd Then
+                Return False
             End If
-        End With
+        End If
 
-        Return inRange
+        Return True
 
     End Function
 
