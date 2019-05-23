@@ -6,6 +6,16 @@ Namespace DataOutput
     Public Class clsBPIWriter
         Inherits clsMasicEventNotifier
 
+        Private Function DynamicValueToString(value As Double) As String
+            If value < 100 Then
+                Return PRISM.StringUtilities.ValueToString(value, 5)
+            ElseIf value < 1000 Then
+                Return PRISM.StringUtilities.DblToString(value, 3)
+            Else
+                Return PRISM.StringUtilities.DblToString(value, 2)
+            End If
+        End Function
+
         Public Function SaveBPIs(
           scanList As clsScanList,
           spectraCache As clsSpectraCache,
@@ -322,9 +332,9 @@ Namespace DataOutput
                 scanNumber.ToString(),
                 currentScan.ScanTime.ToString("0.0000"),
                 msLevel.ToString(),
-                currentScan.BasePeakIonIntensity.ToString("0.00000"),
+                DynamicValueToString(currentScan.BasePeakIonIntensity),
                 currentScan.BasePeakIonMZ.ToString("0.00000"),
-                currentScan.TotalIonIntensity.ToString("0.00000"),
+                DynamicValueToString(currentScan.TotalIonIntensity),
                 numPeaks.ToString(),
                 numIsotopicSignatures.ToString()
             }
