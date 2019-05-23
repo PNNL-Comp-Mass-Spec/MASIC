@@ -20,7 +20,7 @@ Public Class clsMASICPeakFinder
     Inherits PRISM.EventNotifier
 
 #Region "Constants and Enums"
-    Public PROGRAM_DATE As String = "October 16, 2018"
+    Public PROGRAM_DATE As String = "May 18, 2019"
 
     Public Const MINIMUM_PEAK_WIDTH As Integer = 3                         ' Width in points
 
@@ -2584,7 +2584,7 @@ Public Class clsMASICPeakFinder
 
         Dim peakWidthPointsCompare As Integer
 
-        Dim filter As New DataFilter.DataFilter
+        Dim filter As New DataFilter.DataFilter()
 
         ReDim peaksContainer.SmoothedYData(peaksContainer.SourceDataCount - 1)
 
