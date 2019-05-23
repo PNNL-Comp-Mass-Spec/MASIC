@@ -175,11 +175,11 @@ Public Class clsDatasetStatsSummarizer
     ''' Summarizes the scan info in objScanStats()
     ''' </summary>
     ''' <param name="objScanStats">ScanStats data to parse</param>
-    ''' <param name="objSummaryStats">Stats output (initialized if nothing)</param>
+    ''' <param name="summaryStats">Stats output (initialized if nothing)</param>
     ''' <returns>>True if success, false if error</returns>
     ''' <remarks></remarks>
     Public Function ComputeScanStatsSummary(objScanStats As List(Of clsScanStatsEntry),
-                                            ByRef objSummaryStats As clsDatasetSummaryStats) As Boolean
+                                            ByRef summaryStats As clsDatasetSummaryStats) As Boolean
 
         Dim objEntry As clsScanStatsEntry
 
@@ -202,11 +202,11 @@ Public Class clsDatasetStatsSummarizer
                 mErrorMessage = String.Empty
             End If
 
-            ' Initialize objSummaryStats
-            If objSummaryStats Is Nothing Then
-                objSummaryStats = New clsDatasetSummaryStats
+            ' Initialize summaryStats
+            If summaryStats Is Nothing Then
+                summaryStats = New clsDatasetSummaryStats
             Else
-                objSummaryStats.Clear()
+                summaryStats.Clear()
             End If
 
             For Each objEntry In objScanStats
@@ -214,32 +214,32 @@ Public Class clsDatasetStatsSummarizer
                 If objEntry.ScanType > 1 Then
                     ' MSn spectrum
                     ComputeScanStatsUpdateDetails(objEntry,
-                                                  objSummaryStats.ElutionTimeMax,
-                                                  objSummaryStats.MSnStats,
+                                                  summaryStats.ElutionTimeMax,
+                                                  summaryStats.MSnStats,
                                                   ticListMSn,
                                                   bpiListMSn)
                 Else
                     ' MS spectrum
                     ComputeScanStatsUpdateDetails(objEntry,
-                                                  objSummaryStats.ElutionTimeMax,
-                                                  objSummaryStats.MSStats,
+                                                  summaryStats.ElutionTimeMax,
+                                                  summaryStats.MSStats,
                                                   ticListMS,
                                                   bpiListMS)
                 End If
 
                 scanTypeKey = objEntry.ScanTypeName & SCAN_TYPE_STATS_SEP_CHAR & objEntry.ScanFilterText
-                If objSummaryStats.objScanTypeStats.ContainsKey(scanTypeKey) Then
-                    objSummaryStats.objScanTypeStats.Item(scanTypeKey) += 1
+                If summaryStats.objScanTypeStats.ContainsKey(scanTypeKey) Then
+                    summaryStats.objScanTypeStats.Item(scanTypeKey) += 1
                 Else
-                    objSummaryStats.objScanTypeStats.Add(scanTypeKey, 1)
+                    summaryStats.objScanTypeStats.Add(scanTypeKey, 1)
                 End If
             Next
 
-            objSummaryStats.MSStats.TICMedian = mMedianUtils.Median(ticListMS)
-            objSummaryStats.MSStats.BPIMedian = mMedianUtils.Median(bpiListMS)
+            summaryStats.MSStats.TICMedian = mMedianUtils.Median(ticListMS)
+            summaryStats.MSStats.BPIMedian = mMedianUtils.Median(bpiListMS)
 
-            objSummaryStats.MSnStats.TICMedian = mMedianUtils.Median(ticListMSn)
-            objSummaryStats.MSnStats.BPIMedian = mMedianUtils.Median(bpiListMSn)
+            summaryStats.MSnStats.TICMedian = mMedianUtils.Median(ticListMSn)
+            summaryStats.MSnStats.BPIMedian = mMedianUtils.Median(bpiListMSn)
 
             Return True
 
@@ -448,15 +448,15 @@ Public Class clsDatasetStatsSummarizer
                 mErrorMessage = String.Empty
             End If
 
-            Dim objSummaryStats As clsDatasetSummaryStats
+            Dim summaryStats As clsDatasetSummaryStats
 
             If objScanStats Is mDatasetScanStats Then
-                objSummaryStats = GetDatasetSummaryStats()
+                summaryStats = GetDatasetSummaryStats()
             Else
-                objSummaryStats = New clsDatasetSummaryStats()
+                summaryStats = New clsDatasetSummaryStats()
 
                 ' Parse the data in objScanStats to compute the bulk values
-                Me.ComputeScanStatsSummary(objScanStats, objSummaryStats)
+                Me.ComputeScanStatsSummary(objScanStats, summaryStats)
             End If
 
             Dim objXMLSettings = New XmlWriterSettings()
@@ -500,7 +500,7 @@ Public Class clsDatasetStatsSummarizer
 
             objDSInfo.WriteStartElement("ScanTypes")
 
-            Dim objEnum = objSummaryStats.objScanTypeStats.GetEnumerator()
+            Dim objEnum = summaryStats.objScanTypeStats.GetEnumerator()
             Do While objEnum.MoveNext
 
                 Dim scanType = objEnum.Current.Key
@@ -529,16 +529,16 @@ Public Class clsDatasetStatsSummarizer
 
             objDSInfo.WriteStartElement("AcquisitionInfo")
 
-            Dim scanCountTotal = objSummaryStats.MSStats.ScanCount + objSummaryStats.MSnStats.ScanCount
+            Dim scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount
             If scanCountTotal = 0 And udtDatasetFileInfo.ScanCount > 0 Then
                 scanCountTotal = udtDatasetFileInfo.ScanCount
             End If
 
             objDSInfo.WriteElementString("ScanCount", scanCountTotal.ToString())
 
-            objDSInfo.WriteElementString("ScanCountMS", objSummaryStats.MSStats.ScanCount.ToString())
-            objDSInfo.WriteElementString("ScanCountMSn", objSummaryStats.MSnStats.ScanCount.ToString())
-            objDSInfo.WriteElementString("Elution_Time_Max", objSummaryStats.ElutionTimeMax.ToString())
+            objDSInfo.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString())
+            objDSInfo.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString())
+            objDSInfo.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString())
 
             objDSInfo.WriteElementString("AcqTimeMinutes", udtDatasetFileInfo.AcqTimeEnd.Subtract(udtDatasetFileInfo.AcqTimeStart).TotalMinutes.ToString("0.00"))
             objDSInfo.WriteElementString("StartTime", udtDatasetFileInfo.AcqTimeStart.ToString("yyyy-MM-dd hh:mm:ss tt"))
@@ -549,14 +549,14 @@ Public Class clsDatasetStatsSummarizer
             objDSInfo.WriteEndElement()       ' AcquisitionInfo
 
             objDSInfo.WriteStartElement("TICInfo")
-            objDSInfo.WriteElementString("TIC_Max_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.TICMax, 5))
-            objDSInfo.WriteElementString("TIC_Max_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.TICMax, 5))
-            objDSInfo.WriteElementString("BPI_Max_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.BPIMax, 5))
-            objDSInfo.WriteElementString("BPI_Max_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.BPIMax, 5))
-            objDSInfo.WriteElementString("TIC_Median_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.TICMedian, 5))
-            objDSInfo.WriteElementString("TIC_Median_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.TICMedian, 5))
-            objDSInfo.WriteElementString("BPI_Median_MS", StringUtilities.ValueToString(objSummaryStats.MSStats.BPIMedian, 5))
-            objDSInfo.WriteElementString("BPI_Median_MSn", StringUtilities.ValueToString(objSummaryStats.MSnStats.BPIMedian, 5))
+            objDSInfo.WriteElementString("TIC_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMax, 5))
+            objDSInfo.WriteElementString("TIC_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMax, 5))
+            objDSInfo.WriteElementString("BPI_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMax, 5))
+            objDSInfo.WriteElementString("BPI_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMax, 5))
+            objDSInfo.WriteElementString("TIC_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMedian, 5))
+            objDSInfo.WriteElementString("TIC_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMedian, 5))
+            objDSInfo.WriteElementString("BPI_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMedian, 5))
+            objDSInfo.WriteElementString("BPI_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMedian, 5))
             objDSInfo.WriteEndElement()       ' TICInfo
 
             ' Only write the SampleInfo block if udtSampleInfo contains entries
@@ -781,7 +781,7 @@ Public Class clsDatasetStatsSummarizer
 
         Dim writeHeaders As Boolean
 
-        Dim objSummaryStats As clsDatasetSummaryStats
+        Dim summaryStats As clsDatasetSummaryStats
 
         Try
 
@@ -793,12 +793,12 @@ Public Class clsDatasetStatsSummarizer
             End If
 
             If objScanStats Is mDatasetScanStats Then
-                objSummaryStats = GetDatasetSummaryStats()
+                summaryStats = GetDatasetSummaryStats()
             Else
-                objSummaryStats = New clsDatasetSummaryStats()
+                summaryStats = New clsDatasetSummaryStats()
 
                 ' Parse the data in objScanStats to compute the bulk values
-                Me.ComputeScanStatsSummary(objScanStats, objSummaryStats)
+                Me.ComputeScanStatsSummary(objScanStats, summaryStats)
             End If
 
             If Not File.Exists(datasetStatsFilePath) Then
@@ -812,17 +812,17 @@ Public Class clsDatasetStatsSummarizer
                     ' Write the header line
                     Dim headerNames = New List(Of String) From {
                         "Dataset",
-                         "ScanCount",
-                         "ScanCountMS",
-                         "ScanCountMSn",
-                         "Elution_Time_Max",
-                         "AcqTimeMinutes",
-                         "StartTime",
-                         "EndTime",
-                         "FileSizeBytes",
-                         "SampleName",
-                         "Comment1",
-                         "Comment2"
+                        "ScanCount",
+                        "ScanCountMS",
+                        "ScanCountMSn",
+                        "Elution_Time_Max",
+                        "AcqTimeMinutes",
+                        "StartTime",
+                        "EndTime",
+                        "FileSizeBytes",
+                        "SampleName",
+                        "Comment1",
+                        "Comment2"
                     }
 
                     writer.WriteLine(String.Join(ControlChars.Tab, headerNames))
@@ -830,10 +830,10 @@ Public Class clsDatasetStatsSummarizer
 
                 Dim dataColumns = New List(Of String) From {
                     datasetName,
-                    (objSummaryStats.MSStats.ScanCount + objSummaryStats.MSnStats.ScanCount).ToString(),
-                    objSummaryStats.MSStats.ScanCount.ToString(),
-                    objSummaryStats.MSnStats.ScanCount.ToString(),
-                    objSummaryStats.ElutionTimeMax.ToString(),
+                    (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),
+                    summaryStats.MSStats.ScanCount.ToString(),
+                    summaryStats.MSnStats.ScanCount.ToString(),
+                    summaryStats.ElutionTimeMax.ToString(),
                     udtDatasetFileInfo.AcqTimeEnd.Subtract(udtDatasetFileInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
                     udtDatasetFileInfo.AcqTimeStart.ToString("yyyy-MM-dd hh:mm:ss tt"),
                     udtDatasetFileInfo.AcqTimeEnd.ToString("yyyy-MM-dd hh:mm:ss tt"),

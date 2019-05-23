@@ -9,7 +9,7 @@ Public MustInherit Class clsMasicEventNotifier
 #Region "Events"
 
     ''' <summary>
-    ''' Provides information on the number of cache and uncache events in objSpectraCache
+    ''' Provides information on the number of cache and uncache events in spectraCache
     ''' </summary>
     ''' <param name="cacheEventCount"></param>
     ''' <param name="unCacheEventCount"></param>
@@ -99,8 +99,8 @@ Public MustInherit Class clsMasicEventNotifier
         OnUpdateErrorCode(eNewErrorCode, leaveExistingErrorCodeUnchanged)
     End Sub
 
-    Protected Sub UpdateCacheStats(objSpectraCache As clsSpectraCache)
-        OnUpdateCacheStats(objSpectraCache.CacheEventCount, objSpectraCache.UnCacheEventCount)
+    Protected Sub UpdateCacheStats(spectraCache As clsSpectraCache)
+        OnUpdateCacheStats(spectraCache.CacheEventCount, spectraCache.UnCacheEventCount)
     End Sub
 
     ''' <summary>

@@ -17,7 +17,7 @@ Namespace DataInput
         Public Function ExtractScanInfoFromMGFandCDF(
           filePath As String,
           scanList As clsScanList,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           dataOutputHandler As DataOutput.clsDataOutput,
           keepRawSpectra As Boolean,
           keepMSMSSpectra As Boolean) As Boolean
@@ -174,7 +174,7 @@ Namespace DataInput
 
                             mScanTracking.ProcessAndStoreSpectrum(
                                 newSurveyScan, Me,
-                                objSpectraCache, msSpectrum,
+                                spectraCache, msSpectrum,
                                 sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
                                 DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
                                 sicOptions.CompressMSSpectraData,
@@ -199,7 +199,7 @@ Namespace DataInput
                         UpdateProgress(0)
                     End If
 
-                    UpdateCacheStats(objSpectraCache)
+                    UpdateCacheStats(spectraCache)
                     If mOptions.AbortProcessing Then
                         scanList.ProcessingIncomplete = True
                         Exit For
@@ -367,7 +367,7 @@ Namespace DataInput
 
                         mScanTracking.ProcessAndStoreSpectrum(
                             newFragScan, Me,
-                            objSpectraCache, msSpectrum,
+                            spectraCache, msSpectrum,
                             sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
                             DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
                             sicOptions.CompressMSMSSpectraData,
@@ -383,7 +383,7 @@ Namespace DataInput
                     End If
 
                     mParentIonProcessor.AddUpdateParentIons(scanList, lastSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                                                            scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
+                                                            scanList.FragScans.Count - 1, spectraCache, sicOptions)
 
                     ' Note: We need to take msScanCount * 2, in addition to adding msScanCount to lastSurveyScanIndex, since we have to read two different files
                     If msScanCount > 1 Then
@@ -392,7 +392,7 @@ Namespace DataInput
                         UpdateProgress(0)
                     End If
 
-                    UpdateCacheStats(objSpectraCache)
+                    UpdateCacheStats(spectraCache)
                     If mOptions.AbortProcessing Then
                         scanList.ProcessingIncomplete = True
                         Exit Do

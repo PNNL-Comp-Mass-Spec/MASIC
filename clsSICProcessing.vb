@@ -88,7 +88,7 @@ Public Class clsSICProcessing
 
     Public Function CreateParentIonSICs(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       masicOptions As clsMASICOptions,
       dataOutputHandler As clsDataOutput,
       sicProcessor As clsSICProcessing,
@@ -135,7 +135,7 @@ Public Class clsSICProcessing
             Dim mzBinList = CreateMZLookupList(masicOptions, scanList, False, 0)
             If mzBinList.Count > 0 Then
 
-                success = ProcessMZList(scanList, objSpectraCache, masicOptions,
+                success = ProcessMZList(scanList, spectraCache, masicOptions,
                                         dataOutputHandler, xmlResultsWriter,
                                         mzBinList, False, 0, parentIonsProcessed)
             End If
@@ -161,7 +161,7 @@ Public Class clsSICProcessing
 
                     If mzBinListSIM.Count > 0 Then
 
-                        ProcessMZList(scanList, objSpectraCache, masicOptions,
+                        ProcessMZList(scanList, spectraCache, masicOptions,
                                                    dataOutputHandler, xmlResultsWriter,
                                                    mzBinListSIM, True, simIndex, parentIonsProcessed)
                     End If
@@ -170,7 +170,7 @@ Public Class clsSICProcessing
 
             ' Lastly, process the MRM scans (if any)
             If scanList.MRMDataPresent Then
-                mMRMProcessor.ProcessMRMList(scanList, objSpectraCache, sicProcessor, xmlResultsWriter, mMASICPeakFinder, parentIonsProcessed)
+                mMRMProcessor.ProcessMRMList(scanList, spectraCache, sicProcessor, xmlResultsWriter, mMASICPeakFinder, parentIonsProcessed)
             End If
 
             Console.WriteLine()
@@ -477,7 +477,7 @@ Public Class clsSICProcessing
 
     Private Function ProcessMZList(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       masicOptions As clsMASICOptions,
       dataOutputHandler As clsDataOutput,
       xmlResultsWriter As clsXMLResultsWriter,
@@ -593,7 +593,7 @@ Public Class clsSICProcessing
                         masicOptions,
                         scanList,
                         dataAggregation, dataOutputHandler, xmlResultsWriter,
-                        objSpectraCache, scanNumScanConverter,
+                        spectraCache, scanNumScanConverter,
                         mzSearchChunks,
                         parentIonIndices,
                         processSIMScans,
@@ -632,7 +632,7 @@ Public Class clsSICProcessing
       dataAggregation As clsDataAggregation,
       dataOutputHandler As clsDataOutput,
       xmlResultsWriter As clsXMLResultsWriter,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       scanNumScanConverter As clsScanNumScanTimeConversion,
       mzSearchChunk As IReadOnlyList(Of clsMzSearchInfo),
       parentIonIndices As IList(Of Integer),
@@ -699,7 +699,7 @@ Public Class clsSICProcessing
 
             Dim poolIndex As Integer
 
-            If Not objSpectraCache.ValidateSpectrumInPool(scanList.SurveyScans(surveyScanIndex).ScanNumber, poolIndex) Then
+            If Not spectraCache.ValidateSpectrumInPool(scanList.SurveyScans(surveyScanIndex).ScanNumber, poolIndex) Then
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum)
                 Return False
             End If
@@ -719,7 +719,7 @@ Public Class clsSICProcessing
                 Dim ionMatchCount As Integer
                 Dim closestMZ As Double
 
-                Dim ionSum = dataAggregation.AggregateIonsInRange(objSpectraCache.SpectraPool(poolIndex),
+                Dim ionSum = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool(poolIndex),
                                                                          current.SearchMZ, mzToleranceDa,
                                                                          ionMatchCount, closestMZ, False)
 
@@ -961,7 +961,7 @@ Public Class clsSICProcessing
                     UpdateProgress(0)
                 End If
 
-                UpdateCacheStats(objSpectraCache)
+                UpdateCacheStats(spectraCache)
                 If masicOptions.AbortProcessing Then
                     scanList.ProcessingIncomplete = True
                     Exit For

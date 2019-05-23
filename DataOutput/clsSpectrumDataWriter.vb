@@ -20,7 +20,7 @@ Namespace DataOutput
 
         Public Function ExportRawDataToDisk(
           scanList As clsScanList,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           inputFileName As String,
           outputDirectoryPath As String) As Boolean
 
@@ -67,12 +67,12 @@ Namespace DataOutput
                 For masterOrderIndex = 0 To scanList.MasterScanOrderCount - 1
                     Dim scanPointer = scanList.MasterScanOrder(masterOrderIndex).ScanIndexPointer
                     If scanList.MasterScanOrder(masterOrderIndex).ScanType = clsScanList.eScanTypeConstants.SurveyScan Then
-                        SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.SurveyScans(scanPointer), objSpectraCache, inputFileName, False, spectrumExportCount)
+                        SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.SurveyScans(scanPointer), spectraCache, inputFileName, False, spectrumExportCount)
                     Else
                         If mOptions.RawDataExportOptions.IncludeMSMS OrElse
                           Not scanList.FragScans(scanPointer).MRMScanType = ThermoRawFileReader.MRMScanTypeConstants.NotMRM Then
                             ' Either we're writing out MS/MS data or this is an MRM scan
-                            SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.FragScans(scanPointer), objSpectraCache, inputFileName, True, spectrumExportCount)
+                            SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.FragScans(scanPointer), spectraCache, inputFileName, True, spectrumExportCount)
                         End If
                     End If
 
@@ -82,7 +82,7 @@ Namespace DataOutput
                         UpdateProgress(0)
                     End If
 
-                    UpdateCacheStats(objSpectraCache)
+                    UpdateCacheStats(spectraCache)
 
                     If mOptions.AbortProcessing Then
                         Exit For
@@ -106,7 +106,7 @@ Namespace DataOutput
           dataWriter As StreamWriter,
           scanInfoWriter As StreamWriter,
           currentScan As clsScanInfo,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           fragmentationScan As Boolean,
           ByRef spectrumExportCount As Integer)
 
@@ -114,7 +114,7 @@ Namespace DataOutput
             Dim scanNumber As Integer
             Dim baselineNoiseLevel As Double
 
-            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
+            If Not spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                 Exit Sub
             End If
@@ -138,7 +138,7 @@ Namespace DataOutput
                 End If
 
                 Dim numIsotopicSignatures = 0
-                Dim numPeaks = objSpectraCache.SpectraPool(poolIndex).IonCount
+                Dim numPeaks = spectraCache.SpectraPool(poolIndex).IonCount
 
                 baselineNoiseLevel = .BaselineNoiseStats.NoiseLevel
                 If baselineNoiseLevel < 1 Then baselineNoiseLevel = 1
@@ -147,7 +147,7 @@ Namespace DataOutput
             End With
 
 
-            With objSpectraCache.SpectraPool(poolIndex)
+            With spectraCache.SpectraPool(poolIndex)
                 ' Now write an entry to the "_isos.csv" file
 
                 If .IonCount > 0 Then
@@ -214,7 +214,7 @@ Namespace DataOutput
         Private Sub SavePEKFileToDiskWork(
           writer As TextWriter,
           currentScan As clsScanInfo,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           inputFileName As String,
           fragmentationScan As Boolean,
           ByRef spectrumExportCount As Integer)
@@ -222,7 +222,7 @@ Namespace DataOutput
             Dim poolIndex As Integer
             Dim exportCount = 0
 
-            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
+            If Not spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                 SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                 Exit Sub
             End If
@@ -261,7 +261,7 @@ Namespace DataOutput
                 writer.WriteLine("First CS,    Number of CS,   Abundance,   Mass,   Standard deviation")
             End With
 
-            With objSpectraCache.SpectraPool(poolIndex)
+            With spectraCache.SpectraPool(poolIndex)
 
                 If .IonCount > 0 Then
                     ' Populate intensities and pointerArray()
@@ -327,16 +327,16 @@ Namespace DataOutput
           dataWriter As StreamWriter,
           scanInfoWriter As StreamWriter,
           currentScan As clsScanInfo,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           inputFileName As String,
           fragmentationScan As Boolean,
           ByRef spectrumExportCount As Integer)
 
             Select Case mOptions.RawDataExportOptions.FileFormat
                 Case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile
-                    SavePEKFileToDiskWork(dataWriter, currentScan, objSpectraCache, inputFileName, fragmentationScan, spectrumExportCount)
+                    SavePEKFileToDiskWork(dataWriter, currentScan, spectraCache, inputFileName, fragmentationScan, spectrumExportCount)
                 Case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile
-                    SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, objSpectraCache, fragmentationScan, spectrumExportCount)
+                    SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, spectraCache, fragmentationScan, spectrumExportCount)
                 Case Else
                     ' Unknown format
                     ' This code should never be reached

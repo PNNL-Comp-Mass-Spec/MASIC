@@ -134,14 +134,14 @@ Namespace DataInput
           isolationWidth As Double,
           chargeState As Integer) As Double
 
-            Dim oPrecursorInfo = New InterDetect.PrecursorIntense(parentIonMz, isolationWidth, chargeState) With {
+            Dim precursorInfo = New InterDetect.PrecursorIntense(parentIonMz, isolationWidth, chargeState) With {
                 .PrecursorScanNumber = precursorScanNumber,
                 .ScanNumber = fragScanNumber
             }
 
-            mInterferenceCalculator.Interference(oPrecursorInfo, mCachedPrecursorIons)
+            mInterferenceCalculator.Interference(precursorInfo, mCachedPrecursorIons)
 
-            Return oPrecursorInfo.Interference
+            Return precursorInfo.Interference
 
         End Function
 

@@ -382,7 +382,7 @@ Namespace DataOutput
         Public Function XMLOutputFileFinalize(
            dataOutputHandler As clsDataOutput,
            scanList As clsScanList,
-           objSpectraCache As clsSpectraCache,
+           spectraCache As clsSpectraCache,
            processingStats As clsProcessingStats,
            processingTimeSec As Single) As Boolean
 
@@ -392,7 +392,7 @@ Namespace DataOutput
 
             Try
                 objXMLOut.WriteStartElement("ProcessingStats")
-                With objSpectraCache
+                With spectraCache
                     objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
                     objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
                 End With
@@ -428,7 +428,7 @@ Namespace DataOutput
           outputDirectoryPath As String,
           dataOutputHandler As clsDataOutput,
           scanList As clsScanList,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           sicOptions As clsSICOptions,
           binningOptions As clsBinningOptions) As Boolean
 
@@ -482,7 +482,7 @@ Namespace DataOutput
                 objXMLOut.WriteEndElement()
 
                 objXMLOut.WriteStartElement("MemoryOptions")
-                With objSpectraCache
+                With spectraCache
 
                     objXMLOut.WriteElementString("CacheAlwaysDisabled", .DiskCachingAlwaysDisabled.ToString())
                     objXMLOut.WriteElementString("CacheSpectraToRetainInMemory", .CacheSpectraToRetainInMemory.ToString())

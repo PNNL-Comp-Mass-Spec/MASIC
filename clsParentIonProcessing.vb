@@ -21,10 +21,10 @@ Public Class clsParentIonProcessing
       surveyScanIndex As Integer,
       parentIonMZ As Double,
       fragScanIndex As Integer,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       sicOptions As clsSICOptions)
 
-        AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, 0, 0, fragScanIndex, objSpectraCache, sicOptions)
+        AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, 0, 0, fragScanIndex, spectraCache, sicOptions)
     End Sub
 
     Public Sub AddUpdateParentIons(
@@ -32,7 +32,7 @@ Public Class clsParentIonProcessing
       surveyScanIndex As Integer,
       parentIonMZ As Double,
       mrmInfo As clsMRMScanInfo,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       sicOptions As clsSICOptions)
 
         Dim mrmIndex As Integer
@@ -46,7 +46,7 @@ Public Class clsParentIonProcessing
                 mrmToleranceHalfWidth = 0.001
             End If
 
-            AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, mrmDaughterMZ, mrmToleranceHalfWidth, scanList.FragScans.Count - 1, objSpectraCache, sicOptions)
+            AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, mrmDaughterMZ, mrmToleranceHalfWidth, scanList.FragScans.Count - 1, spectraCache, sicOptions)
         Next
 
     End Sub
@@ -58,7 +58,7 @@ Public Class clsParentIonProcessing
       mrmDaughterMZ As Double,
       mrmToleranceHalfWidth As Double,
       fragScanIndex As Integer,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       sicOptions As clsSICOptions)
 
         Const MINIMUM_TOLERANCE_PPM = 0.01
@@ -207,7 +207,7 @@ Public Class clsParentIonProcessing
 
     Private Function CompareFragSpectraForParentIons(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       parentIonIndex1 As Integer,
       parentIonIndex2 As Integer,
       binningOptions As clsBinningOptions,
@@ -236,29 +236,29 @@ Public Class clsParentIonProcessing
                 For fragIndex1 = 0 To scanList.ParentIons(parentIonIndex1).FragScanIndices.Count - 1
                     fragSpectrumIndex1 = scanList.ParentIons(parentIonIndex1).FragScanIndices(fragIndex1)
 
-                    If Not objSpectraCache.ValidateSpectrumInPool(scanList.FragScans(fragSpectrumIndex1).ScanNumber, poolIndex1) Then
+                    If Not spectraCache.ValidateSpectrumInPool(scanList.FragScans(fragSpectrumIndex1).ScanNumber, poolIndex1) Then
                         SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                         Return -1
                     End If
 
                     If Not DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD Then
-                        dataImportUtilities.DiscardDataBelowNoiseThreshold(objSpectraCache.SpectraPool(poolIndex1), scanList.FragScans(fragSpectrumIndex1).BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions)
+                        dataImportUtilities.DiscardDataBelowNoiseThreshold(spectraCache.SpectraPool(poolIndex1), scanList.FragScans(fragSpectrumIndex1).BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions)
                     End If
 
                     For fragIndex2 = 0 To scanList.ParentIons(parentIonIndex2).FragScanIndices.Count - 1
 
                         fragSpectrumIndex2 = scanList.ParentIons(parentIonIndex2).FragScanIndices(fragIndex2)
 
-                        If Not objSpectraCache.ValidateSpectrumInPool(scanList.FragScans(fragSpectrumIndex2).ScanNumber, poolIndex2) Then
+                        If Not spectraCache.ValidateSpectrumInPool(scanList.FragScans(fragSpectrumIndex2).ScanNumber, poolIndex2) Then
                             SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                             Return -1
                         End If
 
                         If Not DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD Then
-                            dataImportUtilities.DiscardDataBelowNoiseThreshold(objSpectraCache.SpectraPool(poolIndex2), scanList.FragScans(fragSpectrumIndex2).BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions)
+                            dataImportUtilities.DiscardDataBelowNoiseThreshold(spectraCache.SpectraPool(poolIndex2), scanList.FragScans(fragSpectrumIndex2).BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions)
                         End If
 
-                        similarityScore = CompareSpectra(objSpectraCache.SpectraPool(poolIndex1), objSpectraCache.SpectraPool(poolIndex2), binningOptions)
+                        similarityScore = CompareSpectra(spectraCache.SpectraPool(poolIndex1), spectraCache.SpectraPool(poolIndex2), binningOptions)
 
                         If similarityScore > highestSimilarityScore Then
                             highestSimilarityScore = similarityScore
@@ -359,7 +359,7 @@ Public Class clsParentIonProcessing
     End Function
 
     Private Function FindClosestMZ(
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       scanList As IList(Of clsScanInfo),
       spectrumIndex As Integer,
       searchMZ As Double,
@@ -376,11 +376,11 @@ Public Class clsParentIonProcessing
                 ' No data in this spectrum
                 success = False
             Else
-                If Not objSpectraCache.ValidateSpectrumInPool(scanList(spectrumIndex).ScanNumber, poolIndex) Then
+                If Not spectraCache.ValidateSpectrumInPool(scanList(spectrumIndex).ScanNumber, poolIndex) Then
                     SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                     success = False
                 Else
-                    With objSpectraCache.SpectraPool(poolIndex)
+                    With spectraCache.SpectraPool(poolIndex)
                         success = FindClosestMZ(.IonsMZ, .IonCount, searchMZ, toleranceMZ, bestMatchMZ)
                     End With
                 End If
@@ -439,7 +439,7 @@ Public Class clsParentIonProcessing
 
     Public Function FindSimilarParentIons(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       masicOptions As clsMASICOptions,
       dataImportUtilities As DataInput.clsDataImport,
       ByRef ionUpdateCount As Integer) As Boolean
@@ -582,46 +582,46 @@ Public Class clsParentIonProcessing
 
                         If currentMZ <= 0 Then Continue Do
 
-                        FindSimilarParentIonsWork(objSpectraCache, currentMZ, 0, originalIndex,
-                                                  scanList, udtFindSimilarIonsData,
+                        FindSimilarParentIonsWork(spectraCache, currentMZ, 0, originalIndex,
+                                                  scanList, similarParentIonsData,
                                                   masicOptions, dataImportUtilities, objSearchRange)
 
                         ' Look for similar 1+ spaced m/z values
-                        FindSimilarParentIonsWork(objSpectraCache, currentMZ, 1, originalIndex,
-                                                  scanList, udtFindSimilarIonsData,
+                        FindSimilarParentIonsWork(spectraCache, currentMZ, 1, originalIndex,
+                                                  scanList, similarParentIonsData,
                                                   masicOptions, dataImportUtilities, objSearchRange)
 
-                        FindSimilarParentIonsWork(objSpectraCache, currentMZ, -1, originalIndex,
-                                                  scanList, udtFindSimilarIonsData,
+                        FindSimilarParentIonsWork(spectraCache, currentMZ, -1, originalIndex,
+                                                  scanList, similarParentIonsData,
                                                   masicOptions, dataImportUtilities, objSearchRange)
 
                         ' Look for similar 2+ spaced m/z values
-                        FindSimilarParentIonsWork(objSpectraCache, currentMZ, 0.5, originalIndex,
-                                                  scanList, udtFindSimilarIonsData,
+                        FindSimilarParentIonsWork(spectraCache, currentMZ, 0.5, originalIndex,
+                                                  scanList, similarParentIonsData,
                                                   masicOptions, dataImportUtilities, objSearchRange)
 
-                        FindSimilarParentIonsWork(objSpectraCache, currentMZ, -0.5, originalIndex,
-                                                  scanList, udtFindSimilarIonsData,
+                        FindSimilarParentIonsWork(spectraCache, currentMZ, -0.5, originalIndex,
+                                                  scanList, similarParentIonsData,
                                                   masicOptions, dataImportUtilities, objSearchRange)
 
                         Dim parentIonToleranceDa = GetParentIonToleranceDa(masicOptions.SICOptions, currentMZ)
 
                         If parentIonToleranceDa <= 0.25 AndAlso masicOptions.SICOptions.SimilarIonMZToleranceHalfWidth <= 0.15 Then
                             ' Also look for similar 3+ spaced m/z values
-                            FindSimilarParentIonsWork(objSpectraCache, currentMZ, 0.666, originalIndex,
-                                                      scanList, udtFindSimilarIonsData,
+                            FindSimilarParentIonsWork(spectraCache, currentMZ, 0.666, originalIndex,
+                                                      scanList, similarParentIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
 
-                            FindSimilarParentIonsWork(objSpectraCache, currentMZ, 0.333, originalIndex,
-                                                      scanList, udtFindSimilarIonsData,
+                            FindSimilarParentIonsWork(spectraCache, currentMZ, 0.333, originalIndex,
+                                                      scanList, similarParentIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
 
-                            FindSimilarParentIonsWork(objSpectraCache, currentMZ, -0.333, originalIndex,
-                                                      scanList, udtFindSimilarIonsData,
+                            FindSimilarParentIonsWork(spectraCache, currentMZ, -0.333, originalIndex,
+                                                      scanList, similarParentIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
 
-                            FindSimilarParentIonsWork(objSpectraCache, currentMZ, -0.666, originalIndex,
-                                                      scanList, udtFindSimilarIonsData,
+                            FindSimilarParentIonsWork(spectraCache, currentMZ, -0.666, originalIndex,
+                                                      scanList, similarParentIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange)
                         End If
 
@@ -639,7 +639,7 @@ Public Class clsParentIonProcessing
                     UpdateProgress(1)
                 End If
 
-                UpdateCacheStats(objSpectraCache)
+                UpdateCacheStats(spectraCache)
                 If masicOptions.AbortProcessing Then
                     scanList.ProcessingIncomplete = True
                     Exit Do
@@ -687,7 +687,7 @@ Public Class clsParentIonProcessing
     End Function
 
     Private Sub FindSimilarParentIonsWork(
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       searchMZ As Double,
       searchMZOffset As Double,
       originalIndex As Integer,

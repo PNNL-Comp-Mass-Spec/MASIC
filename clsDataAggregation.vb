@@ -70,7 +70,7 @@ Public Class clsDataAggregation
     End Function
 
     Public Function FindMaxValueInMZRange(
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       currentScan As clsScanInfo,
       mzStart As Double,
       mzEnd As Double,
@@ -91,14 +91,14 @@ Public Class clsDataAggregation
         matchIntensity = 0
 
         Try
-            If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
+            If Not spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                 OnErrorEvent("Error uncaching scan " & currentScan.ScanNumber)
                 Return False
             Else
                 Dim success = FindMaxValueInMZRange(
-                    objSpectraCache.SpectraPool(poolIndex).IonsMZ,
-                    objSpectraCache.SpectraPool(poolIndex).IonsIntensity,
-                    objSpectraCache.SpectraPool(poolIndex).IonCount,
+                    spectraCache.SpectraPool(poolIndex).IonsMZ,
+                    spectraCache.SpectraPool(poolIndex).IonsIntensity,
+                    spectraCache.SpectraPool(poolIndex).IonCount,
                     mzStart, mzEnd,
                     bestMatchMZ, matchIntensity)
 

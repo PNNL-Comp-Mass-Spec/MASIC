@@ -22,14 +22,14 @@ Public Class clsReporterIonProcessor
     ''' Looks for the reporter ion peaks using FindReporterIonsWork
     ''' </summary>
     ''' <param name="scanList"></param>
-    ''' <param name="objSpectraCache"></param>
+    ''' <param name="spectraCache"></param>
     ''' <param name="inputFilePathFull">Full path to the input file</param>
     ''' <param name="outputDirectoryPath"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function FindReporterIons(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       inputFilePathFull As String,
       outputDirectoryPath As String) As Boolean
 
@@ -199,7 +199,7 @@ Public Class clsReporterIonProcessor
                         includeFtmsColumns,
                         mOptions.SICOptions,
                         scanList,
-                        objSpectraCache,
+                        spectraCache,
                         scanList.FragScans(scanPointer),
                         writer,
                         reporterIons,
@@ -213,7 +213,7 @@ Public Class clsReporterIonProcessor
                         UpdateProgress(0)
                     End If
 
-                    UpdateCacheStats(objSpectraCache)
+                    UpdateCacheStats(spectraCache)
                     If mOptions.AbortProcessing Then
                         Exit For
                     End If
@@ -245,7 +245,7 @@ Public Class clsReporterIonProcessor
     ''' <param name="includeFtmsColumns"></param>
     ''' <param name="sicOptions"></param>
     ''' <param name="scanList"></param>
-    ''' <param name="objSpectraCache"></param>
+    ''' <param name="spectraCache"></param>
     ''' <param name="currentScan"></param>
     ''' <param name="writer"></param>
     ''' <param name="reporterIons"></param>
@@ -259,7 +259,7 @@ Public Class clsReporterIonProcessor
       includeFtmsColumns As Boolean,
       sicOptions As clsSICOptions,
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       currentScan As clsScanInfo,
       writer As TextWriter,
       reporterIons As IList(Of clsReporterIonInfo),
@@ -288,7 +288,7 @@ Public Class clsReporterIonProcessor
         End If
 
         Dim poolIndex As Integer
-        If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
+        If Not spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
             SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
             Exit Sub
         End If
@@ -328,7 +328,7 @@ Public Class clsReporterIonProcessor
             With reporterIons(reporterIonIndex)
                 ' Search for the reporter ion MZ in this mass spectrum
                 reporterIntensities(reporterIonIndex) = dataAggregation.AggregateIonsInRange(
-                    objSpectraCache.SpectraPool(poolIndex),
+                    spectraCache.SpectraPool(poolIndex),
                     .MZ,
                     .MZToleranceDa,
                     ionMatchCount,

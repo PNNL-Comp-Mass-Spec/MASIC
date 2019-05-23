@@ -185,7 +185,7 @@ Public Class clsMRMProcessing
 
     Public Function ExportMRMDataToDisk(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       inputFileName As String,
       outputDirectoryPath As String) As Boolean
 
@@ -196,7 +196,7 @@ Public Class clsMRMProcessing
             Return False
         End If
 
-        Dim success = ExportMRMDataToDisk(scanList, objSpectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath)
+        Dim success = ExportMRMDataToDisk(scanList, spectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath)
 
         Return success
 
@@ -204,7 +204,7 @@ Public Class clsMRMProcessing
 
     Private Function ExportMRMDataToDisk(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       mrmSettings As IReadOnlyList(Of clsMRMScanInfo),
       srmList As IReadOnlyList(Of udtSRMListType),
       inputFileName As String,
@@ -330,7 +330,7 @@ Public Class clsMRMProcessing
                             Dim matchIntensity As Double
 
                             Dim matchFound = mDataAggregation.FindMaxValueInMZRange(
-                                objSpectraCache, fragScan,
+                                spectraCache, fragScan,
                                 mzStart - mrmToleranceHalfWidth,
                                 mzEnd + mrmToleranceHalfWidth,
                                 closestMZ, matchIntensity)
@@ -387,7 +387,7 @@ Public Class clsMRMProcessing
 
                         Next
 
-                        UpdateCacheStats(objSpectraCache)
+                        UpdateCacheStats(spectraCache)
                         If mOptions.AbortProcessing Then
                             Exit For
                         End If
@@ -509,7 +509,7 @@ Public Class clsMRMProcessing
 
     Public Function ProcessMRMList(
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       sicProcessor As clsSICProcessing,
       xmlResultsWriter As clsXMLResultsWriter,
       peakFinder As clsMASICPeakFinder,
@@ -565,7 +565,7 @@ Public Class clsMRMProcessing
                         Dim matchIntensity As Double
                         Dim closestMZ As Double
 
-                        mDataAggregation.FindMaxValueInMZRange(objSpectraCache,
+                        mDataAggregation.FindMaxValueInMZRange(spectraCache,
                                                               scanList.FragScans(scanIndex),
                                                               mrmDaughterMZ - searchToleranceHalfWidth,
                                                               mrmDaughterMZ + searchToleranceHalfWidth,
@@ -662,7 +662,7 @@ Public Class clsMRMProcessing
                         UpdateProgress(0)
                     End If
 
-                    UpdateCacheStats(objSpectraCache)
+                    UpdateCacheStats(spectraCache)
                     If mOptions.AbortProcessing Then
                         scanList.ProcessingIncomplete = True
                         Exit For

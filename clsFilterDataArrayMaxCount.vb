@@ -45,9 +45,9 @@ Public Class clsFilterDataArrayMaxCount
         Me.New(INITIAL_MEMORY_RESERVE)
     End Sub
 
-    Public Sub New(InitialCapacity As Integer)
+    Public Sub New(initialCapacity As Integer)
         SkipDataPointFlag = DEFAULT_SKIP_DATA_POINT_FLAG
-        Me.Clear(InitialCapacity)
+        Me.Clear(initialCapacity)
     End Sub
 
     Public Sub AddDataPoint(abundance As Double, dataPointIndex As Integer)
@@ -63,19 +63,19 @@ Public Class clsFilterDataArrayMaxCount
         mDataCount += 1
     End Sub
 
-    Public Sub Clear(InitialCapacity As Integer)
+    Public Sub Clear(initialCapacity As Integer)
         MaximumDataCountToLoad = 400000
 
         TotalIntensityPercentageFilterEnabled = False
         TotalIntensityPercentageFilter = 90
 
-        If InitialCapacity < 4 Then
-            InitialCapacity = 4
+        If initialCapacity < 4 Then
+            initialCapacity = 4
         End If
 
         mDataCount = 0
-        ReDim mDataValues(InitialCapacity - 1)
-        ReDim mDataIndices(InitialCapacity - 1)
+        ReDim mDataValues(initialCapacity - 1)
+        ReDim mDataIndices(initialCapacity - 1)
     End Sub
 
     Public Function GetAbundanceByIndex(dataPointIndex As Integer) As Double
@@ -92,7 +92,7 @@ Public Class clsFilterDataArrayMaxCount
         If mDataCount <= 0 Then
             ' Nothing to do
         Else
-            '' Shrink the arrays to mDataCount
+            ' Shrink the arrays to mDataCount
             If mDataCount < mDataValues.Length Then
                 ReDim Preserve mDataValues(mDataCount - 1)
                 ReDim Preserve mDataIndices(mDataCount - 1)

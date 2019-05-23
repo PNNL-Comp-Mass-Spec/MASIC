@@ -1090,7 +1090,7 @@ Public Class clsMASIC
       inputFilePathFull As String,
       outputDirectoryPath As String,
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       dataOutputHandler As clsDataOutput,
       scanTracking As clsScanTracking,
       datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType,
@@ -1120,7 +1120,7 @@ Public Class clsMASIC
 
             If mOptions.SkipSICAndRawDataProcessing OrElse Not mOptions.ExportRawDataOnly Then
                 LogMessage("ProcessFile: Call SaveBPIs")
-                bpiWriter.SaveBPIs(scanList, objSpectraCache, inputFilePathFull, outputDirectoryPath)
+                bpiWriter.SaveBPIs(scanList, spectraCache, inputFilePathFull, outputDirectoryPath)
             End If
 
             '---------------------------------------------------------
@@ -1156,7 +1156,7 @@ Public Class clsMASIC
                     Dim rawDataExporter = New clsSpectrumDataWriter(bpiWriter, mOptions)
                     RegisterEvents(rawDataExporter)
 
-                    rawDataExporter.ExportRawDataToDisk(scanList, objSpectraCache, inputFileName, outputDirectoryPath)
+                    rawDataExporter.ExportRawDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath)
                 End If
 
                 If mOptions.ReporterIons.ReporterIonStatsEnabled Then
@@ -1164,7 +1164,7 @@ Public Class clsMASIC
 
                     Dim reporterIonProcessor = New clsReporterIonProcessor(mOptions)
                     RegisterEvents(reporterIonProcessor)
-                    reporterIonProcessor.FindReporterIons(scanList, objSpectraCache, inputFilePathFull, outputDirectoryPath)
+                    reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath)
                 End If
 
                 Dim mrmProcessor = New clsMRMProcessing(mOptions, dataOutputHandler)
@@ -1174,7 +1174,7 @@ Public Class clsMASIC
                 ' If MRM data is present, then save the MRM values to disk
                 '---------------------------------------------------------
                 If scanList.MRMDataPresent Then
-                    mrmProcessor.ExportMRMDataToDisk(scanList, objSpectraCache, inputFileName, outputDirectoryPath)
+                    mrmProcessor.ExportMRMDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath)
                 End If
 
                 If Not mOptions.ExportRawDataOnly Then
@@ -1200,7 +1200,7 @@ Public Class clsMASIC
                     '---------------------------------------------------------
                     ' Create the XML output file
                     '---------------------------------------------------------
-                    success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, objSpectraCache, mOptions.SICOptions, mOptions.BinningOptions)
+                    success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, spectraCache, mOptions.SICOptions, mOptions.BinningOptions)
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
                         Exit Try
@@ -1219,7 +1219,7 @@ Public Class clsMASIC
                     Dim sicProcessor = New clsSICProcessing(mMASICPeakFinder, mrmProcessor)
                     RegisterEvents(sicProcessor)
 
-                    success = sicProcessor.CreateParentIonSICs(scanList, objSpectraCache, mOptions, dataOutputHandler, sicProcessor, xmlResultsWriter)
+                    success = sicProcessor.CreateParentIonSICs(scanList, spectraCache, mOptions, dataOutputHandler, sicProcessor, xmlResultsWriter)
 
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
@@ -1239,7 +1239,7 @@ Public Class clsMASIC
                     UpdatePeakMemoryUsage()
 
                     LogMessage("ProcessFile: Call FindSimilarParentIons")
-                    success = parentIonProcessor.FindSimilarParentIons(scanList, objSpectraCache, mOptions, dataImporterBase, similarParentIonUpdateCount)
+                    success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, mOptions, dataImporterBase, similarParentIonUpdateCount)
 
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
@@ -1304,7 +1304,7 @@ Public Class clsMASIC
 
                 LogMessage("ProcessFile: Call FinalizeXMLFile")
                 Dim processingTimeSec = GetTotalProcessingTimeSec()
-                success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, objSpectraCache,
+                success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, spectraCache,
                                                                     mProcessingStats, processingTimeSec)
 
             End If
@@ -1464,7 +1464,7 @@ Public Class clsMASIC
       parentIonProcessor As clsParentIonProcessing,
       scanTracking As clsScanTracking,
       scanList As clsScanList,
-      objSpectraCache As clsSpectraCache,
+      spectraCache As clsSpectraCache,
       <Out> ByRef dataImporterBase As DataInput.clsDataImport,
       <Out> ByRef datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType
       ) As Boolean
@@ -1512,7 +1512,7 @@ Public Class clsMASIC
 
                     success = dataImporter.ExtractScanInfoFromXcaliburDataFile(
                       inputFilePathFull,
-                      scanList, objSpectraCache, dataOutputHandler,
+                      scanList, spectraCache, dataOutputHandler,
                       keepRawMSSpectra,
                       Not mOptions.SkipMSMSProcessing)
 
@@ -1528,7 +1528,7 @@ Public Class clsMASIC
 
                     success = dataImporter.ExtractScanInfoFromMzMLDataFile(
                         inputFilePathFull,
-                        scanList, objSpectraCache, dataOutputHandler,
+                        scanList, spectraCache, dataOutputHandler,
                         keepRawMSSpectra,
                         Not mOptions.SkipMSMSProcessing)
 
@@ -1545,7 +1545,7 @@ Public Class clsMASIC
 
                     success = dataImporter.ExtractScanInfoFromMzXMLDataFile(
                       inputFilePathFull,
-                      scanList, objSpectraCache, dataOutputHandler,
+                      scanList, spectraCache, dataOutputHandler,
                       keepRawMSSpectra,
                       Not mOptions.SkipMSMSProcessing)
 
@@ -1562,7 +1562,7 @@ Public Class clsMASIC
 
                     success = dataImporter.ExtractScanInfoFromMzDataFile(
                       inputFilePathFull,
-                      scanList, objSpectraCache, dataOutputHandler,
+                      scanList, spectraCache, dataOutputHandler,
                       keepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
@@ -1578,7 +1578,7 @@ Public Class clsMASIC
 
                     success = dataImporter.ExtractScanInfoFromMGFandCDF(
                       inputFilePathFull,
-                      scanList, objSpectraCache, dataOutputHandler,
+                      scanList, spectraCache, dataOutputHandler,
                       keepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
@@ -1832,14 +1832,14 @@ Public Class clsMASIC
             ' Instantiate the SpectraCache
             '---------------------------------------------------------
 
-            Using objSpectraCache = New clsSpectraCache(mOptions.CacheOptions) With {
+            Using spectraCache = New clsSpectraCache(mOptions.CacheOptions) With {
                 .DiskCachingAlwaysDisabled = mOptions.CacheOptions.DiskCachingAlwaysDisabled,
                 .CacheDirectoryPath = mOptions.CacheOptions.DirectoryPath,
                 .CacheSpectraToRetainInMemory = mOptions.CacheOptions.SpectraToRetainInMemory
             }
-                RegisterEvents(objSpectraCache)
+                RegisterEvents(spectraCache)
 
-                objSpectraCache.InitializeSpectraPool()
+                spectraCache.InitializeSpectraPool()
 
                 Dim datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType
 
@@ -1864,7 +1864,7 @@ Public Class clsMASIC
                                    parentIonProcessor,
                                    scanTracking,
                                    scanList,
-                                   objSpectraCache,
+                                   spectraCache,
                                    dataImporterBase,
                                    datasetFileInfo)
 
@@ -1889,7 +1889,7 @@ Public Class clsMASIC
 
                     success = FindSICsAndWriteOutput(
                         inputFilePathFull, outputDirectoryPath,
-                        scanList, objSpectraCache, dataOutputHandler, scanTracking,
+                        scanList, spectraCache, dataOutputHandler, scanTracking,
                         datasetFileInfo, parentIonProcessor, dataImporterBase)
                 End If
 

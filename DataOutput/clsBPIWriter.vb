@@ -8,7 +8,7 @@ Namespace DataOutput
 
         Public Function SaveBPIs(
           scanList As clsScanList,
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           inputFilePathFull As String,
           outputDirectoryPath As String) As Boolean
 
@@ -44,7 +44,7 @@ Namespace DataOutput
 
                 ReportMessage("Saving Decon2LS MS Chromatogram File to " & Path.GetFileName(msScansFilePath))
 
-                SaveDecon2LSChromatogram(scanList.SurveyScans, objSpectraCache, msScansFilePath)
+                SaveDecon2LSChromatogram(scanList.SurveyScans, spectraCache, msScansFilePath)
 
                 stepsCompleted += 1
                 UpdateProgress(CShort(stepsCompleted / bpiStepCount * 100))
@@ -56,7 +56,7 @@ Namespace DataOutput
 
                 ReportMessage("Saving Decon2LS MSMS Chromatogram File to " & Path.GetFileName(msmsScansFilePath))
 
-                SaveDecon2LSChromatogram(scanList.FragScans, objSpectraCache, msmsScansFilePath)
+                SaveDecon2LSChromatogram(scanList.FragScans, spectraCache, msmsScansFilePath)
 
                 UpdateProgress(100)
                 Return True
@@ -70,7 +70,7 @@ Namespace DataOutput
 
         Private Sub SaveDecon2LSChromatogram(
           scanList As IEnumerable(Of clsScanInfo),
-          objSpectraCache As clsSpectraCache,
+          spectraCache As clsSpectraCache,
           outputFilePath As String)
 
             Dim scansWritten = 0
@@ -83,10 +83,10 @@ Namespace DataOutput
 
                 ' Step through the scans and write each one
                 For Each scanItem In scanList
-                    WriteDecon2LSScanFileEntry(writer, scanItem, objSpectraCache)
+                    WriteDecon2LSScanFileEntry(writer, scanItem, spectraCache)
 
                     If scansWritten Mod 250 = 0 Then
-                        UpdateCacheStats(objSpectraCache)
+                        UpdateCacheStats(spectraCache)
 
                         If DateTime.UtcNow.Subtract(lastStatus).TotalSeconds >= 30 Then
                             lastStatus = DateTime.UtcNow
@@ -284,19 +284,19 @@ Namespace DataOutput
         Private Sub WriteDecon2LSScanFileEntry(
           writer As StreamWriter,
           currentScan As clsScanInfo,
-          objSpectraCache As clsSpectraCache)
+          spectraCache As clsSpectraCache)
 
             Dim numPeaks As Integer
 
-            If objSpectraCache Is Nothing Then
+            If spectraCache Is Nothing Then
                 numPeaks = 0
             Else
                 Dim poolIndex As Integer
-                If Not objSpectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
+                If Not spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, poolIndex) Then
                     SetLocalErrorCode(eMasicErrorCodes.ErrorUncachingSpectrum)
                     Exit Sub
                 End If
-                numPeaks = objSpectraCache.SpectraPool(poolIndex).IonCount
+                numPeaks = spectraCache.SpectraPool(poolIndex).IonCount
             End If
 
             Dim scanNumber = currentScan.ScanNumber
