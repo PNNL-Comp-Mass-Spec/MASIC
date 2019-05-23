@@ -1882,23 +1882,6 @@ Public Class clsMASIC
                     Exit Try
                 End If
 
-                Try
-                    ' Make sure the arrays in scanList range from 0 to the Count-1
-                    With scanList
-                        If .MasterScanOrderCount <> .MasterScanOrder.Length Then
-                            ReDim Preserve .MasterScanOrder(.MasterScanOrderCount - 1)
-                            ReDim Preserve .MasterScanNumList(.MasterScanOrderCount - 1)
-                            ReDim Preserve .MasterScanTimeList(.MasterScanOrderCount - 1)
-                        End If
-
-                        If .ParentIonInfoCount <> .ParentIons.Length Then ReDim Preserve .ParentIons(.ParentIonInfoCount - 1)
-                    End With
-                Catch ex As Exception
-                    success = False
-                    LogErrors("ProcessFile", "Error resizing the arrays in scanList", ex, eMasicErrorCodes.UnspecifiedError)
-                    Exit Try
-                End Try
-
                 If success Then
                     '---------------------------------------------------------
                     ' Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
@@ -2058,7 +2041,7 @@ Public Class clsMASIC
         Dim scanIndexObserved As Integer
 
         Try
-            For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+            For parentIonIndex = 0 To scanList.ParentIons.Count - 1
                 With scanList.ParentIons(parentIonIndex)
                     scanIndexObserved = .SurveyScanIndex
 

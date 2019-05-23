@@ -197,49 +197,55 @@ Public Class clsCorrelation
 
     End Function
 
+    ''' <summary>
+    ''' Bins the data in xData() according to startBinXValue and binSize
+    ''' </summary>
+    ''' <param name="xData"></param>
+    ''' <param name="yData"></param>
+    ''' <param name="binnedYData">Binned y data (the calling class must instantiate this)</param>
+    ''' <param name="binnedOffsetYData">Binned y data, where the StartX value is offset by 50% of the bin size vs. binnedYData</param>
+    ''' <returns>True if successful, otherwise false</returns>
     Public Function BinData(
-      xData() As Single,
-      yData() As Single,
-      <Out> ByRef binnedYData() As Single,
-      <Out> ByRef binnedOffsetYData() As Single,
-      <Out> ByRef binCount As Integer) As Boolean
-
-        ' Bins the data in xData() according to startBinXValue and binSize
-        ' Returns the binned data in binnedYData() and binnedOffsetYData()
-        ' The difference between the two is that the StartX value is offset by 50% of the bin size when populating binnedOffsetYData()
-        '
-        ' Returns True if successful, false otherwise
+      xData As List(Of Single),
+      yData As List(Of Single),
+      binnedYData As List(Of Single),
+      binnedOffsetYData As List(Of Single)) As Boolean
 
         Dim dataCount As Integer
 
         Dim bin2Offset As Single
 
+        binnedYData.Clear()
+        binnedOffsetYData.Clear()
+
         Try
-            dataCount = xData.Length
+            dataCount = xData.Count
             If dataCount <= 0 Then
-                ReDim binnedYData(-1)
-                ReDim binnedOffsetYData(-1)
-                binCount = 0
                 Return False
             End If
 
-            With mBinningOptions
-                If .BinSize <= 0 Then .BinSize = 1
-                If .StartX >= .EndX Then .EndX = .StartX + .BinSize * 10
+            If mBinningOptions.BinSize <= 0 Then
+                mBinningOptions.BinSize = 1
+            End If
 
-                binCount = CInt((.EndX - .StartX) / .BinSize - 1)
-                If binCount < 1 Then binCount = 1
+            If mBinningOptions.StartX >= mBinningOptions.EndX Then
+                mBinningOptions.EndX = mBinningOptions.StartX + mBinningOptions.BinSize * 10
+            End If
 
-                If binCount > .MaximumBinCount Then
-                    .BinSize = (.EndX - .StartX) / .MaximumBinCount
-                    binCount = CInt((.EndX - .StartX) / .BinSize - 1)
-                End If
-                bin2Offset = .BinSize / 2
+            Dim binCount = CInt((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1)
+            If binCount < 1 Then binCount = 1
 
-                ReDim binnedYData(binCount - 1)
-                ReDim binnedOffsetYData(binCount - 1)
+            If binCount > mBinningOptions.MaximumBinCount Then
+                mBinningOptions.BinSize = (mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.MaximumBinCount
+                binCount = CInt((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1)
+            End If
+            bin2Offset = mBinningOptions.BinSize / 2
 
-            End With
+            ' Initialize the bins
+            For i = 1 To binCount
+                binnedYData.Add(0)
+                binnedOffsetYData.Add(0)
+            Next
 
             ' Fill binnedYData()
             BinDataWork(xData, yData, dataCount, binnedYData, binCount, mBinningOptions, 0)
@@ -249,9 +255,6 @@ Public Class clsCorrelation
 
         Catch ex As Exception
             OnErrorEvent("BinData: " & ex.Message, ex)
-            ReDim binnedYData(-1)
-            ReDim binnedOffsetYData(-1)
-            binCount = 0
             Return False
         End Try
 
@@ -324,15 +327,20 @@ Public Class clsCorrelation
 
     End Sub
 
-    Public Function Correlate(dataList1() As Single, dataList2() As Single, eCorrelationMethod As cmCorrelationMethodConstants) As Single
-        ' Finds the correlation value between the two lists of data
-        ' The lists must have the same number of data points
-        ' If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, then the correlation value returned will be 0
-        '
-        ' Returns correlation value (0 to 1)
-        ' If an error, returns -1
-        '
-        ' Note: If necessary, use the BinData function before calling this function to bin the data
+    ''' <summary>
+    ''' Finds the correlation value between the two lists of data
+    ''' The lists must have the same number of data points
+    ''' If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, the correlation value returned will be 0
+    ''' </summary>
+    ''' <param name="dataList1"></param>
+    ''' <param name="dataList2"></param>
+    ''' <param name="eCorrelationMethod"></param>
+    ''' <returns>Correlation value (0 to 1), or -1 if an error</returns>
+    ''' <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
+    Public Function Correlate(
+      dataList1 As IReadOnlyCollection(Of Single),
+      dataList2 As IReadOnlyCollection(Of Single),
+      eCorrelationMethod As cmCorrelationMethodConstants) As Single
 
         Dim index As Integer
         Dim dataCount As Integer
@@ -342,8 +350,8 @@ Public Class clsCorrelation
         Dim DiffInRanks As Single, ZD As Single, RS As Single, ProbRS As Single
         Dim KendallsTau As Single, Z As Single
 
-        ''        Dim dataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
-        ''        Dim dataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
+        ''  Dim dataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
+        ''  Dim dataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
 
         Try
 
@@ -351,8 +359,8 @@ Public Class clsCorrelation
             RS = 0
             KendallsTau = 0
 
-            dataCount = dataList1.Length
-            If dataList2.Length <> dataList1.Length Then
+            dataCount = dataList1.Count
+            If dataList2.Count <> dataList1.Count Then
                 Return -1
             End If
 
@@ -368,7 +376,6 @@ Public Class clsCorrelation
                 If dataList2(index) > 0 Then nonZeroDataCount += 1
             Next
             If nonZeroDataCount < MIN_NON_ZERO_ION_COUNT Then Return 0
-
 
             Select Case eCorrelationMethod
                 Case cmCorrelationMethodConstants.Pearson
@@ -392,7 +399,7 @@ Public Class clsCorrelation
     End Function
 
     Private Sub CorrelatePearson(
-      dataList1 As IList(Of Single), dataList2 As IList(Of Single),
+      dataList1 As IReadOnlyCollection(Of Single), dataList2 As IReadOnlyCollection(Of Single),
       <Out> ByRef RValue As Single,
       <Out> ByRef ProbOfSignificance As Single,
       <Out> ByRef FishersZ As Single)
@@ -425,8 +432,7 @@ Public Class clsCorrelation
 
         n = dataList1.Count
         If n <> dataList2.Count Then
-            Throw New Exception("dataList1 and dataList2 must be arrays of the same length")
-            n = 0
+            Throw New Exception("dataList1 and dataList2 must be lists of the same length")
         End If
         If n <= 0 Then Exit Sub
 
@@ -461,8 +467,8 @@ Public Class clsCorrelation
     End Sub
 
     Private Sub CorrelateKendall(
-      dataList1 As IList(Of Single),
-      dataList2 As IList(Of Single),
+      dataList1 As IReadOnlyCollection(Of Single),
+      dataList2 As IReadOnlyCollection(Of Single),
       <Out> ByRef KendallsTau As Single,
       <Out> ByRef Z As Single,
       <Out> ByRef ProbOfSignificance As Single)
@@ -491,8 +497,7 @@ Public Class clsCorrelation
 
         n = dataList1.Count
         If n <> dataList2.Count Then
-            Throw New Exception("dataList1 and dataList2 must be arrays of the same length")
-            n = 0
+            Throw New Exception("dataList1 and dataList2 must be lists of the same length")
         End If
         If n <= 0 Then Exit Sub
 
@@ -525,8 +530,8 @@ Public Class clsCorrelation
     End Sub
 
     Private Sub CorrelateSpearman(
-      dataList1() As Single,
-      dataList2() As Single,
+      dataList1 As IReadOnlyCollection(Of Single),
+      dataList2 As IReadOnlyCollection(Of Single),
       <Out> ByRef DiffInRanks As Single,
       <Out> ByRef ZD As Single,
       <Out> ByRef ProbOfSignificance As Single,
@@ -538,7 +543,7 @@ Public Class clsCorrelation
         '
         ' Code from Numerical Recipes in C
 
-        ' Note: dataList1 and dataList2 are re-ordered by this function; thus, they are passed ByVal
+        ' Note: data1 and data2 are re-ordered by this function; thus, they are passed ByVal
 
         ' Given two data arrays, data1[0..n-1] and data2[0..n-1], this routine returns their sum-squared
         ' difference of ranks as D, the number of standard deviations by which D deviates from its null hypothesis
@@ -560,24 +565,27 @@ Public Class clsCorrelation
         RS = 0
         ProbRS = 0
 
-        n = dataList1.Length
-        If n <> dataList2.Length Then
-            Throw New Exception("dataList1 and dataList2 must be arrays of the same length")
-            n = 0
+        n = dataList1.Count
+        If n <> dataList2.Count Then
+            Throw New Exception("dataList1a and dataList2a must be lists of the same length")
         End If
         If n <= 0 Then Exit Sub
 
-        ' Sort dataList1, sorting dataList2 parallel to it
-        Array.Sort(dataList1, dataList2)
-        CRank(n, dataList1, sf)
+        ' Populate arrays so that we can sort the data
+        Dim data1() As Single = dataList1.ToArray()
+        Dim data2() As Single = dataList2.ToArray()
 
-        ' Sort dataList2, sorting dataList1 parallel to it
-        Array.Sort(dataList2, dataList1)
-        CRank(n, dataList2, sg)
+        ' Sort data1, sorting data2 parallel to it
+        Array.Sort(data1, data2)
+        CRank(n, data1, sf)
+
+        ' Sort data2, sorting data1 parallel to it
+        Array.Sort(data2, data1)
+        CRank(n, data2, sg)
 
         DiffInRanksWork = 0.0
         For j = 0 To n - 1
-            DiffInRanksWork += SquareNum(dataList1(j) - dataList2(j))
+            DiffInRanksWork += SquareNum(data1(j) - data2(j))
         Next j
         DiffInRanks = CSng(DiffInRanksWork)
 
@@ -732,7 +740,7 @@ Public Class clsCorrelation
         '  actually gives the bin
         ' For example, given WorkingValue = 0.28 and BinSize = 0.1, Bin = CInt(Round(2.8,0)) = 3
         ' Or, given WorkingValue = 30.83 and BinSize = 0.1, Bin = CInt(Round(308.3,0)) = 308
-        ValueToBinNumber = CInt(Math.Round(WorkingValue / histogramBinSize, 0))
+        ValueToBinNumber = CInt(Math.Round(workingValue / histogramBinSize, 0))
 
     End Function
 

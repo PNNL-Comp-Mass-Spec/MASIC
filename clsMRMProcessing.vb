@@ -524,7 +524,7 @@ Public Class clsMRMProcessing
 
             Dim noiseStatsSegments = New List(Of clsBaselineNoiseStatsSegment)
 
-            For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+            For parentIonIndex = 0 To scanList.ParentIons.Count - 1
 
                 If scanList.ParentIons(parentIonIndex).MRMDaughterMZ <= 0 Then
                     Continue For
@@ -656,8 +656,8 @@ Public Class clsMRMProcessing
                 '---------------------------------------------------------
                 Try
 
-                    If scanList.ParentIonInfoCount > 1 Then
-                        UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
+                    If scanList.ParentIons.Count > 1 Then
+                        UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIons.Count - 1) * 100))
                     Else
                         UpdateProgress(0)
                     End If

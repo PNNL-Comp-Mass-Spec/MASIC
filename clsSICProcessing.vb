@@ -28,11 +28,11 @@ Public Class clsSICProcessing
 
         Dim includeParentIon As Boolean
 
-        Dim mzBinList = New List(Of clsMzBinInfo)(scanList.ParentIonInfoCount - 1)
+        Dim mzBinList = New List(Of clsMzBinInfo)(scanList.ParentIons.Count - 1)
 
         Dim sicOptions = masicOptions.SICOptions
 
-        For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+        For parentIonIndex = 0 To scanList.ParentIons.Count - 1
 
             If scanList.ParentIons(parentIonIndex).MRMDaughterMZ > 0 Then
                 includeParentIon = False
@@ -98,7 +98,7 @@ Public Class clsSICProcessing
         Dim parentIonIndex As Integer
         Dim parentIonsProcessed As Integer
 
-        If scanList.ParentIonInfoCount <= 0 Then
+        If scanList.ParentIons.Count <= 0 Then
             ' No parent ions
             If masicOptions.SuppressNoParentIonsError Then
                 Return True
@@ -144,7 +144,7 @@ Public Class clsSICProcessing
                 ' Now process the SIM scans (if any)
                 ' First, see if any SIMScans are present and determine the maximum SIM Index
                 simIndexMax = -1
-                For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+                For parentIonIndex = 0 To scanList.ParentIons.Count - 1
                     With scanList.SurveyScans(scanList.ParentIons(parentIonIndex).SurveyScanIndex)
                         If .SIMScan Then
                             If .SIMIndex > simIndexMax Then
@@ -955,8 +955,8 @@ Public Class clsSICProcessing
             '---------------------------------------------------------
             Try
 
-                If scanList.ParentIonInfoCount > 1 Then
-                    UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
+                If scanList.ParentIons.Count > 1 Then
+                    UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIons.Count - 1) * 100))
                 Else
                     UpdateProgress(0)
                 End If

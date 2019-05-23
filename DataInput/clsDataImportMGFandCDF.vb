@@ -79,7 +79,7 @@ Namespace DataInput
                 End If
 
                 ' Reserve memory for all of the Survey Scan data
-                scanList.Initialize(msScanCount, 0)
+                scanList.Initialize()
 
                 UpdateProgress("Reading CDF/MGF data (" & msScanCount.ToString() & " scans)" & ControlChars.NewLine & Path.GetFileName(filePath))
                 ReportMessage("Reading CDF/MGF data; Total MS scan count: " & msScanCount.ToString())
@@ -220,7 +220,7 @@ Namespace DataInput
                 ' We loaded all of the survey scan data above
                 ' We can now initialize .MasterScanOrder()
                 Dim lastSurveyScanIndex = 0
-                scanList.MasterScanOrderCount = 0
+
                 scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex)
 
                 Dim surveyScansRecorded = New SortedSet(Of Integer) From {
@@ -430,11 +430,6 @@ Namespace DataInput
                     End If
                 Loop
 
-                ' Shrink the memory usage of the scanList arrays
-                ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
-                ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
-                ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
-
                 ' Make sure that MasterScanOrder really is sorted by scan number
                 ValidateMasterScanOrderSorting(scanList)
 
@@ -614,47 +609,48 @@ Namespace DataInput
             ' Validate that .MasterScanOrder() really is sorted by scan number
             ' Cannot use an IComparer because .MasterScanOrder points into other arrays
 
+            Dim masterScanNumbers() As Integer
             Dim masterScanOrderIndices() As Integer
-            Dim udtMasterScanOrderListCopy() As clsScanList.udtScanOrderPointerType
-            Dim masterScanTimeListCopy() As Single
 
-            Dim listWasSorted As Boolean
+            ReDim masterScanNumbers(scanList.MasterScanOrderCount - 1)
+            ReDim masterScanOrderIndices(scanList.MasterScanOrderCount - 1)
 
-            With scanList
+            For index = 0 To scanList.MasterScanOrderCount - 1
+                masterScanNumbers(index) = scanList.MasterScanNumList(index)
+                masterScanOrderIndices(index) = index
+            Next
 
-                ReDim masterScanOrderIndices(.MasterScanOrderCount - 1)
+            ' Sort masterScanNumbers ascending, sorting the scan order indices array in parallel
+            Array.Sort(masterScanNumbers, masterScanOrderIndices)
 
-                For index = 0 To .MasterScanOrderCount - 1
-                    masterScanOrderIndices(index) = index
-                Next
-
-                ' Sort .MasterScanNumList ascending, sorting the scan order indices array in parallel
-                Array.Sort(.MasterScanNumList, masterScanOrderIndices)
-
-                ' Check whether we need to re-populate the lists
-                listWasSorted = False
-                For index = 1 To .MasterScanOrderCount - 1
-                    If masterScanOrderIndices(index) < masterScanOrderIndices(index - 1) Then
-                        listWasSorted = True
-                    End If
-                Next
-
-                If listWasSorted Then
-                    ' Reorder .MasterScanOrder
-                    ReDim udtMasterScanOrderListCopy(.MasterScanOrder.Length - 1)
-                    ReDim masterScanTimeListCopy(.MasterScanOrder.Length - 1)
-
-                    Array.Copy(.MasterScanOrder, udtMasterScanOrderListCopy, .MasterScanOrderCount)
-                    Array.Copy(.MasterScanTimeList, masterScanTimeListCopy, .MasterScanOrderCount)
-
-                    For index = 0 To .MasterScanOrderCount - 1
-                        .MasterScanOrder(index) = udtMasterScanOrderListCopy(masterScanOrderIndices(index))
-                        .MasterScanTimeList(index) = masterScanTimeListCopy(masterScanOrderIndices(index))
-                    Next
+            ' Check whether we need to re-populate the lists
+            Dim needToSort = False
+            For index = 1 To scanList.MasterScanOrderCount - 1
+                If masterScanOrderIndices(index) < masterScanOrderIndices(index - 1) Then
+                    needToSort = True
+                    Exit For
                 End If
+            Next
 
+            If needToSort Then
+                ' Reorder .MasterScanOrder, .MasterScanNumList, and .MasterScanTimeList
 
-            End With
+                Dim udtMasterScanOrderListCopy() As clsScanList.udtScanOrderPointerType
+                Dim masterScanTimeListCopy() As Single
+
+                ReDim udtMasterScanOrderListCopy(scanList.MasterScanOrder.Count - 1)
+                ReDim masterScanTimeListCopy(scanList.MasterScanOrder.Count - 1)
+
+                Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount)
+                Array.Copy(scanList.MasterScanTimeList.ToArray(), masterScanTimeListCopy, scanList.MasterScanOrderCount)
+
+                For index = 0 To scanList.MasterScanOrderCount - 1
+                    scanList.MasterScanOrder(index) = udtMasterScanOrderListCopy(masterScanOrderIndices(index))
+                    scanList.MasterScanNumList(index) = masterScanNumbers(index)
+                    scanList.MasterScanTimeList(index) = masterScanTimeListCopy(masterScanOrderIndices(index))
+                Next
+            End If
+
         End Sub
 
     End Class

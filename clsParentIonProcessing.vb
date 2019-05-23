@@ -4,89 +4,6 @@ Imports System.Runtime.InteropServices
 Public Class clsParentIonProcessing
     Inherits clsMasicEventNotifier
 
-#Region "Structures"
-    Private Structure udtBinnedDataType
-        Public BinnedDataStartX As Single
-        Public BinSize As Single
-        Public BinCount As Integer
-
-        ''' <summary>
-        ''' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX
-        ''' </summary>
-        Public BinnedIntensities() As Single
-
-        ''' <summary>
-        ''' 0-based array, ranging from 0 to BinCount-1; First bin starts at BinnedDataStartX + BinSize/2
-        ''' </summary>
-        Public BinnedIntensitiesOffset() As Single
-
-        Public Overrides Function ToString() As String
-            Return "BinCount: " & BinCount & ", BinSize: " & BinSize.ToString("0.0") & ", StartX: " & BinnedDataStartX.ToString("0.0")
-        End Function
-    End Structure
-
-    Friend Structure udtFindSimilarIonsDataType
-        Public MZPointerArray() As Integer
-        Public IonInUseCount As Integer
-        Public IonUsed() As Boolean
-        Public UniqueMZListCount As Integer
-        Public UniqueMZList() As udtUniqueMZListType
-
-        Public Overrides Function ToString() As String
-            Return "IonInUseCount: " & IonInUseCount
-        End Function
-    End Structure
-
-    Friend Structure udtUniqueMZListType
-        ''' <summary>
-        ''' Average m/z
-        ''' </summary>
-        Public MZAvg As Double
-
-        ''' <summary>
-        ''' Highest intensity value of the similar parent ions
-        ''' </summary>
-        Public MaxIntensity As Double
-
-        ''' <summary>
-        ''' Largest peak intensity value of the similar parent ions
-        ''' </summary>
-        Public MaxPeakArea As Double
-
-        ''' <summary>
-        ''' Scan number of the parent ion with the highest intensity
-        ''' </summary>
-        Public ScanNumberMaxIntensity As Integer
-
-        ''' <summary>
-        ''' Elution time of the parent ion with the highest intensity
-        ''' </summary>
-        Public ScanTimeMaxIntensity As Single
-
-        ''' <summary>
-        ''' Pointer to an entry in .ParentIons()
-        ''' </summary>
-        Public ParentIonIndexMaxIntensity As Integer
-
-        ''' <summary>
-        ''' Pointer to an entry in .ParentIons()
-        ''' </summary>
-        Public ParentIonIndexMaxPeakArea As Integer
-
-        Public MatchCount As Integer
-
-        ''' <summary>
-        ''' Pointer to an entry in .ParentIons()
-        ''' </summary>
-        Public MatchIndices() As Integer
-
-        Public Overrides Function ToString() As String
-            Return "m/z avg: " & MZAvg & ", MatchCount: " & MatchCount
-        End Function
-    End Structure
-
-#End Region
-
 #Region "Classwide Variables"
     Private ReadOnly mReporterIons As clsReporterIons
 #End Region
@@ -191,7 +108,7 @@ Public Class clsParentIonProcessing
 
             Dim parentIonToleranceDa = GetParentIonToleranceDa(sicOptions, parentIonMZ, parentIonTolerance)
 
-            For parentIonIndex = scanList.ParentIonInfoCount - 1 To 0 Step -1
+            For parentIonIndex = scanList.ParentIons.Count - 1 To 0 Step -1
                 If scanList.ParentIons(parentIonIndex).SurveyScanIndex >= surveyScanIndex Then
                     If Math.Abs(scanList.ParentIons(parentIonIndex).MZ - parentIonMZ) <= parentIonToleranceDa Then
                         If mrmDaughterMZ < Double.Epsilon OrElse
@@ -211,54 +128,39 @@ Public Class clsParentIonProcessing
             ' Add a new parent ion entry to .ParentIons(), but only if surveyScanIndex >= 0
 
             If surveyScanIndex >= 0 Then
-                With scanList
-                    If .ParentIonInfoCount >= .ParentIons.Length Then
-                        ReDim Preserve .ParentIons(.ParentIonInfoCount + 100)
-                        For index = .ParentIonInfoCount To .ParentIons.Length - 1
-                            .ParentIons(index) = New clsParentIonInfo(0)
-                        Next
+
+                Dim newParentIon = New clsParentIonInfo(parentIonMZ) With {
+                    .SurveyScanIndex = surveyScanIndex,
+                    .CustomSICPeak = False,
+                    .MRMDaughterMZ = mrmDaughterMZ,
+                    .MRMToleranceHalfWidth = mrmToleranceHalfWidth
+                }
+
+                newParentIon.FragScanIndices.Add(fragScanIndex)
+
+                newParentIon.OptimalPeakApexScanNumber = scanList.SurveyScans(surveyScanIndex).ScanNumber        ' Was: .FragScans(fragScanIndex).ScanNumber
+                newParentIon.PeakApexOverrideParentIonIndex = -1
+                scanList.FragScans(fragScanIndex).FragScanInfo.ParentIonInfoIndex = scanList.ParentIons.Count
+
+                ' Look for .MZ in the survey scan, using a tolerance of parentIonTolerance
+                ' If found, then update the mass to the matched ion
+                ' This is done to determine the parent ion mass more precisely
+                If sicOptions.RefineReportedParentIonMZ Then
+                    If FindClosestMZ(spectraCache, scanList.SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, parentIonMZMatch) Then
+                        newParentIon.UpdateMz(parentIonMZMatch)
                     End If
+                End If
 
-                    With .ParentIons(.ParentIonInfoCount)
-                        .UpdateMz(parentIonMZ)
+                scanList.ParentIons.Add(newParentIon)
 
-                        .SurveyScanIndex = surveyScanIndex
-
-                        .FragScanIndices.Add(fragScanIndex)
-
-                        .CustomSICPeak = False
-
-                        .MRMDaughterMZ = mrmDaughterMZ
-                        .MRMToleranceHalfWidth = mrmToleranceHalfWidth
-                    End With
-
-                    .ParentIons(.ParentIonInfoCount).OptimalPeakApexScanNumber = .SurveyScans(surveyScanIndex).ScanNumber        ' Was: .FragScans(fragScanIndex).ScanNumber
-                    .ParentIons(.ParentIonInfoCount).PeakApexOverrideParentIonIndex = -1
-                    .FragScans(fragScanIndex).FragScanInfo.ParentIonInfoIndex = .ParentIonInfoCount
-
-                    ' Look for .MZ in the survey scan, using a tolerance of parentIonTolerance
-                    ' If found, then update the mass to the matched ion
-                    ' This is done to determine the parent ion mass more precisely
-                    If sicOptions.RefineReportedParentIonMZ Then
-                        If FindClosestMZ(objSpectraCache, .SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, parentIonMZMatch) Then
-                            .ParentIons(.ParentIonInfoCount).UpdateMz(parentIonMZMatch)
-                        End If
-                    End If
-
-                    .ParentIonInfoCount += 1
-                End With
             End If
         Else
             ' Add a new entry to .FragScanIndices() for the matching parent ion
             ' However, do not add a new entry if this is an MRM scan
 
             If mrmDaughterMZ < Double.Epsilon Then
-                With scanList
-                    With .ParentIons(parentIonIndex)
-                        .FragScanIndices.Add(fragScanIndex)
-                    End With
-                    .FragScans(fragScanIndex).FragScanInfo.ParentIonInfoIndex = parentIonIndex
-                End With
+                scanList.ParentIons(parentIonIndex).FragScanIndices.Add(fragScanIndex)
+                scanList.FragScans(fragScanIndex).FragScanInfo.ParentIonInfoIndex = parentIonIndex
             End If
         End If
 
@@ -267,41 +169,35 @@ Public Class clsParentIonProcessing
     Private Sub AppendParentIonToUniqueMZEntry(
       scanList As clsScanList,
       parentIonIndex As Integer,
-      ByRef udtMZListEntry As udtUniqueMZListType,
+      mzListEntry As clsUniqueMZListItem,
       searchMZOffset As Double)
 
         With scanList.ParentIons(parentIonIndex)
-            If udtMZListEntry.MatchCount = 0 Then
-                udtMZListEntry.MZAvg = .MZ - searchMZOffset
-                udtMZListEntry.MatchCount = 1
-
-                ' Note that .MatchIndices() was initialized in InitializeUniqueMZListMatchIndices()
-                udtMZListEntry.MatchIndices(0) = parentIonIndex
+            If mzListEntry.MatchCount = 0 Then
+                mzListEntry.MZAvg = .MZ - searchMZOffset
+                mzListEntry.MatchIndices.Add(parentIonIndex)
             Else
                 ' Update the average MZ: NewAvg = (OldAvg * OldCount + NewValue) / NewCount
-                udtMZListEntry.MZAvg = (udtMZListEntry.MZAvg * udtMZListEntry.MatchCount + (.MZ - searchMZOffset)) / (udtMZListEntry.MatchCount + 1)
-
-                ReDim Preserve udtMZListEntry.MatchIndices(udtMZListEntry.MatchCount)
-                udtMZListEntry.MatchIndices(udtMZListEntry.MatchCount) = parentIonIndex
-                udtMZListEntry.MatchCount += 1
+                mzListEntry.MZAvg = (mzListEntry.MZAvg * mzListEntry.MatchCount + (.MZ - searchMZOffset)) / (mzListEntry.MatchCount + 1)
+                mzListEntry.MatchIndices.Add(parentIonIndex)
             End If
 
             With .SICStats
-                If .Peak.MaxIntensityValue > udtMZListEntry.MaxIntensity OrElse udtMZListEntry.MatchCount = 1 Then
-                    udtMZListEntry.MaxIntensity = .Peak.MaxIntensityValue
+                If .Peak.MaxIntensityValue > mzListEntry.MaxIntensity OrElse mzListEntry.MatchCount = 1 Then
+                    mzListEntry.MaxIntensity = .Peak.MaxIntensityValue
                     If .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
-                        udtMZListEntry.ScanNumberMaxIntensity = scanList.FragScans(.PeakScanIndexMax).ScanNumber
-                        udtMZListEntry.ScanTimeMaxIntensity = scanList.FragScans(.PeakScanIndexMax).ScanTime
+                        mzListEntry.ScanNumberMaxIntensity = scanList.FragScans(.PeakScanIndexMax).ScanNumber
+                        mzListEntry.ScanTimeMaxIntensity = scanList.FragScans(.PeakScanIndexMax).ScanTime
                     Else
-                        udtMZListEntry.ScanNumberMaxIntensity = scanList.SurveyScans(.PeakScanIndexMax).ScanNumber
-                        udtMZListEntry.ScanTimeMaxIntensity = scanList.SurveyScans(.PeakScanIndexMax).ScanTime
+                        mzListEntry.ScanNumberMaxIntensity = scanList.SurveyScans(.PeakScanIndexMax).ScanNumber
+                        mzListEntry.ScanTimeMaxIntensity = scanList.SurveyScans(.PeakScanIndexMax).ScanTime
                     End If
-                    udtMZListEntry.ParentIonIndexMaxIntensity = parentIonIndex
+                    mzListEntry.ParentIonIndexMaxIntensity = parentIonIndex
                 End If
 
-                If .Peak.Area > udtMZListEntry.MaxPeakArea OrElse udtMZListEntry.MatchCount = 1 Then
-                    udtMZListEntry.MaxPeakArea = .Peak.Area
-                    udtMZListEntry.ParentIonIndexMaxPeakArea = parentIonIndex
+                If .Peak.Area > mzListEntry.MaxPeakArea OrElse mzListEntry.MatchCount = 1 Then
+                    mzListEntry.MaxPeakArea = .Peak.Area
+                    mzListEntry.ParentIonIndexMaxPeakArea = parentIonIndex
                 End If
             End With
 
@@ -394,8 +290,8 @@ Public Class clsParentIonProcessing
         '
         ' If an error, returns -1
 
-        Dim udtBinnedSpectrum1 = New udtBinnedDataType
-        Dim udtBinnedSpectrum2 = New udtBinnedDataType
+        Dim binnedSpectrum1 = New clsBinnedData()
+        Dim binnedSpectrum2 = New clsBinnedData()
 
         Dim success As Boolean
 
@@ -407,22 +303,22 @@ Public Class clsParentIonProcessing
             Const eCorrelationMethod = clsCorrelation.cmCorrelationMethodConstants.Pearson
 
             ' Bin the data in the first spectrum
-            success = CompareSpectraBinData(objCorrelate, fragSpectrum1, udtBinnedSpectrum1)
+            success = CompareSpectraBinData(objCorrelate, fragSpectrum1, binnedSpectrum1)
             If Not success Then Return -1
 
             ' Bin the data in the second spectrum
-            success = CompareSpectraBinData(objCorrelate, fragSpectrum2, udtBinnedSpectrum2)
+            success = CompareSpectraBinData(objCorrelate, fragSpectrum2, binnedSpectrum2)
             If Not success Then Return -1
 
             ' Now compare the binned spectra
             ' Similarity will be 0 if either instance of BinnedIntensities has fewer than 5 data points
-            Dim similarity1 = objCorrelate.Correlate(udtBinnedSpectrum1.BinnedIntensities, udtBinnedSpectrum2.BinnedIntensities, eCorrelationMethod)
+            Dim similarity1 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensities, binnedSpectrum2.BinnedIntensities, eCorrelationMethod)
 
             If Not considerOffsetBinnedData Then
                 Return similarity1
             End If
 
-            Dim similarity2 = objCorrelate.Correlate(udtBinnedSpectrum1.BinnedIntensitiesOffset, udtBinnedSpectrum2.BinnedIntensitiesOffset, eCorrelationMethod)
+            Dim similarity2 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensitiesOffset, binnedSpectrum2.BinnedIntensitiesOffset, eCorrelationMethod)
             Return Math.Max(similarity1, similarity2)
 
         Catch ex As Exception
@@ -435,43 +331,28 @@ Public Class clsParentIonProcessing
     Private Function CompareSpectraBinData(
       objCorrelate As clsCorrelation,
       fragSpectrum As clsMSSpectrum,
-      ByRef udtBinnedSpectrum As udtBinnedDataType) As Boolean
+      binnedSpectrum As clsBinnedData) As Boolean
 
         Dim index As Integer
-        Dim xData As Single()
-        Dim yData As Single()
+        Dim xData = New List(Of Single)
+        Dim yData = New List(Of Single)
 
         ' Make a copy of the data, excluding any Reporter Ion data
-        Dim filteredDataCount = 0
-        ReDim xData(fragSpectrum.IonCount - 1)
-        ReDim yData(fragSpectrum.IonCount - 1)
 
         For index = 0 To fragSpectrum.IonCount - 1
             If Not clsUtilities.CheckPointInMZIgnoreRange(fragSpectrum.IonsMZ(index),
                                                           mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                                           mReporterIons.MZIntensityFilterIgnoreRangeEnd) Then
-                xData(filteredDataCount) = CSng(fragSpectrum.IonsMZ(index))
-                yData(filteredDataCount) = CSng(fragSpectrum.IonsIntensity(index))
-                filteredDataCount += 1
+                xData.Add(CSng(fragSpectrum.IonsMZ(index)))
+                yData.Add(CSng(fragSpectrum.IonsIntensity(index)))
             End If
         Next
 
-        If filteredDataCount > 0 Then
-            ReDim Preserve xData(filteredDataCount - 1)
-            ReDim Preserve yData(filteredDataCount - 1)
-        Else
-            ReDim Preserve xData(0)
-            ReDim Preserve yData(0)
-        End If
-
-        udtBinnedSpectrum.BinnedDataStartX = objCorrelate.BinStartX
-        udtBinnedSpectrum.BinSize = objCorrelate.BinSize
-
-        udtBinnedSpectrum.BinnedIntensities = Nothing
-        udtBinnedSpectrum.BinnedIntensitiesOffset = Nothing
+        binnedSpectrum.BinnedDataStartX = objCorrelate.BinStartX
+        binnedSpectrum.BinSize = objCorrelate.BinSize
 
         ' Note that the data in xData and yData should have already been filtered to discard data points below the noise threshold intensity
-        Dim success = objCorrelate.BinData(xData, yData, udtBinnedSpectrum.BinnedIntensities, udtBinnedSpectrum.BinnedIntensitiesOffset, udtBinnedSpectrum.BinCount)
+        Dim success = objCorrelate.BinData(xData, yData, binnedSpectrum.BinnedIntensities, binnedSpectrum.BinnedIntensitiesOffset)
 
         Return success
 
@@ -571,7 +452,7 @@ Public Class clsParentIonProcessing
         Try
             ionUpdateCount = 0
 
-            If scanList.ParentIonInfoCount <= 0 Then
+            If scanList.ParentIons.Count <= 0 Then
                 If masicOptions.SuppressNoParentIonsError Then
                     Return True
                 Else
@@ -584,26 +465,26 @@ Public Class clsParentIonProcessing
             UpdateProgress(0, "Finding similar parent ions")
 
             Dim findSimilarIonsDataCount As Integer
-            Dim udtFindSimilarIonsData As udtFindSimilarIonsDataType
+            Dim similarParentIonsData = New clsSimilarParentIonsData(scanList.ParentIons.Count)
+
+            similarParentIonsData.UniqueMZList.Clear()
 
             ' Original m/z values, rounded to 2 decimal places
             Dim mzList() As Double
             Dim intensityPointerArray() As Integer
             Dim intensityList() As Double
 
-            ' Populate udtFindSimilarIonsData.MZPointerArray and mzList, plus intensityPointerArray and intensityList()
-            ReDim udtFindSimilarIonsData.MZPointerArray(scanList.ParentIonInfoCount - 1)
-            ReDim udtFindSimilarIonsData.IonUsed(scanList.ParentIonInfoCount - 1)
+            ' Initialize the arrays
 
-            ReDim mzList(scanList.ParentIonInfoCount - 1)
-            ReDim intensityPointerArray(scanList.ParentIonInfoCount - 1)
-            ReDim intensityList(scanList.ParentIonInfoCount - 1)
+            ReDim mzList(scanList.ParentIons.Count - 1)
+            ReDim intensityPointerArray(scanList.ParentIons.Count - 1)
+            ReDim intensityList(scanList.ParentIons.Count - 1)
 
             Dim parentIonIndex As Integer
             Dim ionInUseCountOriginal As Integer
 
             findSimilarIonsDataCount = 0
-            For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+            For parentIonIndex = 0 To scanList.ParentIons.Count - 1
 
                 Dim includeParentIon As Boolean
 
@@ -618,7 +499,7 @@ Public Class clsParentIonProcessing
                 End If
 
                 If includeParentIon Then
-                    udtFindSimilarIonsData.MZPointerArray(findSimilarIonsDataCount) = parentIonIndex
+                    similarParentIonsData.MZPointerArray(findSimilarIonsDataCount) = parentIonIndex
                     mzList(findSimilarIonsDataCount) = Math.Round(scanList.ParentIons(parentIonIndex).MZ, 2)
 
                     intensityPointerArray(findSimilarIonsDataCount) = parentIonIndex
@@ -627,8 +508,8 @@ Public Class clsParentIonProcessing
                 End If
             Next
 
-            If udtFindSimilarIonsData.MZPointerArray.Length <> findSimilarIonsDataCount AndAlso findSimilarIonsDataCount > 0 Then
-                ReDim Preserve udtFindSimilarIonsData.MZPointerArray(findSimilarIonsDataCount - 1)
+            If similarParentIonsData.MZPointerArray.Length <> findSimilarIonsDataCount AndAlso findSimilarIonsDataCount > 0 Then
+                ReDim Preserve similarParentIonsData.MZPointerArray(findSimilarIonsDataCount - 1)
                 ReDim Preserve mzList(findSimilarIonsDataCount - 1)
                 ReDim Preserve intensityPointerArray(findSimilarIonsDataCount - 1)
                 ReDim Preserve intensityList(findSimilarIonsDataCount - 1)
@@ -649,7 +530,7 @@ Public Class clsParentIonProcessing
             ReportMessage("FindSimilarParentIons: Sorting the mz arrays")
 
             ' Sort the MZ arrays
-            Array.Sort(mzList, udtFindSimilarIonsData.MZPointerArray)
+            Array.Sort(mzList, similarParentIonsData.MZPointerArray)
 
             ReportMessage("FindSimilarParentIons: Populate objSearchRange")
 
@@ -673,15 +554,6 @@ Public Class clsParentIonProcessing
             Array.Reverse(intensityPointerArray)
             Array.Reverse(intensityList)
 
-
-            ' Initialize udtUniqueMZList
-            ' Pre-reserve enough space for findSimilarIonsDataCount entries to avoid repeated use of Redim Preserve
-            udtFindSimilarIonsData.UniqueMZListCount = 0
-            ReDim udtFindSimilarIonsData.UniqueMZList(findSimilarIonsDataCount - 1)
-
-            ' Initialize the .UniqueMZList().MatchIndices() arrays
-            InitializeUniqueMZListMatchIndices(udtFindSimilarIonsData.UniqueMZList, 0, findSimilarIonsDataCount - 1)
-
             ReportMessage("FindSimilarParentIons: Look for similar parent ions by using m/z and scan")
             Dim lastLogTime = DateTime.UtcNow
 
@@ -690,30 +562,23 @@ Public Class clsParentIonProcessing
             parentIonIndex = 0
             Do
                 Dim originalIndex = intensityPointerArray(parentIonIndex)
-                If udtFindSimilarIonsData.IonUsed(originalIndex) Then
+                If similarParentIonsData.IonUsed(originalIndex) Then
                     ' Parent ion was already used; move onto the next one
                     parentIonIndex += 1
                 Else
-                    With udtFindSimilarIonsData
-                        If .UniqueMZListCount >= udtFindSimilarIonsData.UniqueMZList.Length Then
-                            ReDim Preserve .UniqueMZList(.UniqueMZListCount + 100)
+                    Dim mzListEntry = New clsUniqueMZListItem()
+                    similarParentIonsData.UniqueMZList.Add(mzListEntry)
 
-                            ' Initialize the .UniqueMZList().MatchIndices() arrays
-                            InitializeUniqueMZListMatchIndices(udtFindSimilarIonsData.UniqueMZList, .UniqueMZListCount, .UniqueMZList.Length - 1)
+                    AppendParentIonToUniqueMZEntry(scanList, originalIndex, mzListEntry, 0)
 
-                        End If
-                        AppendParentIonToUniqueMZEntry(scanList, originalIndex, .UniqueMZList(.UniqueMZListCount), 0)
-                        .UniqueMZListCount += 1
-
-                        .IonUsed(originalIndex) = True
-                        .IonInUseCount = 1
-                    End With
+                    similarParentIonsData.IonUsed(originalIndex) = True
+                    similarParentIonsData.IonInUseCount = 1
 
                     ' Look for other parent ions with m/z values in tolerance (must be within mass tolerance and scan tolerance)
                     ' If new values are added, then repeat the search using the updated udtUniqueMZList().MZAvg value
                     Do
-                        ionInUseCountOriginal = udtFindSimilarIonsData.IonInUseCount
-                        Dim currentMZ = udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).MZAvg
+                        ionInUseCountOriginal = similarParentIonsData.IonInUseCount
+                        Dim currentMZ = mzListEntry.MZAvg
 
                         If currentMZ <= 0 Then Continue Do
 
@@ -761,7 +626,7 @@ Public Class clsParentIonProcessing
                         End If
 
 
-                    Loop While udtFindSimilarIonsData.IonInUseCount > ionInUseCountOriginal
+                    Loop While similarParentIonsData.IonInUseCount > ionInUseCountOriginal
 
                     parentIonIndex += 1
                 End If
@@ -792,27 +657,23 @@ Public Class clsParentIonProcessing
 
             Console.WriteLine()
 
-            ' Shrink the .UniqueMZList array to the appropriate length
-            ReDim Preserve udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1)
-
             ReportMessage("FindSimilarParentIons: Update the scan numbers for the unique ions")
 
             ' Update the optimal peak apex scan numbers for the unique ions
             ionUpdateCount = 0
-            For uniqueMZIndex = 0 To udtFindSimilarIonsData.UniqueMZListCount - 1
-                With udtFindSimilarIonsData.UniqueMZList(uniqueMZIndex)
-                    For matchIndex = 0 To .MatchCount - 1
-                        parentIonIndex = .MatchIndices(matchIndex)
+            For Each uniqueMzListItem In similarParentIonsData.UniqueMZList
 
-                        If scanList.ParentIons(parentIonIndex).MZ > 0 Then
-                            If scanList.ParentIons(parentIonIndex).OptimalPeakApexScanNumber <> .ScanNumberMaxIntensity Then
-                                ionUpdateCount += 1
-                                scanList.ParentIons(parentIonIndex).OptimalPeakApexScanNumber = .ScanNumberMaxIntensity
-                                scanList.ParentIons(parentIonIndex).PeakApexOverrideParentIonIndex = .ParentIonIndexMaxIntensity
-                            End If
+                For matchIndex = 0 To uniqueMzListItem.MatchCount - 1
+                    parentIonIndex = uniqueMzListItem.MatchIndices(matchIndex)
+
+                    If scanList.ParentIons(parentIonIndex).MZ > 0 Then
+                        If scanList.ParentIons(parentIonIndex).OptimalPeakApexScanNumber <> uniqueMzListItem.ScanNumberMaxIntensity Then
+                            ionUpdateCount += 1
+                            scanList.ParentIons(parentIonIndex).OptimalPeakApexScanNumber = uniqueMzListItem.ScanNumberMaxIntensity
+                            scanList.ParentIons(parentIonIndex).PeakApexOverrideParentIonIndex = uniqueMzListItem.ParentIonIndexMaxIntensity
                         End If
-                    Next
-                End With
+                    End If
+                Next
             Next
 
             success = True
@@ -831,7 +692,7 @@ Public Class clsParentIonProcessing
       searchMZOffset As Double,
       originalIndex As Integer,
       scanList As clsScanList,
-      ByRef udtFindSimilarIonsData As udtFindSimilarIonsDataType,
+      similarParentIonsData As clsSimilarParentIonsData,
       masicOptions As clsMASICOptions,
       dataImportUtilities As DataInput.clsDataImport,
       objSearchRange As clsSearchRange)
@@ -846,48 +707,48 @@ Public Class clsParentIonProcessing
 
             For matchIndex = indexFirst To indexLast
                 ' See if the matches are unused and within the scan tolerance
-                Dim matchOriginalIndex = udtFindSimilarIonsData.MZPointerArray(matchIndex)
+                Dim matchOriginalIndex = similarParentIonsData.MZPointerArray(matchIndex)
 
-                If udtFindSimilarIonsData.IonUsed(matchOriginalIndex) Then Continue For
+                If similarParentIonsData.IonUsed(matchOriginalIndex) Then Continue For
 
                 Dim timeDiff As Single
 
-                With scanList.ParentIons(matchOriginalIndex)
+                Dim uniqueMzListItem = similarParentIonsData.UniqueMZList.Last
+                Dim sicStats = scanList.ParentIons(matchOriginalIndex).SICStats
 
-                    If .SICStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
-                        If scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
-                           udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
-                            ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                            timeDiff = CSng(Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
-                        Else
-                            timeDiff = Math.Abs(scanList.FragScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
-                        End If
+                If sicStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
+                    If scanList.FragScans(sicStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
+                       uniqueMzListItem.ScanTimeMaxIntensity < Single.Epsilon Then
+                        ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
+                        timeDiff = CSng(Math.Abs(scanList.FragScans(sicStats.PeakScanIndexMax).ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0)
                     Else
-                        If scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
-                           udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity < Single.Epsilon Then
-                            ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                            timeDiff = CSng(Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanNumber - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanNumberMaxIntensity) / 60.0)
-                        Else
-                            timeDiff = Math.Abs(scanList.SurveyScans(.SICStats.PeakScanIndexMax).ScanTime - udtFindSimilarIonsData.UniqueMZList(udtFindSimilarIonsData.UniqueMZListCount - 1).ScanTimeMaxIntensity)
-                        End If
+                        timeDiff = Math.Abs(scanList.FragScans(sicStats.PeakScanIndexMax).ScanTime - uniqueMzListItem.ScanTimeMaxIntensity)
                     End If
-
-                    If timeDiff <= sicOptions.SimilarIonToleranceHalfWidthMinutes Then
-                        ' Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
-
-                        Dim similarityScore = CompareFragSpectraForParentIons(scanList, objSpectraCache, originalIndex, matchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities)
-
-                        If similarityScore > sicOptions.SpectrumSimilarityMinimum Then
-                            ' Yes, the spectra are similar
-                            ' Add this parent ion to udtUniqueMZList(uniqueMZListCount - 1)
-                            With udtFindSimilarIonsData
-                                AppendParentIonToUniqueMZEntry(scanList, matchOriginalIndex, .UniqueMZList(.UniqueMZListCount - 1), searchMZOffset)
-                            End With
-                            udtFindSimilarIonsData.IonUsed(matchOriginalIndex) = True
-                            udtFindSimilarIonsData.IonInUseCount += 1
-                        End If
+                Else
+                    If scanList.SurveyScans(sicStats.PeakScanIndexMax).ScanTime < Single.Epsilon AndAlso
+                       uniqueMzListItem.ScanTimeMaxIntensity < Single.Epsilon Then
+                        ' Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
+                        timeDiff = CSng(Math.Abs(scanList.SurveyScans(sicStats.PeakScanIndexMax).ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0)
+                    Else
+                        timeDiff = Math.Abs(scanList.SurveyScans(sicStats.PeakScanIndexMax).ScanTime - uniqueMzListItem.ScanTimeMaxIntensity)
                     End If
-                End With
+                End If
+
+                If timeDiff <= sicOptions.SimilarIonToleranceHalfWidthMinutes Then
+                    ' Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
+
+                    Dim similarityScore = CompareFragSpectraForParentIons(scanList, spectraCache, originalIndex, matchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities)
+
+                    If similarityScore > sicOptions.SpectrumSimilarityMinimum Then
+                        ' Yes, the spectra are similar
+                        ' Add this parent ion to uniqueMzListItem
+                        AppendParentIonToUniqueMZEntry(scanList, matchOriginalIndex, uniqueMzListItem, searchMZOffset)
+
+                        similarParentIonsData.IonUsed(matchOriginalIndex) = True
+                        similarParentIonsData.IonInUseCount += 1
+                    End If
+                End If
+
 
             Next
         End If
@@ -905,19 +766,5 @@ Public Class clsParentIonProcessing
             Return parentIonTolerance
         End If
     End Function
-
-    Private Sub InitializeUniqueMZListMatchIndices(
-      ByRef udtUniqueMZList() As udtUniqueMZListType,
-      startIndex As Integer,
-      endIndex As Integer)
-
-        Dim index As Integer
-
-        For index = startIndex To endIndex
-            ReDim udtUniqueMZList(index).MatchIndices(0)
-            udtUniqueMZList(index).MatchCount = 0
-        Next
-
-    End Sub
 
 End Class

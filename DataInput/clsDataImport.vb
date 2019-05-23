@@ -124,7 +124,7 @@ Namespace DataInput
         ''' <param name="chargeState"></param>
         ''' <returns>
         ''' Interference score: fraction of observed peaks that are from the precursor
-        ''' Larger is better, with a max of 1 And minimum of 0
+        ''' Larger is better, with a max of 1 and minimum of 0
         ''' 1 means all peaks are from the precursor
         ''' </returns>
         Protected Function ComputePrecursorInterference(
@@ -314,11 +314,6 @@ Namespace DataInput
         End Sub
 
         Protected Function FinalizeScanList(scanList As clsScanList, dataFile As FileSystemInfo) As Boolean
-
-            ' Shrink the memory usage of the scanList arrays
-            ReDim Preserve scanList.MasterScanOrder(scanList.MasterScanOrderCount - 1)
-            ReDim Preserve scanList.MasterScanNumList(scanList.MasterScanOrderCount - 1)
-            ReDim Preserve scanList.MasterScanTimeList(scanList.MasterScanOrderCount - 1)
 
             If scanList.MasterScanOrderCount <= 0 Then
                 ' No scans found

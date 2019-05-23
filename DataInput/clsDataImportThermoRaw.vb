@@ -193,7 +193,7 @@ Namespace DataInput
                 Dim scanStart = xcaliburAccessor.FileInfo.ScanStart
                 Dim scanEnd = xcaliburAccessor.FileInfo.ScanEnd
 
-                InitOptions(scanList, keepRawSpectra, keepMSMSSpectra, scanStart, scanEnd)
+                InitOptions(scanList, keepRawSpectra, keepMSMSSpectra)
 
                 UpdateProgress(String.Format("Reading Xcalibur data with {0} ({1:N0} scans){2}", ioMode, scanCount, ControlChars.NewLine & Path.GetFileName(filePath)))
                 ReportMessage(String.Format("Reading Xcalibur data with {0}; Total scan count: {1:N0}", ioMode, scanCount))
@@ -502,8 +502,9 @@ Namespace DataInput
             End If
 
             scanList.FragScans.Add(scanInfo)
+            Dim fragScanIndex = scanList.FragScans.Count - 1
 
-            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
+            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, fragScanIndex)
 
             ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             Dim msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
@@ -525,7 +526,7 @@ Namespace DataInput
             If thermoScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan
                 mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
-                                                        scanList.FragScans.Count - 1, spectraCache, sicOptions)
+                                                        fragScanIndex, spectraCache, sicOptions)
             Else
                 ' This is an MRM scan
                 mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, thermoScanInfo.ParentIonMZ,
@@ -545,22 +546,13 @@ Namespace DataInput
 
         Private Sub InitOptions(scanList As clsScanList,
                                 keepRawSpectra As Boolean,
-                                keepMSMSSpectra As Boolean,
-                                scanStart As Integer,
-                                scanEnd As Integer)
+                                keepMSMSSpectra As Boolean)
 
             If mOptions.SICOptions.ScanRangeStart > 0 AndAlso mOptions.SICOptions.ScanRangeEnd = 0 Then
                 mOptions.SICOptions.ScanRangeEnd = Integer.MaxValue
             End If
 
-            If mOptions.SICOptions.ScanRangeStart >= 0 AndAlso mOptions.SICOptions.ScanRangeEnd > mOptions.SICOptions.ScanRangeStart Then
-                scanStart = Math.Max(scanStart, mOptions.SICOptions.ScanRangeStart)
-                scanEnd = Math.Min(scanEnd, mOptions.SICOptions.ScanRangeEnd)
-            End If
-
-            ' Pre-reserve memory for the maximum number of scans that might be loaded
-            ' Re-dimming after loading each scan is extremely slow and uses additional memory
-            scanList.Initialize(scanEnd - scanStart + 1, scanEnd - scanStart + 1)
+            scanList.Initialize()
 
             mSIMScanMapping.Clear()
 

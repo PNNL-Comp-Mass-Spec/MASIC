@@ -1098,10 +1098,7 @@ Namespace DataInput
                                 keepRawSpectra As Boolean,
                                 keepMSMSSpectra As Boolean)
 
-            ' We won't know the total scan count until we have read all the data
-            ' Thus, initially reserve space for 1000 scans
-
-            scanList.Initialize(1000, 1000)
+            scanList.Initialize()
 
             InitBaseOptions(scanList, keepRawSpectra, keepMSMSSpectra)
 
@@ -1262,7 +1259,6 @@ Namespace DataInput
                 scanInfo.ZoomScan = zoomScan
 
                 Return
-
             End If
 
             scanInfo.ScanHeaderText = String.Empty

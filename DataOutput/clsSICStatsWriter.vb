@@ -121,7 +121,7 @@ Namespace DataOutput
                         writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
                     End If
 
-                    If scanList.SurveyScans.Count = 0 AndAlso scanList.ParentIonInfoCount = 0 Then
+                    If scanList.SurveyScans.Count = 0 AndAlso scanList.ParentIons.Count = 0 Then
                         ' Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
                         For fragScanIndex = 0 To scanList.FragScans.Count - 1
 
@@ -137,7 +137,7 @@ Namespace DataOutput
                         Next
                     Else
 
-                        For parentIonIndex = 0 To scanList.ParentIonInfoCount - 1
+                        For parentIonIndex = 0 To scanList.ParentIons.Count - 1
                             Dim includeParentIon As Boolean
 
                             If masicOptions.CustomSICList.LimitSearchToCustomMZList Then
@@ -168,9 +168,9 @@ Namespace DataOutput
                                 Next
                             End If
 
-                            If scanList.ParentIonInfoCount > 1 Then
+                            If scanList.ParentIons.Count > 1 Then
                                 If parentIonIndex Mod 100 = 0 Then
-                                    UpdateProgress(CShort(parentIonIndex / (scanList.ParentIonInfoCount - 1) * 100))
+                                    UpdateProgress(CShort(parentIonIndex / (scanList.ParentIons.Count - 1) * 100))
                                 End If
                             Else
                                 UpdateProgress(1)

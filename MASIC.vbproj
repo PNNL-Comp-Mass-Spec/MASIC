@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBinarySearch.vb" />
+    <Compile Include="clsBinnedData.vb" />
     <Compile Include="clsBinningOptions.vb" />
     <Compile Include="clsCorrelation.vb" />
     <Compile Include="clsCustomMZSearchSpec.vb" />
@@ -146,9 +147,12 @@
     <Compile Include="clsSICOptions.vb" />
     <Compile Include="clsSICProcessing.vb" />
     <Compile Include="clsSICStats.vb" />
+    <Compile Include="clsSimilarParentIonsData.vb" />
     <Compile Include="clsSpectraCache.vb" />
     <Compile Include="clsSpectrumCacheOptions.vb" />
+    <Compile Include="clsUniqueMZListItem.vb" />
     <Compile Include="clsUtilities.vb" />
+    <Compile Include="DataInput\Centroider.vb" />
     <Compile Include="DataInput\clsCustomSICListReader.vb" />
     <Compile Include="DataInput\clsDataImport.vb" />
     <Compile Include="DataInput\clsDataImportMGFandCDF.vb" />

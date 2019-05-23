@@ -683,9 +683,9 @@ Namespace DataOutput
                                         parentIonsProcessed += 1
 
                                         ' Update progress
-                                        If scanList.ParentIonInfoCount > 1 Then
+                                        If scanList.ParentIons.Count > 1 Then
                                             If parentIonsProcessed Mod 100 = 0 Then
-                                                UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIonInfoCount - 1) * 100))
+                                                UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIons.Count - 1) * 100))
                                             End If
                                         Else
                                             UpdateProgress(0)
@@ -703,11 +703,11 @@ Namespace DataOutput
                             writer.WriteLine(dataLine)
 
                         ElseIf dataLineLCase.StartsWith("<" & OPTIMAL_PEAK_APEX_TAG_NAME.ToLower) AndAlso parentIonIndex >= 0 Then
-                            If parentIonIndex < scanList.ParentIonInfoCount Then
+                            If parentIonIndex < scanList.ParentIons.Count Then
                                 XmlOutputFileReplaceSetting(writer, dataLine, OPTIMAL_PEAK_APEX_TAG_NAME, scanList.ParentIons(parentIonIndex).OptimalPeakApexScanNumber)
                             End If
                         ElseIf dataLineLCase.StartsWith("<" & PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME.ToLower) AndAlso parentIonIndex >= 0 Then
-                            If parentIonIndex < scanList.ParentIonInfoCount Then
+                            If parentIonIndex < scanList.ParentIons.Count Then
                                 XmlOutputFileReplaceSetting(writer, dataLine, PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME, scanList.ParentIons(parentIonIndex).PeakApexOverrideParentIonIndex)
                             End If
                         Else

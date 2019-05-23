@@ -83,8 +83,6 @@ Public Class clsCustomSICList
                 Exit Sub
             End If
 
-            ReDim Preserve scanList.ParentIons(scanList.ParentIonInfoCount + CustomMZSearchValues.Count - 1)
-
             Dim scanNumScanConverter = New clsScanNumScanTimeConversion()
             RegisterEvents(scanNumScanConverter)
 
@@ -166,10 +164,7 @@ Public Class clsCustomSICList
 
                 currentParentIon.PeakApexOverrideParentIonIndex = -1
 
-                scanList.ParentIons(scanList.ParentIonInfoCount) = currentParentIon
-
-                scanList.ParentIonInfoCount += 1
-
+                scanList.ParentIons.Add(currentParentIon)
 
             Next
 
