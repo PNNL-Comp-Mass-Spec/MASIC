@@ -1733,7 +1733,7 @@ Public Class frmBrowser
                 Debug.Assert(False, "This code should normally not be reached (frmBrowser->InterpolateY)")
             Else
                 deltaX = X2 - X1
-                fraction = (targetX - X1) / CSng(deltaX)
+                fraction = (targetX - X1) / CDbl(deltaX)
                 deltaY = Y2 - Y1
 
                 targetY = fraction * deltaY + Y1
@@ -2186,9 +2186,9 @@ Public Class frmBrowser
                 xRangeHalfWidth = 0
             End If
 
-            Dim yRange As Single
+            Dim yRange As Double
             If DataUtils.StringToValueUtils.IsNumber(txtFixYRange.Text) Then
-                yRange = CSng(txtFixYRange.Text)
+                yRange = CDbl(txtFixYRange.Text)
             Else
                 yRange = 0
             End If
@@ -2212,7 +2212,7 @@ Public Class frmBrowser
 
             If chkFixYRange.Checked And yRange > 0 Then
                 mSpectrum.SetAutoscaleYAxis(False)
-                mSpectrum.SetRangeY(0, CDbl(yRange))
+                mSpectrum.SetRangeY(0, yRange)
             Else
                 mSpectrum.SetAutoscaleYAxis(True)
             End If
@@ -2491,7 +2491,7 @@ Public Class frmBrowser
                                     ' Split apart the value list variables
 
                                     Dim sicScans = New List(Of Integer)
-                                    Dim sicIntensities = New List(Of Single)
+                                    Dim sicIntensities = New List(Of Double)
                                     Dim sicMasses = New List(Of Double)
 
                                     sicScans.Add(scanStart)
@@ -2530,7 +2530,7 @@ Public Class frmBrowser
                                         valueList = intensityDataList.Trim.Split(delimiterList)
                                         For index = 0 To valueList.Length - 1
                                             If DataUtils.StringToValueUtils.IsNumber(valueList(index)) Then
-                                                sicIntensities.Add(CSng(valueList(index)))
+                                                sicIntensities.Add(CDbl(valueList(index)))
                                             Else
                                                 sicIntensities.Add(0)
                                             End If
@@ -2592,7 +2592,7 @@ Public Class frmBrowser
                                                 Exit For
                                             End If
                                             If DataUtils.StringToValueUtils.IsNumber(valueList(index)) Then
-                                                currentParentIon.SICStats.SICSmoothedYData.Add(CSng(valueList(index)))
+                                                currentParentIon.SICStats.SICSmoothedYData.Add(CDbl(valueList(index)))
                                                 smoothedDataFound = True
                                             Else
                                                 currentParentIon.SICStats.SICSmoothedYData.Add(0)
@@ -2714,39 +2714,39 @@ Public Class frmBrowser
                                                 Case "PeakScanMaxIntensity"
                                                     .SICStats.ScanNumberMaxIntensity = CInt(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "PeakIntensity"
-                                                    .SICStats.Peak.MaxIntensityValue = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.MaxIntensityValue = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "PeakSignalToNoiseRatio"
-                                                    .SICStats.Peak.SignalToNoiseRatio = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.SignalToNoiseRatio = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "FWHMInScans"
                                                     .SICStats.Peak.FWHMScanWidth = CInt(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "PeakArea"
-                                                    .SICStats.Peak.Area = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.Area = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "ShoulderCount"
                                                     .SICStats.Peak.ShoulderCount = CInt(XMLTextReaderGetInnerText(objXMLReader))
 
                                                 Case "ParentIonIntensity"
-                                                    .SICStats.Peak.ParentIonIntensity = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.ParentIonIntensity = CDbl(XMLTextReaderGetInnerText(objXMLReader))
 
                                                 Case "PeakBaselineNoiseLevel"
-                                                    .SICStats.Peak.BaselineNoiseStats.NoiseLevel = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.BaselineNoiseStats.NoiseLevel = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                     baselineNoiseStatsFound = True
                                                 Case "PeakBaselineNoiseStDev"
-                                                    .SICStats.Peak.BaselineNoiseStats.NoiseStDev = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.BaselineNoiseStats.NoiseStDev = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "PeakBaselinePointsUsed"
                                                     .SICStats.Peak.BaselineNoiseStats.PointsUsed = CInt(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "NoiseThresholdModeUsed"
                                                     .SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = CType(XMLTextReaderGetInnerText(objXMLReader), clsMASICPeakFinder.eNoiseThresholdModes)
 
                                                 Case "StatMomentsArea"
-                                                    .SICStats.Peak.StatisticalMoments.Area = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.StatisticalMoments.Area = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "CenterOfMassScan"
                                                     .SICStats.Peak.StatisticalMoments.CenterOfMassScan = CInt(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "PeakStDev"
-                                                    .SICStats.Peak.StatisticalMoments.StDev = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.StatisticalMoments.StDev = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "PeakSkew"
-                                                    .SICStats.Peak.StatisticalMoments.Skew = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.StatisticalMoments.Skew = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "PeakKSStat"
-                                                    .SICStats.Peak.StatisticalMoments.KSStat = CSng(XMLTextReaderGetInnerText(objXMLReader))
+                                                    .SICStats.Peak.StatisticalMoments.KSStat = CDbl(XMLTextReaderGetInnerText(objXMLReader))
                                                 Case "StatMomentsDataCountUsed"
                                                     .SICStats.Peak.StatisticalMoments.DataCountUsed = CInt(XMLTextReaderGetInnerText(objXMLReader))
 
@@ -3205,9 +3205,9 @@ Public Class frmBrowser
 
         Dim scanNumberSaved As Integer
 
-        Dim minimumIntensity As Single
-        Dim mzFilter, mzFilterTol As Single
-        Dim minimumSN As Single
+        Dim minimumIntensity As Double
+        Dim mzFilter, mzFilterTol As Double
+        Dim minimumSN As Double
 
         If mParentIonStats.Count <= 0 Then
             ReDim mParentIonPointerArray(-1)
@@ -3233,24 +3233,24 @@ Public Class frmBrowser
         End If
 
         If chkFilterByIntensity.Checked AndAlso DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text) Then
-            minimumIntensity = CSng(txtMinimumIntensity.Text)
+            minimumIntensity = CDbl(txtMinimumIntensity.Text)
         Else
-            minimumIntensity = Single.MinValue
+            minimumIntensity = Double.MinValue
         End If
 
         If chkFilterByMZ.Checked AndAlso DataUtils.StringToValueUtils.IsNumber(txtFilterByMZ.Text) AndAlso
            DataUtils.StringToValueUtils.IsNumber(txtFilterByMZTol.Text) Then
-            mzFilter = Math.Abs(CSng(txtFilterByMZ.Text))
-            mzFilterTol = Math.Abs(CSng(txtFilterByMZTol.Text))
+            mzFilter = Math.Abs(CDbl(txtFilterByMZ.Text))
+            mzFilterTol = Math.Abs(CDbl(txtFilterByMZTol.Text))
         Else
             mzFilter = -1
-            mzFilterTol = Single.MaxValue
+            mzFilterTol = Double.MaxValue
         End If
 
         If chkFilterBySignalToNoise.Checked AndAlso DataUtils.StringToValueUtils.IsNumber(txtMinimumSignalToNoise.Text) Then
-            minimumSN = CSng(txtMinimumSignalToNoise.Text)
+            minimumSN = CDbl(txtMinimumSignalToNoise.Text)
         Else
-            minimumSN = Single.MinValue
+            minimumSN = Double.MinValue
         End If
 
         Select Case eSortMode
@@ -3490,7 +3490,15 @@ Public Class frmBrowser
 
     End Sub
 
-    Private Function SortDataFilterCheck(peakMaxIntensityValue As Double, peakSN As Double, peakMZ As Double, minimumIntensity As Double, minimumSN As Double, mzFilter As Single, mzFilterTol As Single, isCustomSIC As Boolean) As Boolean
+    Private Function SortDataFilterCheck(
+      peakMaxIntensityValue As Double,
+      peakSN As Double,
+      peakMZ As Double,
+      minimumIntensity As Double,
+      minimumSN As Double,
+      mzFilter As Double,
+      mzFilterTol As Double,
+      isCustomSIC As Boolean) As Boolean
 
         Dim useData As Boolean
 
@@ -3684,7 +3692,7 @@ Public Class frmBrowser
             sicStats.SICSmoothedYData.Clear()
 
             For index = 0 To intensities.Length - 1
-                sicStats.SICSmoothedYData.Add(CSng(intensities(index)))
+                sicStats.SICSmoothedYData.Add(CDbl(intensities(index)))
             Next
 
         End If
