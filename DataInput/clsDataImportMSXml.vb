@@ -832,6 +832,8 @@ Namespace DataInput
 
             scanInfo.FragScanInfo.MSLevel = spectrumInfo.MSLevel
 
+            scanInfo.FragScanInfo.CollisionMode = mzXmlSourceSpectrum.ActivationMethod
+
             ' Determine the minimum positive intensity in this scan
             scanInfo.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0)
 

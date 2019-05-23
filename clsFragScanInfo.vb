@@ -40,6 +40,7 @@
         ' -1 means undefined; only used for fragmentation scans
         ParentIonInfoIndex = -1
         ParentIonMz = parentIonMzValue
+        CollisionMode = String.Empty
     End Sub
 
     Public Overrides Function ToString() As String
