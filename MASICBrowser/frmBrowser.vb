@@ -1593,6 +1593,14 @@ Public Class frmBrowser
 
     End Function
 
+    Private Function GetSortKey(value1 As Integer, value2 As Integer) As Double
+        Return CDbl(value1.ToString() & "." & value2.ToString("000000"))
+    End Function
+
+    Private Function GetSortKey(value1 As Integer, value2 As Double) As Double
+        Return CDbl(value1.ToString() & "." & value2.ToString("000000"))
+    End Function
+
     Private Sub InitializeControls()
         mMASICPeakFinder = New clsMASICPeakFinder()
         AddHandler mMASICPeakFinder.ErrorEvent, AddressOf MASICPeakFinderErrorHandler
@@ -3249,7 +3257,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByPeakIndex
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).Index
                             mParentIonPointerArrayCount += 1
@@ -3259,7 +3268,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByScanPeakCenter
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).SICStats.ScanNumberMaxIntensity
                             mParentIonPointerArrayCount += 1
@@ -3269,9 +3279,10 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByScanOptimalPeakCenter
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
-                            sortKeys(mParentIonPointerArrayCount) = CDbl(mParentIonStats(index).OptimalPeakApexScanNumber.ToString & "." & Math.Round(mParentIonStats(index).MZ, 0).ToString("0000") & mParentIonStats(index).Index.ToString("00000"))
+                            sortKeys(mParentIonPointerArrayCount) = CDbl(mParentIonStats(index).OptimalPeakApexScanNumber.ToString() & "." & Math.Round(mParentIonStats(index).MZ, 0).ToString("0000") & mParentIonStats(index).Index.ToString("00000"))
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
@@ -3279,9 +3290,10 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByMz
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
-                            sortKeys(mParentIonPointerArrayCount) = CDbl(Math.Round(mParentIonStats(index).MZ, 2).ToString & mParentIonStats(index).SICStats.ScanNumberMaxIntensity.ToString("000000"))
+                            sortKeys(mParentIonPointerArrayCount) = CDbl(Math.Round(mParentIonStats(index).MZ, 2).ToString() & mParentIonStats(index).SICStats.ScanNumberMaxIntensity.ToString("000000"))
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
@@ -3289,7 +3301,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByPeakSignalToNoise
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).SICStats.Peak.SignalToNoiseRatio
                             mParentIonPointerArrayCount += 1
@@ -3299,7 +3312,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByBaselineCorrectedPeakIntensity
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             With mParentIonStats(index).SICStats
                                 sortKeys(mParentIonPointerArrayCount) = clsMASICPeakFinder.BaselineAdjustIntensity(.Peak, True)
@@ -3311,7 +3325,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByBaselineCorrectedPeakArea
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             With mParentIonStats(index).SICStats
                                 sortKeys(mParentIonPointerArrayCount) = clsMASICPeakFinder.BaselineAdjustArea(.Peak, .SICPeakWidthFullScans, True)
@@ -3323,10 +3338,12 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByPeakWidth
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             ' Create a sort key that is based on both PeakFWHMScans and ScanNumberMaxIntensity by separating the two integers with a "."
-                            sortKeys(mParentIonPointerArrayCount) = CDbl(mParentIonStats(index).SICStats.Peak.FWHMScanWidth.ToString & "." & mParentIonStats(index).SICStats.ScanNumberMaxIntensity.ToString("000000"))
+                            sortKeys(mParentIonPointerArrayCount) = GetSortKey(mParentIonStats(index).SICStats.Peak.FWHMScanWidth,
+                                                                               mParentIonStats(index).SICStats.ScanNumberMaxIntensity)
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
@@ -3334,7 +3351,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortBySICIntensityMax
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = Math.Round(mParentIonStats(index).SICIntensityMax, 0)
                             ' Append the scan number so that we sort by intensity, then scan
@@ -3350,7 +3368,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByPeakIntensity
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).SICStats.Peak.MaxIntensityValue
                             mParentIonPointerArrayCount += 1
@@ -3360,7 +3379,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByPeakArea
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).SICStats.Peak.Area
                             mParentIonPointerArrayCount += 1
@@ -3370,10 +3390,12 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByFragScanToOptimalLocDistance
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             ' Create a sort key that is based on both FragScan-OptimalPeakApexScanNumber and OptimalPeakApexScanNumber by separating the two integers with a "."
-                            sortKeys(mParentIonPointerArrayCount) = CDbl((mParentIonStats(index).FragScanObserved - mParentIonStats(index).OptimalPeakApexScanNumber).ToString & "." & mParentIonStats(index).OptimalPeakApexScanNumber.ToString("000000"))
+                            sortKeys(mParentIonPointerArrayCount) = GetSortKey(mParentIonStats(index).FragScanObserved - mParentIonStats(index).OptimalPeakApexScanNumber,
+                                                                               mParentIonStats(index).OptimalPeakApexScanNumber)
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
@@ -3381,10 +3403,12 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByPeakCenterToOptimalLocDistance
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             ' Create a sort key that is based on both ScanNumberMaxIntensity-OptimalPeakApexScanNumber and OptimalPeakApexScanNumber by separating the two integers with a "."
-                            sortKeys(mParentIonPointerArrayCount) = CDbl((mParentIonStats(index).SICStats.ScanNumberMaxIntensity - mParentIonStats(index).OptimalPeakApexScanNumber).ToString & "." & mParentIonStats(index).OptimalPeakApexScanNumber.ToString("000000"))
+                            sortKeys(mParentIonPointerArrayCount) = GetSortKey(mParentIonStats(index).SICStats.ScanNumberMaxIntensity - mParentIonStats(index).OptimalPeakApexScanNumber,
+                                                                               mParentIonStats(index).OptimalPeakApexScanNumber)
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
@@ -3392,10 +3416,12 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByShoulderCount
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             ' Create a sort key that is based on both ShoulderCount and OptimalPeakApexScanNumber by separating the two integers with a "."
-                            sortKeys(mParentIonPointerArrayCount) = CDbl(mParentIonStats(index).SICStats.Peak.ShoulderCount.ToString & "." & mParentIonStats(index).OptimalPeakApexScanNumber.ToString("000000"))
+                            sortKeys(mParentIonPointerArrayCount) = GetSortKey(mParentIonStats(index).SICStats.Peak.ShoulderCount,
+                                                                               mParentIonStats(index).OptimalPeakApexScanNumber)
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
@@ -3403,7 +3429,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByParentIonIntensity
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).SICStats.Peak.ParentIonIntensity
                             mParentIonPointerArrayCount += 1
@@ -3413,7 +3440,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByPeakSkew
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).SICStats.Peak.StatisticalMoments.Skew
                             mParentIonPointerArrayCount += 1
@@ -3423,7 +3451,8 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByKSStat
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
                             sortKeys(mParentIonPointerArrayCount) = mParentIonStats(index).SICStats.Peak.StatisticalMoments.KSStat
                             mParentIonPointerArrayCount += 1
@@ -3433,9 +3462,11 @@ Public Class frmBrowser
             Case eSortOrderConstants.SortByBaselineNoiseLevel
                 For index = 0 To mParentIonStats.Count - 1
                     With mParentIonStats(index)
-                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ, minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
+                        If SortDataFilterCheck(.SICStats.Peak.MaxIntensityValue, .SICStats.Peak.SignalToNoiseRatio, .MZ,
+                                               minimumIntensity, minimumSN, mzFilter, mzFilterTol, .CustomSICPeak) Then
                             mParentIonPointerArray(mParentIonPointerArrayCount) = index
-                            sortKeys(mParentIonPointerArrayCount) = CDbl(CInt(Math.Round(mParentIonStats(index).SICStats.Peak.BaselineNoiseStats.NoiseLevel, 0)).ToString & "." & mParentIonStats(index).SICStats.Peak.SignalToNoiseRatio.ToString("0000000"))
+                            sortKeys(mParentIonPointerArrayCount) = GetSortKey(CInt(Math.Round(mParentIonStats(index).SICStats.Peak.BaselineNoiseStats.NoiseLevel, 0)),
+                                                                               mParentIonStats(index).SICStats.Peak.SignalToNoiseRatio)
                             mParentIonPointerArrayCount += 1
                         End If
                     End With
