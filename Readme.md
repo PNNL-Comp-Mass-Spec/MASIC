@@ -7,7 +7,7 @@ algorithm to characterize the chromatographic peaks, providing peak statistics
 including elution time of the peak apex, peak area, and peak signal/noise.
 The program can read instrument data in the following formats:
 * Thermo .Raw files
-* mzML files
+* mzML files (see notes below)
 * mzXML files
 * mzData files
 * .cdf/.mgf combo files
@@ -144,6 +144,42 @@ within ~0.05 m/z (thus, combine 1000.05 and 1000.052 as simply 1000.051).
 Additionally, for scans with a lot of low quality, low intensity data, MASIC 
 discards the low intensity data.  The IonCount value would let you see which 
 scans MASIC is discarding some data, for whatever reason.
+
+## .mzML Support
+
+Although MASIC can read .mzML files, when possible, you should process Thermo raw files directly with MASIC. 
+The reason is that the m/z and intensity values obtained using ThermoRawFileReader.dll and ThermoFisher.CommonCore.Data.dll 
+more accurately represent the true data, in particular for centroided data obtained from a profile mode scan.
+
+The following observations are based on comparing results from .mzML files created using the following options
+with a Thermo .raw file that has profile mode MS1 and MS2 scans
+
+Profile mode .mzML file
+```
+msconvert --32 --mzML DatasetName.raw
+```
+
+Centroid mode .mzML file
+```
+msconvert --32 --mzML --filter "peakPicking true 1-" DatasetName.raw
+```
+
+Peak intensities (and thus areas) reported by MASIC
+* .mzML profile  mode data has intensities and areas ~1.5 fold smaller than Thermo .raw files
+* .mzML centroid mode data has intensities and areas ~2.5 fold smaller than Thermo .raw files
+
+Reporter Ion Intensities
+* .mzML profile  mode data has identical reporter ion intensities vs. Thermo .raw files
+* .mzML centroid mode data has similar reporter ion intensities vs. Thermo .raw files (agreement within 2%)
+
+Precursor Ion Interference Scores
+* .mzML profile  mode data has similar interfence scores only for higher abundance precursors; for lower abundance precursors, the centroiding algorithm does not perform well (m/z values deviate from their true values), and thus the interference scores do not correlate well with Thermo .raw file based scores
+* .mzML centroid mode data has identical interfence scores as Thermo .raw files
+
+Based on the above observations, if you must work with .mzML files, use centroided .mzML files if the 
+interference score value is important, but reporter ion intensities don't matter.  Alternatively,
+use profile-based files if reporter ion intensities are important, but interference score doesn't matter.
+
 
 ## Command Line Interface
 
