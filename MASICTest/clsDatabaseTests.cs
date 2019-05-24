@@ -57,7 +57,7 @@ namespace MASICTest
 
             var dbAccessor = new clsDatabaseAccess(options);
 
-            var datasetID = dbAccessor.LookupDatasetNumber(datasetName, strDatasetLookupFilePath, 1);
+            var datasetID = dbAccessor.LookupDatasetID(datasetName, strDatasetLookupFilePath, 1);
 
             Console.WriteLine("Data file " + datasetName + " is dataset ID " + datasetID);
 
