@@ -724,7 +724,6 @@ Namespace DataInput
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1)
             mLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1
 
-            ' ReSharper disable once NotAccessedVariable
             Dim msDataResolution As Double
 
             If mOptions.SICOptions.SICToleranceIsPPM Then
@@ -747,7 +746,7 @@ Namespace DataInput
                 sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
                 DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
                 sicOptions.CompressMSSpectraData,
-                sicOptions.SimilarIonMZToleranceHalfWidth / sicOptions.CompressToleranceDivisorForDa,
+                msDataResolution,
                 mKeepRawSpectra)
 
             If Not msSpectrum.IonsMZ Is Nothing AndAlso Not msSpectrum.IonsIntensity Is Nothing Then
@@ -900,6 +899,8 @@ Namespace DataInput
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
 
             ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
+            Dim msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
+
             StoreSpectrum(
                 msSpectrum,
                 scanInfo,
@@ -907,7 +908,7 @@ Namespace DataInput
                 sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
                 DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
                 sicOptions.CompressMSMSSpectraData,
-                mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa,
+                msDataResolution,
                 mKeepRawSpectra AndAlso mKeepMSMSSpectra)
 
             SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetNumber)
