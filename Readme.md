@@ -209,8 +209,10 @@ XML parameter file.  If omitted, defaults are used.
 The `/D` switch can be used to specify the dataset number of the input file; if
 omitted, 0 will be used
 
-Alternatively, a lookup file can be specified with the `/D `switch (useful if
-processing multiple files using * or `/S`)
+Alternatively, a lookup file can be specified with the `/D` switch (useful if
+processing multiple files using * or `/S`, or if running outside PNNL).
+This is a comma, space, or tab delimited file with two columns:\
+Dataset Name and Dataset ID
 
 Use `/S` to process all valid files in the input directory and subdirectories.
 Include a number after `/S` (like `/S:2`) to limit the level of subdirectories to

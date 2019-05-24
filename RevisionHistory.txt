@@ -1,5 +1,11 @@
 MASIC Change Log
 
+Version 3.0.7083; May 24, 2019
+	- Create console only version of MASIC
+		- Progress messages now appear at the console instead of in a window
+	- Track intensities with doubles instead of floats
+	- Add support for reading .mzML files
+
 Version 2.8.6969; January 30, 2019
 	- New version of ThermoRawFileReader.dll that uses C#-based ThermoFisher.CommonCore.RawFileReader.dll
 
