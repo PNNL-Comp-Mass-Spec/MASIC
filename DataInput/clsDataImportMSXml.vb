@@ -935,8 +935,20 @@ Namespace DataInput
 
         End Function
 
+        ''' <summary>
+        ''' Get the first filter string defined in the CVParams of this mzML Spectrum
+        ''' </summary>
+        ''' <param name="mzMLSpectrum"></param>
+        ''' <returns></returns>
+        Private Function GetFilterString(mzMLSpectrum As SimpleMzMLReader.ParamData) As String
+            Dim filterStrings = (From item In mzMLSpectrum.CVParams Where item.TermInfo.Cvid = CV.CVID.MS_filter_string).ToList()
 
+            If filterStrings.Count <= 0 Then
+                Return String.Empty
             End If
+
+            Dim filterString = filterStrings.First().Value
+            Return filterString
 
         End Function
 
@@ -1068,10 +1080,9 @@ Namespace DataInput
 
             ' Store the "filter string" in .FilterLine
 
-            Dim filterStrings = (From item In mzMLSpectrum.CVParams Where item.TermInfo.Cvid = CV.CVID.MS_filter_string).ToList()
+            Dim filterString = GetFilterString(mzMLSpectrum)
 
-            If filterStrings.Count > 0 Then
-                Dim filterString = filterStrings.First().Value
+            If Not String.IsNullOrWhiteSpace(filterString) Then
 
                 If thermoRawFile Then
                     mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericFinniganScanFilter(filterString)
@@ -1081,7 +1092,7 @@ Namespace DataInput
                 End If
             End If
 
-            If filterStrings.Count = 0 OrElse Not thermoRawFile Then
+            If String.IsNullOrWhiteSpace(filterString) OrElse Not thermoRawFile Then
                 Dim matchingParams = mzMLSpectrum.GetCVParamsChildOf(CV.CVID.MS_spectrum_type)
                 If matchingParams.Count > 0 Then
                     mzXmlSourceSpectrum.ScanType = matchingParams.First().TermInfo.Name
