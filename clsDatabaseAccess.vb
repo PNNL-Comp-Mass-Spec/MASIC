@@ -69,7 +69,7 @@ Public Class clsDatabaseAccess
                         sqlQuery = "Select Dataset, ID FROM V_Dataset_Export"
                     End If
 
-                    If sqlQuery.ToUpper().StartsWith("SELECT DATASET") Then
+                    If sqlQuery.StartsWith("SELECT Dataset", StringComparison.OrdinalIgnoreCase) Then
                         ' Add a where clause to the query
                         If iteration = 1 Then
                             sqlQuery &= " WHERE Dataset = '" & datasetName & "'"
@@ -86,31 +86,24 @@ Public Class clsDatabaseAccess
 
                         ' Find the row in the lstResults that matches fileNameCompare
                         For Each datasetItem In lstResults
-                            If String.Equals(datasetItem(0), fileNameCompare, StringComparison.InvariantCultureIgnoreCase) Then
+                            If String.Equals(datasetItem(0), datasetName, StringComparison.OrdinalIgnoreCase) Then
                                 ' Match found
-                                Try
-                                    If Integer.TryParse(datasetItem(1), newDatasetNumber) Then
-                                        datasetFoundInDB = True
-                                    End If
-
-                                Catch ex As Exception
-                                    Try
-                                        ReportError("Error converting '" & datasetItem(1) & "' to a dataset ID", ex, eMasicErrorCodes.InvalidDatasetNumber)
-                                    Catch ex2 As Exception
-                                        ReportError("Error converting column 2 from the dataset report to a dataset ID", ex, eMasicErrorCodes.InvalidDatasetNumber)
-                                    End Try
-                                    datasetFoundInDB = False
-                                End Try
+                                If Integer.TryParse(datasetItem(1), newDatasetID) Then
+                                    Return newDatasetID
+                                Else
+                                    ReportError("Error converting Dataset ID '" & datasetItem(1) & "' to an integer", eMasicErrorCodes.InvalidDatasetID)
+                                End If
                                 Exit For
                             End If
                         Next
 
-                        If Not datasetFoundInDB AndAlso lstResults.Count > 0 Then
+                        If lstResults.Count > 0 Then
 
                             Try
-                                If queryingSingleDataset OrElse lstResults.First().Item(0).StartsWith(fileNameCompare) Then
-                                    Integer.TryParse(lstResults.First().Item(1), newDatasetNumber)
-                                    datasetFoundInDB = True
+                                If queryingSingleDataset OrElse lstResults.First().Item(0).StartsWith(datasetName) Then
+                                    If Integer.TryParse(lstResults.First().Item(1), newDatasetID) Then
+                                        Return newDatasetID
+                                    End If
                                 End If
 
                             Catch ex As Exception
@@ -121,21 +114,17 @@ Public Class clsDatabaseAccess
 
                     End If
 
-                    If datasetFoundInDB Then
-                        Exit For
-                    End If
                 Next
 
             Catch ex2 As NullReferenceException
-                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetNumber)
-                datasetFoundInDB = False
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetID)
             Catch ex As Exception
-                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetNumber)
-                datasetFoundInDB = False
+                ReportError("Error connecting to database: " & mOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetID)
             End Try
+
         End If
 
-        If Not datasetFoundInDB AndAlso Not String.IsNullOrWhiteSpace(datasetLookupFilePath) Then
+        If Not String.IsNullOrWhiteSpace(datasetLookupFilePath) Then
 
             ' Lookup the Dataset ID in the dataset lookup file
 
@@ -145,24 +134,30 @@ Public Class clsDatabaseAccess
                 Using reader = New StreamReader(datasetLookupFilePath)
                     Do While Not reader.EndOfStream
                         Dim dataLine = reader.ReadLine()
-                        If dataLine Is Nothing Then Continue Do
-
-                        If dataLine.Length < fileNameCompare.Length Then Continue Do
-
-                        If dataLine.Substring(0, fileNameCompare.Length).ToUpper() <> fileNameCompare Then Continue Do
-
-                        Dim dataValues = dataLine.Split(delimiterList)
-                        If dataValues.Length < 2 Then Continue Do
-
-                        If clsUtilities.IsNumber(dataValues(1)) Then
-                            newDatasetNumber = CInt(dataValues(1))
-                            Exit Do
-                        Else
-                            ReportWarning("Invalid dataset number: " & dataValues(1))
-                            Exit Do
+                        If String.IsNullOrWhiteSpace(dataLine) Then
+                            Continue Do
                         End If
 
+                        If dataLine.Length < datasetName.Length Then
+                            Continue Do
+                        End If
+
+                        Dim dataValues = dataLine.Split(delimiterList)
+                        If dataValues.Length < 2 Then
+                            Continue Do
+                        End If
+
+                        If Not String.Equals(dataValues(0), datasetName, StringComparison.OrdinalIgnoreCase) Then
+                            Continue Do
+                        End If
+
+                        If Integer.TryParse(dataValues(1), newDatasetID) Then
+                            Return newDatasetID
+                        Else
+                            ReportError("Error converting Dataset ID '" & dataValues(1) & "' to an integer", eMasicErrorCodes.InvalidDatasetID)
+                        End If
                     Loop
+
                 End Using
 
             Catch ex As Exception
