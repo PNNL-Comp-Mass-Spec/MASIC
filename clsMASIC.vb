@@ -1171,7 +1171,7 @@ Public Class clsMASIC
                 RegisterEvents(mrmProcessor)
 
                 '---------------------------------------------------------
-                ' If MRM data is present, then save the MRM values to disk
+                ' If MRM data is present, save the MRM values to disk
                 '---------------------------------------------------------
                 If scanList.MRMDataPresent Then
                     mrmProcessor.ExportMRMDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath)

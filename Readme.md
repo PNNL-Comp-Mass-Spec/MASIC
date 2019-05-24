@@ -131,7 +131,7 @@ you need to use command line switches `--srmAsSpectra` and `--simAsSpectra`.
 Otherwise, the PSI_Interface utility which we use to read .mzML files cannot 
 load the mass spectra data.  Example command line:
 ```
-msconvert --32 --mzML --srmAsSpectra --simAsSpectra DatasetName.raw
+msconvert.exe --32 --mzML --srmAsSpectra --simAsSpectra DatasetName.raw
 ```
 
 ## IonCountRaw vs. IonCount
@@ -156,16 +156,16 @@ with a Thermo .raw file that has profile mode MS1 and MS2 scans
 
 Profile mode .mzML file
 ```
-msconvert --32 --mzML DatasetName.raw
+msconvert.exe --32 --mzML DatasetName.raw
 ```
 
 Centroid mode .mzML file
 ```
-msconvert --32 --mzML --filter "peakPicking true 1-" DatasetName.raw
+msconvert.exe --32 --mzML --filter "peakPicking true 1-" DatasetName.raw
 ```
 
 Peak intensities (and thus areas) reported by MASIC
-* .mzML profile  mode data has intensities and areas ~1.5 fold smaller than Thermo .raw files
+* .mzML profile  mode data has intensities and areas nearly identical to Thermo .raw files
 * .mzML centroid mode data has intensities and areas ~2.5 fold smaller than Thermo .raw files
 
 Reporter Ion Intensities
@@ -176,9 +176,14 @@ Precursor Ion Interference Scores
 * .mzML profile  mode data has similar interfence scores only for higher abundance precursors; for lower abundance precursors, the centroiding algorithm does not perform well (m/z values deviate from their true values), and thus the interference scores do not correlate well with Thermo .raw file based scores
 * .mzML centroid mode data has identical interfence scores as Thermo .raw files
 
-Based on the above observations, if you must work with .mzML files, use centroided .mzML files if the 
-interference score value is important, but reporter ion intensities don't matter.  Alternatively,
-use profile-based files if reporter ion intensities are important, but interference score doesn't matter.
+Based on the above observations, when reading .mzML files, centroided MS1 spectra work better for
+interference score calculations, but intensities are 2.5 fold smaller.  In contrast,
+profile mode MS2 spectra more accurately represent reporter ion intensities.
+
+MSConvert supports creating files with centroided MS1 spectra and profile mode MS2 spectra:
+```
+msconvert.exe --32 --mzML --filter "peakPicking true 1" DatasetName.raw
+```
 
 
 ## Command Line Interface
