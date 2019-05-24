@@ -2,17 +2,17 @@
 <DatasetInfo>
   <Dataset>TMT_QCPool_23Jun14</Dataset>
   <ScanTypes>
-    <ScanType ScanCount="76" ScanFilterText="">MS</ScanType>
-    <ScanType ScanCount="425" ScanFilterText="">Unknown, beam-type collision-induced dissociation-MSn</ScanType>
+    <ScanType ScanCount="76" ScanFilterText="FTMS + p NSI Full ms">HMS</ScanType>
+    <ScanType ScanCount="425" ScanFilterText="FTMS + p NSI d Full ms2 0@hcd32.00">HCD-HMSn</ScanType>
   </ScanTypes>
   <AcquisitionInfo>
     <ScanCount>501</ScanCount>
     <ScanCountMS>76</ScanCountMS>
     <ScanCountMSn>425</ScanCountMSn>
     <Elution_Time_Max>70.2085</Elution_Time_Max>
-    <AcqTimeMinutes>0.00</AcqTimeMinutes>
-    <StartTime>2019-04-26 06:49:41 PM</StartTime>
-    <EndTime>2019-04-26 06:49:41 PM</EndTime>
+    <AcqTimeMinutes>70.21</AcqTimeMinutes>
+    <StartTime>2014-06-23 11:38:32 PM</StartTime>
+    <EndTime>2014-06-24 12:48:44 AM</EndTime>
     <FileSizeBytes>6478568</FileSizeBytes>
   </AcquisitionInfo>
   <TICInfo>

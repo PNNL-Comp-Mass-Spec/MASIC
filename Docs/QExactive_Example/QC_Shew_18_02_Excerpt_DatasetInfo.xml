@@ -10,9 +10,9 @@
     <ScanCountMS>79</ScanCountMS>
     <ScanCountMSn>922</ScanCountMSn>
     <Elution_Time_Max>80.5518</Elution_Time_Max>
-    <AcqTimeMinutes>0.00</AcqTimeMinutes>
+    <AcqTimeMinutes>80.55</AcqTimeMinutes>
     <StartTime>2019-03-05 04:01:07 PM</StartTime>
-    <EndTime>2019-03-05 04:01:07 PM</EndTime>
+    <EndTime>2019-03-05 05:21:40 PM</EndTime>
     <FileSizeBytes>2320048</FileSizeBytes>
   </AcquisitionInfo>
   <TICInfo>
