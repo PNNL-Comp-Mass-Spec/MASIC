@@ -79,7 +79,7 @@ Public Class clsMASIC
         InvalidDatasetLookupFilePath = 1
         UnknownFileExtension = 2            ' This error code matches the identical code in clsFilterMsMsSpectra
         InputFileAccessError = 4            ' This error code matches the identical code in clsFilterMsMsSpectra
-        InvalidDatasetNumber = 8
+        InvalidDatasetID = 8
         CreateSICsError = 16
         FindSICPeaksError = 32
         InvalidCustomSICValues = 64
@@ -1365,7 +1365,7 @@ Public Class clsMASIC
                     errorMessage = "Unknown file extension"
                 Case eMasicErrorCodes.InputFileAccessError
                     errorMessage = "Input file access error"
-                Case eMasicErrorCodes.InvalidDatasetNumber
+                Case eMasicErrorCodes.InvalidDatasetID
                     errorMessage = "Invalid dataset number"
                 Case eMasicErrorCodes.CreateSICsError
                     errorMessage = "Create SIC's error"
@@ -1741,10 +1741,10 @@ Public Class clsMASIC
                 Dim dbAccessor = New clsDatabaseAccess(mOptions)
                 RegisterEvents(dbAccessor)
 
-                mOptions.SICOptions.DatasetNumber = dbAccessor.LookupDatasetNumber(inputFilePath, mOptions.DatasetLookupFilePath, mOptions.SICOptions.DatasetNumber)
+                mOptions.SICOptions.DatasetNumber = dbAccessor.LookupDatasetID(inputFilePath, mOptions.DatasetLookupFilePath, mOptions.SICOptions.DatasetNumber)
 
                 If Me.LocalErrorCode <> eMasicErrorCodes.NoError Then
-                    If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetNumber OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
+                    If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetID OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
                         ' Ignore this error
                         Me.SetLocalErrorCode(eMasicErrorCodes.NoError)
                         success = True

@@ -6,8 +6,14 @@ Public Class clsDatabaseAccess
 
 #Region "Constants and Enums"
 
-    Public Const DATABASE_CONNECTION_STRING_DEFAULT As String = "Data Source=Pogo;Initial Catalog=Prism_IFC;User=mtuser;Password=mt4fun"
-    Public Const DATABASE_DATASET_INFO_QUERY_DEFAULT As String = "Select Dataset, ID FROM Prism_IFC..V_DMS_Dataset_Summary"
+    ' frmMain uses these constants
+
+    ' ReSharper disable UnusedMember.Global
+
+    Public Const DATABASE_CONNECTION_STRING_DEFAULT As String = "Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=dms4fun"
+    Public Const DATABASE_DATASET_INFO_QUERY_DEFAULT As String = "Select Dataset, ID FROM V_Dataset_Export"
+
+    ' ReSharper restore UnusedMember.Global
 
 #End Region
 
@@ -23,25 +29,33 @@ Public Class clsDatabaseAccess
         mOptions = masicOptions
     End Sub
 
-    Public Function LookupDatasetNumber(
+
+    ''' <summary>
+    ''' Lookup the dataset ID given the dataset name
+    ''' First contacts the database using the specified connection string and query
+    ''' If not found, looks for the dataset name in the file specified by mDatasetLookupFilePath
+    ''' </summary>
+    ''' <param name="inputFilePath"></param>
+    ''' <param name="datasetLookupFilePath"></param>
+    ''' <param name="defaultDatasetID"></param>
+    ''' <returns></returns>
+    Public Function LookupDatasetID(
       inputFilePath As String,
       datasetLookupFilePath As String,
-      defaultDatasetNumber As Integer) As Integer
+      defaultDatasetID As Integer) As Integer
 
-        ' First tries to poll the database for the dataset number
-        ' If this doesn't work, then looks for the dataset name in mDatasetLookupFilePath
-
-        ' Initialize newDatasetNumber and fileNameCompare
-        Dim fileNameCompare = Path.GetFileNameWithoutExtension(inputFilePath).ToUpper()
-        Dim newDatasetNumber = defaultDatasetNumber
+        Dim datasetName = Path.GetFileNameWithoutExtension(inputFilePath)
+        Dim newDatasetID = defaultDatasetID
 
         Dim avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " &
-            "'Dataset Info Query SQL' entries on the Advanced tab."
+                                "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " &
+                                "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " &
+                                "for parameters ConnectionString and DatasetInfoQuerySql."
 
         Dim datasetFoundInDB = False
 
         If Not mOptions.DatabaseConnectionString Is Nothing AndAlso mOptions.DatabaseConnectionString.Length > 0 Then
-            ' Attempt to lookup the dataset number in the database
+            ' Attempt to lookup the Dataset ID in the database
             Try
                 Dim objDBTools = New PRISM.DBTools(mOptions.DatabaseConnectionString)
 
@@ -58,16 +72,16 @@ Public Class clsDatabaseAccess
                     If sqlQuery.ToUpper().StartsWith("SELECT DATASET") Then
                         ' Add a where clause to the query
                         If iteration = 1 Then
-                            sqlQuery &= " WHERE Dataset = '" & fileNameCompare & "'"
+                            sqlQuery &= " WHERE Dataset = '" & datasetName & "'"
                             queryingSingleDataset = True
                         Else
-                            sqlQuery &= " WHERE Dataset Like '" & fileNameCompare & "%'"
+                            sqlQuery &= " WHERE Dataset Like '" & datasetName & "%'"
                         End If
                     End If
 
                     Dim lstResults As List(Of List(Of String)) = Nothing
 
-                    Dim success = objDBTools.GetQueryResults(sqlQuery, lstResults, "LookupDatasetNumber")
+                    Dim success = objDBTools.GetQueryResults(sqlQuery, lstResults, "LookupDatasetID")
                     If success Then
 
                         ' Find the row in the lstResults that matches fileNameCompare
@@ -123,7 +137,7 @@ Public Class clsDatabaseAccess
 
         If Not datasetFoundInDB AndAlso Not String.IsNullOrWhiteSpace(datasetLookupFilePath) Then
 
-            ' Lookup the dataset number in the dataset lookup file
+            ' Lookup the Dataset ID in the dataset lookup file
 
             Dim delimiterList = New Char() {" "c, ","c, ControlChars.Tab}
 
@@ -157,10 +171,8 @@ Public Class clsDatabaseAccess
 
         End If
 
-        Return newDatasetNumber
+        Return newDatasetID
 
     End Function
-
-
 
 End Class

@@ -12,7 +12,8 @@ Public Class clsSICOptions
 #Region "Properties"
 
     ''' <summary>
-    ''' Provided by the user at the command line or through the Property Function Interface; 0 if unknown
+    ''' Provided by the user at the command line or obtained from the database (if a connection string is defined)
+    ''' 0 if unknown
     ''' </summary>
     Public Property DatasetNumber As Integer
 

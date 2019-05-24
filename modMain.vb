@@ -223,7 +223,7 @@ Public Module modMain
                         If Integer.TryParse(value, intValue) Then
                             mDatasetNumber = intValue
                         ElseIf Not String.IsNullOrWhiteSpace(value) Then
-                            ' Assume the user specified a dataset number lookup file (comma or tab delimited file specifying the dataset number for each input file)
+                            ' Assume the user specified a dataset number lookup file comma, space, or tab delimited delimited file specifying the dataset number for each input file)
                             mDatasetLookupFilePath = value
                             mDatasetNumber = 0
                         End If
@@ -315,7 +315,7 @@ Public Module modMain
 
             Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(ProcessFilesBase.GetAppPath()))
             Console.WriteLine(" /I:InputFilePath.raw [/O:OutputDirectoryPath]")
-            Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath] ")
+            Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath] ")
             Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]")
             Console.WriteLine(" [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]")
             Console.WriteLine()
@@ -334,11 +334,12 @@ Public Module modMain
 
             Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                "The /D switch can be used to specify the dataset number of the input file; if omitted, 0 will be used"))
+                "The /D switch can be used to specify the Dataset ID of the input file; if omitted, 0 will be used"))
 
             Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                "Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S)"))
+                "Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S). " &
+                "The lookup file is a comma, space, or tab delimited file with two columns:" & ControlChars.NewLine & "Dataset Name and Dataset ID"))
             Console.WriteLine()
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                 "Use /S to process all valid files in the input directory and subdirectories. " &

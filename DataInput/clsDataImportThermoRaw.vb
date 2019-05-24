@@ -118,6 +118,17 @@ Namespace DataInput
 
         End Function
 
+        ''' <summary>
+        ''' Read scan data and ions from a Thermo .raw file
+        ''' </summary>
+        ''' <param name="filePath"></param>
+        ''' <param name="scanList"></param>
+        ''' <param name="spectraCache"></param>
+        ''' <param name="dataOutputHandler"></param>
+        ''' <param name="keepRawSpectra"></param>
+        ''' <param name="keepMSMSSpectra"></param>
+        ''' <returns>True if Success, False if failure</returns>
+        ''' <remarks>Assumes filePath exists</remarks>
         Public Function ExtractScanInfoFromXcaliburDataFile(
           filePath As String,
           scanList As clsScanList,
@@ -126,14 +137,9 @@ Namespace DataInput
           keepRawSpectra As Boolean,
           keepMSMSSpectra As Boolean) As Boolean
 
-            ' Returns True if Success, False if failure
-            ' Note: This function assumes filePath exists
-
-            ' Use Xraw to read the .Raw files
+            ' Use XrawFileIO to read the .Raw files (it uses ThermoFisher.CommonCore)
             Dim xcaliburAccessor = New XRawFileIO()
             RegisterEvents(xcaliburAccessor)
-
-            Dim ioMode = "Xraw"
 
             mBpiUpdateCount = 0
 
@@ -141,8 +147,8 @@ Namespace DataInput
             Dim success = True
 
             Try
-                Console.Write("Reading Xcalibur data file ")
-                ReportMessage("Reading Xcalibur data file")
+                Console.Write("Reading Thermo .raw file ")
+                ReportMessage("Reading Thermo .raw file")
 
                 UpdateProgress(0, "Opening data file:" & ControlChars.NewLine & Path.GetFileName(filePath))
 
@@ -195,8 +201,8 @@ Namespace DataInput
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra)
 
-                UpdateProgress(String.Format("Reading Xcalibur data with {0} ({1:N0} scans){2}", ioMode, scanCount, ControlChars.NewLine & Path.GetFileName(filePath)))
-                ReportMessage(String.Format("Reading Xcalibur data with {0}; Total scan count: {1:N0}", ioMode, scanCount))
+                UpdateProgress(String.Format("Reading Xcalibur data ({0:N0} scans){1}", scanCount, ControlChars.NewLine & Path.GetFileName(filePath)))
+                ReportMessage(String.Format("Reading Xcalibur data; Total scan count: {0:N0}", scanCount))
 
                 Dim scanCountToRead = scanEnd - scanStart + 1
                 For scanNumber = scanStart To scanEnd
