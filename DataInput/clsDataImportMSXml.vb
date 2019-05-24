@@ -649,7 +649,6 @@ Namespace DataInput
             ' If yes, determine the scan number of the survey scan
             If spectrumInfo.MSLevel <= 1 Then
                 ' Survey Scan
-
                 success = ExtractSurveyScan(scanList, spectraCache, dataOutputHandler,
                                             spectrumInfo, msSpectrum, sicOptions,
                                             isMzXML, mzXmlSourceSpectrum)
@@ -844,10 +843,19 @@ Namespace DataInput
                 scanList.MRMDataPresent = True
 
                 Dim mrmScan = New ThermoRawFileReader.clsScanInfo(spectrumInfo.SpectrumID) With {
-                    .FilterText = scanInfo.ScanHeaderText,
                     .MRMScanType = eMRMScanType,
                     .MRMInfo = New MRMInfo()
                 }
+
+                ' Obtain the detailed filter string, e.g. "+ c NSI SRM ms2 495.285 [409.260-409.262, 506.329-506.331, 607.376-607.378]"
+                ' In contrast, scanInfo.ScanHeaderText has a truncated filter string, e.g. "+ c NSI SRM ms2"
+
+                Dim filterString = GetFilterString(mzMLSpectrum)
+                If String.IsNullOrWhiteSpace(filterString) Then
+                    mrmScan.FilterText = scanInfo.ScanHeaderText
+                Else
+                    mrmScan.FilterText = filterString
+                End If
 
                 If Not String.IsNullOrEmpty(mrmScan.FilterText) Then
                     ' Parse out the MRM_QMS or SRM information for this scan
@@ -858,7 +866,7 @@ Namespace DataInput
                     If spectrumInfo.mzRangeEnd - spectrumInfo.mzRangeStart >= 0.5 Then
                         ' The data is likely MRM and not SRM
                         ' We cannot currently handle data like this
-                        ' (would need to examine the mass values  and find the clumps of data to infer the transitions present)
+                        ' (would need to examine the mass values and find the clumps of data to infer the transitions present)
                         mWarnCount += 1
                         If mWarnCount <= 5 Then
                             ReportError("Warning: m/z range for SRM scan " & spectrumInfo.ScanNumber & " is " &
