@@ -935,13 +935,9 @@ Namespace DataInput
 
         End Function
 
-        Private Function IsHighResolutionSpectrum(filterString As String) As Boolean
 
-            If filterString.IndexOf("FTMS", StringComparison.OrdinalIgnoreCase) >= 0 Then
-                Return True
             End If
 
-            Return False
         End Function
 
         Private Function GetSpectrumInfoFromMzMLSpectrum(
@@ -1113,6 +1109,15 @@ Namespace DataInput
             mWarnCount = 0
 
         End Sub
+
+        Private Function IsHighResolutionSpectrum(filterString As String) As Boolean
+
+            If filterString.IndexOf("FTMS", StringComparison.OrdinalIgnoreCase) >= 0 Then
+                Return True
+            End If
+
+            Return False
+        End Function
 
         Private Function IsSrmChromatogram(chromatogramItem As SimpleMzMLReader.ParamData) As Boolean
 
