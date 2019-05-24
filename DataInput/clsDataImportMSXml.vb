@@ -895,8 +895,9 @@ Namespace DataInput
             scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine)
 
             scanList.FragScans.Add(scanInfo)
+            Dim fragScanIndex = scanList.FragScans.Count - 1
 
-            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1)
+            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, fragScanIndex)
 
             ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             Dim msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
@@ -916,7 +917,7 @@ Namespace DataInput
             If eMRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan
                 mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
-                                                        scanList.FragScans.Count - 1, spectraCache, sicOptions)
+                                                        fragScanIndex, spectraCache, sicOptions)
             Else
                 ' This is an MRM scan
                 mParentIonProcessor.AddUpdateParentIons(scanList, mLastNonZoomSurveyScanIndex, spectrumInfo.ParentIonMZ,
