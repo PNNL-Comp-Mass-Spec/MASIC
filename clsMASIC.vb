@@ -172,10 +172,10 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property DatasetNumber As Integer
         Get
-            Return mOptions.SICOptions.DatasetNumber
+            Return mOptions.SICOptions.DatasetID
         End Get
         Set
-            mOptions.SICOptions.DatasetNumber = Value
+            mOptions.SICOptions.DatasetID = Value
         End Set
     End Property
 
@@ -1741,7 +1741,7 @@ Public Class clsMASIC
                 Dim dbAccessor = New clsDatabaseAccess(mOptions)
                 RegisterEvents(dbAccessor)
 
-                mOptions.SICOptions.DatasetNumber = dbAccessor.LookupDatasetID(inputFilePath, mOptions.DatasetLookupFilePath, mOptions.SICOptions.DatasetNumber)
+                mOptions.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, mOptions.DatasetLookupFilePath, mOptions.SICOptions.DatasetID)
 
                 If Me.LocalErrorCode <> eMasicErrorCodes.NoError Then
                     If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetID OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
@@ -1963,7 +1963,7 @@ Public Class clsMASIC
         End Try
 
         If success Then
-            mOptions.SICOptions.DatasetNumber += 1
+            mOptions.SICOptions.DatasetID += 1
         End If
 
         If success Then

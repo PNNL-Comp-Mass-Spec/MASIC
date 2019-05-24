@@ -15,7 +15,7 @@ Public Class clsSICOptions
     ''' Provided by the user at the command line or obtained from the database (if a connection string is defined)
     ''' 0 if unknown
     ''' </summary>
-    Public Property DatasetNumber As Integer
+    Public Property DatasetID As Integer
 
     ''' <summary>
     ''' Defaults to 10 ppm

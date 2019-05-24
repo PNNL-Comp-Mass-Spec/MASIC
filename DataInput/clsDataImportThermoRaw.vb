@@ -172,7 +172,7 @@ Namespace DataInput
                     Return False
                 End If
 
-                Dim datasetID = mOptions.SICOptions.DatasetNumber
+                Dim datasetID = mOptions.SICOptions.DatasetID
 
                 success = UpdateDatasetFileStats(rawFileInfo, datasetID, xcaliburAccessor)
 
@@ -426,7 +426,7 @@ Namespace DataInput
 
             If Not success Then Return False
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID)
 
             Return True
 
@@ -527,7 +527,7 @@ Namespace DataInput
 
             If Not success Then Return False
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetNumber)
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID)
 
             If thermoScanInfo.MRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan

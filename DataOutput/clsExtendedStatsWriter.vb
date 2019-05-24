@@ -351,7 +351,7 @@ Namespace DataOutput
 
                         Dim currentScan = GetScanByMasterScanIndex(scanList, scanIndex)
 
-                        Dim dataColumns As IEnumerable(Of String) = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetNumber, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo)
+                        Dim dataColumns As IEnumerable(Of String) = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetID, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo)
                         writer.WriteLine(String.Join(cColDelimiter, dataColumns))
 
                         If scanIndex Mod 100 = 0 Then

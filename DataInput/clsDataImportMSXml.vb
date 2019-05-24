@@ -285,7 +285,7 @@ Namespace DataInput
                 Dim msXmlFileInfo = New FileInfo(filePath)
                 Dim inputFileFullPath = msXmlFileInfo.FullName
 
-                Dim datasetID = mOptions.SICOptions.DatasetNumber
+                Dim datasetID = mOptions.SICOptions.DatasetID
 
                 Dim fileStatsSuccess = UpdateDatasetFileStats(msXmlFileInfo, datasetID)
                 If Not fileStatsSuccess Then
@@ -378,7 +378,7 @@ Namespace DataInput
 
                 UpdateProgress(0, "Opening data file:" & ControlChars.NewLine & mzMLFile.Name)
 
-                Dim datasetID = mOptions.SICOptions.DatasetNumber
+                Dim datasetID = mOptions.SICOptions.DatasetID
 
                 If Not mzMLFile.Exists Then
                     Return False
@@ -789,7 +789,7 @@ Namespace DataInput
 
             End If
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetNumber)
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID)
 
             Return True
 
@@ -920,7 +920,7 @@ Namespace DataInput
                 msDataResolution,
                 mKeepRawSpectra AndAlso mKeepMSMSSpectra)
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetNumber)
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID)
 
             If eMRMScanType = MRMScanTypeConstants.NotMRM Then
                 ' This is not an MRM scan

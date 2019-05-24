@@ -47,8 +47,8 @@ Partial Class frmMain
         Me.TabPageMasicExportOptions = New System.Windows.Forms.TabPage()
         Me.chkWriteDetailedSICDataFile = New System.Windows.Forms.CheckBox()
         Me.chkIncludeScanTimesInSICStatsFile = New System.Windows.Forms.CheckBox()
-        Me.txtDatasetNumber = New System.Windows.Forms.TextBox()
-        Me.lblDatasetNumber = New System.Windows.Forms.Label()
+        Me.txtDatasetID = New System.Windows.Forms.TextBox()
+        Me.lblDatasetID = New System.Windows.Forms.Label()
         Me.lblRawDataExportOverview = New System.Windows.Forms.Label()
         Me.fraExportAllSpectraDataPoints = New System.Windows.Forms.GroupBox()
         Me.txtExportRawDataSignalToNoiseRatioMinimum = New System.Windows.Forms.TextBox()
@@ -382,8 +382,8 @@ Partial Class frmMain
         '
         Me.TabPageMasicExportOptions.Controls.Add(Me.chkWriteDetailedSICDataFile)
         Me.TabPageMasicExportOptions.Controls.Add(Me.chkIncludeScanTimesInSICStatsFile)
-        Me.TabPageMasicExportOptions.Controls.Add(Me.txtDatasetNumber)
-        Me.TabPageMasicExportOptions.Controls.Add(Me.lblDatasetNumber)
+        Me.TabPageMasicExportOptions.Controls.Add(Me.txtDatasetID)
+        Me.TabPageMasicExportOptions.Controls.Add(Me.lblDatasetID)
         Me.TabPageMasicExportOptions.Controls.Add(Me.lblRawDataExportOverview)
         Me.TabPageMasicExportOptions.Controls.Add(Me.fraExportAllSpectraDataPoints)
         Me.TabPageMasicExportOptions.Controls.Add(Me.chkIncludeHeaders)
@@ -412,21 +412,21 @@ Partial Class frmMain
         Me.chkIncludeScanTimesInSICStatsFile.TabIndex = 6
         Me.chkIncludeScanTimesInSICStatsFile.Text = "Include scan times in SIC stats file"
         '
-        'txtDatasetNumber
+        'txtDatasetID
         '
-        Me.txtDatasetNumber.Location = New System.Drawing.Point(605, 18)
-        Me.txtDatasetNumber.Name = "txtDatasetNumber"
-        Me.txtDatasetNumber.Size = New System.Drawing.Size(105, 22)
-        Me.txtDatasetNumber.TabIndex = 4
-        Me.txtDatasetNumber.Text = "0"
+        Me.txtDatasetID.Location = New System.Drawing.Point(605, 18)
+        Me.txtDatasetID.Name = "txtDatasetID"
+        Me.txtDatasetID.Size = New System.Drawing.Size(105, 22)
+        Me.txtDatasetID.TabIndex = 4
+        Me.txtDatasetID.Text = "0"
         '
-        'lblDatasetNumber
+        'lblDatasetID
         '
-        Me.lblDatasetNumber.Location = New System.Drawing.Point(432, 18)
-        Me.lblDatasetNumber.Name = "lblDatasetNumber"
-        Me.lblDatasetNumber.Size = New System.Drawing.Size(182, 19)
-        Me.lblDatasetNumber.TabIndex = 3
-        Me.lblDatasetNumber.Text = "Input File Dataset Number"
+        Me.lblDatasetID.Location = New System.Drawing.Point(432, 18)
+        Me.lblDatasetID.Name = "lblDatasetID"
+        Me.lblDatasetID.Size = New System.Drawing.Size(182, 19)
+        Me.lblDatasetID.TabIndex = 3
+        Me.lblDatasetID.Text = "Input File Dataset Number"
         '
         'lblRawDataExportOverview
         '
@@ -2142,8 +2142,8 @@ Partial Class frmMain
     Friend WithEvents txtSICNoiseThresholdIntensity As System.Windows.Forms.TextBox
     Friend WithEvents lblSICOptionsOverview As System.Windows.Forms.Label
     Friend WithEvents lblRawDataExportOverview As System.Windows.Forms.Label
-    Friend WithEvents txtDatasetNumber As System.Windows.Forms.TextBox
-    Friend WithEvents lblDatasetNumber As System.Windows.Forms.Label
+    Friend WithEvents txtDatasetID As System.Windows.Forms.TextBox
+    Friend WithEvents lblDatasetID As System.Windows.Forms.Label
     Friend WithEvents txtCustomSICScanOrAcqTimeTolerance As System.Windows.Forms.TextBox
     Friend WithEvents lblCustomSICScanTolerance As System.Windows.Forms.Label
     Friend WithEvents lblExportRawDataMaxIonCountPerScan As System.Windows.Forms.Label

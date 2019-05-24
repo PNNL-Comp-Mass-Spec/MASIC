@@ -231,7 +231,7 @@ Namespace DataOutput
             Dim fragScanTime As Single = 0
             Dim optimalPeakApexScanTime As Single = 0
 
-            dataValues.Add(sicOptions.DatasetNumber.ToString())             ' Dataset number
+            dataValues.Add(sicOptions.DatasetID.ToString())                 ' Dataset ID
             dataValues.Add(parentIonIndex.ToString())                       ' Parent Ion Index
 
             dataValues.Add(StringUtilities.DblToString(parentIon.MZ, 4))    ' MZ

@@ -428,7 +428,7 @@ Public Class clsMASICOptions
                     Return False
                 Else
                     ' SIC Options
-                    ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
+                    ' Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
 
                     Dim notPresent As Boolean
 
@@ -784,7 +784,7 @@ Public Class clsMASICOptions
 
 
                 ' SIC Options
-                ' Note: Skipping .DatasetNumber since this must be provided at the command line or through the Property Function interface
+                ' Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
 
                 ' "SICToleranceDa" is a legacy parameter.  If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
                 .SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa.ToString("0.0000"))

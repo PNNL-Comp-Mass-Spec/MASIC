@@ -300,7 +300,7 @@ Public Class clsReporterIonProcessor
 
         ' Initialize the output variables
         Dim dataColumns = New List(Of String) From {
-            sicOptions.DatasetNumber.ToString(),
+            sicOptions.DatasetID.ToString(),
             currentScan.ScanNumber.ToString(),
             currentScan.FragScanInfo.CollisionMode,
             StringUtilities.DblToString(parentIonMZ, 2),

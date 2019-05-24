@@ -49,7 +49,7 @@ Namespace DataInput
                 mgfInputFilePathFull = Path.ChangeExtension(mgfInputFilePathFull, AGILENT_MSMS_FILE_EXTENSION)
                 Dim cdfInputFilePathFull = Path.ChangeExtension(mgfInputFilePathFull, AGILENT_MS_FILE_EXTENSION)
 
-                Dim datasetID = mOptions.SICOptions.DatasetNumber
+                Dim datasetID = mOptions.SICOptions.DatasetID
                 Dim sicOptions = mOptions.SICOptions
 
                 Dim success = UpdateDatasetFileStats(mgfFileInfo, datasetID)
@@ -447,7 +447,7 @@ Namespace DataInput
                         currentScan = scanList.FragScans(scanList.MasterScanOrder(scanIndex).ScanIndexPointer)
                     End If
 
-                    SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, eScanType, currentScan, sicOptions.DatasetNumber)
+                    SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, eScanType, currentScan, sicOptions.DatasetID)
                 Next
 
                 Console.WriteLine()

@@ -450,7 +450,7 @@ Namespace DataOutput
                 objXMLOut.WriteStartElement("SICData")
 
                 objXMLOut.WriteStartElement("ProcessingSummary")
-                objXMLOut.WriteElementString("DatasetNumber", sicOptions.DatasetNumber.ToString())
+                objXMLOut.WriteElementString("DatasetID", sicOptions.DatasetID.ToString())
                 objXMLOut.WriteElementString("SourceFilePath", inputFilePathFull)
 
                 Dim lastModTimeText As String

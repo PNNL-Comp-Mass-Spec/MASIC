@@ -1185,7 +1185,7 @@ Public Class frmMain
                 chkConsolidateConstantExtendedHeaderValues.Checked = .ConsolidateConstantExtendedHeaderValues
 
                 ' Dataset and Database Options
-                txtDatasetNumber.Text = "0"
+                txtDatasetID.Text = "0"
                 txtDatabaseConnectionString.Text = .DatabaseConnectionString
                 txtDatasetInfoQuerySQL.Text = .DatasetInfoQuerySql
 
@@ -1562,7 +1562,7 @@ Public Class frmMain
         Dim objToolTipControl As New ToolTip
 
         With objToolTipControl
-            .SetToolTip(txtDatasetNumber, "The dataset number is included as the first column in the output file.")
+            .SetToolTip(txtDatasetID, "The dataset ID is included as the first column in the output file.")
 
             .SetToolTip(txtIntensityThresholdAbsoluteMinimum, "Threshold for extending SIC")
             .SetToolTip(txtMaxDistanceScansNoOverlap, "Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion.")
@@ -1715,7 +1715,7 @@ Public Class frmMain
                 .ConsolidateConstantExtendedHeaderValues = chkConsolidateConstantExtendedHeaderValues.Checked
 
                 ' Dataset and Database options
-                .SICOptions.DatasetNumber = ParseTextBoxValueInt(txtDatasetNumber, lblDatasetNumber.Text & " must be an integer value", parseError)
+                .SICOptions.DatasetID = ParseTextBoxValueInt(txtDatasetID, lblDatasetID.Text & " must be an integer value", parseError)
                 If parseError Then Exit Try
 
                 If txtDatabaseConnectionString.TextLength > 0 And txtDatasetInfoQuerySQL.TextLength > 0 Then
@@ -2135,8 +2135,8 @@ Public Class frmMain
         TextBoxKeyPressHandler(txtCustomSICScanOrAcqTimeTolerance, e, True, True)
     End Sub
 
-    Private Sub txtDatasetNumber_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtDatasetNumber.KeyPress
-        TextBoxKeyPressHandler(txtDatasetNumber, e, True, False)
+    Private Sub txtDatasetID_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtDatasetID.KeyPress
+        TextBoxKeyPressHandler(txtDatasetID, e, True, False)
     End Sub
 
     Private Sub txtExportRawDataIntensityMinimum_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtExportRawDataIntensityMinimum.KeyPress

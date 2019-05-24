@@ -33,7 +33,7 @@ Public Module modMain
     Private mRecreateDirectoryHierarchyInAlternatePath As Boolean  ' Optional
 
     Private mDatasetLookupFilePath As String            ' Optional
-    Private mDatasetNumber As Integer
+    Private mDatasetID As Integer
 
     Private mRecurseDirectories As Boolean
     Private mMaxLevelsToRecurse As Integer
@@ -97,7 +97,7 @@ Public Module modMain
             RegisterMasicEvents(mMASIC)
 
             mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath
-            mMASIC.Options.SICOptions.DatasetNumber = mDatasetNumber
+            mMASIC.Options.SICOptions.DatasetID = mDatasetID
 
             If Not mMASICStatusFilename Is Nothing AndAlso mMASICStatusFilename.Length > 0 Then
                 mMASIC.Options.MASICStatusFilename = mMASICStatusFilename
@@ -221,11 +221,11 @@ Public Module modMain
                     If .RetrieveValueForParameter("P", value) Then mParameterFilePath = value
                     If .RetrieveValueForParameter("D", value) Then
                         If Integer.TryParse(value, intValue) Then
-                            mDatasetNumber = intValue
+                            mDatasetID = intValue
                         ElseIf Not String.IsNullOrWhiteSpace(value) Then
                             ' Assume the user specified a dataset number lookup file comma, space, or tab delimited delimited file specifying the dataset number for each input file)
                             mDatasetLookupFilePath = value
-                            mDatasetNumber = 0
+                            mDatasetID = 0
                         End If
                     End If
 

@@ -128,7 +128,7 @@ Namespace DataOutput
                         For Each valueNode As Xml.XmlNode In matchingNodeList(0).ChildNodes
                             With sicOptionsCompare
                                 Select Case valueNode.Name
-                                    Case "DatasetNumber" : .DatasetNumber = CInt(valueNode.InnerText)
+                                    Case "DatasetID" : .DatasetID = CInt(valueNode.InnerText)
                                     Case "SourceFilePath" : sourceFilePathCheck = valueNode.InnerText
                                     Case "SourceFileDateTime" : sourceFileDateTimeCheck = valueNode.InnerText
                                     Case "SourceFileSizeBytes" : sourceFileSizeBytes = CLng(valueNode.InnerText)
@@ -148,7 +148,7 @@ Namespace DataOutput
                         If masicPeakFinderDllVersion <> masicOptions.PeakFinderVersion Then Exit Try
 
                         ' Check the dataset number
-                        If sicOptionsCompare.DatasetNumber <> masicOptions.SICOptions.DatasetNumber Then Exit Try
+                        If sicOptionsCompare.DatasetID <> masicOptions.SICOptions.DatasetID Then Exit Try
 
                         ' Check the filename in sourceFilePathCheck
                         If Path.GetFileName(sourceFilePathCheck) <> Path.GetFileName(inputFilePathFull) Then Exit Try
@@ -704,7 +704,7 @@ Namespace DataOutput
                 For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndices.Count - 1
 
                     ' "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
-                    prefix = sicOptions.DatasetNumber.ToString() & ControlChars.Tab &
+                    prefix = sicOptions.DatasetID.ToString() & ControlChars.Tab &
                        parentIonIndex.ToString() & ControlChars.Tab &
                        fragScanIndex.ToString() & ControlChars.Tab &
                        StringUtilities.DblToString(scanList.ParentIons(parentIonIndex).MZ, 4) & ControlChars.Tab

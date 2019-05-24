@@ -379,7 +379,7 @@ Namespace DataInput
           writer As StreamWriter,
           eScanType As clsScanList.eScanTypeConstants,
           currentScan As clsScanInfo,
-          datasetNumber As Integer)
+          datasetID As Integer)
 
             Const cColDelimiter As Char = ControlChars.Tab
 
@@ -417,18 +417,18 @@ Namespace DataInput
             mScanTracking.ScanStats.Add(scanStatsEntry)
 
             Dim dataColumns = New List(Of String) From {
-                datasetNumber.ToString(),                   ' Dataset number
-                scanStatsEntry.ScanNumber.ToString(),       ' Scan number
-                scanStatsEntry.ElutionTime,                 ' Scan time (minutes)
-                scanStatsEntry.ScanType.ToString(),         ' Scan type (1 for MS, 2 for MS2, etc.)
-                scanStatsEntry.TotalIonIntensity,           ' Total ion intensity
-                scanStatsEntry.BasePeakIntensity,           ' Base peak ion intensity
-                scanStatsEntry.BasePeakMZ,                  ' Base peak ion m/z
-                scanStatsEntry.BasePeakSignalToNoiseRatio,  ' Base peak signal to noise ratio
-                scanStatsEntry.IonCount.ToString(),         ' Number of peaks (aka ions) in the spectrum
-                scanStatsEntry.IonCountRaw.ToString(),      ' Number of peaks (aka ions) in the spectrum prior to any filtering
-                scanStatsEntry.ScanTypeName                 ' Scan type name
-                }
+                    datasetID.ToString(),                       ' Dataset ID
+                    scanStatsEntry.ScanNumber.ToString(),       ' Scan number
+                    scanStatsEntry.ElutionTime,                 ' Scan time (minutes)
+                    scanStatsEntry.ScanType.ToString(),         ' Scan type (1 for MS, 2 for MS2, etc.)
+                    scanStatsEntry.TotalIonIntensity,           ' Total ion intensity
+                    scanStatsEntry.BasePeakIntensity,           ' Base peak ion intensity
+                    scanStatsEntry.BasePeakMZ,                  ' Base peak ion m/z
+                    scanStatsEntry.BasePeakSignalToNoiseRatio,  ' Base peak signal to noise ratio
+                    scanStatsEntry.IonCount.ToString(),         ' Number of peaks (aka ions) in the spectrum
+                    scanStatsEntry.IonCountRaw.ToString(),      ' Number of peaks (aka ions) in the spectrum prior to any filtering
+                    scanStatsEntry.ScanTypeName                 ' Scan type name
+                    }
 
             writer.WriteLine(String.Join(cColDelimiter, dataColumns))
 
