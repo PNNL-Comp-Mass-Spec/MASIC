@@ -1,7 +1,9 @@
-﻿Imports MASIC.clsMASIC
+﻿Imports System.Net.Sockets
+Imports MASIC.clsMASIC
 Imports MASIC.DataOutput
 Imports MASICPeakFinder
 Imports MSDataFileReader
+Imports PRISM
 Imports PSI_Interface.CV
 Imports PSI_Interface.MSData
 Imports SpectraTypeClassifier
@@ -456,8 +458,10 @@ Namespace DataInput
                     Dim scanTimeDiffMedians = New List(Of Double)
 
                     ' Also keep track of elution times
-                    ' Keys in this dictionary are elution times; values are the pseudo scan number mapped to each time (initially 0)
-                    Dim elutionTimeToScanMap = New Dictionary(Of Double, Integer)
+                    ' Keys in this dictionary are chromatogram number
+                    ' Values are a dictionary where keys are elution times and values are the pseudo scan number mapped to each time (initially 0)
+                    Dim elutionTimeToScanMapByChromatogram = New Dictionary(Of Integer, SortedDictionary(Of Double, Integer))
+                    Dim chromatogramNumber = 0
 
                     While iterator1.MoveNext()
 
@@ -465,6 +469,10 @@ Namespace DataInput
 
                         Dim isSRM As Boolean = IsSrmChromatogram(chromatogramItem)
                         If Not isSRM Then Continue While
+
+                        chromatogramNumber += 1
+                        Dim elutionTimeToScanMap = New SortedDictionary(Of Double, Integer)
+                        elutionTimeToScanMapByChromatogram.Add(chromatogramNumber, elutionTimeToScanMap)
 
                         ' Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
                         Dim scanTimeDiffs = New List(Of Double)
@@ -500,18 +508,83 @@ Namespace DataInput
                         medianScanTimeDiff = 0.000001
                     End If
 
-                    ' Populate a dictionary mapping elution time to scan number
-                    For Each elutionTime In elutionTimeToScanMap.Keys.ToList()
-                        Dim nearestPseudoScan = CInt(Math.Floor(elutionTime / medianScanTimeDiff)) + 1
-                        elutionTimeToScanMap(elutionTime) = nearestPseudoScan
+                    Console.WriteLine("Populating dictionary mapping SRM ion elution times to pseudo scan number")
+
+                    Dim lastProgress = DateTime.UtcNow
+                    Dim chromatogramsProcessed = 0
+
+                    ' Keys in this dictionary are scan times, values are the pseudo scan number mapped to each time
+                    Dim elutionTimeToScanMapMaster = New Dictionary(Of Double, Integer)
+
+                    ' Define the mapped scan number fo each elution time in elutionTimeToScanMapByChromatogram
+                    For Each chromTimesEntry In elutionTimeToScanMapByChromatogram
+                        If DateTime.UtcNow.Subtract(lastProgress).TotalSeconds >= 2.5 Then
+                            lastProgress = DateTime.UtcNow
+                            Dim percentComplete = chromatogramsProcessed / CDbl(elutionTimeToScanMapByChromatogram.Count) * 100
+                            Console.Write("{0:N0}% ", percentComplete)
+                        End If
+
+                        Dim elutionTimeToScanMap = chromTimesEntry.Value
+                        For Each elutionTime In elutionTimeToScanMap.Keys.ToList()
+                            Dim nearestPseudoScan = CInt(Math.Round(elutionTime / medianScanTimeDiff * 100)) + 1
+                            elutionTimeToScanMap(elutionTime) = nearestPseudoScan
+                        Next
+
+                        ' Fix duplicate scans (values) in elutionTimeToScanMap, if possible
+                        ' For Each elutionTime In (From item In elutionTimeToScanMap.Keys Order By item Select item)
+
+                        For i = 1 To elutionTimeToScanMap.Count - 1
+                            Dim previousScan = elutionTimeToScanMap.Values(i - 1)
+                            Dim currentScan = elutionTimeToScanMap.Values(i)
+
+                            If currentScan = previousScan Then
+                                ' Adjacent time points have an identical scan number
+                                If i = elutionTimeToScanMap.Count - 1 Then
+                                    elutionTimeToScanMap(elutionTimeToScanMap.Keys(i)) = currentScan + 1
+                                Else
+                                    Dim nextScan = elutionTimeToScanMap.Values(i + 1)
+
+                                    If nextScan - currentScan > 1 Then
+                                        ' The next scan is more than 1 scan away from this one; it is safe to increment currentScan
+                                        elutionTimeToScanMap(elutionTimeToScanMap.Keys(i)) = currentScan + 1
+                                    End If
+
+                                End If
+                            End If
+                        Next
+
+                        ' Populate the master dictionary mapping elution time to scan number
+                        Dim existingScan As Integer
+
+                        For Each item In elutionTimeToScanMap
+                            If elutionTimeToScanMapMaster.TryGetValue(item.Key, existingScan) Then
+                                If existingScan <> item.Value Then
+                                    Console.WriteLine("Elution times resulted in different pseudo scans; this is unexpected")
+                                End If
+                            Else
+                                elutionTimeToScanMapMaster.Add(item.Key, item.Value)
+                            End If
+                        Next
+
+                        chromatogramsProcessed += 1
                     Next
+
+                    Console.WriteLine()
 
                     ' Keys in this dictionary are scan numbers
                     ' Values are a dictionary tracking m/z values and intensities
                     Dim simulatedSpectraByScan = New Dictionary(Of Integer, Dictionary(Of Double, Double))
 
+                    ' Keys in this dictionary are scan numbers
+                    ' Values are the elution time for the scan
+                    Dim simulatedSpectraTimes = New Dictionary(Of Integer, Double)
+
                     Dim xmlReader2 = New SimpleMzMLReader(mzMLFile.FullName, False)
                     Dim iterator2 = xmlReader2.ReadAllChromatograms(True).GetEnumerator()
+
+                    Dim scanTimeLookupErrors = 0
+                    Dim nextWarningThreshold = 10
+
                     While iterator2.MoveNext()
 
                         Dim chromatogramItem = iterator2.Current
@@ -521,48 +594,100 @@ Namespace DataInput
 
                         Dim scanTimes = chromatogramItem.Times().ToList()
                         Dim intensities = chromatogramItem.Intensities().ToList()
+                        Dim currentMz = chromatogramItem.Product.TargetMz
 
                         Dim scanToStore As Integer
 
                         For i = 0 To scanTimes.Count - 1
-                            If elutionTimeToScanMap.TryGetValue(scanTimes(i), scanToStore) Then
-                                ' Keys in this dictionary are m/z; values are intensity for the m/z
-                                Dim mzListForScan As Dictionary(Of Double, Double) = Nothing
-                                If Not simulatedSpectraByScan.TryGetValue(scanToStore, mzListForScan) Then
-                                    mzListForScan = New Dictionary(Of Double, Double)
+                            If elutionTimeToScanMapMaster.TryGetValue(scanTimes(i), scanToStore) Then
+
+                                Dim success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore, scanTimes(i), currentMz, intensities(i))
+
+                                If Not success AndAlso scanToStore > 1 Then
+                                    ' The current scan already has a value for this m/z
+                                    ' Try storing in the previous scan
+                                    success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore - 1, scanTimes(i), currentMz, intensities(i))
                                 End If
 
-                                ' mzListForScan.Add(currentMz, intensities(i))
+                                If Not success Then
+                                    ' The current scan and the previous scan already have a value for this m/z
+                                    ' Store in the next scan
+                                    StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore + 1, scanTimes(i), currentMz, intensities(i))
+                                End If
+
+                                If Not success Then
+                                    ConsoleMsgUtils.ShowDebug("Skipping duplicate m/z value {0} for scan {1}", currentMz, scanToStore)
+                                End If
+                            Else
+                                scanTimeLookupErrors += 1
+                                If scanTimeLookupErrors <= 5 OrElse scanTimeLookupErrors >= nextWarningThreshold Then
+                                    ConsoleMsgUtils.ShowWarning("The elutionTimeToScanMap dictionary did not have scan time {0:N1} for {1}; this is unexpected",
+                                                                scanTimes(i), chromatogramItem.Id)
+
+                                    If scanTimeLookupErrors > 5 Then
+                                        nextWarningThreshold *= 2
+                                    End If
+                                End If
                             End If
+
                         Next
 
                     End While
 
+                    ' Call ExtractFragmentationScan for each scan in simulatedSpectraByScan
 
-                    ' ToDo: Implement this
-                    'Dim spectrumInfo = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum)
+                    Dim mzList = New List(Of Double)
+                    Dim intensityList = New List(Of Double)
 
-                    'Dim msSpectrum = GetNewSpectrum(spectrumInfo.DataCount)
+                    For Each simulatedSpectrum In simulatedSpectraByScan
 
-                    'mzList.CopyTo(msSpectrum.IonsMZ, 0)
-                    'intensityList.CopyTo(msSpectrum.IonsIntensity, 0)
+                        Dim scanNumber = simulatedSpectrum.Key
 
+                        mDatasetFileInfo.ScanCount += 1
 
-                    If xmlReader.NumChromatograms > 0 Then
-                        Dim percentComplete = scanList.MasterScanOrderCount / CDbl(xmlReader.NumChromatograms) * 100
-                    End If
+                        If scanNumber > 0 AndAlso Not mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions) Then
+                            mScansOutOfRange += 1
+                            Continue For
+                        End If
 
-                    'Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, spectrumInfo, nullMzMLSpectrum,
-                    '                                               scanList, spectraCache, dataOutputHandler,
-                    '                                               percentComplete, mDatasetFileInfo.ScanCount)
+                        Dim nativeId = String.Format("controllerType=0 controllerNumber=1 scan={0}", scanNumber)
+                        Dim scanStartTime As Double = simulatedSpectraTimes(scanNumber)
 
+                        Dim cvParams = New List(Of SimpleMzMLReader.CVParamData)
+                        Dim userParams = New List(Of SimpleMzMLReader.UserParamData)
+                        Dim precursors = New List(Of SimpleMzMLReader.Precursor)
+                        Dim scanWindows = New List(Of SimpleMzMLReader.ScanWindowData)
 
-                    'If Not extractSuccess Then
-                    '    Exit While
-                    'End If
+                        mzList.Clear()
+                        intensityList.Clear()
 
-                    'mDatasetFileInfo.ScanCount += 1
+                        For Each dataPoint In simulatedSpectrum.Value
+                            mzList.Add(dataPoint.Key)
+                            intensityList.Add(dataPoint.Value)
+                        Next
+
+                        Dim mzMLSpectrum = New SimpleMzMLReader.SimpleSpectrum(
+                            mzList, intensityList, scanNumber, nativeId, scanStartTime, cvParams, userParams, precursors, scanWindows)
+
+                        Dim mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, thermoRawFile)
+                        scanTimeMax = mzXmlSourceSpectrum.RetentionTimeMin
+
+                        Dim msSpectrum = New clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count)
+
+                        Dim percentComplete = scanList.MasterScanOrderCount / CDbl(xmlReader.NumSpectra) * 100
+
+                        Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
+                                                                       scanList, spectraCache, dataOutputHandler,
+                                                                       percentComplete, mDatasetFileInfo.ScanCount)
+
+                        If Not extractSuccess Then
+                            Exit For
+                        End If
+
+                    Next
+
                     mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanTimeMax)
+
                 End If
 
                 ' Shrink the memory usage of the scanList arrays
@@ -649,7 +774,7 @@ Namespace DataInput
             ' If yes, determine the scan number of the survey scan
             If spectrumInfo.MSLevel <= 1 Then
                 ' Survey Scan
-                success = ExtractSurveyScan(scanList, spectraCache, dataOutputHandler,
+                        success = ExtractSurveyScan(scanList, spectraCache, dataOutputHandler,
                                             spectrumInfo, msSpectrum, sicOptions,
                                             isMzXML, mzXmlSourceSpectrum)
 
@@ -1155,6 +1280,32 @@ Namespace DataInput
             End If
 
             Return False
+        End Function
+
+        Private Function StoreSimulatedDataPoint(
+          simulatedSpectraByScan As IDictionary(Of Integer, Dictionary(Of Double, Double)),
+          simulatedSpectraTimes As IDictionary(Of Integer, Double),
+          scanToStore As Integer,
+          elutionTime As Double,
+          mz As Double,
+          intensity As Double) As Boolean
+
+            ' Keys in this dictionary are m/z; values are intensity for the m/z
+            Dim mzListForScan As Dictionary(Of Double, Double) = Nothing
+            If Not simulatedSpectraByScan.TryGetValue(scanToStore, mzListForScan) Then
+                mzListForScan = New Dictionary(Of Double, Double)
+                simulatedSpectraByScan.Add(scanToStore, mzListForScan)
+                simulatedSpectraTimes.Add(scanToStore, elutionTime)
+            End If
+
+            Dim existingIntensity As Double
+            If mzListForScan.TryGetValue(mz, existingIntensity) Then
+                Return False
+            Else
+                mzListForScan.Add(mz, intensity)
+                Return True
+            End If
+
         End Function
 
         Private Sub StoreSpectrum(
