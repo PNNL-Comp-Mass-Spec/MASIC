@@ -52,6 +52,7 @@ Namespace DataInput
 
         Private mIsolationWidthNotFoundCount As Integer
         Private mPrecursorNotFoundCount As Integer
+        Private mNextPrecursorNotFoundCountThreshold As Integer
 
         Protected mScansOutOfRange As Integer
 
@@ -519,10 +520,15 @@ Namespace DataInput
             If message.StartsWith("Did not find the precursor for") Then
                 ' The precursor ion was not found in the centroided MS1 spectrum; this happens sometimes
                 mPrecursorNotFoundCount += 1
-                If mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
+                If mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW OrElse mPrecursorNotFoundCount > mNextPrecursorNotFoundCountThreshold Then
                     OnWarningEvent(message)
+
+                    If mPrecursorNotFoundCount > PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
+                        mNextPrecursorNotFoundCountThreshold *= 2
+                    End If
+
                 End If
-            Else
+                Else
                 OnWarningEvent(message)
             End If
         End Sub
