@@ -192,7 +192,7 @@ Both MASIC.exe and MASIC_Console.exe include the same command line interface.
 ```
 MASIC.exe
  /I:InputFilePath.raw [/O:OutputDirectoryPath]
- [/P:ParamFilePath] [/D:DatasetNumber or DatasetLookupFilePath]
+ [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath]
  [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]
  [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]
 ```
@@ -203,15 +203,15 @@ The output directory name is optional. If omitted, the output files will be
 created in the same directory as the input file. If included, then a subdirectory
 is created with the name OutputDirectoryName.
 
-The parameter file switch `/P` is optional. If supplied, it should point to a valid MASIC
-XML parameter file.  If omitted, defaults are used.
+The parameter file switch `/P` is optional. If supplied, it should point to a valid 
+MASIC XML parameter file.  If omitted, defaults are used.
 
-The `/D` switch can be used to specify the dataset number of the input file; if
+The `/D` switch can be used to specify the Dataset ID of the input file; if
 omitted, 0 will be used
 
 Alternatively, a lookup file can be specified with the `/D` switch (useful if
-processing multiple files using * or `/S`, or if running outside PNNL).
-This is a comma, space, or tab delimited file with two columns:\
+processing multiple files using * or `/S`). The lookup file is a comma, space, or
+tab delimited file with two columns:\
 Dataset Name and Dataset ID
 
 Use `/S` to process all valid files in the input directory and subdirectories.
@@ -232,7 +232,7 @@ The optional `/Q` switch will prevent the progress window from being shown (only
 ## Contacts
 
 Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)\
-Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.\
+Copyright 2019, Battelle Memorial Institute.  All Rights Reserved.\
 E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov\
 Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/\
 
