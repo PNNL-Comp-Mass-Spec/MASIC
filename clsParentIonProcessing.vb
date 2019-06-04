@@ -550,7 +550,7 @@ Public Class clsParentIonProcessing
 
             ' Reverse the order of intensityPointerArray so that it is ordered from the most intense to the least intense ion
             ' Note: We don't really need to reverse intensityList since we're done using it, but
-            ' it doesn't take long, it won't hurt, and it will keep intensityList sync'd with intensityPointerArray
+            ' it doesn't take long, it won't hurt, and it will keep intensityList synchronized with intensityPointerArray
             Array.Reverse(intensityPointerArray)
             Array.Reverse(intensityList)
 

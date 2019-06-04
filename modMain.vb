@@ -24,7 +24,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "May 23, 2019"
+    Public Const PROGRAM_DATE As String = "June 4, 2019"
 
     Private mInputFilePath As String
     Private mOutputDirectoryPath As String              ' Optional
@@ -143,14 +143,14 @@ Public Module modMain
             End If
 
             If returnCode <> 0 Then
-                PRISM.ProgRunner.SleepMilliseconds(1500)
+                ProgRunner.SleepMilliseconds(1500)
             End If
 
             Return returnCode
 
         Catch ex As Exception
             ShowErrorMessage("Error occurred in modMain->Main: " & Environment.NewLine & ex.Message)
-            PRISM.ProgRunner.SleepMilliseconds(1500)
+            ProgRunner.SleepMilliseconds(1500)
             Return -1
 #If GUI Then
         Finally

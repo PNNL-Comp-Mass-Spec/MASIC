@@ -5,10 +5,10 @@ Imports MASICPeakFinder
 Public Class clsSICProcessing
     Inherits clsMasicEventNotifier
 
-#Region "Classwide variables"
+    Private Const CREATING_SICS = "Creating SIC's for parent ions"
+
     Private ReadOnly mMASICPeakFinder As clsMASICPeakFinder
     Private ReadOnly mMRMProcessor As clsMRMProcessing
-#End Region
 
     ''' <summary>
     ''' Constructor
@@ -120,9 +120,9 @@ Public Class clsSICProcessing
             parentIonsProcessed = 0
             masicOptions.LastParentIonProcessingLogTime = DateTime.UtcNow
 
-            UpdateProgress(0, "Creating SIC's for the parent ions")
-            Console.Write("Creating SIC's for parent ions ")
-            ReportMessage("Creating SIC's for parent ions")
+            UpdateProgress(0, CREATING_SICS)
+            Console.Write(CREATING_SICS)
+            ReportMessage(CREATING_SICS)
 
             ' Create an array of m/z values in scanList.ParentIons, then sort by m/z
             ' Next, step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
@@ -750,7 +750,7 @@ Public Class clsSICProcessing
             End If
         Next
 
-        UpdateProgress("Creating SIC's for the parent ions")
+        UpdateProgress(CREATING_SICS)
 
         If masicOptions.AbortProcessing Then
             scanList.ProcessingIncomplete = True
