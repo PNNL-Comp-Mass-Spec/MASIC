@@ -133,7 +133,7 @@
       <Version>2.5.20</Version>
     </PackageReference>
     <PackageReference Include="PRISMWin-Library">
-      <Version>1.0.10</Version>
+      <Version>1.0.12</Version>
     </PackageReference>
     <PackageReference Include="Svg">
       <Version>2.3.0</Version>

@@ -189,7 +189,7 @@
       <Version>2.5.20</Version>
     </PackageReference>
     <PackageReference Include="PRISMWin-Library">
-      <Version>1.0.10</Version>
+      <Version>1.0.12</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
       <Version>2.2.0</Version>
