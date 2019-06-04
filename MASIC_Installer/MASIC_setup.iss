@@ -12,20 +12,22 @@ WelcomeLabel2=This will install [name/ver] on your computer.
 ; WelcomeLabel2=Welcome message%n%nAdditional sentence
 
 [Files]
-Source: ..\bin\MASIC.exe                      ; DestDir: {app}
-Source: ..\bin\MASIC.pdb                      ; DestDir: {app}
-Source: ..\bin\DataFilter.dll                 ; DestDir: {app}
-Source: ..\bin\InterDetect.dll                ; DestDir: {app}
-Source: ..\bin\MASICPeakFinder.dll            ; DestDir: {app}
-Source: ..\bin\MatrixDecompositionUtility.dll ; DestDir: {app}
-Source: ..\bin\MSDataFileReader.dll           ; DestDir: {app}
-Source: ..\bin\NetCDFReader.dll               ; DestDir: {app}
-Source: ..\bin\PRISM.dll                      ; DestDir: {app}
-Source: ..\bin\PRISMWin.dll                   ; DestDir: {app}
-Source: ..\bin\ProgressFormNET.dll            ; DestDir: {app}
-Source: ..\bin\PSI_Interface.dll              ; DestDir: {app}
-Source: ..\bin\ShFolderBrowser.dll            ; DestDir: {app}
-Source: ..\bin\SpectraTypeClassifier.dll      ; DestDir: {app}
+Source: ..\bin\MASIC.exe                       ; DestDir: {app}
+Source: ..\bin\MASIC.pdb                       ; DestDir: {app}
+Source: ..\bin\Console\Debug\MASIC_Console.exe ; DestDir: {app}
+Source: ..\bin\Console\Debug\MASIC_Console.pdb ; DestDir: {app}
+Source: ..\bin\DataFilter.dll                  ; DestDir: {app}
+Source: ..\bin\InterDetect.dll                 ; DestDir: {app}
+Source: ..\bin\MASICPeakFinder.dll             ; DestDir: {app}
+Source: ..\bin\MatrixDecompositionUtility.dll  ; DestDir: {app}
+Source: ..\bin\MSDataFileReader.dll            ; DestDir: {app}
+Source: ..\bin\NetCDFReader.dll                ; DestDir: {app}
+Source: ..\bin\PRISM.dll                       ; DestDir: {app}
+Source: ..\bin\PRISMWin.dll                    ; DestDir: {app}
+Source: ..\bin\ProgressFormNET.dll             ; DestDir: {app}
+Source: ..\bin\PSI_Interface.dll               ; DestDir: {app}
+Source: ..\bin\ShFolderBrowser.dll             ; DestDir: {app}
+Source: ..\bin\SpectraTypeClassifier.dll       ; DestDir: {app}
 Source: ..\bin\ThermoFisher.CommonCore.BackgroundSubtraction.dll    ; DestDir: {app}
 Source: ..\bin\ThermoFisher.CommonCore.Data.dll                     ; DestDir: {app}
 Source: ..\bin\ThermoFisher.CommonCore.MassPrecisionEstimator.dll   ; DestDir: {app}
