@@ -17,7 +17,7 @@ Public Class clsScanTracking
 
 #Region "Classwide variables"
     Private ReadOnly mReporterIons As clsReporterIons
-    Private ReadOnly mPeakFinder As MASICPeakFinder.clsMASICPeakFinder
+    Private ReadOnly mPeakFinder As clsMASICPeakFinder
 
     Private mSpectraFoundExceedingMaxIonCount As Integer = 0
     Private mMaxIonCountReported As Integer = 0
@@ -29,7 +29,7 @@ Public Class clsScanTracking
     ''' </summary>
     ''' <param name="reporterIons"></param>
     ''' <param name="peakFinder"></param>
-    Public Sub New(reporterIons As clsReporterIons, peakFinder As MASICPeakFinder.clsMASICPeakFinder)
+    Public Sub New(reporterIons As clsReporterIons, peakFinder As clsMASICPeakFinder)
         mReporterIons = reporterIons
         mPeakFinder = peakFinder
 
@@ -207,7 +207,7 @@ Public Class clsScanTracking
     Private Sub ComputeNoiseLevelForMassSpectrum(
       scanInfo As clsScanInfo,
       msSpectrum As clsMSSpectrum,
-      noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions)
+      noiseThresholdOptions As clsBaselineNoiseOptions)
 
         Const IGNORE_NON_POSITIVE_DATA = True
 
@@ -236,7 +236,7 @@ Public Class clsScanTracking
       dataImportUtilities As DataInput.clsDataImport,
       spectraCache As clsSpectraCache,
       msSpectrum As clsMSSpectrum,
-      noiseThresholdOptions As MASICPeakFinder.clsBaselineNoiseOptions,
+      noiseThresholdOptions As clsBaselineNoiseOptions,
       discardLowIntensityData As Boolean,
       compressData As Boolean,
       msDataResolution As Double,
