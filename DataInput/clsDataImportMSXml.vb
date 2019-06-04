@@ -1,5 +1,4 @@
-﻿Imports System.Net.Sockets
-Imports MASIC.clsMASIC
+﻿Imports MASIC.clsMASIC
 Imports MASIC.DataOutput
 Imports MASICPeakFinder
 Imports MSDataFileReader

@@ -59,12 +59,6 @@
     <Reference Include="NetCDFReader">
       <HintPath>Lib\NetCDFReader.dll</HintPath>
     </Reference>
-    <Reference Include="ProgressFormNET">
-      <HintPath>Lib\ProgressFormNET.dll</HintPath>
-    </Reference>
-    <Reference Include="ShFolderBrowser">
-      <HintPath>Lib\ShFolderBrowser.dll</HintPath>
-    </Reference>
     <Reference Include="SpectraTypeClassifier">
       <HintPath>Lib\SpectraTypeClassifier.dll</HintPath>
     </Reference>
