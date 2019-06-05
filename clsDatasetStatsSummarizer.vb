@@ -927,8 +927,10 @@ End Class
 
 Public Class clsDatasetSummaryStats
 
-    Public Property ElutionTimeMax As Double
+    Public ElutionTimeMax As Double
+
     Public MSStats As udtSummaryStatDetailsType
+
     Public MSnStats As udtSummaryStatDetailsType
 
     ''' <summary>
