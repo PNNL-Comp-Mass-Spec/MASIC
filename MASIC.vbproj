@@ -168,6 +168,9 @@
     <Compile Include="DatasetStats\clsDatasetFileInfo.vb" />
     <Compile Include="DatasetStats\clsDatasetStatsSummarizer.vb" />
     <Compile Include="DatasetStats\clsSampleInfo.vb" />
+    <Compile Include="DatasetStats\DatasetSummaryStats.vb" />
+    <Compile Include="DatasetStats\ScanStatsEntry.vb" />
+    <Compile Include="DatasetStats\SummaryStatDetails.vb" />    
     <Compile Include="frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
     </Compile>
@@ -180,11 +183,11 @@
     </EmbeddedResource>
     <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="modMain.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
     </Compile>
-    <Compile Include="My Project\AssemblyInfo.vb" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library">

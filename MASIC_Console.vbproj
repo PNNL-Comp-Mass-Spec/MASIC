@@ -158,6 +158,9 @@
     <Compile Include="DatasetStats\clsDatasetFileInfo.vb" />
     <Compile Include="DatasetStats\clsDatasetStatsSummarizer.vb" />
     <Compile Include="DatasetStats\clsSampleInfo.vb" />
+    <Compile Include="DatasetStats\DatasetSummaryStats.vb" />
+    <Compile Include="DatasetStats\ScanStatsEntry.vb" />
+    <Compile Include="DatasetStats\SummaryStatDetails.vb" />
     <Compile Include="modMain.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

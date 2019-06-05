@@ -385,7 +385,7 @@ Namespace DataInput
 
             Const cColDelimiter As Char = ControlChars.Tab
 
-            Dim scanStatsEntry As New clsScanStatsEntry() With {
+            Dim scanStatsEntry As New ScanStatsEntry() With {
                 .ScanNumber = currentScan.ScanNumber
             }
 

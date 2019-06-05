@@ -48,10 +48,10 @@ Namespace DatasetStats
         Private mDatasetStatsSummaryFileName As String
         Private mErrorMessage As String = String.Empty
 
-        Private ReadOnly mDatasetScanStats As List(Of clsScanStatsEntry)
+        Private ReadOnly mDatasetScanStats As List(Of ScanStatsEntry)
 
         Private mDatasetSummaryStatsUpToDate As Boolean
-        Private mDatasetSummaryStats As clsDatasetSummaryStats
+        Private mDatasetSummaryStats As DatasetSummaryStats
 
         Private ReadOnly mMedianUtils As clsMedianUtilities
 
@@ -115,8 +115,8 @@ Namespace DatasetStats
 
             mMedianUtils = New clsMedianUtilities()
 
-            mDatasetScanStats = New List(Of clsScanStatsEntry)
-            mDatasetSummaryStats = New clsDatasetSummaryStats()
+            mDatasetScanStats = New List(Of ScanStatsEntry)
+            mDatasetSummaryStats = New DatasetSummaryStats()
 
             mDatasetSummaryStatsUpToDate = False
 
@@ -131,7 +131,7 @@ Namespace DatasetStats
         ''' Add a New scan
         ''' </summary>
         ''' <param name="scanStats"></param>
-        Public Sub AddDatasetScan(scanStats As clsScanStatsEntry)
+        Public Sub AddDatasetScan(scanStats As ScanStatsEntry)
 
             mDatasetScanStats.Add(scanStats)
             mDatasetSummaryStatsUpToDate = False
@@ -158,9 +158,9 @@ Namespace DatasetStats
         ''' <param name="summaryStats">Stats output (initialized if nothing)</param>
         ''' <returns>>True if success, false if error</returns>
         ''' <remarks></remarks>
-        Public Function ComputeScanStatsSummary(scanStats As List(Of clsScanStatsEntry), <Out> ByRef summaryStats As clsDatasetSummaryStats) As Boolean
+        Public Function ComputeScanStatsSummary(scanStats As List(Of ScanStatsEntry), <Out> ByRef summaryStats As DatasetSummaryStats) As Boolean
 
-            summaryStats = New clsDatasetSummaryStats()
+            summaryStats = New DatasetSummaryStats()
 
             Try
 
@@ -185,14 +185,14 @@ Namespace DatasetStats
                     If statEntry.ScanType > 1 Then
                         ' MSn spectrum
                         ComputeScanStatsUpdateDetails(statEntry,
-                                                      summaryStats.ElutionTimeMax,
+                                                      summaryStats,
                                                       summaryStats.MSnStats,
                                                       ticListMSn,
                                                       bpiListMSn)
                     Else
                         ' MS spectrum
                         ComputeScanStatsUpdateDetails(statEntry,
-                                                      summaryStats.ElutionTimeMax,
+                                                      summaryStats,
                                                       summaryStats.MSStats,
                                                       ticListMS,
                                                       bpiListMS)
@@ -222,9 +222,9 @@ Namespace DatasetStats
         End Function
 
         Private Sub ComputeScanStatsUpdateDetails(
-                                                  scanStats As clsScanStatsEntry,
-                                                  ByRef elutionTimeMax As Double,
-                                                  ByRef udtSummaryStatDetails As clsDatasetSummaryStats.udtSummaryStatDetailsType,
+                                                  scanStats As ScanStatsEntry,
+                                                  summaryStats As DatasetSummaryStats,
+                                                  summaryStatDetails As SummaryStatDetails,
                                                   ticList As ICollection(Of Double),
                                                   bpiList As ICollection(Of Double))
 
@@ -234,29 +234,29 @@ Namespace DatasetStats
 
             If Not String.IsNullOrWhiteSpace(scanStats.ElutionTime) Then
                 If Double.TryParse(scanStats.ElutionTime, elutionTime) Then
-                    If elutionTime > elutionTimeMax Then
-                        elutionTimeMax = elutionTime
+                    If elutionTime > summaryStats.ElutionTimeMax Then
+                        summaryStats.ElutionTimeMax = elutionTime
                     End If
                 End If
             End If
 
             If Double.TryParse(scanStats.TotalIonIntensity, totalIonCurrent) Then
-                If totalIonCurrent > udtSummaryStatDetails.TICMax Then
-                    udtSummaryStatDetails.TICMax = totalIonCurrent
+                If totalIonCurrent > summaryStatDetails.TICMax Then
+                    summaryStatDetails.TICMax = totalIonCurrent
                 End If
 
                 ticList.Add(totalIonCurrent)
             End If
 
             If Double.TryParse(scanStats.BasePeakIntensity, basePeakIntensity) Then
-                If basePeakIntensity > udtSummaryStatDetails.BPIMax Then
-                    udtSummaryStatDetails.BPIMax = basePeakIntensity
+                If basePeakIntensity > summaryStatDetails.BPIMax Then
+                    summaryStatDetails.BPIMax = basePeakIntensity
                 End If
 
                 bpiList.Add(basePeakIntensity)
             End If
 
-            udtSummaryStatDetails.ScanCount += 1
+            summaryStatDetails.ScanCount += 1
 
         End Sub
 
@@ -285,7 +285,7 @@ Namespace DatasetStats
         Public Function CreateDatasetInfoFile(
                                               datasetName As String,
                                               datasetInfoFilePath As String,
-                                              scanStats As List(Of clsScanStatsEntry),
+                                              scanStats As List(Of ScanStatsEntry),
                                               datasetInfo As DatasetFileInfo,
                                               oSampleInfo As SampleInfo) As Boolean
 
@@ -349,7 +349,7 @@ Namespace DatasetStats
         ''' <param name="datasetInfo">Dataset Info</param>
         ''' <returns>XML (as string)</returns>
         ''' <remarks></remarks>
-        Public Function CreateDatasetInfoXML(scanStats As List(Of clsScanStatsEntry), datasetInfo As DatasetFileInfo) As String
+        Public Function CreateDatasetInfoXML(scanStats As List(Of ScanStatsEntry), datasetInfo As DatasetFileInfo) As String
             Return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo)
         End Function
 
@@ -364,7 +364,7 @@ Namespace DatasetStats
         ''' <returns>XML (as string)</returns>
         ''' <remarks></remarks>
         Public Function CreateDatasetInfoXML(
-                                             scanStats As List(Of clsScanStatsEntry),
+                                             scanStats As List(Of ScanStatsEntry),
                                              datasetInfo As DatasetFileInfo,
                                              oSampleInfo As SampleInfo) As String
 
@@ -381,7 +381,7 @@ Namespace DatasetStats
         ''' <remarks></remarks>
         Public Function CreateDatasetInfoXML(
                                              datasetName As String,
-                                             scanStats As List(Of clsScanStatsEntry),
+                                             scanStats As List(Of ScanStatsEntry),
                                              datasetInfo As DatasetFileInfo) As String
 
             Return CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, New SampleInfo())
@@ -397,7 +397,7 @@ Namespace DatasetStats
         ''' <remarks></remarks>
         Public Function CreateDatasetInfoXML(
                                              datasetName As String,
-                                             scanStats As List(Of clsScanStatsEntry),
+                                             scanStats As List(Of ScanStatsEntry),
                                              datasetInfo As DatasetFileInfo,
                                              oSampleInfo As SampleInfo) As String
 
@@ -410,12 +410,12 @@ Namespace DatasetStats
 
                 mErrorMessage = String.Empty
 
-                Dim summaryStats As clsDatasetSummaryStats
+                Dim summaryStats As DatasetSummaryStats
 
                 If scanStats Is mDatasetScanStats Then
                     summaryStats = GetDatasetSummaryStats()
                 Else
-                    summaryStats = New clsDatasetSummaryStats()
+                    summaryStats = New DatasetSummaryStats()
 
                     ' Parse the data in scanStats to compute the bulk values
                     Me.ComputeScanStatsSummary(scanStats, summaryStats)
@@ -576,7 +576,7 @@ Namespace DatasetStats
         Public Function CreateScanStatsFile(
                                             datasetName As String,
                                             scanStatsFilePath As String,
-                                            scanStats As List(Of clsScanStatsEntry),
+                                            scanStats As List(Of ScanStatsEntry),
                                             datasetInfo As DatasetFileInfo,
                                             oSampleInfo As SampleInfo) As Boolean
 
@@ -612,7 +612,7 @@ Namespace DatasetStats
 
                     Dim dataValues As New List(Of String)
 
-                    For Each scanStatsEntry As clsScanStatsEntry In scanStats
+                    For Each scanStatsEntry In scanStats
 
                         dataValues.Clear()
 
@@ -672,7 +672,7 @@ Namespace DatasetStats
             End If
         End Function
 
-        Public Function GetDatasetSummaryStats() As clsDatasetSummaryStats
+        Public Function GetDatasetSummaryStats() As DatasetSummaryStats
 
             If Not mDatasetSummaryStatsUpToDate Then
                 ComputeScanStatsSummary(mDatasetScanStats, mDatasetSummaryStats)
@@ -742,13 +742,13 @@ Namespace DatasetStats
         Public Function UpdateDatasetStatsTextFile(
                                                    datasetName As String,
                                                    datasetStatsFilePath As String,
-                                                   scanStats As List(Of clsScanStatsEntry),
+                                                   scanStats As List(Of ScanStatsEntry),
                                                    datasetInfo As DatasetFileInfo,
                                                    oSampleInfo As SampleInfo) As Boolean
 
             Dim writeHeaders As Boolean
 
-            Dim summaryStats As clsDatasetSummaryStats
+            Dim summaryStats As DatasetSummaryStats
 
             Try
 
@@ -762,7 +762,7 @@ Namespace DatasetStats
                 If scanStats Is mDatasetScanStats Then
                     summaryStats = GetDatasetSummaryStats()
                 Else
-                    summaryStats = New clsDatasetSummaryStats()
+                    summaryStats = New DatasetSummaryStats()
 
                     ' Parse the data in scanStats to compute the bulk values
                     Dim summarySuccess = Me.ComputeScanStatsSummary(scanStats, summaryStats)
@@ -829,165 +829,4 @@ Namespace DatasetStats
 
     End Class
 
-    Public Class clsScanStatsEntry
-        ''' <summary>
-        ''' Scan number
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property ScanNumber As Integer
-
-        ''' <summary>
-        ''' Scan Type (aka MSLevel)
-        ''' </summary>
-        ''' <remarks>1 for MS, 2 for MS2, 3 for MS3</remarks>
-        Public Property ScanType As Integer
-
-        ''' <summary>
-        ''' Scan filter
-        ''' </summary>
-        ''' <remarks>
-        ''' Examples:
-        '''   FTMS + p NSI Full ms [400.00-2000.00]
-        '''   ITMS + c ESI Full ms [300.00-2000.00]
-        '''   ITMS + p ESI d Z ms [1108.00-1118.00]
-        '''   ITMS + c ESI d Full ms2 342.90@cid35.00
-        ''' </remarks>
-        Public Property ScanFilterText As String
-
-        ''' <summary>
-        ''' Scan type name
-        ''' </summary>
-        ''' <remarks>
-        ''' Examples:
-        '''   MS, HMS, Zoom, CID-MSn, or PQD-MSn
-        ''' </remarks>
-        Public Property ScanTypeName As String
-
-        ' The following properties are strings to prevent the number formatting from changing
-
-        ''' <summary>
-        ''' Elution time, in minutes
-        ''' </summary>
-        Public Property ElutionTime As String
-
-        ''' <summary>
-        ''' Total ion intensity
-        ''' </summary>
-        Public Property TotalIonIntensity As String
-
-        ''' <summary>
-        ''' Base peak ion intensity
-        ''' </summary>
-        Public Property BasePeakIntensity As String
-
-        ''' <summary>
-        '''  Base peak m/z
-        ''' </summary>
-        Public Property BasePeakMZ As String
-
-        ''' <summary>
-        ''' Signal to noise ratio (S/N)
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property BasePeakSignalToNoiseRatio As String
-
-        ''' <summary>
-        ''' Ion count
-        ''' </summary>
-        Public Property IonCount As Integer
-
-        ''' <summary>
-        ''' Ion count before centroiding
-        ''' </summary>
-        Public Property IonCountRaw As Integer
-
-        ''' <summary>
-        ''' Clear all values
-        ''' </summary>
-        Public Sub Clear()
-            ScanNumber = 0
-            ScanType = 0
-
-            ScanFilterText = String.Empty
-            ScanTypeName = String.Empty
-
-            ElutionTime = "0"
-            TotalIonIntensity = "0"
-            BasePeakIntensity = "0"
-            BasePeakMZ = "0"
-            BasePeakSignalToNoiseRatio = "0"
-
-            IonCount = 0
-            IonCountRaw = 0
-        End Sub
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New()
-            Me.Clear()
-        End Sub
-    End Class
-
-    Public Class clsDatasetSummaryStats
-
-        Public ElutionTimeMax As Double
-
-        Public MSStats As udtSummaryStatDetailsType
-
-        Public MSnStats As udtSummaryStatDetailsType
-
-        ''' <summary>
-        ''' Keeps track of each ScanType in the dataset, along with the number of scans of this type
-        ''' </summary>
-        ''' <remarks>
-        ''' Examples:
-        '''   FTMS + p NSI Full ms
-        '''   ITMS + c ESI Full ms
-        '''   ITMS + p ESI d Z ms
-        '''   ITMS + c ESI d Full ms2 @cid35.00
-        ''' </remarks>
-        Public ReadOnly ScanTypeStats As Dictionary(Of String, Integer)
-
-        Public Structure udtSummaryStatDetailsType
-            Public ScanCount As Integer
-            Public TICMax As Double
-            Public BPIMax As Double
-            Public TICMedian As Double
-            Public BPIMedian As Double
-
-            Public Overrides Function ToString() As String
-                Return "ScanCount: " & ScanCount
-            End Function
-        End Structure
-
-        Public Sub Clear()
-
-            ElutionTimeMax = 0
-
-            MSStats.ScanCount = 0
-            MSStats.TICMax = 0
-            MSStats.BPIMax = 0
-            MSStats.TICMedian = 0
-            MSStats.BPIMedian = 0
-
-            MSnStats.ScanCount = 0
-            MSnStats.TICMax = 0
-            MSnStats.BPIMax = 0
-            MSnStats.TICMedian = 0
-            MSnStats.BPIMedian = 0
-
-            ScanTypeStats.Clear()
-
-        End Sub
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New()
-            ScanTypeStats = New Dictionary(Of String, Integer)
-            Me.Clear()
-        End Sub
-
-    End Class
 End Namespace

@@ -13,7 +13,7 @@ Public Class clsScanTracking
 #End Region
 
 #Region "Properties"
-    Public ReadOnly Property ScanStats As List(Of clsScanStatsEntry)
+    Public ReadOnly Property ScanStats As List(Of ScanStatsEntry)
 #End Region
 
 #Region "Classwide variables"
@@ -34,7 +34,7 @@ Public Class clsScanTracking
         mReporterIons = reporterIons
         mPeakFinder = peakFinder
 
-        ScanStats = New List(Of clsScanStatsEntry)
+        ScanStats = New List(Of ScanStatsEntry)
     End Sub
 
     ''' <summary>
