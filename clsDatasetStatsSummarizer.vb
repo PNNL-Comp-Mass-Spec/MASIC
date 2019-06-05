@@ -102,9 +102,13 @@ Public Class clsDatasetStatsSummarizer
     End Sub
 
     ' ReSharper disable once UnusedMember.Global
-    Public Sub AddDatasetScan(objScanStats As clsScanStatsEntry)
+    '''<summary>
+    ''' Add a New scan
+    ''' </summary>
+    ''' <param name="scanStats"></param>
+    Public Sub AddDatasetScan(scanStats As clsScanStatsEntry)
 
-        mDatasetScanStats.Add(objScanStats)
+        mDatasetScanStats.Add(scanStats)
         mDatasetSummaryStatsUpToDate = False
 
     End Sub
@@ -130,15 +134,12 @@ Public Class clsDatasetStatsSummarizer
     End Sub
 
     ''' <summary>
-    ''' Summarizes the scan info in objScanStats()
+    ''' Summarizes the scan info in scanStats()
     ''' </summary>
-    ''' <param name="objScanStats">ScanStats data to parse</param>
+    ''' <param name="scanStats">ScanStats data to parse</param>
     ''' <param name="summaryStats">Stats output (initialized if nothing)</param>
     ''' <returns>>True if success, false if error</returns>
     ''' <remarks></remarks>
-    Public Function ComputeScanStatsSummary(objScanStats As List(Of clsScanStatsEntry),
-                                            ByRef summaryStats As clsDatasetSummaryStats) As Boolean
-
         Dim objEntry As clsScanStatsEntry
 
         Dim scanTypeKey As String
@@ -148,13 +149,14 @@ Public Class clsDatasetStatsSummarizer
         Dim ticListMSn = New List(Of Double)
 
         Dim bpiListMS = New List(Of Double)
+    Public Function ComputeScanStatsSummary(scanStats As List(Of clsScanStatsEntry), <Out> ByRef summaryStats As clsDatasetSummaryStats) As Boolean
 
         Dim bpiListMSn = New List(Of Double)
 
         Try
 
-            If objScanStats Is Nothing Then
-                ReportError("objScanStats is Nothing; unable to continue in ComputeScanStatsSummary")
+            If scanStats Is Nothing Then
+                ReportError("scanStats is Nothing; unable to continue in ComputeScanStatsSummary")
                 Return False
             Else
                 mErrorMessage = String.Empty
@@ -167,29 +169,30 @@ Public Class clsDatasetStatsSummarizer
                 summaryStats.Clear()
             End If
 
-            For Each objEntry In objScanStats
 
-                If objEntry.ScanType > 1 Then
+            For Each statEntry In scanStats
+
+                If statEntry.ScanType > 1 Then
                     ' MSn spectrum
-                    ComputeScanStatsUpdateDetails(objEntry,
+                    ComputeScanStatsUpdateDetails(statEntry,
                                                   summaryStats.ElutionTimeMax,
                                                   summaryStats.MSnStats,
                                                   ticListMSn,
                                                   bpiListMSn)
                 Else
                     ' MS spectrum
-                    ComputeScanStatsUpdateDetails(objEntry,
+                    ComputeScanStatsUpdateDetails(statEntry,
                                                   summaryStats.ElutionTimeMax,
                                                   summaryStats.MSStats,
                                                   ticListMS,
                                                   bpiListMS)
                 End If
 
-                scanTypeKey = objEntry.ScanTypeName & SCAN_TYPE_STATS_SEP_CHAR & objEntry.ScanFilterText
-                If summaryStats.objScanTypeStats.ContainsKey(scanTypeKey) Then
-                    summaryStats.objScanTypeStats.Item(scanTypeKey) += 1
+                Dim scanTypeKey = statEntry.ScanTypeName & SCAN_TYPE_STATS_SEP_CHAR & statEntry.ScanFilterText
+                If summaryStats.ScanTypeStats.ContainsKey(scanTypeKey) Then
+                    summaryStats.ScanTypeStats.Item(scanTypeKey) += 1
                 Else
-                    summaryStats.objScanTypeStats.Add(scanTypeKey, 1)
+                    summaryStats.ScanTypeStats.Add(scanTypeKey, 1)
                 End If
             Next
 
@@ -209,25 +212,25 @@ Public Class clsDatasetStatsSummarizer
     End Function
 
     Private Sub ComputeScanStatsUpdateDetails(
-                                              ByRef objScanStats As clsScanStatsEntry,
-                                              ByRef elutionTimeMax As Double,
-                                              ByRef udtSummaryStatDetails As clsDatasetSummaryStats.udtSummaryStatDetailsType,
-                                              ByRef ticList As List(Of Double),
-                                              ByRef bpiList As List(Of Double))
+        scanStats As clsScanStatsEntry,
+        ByRef elutionTimeMax As Double,
+        ByRef udtSummaryStatDetails As clsDatasetSummaryStats.udtSummaryStatDetailsType,
+        ticList As ICollection(Of Double),
+        bpiList As ICollection(Of Double))
 
         Dim elutionTime As Double
         Dim totalIonCurrent As Double
         Dim basePeakIntensity As Double
 
-        If objScanStats.ElutionTime <> Nothing AndAlso objScanStats.ElutionTime.Length > 0 Then
-            If Double.TryParse(objScanStats.ElutionTime, elutionTime) Then
+        If Not String.IsNullOrWhiteSpace(scanStats.ElutionTime) Then
+            If Double.TryParse(scanStats.ElutionTime, elutionTime) Then
                 If elutionTime > elutionTimeMax Then
                     elutionTimeMax = elutionTime
                 End If
             End If
         End If
 
-        If Double.TryParse(objScanStats.TotalIonIntensity, totalIonCurrent) Then
+        If Double.TryParse(scanStats.TotalIonIntensity, totalIonCurrent) Then
             If totalIonCurrent > udtSummaryStatDetails.TICMax Then
                 udtSummaryStatDetails.TICMax = totalIonCurrent
             End If
@@ -235,7 +238,7 @@ Public Class clsDatasetStatsSummarizer
             ticList.Add(totalIonCurrent)
         End If
 
-        If Double.TryParse(objScanStats.BasePeakIntensity, basePeakIntensity) Then
+        If Double.TryParse(scanStats.BasePeakIntensity, basePeakIntensity) Then
             If basePeakIntensity > udtSummaryStatDetails.BPIMax Then
                 udtSummaryStatDetails.BPIMax = basePeakIntensity
             End If
@@ -255,39 +258,36 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
-    Public Function CreateDatasetInfoFile(
-                                          datasetName As String,
-                                          datasetInfoFilePath As String) As Boolean
-
+    Public Function CreateDatasetInfoFile(datasetName As String, datasetInfoFilePath As String) As Boolean
         Return CreateDatasetInfoFile(datasetName, datasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
     ''' <summary>
-    ''' Creates an XML file summarizing the data in objScanStats and udtDatasetFileInfo
+    ''' Creates an XML file summarizing the data in scanStats and datasetInfo
     ''' </summary>
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
-    ''' <param name="objScanStats">Scan stats to parse</param>
+    ''' <param name="scanStats">Scan stats to parse</param>
     ''' <param name="datasetInfo">Dataset Info</param>
     ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoFile(
-                                          datasetName As String,
-                                          datasetInfoFilePath As String,
-                                          ByRef objScanStats As List(Of clsScanStatsEntry),
+        datasetName As String,
+        datasetInfoFilePath As String,
+        scanStats As List(Of clsScanStatsEntry),
         datasetInfo As DatasetFileInfo,
         oSampleInfo As SampleInfo) As Boolean
 
         Dim success As Boolean
 
         Try
-            If objScanStats Is Nothing Then
-                ReportError("objScanStats is Nothing; unable to continue in CreateDatasetInfoFile")
+            If scanStats Is Nothing Then
+                ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoFile")
                 Return False
-            Else
-                mErrorMessage = String.Empty
             End If
+
+            mErrorMessage = String.Empty
 
             ' If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, then we would have to use System.Encoding.Unicode
             ' However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
@@ -332,30 +332,29 @@ Public Class clsDatasetStatsSummarizer
 
     ' ReSharper disable once UnusedMember.Global
     ''' <summary>
-    ''' Creates XML summarizing the data in objScanStats and udtDatasetFileInfo
-    ''' Auto-determines the dataset name using udtDatasetFileInfo.DatasetName
+    ''' Creates XML summarizing the data in scanStats and datasetInfo
+    ''' Auto-determines the dataset name using datasetInfo.DatasetName
     ''' </summary>
-    ''' <param name="objScanStats">Scan stats to parse</param>
-    ''' <param name="udtDatasetFileInfo">Dataset Info</param>
+    ''' <param name="scanStats">Scan stats to parse</param>
+    ''' <param name="datasetInfo">Dataset Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
-    Public Function CreateDatasetInfoXML(
-                                         ByRef objScanStats As List(Of clsScanStatsEntry),
-                                         ByRef udtDatasetFileInfo As udtDatasetFileInfoType) As String
-
-        Return CreateDatasetInfoXML(udtDatasetFileInfo.DatasetName, objScanStats, udtDatasetFileInfo)
+    Public Function CreateDatasetInfoXML(scanStats As List(Of clsScanStatsEntry), datasetInfo As DatasetFileInfo) As String
+        Return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo)
     End Function
 
     ' ReSharper disable once UnusedMember.Global
     ''' <summary>
-    ''' Auto-determines the dataset name using udtDatasetFileInfo.DatasetName
+    ''' Creates XML summarizing the data in scanStats, datasetInfo, and oSampleInfo
+    ''' Auto-determines the dataset name using datasetInfo.DatasetName
     ''' </summary>
+    ''' <param name="scanStats">Scan stats to parse</param>
     ''' <param name="datasetInfo">Dataset Info</param>
     ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
-                                         ByRef objScanStats As List(Of clsScanStatsEntry),
+        scanStats As List(Of clsScanStatsEntry),
         datasetInfo As DatasetFileInfo,
         oSampleInfo As SampleInfo) As String
 
@@ -363,56 +362,53 @@ Public Class clsDatasetStatsSummarizer
     End Function
 
     ''' <summary>
-    ''' Creates XML summarizing the data in objScanStats and udtDatasetFileInfo
+    ''' Creates XML summarizing the data in scanStats and datasetInfo
     ''' </summary>
     ''' <param name="datasetName">Dataset Name</param>
-    ''' <param name="objScanStats">Scan stats to parse</param>
+    ''' <param name="scanStats">Scan stats to parse</param>
     ''' <param name="datasetInfo">Dataset Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
-                                         datasetName As String,
-                                         ByRef objScanStats As List(Of clsScanStatsEntry),
+        datasetName As String,
+        scanStats As List(Of clsScanStatsEntry),
         datasetInfo As DatasetFileInfo) As String
 
-        Dim udtSampleInfo = New udtSampleInfoType()
-        udtSampleInfo.Clear()
-
-        Return CreateDatasetInfoXML(datasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo)
+        Return CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, New SampleInfo())
     End Function
 
     ''' <summary>
-    ''' Creates XML summarizing the data in objScanStats and udtDatasetFileInfo
+    ''' Creates XML summarizing the data in scanStats and datasetInfo
     ''' </summary>
     ''' <param name="datasetName">Dataset Name</param>
-    ''' <param name="objScanStats">Scan stats to parse</param>
+    ''' <param name="scanStats">Scan stats to parse</param>
     ''' <param name="datasetInfo">Dataset Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
-                                         datasetName As String,
-                                         objScanStats As List(Of clsScanStatsEntry),
+        datasetName As String,
+        scanStats As List(Of clsScanStatsEntry),
         datasetInfo As DatasetFileInfo,
         oSampleInfo As SampleInfo) As String
 
         Try
 
-            If objScanStats Is Nothing Then
-                ReportError("objScanStats is Nothing; unable to continue in CreateDatasetInfoXML")
+            If scanStats Is Nothing Then
+                ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoXML")
                 Return String.Empty
-            Else
-                mErrorMessage = String.Empty
             End If
+
+            mErrorMessage = String.Empty
 
             Dim summaryStats As clsDatasetSummaryStats
 
-            If objScanStats Is mDatasetScanStats Then
+            If scanStats Is mDatasetScanStats Then
                 summaryStats = GetDatasetSummaryStats()
             Else
                 summaryStats = New clsDatasetSummaryStats()
 
-                ' Parse the data in objScanStats to compute the bulk values
-                Me.ComputeScanStatsSummary(objScanStats, summaryStats)
+                ' Parse the data in scanStats to compute the bulk values
+                Me.ComputeScanStatsSummary(scanStats, summaryStats)
             End If
 
             Dim objXMLSettings = New XmlWriterSettings()
@@ -433,9 +429,9 @@ Public Class clsDatasetStatsSummarizer
             ' Dim sbDatasetInfo As New System.StringBuilder
             ' Dim objStringWriter As = StringWriter
             ' objStringWriter = New StringWriter(sbDatasetInfo)
-            ' objDSInfo = New System.Xml.XmlTextWriter(objStringWriter)
-            ' objDSInfo.Formatting = System.Xml.Formatting.Indented
-            ' objDSInfo.Indentation = 2
+            ' writer = New System.Xml.XmlTextWriter(objStringWriter)
+            ' writer.Formatting = System.Xml.Formatting.Indented
+            ' writer.Indentation = 2
 
             ' However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16)
             '  since this is the only character encoding used in the .NET Framework for String values,
@@ -445,21 +441,20 @@ Public Class clsDatasetStatsSummarizer
             '  (since we used objXMLSettings.Encoding = System.Encoding.UTF8)
             '
             Dim objMemStream = New MemoryStream()
-            Dim objDSInfo = XmlWriter.Create(objMemStream, objXMLSettings)
+            Dim writer = XmlWriter.Create(objMemStream, objXMLSettings)
 
-            objDSInfo.WriteStartDocument(True)
+            writer.WriteStartDocument(True)
 
             'Write the beginning of the "Root" element.
-            objDSInfo.WriteStartElement("DatasetInfo")
+            writer.WriteStartElement("DatasetInfo")
 
-            objDSInfo.WriteElementString("Dataset", datasetName)
+            writer.WriteElementString("Dataset", datasetName)
 
-            objDSInfo.WriteStartElement("ScanTypes")
+            writer.WriteStartElement("ScanTypes")
 
-            Dim objEnum = summaryStats.objScanTypeStats.GetEnumerator()
-            Do While objEnum.MoveNext
+            For Each scanTypeEntry In summaryStats.ScanTypeStats
 
-                Dim scanType = objEnum.Current.Key
+                Dim scanType = scanTypeEntry.Key
                 Dim indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal)
                 Dim scanFilterText As String
 
@@ -474,61 +469,61 @@ Public Class clsDatasetStatsSummarizer
                     scanFilterText = String.Empty
                 End If
 
-                objDSInfo.WriteStartElement("ScanType")
-                objDSInfo.WriteAttributeString("ScanCount", objEnum.Current.Value.ToString())
-                objDSInfo.WriteAttributeString("ScanFilterText", FixNull(scanFilterText))
-                objDSInfo.WriteString(scanType)
-                objDSInfo.WriteEndElement()     ' ScanType
-            Loop
+                writer.WriteStartElement("ScanType")
+                writer.WriteAttributeString("ScanCount", scanTypeEntry.Value.ToString())
+                writer.WriteAttributeString("ScanFilterText", FixNull(scanFilterText))
+                writer.WriteString(scanType)
+                writer.WriteEndElement()     ' ScanType
+            Next
 
-            objDSInfo.WriteEndElement()       ' ScanTypes
+            writer.WriteEndElement()       ' ScanTypes
 
-            objDSInfo.WriteStartElement("AcquisitionInfo")
+            writer.WriteStartElement("AcquisitionInfo")
 
             Dim scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount
             If scanCountTotal = 0 And datasetInfo.ScanCount > 0 Then
                 scanCountTotal = datasetInfo.ScanCount
             End If
 
-            objDSInfo.WriteElementString("ScanCount", scanCountTotal.ToString())
+            writer.WriteElementString("ScanCount", scanCountTotal.ToString())
 
-            objDSInfo.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString())
-            objDSInfo.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString())
-            objDSInfo.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString())
+            writer.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString())
+            writer.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString())
+            writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString())
 
-            objDSInfo.WriteElementString("AcqTimeMinutes", udtDatasetFileInfo.AcqTimeEnd.Subtract(udtDatasetFileInfo.AcqTimeStart).TotalMinutes.ToString("0.00"))
-            objDSInfo.WriteElementString("StartTime", udtDatasetFileInfo.AcqTimeStart.ToString("yyyy-MM-dd hh:mm:ss tt"))
-            objDSInfo.WriteElementString("EndTime", udtDatasetFileInfo.AcqTimeEnd.ToString("yyyy-MM-dd hh:mm:ss tt"))
+            writer.WriteElementString("AcqTimeMinutes", datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"))
+            writer.WriteElementString("StartTime", datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING))
+            writer.WriteElementString("EndTime", datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING))
 
-            objDSInfo.WriteElementString("FileSizeBytes", udtDatasetFileInfo.FileSizeBytes.ToString())
+            writer.WriteElementString("FileSizeBytes", datasetInfo.FileSizeBytes.ToString())
 
-            objDSInfo.WriteEndElement()       ' AcquisitionInfo
+            writer.WriteEndElement()       ' AcquisitionInfo
 
-            objDSInfo.WriteStartElement("TICInfo")
-            objDSInfo.WriteElementString("TIC_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMax, 5))
-            objDSInfo.WriteElementString("TIC_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMax, 5))
-            objDSInfo.WriteElementString("BPI_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMax, 5))
-            objDSInfo.WriteElementString("BPI_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMax, 5))
-            objDSInfo.WriteElementString("TIC_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMedian, 5))
-            objDSInfo.WriteElementString("TIC_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMedian, 5))
-            objDSInfo.WriteElementString("BPI_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMedian, 5))
-            objDSInfo.WriteElementString("BPI_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMedian, 5))
-            objDSInfo.WriteEndElement()       ' TICInfo
+            writer.WriteStartElement("TICInfo")
+            writer.WriteElementString("TIC_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMax, 5))
+            writer.WriteElementString("TIC_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMax, 5))
+            writer.WriteElementString("BPI_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMax, 5))
+            writer.WriteElementString("BPI_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMax, 5))
+            writer.WriteElementString("TIC_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMedian, 5))
+            writer.WriteElementString("TIC_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMedian, 5))
+            writer.WriteElementString("BPI_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMedian, 5))
+            writer.WriteElementString("BPI_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMedian, 5))
+            writer.WriteEndElement()       ' TICInfo
 
-            ' Only write the SampleInfo block if udtSampleInfo contains entries
-            If udtSampleInfo.HasData() Then
-                objDSInfo.WriteStartElement("SampleInfo")
-                objDSInfo.WriteElementString("SampleName", FixNull(udtSampleInfo.SampleName))
-                objDSInfo.WriteElementString("Comment1", FixNull(udtSampleInfo.Comment1))
-                objDSInfo.WriteElementString("Comment2", FixNull(udtSampleInfo.Comment2))
-                objDSInfo.WriteEndElement()       ' SampleInfo
+            ' Only write the oSampleInfo block if oSampleInfo contains entries
+            If oSampleInfo.HasData() Then
+                writer.WriteStartElement("SampleInfo")
+                writer.WriteElementString("SampleName", FixNull(oSampleInfo.SampleName))
+                writer.WriteElementString("Comment1", FixNull(oSampleInfo.Comment1))
+                writer.WriteElementString("Comment2", FixNull(oSampleInfo.Comment2))
+                writer.WriteEndElement()       ' SampleInfo
             End If
 
 
-            objDSInfo.WriteEndElement()  'End the "Root" element (DatasetInfo)
-            objDSInfo.WriteEndDocument() 'End the document
+            writer.WriteEndElement()  'End the "Root" element (DatasetInfo)
+            writer.WriteEndDocument() 'End the document
 
-            objDSInfo.Close()
+            writer.Close()
 
             ' Now Rewind the memory stream and output as a string
             objMemStream.Position = 0
@@ -554,10 +549,7 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="scanStatsFilePath">File path to write the text file to</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
-    Public Function CreateScanStatsFile(
-                                        datasetName As String,
-                                        scanStatsFilePath As String) As Boolean
-
+    Public Function CreateScanStatsFile(datasetName As String, scanStatsFilePath As String) As Boolean
         Return CreateScanStatsFile(datasetName, scanStatsFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
@@ -566,15 +558,15 @@ Public Class clsDatasetStatsSummarizer
     ''' </summary>
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="scanStatsFilePath">File path to write the text file to</param>
-    ''' <param name="objScanStats">Scan stats to parse</param>
+    ''' <param name="scanStats">Scan stats to parse</param>
     ''' <param name="datasetInfo">Dataset Info</param>
     ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateScanStatsFile(
-                                        datasetName As String,
-                                        scanStatsFilePath As String,
-                                        objScanStats As List(Of clsScanStatsEntry),
+        datasetName As String,
+        scanStatsFilePath As String,
+        scanStats As List(Of clsScanStatsEntry),
         datasetInfo As DatasetFileInfo,
         oSampleInfo As SampleInfo) As Boolean
 
@@ -582,12 +574,12 @@ Public Class clsDatasetStatsSummarizer
         Dim datasetID = 0
 
         Try
-            If objScanStats Is Nothing Then
-                ReportError("objScanStats is Nothing; unable to continue in CreateScanStatsFile")
+            If scanStats Is Nothing Then
+                ReportError("scanStats is Nothing; unable to continue in CreateScanStatsFile")
                 Return False
-            Else
-                mErrorMessage = String.Empty
             End If
+
+            mErrorMessage = String.Empty
 
             Using writer = New StreamWriter(New FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
 
@@ -608,24 +600,46 @@ Public Class clsDatasetStatsSummarizer
 
                 writer.WriteLine(String.Join(ControlChars.Tab, headerNames))
 
-                Dim dataColumns As New List(Of String)
+                Dim dataValues As New List(Of String)
 
-                For Each objScanStatsEntry As clsScanStatsEntry In objScanStats
+                For Each scanStatsEntry As clsScanStatsEntry In scanStats
 
-                    dataColumns.Clear()
-                    dataColumns.Add(datasetID.ToString())                           ' Dataset number (aka Dataset ID)
-                    dataColumns.Add(objScanStatsEntry.ScanNumber.ToString())        ' Scan number
-                    dataColumns.Add(objScanStatsEntry.ElutionTime)                  ' Scan time (minutes)
-                    dataColumns.Add(objScanStatsEntry.ScanType.ToString())          ' Scan type (1 for MS, 2 for MS2, etc.)
-                    dataColumns.Add(objScanStatsEntry.TotalIonIntensity)            ' Total ion intensity
-                    dataColumns.Add(objScanStatsEntry.BasePeakIntensity)            ' Base peak ion intensity
-                    dataColumns.Add(objScanStatsEntry.BasePeakMZ)                   ' Base peak ion m/z
-                    dataColumns.Add(objScanStatsEntry.BasePeakSignalToNoiseRatio)   ' Base peak signal to noise ratio
-                    dataColumns.Add(objScanStatsEntry.IonCount.ToString())          ' Number of peaks (aka ions) in the spectrum
-                    dataColumns.Add(objScanStatsEntry.IonCountRaw.ToString())       ' Number of peaks (aka ions) in the spectrum prior to any filtering
-                    dataColumns.Add(objScanStatsEntry.ScanTypeName)                 ' Scan type name
+                    dataValues.Clear()
 
-                    writer.WriteLine(String.Join(ControlChars.Tab, dataColumns))
+                    ' Dataset ID
+                    dataValues.Add(datasetID.ToString())
+
+                    ' Scan number
+                    dataValues.Add(scanStatsEntry.ScanNumber.ToString())
+
+                    ' Scan time (minutes)
+                    dataValues.Add(scanStatsEntry.ElutionTime)
+
+                    ' Scan type (1 for MS, 2 for MS2, etc.)
+                    dataValues.Add(scanStatsEntry.ScanType.ToString())
+
+                    ' Total ion intensity
+                    dataValues.Add(scanStatsEntry.TotalIonIntensity)
+
+                    ' Base peak ion intensity
+                    dataValues.Add(scanStatsEntry.BasePeakIntensity)
+
+                    ' Base peak ion m/z
+                    dataValues.Add(scanStatsEntry.BasePeakMZ)
+
+                    ' Base peak signal to noise ratio
+                    dataValues.Add(scanStatsEntry.BasePeakSignalToNoiseRatio)
+
+                    ' Number of peaks (aka ions) in the spectrum
+                    dataValues.Add(scanStatsEntry.IonCount.ToString())
+
+                    ' Number of peaks (aka ions) in the spectrum prior to any filtering
+                    dataValues.Add(scanStatsEntry.IonCountRaw.ToString())
+
+                    ' Scan type name
+                    dataValues.Add(scanStatsEntry.ScanTypeName)
+
+                    writer.WriteLine(String.Join(ControlChars.Tab, dataValues))
 
                 Next
 
@@ -679,12 +693,8 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="scanTypeName"></param>
     ''' <returns>True if the scan was found and updated; otherwise false</returns>
     ''' <remarks></remarks>
-    Public Function UpdateDatasetScanType(
-                                          scanNumber As Integer,
-                                          scanType As Integer,
-                                          scanTypeName As String) As Boolean
+    Public Function UpdateDatasetScanType(scanNumber As Integer, scanType As Integer, scanTypeName As String) As Boolean
 
-        Dim index As Integer
         Dim matchFound As Boolean
 
         ' Look for scan scanNumber in mDatasetScanStats
@@ -711,27 +721,24 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
-    Public Function UpdateDatasetStatsTextFile(
-                                               datasetName As String,
-                                               datasetInfoFilePath As String) As Boolean
-
+    Public Function UpdateDatasetStatsTextFile(datasetName As String, datasetInfoFilePath As String) As Boolean
         Return UpdateDatasetStatsTextFile(datasetName, datasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
     End Function
 
     ''' <summary>
-    ''' Updates a tab-delimited text file, adding a new line summarizing the data in objScanStats and udtDatasetFileInfo
+    ''' Updates a tab-delimited text file, adding a new line summarizing the data in scanStats and datasetInfo
     ''' </summary>
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="datasetStatsFilePath">Tab-delimited file to create/update</param>
-    ''' <param name="objScanStats">Scan stats to parse</param>
+    ''' <param name="scanStats">Scan stats to parse</param>
     ''' <param name="datasetInfo">Dataset Info</param>
     ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function UpdateDatasetStatsTextFile(
-                                               datasetName As String,
-                                               datasetStatsFilePath As String,
-                                               objScanStats As List(Of clsScanStatsEntry),
+        datasetName As String,
+        datasetStatsFilePath As String,
+        scanStats As List(Of clsScanStatsEntry),
         datasetInfo As DatasetFileInfo,
         oSampleInfo As SampleInfo) As Boolean
 
@@ -741,20 +748,24 @@ Public Class clsDatasetStatsSummarizer
 
         Try
 
-            If objScanStats Is Nothing Then
-                ReportError("objScanStats is Nothing; unable to continue in UpdateDatasetStatsTextFile")
+            If scanStats Is Nothing Then
+                ReportError("scanStats is Nothing; unable to continue in UpdateDatasetStatsTextFile")
                 Return False
-            Else
-                mErrorMessage = String.Empty
             End If
 
-            If objScanStats Is mDatasetScanStats Then
+            mErrorMessage = String.Empty
+
+            If scanStats Is mDatasetScanStats Then
                 summaryStats = GetDatasetSummaryStats()
             Else
                 summaryStats = New clsDatasetSummaryStats()
 
-                ' Parse the data in objScanStats to compute the bulk values
-                Me.ComputeScanStatsSummary(objScanStats, summaryStats)
+                ' Parse the data in scanStats to compute the bulk values
+                Dim summarySuccess = Me.ComputeScanStatsSummary(scanStats, summaryStats)
+                If Not summarySuccess Then
+                    ReportError("ComputeScanStatsSummary returned false; unable to continue in UpdateDatasetStatsTextFile")
+                    Return False
+                End If
             End If
 
             If Not File.Exists(datasetStatsFilePath) Then
@@ -784,22 +795,22 @@ Public Class clsDatasetStatsSummarizer
                     writer.WriteLine(String.Join(ControlChars.Tab, headerNames))
                 End If
 
-                Dim dataColumns = New List(Of String) From {
-                    datasetName,
-                    (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),
-                    summaryStats.MSStats.ScanCount.ToString(),
-                    summaryStats.MSnStats.ScanCount.ToString(),
-                    summaryStats.ElutionTimeMax.ToString(),
-                    udtDatasetFileInfo.AcqTimeEnd.Subtract(udtDatasetFileInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
-                    udtDatasetFileInfo.AcqTimeStart.ToString("yyyy-MM-dd hh:mm:ss tt"),
-                    udtDatasetFileInfo.AcqTimeEnd.ToString("yyyy-MM-dd hh:mm:ss tt"),
-                    udtDatasetFileInfo.FileSizeBytes.ToString(),
-                    FixNull(udtSampleInfo.SampleName),
-                    FixNull(udtSampleInfo.Comment1),
-                    FixNull(udtSampleInfo.Comment2)
+                Dim dataValues = New List(Of String) From {
+                        datasetName,
+                        (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),
+                        summaryStats.MSStats.ScanCount.ToString(),
+                        summaryStats.MSnStats.ScanCount.ToString(),
+                        summaryStats.ElutionTimeMax.ToString("0.00"),
+                        datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
+                        datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING),
+                        datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING),
+                        datasetInfo.FileSizeBytes.ToString(),
+                        FixNull(oSampleInfo.SampleName),
+                        FixNull(oSampleInfo.Comment1),
+                        FixNull(oSampleInfo.Comment2)
                 }
 
-                writer.WriteLine(String.Join(ControlChars.Tab, dataColumns))
+                writer.WriteLine(String.Join(ControlChars.Tab, dataValues))
 
             End Using
 
@@ -884,9 +895,17 @@ Public Class clsDatasetSummaryStats
     Public MSStats As udtSummaryStatDetailsType
     Public MSnStats As udtSummaryStatDetailsType
 
-    ' The following collection keeps track of each ScanType in the dataset, along with the number of scans of this type
-    ' Example scan types:  FTMS + p NSI Full ms" or "ITMS + c ESI Full ms" or "ITMS + p ESI d Z ms" or "ITMS + c ESI d Full ms2 @cid35.00"
-    Public objScanTypeStats As Dictionary(Of String, Integer)
+    ''' <summary>
+    ''' Keeps track of each ScanType in the dataset, along with the number of scans of this type
+    ''' </summary>
+    ''' <remarks>
+    ''' Examples:
+    '''   FTMS + p NSI Full ms
+    '''   ITMS + c ESI Full ms
+    '''   ITMS + p ESI d Z ms
+    '''   ITMS + c ESI d Full ms2 @cid35.00
+    ''' </remarks>
+    Public ReadOnly ScanTypeStats As Dictionary(Of String, Integer)
 
     Public Structure udtSummaryStatDetailsType
         Public ScanCount As Integer
@@ -920,15 +939,15 @@ Public Class clsDatasetSummaryStats
             .BPIMedian = 0
         End With
 
-        If objScanTypeStats Is Nothing Then
-            objScanTypeStats = New Dictionary(Of String, Integer)
-        Else
-            objScanTypeStats.Clear()
-        End If
+        ScanTypeStats.Clear()
 
     End Sub
 
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
     Public Sub New()
+        ScanTypeStats = New Dictionary(Of String, Integer)
         Me.Clear()
     End Sub
 
