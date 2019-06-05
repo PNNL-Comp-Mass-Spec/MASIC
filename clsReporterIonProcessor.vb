@@ -40,7 +40,12 @@ Public Class clsReporterIonProcessor
         Try
 
             ' Use Xraw to read the .Raw files
-            Dim xcaliburAccessor = New XRawFileIO()
+            Dim readerOptions = New ThermoReaderOptions With {
+                .LoadMSMethodInfo = False,
+                .LoadMSTuneInfo = False
+            }
+
+            Dim xcaliburAccessor = New XRawFileIO(readerOptions)
             RegisterEvents(xcaliburAccessor)
 
             Dim includeFtmsColumns = False

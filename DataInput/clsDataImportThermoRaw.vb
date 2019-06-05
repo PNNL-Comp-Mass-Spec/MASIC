@@ -138,7 +138,13 @@ Namespace DataInput
           keepMSMSSpectra As Boolean) As Boolean
 
             ' Use XrawFileIO to read the .Raw files (it uses ThermoFisher.CommonCore)
-            Dim xcaliburAccessor = New XRawFileIO()
+
+            Dim readerOptions = New ThermoReaderOptions() With {
+                .LoadMSMethodInfo = mOptions.WriteMSMethodFile,
+                .LoadMSTuneInfo = mOptions.WriteMSTuneFile
+            }
+
+            Dim xcaliburAccessor = New XRawFileIO(readerOptions)
             RegisterEvents(xcaliburAccessor)
 
             mBpiUpdateCount = 0
@@ -155,9 +161,6 @@ Namespace DataInput
                 ' Obtain the full path to the file
                 Dim rawFileInfo = New FileInfo(filePath)
                 Dim inputFileFullPath = rawFileInfo.FullName
-
-                xcaliburAccessor.LoadMSMethodInfo = mOptions.WriteMSMethodFile
-                xcaliburAccessor.LoadMSTuneInfo = mOptions.WriteMSTuneFile
 
                 ' Open a handle to the data file
                 If Not xcaliburAccessor.OpenRawFile(inputFileFullPath) Then
