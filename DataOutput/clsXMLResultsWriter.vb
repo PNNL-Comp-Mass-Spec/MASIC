@@ -469,7 +469,7 @@ Namespace DataOutput
                 objXMLOut.WriteElementString("SourceFileDateTime", lastModTimeText)
                 objXMLOut.WriteElementString("SourceFileSizeBytes", fileSizeBytes)
 
-                objXMLOut.WriteElementString("MASICProcessingDate", DateTime.Now.ToShortDateString() & " " & DateTime.Now.ToLongTimeString())
+                objXMLOut.WriteElementString("MASICProcessingDate", DateTime.Now.ToString(clsDatasetStatsSummarizer.DATE_TIME_FORMAT_STRING))
                 objXMLOut.WriteElementString("MASICVersion", mOptions.MASICVersion)
                 objXMLOut.WriteElementString("MASICPeakFinderDllVersion", mOptions.PeakFinderVersion)
                 objXMLOut.WriteElementString("ScanCountTotal", scanList.MasterScanOrderCount.ToString())

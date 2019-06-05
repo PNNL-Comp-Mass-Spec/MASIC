@@ -15,6 +15,7 @@ Option Strict On
 ' in compliance with the License.  You may obtain a copy of the License at
 ' https://opensource.org/licenses/BSD-2-Clause
 
+Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Xml
 Imports MASIC.DatasetStats
@@ -34,6 +35,10 @@ Public Class clsDatasetStatsSummarizer
     ' ReSharper disable once UnusedMember.Global
     Public Const DEFAULT_DATASET_STATS_FILENAME As String = "MSFileInfo_DatasetStats.txt"
 
+    ''' <summary>
+    ''' Date/time format string
+    ''' </summary>
+    Public Const DATE_TIME_FORMAT_STRING As String = "yyyy-MM-dd hh:mm:ss tt"
 
 #End Region
 
