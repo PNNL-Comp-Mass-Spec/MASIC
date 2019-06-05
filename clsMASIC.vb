@@ -24,6 +24,7 @@ Option Strict On
 
 Imports System.Runtime.InteropServices
 Imports MASIC.DataOutput
+Imports MASIC.DatasetStats
 Imports PRISM
 
 Public Class clsMASIC
@@ -1093,7 +1094,7 @@ Public Class clsMASIC
       spectraCache As clsSpectraCache,
       dataOutputHandler As clsDataOutput,
       scanTracking As clsScanTracking,
-      datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType,
+      datasetFileInfo As DatasetFileInfo,
       parentIonProcessor As clsParentIonProcessing,
       dataImporterBase As DataInput.clsDataImport
       ) As Boolean
@@ -1466,11 +1467,11 @@ Public Class clsMASIC
       scanList As clsScanList,
       spectraCache As clsSpectraCache,
       <Out> ByRef dataImporterBase As DataInput.clsDataImport,
-      <Out> ByRef datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType
+      <Out> ByRef datasetFileInfo As DatasetFileInfo
       ) As Boolean
 
         Dim success As Boolean
-        datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
+        datasetFileInfo = New DatasetFileInfo()
 
         Try
 
@@ -1590,7 +1591,7 @@ Public Class clsMASIC
 
                     ' Instantiate this object to avoid a warning below about the object potentially not being initialized
                     ' In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
-                    datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
+                    datasetFileInfo = New DatasetFileInfo()
                     dataImporterBase = Nothing
             End Select
 
@@ -1841,7 +1842,7 @@ Public Class clsMASIC
 
                 spectraCache.InitializeSpectraPool()
 
-                Dim datasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType
+                Dim datasetFileInfo = New DatasetFileInfo()
 
                 Dim scanList = New clsScanList()
                 RegisterEvents(scanList)

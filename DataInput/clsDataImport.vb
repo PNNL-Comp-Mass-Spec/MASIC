@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports MASIC.DatasetStats
 Imports PRISM
 
 Namespace DataInput
@@ -36,7 +37,7 @@ Namespace DataInput
 
         Protected ReadOnly mScanTracking As clsScanTracking
 
-        Protected mDatasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType
+        Protected mDatasetFileInfo As DatasetFileInfo
 
         Protected mKeepRawSpectra As Boolean
         Protected mKeepMSMSSpectra As Boolean
@@ -60,7 +61,7 @@ Namespace DataInput
 
 #Region "Properties"
 
-        Public ReadOnly Property DatasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType
+        Public ReadOnly Property DatasetFileInfo As DatasetFileInfo
             Get
                 Return mDatasetFileInfo
             End Get
@@ -98,7 +99,7 @@ Namespace DataInput
             mParentIonProcessor = parentIonProcessor
             mScanTracking = scanTracking
 
-            mDatasetFileInfo = New clsDatasetStatsSummarizer.udtDatasetFileInfoType()
+            mDatasetFileInfo = New DatasetFileInfo()
 
             mInterferenceCalculator = New InterDetect.InterferenceCalculator()
 

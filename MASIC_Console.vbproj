@@ -155,6 +155,8 @@
     <Compile Include="DataOutput\clsSpectrumDataWriter.vb" />
     <Compile Include="DataOutput\clsThermoMetadataWriter.vb" />
     <Compile Include="DataOutput\clsXMLResultsWriter.vb" />
+    <Compile Include="DatasetStats\clsDatasetFileInfo.vb" />
+    <Compile Include="DatasetStats\clsSampleInfo.vb" />
     <Compile Include="modMain.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

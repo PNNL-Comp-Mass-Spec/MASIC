@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports MASIC.DatasetStats
 Imports PRISM
 
 Namespace DataOutput
@@ -458,10 +459,9 @@ Namespace DataOutput
           inputFileName As String,
           outputDirectoryPath As String,
           scanTracking As clsScanTracking,
-          datasetFileInfo As clsDatasetStatsSummarizer.udtDatasetFileInfoType) As Boolean
+          datasetFileInfo As DatasetFileInfo) As Boolean
 
-            Dim udtSampleInfo = New clsDatasetStatsSummarizer.udtSampleInfoType
-            udtSampleInfo.Clear()
+            Dim sampleInfo = New SampleInfo()
 
             Try
                 Dim datasetName = Path.GetFileNameWithoutExtension(inputFileName)
@@ -471,7 +471,7 @@ Namespace DataOutput
 
                 Dim success = datasetStatsSummarizer.CreateDatasetInfoFile(
                   datasetName, datasetInfoFilePath,
-                  scanTracking.ScanStats, datasetFileInfo, udtSampleInfo)
+                  scanTracking.ScanStats, datasetFileInfo, sampleInfo)
 
                 If success Then
                     Return True

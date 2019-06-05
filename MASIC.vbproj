@@ -166,6 +166,8 @@
     <Compile Include="DataOutput\clsSpectrumDataWriter.vb" />
     <Compile Include="DataOutput\clsThermoMetadataWriter.vb" />
     <Compile Include="DataOutput\clsXMLResultsWriter.vb" />
+    <Compile Include="DatasetStats\clsDatasetFileInfo.vb" />
+    <Compile Include="DatasetStats\clsSampleInfo.vb" />
     <Compile Include="frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
     </Compile>

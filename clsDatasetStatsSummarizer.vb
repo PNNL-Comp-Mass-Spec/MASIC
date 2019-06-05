@@ -17,6 +17,7 @@ Option Strict On
 
 Imports System.Text
 Imports System.Xml
+Imports MASIC.DatasetStats
 Imports PRISM
 Imports SpectraTypeClassifier
 
@@ -31,63 +32,7 @@ Public Class clsDatasetStatsSummarizer
 
     ' ReSharper disable once UnusedMember.Global
     Public Const DEFAULT_DATASET_STATS_FILENAME As String = "MSFileInfo_DatasetStats.txt"
-#End Region
 
-#Region "Structures"
-
-    Public Structure udtDatasetFileInfoType
-        Public FileSystemCreationTime As DateTime
-        Public FileSystemModificationTime As DateTime
-        Public DatasetID As Integer
-        Public DatasetName As String
-        Public FileExtension As String
-        Public AcqTimeStart As DateTime
-        Public AcqTimeEnd As DateTime
-        Public ScanCount As Integer
-        Public FileSizeBytes As Long
-
-        Public Sub Clear()
-            FileSystemCreationTime = DateTime.MinValue
-            FileSystemModificationTime = DateTime.MinValue
-            DatasetID = 0
-            DatasetName = String.Empty
-            FileExtension = String.Empty
-            AcqTimeStart = DateTime.MinValue
-            AcqTimeEnd = DateTime.MinValue
-            ScanCount = 0
-            FileSizeBytes = 0
-        End Sub
-
-        Public Overrides Function ToString() As String
-            Return "Dataset " & DatasetName & ", ScanCount=" & ScanCount
-        End Function
-    End Structure
-
-    Public Structure udtSampleInfoType
-        Public SampleName As String
-        Public Comment1 As String
-        Public Comment2 As String
-
-        Public Sub Clear()
-            SampleName = String.Empty
-            Comment1 = String.Empty
-            Comment2 = String.Empty
-        End Sub
-
-        Public Function HasData() As Boolean
-            If Not String.IsNullOrEmpty(SampleName) OrElse
-               Not String.IsNullOrEmpty(Comment1) OrElse
-               Not String.IsNullOrEmpty(Comment2) Then
-                Return True
-            Else
-                Return False
-            End If
-        End Function
-
-        Public Overrides Function ToString() As String
-            Return SampleName
-        End Function
-    End Structure
 
 #End Region
 
@@ -97,8 +42,6 @@ Public Class clsDatasetStatsSummarizer
     Private mErrorMessage As String = String.Empty
 
     Private mDatasetScanStats As List(Of clsScanStatsEntry)
-    Public DatasetFileInfo As udtDatasetFileInfoType
-    Public SampleInfo As udtSampleInfoType
 
     Private mDatasetSummaryStatsUpToDate As Boolean
     Private mDatasetSummaryStats As clsDatasetSummaryStats
@@ -121,6 +64,11 @@ Public Class clsDatasetStatsSummarizer
         End Set
     End Property
 
+    ''' <summary>
+    ''' Dataset file info
+    ''' </summary>
+    ''' <returns></returns>
+    Public ReadOnly Property DatasetFileInfo As DatasetFileInfo
     Public ReadOnly Property ErrorMessage As String
         Get
             Return mErrorMessage
@@ -133,6 +81,12 @@ Public Class clsDatasetStatsSummarizer
         End Get
     End Property
 
+    ''' <summary>
+    ''' Sample info
+    ''' </summary>
+    ''' <returns></returns>
+    Public ReadOnly Property SampleInfo As SampleInfo
+
 #End Region
 
     Public Sub New()
@@ -141,6 +95,10 @@ Public Class clsDatasetStatsSummarizer
         mMedianUtils = New clsMedianUtilities()
 
         InitializeLocalVariables()
+
+        DatasetFileInfo = New DatasetFileInfo()
+        SampleInfo = New SampleInfo()
+
     End Sub
 
     ' ReSharper disable once UnusedMember.Global
@@ -164,8 +122,8 @@ Public Class clsDatasetStatsSummarizer
             mDatasetSummaryStats.Clear()
         End If
 
-        Me.DatasetFileInfo.Clear()
-        Me.SampleInfo.Clear()
+        DatasetFileInfo.Clear()
+        SampleInfo.Clear()
 
         mDatasetSummaryStatsUpToDate = False
 
@@ -310,16 +268,16 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
-    ''' <param name="udtDatasetFileInfo">Dataset Info</param>
-    ''' <param name="udtSampleInfo">Sample Info</param>
+    ''' <param name="datasetInfo">Dataset Info</param>
+    ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoFile(
                                           datasetName As String,
                                           datasetInfoFilePath As String,
                                           ByRef objScanStats As List(Of clsScanStatsEntry),
-                                          ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
-                                          ByRef udtSampleInfo As udtSampleInfoType) As Boolean
+        datasetInfo As DatasetFileInfo,
+        oSampleInfo As SampleInfo) As Boolean
 
         Dim success As Boolean
 
@@ -335,7 +293,7 @@ Public Class clsDatasetStatsSummarizer
             ' However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
             Using writer = New StreamWriter(New FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8)
 
-                writer.WriteLine(CreateDatasetInfoXML(datasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo))
+                writer.WriteLine(CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, oSampleInfo))
 
             End Using
 
@@ -390,20 +348,18 @@ Public Class clsDatasetStatsSummarizer
 
     ' ReSharper disable once UnusedMember.Global
     ''' <summary>
-    ''' Creates XML summarizing the data in objScanStats, udtDatasetFileInfo, and udtSampleInfo
     ''' Auto-determines the dataset name using udtDatasetFileInfo.DatasetName
     ''' </summary>
-    ''' <param name="objScanStats">Scan stats to parse</param>
-    ''' <param name="udtDatasetFileInfo">Dataset Info</param>
-    ''' <param name="udtSampleInfo">Sample Info</param>
+    ''' <param name="datasetInfo">Dataset Info</param>
+    ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
                                          ByRef objScanStats As List(Of clsScanStatsEntry),
-                                         ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
-                                         ByRef udtSampleInfo As udtSampleInfoType) As String
+        datasetInfo As DatasetFileInfo,
+        oSampleInfo As SampleInfo) As String
 
-        Return CreateDatasetInfoXML(udtDatasetFileInfo.DatasetName, objScanStats, udtDatasetFileInfo, udtSampleInfo)
+        Return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo, oSampleInfo)
     End Function
 
     ''' <summary>
@@ -411,13 +367,13 @@ Public Class clsDatasetStatsSummarizer
     ''' </summary>
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
-    ''' <param name="udtDatasetFileInfo">Dataset Info</param>
+    ''' <param name="datasetInfo">Dataset Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
                                          datasetName As String,
                                          ByRef objScanStats As List(Of clsScanStatsEntry),
-                                         ByRef udtDatasetFileInfo As udtDatasetFileInfoType) As String
+        datasetInfo As DatasetFileInfo) As String
 
         Dim udtSampleInfo = New udtSampleInfoType()
         udtSampleInfo.Clear()
@@ -430,14 +386,14 @@ Public Class clsDatasetStatsSummarizer
     ''' </summary>
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
-    ''' <param name="udtDatasetFileInfo">Dataset Info</param>
+    ''' <param name="datasetInfo">Dataset Info</param>
     ''' <returns>XML (as string)</returns>
     ''' <remarks></remarks>
     Public Function CreateDatasetInfoXML(
                                          datasetName As String,
                                          objScanStats As List(Of clsScanStatsEntry),
-                                         ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
-                                         ByRef udtSampleInfo As udtSampleInfoType) As String
+        datasetInfo As DatasetFileInfo,
+        oSampleInfo As SampleInfo) As String
 
         Try
 
@@ -530,8 +486,8 @@ Public Class clsDatasetStatsSummarizer
             objDSInfo.WriteStartElement("AcquisitionInfo")
 
             Dim scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount
-            If scanCountTotal = 0 And udtDatasetFileInfo.ScanCount > 0 Then
-                scanCountTotal = udtDatasetFileInfo.ScanCount
+            If scanCountTotal = 0 And datasetInfo.ScanCount > 0 Then
+                scanCountTotal = datasetInfo.ScanCount
             End If
 
             objDSInfo.WriteElementString("ScanCount", scanCountTotal.ToString())
@@ -611,16 +567,16 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="scanStatsFilePath">File path to write the text file to</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
-    ''' <param name="udtDatasetFileInfo">Dataset Info</param>
-    ''' <param name="udtSampleInfo">Sample Info</param>
+    ''' <param name="datasetInfo">Dataset Info</param>
+    ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function CreateScanStatsFile(
                                         datasetName As String,
                                         scanStatsFilePath As String,
                                         objScanStats As List(Of clsScanStatsEntry),
-                                        ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
-                                        ByRef udtSampleInfo As udtSampleInfoType) As Boolean
+        datasetInfo As DatasetFileInfo,
+        oSampleInfo As SampleInfo) As Boolean
 
 
         Dim datasetID = 0
@@ -768,16 +724,16 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="datasetName">Dataset Name</param>
     ''' <param name="datasetStatsFilePath">Tab-delimited file to create/update</param>
     ''' <param name="objScanStats">Scan stats to parse</param>
-    ''' <param name="udtDatasetFileInfo">Dataset Info</param>
-    ''' <param name="udtSampleInfo">Sample Info</param>
+    ''' <param name="datasetInfo">Dataset Info</param>
+    ''' <param name="oSampleInfo">Sample Info</param>
     ''' <returns>True if success; False if failure</returns>
     ''' <remarks></remarks>
     Public Function UpdateDatasetStatsTextFile(
                                                datasetName As String,
                                                datasetStatsFilePath As String,
                                                objScanStats As List(Of clsScanStatsEntry),
-                                               ByRef udtDatasetFileInfo As udtDatasetFileInfoType,
-                                               ByRef udtSampleInfo As udtSampleInfoType) As Boolean
+        datasetInfo As DatasetFileInfo,
+        oSampleInfo As SampleInfo) As Boolean
 
         Dim writeHeaders As Boolean
 
