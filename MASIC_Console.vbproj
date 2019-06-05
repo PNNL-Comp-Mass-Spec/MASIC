@@ -109,7 +109,6 @@
     <Compile Include="clsCustomSICList.vb" />
     <Compile Include="clsDataAggregation.vb" />
     <Compile Include="clsDatabaseAccess.vb" />
-    <Compile Include="clsDatasetStatsSummarizer.vb" />
     <Compile Include="clsFilterDataArrayMaxCount.vb" />
     <Compile Include="clsFragScanInfo.vb" />
     <Compile Include="clsITraqIntensityCorrection.vb" />
@@ -157,6 +156,7 @@
     <Compile Include="DataOutput\clsThermoMetadataWriter.vb" />
     <Compile Include="DataOutput\clsXMLResultsWriter.vb" />
     <Compile Include="DatasetStats\clsDatasetFileInfo.vb" />
+    <Compile Include="DatasetStats\clsDatasetStatsSummarizer.vb" />
     <Compile Include="DatasetStats\clsSampleInfo.vb" />
     <Compile Include="modMain.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
