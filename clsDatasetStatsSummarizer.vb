@@ -152,29 +152,27 @@ Public Class clsDatasetStatsSummarizer
     ''' <param name="summaryStats">Stats output (initialized if nothing)</param>
     ''' <returns>>True if success, false if error</returns>
     ''' <remarks></remarks>
-        Dim objEntry As clsScanStatsEntry
-
-        Dim scanTypeKey As String
-
-        Dim ticListMS = New List(Of Double)
-
-        Dim ticListMSn = New List(Of Double)
-
-        Dim bpiListMS = New List(Of Double)
     Public Function ComputeScanStatsSummary(scanStats As List(Of clsScanStatsEntry), <Out> ByRef summaryStats As clsDatasetSummaryStats) As Boolean
 
-        Dim bpiListMSn = New List(Of Double)
+        summaryStats = New clsDatasetSummaryStats()
 
         Try
 
             If scanStats Is Nothing Then
                 ReportError("scanStats is Nothing; unable to continue in ComputeScanStatsSummary")
                 Return False
-            Else
-                mErrorMessage = String.Empty
             End If
 
+            mErrorMessage = String.Empty
 
+            Dim scanStatsCount = scanStats.Count
+
+            ' Initialize the TIC and BPI Lists
+            Dim ticListMS = New List(Of Double)(scanStatsCount)
+            Dim ticListMSn = New List(Of Double)(scanStatsCount)
+
+            Dim bpiListMS = New List(Of Double)(scanStatsCount)
+            Dim bpiListMSn = New List(Of Double)(scanStatsCount)
 
             For Each statEntry In scanStats
 
