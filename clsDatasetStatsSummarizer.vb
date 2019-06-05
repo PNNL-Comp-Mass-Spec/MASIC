@@ -923,21 +923,17 @@ Public Class clsDatasetSummaryStats
 
         ElutionTimeMax = 0
 
-        With MSStats
-            .ScanCount = 0
-            .TICMax = 0
-            .BPIMax = 0
-            .TICMedian = 0
-            .BPIMedian = 0
-        End With
+        MSStats.ScanCount = 0
+        MSStats.TICMax = 0
+        MSStats.BPIMax = 0
+        MSStats.TICMedian = 0
+        MSStats.BPIMedian = 0
 
-        With MSnStats
-            .ScanCount = 0
-            .TICMax = 0
-            .BPIMax = 0
-            .TICMedian = 0
-            .BPIMedian = 0
-        End With
+        MSnStats.ScanCount = 0
+        MSnStats.TICMax = 0
+        MSnStats.BPIMax = 0
+        MSnStats.TICMedian = 0
+        MSnStats.BPIMedian = 0
 
         ScanTypeStats.Clear()
 
