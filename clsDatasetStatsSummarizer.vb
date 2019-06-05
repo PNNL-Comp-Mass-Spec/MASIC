@@ -25,6 +25,7 @@ Public Class clsDatasetStatsSummarizer
     Inherits EventNotifier
 
 #Region "Constants and Enums"
+
     Public Const SCAN_TYPE_STATS_SEP_CHAR As String = "::###::"
 
     ' ReSharper disable once UnusedMember.Global
@@ -69,12 +70,21 @@ Public Class clsDatasetStatsSummarizer
     ''' </summary>
     ''' <returns></returns>
     Public ReadOnly Property DatasetFileInfo As DatasetFileInfo
+
+    ''' <summary>
+    ''' Error message
+    ''' </summary>
+    ''' <returns></returns>
     Public ReadOnly Property ErrorMessage As String
         Get
             Return mErrorMessage
         End Get
     End Property
 
+    ''' <summary>
+    ''' Dataset file modification time
+    ''' </summary>
+    ''' <returns></returns>
     Public ReadOnly Property FileDate As String
         Get
             FileDate = mFileDate
@@ -89,8 +99,13 @@ Public Class clsDatasetStatsSummarizer
 
 #End Region
 
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
     Public Sub New()
-        mFileDate = "October 16, 2018"
+        mFileDate = "June 4, 2019"
+
+        mErrorMessage = String.Empty
 
         mMedianUtils = New clsMedianUtilities()
 
@@ -117,6 +132,9 @@ Public Class clsDatasetStatsSummarizer
 
     End Sub
 
+    ''' <summary>
+    ''' Clear cached data
+    ''' </summary>
     Public Sub ClearCachedData()
         mDatasetScanStats.Clear()
         mDatasetSummaryStats.Clear()
@@ -125,7 +143,6 @@ Public Class clsDatasetStatsSummarizer
         SampleInfo.Clear()
 
         mDatasetSummaryStatsUpToDate = False
-
     End Sub
 
     ''' <summary>
@@ -809,47 +826,80 @@ Public Class clsDatasetStatsSummarizer
 End Class
 
 Public Class clsScanStatsEntry
+    ''' <summary>
+    ''' Scan number
+    ''' </summary>
+    ''' <returns></returns>
     Public Property ScanNumber As Integer
 
     ''' <summary>
-    ''' 1 for MS, 2 for MS2, 3 for MS3
+    ''' Scan Type (aka MSLevel)
     ''' </summary>
-    ''' <returns></returns>
+    ''' <remarks>1 for MS, 2 for MS2, 3 for MS3</remarks>
     Public Property ScanType As Integer
 
     ''' <summary>
     ''' Scan filter
     ''' </summary>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Examples:
-    ''' FTMS + p NSI Full ms [400.00-2000.00]
-    ''' ITMS + c ESI Full ms [300.00-2000.00]
-    ''' ITMS + p ESI d Z ms [1108.00-1118.00]
-    ''' ITMS + c ESI d Full ms2 342.90@cid35.00
+    '''   FTMS + p NSI Full ms [400.00-2000.00]
+    '''   ITMS + c ESI Full ms [300.00-2000.00]
+    '''   ITMS + p ESI d Z ms [1108.00-1118.00]
+    '''   ITMS + c ESI d Full ms2 342.90@cid35.00
     ''' </remarks>
     Public Property ScanFilterText As String
 
     ''' <summary>
     ''' Scan type name
     ''' </summary>
-    ''' <returns></returns>
     ''' <remarks>
     ''' Examples:
-    ''' MS, HMS, Zoom, CID-MSn, or PQD-MSn
+    '''   MS, HMS, Zoom, CID-MSn, or PQD-MSn
     ''' </remarks>
     Public Property ScanTypeName As String
 
-    ' The following are strings to prevent the number formatting from changing
+    ' The following properties are strings to prevent the number formatting from changing
+
+    ''' <summary>
+    ''' Elution time, in minutes
+    ''' </summary>
     Public Property ElutionTime As String
+
+    ''' <summary>
+    ''' Total ion intensity
+    ''' </summary>
     Public Property TotalIonIntensity As String
+
+    ''' <summary>
+    ''' Base peak ion intensity
+    ''' </summary>
     Public Property BasePeakIntensity As String
+
+    ''' <summary>
+    '''  Base peak m/z
+    ''' </summary>
     Public Property BasePeakMZ As String
+
+    ''' <summary>
+    ''' Signal to noise ratio (S/N)
+    ''' </summary>
+    ''' <returns></returns>
     Public Property BasePeakSignalToNoiseRatio As String
 
+    ''' <summary>
+    ''' Ion count
+    ''' </summary>
     Public Property IonCount As Integer
+
+    ''' <summary>
+    ''' Ion count before centroiding
+    ''' </summary>
     Public Property IonCountRaw As Integer
 
+    ''' <summary>
+    ''' Clear all values
+    ''' </summary>
     Public Sub Clear()
         ScanNumber = 0
         ScanType = 0
@@ -867,6 +917,9 @@ Public Class clsScanStatsEntry
         IonCountRaw = 0
     End Sub
 
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
     Public Sub New()
         Me.Clear()
     End Sub
