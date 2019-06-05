@@ -1,4 +1,5 @@
 ﻿Imports MASIC.clsMASIC
+Imports MASIC.DatasetStats
 Imports MASICPeakFinder
 
 Public Class clsScanTracking
