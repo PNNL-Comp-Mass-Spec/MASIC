@@ -41,7 +41,7 @@ Public Class clsDatasetStatsSummarizer
     Private mDatasetStatsSummaryFileName As String
     Private mErrorMessage As String = String.Empty
 
-    Private mDatasetScanStats As List(Of clsScanStatsEntry)
+    Private ReadOnly mDatasetScanStats As List(Of clsScanStatsEntry)
 
     Private mDatasetSummaryStatsUpToDate As Boolean
     Private mDatasetSummaryStats As clsDatasetSummaryStats
@@ -94,11 +94,15 @@ Public Class clsDatasetStatsSummarizer
 
         mMedianUtils = New clsMedianUtilities()
 
-        InitializeLocalVariables()
+        mDatasetScanStats = New List(Of clsScanStatsEntry)
+        mDatasetSummaryStats = New clsDatasetSummaryStats()
+
+        mDatasetSummaryStatsUpToDate = False
 
         DatasetFileInfo = New DatasetFileInfo()
         SampleInfo = New SampleInfo()
 
+        ClearCachedData()
     End Sub
 
     ' ReSharper disable once UnusedMember.Global
@@ -114,17 +118,8 @@ Public Class clsDatasetStatsSummarizer
     End Sub
 
     Public Sub ClearCachedData()
-        If mDatasetScanStats Is Nothing Then
-            mDatasetScanStats = New List(Of clsScanStatsEntry)
-        Else
-            mDatasetScanStats.Clear()
-        End If
-
-        If mDatasetSummaryStats Is Nothing Then
-            mDatasetSummaryStats = New clsDatasetSummaryStats
-        Else
-            mDatasetSummaryStats.Clear()
-        End If
+        mDatasetScanStats.Clear()
+        mDatasetSummaryStats.Clear()
 
         DatasetFileInfo.Clear()
         SampleInfo.Clear()
@@ -162,12 +157,6 @@ Public Class clsDatasetStatsSummarizer
                 mErrorMessage = String.Empty
             End If
 
-            ' Initialize summaryStats
-            If summaryStats Is Nothing Then
-                summaryStats = New clsDatasetSummaryStats
-            Else
-                summaryStats.Clear()
-            End If
 
 
             For Each statEntry In scanStats
@@ -672,12 +661,6 @@ Public Class clsDatasetStatsSummarizer
         Return mDatasetSummaryStats
 
     End Function
-
-    Private Sub InitializeLocalVariables()
-        mErrorMessage = String.Empty
-
-        ClearCachedData()
-    End Sub
 
     Private Sub ReportError(message As String, Optional ex As Exception = Nothing)
         mErrorMessage = String.Copy(message)
