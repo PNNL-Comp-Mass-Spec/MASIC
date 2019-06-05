@@ -199,8 +199,8 @@ Namespace DataInput
                     Return False
                 End If
 
-                Dim scanStart = xcaliburAccessor.FileInfo.ScanStart
-                Dim scanEnd = xcaliburAccessor.FileInfo.ScanEnd
+                Dim scanStart = xcaliburAccessor.ScanStart
+                Dim scanEnd = xcaliburAccessor.ScanEnd
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra)
 
@@ -701,7 +701,7 @@ Namespace DataInput
 
             Try
                 ' Look up the end scan time then compute .AcqTimeEnd
-                Dim scanEnd = xcaliburAccessor.FileInfo.ScanEnd
+                Dim scanEnd = xcaliburAccessor.ScanEnd
                 xcaliburAccessor.GetScanInfo(scanEnd, scanInfo)
 
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanInfo.RetentionTime)
