@@ -299,7 +299,7 @@ Namespace DatasetStats
 
                 mErrorMessage = String.Empty
 
-                ' If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, then we would have to use System.Encoding.Unicode
+                ' If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, we would have to use System.Encoding.Unicode
                 ' However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
                 Using writer = New StreamWriter(New FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8)
 
