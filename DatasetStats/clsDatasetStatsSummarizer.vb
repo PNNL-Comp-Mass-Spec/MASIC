@@ -411,18 +411,13 @@ Namespace DatasetStats
                     Me.ComputeScanStatsSummary(scanStats, summaryStats)
                 End If
 
-                Dim objXMLSettings = New XmlWriterSettings()
-
-                With objXMLSettings
-                    .CheckCharacters = True
-                    .Indent = True
-                    .IndentChars = "  "
-                    .Encoding = Encoding.UTF8
-
-                    ' Do not close output automatically so that MemoryStream
-                    ' can be read after the XmlWriter has been closed
-                    .CloseOutput = False
-                End With
+                Dim xmlSettings = New XmlWriterSettings() With {
+                    .CheckCharacters = True,
+                    .Indent = True,
+                    .IndentChars = "  ",
+                    .Encoding = Encoding.UTF8,
+                    .CloseOutput = False        ' Do not close output automatically so that the MemoryStream can be read after the XmlWriter has been closed
+                }
 
                 ' We could cache the text using a StringBuilder, like this:
                 '
@@ -440,8 +435,8 @@ Namespace DatasetStats
                 '  and so you see the attribute encoding="utf-8" in the opening XML declaration encoding
                 '  (since we used objXMLSettings.Encoding = System.Encoding.UTF8)
                 '
-                Dim objMemStream = New MemoryStream()
-                Dim writer = XmlWriter.Create(objMemStream, objXMLSettings)
+                Dim memStream = New MemoryStream()
+                Dim writer = XmlWriter.Create(memStream, xmlSettings)
 
                 writer.WriteStartDocument(True)
 
@@ -481,7 +476,7 @@ Namespace DatasetStats
                 writer.WriteStartElement("AcquisitionInfo")
 
                 Dim scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount
-                If scanCountTotal = 0 And datasetInfo.ScanCount > 0 Then
+                If scanCountTotal = 0 AndAlso datasetInfo.ScanCount > 0 Then
                     scanCountTotal = datasetInfo.ScanCount
                 End If
 
@@ -526,8 +521,8 @@ Namespace DatasetStats
                 writer.Close()
 
                 ' Now Rewind the memory stream and output as a string
-                objMemStream.Position = 0
-                Dim reader = New StreamReader(objMemStream)
+                memStream.Position = 0
+                Dim reader = New StreamReader(memStream)
 
                 ' Return the XML as text
                 Return reader.ReadToEnd()
@@ -581,7 +576,7 @@ Namespace DatasetStats
 
                 mErrorMessage = String.Empty
 
-                Using writer = New StreamWriter(New FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                Using scanStatsWriter = New StreamWriter(New FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
 
                     ' Write the headers
                     Dim headerNames = New List(Of String) From {
@@ -598,7 +593,7 @@ Namespace DatasetStats
                             "ScanTypeName"
                             }
 
-                    writer.WriteLine(String.Join(ControlChars.Tab, headerNames))
+                    scanStatsWriter.WriteLine(String.Join(ControlChars.Tab, headerNames))
 
                     Dim dataValues As New List(Of String)
 
@@ -639,7 +634,7 @@ Namespace DatasetStats
                         ' Scan type name
                         dataValues.Add(scanStatsEntry.ScanTypeName)
 
-                        writer.WriteLine(String.Join(ControlChars.Tab, dataValues))
+                        scanStatsWriter.WriteLine(String.Join(ControlChars.Tab, dataValues))
 
                     Next
 
