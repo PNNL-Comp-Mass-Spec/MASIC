@@ -5,7 +5,6 @@ Imports MSDataFileReader
 Imports PRISM
 Imports PSI_Interface.CV
 Imports PSI_Interface.MSData
-Imports SpectraTypeClassifier
 Imports ThermoRawFileReader
 
 Namespace DataInput
@@ -371,7 +370,6 @@ Namespace DataInput
 
 
             Dim fileOpened = False
-            Dim medianUtils = New clsMedianUtilities()
 
             Try
                 Console.Write("Reading MSXml data file ")
@@ -492,7 +490,7 @@ Namespace DataInput
                         Next
 
                         ' First, compute the median time diff in scanTimeDiffs
-                        Dim medianScanTimeDiffThisChromatogram = medianUtils.Median(scanTimeDiffs)
+                        Dim medianScanTimeDiffThisChromatogram = MathNet.Numerics.Statistics.Statistics.Median(scanTimeDiffs)
 
                         scanTimeDiffMedians.Add(medianScanTimeDiffThisChromatogram)
 
@@ -502,7 +500,7 @@ Namespace DataInput
                     ' This is a bit of a challenge since chromatogram data only tracks elution time, and not scan number
 
                     ' First, compute the overall median time diff
-                    Dim medianScanTimeDiff = medianUtils.Median(scanTimeDiffMedians)
+                    Dim medianScanTimeDiff = MathNet.Numerics.Statistics.Statistics.Median(scanTimeDiffMedians)
                     If Math.Abs(medianScanTimeDiff) < 0.000001 Then
                         medianScanTimeDiff = 0.000001
                     End If

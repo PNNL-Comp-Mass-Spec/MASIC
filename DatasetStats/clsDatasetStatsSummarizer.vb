@@ -19,7 +19,6 @@ Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Xml
 Imports PRISM
-Imports SpectraTypeClassifier
 
 Namespace DatasetStats
 
@@ -52,9 +51,6 @@ Namespace DatasetStats
 
         Private mDatasetSummaryStatsUpToDate As Boolean
         Private mDatasetSummaryStats As DatasetSummaryStats
-
-        Private ReadOnly mMedianUtils As clsMedianUtilities
-
 #End Region
 
 #Region "Properties"
@@ -109,11 +105,9 @@ Namespace DatasetStats
         ''' Constructor
         ''' </summary>
         Public Sub New()
-            mFileDate = "June 4, 2019"
+            mFileDate = "June 12, 2019"
 
             mErrorMessage = String.Empty
-
-            mMedianUtils = New clsMedianUtilities()
 
             mDatasetScanStats = New List(Of ScanStatsEntry)
             mDatasetSummaryStats = New DatasetSummaryStats()
@@ -206,16 +200,16 @@ Namespace DatasetStats
                     End If
                 Next
 
-                summaryStats.MSStats.TICMedian = mMedianUtils.Median(ticListMS)
-                summaryStats.MSStats.BPIMedian = mMedianUtils.Median(bpiListMS)
+                summaryStats.MSStats.TICMedian = MathNet.Numerics.Statistics.Statistics.Median(ticListMS)
+                summaryStats.MSStats.BPIMedian = MathNet.Numerics.Statistics.Statistics.Median(bpiListMS)
 
-                summaryStats.MSnStats.TICMedian = mMedianUtils.Median(ticListMSn)
-                summaryStats.MSnStats.BPIMedian = mMedianUtils.Median(bpiListMSn)
+                summaryStats.MSnStats.TICMedian = MathNet.Numerics.Statistics.Statistics.Median(ticListMSn)
+                summaryStats.MSnStats.BPIMedian = MathNet.Numerics.Statistics.Statistics.Median(bpiListMSn)
 
                 Return True
 
             Catch ex As Exception
-                ReportError("Error in ComputeScanStatsSummary: " & ex.Message)
+                ReportError("Error in ComputeScanStatsSummary", ex)
                 Return False
             End Try
 
@@ -289,8 +283,6 @@ Namespace DatasetStats
                                               datasetInfo As DatasetFileInfo,
                                               oSampleInfo As SampleInfo) As Boolean
 
-            Dim success As Boolean
-
             Try
                 If scanStats Is Nothing Then
                     ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoFile")
@@ -307,14 +299,12 @@ Namespace DatasetStats
 
                 End Using
 
-                success = True
+                Return True
 
             Catch ex As Exception
-                ReportError("Error in CreateDatasetInfoFile: " & ex.Message)
-                success = False
+                ReportError("Error in CreateDatasetInfoFile", ex)
+                Return False
             End Try
-
-            Return success
 
         End Function
 
