@@ -30,7 +30,7 @@
         End Sub
 
         Public Overrides Function ToString() As String
-            Return "Dataset " & DatasetName & ", ScanCount=" & ScanCount
+            Return string.Format("Dataset {0}, ScanCount={1}", DatasetName, ScanCount)
         End Function
     End Class
 End Namespace

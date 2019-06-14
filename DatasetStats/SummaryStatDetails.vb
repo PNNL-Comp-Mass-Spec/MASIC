@@ -42,7 +42,7 @@ Namespace DatasetStats
         End Sub
 
         Public Overrides Function ToString() As String
-            Return "ScanCount: " & ScanCount
+            Return string.Format("ScanCount: {0}", ScanCount)
         End Function
     End Class
 End Namespace

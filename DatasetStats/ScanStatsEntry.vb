@@ -117,5 +117,10 @@ Namespace DatasetStats
             MzMax = 0
         End Sub
 
+        Public Overrides Function ToString() As String
+            Return String.Format("Scan {0}: {1}", ScanNumber, ScanFilterText)
+        End Function
+
     End Class
+
 End Namespace
