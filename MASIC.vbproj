@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -170,7 +170,7 @@
     <Compile Include="DatasetStats\clsSampleInfo.vb" />
     <Compile Include="DatasetStats\DatasetSummaryStats.vb" />
     <Compile Include="DatasetStats\ScanStatsEntry.vb" />
-    <Compile Include="DatasetStats\SummaryStatDetails.vb" />    
+    <Compile Include="DatasetStats\SummaryStatDetails.vb" />
     <Compile Include="frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
     </Compile>
@@ -190,6 +190,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MathNet.Numerics">
+      <Version>4.8.1</Version>
+    </PackageReference>
     <PackageReference Include="PRISM-Library">
       <Version>2.5.21</Version>
     </PackageReference>
@@ -197,7 +200,7 @@
       <Version>1.0.12</Version>
     </PackageReference>
     <PackageReference Include="PSI_Interface">
-      <Version>2.2.0</Version>
+      <Version>2.2.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
