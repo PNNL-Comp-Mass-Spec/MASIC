@@ -528,7 +528,7 @@ Namespace DatasetStats
                 Return reader.ReadToEnd()
 
             Catch ex As Exception
-                ReportError("Error in CreateDatasetInfoXML: " & ex.Message)
+                ReportError("Error in CreateDatasetInfoXML", ex)
             End Try
 
             ' This code will only be reached if an exception occurs
@@ -643,7 +643,7 @@ Namespace DatasetStats
                 Return True
 
             Catch ex As Exception
-                ReportError("Error in CreateScanStatsFile: " & ex.Message)
+                ReportError("Error in CreateScanStatsFile", ex)
                 Return False
             End Try
 
@@ -806,7 +806,7 @@ Namespace DatasetStats
                 Return True
 
             Catch ex As Exception
-                ReportError("Error in UpdateDatasetStatsTextFile: " & ex.Message, ex)
+                ReportError("Error in UpdateDatasetStatsTextFile", ex)
                 Return False
             End Try
 
