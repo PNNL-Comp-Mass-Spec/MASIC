@@ -671,7 +671,7 @@ Namespace DataInput
 
                         Dim msSpectrum = New clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count)
 
-                        Dim percentComplete = scanList.MasterScanOrderCount / CDbl(xmlReader.NumSpectra) * 100
+                        Dim percentComplete = scanList.MasterScanOrderCount / CDbl(simulatedSpectraByScan.Count) * 100
 
                         Dim extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
                                                                        scanList, spectraCache, dataOutputHandler,
@@ -725,7 +725,9 @@ Namespace DataInput
                 success = True
             End If
 
-            UpdateProgress(CShort(Math.Round(percentComplete, 0)))
+            If Not Double.IsNaN(percentComplete) Then
+                UpdateProgress(CShort(Math.Round(percentComplete, 0)))
+            End If
 
             UpdateCacheStats(spectraCache)
 
