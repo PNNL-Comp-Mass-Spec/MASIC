@@ -1676,8 +1676,6 @@ Public Class clsMASIC
             mLoggedMASICVersion = True
         End If
 
-        LogMessage("Parsing " & Path.GetFileName(inputFilePath))
-
         If resetErrorCode Then
             SetLocalErrorCode(eMasicErrorCodes.NoError)
         End If

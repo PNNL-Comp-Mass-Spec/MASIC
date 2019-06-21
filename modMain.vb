@@ -116,6 +116,8 @@ Public Module modMain
                 mProgressForm.ResetKeyPressAbortProcess()
                 mProgressForm.Show()
                 Application.DoEvents()
+#Else
+                Console.WriteLine("Parsing " & Path.GetFileName(mInputFilePath))
 #End If
             End If
 
