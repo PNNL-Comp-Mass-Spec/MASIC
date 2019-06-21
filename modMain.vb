@@ -24,7 +24,7 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "June 7, 2019"
+    Public Const PROGRAM_DATE As String = "June 21, 2019"
 
     Private mInputFilePath As String
     Private mOutputDirectoryPath As String              ' Optional
@@ -195,7 +195,7 @@ Public Module modMain
         ' Returns True if no problems; otherwise, returns false
 
         Dim value As String = String.Empty
-        Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "SF", "LogDir", "LogFolder", "Q"}
+        Dim lstValidParameters = New List(Of String) From {"I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q"}
         Dim intValue As Integer
 
         Try
@@ -235,8 +235,19 @@ Public Module modMain
                 If commandLineParser.RetrieveValueForParameter("A", value) Then mOutputDirectoryAlternatePath = value
                 If commandLineParser.IsParameterPresent("R") Then mRecreateDirectoryHierarchyInAlternatePath = True
 
-                    If .RetrieveValueForParameter("SF", value) Then
-                        mMASICStatusFilename = value
+                Dim logFileName As String = String.Empty
+                Dim logToFile = False
+
+                If commandLineParser.IsParameterPresent("L") Then
+                    logToFile = commandLineParser.RetrieveValueForParameter("L", logFileName)
+                ElseIf commandLineParser.IsParameterPresent("Log") Then
+                    logToFile = commandLineParser.RetrieveValueForParameter("Log", logFileName)
+                End If
+
+                If logToFile Then
+                    mLogMessagesToFile = True
+                    If Not String.IsNullOrEmpty(logFileName) Then
+                        mLogFilePath = logFileName.Trim(""""c)
                     End If
                 End If
 
@@ -349,6 +360,9 @@ Public Module modMain
                 "When using /S, you can use /R to re-create the input directory hierarchy in the alternate output directory (if defined)."))
             Console.WriteLine()
 
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "Use /L or /Log to specify that a log file should be created. " &
+                "Use /L:LogFilePath to specify the name (or full path) for the log file."))
             Console.WriteLine()
 
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
