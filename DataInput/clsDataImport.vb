@@ -524,12 +524,14 @@ Namespace DataInput
                 If mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW OrElse mPrecursorNotFoundCount > mNextPrecursorNotFoundCountThreshold Then
                     OnWarningEvent(message)
 
-                    If mPrecursorNotFoundCount > PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
+                    If mNextPrecursorNotFoundCountThreshold <= 0 Then
+                        mNextPrecursorNotFoundCountThreshold = PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW * 2
+                    ElseIf mPrecursorNotFoundCount > PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW Then
                         mNextPrecursorNotFoundCountThreshold *= 2
                     End If
 
                 End If
-                Else
+            Else
                 OnWarningEvent(message)
             End If
         End Sub
