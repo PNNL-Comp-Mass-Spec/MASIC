@@ -336,9 +336,10 @@ Namespace DataInput
                     precursorMissingPct = mPrecursorNotFoundCount / CDbl(scanList.FragScans.Count) * 100
                 End If
 
-                OnWarningEvent(String.Format("Could not determine the precursor for {0:F1}% of the MS2 spectra ({1} / {2} scans). " &
-                                             "These scans will have an Interference Score of 1 (to avoid accidentally filtering out low intensity results).",
-                                             precursorMissingPct, mPrecursorNotFoundCount, scanList.FragScans.Count))
+                OnWarningEvent(
+                    String.Format("Could not find the precursor ion for {0:F1}% of the MS2 spectra ({1} / {2} scans). " &
+                                  "These scans will have an Interference Score of 1 (to avoid accidentally filtering out low intensity results).",
+                                  precursorMissingPct, mPrecursorNotFoundCount, scanList.FragScans.Count))
             End If
 
             ' Record the current memory usage

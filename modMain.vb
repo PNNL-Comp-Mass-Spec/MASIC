@@ -207,61 +207,59 @@ Public Module modMain
             Else
 
                 ' Query commandLineParser to see if various parameters are present
-                With commandLineParser
-                    If .RetrieveValueForParameter("I", value) Then
-                        mInputFilePath = value
-                    ElseIf .NonSwitchParameterCount > 0 Then
-                        ' Treat the first non-switch parameter as the input file
-                        mInputFilePath = .RetrieveNonSwitchParameter(0)
-                    End If
+                If commandLineParser.RetrieveValueForParameter("I", value) Then
+                    mInputFilePath = value
+                ElseIf commandLineParser.NonSwitchParameterCount > 0 Then
+                    ' Treat the first non-switch parameter as the input file
+                    mInputFilePath = commandLineParser.RetrieveNonSwitchParameter(0)
+                End If
 
-                    If .RetrieveValueForParameter("O", value) Then mOutputDirectoryPath = value
-                    If .RetrieveValueForParameter("P", value) Then mParameterFilePath = value
-                    If .RetrieveValueForParameter("D", value) Then
-                        If Integer.TryParse(value, intValue) Then
-                            mDatasetID = intValue
-                        ElseIf Not String.IsNullOrWhiteSpace(value) Then
-                            ' Assume the user specified a dataset number lookup file comma, space, or tab delimited delimited file specifying the dataset number for each input file)
-                            mDatasetLookupFilePath = value
-                            mDatasetID = 0
-                        End If
+                If commandLineParser.RetrieveValueForParameter("O", value) Then mOutputDirectoryPath = value
+                If commandLineParser.RetrieveValueForParameter("P", value) Then mParameterFilePath = value
+                If commandLineParser.RetrieveValueForParameter("D", value) Then
+                    If Integer.TryParse(value, intValue) Then
+                        mDatasetID = intValue
+                    ElseIf Not String.IsNullOrWhiteSpace(value) Then
+                        ' Assume the user specified a dataset number lookup file comma, space, or tab delimited delimited file specifying the dataset number for each input file)
+                        mDatasetLookupFilePath = value
+                        mDatasetID = 0
                     End If
+                End If
 
-                    If .RetrieveValueForParameter("S", value) Then
-                        mRecurseDirectories = True
-                        If Integer.TryParse(value, intValue) Then
-                            mMaxLevelsToRecurse = intValue
-                        End If
+                If commandLineParser.RetrieveValueForParameter("S", value) Then
+                    mRecurseDirectories = True
+                    If Integer.TryParse(value, intValue) Then
+                        mMaxLevelsToRecurse = intValue
                     End If
-                    If .RetrieveValueForParameter("A", value) Then mOutputDirectoryAlternatePath = value
-                    If .IsParameterPresent("R") Then mRecreateDirectoryHierarchyInAlternatePath = True
-
-                    If .RetrieveValueForParameter("L", value) Then
-                        mLogMessagesToFile = True
-                        If Not String.IsNullOrEmpty(value) Then
-                            mLogFilePath = value.Trim(""""c)
-                        End If
-                    End If
+                End If
+                If commandLineParser.RetrieveValueForParameter("A", value) Then mOutputDirectoryAlternatePath = value
+                If commandLineParser.IsParameterPresent("R") Then mRecreateDirectoryHierarchyInAlternatePath = True
 
                     If .RetrieveValueForParameter("SF", value) Then
                         mMASICStatusFilename = value
                     End If
+                End If
 
-                    If .RetrieveValueForParameter("LogDir", value) Then
-                        mLogMessagesToFile = True
-                        If Not String.IsNullOrEmpty(value) Then
-                            mLogDirectoryPath = value
-                        End If
-                    End If
+                If commandLineParser.RetrieveValueForParameter("SF", value) Then
+                    mMASICStatusFilename = value
+                End If
 
-                    If .RetrieveValueForParameter("LogFolder", value) Then
-                        mLogMessagesToFile = True
-                        If Not String.IsNullOrEmpty(value) Then
-                            mLogDirectoryPath = value
-                        End If
+                If commandLineParser.RetrieveValueForParameter("LogDir", value) Then
+                    mLogMessagesToFile = True
+                    If Not String.IsNullOrEmpty(value) Then
+                        mLogDirectoryPath = value
                     End If
-                    If .IsParameterPresent("Q") Then mQuietMode = True
-                End With
+                End If
+
+                If commandLineParser.RetrieveValueForParameter("LogFolder", value) Then
+                    mLogMessagesToFile = True
+                    If Not String.IsNullOrEmpty(value) Then
+                        mLogDirectoryPath = value
+                    End If
+                End If
+
+                If commandLineParser.IsParameterPresent("Q") Then mQuietMode = True
+
 
                 Return True
             End If
@@ -320,6 +318,7 @@ Public Module modMain
 
             Console.WriteLine("The input file path can contain the wildcard character *")
             Console.WriteLine()
+
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                 "The output directory name is optional. " &
                 "If omitted, the output files will be created in the same directory as the input file. " &
@@ -331,25 +330,31 @@ Public Module modMain
                 "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used."))
 
             Console.WriteLine()
+
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                 "The /D switch can be used to specify the Dataset ID of the input file; if omitted, 0 will be used"))
-
             Console.WriteLine()
+
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                 "Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S). " &
                 "The lookup file is a comma, space, or tab delimited file with two columns:" & ControlChars.NewLine & "Dataset Name and Dataset ID"))
             Console.WriteLine()
+
             Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                 "Use /S to process all valid files in the input directory and subdirectories. " &
                 "Include a number after /S (like /S:2) to limit the level of subdirectories to examine."))
 
             Console.WriteLine("When using /S, you can redirect the output of the results using /A.")
-            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("When using /S, you can use /R to re-create the input directory hierarchy in the alternate output directory (if defined)."))
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "When using /S, you can use /R to re-create the input directory hierarchy in the alternate output directory (if defined)."))
             Console.WriteLine()
-            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /L to specify that a log file should be created.  Use /L:LogFilePath to specify the name (or full path) for the log file."))
+
             Console.WriteLine()
-            Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /SF to specify the name to use for the Masic Status file (default is " & clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME & ")."))
+
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "Use /SF to specify the name to use for the Masic Status file (default is " & clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME & ")."))
             Console.WriteLine()
+
             Console.WriteLine("The optional /Q switch will prevent the progress window from being shown")
             Console.WriteLine()
 
