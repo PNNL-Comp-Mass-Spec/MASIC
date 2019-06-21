@@ -45,9 +45,9 @@ Public Class clsMASIC
         mMASICPeakFinder = New MASICPeakFinder.clsMASICPeakFinder()
         RegisterEvents(mMASICPeakFinder)
 
-        mOptions = New clsMASICOptions(Me.FileVersion(), mMASICPeakFinder.ProgramVersion)
-        mOptions.InitializeVariables()
-        RegisterEvents(mOptions)
+        Options = New clsMASICOptions(Me.FileVersion(), mMASICPeakFinder.ProgramVersion)
+        Options.InitializeVariables()
+        RegisterEvents(Options)
 
     End Sub
 
@@ -101,7 +101,6 @@ Public Class clsMASIC
 
 #Region "Classwide Variables"
 
-    Private ReadOnly mOptions As clsMASICOptions
 
     Private ReadOnly mMASICPeakFinder As MASICPeakFinder.clsMASICPeakFinder
 
@@ -143,40 +142,40 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property DatabaseConnectionString As String
         Get
-            Return mOptions.DatabaseConnectionString
+            Return Options.DatabaseConnectionString
         End Get
         Set
-            mOptions.DatabaseConnectionString = Value
+            Options.DatabaseConnectionString = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property DatasetInfoQuerySql As String
         Get
-            Return mOptions.DatasetInfoQuerySql
+            Return Options.DatasetInfoQuerySql
         End Get
         Set
-            mOptions.DatasetInfoQuerySql = Value
+            Options.DatasetInfoQuerySql = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property DatasetLookupFilePath As String
         Get
-            Return mOptions.DatasetLookupFilePath
+            Return Options.DatasetLookupFilePath
         End Get
         Set
-            mOptions.DatasetLookupFilePath = Value
+            Options.DatasetLookupFilePath = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property DatasetNumber As Integer
         Get
-            Return mOptions.SICOptions.DatasetID
+            Return Options.SICOptions.DatasetID
         End Get
         Set
-            mOptions.SICOptions.DatasetID = Value
+            Options.SICOptions.DatasetID = Value
         End Set
     End Property
 
@@ -199,22 +198,18 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property MASICStatusFilename As String
         Get
-            Return mOptions.MASICStatusFilename
+            Return Options.MASICStatusFilename
         End Get
         Set
             If Value Is Nothing OrElse Value.Trim.Length = 0 Then
-                mOptions.MASICStatusFilename = clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME
+                Options.MASICStatusFilename = clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME
             Else
-                mOptions.MASICStatusFilename = Value
+                Options.MASICStatusFilename = Value
             End If
         End Set
     End Property
 
     Public ReadOnly Property Options As clsMASICOptions
-        Get
-            Return mOptions
-        End Get
-    End Property
 
     Public ReadOnly Property ProcessStep As eProcessingStepConstants
         Get
@@ -250,181 +245,181 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property CDFTimeInSeconds As Boolean
         Get
-            Return mOptions.CDFTimeInSeconds
+            Return Options.CDFTimeInSeconds
         End Get
         Set
-            mOptions.CDFTimeInSeconds = Value
+            Options.CDFTimeInSeconds = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property CompressMSSpectraData As Boolean
         Get
-            Return mOptions.SICOptions.CompressMSSpectraData
+            Return Options.SICOptions.CompressMSSpectraData
         End Get
         Set
-            mOptions.SICOptions.CompressMSSpectraData = Value
+            Options.SICOptions.CompressMSSpectraData = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property CompressMSMSSpectraData As Boolean
         Get
-            Return mOptions.SICOptions.CompressMSMSSpectraData
+            Return Options.SICOptions.CompressMSMSSpectraData
         End Get
         Set
-            mOptions.SICOptions.CompressMSMSSpectraData = Value
+            Options.SICOptions.CompressMSMSSpectraData = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property CompressToleranceDivisorForDa As Double
         Get
-            Return mOptions.SICOptions.CompressToleranceDivisorForDa
+            Return Options.SICOptions.CompressToleranceDivisorForDa
         End Get
         Set
-            mOptions.SICOptions.CompressToleranceDivisorForDa = Value
+            Options.SICOptions.CompressToleranceDivisorForDa = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property CompressToleranceDivisorForPPM As Double
         Get
-            Return mOptions.SICOptions.CompressToleranceDivisorForPPM
+            Return Options.SICOptions.CompressToleranceDivisorForPPM
         End Get
         Set
-            mOptions.SICOptions.CompressToleranceDivisorForPPM = Value
+            Options.SICOptions.CompressToleranceDivisorForPPM = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ConsolidateConstantExtendedHeaderValues As Boolean
         Get
-            Return mOptions.ConsolidateConstantExtendedHeaderValues
+            Return Options.ConsolidateConstantExtendedHeaderValues
         End Get
         Set
-            mOptions.ConsolidateConstantExtendedHeaderValues = Value
+            Options.ConsolidateConstantExtendedHeaderValues = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public ReadOnly Property CustomSICListScanType As clsCustomSICList.eCustomSICScanTypeConstants
         Get
-            Return mOptions.CustomSICList.ScanToleranceType
+            Return Options.CustomSICList.ScanToleranceType
         End Get
     End Property
 
     <Obsolete("Use Property Options")>
     Public ReadOnly Property CustomSICListScanTolerance As Single
         Get
-            Return mOptions.CustomSICList.ScanOrAcqTimeTolerance
+            Return Options.CustomSICList.ScanOrAcqTimeTolerance
         End Get
     End Property
 
     <Obsolete("Use Property Options")>
     Public ReadOnly Property CustomSICListSearchValues As List(Of clsCustomMZSearchSpec)
         Get
-            Return mOptions.CustomSICList.CustomMZSearchValues
+            Return Options.CustomSICList.CustomMZSearchValues
         End Get
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property CustomSICListFileName As String
         Get
-            Return mOptions.CustomSICList.CustomSICListFileName
+            Return Options.CustomSICList.CustomSICListFileName
         End Get
         Set
-            mOptions.CustomSICList.CustomSICListFileName = Value
+            Options.CustomSICList.CustomSICListFileName = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ExportRawDataOnly As Boolean
         Get
-            Return mOptions.ExportRawDataOnly
+            Return Options.ExportRawDataOnly
         End Get
         Set
-            mOptions.ExportRawDataOnly = Value
+            Options.ExportRawDataOnly = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property FastExistingXMLFileTest As Boolean
         Get
-            Return mOptions.FastExistingXMLFileTest
+            Return Options.FastExistingXMLFileTest
         End Get
         Set
-            mOptions.FastExistingXMLFileTest = Value
+            Options.FastExistingXMLFileTest = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property IncludeHeadersInExportFile As Boolean
         Get
-            Return mOptions.IncludeHeadersInExportFile
+            Return Options.IncludeHeadersInExportFile
         End Get
         Set
-            mOptions.IncludeHeadersInExportFile = Value
+            Options.IncludeHeadersInExportFile = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property IncludeScanTimesInSICStatsFile As Boolean
         Get
-            Return mOptions.IncludeScanTimesInSICStatsFile
+            Return Options.IncludeScanTimesInSICStatsFile
         End Get
         Set
-            mOptions.IncludeScanTimesInSICStatsFile = Value
+            Options.IncludeScanTimesInSICStatsFile = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property LimitSearchToCustomMZList As Boolean
         Get
-            Return mOptions.CustomSICList.LimitSearchToCustomMZList
+            Return Options.CustomSICList.LimitSearchToCustomMZList
         End Get
         Set
-            mOptions.CustomSICList.LimitSearchToCustomMZList = Value
+            Options.CustomSICList.LimitSearchToCustomMZList = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ParentIonDecoyMassDa As Double
         Get
-            Return mOptions.ParentIonDecoyMassDa
+            Return Options.ParentIonDecoyMassDa
         End Get
         Set
-            mOptions.ParentIonDecoyMassDa = Value
+            Options.ParentIonDecoyMassDa = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SkipMSMSProcessing As Boolean
         Get
-            Return mOptions.SkipMSMSProcessing
+            Return Options.SkipMSMSProcessing
         End Get
         Set
-            mOptions.SkipMSMSProcessing = Value
+            Options.SkipMSMSProcessing = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SkipSICAndRawDataProcessing As Boolean
         Get
-            Return mOptions.SkipSICAndRawDataProcessing
+            Return Options.SkipSICAndRawDataProcessing
         End Get
         Set
-            mOptions.SkipSICAndRawDataProcessing = Value
+            Options.SkipSICAndRawDataProcessing = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SuppressNoParentIonsError As Boolean
         Get
-            Return mOptions.SuppressNoParentIonsError
+            Return Options.SuppressNoParentIonsError
         End Get
         Set
-            mOptions.SuppressNoParentIonsError = Value
+            Options.SuppressNoParentIonsError = Value
         End Set
     End Property
 
@@ -441,60 +436,60 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property WriteDetailedSICDataFile As Boolean
         Get
-            Return mOptions.WriteDetailedSICDataFile
+            Return Options.WriteDetailedSICDataFile
         End Get
         Set
-            mOptions.WriteDetailedSICDataFile = Value
+            Options.WriteDetailedSICDataFile = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property WriteExtendedStats As Boolean
         Get
-            Return mOptions.WriteExtendedStats
+            Return Options.WriteExtendedStats
         End Get
         Set
-            mOptions.WriteExtendedStats = Value
+            Options.WriteExtendedStats = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property WriteExtendedStatsIncludeScanFilterText As Boolean
         Get
-            Return mOptions.WriteExtendedStatsIncludeScanFilterText
+            Return Options.WriteExtendedStatsIncludeScanFilterText
         End Get
         Set
-            mOptions.WriteExtendedStatsIncludeScanFilterText = Value
+            Options.WriteExtendedStatsIncludeScanFilterText = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property WriteExtendedStatsStatusLog As Boolean
         Get
-            Return mOptions.WriteExtendedStatsStatusLog
+            Return Options.WriteExtendedStatsStatusLog
         End Get
         Set
-            mOptions.WriteExtendedStatsStatusLog = Value
+            Options.WriteExtendedStatsStatusLog = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property WriteMSMethodFile As Boolean
         Get
-            Return mOptions.WriteMSMethodFile
+            Return Options.WriteMSMethodFile
         End Get
         Set
-            mOptions.WriteMSMethodFile = Value
+            Options.WriteMSMethodFile = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property WriteMSTuneFile As Boolean
         Get
-            Return mOptions.WriteMSTuneFile
+            Return Options.WriteMSTuneFile
         End Get
         Set
-            mOptions.WriteMSTuneFile = Value
+            Options.WriteMSTuneFile = Value
         End Set
     End Property
 
@@ -505,198 +500,198 @@ Public Class clsMASIC
     <Obsolete("Use Property Options.  Also, the SICToleranceDa setting should not be used; use SetSICTolerance and GetSICTolerance instead")>
     Public Property SICToleranceDa As Double
         Get
-            Return mOptions.SICOptions.SICToleranceDa
+            Return Options.SICOptions.SICToleranceDa
         End Get
         Set
-            mOptions.SICOptions.SICToleranceDa = Value
+            Options.SICOptions.SICToleranceDa = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options.SICOptions.GetSICTolerance")>
     Public Function GetSICTolerance() As Double
         Dim toleranceIsPPM As Boolean
-        Return mOptions.SICOptions.GetSICTolerance(toleranceIsPPM)
+        Return Options.SICOptions.GetSICTolerance(toleranceIsPPM)
     End Function
 
     <Obsolete("Use Property Options.SICOptions.GetSICTolerance")>
     Public Function GetSICTolerance(<Out> ByRef toleranceIsPPM As Boolean) As Double
-        Return mOptions.SICOptions.GetSICTolerance(toleranceIsPPM)
+        Return Options.SICOptions.GetSICTolerance(toleranceIsPPM)
     End Function
 
     <Obsolete("Use Property Options.SICOptions.SetSICTolerance")>
     Public Sub SetSICTolerance(sicTolerance As Double, toleranceIsPPM As Boolean)
-        mOptions.SICOptions.SetSICTolerance(sicTolerance, toleranceIsPPM)
+        Options.SICOptions.SetSICTolerance(sicTolerance, toleranceIsPPM)
     End Sub
 
     <Obsolete("Use Property Options")>
     Public Property SICToleranceIsPPM As Boolean
         Get
-            Return mOptions.SICOptions.SICToleranceIsPPM
+            Return Options.SICOptions.SICToleranceIsPPM
         End Get
         Set
-            mOptions.SICOptions.SICToleranceIsPPM = Value
+            Options.SICOptions.SICToleranceIsPPM = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property RefineReportedParentIonMZ As Boolean
         Get
-            Return mOptions.SICOptions.RefineReportedParentIonMZ
+            Return Options.SICOptions.RefineReportedParentIonMZ
         End Get
         Set
-            mOptions.SICOptions.RefineReportedParentIonMZ = Value
+            Options.SICOptions.RefineReportedParentIonMZ = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property RTRangeEnd As Single
         Get
-            Return mOptions.SICOptions.RTRangeEnd
+            Return Options.SICOptions.RTRangeEnd
         End Get
         Set
-            mOptions.SICOptions.RTRangeEnd = Value
+            Options.SICOptions.RTRangeEnd = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property RTRangeStart As Single
         Get
-            Return mOptions.SICOptions.RTRangeStart
+            Return Options.SICOptions.RTRangeStart
         End Get
         Set
-            mOptions.SICOptions.RTRangeStart = Value
+            Options.SICOptions.RTRangeStart = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ScanRangeEnd As Integer
         Get
-            Return mOptions.SICOptions.ScanRangeEnd
+            Return Options.SICOptions.ScanRangeEnd
         End Get
         Set
-            mOptions.SICOptions.ScanRangeEnd = Value
+            Options.SICOptions.ScanRangeEnd = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ScanRangeStart As Integer
         Get
-            Return mOptions.SICOptions.ScanRangeStart
+            Return Options.SICOptions.ScanRangeStart
         End Get
         Set
-            mOptions.SICOptions.ScanRangeStart = Value
+            Options.SICOptions.ScanRangeStart = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MaxSICPeakWidthMinutesBackward As Single
         Get
-            Return mOptions.SICOptions.MaxSICPeakWidthMinutesBackward
+            Return Options.SICOptions.MaxSICPeakWidthMinutesBackward
         End Get
         Set
-            mOptions.SICOptions.MaxSICPeakWidthMinutesBackward = Value
+            Options.SICOptions.MaxSICPeakWidthMinutesBackward = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MaxSICPeakWidthMinutesForward As Single
         Get
-            Return mOptions.SICOptions.MaxSICPeakWidthMinutesForward
+            Return Options.SICOptions.MaxSICPeakWidthMinutesForward
         End Get
         Set
-            mOptions.SICOptions.MaxSICPeakWidthMinutesForward = Value
+            Options.SICOptions.MaxSICPeakWidthMinutesForward = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SICNoiseFractionLowIntensityDataToAverage As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
+            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = Value
+            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SICNoiseMinimumSignalToNoiseRatio As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio
+            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio
         End Get
         Set
             ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
-            mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
+            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SICNoiseThresholdIntensity As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute
+            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = Value
+            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SICNoiseThresholdMode As MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode
+            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = Value
+            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MassSpectraNoiseFractionLowIntensityDataToAverage As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage
+            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = Value
+            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MassSpectraNoiseMinimumSignalToNoiseRatio As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio
+            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = Value
+            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MassSpectraNoiseThresholdIntensity As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute
+            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute
         End Get
         Set
             If Value < 0 Or Value > Double.MaxValue Then Value = 0
-            mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Value
+            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MassSpectraNoiseThresholdMode As MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode
+            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = Value
+            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ReplaceSICZeroesWithMinimumPositiveValueFromMSData As Boolean
         Get
-            Return mOptions.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData
+            Return Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData
         End Get
         Set
-            mOptions.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = Value
+            Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = Value
         End Set
     End Property
 #End Region
@@ -706,70 +701,70 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property ExportRawDataIncludeMSMS As Boolean
         Get
-            Return mOptions.RawDataExportOptions.IncludeMSMS
+            Return Options.RawDataExportOptions.IncludeMSMS
         End Get
         Set
-            mOptions.RawDataExportOptions.IncludeMSMS = Value
+            Options.RawDataExportOptions.IncludeMSMS = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ExportRawDataRenumberScans As Boolean
         Get
-            Return mOptions.RawDataExportOptions.RenumberScans
+            Return Options.RawDataExportOptions.RenumberScans
         End Get
         Set
-            mOptions.RawDataExportOptions.RenumberScans = Value
+            Options.RawDataExportOptions.RenumberScans = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ExportRawDataIntensityMinimum As Single
         Get
-            Return mOptions.RawDataExportOptions.IntensityMinimum
+            Return Options.RawDataExportOptions.IntensityMinimum
         End Get
         Set
-            mOptions.RawDataExportOptions.IntensityMinimum = Value
+            Options.RawDataExportOptions.IntensityMinimum = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ExportRawDataMaxIonCountPerScan As Integer
         Get
-            Return mOptions.RawDataExportOptions.MaxIonCountPerScan
+            Return Options.RawDataExportOptions.MaxIonCountPerScan
         End Get
         Set
-            mOptions.RawDataExportOptions.MaxIonCountPerScan = Value
+            Options.RawDataExportOptions.MaxIonCountPerScan = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ExportRawDataFileFormat As clsRawDataExportOptions.eExportRawDataFileFormatConstants
         Get
-            Return mOptions.RawDataExportOptions.FileFormat
+            Return Options.RawDataExportOptions.FileFormat
         End Get
         Set
-            mOptions.RawDataExportOptions.FileFormat = Value
+            Options.RawDataExportOptions.FileFormat = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ExportRawDataMinimumSignalToNoiseRatio As Single
         Get
-            Return mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio
+            Return Options.RawDataExportOptions.MinimumSignalToNoiseRatio
         End Get
         Set
-            mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio = Value
+            Options.RawDataExportOptions.MinimumSignalToNoiseRatio = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ExportRawSpectraData As Boolean
         Get
-            Return mOptions.RawDataExportOptions.ExportEnabled
+            Return Options.RawDataExportOptions.ExportEnabled
         End Get
         Set
-            mOptions.RawDataExportOptions.ExportEnabled = Value
+            Options.RawDataExportOptions.ExportEnabled = Value
         End Set
     End Property
 
@@ -779,141 +774,141 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property IntensityThresholdAbsoluteMinimum As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum
+            Return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = Value
+            Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property IntensityThresholdFractionMax As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax
+            Return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = Value
+            Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MaxDistanceScansNoOverlap As Integer
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap
+            Return Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = Value
+            Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property FindPeaksOnSmoothedData As Boolean
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData
+            Return Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = Value
+            Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SmoothDataRegardlessOfMinimumPeakWidth As Boolean
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth
+            Return Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = Value
+            Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property UseButterworthSmooth As Boolean
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.UseButterworthSmooth
+            Return Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.UseButterworthSmooth = Value
+            Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ButterworthSamplingFrequency As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency
+            Return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency
         End Get
         Set
             ' Value should be between 0.01 and 0.99; this is checked for in the filter, so we don't need to check here
-            mOptions.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency = Value
+            Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property ButterworthSamplingFrequencyDoubledForSIMData As Boolean
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData
+            Return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = Value
+            Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property UseSavitzkyGolaySmooth As Boolean
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth
+            Return Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = Value
+            Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SavitzkyGolayFilterOrder As Short
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder
+            Return Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = Value
+            Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SaveSmoothedData As Boolean
         Get
-            Return mOptions.SICOptions.SaveSmoothedData
+            Return Options.SICOptions.SaveSmoothedData
         End Get
         Set
-            mOptions.SICOptions.SaveSmoothedData = Value
+            Options.SICOptions.SaveSmoothedData = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MaxAllowedUpwardSpikeFractionMax As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
+            Return Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = Value
+            Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property InitialPeakWidthScansScaler As Double
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler
+            Return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = Value
+            Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property InitialPeakWidthScansMaximum As Integer
         Get
-            Return mOptions.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum
+            Return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum
         End Get
         Set
-            mOptions.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = Value
+            Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = Value
         End Set
     End Property
 #End Region
@@ -922,30 +917,30 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property SimilarIonMZToleranceHalfWidth As Single
         Get
-            Return mOptions.SICOptions.SimilarIonMZToleranceHalfWidth
+            Return Options.SICOptions.SimilarIonMZToleranceHalfWidth
         End Get
         Set
-            mOptions.SICOptions.SimilarIonMZToleranceHalfWidth = Value
+            Options.SICOptions.SimilarIonMZToleranceHalfWidth = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SimilarIonToleranceHalfWidthMinutes As Single
         Get
-            Return mOptions.SICOptions.SimilarIonToleranceHalfWidthMinutes
+            Return Options.SICOptions.SimilarIonToleranceHalfWidthMinutes
         End Get
         Set
-            mOptions.SICOptions.SimilarIonToleranceHalfWidthMinutes = Value
+            Options.SICOptions.SimilarIonToleranceHalfWidthMinutes = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SpectrumSimilarityMinimum As Single
         Get
-            Return mOptions.SICOptions.SpectrumSimilarityMinimum
+            Return Options.SICOptions.SpectrumSimilarityMinimum
         End Get
         Set
-            mOptions.SICOptions.SpectrumSimilarityMinimum = Value
+            Options.SICOptions.SpectrumSimilarityMinimum = Value
         End Set
     End Property
 #End Region
@@ -955,70 +950,70 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property BinStartX As Single
         Get
-            Return mOptions.BinningOptions.StartX
+            Return Options.BinningOptions.StartX
         End Get
         Set
-            mOptions.BinningOptions.StartX = Value
+            Options.BinningOptions.StartX = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property BinEndX As Single
         Get
-            Return mOptions.BinningOptions.EndX
+            Return Options.BinningOptions.EndX
         End Get
         Set
-            mOptions.BinningOptions.EndX = Value
+            Options.BinningOptions.EndX = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property BinSize As Single
         Get
-            Return mOptions.BinningOptions.BinSize
+            Return Options.BinningOptions.BinSize
         End Get
         Set
-            mOptions.BinningOptions.BinSize = Value
+            Options.BinningOptions.BinSize = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property BinnedDataIntensityPrecisionPercent As Single
         Get
-            Return mOptions.BinningOptions.IntensityPrecisionPercent
+            Return Options.BinningOptions.IntensityPrecisionPercent
         End Get
         Set
-            mOptions.BinningOptions.IntensityPrecisionPercent = Value
+            Options.BinningOptions.IntensityPrecisionPercent = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property NormalizeBinnedData As Boolean
         Get
-            Return mOptions.BinningOptions.Normalize
+            Return Options.BinningOptions.Normalize
         End Get
         Set
-            mOptions.BinningOptions.Normalize = Value
+            Options.BinningOptions.Normalize = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property SumAllIntensitiesForBin As Boolean
         Get
-            Return mOptions.BinningOptions.SumAllIntensitiesForBin
+            Return Options.BinningOptions.SumAllIntensitiesForBin
         End Get
         Set
-            mOptions.BinningOptions.SumAllIntensitiesForBin = Value
+            Options.BinningOptions.SumAllIntensitiesForBin = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property MaximumBinCount As Integer
         Get
-            Return mOptions.BinningOptions.MaximumBinCount
+            Return Options.BinningOptions.MaximumBinCount
         End Get
         Set
-            mOptions.BinningOptions.MaximumBinCount = Value
+            Options.BinningOptions.MaximumBinCount = Value
         End Set
     End Property
 #End Region
@@ -1028,53 +1023,53 @@ Public Class clsMASIC
     <Obsolete("Use Property Options")>
     Public Property DiskCachingAlwaysDisabled As Boolean
         Get
-            Return mOptions.CacheOptions.DiskCachingAlwaysDisabled
+            Return Options.CacheOptions.DiskCachingAlwaysDisabled
         End Get
         Set
-            mOptions.CacheOptions.DiskCachingAlwaysDisabled = Value
+            Options.CacheOptions.DiskCachingAlwaysDisabled = Value
         End Set
     End Property
 
     <Obsolete("Use Property Options")>
     Public Property CacheDirectoryPath As String
         Get
-            Return mOptions.CacheOptions.DirectoryPath
+            Return Options.CacheOptions.DirectoryPath
         End Get
         Set
-            mOptions.CacheOptions.DirectoryPath = Value
+            Options.CacheOptions.DirectoryPath = Value
         End Set
     End Property
 
     <Obsolete("Legacy parameter; no longer used")>
     Public Property CacheMaximumMemoryUsageMB As Single
         Get
-            Return mOptions.CacheOptions.MaximumMemoryUsageMB
+            Return Options.CacheOptions.MaximumMemoryUsageMB
         End Get
         Set
-            mOptions.CacheOptions.MaximumMemoryUsageMB = Value
+            Options.CacheOptions.MaximumMemoryUsageMB = Value
         End Set
     End Property
 
     <Obsolete("Legacy parameter; no longer used")>
     Public Property CacheMinimumFreeMemoryMB As Single
         Get
-            Return mOptions.CacheOptions.MinimumFreeMemoryMB
+            Return Options.CacheOptions.MinimumFreeMemoryMB
         End Get
         Set
-            If mOptions.CacheOptions.MinimumFreeMemoryMB < 10 Then
-                mOptions.CacheOptions.MinimumFreeMemoryMB = 10
+            If Options.CacheOptions.MinimumFreeMemoryMB < 10 Then
+                Options.CacheOptions.MinimumFreeMemoryMB = 10
             End If
-            mOptions.CacheOptions.MinimumFreeMemoryMB = Value
+            Options.CacheOptions.MinimumFreeMemoryMB = Value
         End Set
     End Property
 
     <Obsolete("Legacy parameter; no longer used")>
     Public Property CacheSpectraToRetainInMemory As Integer
         Get
-            Return mOptions.CacheOptions.SpectraToRetainInMemory
+            Return Options.CacheOptions.SpectraToRetainInMemory
         End Get
         Set
-            mOptions.CacheOptions.SpectraToRetainInMemory = Value
+            Options.CacheOptions.SpectraToRetainInMemory = Value
         End Set
     End Property
 
@@ -1084,7 +1079,7 @@ Public Class clsMASIC
 
     Public Overrides Sub AbortProcessingNow()
         AbortProcessing = True
-        mOptions.AbortProcessing = True
+        Options.AbortProcessing = True
     End Sub
 
     Private Function FindSICsAndWriteOutput(
@@ -1107,7 +1102,7 @@ Public Class clsMASIC
             Dim bpiWriter = New clsBPIWriter()
             RegisterEvents(bpiWriter)
 
-            Dim xmlResultsWriter = New clsXMLResultsWriter(mOptions)
+            Dim xmlResultsWriter = New clsXMLResultsWriter(Options)
             RegisterEvents(xmlResultsWriter)
 
             '---------------------------------------------------------
@@ -1119,7 +1114,7 @@ Public Class clsMASIC
             SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk")
             UpdatePeakMemoryUsage()
 
-            If mOptions.SkipSICAndRawDataProcessing OrElse Not mOptions.ExportRawDataOnly Then
+            If Options.SkipSICAndRawDataProcessing OrElse Not Options.ExportRawDataOnly Then
                 LogMessage("ProcessFile: Call SaveBPIs")
                 bpiWriter.SaveBPIs(scanList, spectraCache, inputFilePathFull, outputDirectoryPath)
             End If
@@ -1143,7 +1138,7 @@ Public Class clsMASIC
             LogMessage("ProcessFile: Create DatasetInfo File")
             dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputDirectoryPath, scanTracking, datasetFileInfo)
 
-            If mOptions.SkipSICAndRawDataProcessing Then
+            If Options.SkipSICAndRawDataProcessing Then
                 LogMessage("ProcessFile: Skipping SIC Processing")
 
                 SetDefaultPeakLocValues(scanList)
@@ -1153,22 +1148,22 @@ Public Class clsMASIC
                 ' Optionally, export the raw mass spectra data
                 '---------------------------------------------------------
 
-                If mOptions.RawDataExportOptions.ExportEnabled Then
-                    Dim rawDataExporter = New clsSpectrumDataWriter(bpiWriter, mOptions)
+                If Options.RawDataExportOptions.ExportEnabled Then
+                    Dim rawDataExporter = New clsSpectrumDataWriter(bpiWriter, Options)
                     RegisterEvents(rawDataExporter)
 
                     rawDataExporter.ExportRawDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath)
                 End If
 
-                If mOptions.ReporterIons.ReporterIonStatsEnabled Then
+                If Options.ReporterIons.ReporterIonStatsEnabled Then
                     ' Look for Reporter Ions in the Fragmentation spectra
 
-                    Dim reporterIonProcessor = New clsReporterIonProcessor(mOptions)
+                    Dim reporterIonProcessor = New clsReporterIonProcessor(Options)
                     RegisterEvents(reporterIonProcessor)
                     reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath)
                 End If
 
-                Dim mrmProcessor = New clsMRMProcessing(mOptions, dataOutputHandler)
+                Dim mrmProcessor = New clsMRMProcessing(Options, dataOutputHandler)
                 RegisterEvents(mrmProcessor)
 
                 '---------------------------------------------------------
@@ -1178,19 +1173,19 @@ Public Class clsMASIC
                     mrmProcessor.ExportMRMDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath)
                 End If
 
-                If Not mOptions.ExportRawDataOnly Then
+                If Not Options.ExportRawDataOnly Then
 
                     '---------------------------------------------------------
                     ' Add the custom SIC values to scanList
                     '---------------------------------------------------------
-                    mOptions.CustomSICList.AddCustomSICValues(scanList, mOptions.SICOptions.SICTolerance,
-                                       mOptions.SICOptions.SICToleranceIsPPM, mOptions.CustomSICList.ScanOrAcqTimeTolerance)
+                    Options.CustomSICList.AddCustomSICValues(scanList, Options.SICOptions.SICTolerance,
+                                       Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance)
 
 
                     '---------------------------------------------------------
                     ' Possibly create the Tab-separated values SIC details output file
                     '---------------------------------------------------------
-                    If mOptions.WriteDetailedSICDataFile Then
+                    If Options.WriteDetailedSICDataFile Then
                         success = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath)
                         If Not success Then
                             SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
@@ -1201,7 +1196,7 @@ Public Class clsMASIC
                     '---------------------------------------------------------
                     ' Create the XML output file
                     '---------------------------------------------------------
-                    success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, spectraCache, mOptions.SICOptions, mOptions.BinningOptions)
+                    success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, spectraCache, Options.SICOptions, Options.BinningOptions)
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
                         Exit Try
@@ -1220,7 +1215,7 @@ Public Class clsMASIC
                     Dim sicProcessor = New clsSICProcessing(mMASICPeakFinder, mrmProcessor)
                     RegisterEvents(sicProcessor)
 
-                    success = sicProcessor.CreateParentIonSICs(scanList, spectraCache, mOptions, dataOutputHandler, sicProcessor, xmlResultsWriter)
+                    success = sicProcessor.CreateParentIonSICs(scanList, spectraCache, Options, dataOutputHandler, sicProcessor, xmlResultsWriter)
 
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
@@ -1229,7 +1224,7 @@ Public Class clsMASIC
 
                 End If
 
-                If Not (mOptions.SkipMSMSProcessing OrElse mOptions.ExportRawDataOnly) Then
+                If Not (Options.SkipMSMSProcessing OrElse Options.ExportRawDataOnly) Then
 
                     '---------------------------------------------------------
                     ' Find Similar Parent Ions
@@ -1240,7 +1235,7 @@ Public Class clsMASIC
                     UpdatePeakMemoryUsage()
 
                     LogMessage("ProcessFile: Call FindSimilarParentIons")
-                    success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, mOptions, dataImporterBase, similarParentIonUpdateCount)
+                    success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, Options, dataImporterBase, similarParentIonUpdateCount)
 
                     If Not success Then
                         SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
@@ -1250,7 +1245,7 @@ Public Class clsMASIC
 
             End If
 
-            If mOptions.WriteExtendedStats AndAlso Not mOptions.ExportRawDataOnly Then
+            If Options.WriteExtendedStats AndAlso Not Options.ExportRawDataOnly Then
                 '---------------------------------------------------------
                 ' Save Extended Scan Stats Files
                 '---------------------------------------------------------
@@ -1261,7 +1256,7 @@ Public Class clsMASIC
 
                 LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
                 success = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
-                    scanList, inputFileName, outputDirectoryPath, mOptions.IncludeHeadersInExportFile)
+                    scanList, inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile)
 
                 If Not success Then
                     SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
@@ -1278,13 +1273,13 @@ Public Class clsMASIC
             SetSubtaskProcessingStepPct(0)
             UpdatePeakMemoryUsage()
 
-            If Not mOptions.ExportRawDataOnly Then
+            If Not Options.ExportRawDataOnly Then
 
                 Dim sicStatsWriter = New clsSICStatsWriter()
                 RegisterEvents(sicStatsWriter)
 
                 LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
-                success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, mOptions, dataOutputHandler)
+                success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, Options, dataOutputHandler)
 
                 If Not success Then
                     SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
@@ -1297,7 +1292,7 @@ Public Class clsMASIC
             SetSubtaskProcessingStepPct(0)
             UpdatePeakMemoryUsage()
 
-            If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) Then
+            If Not (Options.SkipSICAndRawDataProcessing OrElse Options.ExportRawDataOnly) Then
 
                 '---------------------------------------------------------
                 ' Write processing stats to the XML output file
@@ -1318,12 +1313,12 @@ Public Class clsMASIC
             '---------------------------------------------------------
             ' Save a text file containing the headers used in the text files
             '---------------------------------------------------------
-            If Not mOptions.IncludeHeadersInExportFile Then
+            If Not Options.IncludeHeadersInExportFile Then
                 LogMessage("ProcessFile: Call SaveHeaderGlossary")
                 dataOutputHandler.SaveHeaderGlossary(scanList, inputFileName, outputDirectoryPath)
             End If
 
-            If Not (mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly) AndAlso similarParentIonUpdateCount > 0 Then
+            If Not (Options.SkipSICAndRawDataProcessing OrElse Options.ExportRawDataOnly) AndAlso similarParentIonUpdateCount > 0 Then
                 '---------------------------------------------------------
                 ' Reopen the XML file and update the entries for those ions in scanList that had their
                 ' Optimal peak apex scan numbers updated
@@ -1483,7 +1478,7 @@ Public Class clsMASIC
             '---------------------------------------------------------
             ' Create the _ScanStats.txt file
             '---------------------------------------------------------
-            dataOutputHandler.OpenOutputFileHandles(inputFileName, outputDirectoryPath, mOptions.IncludeHeadersInExportFile)
+            dataOutputHandler.OpenOutputFileHandles(inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile)
 
             '---------------------------------------------------------
             ' Read the mass spectra from the input data file
@@ -1494,20 +1489,20 @@ Public Class clsMASIC
             UpdatePeakMemoryUsage()
             mStatusMessage = String.Empty
 
-            If mOptions.SkipSICAndRawDataProcessing Then
-                mOptions.ExportRawDataOnly = False
+            If Options.SkipSICAndRawDataProcessing Then
+                Options.ExportRawDataOnly = False
             End If
 
-            Dim keepRawMSSpectra = Not mOptions.SkipSICAndRawDataProcessing OrElse mOptions.ExportRawDataOnly
+            Dim keepRawMSSpectra = Not Options.SkipSICAndRawDataProcessing OrElse Options.ExportRawDataOnly
 
-            mOptions.SICOptions.ValidateSICOptions()
+            Options.SICOptions.ValidateSICOptions()
 
             Select Case Path.GetExtension(inputFileName).ToUpper()
                 Case DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()
 
                     ' Open the .Raw file and obtain the scan information
 
-                    Dim dataImporter = New DataInput.clsDataImportThermoRaw(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                    Dim dataImporter = New DataInput.clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
                     RegisterDataImportEvents(dataImporter)
                     dataImporterBase = dataImporter
 
@@ -1515,7 +1510,7 @@ Public Class clsMASIC
                       inputFilePathFull,
                       scanList, spectraCache, dataOutputHandler,
                       keepRawMSSpectra,
-                      Not mOptions.SkipMSMSProcessing)
+                      Not Options.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
@@ -1523,7 +1518,7 @@ Public Class clsMASIC
 
                     ' Open the .mzML file and obtain the scan information
 
-                    Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                    Dim dataImporter = New DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
                     RegisterDataImportEvents(dataImporter)
                     dataImporterBase = dataImporter
 
@@ -1531,7 +1526,7 @@ Public Class clsMASIC
                         inputFilePathFull,
                         scanList, spectraCache, dataOutputHandler,
                         keepRawMSSpectra,
-                        Not mOptions.SkipMSMSProcessing)
+                        Not Options.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
@@ -1540,7 +1535,7 @@ Public Class clsMASIC
 
                     ' Open the .mzXML file and obtain the scan information
 
-                    Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                    Dim dataImporter = New DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
                     RegisterDataImportEvents(dataImporter)
                     dataImporterBase = dataImporter
 
@@ -1548,7 +1543,7 @@ Public Class clsMASIC
                       inputFilePathFull,
                       scanList, spectraCache, dataOutputHandler,
                       keepRawMSSpectra,
-                      Not mOptions.SkipMSMSProcessing)
+                      Not Options.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
@@ -1557,14 +1552,14 @@ Public Class clsMASIC
 
                     ' Open the .mzData file and obtain the scan information
 
-                    Dim dataImporter = New DataInput.clsDataImportMSXml(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                    Dim dataImporter = New DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
                     RegisterDataImportEvents(dataImporter)
                     dataImporterBase = dataImporter
 
                     success = dataImporter.ExtractScanInfoFromMzDataFile(
                       inputFilePathFull,
                       scanList, spectraCache, dataOutputHandler,
-                      keepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
+                      keepRawMSSpectra, Not Options.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
@@ -1573,14 +1568,14 @@ Public Class clsMASIC
 
                     ' Open the .MGF and .CDF files to obtain the scan information
 
-                    Dim dataImporter = New DataInput.clsDataImportMGFandCDF(mOptions, mMASICPeakFinder, parentIonProcessor, scanTracking)
+                    Dim dataImporter = New DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
                     RegisterDataImportEvents(dataImporter)
                     dataImporterBase = dataImporter
 
                     success = dataImporter.ExtractScanInfoFromMGFandCDF(
                       inputFilePathFull,
                       scanList, spectraCache, dataOutputHandler,
-                      keepRawMSSpectra, Not mOptions.SkipMSMSProcessing)
+                      keepRawMSSpectra, Not Options.SkipMSMSProcessing)
 
                     datasetFileInfo = dataImporter.DatasetFileInfo
 
@@ -1613,7 +1608,7 @@ Public Class clsMASIC
     End Function
 
     Public Function LoadParameterFileSettings(parameterFilePath As String) As Boolean
-        Dim success = mOptions.LoadParameterFileSettings(parameterFilePath)
+        Dim success = Options.LoadParameterFileSettings(parameterFilePath)
         Return success
     End Function
 
@@ -1625,9 +1620,9 @@ Public Class clsMASIC
 
         Dim messageWithoutCRLF As String
 
-        mOptions.StatusMessage = message
+        Options.StatusMessage = message
 
-        messageWithoutCRLF = mOptions.StatusMessage.Replace(ControlChars.NewLine, "; ")
+        messageWithoutCRLF = Options.StatusMessage.Replace(ControlChars.NewLine, "; ")
 
         If ex Is Nothing Then
             ex = New Exception("Error")
@@ -1678,7 +1673,7 @@ Public Class clsMASIC
             SetLocalErrorCode(eMasicErrorCodes.NoError)
         End If
 
-        mOptions.OutputDirectoryPath = outputDirectoryPath
+        Options.OutputDirectoryPath = outputDirectoryPath
 
         mSubtaskProcessingStepPct = 0
         UpdateProcessingStep(eProcessingStepConstants.NewTask, True)
@@ -1688,7 +1683,7 @@ Public Class clsMASIC
 
         UpdateStatusFile(True)
 
-        If Not mOptions.LoadParameterFileSettings(parameterFilePath, inputFilePath) Then
+        If Not Options.LoadParameterFileSettings(parameterFilePath, inputFilePath) Then
             MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile)
             mStatusMessage = "Parameter file load error: " & parameterFilePath
 
@@ -1703,24 +1698,24 @@ Public Class clsMASIC
             Return False
         End If
 
-        Dim dataOutputHandler = New clsDataOutput(mOptions)
+        Dim dataOutputHandler = New clsDataOutput(Options)
         RegisterEvents(dataOutputHandler)
 
         Try
             ' If a Custom SICList file is defined, then load the custom SIC values now
-            If mOptions.CustomSICList.CustomSICListFileName.Length > 0 Then
-                Dim sicListReader = New DataInput.clsCustomSICListReader(mOptions.CustomSICList)
+            If Options.CustomSICList.CustomSICListFileName.Length > 0 Then
+                Dim sicListReader = New DataInput.clsCustomSICListReader(Options.CustomSICList)
                 RegisterEvents(sicListReader)
 
-                LogMessage("ProcessFile: Reading custom SIC values file: " & mOptions.CustomSICList.CustomSICListFileName)
-                success = sicListReader.LoadCustomSICListFromFile(mOptions.CustomSICList.CustomSICListFileName)
+                LogMessage("ProcessFile: Reading custom SIC values file: " & Options.CustomSICList.CustomSICListFileName)
+                success = sicListReader.LoadCustomSICListFromFile(Options.CustomSICList.CustomSICListFileName)
                 If Not success Then
                     SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues)
                     Exit Try
                 End If
             End If
 
-            mOptions.ReporterIons.UpdateMZIntensityFilterIgnoreRange()
+            Options.ReporterIons.UpdateMZIntensityFilterIgnoreRange()
 
             LogMessage("Source data file: " & inputFilePath)
 
@@ -1736,13 +1731,13 @@ Public Class clsMASIC
             ShowMessage(mStatusMessage)
 
             success = CleanupFilePaths(inputFilePath, outputDirectoryPath)
-            mOptions.OutputDirectoryPath = outputDirectoryPath
+            Options.OutputDirectoryPath = outputDirectoryPath
 
             If success Then
-                Dim dbAccessor = New clsDatabaseAccess(mOptions)
+                Dim dbAccessor = New clsDatabaseAccess(Options)
                 RegisterEvents(dbAccessor)
 
-                mOptions.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, mOptions.DatasetLookupFilePath, mOptions.SICOptions.DatasetID)
+                Options.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, Options.DatasetLookupFilePath, Options.SICOptions.DatasetID)
 
                 If Me.LocalErrorCode <> eMasicErrorCodes.NoError Then
                     If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetID OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
@@ -1774,7 +1769,7 @@ Public Class clsMASIC
 
                 LogMessage("Checking for existing results in the output path: " & outputDirectoryPath)
 
-                doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, mOptions)
+                doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, Options)
 
                 If doNotProcess Then
                     LogMessage("Existing results found; data will not be reprocessed")
@@ -1833,10 +1828,10 @@ Public Class clsMASIC
             ' Instantiate the SpectraCache
             '---------------------------------------------------------
 
-            Using spectraCache = New clsSpectraCache(mOptions.CacheOptions) With {
-                .DiskCachingAlwaysDisabled = mOptions.CacheOptions.DiskCachingAlwaysDisabled,
-                .CacheDirectoryPath = mOptions.CacheOptions.DirectoryPath,
-                .CacheSpectraToRetainInMemory = mOptions.CacheOptions.SpectraToRetainInMemory
+            Using spectraCache = New clsSpectraCache(Options.CacheOptions) With {
+                .DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
+                .CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
+                .CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
             }
                 RegisterEvents(spectraCache)
 
@@ -1847,10 +1842,10 @@ Public Class clsMASIC
                 Dim scanList = New clsScanList()
                 RegisterEvents(scanList)
 
-                Dim parentIonProcessor = New clsParentIonProcessing(mOptions.ReporterIons)
+                Dim parentIonProcessor = New clsParentIonProcessing(Options.ReporterIons)
                 RegisterEvents(parentIonProcessor)
 
-                Dim scanTracking = New clsScanTracking(mOptions.ReporterIons, mMASICPeakFinder)
+                Dim scanTracking = New clsScanTracking(Options.ReporterIons, mMASICPeakFinder)
                 RegisterEvents(scanTracking)
 
                 Dim dataImporterBase As DataInput.clsDataImport = Nothing
@@ -1964,7 +1959,7 @@ Public Class clsMASIC
         End Try
 
         If success Then
-            mOptions.SICOptions.DatasetID += 1
+            Options.SICOptions.DatasetID += 1
         End If
 
         If success Then
@@ -2001,28 +1996,28 @@ Public Class clsMASIC
 
     <Obsolete("Use Options.SaveParameterFileSettings")>
     Public Function SaveParameterFileSettings(parameterFilePath As String) As Boolean
-        Dim success = mOptions.SaveParameterFileSettings(parameterFilePath)
+        Dim success = Options.SaveParameterFileSettings(parameterFilePath)
         Return success
     End Function
 
     <Obsolete("Use Options.ReporterIons.SetReporterIons")>
     Public Sub SetReporterIons(reporterIonMZList() As Double)
-        mOptions.ReporterIons.SetReporterIons(reporterIonMZList)
+        Options.ReporterIons.SetReporterIons(reporterIonMZList)
     End Sub
 
     <Obsolete("Use Options.ReporterIons.SetReporterIons")>
     Public Sub SetReporterIons(reporterIonMZList() As Double, mzToleranceDa As Double)
-        mOptions.ReporterIons.SetReporterIons(reporterIonMZList, mzToleranceDa)
+        Options.ReporterIons.SetReporterIons(reporterIonMZList, mzToleranceDa)
     End Sub
 
     <Obsolete("Use Options.ReporterIons.SetReporterIons")>
     Public Sub SetReporterIons(reporterIons As List(Of clsReporterIonInfo))
-        mOptions.ReporterIons.SetReporterIons(reporterIons, True)
+        Options.ReporterIons.SetReporterIons(reporterIons, True)
     End Sub
 
     <Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")>
     Public Sub SetReporterIonMassMode(eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants)
-        mOptions.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode)
+        Options.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode)
     End Sub
 
     <Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")>
@@ -2030,7 +2025,7 @@ Public Class clsMASIC
       eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants,
       mzToleranceDa As Double)
 
-        mOptions.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode, mzToleranceDa)
+        Options.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode, mzToleranceDa)
 
     End Sub
 
@@ -2156,7 +2151,7 @@ Public Class clsMASIC
 
         Dim weightingFactors() As Single
 
-        If mOptions.SkipMSMSProcessing Then
+        If Options.SkipMSMSProcessing Then
             ' Step                           0   1     2     3  4   5      6      7      8
             weightingFactors = New Single() {0, 0.97, 0.002, 0, 0, 0.001, 0.025, 0.001, 0.001}            ' The sum of these factors should be 1.00
         Else
@@ -2213,8 +2208,8 @@ Public Class clsMASIC
             LastFileWriteTime = DateTime.UtcNow
 
             Try
-                Dim tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" & mOptions.MASICStatusFilename)
-                Dim statusFilePath = Path.Combine(GetAppDirectoryPath(), mOptions.MASICStatusFilename)
+                Dim tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" & Options.MASICStatusFilename)
+                Dim statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename)
 
                 Using writer = New Xml.XmlTextWriter(tempPath, Text.Encoding.UTF8)
 
