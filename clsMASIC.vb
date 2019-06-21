@@ -34,7 +34,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "June 4, 2019"
+        MyBase.mFileDate = "June 21, 2019"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
@@ -101,6 +101,7 @@ Public Class clsMASIC
 
 #Region "Classwide Variables"
 
+    Private mLoggedMASICVersion As Boolean = False
 
     Private ReadOnly mMASICPeakFinder As MASICPeakFinder.clsMASICPeakFinder
 
@@ -1668,6 +1669,14 @@ Public Class clsMASIC
         Dim success, doNotProcess As Boolean
 
         Dim inputFilePathFull As String = String.Empty
+
+        If Not mLoggedMASICVersion Then
+            LogMessage("Starting MASIC v" & GetAppVersion(mFileDate))
+            Console.WriteLine()
+            mLoggedMASICVersion = True
+        End If
+
+        LogMessage("Parsing " & Path.GetFileName(inputFilePath))
 
         If resetErrorCode Then
             SetLocalErrorCode(eMasicErrorCodes.NoError)
