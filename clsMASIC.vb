@@ -1732,10 +1732,7 @@ Public Class clsMASIC
                 Exit Try
             End If
 
-
             mStatusMessage = "Parsing " & Path.GetFileName(inputFilePath)
-            Console.WriteLine()
-            ShowMessage(mStatusMessage)
 
             success = CleanupFilePaths(inputFilePath, outputDirectoryPath)
             Options.OutputDirectoryPath = outputDirectoryPath
