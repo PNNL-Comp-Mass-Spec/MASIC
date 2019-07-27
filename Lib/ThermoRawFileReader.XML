@@ -909,6 +909,11 @@
             Data Dependent ZoomScan Map
             </summary>
         </member>
+        <member name="T:ThermoRawFileReader.ThermoReaderOptions">
+            <summary>
+            Thermo reader options
+            </summary>
+        </member>
         <member name="P:ThermoRawFileReader.ThermoReaderOptions.LoadMSMethodInfo">
             <summary>
             MS Method Information
