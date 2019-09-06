@@ -1,4 +1,5 @@
-﻿Imports MASIC.clsMASIC
+﻿Imports System.Xml
+Imports MASIC.clsMASIC
 Imports MASIC.DatasetStats
 Imports PRISM
 
@@ -88,9 +89,8 @@ Namespace DataOutput
                     Next
                 End If
 
-
-                Dim objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
-                If objXMLOut Is Nothing Then Return False
+                Dim writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs
+                If writer Is Nothing Then Return False
 
                 ' Initialize the StringBuilder objects
                 Dim sbIntensityDataList = New Text.StringBuilder()
@@ -103,232 +103,230 @@ Namespace DataOutput
                 For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndices.Count - 1
                     lastGoodLoc = "fragScanIndex=" & fragScanIndex.ToString
 
-                    objXMLOut.WriteStartElement("ParentIon")
-                    objXMLOut.WriteAttributeString("Index", parentIonIndex.ToString())             ' Parent ion Index
-                    objXMLOut.WriteAttributeString("FragScanIndex", fragScanIndex.ToString())      ' Frag Scan Index
+                    writer.WriteStartElement("ParentIon")
+                    writer.WriteAttributeString("Index", parentIonIndex.ToString())             ' Parent ion Index
+                    writer.WriteAttributeString("FragScanIndex", fragScanIndex.ToString())      ' Frag Scan Index
 
-                    lastGoodLoc = "With scanList.ParentIons(parentIonIndex)"
-                    With scanList.ParentIons(parentIonIndex)
-                        objXMLOut.WriteElementString("MZ", StringUtilities.DblToString(.MZ, 4))
+                    lastGoodLoc = "currentParentIon = scanList.ParentIons(parentIonIndex)"
+                    Dim currentParentIon = scanList.ParentIons(parentIonIndex)
 
-                        If .SurveyScanIndex >= 0 AndAlso .SurveyScanIndex < scanList.SurveyScans.Count Then
-                            objXMLOut.WriteElementString("SurveyScanNumber", scanList.SurveyScans(.SurveyScanIndex).ScanNumber.ToString())
-                        Else
-                            objXMLOut.WriteElementString("SurveyScanNumber", "-1")
-                        End If
+                    writer.WriteElementString("MZ", StringUtilities.DblToString(currentParentIon.MZ, 4))
 
-                        lastGoodLoc = "Write FragScanNumber"
+                    If currentParentIon.SurveyScanIndex >= 0 AndAlso currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count Then
+                        writer.WriteElementString("SurveyScanNumber", scanList.SurveyScans(currentParentIon.SurveyScanIndex).ScanNumber.ToString())
+                    Else
+                        writer.WriteElementString("SurveyScanNumber", "-1")
+                    End If
 
-                        Dim interferenceScore As Double
+                    lastGoodLoc = "Write FragScanNumber"
 
-                        If fragScanIndex < scanList.FragScans.Count Then
-                            objXMLOut.WriteElementString("FragScanNumber", scanList.FragScans(.FragScanIndices(fragScanIndex)).ScanNumber.ToString())
-                            objXMLOut.WriteElementString("FragScanTime", scanList.FragScans(.FragScanIndices(fragScanIndex)).ScanTime.ToString())
-                            interferenceScore = scanList.FragScans(.FragScanIndices(fragScanIndex)).FragScanInfo.InterferenceScore
-                        Else
-                            ' Fragmentation scan does not exist
-                            objXMLOut.WriteElementString("FragScanNumber", "0")
-                            objXMLOut.WriteElementString("FragScanTime", "0")
-                            interferenceScore = 0
-                        End If
+                    Dim interferenceScore As Double
 
-                        objXMLOut.WriteElementString("OptimalPeakApexScanNumber", .OptimalPeakApexScanNumber.ToString())
-                        objXMLOut.WriteElementString("PeakApexOverrideParentIonIndex", .PeakApexOverrideParentIonIndex.ToString())
-                        objXMLOut.WriteElementString("CustomSICPeak", .CustomSICPeak.ToString())
+                    If fragScanIndex < scanList.FragScans.Count Then
+                        Dim currentFragScan = scanList.FragScans(currentParentIon.FragScanIndices(fragScanIndex))
+                        writer.WriteElementString("FragScanNumber", currentFragScan.ScanNumber.ToString())
+                        writer.WriteElementString("FragScanTime", currentFragScan.ScanTime.ToString())
+                        interferenceScore = currentFragScan.FragScanInfo.InterferenceScore
+                    Else
+                        ' Fragmentation scan does not exist
+                        writer.WriteElementString("FragScanNumber", "0")
+                        writer.WriteElementString("FragScanTime", "0")
+                        interferenceScore = 0
+                    End If
 
-                        If .CustomSICPeak Then
-                            objXMLOut.WriteElementString("CustomSICPeakComment", .CustomSICPeakComment)
-                            objXMLOut.WriteElementString("CustomSICPeakMZToleranceDa", .CustomSICPeakMZToleranceDa.ToString())
-                            objXMLOut.WriteElementString("CustomSICPeakScanTolerance", .CustomSICPeakScanOrAcqTimeTolerance.ToString())
-                            objXMLOut.WriteElementString("CustomSICPeakScanToleranceType", mOptions.CustomSICList.ScanToleranceType.ToString())
-                        End If
+                    writer.WriteElementString("OptimalPeakApexScanNumber", currentParentIon.OptimalPeakApexScanNumber.ToString())
+                    writer.WriteElementString("PeakApexOverrideParentIonIndex", currentParentIon.PeakApexOverrideParentIonIndex.ToString())
+                    writer.WriteElementString("CustomSICPeak", currentParentIon.CustomSICPeak.ToString())
 
-                        lastGoodLoc = "With .SICStats"
-                        With .SICStats
-                            With .Peak
-                                If sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then
-                                    objXMLOut.WriteElementString("SICScanType", "FragScan")
-                                    objXMLOut.WriteElementString("PeakScanStart", scanList.FragScans(sicScanIndices(.IndexBaseLeft)).ScanNumber.ToString())
-                                    objXMLOut.WriteElementString("PeakScanEnd", scanList.FragScans(sicScanIndices(.IndexBaseRight)).ScanNumber.ToString())
-                                    objXMLOut.WriteElementString("PeakScanMaxIntensity", scanList.FragScans(sicScanIndices(.IndexMax)).ScanNumber.ToString())
+                    If currentParentIon.CustomSICPeak Then
+                        writer.WriteElementString("CustomSICPeakComment", currentParentIon.CustomSICPeakComment)
+                        writer.WriteElementString("CustomSICPeakMZToleranceDa", currentParentIon.CustomSICPeakMZToleranceDa.ToString())
+                        writer.WriteElementString("CustomSICPeakScanTolerance", currentParentIon.CustomSICPeakScanOrAcqTimeTolerance.ToString())
+                        writer.WriteElementString("CustomSICPeakScanToleranceType", mOptions.CustomSICList.ScanToleranceType.ToString())
+                    End If
+
+                    lastGoodLoc = "sicStatsPeak = currentParentIon.SICStats.Peak"
+                    Dim sicStatsPeak = currentParentIon.SICStats.Peak
+
+                    If sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then
+                        writer.WriteElementString("SICScanType", "FragScan")
+                        writer.WriteElementString("PeakScanStart", scanList.FragScans(sicScanIndices(sicStatsPeak.IndexBaseLeft)).ScanNumber.ToString())
+                        writer.WriteElementString("PeakScanEnd", scanList.FragScans(sicScanIndices(sicStatsPeak.IndexBaseRight)).ScanNumber.ToString())
+                        writer.WriteElementString("PeakScanMaxIntensity", scanList.FragScans(sicScanIndices(sicStatsPeak.IndexMax)).ScanNumber.ToString())
+                    Else
+                        writer.WriteElementString("SICScanType", "SurveyScan")
+                        writer.WriteElementString("PeakScanStart", scanList.SurveyScans(sicScanIndices(sicStatsPeak.IndexBaseLeft)).ScanNumber.ToString())
+                        writer.WriteElementString("PeakScanEnd", scanList.SurveyScans(sicScanIndices(sicStatsPeak.IndexBaseRight)).ScanNumber.ToString())
+                        writer.WriteElementString("PeakScanMaxIntensity", scanList.SurveyScans(sicScanIndices(sicStatsPeak.IndexMax)).ScanNumber.ToString())
+                    End If
+
+                    writer.WriteElementString("PeakIntensity", StringUtilities.ValueToString(sicStatsPeak.MaxIntensityValue, 5))
+                    writer.WriteElementString("PeakSignalToNoiseRatio", StringUtilities.ValueToString(sicStatsPeak.SignalToNoiseRatio, 4))
+                    writer.WriteElementString("FWHMInScans", sicStatsPeak.FWHMScanWidth.ToString())
+                    writer.WriteElementString("PeakArea", StringUtilities.ValueToString(sicStatsPeak.Area, 5))
+                    writer.WriteElementString("ShoulderCount", sicStatsPeak.ShoulderCount.ToString())
+
+                    writer.WriteElementString("ParentIonIntensity", StringUtilities.ValueToString(sicStatsPeak.ParentIonIntensity, 5))
+
+                    Dim noiseStats = sicStatsPeak.BaselineNoiseStats
+                    writer.WriteElementString("PeakBaselineNoiseLevel", StringUtilities.ValueToString(noiseStats.NoiseLevel, 5))
+                    writer.WriteElementString("PeakBaselineNoiseStDev", StringUtilities.ValueToString(noiseStats.NoiseStDev, 3))
+                    writer.WriteElementString("PeakBaselinePointsUsed", noiseStats.PointsUsed.ToString())
+                    writer.WriteElementString("NoiseThresholdModeUsed", CInt(noiseStats.NoiseThresholdModeUsed).ToString())
+
+                    Dim statMoments = sicStatsPeak.StatisticalMoments
+
+                    writer.WriteElementString("StatMomentsArea", StringUtilities.ValueToString(statMoments.Area, 5))
+                    writer.WriteElementString("CenterOfMassScan", statMoments.CenterOfMassScan.ToString())
+                    writer.WriteElementString("PeakStDev", StringUtilities.ValueToString(statMoments.StDev, 3))
+                    writer.WriteElementString("PeakSkew", StringUtilities.ValueToString(statMoments.Skew, 4))
+                    writer.WriteElementString("PeakKSStat", StringUtilities.ValueToString(statMoments.KSStat, 4))
+                    writer.WriteElementString("StatMomentsDataCountUsed", statMoments.DataCountUsed.ToString())
+
+                    writer.WriteElementString("InterferenceScore", StringUtilities.ValueToString(interferenceScore, 4))
+
+                    If sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then
+                        writer.WriteElementString("SICScanStart", scanList.FragScans(sicScanIndices(0)).ScanNumber.ToString())
+                    Else
+                        writer.WriteElementString("SICScanStart", scanList.SurveyScans(sicScanIndices(0)).ScanNumber.ToString())
+                    End If
+
+                    If mOptions.UseBase64DataEncoding Then
+                        ' Save scan interval list as base-64 encoded strings
+                        lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICScanIntervals"
+                        SaveDataToXMLEncodeArray(writer, "SICScanIntervals", SICDataScanIntervals)
+                    Else
+                        ' Save scan interval list as long list of numbers
+                        ' There are no tab delimiters, since we require that all
+                        '  of the SICDataScanInterval values be <= 61
+                        '   If the interval is <=9, then the interval is stored as a number
+                        '   For intervals between 10 and 35, uses letters A to Z
+                        '   For intervals between 36 and 61, uses letters A to Z
+
+                        lastGoodLoc = "Populate scanIntervalList"
+                        Dim scanIntervalList = String.Empty
+                        If Not SICDataScanIntervals Is Nothing Then
+                            For scanIntervalIndex = 0 To sicDetails.SICDataCount - 1
+                                If SICDataScanIntervals(scanIntervalIndex) <= 9 Then
+                                    scanIntervalList &= SICDataScanIntervals(scanIntervalIndex)
+                                ElseIf SICDataScanIntervals(scanIntervalIndex) <= 35 Then
+                                    scanIntervalList &= Chr(SICDataScanIntervals(scanIntervalIndex) + 55)     ' 55 = -10 + 65
+                                ElseIf SICDataScanIntervals(scanIntervalIndex) <= 61 Then
+                                    scanIntervalList &= Chr(SICDataScanIntervals(scanIntervalIndex) + 61)     ' 61 = -36 + 97
                                 Else
-                                    objXMLOut.WriteElementString("SICScanType", "SurveyScan")
-                                    objXMLOut.WriteElementString("PeakScanStart", scanList.SurveyScans(sicScanIndices(.IndexBaseLeft)).ScanNumber.ToString())
-                                    objXMLOut.WriteElementString("PeakScanEnd", scanList.SurveyScans(sicScanIndices(.IndexBaseRight)).ScanNumber.ToString())
-                                    objXMLOut.WriteElementString("PeakScanMaxIntensity", scanList.SurveyScans(sicScanIndices(.IndexMax)).ScanNumber.ToString())
+                                    scanIntervalList &= "z"
+                                End If
+                            Next
+                        End If
+                        writer.WriteElementString("SICScanIntervals", scanIntervalList)
+                    End If
+
+                    lastGoodLoc = "Write SICPeakIndexStart"
+                    writer.WriteElementString("SICPeakIndexStart", currentParentIon.SICStats.Peak.IndexBaseLeft.ToString())
+                    writer.WriteElementString("SICPeakIndexEnd", currentParentIon.SICStats.Peak.IndexBaseRight.ToString())
+                    writer.WriteElementString("SICDataCount", sicDetails.SICDataCount.ToString())
+
+                    If mOptions.SICOptions.SaveSmoothedData Then
+                        writer.WriteElementString("SICSmoothedYDataIndexStart", smoothedYDataSubset.DataStartIndex.ToString())
+                    End If
+
+                    If mOptions.UseBase64DataEncoding Then
+
+                        ' Save intensity and mass data lists as base-64 encoded strings
+                        ' Note that these field names are purposely different than the DataList names used below for comma separated lists
+                        lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
+                        SaveDataToXMLEncodeArray(writer, "SICIntensityData", sicDetails.SICIntensitiesAsFloat)
+
+                        lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
+                        SaveDataToXMLEncodeArray(writer, "SICMassData", sicDetails.SICMassesAsFloat)
+
+                        If mOptions.SICOptions.SaveSmoothedData Then
+                            ' Need to copy the data into an array with the correct number of elements
+                            Dim dataArray As Single()
+                            ReDim dataArray(smoothedYDataSubset.DataCount - 1)
+                            Array.Copy(smoothedYDataSubset.Data, dataArray, smoothedYDataSubset.DataCount)
+
+                            SaveDataToXMLEncodeArray(writer, "SICSmoothedYData", dataArray)
+                        End If
+                    Else
+                        ' Save intensity and mass data lists as tab-delimited text list
+
+                        intensityDataListWritten = False
+                        massDataList = False
+
+                        Try
+                            lastGoodLoc = "Populate sbIntensityDataList"
+                            sbIntensityDataList.Length = 0
+                            sbMassDataList.Length = 0
+
+                            If sicDetails.SICDataCount > 0 Then
+                                For Each dataPoint In sicDetails.SICData
+                                    If dataPoint.Intensity > 0 Then
+                                        sbIntensityDataList.Append(StringUtilities.DblToString(dataPoint.Intensity, 1) & ",")
+                                    Else
+                                        sbIntensityDataList.Append(","c)     ' Do not output any number if the intensity is 0
+                                    End If
+
+                                    If dataPoint.Mass > 0 Then
+                                        sbMassDataList.Append(StringUtilities.DblToString(dataPoint.Mass, 3) & ",")
+                                    Else
+                                        sbMassDataList.Append(","c)     ' Do not output any number if the mass is 0
+                                    End If
+                                Next
+
+                                ' Trim the trailing comma
+                                If sbIntensityDataList.Chars(sbIntensityDataList.Length - 1) = ","c Then
+                                    sbIntensityDataList.Length -= 1
+                                    sbMassDataList.Length -= 1
                                 End If
 
-                                objXMLOut.WriteElementString("PeakIntensity", StringUtilities.ValueToString(.MaxIntensityValue, 5))
-                                objXMLOut.WriteElementString("PeakSignalToNoiseRatio", StringUtilities.ValueToString(.SignalToNoiseRatio, 4))
-                                objXMLOut.WriteElementString("FWHMInScans", .FWHMScanWidth.ToString())
-                                objXMLOut.WriteElementString("PeakArea", StringUtilities.ValueToString(.Area, 5))
-                                objXMLOut.WriteElementString("ShoulderCount", .ShoulderCount.ToString())
-
-                                objXMLOut.WriteElementString("ParentIonIntensity", StringUtilities.ValueToString(.ParentIonIntensity, 5))
-
-                                With .BaselineNoiseStats
-                                    objXMLOut.WriteElementString("PeakBaselineNoiseLevel", StringUtilities.ValueToString(.NoiseLevel, 5))
-                                    objXMLOut.WriteElementString("PeakBaselineNoiseStDev", StringUtilities.ValueToString(.NoiseStDev, 3))
-                                    objXMLOut.WriteElementString("PeakBaselinePointsUsed", .PointsUsed.ToString())
-                                    objXMLOut.WriteElementString("NoiseThresholdModeUsed", CInt(.NoiseThresholdModeUsed).ToString())
-                                End With
-
-                                With .StatisticalMoments
-                                    objXMLOut.WriteElementString("StatMomentsArea", StringUtilities.ValueToString(.Area, 5))
-                                    objXMLOut.WriteElementString("CenterOfMassScan", .CenterOfMassScan.ToString())
-                                    objXMLOut.WriteElementString("PeakStDev", StringUtilities.ValueToString(.StDev, 3))
-                                    objXMLOut.WriteElementString("PeakSkew", StringUtilities.ValueToString(.Skew, 4))
-                                    objXMLOut.WriteElementString("PeakKSStat", StringUtilities.ValueToString(.KSStat, 4))
-                                    objXMLOut.WriteElementString("StatMomentsDataCountUsed", .DataCountUsed.ToString())
-                                End With
-
-                                objXMLOut.WriteElementString("InterferenceScore", StringUtilities.ValueToString(interferenceScore, 4))
-                            End With
-
-                            If sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan Then
-                                objXMLOut.WriteElementString("SICScanStart", scanList.FragScans(sicScanIndices(0)).ScanNumber.ToString())
-                            Else
-                                objXMLOut.WriteElementString("SICScanStart", scanList.SurveyScans(sicScanIndices(0)).ScanNumber.ToString())
                             End If
 
-                            If mOptions.UseBase64DataEncoding Then
-                                ' Save scan interval list as base-64 encoded strings
-                                lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICScanIntervals"
-                                SaveDataToXMLEncodeArray(objXMLOut, "SICScanIntervals", SICDataScanIntervals)
-                            Else
-                                ' Save scan interval list as long list of numbers
-                                ' There are no tab delimiters, since we require that all
-                                '  of the SICDataScanInterval values be <= 61
-                                '   If the interval is <=9, then the interval is stored as a number
-                                '   For intervals between 10 and 35, uses letters A to Z
-                                '   For intervals between 36 and 61, uses letters A to Z
+                            writer.WriteElementString("IntensityDataList", sbIntensityDataList.ToString())
+                            intensityDataListWritten = True
 
-                                lastGoodLoc = "Populate scanIntervalList"
-                                Dim scanIntervalList = String.Empty
-                                If Not SICDataScanIntervals Is Nothing Then
-                                    For scanIntervalIndex = 0 To sicDetails.SICDataCount - 1
-                                        If SICDataScanIntervals(scanIntervalIndex) <= 9 Then
-                                            scanIntervalList &= SICDataScanIntervals(scanIntervalIndex)
-                                        ElseIf SICDataScanIntervals(scanIntervalIndex) <= 35 Then
-                                            scanIntervalList &= Chr(SICDataScanIntervals(scanIntervalIndex) + 55)     ' 55 = -10 + 65
-                                        ElseIf SICDataScanIntervals(scanIntervalIndex) <= 61 Then
-                                            scanIntervalList &= Chr(SICDataScanIntervals(scanIntervalIndex) + 61)     ' 61 = -36 + 97
-                                        Else
-                                            scanIntervalList &= "z"
-                                        End If
+                            writer.WriteElementString("MassDataList", sbMassDataList.ToString())
+                            massDataList = True
+
+                        Catch ex As OutOfMemoryException
+                            ' Ignore the exception if this is an Out of Memory exception
+
+                            If Not intensityDataListWritten Then
+                                writer.WriteElementString("IntensityDataList", String.Empty)
+                            End If
+
+                            If Not massDataList Then
+                                writer.WriteElementString("MassDataList", String.Empty)
+                            End If
+
+                        End Try
+
+                        If mOptions.SICOptions.SaveSmoothedData Then
+                            Try
+                                lastGoodLoc = "Populate sbPeakYDataSmoothed"
+                                sbPeakYDataSmoothed.Length = 0
+
+                                If Not smoothedYDataSubset.Data Is Nothing AndAlso smoothedYDataSubset.DataCount > 0 Then
+                                    For index = 0 To smoothedYDataSubset.DataCount - 1
+                                        sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data(index)).ToString() & ",")
                                     Next
-                                End If
-                                objXMLOut.WriteElementString("SICScanIntervals", scanIntervalList)
-                            End If
 
-                            lastGoodLoc = "Write SICPeakIndexStart"
-                            objXMLOut.WriteElementString("SICPeakIndexStart", .Peak.IndexBaseLeft.ToString())
-                            objXMLOut.WriteElementString("SICPeakIndexEnd", .Peak.IndexBaseRight.ToString())
-                            objXMLOut.WriteElementString("SICDataCount", sicDetails.SICDataCount.ToString())
-
-                            If mOptions.SICOptions.SaveSmoothedData Then
-                                objXMLOut.WriteElementString("SICSmoothedYDataIndexStart", smoothedYDataSubset.DataStartIndex.ToString())
-                            End If
-
-                            If mOptions.UseBase64DataEncoding Then
-
-                                ' Save intensity and mass data lists as base-64 encoded strings
-                                ' Note that these field names are purposely different than the DataList names used below for comma separated lists
-                                lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData"
-                                SaveDataToXMLEncodeArray(objXMLOut, "SICIntensityData", sicDetails.SICIntensitiesAsFloat)
-
-                                lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICMassData"
-                                SaveDataToXMLEncodeArray(objXMLOut, "SICMassData", sicDetails.SICMassesAsFloat)
-
-                                If mOptions.SICOptions.SaveSmoothedData Then
-                                    ' Need to copy the data into an array with the correct number of elements
-                                    Dim dataArray As Single()
-                                    ReDim dataArray(smoothedYDataSubset.DataCount - 1)
-                                    Array.Copy(smoothedYDataSubset.Data, dataArray, smoothedYDataSubset.DataCount)
-
-                                    SaveDataToXMLEncodeArray(objXMLOut, "SICSmoothedYData", dataArray)
-                                End If
-                            Else
-                                ' Save intensity and mass data lists as tab-delimited text list
-
-                                intensityDataListWritten = False
-                                massDataList = False
-
-                                Try
-                                    lastGoodLoc = "Populate sbIntensityDataList"
-                                    sbIntensityDataList.Length = 0
-                                    sbMassDataList.Length = 0
-
-                                    If sicDetails.SICDataCount > 0 Then
-                                        For Each dataPoint In sicDetails.SICData
-                                            If dataPoint.Intensity > 0 Then
-                                                sbIntensityDataList.Append(StringUtilities.DblToString(dataPoint.Intensity, 1) & ",")
-                                            Else
-                                                sbIntensityDataList.Append(","c)     ' Do not output any number if the intensity is 0
-                                            End If
-
-                                            If dataPoint.Mass > 0 Then
-                                                sbMassDataList.Append(StringUtilities.DblToString(dataPoint.Mass, 3) & ",")
-                                            Else
-                                                sbMassDataList.Append(","c)     ' Do not output any number if the mass is 0
-                                            End If
-                                        Next
-
-                                        ' Trim the trailing comma
-                                        If sbIntensityDataList.Chars(sbIntensityDataList.Length - 1) = ","c Then
-                                            sbIntensityDataList.Length -= 1
-                                            sbMassDataList.Length -= 1
-                                        End If
-
-                                    End If
-
-                                    objXMLOut.WriteElementString("IntensityDataList", sbIntensityDataList.ToString())
-                                    intensityDataListWritten = True
-
-                                    objXMLOut.WriteElementString("MassDataList", sbMassDataList.ToString())
-                                    massDataList = True
-
-                                Catch ex As OutOfMemoryException
-                                    ' Ignore the exception if this is an Out of Memory exception
-
-                                    If Not intensityDataListWritten Then
-                                        objXMLOut.WriteElementString("IntensityDataList", String.Empty)
-                                    End If
-
-                                    If Not massDataList Then
-                                        objXMLOut.WriteElementString("MassDataList", String.Empty)
-                                    End If
-
-                                End Try
-
-                                If mOptions.SICOptions.SaveSmoothedData Then
-                                    Try
-                                        lastGoodLoc = "Populate sbPeakYDataSmoothed"
-                                        sbPeakYDataSmoothed.Length = 0
-
-                                        If Not smoothedYDataSubset.Data Is Nothing AndAlso smoothedYDataSubset.DataCount > 0 Then
-                                            For index = 0 To smoothedYDataSubset.DataCount - 1
-                                                sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data(index)).ToString() & ",")
-                                            Next
-
-                                            ' Trim the trailing comma
-                                            sbPeakYDataSmoothed.Length -= 1
-                                        End If
-
-                                        objXMLOut.WriteElementString("SmoothedYDataList", sbPeakYDataSmoothed.ToString())
-
-                                    Catch ex As OutOfMemoryException
-                                        ' Ignore the exception if this is an Out of Memory exception
-                                        objXMLOut.WriteElementString("SmoothedYDataList", String.Empty)
-                                    End Try
-
+                                    ' Trim the trailing comma
+                                    sbPeakYDataSmoothed.Length -= 1
                                 End If
 
-                            End If
+                                writer.WriteElementString("SmoothedYDataList", sbPeakYDataSmoothed.ToString())
 
-                        End With
-                    End With
-                    objXMLOut.WriteEndElement()
+                            Catch ex As OutOfMemoryException
+                                ' Ignore the exception if this is an Out of Memory exception
+                                writer.WriteElementString("SmoothedYDataList", String.Empty)
+                            End Try
+
+                        End If
+
+                    End If
+
+                    writer.WriteEndElement()
                 Next
 
             Catch ex As Exception
@@ -341,7 +339,7 @@ Namespace DataOutput
         End Function
 
         Private Sub SaveDataToXMLEncodeArray(
-          objXMLOut As Xml.XmlTextWriter,
+          writer As XmlWriter,
           elementName As String,
           dataArray() As Byte)
 
@@ -350,18 +348,16 @@ Namespace DataOutput
 
             Dim encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, precisionBits, dataTypeName)
 
-            With objXMLOut
-                .WriteStartElement(elementName)
-                .WriteAttributeString("precision", precisionBits.ToString())        ' Store the precision, in bits
-                .WriteAttributeString("type", dataTypeName)
-                .WriteString(encodedValues)
-                .WriteEndElement()
-            End With
+            writer.WriteStartElement(elementName)
+            writer.WriteAttributeString("precision", precisionBits.ToString())        ' Store the precision, in bits
+            writer.WriteAttributeString("type", dataTypeName)
+            writer.WriteString(encodedValues)
+            writer.WriteEndElement()
 
         End Sub
 
         Private Sub SaveDataToXMLEncodeArray(
-          objXMLOut As Xml.XmlTextWriter,
+          writer As XmlWriter,
           elementName As String,
           dataArray() As Single)
 
@@ -370,13 +366,11 @@ Namespace DataOutput
 
             Dim encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, precisionBits, dataTypeName)
 
-            With objXMLOut
-                .WriteStartElement(elementName)
-                .WriteAttributeString("precision", precisionBits.ToString())        ' Store the precision, in bits
-                .WriteAttributeString("type", dataTypeName)
-                .WriteString(encodedValues)
-                .WriteEndElement()
-            End With
+            writer.WriteStartElement(elementName)
+            writer.WriteAttributeString("precision", precisionBits.ToString())        ' Store the precision, in bits
+            writer.WriteAttributeString("type", dataTypeName)
+            writer.WriteString(encodedValues)
+            writer.WriteEndElement()
 
         End Sub
 
@@ -388,32 +382,32 @@ Namespace DataOutput
            processingTimeSec As Single) As Boolean
 
 
-            Dim objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
-            If objXMLOut Is Nothing Then Return False
+            Dim writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs
+            If writer Is Nothing Then Return False
 
             Try
-                objXMLOut.WriteStartElement("ProcessingStats")
+                writer.WriteStartElement("ProcessingStats")
                 With spectraCache
-                    objXMLOut.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
-                    objXMLOut.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
+                    writer.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
+                    writer.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
                 End With
 
                 With processingStats
-                    objXMLOut.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(.PeakMemoryUsageMB, 2))
+                    writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(.PeakMemoryUsageMB, 2))
                     Dim effectiveSeconds = processingTimeSec - .TotalProcessingTimeAtStart
-                    objXMLOut.WriteElementString("TotalProcessingTimeSeconds", StringUtilities.DblToString(effectiveSeconds, 2))
+                    writer.WriteElementString("TotalProcessingTimeSeconds", StringUtilities.DblToString(effectiveSeconds, 2))
                 End With
-                objXMLOut.WriteEndElement()
+                writer.WriteEndElement()
 
                 If scanList.ProcessingIncomplete Then
-                    objXMLOut.WriteElementString("ProcessingComplete", "False")
+                    writer.WriteElementString("ProcessingComplete", "False")
                 Else
-                    objXMLOut.WriteElementString("ProcessingComplete", "True")
+                    writer.WriteElementString("ProcessingComplete", "True")
                 End If
 
-                objXMLOut.WriteEndElement()     ' Close out the <SICData> element
-                objXMLOut.WriteEndDocument()
-                objXMLOut.Close()
+                writer.WriteEndElement()     ' Close out the <SICData> element
+                writer.WriteEndDocument()
+                writer.Close()
 
             Catch ex As Exception
                 ReportError("Error finalizing the XML output file", ex, eMasicErrorCodes.OutputFileWriteError)
@@ -440,19 +434,16 @@ Namespace DataOutput
                 xmlOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.XMLFile)
 
                 dataOutputHandler.OutputFileHandles.XMLFileForSICs = New Xml.XmlTextWriter(xmlOutputFilePath, Text.Encoding.UTF8)
-                Dim objXMLOut = dataOutputHandler.OutputFileHandles.XMLFileForSICs
+                Dim writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs
+                writer.Formatting = Xml.Formatting.Indented
+                writer.Indentation = 1
 
-                With objXMLOut
-                    .Formatting = Xml.Formatting.Indented
-                    .Indentation = 1
-                End With
+                writer.WriteStartDocument(True)
+                writer.WriteStartElement("SICData")
 
-                objXMLOut.WriteStartDocument(True)
-                objXMLOut.WriteStartElement("SICData")
-
-                objXMLOut.WriteStartElement("ProcessingSummary")
-                objXMLOut.WriteElementString("DatasetID", sicOptions.DatasetID.ToString())
-                objXMLOut.WriteElementString("SourceFilePath", inputFilePathFull)
+                writer.WriteStartElement("ProcessingSummary")
+                writer.WriteElementString("DatasetID", sicOptions.DatasetID.ToString())
+                writer.WriteElementString("SourceFilePath", inputFilePathFull)
 
                 Dim lastModTimeText As String
                 Dim fileSizeBytes As String
@@ -467,127 +458,126 @@ Namespace DataOutput
                     fileSizeBytes = "0"
                 End Try
 
-                objXMLOut.WriteElementString("SourceFileDateTime", lastModTimeText)
-                objXMLOut.WriteElementString("SourceFileSizeBytes", fileSizeBytes)
+                writer.WriteElementString("SourceFileDateTime", lastModTimeText)
+                writer.WriteElementString("SourceFileSizeBytes", fileSizeBytes)
 
-                objXMLOut.WriteElementString("MASICProcessingDate", DateTime.Now.ToString(clsDatasetStatsSummarizer.DATE_TIME_FORMAT_STRING))
-                objXMLOut.WriteElementString("MASICVersion", mOptions.MASICVersion)
-                objXMLOut.WriteElementString("MASICPeakFinderDllVersion", mOptions.PeakFinderVersion)
-                objXMLOut.WriteElementString("ScanCountTotal", scanList.MasterScanOrderCount.ToString())
-                objXMLOut.WriteElementString("SurveyScanCount", scanList.SurveyScans.Count.ToString())
-                objXMLOut.WriteElementString("FragScanCount", scanList.FragScans.Count.ToString())
-                objXMLOut.WriteElementString("SkipMSMSProcessing", mOptions.SkipMSMSProcessing.ToString())
+                writer.WriteElementString("MASICProcessingDate", DateTime.Now.ToString(clsDatasetStatsSummarizer.DATE_TIME_FORMAT_STRING))
+                writer.WriteElementString("MASICVersion", mOptions.MASICVersion)
+                writer.WriteElementString("MASICPeakFinderDllVersion", mOptions.PeakFinderVersion)
+                writer.WriteElementString("ScanCountTotal", scanList.MasterScanOrderCount.ToString())
+                writer.WriteElementString("SurveyScanCount", scanList.SurveyScans.Count.ToString())
+                writer.WriteElementString("FragScanCount", scanList.FragScans.Count.ToString())
+                writer.WriteElementString("SkipMSMSProcessing", mOptions.SkipMSMSProcessing.ToString())
 
-                objXMLOut.WriteElementString("ParentIonDecoyMassDa", mOptions.ParentIonDecoyMassDa.ToString("0.0000"))
+                writer.WriteElementString("ParentIonDecoyMassDa", mOptions.ParentIonDecoyMassDa.ToString("0.0000"))
 
-                objXMLOut.WriteEndElement()
+                writer.WriteEndElement()
 
-                objXMLOut.WriteStartElement("MemoryOptions")
+                writer.WriteStartElement("MemoryOptions")
                 With spectraCache
 
-                    objXMLOut.WriteElementString("CacheAlwaysDisabled", .DiskCachingAlwaysDisabled.ToString())
-                    objXMLOut.WriteElementString("CacheSpectraToRetainInMemory", .CacheSpectraToRetainInMemory.ToString())
+                    writer.WriteElementString("CacheAlwaysDisabled", .DiskCachingAlwaysDisabled.ToString())
+                    writer.WriteElementString("CacheSpectraToRetainInMemory", .CacheSpectraToRetainInMemory.ToString())
 
                 End With
-                objXMLOut.WriteEndElement()
+                writer.WriteEndElement()
 
 
-                objXMLOut.WriteStartElement("SICOptions")
+                writer.WriteStartElement("SICOptions")
                 With sicOptions
                     ' SIC Options
 
                     ' "SICToleranceDa" is a legacy parameter; If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
-                    objXMLOut.WriteElementString("SICToleranceDa", clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"))
+                    writer.WriteElementString("SICToleranceDa", clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"))
 
-                    objXMLOut.WriteElementString("SICTolerance", .SICTolerance.ToString("0.0000"))
-                    objXMLOut.WriteElementString("SICToleranceIsPPM", .SICToleranceIsPPM.ToString())
+                    writer.WriteElementString("SICTolerance", .SICTolerance.ToString("0.0000"))
+                    writer.WriteElementString("SICToleranceIsPPM", .SICToleranceIsPPM.ToString())
 
-                    objXMLOut.WriteElementString("RefineReportedParentIonMZ", .RefineReportedParentIonMZ.ToString())
+                    writer.WriteElementString("RefineReportedParentIonMZ", .RefineReportedParentIonMZ.ToString())
 
-                    objXMLOut.WriteElementString("ScanRangeStart", .ScanRangeStart.ToString())
-                    objXMLOut.WriteElementString("ScanRangeEnd", .ScanRangeEnd.ToString())
-                    objXMLOut.WriteElementString("RTRangeStart", .RTRangeStart.ToString())
-                    objXMLOut.WriteElementString("RTRangeEnd", .RTRangeEnd.ToString())
+                    writer.WriteElementString("ScanRangeStart", .ScanRangeStart.ToString())
+                    writer.WriteElementString("ScanRangeEnd", .ScanRangeEnd.ToString())
+                    writer.WriteElementString("RTRangeStart", .RTRangeStart.ToString())
+                    writer.WriteElementString("RTRangeEnd", .RTRangeEnd.ToString())
 
-                    objXMLOut.WriteElementString("CompressMSSpectraData", .CompressMSSpectraData.ToString())
-                    objXMLOut.WriteElementString("CompressMSMSSpectraData", .CompressMSMSSpectraData.ToString())
+                    writer.WriteElementString("CompressMSSpectraData", .CompressMSSpectraData.ToString())
+                    writer.WriteElementString("CompressMSMSSpectraData", .CompressMSMSSpectraData.ToString())
 
-                    objXMLOut.WriteElementString("CompressToleranceDivisorForDa", .CompressToleranceDivisorForDa.ToString("0.0"))
-                    objXMLOut.WriteElementString("CompressToleranceDivisorForPPM", .CompressToleranceDivisorForPPM.ToString("0.0"))
+                    writer.WriteElementString("CompressToleranceDivisorForDa", .CompressToleranceDivisorForDa.ToString("0.0"))
+                    writer.WriteElementString("CompressToleranceDivisorForPPM", .CompressToleranceDivisorForPPM.ToString("0.0"))
 
-                    objXMLOut.WriteElementString("MaxSICPeakWidthMinutesBackward", .MaxSICPeakWidthMinutesBackward.ToString())
-                    objXMLOut.WriteElementString("MaxSICPeakWidthMinutesForward", .MaxSICPeakWidthMinutesForward.ToString())
+                    writer.WriteElementString("MaxSICPeakWidthMinutesBackward", .MaxSICPeakWidthMinutesBackward.ToString())
+                    writer.WriteElementString("MaxSICPeakWidthMinutesForward", .MaxSICPeakWidthMinutesForward.ToString())
 
                     With .SICPeakFinderOptions
-                        objXMLOut.WriteElementString("IntensityThresholdFractionMax", .IntensityThresholdFractionMax.ToString())
-                        objXMLOut.WriteElementString("IntensityThresholdAbsoluteMinimum", .IntensityThresholdAbsoluteMinimum.ToString())
+                        writer.WriteElementString("IntensityThresholdFractionMax", .IntensityThresholdFractionMax.ToString())
+                        writer.WriteElementString("IntensityThresholdAbsoluteMinimum", .IntensityThresholdAbsoluteMinimum.ToString())
 
                         ' Peak Finding Options
                         With .SICBaselineNoiseOptions
-                            objXMLOut.WriteElementString("SICNoiseThresholdMode", .BaselineNoiseMode.ToString())
-                            objXMLOut.WriteElementString("SICNoiseThresholdIntensity", .BaselineNoiseLevelAbsolute.ToString())
-                            objXMLOut.WriteElementString("SICNoiseFractionLowIntensityDataToAverage", .TrimmedMeanFractionLowIntensityDataToAverage.ToString())
-                            objXMLOut.WriteElementString("SICNoiseMinimumSignalToNoiseRatio", .MinimumSignalToNoiseRatio.ToString())
+                            writer.WriteElementString("SICNoiseThresholdMode", .BaselineNoiseMode.ToString())
+                            writer.WriteElementString("SICNoiseThresholdIntensity", .BaselineNoiseLevelAbsolute.ToString())
+                            writer.WriteElementString("SICNoiseFractionLowIntensityDataToAverage", .TrimmedMeanFractionLowIntensityDataToAverage.ToString())
+                            writer.WriteElementString("SICNoiseMinimumSignalToNoiseRatio", .MinimumSignalToNoiseRatio.ToString())
                         End With
 
-                        objXMLOut.WriteElementString("MaxDistanceScansNoOverlap", .MaxDistanceScansNoOverlap.ToString())
-                        objXMLOut.WriteElementString("MaxAllowedUpwardSpikeFractionMax", .MaxAllowedUpwardSpikeFractionMax.ToString())
-                        objXMLOut.WriteElementString("InitialPeakWidthScansScaler", .InitialPeakWidthScansScaler.ToString())
-                        objXMLOut.WriteElementString("InitialPeakWidthScansMaximum", .InitialPeakWidthScansMaximum.ToString())
+                        writer.WriteElementString("MaxDistanceScansNoOverlap", .MaxDistanceScansNoOverlap.ToString())
+                        writer.WriteElementString("MaxAllowedUpwardSpikeFractionMax", .MaxAllowedUpwardSpikeFractionMax.ToString())
+                        writer.WriteElementString("InitialPeakWidthScansScaler", .InitialPeakWidthScansScaler.ToString())
+                        writer.WriteElementString("InitialPeakWidthScansMaximum", .InitialPeakWidthScansMaximum.ToString())
 
-                        objXMLOut.WriteElementString("FindPeaksOnSmoothedData", .FindPeaksOnSmoothedData.ToString())
-                        objXMLOut.WriteElementString("SmoothDataRegardlessOfMinimumPeakWidth", .SmoothDataRegardlessOfMinimumPeakWidth.ToString())
-                        objXMLOut.WriteElementString("UseButterworthSmooth", .UseButterworthSmooth.ToString())
-                        objXMLOut.WriteElementString("ButterworthSamplingFrequency", .ButterworthSamplingFrequency.ToString())
-                        objXMLOut.WriteElementString("ButterworthSamplingFrequencyDoubledForSIMData", .ButterworthSamplingFrequencyDoubledForSIMData.ToString())
+                        writer.WriteElementString("FindPeaksOnSmoothedData", .FindPeaksOnSmoothedData.ToString())
+                        writer.WriteElementString("SmoothDataRegardlessOfMinimumPeakWidth", .SmoothDataRegardlessOfMinimumPeakWidth.ToString())
+                        writer.WriteElementString("UseButterworthSmooth", .UseButterworthSmooth.ToString())
+                        writer.WriteElementString("ButterworthSamplingFrequency", .ButterworthSamplingFrequency.ToString())
+                        writer.WriteElementString("ButterworthSamplingFrequencyDoubledForSIMData", .ButterworthSamplingFrequencyDoubledForSIMData.ToString())
 
-                        objXMLOut.WriteElementString("UseSavitzkyGolaySmooth", .UseSavitzkyGolaySmooth.ToString())
-                        objXMLOut.WriteElementString("SavitzkyGolayFilterOrder", .SavitzkyGolayFilterOrder.ToString())
+                        writer.WriteElementString("UseSavitzkyGolaySmooth", .UseSavitzkyGolaySmooth.ToString())
+                        writer.WriteElementString("SavitzkyGolayFilterOrder", .SavitzkyGolayFilterOrder.ToString())
 
                         With .MassSpectraNoiseThresholdOptions
-                            objXMLOut.WriteElementString("MassSpectraNoiseThresholdMode", .BaselineNoiseMode.ToString())
-                            objXMLOut.WriteElementString("MassSpectraNoiseThresholdIntensity", .BaselineNoiseLevelAbsolute.ToString())
-                            objXMLOut.WriteElementString("MassSpectraNoiseFractionLowIntensityDataToAverage", .TrimmedMeanFractionLowIntensityDataToAverage.ToString())
-                            objXMLOut.WriteElementString("MassSpectraNoiseMinimumSignalToNoiseRatio", .MinimumSignalToNoiseRatio.ToString())
+                            writer.WriteElementString("MassSpectraNoiseThresholdMode", .BaselineNoiseMode.ToString())
+                            writer.WriteElementString("MassSpectraNoiseThresholdIntensity", .BaselineNoiseLevelAbsolute.ToString())
+                            writer.WriteElementString("MassSpectraNoiseFractionLowIntensityDataToAverage", .TrimmedMeanFractionLowIntensityDataToAverage.ToString())
+                            writer.WriteElementString("MassSpectraNoiseMinimumSignalToNoiseRatio", .MinimumSignalToNoiseRatio.ToString())
                         End With
                     End With
 
-                    objXMLOut.WriteElementString("ReplaceSICZeroesWithMinimumPositiveValueFromMSData", .ReplaceSICZeroesWithMinimumPositiveValueFromMSData.ToString())
-
-                    objXMLOut.WriteElementString("SaveSmoothedData", .SaveSmoothedData.ToString())
+                    writer.WriteElementString("ReplaceSICZeroesWithMinimumPositiveValueFromMSData", .ReplaceSICZeroesWithMinimumPositiveValueFromMSData.ToString())
+                    writer.WriteElementString("SaveSmoothedData", .SaveSmoothedData.ToString())
 
                     ' Similarity options
-                    objXMLOut.WriteElementString("SimilarIonMZToleranceHalfWidth", .SimilarIonMZToleranceHalfWidth.ToString())
-                    objXMLOut.WriteElementString("SimilarIonToleranceHalfWidthMinutes", .SimilarIonToleranceHalfWidthMinutes.ToString())
-                    objXMLOut.WriteElementString("SpectrumSimilarityMinimum", .SpectrumSimilarityMinimum.ToString())
+                    writer.WriteElementString("SimilarIonMZToleranceHalfWidth", .SimilarIonMZToleranceHalfWidth.ToString())
+                    writer.WriteElementString("SimilarIonToleranceHalfWidthMinutes", .SimilarIonToleranceHalfWidthMinutes.ToString())
+                    writer.WriteElementString("SpectrumSimilarityMinimum", .SpectrumSimilarityMinimum.ToString())
                 End With
-                objXMLOut.WriteEndElement()
+                writer.WriteEndElement()
 
-                objXMLOut.WriteStartElement("BinningOptions")
+                writer.WriteStartElement("BinningOptions")
                 With binningOptions
-                    objXMLOut.WriteElementString("BinStartX", .StartX.ToString())
-                    objXMLOut.WriteElementString("BinEndX", .EndX.ToString())
-                    objXMLOut.WriteElementString("BinSize", .BinSize.ToString())
-                    objXMLOut.WriteElementString("MaximumBinCount", .MaximumBinCount.ToString())
+                    writer.WriteElementString("BinStartX", .StartX.ToString())
+                    writer.WriteElementString("BinEndX", .EndX.ToString())
+                    writer.WriteElementString("BinSize", .BinSize.ToString())
+                    writer.WriteElementString("MaximumBinCount", .MaximumBinCount.ToString())
 
-                    objXMLOut.WriteElementString("IntensityPrecisionPercent", .IntensityPrecisionPercent.ToString())
-                    objXMLOut.WriteElementString("Normalize", .Normalize.ToString())
-                    objXMLOut.WriteElementString("SumAllIntensitiesForBin", .SumAllIntensitiesForBin.ToString())
+                    writer.WriteElementString("IntensityPrecisionPercent", .IntensityPrecisionPercent.ToString())
+                    writer.WriteElementString("Normalize", .Normalize.ToString())
+                    writer.WriteElementString("SumAllIntensitiesForBin", .SumAllIntensitiesForBin.ToString())
 
                 End With
-                objXMLOut.WriteEndElement()
+                writer.WriteEndElement()
 
-                objXMLOut.WriteStartElement("CustomSICValues")
+                writer.WriteStartElement("CustomSICValues")
                 With mOptions.CustomSICList
-                    objXMLOut.WriteElementString("MZList", .RawTextMZList)
-                    objXMLOut.WriteElementString("MZToleranceDaList", CheckForEmptyToleranceList(.RawTextMZToleranceDaList))
-                    objXMLOut.WriteElementString("ScanCenterList", .RawTextScanOrAcqTimeCenterList)
-                    objXMLOut.WriteElementString("ScanToleranceList", CheckForEmptyToleranceList(.RawTextScanOrAcqTimeToleranceList))
-                    objXMLOut.WriteElementString("ScanTolerance", .ScanOrAcqTimeTolerance.ToString())
-                    objXMLOut.WriteElementString("ScanType", .ScanToleranceType.ToString())
-                    objXMLOut.WriteElementString("LimitSearchToCustomMZList", .LimitSearchToCustomMZList.ToString())
+                    writer.WriteElementString("MZList", .RawTextMZList)
+                    writer.WriteElementString("MZToleranceDaList", CheckForEmptyToleranceList(.RawTextMZToleranceDaList))
+                    writer.WriteElementString("ScanCenterList", .RawTextScanOrAcqTimeCenterList)
+                    writer.WriteElementString("ScanToleranceList", CheckForEmptyToleranceList(.RawTextScanOrAcqTimeToleranceList))
+                    writer.WriteElementString("ScanTolerance", .ScanOrAcqTimeTolerance.ToString())
+                    writer.WriteElementString("ScanType", .ScanToleranceType.ToString())
+                    writer.WriteElementString("LimitSearchToCustomMZList", .LimitSearchToCustomMZList.ToString())
                 End With
-                objXMLOut.WriteEndElement()
+                writer.WriteEndElement()
 
 
             Catch ex As Exception
@@ -640,6 +630,7 @@ Namespace DataOutput
           inputFileName As String,
           outputDirectoryPath As String) As Boolean
 
+            ' ReSharper disable once StringLiteralTypo
             Const PARENT_ION_TAG_START_LCASE = "<parention"     ' Note: this needs to be lowercase
             Const INDEX_ATTRIBUTE_LCASE = "index="              ' Note: this needs to be lowercase
 
@@ -739,7 +730,7 @@ Namespace DataOutput
 
                 UpdateProgress(100)
 
-#If GUI
+#If GUI Then
                 System.Windows.Forms.Application.DoEvents()
 #End If
             Catch ex As Exception

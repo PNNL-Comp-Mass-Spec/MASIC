@@ -239,9 +239,11 @@ Namespace DataOutput
             dataValues.Add(surveyScanNumber.ToString())                     ' Survey scan number
 
             Dim interferenceScore As Double
+            Dim fragScanNumber As Integer
 
             If fragScanIndex < scanList.FragScans.Count Then
-                dataValues.Add(scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).ScanNumber.ToString())  ' Fragmentation scan number
+                fragScanNumber = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).ScanNumber
+                dataValues.Add(fragScanNumber.ToString())  ' Fragmentation scan number
                 interferenceScore = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).FragScanInfo.InterferenceScore
             Else
                 dataValues.Add("0")    ' Fragmentation scan does not exist
@@ -267,41 +269,38 @@ Namespace DataOutput
                 dataValues.Add("0")   ' Not a Custom SIC peak, record 0
             End If
 
-            With parentIon.SICStats
-                If .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
-                    dataValues.Add(scanList.FragScans(.PeakScanIndexStart).ScanNumber.ToString())    ' Peak Scan Start
-                    dataValues.Add(scanList.FragScans(.PeakScanIndexEnd).ScanNumber.ToString())      ' Peak Scan End
-                    dataValues.Add(scanList.FragScans(.PeakScanIndexMax).ScanNumber.ToString())      ' Peak Scan Max Intensity
-                Else
-                    dataValues.Add(scanList.SurveyScans(.PeakScanIndexStart).ScanNumber.ToString())  ' Peak Scan Start
-                    dataValues.Add(scanList.SurveyScans(.PeakScanIndexEnd).ScanNumber.ToString())    ' Peak Scan End
-                    dataValues.Add(scanList.SurveyScans(.PeakScanIndexMax).ScanNumber.ToString())    ' Peak Scan Max Intensity
-                End If
+            Dim currentSIC = parentIon.SICStats
 
-                With .Peak
-                    dataValues.Add(StringUtilities.ValueToString(.MaxIntensityValue, 5))          ' Peak Intensity
-                    dataValues.Add(StringUtilities.ValueToString(.SignalToNoiseRatio, 4))         ' Peak signal to noise ratio
-                    dataValues.Add(.FWHMScanWidth.ToString())                                     ' Full width at half max (in scans)
-                    dataValues.Add(StringUtilities.ValueToString(.Area, 5))                       ' Peak area
+            If currentSIC.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
+                dataValues.Add(scanList.FragScans(currentSIC.PeakScanIndexStart).ScanNumber.ToString())    ' Peak Scan Start
+                dataValues.Add(scanList.FragScans(currentSIC.PeakScanIndexEnd).ScanNumber.ToString())      ' Peak Scan End
+                dataValues.Add(scanList.FragScans(currentSIC.PeakScanIndexMax).ScanNumber.ToString())      ' Peak Scan Max Intensity
+            Else
+                dataValues.Add(scanList.SurveyScans(currentSIC.PeakScanIndexStart).ScanNumber.ToString())  ' Peak Scan Start
+                dataValues.Add(scanList.SurveyScans(currentSIC.PeakScanIndexEnd).ScanNumber.ToString())    ' Peak Scan End
+                dataValues.Add(scanList.SurveyScans(currentSIC.PeakScanIndexMax).ScanNumber.ToString())    ' Peak Scan Max Intensity
+            End If
 
-                    dataValues.Add(StringUtilities.ValueToString(.ParentIonIntensity, 5))         ' Intensity of the parent ion (just before the fragmentation scan)
-                    With .BaselineNoiseStats
-                        dataValues.Add(StringUtilities.ValueToString(.NoiseLevel, 5))
-                        dataValues.Add(StringUtilities.ValueToString(.NoiseStDev, 3))
-                        dataValues.Add(.PointsUsed.ToString())
-                    End With
+            Dim currentPeak = currentSIC.Peak
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.MaxIntensityValue, 5))          ' Peak Intensity
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.SignalToNoiseRatio, 4))         ' Peak signal to noise ratio
+            dataValues.Add(currentPeak.FWHMScanWidth.ToString())                                     ' Full width at half max (in scans)
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.Area, 5))                       ' Peak area
 
-                    With .StatisticalMoments
-                        dataValues.Add(StringUtilities.ValueToString(.Area, 5))
-                        dataValues.Add(.CenterOfMassScan.ToString())
-                        dataValues.Add(StringUtilities.ValueToString(.StDev, 3))
-                        dataValues.Add(StringUtilities.ValueToString(.Skew, 4))
-                        dataValues.Add(StringUtilities.ValueToString(.KSStat, 4))
-                        dataValues.Add(.DataCountUsed.ToString())
-                    End With
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.ParentIonIntensity, 5))         ' Intensity of the parent ion (just before the fragmentation scan)
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.BaselineNoiseStats.NoiseLevel, 5))
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.BaselineNoiseStats.NoiseStDev, 3))
+            dataValues.Add(currentPeak.BaselineNoiseStats.PointsUsed.ToString())
 
-                End With
-            End With
+            Dim statMoments = currentPeak.StatisticalMoments
+
+            dataValues.Add(StringUtilities.ValueToString(statMoments.Area, 5))
+            dataValues.Add(statMoments.CenterOfMassScan.ToString())
+            dataValues.Add(StringUtilities.ValueToString(statMoments.StDev, 3))
+            dataValues.Add(StringUtilities.ValueToString(statMoments.Skew, 4))
+            dataValues.Add(StringUtilities.ValueToString(statMoments.KSStat, 4))
+            dataValues.Add(statMoments.DataCountUsed.ToString())
+
 
             dataValues.Add(StringUtilities.ValueToString(interferenceScore, 4))     ' Interference Score
 
