@@ -1061,11 +1061,12 @@ Public Class clsSICProcessing
                 processingMRMPeak = False
             End If
 
-                    .Peak = sicPeak
             Dim sicStats = currentParentIon.SICStats
 
             sicStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeak
 
+            ' Clone sicPeak since it will be updated to include the ParentIonIntensity for this parent ion's fragmentation scan
+            sicStats.Peak = sicPeak.Clone()
 
             sicStats.ScanTypeForPeakIndices = sicDetails.SICScanType
             If processingMRMPeak Then
