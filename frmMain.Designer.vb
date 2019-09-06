@@ -18,7 +18,7 @@ Partial Class frmMain
     Private components As System.ComponentModel.IContainer
 
     'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
+    'It can be modified using the Windows Form Designer.
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
@@ -209,12 +209,12 @@ Partial Class frmMain
         Me.chkSkipMSMSProcessing = New System.Windows.Forms.CheckBox()
         Me.chkSkipSICAndRawDataProcessing = New System.Windows.Forms.CheckBox()
         Me.chkExportRawDataOnly = New System.Windows.Forms.CheckBox()
+        Me.TabPageLog = New System.Windows.Forms.TabPage()
+        Me.txtLogMessages = New System.Windows.Forms.TextBox()
         Me.fraOutputDirectoryPath = New System.Windows.Forms.GroupBox()
         Me.cmdStartProcessing = New System.Windows.Forms.Button()
         Me.cmdSelectOutputDirectory = New System.Windows.Forms.Button()
         Me.txtOutputDirectoryPath = New System.Windows.Forms.TextBox()
-        Me.TabPageLog = New System.Windows.Forms.TabPage()
-        Me.txtLogMessages = New System.Windows.Forms.TextBox()
         Me.fraInputFilePath.SuspendLayout()
         Me.tbsOptions.SuspendLayout()
         Me.TabPageMasicExportOptions.SuspendLayout()
@@ -243,8 +243,8 @@ Partial Class frmMain
         Me.fraAdditionalInfoFiles.SuspendLayout()
         Me.fraDatasetLookupInfo.SuspendLayout()
         Me.fraMemoryConservationOptions.SuspendLayout()
-        Me.fraOutputDirectoryPath.SuspendLayout()
         Me.TabPageLog.SuspendLayout()
+        Me.fraOutputDirectoryPath.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtInputFilePath
@@ -579,16 +579,16 @@ Partial Class frmMain
         Me.fraInputFileRangeFilters.Controls.Add(Me.lblScanEnd)
         Me.fraInputFileRangeFilters.Controls.Add(Me.lblScanStart)
         Me.fraInputFileRangeFilters.Controls.Add(Me.cmdClearAllRangeFilters)
-        Me.fraInputFileRangeFilters.Location = New System.Drawing.Point(19, 222)
+        Me.fraInputFileRangeFilters.Location = New System.Drawing.Point(19, 232)
         Me.fraInputFileRangeFilters.Name = "fraInputFileRangeFilters"
-        Me.fraInputFileRangeFilters.Size = New System.Drawing.Size(586, 92)
+        Me.fraInputFileRangeFilters.Size = New System.Drawing.Size(586, 82)
         Me.fraInputFileRangeFilters.TabIndex = 1
         Me.fraInputFileRangeFilters.TabStop = False
         Me.fraInputFileRangeFilters.Text = "Input File Range Filters"
         '
         'lblTimeEndUnits
         '
-        Me.lblTimeEndUnits.Location = New System.Drawing.Point(499, 58)
+        Me.lblTimeEndUnits.Location = New System.Drawing.Point(499, 52)
         Me.lblTimeEndUnits.Name = "lblTimeEndUnits"
         Me.lblTimeEndUnits.Size = New System.Drawing.Size(77, 18)
         Me.lblTimeEndUnits.TabIndex = 10
@@ -596,7 +596,7 @@ Partial Class frmMain
         '
         'lblTimeStartUnits
         '
-        Me.lblTimeStartUnits.Location = New System.Drawing.Point(499, 30)
+        Me.lblTimeStartUnits.Location = New System.Drawing.Point(499, 24)
         Me.lblTimeStartUnits.Name = "lblTimeStartUnits"
         Me.lblTimeStartUnits.Size = New System.Drawing.Size(77, 18)
         Me.lblTimeStartUnits.TabIndex = 7
@@ -604,7 +604,7 @@ Partial Class frmMain
         '
         'txtTimeEnd
         '
-        Me.txtTimeEnd.Location = New System.Drawing.Point(422, 55)
+        Me.txtTimeEnd.Location = New System.Drawing.Point(422, 49)
         Me.txtTimeEnd.Name = "txtTimeEnd"
         Me.txtTimeEnd.Size = New System.Drawing.Size(68, 22)
         Me.txtTimeEnd.TabIndex = 9
@@ -612,7 +612,7 @@ Partial Class frmMain
         '
         'txtTimeStart
         '
-        Me.txtTimeStart.Location = New System.Drawing.Point(422, 28)
+        Me.txtTimeStart.Location = New System.Drawing.Point(422, 22)
         Me.txtTimeStart.Name = "txtTimeStart"
         Me.txtTimeStart.Size = New System.Drawing.Size(68, 22)
         Me.txtTimeStart.TabIndex = 6
@@ -620,7 +620,7 @@ Partial Class frmMain
         '
         'lblTimeEnd
         '
-        Me.lblTimeEnd.Location = New System.Drawing.Point(336, 58)
+        Me.lblTimeEnd.Location = New System.Drawing.Point(336, 52)
         Me.lblTimeEnd.Name = "lblTimeEnd"
         Me.lblTimeEnd.Size = New System.Drawing.Size(86, 18)
         Me.lblTimeEnd.TabIndex = 8
@@ -628,7 +628,7 @@ Partial Class frmMain
         '
         'lblTimeStart
         '
-        Me.lblTimeStart.Location = New System.Drawing.Point(336, 30)
+        Me.lblTimeStart.Location = New System.Drawing.Point(336, 24)
         Me.lblTimeStart.Name = "lblTimeStart"
         Me.lblTimeStart.Size = New System.Drawing.Size(77, 18)
         Me.lblTimeStart.TabIndex = 5
@@ -636,7 +636,7 @@ Partial Class frmMain
         '
         'txtScanEnd
         '
-        Me.txtScanEnd.Location = New System.Drawing.Point(230, 55)
+        Me.txtScanEnd.Location = New System.Drawing.Point(230, 49)
         Me.txtScanEnd.Name = "txtScanEnd"
         Me.txtScanEnd.Size = New System.Drawing.Size(68, 22)
         Me.txtScanEnd.TabIndex = 4
@@ -644,7 +644,7 @@ Partial Class frmMain
         '
         'txtScanStart
         '
-        Me.txtScanStart.Location = New System.Drawing.Point(230, 28)
+        Me.txtScanStart.Location = New System.Drawing.Point(230, 22)
         Me.txtScanStart.Name = "txtScanStart"
         Me.txtScanStart.Size = New System.Drawing.Size(68, 22)
         Me.txtScanStart.TabIndex = 2
@@ -652,7 +652,7 @@ Partial Class frmMain
         '
         'lblScanEnd
         '
-        Me.lblScanEnd.Location = New System.Drawing.Point(144, 58)
+        Me.lblScanEnd.Location = New System.Drawing.Point(144, 52)
         Me.lblScanEnd.Name = "lblScanEnd"
         Me.lblScanEnd.Size = New System.Drawing.Size(86, 18)
         Me.lblScanEnd.TabIndex = 3
@@ -660,7 +660,7 @@ Partial Class frmMain
         '
         'lblScanStart
         '
-        Me.lblScanStart.Location = New System.Drawing.Point(144, 30)
+        Me.lblScanStart.Location = New System.Drawing.Point(144, 24)
         Me.lblScanStart.Name = "lblScanStart"
         Me.lblScanStart.Size = New System.Drawing.Size(77, 18)
         Me.lblScanStart.TabIndex = 1
@@ -668,7 +668,7 @@ Partial Class frmMain
         '
         'cmdClearAllRangeFilters
         '
-        Me.cmdClearAllRangeFilters.Location = New System.Drawing.Point(19, 37)
+        Me.cmdClearAllRangeFilters.Location = New System.Drawing.Point(19, 31)
         Me.cmdClearAllRangeFilters.Name = "cmdClearAllRangeFilters"
         Me.cmdClearAllRangeFilters.Size = New System.Drawing.Size(106, 28)
         Me.cmdClearAllRangeFilters.TabIndex = 0
@@ -701,7 +701,7 @@ Partial Class frmMain
         Me.fraSICSearchThresholds.Controls.Add(Me.lblSICToleranceDa)
         Me.fraSICSearchThresholds.Location = New System.Drawing.Point(19, 9)
         Me.fraSICSearchThresholds.Name = "fraSICSearchThresholds"
-        Me.fraSICSearchThresholds.Size = New System.Drawing.Size(336, 203)
+        Me.fraSICSearchThresholds.Size = New System.Drawing.Size(336, 217)
         Me.fraSICSearchThresholds.TabIndex = 0
         Me.fraSICSearchThresholds.TabStop = False
         Me.fraSICSearchThresholds.Text = "SIC Search Thresholds"
@@ -726,9 +726,9 @@ Partial Class frmMain
         '
         'chkRefineReportedParentIonMZ
         '
-        Me.chkRefineReportedParentIonMZ.Location = New System.Drawing.Point(10, 175)
+        Me.chkRefineReportedParentIonMZ.Location = New System.Drawing.Point(10, 183)
         Me.chkRefineReportedParentIonMZ.Name = "chkRefineReportedParentIonMZ"
-        Me.chkRefineReportedParentIonMZ.Size = New System.Drawing.Size(316, 19)
+        Me.chkRefineReportedParentIonMZ.Size = New System.Drawing.Size(316, 20)
         Me.chkRefineReportedParentIonMZ.TabIndex = 12
         Me.chkRefineReportedParentIonMZ.Text = "Refine reported parent ion m/z values"
         '
@@ -738,7 +738,7 @@ Partial Class frmMain
         Me.chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Location = New System.Drawing.Point(10, 157)
         Me.chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Name = "chkReplaceSICZeroesWithMinimumPositiveValueFromMSData"
-        Me.chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Size = New System.Drawing.Size(316, 18)
+        Me.chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Size = New System.Drawing.Size(316, 20)
         Me.chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.TabIndex = 11
         Me.chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Text = "Replace SIC zeroes with min MS data values"
         '
@@ -1896,7 +1896,7 @@ Partial Class frmMain
         Me.fraMemoryConservationOptions.Size = New System.Drawing.Size(355, 120)
         Me.fraMemoryConservationOptions.TabIndex = 0
         Me.fraMemoryConservationOptions.TabStop = False
-        Me.fraMemoryConservationOptions.Text = "Memory Conservation and Processing Speed Options"
+        Me.fraMemoryConservationOptions.Text = "Memory Usage and Speed Options"
         '
         'chkSkipMSMSProcessing
         '
@@ -1921,6 +1921,28 @@ Partial Class frmMain
         Me.chkExportRawDataOnly.Size = New System.Drawing.Size(240, 21)
         Me.chkExportRawDataOnly.TabIndex = 2
         Me.chkExportRawDataOnly.Text = "Export Raw Data Only (No SICs)"
+        '
+        'TabPageLog
+        '
+        Me.TabPageLog.Controls.Add(Me.txtLogMessages)
+        Me.TabPageLog.Location = New System.Drawing.Point(4, 25)
+        Me.TabPageLog.Name = "TabPageLog"
+        Me.TabPageLog.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageLog.Size = New System.Drawing.Size(882, 327)
+        Me.TabPageLog.TabIndex = 10
+        Me.TabPageLog.Text = "Log"
+        Me.TabPageLog.UseVisualStyleBackColor = True
+        '
+        'txtLogMessages
+        '
+        Me.txtLogMessages.Location = New System.Drawing.Point(6, 6)
+        Me.txtLogMessages.Multiline = True
+        Me.txtLogMessages.Name = "txtLogMessages"
+        Me.txtLogMessages.ReadOnly = True
+        Me.txtLogMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtLogMessages.Size = New System.Drawing.Size(870, 315)
+        Me.txtLogMessages.TabIndex = 1
+        Me.txtLogMessages.Text = "No log messages."
         '
         'fraOutputDirectoryPath
         '
@@ -1960,28 +1982,6 @@ Partial Class frmMain
         Me.txtOutputDirectoryPath.Name = "txtOutputDirectoryPath"
         Me.txtOutputDirectoryPath.Size = New System.Drawing.Size(741, 22)
         Me.txtOutputDirectoryPath.TabIndex = 1
-        '
-        'TabPageLog
-        '
-        Me.TabPageLog.Controls.Add(Me.txtLogMessages)
-        Me.TabPageLog.Location = New System.Drawing.Point(4, 25)
-        Me.TabPageLog.Name = "TabPageLog"
-        Me.TabPageLog.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageLog.Size = New System.Drawing.Size(882, 327)
-        Me.TabPageLog.TabIndex = 10
-        Me.TabPageLog.Text = "Log"
-        Me.TabPageLog.UseVisualStyleBackColor = True
-        '
-        'txtLogMessages
-        '
-        Me.txtLogMessages.Location = New System.Drawing.Point(6, 6)
-        Me.txtLogMessages.Multiline = True
-        Me.txtLogMessages.Name = "txtLogMessages"
-        Me.txtLogMessages.ReadOnly = True
-        Me.txtLogMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtLogMessages.Size = New System.Drawing.Size(870, 315)
-        Me.txtLogMessages.TabIndex = 1
-        Me.txtLogMessages.Text = "No log messages."
         '
         'frmMain
         '
@@ -2040,10 +2040,10 @@ Partial Class frmMain
         Me.fraDatasetLookupInfo.ResumeLayout(False)
         Me.fraDatasetLookupInfo.PerformLayout()
         Me.fraMemoryConservationOptions.ResumeLayout(False)
-        Me.fraOutputDirectoryPath.ResumeLayout(False)
-        Me.fraOutputDirectoryPath.PerformLayout()
         Me.TabPageLog.ResumeLayout(False)
         Me.TabPageLog.PerformLayout()
+        Me.fraOutputDirectoryPath.ResumeLayout(False)
+        Me.fraOutputDirectoryPath.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub

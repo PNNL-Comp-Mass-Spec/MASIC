@@ -276,6 +276,7 @@ Namespace DataOutput
 
                         ' Check if the processing options match
                         With sicOptionsCompare
+
                             If clsUtilities.ValuesMatch(.SICTolerance, sicOptions.SICTolerance, 3) AndAlso
                              .SICToleranceIsPPM = sicOptions.SICToleranceIsPPM AndAlso
                              .RefineReportedParentIonMZ = sicOptions.RefineReportedParentIonMZ AndAlso

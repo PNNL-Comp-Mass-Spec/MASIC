@@ -1242,6 +1242,7 @@ Public Class frmMain
             With masicOptions.SICOptions
                 chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked = .ReplaceSICZeroesWithMinimumPositiveValueFromMSData
                 chkRefineReportedParentIonMZ.Checked = .RefineReportedParentIonMZ
+                '' chkUseSICStatsFromLargestPeak.checked = .UseSICStatsFromLargestPeak
             End With
 
             With masicOptions.SICOptions.SICPeakFinderOptions
@@ -1576,6 +1577,8 @@ Public Class frmMain
 
             .SetToolTip(chkRefineReportedParentIonMZ, "If enabled, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / " & clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA.ToString() & "); will update the reported m/z value to the one found")
 
+            '' .SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram")
+
             .SetToolTip(txtStatusLogKeyNameFilterList, "Enter a comma and/or NewLine separated list of Status Log Key names to match (will match any part of the key name to the text you enter).  Leave blank to include all Status Log entries.")
         End With
 
@@ -1780,6 +1783,8 @@ Public Class frmMain
 
                 .ReplaceSICZeroesWithMinimumPositiveValueFromMSData = chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked
                 .RefineReportedParentIonMZ = chkRefineReportedParentIonMZ.Checked
+
+                '' .UseSICStatsFromLargestPeak = chkUseSICStatsFromLargestPeak.Checked
             End With
 
             With masicOptions.SICOptions.SICPeakFinderOptions

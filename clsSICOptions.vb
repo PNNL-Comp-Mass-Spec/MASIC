@@ -158,6 +158,7 @@ Public Class clsSICOptions
             mSpectrumSimilarityMinimum = Value
         End Set
     End Property
+
 #End Region
 
 #Region "Classwide Variables"
