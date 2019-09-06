@@ -1108,11 +1108,6 @@ Public Class clsSICProcessing
                 fragScanNumber = scanList.SurveyScans(currentParentIon.SurveyScanIndex).ScanNumber
             End If
 
-            If fragScanNumber = 23450 OrElse
-               fragScanNumber = 23389 Then
-                Console.WriteLine("TODO: Check this code")
-            End If
-
             If processingMRMPeak Then
                 sicStats.Peak.ParentIonIntensity = 0
             Else
