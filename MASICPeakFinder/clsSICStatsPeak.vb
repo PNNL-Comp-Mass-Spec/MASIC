@@ -15,7 +15,7 @@
     Public Property IndexMax As Integer
 
     ''' <summary>
-    ''' Index that the SIC peak was first observed in by the instrument(and thus caused it to be chosen for fragmentation)
+    ''' Index that the SIC peak was first observed in by the instrument (and thus caused it to be chosen for fragmentation)
     ''' Pointer to entry in .SICData()
     ''' </summary>
     Public Property IndexObserved As Integer
@@ -64,4 +64,26 @@
         BaselineNoiseStats = New clsBaselineNoiseStats()
         StatisticalMoments = New clsStatisticalMoments()
     End Sub
+
+    Public Function Clone() As clsSICStatsPeak
+        Dim clonedPeak = New clsSICStatsPeak() With {
+            .IndexBaseLeft = IndexBaseLeft,
+            .IndexBaseRight = IndexBaseRight,
+            .IndexMax = IndexMax,
+            .IndexObserved = IndexObserved,
+            .ParentIonIntensity = ParentIonIntensity,
+            .PreviousPeakFWHMPointRight = PreviousPeakFWHMPointRight,
+            .NextPeakFWHMPointLeft = NextPeakFWHMPointLeft,
+            .FWHMScanWidth = FWHMScanWidth,
+            .MaxIntensityValue = MaxIntensityValue,
+            .Area = Area,
+            .ShoulderCount = ShoulderCount,
+            .SignalToNoiseRatio = SignalToNoiseRatio,
+            .BaselineNoiseStats = BaselineNoiseStats.Clone(),
+            .StatisticalMoments = StatisticalMoments.Clone()
+        }
+
+        Return clonedPeak
+
+    End Function
 End Class

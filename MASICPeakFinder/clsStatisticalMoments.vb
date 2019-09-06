@@ -32,4 +32,17 @@
     ''' </summary>
     Public Property DataCountUsed As Integer
 
+    Public Function Clone() As clsStatisticalMoments
+        Dim clonedStats = New clsStatisticalMoments() With {
+            .Area = Area,
+            .CenterOfMassScan = CenterOfMassScan,
+            .StDev = StDev,
+            .Skew = Skew,
+            .KSStat = KSStat,
+            .DataCountUsed = DataCountUsed
+        }
+
+        Return clonedStats
+
+    End Function
 End Class
