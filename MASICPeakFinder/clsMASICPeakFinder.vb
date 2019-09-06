@@ -1020,9 +1020,13 @@ Public Class clsMASICPeakFinder
                 If sicPeak.IndexObserved < sicData.Count - 1 Then
                     Dim x2 = sicData(sicPeak.IndexObserved + 1).ScanNumber
                     Dim y2 = sicData(sicPeak.IndexObserved + 1).Intensity
+                    Dim interpolatedIntensity As Double
 
-                    success = InterpolateY(sicPeak.ParentIonIntensity, x1, x2, y1, y2, fragScanNumber - 1)
-                    If Not success Then
+                    success = InterpolateY(interpolatedIntensity, x1, x2, y1, y2, fragScanNumber - 1)
+
+                    If success Then
+                        sicPeak.ParentIonIntensity = interpolatedIntensity
+                    Else
                         ' Interpolation failed; use y1
                         sicPeak.ParentIonIntensity = y1
                     End If
@@ -2984,14 +2988,12 @@ Public Class clsMASICPeakFinder
 
             End If
 
-            success = True
+            Return True
 
         Catch ex As Exception
             LogErrors("clsMASICPeakFinder->FindSICPeakAndArea", "Error finding SIC peaks and their areas", ex, False)
-            success = False
+            Return False
         End Try
-
-        Return success
 
     End Function
 
