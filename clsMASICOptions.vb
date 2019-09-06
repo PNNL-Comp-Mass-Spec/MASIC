@@ -596,7 +596,6 @@ Public Class clsMASICOptions
                     SICOptions.SpectrumSimilarityMinimum = .GetParam(XML_SECTION_SIC_OPTIONS,
                                                                      "SpectrumSimilarityMinimum",
                                                                      SICOptions.SpectrumSimilarityMinimum)
-
                 End If
 
                 ' Binning Options

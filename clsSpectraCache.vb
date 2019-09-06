@@ -283,7 +283,6 @@ Public Class clsSpectraCache
 
     Public Sub ClosePageFile()
 
-
         Try
             Dim garbageCollect As Boolean
 
