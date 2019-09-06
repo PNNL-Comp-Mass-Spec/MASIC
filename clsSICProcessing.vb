@@ -751,7 +751,7 @@ Public Class clsSICProcessing
             Return False
         End If
 
-        Const DebugParentIonIndexToFind = 3139
+        Const debugParentIonIndexToFind = 3139
         Const DebugMZToFind As Single = 488.47
 
         '---------------------------------------------------------
@@ -812,121 +812,88 @@ Public Class clsSICProcessing
                 sicDetails,
                 masicOptions, scanNumScanConverter, False, 0)
 
-            Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
-
-            ' Find the largest peak in the SIC for this m/z
-            Dim largestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
-                sicDetails.SICData,
-                potentialAreaStatsForPeak, sicPeak,
-                smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
+            UpdateSICStatsUsingLargestPeak(
+                sicDetails,
+                potentialAreaStatsForPeak,
+                sicPeak,
+                masicOptions,
                 potentialAreaStatsInFullSIC,
-                True, scanList.SIMDataPresent, False)
-
-            If largestPeakFound Then
-                '--------------------------------------------------------
-                ' Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
-                ' If it is, then assign the stats of the largest peak to the given parent ion
-                '--------------------------------------------------------
-
-                Dim mzIndexSICIndices = sicDetails.SICScanIndices
-
-                For parentIonIndexPointer = mzSearchChunk(mzIndexWork).MZIndexStart To mzSearchChunk(mzIndexWork).MZIndexEnd
-                    ' Use this for debugging
-                    If parentIonIndices(parentIonIndexPointer) = DebugParentIonIndexToFind Then
-                        scanIndexObservedInFullSIC = -1
-                    End If
-
-                    Dim storePeak = False
-                    If scanList.ParentIons(parentIonIndices(parentIonIndexPointer)).CustomSICPeak Then Continue For
-
-                    ' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
-                    With scanList.ParentIons(parentIonIndices(parentIonIndexPointer))
-                        If .SurveyScanIndex >= mzIndexSICIndices(sicPeak.IndexBaseLeft) AndAlso
-                           .SurveyScanIndex <= mzIndexSICIndices(sicPeak.IndexBaseRight) Then
-
-                            storePeak = True
-                        End If
-                    End With
-
-                    If storePeak Then
-                        StorePeakInParentIon(scanList, parentIonIndices(parentIonIndexPointer),
-                                                       sicDetails,
-                                                       potentialAreaStatsForPeak, sicPeak, True)
-
-                        ' Possibly save the stats for this SIC to the SICData file
-                        dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
-                                                            parentIonIndices(parentIonIndexPointer), sicDetails)
-
-                        ' Save the stats for this SIC to the XML file
-                        xmlResultsWriter.SaveDataToXML(scanList,
-                                                       parentIonIndices(parentIonIndexPointer), sicDetails,
-                                                       smoothedYDataSubset, dataOutputHandler)
-
-                        parentIonUpdated(parentIonIndexPointer) = True
-                        parentIonsProcessed += 1
-
-                    End If
-
-
-                Next
-            End If
+                scanList,
+                mzSearchChunk,
+                mzIndexWork,
+                parentIonIndices,
+                debugParentIonIndexToFind,
+                dataOutputHandler,
+                xmlResultsWriter,
+                parentIonUpdated,
+                parentIonsProcessed)
 
             '--------------------------------------------------------
-            ' Now step through the parent ions and process those that were not updated using udtSICPeak
-            ' For each, search for the closest peak in sICIntensity
+            ' Now step through the parent ions and process those that were not updated using sicPeak
+            ' For each, search for the closest peak in SICIntensity
             '--------------------------------------------------------
             For parentIonIndexPointer = mzSearchChunk(mzIndexWork).MZIndexStart To mzSearchChunk(mzIndexWork).MZIndexEnd
 
                 If parentIonUpdated(parentIonIndexPointer) Then Continue For
 
-                If parentIonIndices(parentIonIndexPointer) = DebugParentIonIndexToFind Then
+                If parentIonIndices(parentIonIndexPointer) = debugParentIonIndexToFind Then
                     scanIndexObservedInFullSIC = -1
                 End If
 
                 Dim smoothedYDataSubsetInSearchChunk As clsSmoothedYDataSubset = Nothing
 
-                With scanList.ParentIons(parentIonIndices(parentIonIndexPointer))
-                    ' Clear udtSICPotentialAreaStatsForPeak
-                    .SICStats.SICPotentialAreaStatsForPeak = New clsSICPotentialAreaStats()
+                Dim currentParentIon = scanList.ParentIons(parentIonIndices(parentIonIndexPointer))
 
-                    ' Record the index in the Full SIC that the parent ion mass was first observed
-                    ' Search for .SurveyScanIndex in fullSICScanIndices
-                    scanIndexObservedInFullSIC = -1
-                    For dataIndex = 0 To fullSICDataCount(mzIndexWork) - 1
-                        If fullSICScanIndices(mzIndexWork, dataIndex) >= .SurveyScanIndex Then
-                            scanIndexObservedInFullSIC = dataIndex
-                            Exit For
-                        End If
-                    Next
+                ' Clear udtSICPotentialAreaStatsForPeak
+                currentParentIon.SICStats.SICPotentialAreaStatsForPeak = New clsSICPotentialAreaStats()
 
-                    If scanIndexObservedInFullSIC = -1 Then
-                        ' Match wasn't found; this is unexpected
-                        ReportError("Programming error: survey scan index not found in fullSICScanIndices()", clsMASIC.eMasicErrorCodes.FindSICPeaksError)
-                        scanIndexObservedInFullSIC = 0
+                ' Record the index in the Full SIC that the parent ion mass was first observed
+                ' Search for .SurveyScanIndex in fullSICScanIndices
+                scanIndexObservedInFullSIC = -1
+                For dataIndex = 0 To fullSICDataCount(mzIndexWork) - 1
+                    If fullSICScanIndices(mzIndexWork, dataIndex) >= currentParentIon.SurveyScanIndex Then
+                        scanIndexObservedInFullSIC = dataIndex
+                        Exit For
                     End If
+                Next
 
-                    ' Populate udtSICDetails using the data centered around scanIndexObservedInFullSIC
-                    ' Note that this function will update udtSICPeak.IndexObserved
-                    ExtractSICDetailsFromFullSIC(
-                        mzIndexWork, mzSearchChunk(mzIndexWork).BaselineNoiseStatSegments,
-                        fullSICDataCount(mzIndexWork), fullSICScanIndices, fullSICIntensities, fullSICMasses,
-                        scanList, scanIndexObservedInFullSIC,
-                        sicDetails, .SICStats.Peak,
-                        masicOptions, scanNumScanConverter,
-                        .CustomSICPeak, .CustomSICPeakScanOrAcqTimeTolerance)
+                If scanIndexObservedInFullSIC = -1 Then
+                    ' Match wasn't found; this is unexpected
+                    ReportError("Programming error: survey scan index not found in fullSICScanIndices()", clsMASIC.eMasicErrorCodes.FindSICPeaksError)
+                    scanIndexObservedInFullSIC = 0
+                End If
 
-                    Dim peakIsValid = mMASICPeakFinder.FindSICPeakAndArea(
-                        sicDetails.SICData,
-                        .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak,
-                        smoothedYDataSubsetInSearchChunk, masicOptions.SICOptions.SICPeakFinderOptions,
-                        potentialAreaStatsInFullSIC,
-                        Not .CustomSICPeak, scanList.SIMDataPresent, False)
+                ' Populate udtSICDetails using the data centered around scanIndexObservedInFullSIC
+                ' Note that this function will update sicStatsPeak.IndexObserved
+                Dim sicStatsPeak = ExtractSICDetailsFromFullSIC(
+                    mzIndexWork, mzSearchChunk(mzIndexWork).BaselineNoiseStatSegments,
+                    fullSICDataCount(mzIndexWork), fullSICScanIndices, fullSICIntensities, fullSICMasses,
+                    scanList, scanIndexObservedInFullSIC,
+                    sicDetails,
+                    masicOptions, scanNumScanConverter,
+                    currentParentIon.CustomSICPeak, currentParentIon.CustomSICPeakScanOrAcqTimeTolerance)
 
+                currentParentIon.SICStats.Peak = sicStatsPeak
 
-                    StorePeakInParentIon(scanList, parentIonIndices(parentIonIndexPointer),
-                                                      sicDetails,
-                                                      .SICStats.SICPotentialAreaStatsForPeak, .SICStats.Peak, peakIsValid)
-                End With
+                Dim returnClosestPeak = Not currentParentIon.CustomSICPeak
+
+                Dim peakIsValid = mMASICPeakFinder.FindSICPeakAndArea(
+                    sicDetails.SICData,
+                    currentParentIon.SICStats.SICPotentialAreaStatsForPeak,
+                    sicStatsPeak,
+                    smoothedYDataSubsetInSearchChunk,
+                    masicOptions.SICOptions.SICPeakFinderOptions,
+                    potentialAreaStatsInFullSIC,
+                    returnClosestPeak,
+                    scanList.SIMDataPresent,
+                    False)
+
+                StorePeakInParentIon(scanList,
+                                     parentIonIndices(parentIonIndexPointer),
+                                     sicDetails,
+                                     currentParentIon.SICStats.SICPotentialAreaStatsForPeak,
+                                     sicStatsPeak,
+                                     peakIsValid)
 
                 ' Possibly save the stats for this SIC to the SICData file
                 dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
@@ -977,6 +944,81 @@ Public Class clsSICProcessing
 
     End Function
 
+    Private Sub UpdateSICStatsUsingLargestPeak(
+        sicDetails As clsSICDetails,
+        potentialAreaStatsForPeak As clsSICPotentialAreaStats,
+        sicPeak As clsSICStatsPeak,
+        masicOptions As clsMASICOptions,
+        potentialAreaStatsInFullSIC As clsSICPotentialAreaStats,
+        scanList As clsScanList,
+        mzSearchChunk As IReadOnlyList(Of clsMzSearchInfo),
+        mzIndexWork As Integer,
+        parentIonIndices As IList(Of Integer),
+        debugParentIonIndexToFind As Integer,
+        dataOutputHandler As clsDataOutput,
+        xmlResultsWriter As clsXMLResultsWriter,
+        parentIonUpdated As IList(Of Boolean),
+        ByRef parentIonsProcessed As Integer)
+
+        Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
+
+        ' Find the largest peak in the SIC for this m/z
+        Dim largestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
+            sicDetails.SICData,
+            potentialAreaStatsForPeak, sicPeak,
+            smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
+            potentialAreaStatsInFullSIC,
+            True, scanList.SIMDataPresent, False)
+
+        If Not largestPeakFound Then
+            Exit Sub
+        End If
+
+        '--------------------------------------------------------
+        ' Step through the parent ions and see if .SurveyScanIndex is contained in udtSICPeak
+        ' If it is, assign the stats of the largest peak to the given parent ion
+        '--------------------------------------------------------
+
+        Dim mzIndexSICIndices = sicDetails.SICScanIndices
+
+        For parentIonIndexPointer = mzSearchChunk(mzIndexWork).MZIndexStart To mzSearchChunk(mzIndexWork).MZIndexEnd
+            Dim storePeak = False
+
+            ' Use this for debugging
+            If parentIonIndices(parentIonIndexPointer) = debugParentIonIndexToFind Then
+                storePeak = False
+            End If
+
+            If scanList.ParentIons(parentIonIndices(parentIonIndexPointer)).CustomSICPeak Then Continue For
+
+            ' Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
+            Dim currentParentIon = scanList.ParentIons(parentIonIndices(parentIonIndexPointer))
+            If currentParentIon.SurveyScanIndex >= mzIndexSICIndices(sicPeak.IndexBaseLeft) AndAlso
+               currentParentIon.SurveyScanIndex <= mzIndexSICIndices(sicPeak.IndexBaseRight) Then
+                storePeak = True
+            End If
+
+            If Not storePeak Then Continue For
+
+            StorePeakInParentIon(scanList, parentIonIndices(parentIonIndexPointer),
+                                 sicDetails, potentialAreaStatsForPeak, sicPeak, True)
+
+            ' Possibly save the stats for this SIC to the SICData file
+            dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
+                                                parentIonIndices(parentIonIndexPointer), sicDetails)
+
+            ' Save the stats for this SIC to the XML file
+            xmlResultsWriter.SaveDataToXML(scanList,
+                                           parentIonIndices(parentIonIndexPointer), sicDetails,
+                                           smoothedYDataSubset, dataOutputHandler)
+
+            parentIonUpdated(parentIonIndexPointer) = True
+            parentIonsProcessed += 1
+
+        Next
+
+    End Sub
+
     Public Function StorePeakInParentIon(
       scanList As clsScanList,
       parentIonIndex As Integer,
@@ -984,11 +1026,6 @@ Public Class clsSICProcessing
       potentialAreaStatsForPeak As clsSICPotentialAreaStats,
       sicPeak As clsSICStatsPeak,
       peakIsValid As Boolean) As Boolean
-
-        ' sicIntensities
-        ' sicScanIndices is sicDetails.SICScanIndices
-
-
 
         Dim dataIndex As Integer
         Dim scanIndexObserved As Integer
