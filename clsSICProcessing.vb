@@ -191,11 +191,10 @@ Public Class clsSICProcessing
       scanList As clsScanList,
       scanIndexObservedInFullSIC As Integer,
       sicDetails As clsSICDetails,
-      <Out> ByRef sicPeak As clsSICStatsPeak,
       masicOptions As clsMASICOptions,
       scanNumScanConverter As clsScanNumScanTimeConversion,
       customSICPeak As Boolean,
-      customSICPeakScanOrAcqTimeTolerance As Single) As Boolean
+      customSICPeakScanOrAcqTimeTolerance As Single) As clsSICStatsPeak
 
         ' Minimum number of scans to extend left or right of the scan that meets the minimum intensity threshold requirement
         Const MINIMUM_NOISE_SCANS_TO_INCLUDE = 10
@@ -212,7 +211,7 @@ Public Class clsSICProcessing
         Dim baselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(scanIndexObservedInFullSIC, baselineNoiseStatSegments)
 
         ' Initialize the peak
-        sicPeak = New clsSICStatsPeak() With {
+        Dim sicPeak = New clsSICStatsPeak() With {
             .BaselineNoiseStats = baselineNoiseStats
         }
 
@@ -466,7 +465,7 @@ Public Class clsSICProcessing
             ReportError("Error populating .SICScanIndices, .SICData, and .SICMasses", ex, clsMASIC.eMasicErrorCodes.CreateSICsError)
         End Try
 
-        Return True
+        Return sicPeak
 
     End Function
 
@@ -804,15 +803,13 @@ Public Class clsSICProcessing
                 .SICScanType = clsScanList.eScanTypeConstants.SurveyScan
             }
 
-            Dim sicPeak As clsSICStatsPeak = Nothing
-
             ' Populate sicDetails using the data centered around the highest intensity in fullSICIntensities
-            ' Note that this function will update udtSICPeak.IndexObserved
-            ExtractSICDetailsFromFullSIC(
+            ' Note that this function will update sicPeak.IndexObserved
+            Dim sicPeak = ExtractSICDetailsFromFullSIC(
                 mzIndexWork, mzSearchChunk(mzIndexWork).BaselineNoiseStatSegments,
                 fullSICDataCount(mzIndexWork), fullSICScanIndices, fullSICIntensities, fullSICMasses,
                 scanList, scanIndexObservedInFullSIC,
-                sicDetails, sicPeak,
+                sicDetails,
                 masicOptions, scanNumScanConverter, False, 0)
 
             Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
