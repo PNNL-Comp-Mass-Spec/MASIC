@@ -1,5 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports MASIC.DataOutput
+﻿Imports MASIC.DataOutput
 Imports MASICPeakFinder
 
 Public Class clsSICProcessing
