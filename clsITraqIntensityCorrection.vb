@@ -845,7 +845,11 @@ Public Class clsITraqIntensityCorrection
                     ' Header line
                     Console.Write("     ")
                     For j = 0 To maxIndex
-                        Console.Write("   " & j.ToString() & "    ")
+                        If j < 10 Then
+                            Console.Write("   " & j.ToString() & "    ")
+                        Else
+                            Console.Write("   " & j.ToString() & "   ")
+                        End If
                     Next
                     Console.WriteLine()
 
