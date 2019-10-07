@@ -24,15 +24,15 @@ Imports ProgressFormNET
 
 Public Module modMain
 
-    Public Const PROGRAM_DATE As String = "September 6, 2019"
+    Public Const PROGRAM_DATE As String = "October 7, 2019"
 
     Private mInputFilePath As String
-    Private mOutputDirectoryPath As String              ' Optional
-    Private mParameterFilePath As String                ' Optional
-    Private mOutputDirectoryAlternatePath As String                ' Optional
-    Private mRecreateDirectoryHierarchyInAlternatePath As Boolean  ' Optional
+    Private mOutputDirectoryPath As String                          ' Optional
+    Private mParameterFilePath As String                            ' Optional
+    Private mOutputDirectoryAlternatePath As String                 ' Optional
+    Private mRecreateDirectoryHierarchyInAlternatePath As Boolean   ' Optional
 
-    Private mDatasetLookupFilePath As String            ' Optional
+    Private mDatasetLookupFilePath As String                        ' Optional
     Private mDatasetID As Integer
 
     Private mRecurseDirectories As Boolean

@@ -129,7 +129,8 @@ Public Class clsReporterIonProcessor
 
                         Dim mzValue As String
                         If (mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ OrElse
-                            mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ) Then
+                            mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ OrElse
+                            mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ) Then
                             mzValue = reporterIon.MZ.ToString("#0.000")
                         Else
                             mzValue = CInt(reporterIon.MZ).ToString()
@@ -396,7 +397,8 @@ Public Class clsReporterIonProcessor
                mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes OrElse
                mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes OrElse
                mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ OrElse
-               mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ Then
+               mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ OrElse
+               mOptions.ReporterIons.ReporterIonMassMode = clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ Then
 
                 ' Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 

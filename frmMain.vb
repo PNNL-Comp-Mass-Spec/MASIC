@@ -1026,7 +1026,7 @@ Public Class frmMain
                 .Insert(clsReporterIons.eReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl")
                 .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C")
                 .Insert(clsReporterIons.eReporterIonMassModeConstants.Acetylation, "Acetylated K")
-
+                .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N")
 
             End With
             .SelectedIndex = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone

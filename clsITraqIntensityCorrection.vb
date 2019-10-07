@@ -2,7 +2,7 @@
 
 ' This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
 ' It supports 4-plex and 8-plex iTraq
-' It also supports TMT10 and TMT11
+' It also supports TMT10, TMT11, and TMT16 (aka TMTpro)
 '
 ' The isotopic distribution weights are provided by the iTraq or TMT manufacturer
 '
@@ -19,6 +19,7 @@ Public Class clsITraqIntensityCorrection
     Private Const EIGHT_PLEX_LOW_RES_MATRIX_LENGTH As Integer = 9
     Private Const TEN_PLEX_TMT_MATRIX_LENGTH As Integer = 10
     Private Const ELEVEN_PLEX_TMT_MATRIX_LENGTH As Integer = 11
+    Private Const SIXTEEN_PLEX_TMT_MATRIX_LENGTH = 16
 
     Public Enum eCorrectionFactorsiTRAQ4Plex
         ABSciex = 0
@@ -219,6 +220,8 @@ Public Class clsITraqIntensityCorrection
                 Return TEN_PLEX_TMT_MATRIX_LENGTH
             Case clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ
                 Return ELEVEN_PLEX_TMT_MATRIX_LENGTH
+            Case clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ
+                Return SIXTEEN_PLEX_TMT_MATRIX_LENGTH
             Case Else
                 Throw New ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " & eReporterIonMode.ToString())
         End Select
@@ -253,6 +256,12 @@ Public Class clsITraqIntensityCorrection
         Dim udtIsoPct130C As udtIsotopeContributionType
         Dim udtIsoPct131N As udtIsotopeContributionType
         Dim udtIsoPct131C As udtIsotopeContributionType
+
+        Dim udtIsoPct132N As udtIsotopeContributionType
+        Dim udtIsoPct132C As udtIsotopeContributionType
+        Dim udtIsoPct133N As udtIsotopeContributionType
+        Dim udtIsoPct133C As udtIsotopeContributionType
+        Dim udtIsoPct134N As udtIsotopeContributionType
 
         Dim matrixSize = GetMatrixLength(mReporterIonMode)
         Dim maxIndex = matrixSize - 1
@@ -630,6 +639,191 @@ Public Class clsITraqIntensityCorrection
                     mCoeffs(10, 9) = 0
                     mCoeffs(10, 10) = udtIsoPct131C.Zero
                 End If
+
+
+            Case clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ
+
+                ' 16-plex TMT, isotope contribution table for High Res MS/MS
+                ' Source percentages provided by Thermo
+
+                ' TMTpro lot UH290428
+                udtIsoPct126 = DefineIsotopeContribution(0, 0, 100, 7.73, 0.22)
+                udtIsoPct127N = DefineIsotopeContribution(0, 0, 100, 7.46, 0.22)
+                udtIsoPct127C = DefineIsotopeContribution(0, 0.71, 100, 6.62, 0.16)
+                udtIsoPct128N = DefineIsotopeContribution(0, 0.75, 100, 6.67, 0.16)
+                udtIsoPct128C = DefineIsotopeContribution(0.06, 1.34, 100, 5.31, 0.11)
+                udtIsoPct129N = DefineIsotopeContribution(0.01, 1.29, 100, 5.48, 0.1)
+                udtIsoPct129C = DefineIsotopeContribution(0.26, 2.34, 100, 4.87, 0.08)
+                udtIsoPct130N = DefineIsotopeContribution(0.39, 2.36, 100, 4.57, 0.07)
+                udtIsoPct130C = DefineIsotopeContribution(0.05, 2.67, 100, 3.85, 0.15)
+                udtIsoPct131N = DefineIsotopeContribution(0.05, 2.71, 100, 3.73, 0.04)
+                udtIsoPct131C = DefineIsotopeContribution(0.09, 3.69, 100, 2.77, 0.01)
+                udtIsoPct132N = DefineIsotopeContribution(0.09, 2.51, 100, 2.76, 0.01)
+                udtIsoPct132C = DefineIsotopeContribution(0.1, 4.11, 100, 1.63, 0)
+                udtIsoPct133N = DefineIsotopeContribution(0.09, 3.09, 100, 1.58, 0)
+                udtIsoPct133C = DefineIsotopeContribution(0.36, 4.63, 100, 0.88, 0)
+                udtIsoPct134N = DefineIsotopeContribution(0.38, 4.82, 100, 0.86, 0)
+
+                ' Goal is to generate a 16x16 matrix
+                '        0       1       2       3       4       5       6       7       8       9       10      11      12      13      14      15
+                '      ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------  ------
+                '  0   0.9260    0     0.0050    0       0       0       0       0       0       0       0     etc.
+                '  1     0     0.9210    0     0.0070    0       0       0       0       0       0       0
+                '  2   0.0720    0     0.9320    0     0.0140    0       0       0       0       0       0
+                '  3     0     0.0730    0     0.9360    0     0.0250    0       0       0       0       0
+                '  4   0.0020    0     0.0630    0     0.9350    0     0.0230    0     0.0040    0       0
+                '  5     0     0.0020    0     0.0570    0     0.9250    0     0.0270    0       0       0
+                '  6     0       0       0       0     0.0510    0     0.9340    0     0.0290    0       0
+                '  7     0       0       0       0       0     0.0500    0     0.9340    0     0.0340    0
+                '  8     0       0       0       0       0       0     0.0430    0     0.9340    0     0.0370
+                '  9     0       0       0       0       0       0       0     0.0390    0     0.9330    0
+                '  10    0       0       0       0       0       0       0       0     0.0330    0     0.9340
+                '  11    etc.
+                '  12
+                '  13
+                '  14
+                '  15
+
+                ReDim mCoeffs(maxIndex, maxIndex)
+
+                mCoeffs(0, 0) = udtIsoPct126.Zero
+                mCoeffs(0, 1) = 0
+                mCoeffs(0, 2) = udtIsoPct127C.Minus1
+                mCoeffs(0, 3) = 0
+                mCoeffs(0, 4) = udtIsoPct128C.Minus2
+
+                mCoeffs(1, 0) = 0
+                mCoeffs(1, 1) = udtIsoPct127N.Zero
+                mCoeffs(1, 2) = 0
+                mCoeffs(1, 3) = udtIsoPct128N.Minus1
+                mCoeffs(1, 4) = 0
+                mCoeffs(1, 5) = udtIsoPct129N.Minus2
+
+                mCoeffs(2, 0) = udtIsoPct126.Plus1
+                mCoeffs(2, 1) = 0
+                mCoeffs(2, 2) = udtIsoPct127C.Zero
+                mCoeffs(2, 3) = 0
+                mCoeffs(2, 4) = udtIsoPct128C.Minus1
+                mCoeffs(2, 5) = 0
+                mCoeffs(2, 6) = udtIsoPct129C.Minus2
+
+                mCoeffs(3, 0) = 0
+                mCoeffs(3, 1) = udtIsoPct127N.Plus1
+                mCoeffs(3, 2) = 0
+                mCoeffs(3, 3) = udtIsoPct128N.Zero
+                mCoeffs(3, 4) = 0
+                mCoeffs(3, 5) = udtIsoPct129N.Minus1
+                mCoeffs(3, 6) = 0
+                mCoeffs(3, 7) = udtIsoPct130N.Minus2
+
+                mCoeffs(4, 0) = udtIsoPct126.Plus2
+                mCoeffs(4, 1) = 0
+                mCoeffs(4, 2) = udtIsoPct127C.Plus1
+                mCoeffs(4, 3) = 0
+                mCoeffs(4, 4) = udtIsoPct128C.Zero
+                mCoeffs(4, 5) = 0
+                mCoeffs(4, 6) = udtIsoPct129C.Minus1
+                mCoeffs(4, 7) = 0
+                mCoeffs(4, 8) = udtIsoPct130C.Minus2
+
+                mCoeffs(5, 1) = udtIsoPct127N.Plus2
+                mCoeffs(5, 2) = 0
+                mCoeffs(5, 3) = udtIsoPct128N.Plus1
+                mCoeffs(5, 4) = 0
+                mCoeffs(5, 5) = udtIsoPct129N.Zero
+                mCoeffs(5, 6) = 0
+                mCoeffs(5, 7) = udtIsoPct130N.Minus1
+                mCoeffs(5, 8) = 0
+                mCoeffs(5, 9) = udtIsoPct131N.Minus2
+
+                mCoeffs(6, 2) = udtIsoPct127C.Plus2
+                mCoeffs(6, 3) = 0
+                mCoeffs(6, 4) = udtIsoPct128C.Plus1
+                mCoeffs(6, 5) = 0
+                mCoeffs(6, 6) = udtIsoPct129C.Zero
+                mCoeffs(6, 7) = 0
+                mCoeffs(6, 8) = udtIsoPct130C.Minus1
+                mCoeffs(6, 9) = 0
+                mCoeffs(6, 10) = udtIsoPct130C.Minus2
+
+                mCoeffs(7, 3) = udtIsoPct128N.Plus2
+                mCoeffs(7, 4) = 0
+                mCoeffs(7, 5) = udtIsoPct129N.Plus1
+                mCoeffs(7, 6) = 0
+                mCoeffs(7, 7) = udtIsoPct130N.Zero
+                mCoeffs(7, 8) = 0
+                mCoeffs(7, 9) = udtIsoPct131N.Minus1
+                mCoeffs(7, 10) = 0
+                mCoeffs(7, 11) = udtIsoPct131N.Minus2
+
+                mCoeffs(8, 4) = udtIsoPct128C.Plus2
+                mCoeffs(8, 5) = 0
+                mCoeffs(8, 6) = udtIsoPct129C.Plus1
+                mCoeffs(8, 7) = 0
+                mCoeffs(8, 8) = udtIsoPct130C.Zero
+                mCoeffs(8, 9) = 0
+                mCoeffs(8, 10) = udtIsoPct131C.Minus1
+                mCoeffs(8, 11) = 0
+                mCoeffs(8, 12) = udtIsoPct131C.Minus2
+
+                mCoeffs(9, 5) = udtIsoPct129N.Plus2
+                mCoeffs(9, 6) = 0
+                mCoeffs(9, 7) = udtIsoPct130N.Plus1
+                mCoeffs(9, 8) = 0
+                mCoeffs(9, 9) = udtIsoPct131N.Zero
+                mCoeffs(9, 10) = 0
+                mCoeffs(9, 11) = udtIsoPct131N.Minus1
+                mCoeffs(9, 12) = 0
+                mCoeffs(9, 13) = udtIsoPct131N.Minus2
+
+                mCoeffs(10, 6) = udtIsoPct129C.Plus2
+                mCoeffs(10, 7) = 0
+                mCoeffs(10, 8) = udtIsoPct130C.Plus1
+                mCoeffs(10, 9) = 0
+                mCoeffs(10, 10) = udtIsoPct131C.Zero
+                mCoeffs(10, 11) = 0
+                mCoeffs(10, 12) = udtIsoPct131C.Minus1
+                mCoeffs(10, 13) = 0
+                mCoeffs(10, 14) = udtIsoPct131C.Minus2
+
+
+                mCoeffs(11, 7) = udtIsoPct129C.Plus2
+                mCoeffs(11, 8) = 0
+                mCoeffs(11, 9) = udtIsoPct130C.Plus1
+                mCoeffs(11, 10) = 0
+                mCoeffs(11, 11) = udtIsoPct131C.Zero
+                mCoeffs(11, 12) = 0
+                mCoeffs(11, 13) = udtIsoPct131C.Minus1
+                mCoeffs(11, 14) = 0
+                mCoeffs(11, 15) = udtIsoPct131C.Minus2
+
+                mCoeffs(12, 8) = udtIsoPct129C.Plus2
+                mCoeffs(12, 9) = 0
+                mCoeffs(12, 10) = udtIsoPct130C.Plus1
+                mCoeffs(12, 11) = 0
+                mCoeffs(12, 12) = udtIsoPct131C.Zero
+                mCoeffs(12, 13) = 0
+                mCoeffs(12, 14) = udtIsoPct131C.Minus1
+
+                mCoeffs(13, 9) = udtIsoPct129C.Plus2
+                mCoeffs(13, 10) = 0
+                mCoeffs(13, 11) = udtIsoPct130C.Plus1
+                mCoeffs(13, 12) = 0
+                mCoeffs(13, 13) = udtIsoPct131C.Zero
+                mCoeffs(13, 14) = 0
+                mCoeffs(13, 15) = udtIsoPct131C.Minus1
+
+                mCoeffs(14, 10) = udtIsoPct129C.Plus2
+                mCoeffs(14, 11) = 0
+                mCoeffs(14, 12) = udtIsoPct130C.Plus1
+                mCoeffs(14, 13) = 0
+                mCoeffs(14, 14) = udtIsoPct131C.Zero
+
+                mCoeffs(15, 11) = udtIsoPct129C.Plus2
+                mCoeffs(15, 12) = 0
+                mCoeffs(15, 13) = udtIsoPct130C.Plus1
+                mCoeffs(15, 14) = 0
+                mCoeffs(15, 15) = udtIsoPct131C.Zero
 
             Case Else
                 Throw New Exception("Invalid reporter ion mode in IntensityCorrection.InitializeCoefficients")

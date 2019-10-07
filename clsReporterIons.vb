@@ -25,6 +25,7 @@
         FSFACustomHydroxyl = 15
         TMTElevenMZ = 16
         Acetylation = 17
+        TMTSixteenMZ = 18
     End Enum
 
 #End Region
@@ -174,6 +175,26 @@
                 reporterIons.Add(New clsReporterIonInfo(131.138180))        ' 131N
                 reporterIons.Add(New clsReporterIonInfo(131.144499))        ' 131C
 
+            Case eReporterIonMassModeConstants.TMTSixteenMZ
+                ' TMT 16-plex Isobaric tags (from Thermo), aka TMT16 or TMTpro
+                ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
+                reporterIons.Add(New clsReporterIonInfo(126.127726))        '
+                reporterIons.Add(New clsReporterIonInfo(127.124761))        ' 127N
+                reporterIons.Add(New clsReporterIonInfo(127.131081))        ' 127C
+                reporterIons.Add(New clsReporterIonInfo(128.128116))        ' 128N
+                reporterIons.Add(New clsReporterIonInfo(128.134436))        ' 128C
+                reporterIons.Add(New clsReporterIonInfo(129.131471))        ' 129N
+                reporterIons.Add(New clsReporterIonInfo(129.13779))         ' 129C
+                reporterIons.Add(New clsReporterIonInfo(130.134825))        ' 130N
+                reporterIons.Add(New clsReporterIonInfo(130.141145))        ' 130C
+                reporterIons.Add(New clsReporterIonInfo(131.13818))         ' 131N
+                reporterIons.Add(New clsReporterIonInfo(131.144499))        ' 131C
+                reporterIons.Add(New clsReporterIonInfo(132.141535))        ' 132N
+                reporterIons.Add(New clsReporterIonInfo(132.147855))        ' 132C
+                reporterIons.Add(New clsReporterIonInfo(133.14489))         ' 133N
+                reporterIons.Add(New clsReporterIonInfo(133.15121))         ' 133C
+                reporterIons.Add(New clsReporterIonInfo(134.148245))        ' 134N
+
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
 
                 ' ITRAQ eight-plex Isobaric tags (iTRAQ8), High-Res MS/MS
@@ -291,6 +312,8 @@
                 Return "10-plex TMT"
             Case eReporterIonMassModeConstants.TMTElevenMZ
                 Return "11-plex TMT"
+            Case eReporterIonMassModeConstants.TMTSixteenMZ
+                Return "16-plex TMT (aka TMTpro)"
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
                 Return "8-plex iTraq (High Res MS/MS)"
             Case eReporterIonMassModeConstants.ITraqEightMZLowRes
