@@ -1826,24 +1826,36 @@ Public Class clsMASICPeakFinder
 
     Public Function FindMinimumPositiveValue(sicData As IList(Of clsSICDataPoint), absoluteMinimumValue As Double) As Double
 
-        Dim minimumPositiveValue = (From item In sicData Where item.Intensity > 0 Select item.Intensity).Min()
+        Dim positiveValues = (From item In sicData Where item.Intensity > 0 Select item.Intensity).ToList()
 
+        If positiveValues.Count = 0 Then
+            Return absoluteMinimumValue
+        End If
+
+        Dim minimumPositiveValue = positiveValues.Min()
         If minimumPositiveValue < absoluteMinimumValue Then
             Return absoluteMinimumValue
         End If
 
         Return minimumPositiveValue
+
     End Function
 
     Public Function FindMinimumPositiveValue(dataList As IList(Of Double), absoluteMinimumValue As Double) As Double
 
-        Dim minimumPositiveValue = (From item In dataList Where item > 0 Select item).Min()
+        Dim positiveValues = (From item In dataList Where item > 0 Select item).ToList()
 
+        If positiveValues.Count = 0 Then
+            Return absoluteMinimumValue
+        End If
+
+        Dim minimumPositiveValue = positiveValues.Min()
         If minimumPositiveValue < absoluteMinimumValue Then
             Return absoluteMinimumValue
         End If
 
         Return minimumPositiveValue
+
     End Function
 
     Public Function FindMinimumPositiveValue(dataCount As Integer, dataList As IReadOnlyList(Of Double), absoluteMinimumValue As Double) As Double
