@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="clsBinarySearchTests.cs" />
     <Compile Include="clsDatabaseTests.cs" />
+    <Compile Include="clsPeakFinderTests.cs" />
     <Compile Include="clsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
