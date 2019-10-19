@@ -1824,15 +1824,15 @@ Public Class clsMASICPeakFinder
 
     End Function
 
+    ''' <summary>
+    ''' Determine the minimum positive value in the list, or absoluteMinimumValue if the list is empty
+    ''' </summary>
+    ''' <param name="sicData"></param>
+    ''' <param name="absoluteMinimumValue"></param>
+    ''' <returns></returns>
     Public Function FindMinimumPositiveValue(sicData As IList(Of clsSICDataPoint), absoluteMinimumValue As Double) As Double
 
-        Dim positiveValues = (From item In sicData Where item.Intensity > 0 Select item.Intensity).ToList()
-
-        If positiveValues.Count = 0 Then
-            Return absoluteMinimumValue
-        End If
-
-        Dim minimumPositiveValue = positiveValues.Min()
+        Dim minimumPositiveValue = (From item In sicData Where item.Intensity > 0 Select item.Intensity).DefaultIfEmpty(absoluteMinimumValue).Min()
         If minimumPositiveValue < absoluteMinimumValue Then
             Return absoluteMinimumValue
         End If
@@ -1841,15 +1841,15 @@ Public Class clsMASICPeakFinder
 
     End Function
 
+    ''' <summary>
+    ''' Determine the minimum positive value in the list, or absoluteMinimumValue if the list is empty
+    ''' </summary>
+    ''' <param name="dataList"></param>
+    ''' <param name="absoluteMinimumValue"></param>
+    ''' <returns></returns>
     Public Function FindMinimumPositiveValue(dataList As IList(Of Double), absoluteMinimumValue As Double) As Double
 
-        Dim positiveValues = (From item In dataList Where item > 0 Select item).ToList()
-
-        If positiveValues.Count = 0 Then
-            Return absoluteMinimumValue
-        End If
-
-        Dim minimumPositiveValue = positiveValues.Min()
+        Dim minimumPositiveValue = (From item In dataList Where item > 0 Select item).DefaultIfEmpty(absoluteMinimumValue).Min()
         If minimumPositiveValue < absoluteMinimumValue Then
             Return absoluteMinimumValue
         End If
@@ -1858,26 +1858,26 @@ Public Class clsMASICPeakFinder
 
     End Function
 
+    ''' <summary>
+    ''' Determine the minimum positive value in the list, examining the first dataCount items
+    ''' </summary>
+    ''' <param name="dataCount"></param>
+    ''' <param name="dataList"></param>
+    ''' <param name="absoluteMinimumValue"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Does not use dataList.Length to determine the length of the list; uses dataCount
+    ''' However, if dataCount is > dataList.Length, dataList.Length-1 will be used for the maximum index to examine
+    ''' </remarks>
     Public Function FindMinimumPositiveValue(dataCount As Integer, dataList As IReadOnlyList(Of Double), absoluteMinimumValue As Double) As Double
-        ' Note: Do not use dataList.Length to determine the length of the array; use dataCount
-        ' However, if dataCount is > dataList.Length then dataList.Length-1 will be used for the maximum index to examine
 
         If dataCount > dataList.Count Then
             dataCount = dataList.Count
         End If
 
-        ' Find the minimum positive value in dataList
-        Dim minimumPositiveValue = Double.MaxValue
-        For i = 0 To dataCount - 1
-            If dataList(i) > 0 Then
-                If dataList(i) < minimumPositiveValue Then
-                    minimumPositiveValue = dataList(i)
-                End If
-            End If
-        Next
-
-        If minimumPositiveValue >= Double.MaxValue OrElse minimumPositiveValue < absoluteMinimumValue Then
-            minimumPositiveValue = absoluteMinimumValue
+        Dim minimumPositiveValue = (From item In dataList.Take(dataCount) Where item > 0 Select item).DefaultIfEmpty(absoluteMinimumValue).Min()
+        If minimumPositiveValue < absoluteMinimumValue Then
+            Return absoluteMinimumValue
         End If
 
         Return minimumPositiveValue
