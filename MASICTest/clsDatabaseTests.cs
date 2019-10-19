@@ -10,7 +10,7 @@ namespace MASICTest
         private clsMASIC mMasic;
         private MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
 
-        [OneTimeSetUp()]
+        [OneTimeSetUp]
         public void Setup()
         {
             mMasic = new clsMASIC();
