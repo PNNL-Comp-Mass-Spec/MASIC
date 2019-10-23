@@ -739,13 +739,10 @@ Public Class frmMain
     End Sub
 
     Private Sub IniFileSaveOptions(filePath As String, Optional saveWindowDimensionsOnly As Boolean = False)
-        Dim objXmlFile As New XmlSettingsFileAccessor
-
-        Dim objMasic As clsMASIC
 
         Try
             If Not saveWindowDimensionsOnly Then
-                objMasic = New clsMASIC()
+                Dim objMasic = New clsMASIC()
 
                 UpdateMasicSettings(objMasic)
 
@@ -851,8 +848,8 @@ Public Class frmMain
 
     Private Sub PasteCustomSICValues(clearList As Boolean)
 
-        Dim LineDelimiters = New Char() {ControlChars.Cr, ControlChars.Lf}
-        Dim ColumnDelimiters = New Char() {ControlChars.Tab, ","c}
+        Dim lineDelimiters = New Char() {ControlChars.Cr, ControlChars.Lf}
+        Dim columnDelimiters = New Char() {ControlChars.Tab, ","c}
 
         ' Examine the clipboard contents
         Dim objData = Clipboard.GetDataObject()
@@ -869,7 +866,7 @@ Public Class frmMain
 
         ' Split data on carriage return or line feed characters
         ' Lines that end in CrLf will give two separate lines; one with the text, and one blank; that's OK
-        Dim dataLines = data.Split(LineDelimiters, 50000)
+        Dim dataLines = data.Split(lineDelimiters, 50000)
 
         If dataLines.Length = 0 Then
             Return
@@ -892,7 +889,7 @@ Public Class frmMain
                 Continue For
             End If
 
-            Dim columns = dataLine.Split(ColumnDelimiters, 5)
+            Dim columns = dataLine.Split(columnDelimiters, 5)
             If columns.Length < 2 Then
                 rowsSkipped += 1
                 Continue For
@@ -1873,22 +1870,22 @@ Public Class frmMain
 
             End If
 
-            Dim eScanType As clsCustomSICList.eCustomSICScanTypeConstants
+            Dim scanType As clsCustomSICList.eCustomSICScanTypeConstants
             If optCustomSICScanToleranceAbsolute.Checked Then
-                eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
+                scanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
             ElseIf optCustomSICScanToleranceRelative.Checked Then
-                eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Relative
+                scanType = clsCustomSICList.eCustomSICScanTypeConstants.Relative
             ElseIf optCustomSICScanToleranceAcqTime.Checked Then
-                eScanType = clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
+                scanType = clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
             Else
                 ' Assume absolute
-                eScanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
+                scanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute
             End If
 
             Dim scanOrAcqTimeTolerance = ParseTextBoxValueFloat(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text & " must be a value", parseError)
             If parseError Then Exit Try
 
-            masicOptions.CustomSICList.SetCustomSICListValues(eScanType, scanOrAcqTimeTolerance, mzSearchSpecs)
+            masicOptions.CustomSICList.SetCustomSICListValues(scanType, scanOrAcqTimeTolerance, mzSearchSpecs)
 
         Catch ex As Exception
             MessageBox.Show("Error applying setting to clsMASIC: " & ControlChars.NewLine & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -2153,7 +2150,7 @@ Public Class frmMain
     End Sub
 
     Private Sub txtSavitzkyGolayFilterOrder_Validating(sender As Object, e As CancelEventArgs) Handles txtSavitzkyGolayFilterOrder.Validating
-        ValidateTextboxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
+        ValidateTextBoxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0)
     End Sub
 
     Private Sub txtSICTolerance_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtSICTolerance.KeyPress
