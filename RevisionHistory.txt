@@ -1,5 +1,16 @@
 MASIC Change Log
 
+Version 3.0.7511; October 23, 2019
+	- Add Native O-GlcNAc reporter ions
+	- Sort items when populating the reporter ion mass mode combo box
+
+Version 3.0.7359; October 11, 2019
+	- Fix bug that caused the program to stop loading scan data if an empty mass spectrum was encountered
+		- Now checking for an empty list in FindMinimumPositiveValue before using .Min()
+
+Version 3.0.7219; October 7, 2019
+	- Add 16-plex TMT (aka TMTpro)
+
 Version 3.0.7083; May 24, 2019
 	- Create console only version of MASIC
 		- Progress messages now appear at the console instead of in a window
