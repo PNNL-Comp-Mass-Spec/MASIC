@@ -1,10 +1,10 @@
 MASIC Change Log
 
-Version 3.0.7511; October 23, 2019
+Version 3.0.7235; October 23, 2019
 	- Add Native O-GlcNAc reporter ions
 	- Sort items when populating the reporter ion mass mode combo box
 
-Version 3.0.7359; October 11, 2019
+Version 3.0.7223; October 11, 2019
 	- Fix bug that caused the program to stop loading scan data if an empty mass spectrum was encountered
 		- Now checking for an empty list in FindMinimumPositiveValue before using .Min()
 
