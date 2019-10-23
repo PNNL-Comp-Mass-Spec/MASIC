@@ -136,31 +136,27 @@ Public Class frmMain
       comment As String,
       Optional ByRef existingRowFound As Boolean = False)
 
-        Dim myDataRow As DataRow
-
-        With mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE)
-
-            For Each myDataRow In .Rows
-                With myDataRow
-                    If Math.Abs(CDbl(.Item(0)) - mz) < Single.Epsilon And Math.Abs(CSng(.Item(1)) - scanOrAcqTimeCenter) < Single.Epsilon Then
-                        existingRowFound = True
-                        Exit For
-                    End If
-                End With
-            Next myDataRow
-
-            If comment Is Nothing Then comment = String.Empty
-
-            If Not existingRowFound Then
-                myDataRow = .NewRow
-                myDataRow(0) = Math.Round(mz, 4)
-                myDataRow(1) = Math.Round(mzToleranceDa, 4)
-                myDataRow(2) = Math.Round(scanOrAcqTimeCenter, 6)
-                myDataRow(3) = Math.Round(scanOrAcqTimeTolerance, 6)
-                myDataRow(4) = comment
-                .Rows.Add(myDataRow)
+        For Each myDataRow As DataRow In mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE).Rows
+            If Math.Abs(CDbl(myDataRow.Item(0)) - mz) < Single.Epsilon And Math.Abs(CSng(myDataRow.Item(1)) - scanOrAcqTimeCenter) < Single.Epsilon Then
+                existingRowFound = True
+                Exit For
             End If
-        End With
+        Next myDataRow
+
+        If comment Is Nothing Then comment = String.Empty
+
+        If Not existingRowFound Then
+            Dim newDataRow = mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE).NewRow
+            newDataRow(0) = Math.Round(mz, 4)
+            newDataRow(1) = Math.Round(mzToleranceDa, 4)
+            newDataRow(2) = Math.Round(scanOrAcqTimeCenter, 6)
+            newDataRow(3) = Math.Round(scanOrAcqTimeTolerance, 6)
+            newDataRow(4) = comment
+            mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE).Rows.Add(newDataRow)
+        End If
+
+    End Sub
+
     Private Sub AppendCustomSICListItem(mz As Double, scanCenter As Single, comment As String)
         Dim customSicEntryItem = New udtCustomSICEntryType()
 
@@ -220,8 +216,6 @@ Public Class frmMain
     End Sub
 
     Private Sub AutoPopulateCustomSICValues(confirmReplaceExistingResults As Boolean)
-
-        Dim index As Integer
 
         Dim defaultMZTolerance As Double
         Dim defaultScanOrAcqTimeTolerance As Single
@@ -648,41 +642,40 @@ Public Class frmMain
             ' Now load some custom options that aren't loaded by clsMASIC
             Dim objXmlFile = New XmlSettingsFileAccessor()
 
-            With objXmlFile
-                ' Pass True to .LoadSettings() to turn off case sensitive matching
-                .LoadSettings(filePath, False)
+            ' Pass True to .LoadSettings() to turn off case sensitive matching
+            objXmlFile.LoadSettings(filePath, False)
 
+            Try
+                txtDatasetLookupFilePath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
                 Try
-                    txtDatasetLookupFilePath.Text = .GetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
-                    Try
-                        If Not File.Exists(txtDatasetLookupFilePath.Text) Then
-                            txtDatasetLookupFilePath.Text = String.Empty
-                        End If
-                    Catch ex As Exception
-                        ' Ignore any errors here
-                    End Try
-
-                    If updateIOPaths Then
-                        txtInputFilePath.Text = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
+                    If Not File.Exists(txtDatasetLookupFilePath.Text) Then
+                        txtDatasetLookupFilePath.Text = String.Empty
                     End If
-
-                    Me.Width = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
-                    Me.Height = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
-
-                    If updateIOPaths Then
-                        txtOutputDirectoryPath.Text = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text)
-                    End If
-
-                    If txtOutputDirectoryPath.TextLength = 0 Then
-                        txtOutputDirectoryPath.Text = ProcessFilesBase.GetAppDirectoryPath()
-                    End If
-
-                    mPreferredInputFileExtension = .GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
-
                 Catch ex As Exception
-                    MessageBox.Show("Invalid parameter in settings file: " & Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    ' Ignore any errors here
                 End Try
-            End With
+
+                If updateIOPaths Then
+                    txtInputFilePath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
+                End If
+
+                Me.Width = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
+                Me.Height = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
+
+                If updateIOPaths Then
+                    txtOutputDirectoryPath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text)
+                End If
+
+                If txtOutputDirectoryPath.TextLength = 0 Then
+                    txtOutputDirectoryPath.Text = ProcessFilesBase.GetAppDirectoryPath()
+                End If
+
+                mPreferredInputFileExtension = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
+
+            Catch ex As Exception
+                MessageBox.Show("Invalid parameter in settings file: " & Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            End Try
+
 
         Catch ex As Exception
             MessageBox.Show("Error loading settings from file: " & filePath & "; " & ControlChars.NewLine &
@@ -762,35 +755,36 @@ Public Class frmMain
                 Thread.Sleep(100)
             End If
 
-            With objXmlFile
-                ' Pass True to .LoadSettings() here so that newly made Xml files will have the correct capitalization
-                .LoadSettings(filePath, True)
+            ' Pass True to .LoadSettings() here so that newly made Xml files will have the correct capitalization
+            Dim objXmlFile = New XmlSettingsFileAccessor
 
-                Try
-                    If Not saveWindowDimensionsOnly Then
-                        Try
-                            If File.Exists(txtDatasetLookupFilePath.Text) Then
-                                .SetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
-                            End If
-                        Catch ex As Exception
-                            ' Ignore any errors here
-                        End Try
+            objXmlFile.LoadSettings(filePath, True)
 
-                        .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
-                    End If
+            Try
+                If Not saveWindowDimensionsOnly Then
+                    Try
+                        If File.Exists(txtDatasetLookupFilePath.Text) Then
+                            objXmlFile.SetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text)
+                        End If
+                    Catch ex As Exception
+                        ' Ignore any errors here
+                    End Try
 
-                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text)
-                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
+                    objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text)
+                End If
 
-                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
-                    .SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
+                objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text)
+                objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension)
 
-                Catch ex As Exception
-                    MessageBox.Show("Error storing parameter in settings file: " & Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                End Try
+                objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Me.Width)
+                objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Me.Height)
 
-                .SaveSettings()
-            End With
+            Catch ex As Exception
+                MessageBox.Show("Error storing parameter in settings file: " & Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            End Try
+
+            objXmlFile.SaveSettings()
+
         Catch ex As Exception
             MessageBox.Show("Error saving settings to file: " & filePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End Try
@@ -834,10 +828,8 @@ Public Class frmMain
         DatabaseUtils.DataTableUtils.AppendColumnStringToTable(customSICValues, COL_NAME_SCAN_COMMENT, String.Empty)
         DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(customSICValues, COL_NAME_CUSTOM_SIC_VALUE_ROW_ID, 0, True, True)
 
-        With customSICValues
-            Dim PrimaryKeyColumn = New DataColumn() { .Columns(COL_NAME_CUSTOM_SIC_VALUE_ROW_ID)}
-            .PrimaryKey = PrimaryKeyColumn
-        End With
+        Dim primaryKeyColumn = New DataColumn() {customSICValues.Columns(COL_NAME_CUSTOM_SIC_VALUE_ROW_ID)}
+        customSICValues.PrimaryKey = primaryKeyColumn
 
         ' Instantiate the dataset
         mCustomSICValuesDataset = New DataSet(CUSTOM_SIC_VALUES_DATA_TABLE)
@@ -846,10 +838,8 @@ Public Class frmMain
         mCustomSICValuesDataset.Tables.Add(customSICValues)
 
         ' Bind the DataSet to the DataGrid
-        With dgCustomSICValues
-            .DataSource = mCustomSICValuesDataset
-            .DataMember = CUSTOM_SIC_VALUES_DATA_TABLE
-        End With
+        dgCustomSICValues.DataSource = mCustomSICValuesDataset
+        dgCustomSICValues.DataMember = CUSTOM_SIC_VALUES_DATA_TABLE
 
         ' Update the grid's table style
         UpdateCustomSICDataGridTableStyle()
@@ -994,37 +984,26 @@ Public Class frmMain
 
     Private Sub PopulateComboBoxes()
 
-        With cboExportRawDataFileFormat
-            With .Items
-                .Clear()
-                .Insert(clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile, "PEK File")
-                .Insert(clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File")
-            End With
-            .SelectedIndex = clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile
-        End With
+        cboExportRawDataFileFormat.Items.Clear()
+        cboExportRawDataFileFormat.Items.Insert(clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile, "PEK File")
+        cboExportRawDataFileFormat.Items.Insert(clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File")
+        cboExportRawDataFileFormat.SelectedIndex = clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile
 
-        With cboSICNoiseThresholdMode
-            With .Items
-                .Clear()
-                .Insert(eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold")
-                .Insert(eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance")
-                .Insert(eNoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count")
-                .Insert(eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance")
-                .Insert(eNoiseThresholdModes.DualTrimmedMeanByAbundance, "Dual Trimmed Mean By Abundance")
-            End With
-            .SelectedIndex = eNoiseThresholdModes.DualTrimmedMeanByAbundance
-        End With
+        cboSICNoiseThresholdMode.Items.Clear()
+        cboSICNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold")
+        cboSICNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance")
+        cboSICNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count")
+        cboSICNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance")
+        cboSICNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.DualTrimmedMeanByAbundance, "Dual Trimmed Mean By Abundance")
+        cboSICNoiseThresholdMode.SelectedIndex = eNoiseThresholdModes.DualTrimmedMeanByAbundance
 
-        With cboMassSpectraNoiseThresholdMode
-            With .Items
-                .Clear()
-                .Insert(eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold")
-                .Insert(eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance")
-                .Insert(eNoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count")
-                .Insert(eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance")
-            End With
-            .SelectedIndex = eNoiseThresholdModes.TrimmedMedianByAbundance
-        End With
+        cboMassSpectraNoiseThresholdMode.Items.Clear()
+        cboMassSpectraNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold")
+        cboMassSpectraNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance")
+        cboMassSpectraNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count")
+        cboMassSpectraNoiseThresholdMode.Items.Insert(eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance")
+        cboMassSpectraNoiseThresholdMode.SelectedIndex = eNoiseThresholdModes.TrimmedMedianByAbundance
+
         cboReporterIonMassMode.Items.Clear()
         mReporterIonIndexToModeMap.Clear()
 
@@ -1082,30 +1061,30 @@ Public Class frmMain
                 mProgressForm.Show()
                 Application.DoEvents()
 
-                With mMasic
-                    Cursor.Current = Cursors.WaitCursor
-                    mWorking = True
-                    cmdStartProcessing.Enabled = False
-                    Application.DoEvents()
+                Cursor.Current = Cursors.WaitCursor
+                mWorking = True
+                cmdStartProcessing.Enabled = False
+                Application.DoEvents()
 
-                    startTime = DateTime.UtcNow
+                startTime = DateTime.UtcNow
 
-                    outputDirectoryPath = txtOutputDirectoryPath.Text
-                    success = .ProcessFile(txtInputFilePath.Text, outputDirectoryPath)
+                outputDirectoryPath = txtOutputDirectoryPath.Text
+                success = mMasic.ProcessFile(txtInputFilePath.Text, outputDirectoryPath)
 
-                    Cursor.Current = Cursors.Default
+                Cursor.Current = Cursors.Default
 
-                    If .Options.AbortProcessing Then
-                        MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    End If
+                If mMasic.Options.AbortProcessing Then
+                    MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                End If
 
-                    If success Then
-                        ' Grab the status message, but insert a carriage return directly after "in folder:"
-                        MessageBox.Show(.StatusMessage.Replace("in folder:", "in folder:" & ControlChars.NewLine) & ControlChars.NewLine & "Elapsed time: " & StringUtilities.DblToString(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 2) & " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    Else
-                        MessageBox.Show("Error analyzing input file with MASIC: " & ControlChars.NewLine & .GetErrorMessage() & ControlChars.NewLine & .StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                    End If
-                End With
+                If success Then
+                    ' Grab the status message, but insert a carriage return directly after "in folder:"
+                    MessageBox.Show(mMasic.StatusMessage.Replace("in folder:", "in folder:" & ControlChars.NewLine) & ControlChars.NewLine & "Elapsed time: " & StringUtilities.DblToString(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 2) & " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Else
+                    MessageBox.Show("Error analyzing input file with MASIC: " & ControlChars.NewLine &
+                                        mMasic.GetErrorMessage() & ControlChars.NewLine &
+                                        mMasic.StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                End If
 
             Catch ex As Exception
                 MessageBox.Show("Error in frmMain->ProcessFileUsingMASIC: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -1166,204 +1145,180 @@ Public Class frmMain
         Try
             Dim masicOptions = objMasic.Options
 
-            With masicOptions
-                ' Import Options
-                txtParentIonDecoyMassDa.Text = .ParentIonDecoyMassDa.ToString()
+            ' Import Options
+            txtParentIonDecoyMassDa.Text = masicOptions.ParentIonDecoyMassDa.ToString()
 
-                ' Masic Export Options
-                chkIncludeHeaders.Checked = .IncludeHeadersInExportFile
-                chkIncludeScanTimesInSICStatsFile.Checked = .IncludeScanTimesInSICStatsFile
+            ' Masic Export Options
+            chkIncludeHeaders.Checked = masicOptions.IncludeHeadersInExportFile
+            chkIncludeScanTimesInSICStatsFile.Checked = masicOptions.IncludeScanTimesInSICStatsFile
 
-                chkSkipMSMSProcessing.Checked = .SkipMSMSProcessing
-                chkSkipSICAndRawDataProcessing.Checked = .SkipSICAndRawDataProcessing
-                chkExportRawDataOnly.Checked = .ExportRawDataOnly
-            End With
+            chkSkipMSMSProcessing.Checked = masicOptions.SkipMSMSProcessing
+            chkSkipSICAndRawDataProcessing.Checked = masicOptions.SkipSICAndRawDataProcessing
+            chkExportRawDataOnly.Checked = masicOptions.ExportRawDataOnly
 
-            With masicOptions.RawDataExportOptions
-                ' Raw data export options
-                chkExportRawSpectraData.Checked = .ExportEnabled                 ' Create .PEK file, or similar
-                cboExportRawDataFileFormat.SelectedIndex = .FileFormat
+            ' Raw data export options
+            Dim exportOptions = masicOptions.RawDataExportOptions
+            chkExportRawSpectraData.Checked = exportOptions.ExportEnabled                 ' Create .PEK file, or similar
+            cboExportRawDataFileFormat.SelectedIndex = exportOptions.FileFormat
 
-                chkExportRawDataIncludeMSMS.Checked = .IncludeMSMS
-                chkExportRawDataRenumberScans.Checked = .RenumberScans
+            chkExportRawDataIncludeMSMS.Checked = exportOptions.IncludeMSMS
+            chkExportRawDataRenumberScans.Checked = exportOptions.RenumberScans
 
-                txtExportRawDataSignalToNoiseRatioMinimum.Text = .MinimumSignalToNoiseRatio.ToString()
-                txtExportRawDataMaxIonCountPerScan.Text = .MaxIonCountPerScan.ToString()
-                txtExportRawDataIntensityMinimum.Text = .IntensityMinimum.ToString()
-            End With
+            txtExportRawDataSignalToNoiseRatioMinimum.Text = exportOptions.MinimumSignalToNoiseRatio.ToString()
+            txtExportRawDataMaxIonCountPerScan.Text = exportOptions.MaxIonCountPerScan.ToString()
+            txtExportRawDataIntensityMinimum.Text = exportOptions.IntensityMinimum.ToString()
 
-            With masicOptions
-                ' Finnigan Info File options
-                chkSaveMSMethodFile.Checked = .WriteMSMethodFile
-                chkSaveMSTuneFile.Checked = .WriteMSTuneFile
-                chkWriteDetailedSICDataFile.Checked = .WriteDetailedSICDataFile
-                chkSaveExtendedStatsFile.Checked = .WriteExtendedStats
-                chkSaveExtendedStatsFileIncludeFilterText.Checked = .WriteExtendedStatsIncludeScanFilterText
-                chkSaveExtendedStatsFileIncludeStatusLog.Checked = .WriteExtendedStatsStatusLog
-                txtStatusLogKeyNameFilterList.Text = .GetStatusLogKeyNameFilterListAsText(False)
 
-                chkConsolidateConstantExtendedHeaderValues.Checked = .ConsolidateConstantExtendedHeaderValues
+            ' Finnigan Info File options
+            chkSaveMSMethodFile.Checked = masicOptions.WriteMSMethodFile
+            chkSaveMSTuneFile.Checked = masicOptions.WriteMSTuneFile
+            chkWriteDetailedSICDataFile.Checked = masicOptions.WriteDetailedSICDataFile
+            chkSaveExtendedStatsFile.Checked = masicOptions.WriteExtendedStats
+            chkSaveExtendedStatsFileIncludeFilterText.Checked = masicOptions.WriteExtendedStatsIncludeScanFilterText
+            chkSaveExtendedStatsFileIncludeStatusLog.Checked = masicOptions.WriteExtendedStatsStatusLog
+            txtStatusLogKeyNameFilterList.Text = masicOptions.GetStatusLogKeyNameFilterListAsText(False)
 
-                ' Dataset and Database Options
-                txtDatasetID.Text = "0"
-                txtDatabaseConnectionString.Text = .DatabaseConnectionString
-                txtDatasetInfoQuerySQL.Text = .DatasetInfoQuerySql
+            chkConsolidateConstantExtendedHeaderValues.Checked = masicOptions.ConsolidateConstantExtendedHeaderValues
 
-                Try
-                    If File.Exists(.DatasetLookupFilePath) Then
-                        txtDatasetLookupFilePath.Text = .DatasetLookupFilePath
-                    Else
-                        txtDatasetLookupFilePath.Text = String.Empty
-                    End If
-                Catch ex As Exception
+            ' Dataset and Database Options
+            txtDatasetID.Text = "0"
+            txtDatabaseConnectionString.Text = masicOptions.DatabaseConnectionString
+            txtDatasetInfoQuerySQL.Text = masicOptions.DatasetInfoQuerySql
+
+            Try
+                If File.Exists(masicOptions.DatasetLookupFilePath) Then
+                    txtDatasetLookupFilePath.Text = masicOptions.DatasetLookupFilePath
+                Else
                     txtDatasetLookupFilePath.Text = String.Empty
-                End Try
-
-                ' SIC Options
-                Dim sicToleranceIsPPM As Boolean
-                Dim sicTolerance = .SICOptions.GetSICTolerance(sicToleranceIsPPM)
-
-                txtSICTolerance.Text = StringUtilities.DblToString(sicTolerance, 6)
-                If sicToleranceIsPPM Then
-                    optSICTolerancePPM.Checked = True
-                Else
-                    optSICToleranceDa.Checked = True
                 End If
-            End With
+            Catch ex As Exception
+                txtDatasetLookupFilePath.Text = String.Empty
+            End Try
 
-            With masicOptions.SICOptions
-                txtScanStart.Text = .ScanRangeStart.ToString()
-                txtScanEnd.Text = .ScanRangeEnd.ToString()
-                txtTimeStart.Text = .RTRangeStart.ToString()
-                txtTimeEnd.Text = .RTRangeEnd.ToString()
-            End With
+            ' SIC Options
+            Dim sicOptions = masicOptions.SICOptions
+            Dim peakFinderOptions = masicOptions.SICOptions.SICPeakFinderOptions
 
-            With masicOptions
-                ' Note: the following 5 options are not graphically editable
-                mSuppressNoParentIonsError = .SuppressNoParentIonsError
+            Dim sicToleranceIsPPM As Boolean
+            Dim sicTolerance = sicOptions.GetSICTolerance(sicToleranceIsPPM)
 
-            End With
+            txtSICTolerance.Text = StringUtilities.DblToString(sicTolerance, 6)
+            If sicToleranceIsPPM Then
+                optSICTolerancePPM.Checked = True
+            Else
+                optSICToleranceDa.Checked = True
+            End If
 
-            With masicOptions.SICOptions
-                mCompressMSSpectraData = .CompressMSSpectraData
-                mCompressMSMSSpectraData = .CompressMSMSSpectraData
-                mCompressToleranceDivisorForDa = .CompressToleranceDivisorForDa
-                mCompressToleranceDivisorForPPM = .CompressToleranceDivisorForPPM
+            txtScanStart.Text = sicOptions.ScanRangeStart.ToString()
+            txtScanEnd.Text = sicOptions.ScanRangeEnd.ToString()
+            txtTimeStart.Text = sicOptions.RTRangeStart.ToString()
+            txtTimeEnd.Text = sicOptions.RTRangeEnd.ToString()
 
-                txtMaxPeakWidthMinutesBackward.Text = .MaxSICPeakWidthMinutesBackward.ToString()
-                txtMaxPeakWidthMinutesForward.Text = .MaxSICPeakWidthMinutesForward.ToString()
-            End With
+            ' Note: the following 5 options are not graphically editable
+            mSuppressNoParentIonsError = masicOptions.SuppressNoParentIonsError
 
-            With masicOptions.SICOptions.SICPeakFinderOptions
-                txtIntensityThresholdFractionMax.Text = .IntensityThresholdFractionMax.ToString()
-                txtIntensityThresholdAbsoluteMinimum.Text = .IntensityThresholdAbsoluteMinimum.ToString()
-            End With
+            mCompressMSSpectraData = sicOptions.CompressMSSpectraData
+            mCompressMSMSSpectraData = sicOptions.CompressMSMSSpectraData
+            mCompressToleranceDivisorForDa = sicOptions.CompressToleranceDivisorForDa
+            mCompressToleranceDivisorForPPM = sicOptions.CompressToleranceDivisorForPPM
 
-            With masicOptions.SICOptions
-                chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked = .ReplaceSICZeroesWithMinimumPositiveValueFromMSData
-                chkRefineReportedParentIonMZ.Checked = .RefineReportedParentIonMZ
-                '' chkUseSICStatsFromLargestPeak.checked = .UseSICStatsFromLargestPeak
-            End With
+            txtMaxPeakWidthMinutesBackward.Text = sicOptions.MaxSICPeakWidthMinutesBackward.ToString()
+            txtMaxPeakWidthMinutesForward.Text = sicOptions.MaxSICPeakWidthMinutesForward.ToString()
 
-            With masicOptions.SICOptions.SICPeakFinderOptions
-                ' Peak Finding Options
-                cboSICNoiseThresholdMode.SelectedIndex = .SICBaselineNoiseOptions.BaselineNoiseMode
-                txtSICNoiseThresholdIntensity.Text = .SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString()
-                txtSICNoiseFractionLowIntensityDataToAverage.Text = .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString()
+            txtIntensityThresholdFractionMax.Text = peakFinderOptions.IntensityThresholdFractionMax.ToString()
+            txtIntensityThresholdAbsoluteMinimum.Text = peakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString()
 
-                txtMaxDistanceScansNoOverlap.Text = .MaxDistanceScansNoOverlap.ToString()
-                txtMaxAllowedUpwardSpikeFractionMax.Text = .MaxAllowedUpwardSpikeFractionMax.ToString()
-                txtInitialPeakWidthScansScaler.Text = .InitialPeakWidthScansScaler.ToString()
-                txtInitialPeakWidthScansMaximum.Text = .InitialPeakWidthScansMaximum.ToString()
-
-                If .UseButterworthSmooth Then
-                    optUseButterworthSmooth.Checked = True
-                    optUseSavitzkyGolaySmooth.Checked = False
-                Else
-                    optUseButterworthSmooth.Checked = False
-                    optUseSavitzkyGolaySmooth.Checked = True
-                End If
-
-                txtButterworthSamplingFrequency.Text = .ButterworthSamplingFrequency.ToString()
-                txtSavitzkyGolayFilterOrder.Text = .SavitzkyGolayFilterOrder.ToString()
-
-                chkFindPeaksOnSmoothedData.Checked = .FindPeaksOnSmoothedData
-                chkSmoothDataRegardlessOfMinimumPeakWidth.Checked = .SmoothDataRegardlessOfMinimumPeakWidth
-
-                ' Mass Spectra Noise Threshold Options
-                cboMassSpectraNoiseThresholdMode.SelectedIndex = .MassSpectraNoiseThresholdOptions.BaselineNoiseMode
-                txtMassSpectraNoiseThresholdIntensity.Text = .MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString()
-                txtMassSpectraNoiseFractionLowIntensityDataToAverage.Text = .MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString()
-                txtMassSpectraNoiseMinimumSignalToNoiseRatio.Text = .MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio.ToString()
-
-            End With
-
-            With masicOptions.SICOptions
-                ' Similarity Options
-                txtSimilarIonMZToleranceHalfWidth.Text = .SimilarIonMZToleranceHalfWidth.ToString()
-                txtSimilarIonToleranceHalfWidthMinutes.Text = .SimilarIonToleranceHalfWidthMinutes.ToString()
-                txtSpectrumSimilarityMinimum.Text = .SpectrumSimilarityMinimum.ToString()
-            End With
-
-            With masicOptions.BinningOptions
-                ' Binning Options
-                txtBinStartX.Text = .StartX.ToString()
-                txtBinEndX.Text = .EndX.ToString()
-                txtBinSize.Text = .BinSize.ToString()
-                txtMaximumBinCount.Text = .MaximumBinCount.ToString()
-
-                txtBinnedDataIntensityPrecisionPct.Text = .IntensityPrecisionPercent.ToString()
-
-                chkBinnedDataNormalize.Checked = .Normalize
-                chkBinnedDataSumAllIntensitiesForBin.Checked = .SumAllIntensitiesForBin
-            End With
-
-            With masicOptions.CacheOptions
-                ' Spectrum caching options (not graphically editable)
-                mCacheOptions.DiskCachingAlwaysDisabled = .DiskCachingAlwaysDisabled
-                mCacheOptions.DirectoryPath = .DirectoryPath
-                mCacheOptions.SpectraToRetainInMemory = .SpectraToRetainInMemory
-
-            End With
-
-            With masicOptions.ReporterIons
-                ' Reporter ion options
-                txtReporterIonMZToleranceDa.Text = StringUtilities.DblToString(.ReporterIonToleranceDaDefault, 6)
+            chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked = sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData
+            chkRefineReportedParentIonMZ.Checked = sicOptions.RefineReportedParentIonMZ
+            '' chkUseSICStatsFromLargestPeak.checked = sicOptions.UseSICStatsFromLargestPeak
 
 
-                chkReporterIonStatsEnabled.Checked = .ReporterIonStatsEnabled
-                chkReporterIonApplyAbundanceCorrection.Checked = .ReporterIonApplyAbundanceCorrection
+            ' Peak Finding Options
+            cboSICNoiseThresholdMode.SelectedIndex = peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode
+            txtSICNoiseThresholdIntensity.Text = peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString()
+            txtSICNoiseFractionLowIntensityDataToAverage.Text = peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString()
 
-                chkReporterIonSaveObservedMasses.Checked = .ReporterIonSaveObservedMasses
-                chkReporterIonSaveUncorrectedIntensities.Checked = .ReporterIonSaveUncorrectedIntensities
-            End With
+            txtMaxDistanceScansNoOverlap.Text = peakFinderOptions.MaxDistanceScansNoOverlap.ToString()
+            txtMaxAllowedUpwardSpikeFractionMax.Text = peakFinderOptions.MaxAllowedUpwardSpikeFractionMax.ToString()
+            txtInitialPeakWidthScansScaler.Text = peakFinderOptions.InitialPeakWidthScansScaler.ToString()
+            txtInitialPeakWidthScansMaximum.Text = peakFinderOptions.InitialPeakWidthScansMaximum.ToString()
+
+            If peakFinderOptions.UseButterworthSmooth Then
+                optUseButterworthSmooth.Checked = True
+                optUseSavitzkyGolaySmooth.Checked = False
+            Else
+                optUseButterworthSmooth.Checked = False
+                optUseSavitzkyGolaySmooth.Checked = True
+            End If
+
+            txtButterworthSamplingFrequency.Text = peakFinderOptions.ButterworthSamplingFrequency.ToString()
+            txtSavitzkyGolayFilterOrder.Text = peakFinderOptions.SavitzkyGolayFilterOrder.ToString()
+
+            chkFindPeaksOnSmoothedData.Checked = peakFinderOptions.FindPeaksOnSmoothedData
+            chkSmoothDataRegardlessOfMinimumPeakWidth.Checked = peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth
+
+            ' Mass Spectra Noise Threshold Options
+            cboMassSpectraNoiseThresholdMode.SelectedIndex = peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode
+            txtMassSpectraNoiseThresholdIntensity.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString()
+            txtMassSpectraNoiseFractionLowIntensityDataToAverage.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString()
+            txtMassSpectraNoiseMinimumSignalToNoiseRatio.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio.ToString()
+
+            ' Similarity Options
+            txtSimilarIonMZToleranceHalfWidth.Text = sicOptions.SimilarIonMZToleranceHalfWidth.ToString()
+            txtSimilarIonToleranceHalfWidthMinutes.Text = sicOptions.SimilarIonToleranceHalfWidthMinutes.ToString()
+            txtSpectrumSimilarityMinimum.Text = sicOptions.SpectrumSimilarityMinimum.ToString()
+
+            Dim binningOptions = masicOptions.BinningOptions
+
+            ' Binning Options
+            txtBinStartX.Text = binningOptions.StartX.ToString()
+            txtBinEndX.Text = binningOptions.EndX.ToString()
+            txtBinSize.Text = binningOptions.BinSize.ToString()
+            txtMaximumBinCount.Text = binningOptions.MaximumBinCount.ToString()
+
+            txtBinnedDataIntensityPrecisionPct.Text = binningOptions.IntensityPrecisionPercent.ToString()
+
+            chkBinnedDataNormalize.Checked = binningOptions.Normalize
+            chkBinnedDataSumAllIntensitiesForBin.Checked = binningOptions.SumAllIntensitiesForBin
+
+            ' Spectrum caching options (not graphically editable)
+            mCacheOptions.DiskCachingAlwaysDisabled = masicOptions.CacheOptions.DiskCachingAlwaysDisabled
+            mCacheOptions.DirectoryPath = masicOptions.CacheOptions.DirectoryPath
+            mCacheOptions.SpectraToRetainInMemory = masicOptions.CacheOptions.SpectraToRetainInMemory
+
+            Dim reporterIonOptions = masicOptions.ReporterIons
+
+            ' Reporter ion options
+            txtReporterIonMZToleranceDa.Text = StringUtilities.DblToString(reporterIonOptions.ReporterIonToleranceDaDefault, 6)
+
             SelectedReporterIonMode = reporterIonOptions.ReporterIonMassMode
 
-            With masicOptions
-                ' MRM Options
-                chkMRMWriteDataList.Checked = .WriteMRMDataList
-                chkMRMWriteIntensityCrosstab.Checked = .WriteMRMIntensityCrosstab
-            End With
+            chkReporterIonStatsEnabled.Checked = reporterIonOptions.ReporterIonStatsEnabled
+            chkReporterIonApplyAbundanceCorrection.Checked = reporterIonOptions.ReporterIonApplyAbundanceCorrection
 
-            With masicOptions.CustomSICList
-                ' Custom SIC Options
-                txtCustomSICFileName.Text = .CustomSICListFileName
+            chkReporterIonSaveObservedMasses.Checked = reporterIonOptions.ReporterIonSaveObservedMasses
+            chkReporterIonSaveUncorrectedIntensities.Checked = reporterIonOptions.ReporterIonSaveUncorrectedIntensities
 
-                chkLimitSearchToCustomMZs.Checked = .LimitSearchToCustomMZList
-                SetCustomSICToleranceType(.ScanToleranceType)
+            ' MRM Options
+            chkMRMWriteDataList.Checked = masicOptions.WriteMRMDataList
+            chkMRMWriteIntensityCrosstab.Checked = masicOptions.WriteMRMIntensityCrosstab
 
-                txtCustomSICScanOrAcqTimeTolerance.Text = .ScanOrAcqTimeTolerance.ToString()
+            Dim customSICOptions = masicOptions.CustomSICList
 
-            End With
+            ' Custom SIC Options
+            txtCustomSICFileName.Text = customSICOptions.CustomSICListFileName
+
+            chkLimitSearchToCustomMZs.Checked = customSICOptions.LimitSearchToCustomMZList
+            SetCustomSICToleranceType(customSICOptions.ScanToleranceType)
+
+            txtCustomSICScanOrAcqTimeTolerance.Text = customSICOptions.ScanOrAcqTimeTolerance.ToString()
 
             ' Load the Custom m/z values from mCustomSICList
             Dim customMzList = masicOptions.CustomSICList.CustomMZSearchValues()
 
             ClearCustomSICList(False)
             For Each customMzSpec In customMzList
-                With customMzSpec
-                    AddCustomSICRow(.MZ, .MZToleranceDa, .ScanOrAcqTimeCenter, .ScanOrAcqTimeTolerance, .Comment)
-                End With
+                AddCustomSICRow(customMzSpec.MZ, customMzSpec.MZToleranceDa, customMzSpec.ScanOrAcqTimeCenter, customMzSpec.ScanOrAcqTimeTolerance, customMzSpec.Comment)
             Next
 
         Catch ex As Exception
@@ -1537,19 +1492,17 @@ Public Class frmMain
 
     Private Sub SelectOutputDirectory()
 
-        Dim objFolderBrowserDialog As New FolderBrowser()
+        Dim folderBrowserDialog As New FolderBrowser()
 
-        With objFolderBrowserDialog
-            ' No need to set the Browse Flags; default values are already set
+        ' No need to set the Browse Flags; default values are already set
 
-            If txtOutputDirectoryPath.TextLength > 0 Then
-                .FolderPath = txtOutputDirectoryPath.Text
-            End If
+        If txtOutputDirectoryPath.TextLength > 0 Then
+            folderBrowserDialog.FolderPath = txtOutputDirectoryPath.Text
+        End If
 
-            If .BrowseForFolder() Then
-                txtOutputDirectoryPath.Text = .FolderPath
-            End If
-        End With
+        If folderBrowserDialog.BrowseForFolder() Then
+            txtOutputDirectoryPath.Text = folderBrowserDialog.FolderPath
+        End If
     End Sub
 
     Private Sub SetConnectionStringToPNNLServer()
@@ -1584,25 +1537,23 @@ Public Class frmMain
     Private Sub SetToolTips()
         Dim objToolTipControl As New ToolTip
 
-        With objToolTipControl
-            .SetToolTip(txtDatasetID, "The dataset ID is included as the first column in the output file.")
+        objToolTipControl.SetToolTip(txtDatasetID, "The dataset ID is included as the first column in the output file.")
 
-            .SetToolTip(txtIntensityThresholdAbsoluteMinimum, "Threshold for extending SIC")
-            .SetToolTip(txtMaxDistanceScansNoOverlap, "Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion.")
-            .SetToolTip(txtMaxAllowedUpwardSpikeFractionMax, "Maximum fraction of the peak maximum that an upward spike can be to be included in the peak")
-            .SetToolTip(txtInitialPeakWidthScansScaler, "Multiplied by the S/N for the given spectrum to determine the initial minimum peak width (in scans) to try")
-            .SetToolTip(txtInitialPeakWidthScansMaximum, "Maximum initial peak width to allow")
+        objToolTipControl.SetToolTip(txtIntensityThresholdAbsoluteMinimum, "Threshold for extending SIC")
+        objToolTipControl.SetToolTip(txtMaxDistanceScansNoOverlap, "Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion.")
+        objToolTipControl.SetToolTip(txtMaxAllowedUpwardSpikeFractionMax, "Maximum fraction of the peak maximum that an upward spike can be to be included in the peak")
+        objToolTipControl.SetToolTip(txtInitialPeakWidthScansScaler, "Multiplied by the S/N for the given spectrum to determine the initial minimum peak width (in scans) to try")
+        objToolTipControl.SetToolTip(txtInitialPeakWidthScansMaximum, "Maximum initial peak width to allow")
 
-            .SetToolTip(txtSICTolerance, "Search tolerance for creating SIC; suggest 0.6 Da for ion traps and 20 ppm for TOF, FT or Orbitrap instruments")
-            .SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.25")
-            .SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter")
+        objToolTipControl.SetToolTip(txtSICTolerance, "Search tolerance for creating SIC; suggest 0.6 Da for ion traps and 20 ppm for TOF, FT or Orbitrap instruments")
+        objToolTipControl.SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.25")
+        objToolTipControl.SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter")
 
-            .SetToolTip(chkRefineReportedParentIonMZ, "If enabled, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / " & clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA.ToString() & "); will update the reported m/z value to the one found")
+        objToolTipControl.SetToolTip(chkRefineReportedParentIonMZ, "If enabled, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / " & clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA.ToString() & "); will update the reported m/z value to the one found")
 
-            '' .SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram")
+        '' objToolTipControl.SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram")
 
-            .SetToolTip(txtStatusLogKeyNameFilterList, "Enter a comma and/or NewLine separated list of Status Log Key names to match (will match any part of the key name to the text you enter).  Leave blank to include all Status Log entries.")
-        End With
+        objToolTipControl.SetToolTip(txtStatusLogKeyNameFilterList, "Enter a comma and/or NewLine separated list of Status Log Key names to match (will match any part of the key name to the text you enter).  Leave blank to include all Status Log entries.")
 
     End Sub
 
@@ -1635,13 +1586,11 @@ Public Class frmMain
         tsCustomSICValues = New DataGridTableStyle
 
         ' Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATA_TABLE will cause this style to be used with that table
-        With tsCustomSICValues
-            .MappingName = CUSTOM_SIC_VALUES_DATA_TABLE
-            .AllowSorting = True
-            .ColumnHeadersVisible = True
-            .RowHeadersVisible = True
-            .ReadOnly = False
-        End With
+        tsCustomSICValues.MappingName = CUSTOM_SIC_VALUES_DATA_TABLE
+        tsCustomSICValues.AllowSorting = True
+        tsCustomSICValues.ColumnHeadersVisible = True
+        tsCustomSICValues.RowHeadersVisible = True
+        tsCustomSICValues.ReadOnly = False
 
         DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ, "Custom m/z", 90)
         DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ_TOLERANCE, "m/z tolerance (Da)", 110)
@@ -1667,15 +1616,13 @@ Public Class frmMain
 
         fraCustomSICControls.Left = dgCustomSICValues.Left + dgCustomSICValues.Width + 15
 
-        With dgCustomSICValues
-            .TableStyles.Clear()
+        dgCustomSICValues.TableStyles.Clear()
 
-            If Not .TableStyles.Contains(tsCustomSICValues) Then
-                .TableStyles.Add(tsCustomSICValues)
-            End If
+        If Not dgCustomSICValues.TableStyles.Contains(tsCustomSICValues) Then
+            dgCustomSICValues.TableStyles.Add(tsCustomSICValues)
+        End If
 
-            .Refresh()
-        End With
+        dgCustomSICValues.Refresh()
 
         If timeTolerance Then
             lblCustomSICScanTolerance.Text = "Time Tolerance"
@@ -1692,228 +1639,212 @@ Public Class frmMain
         Try
             Dim masicOptions = objMasic.Options
 
-            With masicOptions
-                ' Import options
+            ' Import options
 
-                .ParentIonDecoyMassDa = ParseTextboxValueDbl(txtParentIonDecoyMassDa, lblParentIonDecoyMassDa.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            masicOptions.ParentIonDecoyMassDa = ParseTextBoxValueDbl(txtParentIonDecoyMassDa, lblParentIonDecoyMassDa.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                ' Masic Export Options
-                .IncludeHeadersInExportFile = chkIncludeHeaders.Checked
-                .IncludeScanTimesInSICStatsFile = chkIncludeScanTimesInSICStatsFile.Checked
+            ' Masic Export Options
+            masicOptions.IncludeHeadersInExportFile = chkIncludeHeaders.Checked
+            masicOptions.IncludeScanTimesInSICStatsFile = chkIncludeScanTimesInSICStatsFile.Checked
 
-                .SkipMSMSProcessing = chkSkipMSMSProcessing.Checked
-                .SkipSICAndRawDataProcessing = chkSkipSICAndRawDataProcessing.Checked
-                .ExportRawDataOnly = chkExportRawDataOnly.Checked
-            End With
+            masicOptions.SkipMSMSProcessing = chkSkipMSMSProcessing.Checked
+            masicOptions.SkipSICAndRawDataProcessing = chkSkipSICAndRawDataProcessing.Checked
+            masicOptions.ExportRawDataOnly = chkExportRawDataOnly.Checked
 
-            With masicOptions.RawDataExportOptions
-                ' Raw data export options
-                .ExportEnabled = chkExportRawSpectraData.Checked
-                .FileFormat = CType(cboExportRawDataFileFormat.SelectedIndex, clsRawDataExportOptions.eExportRawDataFileFormatConstants)
+            ' Raw data export options
+            Dim exportOptions = masicOptions.RawDataExportOptions
 
-                .IncludeMSMS = chkExportRawDataIncludeMSMS.Checked
-                .RenumberScans = chkExportRawDataRenumberScans.Checked
+            exportOptions.ExportEnabled = chkExportRawSpectraData.Checked
+            exportOptions.FileFormat = CType(cboExportRawDataFileFormat.SelectedIndex, clsRawDataExportOptions.eExportRawDataFileFormatConstants)
 
-                .MinimumSignalToNoiseRatio = ParseTextBoxValueFloat(txtExportRawDataSignalToNoiseRatioMinimum,
+            exportOptions.IncludeMSMS = chkExportRawDataIncludeMSMS.Checked
+            exportOptions.RenumberScans = chkExportRawDataRenumberScans.Checked
+
+            exportOptions.MinimumSignalToNoiseRatio = ParseTextBoxValueFloat(txtExportRawDataSignalToNoiseRatioMinimum,
                                                                     lblExportRawDataSignalToNoiseRatioMinimum.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .MaxIonCountPerScan = ParseTextBoxValueInt(txtExportRawDataMaxIonCountPerScan,
+            If parseError Then Exit Try
+            exportOptions.MaxIonCountPerScan = ParseTextBoxValueInt(txtExportRawDataMaxIonCountPerScan,
                                                            lblExportRawDataMaxIonCountPerScan.Text & " must be an integer value", parseError)
-                If parseError Then Exit Try
-                .IntensityMinimum = ParseTextBoxValueFloat(txtExportRawDataIntensityMinimum,
+            If parseError Then Exit Try
+            exportOptions.IntensityMinimum = ParseTextBoxValueFloat(txtExportRawDataIntensityMinimum,
                                                            lblExportRawDataIntensityMinimum.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-            End With
+            If parseError Then Exit Try
 
-            With masicOptions
+            ' Finnigan Info File options
+            masicOptions.WriteMSMethodFile = chkSaveMSMethodFile.Checked
+            masicOptions.WriteMSTuneFile = chkSaveMSTuneFile.Checked
+            masicOptions.WriteDetailedSICDataFile = chkWriteDetailedSICDataFile.Checked
+            masicOptions.WriteExtendedStats = chkSaveExtendedStatsFile.Checked
+            masicOptions.WriteExtendedStatsIncludeScanFilterText = chkSaveExtendedStatsFileIncludeFilterText.Checked
+            masicOptions.WriteExtendedStatsStatusLog = chkSaveExtendedStatsFileIncludeStatusLog.Checked
+            masicOptions.SetStatusLogKeyNameFilterList(txtStatusLogKeyNameFilterList.Text, ","c)
 
-                ' Finnigan Info File options
-                .WriteMSMethodFile = chkSaveMSMethodFile.Checked
-                .WriteMSTuneFile = chkSaveMSTuneFile.Checked
-                .WriteDetailedSICDataFile = chkWriteDetailedSICDataFile.Checked
-                .WriteExtendedStats = chkSaveExtendedStatsFile.Checked
-                .WriteExtendedStatsIncludeScanFilterText = chkSaveExtendedStatsFileIncludeFilterText.Checked
-                .WriteExtendedStatsStatusLog = chkSaveExtendedStatsFileIncludeStatusLog.Checked
-                .SetStatusLogKeyNameFilterList(txtStatusLogKeyNameFilterList.Text, ","c)
+            masicOptions.ConsolidateConstantExtendedHeaderValues = chkConsolidateConstantExtendedHeaderValues.Checked
 
-                .ConsolidateConstantExtendedHeaderValues = chkConsolidateConstantExtendedHeaderValues.Checked
+            Dim sicOptions = masicOptions.SICOptions
+            Dim peakFinderOptions = masicOptions.SICOptions.SICPeakFinderOptions
 
-                ' Dataset and Database options
-                .SICOptions.DatasetID = ParseTextBoxValueInt(txtDatasetID, lblDatasetID.Text & " must be an integer value", parseError)
-                If parseError Then Exit Try
+            ' Dataset and Database options
+            sicOptions.DatasetID = ParseTextBoxValueInt(txtDatasetID, lblDatasetID.Text & " must be an integer value", parseError)
+            If parseError Then Exit Try
 
-                If txtDatabaseConnectionString.TextLength > 0 And txtDatasetInfoQuerySQL.TextLength > 0 Then
-                    .DatabaseConnectionString = txtDatabaseConnectionString.Text
-                    .DatasetInfoQuerySql = txtDatasetInfoQuerySQL.Text
+            If txtDatabaseConnectionString.TextLength > 0 And txtDatasetInfoQuerySQL.TextLength > 0 Then
+                masicOptions.DatabaseConnectionString = txtDatabaseConnectionString.Text
+                masicOptions.DatasetInfoQuerySql = txtDatasetInfoQuerySQL.Text
+            Else
+                masicOptions.DatabaseConnectionString = String.Empty
+                masicOptions.DatasetInfoQuerySql = String.Empty
+            End If
+
+            Try
+                If File.Exists(txtDatasetLookupFilePath.Text) Then
+                    masicOptions.DatasetLookupFilePath = txtDatasetLookupFilePath.Text
                 Else
-                    .DatabaseConnectionString = String.Empty
-                    .DatasetInfoQuerySql = String.Empty
+                    masicOptions.DatasetLookupFilePath = String.Empty
                 End If
-
-                Try
-                    If File.Exists(txtDatasetLookupFilePath.Text) Then
-                        .DatasetLookupFilePath = txtDatasetLookupFilePath.Text
-                    Else
-                        .DatasetLookupFilePath = String.Empty
-                    End If
-                Catch ex As Exception
-                    .DatasetLookupFilePath = String.Empty
-                End Try
-
-            End With
+            Catch ex As Exception
+                masicOptions.DatasetLookupFilePath = String.Empty
+            End Try
 
             ' SIC Options
             Dim sicTolerance = ParseTextBoxValueDbl(txtSICTolerance, lblSICToleranceDa.Text & " must be a value", parseError)
             If parseError Then Exit Try
 
-            With masicOptions.SICOptions
-                .SetSICTolerance(sicTolerance, optSICTolerancePPM.Checked)
+            sicOptions.SetSICTolerance(sicTolerance, optSICTolerancePPM.Checked)
 
-                .ScanRangeStart = ParseTextBoxValueInt(txtScanStart, lblScanStart.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .ScanRangeEnd = ParseTextBoxValueInt(txtScanEnd, lblScanEnd.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            sicOptions.ScanRangeStart = ParseTextBoxValueInt(txtScanStart, lblScanStart.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            sicOptions.ScanRangeEnd = ParseTextBoxValueInt(txtScanEnd, lblScanEnd.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .RTRangeStart = ParseTextBoxValueFloat(txtTimeStart, lblTimeStart.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .RTRangeEnd = ParseTextBoxValueFloat(txtTimeEnd, lblTimeEnd.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-            End With
+            sicOptions.RTRangeStart = ParseTextBoxValueFloat(txtTimeStart, lblTimeStart.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            sicOptions.RTRangeEnd = ParseTextBoxValueFloat(txtTimeEnd, lblTimeEnd.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+
 
             ' Note: the following 5 options are not graphically editable
             masicOptions.SuppressNoParentIonsError = mSuppressNoParentIonsError
 
-            With masicOptions.SICOptions
-                .CompressMSSpectraData = mCompressMSSpectraData
-                .CompressMSMSSpectraData = mCompressMSMSSpectraData
-                .CompressToleranceDivisorForDa = mCompressToleranceDivisorForDa
-                .CompressToleranceDivisorForPPM = mCompressToleranceDivisorForPPM
+            sicOptions.CompressMSSpectraData = mCompressMSSpectraData
+            sicOptions.CompressMSMSSpectraData = mCompressMSMSSpectraData
+            sicOptions.CompressToleranceDivisorForDa = mCompressToleranceDivisorForDa
+            sicOptions.CompressToleranceDivisorForPPM = mCompressToleranceDivisorForPPM
 
-                .MaxSICPeakWidthMinutesBackward = ParseTextBoxValueFloat(txtMaxPeakWidthMinutesBackward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesBackward.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .MaxSICPeakWidthMinutesForward = ParseTextBoxValueFloat(txtMaxPeakWidthMinutesForward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesForward.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-            End With
+            sicOptions.MaxSICPeakWidthMinutesBackward = ParseTextBoxValueFloat(txtMaxPeakWidthMinutesBackward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesBackward.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            sicOptions.MaxSICPeakWidthMinutesForward = ParseTextBoxValueFloat(txtMaxPeakWidthMinutesForward, lblMaxPeakWidthMinutes.Text & " " & lblMaxPeakWidthMinutesForward.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-            With masicOptions.SICOptions
-                .SICPeakFinderOptions.IntensityThresholdFractionMax = ParseTextBoxValueFloat(txtIntensityThresholdFractionMax, lblIntensityThresholdFractionMax.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            peakFinderOptions.IntensityThresholdFractionMax = ParseTextBoxValueFloat(txtIntensityThresholdFractionMax, lblIntensityThresholdFractionMax.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = ParseTextBoxValueFloat(txtIntensityThresholdAbsoluteMinimum, lblIntensityThresholdAbsoluteMinimum.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            peakFinderOptions.IntensityThresholdAbsoluteMinimum = ParseTextBoxValueFloat(txtIntensityThresholdAbsoluteMinimum, lblIntensityThresholdAbsoluteMinimum.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .ReplaceSICZeroesWithMinimumPositiveValueFromMSData = chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked
-                .RefineReportedParentIonMZ = chkRefineReportedParentIonMZ.Checked
+            sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked
+            sicOptions.RefineReportedParentIonMZ = chkRefineReportedParentIonMZ.Checked
 
-                '' .UseSICStatsFromLargestPeak = chkUseSICStatsFromLargestPeak.Checked
-            End With
+            '' sicOptions.UseSICStatsFromLargestPeak = chkUseSICStatsFromLargestPeak.Checked
 
-            With masicOptions.SICOptions.SICPeakFinderOptions
-                ' Peak Finding Options
-                .SICBaselineNoiseOptions.BaselineNoiseMode = CType(cboSICNoiseThresholdMode.SelectedIndex, eNoiseThresholdModes)
-                .SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            ' Peak Finding Options
+            peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = CType(cboSICNoiseThresholdMode.SelectedIndex, eNoiseThresholdModes)
+            peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat(txtSICNoiseFractionLowIntensityDataToAverage, lblSICNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat(txtSICNoiseFractionLowIntensityDataToAverage, lblSICNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
-                .SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
+            ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
+            peakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
 
-                .MaxDistanceScansNoOverlap = ParseTextBoxValueInt(txtMaxDistanceScansNoOverlap, lblMaxDistanceScansNoOverlap.Text & " must be an integer value", parseError)
-                If parseError Then Exit Try
-                .MaxAllowedUpwardSpikeFractionMax = ParseTextBoxValueFloat(txtMaxAllowedUpwardSpikeFractionMax, lblMaxAllowedUpwardSpikeFractionMax.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .InitialPeakWidthScansScaler = ParseTextBoxValueFloat(txtInitialPeakWidthScansScaler, lblInitialPeakWidthScansScaler.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .InitialPeakWidthScansMaximum = ParseTextBoxValueInt(txtInitialPeakWidthScansMaximum, lblInitialPeakWidthScansMaximum.Text & " must be an integer value", parseError)
-                If parseError Then Exit Try
+            peakFinderOptions.MaxDistanceScansNoOverlap = ParseTextBoxValueInt(txtMaxDistanceScansNoOverlap, lblMaxDistanceScansNoOverlap.Text & " must be an integer value", parseError)
+            If parseError Then Exit Try
+            peakFinderOptions.MaxAllowedUpwardSpikeFractionMax = ParseTextBoxValueFloat(txtMaxAllowedUpwardSpikeFractionMax, lblMaxAllowedUpwardSpikeFractionMax.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            peakFinderOptions.InitialPeakWidthScansScaler = ParseTextBoxValueFloat(txtInitialPeakWidthScansScaler, lblInitialPeakWidthScansScaler.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            peakFinderOptions.InitialPeakWidthScansMaximum = ParseTextBoxValueInt(txtInitialPeakWidthScansMaximum, lblInitialPeakWidthScansMaximum.Text & " must be an integer value", parseError)
+            If parseError Then Exit Try
 
-                .UseButterworthSmooth = optUseButterworthSmooth.Checked
-                .ButterworthSamplingFrequency = ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            peakFinderOptions.UseButterworthSmooth = optUseButterworthSmooth.Checked
+            peakFinderOptions.ButterworthSamplingFrequency = ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .UseSavitzkyGolaySmooth = optUseSavitzkyGolaySmooth.Checked
-                .SavitzkyGolayFilterOrder = CShort(ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " must be an integer value", parseError))
-                If parseError Then Exit Try
+            peakFinderOptions.UseSavitzkyGolaySmooth = optUseSavitzkyGolaySmooth.Checked
+            peakFinderOptions.SavitzkyGolayFilterOrder = CShort(ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text & " must be an integer value", parseError))
+            If parseError Then Exit Try
 
-                .FindPeaksOnSmoothedData = chkFindPeaksOnSmoothedData.Checked
-                .SmoothDataRegardlessOfMinimumPeakWidth = chkSmoothDataRegardlessOfMinimumPeakWidth.Checked
+            peakFinderOptions.FindPeaksOnSmoothedData = chkFindPeaksOnSmoothedData.Checked
+            peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = chkSmoothDataRegardlessOfMinimumPeakWidth.Checked
 
-                ' Mass Spectra Noise Threshold Options
-                .MassSpectraNoiseThresholdOptions.BaselineNoiseMode = CType(cboMassSpectraNoiseThresholdMode.SelectedIndex, eNoiseThresholdModes)
-                .MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            ' Mass Spectra Noise Threshold Options
+            peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = CType(cboMassSpectraNoiseThresholdMode.SelectedIndex, eNoiseThresholdModes)
+            peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat(txtMassSpectraNoiseFractionLowIntensityDataToAverage, lblMassSpectraNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            peakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat(txtMassSpectraNoiseFractionLowIntensityDataToAverage, lblMassSpectraNoiseFractionLowIntensityDataToAverage.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = ParseTextBoxValueFloat(txtMassSpectraNoiseMinimumSignalToNoiseRatio, lblMassSpectraNoiseMinimumSignalToNoiseRatio.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            peakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = ParseTextBoxValueFloat(txtMassSpectraNoiseMinimumSignalToNoiseRatio, lblMassSpectraNoiseMinimumSignalToNoiseRatio.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-            End With
+            ' Similarity Options
+            sicOptions.SimilarIonMZToleranceHalfWidth = ParseTextBoxValueFloat(txtSimilarIonMZToleranceHalfWidth, lblSimilarIonMZToleranceHalfWidth.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            sicOptions.SimilarIonToleranceHalfWidthMinutes = ParseTextBoxValueInt(txtSimilarIonToleranceHalfWidthMinutes, lblSimilarIonTimeToleranceHalfWidth.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            sicOptions.SpectrumSimilarityMinimum = ParseTextBoxValueFloat(txtSpectrumSimilarityMinimum, lblSpectrumSimilarityMinimum.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-            With masicOptions.SICOptions
-                ' Similarity Options
-                .SimilarIonMZToleranceHalfWidth = ParseTextBoxValueFloat(txtSimilarIonMZToleranceHalfWidth, lblSimilarIonMZToleranceHalfWidth.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .SimilarIonToleranceHalfWidthMinutes = ParseTextBoxValueInt(txtSimilarIonToleranceHalfWidthMinutes, lblSimilarIonTimeToleranceHalfWidth.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .SpectrumSimilarityMinimum = ParseTextBoxValueFloat(txtSpectrumSimilarityMinimum, lblSpectrumSimilarityMinimum.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-            End With
+            Dim binningOptions = masicOptions.BinningOptions
 
-            With masicOptions.BinningOptions
+            ' Binning Options
+            binningOptions.StartX = ParseTextBoxValueFloat(txtBinStartX, lblBinStartX.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            binningOptions.EndX = ParseTextBoxValueFloat(txtBinEndX, lblBinEndX.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            binningOptions.BinSize = ParseTextBoxValueFloat(txtBinSize, lblBinSize.Text & " must be a value", parseError)
+            If parseError Then Exit Try
+            binningOptions.MaximumBinCount = ParseTextBoxValueInt(txtMaximumBinCount, lblMaximumBinCount.Text & " must be an integer value", parseError)
+            If parseError Then Exit Try
 
-                ' Binning Options
-                .StartX = ParseTextBoxValueFloat(txtBinStartX, lblBinStartX.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .EndX = ParseTextBoxValueFloat(txtBinEndX, lblBinEndX.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .BinSize = ParseTextBoxValueFloat(txtBinSize, lblBinSize.Text & " must be a value", parseError)
-                If parseError Then Exit Try
-                .MaximumBinCount = ParseTextBoxValueInt(txtMaximumBinCount, lblMaximumBinCount.Text & " must be an integer value", parseError)
-                If parseError Then Exit Try
+            binningOptions.IntensityPrecisionPercent = ParseTextBoxValueFloat(txtBinnedDataIntensityPrecisionPct, lblBinnedDataIntensityPrecisionPct.Text & " must be a value", parseError)
+            If parseError Then Exit Try
 
-                .IntensityPrecisionPercent = ParseTextBoxValueFloat(txtBinnedDataIntensityPrecisionPct, lblBinnedDataIntensityPrecisionPct.Text & " must be a value", parseError)
-                If parseError Then Exit Try
+            binningOptions.Normalize = chkBinnedDataNormalize.Checked
+            binningOptions.SumAllIntensitiesForBin = chkBinnedDataSumAllIntensitiesForBin.Checked
 
-                .Normalize = chkBinnedDataNormalize.Checked
-                .SumAllIntensitiesForBin = chkBinnedDataSumAllIntensitiesForBin.Checked
-            End With
+            ' Spectrum caching options
+            masicOptions.CacheOptions.DiskCachingAlwaysDisabled = mCacheOptions.DiskCachingAlwaysDisabled
+            masicOptions.CacheOptions.DirectoryPath = mCacheOptions.DirectoryPath
+            masicOptions.CacheOptions.SpectraToRetainInMemory = mCacheOptions.SpectraToRetainInMemory
 
-            With masicOptions.CacheOptions
-                ' Spectrum caching options
-                .DiskCachingAlwaysDisabled = mCacheOptions.DiskCachingAlwaysDisabled
-                .DirectoryPath = mCacheOptions.DirectoryPath
-                .SpectraToRetainInMemory = mCacheOptions.SpectraToRetainInMemory
-            End With
+            Dim reporterIonOptions = masicOptions.ReporterIons
 
-            With masicOptions.ReporterIons
-                ' Reporter ion options
-                .ReporterIonStatsEnabled = chkReporterIonStatsEnabled.Checked
+            ' Reporter ion options
+            reporterIonOptions.ReporterIonStatsEnabled = chkReporterIonStatsEnabled.Checked
 
+            ' Note that this will set .ReporterIonToleranceDa to 0.5
+            reporterIonOptions.ReporterIonMassMode = SelectedReporterIonMode
 
-                ' Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
-                .ReporterIonToleranceDaDefault = ParseTextBoxValueDbl(txtReporterIonMZToleranceDa, "", parseError,
+            ' Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
+            reporterIonOptions.ReporterIonToleranceDaDefault = ParseTextBoxValueDbl(txtReporterIonMZToleranceDa, "", parseError,
                                                                       clsReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, False)
-                .SetReporterIonMassMode(.ReporterIonMassMode, .ReporterIonToleranceDaDefault)
+            reporterIonOptions.SetReporterIonMassMode(reporterIonOptions.ReporterIonMassMode, reporterIonOptions.ReporterIonToleranceDaDefault)
 
-                .ReporterIonApplyAbundanceCorrection = chkReporterIonApplyAbundanceCorrection.Checked
+            reporterIonOptions.ReporterIonApplyAbundanceCorrection = chkReporterIonApplyAbundanceCorrection.Checked
 
-                .ReporterIonSaveObservedMasses = chkReporterIonSaveObservedMasses.Checked
-                .ReporterIonSaveUncorrectedIntensities = chkReporterIonSaveUncorrectedIntensities.Checked
-            End With
+            reporterIonOptions.ReporterIonSaveObservedMasses = chkReporterIonSaveObservedMasses.Checked
+            reporterIonOptions.ReporterIonSaveUncorrectedIntensities = chkReporterIonSaveUncorrectedIntensities.Checked
 
-            With masicOptions
-                ' MRM Options
-                .WriteMRMDataList = chkMRMWriteDataList.Checked
-                .WriteMRMIntensityCrosstab = chkMRMWriteIntensityCrosstab.Checked
+            ' MRM Options
+            masicOptions.WriteMRMDataList = chkMRMWriteDataList.Checked
+            masicOptions.WriteMRMIntensityCrosstab = chkMRMWriteIntensityCrosstab.Checked
 
-                ' Custom m/z options
-                .CustomSICList.LimitSearchToCustomMZList = chkLimitSearchToCustomMZs.Checked
-            End With
+            ' Custom m/z options
+            masicOptions.CustomSICList.LimitSearchToCustomMZList = chkLimitSearchToCustomMZs.Checked
 
             ' Store the custom M/Z values in mCustomSICList
 
@@ -1925,23 +1856,20 @@ Public Class frmMain
             ' Only use the data in table CUSTOM_SIC_VALUES_DATA_TABLE if the CustomSicFileName is empty
             If String.IsNullOrWhiteSpace(customSICFileName) Then
 
-                For Each myDataRow As DataRow In mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE).Rows
-                    With myDataRow
-                        If IsNumeric(.Item(0)) And IsNumeric(.Item(1)) Then
+                For Each currentRow As DataRow In mCustomSICValuesDataset.Tables(CUSTOM_SIC_VALUES_DATA_TABLE).Rows
+                    If IsNumeric(currentRow.Item(0)) And IsNumeric(currentRow.Item(1)) Then
 
-                            Dim targetMz = CDbl(.Item(0))
-                            Dim mzSearchSpec = New clsCustomMZSearchSpec(targetMz)
+                        Dim targetMz = CDbl(currentRow.Item(0))
+                        Dim mzSearchSpec = New clsCustomMZSearchSpec(targetMz) With {
+                            .MZToleranceDa = CDbl(currentRow.Item(1)),
+                            .ScanOrAcqTimeCenter = CSng(currentRow.Item(2)),
+                            .ScanOrAcqTimeTolerance = CSng(currentRow.Item(3)),
+                            .Comment = CStrSafe(currentRow.Item(4))
+                        }
 
-                            mzSearchSpec.MZToleranceDa = CDbl(.Item(1))
-
-                            mzSearchSpec.ScanOrAcqTimeCenter = CSng(.Item(2))
-                            mzSearchSpec.ScanOrAcqTimeTolerance = CSng(.Item(3))
-                            mzSearchSpec.Comment = CStrSafe(.Item(4))
-
-                            mzSearchSpecs.Add(mzSearchSpec)
-                        End If
-                    End With
-                Next myDataRow
+                        mzSearchSpecs.Add(mzSearchSpec)
+                    End If
+                Next
 
             End If
 
