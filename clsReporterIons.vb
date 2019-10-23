@@ -26,6 +26,7 @@
         TMTElevenMZ = 16
         Acetylation = 17
         TMTSixteenMZ = 18
+        NativeOGlcNAc = 19
     End Enum
 
 #End Region
@@ -282,6 +283,16 @@
                 reporterIons.Add(New clsReporterIonInfo(126.09134))
                 reporterIons.Add(New clsReporterIonInfo(143.11789))
 
+            Case eReporterIonMassModeConstants.NativeOGlcNAc
+                ' Native O-GlcNAc
+                reporterIons.Add(New clsReporterIonInfo(126.055))
+                reporterIons.Add(New clsReporterIonInfo(138.055))
+                reporterIons.Add(New clsReporterIonInfo(144.065))
+                reporterIons.Add(New clsReporterIonInfo(168.066))
+                reporterIons.Add(New clsReporterIonInfo(186.076))
+                reporterIons.Add(New clsReporterIonInfo(204.087))
+                reporterIons.Add(New clsReporterIonInfo(366.14))
+
             Case Else
                 ' Includes eReporterIonMassModeConstants.CustomOrNone
                 reporterIons.Clear()
@@ -326,6 +337,8 @@
                 Return "Lys Acet (126.091 m/z and 127.095 m/z)"
             Case eReporterIonMassModeConstants.OGlcNAc
                 Return "O-GlcNAc (204.087, 300.13, and 503.21 m/z)"
+            Case eReporterIonMassModeConstants.NativeOGlcNAc
+                Return "Native O-GlcNAc (126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14 m/z)"
             Case eReporterIonMassModeConstants.FrackingAmine20160217
                 Return "Fracking Amine 20160217 (157.089, 170.097, and 234.059 m/z)"
             Case eReporterIonMassModeConstants.FSFACustomCarbonyl
