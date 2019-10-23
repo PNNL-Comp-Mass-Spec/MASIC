@@ -23,7 +23,7 @@ Monroe ME et. al., Comput Biol Chem. 2008 Jun;32(3):215-217.  More info is on
 
 ## Installation
 
-Double click the MASIC_installer.msi file to install.\
+Double click file MASIC_Installer.exe file to install.\
 The program shortcut can be found at Start Menu -> Programs -> PAST Toolkit -> MASIC\
 The MASIC browser shortcut can be found at PAST Toolkit -> MASIC Browser
 
@@ -95,23 +95,31 @@ or in the XML parameter file.
 
 Enable the "Generate Reporter Ion Stats" option to instruct MASIC to look 
 for standard reporter ion masses and to save their observed intensities in
-file _ReporterIons.txt.  Supported reporter ion modes are:
-* Mode 1, iTraq ions 114.1112, 115.1083, 116.1116, and 117.115 m/z
-* Mode 2, ITraq ETD: 101.107, 102.104, and 104.1107 m/z
-* Mode 3, TMT 2: 126.1283 and 127.1316
-* Mode 4, TMT 6: 126.1283, 127.1316, 128.135, 129.1383, 130.1417, and 131.1387
-* Mode 5, ITraq 8 (high res): 113.107873, 114.111228, 115.108263, 116.111618, 117.114973, 118.112008, 119.115363, and 121.122072
-* Mode 6, ITraq 8 (low res): same ions as Mode 5, but corrects for contamination from the immonium ion at 120.08131
-* Mode 7, PCGalnaz: 300.13 and 503.21 m/z
-* Mode 8, HemeCFragment: 616.1767 and 617.1845
-* Mode 9, LycAcetFragment: 126.09134 and 127.094695
-* Mode 10, TMT 10: 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137790, 130.134825, 130.141145, 131.138180
-* Mode 11, OGlcNAc: 204.0872, 300.13079, and 503.21017
-* Mode 12, Fracking Amine 20160217: 157.089, 170.097, and 234.059
-* Mode 13, FSFACustomCarbonyl
-* Mode 14, FSFACustomCarboxylic
-* Mode 15, FSFACustomHydroxyl
-* Mode 16, TMT 11: 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137790, 130.134825, 130.141145, 131.138180, 131.144499
+file _ReporterIons.txt.  Supported reporter ion modes are shown in the following table
+The integer value corresponds to the number that appears in the MASIC settings file, e.g.
+`<item key="ReporterIonMassMode" value="16" />` for TMT 11
+
+| Integer Value | Name                    | Description                                 | Ions (m/z values)                                                                                     |
+|---------------|-------------------------|---------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| 1             | iTraq                   | Original 4-plex iTRAQ                       | 114.1112, 115.1083, 116.1116, and 117.115                                                             |
+| 2             | ITraq ETD               | ITRAQ ETD tags                              | 101.107, 102.104, and 104.1107                                                                        |
+| 5             | ITraq 8 (high res)      | High resolution eight-plex iTRAQ            | 113.107873, 114.111228, 115.108263, 116.111618, 117.114973, 118.112008, 119.115363, and 121.122072    |
+| 6             | ITraq 8 (low res)       | Low resolution eight-plex iTRAQ             | Same ions as Mode 5, but corrects for contamination from the immonium ion at 120.08131                |
+| 3             | TMT 2                   | TMT duplex                                  | 126.1283 and 127.1316                                                                                 |
+| 4             | TMT 6                   | 6-plex TMT                                  | 126.1283, 127.1316, 128.135, 129.1383, 130.1417, and 131.1387                                                                               |
+| 10            | TMT 10                  | 10-plex TMT                                 | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137790, 130.134825, 130.141145, and 131.138180                  |
+| 16            | TMT 11                  | 11-plex TMT                                 | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.137790, 130.134825, 130.141145, 131.138180, and 131.144499      |
+| 18            | TMT 16                  | 16-plex TMT                                 | 126.127726, 127.124761, 127.131081, 128.128116, 128.134436, 129.131471, 129.13779, 130.134825, 130.141145, 131.13818, 131.144499, 132.141535, 132.147855, 133.14489, 133.15121 and 134.148245 |
+| 7             | PCGalnaz                | Custom reporter ions for Josh Alfaro        | 300.13 and 503.21 m/z                                                                                 |
+| 8             | HemeCFragment           | Custom reporter ions for Eric Merkley       | 616.1767 and 617.1845                                                                                 |
+| 9             | LycAcetFragment         | Custom reporter ions for Ernesto Nakayasu   | 126.09134 and 127.094695                                                                              |
+| 11            | OGlcNAc                 | O-GlcNAc                                    | 204.0872, 300.13079, and 503.21017                                                                    |
+| 12            | Fracking Amine 20160217 | Product ions associated with FrackingFluid_amine_1_02172016 | 157.089, 170.097, and 234.059                                                         |
+| 13            | FSFACustomCarbonyl      | Custom product ions from Chengdong Xu       | 171.104, 236.074, and 257.088                                                                         |
+| 14            | FSFACustomCarboxylic    | Custom product ions from Chengdong Xu       | 171.104, 234.058, and 336.174                                                                         |
+| 15            | FSFACustomHydroxyl      | Custom product ions from Chengdong Xu       | 151.063 and 166.087                                                                                   |
+| 17            | Acetylation             | Peptides with acetylated lysine residues    | 126.09134 and 143.11789                                                                               |
+| 19            | NativeOGlcNAc           | Native O-GlcNAc                             | 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14                                      |
 
 ## MRM Data
 
@@ -173,8 +181,8 @@ Reporter Ion Intensities
 * .mzML centroid mode data has similar reporter ion intensities vs. Thermo .raw files (agreement within 2%)
 
 Precursor Ion Interference Scores
-* .mzML profile  mode data has similar interfence scores only for higher abundance precursors; for lower abundance precursors, the centroiding algorithm does not perform well (m/z values deviate from their true values), and thus the interference scores do not correlate well with Thermo .raw file based scores
-* .mzML centroid mode data has identical interfence scores as Thermo .raw files
+* .mzML profile  mode data has similar interference scores only for higher abundance precursors; for lower abundance precursors, the centroiding algorithm does not perform well (m/z values deviate from their true values), and thus the interference scores do not correlate well with Thermo .raw file based scores
+* .mzML centroid mode data has identical interference scores as Thermo .raw files
 
 Based on the above observations, when reading .mzML files, centroided MS1 spectra work better for
 interference score calculations, but intensities are 2.5 fold smaller.  In contrast,
@@ -224,7 +232,7 @@ alternate output directory (if defined).
 Use `/L` to specify that a log file should be created.  Use `/L:LogFilePath` to
 specify the name (or full path) for the log file.
 
-Use `/SF` to specify the name to use for the Masic Status file (default is
+Use `/SF` to specify the name to use for the MASIC Status file (default is
 MasicStatus.xml).
 
 The optional `/Q` switch will prevent the progress window from being shown (only applicable to the GUI version, MASIC.exe)
