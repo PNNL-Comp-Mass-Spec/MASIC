@@ -38,6 +38,7 @@ Public Class frmMain
         InitializeControls()
 
         mCacheOptions = New clsSpectrumCacheOptions()
+        mDefaultCustomSICList = New List(Of udtCustomSICEntryType)
         mLogMessages = New List(Of String)
 
         mMasic = New clsMASIC()
@@ -74,7 +75,7 @@ Public Class frmMain
 
     Private mCustomSICValuesDataset As DataSet
 
-    Private mDefaultCustomSICList() As udtCustomSICEntryType
+    Private ReadOnly mDefaultCustomSICList As List(Of udtCustomSICEntryType)
     Private mWorking As Boolean
 
     Private mXmlSettingsFilePath As String
@@ -137,6 +138,15 @@ Public Class frmMain
                 .Rows.Add(myDataRow)
             End If
         End With
+    Private Sub AppendCustomSICListItem(mz As Double, scanCenter As Single, comment As String)
+        Dim customSicEntryItem = New udtCustomSICEntryType()
+
+        customSicEntryItem.MZ = mz
+        customSicEntryItem.ScanCenter = scanCenter
+        customSicEntryItem.Comment = comment
+
+        mDefaultCustomSICList.Add(customSicEntryItem)
+    End Sub
 
     End Sub
 
@@ -192,10 +202,8 @@ Public Class frmMain
 
             txtCustomSICScanOrAcqTimeTolerance.Text = defaultScanOrAcqTimeTolerance.ToString
 
-            For index = 0 To mDefaultCustomSICList.Length - 1
-                With mDefaultCustomSICList(index)
-                    AddCustomSICRow(.MZ, defaultMZTolerance, .ScanCenter, defaultScanOrAcqTimeTolerance, .Comment)
-                End With
+            For Each item In mDefaultCustomSICList
+                AddCustomSICRow(item.MZ, defaultMZTolerance, item.ScanCenter, defaultScanOrAcqTimeTolerance, item.Comment)
             Next
 
         End If
@@ -303,61 +311,17 @@ Public Class frmMain
 
     Private Sub DefineDefaultCustomSICList()
 
-        ReDim mDefaultCustomSICList(8)
+        mDefaultCustomSICList.Clear()
 
-        With mDefaultCustomSICList(0)
-            .MZ = 824.47422
-            .ScanCenter = 0.176
-            .Comment = "Pep-09"
-        End With
-
-        With mDefaultCustomSICList(1)
-            .MZ = 412.74102
-            .ScanCenter = 0.176
-            .Comment = "Pep-09"
-        End With
-
-        With mDefaultCustomSICList(2)
-            .MZ = 484.28137
-            .ScanCenter = 0.092
-            .Comment = "Pep-11"
-        End With
-
-        With mDefaultCustomSICList(3)
-            .MZ = 459.27687
-            .ScanCenter = 0.368
-            .Comment = "Pep-14"
-        End With
-
-        With mDefaultCustomSICList(4)
-            .MZ = 740.01082
-            .ScanCenter = 0.574
-            .Comment = "Pep-16"
-        End With
-
-        With mDefaultCustomSICList(5)
-            .MZ = 762.51852
-            .ScanCenter = 0.642
-            .Comment = "Pep-26"
-        End With
-
-        With mDefaultCustomSICList(6)
-            .MZ = 657.42992
-            .ScanCenter = 0.192
-            .Comment = "Pep-16_Partial"
-        End With
-
-        With mDefaultCustomSICList(7)
-            .MZ = 900.59222
-            .ScanCenter = 0.4
-            .Comment = "Pep-26_PartialA"
-        End With
-
-        With mDefaultCustomSICList(8)
-            .MZ = 640.43972
-            .ScanCenter = 0.4
-            .Comment = "Pep-26_PartialB"
-        End With
+        AppendCustomSICListItem(824.47422, 0.176, "Pep-09")
+        AppendCustomSICListItem(412.74102, 0.176, "Pep-09")
+        AppendCustomSICListItem(484.28137, 0.092, "Pep-11")
+        AppendCustomSICListItem(459.27687, 0.368, "Pep-14")
+        AppendCustomSICListItem(740.01082, 0.574, "Pep-16")
+        AppendCustomSICListItem(762.51852, 0.642, "Pep-26")
+        AppendCustomSICListItem(657.42992, 0.192, "Pep-16_Partial")
+        AppendCustomSICListItem(900.59222, 0.4, "Pep-26_PartialA")
+        AppendCustomSICListItem(640.43972, 0.4, "Pep-26_PartialB")
 
     End Sub
 
