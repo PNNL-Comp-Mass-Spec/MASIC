@@ -585,46 +585,45 @@ Public Class frmMain
 
         Dim filePath As String
 
-        Dim objOpenFile As New OpenFileDialog
-
-        filePath = mXmlSettingsFilePath
-
-        With objOpenFile
-            .AddExtension = True
-            .CheckFileExists = True
-            .CheckPathExists = True
-            .DefaultExt = ".xml"
-            .DereferenceLinks = True
-            .Multiselect = False
-            .ValidateNames = True
-
-            .Filter = "Settings files (*.xml)|*.xml|All files (*.*)|*.*"
-
+        Using objOpenFile As New OpenFileDialog With {
+            .AddExtension = True,
+            .CheckFileExists = True,
+            .CheckPathExists = True,
+            .DefaultExt = ".xml",
+            .DereferenceLinks = True,
+            .Multiselect = False,
+            .ValidateNames = True,
+            .Filter = "Settings files (*.xml)|*.xml|All files (*.*)|*.*",
             .FilterIndex = 1
+            }
+
+            filePath = mXmlSettingsFilePath
 
             If filePath.Length > 0 Then
                 Try
-                    .InitialDirectory = Directory.GetParent(filePath).ToString
+                    objOpenFile.InitialDirectory = Directory.GetParent(filePath).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath()
             End If
 
             If File.Exists(filePath) Then
-                .FileName = Path.GetFileName(filePath)
+                objOpenFile.FileName = Path.GetFileName(filePath)
             End If
 
-            .Title = "Specify file to load options from"
+            objOpenFile.Title = "Specify file to load options from"
 
-            .ShowDialog()
-            If .FileName.Length > 0 Then
-                mXmlSettingsFilePath = .FileName
+            Dim result = objOpenFile.ShowDialog()
+            If result = DialogResult.Cancel Then Exit Sub
+
+            If objOpenFile.FileName.Length > 0 Then
+                mXmlSettingsFilePath = objOpenFile.FileName
 
                 IniFileLoadOptions(mXmlSettingsFilePath, updateIOPaths)
             End If
-        End With
+        End Using
 
     End Sub
 
@@ -706,47 +705,44 @@ Public Class frmMain
 
         Dim filePath As String
 
-        Dim objSaveFile As New SaveFileDialog
-
-        filePath = mXmlSettingsFilePath
-
-        With objSaveFile
-            .AddExtension = True
-            .CheckFileExists = False
-            .CheckPathExists = True
-            .DefaultExt = ".xml"
-            .DereferenceLinks = True
-            .OverwritePrompt = True
-            .ValidateNames = True
-
-            .Filter = "Settings files (*.xml)|*.xml|All files (*.*)|*.*"
-
+        Using objSaveFile As New SaveFileDialog With {
+            .AddExtension = True,
+            .CheckFileExists = False,
+            .CheckPathExists = True,
+            .DefaultExt = ".xml",
+            .DereferenceLinks = True,
+            .OverwritePrompt = True,
+            .ValidateNames = True,
+            .Filter = "Settings files (*.xml)|*.xml|All files (*.*)|*.*",
             .FilterIndex = 1
+            }
 
+            filePath = mXmlSettingsFilePath
             If filePath.Length > 0 Then
                 Try
-                    .InitialDirectory = Directory.GetParent(filePath).ToString
+                    objSaveFile.InitialDirectory = Directory.GetParent(filePath).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                    objSaveFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                objSaveFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath()
             End If
 
             If File.Exists(filePath) Then
-                .FileName = Path.GetFileName(filePath)
+                objSaveFile.FileName = Path.GetFileName(filePath)
             End If
 
-            .Title = "Specify file to save options to"
+            objSaveFile.Title = "Specify file to save options to"
 
-            .ShowDialog()
-            If .FileName.Length > 0 Then
-                mXmlSettingsFilePath = .FileName
+            Dim result = objSaveFile.ShowDialog()
+            If result = DialogResult.Cancel Then Exit Sub
+
+            If objSaveFile.FileName.Length > 0 Then
+                mXmlSettingsFilePath = objSaveFile.FileName
 
                 IniFileSaveOptions(mXmlSettingsFilePath, False)
             End If
-        End With
-
+        End Using
     End Sub
 
     Private Sub IniFileSaveOptions(filePath As String, Optional saveWindowDimensionsOnly As Boolean = False)
@@ -1383,59 +1379,57 @@ Public Class frmMain
     End Sub
 
     Private Sub SelectDatasetLookupFile()
-        Dim objOpenFile As New OpenFileDialog
 
-        With objOpenFile
-            .AddExtension = True
-            .CheckFileExists = True
-            .CheckPathExists = True
-            .DefaultExt = ".txt"
-            .DereferenceLinks = True
-            .Multiselect = False
-            .ValidateNames = True
-
-            .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+        Using objOpenFile As New OpenFileDialog With {
+            .AddExtension = True,
+            .CheckFileExists = True,
+            .CheckPathExists = True,
+            .DefaultExt = ".txt",
+            .DereferenceLinks = True,
+            .Multiselect = False,
+            .ValidateNames = True,
+            .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
             .FilterIndex = 1
+            }
 
             If txtDatasetLookupFilePath.TextLength > 0 Then
                 Try
-                    .InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString
+                    objOpenFile.InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                    objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
-            .Title = "Select dataset lookup file"
+            objOpenFile.Title = "Select dataset lookup file"
 
-            .ShowDialog()
-            If .FileName.Length > 0 Then
-                txtDatasetLookupFilePath.Text = .FileName
+            Dim result = objOpenFile.ShowDialog()
+            If result = DialogResult.Cancel Then Exit Sub
+
+            If objOpenFile.FileName.Length > 0 Then
+                txtDatasetLookupFilePath.Text = objOpenFile.FileName
             End If
-        End With
 
+        End Using
     End Sub
 
     Private Sub SelectCustomSICFile()
 
-        Dim objOpenFile As New OpenFileDialog
-        Dim fileExtension As String
-
-        With objOpenFile
-            .AddExtension = True
-            .CheckFileExists = True
-            .CheckPathExists = True
-            .DefaultExt = ".txt"
-            .DereferenceLinks = True
-            .Multiselect = False
-            .ValidateNames = True
-
+        Using objOpenFile As New OpenFileDialog With {
+            .AddExtension = True,
+            .CheckFileExists = True,
+            .CheckPathExists = True,
+            .DefaultExt = ".txt",
+            .DereferenceLinks = True,
+            .Multiselect = False,
+            .ValidateNames = True,
             .Filter = "Text files (*.txt)|*.txt|" &
-             "CSV files (*.csv)|*.csv|" &
-             "All files (*.*)|*.*"
+                      "CSV files (*.csv)|*.csv|" &
+                      "All files (*.*)|*.*"
+            }
 
-            fileExtension = ".txt"
+            Dim fileExtension = ".txt"
 
             If txtCustomSICFileName.TextLength > 0 Then
                 fileExtension = Path.GetExtension(txtCustomSICFileName.Text)
@@ -1443,97 +1437,101 @@ Public Class frmMain
 
             Select Case fileExtension.ToLower()
                 Case ".txt"
-                    .FilterIndex = 1
+                    objOpenFile.FilterIndex = 1
                 Case "csv"
-                    .FilterIndex = 2
+                    objOpenFile.FilterIndex = 2
                 Case Else
-                    .FilterIndex = 1
+                    objOpenFile.FilterIndex = 1
             End Select
 
             If txtCustomSICFileName.TextLength > 0 Then
                 Try
-                    .InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString
+                    objOpenFile.InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                    objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
-            .Title = "Select custom SIC values file"
+            objOpenFile.Title = "Select custom SIC values file"
 
-            .ShowDialog()
-            If .FileName.Length > 0 Then
-                txtCustomSICFileName.Text = .FileName
+            Dim result = objOpenFile.ShowDialog()
+            If result = DialogResult.Cancel Then Exit Sub
+
+            If objOpenFile.FileName.Length > 0 Then
+                txtCustomSICFileName.Text = objOpenFile.FileName
             End If
-        End With
+        End Using
 
     End Sub
 
     Private Sub SelectInputFile()
 
-        Dim objOpenFile As New OpenFileDialog
-        Dim fileExtension As String
-
-        With objOpenFile
-            .AddExtension = True
-            .CheckFileExists = True
-            .CheckPathExists = True
-            .DefaultExt = ".txt"
-            .DereferenceLinks = True
-            .Multiselect = False
-            .ValidateNames = True
-
+        Using objOpenFile As New OpenFileDialog With {
+            .AddExtension = True,
+            .CheckFileExists = True,
+            .CheckPathExists = True,
+            .DefaultExt = ".txt",
+            .DereferenceLinks = True,
+            .Multiselect = False,
+            .ValidateNames = True,
             .Filter = "Xcalibur Raw files (*.raw)|*.raw|" &
-             "mzXML files (*.mzXML)|*.mzXML|" &
-             "mzXML files (*mzXML.xml)|*mzXML.xml|" &
-             "mzData files (*.mzData)|*.mzData|" &
-             "mzData files (*mzData.xml)|*mzData.xml|" &
-             "Mascot Generic Format files (*.mgf)|*.mgf|" &
-             "CDF files (*.cdf)|*.cdf|" &
-             "All files (*.*)|*.*"
+                      "mzXML files (*.mzXML)|*.mzXML|" &
+                      "mzXML files (*mzXML.xml)|*mzXML.xml|" &
+                      "mzData files (*.mzData)|*.mzData|" &
+                      "mzData files (*mzData.xml)|*mzData.xml|" &
+                      "Mascot Generic Format files (*.mgf)|*.mgf|" &
+                      "CDF files (*.cdf)|*.cdf|" &
+                      "All files (*.*)|*.*"
+            }
 
-            fileExtension = String.Copy(mPreferredInputFileExtension)
+            Dim fileExtension = String.Copy(mPreferredInputFileExtension)
 
             If txtInputFilePath.TextLength > 0 Then
                 fileExtension = Path.GetExtension(txtInputFilePath.Text)
             End If
 
+            Dim filterIndex As Integer
             Select Case fileExtension.ToLower()
                 Case ".mzxml"
-                    .FilterIndex = 2
+                    filterIndex = 2
                 Case "mzxml.xml"
-                    .FilterIndex = 3
+                    filterIndex = 3
                 Case ".mzdata"
-                    .FilterIndex = 4
+                    filterIndex = 4
                 Case "mzdata.xml"
-                    .FilterIndex = 5
+                    filterIndex = 5
                 Case ".mgf"
-                    .FilterIndex = 6
+                    filterIndex = 6
                 Case ".cdf"
-                    .FilterIndex = 7
+                    filterIndex = 7
                 Case Else
-                    .FilterIndex = 1
+                    filterIndex = 1
             End Select
+
+            objOpenFile.FilterIndex = filterIndex
 
             If txtInputFilePath.TextLength > 0 Then
                 Try
-                    .InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString
+                    objOpenFile.InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString
                 Catch
-                    .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                    objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
                 End Try
             Else
-                .InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
+                objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath()
             End If
 
-            .Title = "Select input file"
+            objOpenFile.Title = "Select input file"
 
-            .ShowDialog()
-            If .FileName.Length > 0 Then
-                txtInputFilePath.Text = .FileName
-                mPreferredInputFileExtension = Path.GetExtension(.FileName)
+            Dim result = objOpenFile.ShowDialog()
+            If result = DialogResult.Cancel Then Exit Sub
+
+            If objOpenFile.FileName.Length > 0 Then
+                txtInputFilePath.Text = objOpenFile.FileName
+                mPreferredInputFileExtension = Path.GetExtension(objOpenFile.FileName)
             End If
-        End With
+        End Using
 
     End Sub
 
