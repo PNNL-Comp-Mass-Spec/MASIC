@@ -35,11 +35,14 @@ Public Class frmMain
         InitializeComponent()
 
         'Add any initialization after the InitializeComponent() call
-        InitializeControls()
 
         mCacheOptions = New clsSpectrumCacheOptions()
         mDefaultCustomSICList = New List(Of udtCustomSICEntryType)
         mLogMessages = New List(Of String)
+
+        mReporterIonIndexToModeMap = New Dictionary(Of Integer, clsReporterIons.eReporterIonMassModeConstants)
+
+        InitializeControls()
 
         mMasic = New clsMASIC()
         RegisterEvents(mMasic)
@@ -101,8 +104,28 @@ Public Class frmMain
     ''' </summary>
     Private ReadOnly mLogMessages As List(Of String)
 
+    Private ReadOnly mReporterIonIndexToModeMap As Dictionary(Of Integer, clsReporterIons.eReporterIonMassModeConstants)
+
 #End Region
 
+#Region "Properties"
+
+    Private Property SelectedReporterIonMode As clsReporterIons.eReporterIonMassModeConstants
+        Get
+            Dim reporterIonMode = GetSelectedReporterIonMode()
+            Return reporterIonMode
+        End Get
+        Set
+            Try
+                Dim targetIndex = GetReporterIonIndexFromMode(Value)
+                cboReporterIonMassMode.SelectedIndex = targetIndex
+            Catch ex As Exception
+                ' Ignore errors here
+            End Try
+
+        End Set
+    End Property
+#End Region
 #Region "Procedures"
 
     Private Sub AddCustomSICRow(
@@ -147,6 +170,18 @@ Public Class frmMain
 
         mDefaultCustomSICList.Add(customSicEntryItem)
     End Sub
+
+    Private Sub AppendReporterIonMassMode(reporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants, description As String)
+
+        cboReporterIonMassMode.Items.Add(description)
+
+        Dim currentIndex = cboReporterIonMassMode.Items.Count - 1
+
+        If mReporterIonIndexToModeMap.ContainsKey(currentIndex) Then
+            mReporterIonIndexToModeMap(currentIndex) = reporterIonMassMode
+        Else
+            mReporterIonIndexToModeMap.Add(currentIndex, reporterIonMassMode)
+        End If
 
     End Sub
 
@@ -229,7 +264,7 @@ Public Class frmMain
     End Sub
 
     Private Sub AutoToggleReporterIonStatsEnabled()
-        If cboReporterIonMassMode.SelectedIndex = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
+        If SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
             If chkReporterIonStatsEnabled.Checked Then
                 chkReporterIonStatsEnabled.Checked = False
             End If
@@ -242,12 +277,12 @@ Public Class frmMain
 
     Private Sub AutoToggleReporterIonStatsMode()
         If chkReporterIonStatsEnabled.Checked Then
-            If cboReporterIonMassMode.SelectedIndex = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
-                cboReporterIonMassMode.SelectedIndex = clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ
+            If SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
+                SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ
             End If
         Else
-            If cboReporterIonMassMode.SelectedIndex <> clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
-                cboReporterIonMassMode.SelectedIndex = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone
+            If SelectedReporterIonMode <> clsReporterIons.eReporterIonMassModeConstants.CustomOrNone Then
+                SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone
             End If
         End If
     End Sub
@@ -512,6 +547,33 @@ Public Class frmMain
             Return clsCustomSICList.eCustomSICScanTypeConstants.Absolute
         End If
 
+    End Function
+
+    Private Function GetReporterIonIndexFromMode(reporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants) As Integer
+
+        For Each item In mReporterIonIndexToModeMap
+            If item.Value = reporterIonMassMode Then
+                Return item.Key
+            End If
+        Next
+
+        Throw New InvalidEnumArgumentException("Dictionary mReporterIonIndexToModeMap is missing enum " & reporterIonMassMode)
+
+    End Function
+
+    Private Function GetReporterIonModeFromIndex(comboboxIndex As Integer) As clsReporterIons.eReporterIonMassModeConstants
+
+        Dim reporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants
+        If mReporterIonIndexToModeMap.TryGetValue(comboboxIndex, reporterIonMassMode) Then
+            Return reporterIonMassMode
+        End If
+
+        Throw New Exception("Dictionary mReporterIonIndexToModeMap is missing index " & comboboxIndex)
+
+    End Function
+
+    Private Function GetSelectedReporterIonMode() As clsReporterIons.eReporterIonMassModeConstants
+        Return GetReporterIonModeFromIndex(cboReporterIonMassMode.SelectedIndex)
     End Function
 
     Private Function GetSettingsFilePath() As String
@@ -967,34 +1029,32 @@ Public Class frmMain
             End With
             .SelectedIndex = eNoiseThresholdModes.TrimmedMedianByAbundance
         End With
+        cboReporterIonMassMode.Items.Clear()
+        mReporterIonIndexToModeMap.Clear()
 
-        With cboReporterIonMassMode
-            With .Items
-                .Clear()
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.CustomOrNone, "None")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ, "iTraq: 114, 115, 116, and 117")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.ITraqETDThreeMZ, "iTraq ETD: 101, 102, and 104")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes, "iTraq 8 for High Res MS/MS: 113, 114, ... 121")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes, "iTraq 8 for Low Res MS/MS (Considers 120 m/z for immonium loss from phenylalanine)")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.CustomOrNone, "None")
 
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.Acetylation, "Acetylated K")
-                .Insert(clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.Acetylation, "Acetylated K")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqETDThreeMZ, "iTraq ETD: 101, 102, and 104")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ, "iTraq: 114, 115, 116, and 117")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes, "iTraq 8 for High Res MS/MS: 113, 114, ... 121")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes, "iTraq 8 for Low Res MS/MS (Considers 120 m/z for immonium loss from phenylalanine)")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.NativeOGlcNAc, "Native OGlcNAc: 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C")
+        AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N")
 
-            End With
-            .SelectedIndex = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone
-        End With
+        SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone
 
     End Sub
 
@@ -1274,7 +1334,6 @@ Public Class frmMain
                 ' Reporter ion options
                 txtReporterIonMZToleranceDa.Text = StringUtilities.DblToString(.ReporterIonToleranceDaDefault, 6)
 
-                cboReporterIonMassMode.SelectedIndex = .ReporterIonMassMode
 
                 chkReporterIonStatsEnabled.Checked = .ReporterIonStatsEnabled
                 chkReporterIonApplyAbundanceCorrection.Checked = .ReporterIonApplyAbundanceCorrection
@@ -1282,6 +1341,7 @@ Public Class frmMain
                 chkReporterIonSaveObservedMasses.Checked = .ReporterIonSaveObservedMasses
                 chkReporterIonSaveUncorrectedIntensities.Checked = .ReporterIonSaveUncorrectedIntensities
             End With
+            SelectedReporterIonMode = reporterIonOptions.ReporterIonMassMode
 
             With masicOptions
                 ' MRM Options
@@ -1836,8 +1896,6 @@ Public Class frmMain
                 ' Reporter ion options
                 .ReporterIonStatsEnabled = chkReporterIonStatsEnabled.Checked
 
-                ' Note that this will set .ReporterIonToleranceDa to 0.5
-                .ReporterIonMassMode = CType(cboReporterIonMassMode.SelectedIndex, clsReporterIons.eReporterIonMassModeConstants)
 
                 ' Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
                 .ReporterIonToleranceDaDefault = ParseTextBoxValueDbl(txtReporterIonMZToleranceDa, "", parseError,
