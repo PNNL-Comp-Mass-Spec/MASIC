@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections>
+  <section name="MasicDatabaseSettings">
+    <item key="ConnectionString" value="Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=dms4fun" />
+    <item key="DatasetInfoQuerySql" value="Select Dataset, ID FROM V_Dataset_Export" />
+  </section>
+  <section name="MasicImportOptions">
+    <item key="CDFTimeInSeconds" value="True" />
+    <item key="UseFinniganXRawAccessorFunctions" value="True" />
+    <item key="ParentIonDecoyMassDa" value="0" />
+    <item key="InputFilePath" value="" />
+    <item key="LastDirectory" value="" />
+    <item key="PreferredInputFileExtension" value=".RAW" />
+    <item key="WindowWidth" value="710" />
+    <item key="WindowHeight" value="560" />
+  </section>
+  <section name="MasicExportOptions">
+    <item key="IncludeHeaders" value="True" />
+    <item key="IncludeScanTimesInSICStatsFile" value="False" />
+    <item key="SkipMSMSProcessing" value="False" />
+    <item key="SkipSICAndRawDataProcessing" value="False" />
+    <item key="ExportRawDataOnly" value="False" />
+    <item key="SuppressNoParentIonsError" value="True" />
+    <item key="WriteExtendedStats" value="True" />
+    <item key="WriteExtendedStatsIncludeScanFilterText" value="True" />
+    <item key="WriteExtendedStatsStatusLog" value="True" />
+    <item key="StatusLogKeyNameFilterList" value="Source" />
+    <item key="ConsolidateConstantExtendedHeaderValues" value="True" />
+    <item key="WriteDetailedSICDataFile" value="False" />
+    <item key="WriteMSMethodFile" value="True" />
+    <item key="WriteMSTuneFile" value="False" />
+    <item key="WriteMRMDataList" value="False" />
+    <item key="WriteMRMIntensityCrosstab" value="True" />
+    <item key="FastExistingXMLFileTest" value="False" />
+    <item key="ReporterIonStatsEnabled" value="True" />
+    <item key="ReporterIonMassMode" value="16" />
+    <item key="ReporterIonToleranceDa" value="0.003" />
+    <item key="ReporterIonApplyAbundanceCorrection" value="True" />
+    <item key="ReporterIonITraq4PlexCorrectionFactorType" value="0" />
+    <item key="ReporterIonSaveObservedMasses" value="False" />
+    <item key="ReporterIonSaveUncorrectedIntensities" value="False" />
+    <item key="ExportRawSpectraData" value="False" />
+    <item key="ExportRawDataFileFormat" value="1" />
+    <item key="ExportRawDataIncludeMSMS" value="False" />
+    <item key="ExportRawDataRenumberScans" value="False" />
+    <item key="ExportRawDataMinimumSignalToNoiseRatio" value="1" />
+    <item key="ExportRawDataMaxIonCountPerScan" value="200" />
+    <item key="ExportRawDataIntensityMinimum" value="0" />
+  </section>
+  <section name="SICOptions">
+  	<!-- When using narrow SIC tolerances, be sure to also use a narrow value for SimilarIonMZToleranceHalfWidth -->
+    <item key="SICToleranceDa" value="0.0100" />
+    <item key="SICTolerance" value="10.0000" />
+    <item key="SICToleranceIsPPM" value="True" />
+    <item key="RefineReportedParentIonMZ" value="False" />
+    <item key="ScanRangeStart" value="0" />
+    <item key="ScanRangeEnd" value="0" />
+    <item key="RTRangeStart" value="0" />
+    <item key="RTRangeEnd" value="0" />
+    <item key="CompressMSSpectraData" value="True" />
+    <item key="CompressMSMSSpectraData" value="True" />
+    <item key="CompressToleranceDivisorForDa" value="5" />
+    <item key="CompressToleranceDivisorForPPM" value="3" />
+    <item key="MaxSICPeakWidthMinutesBackward" value="5" />
+    <item key="MaxSICPeakWidthMinutesForward" value="5" />
+    <item key="IntensityThresholdFractionMax" value="0.01" />
+    <item key="IntensityThresholdAbsoluteMinimum" value="0" />
+    <item key="SICNoiseThresholdMode" value="3" />
+    <item key="SICNoiseThresholdIntensity" value="0" />
+    <item key="SICNoiseFractionLowIntensityDataToAverage" value="0.75" />
+    <item key="SICNoiseMinimumSignalToNoiseRatio" value="0" />
+    <item key="MaxDistanceScansNoOverlap" value="0" />
+    <item key="MaxAllowedUpwardSpikeFractionMax" value="0.2" />
+    <item key="InitialPeakWidthScansScaler" value="1" />
+    <item key="InitialPeakWidthScansMaximum" value="30" />
+    <item key="FindPeaksOnSmoothedData" value="True" />
+    <item key="SmoothDataRegardlessOfMinimumPeakWidth" value="True" />
+    <item key="UseButterworthSmooth" value="True" />
+    <item key="ButterworthSamplingFrequency" value="0.25" />
+    <item key="ButterworthSamplingFrequencyDoubledForSIMData" value="True" />
+    <item key="UseSavitzkyGolaySmooth" value="False" />
+    <item key="SavitzkyGolayFilterOrder" value="0" />
+    <item key="SaveSmoothedData" value="False" />
+    <item key="MassSpectraNoiseThresholdMode" value="3" />
+    <item key="MassSpectraNoiseThresholdIntensity" value="0" />
+    <item key="MassSpectraNoiseFractionLowIntensityDataToAverage" value="0.5" />
+    <item key="MassSpectraNoiseMinimumSignalToNoiseRatio" value="2" />
+    <item key="ReplaceSICZeroesWithMinimumPositiveValueFromMSData" value="True" />
+  	<!-- When using narrow SIC tolerances, be sure to also use a narrow value for SimilarIonMZToleranceHalfWidth -->
+    <item key="SimilarIonMZToleranceHalfWidth" value="0.05" />
+    <item key="SimilarIonToleranceHalfWidthMinutes" value="5" />
+    <item key="SpectrumSimilarityMinimum" value="0.8" />
+  </section>
+  <section name="BinningOptions">
+    <item key="BinStartX" value="50" />
+    <item key="BinEndX" value="2000" />
+    <item key="BinSize" value="1" />
+    <item key="MaximumBinCount" value="100000" />
+    <item key="IntensityPrecisionPercent" value="1" />
+    <item key="Normalize" value="False" />
+    <item key="SumAllIntensitiesForBin" value="True" />
+  </section>
+  <section name="MemoryOptions">
+    <item key="DiskCachingAlwaysDisabled" value="False" />
+    <item key="CacheFolderPath" value="" />
+    <item key="CacheSpectraToRetainInMemory" value="500" />
+    <item key="CacheMinimumFreeMemoryMB" value="150" />
+    <item key="CacheMaximumMemoryUsageMB" value="500" />
+  </section>
+  <section name="CustomSICValues">
+    <item key="MZList" value="" />
+    <item key="ScanCenterList" value="" />
+    <item key="ScanCommentList" value="" />
+    <item key="ScanTolerance" value="1000" />
+    <item key="ScanType" value="Absolute" />
+    <item key="CustomMZFile" value="" />
+    <item key="LimitSearchToCustomMZList" value="False" />
+  </section>
+</sections>
