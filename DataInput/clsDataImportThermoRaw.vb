@@ -817,8 +817,8 @@ Namespace DataInput
                     ReportWarning("Scan found with IonCount = 0, scan " & scanNumber)
                 Else
                     ReportWarning(String.Format(
-                                  "Scan found where IonCount <> mzList.Length, scan {0}: {1} vs. {2}",
-                                  scanNumber, ionCount, mzList.Length))
+                        "Scan found where IonCount <> mzList.Length, scan {0}: {1} vs. {2}",
+                        scanNumber, ionCount, mzList.Length))
                 End If
                 ionCount = Math.Min(ionCount, mzList.Length)
             End If

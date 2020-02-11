@@ -2272,6 +2272,24 @@ Public Class clsMASICPeakFinder
 
     End Function
 
+    ''' <summary>
+    ''' Find peaks
+    ''' </summary>
+    ''' <param name="peakDetector">peak detector object</param>
+    ''' <param name="scanNumbers">Scan numbers of the data tracked by peaksContainer</param>
+    ''' <param name="peaksContainer">Container object with XData, YData, SmoothedData, found Peaks, and various tracking properties</param>
+    ''' <param name="simDataPresent">
+    ''' Set to true if processing selected ion monitoring data (or if there are huge gaps in the scan numbers).
+    ''' When true, and if sicPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData is true, uses a larger Butterworth filter sampling frequency
+    ''' </param>
+    ''' <param name="sicPeakFinderOptions">Peak finder options</param>
+    ''' <param name="testingMinimumPeakWidth">When true, assure that at least one peak is returned</param>
+    ''' <param name="returnClosestPeak">
+    ''' When true, a valid peak is one that contains peaksContainer.OriginalPeakLocationIndex
+    ''' When false, stores the index of the most intense peak in peaksContainer.BestPeakIndex
+    ''' </param>
+    ''' <returns>True if a valid peak is found; otherwise, returns false</returns>
+    ''' <remarks>All of the identified peaks are returned in peaksContainer.Peaks(), regardless of whether they are valid or not</remarks>
     Private Function FindPeaksWork(
       peakDetector As clsPeakDetection,
       scanNumbers As IList(Of Integer),
@@ -2281,25 +2299,6 @@ Public Class clsMASICPeakFinder
       testingMinimumPeakWidth As Boolean,
       returnClosestPeak As Boolean) As Boolean
 
-        ' Returns True if a valid peak is found; otherwise, returns false
-        ' When returnClosestPeak is True, then a valid peak is one that contains peaksContainer.OriginalPeakLocationIndex
-        ' When returnClosestPeak is False, then stores the index of the most intense peak in peaksContainer.BestPeakIndex
-        ' All of the identified peaks are returned in peaksContainer.Peaks(), regardless of whether they are valid or not
-
-        'Dim foundPeakIndex As Integer
-
-        'Dim peakMaximum As Double
-
-        '' ReSharper disable once NotAccessedVariable
-        'Dim usedSmoothedDataForPeakDetection As Boolean
-
-        'Dim validPeakFound As Boolean
-        'Dim success As Boolean
-
-        'Dim peakLocationIndex As Integer
-        'Dim peakIndexStart, peakIndexEnd As Integer
-
-        'Dim stepOverIncreaseCount As Integer
 
         Dim errorMessage As String = String.Empty
 
@@ -2441,7 +2440,6 @@ Public Class clsMASICPeakFinder
                 End If
             Loop
 
-
             ' Now see if we need to expand the peak by looking for decreasing intensities moving away from the peak center,
             '  but allowing for small increases
             ' We'll use the smoothed data for this; if we encounter negative values in the smoothed data, we'll keep going until we reach the low point since huge peaks can cause some odd behavior with the Butterworth filter
@@ -2457,6 +2455,7 @@ Public Class clsMASICPeakFinder
                 '    ' Step once more and stop
                 '    peakIndexStart -= 1
                 '    Exit Do
+
                 If peaksContainer.SmoothedYData(peakIndexStart - 1) < peaksContainer.SmoothedYData(peakIndexStart) Then
                     ' The adjacent point is lower than the current point
                     peakIndexStart -= 1
@@ -2501,6 +2500,7 @@ Public Class clsMASICPeakFinder
                 '    ' We reached a low intensity data point and we're going downhill (i.e. the slope from peakLocationIndex to this point is negative)
                 '    peakIndexEnd += 1
                 '    Exit Do
+
                 If peaksContainer.SmoothedYData(peakIndexEnd + 1) < peaksContainer.SmoothedYData(peakIndexEnd) Then
                     ' The adjacent point is lower than the current point
                     peakIndexEnd += 1
