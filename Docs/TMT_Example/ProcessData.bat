@@ -1,0 +1,1 @@
+..\..\bin\Console\Debug\MASIC_Console.exe TMT_QCPool_23Jun14.mzML /p:TMT10_LTQ-FT_10ppm_ReporterTol0.003Da_2014-08-06.xml /o:Compare

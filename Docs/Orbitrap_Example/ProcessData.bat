@@ -1,0 +1,1 @@
+..\..\bin\Console\Debug\MASIC_Console.exe Example_Orbitrap_Data.mzXML /p:LTQ-FT_10ppm_2014-08-06.xml /o:Compare
