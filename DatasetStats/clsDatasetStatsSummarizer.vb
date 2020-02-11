@@ -105,7 +105,7 @@ Namespace DatasetStats
         ''' Constructor
         ''' </summary>
         Public Sub New()
-            mFileDate = "June 12, 2019"
+            mFileDate = "February 11, 2020"
 
             mErrorMessage = String.Empty
 
@@ -495,14 +495,14 @@ Namespace DatasetStats
                 writer.WriteEndElement()       ' AcquisitionInfo
 
                 writer.WriteStartElement("TICInfo")
-                writer.WriteElementString("TIC_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMax, 5))
-                writer.WriteElementString("TIC_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMax, 5))
-                writer.WriteElementString("BPI_Max_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMax, 5))
-                writer.WriteElementString("BPI_Max_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMax, 5))
-                writer.WriteElementString("TIC_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.TICMedian, 5))
-                writer.WriteElementString("TIC_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.TICMedian, 5))
-                writer.WriteElementString("BPI_Median_MS", StringUtilities.ValueToString(summaryStats.MSStats.BPIMedian, 5))
-                writer.WriteElementString("BPI_Median_MSn", StringUtilities.ValueToString(summaryStats.MSnStats.BPIMedian, 5))
+                writer.WriteElementString("TIC_Max_MS", ValueToString(summaryStats.MSStats.TICMax, 5, 0))
+                writer.WriteElementString("TIC_Max_MSn", ValueToString(summaryStats.MSnStats.TICMax, 5, 0))
+                writer.WriteElementString("BPI_Max_MS", ValueToString(summaryStats.MSStats.BPIMax, 5, 0))
+                writer.WriteElementString("BPI_Max_MSn", ValueToString(summaryStats.MSnStats.BPIMax, 5, 0))
+                writer.WriteElementString("TIC_Median_MS", ValueToString(summaryStats.MSStats.TICMedian, 5, 0))
+                writer.WriteElementString("TIC_Median_MSn", ValueToString(summaryStats.MSnStats.TICMedian, 5, 0))
+                writer.WriteElementString("BPI_Median_MS", ValueToString(summaryStats.MSStats.BPIMedian, 5, 0))
+                writer.WriteElementString("BPI_Median_MSn", ValueToString(summaryStats.MSnStats.BPIMedian, 5, 0))
                 writer.WriteEndElement()       ' TICInfo
 
                 ' Only write the oSampleInfo block if oSampleInfo contains entries
@@ -812,6 +812,19 @@ Namespace DatasetStats
 
         End Function
 
+        Private Function ValueToString(value As Double, digitsOfPrecision As Byte, valueIfNaN As Double) As String
+
+            If Double.IsNaN(value) Then
+                Return StringUtilities.ValueToString(valueIfNaN, digitsOfPrecision)
+            ElseIf Double.IsNegativeInfinity(value) Then
+                Return StringUtilities.ValueToString(Double.MinValue, digitsOfPrecision)
+            ElseIf Double.IsPositiveInfinity(value) Then
+                Return StringUtilities.ValueToString(Double.MaxValue, digitsOfPrecision)
+            Else
+                Return StringUtilities.ValueToString(value, 5)
+            End If
+
+        End Function
     End Class
 
 End Namespace
