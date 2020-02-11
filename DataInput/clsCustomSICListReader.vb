@@ -48,7 +48,7 @@ Namespace DataInput
                     }
 
             If includeAndBeforeLastItem Then
-                headerNames.Add(" and " & CUSTOM_SIC_COLUMN_COMMENT)
+                headerNames.Add("and " & CUSTOM_SIC_COLUMN_COMMENT)
             Else
                 headerNames.Add(CUSTOM_SIC_COLUMN_COMMENT)
             End If
