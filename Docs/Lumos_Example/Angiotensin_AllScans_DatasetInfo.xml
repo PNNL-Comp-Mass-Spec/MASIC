@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<DatasetInfo>
+  <Dataset>Angiotensin_AllScans</Dataset>
+  <ScanTypes>
+    <ScanType ScanCount="87" ScanFilterText="FTMS + p ESI Full ms">HMS</ScanType>
+    <ScanType ScanCount="422" ScanFilterText="FTMS + c ESI d Full ms2 0@hcd30.00">HCD-HMSn</ScanType>
+    <ScanType ScanCount="170" ScanFilterText="FTMS + c ESI d Full ms2 0@etd53.99">ETD-HMSn</ScanType>
+    <ScanType ScanCount="170" ScanFilterText="FTMS + c ESI d sa Full ms2 0@etd53.99 0@hcd30.00">SA_HCD-HMSn</ScanType>
+    <ScanType ScanCount="170" ScanFilterText="FTMS + c ESI d sa Full ms2 0@etd53.99 0@cid30.00">SA_CID-HMSn</ScanType>
+    <ScanType ScanCount="252" ScanFilterText="FTMS + c ESI d Full ms2 0@etd121.47">ETD-HMSn</ScanType>
+    <ScanType ScanCount="252" ScanFilterText="FTMS + c ESI d sa Full ms2 0@etd121.47 0@hcd30.00">SA_HCD-HMSn</ScanType>
+    <ScanType ScanCount="252" ScanFilterText="FTMS + c ESI d sa Full ms2 0@etd121.47 0@cid30.00">SA_CID-HMSn</ScanType>
+  </ScanTypes>
+  <AcquisitionInfo>
+    <ScanCount>1775</ScanCount>
+    <ScanCountMS>87</ScanCountMS>
+    <ScanCountMSn>1688</ScanCountMSn>
+    <Elution_Time_Max>5.0417</Elution_Time_Max>
+    <AcqTimeMinutes>5.04</AcqTimeMinutes>
+    <StartTime>2018-09-26 09:06:07 AM</StartTime>
+    <EndTime>2018-09-26 09:11:10 AM</EndTime>
+    <FileSizeBytes>9727363</FileSizeBytes>
+  </AcquisitionInfo>
+  <TICInfo>
+    <TIC_Max_MS>2.8329E+09</TIC_Max_MS>
+    <TIC_Max_MSn>1.8756E+09</TIC_Max_MSn>
+    <BPI_Max_MS>1.0065E+09</BPI_Max_MS>
+    <BPI_Max_MSn>2.8662E+08</BPI_Max_MSn>
+    <TIC_Median_MS>1.9365E+09</TIC_Median_MS>
+    <TIC_Median_MSn>5.0695E+07</TIC_Median_MSn>
+    <BPI_Median_MS>6.3502E+08</BPI_Median_MS>
+    <BPI_Median_MSn>8.4759E+06</BPI_Median_MSn>
+  </TICInfo>
+</DatasetInfo>

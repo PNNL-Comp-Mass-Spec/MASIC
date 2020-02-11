@@ -1,0 +1,169 @@
+Instrument model: Orbitrap Fusion Lumos
+Instrument name: Orbitrap Fusion Lumos
+Instrument description: 
+Instrument serial number: FSN20129
+
+Orbitrap Fusion Lumos Method Summary
+  
+Creator: LUMOS01\LCMSOperator          Last Modified: 9/26/2018 9:04:04 AM by LUMOS01\LCMSOperator
+  
+Global Settings
+	Use Ion Source Settings from Tune = False
+	Method Duration (min)= 5
+	Ion Source Type = H-ESI
+	Spray Voltage: Positive Ion (V) = 4000
+	Spray Voltage: Negative Ion (V) = 3200
+	Sheath Gas (Arb) = 2
+	Aux Gas (Arb) = 2
+	Sweep Gas (Arb) = 0
+	Ion Transfer Tube Temp (°C) = 350
+	Vaporizer Temp (°C) = 75
+	APPI Lamp = Not in use
+	Pressure Mode = Standard
+	Default Charge State = 4
+	Advanced Precursor Determination = False
+Experiment 1
+	Start Time (min) = 0
+	End Time (min) = 5
+		
+
+
+		Scan MasterScan
+			MSn Level = 1
+			Use Wide Quad Isolation = True
+			Detector Type = Orbitrap
+			Orbitrap Resolution = 60K
+			Mass Range = Normal
+			Scan Range (m/z) = 350-2000
+			Maximum Injection Time (ms) = 50
+			AGC Target = 400000
+			Microscans = 1
+			RF Lens (%) = 60
+			Use ETD Internal Calibration = False
+			DataType = Profile
+			Polarity = Positive
+			Source Fragmentation = False
+			Scan Description = 
+
+		Filter ChargeState
+			Include undetermined charge states = False
+			Include charge state(s) = 2-10
+			Include charge states 25 and higher = False
+
+		Data Dependent Properties
+			Data Dependent Mode= Number of Scans
+			Number of Dependent Scans= 5
+Scan Event 1
+		
+
+
+		Scan ddMSnScan
+			MSn Level = 2
+			Isolation Mode = Quadrupole
+			Isolation Offset = Off
+			Isolation Window = 2
+			Reported Mass = Offset Mass
+			Multi-notch Isolation = False
+			Scan Range Mode = Auto Normal
+			FirstMass = 100
+			Scan Priority= 1
+			ActivationType = HCD
+			Is Stepped Collision Energy On = False
+			Stepped Collision Energy (%) = 5
+			Collision Energy (%) = 30
+			Detector Type = Orbitrap
+			Orbitrap Resolution = 30K
+			Maximum Injection Time (ms) = 100
+			AGC Target = 50000
+			Inject ions for all available parallelizable time = False
+			Microscans = 1
+			Use ETD Internal Calibration = False
+			DataType = Centroid
+			Polarity = Positive
+			Source Fragmentation = False
+			Scan Description = 
+
+		Data Dependent Properties
+			Data Dependent Mode= Number of Scans
+			Number of Dependent Scans= 3
+		
+
+
+		Scan ddMSnScan
+			MSn Level = 2
+			Isolation Mode = Quadrupole
+			Isolation Offset = Off
+			Isolation Window = 1.6
+			Reported Mass = Offset Mass
+			Multi-notch Isolation = False
+			Scan Range Mode = Auto Normal
+			FirstMass = 100
+			Scan Priority= 1
+			ActivationType = ETD
+			Use calibrated charge dependent ETD parameters = True
+			Detector Type = Orbitrap
+			Orbitrap Resolution = 30K
+			Maximum Injection Time (ms) = 100
+			AGC Target = 50000
+			Inject ions for all available parallelizable time = False
+			Microscans = 1
+			Use ETD Internal Calibration = False
+			DataType = Centroid
+			Polarity = Positive
+			Source Fragmentation = False
+			Scan Description = 
+		
+
+
+		Scan ddMSnScan
+			MSn Level = 2
+			Isolation Mode = Quadrupole
+			Isolation Offset = Off
+			Isolation Window = 2
+			Reported Mass = Offset Mass
+			Multi-notch Isolation = False
+			Scan Range Mode = Auto Normal
+			FirstMass = 100
+			Scan Priority= 1
+			ActivationType = ETD
+			Is EThcD Active = True
+			Use calibrated charge dependent ETD parameters = True
+			Detector Type = Orbitrap
+			Orbitrap Resolution = 30K
+			Maximum Injection Time (ms) = 100
+			AGC Target = 50000
+			Inject ions for all available parallelizable time = False
+			Microscans = 1
+			Use ETD Internal Calibration = False
+			DataType = Centroid
+			Polarity = Positive
+			Source Fragmentation = False
+			Scan Description = 
+		
+
+
+		Scan ddMSnScan
+			MSn Level = 2
+			Isolation Mode = Quadrupole
+			Isolation Offset = Off
+			Isolation Window = 2
+			Reported Mass = Offset Mass
+			Multi-notch Isolation = False
+			Scan Range Mode = Auto Normal
+			FirstMass = 100
+			Scan Priority= 1
+			ActivationType = ETD
+			Is EThcD Active = False
+			Use calibrated charge dependent ETD parameters = True
+			Detector Type = Orbitrap
+			Orbitrap Resolution = 30K
+			Maximum Injection Time (ms) = 100
+			AGC Target = 50000
+			Inject ions for all available parallelizable time = False
+			Microscans = 1
+			Use ETD Internal Calibration = False
+			DataType = Centroid
+			Polarity = Positive
+			Source Fragmentation = False
+			Scan Description = 
+

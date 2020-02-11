@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<SICData>
+ <ProcessingSummary>
+  <DatasetID>667076</DatasetID>
+  <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\MRM_Example_mzML\QC18PepsR1_4Apr18.mzML</SourceFilePath>
+  <SourceFileDateTime>4/26/2019 3:47 PM</SourceFileDateTime>
+  <SourceFileSizeBytes>2832363</SourceFileSizeBytes>
+  <MASICProcessingDate>2020-02-11 11:39:25 AM</MASICProcessingDate>
+  <MASICVersion>3.0.7346.20829</MASICVersion>
+  <MASICPeakFinderDllVersion>2.0.7346.20799</MASICPeakFinderDllVersion>
+  <ScanCountTotal>60896</ScanCountTotal>
+  <SurveyScanCount>60896</SurveyScanCount>
+  <FragScanCount>0</FragScanCount>
+  <SkipMSMSProcessing>False</SkipMSMSProcessing>
+  <ParentIonDecoyMassDa>0.0000</ParentIonDecoyMassDa>
+ </ProcessingSummary>
+ <MemoryOptions>
+  <CacheAlwaysDisabled>False</CacheAlwaysDisabled>
+  <CacheSpectraToRetainInMemory>1000</CacheSpectraToRetainInMemory>
+ </MemoryOptions>
+ <SICOptions>
+  <SICToleranceDa>0.6000</SICToleranceDa>
+  <SICTolerance>0.6000</SICTolerance>
+  <SICToleranceIsPPM>False</SICToleranceIsPPM>
+  <RefineReportedParentIonMZ>False</RefineReportedParentIonMZ>
+  <ScanRangeStart>0</ScanRangeStart>
+  <ScanRangeEnd>0</ScanRangeEnd>
+  <RTRangeStart>0</RTRangeStart>
+  <RTRangeEnd>0</RTRangeEnd>
+  <CompressMSSpectraData>True</CompressMSSpectraData>
+  <CompressMSMSSpectraData>True</CompressMSMSSpectraData>
+  <CompressToleranceDivisorForDa>5.0</CompressToleranceDivisorForDa>
+  <CompressToleranceDivisorForPPM>3.0</CompressToleranceDivisorForPPM>
+  <MaxSICPeakWidthMinutesBackward>5</MaxSICPeakWidthMinutesBackward>
+  <MaxSICPeakWidthMinutesForward>5</MaxSICPeakWidthMinutesForward>
+  <IntensityThresholdFractionMax>0.01</IntensityThresholdFractionMax>
+  <IntensityThresholdAbsoluteMinimum>0</IntensityThresholdAbsoluteMinimum>
+  <SICNoiseThresholdMode>TrimmedMedianByAbundance</SICNoiseThresholdMode>
+  <SICNoiseThresholdIntensity>0</SICNoiseThresholdIntensity>
+  <SICNoiseFractionLowIntensityDataToAverage>0.75</SICNoiseFractionLowIntensityDataToAverage>
+  <SICNoiseMinimumSignalToNoiseRatio>0</SICNoiseMinimumSignalToNoiseRatio>
+  <MaxDistanceScansNoOverlap>0</MaxDistanceScansNoOverlap>
+  <MaxAllowedUpwardSpikeFractionMax>0.2</MaxAllowedUpwardSpikeFractionMax>
+  <InitialPeakWidthScansScaler>1</InitialPeakWidthScansScaler>
+  <InitialPeakWidthScansMaximum>30</InitialPeakWidthScansMaximum>
+  <FindPeaksOnSmoothedData>True</FindPeaksOnSmoothedData>
+  <SmoothDataRegardlessOfMinimumPeakWidth>True</SmoothDataRegardlessOfMinimumPeakWidth>
+  <UseButterworthSmooth>True</UseButterworthSmooth>
+  <ButterworthSamplingFrequency>0.25</ButterworthSamplingFrequency>
+  <ButterworthSamplingFrequencyDoubledForSIMData>True</ButterworthSamplingFrequencyDoubledForSIMData>
+  <UseSavitzkyGolaySmooth>False</UseSavitzkyGolaySmooth>
+  <SavitzkyGolayFilterOrder>0</SavitzkyGolayFilterOrder>
+  <MassSpectraNoiseThresholdMode>TrimmedMedianByAbundance</MassSpectraNoiseThresholdMode>
+  <MassSpectraNoiseThresholdIntensity>0</MassSpectraNoiseThresholdIntensity>
+  <MassSpectraNoiseFractionLowIntensityDataToAverage>0.5</MassSpectraNoiseFractionLowIntensityDataToAverage>
+  <MassSpectraNoiseMinimumSignalToNoiseRatio>2</MassSpectraNoiseMinimumSignalToNoiseRatio>
+  <ReplaceSICZeroesWithMinimumPositiveValueFromMSData>True</ReplaceSICZeroesWithMinimumPositiveValueFromMSData>
+  <SaveSmoothedData>False</SaveSmoothedData>
+  <SimilarIonMZToleranceHalfWidth>0.1</SimilarIonMZToleranceHalfWidth>
+  <SimilarIonToleranceHalfWidthMinutes>5</SimilarIonToleranceHalfWidthMinutes>
+  <SpectrumSimilarityMinimum>0.7</SpectrumSimilarityMinimum>
+ </SICOptions>
+ <BinningOptions>
+  <BinStartX>50</BinStartX>
+  <BinEndX>2000</BinEndX>
+  <BinSize>1</BinSize>
+  <MaximumBinCount>100000</MaximumBinCount>
+  <IntensityPrecisionPercent>1</IntensityPrecisionPercent>
+  <Normalize>False</Normalize>
+  <SumAllIntensitiesForBin>True</SumAllIntensitiesForBin>
+ </BinningOptions>
+ <CustomSICValues>
+  <MZList />
+  <MZToleranceDaList />
+  <ScanCenterList />
+  <ScanToleranceList />
+  <ScanTolerance>1000</ScanTolerance>
+  <ScanType>Absolute</ScanType>
+  <LimitSearchToCustomMZList>False</LimitSearchToCustomMZList>
+ </CustomSICValues>
+ <ProcessingStats>
+  <CacheEventCount>120792</CacheEventCount>
+  <UnCacheEventCount>60896</UnCacheEventCount>
+  <PeakMemoryUsageMB>160.27</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>17.89</TotalProcessingTimeSeconds>
+ </ProcessingStats>
+ <ProcessingComplete>True</ProcessingComplete>
+</SICData>

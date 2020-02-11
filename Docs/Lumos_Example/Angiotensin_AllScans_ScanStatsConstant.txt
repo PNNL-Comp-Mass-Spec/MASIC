@@ -1,0 +1,17 @@
+Setting	Value
+Scan Description	
+Micro Scan Count	1
+Average Scan by Inst	No
+Access ID	0
+API Process Delay	-1.000
+Multi Inject Info	
+SPS Masses	
+SPS Masses Continued	
+Conversion Parameter I	0.000000
+Conversion Parameter A	0.000000
+Conversion Parameter D	0.000000
+Conversion Parameter E	0.000000
+RF Comp. (ppm)	0.00
+Number of LM Found	0
+LM Correction (ppm)	0.00
+Reagent Ion Injection Time (ms)	0.000
