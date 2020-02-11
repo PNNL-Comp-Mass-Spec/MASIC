@@ -10,9 +10,9 @@
     <ScanCountMS>27</ScanCountMS>
     <ScanCountMSn>270</ScanCountMSn>
     <Elution_Time_Max>39.5167</Elution_Time_Max>
-    <AcqTimeMinutes>0.00</AcqTimeMinutes>
+    <AcqTimeMinutes>39.52</AcqTimeMinutes>
     <StartTime>2006-03-24 11:42:06 AM</StartTime>
-    <EndTime>2006-03-24 11:42:06 AM</EndTime>
+    <EndTime>2006-03-24 12:21:37 PM</EndTime>
     <FileSizeBytes>940496</FileSizeBytes>
   </AcquisitionInfo>
   <TICInfo>
@@ -21,7 +21,7 @@
     <BPI_Max_MS>1.5599E+06</BPI_Max_MS>
     <BPI_Max_MSn>19510</BPI_Max_MSn>
     <TIC_Median_MS>1.3909E+06</TIC_Median_MS>
-    <TIC_Median_MSn>3271.8</TIC_Median_MSn>
+    <TIC_Median_MSn>3271.9</TIC_Median_MSn>
     <BPI_Median_MS>101284</BPI_Median_MS>
     <BPI_Median_MSn>445.82</BPI_Median_MSn>
   </TICInfo>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <SICData>
  <ProcessingSummary>
-  <DatasetNumber>0</DatasetNumber>
+  <DatasetID>0</DatasetID>
   <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\QExactive_Example_mzML\QC_Shew_18_02_Excerpt.mzML</SourceFilePath>
   <SourceFileDateTime>5/1/2019 7:24 PM</SourceFileDateTime>
   <SourceFileSizeBytes>7345105</SourceFileSizeBytes>
-  <MASICProcessingDate>5/24/2019 2:20:19 PM</MASICProcessingDate>
-  <MASICVersion>3.0.7083.25807</MASICVersion>
-  <MASICPeakFinderDllVersion>2.0.7083.19258</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-02-11 11:52:08 AM</MASICProcessingDate>
+  <MASICVersion>3.0.7346.21329</MASICVersion>
+  <MASICPeakFinderDllVersion>2.0.7346.20799</MASICPeakFinderDllVersion>
   <ScanCountTotal>997</ScanCountTotal>
   <SurveyScanCount>79</SurveyScanCount>
   <FragScanCount>918</FragScanCount>
@@ -34047,8 +34047,8 @@
  <ProcessingStats>
   <CacheEventCount>0</CacheEventCount>
   <UnCacheEventCount>0</UnCacheEventCount>
-  <PeakMemoryUsageMB>60.05</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>2.5</TotalProcessingTimeSeconds>
+  <PeakMemoryUsageMB>54.76</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>1.92</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <SICData>
  <ProcessingSummary>
-  <DatasetNumber>0</DatasetNumber>
+  <DatasetID>0</DatasetID>
   <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML</SourceFilePath>
   <SourceFileDateTime>3/24/2006 11:42 AM</SourceFileDateTime>
   <SourceFileSizeBytes>940496</SourceFileSizeBytes>
-  <MASICProcessingDate>3/5/2019 4:27:56 PM</MASICProcessingDate>
-  <MASICVersion>2.8.6969.25525</MASICVersion>
-  <MASICPeakFinderDllVersion>1.1.6969.25525</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-02-11 11:17:47 AM</MASICProcessingDate>
+  <MASICVersion>3.0.7235.27701</MASICVersion>
+  <MASICPeakFinderDllVersion>2.0.7235.23950</MASICPeakFinderDllVersion>
   <ScanCountTotal>297</ScanCountTotal>
   <SurveyScanCount>27</SurveyScanCount>
   <FragScanCount>270</FragScanCount>
@@ -100,7 +100,7 @@
   <PeakBaselineNoiseStDev>1125</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>122900</StatMomentsArea>
+  <StatMomentsArea>122901</StatMomentsArea>
   <CenterOfMassScan>7450</CenterOfMassScan>
   <PeakStDev>21.1</PeakStDev>
   <PeakSkew>0.06817</PeakSkew>
@@ -174,7 +174,7 @@
   <PeakBaselineNoiseStDev>1066</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>16</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>125028</StatMomentsArea>
+  <StatMomentsArea>125029</StatMomentsArea>
   <CenterOfMassScan>7451</CenterOfMassScan>
   <PeakStDev>21.6</PeakStDev>
   <PeakSkew>0.3653</PeakSkew>
@@ -211,7 +211,7 @@
   <PeakBaselineNoiseStDev>1066</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>16</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>125028</StatMomentsArea>
+  <StatMomentsArea>125029</StatMomentsArea>
   <CenterOfMassScan>7451</CenterOfMassScan>
   <PeakStDev>21.6</PeakStDev>
   <PeakSkew>0.3653</PeakSkew>
@@ -288,7 +288,7 @@
   <StatMomentsArea>236736</StatMomentsArea>
   <CenterOfMassScan>7380</CenterOfMassScan>
   <PeakStDev>17.8</PeakStDev>
-  <PeakSkew>-0.03723</PeakSkew>
+  <PeakSkew>-0.03722</PeakSkew>
   <PeakKSStat>0.337</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -325,7 +325,7 @@
   <StatMomentsArea>236736</StatMomentsArea>
   <CenterOfMassScan>7380</CenterOfMassScan>
   <PeakStDev>17.8</PeakStDev>
-  <PeakSkew>-0.03723</PeakSkew>
+  <PeakSkew>-0.03722</PeakSkew>
   <PeakKSStat>0.337</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -399,7 +399,7 @@
   <StatMomentsArea>149435</StatMomentsArea>
   <CenterOfMassScan>7379</CenterOfMassScan>
   <PeakStDev>17.5</PeakStDev>
-  <PeakSkew>-0.01779</PeakSkew>
+  <PeakSkew>-0.0178</PeakSkew>
   <PeakKSStat>0.3335</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -436,7 +436,7 @@
   <StatMomentsArea>88937</StatMomentsArea>
   <CenterOfMassScan>7507</CenterOfMassScan>
   <PeakStDev>18</PeakStDev>
-  <PeakSkew>0.004621</PeakSkew>
+  <PeakSkew>0.00462</PeakSkew>
   <PeakKSStat>0.3234</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -470,7 +470,7 @@
   <PeakBaselineNoiseStDev>745</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>71095</StatMomentsArea>
+  <StatMomentsArea>71096</StatMomentsArea>
   <CenterOfMassScan>7454</CenterOfMassScan>
   <PeakStDev>22.5</PeakStDev>
   <PeakSkew>0.1884</PeakSkew>
@@ -507,7 +507,7 @@
   <PeakBaselineNoiseStDev>4820</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>274148</StatMomentsArea>
+  <StatMomentsArea>274149</StatMomentsArea>
   <CenterOfMassScan>7493</CenterOfMassScan>
   <PeakStDev>27.9</PeakStDev>
   <PeakSkew>-0.6555</PeakSkew>
@@ -544,7 +544,7 @@
   <PeakBaselineNoiseStDev>3371</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>699912</StatMomentsArea>
+  <StatMomentsArea>699914</StatMomentsArea>
   <CenterOfMassScan>7450</CenterOfMassScan>
   <PeakStDev>30</PeakStDev>
   <PeakSkew>0.2604</PeakSkew>
@@ -581,7 +581,7 @@
   <PeakBaselineNoiseStDev>3371</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>699912</StatMomentsArea>
+  <StatMomentsArea>699914</StatMomentsArea>
   <CenterOfMassScan>7450</CenterOfMassScan>
   <PeakStDev>30</PeakStDev>
   <PeakSkew>0.2604</PeakSkew>
@@ -618,7 +618,7 @@
   <PeakBaselineNoiseStDev>3371</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>699912</StatMomentsArea>
+  <StatMomentsArea>699914</StatMomentsArea>
   <CenterOfMassScan>7450</CenterOfMassScan>
   <PeakStDev>30</PeakStDev>
   <PeakSkew>0.2604</PeakSkew>
@@ -729,7 +729,7 @@
   <PeakBaselineNoiseStDev>2269</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>16</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>309532</StatMomentsArea>
+  <StatMomentsArea>309533</StatMomentsArea>
   <CenterOfMassScan>7454</CenterOfMassScan>
   <PeakStDev>21.9</PeakStDev>
   <PeakSkew>0.1218</PeakSkew>
@@ -766,7 +766,7 @@
   <PeakBaselineNoiseStDev>2479</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>392941</StatMomentsArea>
+  <StatMomentsArea>392942</StatMomentsArea>
   <CenterOfMassScan>7453</CenterOfMassScan>
   <PeakStDev>21.8</PeakStDev>
   <PeakSkew>0.1433</PeakSkew>
@@ -803,7 +803,7 @@
   <PeakBaselineNoiseStDev>2037</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>223791</StatMomentsArea>
+  <StatMomentsArea>223792</StatMomentsArea>
   <CenterOfMassScan>7442</CenterOfMassScan>
   <PeakStDev>19.5</PeakStDev>
   <PeakSkew>0.1121</PeakSkew>
@@ -1025,7 +1025,7 @@
   <PeakBaselineNoiseStDev>745</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>48392</StatMomentsArea>
+  <StatMomentsArea>48393</StatMomentsArea>
   <CenterOfMassScan>7479</CenterOfMassScan>
   <PeakStDev>27.2</PeakStDev>
   <PeakSkew>-0.3859</PeakSkew>
@@ -1062,7 +1062,7 @@
   <PeakBaselineNoiseStDev>3945</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>453072</StatMomentsArea>
+  <StatMomentsArea>453073</StatMomentsArea>
   <CenterOfMassScan>7446</CenterOfMassScan>
   <PeakStDev>20.9</PeakStDev>
   <PeakSkew>0.1329</PeakSkew>
@@ -1173,7 +1173,7 @@
   <PeakBaselineNoiseStDev>10653</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>881076</StatMomentsArea>
+  <StatMomentsArea>881077</StatMomentsArea>
   <CenterOfMassScan>7499</CenterOfMassScan>
   <PeakStDev>12.9</PeakStDev>
   <PeakSkew>-0.1159</PeakSkew>
@@ -1432,7 +1432,7 @@
   <PeakBaselineNoiseStDev>1754</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>177220</StatMomentsArea>
+  <StatMomentsArea>177221</StatMomentsArea>
   <CenterOfMassScan>7489</CenterOfMassScan>
   <PeakStDev>19.5</PeakStDev>
   <PeakSkew>-0.08666</PeakSkew>
@@ -1469,7 +1469,7 @@
   <PeakBaselineNoiseStDev>1107</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>29798</StatMomentsArea>
+  <StatMomentsArea>29799</StatMomentsArea>
   <CenterOfMassScan>7381</CenterOfMassScan>
   <PeakStDev>14.5</PeakStDev>
   <PeakSkew>-0.1894</PeakSkew>
@@ -1543,7 +1543,7 @@
   <PeakBaselineNoiseStDev>866</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>83370</StatMomentsArea>
+  <StatMomentsArea>83371</StatMomentsArea>
   <CenterOfMassScan>7452</CenterOfMassScan>
   <PeakStDev>22.1</PeakStDev>
   <PeakSkew>0.08355</PeakSkew>
@@ -1691,7 +1691,7 @@
   <PeakBaselineNoiseStDev>1535</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>126453</StatMomentsArea>
+  <StatMomentsArea>126454</StatMomentsArea>
   <CenterOfMassScan>7367</CenterOfMassScan>
   <PeakStDev>18.7</PeakStDev>
   <PeakSkew>0.02163</PeakSkew>
@@ -1731,7 +1731,7 @@
   <StatMomentsArea>33835</StatMomentsArea>
   <CenterOfMassScan>7331</CenterOfMassScan>
   <PeakStDev>10.9</PeakStDev>
-  <PeakSkew>-0.09466</PeakSkew>
+  <PeakSkew>-0.09465</PeakSkew>
   <PeakKSStat>0.3983</PeakKSStat>
   <StatMomentsDataCountUsed>6</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -1765,7 +1765,7 @@
   <PeakBaselineNoiseStDev>1325</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>76776</StatMomentsArea>
+  <StatMomentsArea>76777</StatMomentsArea>
   <CenterOfMassScan>7474</CenterOfMassScan>
   <PeakStDev>24.4</PeakStDev>
   <PeakSkew>-0.01275</PeakSkew>
@@ -1802,7 +1802,7 @@
   <PeakBaselineNoiseStDev>900</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>78681</StatMomentsArea>
+  <StatMomentsArea>78682</StatMomentsArea>
   <CenterOfMassScan>7452</CenterOfMassScan>
   <PeakStDev>22.8</PeakStDev>
   <PeakSkew>0.1605</PeakSkew>
@@ -1839,7 +1839,7 @@
   <PeakBaselineNoiseStDev>900</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>3798.8</StatMomentsArea>
+  <StatMomentsArea>3798.9</StatMomentsArea>
   <CenterOfMassScan>7342</CenterOfMassScan>
   <PeakStDev>8.32</PeakStDev>
   <PeakSkew>0.2302</PeakSkew>
@@ -1876,7 +1876,7 @@
   <PeakBaselineNoiseStDev>766</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>120689</StatMomentsArea>
+  <StatMomentsArea>120690</StatMomentsArea>
   <CenterOfMassScan>7453</CenterOfMassScan>
   <PeakStDev>23.1</PeakStDev>
   <PeakSkew>0.1846</PeakSkew>
@@ -1950,10 +1950,10 @@
   <PeakBaselineNoiseStDev>680</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>75381</StatMomentsArea>
+  <StatMomentsArea>75382</StatMomentsArea>
   <CenterOfMassScan>7441</CenterOfMassScan>
   <PeakStDev>28.6</PeakStDev>
-  <PeakSkew>-0.05476</PeakSkew>
+  <PeakSkew>-0.05477</PeakSkew>
   <PeakKSStat>0.279</PeakKSStat>
   <StatMomentsDataCountUsed>14</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -1987,10 +1987,10 @@
   <PeakBaselineNoiseStDev>680</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>75381</StatMomentsArea>
+  <StatMomentsArea>75382</StatMomentsArea>
   <CenterOfMassScan>7441</CenterOfMassScan>
   <PeakStDev>28.6</PeakStDev>
-  <PeakSkew>-0.05476</PeakSkew>
+  <PeakSkew>-0.05477</PeakSkew>
   <PeakKSStat>0.279</PeakKSStat>
   <StatMomentsDataCountUsed>14</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -2024,7 +2024,7 @@
   <PeakBaselineNoiseStDev>8122</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>962545</StatMomentsArea>
+  <StatMomentsArea>962547</StatMomentsArea>
   <CenterOfMassScan>7450</CenterOfMassScan>
   <PeakStDev>21.1</PeakStDev>
   <PeakSkew>0.06395</PeakSkew>
@@ -2061,7 +2061,7 @@
   <PeakBaselineNoiseStDev>2874</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>323432</StatMomentsArea>
+  <StatMomentsArea>323433</StatMomentsArea>
   <CenterOfMassScan>7448</CenterOfMassScan>
   <PeakStDev>20.6</PeakStDev>
   <PeakSkew>0.08824</PeakSkew>
@@ -2172,7 +2172,7 @@
   <PeakBaselineNoiseStDev>1768</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>196160</StatMomentsArea>
+  <StatMomentsArea>196161</StatMomentsArea>
   <CenterOfMassScan>7450</CenterOfMassScan>
   <PeakStDev>23</PeakStDev>
   <PeakSkew>0.1781</PeakSkew>
@@ -2209,7 +2209,7 @@
   <PeakBaselineNoiseStDev>1768</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>196160</StatMomentsArea>
+  <StatMomentsArea>196161</StatMomentsArea>
   <CenterOfMassScan>7450</CenterOfMassScan>
   <PeakStDev>23</PeakStDev>
   <PeakSkew>0.1781</PeakSkew>
@@ -2320,10 +2320,10 @@
   <PeakBaselineNoiseStDev>891</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>51730</StatMomentsArea>
+  <StatMomentsArea>51731</StatMomentsArea>
   <CenterOfMassScan>7448</CenterOfMassScan>
   <PeakStDev>28</PeakStDev>
-  <PeakSkew>0.003218</PeakSkew>
+  <PeakSkew>0.003214</PeakSkew>
   <PeakKSStat>0.2789</PeakKSStat>
   <StatMomentsDataCountUsed>13</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -2357,10 +2357,10 @@
   <PeakBaselineNoiseStDev>891</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>51730</StatMomentsArea>
+  <StatMomentsArea>51731</StatMomentsArea>
   <CenterOfMassScan>7448</CenterOfMassScan>
   <PeakStDev>28</PeakStDev>
-  <PeakSkew>0.003218</PeakSkew>
+  <PeakSkew>0.003214</PeakSkew>
   <PeakKSStat>0.2789</PeakKSStat>
   <StatMomentsDataCountUsed>13</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -2468,7 +2468,7 @@
   <PeakBaselineNoiseStDev>868</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>10</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>9465.3</StatMomentsArea>
+  <StatMomentsArea>9465.4</StatMomentsArea>
   <CenterOfMassScan>7510</CenterOfMassScan>
   <PeakStDev>9.24</PeakStDev>
   <PeakSkew>-0.01653</PeakSkew>
@@ -2508,7 +2508,7 @@
   <StatMomentsArea>21519</StatMomentsArea>
   <CenterOfMassScan>7325</CenterOfMassScan>
   <PeakStDev>13.2</PeakStDev>
-  <PeakSkew>-0.088</PeakSkew>
+  <PeakSkew>-0.08801</PeakSkew>
   <PeakKSStat>0.3795</PeakKSStat>
   <StatMomentsDataCountUsed>7</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -2535,7 +2535,7 @@
   <PeakIntensity>1882.8</PeakIntensity>
   <PeakSignalToNoiseRatio>1.494</PeakSignalToNoiseRatio>
   <FWHMInScans>104</FWHMInScans>
-  <PeakArea>268580</PeakArea>
+  <PeakArea>268579</PeakArea>
   <ShoulderCount>1</ShoulderCount>
   <ParentIonIntensity>1635.7</ParentIonIntensity>
   <PeakBaselineNoiseLevel>1260.3</PeakBaselineNoiseLevel>
@@ -2582,7 +2582,7 @@
   <StatMomentsArea>88362</StatMomentsArea>
   <CenterOfMassScan>7379</CenterOfMassScan>
   <PeakStDev>17.4</PeakStDev>
-  <PeakSkew>-0.009655</PeakSkew>
+  <PeakSkew>-0.009656</PeakSkew>
   <PeakKSStat>0.3326</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -2599,33 +2599,33 @@
   <SurveyScanNumber>7499</SurveyScanNumber>
   <FragScanNumber>7504</FragScanNumber>
   <FragScanTime>38.98217</FragScanTime>
-  <OptimalPeakApexScanNumber>7499</OptimalPeakApexScanNumber>
+  <OptimalPeakApexScanNumber>7433</OptimalPeakApexScanNumber>
   <PeakApexOverrideParentIonIndex>-1</PeakApexOverrideParentIonIndex>
   <CustomSICPeak>False</CustomSICPeak>
   <SICScanType>SurveyScan</SICScanType>
-  <PeakScanStart>7488</PeakScanStart>
+  <PeakScanStart>7389</PeakScanStart>
   <PeakScanEnd>7587</PeakScanEnd>
-  <PeakScanMaxIntensity>7499</PeakScanMaxIntensity>
-  <PeakIntensity>3387</PeakIntensity>
-  <PeakSignalToNoiseRatio>0.3881</PeakSignalToNoiseRatio>
-  <FWHMInScans>55</FWHMInScans>
-  <PeakArea>295521</PeakArea>
-  <ShoulderCount>0</ShoulderCount>
+  <PeakScanMaxIntensity>7433</PeakScanMaxIntensity>
+  <PeakIntensity>4814.7</PeakIntensity>
+  <PeakSignalToNoiseRatio>0.5516</PeakSignalToNoiseRatio>
+  <FWHMInScans>99</FWHMInScans>
+  <PeakArea>671502</PeakArea>
+  <ShoulderCount>1</ShoulderCount>
   <ParentIonIntensity>3182</ParentIonIntensity>
   <PeakBaselineNoiseLevel>8727.9</PeakBaselineNoiseLevel>
   <PeakBaselineNoiseStDev>11494</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>144823</StatMomentsArea>
-  <CenterOfMassScan>7499</CenterOfMassScan>
-  <PeakStDev>13</PeakStDev>
-  <PeakSkew>-0.08549</PeakSkew>
+  <StatMomentsArea>194422</StatMomentsArea>
+  <CenterOfMassScan>7434</CenterOfMassScan>
+  <PeakStDev>12.7</PeakStDev>
+  <PeakSkew>-0.1189</PeakSkew>
   <PeakKSStat>0.3727</PeakKSStat>
   <StatMomentsDataCountUsed>5</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
   <SICScanStart>7301</SICScanStart>
   <SICScanIntervals>0BBBBBBBBBBBBBBBBBBBBBBBBBB</SICScanIntervals>
-  <SICPeakIndexStart>17</SICPeakIndexStart>
+  <SICPeakIndexStart>8</SICPeakIndexStart>
   <SICPeakIndexEnd>26</SICPeakIndexEnd>
   <SICDataCount>27</SICDataCount>
   <IntensityDataList>40382.5,37365.1,34559.3,25515.7,15894.8,9538.5,5125.6,6071.7,3678.6,2985.6,2409.8,5506.9,3193.5,3649.2,4703.0,3778.0,4299.6,2708.8,2754.1,3930.8,1893.0,2546.5,3013.7,2833.9,2038.3,2357.9,2919.1</IntensityDataList>
@@ -2653,7 +2653,7 @@
   <PeakBaselineNoiseStDev>11494</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>73514</StatMomentsArea>
+  <StatMomentsArea>73515</StatMomentsArea>
   <CenterOfMassScan>7376</CenterOfMassScan>
   <PeakStDev>6.56</PeakStDev>
   <PeakSkew>0.3293</PeakSkew>
@@ -2690,7 +2690,7 @@
   <PeakBaselineNoiseStDev>11494</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>73514</StatMomentsArea>
+  <StatMomentsArea>73515</StatMomentsArea>
   <CenterOfMassScan>7376</CenterOfMassScan>
   <PeakStDev>6.56</PeakStDev>
   <PeakSkew>0.3293</PeakSkew>
@@ -2764,7 +2764,7 @@
   <PeakBaselineNoiseStDev>3632</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>9</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>35639</StatMomentsArea>
+  <StatMomentsArea>35640</StatMomentsArea>
   <CenterOfMassScan>7522</CenterOfMassScan>
   <PeakStDev>9.19</PeakStDev>
   <PeakSkew>-0.07579</PeakSkew>
@@ -2804,7 +2804,7 @@
   <StatMomentsArea>33298</StatMomentsArea>
   <CenterOfMassScan>7446</CenterOfMassScan>
   <PeakStDev>20.1</PeakStDev>
-  <PeakSkew>-0.001259</PeakSkew>
+  <PeakSkew>-0.00126</PeakSkew>
   <PeakKSStat>0.3188</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -2838,7 +2838,7 @@
   <PeakBaselineNoiseStDev>2619</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>288690</StatMomentsArea>
+  <StatMomentsArea>288691</StatMomentsArea>
   <CenterOfMassScan>7429</CenterOfMassScan>
   <PeakStDev>22.9</PeakStDev>
   <PeakSkew>0.06534</PeakSkew>
@@ -2875,7 +2875,7 @@
   <PeakBaselineNoiseStDev>2619</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>288690</StatMomentsArea>
+  <StatMomentsArea>288691</StatMomentsArea>
   <CenterOfMassScan>7429</CenterOfMassScan>
   <PeakStDev>22.9</PeakStDev>
   <PeakSkew>0.06534</PeakSkew>
@@ -2949,7 +2949,7 @@
   <PeakBaselineNoiseStDev>8700</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>873472</StatMomentsArea>
+  <StatMomentsArea>873473</StatMomentsArea>
   <CenterOfMassScan>7381</CenterOfMassScan>
   <PeakStDev>17.5</PeakStDev>
   <PeakSkew>-0.0502</PeakSkew>
@@ -2986,7 +2986,7 @@
   <PeakBaselineNoiseStDev>8700</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>873472</StatMomentsArea>
+  <StatMomentsArea>873473</StatMomentsArea>
   <CenterOfMassScan>7381</CenterOfMassScan>
   <PeakStDev>17.5</PeakStDev>
   <PeakSkew>-0.0502</PeakSkew>
@@ -3023,7 +3023,7 @@
   <PeakBaselineNoiseStDev>8700</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>873472</StatMomentsArea>
+  <StatMomentsArea>873473</StatMomentsArea>
   <CenterOfMassScan>7381</CenterOfMassScan>
   <PeakStDev>17.5</PeakStDev>
   <PeakSkew>-0.0502</PeakSkew>
@@ -3097,7 +3097,7 @@
   <PeakBaselineNoiseStDev>706</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>45513</StatMomentsArea>
+  <StatMomentsArea>45514</StatMomentsArea>
   <CenterOfMassScan>7386</CenterOfMassScan>
   <PeakStDev>15.5</PeakStDev>
   <PeakSkew>-0.05095</PeakSkew>
@@ -3174,7 +3174,7 @@
   <StatMomentsArea>86693</StatMomentsArea>
   <CenterOfMassScan>7429</CenterOfMassScan>
   <PeakStDev>20.2</PeakStDev>
-  <PeakSkew>-0.002671</PeakSkew>
+  <PeakSkew>-0.002672</PeakSkew>
   <PeakKSStat>0.3037</PeakKSStat>
   <StatMomentsDataCountUsed>10</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -3211,7 +3211,7 @@
   <StatMomentsArea>86693</StatMomentsArea>
   <CenterOfMassScan>7429</CenterOfMassScan>
   <PeakStDev>20.2</PeakStDev>
-  <PeakSkew>-0.002671</PeakSkew>
+  <PeakSkew>-0.002672</PeakSkew>
   <PeakKSStat>0.3037</PeakKSStat>
   <StatMomentsDataCountUsed>10</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -3245,7 +3245,7 @@
   <PeakBaselineNoiseStDev>1005</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>63552</StatMomentsArea>
+  <StatMomentsArea>63553</StatMomentsArea>
   <CenterOfMassScan>7402</CenterOfMassScan>
   <PeakStDev>17.6</PeakStDev>
   <PeakSkew>-0.07276</PeakSkew>
@@ -3282,7 +3282,7 @@
   <PeakBaselineNoiseStDev>871</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>91059</StatMomentsArea>
+  <StatMomentsArea>91060</StatMomentsArea>
   <CenterOfMassScan>7429</CenterOfMassScan>
   <PeakStDev>20.5</PeakStDev>
   <PeakSkew>-0.06115</PeakSkew>
@@ -3356,7 +3356,7 @@
   <PeakBaselineNoiseStDev>1080</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>20354</StatMomentsArea>
+  <StatMomentsArea>20355</StatMomentsArea>
   <CenterOfMassScan>7513</CenterOfMassScan>
   <PeakStDev>12.8</PeakStDev>
   <PeakSkew>-0.08795</PeakSkew>
@@ -3618,7 +3618,7 @@
   <StatMomentsArea>35879</StatMomentsArea>
   <CenterOfMassScan>7313</CenterOfMassScan>
   <PeakStDev>6.73</PeakStDev>
-  <PeakSkew>-0.2215</PeakSkew>
+  <PeakSkew>-0.2216</PeakSkew>
   <PeakKSStat>0.433</PeakKSStat>
   <StatMomentsDataCountUsed>3</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -3689,7 +3689,7 @@
   <PeakBaselineNoiseStDev>1546</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>110627</StatMomentsArea>
+  <StatMomentsArea>110628</StatMomentsArea>
   <CenterOfMassScan>7324</CenterOfMassScan>
   <PeakStDev>15.3</PeakStDev>
   <PeakSkew>0.1022</PeakSkew>
@@ -3911,7 +3911,7 @@
   <PeakBaselineNoiseStDev>793</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>51663</StatMomentsArea>
+  <StatMomentsArea>51664</StatMomentsArea>
   <CenterOfMassScan>7484</CenterOfMassScan>
   <PeakStDev>23.9</PeakStDev>
   <PeakSkew>-0.2465</PeakSkew>
@@ -3948,7 +3948,7 @@
   <PeakBaselineNoiseStDev>413</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>1797.8</StatMomentsArea>
+  <StatMomentsArea>1797.9</StatMomentsArea>
   <CenterOfMassScan>7455</CenterOfMassScan>
   <PeakStDev>9.39</PeakStDev>
   <PeakSkew>-0.03248</PeakSkew>
@@ -3988,7 +3988,7 @@
   <StatMomentsArea>234030</StatMomentsArea>
   <CenterOfMassScan>7411</CenterOfMassScan>
   <PeakStDev>17.8</PeakStDev>
-  <PeakSkew>-0.003027</PeakSkew>
+  <PeakSkew>-0.003026</PeakSkew>
   <PeakKSStat>0.3313</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -4022,7 +4022,7 @@
   <PeakBaselineNoiseStDev>4269</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>355379</StatMomentsArea>
+  <StatMomentsArea>355380</StatMomentsArea>
   <CenterOfMassScan>7326</CenterOfMassScan>
   <PeakStDev>16.3</PeakStDev>
   <PeakSkew>0.09489</PeakSkew>
@@ -4099,7 +4099,7 @@
   <StatMomentsArea>110404</StatMomentsArea>
   <CenterOfMassScan>7328</CenterOfMassScan>
   <PeakStDev>16.1</PeakStDev>
-  <PeakSkew>0.0002479</PeakSkew>
+  <PeakSkew>0.0002477</PeakSkew>
   <PeakKSStat>0.3505</PeakKSStat>
   <StatMomentsDataCountUsed>8</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -4133,7 +4133,7 @@
   <PeakBaselineNoiseStDev>6359</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>9</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>483551</StatMomentsArea>
+  <StatMomentsArea>483553</StatMomentsArea>
   <CenterOfMassScan>7508</CenterOfMassScan>
   <PeakStDev>13.5</PeakStDev>
   <PeakSkew>0.04296</PeakSkew>
@@ -4170,7 +4170,7 @@
   <PeakBaselineNoiseStDev>6359</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>9</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>483551</StatMomentsArea>
+  <StatMomentsArea>483553</StatMomentsArea>
   <CenterOfMassScan>7508</CenterOfMassScan>
   <PeakStDev>13.5</PeakStDev>
   <PeakSkew>0.04296</PeakSkew>
@@ -4207,7 +4207,7 @@
   <PeakBaselineNoiseStDev>4470</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>414625</StatMomentsArea>
+  <StatMomentsArea>414626</StatMomentsArea>
   <CenterOfMassScan>7422</CenterOfMassScan>
   <PeakStDev>18.2</PeakStDev>
   <PeakSkew>0.1083</PeakSkew>
@@ -4244,7 +4244,7 @@
   <PeakBaselineNoiseStDev>4470</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>27530</StatMomentsArea>
+  <StatMomentsArea>27531</StatMomentsArea>
   <CenterOfMassScan>7502</CenterOfMassScan>
   <PeakStDev>10.5</PeakStDev>
   <PeakSkew>-0.09666</PeakSkew>
@@ -4281,7 +4281,7 @@
   <PeakBaselineNoiseStDev>4470</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>27530</StatMomentsArea>
+  <StatMomentsArea>27531</StatMomentsArea>
   <CenterOfMassScan>7502</CenterOfMassScan>
   <PeakStDev>10.5</PeakStDev>
   <PeakSkew>-0.09666</PeakSkew>
@@ -4318,7 +4318,7 @@
   <PeakBaselineNoiseStDev>1040</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>8199.5</StatMomentsArea>
+  <StatMomentsArea>8199.6</StatMomentsArea>
   <CenterOfMassScan>7336</CenterOfMassScan>
   <PeakStDev>8.72</PeakStDev>
   <PeakSkew>-0.1468</PeakSkew>
@@ -4453,14 +4453,14 @@
   <PeakApexOverrideParentIonIndex>-1</PeakApexOverrideParentIonIndex>
   <CustomSICPeak>False</CustomSICPeak>
   <SICScanType>SurveyScan</SICScanType>
-  <PeakScanStart>7444</PeakScanStart>
+  <PeakScanStart>7378</PeakScanStart>
   <PeakScanEnd>7587</PeakScanEnd>
   <PeakScanMaxIntensity>7510</PeakScanMaxIntensity>
   <PeakIntensity>2597.6</PeakIntensity>
   <PeakSignalToNoiseRatio>1.304</PeakSignalToNoiseRatio>
   <FWHMInScans>65</FWHMInScans>
-  <PeakArea>265995</PeakArea>
-  <ShoulderCount>0</ShoulderCount>
+  <PeakArea>302645</PeakArea>
+  <ShoulderCount>1</ShoulderCount>
   <ParentIonIntensity>3228.1</ParentIonIntensity>
   <PeakBaselineNoiseLevel>1992.2</PeakBaselineNoiseLevel>
   <PeakBaselineNoiseStDev>1022</PeakBaselineNoiseStDev>
@@ -4475,7 +4475,7 @@
   <InterferenceScore>0</InterferenceScore>
   <SICScanStart>7301</SICScanStart>
   <SICScanIntervals>0BBBBBBBBBBBBBBBBBBBBBBBBBB</SICScanIntervals>
-  <SICPeakIndexStart>13</SICPeakIndexStart>
+  <SICPeakIndexStart>7</SICPeakIndexStart>
   <SICPeakIndexEnd>26</SICPeakIndexEnd>
   <SICDataCount>27</SICDataCount>
   <IntensityDataList>1864.0,1633.7,1041.5,878.4,737.8,626.1,309.3,249.3,48.9,15.2,814.2,1168,1019.0,20.9,1433.4,993.9,1466.0,649.9,3489,799,3821.4,1645.7,3221.5,2350.2,1106.4,1901.9,1335.2</IntensityDataList>
@@ -4762,7 +4762,7 @@
   <PeakBaselineNoiseStDev>9517</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>18</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>145735</StatMomentsArea>
+  <StatMomentsArea>145736</StatMomentsArea>
   <CenterOfMassScan>7329</CenterOfMassScan>
   <PeakStDev>10.8</PeakStDev>
   <PeakSkew>-0.02392</PeakSkew>
@@ -5004,33 +5004,33 @@
   <SurveyScanNumber>7356</SurveyScanNumber>
   <FragScanNumber>7357</FragScanNumber>
   <FragScanTime>38.13633</FragScanTime>
-  <OptimalPeakApexScanNumber>7356</OptimalPeakApexScanNumber>
+  <OptimalPeakApexScanNumber>7323</OptimalPeakApexScanNumber>
   <PeakApexOverrideParentIonIndex>-1</PeakApexOverrideParentIonIndex>
   <CustomSICPeak>False</CustomSICPeak>
   <SICScanType>SurveyScan</SICScanType>
-  <PeakScanStart>7356</PeakScanStart>
+  <PeakScanStart>7301</PeakScanStart>
   <PeakScanEnd>7389</PeakScanEnd>
-  <PeakScanMaxIntensity>7356</PeakScanMaxIntensity>
-  <PeakIntensity>24733</PeakIntensity>
-  <PeakSignalToNoiseRatio>0.6511</PeakSignalToNoiseRatio>
-  <FWHMInScans>3</FWHMInScans>
-  <PeakArea>431288</PeakArea>
+  <PeakScanMaxIntensity>7323</PeakScanMaxIntensity>
+  <PeakIntensity>85613</PeakIntensity>
+  <PeakSignalToNoiseRatio>2.254</PeakSignalToNoiseRatio>
+  <FWHMInScans>29</FWHMInScans>
+  <PeakArea>3.8442E+06</PeakArea>
   <ShoulderCount>0</ShoulderCount>
   <ParentIonIntensity>13217</ParentIonIntensity>
   <PeakBaselineNoiseLevel>37986</PeakBaselineNoiseLevel>
   <PeakBaselineNoiseStDev>23537</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>563084</StatMomentsArea>
-  <CenterOfMassScan>7354</CenterOfMassScan>
-  <PeakStDev>6.27</PeakStDev>
-  <PeakSkew>0.2818</PeakSkew>
-  <PeakKSStat>0.6523</PeakKSStat>
-  <StatMomentsDataCountUsed>3</StatMomentsDataCountUsed>
+  <StatMomentsArea>1.0501E+06</StatMomentsArea>
+  <CenterOfMassScan>7321</CenterOfMassScan>
+  <PeakStDev>12.9</PeakStDev>
+  <PeakSkew>0.0167</PeakSkew>
+  <PeakKSStat>0.3506</PeakKSStat>
+  <StatMomentsDataCountUsed>7</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
   <SICScanStart>7301</SICScanStart>
   <SICScanIntervals>0BBBBBBBBBBBBBBBBBBBBBBBBBB</SICScanIntervals>
-  <SICPeakIndexStart>5</SICPeakIndexStart>
+  <SICPeakIndexStart>0</SICPeakIndexStart>
   <SICPeakIndexEnd>8</SICPeakIndexEnd>
   <SICDataCount>27</SICDataCount>
   <IntensityDataList>38190.8,102905.2,85612.6,62405.3,16900.8,13217.0,10412.7,9573.0,8484.0,12033.9,9692.9,25410.6,32129.3,47620.1,56668.2,50940.3,64178.9,36501.9,28040.8,60447.6,41105.4,35602.3,47767.5,36903.1,31550.4,30366.8,30968.3</IntensityDataList>
@@ -5058,7 +5058,7 @@
   <PeakBaselineNoiseStDev>23537</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>914328</StatMomentsArea>
+  <StatMomentsArea>914335</StatMomentsArea>
   <CenterOfMassScan>7481</CenterOfMassScan>
   <PeakStDev>22.6</PeakStDev>
   <PeakSkew>0.01971</PeakSkew>
@@ -5095,7 +5095,7 @@
   <PeakBaselineNoiseStDev>23537</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>914328</StatMomentsArea>
+  <StatMomentsArea>914335</StatMomentsArea>
   <CenterOfMassScan>7481</CenterOfMassScan>
   <PeakStDev>22.6</PeakStDev>
   <PeakSkew>0.01971</PeakSkew>
@@ -5169,10 +5169,10 @@
   <PeakBaselineNoiseStDev>3767</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>27473</StatMomentsArea>
+  <StatMomentsArea>27474</StatMomentsArea>
   <CenterOfMassScan>7470</CenterOfMassScan>
   <PeakStDev>17.1</PeakStDev>
-  <PeakSkew>0.0584</PeakSkew>
+  <PeakSkew>0.05839</PeakSkew>
   <PeakKSStat>0.3561</PeakKSStat>
   <StatMomentsDataCountUsed>8</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -5357,7 +5357,7 @@
   <StatMomentsArea>12134</StatMomentsArea>
   <CenterOfMassScan>7511</CenterOfMassScan>
   <PeakStDev>8.76</PeakStDev>
-  <PeakSkew>-0.08147</PeakSkew>
+  <PeakSkew>-0.08146</PeakSkew>
   <PeakKSStat>0.4254</PeakKSStat>
   <StatMomentsDataCountUsed>5</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -5687,7 +5687,7 @@
   <PeakBaselineNoiseStDev>3525</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>394282</StatMomentsArea>
+  <StatMomentsArea>394283</StatMomentsArea>
   <CenterOfMassScan>7451</CenterOfMassScan>
   <PeakStDev>22.1</PeakStDev>
   <PeakSkew>0.1913</PeakSkew>
@@ -5798,7 +5798,7 @@
   <PeakBaselineNoiseStDev>1293</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>16063</StatMomentsArea>
+  <StatMomentsArea>16064</StatMomentsArea>
   <CenterOfMassScan>7494</CenterOfMassScan>
   <PeakStDev>16.2</PeakStDev>
   <PeakSkew>-0.3045</PeakSkew>
@@ -5835,7 +5835,7 @@
   <PeakBaselineNoiseStDev>1702</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>22364</StatMomentsArea>
+  <StatMomentsArea>22365</StatMomentsArea>
   <CenterOfMassScan>7503</CenterOfMassScan>
   <PeakStDev>15.3</PeakStDev>
   <PeakSkew>-0.6921</PeakSkew>
@@ -5899,7 +5899,7 @@
   <PeakScanStart>7389</PeakScanStart>
   <PeakScanEnd>7587</PeakScanEnd>
   <PeakScanMaxIntensity>7499</PeakScanMaxIntensity>
-  <PeakIntensity>2493.8</PeakIntensity>
+  <PeakIntensity>2493.9</PeakIntensity>
   <PeakSignalToNoiseRatio>1.528</PeakSignalToNoiseRatio>
   <FWHMInScans>113</FWHMInScans>
   <PeakArea>330726</PeakArea>
@@ -5936,7 +5936,7 @@
   <PeakScanStart>7389</PeakScanStart>
   <PeakScanEnd>7587</PeakScanEnd>
   <PeakScanMaxIntensity>7499</PeakScanMaxIntensity>
-  <PeakIntensity>2493.8</PeakIntensity>
+  <PeakIntensity>2493.9</PeakIntensity>
   <PeakSignalToNoiseRatio>1.528</PeakSignalToNoiseRatio>
   <FWHMInScans>113</FWHMInScans>
   <PeakArea>330726</PeakArea>
@@ -6097,7 +6097,7 @@
   <StatMomentsArea>35838</StatMomentsArea>
   <CenterOfMassScan>7502</CenterOfMassScan>
   <PeakStDev>15.3</PeakStDev>
-  <PeakSkew>0.02257</PeakSkew>
+  <PeakSkew>0.02258</PeakSkew>
   <PeakKSStat>0.3342</PeakKSStat>
   <StatMomentsDataCountUsed>8</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -6114,34 +6114,34 @@
   <SurveyScanNumber>7301</SurveyScanNumber>
   <FragScanNumber>7304</FragScanNumber>
   <FragScanTime>37.8315</FragScanTime>
-  <OptimalPeakApexScanNumber>7301</OptimalPeakApexScanNumber>
+  <OptimalPeakApexScanNumber>7312</OptimalPeakApexScanNumber>
   <PeakApexOverrideParentIonIndex>-1</PeakApexOverrideParentIonIndex>
   <CustomSICPeak>False</CustomSICPeak>
   <SICScanType>SurveyScan</SICScanType>
   <PeakScanStart>7301</PeakScanStart>
-  <PeakScanEnd>7301</PeakScanEnd>
-  <PeakScanMaxIntensity>7301</PeakScanMaxIntensity>
-  <PeakIntensity>5587.5</PeakIntensity>
-  <PeakSignalToNoiseRatio>5.963</PeakSignalToNoiseRatio>
-  <FWHMInScans>0</FWHMInScans>
-  <PeakArea>5866.8</PeakArea>
+  <PeakScanEnd>7378</PeakScanEnd>
+  <PeakScanMaxIntensity>7312</PeakScanMaxIntensity>
+  <PeakIntensity>1792.4</PeakIntensity>
+  <PeakSignalToNoiseRatio>1.913</PeakSignalToNoiseRatio>
+  <FWHMInScans>22</FWHMInScans>
+  <PeakArea>104360</PeakArea>
   <ShoulderCount>0</ShoulderCount>
   <ParentIonIntensity>4639.3</ParentIonIntensity>
   <PeakBaselineNoiseLevel>937.08</PeakBaselineNoiseLevel>
   <PeakBaselineNoiseStDev>1036</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>37856</StatMomentsArea>
-  <CenterOfMassScan>7312</CenterOfMassScan>
-  <PeakStDev>6.72</PeakStDev>
-  <PeakSkew>-0.1933</PeakSkew>
-  <PeakKSStat>0.433</PeakKSStat>
-  <StatMomentsDataCountUsed>3</StatMomentsDataCountUsed>
+  <StatMomentsArea>27797</StatMomentsArea>
+  <CenterOfMassScan>7314</CenterOfMassScan>
+  <PeakStDev>11.5</PeakStDev>
+  <PeakSkew>0.2618</PeakSkew>
+  <PeakKSStat>0.3713</PeakKSStat>
+  <StatMomentsDataCountUsed>6</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
   <SICScanStart>7301</SICScanStart>
   <SICScanIntervals>0BBBBBBBBBBBBBBBBBBBBBBBBBB</SICScanIntervals>
   <SICPeakIndexStart>0</SICPeakIndexStart>
-  <SICPeakIndexEnd>0</SICPeakIndexEnd>
+  <SICPeakIndexEnd>7</SICPeakIndexEnd>
   <SICDataCount>27</SICDataCount>
   <IntensityDataList>5587.5,372.5,914.5,1082.8,1006.6,617.6,109.1,35.4,345.6,640.1,309.5,586.8,1417.7,497.2,514.2,659.3,2289.2,879.2,1134.7,175.4,582.5,847.9,911.2,851.0,1206,790.8,936.8</IntensityDataList>
   <MassDataList>831.751,831.857,831.462,831.476,832.331,831.923,831.796,,831.338,831.748,831.804,831.302,831.735,831.627,832.313,831.78,831.444,831.592,831.769,831.495,831.87,831.205,831.573,831.539,831.909,831.689,831.539</MassDataList>
@@ -6168,10 +6168,10 @@
   <PeakBaselineNoiseStDev>801</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>7085.2</StatMomentsArea>
+  <StatMomentsArea>7085.3</StatMomentsArea>
   <CenterOfMassScan>7505</CenterOfMassScan>
   <PeakStDev>11.3</PeakStDev>
-  <PeakSkew>-0.02472</PeakSkew>
+  <PeakSkew>-0.02471</PeakSkew>
   <PeakKSStat>0.3969</PeakKSStat>
   <StatMomentsDataCountUsed>6</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -6262,34 +6262,34 @@
   <SurveyScanNumber>7301</SurveyScanNumber>
   <FragScanNumber>7308</FragScanNumber>
   <FragScanTime>37.85517</FragScanTime>
-  <OptimalPeakApexScanNumber>7301</OptimalPeakApexScanNumber>
+  <OptimalPeakApexScanNumber>7312</OptimalPeakApexScanNumber>
   <PeakApexOverrideParentIonIndex>-1</PeakApexOverrideParentIonIndex>
   <CustomSICPeak>False</CustomSICPeak>
   <SICScanType>SurveyScan</SICScanType>
   <PeakScanStart>7301</PeakScanStart>
-  <PeakScanEnd>7301</PeakScanEnd>
-  <PeakScanMaxIntensity>7301</PeakScanMaxIntensity>
-  <PeakIntensity>3810</PeakIntensity>
-  <PeakSignalToNoiseRatio>1.584</PeakSignalToNoiseRatio>
-  <FWHMInScans>0</FWHMInScans>
-  <PeakArea>4000.5</PeakArea>
+  <PeakScanEnd>7389</PeakScanEnd>
+  <PeakScanMaxIntensity>7312</PeakScanMaxIntensity>
+  <PeakIntensity>1187.3</PeakIntensity>
+  <PeakSignalToNoiseRatio>0.4937</PeakSignalToNoiseRatio>
+  <FWHMInScans>86</FWHMInScans>
+  <PeakArea>104310</PeakArea>
   <ShoulderCount>0</ShoulderCount>
   <ParentIonIntensity>1986.9</ParentIonIntensity>
   <PeakBaselineNoiseLevel>2405.1</PeakBaselineNoiseLevel>
   <PeakBaselineNoiseStDev>3748</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>25345</StatMomentsArea>
-  <CenterOfMassScan>7312</CenterOfMassScan>
-  <PeakStDev>6.74</PeakStDev>
-  <PeakSkew>-0.2079</PeakSkew>
-  <PeakKSStat>0.433</PeakKSStat>
-  <StatMomentsDataCountUsed>3</StatMomentsDataCountUsed>
+  <StatMomentsArea>46411</StatMomentsArea>
+  <CenterOfMassScan>7322</CenterOfMassScan>
+  <PeakStDev>12.8</PeakStDev>
+  <PeakSkew>0.02728</PeakSkew>
+  <PeakKSStat>0.3727</PeakKSStat>
+  <StatMomentsDataCountUsed>5</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
   <SICScanStart>7301</SICScanStart>
   <SICScanIntervals>0BBBBBBBBBBBBBBBBBBBBBBBBBB</SICScanIntervals>
   <SICPeakIndexStart>0</SICPeakIndexStart>
-  <SICPeakIndexEnd>0</SICPeakIndexEnd>
+  <SICPeakIndexEnd>8</SICPeakIndexEnd>
   <SICDataCount>27</SICDataCount>
   <IntensityDataList>3810.0,467.6,745.8,645.7,432.2,870.3,485.2,1963.7,224.4,15.2,222.3,1056.0,999.6,328.4,2903.3,968.2,542.2,1095.4,1688.8,2516.3,1264.8,1049.9,3452.6,2701.4,6320.7,10945.7,17223</IntensityDataList>
   <MassDataList>843.244,843.506,842.862,843.087,843.344,843.624,843.441,843.616,843.567,,843.455,843.406,843.012,843.475,843.521,843.372,843.643,842.855,843.801,843.647,843.601,843.393,843.516,843.554,843.517,843.52,843.536</MassDataList>
@@ -6319,7 +6319,7 @@
   <StatMomentsArea>47107</StatMomentsArea>
   <CenterOfMassScan>7520</CenterOfMassScan>
   <PeakStDev>12.5</PeakStDev>
-  <PeakSkew>-0.0009461</PeakSkew>
+  <PeakSkew>-0.0009463</PeakSkew>
   <PeakKSStat>0.3727</PeakKSStat>
   <StatMomentsDataCountUsed>5</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -6353,7 +6353,7 @@
   <PeakBaselineNoiseStDev>1659</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>114179</StatMomentsArea>
+  <StatMomentsArea>114180</StatMomentsArea>
   <CenterOfMassScan>7445</CenterOfMassScan>
   <PeakStDev>27.7</PeakStDev>
   <PeakSkew>0.08559</PeakSkew>
@@ -6390,7 +6390,7 @@
   <PeakBaselineNoiseStDev>2915</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>217728</StatMomentsArea>
+  <StatMomentsArea>217729</StatMomentsArea>
   <CenterOfMassScan>7375</CenterOfMassScan>
   <PeakStDev>20.9</PeakStDev>
   <PeakSkew>0.4378</PeakSkew>
@@ -6427,7 +6427,7 @@
   <PeakBaselineNoiseStDev>2915</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>217728</StatMomentsArea>
+  <StatMomentsArea>217729</StatMomentsArea>
   <CenterOfMassScan>7375</CenterOfMassScan>
   <PeakStDev>20.9</PeakStDev>
   <PeakSkew>0.4378</PeakSkew>
@@ -6464,7 +6464,7 @@
   <PeakBaselineNoiseStDev>2098</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>147976</StatMomentsArea>
+  <StatMomentsArea>147977</StatMomentsArea>
   <CenterOfMassScan>7365</CenterOfMassScan>
   <PeakStDev>18.1</PeakStDev>
   <PeakSkew>0.1139</PeakSkew>
@@ -6538,7 +6538,7 @@
   <PeakBaselineNoiseStDev>974</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>99443</StatMomentsArea>
+  <StatMomentsArea>99444</StatMomentsArea>
   <CenterOfMassScan>7379</CenterOfMassScan>
   <PeakStDev>21.7</PeakStDev>
   <PeakSkew>-0.09279</PeakSkew>
@@ -6578,7 +6578,7 @@
   <StatMomentsArea>264440</StatMomentsArea>
   <CenterOfMassScan>7445</CenterOfMassScan>
   <PeakStDev>17.7</PeakStDev>
-  <PeakSkew>-0.00983</PeakSkew>
+  <PeakSkew>-0.009831</PeakSkew>
   <PeakKSStat>0.3354</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -7076,34 +7076,34 @@
   <SurveyScanNumber>7312</SurveyScanNumber>
   <FragScanNumber>7318</FragScanNumber>
   <FragScanTime>37.912</FragScanTime>
-  <OptimalPeakApexScanNumber>7312</OptimalPeakApexScanNumber>
+  <OptimalPeakApexScanNumber>7323</OptimalPeakApexScanNumber>
   <PeakApexOverrideParentIonIndex>-1</PeakApexOverrideParentIonIndex>
   <CustomSICPeak>False</CustomSICPeak>
   <SICScanType>SurveyScan</SICScanType>
   <PeakScanStart>7301</PeakScanStart>
-  <PeakScanEnd>7312</PeakScanEnd>
-  <PeakScanMaxIntensity>7312</PeakScanMaxIntensity>
-  <PeakIntensity>2568.8</PeakIntensity>
-  <PeakSignalToNoiseRatio>3.249</PeakSignalToNoiseRatio>
-  <FWHMInScans>11</FWHMInScans>
-  <PeakArea>40870</PeakArea>
+  <PeakScanEnd>7378</PeakScanEnd>
+  <PeakScanMaxIntensity>7323</PeakScanMaxIntensity>
+  <PeakIntensity>2337.9</PeakIntensity>
+  <PeakSignalToNoiseRatio>2.957</PeakSignalToNoiseRatio>
+  <FWHMInScans>18</FWHMInScans>
+  <PeakArea>120580</PeakArea>
   <ShoulderCount>0</ShoulderCount>
   <ParentIonIntensity>2463.8</ParentIonIntensity>
   <PeakBaselineNoiseLevel>790.69</PeakBaselineNoiseLevel>
   <PeakBaselineNoiseStDev>692</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>39191</StatMomentsArea>
-  <CenterOfMassScan>7313</CenterOfMassScan>
-  <PeakStDev>6.71</PeakStDev>
-  <PeakSkew>-0.2932</PeakSkew>
-  <PeakKSStat>0.433</PeakKSStat>
-  <StatMomentsDataCountUsed>3</StatMomentsDataCountUsed>
+  <StatMomentsArea>45847</StatMomentsArea>
+  <CenterOfMassScan>7321</CenterOfMassScan>
+  <PeakStDev>14.4</PeakStDev>
+  <PeakSkew>0.1376</PeakSkew>
+  <PeakKSStat>0.3521</PeakKSStat>
+  <StatMomentsDataCountUsed>7</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
   <SICScanStart>7301</SICScanStart>
   <SICScanIntervals>0BBBBBBBBBBBBBBBBBBBBBBBBBB</SICScanIntervals>
   <SICPeakIndexStart>0</SICPeakIndexStart>
-  <SICPeakIndexEnd>1</SICPeakIndexEnd>
+  <SICPeakIndexEnd>7</SICPeakIndexEnd>
   <SICDataCount>27</SICDataCount>
   <IntensityDataList>2148.8,2568.8,2337.9,1047.3,1053.4,721.2,162.6,956.8,568.0,371.0,1219.2,317.6,571.0,504.2,133.3,896.9,348.6,183.8,1676.8,410.9,27.1,465.6,1202.8,266.8,30.8,570.3,587.4</IntensityDataList>
   <MassDataList>879.156,879.203,879.217,879.294,879.241,878.787,879.553,878.925,879.644,879.657,879.734,879.408,879.518,878.804,878.666,879.51,879.124,879.186,879.347,879.517,,879.532,879.762,878.776,,879.09,878.796</MassDataList>
@@ -7204,7 +7204,7 @@
   <PeakBaselineNoiseStDev>5875</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>501463</StatMomentsArea>
+  <StatMomentsArea>501464</StatMomentsArea>
   <CenterOfMassScan>7381</CenterOfMassScan>
   <PeakStDev>16.3</PeakStDev>
   <PeakSkew>0.05251</PeakSkew>
@@ -7244,7 +7244,7 @@
   <StatMomentsArea>24354</StatMomentsArea>
   <CenterOfMassScan>7488</CenterOfMassScan>
   <PeakStDev>9.19</PeakStDev>
-  <PeakSkew>0.005047</PeakSkew>
+  <PeakSkew>0.005049</PeakSkew>
   <PeakKSStat>0.4234</PeakKSStat>
   <StatMomentsDataCountUsed>5</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -7278,7 +7278,7 @@
   <PeakBaselineNoiseStDev>5262</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>460798</StatMomentsArea>
+  <StatMomentsArea>460799</StatMomentsArea>
   <CenterOfMassScan>7381</CenterOfMassScan>
   <PeakStDev>16.6</PeakStDev>
   <PeakSkew>0.03976</PeakSkew>
@@ -7315,7 +7315,7 @@
   <PeakBaselineNoiseStDev>7056</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>787871</StatMomentsArea>
+  <StatMomentsArea>787873</StatMomentsArea>
   <CenterOfMassScan>7491</CenterOfMassScan>
   <PeakStDev>19.5</PeakStDev>
   <PeakSkew>0.0244</PeakSkew>
@@ -7426,7 +7426,7 @@
   <PeakBaselineNoiseStDev>1435</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>120304</StatMomentsArea>
+  <StatMomentsArea>120305</StatMomentsArea>
   <CenterOfMassScan>7440</CenterOfMassScan>
   <PeakStDev>18</PeakStDev>
   <PeakSkew>0.1323</PeakSkew>
@@ -7500,7 +7500,7 @@
   <PeakBaselineNoiseStDev>790</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>58709</StatMomentsArea>
+  <StatMomentsArea>58710</StatMomentsArea>
   <CenterOfMassScan>7388</CenterOfMassScan>
   <PeakStDev>21.3</PeakStDev>
   <PeakSkew>0.05335</PeakSkew>
@@ -7537,7 +7537,7 @@
   <PeakBaselineNoiseStDev>1831</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>203171</StatMomentsArea>
+  <StatMomentsArea>203172</StatMomentsArea>
   <CenterOfMassScan>7451</CenterOfMassScan>
   <PeakStDev>24.9</PeakStDev>
   <PeakSkew>0.1674</PeakSkew>
@@ -7614,7 +7614,7 @@
   <StatMomentsArea>517895</StatMomentsArea>
   <CenterOfMassScan>7502</CenterOfMassScan>
   <PeakStDev>18.6</PeakStDev>
-  <PeakSkew>-0.03233</PeakSkew>
+  <PeakSkew>-0.03234</PeakSkew>
   <PeakKSStat>0.3011</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -7651,7 +7651,7 @@
   <StatMomentsArea>106821</StatMomentsArea>
   <CenterOfMassScan>7499</CenterOfMassScan>
   <PeakStDev>18.4</PeakStDev>
-  <PeakSkew>-0.00795</PeakSkew>
+  <PeakSkew>-0.007952</PeakSkew>
   <PeakKSStat>0.3368</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -7833,7 +7833,7 @@
   <PeakBaselineNoiseStDev>730</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>76208</StatMomentsArea>
+  <StatMomentsArea>76209</StatMomentsArea>
   <CenterOfMassScan>7435</CenterOfMassScan>
   <PeakStDev>25.4</PeakStDev>
   <PeakSkew>0.1172</PeakSkew>
@@ -8129,7 +8129,7 @@
   <PeakBaselineNoiseStDev>5080</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>578892</StatMomentsArea>
+  <StatMomentsArea>578893</StatMomentsArea>
   <CenterOfMassScan>7445</CenterOfMassScan>
   <PeakStDev>20.9</PeakStDev>
   <PeakSkew>0.1488</PeakSkew>
@@ -8206,7 +8206,7 @@
   <StatMomentsArea>1.6669E+06</StatMomentsArea>
   <CenterOfMassScan>7466</CenterOfMassScan>
   <PeakStDev>28.7</PeakStDev>
-  <PeakSkew>0.04082</PeakSkew>
+  <PeakSkew>0.04081</PeakSkew>
   <PeakKSStat>0.2946</PeakKSStat>
   <StatMomentsDataCountUsed>13</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -8243,7 +8243,7 @@
   <StatMomentsArea>1.6669E+06</StatMomentsArea>
   <CenterOfMassScan>7466</CenterOfMassScan>
   <PeakStDev>28.7</PeakStDev>
-  <PeakSkew>0.04082</PeakSkew>
+  <PeakSkew>0.04081</PeakSkew>
   <PeakKSStat>0.2946</PeakKSStat>
   <StatMomentsDataCountUsed>13</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -8314,7 +8314,7 @@
   <PeakBaselineNoiseStDev>5363</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>18</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>440882</StatMomentsArea>
+  <StatMomentsArea>440884</StatMomentsArea>
   <CenterOfMassScan>7469</CenterOfMassScan>
   <PeakStDev>23.7</PeakStDev>
   <PeakSkew>-0.07234</PeakSkew>
@@ -8351,7 +8351,7 @@
   <PeakBaselineNoiseStDev>1681</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>320291</StatMomentsArea>
+  <StatMomentsArea>320292</StatMomentsArea>
   <CenterOfMassScan>7462</CenterOfMassScan>
   <PeakStDev>28.2</PeakStDev>
   <PeakSkew>0.1505</PeakSkew>
@@ -8388,7 +8388,7 @@
   <PeakBaselineNoiseStDev>1681</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>320291</StatMomentsArea>
+  <StatMomentsArea>320292</StatMomentsArea>
   <CenterOfMassScan>7462</CenterOfMassScan>
   <PeakStDev>28.2</PeakStDev>
   <PeakSkew>0.1505</PeakSkew>
@@ -8499,7 +8499,7 @@
   <PeakBaselineNoiseStDev>6130</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>687619</StatMomentsArea>
+  <StatMomentsArea>687620</StatMomentsArea>
   <CenterOfMassScan>7446</CenterOfMassScan>
   <PeakStDev>20.8</PeakStDev>
   <PeakSkew>0.1463</PeakSkew>
@@ -8573,7 +8573,7 @@
   <PeakBaselineNoiseStDev>788</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>79059</StatMomentsArea>
+  <StatMomentsArea>79060</StatMomentsArea>
   <CenterOfMassScan>7465</CenterOfMassScan>
   <PeakStDev>21.6</PeakStDev>
   <PeakSkew>0.01235</PeakSkew>
@@ -8610,7 +8610,7 @@
   <PeakBaselineNoiseStDev>6894</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>794701</StatMomentsArea>
+  <StatMomentsArea>794703</StatMomentsArea>
   <CenterOfMassScan>7448</CenterOfMassScan>
   <PeakStDev>21.6</PeakStDev>
   <PeakSkew>0.1428</PeakSkew>
@@ -8630,33 +8630,33 @@
   <SurveyScanNumber>7499</SurveyScanNumber>
   <FragScanNumber>7505</FragScanNumber>
   <FragScanTime>38.98817</FragScanTime>
-  <OptimalPeakApexScanNumber>7499</OptimalPeakApexScanNumber>
+  <OptimalPeakApexScanNumber>7422</OptimalPeakApexScanNumber>
   <PeakApexOverrideParentIonIndex>-1</PeakApexOverrideParentIonIndex>
   <CustomSICPeak>False</CustomSICPeak>
   <SICScanType>SurveyScan</SICScanType>
-  <PeakScanStart>7488</PeakScanStart>
+  <PeakScanStart>7356</PeakScanStart>
   <PeakScanEnd>7587</PeakScanEnd>
-  <PeakScanMaxIntensity>7499</PeakScanMaxIntensity>
-  <PeakIntensity>2716.1</PeakIntensity>
-  <PeakSignalToNoiseRatio>1.482</PeakSignalToNoiseRatio>
-  <FWHMInScans>16</FWHMInScans>
-  <PeakArea>141190</PeakArea>
-  <ShoulderCount>0</ShoulderCount>
+  <PeakScanMaxIntensity>7422</PeakScanMaxIntensity>
+  <PeakIntensity>3746</PeakIntensity>
+  <PeakSignalToNoiseRatio>2.82</PeakSignalToNoiseRatio>
+  <FWHMInScans>95</FWHMInScans>
+  <PeakArea>380601</PeakArea>
+  <ShoulderCount>1</ShoulderCount>
   <ParentIonIntensity>1943.5</ParentIonIntensity>
-  <PeakBaselineNoiseLevel>1832.2</PeakBaselineNoiseLevel>
-  <PeakBaselineNoiseStDev>1085</PeakBaselineNoiseStDev>
-  <PeakBaselinePointsUsed>18</PeakBaselinePointsUsed>
+  <PeakBaselineNoiseLevel>1328.6</PeakBaselineNoiseLevel>
+  <PeakBaselineNoiseStDev>884</PeakBaselineNoiseStDev>
+  <PeakBaselinePointsUsed>15</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>81844</StatMomentsArea>
-  <CenterOfMassScan>7499</CenterOfMassScan>
-  <PeakStDev>13</PeakStDev>
-  <PeakSkew>-0.07835</PeakSkew>
-  <PeakKSStat>0.3727</PeakKSStat>
-  <StatMomentsDataCountUsed>5</StatMomentsDataCountUsed>
+  <StatMomentsArea>128504</StatMomentsArea>
+  <CenterOfMassScan>7446</CenterOfMassScan>
+  <PeakStDev>32.6</PeakStDev>
+  <PeakSkew>0.6422</PeakSkew>
+  <PeakKSStat>0.4989</PeakKSStat>
+  <StatMomentsDataCountUsed>14</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
   <SICScanStart>7301</SICScanStart>
   <SICScanIntervals>0BBBBBBBBBBBBBBBBBBBBBBBBBB</SICScanIntervals>
-  <SICPeakIndexStart>17</SICPeakIndexStart>
+  <SICPeakIndexStart>5</SICPeakIndexStart>
   <SICPeakIndexEnd>26</SICPeakIndexEnd>
   <SICDataCount>27</SICDataCount>
   <IntensityDataList>1920.8,431.0,26.3,386.3,382.3,234.3,133.2,733.5,457.6,1588.6,3380.7,3746.0,3895.7,1990.9,2135.6,1634.4,1708.0,2497.3,2716.1,1016.3,1092,1837.5,1475.4,541.2,710.3,989.2,23.9</IntensityDataList>
@@ -8684,7 +8684,7 @@
   <PeakBaselineNoiseStDev>2083</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>14</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>454396</StatMomentsArea>
+  <StatMomentsArea>454397</StatMomentsArea>
   <CenterOfMassScan>7447</CenterOfMassScan>
   <PeakStDev>28.2</PeakStDev>
   <PeakSkew>0.3755</PeakSkew>
@@ -8721,7 +8721,7 @@
   <PeakBaselineNoiseStDev>6748</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>763884</StatMomentsArea>
+  <StatMomentsArea>763886</StatMomentsArea>
   <CenterOfMassScan>7444</CenterOfMassScan>
   <PeakStDev>20.7</PeakStDev>
   <PeakSkew>0.155</PeakSkew>
@@ -8795,7 +8795,7 @@
   <PeakBaselineNoiseStDev>1333</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>126270</StatMomentsArea>
+  <StatMomentsArea>126271</StatMomentsArea>
   <CenterOfMassScan>7436</CenterOfMassScan>
   <PeakStDev>18</PeakStDev>
   <PeakSkew>-0.02618</PeakSkew>
@@ -8832,7 +8832,7 @@
   <PeakBaselineNoiseStDev>526</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>18</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>5925.3</StatMomentsArea>
+  <StatMomentsArea>5925.4</StatMomentsArea>
   <CenterOfMassScan>7459</CenterOfMassScan>
   <PeakStDev>17.4</PeakStDev>
   <PeakSkew>0.3767</PeakSkew>
@@ -9054,10 +9054,10 @@
   <PeakBaselineNoiseStDev>1637</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>181232</StatMomentsArea>
+  <StatMomentsArea>181233</StatMomentsArea>
   <CenterOfMassScan>7417</CenterOfMassScan>
   <PeakStDev>20.3</PeakStDev>
-  <PeakSkew>0.0437</PeakSkew>
+  <PeakSkew>0.04371</PeakSkew>
   <PeakKSStat>0.3045</PeakKSStat>
   <StatMomentsDataCountUsed>10</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -9091,7 +9091,7 @@
   <PeakBaselineNoiseStDev>991</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>81616</StatMomentsArea>
+  <StatMomentsArea>81617</StatMomentsArea>
   <CenterOfMassScan>7442</CenterOfMassScan>
   <PeakStDev>25.8</PeakStDev>
   <PeakSkew>0.4229</PeakSkew>
@@ -9195,7 +9195,7 @@
   <PeakIntensity>5821.2</PeakIntensity>
   <PeakSignalToNoiseRatio>2.831</PeakSignalToNoiseRatio>
   <FWHMInScans>29</FWHMInScans>
-  <PeakArea>560556</PeakArea>
+  <PeakArea>560555</PeakArea>
   <ShoulderCount>0</ShoulderCount>
   <ParentIonIntensity>2596.5</ParentIonIntensity>
   <PeakBaselineNoiseLevel>2056</PeakBaselineNoiseLevel>
@@ -9239,7 +9239,7 @@
   <PeakBaselineNoiseStDev>761</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>18</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>52639</StatMomentsArea>
+  <StatMomentsArea>52640</StatMomentsArea>
   <CenterOfMassScan>7520</CenterOfMassScan>
   <PeakStDev>12.5</PeakStDev>
   <PeakSkew>0.01141</PeakSkew>
@@ -9303,7 +9303,7 @@
   <PeakScanStart>7367</PeakScanStart>
   <PeakScanEnd>7587</PeakScanEnd>
   <PeakScanMaxIntensity>7499</PeakScanMaxIntensity>
-  <PeakIntensity>764.39</PeakIntensity>
+  <PeakIntensity>764.4</PeakIntensity>
   <PeakSignalToNoiseRatio>0.8823</PeakSignalToNoiseRatio>
   <FWHMInScans>110</FWHMInScans>
   <PeakArea>217178</PeakArea>
@@ -9424,10 +9424,10 @@
   <PeakBaselineNoiseStDev>775</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>54222</StatMomentsArea>
+  <StatMomentsArea>54223</StatMomentsArea>
   <CenterOfMassScan>7379</CenterOfMassScan>
   <PeakStDev>22.4</PeakStDev>
-  <PeakSkew>-0.02389</PeakSkew>
+  <PeakSkew>-0.02388</PeakSkew>
   <PeakKSStat>0.3042</PeakKSStat>
   <StatMomentsDataCountUsed>11</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -9498,7 +9498,7 @@
   <PeakBaselineNoiseStDev>1003</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>96018</StatMomentsArea>
+  <StatMomentsArea>96019</StatMomentsArea>
   <CenterOfMassScan>7455</CenterOfMassScan>
   <PeakStDev>21.5</PeakStDev>
   <PeakSkew>0.0242</PeakSkew>
@@ -9535,7 +9535,7 @@
   <PeakBaselineNoiseStDev>702</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>31721</StatMomentsArea>
+  <StatMomentsArea>31722</StatMomentsArea>
   <CenterOfMassScan>7465</CenterOfMassScan>
   <PeakStDev>21.5</PeakStDev>
   <PeakSkew>0.34</PeakSkew>
@@ -9575,7 +9575,7 @@
   <StatMomentsArea>92649</StatMomentsArea>
   <CenterOfMassScan>7411</CenterOfMassScan>
   <PeakStDev>18.2</PeakStDev>
-  <PeakSkew>0.0005589</PeakSkew>
+  <PeakSkew>0.0005591</PeakSkew>
   <PeakKSStat>0.3353</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -9871,7 +9871,7 @@
   <StatMomentsArea>18633</StatMomentsArea>
   <CenterOfMassScan>7521</CenterOfMassScan>
   <PeakStDev>12.3</PeakStDev>
-  <PeakSkew>-0.09616</PeakSkew>
+  <PeakSkew>-0.09615</PeakSkew>
   <PeakKSStat>0.3727</PeakKSStat>
   <StatMomentsDataCountUsed>5</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -9908,7 +9908,7 @@
   <StatMomentsArea>28433</StatMomentsArea>
   <CenterOfMassScan>7485</CenterOfMassScan>
   <PeakStDev>18.4</PeakStDev>
-  <PeakSkew>-0.004988</PeakSkew>
+  <PeakSkew>-0.004987</PeakSkew>
   <PeakKSStat>0.3249</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -9942,10 +9942,10 @@
   <PeakBaselineNoiseStDev>509</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>8415.6</StatMomentsArea>
+  <StatMomentsArea>8415.7</StatMomentsArea>
   <CenterOfMassScan>7330</CenterOfMassScan>
   <PeakStDev>16.5</PeakStDev>
-  <PeakSkew>0.2884</PeakSkew>
+  <PeakSkew>0.2885</PeakSkew>
   <PeakKSStat>0.3</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -9982,7 +9982,7 @@
   <StatMomentsArea>109923</StatMomentsArea>
   <CenterOfMassScan>7435</CenterOfMassScan>
   <PeakStDev>17.6</PeakStDev>
-  <PeakSkew>0.02043</PeakSkew>
+  <PeakSkew>0.02042</PeakSkew>
   <PeakKSStat>0.3275</PeakKSStat>
   <StatMomentsDataCountUsed>9</StatMomentsDataCountUsed>
   <InterferenceScore>0</InterferenceScore>
@@ -10016,7 +10016,7 @@
   <PeakBaselineNoiseStDev>789</PeakBaselineNoiseStDev>
   <PeakBaselinePointsUsed>27</PeakBaselinePointsUsed>
   <NoiseThresholdModeUsed>4</NoiseThresholdModeUsed>
-  <StatMomentsArea>62006</StatMomentsArea>
+  <StatMomentsArea>62007</StatMomentsArea>
   <CenterOfMassScan>7439</CenterOfMassScan>
   <PeakStDev>19.2</PeakStDev>
   <PeakSkew>0.03675</PeakSkew>
@@ -10071,8 +10071,8 @@
  <ProcessingStats>
   <CacheEventCount>0</CacheEventCount>
   <UnCacheEventCount>0</UnCacheEventCount>
-  <PeakMemoryUsageMB>89.47</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>0.67</TotalProcessingTimeSeconds>
+  <PeakMemoryUsageMB>39.88</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>0.36</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>
