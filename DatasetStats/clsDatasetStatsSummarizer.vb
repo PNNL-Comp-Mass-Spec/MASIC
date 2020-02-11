@@ -200,11 +200,11 @@ Namespace DatasetStats
                     End If
                 Next
 
-                summaryStats.MSStats.TICMedian = MathNet.Numerics.Statistics.Statistics.Median(ticListMS)
-                summaryStats.MSStats.BPIMedian = MathNet.Numerics.Statistics.Statistics.Median(bpiListMS)
+                summaryStats.MSStats.TICMedian = clsUtilities.ComputeMedian(ticListMS)
+                summaryStats.MSStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMS)
 
-                summaryStats.MSnStats.TICMedian = MathNet.Numerics.Statistics.Statistics.Median(ticListMSn)
-                summaryStats.MSnStats.BPIMedian = MathNet.Numerics.Statistics.Statistics.Median(bpiListMSn)
+                summaryStats.MSnStats.TICMedian = clsUtilities.ComputeMedian(ticListMSn)
+                summaryStats.MSnStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMSn)
 
                 Return True
 

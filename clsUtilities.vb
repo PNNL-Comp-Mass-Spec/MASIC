@@ -26,6 +26,19 @@ Public Class clsUtilities
 
     End Function
 
+    ''' <summary>
+    ''' Compute the median value in a list of doubles
+    ''' </summary>
+    ''' <param name="values"></param>
+    ''' <returns>The median value, or 0 if the list is empty or null</returns>
+    Public Shared Function ComputeMedian(values As IReadOnlyCollection(Of Double)) As Double
+        If values Is Nothing OrElse values.Count = 0 Then
+            Return 0
+        End If
+
+        Return MathNet.Numerics.Statistics.Statistics.Median(values)
+    End Function
+
     Public Shared Function ConvoluteMass(
       massMZ As Double,
       currentCharge As Short,
@@ -141,5 +154,4 @@ Public Class clsUtilities
         Return ppmToConvert / 1000000.0 * currentMZ
     End Function
 #End Region
-
 End Class
