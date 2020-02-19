@@ -890,11 +890,12 @@ Public Class clsITraqIntensityCorrection
     ''' <param name="plus2">Value between 0 and 100, but typically close to 0</param>
     ''' <returns></returns>
     ''' <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
-    Private Function DefineIsotopeContribution(minus2 As Single,
-                                               minus1 As Single,
-                                               zero As Single,
-                                               plus1 As Single,
-                                               plus2 As Single) As udtIsotopeContributionType
+    Private Function DefineIsotopeContribution(
+      minus2 As Single,
+      minus1 As Single,
+      zero As Single,
+      plus1 As Single,
+      plus2 As Single) As udtIsotopeContributionType
 
         Dim udtIsotopePct As udtIsotopeContributionType
 

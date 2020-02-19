@@ -1180,7 +1180,7 @@ Public Class clsMASIC
                     ' Add the custom SIC values to scanList
                     '---------------------------------------------------------
                     Options.CustomSICList.AddCustomSICValues(scanList, Options.SICOptions.SICTolerance,
-                                       Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance)
+                                                             Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance)
 
 
                     '---------------------------------------------------------
@@ -1302,7 +1302,7 @@ Public Class clsMASIC
                 LogMessage("ProcessFile: Call FinalizeXMLFile")
                 Dim processingTimeSec = GetTotalProcessingTimeSec()
                 success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, spectraCache,
-                                                                    mProcessingStats, processingTimeSec)
+                                                                 mProcessingStats, processingTimeSec)
 
             End If
 

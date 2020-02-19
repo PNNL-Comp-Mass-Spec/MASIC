@@ -1558,10 +1558,11 @@ Public Class clsMASICPeakFinder
     ''' Replaces values of 0 with the minimum positive value in dataList()
     ''' You cannot use dataList.Length to determine the length of the array; use dataCount
     ''' </remarks>
-    Public Function ComputeTrimmedNoiseLevel(dataList As IReadOnlyList(Of Double), indexStart As Integer, indexEnd As Integer,
-                                             baselineNoiseOptions As clsBaselineNoiseOptions,
-                                             ignoreNonPositiveData As Boolean,
-                                             <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
+    Public Function ComputeTrimmedNoiseLevel(
+      dataList As IReadOnlyList(Of Double), indexStart As Integer, indexEnd As Integer,
+      baselineNoiseOptions As clsBaselineNoiseOptions,
+      ignoreNonPositiveData As Boolean,
+      <Out> ByRef baselineNoiseStats As clsBaselineNoiseStats) As Boolean
 
         Dim dataListSorted() As Double           ' Note: You cannot use dataListSorted.Length to determine the length of the array; use indexStart and indexEnd to find the limits
 
@@ -2672,10 +2673,10 @@ Public Class clsMASICPeakFinder
     End Function
 
     Public Sub FindPotentialPeakArea(
-       dataCount As Integer,
-       sicIntensities As IReadOnlyList(Of Double),
-       <Out> ByRef potentialAreaStats As clsSICPotentialAreaStats,
-       sicPeakFinderOptions As clsSICPeakFinderOptions)
+      dataCount As Integer,
+      sicIntensities As IReadOnlyList(Of Double),
+      <Out> ByRef potentialAreaStats As clsSICPotentialAreaStats,
+      sicPeakFinderOptions As clsSICPeakFinderOptions)
 
         Dim sicData = New List(Of clsSICDataPoint)
 
@@ -2788,17 +2789,17 @@ Public Class clsMASICPeakFinder
     ''' <param name="recomputeNoiseLevel"></param>
     <Obsolete("Use the version that takes a List(Of clsSICDataPoint")>
     Public Function FindSICPeakAndArea(
-        dataCount As Integer,
-        sicScanNumbers() As Integer,
-        sicIntensities() As Double,
-        <Out> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
-        sicPeak As clsSICStatsPeak,
-        <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
-        sicPeakFinderOptions As clsSICPeakFinderOptions,
-        potentialAreaStatsForRegion As clsSICPotentialAreaStats,
-        returnClosestPeak As Boolean,
-        simDataPresent As Boolean,
-        recomputeNoiseLevel As Boolean) As Boolean
+      dataCount As Integer,
+      sicScanNumbers() As Integer,
+      sicIntensities() As Double,
+      <Out> ByRef potentialAreaStatsForPeak As clsSICPotentialAreaStats,
+      sicPeak As clsSICStatsPeak,
+      <Out> ByRef smoothedYDataSubset As clsSmoothedYDataSubset,
+      sicPeakFinderOptions As clsSICPeakFinderOptions,
+      potentialAreaStatsForRegion As clsSICPotentialAreaStats,
+      returnClosestPeak As Boolean,
+      simDataPresent As Boolean,
+      recomputeNoiseLevel As Boolean) As Boolean
 
         Dim sicData = New List(Of clsSICDataPoint)
 

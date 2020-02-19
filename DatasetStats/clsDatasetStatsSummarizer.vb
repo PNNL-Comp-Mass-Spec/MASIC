@@ -216,11 +216,11 @@ Namespace DatasetStats
         End Function
 
         Private Sub ComputeScanStatsUpdateDetails(
-                                                  scanStats As ScanStatsEntry,
-                                                  summaryStats As DatasetSummaryStats,
-                                                  summaryStatDetails As SummaryStatDetails,
-                                                  ticList As ICollection(Of Double),
-                                                  bpiList As ICollection(Of Double))
+          scanStats As ScanStatsEntry,
+          summaryStats As DatasetSummaryStats,
+          summaryStatDetails As SummaryStatDetails,
+          ticList As ICollection(Of Double),
+          bpiList As ICollection(Of Double))
 
             Dim elutionTime As Double
             Dim totalIonCurrent As Double
@@ -277,11 +277,11 @@ Namespace DatasetStats
         ''' <returns>True if success; False if failure</returns>
         ''' <remarks></remarks>
         Public Function CreateDatasetInfoFile(
-                                              datasetName As String,
-                                              datasetInfoFilePath As String,
-                                              scanStats As List(Of ScanStatsEntry),
-                                              datasetInfo As DatasetFileInfo,
-                                              oSampleInfo As SampleInfo) As Boolean
+          datasetName As String,
+          datasetInfoFilePath As String,
+          scanStats As List(Of ScanStatsEntry),
+          datasetInfo As DatasetFileInfo,
+          oSampleInfo As SampleInfo) As Boolean
 
             Try
                 If scanStats Is Nothing Then
@@ -354,9 +354,9 @@ Namespace DatasetStats
         ''' <returns>XML (as string)</returns>
         ''' <remarks></remarks>
         Public Function CreateDatasetInfoXML(
-                                             scanStats As List(Of ScanStatsEntry),
-                                             datasetInfo As DatasetFileInfo,
-                                             oSampleInfo As SampleInfo) As String
+          scanStats As List(Of ScanStatsEntry),
+          datasetInfo As DatasetFileInfo,
+          oSampleInfo As SampleInfo) As String
 
             Return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo, oSampleInfo)
         End Function
@@ -370,9 +370,9 @@ Namespace DatasetStats
         ''' <returns>XML (as string)</returns>
         ''' <remarks></remarks>
         Public Function CreateDatasetInfoXML(
-                                             datasetName As String,
-                                             scanStats As List(Of ScanStatsEntry),
-                                             datasetInfo As DatasetFileInfo) As String
+          datasetName As String,
+          scanStats As List(Of ScanStatsEntry),
+          datasetInfo As DatasetFileInfo) As String
 
             Return CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, New SampleInfo())
         End Function
@@ -386,10 +386,10 @@ Namespace DatasetStats
         ''' <returns>XML (as string)</returns>
         ''' <remarks></remarks>
         Public Function CreateDatasetInfoXML(
-                                             datasetName As String,
-                                             scanStats As List(Of ScanStatsEntry),
-                                             datasetInfo As DatasetFileInfo,
-                                             oSampleInfo As SampleInfo) As String
+          datasetName As String,
+          scanStats As List(Of ScanStatsEntry),
+          datasetInfo As DatasetFileInfo,
+          oSampleInfo As SampleInfo) As String
 
             Try
 
@@ -559,11 +559,11 @@ Namespace DatasetStats
         ''' <returns>True if success; False if failure</returns>
         ''' <remarks></remarks>
         Public Function CreateScanStatsFile(
-                                            datasetName As String,
-                                            scanStatsFilePath As String,
-                                            scanStats As List(Of ScanStatsEntry),
-                                            datasetInfo As DatasetFileInfo,
-                                            oSampleInfo As SampleInfo) As Boolean
+          datasetName As String,
+          scanStatsFilePath As String,
+          scanStats As List(Of ScanStatsEntry),
+          datasetInfo As DatasetFileInfo,
+          oSampleInfo As SampleInfo) As Boolean
 
 
             Dim datasetID = 0
@@ -725,11 +725,11 @@ Namespace DatasetStats
         ''' <returns>True if success; False if failure</returns>
         ''' <remarks></remarks>
         Public Function UpdateDatasetStatsTextFile(
-                                                   datasetName As String,
-                                                   datasetStatsFilePath As String,
-                                                   scanStats As List(Of ScanStatsEntry),
-                                                   datasetInfo As DatasetFileInfo,
-                                                   oSampleInfo As SampleInfo) As Boolean
+          datasetName As String,
+          datasetStatsFilePath As String,
+          scanStats As List(Of ScanStatsEntry),
+          datasetInfo As DatasetFileInfo,
+          oSampleInfo As SampleInfo) As Boolean
 
             Dim writeHeaders As Boolean
 
