@@ -81,7 +81,7 @@ Public Class clsDatabaseAccess
         newDatasetID = 0
 
         Try
-            Dim objDBTools = New PRISM.DBTools(masicOptions.DatabaseConnectionString)
+            Dim dbTools = PRISMDatabaseUtils.DbToolsFactory.GetDBTools(masicOptions.DatabaseConnectionString)
 
             Dim queryingSingleDataset = False
 
@@ -105,7 +105,7 @@ Public Class clsDatabaseAccess
 
                 Dim lstResults As List(Of List(Of String)) = Nothing
 
-                Dim success = objDBTools.GetQueryResults(sqlQuery, lstResults, "GetDatasetIDFromDatabase")
+                Dim success = dbTools.GetQueryResults(sqlQuery, lstResults)
                 If success Then
 
                     ' Find the row in the lstResults that matches fileNameCompare

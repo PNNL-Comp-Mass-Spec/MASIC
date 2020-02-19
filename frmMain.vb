@@ -21,6 +21,7 @@ Imports MASIC.DataInput
 Imports MASICPeakFinder.clsMASICPeakFinder
 Imports PRISM
 Imports PRISM.FileProcessor
+Imports PRISMDatabaseUtils
 Imports PRISMWin
 Imports PRISMWin.TextBoxUtils
 Imports ProgressFormNET
@@ -818,12 +819,12 @@ Public Class frmMain
         Dim customSICValues = New DataTable(CUSTOM_SIC_VALUES_DATA_TABLE)
 
         ' Add the columns to the data table
-        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ)
-        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ_TOLERANCE)
-        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_CENTER)
-        DatabaseUtils.DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_TOLERANCE)
-        DatabaseUtils.DataTableUtils.AppendColumnStringToTable(customSICValues, COL_NAME_SCAN_COMMENT, String.Empty)
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(customSICValues, COL_NAME_CUSTOM_SIC_VALUE_ROW_ID, 0, True, True)
+        DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ)
+        DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_MZ_TOLERANCE)
+        DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_CENTER)
+        DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_TOLERANCE)
+        DataTableUtils.AppendColumnStringToTable(customSICValues, COL_NAME_SCAN_COMMENT, String.Empty)
+        DataTableUtils.AppendColumnIntegerToTable(customSICValues, COL_NAME_CUSTOM_SIC_VALUE_ROW_ID, 0, True, True)
 
         Dim primaryKeyColumn = New DataColumn() {customSICValues.Columns(COL_NAME_CUSTOM_SIC_VALUE_ROW_ID)}
         customSICValues.PrimaryKey = primaryKeyColumn

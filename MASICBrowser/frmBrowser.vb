@@ -19,11 +19,11 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Timers
 Imports System.Xml
-Imports DataFilter
 Imports MASICPeakFinder
 Imports OxyDataPlotter
 Imports OxyPlot
 Imports PRISM
+Imports PRISMDatabaseUtils
 Imports ProgressFormNET
 
 Public Class frmBrowser
@@ -1644,16 +1644,16 @@ Public Class frmBrowser
         Dim msmsResultsTable = New DataTable(TABLE_NAME_MSMS_RESULTS)
 
         ' Add the columns to the DataTable
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SCAN)
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_CHARGE)
-        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_MH)
-        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_XCORR)
-        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_DELTACN)
-        DatabaseUtils.DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_DELTACN2)
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_SP)
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_XC)
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SEQUENCE_ID)
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_PARENT_ION_INDEX)
+        DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SCAN)
+        DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_CHARGE)
+        DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_MH)
+        DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_XCORR)
+        DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_DELTACN)
+        DataTableUtils.AppendColumnFloatToTable(msmsResultsTable, COL_NAME_DELTACN2)
+        DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_SP)
+        DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_RANK_XC)
+        DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_SEQUENCE_ID)
+        DataTableUtils.AppendColumnIntegerToTable(msmsResultsTable, COL_NAME_PARENT_ION_INDEX)
 
         ' Define a primary key
         With msmsResultsTable
@@ -1673,8 +1673,8 @@ Public Class frmBrowser
         Dim seqToProteinMapTable = New DataTable(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
         ' Add the columns to the DataTable
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(seqToProteinMapTable, COL_NAME_SEQUENCE_ID)
-        DatabaseUtils.DataTableUtils.AppendColumnStringToTable(seqToProteinMapTable, COL_NAME_PROTEIN)
+        DataTableUtils.AppendColumnIntegerToTable(seqToProteinMapTable, COL_NAME_SEQUENCE_ID)
+        DataTableUtils.AppendColumnStringToTable(seqToProteinMapTable, COL_NAME_PROTEIN)
 
         ' Define a primary key
         With seqToProteinMapTable
@@ -1697,8 +1697,8 @@ Public Class frmBrowser
         Dim sequenceInfoTable = New DataTable(TABLE_NAME_SEQUENCES)
 
         ' Add the columns to the DataTable
-        DatabaseUtils.DataTableUtils.AppendColumnIntegerToTable(sequenceInfoTable, COL_NAME_SEQUENCE_ID, 0, True, True, True)
-        DatabaseUtils.DataTableUtils.AppendColumnStringToTable(sequenceInfoTable, COL_NAME_SEQUENCE)
+        DataTableUtils.AppendColumnIntegerToTable(sequenceInfoTable, COL_NAME_SEQUENCE_ID, 0, True, True, True)
+        DataTableUtils.AppendColumnStringToTable(sequenceInfoTable, COL_NAME_SEQUENCE)
 
         ' Define a primary key
         With sequenceInfoTable
