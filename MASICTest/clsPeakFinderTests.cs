@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MASIC;
 using MASICPeakFinder;
 using NUnit.Framework;
 
@@ -12,12 +8,12 @@ namespace MASICTest
     [TestFixture]
     public class clsPeakFinderTests
     {
-        private MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
+        private clsMASICPeakFinder mMASICPeakFinder;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            mMASICPeakFinder = new MASICPeakFinder.clsMASICPeakFinder();
+            mMASICPeakFinder = new clsMASICPeakFinder();
         }
 
         [Test]

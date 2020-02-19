@@ -29,7 +29,7 @@ Imports ProgressFormNET
 Public Class frmBrowser
     Inherits Form
 
-    Private Const PROGRAM_DATE As String = "May 23, 2019"
+    Private Const PROGRAM_DATE As String = "February 19, 2020"
 
 #Region "Windows Form Designer generated code"
 
