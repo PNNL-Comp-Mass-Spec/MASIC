@@ -1499,7 +1499,7 @@ Public Class clsMASIC
             Options.SICOptions.ValidateSICOptions()
 
             Select Case Path.GetExtension(inputFileName).ToUpper()
-                Case DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()
+                Case DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper()
 
                     ' Open the .Raw file and obtain the scan information
 

@@ -50,7 +50,7 @@ Public Class clsReporterIonProcessor
 
             Dim includeFtmsColumns = False
 
-            If inputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.FINNIGAN_RAW_FILE_EXTENSION.ToUpper()) Then
+            If inputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper()) Then
 
                 ' Processing a thermo .Raw file
                 ' Check whether any of the frag scans has IsFTMS true

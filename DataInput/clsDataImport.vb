@@ -9,7 +9,7 @@ Namespace DataInput
 
 #Region "Constants and Enums"
 
-        Public Const FINNIGAN_RAW_FILE_EXTENSION As String = ".RAW"
+        Public Const THERMO_RAW_FILE_EXTENSION As String = ".RAW"
 
         Public Const MZ_ML_FILE_EXTENSION As String = ".MZML"
 
@@ -351,7 +351,7 @@ Namespace DataInput
 
         Public Shared Function GetDefaultExtensionsToParse() As IList(Of String)
             Dim extensionsToParse = New List(Of String) From {
-                FINNIGAN_RAW_FILE_EXTENSION,
+                THERMO_RAW_FILE_EXTENSION,
                 MZ_XML_FILE_EXTENSION1,
                 MZ_XML_FILE_EXTENSION2,
                 MZ_DATA_FILE_EXTENSION1,

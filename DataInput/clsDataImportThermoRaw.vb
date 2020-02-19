@@ -347,7 +347,7 @@ Namespace DataInput
                 .BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
                 .BasePeakIonIntensity = thermoScanInfo.BasePeakIntensity,
                 .TotalIonIntensity = thermoScanInfo.TotalIonCurrent,
-                .MinimumPositiveIntensity = 0,        ' This will be determined in LoadSpectraForFinniganDataFile
+                .MinimumPositiveIntensity = 0,        ' This will be determined in LoadSpectraForThermoRawFile
                 .ZoomScan = thermoScanInfo.ZoomScan,
                 .SIMScan = thermoScanInfo.SIMScan,
                 .MRMScanType = thermoScanInfo.MRMScanType,
@@ -417,7 +417,7 @@ Namespace DataInput
             End If
 
             ' Note: Even if mKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            Dim success = LoadSpectraForFinniganDataFile(
+            Dim success = LoadSpectraForThermoRawFile(
                 xcaliburAccessor,
                 spectraCache,
                 scanInfo,
@@ -444,7 +444,7 @@ Namespace DataInput
           binningOptions As clsBinningOptions,
           thermoScanInfo As ThermoRawFileReader.clsScanInfo) As Boolean
 
-            ' Note that MinimumPositiveIntensity will be determined in LoadSpectraForFinniganDataFile
+            ' Note that MinimumPositiveIntensity will be determined in LoadSpectraForThermoRawFile
 
             Dim scanInfo = New clsScanInfo(thermoScanInfo.ParentIonMZ) With {
                 .ScanNumber = thermoScanInfo.ScanNumber,
@@ -518,7 +518,7 @@ Namespace DataInput
             ' Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             Dim msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
 
-            Dim success = LoadSpectraForFinniganDataFile(
+            Dim success = LoadSpectraForThermoRawFile(
               xcaliburAccessor,
               spectraCache,
               scanInfo,
@@ -569,7 +569,7 @@ Namespace DataInput
 
         End Sub
 
-        Private Function LoadSpectraForFinniganDataFile(
+        Private Function LoadSpectraForThermoRawFile(
           xcaliburAccessor As XRawFileIO,
           spectraCache As clsSpectraCache,
           scanInfo As clsScanInfo,
@@ -608,6 +608,8 @@ Namespace DataInput
                 Dim msSpectrum As New clsMSSpectrum(scanInfo.ScanNumber, mzList, intensityList, scanInfo.IonCountRaw)
 
                 lastKnownLocation = "Manually determine the base peak m/z and base peak intensity"
+
+                ' ReSharper disable once CommentTypo
 
                 ' Regarding BPI, comparison of data read via the ThermoRawFileReader vs.
                 ' that read from the .mzML file for dataset QC_Shew_18_02-run1_02Mar19_Arwen_18-11-02
@@ -671,7 +673,7 @@ Namespace DataInput
                     keepRawSpectrum)
 
             Catch ex As Exception
-                ReportError("Error in LoadSpectraForFinniganDataFile (LastKnownLocation: " & lastKnownLocation & ")", ex, eMasicErrorCodes.InputFileDataReadError)
+                ReportError("Error in LoadSpectraForThermoRawFile (LastKnownLocation: " & lastKnownLocation & ")", ex, eMasicErrorCodes.InputFileDataReadError)
                 Return False
             End Try
 

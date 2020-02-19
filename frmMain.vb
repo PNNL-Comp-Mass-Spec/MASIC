@@ -375,7 +375,7 @@ Public Class frmMain
 
 
         msg.Clear()
-        msg.Append("When processing Thermo-Finnigan MRM data files, a file named _MRMSettings.txt will be created listing the ")
+        msg.Append("When processing Thermo MRM data files, a file named _MRMSettings.txt will be created listing the ")
         msg.Append("parent and daughter m/z values monitored via SRM. ")
         msg.Append("You can optionally export detailed MRM intensity data using these options:")
         lblMRMInfo.Text = msg.ToString()
@@ -1167,7 +1167,7 @@ Public Class frmMain
             txtExportRawDataIntensityMinimum.Text = exportOptions.IntensityMinimum.ToString()
 
 
-            ' Finnigan Info File options
+            ' Thermo .raw info file options
             chkSaveMSMethodFile.Checked = masicOptions.WriteMSMethodFile
             chkSaveMSTuneFile.Checked = masicOptions.WriteMSTuneFile
             chkWriteDetailedSICDataFile.Checked = masicOptions.WriteDetailedSICDataFile
@@ -1669,7 +1669,7 @@ Public Class frmMain
                                                            lblExportRawDataIntensityMinimum.Text & " must be a value", parseError)
             If parseError Then Exit Try
 
-            ' Finnigan Info File options
+            ' Thermo .raw info file options
             masicOptions.WriteMSMethodFile = chkSaveMSMethodFile.Checked
             masicOptions.WriteMSTuneFile = chkSaveMSTuneFile.Checked
             masicOptions.WriteDetailedSICDataFile = chkWriteDetailedSICDataFile.Checked
