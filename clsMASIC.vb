@@ -26,6 +26,7 @@ Imports System.Runtime.InteropServices
 Imports MASIC.DataOutput
 Imports MASIC.DatasetStats
 Imports PRISM
+Imports PRISM.Logging
 
 Public Class clsMASIC
     Inherits FileProcessor.ProcessFilesBase
@@ -34,7 +35,7 @@ Public Class clsMASIC
     ''' Constructor
     ''' </summary>
     Public Sub New()
-        MyBase.mFileDate = "February 11, 2020"
+        MyBase.mFileDate = "February 19, 2020"
 
         mLocalErrorCode = eMasicErrorCodes.NoError
         mStatusMessage = String.Empty
@@ -1981,7 +1982,7 @@ Public Class clsMASIC
         AddHandler dataImporter.UpdateMemoryUsageEvent, AddressOf UpdateMemoryUsageEventHandler
     End Sub
 
-    Private Sub RegisterEventsBase(oClass As EventNotifier)
+    Private Sub RegisterEventsBase(oClass As IEventNotifier)
         AddHandler oClass.StatusEvent, AddressOf MessageEventHandler
         AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
         AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
