@@ -1431,9 +1431,8 @@ Public Class frmMain
             .ValidateNames = True,
             .Filter = "Xcalibur Raw files (*.raw)|*.raw|" &
                       "mzXML files (*.mzXML)|*.mzXML|" &
-                      "mzXML files (*mzXML.xml)|*mzXML.xml|" &
+                      "mzML files (*.mzML)|*.mzML|" &
                       "mzData files (*.mzData)|*.mzData|" &
-                      "mzData files (*mzData.xml)|*mzData.xml|" &
                       "Mascot Generic Format files (*.mgf)|*.mgf|" &
                       "CDF files (*.cdf)|*.cdf|" &
                       "All files (*.*)|*.*"
@@ -1447,18 +1446,16 @@ Public Class frmMain
 
             Dim filterIndex As Integer
             Select Case fileExtension.ToLower()
-                Case ".mzxml"
+                Case ".mzXml".ToLower()
                     filterIndex = 2
-                Case "mzxml.xml"
+                Case "mzML".ToLower()
                     filterIndex = 3
-                Case ".mzdata"
+                Case ".mzData".ToLower()
                     filterIndex = 4
-                Case "mzdata.xml"
-                    filterIndex = 5
                 Case ".mgf"
-                    filterIndex = 6
+                    filterIndex = 5
                 Case ".cdf"
-                    filterIndex = 7
+                    filterIndex = 6
                 Case Else
                     filterIndex = 1
             End Select
