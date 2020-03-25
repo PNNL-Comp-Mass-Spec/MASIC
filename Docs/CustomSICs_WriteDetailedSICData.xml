@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <sections>
   <section name="MasicDatabaseSettings">
     <item key="ConnectionString" value="" />
@@ -19,13 +19,13 @@
     <item key="SkipMSMSProcessing" value="False" />
     <item key="SkipSICAndRawDataProcessing" value="False" />
     <item key="ExportRawDataOnly" value="False" />
-    <item key="SuppressNoParentIonsError" value="False" />
+    <item key="SuppressNoParentIonsError" value="True" />
     <item key="WriteExtendedStats" value="True" />
     <item key="WriteExtendedStatsIncludeScanFilterText" value="True" />
-    <item key="WriteExtendedStatsStatusLog" value="False" />
-    <item key="StatusLogKeyNameFilterList" value="" />
+    <item key="WriteExtendedStatsStatusLog" value="True" />
+    <item key="StatusLogKeyNameFilterList" value="Source" />
     <item key="ConsolidateConstantExtendedHeaderValues" value="True" />
-    <item key="WriteDetailedSICDataFile" value="False" />
+    <item key="WriteDetailedSICDataFile" value="True" />
     <item key="WriteMSMethodFile" value="True" />
     <item key="WriteMSTuneFile" value="False" />
     <item key="WriteMRMDataList" value="False" />
@@ -47,9 +47,9 @@
     <item key="ExportRawDataIntensityMinimum" value="0" />
   </section>
   <section name="SICOptions">
-    <item key="SICToleranceDa" value="0.6000" />
-    <item key="SICTolerance" value="0.6000" />
-    <item key="SICToleranceIsPPM" value="False" />
+    <item key="SICToleranceDa" value="0.0100" />
+    <item key="SICTolerance" value="10.0000" />
+    <item key="SICToleranceIsPPM" value="True" />
     <item key="RefineReportedParentIonMZ" value="False" />
     <item key="ScanRangeStart" value="0" />
     <item key="ScanRangeEnd" value="0" />
@@ -84,9 +84,9 @@
     <item key="MassSpectraNoiseFractionLowIntensityDataToAverage" value="0.5" />
     <item key="MassSpectraNoiseMinimumSignalToNoiseRatio" value="2" />
     <item key="ReplaceSICZeroesWithMinimumPositiveValueFromMSData" value="True" />
-    <item key="SimilarIonMZToleranceHalfWidth" value="0.1" />
+    <item key="SimilarIonMZToleranceHalfWidth" value="0.05" />
     <item key="SimilarIonToleranceHalfWidthMinutes" value="5" />
-    <item key="SpectrumSimilarityMinimum" value="0.7" />
+    <item key="SpectrumSimilarityMinimum" value="0.8" />
   </section>
   <section name="BinningOptions">
     <item key="BinStartX" value="50" />
@@ -100,15 +100,17 @@
   <section name="MemoryOptions">
     <item key="DiskCachingAlwaysDisabled" value="False" />
     <item key="CacheDirectoryPath" value="" />
-    <item key="CacheSpectraToRetainInMemory" value="500" />
+    <item key="CacheSpectraToRetainInMemory" value="5000" />
   </section>
   <section name="CustomSICValues">
-    <item key="MZList" value="" />
-    <item key="ScanCenterList" value="" />
+    <item key="MZList" value="649.85" />
+    <item key="MZToleranceDaList" value="0.2" />
+    <item key="ScanCenterList" value="0" />
+    <item key="ScanToleranceList" value="0" />
     <item key="ScanCommentList" value="" />
     <item key="ScanTolerance" value="1000" />
-    <item key="ScanType" value="Absolute" />
+    <item key="ScanType" value="Relative" />
     <item key="CustomMZFile" value="" />
-    <item key="LimitSearchToCustomMZList" value="False" />
+    <item key="LimitSearchToCustomMZList" value="True" />
   </section>
 </sections>
