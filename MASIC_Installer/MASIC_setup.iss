@@ -1,5 +1,5 @@
-; This is an Inno Setup configuration file
-; http://www.jrsoftware.org/isinfo.php
+﻿; This is an Inno Setup configuration file
+; https://jrsoftware.org/isinfo.php
 
 #define ApplicationVersion GetFileVersion('..\bin\MASIC.exe')
 
@@ -43,7 +43,7 @@ Source: ..\MASICBrowser\bin\Svg.dll                            ; DestDir: {app}
 Source: ..\Readme.md                                           ; DestDir: {app}
 Source: ..\RevisionHistory.txt                                 ; DestDir: {app}
 Source: Images\delete_16x.ico                                  ; DestDir: {app}
-                                                
+
 Source: ..\Docs\MASICParameters.xml                            ; DestDir: {app}
 Source: ..\Docs\LTQ_Example\Default_2008-08-22.xml             ; DestDir: {app}\LTQ_Example
 Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML         ; DestDir: {app}\LTQ_Example
@@ -62,7 +62,7 @@ Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestD
 
 Source: ..\Docs\CustomMZList_AcqTime.txt                       ; DestDir: {app}
 Source: ..\Docs\CustomMZList.txt                               ; DestDir: {app}
-                                                          
+
 Source: ..\Lib\netcdf.dll                                      ; DestDir: {app}
 Source: ..\Lib\RawFileReaderLicense.doc                        ; DestDir: {app}
 
@@ -87,24 +87,27 @@ AppPublisher=Pacific Northwest National Laboratory
 AppPublisherURL=http://omics.pnl.gov/software
 AppSupportURL=http://omics.pnl.gov/software
 AppUpdatesURL=http://omics.pnl.gov/software
+ArchitecturesAllowed=x64 x86
 ArchitecturesInstallIn64BitMode=x64
-DefaultDirName={pf}\MASIC
+DefaultDirName={autopf}\MASIC
 DefaultGroupName=PAST Toolkit
-AppCopyright=� PNNL
+AppCopyright=© PNNL
 ;LicenseFile=.\License.rtf
-PrivilegesRequired=poweruser
+PrivilegesRequired=admin
 OutputBaseFilename=MASIC_Installer
 VersionInfoVersion={#ApplicationVersion}
 VersionInfoCompany=PNNL
 VersionInfoDescription=MASIC
 VersionInfoCopyright=PNNL
-DisableFinishedPage=true
+DisableFinishedPage=yes
+DisableWelcomePage=no
 ShowLanguageDialog=no
-ChangesAssociations=false
-EnableDirDoesntExistWarning=false
-AlwaysShowDirOnReadyPage=true
+ChangesAssociations=no
+WizardStyle=modern
+EnableDirDoesntExistWarning=no
+AlwaysShowDirOnReadyPage=yes
 UninstallDisplayIcon={app}\delete_16x.ico
-ShowTasksTreeLines=true
+ShowTasksTreeLines=yes
 OutputDir=.\Output
 
 [Registry]
