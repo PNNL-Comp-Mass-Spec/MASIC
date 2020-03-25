@@ -801,16 +801,16 @@ Public Class clsMASICOptions
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesBackward", SICOptions.MaxSICPeakWidthMinutesBackward)
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesForward", SICOptions.MaxSICPeakWidthMinutesForward)
+            writer.SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", StringUtilities.DblToString(SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax, 5))
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum)
 
-                .SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax)
             ' Peak Finding Options
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode)
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute)
 
+            writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", StringUtilities.DblToString(SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 5))
 
-                .SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage)
             ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
             SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
 
@@ -818,7 +818,7 @@ Public Class clsMASICOptions
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap", SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap)
 
-                .SetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax)
+            writer.SetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", StringUtilities.DblToString(SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax, 5))
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler", SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler)
 
@@ -830,7 +830,7 @@ Public Class clsMASICOptions
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth", SICOptions.SICPeakFinderOptions.UseButterworthSmooth)
 
-                .SetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency)
+            writer.SetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", StringUtilities.DblToString(SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency, 5))
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData)
 
@@ -844,7 +844,7 @@ Public Class clsMASICOptions
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute)
 
-                .SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage)
+            writer.SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", StringUtilities.DblToString(SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage, 5))
 
             writer.SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio)
 

@@ -504,25 +504,25 @@ Namespace DataOutput
                 writer.WriteElementString("MaxSICPeakWidthMinutesBackward", sicOptions.MaxSICPeakWidthMinutesBackward.ToString())
                 writer.WriteElementString("MaxSICPeakWidthMinutesForward", sicOptions.MaxSICPeakWidthMinutesForward.ToString())
 
-                writer.WriteElementString("IntensityThresholdFractionMax", sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax.ToString())
+                writer.WriteElementString("IntensityThresholdFractionMax", StringUtilities.DblToString(sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax, 5))
                 writer.WriteElementString("IntensityThresholdAbsoluteMinimum", sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString())
 
                 ' Peak Finding Options
                 Dim baselineNoiseOptions = sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions
                 writer.WriteElementString("SICNoiseThresholdMode", baselineNoiseOptions.BaselineNoiseMode.ToString())
                 writer.WriteElementString("SICNoiseThresholdIntensity", baselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString())
-                writer.WriteElementString("SICNoiseFractionLowIntensityDataToAverage", baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString())
+                writer.WriteElementString("SICNoiseFractionLowIntensityDataToAverage", StringUtilities.DblToString(baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 5))
                 writer.WriteElementString("SICNoiseMinimumSignalToNoiseRatio", baselineNoiseOptions.MinimumSignalToNoiseRatio.ToString())
 
                 writer.WriteElementString("MaxDistanceScansNoOverlap", sicOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap.ToString())
-                writer.WriteElementString("MaxAllowedUpwardSpikeFractionMax", sicOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax.ToString())
+                writer.WriteElementString("MaxAllowedUpwardSpikeFractionMax", StringUtilities.DblToString(sicOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax, 5))
                 writer.WriteElementString("InitialPeakWidthScansScaler", sicOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler.ToString())
                 writer.WriteElementString("InitialPeakWidthScansMaximum", sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum.ToString())
 
                 writer.WriteElementString("FindPeaksOnSmoothedData", sicOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData.ToString())
                 writer.WriteElementString("SmoothDataRegardlessOfMinimumPeakWidth", sicOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth.ToString())
                 writer.WriteElementString("UseButterworthSmooth", sicOptions.SICPeakFinderOptions.UseButterworthSmooth.ToString())
-                writer.WriteElementString("ButterworthSamplingFrequency", sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequency.ToString())
+                writer.WriteElementString("ButterworthSamplingFrequency", StringUtilities.DblToString(sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequency, 5))
                 writer.WriteElementString("ButterworthSamplingFrequencyDoubledForSIMData", sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData.ToString())
 
                 writer.WriteElementString("UseSavitzkyGolaySmooth", sicOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth.ToString())
@@ -531,7 +531,7 @@ Namespace DataOutput
                 Dim noiseThresholdOptions = sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions
                 writer.WriteElementString("MassSpectraNoiseThresholdMode", noiseThresholdOptions.BaselineNoiseMode.ToString())
                 writer.WriteElementString("MassSpectraNoiseThresholdIntensity", noiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString())
-                writer.WriteElementString("MassSpectraNoiseFractionLowIntensityDataToAverage", noiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString())
+                writer.WriteElementString("MassSpectraNoiseFractionLowIntensityDataToAverage", StringUtilities.DblToString(noiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage, 5))
                 writer.WriteElementString("MassSpectraNoiseMinimumSignalToNoiseRatio", noiseThresholdOptions.MinimumSignalToNoiseRatio.ToString())
 
                 writer.WriteElementString("ReplaceSICZeroesWithMinimumPositiveValueFromMSData", sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData.ToString())
