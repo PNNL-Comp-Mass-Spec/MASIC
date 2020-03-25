@@ -177,6 +177,7 @@
                 reporterIons.Add(New clsReporterIonInfo(131.144499))        ' 131C
 
             Case eReporterIonMassModeConstants.TMTSixteenMZ
+                ' ReSharper disable once CommentTypo
                 ' TMT 16-plex Isobaric tags (from Thermo), aka TMT16 or TMTpro
                 ' Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
                 reporterIons.Add(New clsReporterIonInfo(126.127726))        '
@@ -324,6 +325,7 @@
             Case eReporterIonMassModeConstants.TMTElevenMZ
                 Return "11-plex TMT"
             Case eReporterIonMassModeConstants.TMTSixteenMZ
+                ' ReSharper disable once StringLiteralTypo
                 Return "16-plex TMT (aka TMTpro)"
             Case eReporterIonMassModeConstants.ITraqEightMZHighRes
                 Return "8-plex iTraq (High Res MS/MS)"

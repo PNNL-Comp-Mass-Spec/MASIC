@@ -275,7 +275,7 @@ Partial Class frmMain
         Me.fraInputFilePath.Size = New System.Drawing.Size(885, 74)
         Me.fraInputFilePath.TabIndex = 0
         Me.fraInputFilePath.TabStop = False
-        Me.fraInputFilePath.Text = "Input File Path (Finnigan Ion Trap .Raw or Agilent .CDF/.MGF combo or mzXML or mz" &
+        Me.fraInputFilePath.Text = "Input File Path (Thermo .Raw or Agilent .CDF/.MGF combo or mzXML or mz" &
     "Data)"
         '
         'MainMenuControl
@@ -1728,7 +1728,7 @@ Partial Class frmMain
         Me.fraAdditionalInfoFiles.Size = New System.Drawing.Size(422, 135)
         Me.fraAdditionalInfoFiles.TabIndex = 1
         Me.fraAdditionalInfoFiles.TabStop = False
-        Me.fraAdditionalInfoFiles.Text = "Thermo Finnigan Info Files"
+        Me.fraAdditionalInfoFiles.Text = "Thermo Info Files"
         '
         'chkConsolidateConstantExtendedHeaderValues
         '

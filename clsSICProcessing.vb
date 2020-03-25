@@ -761,6 +761,7 @@ Public Class clsSICProcessing
 
             ' Use this for debugging
             If Math.Abs(mzSearchChunk(mzIndexWork).SearchMZ - DebugMZToFind) < 0.1 Then
+                ' ReSharper disable once UnusedVariable
                 Dim parentIonIndexPointer = mzSearchChunk(mzIndexWork).MZIndexStart
             End If
 
@@ -836,6 +837,7 @@ Public Class clsSICProcessing
                 If parentIonUpdated(parentIonIndexPointer) Then Continue For
 
                 If parentIonIndices(parentIonIndexPointer) = debugParentIonIndexToFind Then
+                    ' ReSharper disable once RedundantAssignment
                     scanIndexObservedInFullSIC = -1
                 End If
 

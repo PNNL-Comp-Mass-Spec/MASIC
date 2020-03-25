@@ -13,7 +13,7 @@ Public Class clsScanInfo
     Public Property ScanTime As Single
 
     ''' <summary>
-    ''' String description of the scan mode for the given scan; only used for Finnigan .Raw files
+    ''' String description of the scan mode for the given scan; only used for Thermo .Raw files
     ''' </summary>
     ''' <remarks>Typical values are: FTMS + p NSI Full ms, ITMS + c ESI Full ms,
     ''' ITMS + p ESI d Z ms, ITMS + c NSI d Full ms2, ITMS + c NSI d Full ms2,
