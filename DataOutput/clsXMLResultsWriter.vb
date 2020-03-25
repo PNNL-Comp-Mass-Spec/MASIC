@@ -478,6 +478,8 @@ Namespace DataOutput
                 writer.WriteElementString("CacheAlwaysDisabled", spectraCache.DiskCachingAlwaysDisabled.ToString())
                 writer.WriteElementString("CacheSpectraToRetainInMemory", spectraCache.CacheSpectraToRetainInMemory.ToString())
 
+                writer.WriteEndElement()
+
                 writer.WriteStartElement("SICOptions")
 
                 ' SIC Options
