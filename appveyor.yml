@@ -13,5 +13,7 @@ test:
 artifacts:
 - path: bin
   name: MASIC
+- path: bin\Console\Debug
+  name: MASIC_Console
 - path: MASICBrowser\bin
   name: MASICBrowser
