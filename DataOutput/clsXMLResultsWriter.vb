@@ -474,111 +474,100 @@ Namespace DataOutput
                 writer.WriteEndElement()
 
                 writer.WriteStartElement("MemoryOptions")
-                With spectraCache
 
-                    writer.WriteElementString("CacheAlwaysDisabled", .DiskCachingAlwaysDisabled.ToString())
-                    writer.WriteElementString("CacheSpectraToRetainInMemory", .CacheSpectraToRetainInMemory.ToString())
-
-                End With
-                writer.WriteEndElement()
-
+                writer.WriteElementString("CacheAlwaysDisabled", spectraCache.DiskCachingAlwaysDisabled.ToString())
+                writer.WriteElementString("CacheSpectraToRetainInMemory", spectraCache.CacheSpectraToRetainInMemory.ToString())
 
                 writer.WriteStartElement("SICOptions")
-                With sicOptions
-                    ' SIC Options
 
-                    ' "SICToleranceDa" is a legacy parameter; If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
-                    writer.WriteElementString("SICToleranceDa", clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"))
+                ' SIC Options
 
-                    writer.WriteElementString("SICTolerance", .SICTolerance.ToString("0.0000"))
-                    writer.WriteElementString("SICToleranceIsPPM", .SICToleranceIsPPM.ToString())
+                ' "SICToleranceDa" is a legacy parameter; If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
+                writer.WriteElementString("SICToleranceDa", clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 1000).ToString("0.0000"))
 
-                    writer.WriteElementString("RefineReportedParentIonMZ", .RefineReportedParentIonMZ.ToString())
+                writer.WriteElementString("SICTolerance", sicOptions.SICTolerance.ToString("0.0000"))
+                writer.WriteElementString("SICToleranceIsPPM", sicOptions.SICToleranceIsPPM.ToString())
 
-                    writer.WriteElementString("ScanRangeStart", .ScanRangeStart.ToString())
-                    writer.WriteElementString("ScanRangeEnd", .ScanRangeEnd.ToString())
-                    writer.WriteElementString("RTRangeStart", .RTRangeStart.ToString())
-                    writer.WriteElementString("RTRangeEnd", .RTRangeEnd.ToString())
+                writer.WriteElementString("RefineReportedParentIonMZ", sicOptions.RefineReportedParentIonMZ.ToString())
 
-                    writer.WriteElementString("CompressMSSpectraData", .CompressMSSpectraData.ToString())
-                    writer.WriteElementString("CompressMSMSSpectraData", .CompressMSMSSpectraData.ToString())
+                writer.WriteElementString("ScanRangeStart", sicOptions.ScanRangeStart.ToString())
+                writer.WriteElementString("ScanRangeEnd", sicOptions.ScanRangeEnd.ToString())
+                writer.WriteElementString("RTRangeStart", sicOptions.RTRangeStart.ToString())
+                writer.WriteElementString("RTRangeEnd", sicOptions.RTRangeEnd.ToString())
 
-                    writer.WriteElementString("CompressToleranceDivisorForDa", .CompressToleranceDivisorForDa.ToString("0.0"))
-                    writer.WriteElementString("CompressToleranceDivisorForPPM", .CompressToleranceDivisorForPPM.ToString("0.0"))
+                writer.WriteElementString("CompressMSSpectraData", sicOptions.CompressMSSpectraData.ToString())
+                writer.WriteElementString("CompressMSMSSpectraData", sicOptions.CompressMSMSSpectraData.ToString())
 
-                    writer.WriteElementString("MaxSICPeakWidthMinutesBackward", .MaxSICPeakWidthMinutesBackward.ToString())
-                    writer.WriteElementString("MaxSICPeakWidthMinutesForward", .MaxSICPeakWidthMinutesForward.ToString())
+                writer.WriteElementString("CompressToleranceDivisorForDa", sicOptions.CompressToleranceDivisorForDa.ToString("0.0"))
+                writer.WriteElementString("CompressToleranceDivisorForPPM", sicOptions.CompressToleranceDivisorForPPM.ToString("0.0"))
 
-                    With .SICPeakFinderOptions
-                        writer.WriteElementString("IntensityThresholdFractionMax", .IntensityThresholdFractionMax.ToString())
-                        writer.WriteElementString("IntensityThresholdAbsoluteMinimum", .IntensityThresholdAbsoluteMinimum.ToString())
+                writer.WriteElementString("MaxSICPeakWidthMinutesBackward", sicOptions.MaxSICPeakWidthMinutesBackward.ToString())
+                writer.WriteElementString("MaxSICPeakWidthMinutesForward", sicOptions.MaxSICPeakWidthMinutesForward.ToString())
 
-                        ' Peak Finding Options
-                        With .SICBaselineNoiseOptions
-                            writer.WriteElementString("SICNoiseThresholdMode", .BaselineNoiseMode.ToString())
-                            writer.WriteElementString("SICNoiseThresholdIntensity", .BaselineNoiseLevelAbsolute.ToString())
-                            writer.WriteElementString("SICNoiseFractionLowIntensityDataToAverage", .TrimmedMeanFractionLowIntensityDataToAverage.ToString())
-                            writer.WriteElementString("SICNoiseMinimumSignalToNoiseRatio", .MinimumSignalToNoiseRatio.ToString())
-                        End With
+                writer.WriteElementString("IntensityThresholdFractionMax", sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax.ToString())
+                writer.WriteElementString("IntensityThresholdAbsoluteMinimum", sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString())
 
-                        writer.WriteElementString("MaxDistanceScansNoOverlap", .MaxDistanceScansNoOverlap.ToString())
-                        writer.WriteElementString("MaxAllowedUpwardSpikeFractionMax", .MaxAllowedUpwardSpikeFractionMax.ToString())
-                        writer.WriteElementString("InitialPeakWidthScansScaler", .InitialPeakWidthScansScaler.ToString())
-                        writer.WriteElementString("InitialPeakWidthScansMaximum", .InitialPeakWidthScansMaximum.ToString())
+                ' Peak Finding Options
+                Dim baselineNoiseOptions = sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions
+                writer.WriteElementString("SICNoiseThresholdMode", baselineNoiseOptions.BaselineNoiseMode.ToString())
+                writer.WriteElementString("SICNoiseThresholdIntensity", baselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString())
+                writer.WriteElementString("SICNoiseFractionLowIntensityDataToAverage", baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString())
+                writer.WriteElementString("SICNoiseMinimumSignalToNoiseRatio", baselineNoiseOptions.MinimumSignalToNoiseRatio.ToString())
 
-                        writer.WriteElementString("FindPeaksOnSmoothedData", .FindPeaksOnSmoothedData.ToString())
-                        writer.WriteElementString("SmoothDataRegardlessOfMinimumPeakWidth", .SmoothDataRegardlessOfMinimumPeakWidth.ToString())
-                        writer.WriteElementString("UseButterworthSmooth", .UseButterworthSmooth.ToString())
-                        writer.WriteElementString("ButterworthSamplingFrequency", .ButterworthSamplingFrequency.ToString())
-                        writer.WriteElementString("ButterworthSamplingFrequencyDoubledForSIMData", .ButterworthSamplingFrequencyDoubledForSIMData.ToString())
+                writer.WriteElementString("MaxDistanceScansNoOverlap", sicOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap.ToString())
+                writer.WriteElementString("MaxAllowedUpwardSpikeFractionMax", sicOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax.ToString())
+                writer.WriteElementString("InitialPeakWidthScansScaler", sicOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler.ToString())
+                writer.WriteElementString("InitialPeakWidthScansMaximum", sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum.ToString())
 
-                        writer.WriteElementString("UseSavitzkyGolaySmooth", .UseSavitzkyGolaySmooth.ToString())
-                        writer.WriteElementString("SavitzkyGolayFilterOrder", .SavitzkyGolayFilterOrder.ToString())
+                writer.WriteElementString("FindPeaksOnSmoothedData", sicOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData.ToString())
+                writer.WriteElementString("SmoothDataRegardlessOfMinimumPeakWidth", sicOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth.ToString())
+                writer.WriteElementString("UseButterworthSmooth", sicOptions.SICPeakFinderOptions.UseButterworthSmooth.ToString())
+                writer.WriteElementString("ButterworthSamplingFrequency", sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequency.ToString())
+                writer.WriteElementString("ButterworthSamplingFrequencyDoubledForSIMData", sicOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData.ToString())
 
-                        With .MassSpectraNoiseThresholdOptions
-                            writer.WriteElementString("MassSpectraNoiseThresholdMode", .BaselineNoiseMode.ToString())
-                            writer.WriteElementString("MassSpectraNoiseThresholdIntensity", .BaselineNoiseLevelAbsolute.ToString())
-                            writer.WriteElementString("MassSpectraNoiseFractionLowIntensityDataToAverage", .TrimmedMeanFractionLowIntensityDataToAverage.ToString())
-                            writer.WriteElementString("MassSpectraNoiseMinimumSignalToNoiseRatio", .MinimumSignalToNoiseRatio.ToString())
-                        End With
-                    End With
+                writer.WriteElementString("UseSavitzkyGolaySmooth", sicOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth.ToString())
+                writer.WriteElementString("SavitzkyGolayFilterOrder", sicOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder.ToString())
 
-                    writer.WriteElementString("ReplaceSICZeroesWithMinimumPositiveValueFromMSData", .ReplaceSICZeroesWithMinimumPositiveValueFromMSData.ToString())
-                    writer.WriteElementString("SaveSmoothedData", .SaveSmoothedData.ToString())
+                Dim noiseThresholdOptions = sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions
+                writer.WriteElementString("MassSpectraNoiseThresholdMode", noiseThresholdOptions.BaselineNoiseMode.ToString())
+                writer.WriteElementString("MassSpectraNoiseThresholdIntensity", noiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString())
+                writer.WriteElementString("MassSpectraNoiseFractionLowIntensityDataToAverage", noiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString())
+                writer.WriteElementString("MassSpectraNoiseMinimumSignalToNoiseRatio", noiseThresholdOptions.MinimumSignalToNoiseRatio.ToString())
 
-                    ' Similarity options
-                    writer.WriteElementString("SimilarIonMZToleranceHalfWidth", .SimilarIonMZToleranceHalfWidth.ToString())
-                    writer.WriteElementString("SimilarIonToleranceHalfWidthMinutes", .SimilarIonToleranceHalfWidthMinutes.ToString())
-                    writer.WriteElementString("SpectrumSimilarityMinimum", .SpectrumSimilarityMinimum.ToString())
-                End With
+                writer.WriteElementString("ReplaceSICZeroesWithMinimumPositiveValueFromMSData", sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData.ToString())
+                writer.WriteElementString("SaveSmoothedData", sicOptions.SaveSmoothedData.ToString())
+
+                ' Similarity options
+                writer.WriteElementString("SimilarIonMZToleranceHalfWidth", sicOptions.SimilarIonMZToleranceHalfWidth.ToString())
+                writer.WriteElementString("SimilarIonToleranceHalfWidthMinutes", sicOptions.SimilarIonToleranceHalfWidthMinutes.ToString())
+                writer.WriteElementString("SpectrumSimilarityMinimum", sicOptions.SpectrumSimilarityMinimum.ToString())
+
                 writer.WriteEndElement()
 
                 writer.WriteStartElement("BinningOptions")
-                With binningOptions
-                    writer.WriteElementString("BinStartX", .StartX.ToString())
-                    writer.WriteElementString("BinEndX", .EndX.ToString())
-                    writer.WriteElementString("BinSize", .BinSize.ToString())
-                    writer.WriteElementString("MaximumBinCount", .MaximumBinCount.ToString())
 
-                    writer.WriteElementString("IntensityPrecisionPercent", .IntensityPrecisionPercent.ToString())
-                    writer.WriteElementString("Normalize", .Normalize.ToString())
-                    writer.WriteElementString("SumAllIntensitiesForBin", .SumAllIntensitiesForBin.ToString())
+                writer.WriteElementString("BinStartX", binningOptions.StartX.ToString())
+                writer.WriteElementString("BinEndX", binningOptions.EndX.ToString())
+                writer.WriteElementString("BinSize", binningOptions.BinSize.ToString())
+                writer.WriteElementString("MaximumBinCount", binningOptions.MaximumBinCount.ToString())
 
-                End With
+                writer.WriteElementString("IntensityPrecisionPercent", binningOptions.IntensityPrecisionPercent.ToString())
+                writer.WriteElementString("Normalize", binningOptions.Normalize.ToString())
+                writer.WriteElementString("SumAllIntensitiesForBin", binningOptions.SumAllIntensitiesForBin.ToString())
+
                 writer.WriteEndElement()
 
                 writer.WriteStartElement("CustomSICValues")
-                With mOptions.CustomSICList
-                    writer.WriteElementString("MZList", .RawTextMZList)
-                    writer.WriteElementString("MZToleranceDaList", CheckForEmptyToleranceList(.RawTextMZToleranceDaList))
-                    writer.WriteElementString("ScanCenterList", .RawTextScanOrAcqTimeCenterList)
-                    writer.WriteElementString("ScanToleranceList", CheckForEmptyToleranceList(.RawTextScanOrAcqTimeToleranceList))
-                    writer.WriteElementString("ScanTolerance", .ScanOrAcqTimeTolerance.ToString())
-                    writer.WriteElementString("ScanType", .ScanToleranceType.ToString())
-                    writer.WriteElementString("LimitSearchToCustomMZList", .LimitSearchToCustomMZList.ToString())
-                End With
-                writer.WriteEndElement()
 
+                writer.WriteElementString("MZList", mOptions.CustomSICList.RawTextMZList)
+                writer.WriteElementString("MZToleranceDaList", CheckForEmptyToleranceList(mOptions.CustomSICList.RawTextMZToleranceDaList))
+                writer.WriteElementString("ScanCenterList", mOptions.CustomSICList.RawTextScanOrAcqTimeCenterList)
+                writer.WriteElementString("ScanToleranceList", CheckForEmptyToleranceList(mOptions.CustomSICList.RawTextScanOrAcqTimeToleranceList))
+                writer.WriteElementString("ScanTolerance", mOptions.CustomSICList.ScanOrAcqTimeTolerance.ToString())
+                writer.WriteElementString("ScanType", mOptions.CustomSICList.ScanToleranceType.ToString())
+                writer.WriteElementString("LimitSearchToCustomMZList", mOptions.CustomSICList.LimitSearchToCustomMZList.ToString())
+
+                writer.WriteEndElement()
 
             Catch ex As Exception
                 ReportError("Error initializing the XML output file: " & xmlOutputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
