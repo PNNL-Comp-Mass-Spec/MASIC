@@ -126,7 +126,9 @@ Public Class frmMain
 
         End Set
     End Property
+
 #End Region
+
 #Region "Procedures"
 
     Private Sub AddCustomSICRow(
@@ -159,11 +161,11 @@ Public Class frmMain
     End Sub
 
     Private Sub AppendCustomSICListItem(mz As Double, scanCenter As Single, comment As String)
-        Dim customSicEntryItem = New udtCustomSICEntryType()
-
-        customSicEntryItem.MZ = mz
-        customSicEntryItem.ScanCenter = scanCenter
-        customSicEntryItem.Comment = comment
+        Dim customSicEntryItem = New udtCustomSICEntryType With {
+            .MZ = mz,
+            .ScanCenter = scanCenter,
+            .Comment = comment
+        }
 
         mDefaultCustomSICList.Add(customSicEntryItem)
     End Sub
@@ -1578,14 +1580,14 @@ Public Class frmMain
         Dim timeTolerance As Boolean
 
         ' Define the PM Thresholds table style
-        tsCustomSICValues = New DataGridTableStyle
-
         ' Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATA_TABLE will cause this style to be used with that table
-        tsCustomSICValues.MappingName = CUSTOM_SIC_VALUES_DATA_TABLE
-        tsCustomSICValues.AllowSorting = True
-        tsCustomSICValues.ColumnHeadersVisible = True
-        tsCustomSICValues.RowHeadersVisible = True
-        tsCustomSICValues.ReadOnly = False
+        tsCustomSICValues = New DataGridTableStyle With {
+            .MappingName = CUSTOM_SIC_VALUES_DATA_TABLE,
+            .AllowSorting = True,
+            .ColumnHeadersVisible = True,
+            .RowHeadersVisible = True,
+            .ReadOnly = False
+        }
 
         DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ, "Custom m/z", 90)
         DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ_TOLERANCE, "m/z tolerance (Da)", 110)
