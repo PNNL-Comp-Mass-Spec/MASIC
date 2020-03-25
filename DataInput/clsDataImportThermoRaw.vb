@@ -342,8 +342,8 @@ Namespace DataInput
             Dim scanInfo = New clsScanInfo() With {
                 .ScanNumber = thermoScanInfo.ScanNumber,
                 .ScanTime = CSng(thermoScanInfo.RetentionTime),
-                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
-                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
+                .ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText),
+                .ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText),
                 .BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
                 .BasePeakIonIntensity = thermoScanInfo.BasePeakIntensity,
                 .TotalIonIntensity = thermoScanInfo.TotalIonCurrent,
@@ -449,8 +449,8 @@ Namespace DataInput
             Dim scanInfo = New clsScanInfo(thermoScanInfo.ParentIonMZ) With {
                 .ScanNumber = thermoScanInfo.ScanNumber,
                 .ScanTime = CSng(thermoScanInfo.RetentionTime),
-                .ScanHeaderText = XRawFileIO.MakeGenericFinniganScanFilter(thermoScanInfo.FilterText),
-                .ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(thermoScanInfo.FilterText),
+                .ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText),
+                .ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText),
                 .BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
                 .BasePeakIonIntensity = thermoScanInfo.BasePeakIntensity,
                 .TotalIonIntensity = thermoScanInfo.TotalIonCurrent,

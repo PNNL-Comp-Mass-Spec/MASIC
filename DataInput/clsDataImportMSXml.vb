@@ -16,7 +16,6 @@ Namespace DataInput
         Inherits clsDataImport
 
 #Region "Member variables"
-
         Private ReadOnly mCentroider As Centroider
         Private mWarnCount As Integer
 
@@ -24,8 +23,8 @@ Namespace DataInput
 
         Private ReadOnly mCentroidedPrecursorIonsMz As List(Of Double) = New List(Of Double)
         Private ReadOnly mCentroidedPrecursorIonsIntensity As List(Of Double) = New List(Of Double)
-
 #End Region
+
         ''' <summary>
         ''' Constructor
         ''' </summary>
@@ -1217,8 +1216,8 @@ Namespace DataInput
             If Not String.IsNullOrWhiteSpace(filterString) Then
 
                 If thermoRawFile Then
-                    mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericFinniganScanFilter(filterString)
-                    mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(filterString)
+                    mzXmlSourceSpectrum.FilterLine = XRawFileIO.MakeGenericThermoScanFilter(filterString)
+                    mzXmlSourceSpectrum.ScanType = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(filterString)
                 Else
                     mzXmlSourceSpectrum.FilterLine = filterString
                 End If
@@ -1422,7 +1421,7 @@ Namespace DataInput
 
             If Not String.IsNullOrEmpty(scanInfo.ScanHeaderText) Then
                 ' This is a Thermo file; auto define .ScanTypeName using the FilterLine text
-                scanInfo.ScanTypeName = XRawFileIO.GetScanTypeNameFromFinniganScanFilterText(scanInfo.ScanHeaderText)
+                scanInfo.ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(scanInfo.ScanHeaderText)
 
                 ' Now populate .SIMScan, .MRMScanType and .ZoomScan
                 Dim msLevelFromFilter As Integer
@@ -1445,7 +1444,7 @@ Namespace DataInput
             If String.IsNullOrEmpty(scanInfo.ScanTypeName) Then
                 scanInfo.ScanTypeName = defaultScanType
             Else
-                ' Possibly update .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromFinniganScanFilterText()
+                ' Possibly update .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromThermoScanFilterText()
                 Select Case scanInfo.ScanTypeName.ToLower()
                     Case clsSpectrumInfoMzXML.ScanTypeNames.Full.ToLower()
                         If msLevel <= 1 Then
