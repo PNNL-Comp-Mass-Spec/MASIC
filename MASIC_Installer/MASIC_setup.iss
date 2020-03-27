@@ -12,44 +12,58 @@ WelcomeLabel2=This will install [name/ver] on your computer.
 ; WelcomeLabel2=Welcome message%n%nAdditional sentence
 
 [Files]
-Source: ..\bin\MASIC.exe                       ; DestDir: {app}
-Source: ..\bin\MASIC.pdb                       ; DestDir: {app}
-Source: ..\bin\Console\Debug\MASIC_Console.exe ; DestDir: {app}
-Source: ..\bin\Console\Debug\MASIC_Console.pdb ; DestDir: {app}
-Source: ..\bin\DataFilter.dll                  ; DestDir: {app}
-Source: ..\bin\InterDetect.dll                 ; DestDir: {app}
-Source: ..\bin\MASICPeakFinder.dll             ; DestDir: {app}
-Source: ..\bin\MatrixDecompositionUtility.dll  ; DestDir: {app}
-Source: ..\bin\MSDataFileReader.dll            ; DestDir: {app}
-Source: ..\bin\NetCDFReader.dll                ; DestDir: {app}
-Source: ..\bin\PRISM.dll                       ; DestDir: {app}
-Source: ..\bin\PRISMWin.dll                    ; DestDir: {app}
-Source: ..\bin\ProgressFormNET.dll             ; DestDir: {app}
-Source: ..\bin\PSI_Interface.dll               ; DestDir: {app}
-Source: ..\bin\ShFolderBrowser.dll             ; DestDir: {app}
-Source: ..\bin\SpectraTypeClassifier.dll       ; DestDir: {app}
+Source: ..\bin\MASIC.exe                                  ; DestDir: {app}
+Source: ..\bin\MASIC.pdb                                  ; DestDir: {app}
+Source: ..\bin\Console\Debug\MASIC_Console.exe            ; DestDir: {app}
+Source: ..\bin\Console\Debug\MASIC_Console.pdb            ; DestDir: {app}
+Source: ..\bin\DataFilter.dll                             ; DestDir: {app}
+Source: ..\bin\InterDetect.dll                            ; DestDir: {app}
+Source: ..\bin\MASICPeakFinder.dll                        ; DestDir: {app}
+Source: ..\bin\MathNet.Numerics.dll                       ; DestDir: {app}
+Source: ..\bin\MatrixDecompositionUtility.dll             ; DestDir: {app}
+Source: ..\bin\Microsoft.Bcl.AsyncInterfaces.dll          ; DestDir: {app}
+Source: ..\bin\MSDataFileReader.dll                       ; DestDir: {app}
+Source: ..\bin\NetCDFReader.dll                           ; DestDir: {app}
+Source: ..\bin\Npgsql.dll                                 ; DestDir: {app}
+Source: ..\bin\PRISM.dll                                  ; DestDir: {app}
+Source: ..\bin\PRISMDatabaseUtils.dll                     ; DestDir: {app}
+Source: ..\bin\PRISMWin.dll                               ; DestDir: {app}
+Source: ..\bin\ProgressFormNET.dll                        ; DestDir: {app}
+Source: ..\bin\PSI_Interface.dll                          ; DestDir: {app}
+Source: ..\bin\ShFolderBrowser.dll                        ; DestDir: {app}
+Source: ..\bin\SpectraTypeClassifier.dll                  ; DestDir: {app}
+Source: ..\bin\System.Memory.dll                          ; DestDir: {app}
+Source: ..\bin\System.Numerics.Vectors.dll                ; DestDir: {app}
+Source: ..\bin\System.Runtime.CompilerServices.Unsafe.dll ; DestDir: {app}
+Source: ..\bin\System.Text.Encodings.Web.dll              ; DestDir: {app}
+Source: ..\bin\System.Text.Json.dll                       ; DestDir: {app}
+Source: ..\bin\System.Threading.Tasks.Extensions.dll      ; DestDir: {app}
+Source: ..\bin\System.ValueTuple.dll                      ; DestDir: {app}
+Source: ..\bin\System.Buffers.dll                         ; DestDir: {app}
+
 Source: ..\bin\ThermoFisher.CommonCore.BackgroundSubtraction.dll    ; DestDir: {app}
 Source: ..\bin\ThermoFisher.CommonCore.Data.dll                     ; DestDir: {app}
 Source: ..\bin\ThermoFisher.CommonCore.MassPrecisionEstimator.dll   ; DestDir: {app}
 Source: ..\bin\ThermoFisher.CommonCore.RawFileReader.dll            ; DestDir: {app}
 Source: ..\bin\ThermoRawFileReader.dll                              ; DestDir: {app}
 
-Source: ..\MASICBrowser\bin\MASICBrowser.exe                   ; DestDir: {app}
-Source: ..\MASICBrowser\bin\OxyDataPlotter.dll                 ; DestDir: {app}
-Source: ..\MASICBrowser\bin\OxyPlot.dll                        ; DestDir: {app}
-Source: ..\MASICBrowser\bin\OxyPlot.WindowsForms.dll           ; DestDir: {app}
-Source: ..\MASICBrowser\bin\Svg.dll                            ; DestDir: {app}
-
-Source: ..\Readme.md                                           ; DestDir: {app}
-Source: ..\RevisionHistory.txt                                 ; DestDir: {app}
-Source: Images\delete_16x.ico                                  ; DestDir: {app}
-
-Source: ..\Docs\MASICParameters.xml                            ; DestDir: {app}
-Source: ..\Docs\LTQ_Example\Default_2008-08-22.xml             ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML         ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICs.xml      ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_ScanStats.txt ; DestDir: {app}\LTQ_Example
-Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICstats.txt  ; DestDir: {app}\LTQ_Example
+Source: ..\MASICBrowser\bin\MASICBrowser.exe                        ; DestDir: {app}
+Source: ..\MASICBrowser\bin\Fizzler.dll                             ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyDataPlotter.dll                      ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyPlot.dll                             ; DestDir: {app}
+Source: ..\MASICBrowser\bin\OxyPlot.WindowsForms.dll                ; DestDir: {app}
+Source: ..\MASICBrowser\bin\Svg.dll                                 ; DestDir: {app}
+                                                                    
+Source: ..\Readme.md                                                ; DestDir: {app}
+Source: ..\RevisionHistory.txt                                      ; DestDir: {app}
+Source: Images\delete_16x.ico                                       ; DestDir: {app}
+                                                                    
+Source: ..\Docs\MASICParameters.xml                                 ; DestDir: {app}
+Source: ..\Docs\LTQ_Example\Default_2008-08-22.xml                  ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML              ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICs.xml           ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_ScanStats.txt      ; DestDir: {app}\LTQ_Example
+Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt_SICstats.txt       ; DestDir: {app}\LTQ_Example
 
 Source: ..\Docs\QExactive_Example\LTQ-FT_10ppm_2014-08-06.xml            ; DestDir: {app}\QExactive_Example
 Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt.mzXML            ; DestDir: {app}\QExactive_Example
@@ -60,11 +74,11 @@ Source: ..\Docs\QExactive_Example\QC_Shew_18_02_Excerpt_SICstats.txt     ; DestD
 Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICs.xml          ; DestDir: {app}\Orbitrap_Example
 Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestDir: {app}\Orbitrap_Example
 
-Source: ..\Docs\CustomMZList_AcqTime.txt                       ; DestDir: {app}
-Source: ..\Docs\CustomMZList.txt                               ; DestDir: {app}
-
-Source: ..\Lib\netcdf.dll                                      ; DestDir: {app}
-Source: ..\Lib\RawFileReaderLicense.doc                        ; DestDir: {app}
+Source: ..\Docs\CustomMZList_AcqTime.txt                                 ; DestDir: {app}
+Source: ..\Docs\CustomMZList.txt                                         ; DestDir: {app}
+                                                                         
+Source: ..\Lib\netcdf.dll                                                ; DestDir: {app}
+Source: ..\Lib\RawFileReaderLicense.doc                                  ; DestDir: {app}
 
 [Dirs]
 Name: {commonappdata}\MASIC; Flags: uninsalwaysuninstall
