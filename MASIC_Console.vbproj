@@ -223,4 +223,7 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)Lib\netcdf.dll" "$(TargetDir)" /D /Y</PostBuildEvent>
+  </PropertyGroup>
 </Project>
