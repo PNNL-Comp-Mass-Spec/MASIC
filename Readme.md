@@ -21,6 +21,13 @@ The application note describing MASIC is:
 Monroe ME et. al., Comput Biol Chem. 2008 Jun;32(3):215-217.  More info is on 
 [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/18440872)
 
+## Downloads
+
+Download a .zip file with the installer from:
+https://github.com/PNNL-Comp-Mass-Spec/MASIC/releases
+
+The release page also includes a .zip file with MASIC_Console.exe
+
 ## Installation
 
 Double click file MASIC_Installer.exe file to install.\
