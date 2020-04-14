@@ -84,58 +84,30 @@
     <Reference Include="DataFilter">
       <HintPath>..\Lib\DataFilter.dll</HintPath>
     </Reference>
-    <Reference Include="System">
-      <Name>System</Name>
-    </Reference>
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Import Include="Microsoft.VisualBasic" />
-    <Import Include="System" />
-    <Import Include="System.Collections" />
-    <Import Include="System.Data" />
-    <Import Include="System.Diagnostics" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clsBaselineNoiseOptions.vb" />
-    <Compile Include="clsBaselineNoiseStats.vb" />
-    <Compile Include="clsBaselineNoiseStatsSegment.vb" />
-    <Compile Include="clsMASICPeakFinder.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clsPeakDetection.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clsPeakInfo.vb" />
-    <Compile Include="clsPeaksContainer.vb" />
-    <Compile Include="clsSICDataPoint.vb" />
-    <Compile Include="clsSICPeakFinderOptions.vb" />
-    <Compile Include="clsSICPotentialAreaStats.vb" />
-    <Compile Include="clsSICStatsPeak.vb" />
-    <Compile Include="clsSmoothedYDataSubset.vb" />
-    <Compile Include="clsStatisticalMoments.vb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="My Project\" />
+    <Compile Include="clsBaselineNoiseOptions.cs" />
+    <Compile Include="clsBaselineNoiseStats.cs" />
+    <Compile Include="clsBaselineNoiseStatsSegment.cs" />
+    <Compile Include="clsMASICPeakFinder.cs" />
+    <Compile Include="clsPeakDetection.cs" />
+    <Compile Include="clsPeakInfo.cs" />
+    <Compile Include="clsPeaksContainer.cs" />
+    <Compile Include="clsSICDataPoint.cs" />
+    <Compile Include="clsSICPeakFinderOptions.cs" />
+    <Compile Include="clsSICPotentialAreaStats.cs" />
+    <Compile Include="clsSICStatsPeak.cs" />
+    <Compile Include="clsSmoothedYDataSubset.cs" />
+    <Compile Include="clsStatisticalMoments.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library">
       <Version>2.6.4</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -221,7 +221,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="MASICPeakFinder\MASICPeakFinder.vbproj">
+    <ProjectReference Include="MASICPeakFinder\MASICPeakFinder.csproj">
       <Project>{8363e31c-ca3d-4172-99d5-3d2d3c3fd999}</Project>
       <Name>MASICPeakFinder</Name>
     </ProjectReference>
