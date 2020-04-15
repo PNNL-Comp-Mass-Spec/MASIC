@@ -1,4 +1,8 @@
-﻿Public Class clsSICPotentialAreaStats
-    Public Property MinimumPotentialPeakArea As Double
-    Public Property PeakCountBasisForMinimumPotentialArea As Integer
-End Class
+﻿namespace MASICPeakFinder
+{
+    public class clsSICPotentialAreaStats
+    {
+        public double MinimumPotentialPeakArea { get; set; }
+        public int PeakCountBasisForMinimumPotentialArea { get; set; }
+    }
+}

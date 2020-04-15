@@ -1,32 +1,38 @@
-﻿Public Class clsPeakInfo
-    Public Property PeakLocation As Integer
-    Public Property LeftEdge As Integer
-    Public Property RightEdge As Integer
-    Public Property PeakArea As Double
-    Public Property PeakIsValid As Boolean
+﻿namespace MASICPeakFinder
+{
+    public class clsPeakInfo
+    {
+        public int PeakLocation { get; set; }
+        public int LeftEdge { get; set; }
+        public int RightEdge { get; set; }
+        public double PeakArea { get; set; }
+        public bool PeakIsValid { get; set; }
 
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    ''' <param name="intPeakLocation">Index of this peak in the data arrays</param>
-    Public Sub New(intPeakLocation As Integer)
-        PeakLocation = intPeakLocation
-    End Sub
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="intPeakLocation">Index of this peak in the data arrays</param>
+        public clsPeakInfo(int intPeakLocation)
+        {
+            PeakLocation = intPeakLocation;
+        }
 
-    Public Function Clone() As clsPeakInfo
+        public clsPeakInfo Clone()
+        {
+            var newPeak = new clsPeakInfo(PeakLocation)
+            {
+                LeftEdge = LeftEdge,
+                RightEdge = RightEdge,
+                PeakArea = PeakArea,
+                PeakIsValid = PeakIsValid
+            };
 
-        Dim newPeak = New clsPeakInfo(PeakLocation) With {
-                .LeftEdge = LeftEdge,
-                .RightEdge = RightEdge,
-                .PeakArea = PeakArea,
-                .PeakIsValid = PeakIsValid
-            }
+            return newPeak;
+        }
 
-        Return newPeak
-
-    End Function
-
-    Public Overrides Function ToString() As String
-        Return string.Format("Peak Index {0}, Area {1:E1}", peaklocation, PeakArea)
-    End Function
-End Class
+        public override string ToString()
+        {
+            return string.Format("Peak Index {0}, Area {1:E1}", PeakLocation, PeakArea);
+        }
+    }
+}

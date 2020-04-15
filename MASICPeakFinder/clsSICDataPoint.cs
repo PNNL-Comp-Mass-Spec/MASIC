@@ -1,22 +1,28 @@
-﻿Public Class clsSICDataPoint
-    Public ReadOnly ScanIndex As Integer
-    Public ReadOnly ScanNumber As Integer
-    Public ReadOnly Intensity As Double
-    Public ReadOnly Mass As Double
+﻿namespace MASICPeakFinder
+{
+    public class clsSICDataPoint
+    {
+        public readonly int ScanIndex;
+        public readonly int ScanNumber;
+        public readonly double Intensity;
+        public readonly double Mass;
 
-    Public Sub New(intScanNumber As Integer, dblIntensity As Double, dblMass As Double)
-        Me.New(intScanNumber, dblIntensity, dblMass, 0)
-    End Sub
+        public clsSICDataPoint(int intScanNumber, double dblIntensity, double dblMass)
+            : this(intScanNumber, dblIntensity, dblMass, 0)
+        {
+        }
 
-    Public Sub New(intScanNumber As Integer, dblIntensity As Double, dblMass As Double, index As Integer)
-        ScanNumber = intScanNumber
-        Intensity = dblIntensity
-        Mass = dblMass
-        ScanIndex = index
-    End Sub
+        public clsSICDataPoint(int intScanNumber, double dblIntensity, double dblMass, int index)
+        {
+            ScanNumber = intScanNumber;
+            Intensity = dblIntensity;
+            Mass = dblMass;
+            ScanIndex = index;
+        }
 
-    Public Overrides Function ToString() As String
-        Return String.Format("{0:F0} at {1:F2} m/z in scan {2}", Intensity, Mass, ScanNumber)
-    End Function
-
-End Class
+        public override string ToString()
+        {
+            return string.Format("{0:F0} at {1:F2} m/z in scan {2}", Intensity, Mass, ScanNumber);
+        }
+    }
+}

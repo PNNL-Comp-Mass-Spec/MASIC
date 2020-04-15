@@ -1,57 +1,64 @@
-﻿Imports System.Collections.Generic
+﻿using System.Collections.Generic;
 
-Public Class clsPeaksContainer
+namespace MASICPeakFinder
+{
+    public class clsPeaksContainer
+    {
+        public int OriginalPeakLocationIndex { get; set;
+         }
+        public int SourceDataCount { get; set; }
 
-    Public Property OriginalPeakLocationIndex As Integer
+        public double[] XData;
+        public double[] YData;
+        public double[] SmoothedYData;
 
-    Public Property SourceDataCount As Integer
-    Public XData() As Double
-    Public YData() As Double
-    Public SmoothedYData() As Double
+        public List<clsPeakInfo> Peaks { get; set; }
 
-    Public Property Peaks As List(Of clsPeakInfo)
+        public int PeakWidthPointsMinimum { get; set; }
+        public double MaxAllowedUpwardSpikeFractionMax { get; set; }
+        public int BestPeakIndex { get; set; }
+        public double BestPeakArea { get; set; }
 
-    Public Property PeakWidthPointsMinimum As Integer
-    Public Property MaxAllowedUpwardSpikeFractionMax As Double
-    Public Property BestPeakIndex As Integer
-    Public Property BestPeakArea As Double
-
-    Public Sub New()
-        Peaks = New List(Of clsPeakInfo)
-    End Sub
-
-    Public Function Clone(Optional skipSourceData As Boolean = False) As clsPeaksContainer
-        Dim clonedContainer = New clsPeaksContainer() With {
-            .OriginalPeakLocationIndex = Me.OriginalPeakLocationIndex,
-            .SourceDataCount = Me.SourceDataCount,
-            .PeakWidthPointsMinimum = Me.PeakWidthPointsMinimum,
-            .MaxAllowedUpwardSpikeFractionMax = Me.MaxAllowedUpwardSpikeFractionMax,
-            .BestPeakIndex = Me.BestPeakIndex,
-            .BestPeakArea = Me.BestPeakArea
+        public clsPeaksContainer()
+        {
+            Peaks = new List<clsPeakInfo>();
         }
 
-        If skipSourceData OrElse Me.SourceDataCount <= 0 Then
-            clonedContainer.SourceDataCount = 0
+        public clsPeaksContainer Clone(bool skipSourceData = false)
+        {
+            var clonedContainer = new clsPeaksContainer()
+            {
+                OriginalPeakLocationIndex = OriginalPeakLocationIndex,
+                SourceDataCount = SourceDataCount,
+                PeakWidthPointsMinimum = PeakWidthPointsMinimum,
+                MaxAllowedUpwardSpikeFractionMax = MaxAllowedUpwardSpikeFractionMax,
+                BestPeakIndex = BestPeakIndex,
+                BestPeakArea = BestPeakArea
+            };
 
-            ReDim clonedContainer.XData(-1)
-            ReDim clonedContainer.YData(-1)
-            ReDim clonedContainer.SmoothedYData(-1)
+            if (skipSourceData || SourceDataCount <= 0)
+            {
+                clonedContainer.SourceDataCount = 0;
 
-        Else
-            ReDim clonedContainer.XData(Me.SourceDataCount)
-            ReDim clonedContainer.YData(Me.SourceDataCount)
-            ReDim clonedContainer.SmoothedYData(Me.SourceDataCount)
+                clonedContainer.XData = new double[0];
+                clonedContainer.YData = new double[0];
+                clonedContainer.SmoothedYData = new double[0];
+            }
+            else
+            {
+                clonedContainer.XData = new double[SourceDataCount + 1];
+                clonedContainer.YData = new double[SourceDataCount + 1];
+                clonedContainer.SmoothedYData = new double[SourceDataCount + 1];
 
-            Me.XData.CopyTo(clonedContainer.XData, 0)
-            Me.YData.CopyTo(clonedContainer.YData, 0)
-            Me.SmoothedYData.CopyTo(clonedContainer.SmoothedYData, 0)
-        End If
+                XData.CopyTo(clonedContainer.XData, 0);
+                YData.CopyTo(clonedContainer.YData, 0);
+                SmoothedYData.CopyTo(clonedContainer.SmoothedYData, 0);
+            }
 
-        For Each sourcePeak In Me.Peaks
-            clonedContainer.Peaks.Add(sourcePeak.Clone())
-        Next
+            foreach (var sourcePeak in Peaks)
+                clonedContainer.Peaks.Add(sourcePeak.Clone());
 
-        Return clonedContainer
-
-    End Function
-End Class
+            return clonedContainer;
+        }
+    }
+}

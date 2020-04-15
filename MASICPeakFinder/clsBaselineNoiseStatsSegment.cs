@@ -1,17 +1,24 @@
-﻿Public Class clsBaselineNoiseStatsSegment
+﻿using System;
 
-    Public Property BaselineNoiseStats As clsBaselineNoiseStats
+namespace MASICPeakFinder
+{
+    public class clsBaselineNoiseStatsSegment
+    {
+        public clsBaselineNoiseStats BaselineNoiseStats { get; set; }
 
-    Public Property SegmentIndexStart As Integer
+        public int SegmentIndexStart { get; set; }
 
-    Public Property SegmentIndexEnd As Integer
+        public int SegmentIndexEnd { get; set; }
 
-    <Obsolete("Use the constructor that takes an instance of clsBaselineNoiseStats")>
-    Public Sub New()
-        BaselineNoiseStats = New clsBaselineNoiseStats()
-    End Sub
+        [Obsolete("Use the constructor that takes an instance of clsBaselineNoiseStats")]
+        public clsBaselineNoiseStatsSegment()
+        {
+            BaselineNoiseStats = new clsBaselineNoiseStats();
+        }
 
-    Public Sub New(noiseStats As clsBaselineNoiseStats)
-        BaselineNoiseStats = noiseStats
-    End Sub
-End Class
+        public clsBaselineNoiseStatsSegment(clsBaselineNoiseStats noiseStats)
+        {
+            BaselineNoiseStats = noiseStats;
+        }
+    }
+}

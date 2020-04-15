@@ -1,32 +1,37 @@
-﻿Public Class clsBaselineNoiseStats
+﻿namespace MASICPeakFinder
+{
+    public class clsBaselineNoiseStats
+    {
 
-    ''' <summary>
-    ''' Typically the average of the data being sampled to determine the baseline noise estimate
-    ''' </summary>
-    Public Property NoiseLevel As Double
+        /// <summary>
+        /// Typically the average of the data being sampled to determine the baseline noise estimate
+        /// </summary>
+        public double NoiseLevel { get; set; }
 
-    ''' <summary>
-    ''' Standard Deviation of the data used to compute the baseline estimate
-    ''' </summary>
-    Public Property NoiseStDev As Double
+        /// <summary>
+        /// Standard Deviation of the data used to compute the baseline estimate
+        /// </summary>
+        public double NoiseStDev { get; set; }
 
-    Public Property PointsUsed As Integer
+        public int PointsUsed { get; set; }
 
-    Public Property NoiseThresholdModeUsed As clsMASICPeakFinder.eNoiseThresholdModes
+        public clsMASICPeakFinder.eNoiseThresholdModes NoiseThresholdModeUsed { get; set; }
 
-    Public Sub New()
-        NoiseThresholdModeUsed = clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold
-    End Sub
+        public clsBaselineNoiseStats()
+        {
+            NoiseThresholdModeUsed = clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold;
+        }
 
-    Public Function Clone() As clsBaselineNoiseStats
-        Dim clonedStats = New clsBaselineNoiseStats() With {
-                .NoiseLevel = NoiseLevel,
-                .NoiseStDev = NoiseStDev,
-                .PointsUsed = PointsUsed,
-                .NoiseThresholdModeUsed = NoiseThresholdModeUsed
-            }
-
-        Return clonedStats
-
-    End Function
-End Class
+        public clsBaselineNoiseStats Clone()
+        {
+            var clonedStats = new clsBaselineNoiseStats()
+            {
+                NoiseLevel = NoiseLevel,
+                NoiseStDev = NoiseStDev,
+                PointsUsed = PointsUsed,
+                NoiseThresholdModeUsed = NoiseThresholdModeUsed
+            };
+            return clonedStats;
+        }
+    }
+}

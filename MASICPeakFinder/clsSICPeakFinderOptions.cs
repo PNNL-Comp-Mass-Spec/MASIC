@@ -1,144 +1,153 @@
-﻿Public Class clsSICPeakFinderOptions
+﻿namespace MASICPeakFinder
+{
+    public class clsSICPeakFinderOptions
+    {
+        #region "Properties"
 
-#Region "Properties"
+        /// <summary>
+        /// Intensity Threshold Fraction Max
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Value between 0 and 1; default: 0.01</remarks>
+        public double IntensityThresholdFractionMax
+        {
+            get => mIntensityThresholdFractionMax;
+            set
+            {
+                if (value < 0 | value > 1)
+                    value = 0.01;
+                mIntensityThresholdFractionMax = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Intensity Threshold Fraction Max
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Value between 0 and 1; default: 0.01</remarks>
-    Public Property IntensityThresholdFractionMax As Double
-        Get
-            Return mIntensityThresholdFractionMax
-        End Get
-        Set
-            If Value < 0 Or Value > 1 Then Value = 0.01
-            mIntensityThresholdFractionMax = Value
-        End Set
-    End Property
+        /// <summary>
+        /// Intensity Threshold Absolute Minimum
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Default: 0</remarks>
+        public double IntensityThresholdAbsoluteMinimum { get; set; }
 
-    ''' <summary>
-    ''' Intensity Threshold Absolute Minimum
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Default: 0</remarks>
-    Public Property IntensityThresholdAbsoluteMinimum As Double
+        public clsBaselineNoiseOptions SICBaselineNoiseOptions { get; set; }
 
-    Public Property SICBaselineNoiseOptions As clsBaselineNoiseOptions
+        /// <summary>
+        /// Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Default: 0</remarks>
+        public int MaxDistanceScansNoOverlap
+        {
+            get => mMaxDistanceScansNoOverlap;
+            set
+            {
+                if (value < 0 | value > 10000)
+                    value = 0;
+                mMaxDistanceScansNoOverlap = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Default: 0</remarks>
-    Public Property MaxDistanceScansNoOverlap As Integer
-        Get
-            Return mMaxDistanceScansNoOverlap
-        End Get
-        Set
-            If Value < 0 Or Value > 10000 Then Value = 0
-            mMaxDistanceScansNoOverlap = Value
-        End Set
-    End Property
+        /// <summary>
+        /// Maximum fraction of the peak maximum that an upward spike can be to be included in the peak
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Default: 0.20</remarks>
+        public double MaxAllowedUpwardSpikeFractionMax
+        {
+            get => mMaxAllowedUpwardSpikeFractionMax;
+            set
+            {
+                if (value < 0 | value > 1)
+                    value = 0.2;
+                mMaxAllowedUpwardSpikeFractionMax = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Maximum fraction of the peak maximum that an upward spike can be to be included in the peak
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Default: 0.20</remarks>
-    Public Property MaxAllowedUpwardSpikeFractionMax As Double
-        Get
-            Return mMaxAllowedUpwardSpikeFractionMax
-        End Get
-        Set
-            If Value < 0 Or Value > 1 Then Value = 0.2
-            mMaxAllowedUpwardSpikeFractionMax = Value
-        End Set
-    End Property
+        /// <summary>
+        /// Multiplied by scaled S/N for the given spectrum to determine the initial minimum peak width (in scans) to try.  Scaled "S/N" = Math.Log10(Math.Floor("S/N")) * 10
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Default: 0.5</remarks>
+        public double InitialPeakWidthScansScaler
+        {
+            get => mInitialPeakWidthScansScaler;
+            set
+            {
+                if (value < 0.001 | value > 1000)
+                    value = 0.5;
+                mInitialPeakWidthScansScaler = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Multiplied by scaled S/N for the given spectrum to determine the initial minimum peak width (in scans) to try.  Scaled "S/N" = Math.Log10(Math.Floor("S/N")) * 10
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Default: 0.5</remarks>
-    Public Property InitialPeakWidthScansScaler As Double
-        Get
-            Return mInitialPeakWidthScansScaler
-        End Get
-        Set
-            If Value < 0.001 Or Value > 1000 Then Value = 0.5
-            mInitialPeakWidthScansScaler = Value
-        End Set
-    End Property
+        /// <summary>
+        /// Maximum initial peak width to allow
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Default: 30</remarks>
+        public int InitialPeakWidthScansMaximum
+        {
+            get => mInitialPeakWidthScansMaximum;
+            set
+            {
+                if (value < 3 | value > 1000)
+                    value = 6;
+                mInitialPeakWidthScansMaximum = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Maximum initial peak width to allow
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Default: 30</remarks>
-    Public Property InitialPeakWidthScansMaximum As Integer
-        Get
-            Return mInitialPeakWidthScansMaximum
-        End Get
-        Set
-            If Value < 3 Or Value > 1000 Then Value = 6
-            mInitialPeakWidthScansMaximum = Value
-        End Set
-    End Property
+        public bool FindPeaksOnSmoothedData { get; set; }
 
-    Public Property FindPeaksOnSmoothedData As Boolean
+        public bool SmoothDataRegardlessOfMinimumPeakWidth { get; set; }
 
-    Public Property SmoothDataRegardlessOfMinimumPeakWidth As Boolean
+        /// <summary>
+        /// Use Butterworth smoothing
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>UseButterworthSmooth takes precedence over UseSavitzkyGolaySmooth</remarks>
+        public bool UseButterworthSmooth { get; set; }
 
-    ''' <summary>
-    ''' Use Butterworth smoothing
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>UseButterworthSmooth takes precedence over UseSavitzkyGolaySmooth</remarks>
-    Public Property UseButterworthSmooth As Boolean
+        public double ButterworthSamplingFrequency { get; set; }
+        public bool ButterworthSamplingFrequencyDoubledForSIMData { get; set; }
 
-    Public Property ButterworthSamplingFrequency As Double
-    Public Property ButterworthSamplingFrequencyDoubledForSIMData As Boolean
+        /// <summary>
+        /// Use Savitzky Golay smoothing
+        /// </summary>
+        /// <returns></returns>
+        public bool UseSavitzkyGolaySmooth { get; set; }
 
-    ''' <summary>
-    ''' Use Savitzky Golay smoothing
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property UseSavitzkyGolaySmooth As Boolean
+        /// <summary>
+        /// Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Default: 0</remarks>
+        public short SavitzkyGolayFilterOrder
+        {
+            get => mSavitzkyGolayFilterOrder;
+            set
+            {
+                // Polynomial order should be between 0 and 6
+                if (value < 0 | value > 6)
+                    value = 0;
 
-    ''' <summary>
-    ''' Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Default: 0</remarks>
-    Public Property SavitzkyGolayFilterOrder As Short
-        Get
-            Return mSavitzkyGolayFilterOrder
-        End Get
-        Set
+                // Polynomial order should be even
+                if (value % 2 != 0)
+                    value -= 1;
+                if (value < 0)
+                    value = 0;
 
-            ' Polynomial order should be between 0 and 6
-            If Value < 0 Or Value > 6 Then Value = 0
+                mSavitzkyGolayFilterOrder = value;
+            }
+        }
 
-            ' Polynomial order should be even
-            If Value Mod 2 <> 0 Then Value -= CShort(1)
-            If Value < 0 Then Value = 0
+        public clsBaselineNoiseOptions MassSpectraNoiseThresholdOptions { get; set; }
 
-            mSavitzkyGolayFilterOrder = Value
-        End Set
-    End Property
+        #endregion
 
-    Public Property MassSpectraNoiseThresholdOptions As clsBaselineNoiseOptions
-
-#End Region
-
-#Region "Classwide variables"
-    Private mInitialPeakWidthScansMaximum As Integer = 30
-    Private mInitialPeakWidthScansScaler As Double = 0.5
-    Private mIntensityThresholdFractionMax As Double = 0.01
-    Private mMaxAllowedUpwardSpikeFractionMax As Double = 0.2
-    Private mMaxDistanceScansNoOverlap As Integer
-    Private mSavitzkyGolayFilterOrder As Short
-#End Region
-
-End Class
+        #region "Classwide variables"
+        private int mInitialPeakWidthScansMaximum = 30;
+        private double mInitialPeakWidthScansScaler = 0.5;
+        private double mIntensityThresholdFractionMax = 0.01;
+        private double mMaxAllowedUpwardSpikeFractionMax = 0.2;
+        private int mMaxDistanceScansNoOverlap;
+        private short mSavitzkyGolayFilterOrder;
+        #endregion
+    }
+}

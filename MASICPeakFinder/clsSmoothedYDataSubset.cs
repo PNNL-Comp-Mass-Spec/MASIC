@@ -1,33 +1,38 @@
-﻿Imports System.Collections.Generic
+﻿using System;
+using System.Collections.Generic;
 
-Public Class clsSmoothedYDataSubset
-    Public ReadOnly Property DataCount As Integer
-    Public ReadOnly Property Data As Double()
-    Public ReadOnly Property DataStartIndex As Integer
+namespace MASICPeakFinder
+{
+    public class clsSmoothedYDataSubset
+    {
+        public int DataCount { get; private set; }
+        public double[] Data { get; private set; }
+        public int DataStartIndex { get; private set; }
 
-    Public Sub New()
-        DataCount = 0
-        DataStartIndex = 0
-        ReDim Data(0)
-    End Sub
+        public clsSmoothedYDataSubset()
+        {
+            DataCount = 0;
+            DataStartIndex = 0;
+            Data = new double[1];
+        }
 
-    Public Sub New(yData As IList(Of Double), startIndex As Integer, endIndex As Integer)
+        public clsSmoothedYDataSubset(IList<double> yData, int startIndex, int endIndex)
+        {
+            if (yData == null || endIndex < startIndex || startIndex < 0)
+            {
+                DataCount = 0;
+                DataStartIndex = 0;
+                Data = new double[1];
+                return;
+            }
 
-        If yData Is Nothing OrElse endIndex < startIndex OrElse startIndex < 0 Then
-            DataCount = 0
-            DataStartIndex = 0
-            ReDim Data(0)
-            Return
-        End If
+            DataStartIndex = startIndex;
 
-        DataStartIndex = startIndex
+            DataCount = endIndex - startIndex + 1;
+            Data = new double[DataCount + 1];
 
-        DataCount = endIndex - startIndex + 1
-        ReDim Data(DataCount)
-
-        For intIndex = startIndex To endIndex
-            Data(intIndex - startIndex) = Math.Min(yData(intIndex), Double.MaxValue)
-        Next
-
-    End Sub
-End Class
+            for (int intIndex = startIndex; intIndex <= endIndex; intIndex++)
+                Data[intIndex - startIndex] = Math.Min(yData[intIndex], double.MaxValue);
+        }
+    }
+}
