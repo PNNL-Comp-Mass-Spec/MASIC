@@ -110,6 +110,10 @@
     <Compile Include="frmBrowser.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmBrowser.Designer.vb">
+      <DependentUpon>frmBrowser.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </Compile>
     <Compile Include="modMain.vb" />
     <EmbeddedResource Include="frmBrowser.resx">
       <DependentUpon>frmBrowser.vb</DependentUpon>
