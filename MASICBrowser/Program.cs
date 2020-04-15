@@ -16,7 +16,7 @@ Imports PRISM
 ' in compliance with the License.  You may obtain a copy of the License at
 ' https://opensource.org/licenses/BSD-2-Clause
 
-Module modMain
+Module Program
 
     Public Const PROGRAM_DATE As String = "March 27, 2020"
 
@@ -48,7 +48,7 @@ Module modMain
             Return 0
 
         Catch ex As Exception
-            ShowErrorMessage("Error occurred in modMain->Main: " & Environment.NewLine & ex.Message)
+            ShowErrorMessage("Error occurred in Program->Main: " & Environment.NewLine & ex.Message)
             Return -1
         End Try
 

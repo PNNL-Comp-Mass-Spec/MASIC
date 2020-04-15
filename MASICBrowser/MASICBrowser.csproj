@@ -4,9 +4,9 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5A62ED9B-7F03-413D-A879-3042A5D0B7FB}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5A62ED9B-7F03-413D-A879-3042A5D0B7FB}</ProjectGuid>
     <ApplicationIcon>
     </ApplicationIcon>
     <AssemblyKeyContainerName>
@@ -24,7 +24,7 @@
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>On</OptionStrict>
     <RootNamespace>MASICBrowser</RootNamespace>
-    <StartupObject>MASICBrowser.modMain</StartupObject>
+    <StartupObject>MASICBrowser.Program</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
@@ -73,58 +73,32 @@
       <Name>ProgressFormNET</Name>
       <HintPath>..\lib\ProgressFormNET.dll</HintPath>
     </Reference>
-    <Reference Include="System">
-      <Name>System</Name>
-    </Reference>
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
-    <Reference Include="System.Drawing">
-      <Name>System.Drawing</Name>
-    </Reference>
-    <Reference Include="System.Windows.Forms">
-      <Name>System.Windows.Forms</Name>
-    </Reference>
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Import Include="Microsoft.VisualBasic" />
-    <Import Include="System" />
-    <Import Include="System.Collections" />
-    <Import Include="System.Collections.Generic" />
-    <Import Include="System.Data" />
-    <Import Include="System.Diagnostics" />
-    <Import Include="System.Drawing" />
-    <Import Include="System.Linq" />
-    <Import Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clsBinarySearch.vb" />
-    <Compile Include="clsParentIonStats.vb" />
-    <Compile Include="clsSICStats.vb" />
-    <Compile Include="frmBrowser.vb">
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="clsBinarySearch.cs" />
+    <Compile Include="clsParentIonStats.cs" />
+    <Compile Include="clsSICStats.cs" />
+    <Compile Include="frmBrowser.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmBrowser.Designer.vb">
-      <DependentUpon>frmBrowser.vb</DependentUpon>
+    <Compile Include="frmBrowser.Designer.cs">
+      <DependentUpon>frmBrowser.cs</DependentUpon>
       <SubType>Designer</SubType>
     </Compile>
-    <Compile Include="modMain.vb" />
+    <Compile Include="Program.cs" />
     <EmbeddedResource Include="frmBrowser.resx">
-      <DependentUpon>frmBrowser.vb</DependentUpon>
+      <DependentUpon>frmBrowser.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="My Project\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="OxyPlot.Core">
@@ -152,11 +126,5 @@
       <Name>MASICPeakFinder</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
