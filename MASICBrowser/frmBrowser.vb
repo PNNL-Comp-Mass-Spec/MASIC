@@ -1,4 +1,4 @@
-' This program will read the _SICs.xml data file created by MASIC to allow
+﻿' This program will read the _SICs.xml data file created by MASIC to allow
 '   for browsing of the spectra
 '
 ' -------------------------------------------------------------------------------

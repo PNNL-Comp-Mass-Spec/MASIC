@@ -1,4 +1,4 @@
-Module modMASICBrowswer
+﻿Module modMASICBrowswer
 
     'Private objSpectrum As CWSpectrumDLL.SpectrumClass
 
