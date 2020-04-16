@@ -1,25 +1,30 @@
-﻿Module modMASICBrowswer
+﻿using System;
 
-    'Private objSpectrum As CWSpectrumDLL.SpectrumClass
+static class modMASICBrowswer
+{
 
-    Public Sub Main()
+    // private CWSpectrumDLL.SpectrumClass objSpectrum;
 
-        Dim objBrowserForm As frmBrowser
+    public static void Main()
+    {
+        frmBrowser objBrowserForm;
 
-        Try
-            'objSpectrum = New CWSpectrumDLL.SpectrumClass
-            'objSpectrum.ShowSpectrum()
+        try
+        {
+            // objSpectrum = new CWSpectrumDLL.SpectrumClass();
+            // objSpectrum.ShowSpectrum();
 
-            objBrowserForm = New frmBrowser
-            objBrowserForm.ShowDialog()
+            objBrowserForm = new frmBrowser();
+            objBrowserForm.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Unable to initialize the CW Spectrum DLL.  Ending program." + Environment.NewLine + ex.Message, "Missing DLL", MessageBoxButtons.Ok, MessageBoxIcons.Exclamation);
+        }
+    }
 
-        Catch ex As Exception
-            MsgBox("Unable to initialize the CW Spectrum DLL.  Ending program." & vbCrLf & ex.Message, MsgBoxStyle.Exclamation Or MsgBoxStyle.OKOnly, "Missing DLL")
-        End Try
-
-    End Sub
-
-    Public Sub ShowSICSpectrum()
-        'objSpectrum.ShowSpectrum()
-    End Sub
-End Module
+    public static void ShowSICSpectrum()
+    {
+        // objSpectrum.ShowSpectrum();
+    }
+}

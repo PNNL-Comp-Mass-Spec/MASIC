@@ -1,29 +1,55 @@
-﻿
-Public Class clsSICStats
-    Public Property Peak As MASICPeakFinder.clsSICStatsPeak
+﻿using System.Collections.Generic;
+using System.Linq;
 
-    Public Property SICPeakWidthFullScans As Integer
+namespace MASICBrowser
+{
+    public class clsSICStats
+    {
+        public MASICPeakFinder.clsSICStatsPeak Peak { get; set; }
 
-    ''' <summary>
-    ''' Scan number of the peak apex
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property ScanNumberMaxIntensity As Integer
+        public int SICPeakWidthFullScans { get; set; }
 
-    Public Property SICPotentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats
+        /// <summary>
+        /// Scan number of the peak apex
+        /// </summary>
+        /// <returns></returns>
+        public int ScanNumberMaxIntensity { get; set; }
 
-    Public Property SICSmoothedYData As List(Of Double)
+        public MASICPeakFinder.clsSICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }
 
-    Public Property SICSmoothedYDataIndexStart As Integer
+        public List<double> SICSmoothedYData { get; set; }
 
-    Public Sub New()
-        Peak = New MASICPeakFinder.clsSICStatsPeak()
-        SICPotentialAreaStatsForPeak = New MASICPeakFinder.clsSICPotentialAreaStats()
-        SICSmoothedYData = New List(Of Double)
-    End Sub
+        public int SICSmoothedYDataIndexStart { get; set; }
 
-    Public Overrides Function ToString() As String
-        Return "Peak at index " & Peak.IndexMax & ", area " & Peak.Area
-    End Function
+        public clsSICStats()
+        {
+            Peak = new MASICPeakFinder.clsSICStatsPeak();
+            SICPotentialAreaStatsForPeak = new MASICPeakFinder.clsSICPotentialAreaStats();
+            SICSmoothedYData = new List<double>();
+        }
 
-End Class
+        public clsSICStats Clone()
+        {
+            var stats = new clsSICStats
+            {
+                Peak = Peak.Clone(),
+                SICPeakWidthFullScans = SICPeakWidthFullScans,
+                ScanNumberMaxIntensity = ScanNumberMaxIntensity,
+                SICPotentialAreaStatsForPeak = new MASICPeakFinder.clsSICPotentialAreaStats
+                {
+                    MinimumPotentialPeakArea = SICPotentialAreaStatsForPeak.MinimumPotentialPeakArea,
+                    PeakCountBasisForMinimumPotentialArea = SICPotentialAreaStatsForPeak.PeakCountBasisForMinimumPotentialArea,
+                },
+                SICSmoothedYData = SICSmoothedYData.ToList(),
+                SICSmoothedYDataIndexStart = SICSmoothedYDataIndexStart,
+            };
+
+            return stats;
+        }
+
+        public override string ToString()
+        {
+            return "Peak at index " + Peak.IndexMax + ", area " + Peak.Area;
+        }
+    }
+}

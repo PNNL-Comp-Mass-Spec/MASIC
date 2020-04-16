@@ -1,393 +1,517 @@
-﻿
-''' <summary>
-''' This class can be used to search a list of values for the value closest to the search value
-''' If an exact match is found, then the index of that result is returned
-''' If an exact match is not found, then the MissingDataMode defines which value will be returned (closest, always previous, or always next)
-''' </summary>
-''' <remarks>The search functions assume the input data is already sorted</remarks>
-Public Class clsBinarySearch
+﻿using System;
+using System.Collections.Generic;
 
-    Public Enum eMissingDataModeConstants
-        ReturnClosestPoint = 0
-        ReturnPreviousPoint = 1
-        ReturnNextPoint = 2
-    End Enum
+namespace MASICBrowser
+{
+    /// <summary>
+    /// This class can be used to search a list of values for the value closest to the search value
+    /// If an exact match is found, then the index of that result is returned
+    /// If an exact match is not found, then the MissingDataMode defines which value will be returned (closest, always previous, or always next)
+    /// </summary>
+    /// <remarks>The search functions assume the input data is already sorted</remarks>
+    public class clsBinarySearch
+    {
+        public enum eMissingDataModeConstants
+        {
+            ReturnClosestPoint = 0,
+            ReturnPreviousPoint = 1,
+            ReturnNextPoint = 2
+        }
 
-    ''' <summary>
-    ''' Looks through arrayToSearch for itemToSearchFor
-    ''' </summary>
-    ''' <param name="arrayToSearch"></param>
-    ''' <param name="itemToSearchFor"></param>
-    ''' <param name="dataCount"></param>
-    ''' <param name="eMissingDataMode"></param>
-    ''' <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-    ''' <remarks>Assumes arrayToSearch is already sorted</remarks>
-    Public Shared Function BinarySearchFindNearest(
-      arrayToSearch As IList(Of Integer), itemToSearchFor As Integer, dataCount As Integer,
-      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+        /// <summary>
+        /// Looks through arrayToSearch for itemToSearchFor
+        /// </summary>
+        /// <param name="arrayToSearch"></param>
+        /// <param name="itemToSearchFor"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="eMissingDataMode"></param>
+        /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        public static int BinarySearchFindNearest(
+            IList<int> arrayToSearch, int itemToSearchFor, int dataCount,
+            eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
+        {
+            int indexFirst, indexLast;
+            int midIndex;
+            int currentFirst, currentLast;
+            int matchIndex;
 
-        Dim indexFirst As Integer, indexLast As Integer
-        Dim midIndex As Integer
-        Dim currentFirst As Integer, currentLast As Integer
-        Dim matchIndex As Integer
+            try
+            {
+                if (arrayToSearch == null)
+                    return -1;
 
-        Try
-            If arrayToSearch Is Nothing Then Return -1
+                indexFirst = 0;
+                if (dataCount > arrayToSearch.Count)
+                {
+                    dataCount = arrayToSearch.Count;
+                }
 
-            indexFirst = 0
-            If dataCount > arrayToSearch.Count Then
-                dataCount = arrayToSearch.Count
-            End If
-            indexLast = dataCount - 1
+                indexLast = dataCount - 1;
 
-            currentFirst = indexFirst
-            currentLast = indexLast
+                currentFirst = indexFirst;
+                currentLast = indexLast;
 
-            If currentFirst > currentLast Then
-                ' Invalid indices were provided
-                matchIndex = -1
-            ElseIf currentFirst = currentLast Then
-                ' Search space is only one element long; simply return that element's index
-                matchIndex = currentFirst
-            Else
-                midIndex = (currentFirst + currentLast) \ 2            ' Note: Using Integer division
-                If midIndex < currentFirst Then midIndex = currentFirst
+                if (currentFirst > currentLast)
+                {
+                    // Invalid indices were provided
+                    matchIndex = -1;
+                }
+                else if (currentFirst == currentLast)
+                {
+                    // Search space is only one element long; simply return that element's index
+                    matchIndex = currentFirst;
+                }
+                else
+                {
+                    midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
+                    if (midIndex < currentFirst)
+                        midIndex = currentFirst;
 
-                Do While currentFirst <= currentLast AndAlso arrayToSearch(midIndex) <> itemToSearchFor
-                    If itemToSearchFor < arrayToSearch(midIndex) Then
-                        ' Search the lower half
-                        currentLast = midIndex - 1
-                    ElseIf itemToSearchFor > arrayToSearch(midIndex) Then
-                        ' Search the upper half
-                        currentFirst = midIndex + 1
-                    End If
+                    while (currentFirst <= currentLast && arrayToSearch[midIndex] != itemToSearchFor)
+                    {
+                        if (itemToSearchFor < arrayToSearch[midIndex])
+                        {
+                            // Search the lower half
+                            currentLast = midIndex - 1;
+                        }
+                        else if (itemToSearchFor > arrayToSearch[midIndex])
+                        {
+                            // Search the upper half
+                            currentFirst = midIndex + 1;
+                        }
 
-                    ' Compute the new mid point
-                    midIndex = (currentFirst + currentLast) \ 2
-                    If midIndex < currentFirst Then
-                        midIndex = currentFirst
-                        If midIndex > currentLast Then
-                            midIndex = currentLast
-                        End If
-                        Exit Do
-                    End If
-                Loop
+                        // Compute the new mid point
+                        midIndex = (currentFirst + currentLast) / 2;
+                        if (midIndex < currentFirst)
+                        {
+                            midIndex = currentFirst;
+                            if (midIndex > currentLast)
+                            {
+                                midIndex = currentLast;
+                            }
 
-                matchIndex = -1
-                ' See if an exact match has been found
-                If midIndex >= currentFirst AndAlso midIndex <= currentLast Then
-                    If arrayToSearch(midIndex) = itemToSearchFor Then
-                        matchIndex = midIndex
-                    End If
-                End If
+                            break;
+                        }
+                    }
 
-                If matchIndex = -1 Then
-                    If eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint Then
-                        ' No exact match; find the nearest match
-                        If arrayToSearch(midIndex) < itemToSearchFor Then
-                            If midIndex < indexLast Then
-                                If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) <=
-                                   Math.Abs(arrayToSearch(midIndex + 1) - itemToSearchFor) Then
-                                    matchIndex = midIndex
-                                Else
-                                    matchIndex = midIndex + 1
-                                End If
-                            Else
-                                matchIndex = indexLast
-                            End If
-                        Else
-                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
-                            If midIndex > indexFirst Then
-                                If Math.Abs(arrayToSearch(midIndex - 1) - itemToSearchFor) <=
-                                   Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) Then
-                                    matchIndex = midIndex - 1
-                                Else
-                                    matchIndex = midIndex
-                                End If
-                            Else
-                                matchIndex = indexFirst
-                            End If
-                        End If
-                    Else
-                        ' No exact match; return the previous point or the next point
-                        If arrayToSearch(midIndex) < itemToSearchFor Then
-                            If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                matchIndex = midIndex + 1
-                                If matchIndex > indexLast Then matchIndex = indexLast
-                            Else
-                                matchIndex = midIndex
-                            End If
-                        Else
-                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
-                            If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                matchIndex = midIndex
-                            Else
-                                matchIndex = midIndex - 1
-                                If matchIndex < indexFirst Then matchIndex = indexFirst
-                            End If
-                        End If
-                    End If
-                End If
-            End If
+                    matchIndex = -1;
+                    // See if an exact match has been found
+                    if (midIndex >= currentFirst && midIndex <= currentLast)
+                    {
+                        if (arrayToSearch[midIndex] == itemToSearchFor)
+                        {
+                            matchIndex = midIndex;
+                        }
+                    }
 
-        Catch ex As Exception
-            matchIndex = -1
-        End Try
+                    if (matchIndex == -1)
+                    {
+                        if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
+                        {
+                            // No exact match; find the nearest match
+                            if (arrayToSearch[midIndex] < itemToSearchFor)
+                            {
+                                if (midIndex < indexLast)
+                                {
+                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
+                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    {
+                                        matchIndex = midIndex;
+                                    }
+                                    else
+                                    {
+                                        matchIndex = midIndex + 1;
+                                    }
+                                }
+                                else
+                                {
+                                    matchIndex = indexLast;
+                                }
+                            }
+                            // ArrayToSearch(midIndex) >= ItemToSearchFor
+                            else if (midIndex > indexFirst)
+                            {
+                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
+                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                {
+                                    matchIndex = midIndex - 1;
+                                }
+                                else
+                                {
+                                    matchIndex = midIndex;
+                                }
+                            }
+                            else
+                            {
+                                matchIndex = indexFirst;
+                            }
+                        }
+                        // No exact match; return the previous point or the next point
+                        else if (arrayToSearch[midIndex] < itemToSearchFor)
+                        {
+                            if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
+                            {
+                                matchIndex = midIndex + 1;
+                                if (matchIndex > indexLast)
+                                    matchIndex = indexLast;
+                            }
+                            else
+                            {
+                                matchIndex = midIndex;
+                            }
+                        }
+                        // ArrayToSearch(midIndex) >= ItemToSearchFor
+                        else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
+                        {
+                            matchIndex = midIndex;
+                        }
+                        else
+                        {
+                            matchIndex = midIndex - 1;
+                            if (matchIndex < indexFirst)
+                                matchIndex = indexFirst;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                matchIndex = -1;
+            }
 
-        Return matchIndex
+            return matchIndex;
+        }
 
-    End Function
+        /// <summary>
+        /// Looks through arrayToSearch for itemToSearchFor
+        /// </summary>
+        /// <param name="arrayToSearch"></param>
+        /// <param name="itemToSearchFor"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="eMissingDataMode"></param>
+        /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        public static int BinarySearchFindNearest(
+            IList<float> arrayToSearch, float itemToSearchFor, int dataCount,
+            eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
+        {
+            int indexFirst, indexLast;
+            int midIndex;
+            int currentFirst, currentLast;
+            int matchIndex;
 
-    ''' <summary>
-    ''' Looks through arrayToSearch for itemToSearchFor
-    ''' </summary>
-    ''' <param name="arrayToSearch"></param>
-    ''' <param name="itemToSearchFor"></param>
-    ''' <param name="dataCount"></param>
-    ''' <param name="eMissingDataMode"></param>
-    ''' <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-    ''' <remarks>Assumes arrayToSearch is already sorted</remarks>
-    Public Shared Function BinarySearchFindNearest(
-      arrayToSearch As IList(Of Single), itemToSearchFor As Single, dataCount As Integer,
-      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+            try
+            {
+                if (arrayToSearch == null)
+                    return -1;
 
-        Dim indexFirst As Integer, indexLast As Integer
-        Dim midIndex As Integer
-        Dim currentFirst As Integer, currentLast As Integer
-        Dim matchIndex As Integer
+                indexFirst = 0;
+                if (dataCount > arrayToSearch.Count)
+                {
+                    dataCount = arrayToSearch.Count;
+                }
 
-        Try
-            If arrayToSearch Is Nothing Then Return -1
+                indexLast = dataCount - 1;
 
-            indexFirst = 0
-            If dataCount > arrayToSearch.Count Then
-                dataCount = arrayToSearch.Count
-            End If
-            indexLast = dataCount - 1
+                currentFirst = indexFirst;
+                currentLast = indexLast;
 
-            currentFirst = indexFirst
-            currentLast = indexLast
+                if (currentFirst > currentLast)
+                {
+                    // Invalid indices were provided
+                    matchIndex = -1;
+                }
+                else if (currentFirst == currentLast)
+                {
+                    // Search space is only one element long; simply return that element's index
+                    matchIndex = currentFirst;
+                }
+                else
+                {
+                    midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
+                    if (midIndex < currentFirst)
+                        midIndex = currentFirst;
 
-            If currentFirst > currentLast Then
-                ' Invalid indices were provided
-                matchIndex = -1
-            ElseIf currentFirst = currentLast Then
-                ' Search space is only one element long; simply return that element's index
-                matchIndex = currentFirst
-            Else
-                midIndex = (currentFirst + currentLast) \ 2            ' Note: Using Integer division
-                If midIndex < currentFirst Then midIndex = currentFirst
+                    while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
+                    {
+                        if (itemToSearchFor < arrayToSearch[midIndex])
+                        {
+                            // Search the lower half
+                            currentLast = midIndex - 1;
+                        }
+                        else if (itemToSearchFor > arrayToSearch[midIndex])
+                        {
+                            // Search the upper half
+                            currentFirst = midIndex + 1;
+                        }
 
-                Do While currentFirst <= currentLast AndAlso Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) > Single.Epsilon
-                    If itemToSearchFor < arrayToSearch(midIndex) Then
-                        ' Search the lower half
-                        currentLast = midIndex - 1
-                    ElseIf itemToSearchFor > arrayToSearch(midIndex) Then
-                        ' Search the upper half
-                        currentFirst = midIndex + 1
-                    End If
+                        // Compute the new mid point
+                        midIndex = (currentFirst + currentLast) / 2;
+                        if (midIndex < currentFirst)
+                        {
+                            midIndex = currentFirst;
+                            if (midIndex > currentLast)
+                            {
+                                midIndex = currentLast;
+                            }
 
-                    ' Compute the new mid point
-                    midIndex = (currentFirst + currentLast) \ 2
-                    If midIndex < currentFirst Then
-                        midIndex = currentFirst
-                        If midIndex > currentLast Then
-                            midIndex = currentLast
-                        End If
-                        Exit Do
-                    End If
-                Loop
+                            break;
+                        }
+                    }
 
-                matchIndex = -1
-                ' See if an exact match has been found
-                If midIndex >= currentFirst AndAlso midIndex <= currentLast Then
-                    If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) < Single.Epsilon Then
-                        matchIndex = midIndex
-                    End If
-                End If
+                    matchIndex = -1;
+                    // See if an exact match has been found
+                    if (midIndex >= currentFirst && midIndex <= currentLast)
+                    {
+                        if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) < float.Epsilon)
+                        {
+                            matchIndex = midIndex;
+                        }
+                    }
 
-                If matchIndex = -1 Then
-                    If eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint Then
-                        ' No exact match; find the nearest match
-                        If arrayToSearch(midIndex) < itemToSearchFor Then
-                            If midIndex < indexLast Then
-                                If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) <=
-                                   Math.Abs(arrayToSearch(midIndex + 1) - itemToSearchFor) Then
-                                    matchIndex = midIndex
-                                Else
-                                    matchIndex = midIndex + 1
-                                End If
-                            Else
-                                matchIndex = indexLast
-                            End If
-                        Else
-                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
-                            If midIndex > indexFirst Then
-                                If Math.Abs(arrayToSearch(midIndex - 1) - itemToSearchFor) <=
-                                   Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) Then
-                                    matchIndex = midIndex - 1
-                                Else
-                                    matchIndex = midIndex
-                                End If
-                            Else
-                                matchIndex = indexFirst
-                            End If
-                        End If
-                    Else
-                        ' No exact match; return the previous point or the next point
-                        If arrayToSearch(midIndex) < itemToSearchFor Then
-                            If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                matchIndex = midIndex + 1
-                                If matchIndex > indexLast Then matchIndex = indexLast
-                            Else
-                                matchIndex = midIndex
-                            End If
-                        Else
-                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
-                            If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                matchIndex = midIndex
-                            Else
-                                matchIndex = midIndex - 1
-                                If matchIndex < indexFirst Then matchIndex = indexFirst
-                            End If
-                        End If
-                    End If
-                End If
-            End If
+                    if (matchIndex == -1)
+                    {
+                        if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
+                        {
+                            // No exact match; find the nearest match
+                            if (arrayToSearch[midIndex] < itemToSearchFor)
+                            {
+                                if (midIndex < indexLast)
+                                {
+                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
+                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    {
+                                        matchIndex = midIndex;
+                                    }
+                                    else
+                                    {
+                                        matchIndex = midIndex + 1;
+                                    }
+                                }
+                                else
+                                {
+                                    matchIndex = indexLast;
+                                }
+                            }
+                            // ArrayToSearch(midIndex) >= ItemToSearchFor
+                            else if (midIndex > indexFirst)
+                            {
+                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
+                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                {
+                                    matchIndex = midIndex - 1;
+                                }
+                                else
+                                {
+                                    matchIndex = midIndex;
+                                }
+                            }
+                            else
+                            {
+                                matchIndex = indexFirst;
+                            }
+                        }
+                        // No exact match; return the previous point or the next point
+                        else if (arrayToSearch[midIndex] < itemToSearchFor)
+                        {
+                            if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
+                            {
+                                matchIndex = midIndex + 1;
+                                if (matchIndex > indexLast)
+                                    matchIndex = indexLast;
+                            }
+                            else
+                            {
+                                matchIndex = midIndex;
+                            }
+                        }
+                        // ArrayToSearch(midIndex) >= ItemToSearchFor
+                        else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
+                        {
+                            matchIndex = midIndex;
+                        }
+                        else
+                        {
+                            matchIndex = midIndex - 1;
+                            if (matchIndex < indexFirst)
+                                matchIndex = indexFirst;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                matchIndex = -1;
+            }
 
-        Catch ex As Exception
-            matchIndex = -1
-        End Try
+            return matchIndex;
+        }
 
-        Return matchIndex
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Looks through arrayToSearch for itemToSearchFor
+        /// </summary>
+        /// <param name="arrayToSearch"></param>
+        /// <param name="itemToSearchFor"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="eMissingDataMode"></param>
+        /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        public static int BinarySearchFindNearest(
+            IList<double> arrayToSearch, double itemToSearchFor, int dataCount,
+            eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
+        {
+            int indexFirst, indexLast;
+            int midIndex;
+            int currentFirst, currentLast;
+            int matchIndex;
 
-    End Function
+            try
+            {
+                if (arrayToSearch == null)
+                    return -1;
 
-    ' ReSharper disable once UnusedMember.Global
-    ''' <summary>
-    ''' Looks through arrayToSearch for itemToSearchFor
-    ''' </summary>
-    ''' <param name="arrayToSearch"></param>
-    ''' <param name="itemToSearchFor"></param>
-    ''' <param name="dataCount"></param>
-    ''' <param name="eMissingDataMode"></param>
-    ''' <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-    ''' <remarks>Assumes arrayToSearch is already sorted</remarks>
-    Public Shared Function BinarySearchFindNearest(
-      arrayToSearch As IList(Of Double), itemToSearchFor As Double, dataCount As Integer,
-      Optional eMissingDataMode As eMissingDataModeConstants = eMissingDataModeConstants.ReturnClosestPoint) As Integer
+                indexFirst = 0;
+                if (dataCount > arrayToSearch.Count)
+                {
+                    dataCount = arrayToSearch.Count;
+                }
 
-        Dim indexFirst As Integer, indexLast As Integer
-        Dim midIndex As Integer
-        Dim currentFirst As Integer, currentLast As Integer
-        Dim matchIndex As Integer
+                indexLast = dataCount - 1;
 
-        Try
-            If arrayToSearch Is Nothing Then Return -1
+                currentFirst = indexFirst;
+                currentLast = indexLast;
 
-            indexFirst = 0
-            If dataCount > arrayToSearch.Count Then
-                dataCount = arrayToSearch.Count
-            End If
-            indexLast = dataCount - 1
+                if (currentFirst > currentLast)
+                {
+                    // Invalid indices were provided
+                    matchIndex = -1;
+                }
+                else if (currentFirst == currentLast)
+                {
+                    // Search space is only one element long; simply return that element's index
+                    matchIndex = currentFirst;
+                }
+                else
+                {
+                    midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
+                    if (midIndex < currentFirst)
+                        midIndex = currentFirst;
 
-            currentFirst = indexFirst
-            currentLast = indexLast
+                    while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
+                    {
+                        if (itemToSearchFor < arrayToSearch[midIndex])
+                        {
+                            // Search the lower half
+                            currentLast = midIndex - 1;
+                        }
+                        else if (itemToSearchFor > arrayToSearch[midIndex])
+                        {
+                            // Search the upper half
+                            currentFirst = midIndex + 1;
+                        }
 
-            If currentFirst > currentLast Then
-                ' Invalid indices were provided
-                matchIndex = -1
-            ElseIf currentFirst = currentLast Then
-                ' Search space is only one element long; simply return that element's index
-                matchIndex = currentFirst
-            Else
-                midIndex = (currentFirst + currentLast) \ 2            ' Note: Using Integer division
-                If midIndex < currentFirst Then midIndex = currentFirst
+                        // Compute the new mid point
+                        midIndex = (currentFirst + currentLast) / 2;
+                        if (midIndex < currentFirst)
+                        {
+                            midIndex = currentFirst;
+                            if (midIndex > currentLast)
+                            {
+                                midIndex = currentLast;
+                            }
 
-                Do While currentFirst <= currentLast AndAlso Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) > Single.Epsilon
-                    If itemToSearchFor < arrayToSearch(midIndex) Then
-                        ' Search the lower half
-                        currentLast = midIndex - 1
-                    ElseIf itemToSearchFor > arrayToSearch(midIndex) Then
-                        ' Search the upper half
-                        currentFirst = midIndex + 1
-                    End If
+                            break;
+                        }
+                    }
 
-                    ' Compute the new mid point
-                    midIndex = (currentFirst + currentLast) \ 2
-                    If midIndex < currentFirst Then
-                        midIndex = currentFirst
-                        If midIndex > currentLast Then
-                            midIndex = currentLast
-                        End If
-                        Exit Do
-                    End If
-                Loop
+                    matchIndex = -1;
+                    // See if an exact match has been found
+                    if (midIndex >= currentFirst && midIndex <= currentLast)
+                    {
+                        if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) < double.Epsilon)
+                        {
+                            matchIndex = midIndex;
+                        }
+                    }
 
-                matchIndex = -1
-                ' See if an exact match has been found
-                If midIndex >= currentFirst AndAlso midIndex <= currentLast Then
-                    If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) < Double.Epsilon Then
-                        matchIndex = midIndex
-                    End If
-                End If
+                    if (matchIndex == -1)
+                    {
+                        if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
+                        {
+                            // No exact match; find the nearest match
+                            if (arrayToSearch[midIndex] < itemToSearchFor)
+                            {
+                                if (midIndex < indexLast)
+                                {
+                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
+                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    {
+                                        matchIndex = midIndex;
+                                    }
+                                    else
+                                    {
+                                        matchIndex = midIndex + 1;
+                                    }
+                                }
+                                else
+                                {
+                                    matchIndex = indexLast;
+                                }
+                            }
+                            // ArrayToSearch(midIndex) >= ItemToSearchFor
+                            else if (midIndex > indexFirst)
+                            {
+                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
+                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                {
+                                    matchIndex = midIndex - 1;
+                                }
+                                else
+                                {
+                                    matchIndex = midIndex;
+                                }
+                            }
+                            else
+                            {
+                                matchIndex = indexFirst;
+                            }
+                        }
+                        // No exact match; return the previous point or the next point
+                        else if (arrayToSearch[midIndex] < itemToSearchFor)
+                        {
+                            if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
+                            {
+                                matchIndex = midIndex + 1;
+                                if (matchIndex > indexLast)
+                                    matchIndex = indexLast;
+                            }
+                            else
+                            {
+                                matchIndex = midIndex;
+                            }
+                        }
+                        // ArrayToSearch(midIndex) >= ItemToSearchFor
+                        else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
+                        {
+                            matchIndex = midIndex;
+                        }
+                        else
+                        {
+                            matchIndex = midIndex - 1;
+                            if (matchIndex < indexFirst)
+                                matchIndex = indexFirst;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                matchIndex = -1;
+            }
 
-                If matchIndex = -1 Then
-                    If eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint Then
-                        ' No exact match; find the nearest match
-                        If arrayToSearch(midIndex) < itemToSearchFor Then
-                            If midIndex < indexLast Then
-                                If Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) <=
-                                   Math.Abs(arrayToSearch(midIndex + 1) - itemToSearchFor) Then
-                                    matchIndex = midIndex
-                                Else
-                                    matchIndex = midIndex + 1
-                                End If
-                            Else
-                                matchIndex = indexLast
-                            End If
-                        Else
-                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
-                            If midIndex > indexFirst Then
-                                If Math.Abs(arrayToSearch(midIndex - 1) - itemToSearchFor) <=
-                                   Math.Abs(arrayToSearch(midIndex) - itemToSearchFor) Then
-                                    matchIndex = midIndex - 1
-                                Else
-                                    matchIndex = midIndex
-                                End If
-                            Else
-                                matchIndex = indexFirst
-                            End If
-                        End If
-                    Else
-                        ' No exact match; return the previous point or the next point
-                        If arrayToSearch(midIndex) < itemToSearchFor Then
-                            If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                matchIndex = midIndex + 1
-                                If matchIndex > indexLast Then matchIndex = indexLast
-                            Else
-                                matchIndex = midIndex
-                            End If
-                        Else
-                            ' ArrayToSearch(midIndex) >= ItemToSearchFor
-                            If eMissingDataMode = eMissingDataModeConstants.ReturnNextPoint Then
-                                matchIndex = midIndex
-                            Else
-                                matchIndex = midIndex - 1
-                                If matchIndex < indexFirst Then matchIndex = indexFirst
-                            End If
-                        End If
-                    End If
-                End If
-
-            End If
-
-        Catch ex As Exception
-            matchIndex = -1
-        End Try
-
-        Return matchIndex
-
-    End Function
-
-End Class
+            return matchIndex;
+        }
+    }
+}

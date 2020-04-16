@@ -1,168 +1,188 @@
-﻿Imports System.IO
-Imports System.Reflection
-Imports System.Threading
-Imports PRISM
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Windows.Forms;
+using PRISM;
 
-' -------------------------------------------------------------------------------
-' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-' Program started October 17, 2003
-' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
+namespace MASICBrowser
+{
+    // -------------------------------------------------------------------------------
+    // Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
+    // Program started October 17, 2003
+    // Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
 
-' E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
-' Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
-' -------------------------------------------------------------------------------
-'
-' Licensed under the 2-Clause BSD License; you may Not use this file except
-' in compliance with the License.  You may obtain a copy of the License at
-' https://opensource.org/licenses/BSD-2-Clause
+    // E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
+    // Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
+    // -------------------------------------------------------------------------------
+    //
+    // Licensed under the 2-Clause BSD License; you may Not use this file except
+    // in compliance with the License.  You may obtain a copy of the License at
+    // https://opensource.org/licenses/BSD-2-Clause
 
-Module Program
+    static class Program
+    {
+        public const string PROGRAM_DATE = "March 27, 2020";
 
-    Public Const PROGRAM_DATE As String = "March 27, 2020"
+        private static string mInputFilePath;
 
-    Private mInputFilePath As String
+        public static int Main()
+        {
+            // Returns 0 if no error, error code if an error
 
-    Public Function Main() As Integer
-        ' Returns 0 if no error, error code if an error
+            var commandLineParser = new clsParseCommandLine();
+            bool proceed;
 
-        Dim commandLineParser As New clsParseCommandLine()
-        Dim proceed As Boolean
+            mInputFilePath = string.Empty;
 
-        mInputFilePath = String.Empty
+            try
+            {
+                proceed = false;
+                if (commandLineParser.ParseCommandLine())
+                {
+                    if (SetOptionsUsingCommandLineParameters(commandLineParser))
+                        proceed = true;
+                }
+                else if (!commandLineParser.NeedToShowHelp)
+                {
+                    proceed = true;
+                }
 
-        Try
-            proceed = False
-            If commandLineParser.ParseCommandLine Then
-                If SetOptionsUsingCommandLineParameters(commandLineParser) Then proceed = True
-            ElseIf Not commandLineParser.NeedToShowHelp Then
-                proceed = True
-            End If
+                if (commandLineParser.NeedToShowHelp || !proceed)
+                {
+                    ShowProgramHelp();
+                    return -1;
+                }
 
-            If commandLineParser.NeedToShowHelp OrElse Not proceed Then
-                ShowProgramHelp()
-                Return -1
-            End If
+                ShowGUI();
 
-            ShowGUI()
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Error occurred in Program->Main: " + Environment.NewLine + ex.Message);
+                return -1;
+            }
+        }
 
-            Return 0
+        /// <summary>
+        /// Returns the full path to the executing .Exe or .Dll
+        /// </summary>
+        /// <returns>File path</returns>
+        /// <remarks></remarks>
+        private static string GetAppPath()
+        {
+            return Assembly.GetExecutingAssembly().Location;
+        }
 
-        Catch ex As Exception
-            ShowErrorMessage("Error occurred in Program->Main: " & Environment.NewLine & ex.Message)
-            Return -1
-        End Try
+        /// <summary>
+        /// Returns the .NET assembly version followed by the program date
+        /// </summary>
+        /// <param name="programDate"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        private static string GetAppVersion(string programDate)
+        {
+            return Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (" + programDate + ")";
+        }
 
-    End Function
+        private static bool SetOptionsUsingCommandLineParameters(clsParseCommandLine commandLineParser)
+        {
+            // Returns True if no problems; otherwise, returns false
 
-    ''' <summary>
-    ''' Returns the full path to the executing .Exe or .Dll
-    ''' </summary>
-    ''' <returns>File path</returns>
-    ''' <remarks></remarks>
-    Private Function GetAppPath() As String
-        Return Assembly.GetExecutingAssembly().Location
-    End Function
+            string value = string.Empty;
+            var validParameters = new List<string>() { "I" };
 
-    ''' <summary>
-    ''' Returns the .NET assembly version followed by the program date
-    ''' </summary>
-    ''' <param name="programDate"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Private Function GetAppVersion(programDate As String) As String
-        Return Assembly.GetExecutingAssembly().GetName().Version.ToString() & " (" & programDate & ")"
-    End Function
+            try
+            {
+                // Make sure no invalid parameters are present
+                if (commandLineParser.InvalidParametersPresent(validParameters))
+                {
+                    ShowErrorMessage("Invalid command line parameters",
+                        (from item in commandLineParser.InvalidParameters(validParameters) select ("/" + item)).ToList());
+                    return false;
+                }
+                else
+                {
+                    // Query commandLineParser to see if various parameters are present
+                    if (commandLineParser.RetrieveValueForParameter("I", out value))
+                    {
+                        mInputFilePath = value;
+                    }
+                    else if (commandLineParser.NonSwitchParameterCount > 0)
+                    {
+                        // Treat the first non-switch parameter as the input file
+                        mInputFilePath = commandLineParser.RetrieveNonSwitchParameter(0);
+                    }
 
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Error parsing the command line parameters: " + Environment.NewLine + ex.Message);
+            }
 
-    Private Function SetOptionsUsingCommandLineParameters(commandLineParser As clsParseCommandLine) As Boolean
-        ' Returns True if no problems; otherwise, returns false
+            return false;
+        }
 
-        Dim value As String = String.Empty
-        Dim validParameters = New List(Of String) From {"I"}
+        private static void ShowErrorMessage(string message)
+        {
+            ConsoleMsgUtils.ShowError(message);
+        }
 
-        Try
-            ' Make sure no invalid parameters are present
-            If commandLineParser.InvalidParametersPresent(validParameters) Then
-                ShowErrorMessage("Invalid command line parameters",
-                  (From item In commandLineParser.InvalidParameters(validParameters) Select "/" + item).ToList())
-                Return False
-            Else
+        private static void ShowErrorMessage(string title, IEnumerable<string> errorMessages)
+        {
+            ConsoleMsgUtils.ShowErrors(title, errorMessages);
+        }
 
-                ' Query commandLineParser to see if various parameters are present
-                With commandLineParser
-                    If .RetrieveValueForParameter("I", value) Then
-                        mInputFilePath = value
-                    ElseIf .NonSwitchParameterCount > 0 Then
-                        ' Treat the first non-switch parameter as the input file
-                        mInputFilePath = .RetrieveNonSwitchParameter(0)
-                    End If
+        public static void ShowGUI()
+        {
+            Application.EnableVisualStyles();
+            Application.DoEvents();
 
-                End With
+            var masicBrowser = new frmBrowser();
 
-                Return True
-            End If
+            if (!string.IsNullOrWhiteSpace(mInputFilePath))
+            {
+                masicBrowser.FileToAutoLoad = mInputFilePath;
+            }
 
-        Catch ex As Exception
-            ShowErrorMessage("Error parsing the command line parameters: " & Environment.NewLine & ex.Message)
-        End Try
+            masicBrowser.ShowDialog();
+        }
 
-        Return False
+        private static void ShowProgramHelp()
+        {
+            try
+            {
+                Console.WriteLine("This program is used to visualize the results from MASIC");
+                Console.WriteLine();
 
-    End Function
+                Console.WriteLine("Program syntax:" + Environment.NewLine + Path.GetFileName(GetAppPath()));
+                Console.WriteLine(" MasicResults_SICs.xml");
+                Console.WriteLine();
 
-    Private Sub ShowErrorMessage(message As String)
-        ConsoleMsgUtils.ShowError(message)
-    End Sub
+                Console.WriteLine("The input file path is the MASIC results file to load");
+                Console.WriteLine();
 
-    Private Sub ShowErrorMessage(title As String, errorMessages As IEnumerable(Of String))
-        ConsoleMsgUtils.ShowErrors(title, errorMessages)
-    End Sub
+                Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2017");
+                Console.WriteLine("Version: " + GetAppVersion(PROGRAM_DATE));
 
-    Public Sub ShowGUI()
+                Console.WriteLine();
 
-        Application.EnableVisualStyles()
-        Application.DoEvents()
+                Console.WriteLine("E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov");
+                Console.WriteLine("Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/");
+                Console.WriteLine();
 
-        Dim masicBrowser = New frmBrowser()
-
-        If Not String.IsNullOrWhiteSpace(mInputFilePath) Then
-            masicBrowser.FileToAutoLoad = mInputFilePath
-        End If
-        masicBrowser.ShowDialog()
-
-    End Sub
-
-    Private Sub ShowProgramHelp()
-
-        Try
-
-            Console.WriteLine("This program is used to visualize the results from MASIC")
-            Console.WriteLine()
-
-            Console.WriteLine("Program syntax:" & Environment.NewLine & Path.GetFileName(GetAppPath()))
-            Console.WriteLine(" MasicResults_SICs.xml")
-            Console.WriteLine()
-
-            Console.WriteLine("The input file path is the MASIC results file to load")
-            Console.WriteLine()
-
-            Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2017")
-            Console.WriteLine("Version: " & GetAppVersion(PROGRAM_DATE))
-
-            Console.WriteLine()
-
-            Console.WriteLine("E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov")
-            Console.WriteLine("Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/")
-            Console.WriteLine()
-
-            ' Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
-            Thread.Sleep(750)
-
-        Catch ex As Exception
-            ShowErrorMessage("Error displaying the program syntax: " & ex.Message)
-        End Try
-
-    End Sub
-
-
-End Module
+                // Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
+                Thread.Sleep(750);
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Error displaying the program syntax: " + ex.Message);
+            }
+        }
+    }
+}
