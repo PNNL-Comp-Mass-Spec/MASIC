@@ -12,7 +12,6 @@
             {
                 return mBinSize;
             }
-
             set
             {
                 if (value <= 0)
@@ -27,7 +26,6 @@
             {
                 return mIntensityPrecisionPercent;
             }
-
             set
             {
                 if (value < 0 || value > 100)
@@ -50,7 +48,6 @@
             {
                 return mMaximumBinCount;
             }
-
             set
             {
                 if (value < 2)

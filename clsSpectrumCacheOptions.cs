@@ -21,7 +21,6 @@ namespace MASIC
             {
                 return mSpectraToRetainInMemory;
             }
-
             set
             {
                 if (value < 100)

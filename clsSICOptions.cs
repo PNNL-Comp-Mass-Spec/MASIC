@@ -38,7 +38,6 @@
                     return SICTolerance;
                 }
             }
-
             set
             {
                 SetSICTolerance(value, false);
@@ -100,7 +99,6 @@
             {
                 return mMaxSICPeakWidthMinutesBackward;
             }
-
             set
             {
                 if (value < 0 || value > 10000)
@@ -118,7 +116,6 @@
             {
                 return mMaxSICPeakWidthMinutesForward;
             }
-
             set
             {
                 if (value < 0 || value > 10000)
@@ -141,7 +138,6 @@
             {
                 return mSimilarIonMZToleranceHalfWidth;
             }
-
             set
             {
                 if (value < 0.001 || value > 100)
@@ -160,7 +156,6 @@
             {
                 return mSimilarIonToleranceHalfWidthMinutes;
             }
-
             set
             {
                 if (value < 0 || value > 100000)
@@ -178,7 +173,6 @@
             {
                 return mSpectrumSimilarityMinimum;
             }
-
             set
             {
                 if (value < 0 || value > 1)

@@ -102,7 +102,6 @@ namespace MASIC
             {
                 return mCacheOptions.DirectoryPath;
             }
-
             set
             {
                 mCacheOptions.DirectoryPath = value;
@@ -116,7 +115,6 @@ namespace MASIC
             {
                 return mCacheOptions.MaximumMemoryUsageMB;
             }
-
             set
             {
                 mCacheOptions.MaximumMemoryUsageMB = value;
@@ -130,7 +128,6 @@ namespace MASIC
             {
                 return mCacheOptions.MinimumFreeMemoryMB;
             }
-
             set
             {
                 if (mCacheOptions.MinimumFreeMemoryMB < 10)
@@ -148,7 +145,6 @@ namespace MASIC
             {
                 return mCacheOptions.SpectraToRetainInMemory;
             }
-
             set
             {
                 if (value < 100)
@@ -163,7 +159,6 @@ namespace MASIC
             {
                 return mCacheOptions.DiskCachingAlwaysDisabled;
             }
-
             set
             {
                 mCacheOptions.DiskCachingAlwaysDisabled = value;

@@ -63,7 +63,6 @@ namespace MASIC
             {
                 return OutputDirectoryPath;
             }
-
             set
             {
                 OutputDirectoryPath = value;

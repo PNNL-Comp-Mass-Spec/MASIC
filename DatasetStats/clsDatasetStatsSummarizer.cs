@@ -42,7 +42,6 @@ namespace MASIC.DatasetStats
             {
                 return mDatasetStatsSummaryFileName;
             }
-
             set
             {
                 if (value != null)

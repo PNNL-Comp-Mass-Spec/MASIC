@@ -32,7 +32,6 @@ namespace MASIC
                     return string.Empty;
                 return mCustomSICListFileName;
             }
-
             set
             {
                 if (value == null)

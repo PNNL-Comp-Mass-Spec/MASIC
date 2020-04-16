@@ -121,7 +121,6 @@ namespace MASIC
             {
                 return Options.DatabaseConnectionString;
             }
-
             set
             {
                 Options.DatabaseConnectionString = value;
@@ -135,7 +134,6 @@ namespace MASIC
             {
                 return Options.DatasetInfoQuerySql;
             }
-
             set
             {
                 Options.DatasetInfoQuerySql = value;
@@ -149,7 +147,6 @@ namespace MASIC
             {
                 return Options.DatasetLookupFilePath;
             }
-
             set
             {
                 Options.DatasetLookupFilePath = value;
@@ -163,7 +160,6 @@ namespace MASIC
             {
                 return Options.SICOptions.DatasetID;
             }
-
             set
             {
                 Options.SICOptions.DatasetID = value;
@@ -200,7 +196,6 @@ namespace MASIC
             {
                 return Options.MASICStatusFilename;
             }
-
             set
             {
                 if (value == null || value.Trim().Length == 0)
@@ -261,7 +256,6 @@ namespace MASIC
             {
                 return Options.CDFTimeInSeconds;
             }
-
             set
             {
                 Options.CDFTimeInSeconds = value;
@@ -275,7 +269,6 @@ namespace MASIC
             {
                 return Options.SICOptions.CompressMSSpectraData;
             }
-
             set
             {
                 Options.SICOptions.CompressMSSpectraData = value;
@@ -289,7 +282,6 @@ namespace MASIC
             {
                 return Options.SICOptions.CompressMSMSSpectraData;
             }
-
             set
             {
                 Options.SICOptions.CompressMSMSSpectraData = value;
@@ -303,7 +295,6 @@ namespace MASIC
             {
                 return Options.SICOptions.CompressToleranceDivisorForDa;
             }
-
             set
             {
                 Options.SICOptions.CompressToleranceDivisorForDa = value;
@@ -317,7 +308,6 @@ namespace MASIC
             {
                 return Options.SICOptions.CompressToleranceDivisorForPPM;
             }
-
             set
             {
                 Options.SICOptions.CompressToleranceDivisorForPPM = value;
@@ -331,7 +321,6 @@ namespace MASIC
             {
                 return Options.ConsolidateConstantExtendedHeaderValues;
             }
-
             set
             {
                 Options.ConsolidateConstantExtendedHeaderValues = value;
@@ -372,7 +361,6 @@ namespace MASIC
             {
                 return Options.CustomSICList.CustomSICListFileName;
             }
-
             set
             {
                 Options.CustomSICList.CustomSICListFileName = value;
@@ -386,7 +374,6 @@ namespace MASIC
             {
                 return Options.ExportRawDataOnly;
             }
-
             set
             {
                 Options.ExportRawDataOnly = value;
@@ -400,7 +387,6 @@ namespace MASIC
             {
                 return Options.FastExistingXMLFileTest;
             }
-
             set
             {
                 Options.FastExistingXMLFileTest = value;
@@ -414,7 +400,6 @@ namespace MASIC
             {
                 return Options.IncludeHeadersInExportFile;
             }
-
             set
             {
                 Options.IncludeHeadersInExportFile = value;
@@ -428,7 +413,6 @@ namespace MASIC
             {
                 return Options.IncludeScanTimesInSICStatsFile;
             }
-
             set
             {
                 Options.IncludeScanTimesInSICStatsFile = value;
@@ -442,7 +426,6 @@ namespace MASIC
             {
                 return Options.CustomSICList.LimitSearchToCustomMZList;
             }
-
             set
             {
                 Options.CustomSICList.LimitSearchToCustomMZList = value;
@@ -456,7 +439,6 @@ namespace MASIC
             {
                 return Options.ParentIonDecoyMassDa;
             }
-
             set
             {
                 Options.ParentIonDecoyMassDa = value;
@@ -470,7 +452,6 @@ namespace MASIC
             {
                 return Options.SkipMSMSProcessing;
             }
-
             set
             {
                 Options.SkipMSMSProcessing = value;
@@ -484,7 +465,6 @@ namespace MASIC
             {
                 return Options.SkipSICAndRawDataProcessing;
             }
-
             set
             {
                 Options.SkipSICAndRawDataProcessing = value;
@@ -498,7 +478,6 @@ namespace MASIC
             {
                 return Options.SuppressNoParentIonsError;
             }
-
             set
             {
                 Options.SuppressNoParentIonsError = value;
@@ -512,7 +491,6 @@ namespace MASIC
             {
                 return true;
             }
-
             set
             {
             }
@@ -525,7 +503,6 @@ namespace MASIC
             {
                 return Options.WriteDetailedSICDataFile;
             }
-
             set
             {
                 Options.WriteDetailedSICDataFile = value;
@@ -539,7 +516,6 @@ namespace MASIC
             {
                 return Options.WriteExtendedStats;
             }
-
             set
             {
                 Options.WriteExtendedStats = value;
@@ -553,7 +529,6 @@ namespace MASIC
             {
                 return Options.WriteExtendedStatsIncludeScanFilterText;
             }
-
             set
             {
                 Options.WriteExtendedStatsIncludeScanFilterText = value;
@@ -567,7 +542,6 @@ namespace MASIC
             {
                 return Options.WriteExtendedStatsStatusLog;
             }
-
             set
             {
                 Options.WriteExtendedStatsStatusLog = value;
@@ -581,7 +555,6 @@ namespace MASIC
             {
                 return Options.WriteMSMethodFile;
             }
-
             set
             {
                 Options.WriteMSMethodFile = value;
@@ -595,7 +568,6 @@ namespace MASIC
             {
                 return Options.WriteMSTuneFile;
             }
-
             set
             {
                 Options.WriteMSTuneFile = value;
@@ -613,7 +585,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICToleranceDa;
             }
-
             set
             {
                 Options.SICOptions.SICToleranceDa = value;
@@ -646,7 +617,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICToleranceIsPPM;
             }
-
             set
             {
                 Options.SICOptions.SICToleranceIsPPM = value;
@@ -660,7 +630,6 @@ namespace MASIC
             {
                 return Options.SICOptions.RefineReportedParentIonMZ;
             }
-
             set
             {
                 Options.SICOptions.RefineReportedParentIonMZ = value;
@@ -674,7 +643,6 @@ namespace MASIC
             {
                 return Options.SICOptions.RTRangeEnd;
             }
-
             set
             {
                 Options.SICOptions.RTRangeEnd = value;
@@ -688,7 +656,6 @@ namespace MASIC
             {
                 return Options.SICOptions.RTRangeStart;
             }
-
             set
             {
                 Options.SICOptions.RTRangeStart = value;
@@ -702,7 +669,6 @@ namespace MASIC
             {
                 return Options.SICOptions.ScanRangeEnd;
             }
-
             set
             {
                 Options.SICOptions.ScanRangeEnd = value;
@@ -716,7 +682,6 @@ namespace MASIC
             {
                 return Options.SICOptions.ScanRangeStart;
             }
-
             set
             {
                 Options.SICOptions.ScanRangeStart = value;
@@ -730,7 +695,6 @@ namespace MASIC
             {
                 return Options.SICOptions.MaxSICPeakWidthMinutesBackward;
             }
-
             set
             {
                 Options.SICOptions.MaxSICPeakWidthMinutesBackward = value;
@@ -744,7 +708,6 @@ namespace MASIC
             {
                 return Options.SICOptions.MaxSICPeakWidthMinutesForward;
             }
-
             set
             {
                 Options.SICOptions.MaxSICPeakWidthMinutesForward = value;
@@ -758,7 +721,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
@@ -772,7 +734,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio;
             }
-
             set
             {
                 // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
@@ -787,7 +748,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = value;
@@ -801,7 +761,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = value;
@@ -815,7 +774,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
@@ -829,7 +787,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = value;
@@ -843,7 +800,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute;
             }
-
             set
             {
                 if (value < 0 || value > double.MaxValue)
@@ -859,7 +815,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = value;
@@ -873,7 +828,6 @@ namespace MASIC
             {
                 return Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData;
             }
-
             set
             {
                 Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = value;
@@ -888,7 +842,6 @@ namespace MASIC
             {
                 return Options.RawDataExportOptions.IncludeMSMS;
             }
-
             set
             {
                 Options.RawDataExportOptions.IncludeMSMS = value;
@@ -902,7 +855,6 @@ namespace MASIC
             {
                 return Options.RawDataExportOptions.RenumberScans;
             }
-
             set
             {
                 Options.RawDataExportOptions.RenumberScans = value;
@@ -916,7 +868,6 @@ namespace MASIC
             {
                 return Options.RawDataExportOptions.IntensityMinimum;
             }
-
             set
             {
                 Options.RawDataExportOptions.IntensityMinimum = value;
@@ -930,7 +881,6 @@ namespace MASIC
             {
                 return Options.RawDataExportOptions.MaxIonCountPerScan;
             }
-
             set
             {
                 Options.RawDataExportOptions.MaxIonCountPerScan = value;
@@ -944,7 +894,6 @@ namespace MASIC
             {
                 return Options.RawDataExportOptions.FileFormat;
             }
-
             set
             {
                 Options.RawDataExportOptions.FileFormat = value;
@@ -958,7 +907,6 @@ namespace MASIC
             {
                 return Options.RawDataExportOptions.MinimumSignalToNoiseRatio;
             }
-
             set
             {
                 Options.RawDataExportOptions.MinimumSignalToNoiseRatio = value;
@@ -972,7 +920,6 @@ namespace MASIC
             {
                 return Options.RawDataExportOptions.ExportEnabled;
             }
-
             set
             {
                 Options.RawDataExportOptions.ExportEnabled = value;
@@ -988,7 +935,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = value;
@@ -1002,7 +948,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = value;
@@ -1016,7 +961,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = value;
@@ -1030,7 +974,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = value;
@@ -1044,7 +987,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = value;
@@ -1058,7 +1000,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth = value;
@@ -1072,7 +1013,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency;
             }
-
             set
             {
                 // Value should be between 0.01 and 0.99; this is checked for in the filter, so we don't need to check here
@@ -1087,7 +1027,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = value;
@@ -1101,7 +1040,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = value;
@@ -1115,7 +1053,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = value;
@@ -1129,7 +1066,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SaveSmoothedData;
             }
-
             set
             {
                 Options.SICOptions.SaveSmoothedData = value;
@@ -1143,7 +1079,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = value;
@@ -1157,7 +1092,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = value;
@@ -1171,7 +1105,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum;
             }
-
             set
             {
                 Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = value;
@@ -1186,7 +1119,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SimilarIonMZToleranceHalfWidth;
             }
-
             set
             {
                 Options.SICOptions.SimilarIonMZToleranceHalfWidth = value;
@@ -1200,7 +1132,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SimilarIonToleranceHalfWidthMinutes;
             }
-
             set
             {
                 Options.SICOptions.SimilarIonToleranceHalfWidthMinutes = value;
@@ -1214,7 +1145,6 @@ namespace MASIC
             {
                 return Options.SICOptions.SpectrumSimilarityMinimum;
             }
-
             set
             {
                 Options.SICOptions.SpectrumSimilarityMinimum = value;
@@ -1229,7 +1159,6 @@ namespace MASIC
             {
                 return Options.BinningOptions.StartX;
             }
-
             set
             {
                 Options.BinningOptions.StartX = value;
@@ -1243,7 +1172,6 @@ namespace MASIC
             {
                 return Options.BinningOptions.EndX;
             }
-
             set
             {
                 Options.BinningOptions.EndX = value;
@@ -1257,7 +1185,6 @@ namespace MASIC
             {
                 return Options.BinningOptions.BinSize;
             }
-
             set
             {
                 Options.BinningOptions.BinSize = value;
@@ -1271,7 +1198,6 @@ namespace MASIC
             {
                 return Options.BinningOptions.IntensityPrecisionPercent;
             }
-
             set
             {
                 Options.BinningOptions.IntensityPrecisionPercent = value;
@@ -1285,7 +1211,6 @@ namespace MASIC
             {
                 return Options.BinningOptions.Normalize;
             }
-
             set
             {
                 Options.BinningOptions.Normalize = value;
@@ -1299,7 +1224,6 @@ namespace MASIC
             {
                 return Options.BinningOptions.SumAllIntensitiesForBin;
             }
-
             set
             {
                 Options.BinningOptions.SumAllIntensitiesForBin = value;
@@ -1313,7 +1237,6 @@ namespace MASIC
             {
                 return Options.BinningOptions.MaximumBinCount;
             }
-
             set
             {
                 Options.BinningOptions.MaximumBinCount = value;
@@ -1328,7 +1251,6 @@ namespace MASIC
             {
                 return Options.CacheOptions.DiskCachingAlwaysDisabled;
             }
-
             set
             {
                 Options.CacheOptions.DiskCachingAlwaysDisabled = value;
@@ -1342,7 +1264,6 @@ namespace MASIC
             {
                 return Options.CacheOptions.DirectoryPath;
             }
-
             set
             {
                 Options.CacheOptions.DirectoryPath = value;
@@ -1356,7 +1277,6 @@ namespace MASIC
             {
                 return Options.CacheOptions.MaximumMemoryUsageMB;
             }
-
             set
             {
                 Options.CacheOptions.MaximumMemoryUsageMB = value;
@@ -1370,7 +1290,6 @@ namespace MASIC
             {
                 return Options.CacheOptions.MinimumFreeMemoryMB;
             }
-
             set
             {
                 if (Options.CacheOptions.MinimumFreeMemoryMB < 10)
@@ -1389,7 +1308,6 @@ namespace MASIC
             {
                 return Options.CacheOptions.SpectraToRetainInMemory;
             }
-
             set
             {
                 Options.CacheOptions.SpectraToRetainInMemory = value;

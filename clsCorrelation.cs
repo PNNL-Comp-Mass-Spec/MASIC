@@ -59,7 +59,6 @@ namespace MASIC
             {
                 return mBinningOptions.StartX;
             }
-
             set
             {
                 mBinningOptions.StartX = value;
@@ -72,7 +71,6 @@ namespace MASIC
             {
                 return mBinningOptions.EndX;
             }
-
             set
             {
                 mBinningOptions.EndX = value;
@@ -85,7 +83,6 @@ namespace MASIC
             {
                 return mBinningOptions.BinSize;
             }
-
             set
             {
                 if (value <= 0)
@@ -100,7 +97,6 @@ namespace MASIC
             {
                 return mBinningOptions.IntensityPrecisionPercent;
             }
-
             set
             {
                 if (value < 0 || value > 100)
@@ -117,7 +113,6 @@ namespace MASIC
             {
                 return mBinningOptions.Normalize;
             }
-
             set
             {
                 mBinningOptions.Normalize = value;
@@ -130,7 +125,6 @@ namespace MASIC
             {
                 return mBinningOptions.SumAllIntensitiesForBin;
             }
-
             set
             {
                 mBinningOptions.SumAllIntensitiesForBin = value;
@@ -143,7 +137,6 @@ namespace MASIC
             {
                 return mBinningOptions.MaximumBinCount;
             }
-
             set
             {
                 if (value < 2)

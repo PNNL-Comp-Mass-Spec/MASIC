@@ -68,7 +68,6 @@ namespace MASIC
             {
                 return mReporterIonMassMode;
             }
-
             set
             {
                 SetReporterIonMassMode(value);
@@ -88,7 +87,6 @@ namespace MASIC
                     mReporterIonToleranceDaDefault = REPORTER_ION_TOLERANCE_DA_DEFAULT;
                 return mReporterIonToleranceDaDefault;
             }
-
             set
             {
                 if (value < double.Epsilon)

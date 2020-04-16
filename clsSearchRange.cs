@@ -91,7 +91,6 @@ namespace MASIC
             {
                 return mUsePointerIndexArray;
             }
-
             set
             {
                 mUsePointerIndexArray = value;
