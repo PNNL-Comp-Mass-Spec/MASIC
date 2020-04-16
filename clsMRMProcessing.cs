@@ -222,16 +222,16 @@ namespace MASIC
                     var dataColumns = new List<string>();
                     for (int mrmInfoIndex = 0; mrmInfoIndex <= mrmSettings.Count - 1; mrmInfoIndex++)
                     {
-                        var withBlock = mrmSettings[mrmInfoIndex];
-                        for (int mrmMassIndex = 0; mrmMassIndex <= withBlock.MRMMassCount - 1; mrmMassIndex++)
+                        var mrmSetting = mrmSettings[mrmInfoIndex];
+                        for (int mrmMassIndex = 0; mrmMassIndex <= mrmSetting.MRMMassCount - 1; mrmMassIndex++)
                         {
                             dataColumns.Clear();
                             dataColumns.Add(mrmInfoIndex.ToString());
-                            dataColumns.Add(withBlock.ParentIonMZ.ToString("0.000"));
-                            dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
-                            dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].StartMass.ToString("0.000"));
-                            dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].EndMass.ToString("0.000"));
-                            dataColumns.Add(withBlock.ScanCount.ToString());
+                            dataColumns.Add(mrmSetting.ParentIonMZ.ToString("0.000"));
+                            dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
+                            dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].StartMass.ToString("0.000"));
+                            dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].EndMass.ToString("0.000"));
+                            dataColumns.Add(mrmSetting.ScanCount.ToString());
                             settingsWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
                         }
                     }
@@ -489,11 +489,11 @@ namespace MASIC
                             continue;
                         }
 
-                        var withBlock = scanList.FragScans[scanIndex];
+                        var fragScan = scanList.FragScans[scanIndex];
                         bool useScan = false;
-                        for (int mrmMassIndex = 0; mrmMassIndex <= withBlock.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
+                        for (int mrmMassIndex = 0; mrmMassIndex <= fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
                         {
-                            if (MRMParentDaughterMatch(withBlock.MRMScanInfo.ParentIonMZ, withBlock.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass, parentIonMZ, mrmDaughterMZ))
+                            if (MRMParentDaughterMatch(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass, parentIonMZ, mrmDaughterMZ))
                             {
                                 useScan = true;
                                 break;
@@ -508,7 +508,7 @@ namespace MASIC
                         double matchIntensity;
                         double closestMZ;
                         mDataAggregation.FindMaxValueInMZRange(spectraCache, scanList.FragScans[scanIndex], mrmDaughterMZ - searchToleranceHalfWidth, mrmDaughterMZ + searchToleranceHalfWidth, out closestMZ, out matchIntensity);
-                        sicDetails.AddData(withBlock.ScanNumber, matchIntensity, closestMZ, scanIndex);
+                        sicDetails.AddData(fragScan.ScanNumber, matchIntensity, closestMZ, scanIndex);
                     }
 
                     // Step 2: Find the largest peak in the SIC
@@ -546,13 +546,13 @@ namespace MASIC
                     scanList.ParentIons[parentIonIndex].SICStats.Peak.BaselineNoiseStats = peakFinder.LookupNoiseStatsUsingSegments(scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved, noiseStatsSegments);
                     clsSmoothedYDataSubset smoothedYDataSubset = null;
 
-                    var withBlock1 = scanList.ParentIons[parentIonIndex];
+                    var parentIon = scanList.ParentIons[parentIonIndex];
 
                     // Clear udtSICPotentialAreaStatsForPeak
-                    withBlock1.SICStats.SICPotentialAreaStatsForPeak = new clsSICPotentialAreaStats();
-                    bool peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData, out var potentialAreaStatsForPeakOut, withBlock1.SICStats.Peak, out smoothedYDataSubset, mOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, false, scanList.SIMDataPresent, false);
+                    parentIon.SICStats.SICPotentialAreaStatsForPeak = new clsSICPotentialAreaStats();
+                    bool peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData, out var potentialAreaStatsForPeakOut, parentIon.SICStats.Peak, out smoothedYDataSubset, mOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, false, scanList.SIMDataPresent, false);
                     parentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
-                    sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails, withBlock1.SICStats.SICPotentialAreaStatsForPeak, withBlock1.SICStats.Peak, peakIsValid);
+                    sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails, parentIon.SICStats.SICPotentialAreaStatsForPeak, parentIon.SICStats.Peak, peakIsValid);
 
                     // Step 3: store the results
 

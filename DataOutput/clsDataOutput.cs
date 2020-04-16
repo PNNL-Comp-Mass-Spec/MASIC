@@ -251,71 +251,71 @@ namespace MASIC.DataOutput
                                     sicOptionsCompare.SpectrumSimilarityMinimum = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 default:
-                                    var withBlock = sicOptionsCompare.SICPeakFinderOptions;
+                                    var peakFinderOptions = sicOptionsCompare.SICPeakFinderOptions;
                                     switch (valueNode.Name)
                                     {
                                         case "IntensityThresholdFractionMax":
-                                            withBlock.IntensityThresholdFractionMax = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.IntensityThresholdFractionMax = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "IntensityThresholdAbsoluteMinimum":
-                                            withBlock.IntensityThresholdAbsoluteMinimum = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.IntensityThresholdAbsoluteMinimum = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "SICNoiseThresholdMode":
-                                            withBlock.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(valueNode.InnerText);
+                                            peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "SICNoiseThresholdIntensity":
-                                            withBlock.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "SICNoiseFractionLowIntensityDataToAverage":
-                                            withBlock.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "SICNoiseMinimumSignalToNoiseRatio":
-                                            withBlock.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "MaxDistanceScansNoOverlap":
-                                            withBlock.MaxDistanceScansNoOverlap = Convert.ToInt32(valueNode.InnerText);
+                                            peakFinderOptions.MaxDistanceScansNoOverlap = Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "MaxAllowedUpwardSpikeFractionMax":
-                                            withBlock.MaxAllowedUpwardSpikeFractionMax = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.MaxAllowedUpwardSpikeFractionMax = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "InitialPeakWidthScansScaler":
-                                            withBlock.InitialPeakWidthScansScaler = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.InitialPeakWidthScansScaler = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "InitialPeakWidthScansMaximum":
-                                            withBlock.InitialPeakWidthScansMaximum = Convert.ToInt32(valueNode.InnerText);
+                                            peakFinderOptions.InitialPeakWidthScansMaximum = Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "FindPeaksOnSmoothedData":
-                                            withBlock.FindPeaksOnSmoothedData = Convert.ToBoolean(valueNode.InnerText);
+                                            peakFinderOptions.FindPeaksOnSmoothedData = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "SmoothDataRegardlessOfMinimumPeakWidth":
-                                            withBlock.SmoothDataRegardlessOfMinimumPeakWidth = Convert.ToBoolean(valueNode.InnerText);
+                                            peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "UseButterworthSmooth":
-                                            withBlock.UseButterworthSmooth = Convert.ToBoolean(valueNode.InnerText);
+                                            peakFinderOptions.UseButterworthSmooth = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "ButterworthSamplingFrequency":
-                                            withBlock.ButterworthSamplingFrequency = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.ButterworthSamplingFrequency = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "ButterworthSamplingFrequencyDoubledForSIMData":
-                                            withBlock.ButterworthSamplingFrequencyDoubledForSIMData = Convert.ToBoolean(valueNode.InnerText);
+                                            peakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "UseSavitzkyGolaySmooth":
-                                            withBlock.UseSavitzkyGolaySmooth = Convert.ToBoolean(valueNode.InnerText);
+                                            peakFinderOptions.UseSavitzkyGolaySmooth = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "SavitzkyGolayFilterOrder":
-                                            withBlock.SavitzkyGolayFilterOrder = Convert.ToInt16(valueNode.InnerText);
+                                            peakFinderOptions.SavitzkyGolayFilterOrder = Convert.ToInt16(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseThresholdMode":
-                                            withBlock.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(valueNode.InnerText);
+                                            peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseThresholdIntensity":
-                                            withBlock.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseFractionLowIntensityDataToAverage":
-                                            withBlock.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseMinimumSignalToNoiseRatio":
-                                            withBlock.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = Convert.ToSingle(valueNode.InnerText);
+                                            peakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                     }
 
@@ -658,15 +658,13 @@ namespace MASIC.DataOutput
         {
             string outputFilePath;
 
-            var withBlock = OutputFileHandles;
-
             // Scan Stats file
             outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
-            withBlock.ScanStats = new StreamWriter(outputFilePath, false);
+            OutputFileHandles.ScanStats = new StreamWriter(outputFilePath, false);
             if (writeHeaders)
-                withBlock.ScanStats.WriteLine(GetHeadersForOutputFile(null, eOutputFileTypeConstants.ScanStatsFlatFile));
-            withBlock.MSMethodFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSMethodFile);
-            withBlock.MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSTuneFile);
+                OutputFileHandles.ScanStats.WriteLine(GetHeadersForOutputFile(null, eOutputFileTypeConstants.ScanStatsFlatFile));
+            OutputFileHandles.MSMethodFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSMethodFile);
+            OutputFileHandles.MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSTuneFile);
         }
 
         public bool SaveHeaderGlossary(clsScanList scanList, string inputFileName, string outputDirectoryPath)

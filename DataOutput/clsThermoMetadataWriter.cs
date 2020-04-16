@@ -37,11 +37,11 @@ namespace MASIC.DataOutput
                     outputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase + methodNum + ".txt";
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
-                        var withBlock = objXcaliburAccessor.FileInfo;
-                        writer.WriteLine("Instrument model: " + withBlock.InstModel);
-                        writer.WriteLine("Instrument name: " + withBlock.InstName);
-                        writer.WriteLine("Instrument description: " + withBlock.InstrumentDescription);
-                        writer.WriteLine("Instrument serial number: " + withBlock.InstSerialNumber);
+                        var fileInfo = objXcaliburAccessor.FileInfo;
+                        writer.WriteLine("Instrument model: " + fileInfo.InstModel);
+                        writer.WriteLine("Instrument name: " + fileInfo.InstName);
+                        writer.WriteLine("Instrument description: " + fileInfo.InstrumentDescription);
+                        writer.WriteLine("Instrument serial number: " + fileInfo.InstSerialNumber);
                         writer.WriteLine();
                         writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods[index]);
                     }
@@ -89,8 +89,7 @@ namespace MASIC.DataOutput
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
                         writer.WriteLine("Category" + cColDelimiter + "Name" + cColDelimiter + "Value");
-                        var withBlock = objXcaliburAccessor.FileInfo.TuneMethods[index];
-                        foreach (udtTuneMethodSetting setting in withBlock.Settings)
+                        foreach (udtTuneMethodSetting setting in objXcaliburAccessor.FileInfo.TuneMethods[index].Settings)
                             writer.WriteLine(setting.Category + cColDelimiter + setting.Name + cColDelimiter + setting.Value);
                         writer.WriteLine();
                     }

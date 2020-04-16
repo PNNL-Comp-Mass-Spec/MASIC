@@ -159,40 +159,40 @@ namespace MASIC
 
         private void AppendParentIonToUniqueMZEntry(clsScanList scanList, int parentIonIndex, clsUniqueMZListItem mzListEntry, double searchMZOffset)
         {
-            var withBlock = scanList.ParentIons[parentIonIndex];
+            var parentIon = scanList.ParentIons[parentIonIndex];
             if (mzListEntry.MatchCount == 0)
             {
-                mzListEntry.MZAvg = withBlock.MZ - searchMZOffset;
+                mzListEntry.MZAvg = parentIon.MZ - searchMZOffset;
                 mzListEntry.MatchIndices.Add(parentIonIndex);
             }
             else
             {
                 // Update the average MZ: NewAvg = (OldAvg * OldCount + NewValue) / NewCount
-                mzListEntry.MZAvg = (mzListEntry.MZAvg * mzListEntry.MatchCount + (withBlock.MZ - searchMZOffset)) / (mzListEntry.MatchCount + 1);
+                mzListEntry.MZAvg = (mzListEntry.MZAvg * mzListEntry.MatchCount + (parentIon.MZ - searchMZOffset)) / (mzListEntry.MatchCount + 1);
                 mzListEntry.MatchIndices.Add(parentIonIndex);
             }
 
-            var withBlock1 = withBlock.SICStats;
-            if (withBlock1.Peak.MaxIntensityValue > mzListEntry.MaxIntensity || mzListEntry.MatchCount == 1)
+            var sicStats = parentIon.SICStats;
+            if (sicStats.Peak.MaxIntensityValue > mzListEntry.MaxIntensity || mzListEntry.MatchCount == 1)
             {
-                mzListEntry.MaxIntensity = withBlock1.Peak.MaxIntensityValue;
-                if (withBlock1.ScanTypeForPeakIndices == clsScanList.eScanTypeConstants.FragScan)
+                mzListEntry.MaxIntensity = sicStats.Peak.MaxIntensityValue;
+                if (sicStats.ScanTypeForPeakIndices == clsScanList.eScanTypeConstants.FragScan)
                 {
-                    mzListEntry.ScanNumberMaxIntensity = scanList.FragScans[withBlock1.PeakScanIndexMax].ScanNumber;
-                    mzListEntry.ScanTimeMaxIntensity = scanList.FragScans[withBlock1.PeakScanIndexMax].ScanTime;
+                    mzListEntry.ScanNumberMaxIntensity = scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber;
+                    mzListEntry.ScanTimeMaxIntensity = scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime;
                 }
                 else
                 {
-                    mzListEntry.ScanNumberMaxIntensity = scanList.SurveyScans[withBlock1.PeakScanIndexMax].ScanNumber;
-                    mzListEntry.ScanTimeMaxIntensity = scanList.SurveyScans[withBlock1.PeakScanIndexMax].ScanTime;
+                    mzListEntry.ScanNumberMaxIntensity = scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanNumber;
+                    mzListEntry.ScanTimeMaxIntensity = scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanTime;
                 }
 
                 mzListEntry.ParentIonIndexMaxIntensity = parentIonIndex;
             }
 
-            if (withBlock1.Peak.Area > mzListEntry.MaxPeakArea || mzListEntry.MatchCount == 1)
+            if (sicStats.Peak.Area > mzListEntry.MaxPeakArea || mzListEntry.MatchCount == 1)
             {
-                mzListEntry.MaxPeakArea = withBlock1.Peak.Area;
+                mzListEntry.MaxPeakArea = sicStats.Peak.Area;
                 mzListEntry.ParentIonIndexMaxPeakArea = parentIonIndex;
             }
         }
@@ -360,8 +360,8 @@ namespace MASIC
                 }
                 else
                 {
-                    var withBlock = spectraCache.SpectraPool[poolIndex];
-                    success = FindClosestMZ(withBlock.IonsMZ, withBlock.IonCount, searchMZ, toleranceMZ, out bestMatchMZ);
+                    var spectraPool = spectraCache.SpectraPool[poolIndex];
+                    success = FindClosestMZ(spectraPool.IonsMZ, spectraPool.IonCount, searchMZ, toleranceMZ, out bestMatchMZ);
                 }
             }
             catch (Exception ex)

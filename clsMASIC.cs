@@ -1581,9 +1581,8 @@ namespace MASIC
             finally
             {
                 // Record the final processing stats (before the output file handles are closed)
-                var withBlock = mProcessingStats;
-                withBlock.ProcessingEndTime = DateTime.UtcNow;
-                withBlock.MemoryUsageMBAtEnd = GetProcessMemoryUsageMB();
+                mProcessingStats.ProcessingEndTime = DateTime.UtcNow;
+                mProcessingStats.MemoryUsageMBAtEnd = GetProcessMemoryUsageMB();
 
                 // ---------------------------------------------------------
                 // Make sure the output file handles are closed
@@ -1621,15 +1620,14 @@ namespace MASIC
                     ShowErrorMessage(mStatusMessage);
                 }
 
-                var withBlock = mProcessingStats;
-                LogMessage("ProcessingStats: Memory Usage At Start (MB) = " + withBlock.MemoryUsageMBAtStart.ToString());
-                LogMessage("ProcessingStats: Peak memory usage (MB) = " + withBlock.PeakMemoryUsageMB.ToString());
-                LogMessage("ProcessingStats: File Load Time (seconds) = " + withBlock.FileLoadEndTime.Subtract(withBlock.FileLoadStartTime).TotalSeconds.ToString());
-                LogMessage("ProcessingStats: Memory Usage During Load (MB) = " + withBlock.MemoryUsageMBDuringLoad.ToString());
-                LogMessage("ProcessingStats: Processing Time (seconds) = " + withBlock.ProcessingEndTime.Subtract(withBlock.ProcessingStartTime).TotalSeconds.ToString());
-                LogMessage("ProcessingStats: Memory Usage At End (MB) = " + withBlock.MemoryUsageMBAtEnd.ToString());
-                LogMessage("ProcessingStats: Cache Event Count = " + withBlock.CacheEventCount.ToString());
-                LogMessage("ProcessingStats: UncCache Event Count = " + withBlock.UnCacheEventCount.ToString());
+                LogMessage("ProcessingStats: Memory Usage At Start (MB) = " + mProcessingStats.MemoryUsageMBAtStart.ToString());
+                LogMessage("ProcessingStats: Peak memory usage (MB) = " + mProcessingStats.PeakMemoryUsageMB.ToString());
+                LogMessage("ProcessingStats: File Load Time (seconds) = " + mProcessingStats.FileLoadEndTime.Subtract(mProcessingStats.FileLoadStartTime).TotalSeconds.ToString());
+                LogMessage("ProcessingStats: Memory Usage During Load (MB) = " + mProcessingStats.MemoryUsageMBDuringLoad.ToString());
+                LogMessage("ProcessingStats: Processing Time (seconds) = " + mProcessingStats.ProcessingEndTime.Subtract(mProcessingStats.ProcessingStartTime).TotalSeconds.ToString());
+                LogMessage("ProcessingStats: Memory Usage At End (MB) = " + mProcessingStats.MemoryUsageMBAtEnd.ToString());
+                LogMessage("ProcessingStats: Cache Event Count = " + mProcessingStats.CacheEventCount.ToString());
+                LogMessage("ProcessingStats: UncCache Event Count = " + mProcessingStats.UnCacheEventCount.ToString());
 
                 if (success)
                 {
@@ -1734,14 +1732,14 @@ namespace MASIC
             {
                 for (parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                 {
-                    var withBlock = scanList.ParentIons[parentIonIndex];
-                    scanIndexObserved = withBlock.SurveyScanIndex;
+                    var parentIon = scanList.ParentIons[parentIonIndex];
+                    scanIndexObserved = parentIon.SurveyScanIndex;
 
-                    var withBlock1 = withBlock.SICStats;
-                    withBlock1.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan;
-                    withBlock1.PeakScanIndexStart = scanIndexObserved;
-                    withBlock1.PeakScanIndexEnd = scanIndexObserved;
-                    withBlock1.PeakScanIndexMax = scanIndexObserved;
+                    var sicStats = parentIon.SICStats;
+                    sicStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan;
+                    sicStats.PeakScanIndexStart = scanIndexObserved;
+                    sicStats.PeakScanIndexEnd = scanIndexObserved;
+                    sicStats.PeakScanIndexMax = scanIndexObserved;
                 }
             }
             catch (Exception ex)
@@ -1932,9 +1930,8 @@ namespace MASIC
                         writer.WriteElementString("MemoryUsageMB", StringUtilities.DblToString(GetProcessMemoryUsageMB(), 1));
                         writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(mProcessingStats.PeakMemoryUsageMB, 1));
 
-                        var withBlock = mProcessingStats;
-                        writer.WriteElementString("CacheEventCount", withBlock.CacheEventCount.ToString());
-                        writer.WriteElementString("UnCacheEventCount", withBlock.UnCacheEventCount.ToString());
+                        writer.WriteElementString("CacheEventCount", mProcessingStats.CacheEventCount.ToString());
+                        writer.WriteElementString("UnCacheEventCount", mProcessingStats.UnCacheEventCount.ToString());
 
                         writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 2));
                         writer.WriteEndElement();

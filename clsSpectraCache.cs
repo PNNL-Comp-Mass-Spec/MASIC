@@ -208,20 +208,20 @@ namespace MASIC
                         {
                             try
                             {
-                                var withBlock = SpectraPool[poolIndexToCache];
+                                var spectraPool = SpectraPool[poolIndexToCache];
                                 // Write the scan number
                                 mPageFileWriter.Write(scanNumber);
 
                                 // Write the ion count
-                                mPageFileWriter.Write(withBlock.IonCount);
+                                mPageFileWriter.Write(spectraPool.IonCount);
 
                                 // Write the m/z values
-                                for (int index = 0; index <= withBlock.IonCount - 1; index++)
-                                    mPageFileWriter.Write(withBlock.IonsMZ[index]);
+                                for (int index = 0; index <= spectraPool.IonCount - 1; index++)
+                                    mPageFileWriter.Write(spectraPool.IonsMZ[index]);
 
                                 // Write the intensity values
-                                for (int index = 0; index <= withBlock.IonCount - 1; index++)
-                                    mPageFileWriter.Write(withBlock.IonsIntensity[index]);
+                                for (int index = 0; index <= spectraPool.IonCount - 1; index++)
+                                    mPageFileWriter.Write(spectraPool.IonsIntensity[index]);
 
                                 // Write four blank bytes (not really necessary, but adds a little padding between spectra)
                                 mPageFileWriter.Write(0);

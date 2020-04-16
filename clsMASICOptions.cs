@@ -427,23 +427,22 @@ namespace MASIC
                 var scanType = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", string.Empty);
                 var scanTolerance = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", string.Empty);
 
-                var withBlock = CustomSICList;
-                withBlock.ScanToleranceType = GetScanToleranceTypeFromText(scanType);
+                CustomSICList.ScanToleranceType = GetScanToleranceTypeFromText(scanType);
                 if (scanTolerance.Length > 0 && clsUtilities.IsNumber(scanTolerance))
                 {
-                    if (withBlock.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
+                    if (CustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
                     {
-                        withBlock.ScanOrAcqTimeTolerance = Convert.ToInt32(scanTolerance);
+                        CustomSICList.ScanOrAcqTimeTolerance = Convert.ToInt32(scanTolerance);
                     }
                     else
                     {
                         // Includes .Relative and .AcquisitionTime
-                        withBlock.ScanOrAcqTimeTolerance = Convert.ToSingle(scanTolerance);
+                        CustomSICList.ScanOrAcqTimeTolerance = Convert.ToSingle(scanTolerance);
                     }
                 }
                 else
                 {
-                    withBlock.ScanOrAcqTimeTolerance = 0;
+                    CustomSICList.ScanOrAcqTimeTolerance = 0;
                 }
 
                 CustomSICList.CustomSICListFileName = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", string.Empty);
