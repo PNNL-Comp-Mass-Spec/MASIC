@@ -154,7 +154,7 @@ namespace MASIC
 
                 // First, determine the maximum abundance value in mDataValues
                 double maxAbundance = double.MinValue;
-                for (int index = 0, loopTo = mDataCount - 1; index <= loopTo; index++)
+                for (int index = 0; index <= mDataCount - 1; index++)
                 {
                     if (mDataValues[index] > maxAbundance)
                     {
@@ -176,11 +176,11 @@ namespace MASIC
                 double[] histogramBinStartIntensity;
                 histogramBinCounts = new int[binCount];
                 histogramBinStartIntensity = new double[binCount];
-                for (int index = 0, loopTo1 = binCount - 1; index <= loopTo1; index++)
+                for (int index = 0; index <= binCount - 1; index++)
                     histogramBinStartIntensity[index] = index * binSize;
 
                 // Parse mDataValues to populate histogramBinCounts
-                for (int index = 0, loopTo2 = mDataCount - 1; index <= loopTo2; index++)
+                for (int index = 0; index <= mDataCount - 1; index++)
                 {
                     int targetBin;
                     if (mDataValues[index] <= 0)
@@ -267,7 +267,7 @@ namespace MASIC
                     if (!useFullDataSort)
                     {
                         int dataCountImplicitlyIncluded = 0;
-                        for (int index = 0, loopTo3 = mDataCount - 1; index <= loopTo3; index++)
+                        for (int index = 0; index <= mDataCount - 1; index++)
                         {
                             if (mDataValues[index] < binToSortAbundanceMinimum)
                             {
@@ -339,7 +339,7 @@ namespace MASIC
                         // binToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
 
                         int originalDataArrayIndex = 0;
-                        for (int index = 0, loopTo4 = binToSortDataCount - 1; index <= loopTo4; index++)
+                        for (int index = 0; index <= binToSortDataCount - 1; index++)
                         {
                             while (binToSortDataIndices[index] > mDataIndices[originalDataArrayIndex])
                                 originalDataArrayIndex += 1;
@@ -397,8 +397,7 @@ namespace MASIC
                 UpdateProgress(Conversions.ToSingle(2.333 / subtaskStepCount * 100.0));
 
                 // Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
-                var loopTo = dataCount - maximumDataCountInArraysToLoad - 1;
-                for (index = 0; index <= loopTo; index++)
+                for (index = 0; index <= dataCount - maximumDataCountInArraysToLoad - 1; index++)
                     abundances[index] = SkipDataPointFlag;
                 UpdateProgress(Conversions.ToSingle(2.666 / subtaskStepCount * 100.0D));
 

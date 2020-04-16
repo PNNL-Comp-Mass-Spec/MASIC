@@ -2398,8 +2398,7 @@ namespace MASIC
             int scanIndexObserved;
             try
             {
-                var loopTo = scanList.ParentIons.Count - 1;
-                for (parentIonIndex = 0; parentIonIndex <= loopTo; parentIonIndex++)
+                for (parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                 {
                     {
                         var withBlock = scanList.ParentIons[parentIonIndex];
@@ -2545,8 +2544,7 @@ namespace MASIC
                 if (currentStep >= weightingFactors.Length)
                     currentStep = weightingFactors.Length - 1;
                 overallPctCompleted = 0;
-                var loopTo = currentStep - 1;
-                for (index = 0; index <= loopTo; index++)
+                for (index = 0; index <= currentStep - 1; index++)
                     overallPctCompleted += weightingFactors[index] * 100;
                 overallPctCompleted += weightingFactors[currentStep] * mSubtaskProcessingStepPct;
                 mProgressPercentComplete = overallPctCompleted;

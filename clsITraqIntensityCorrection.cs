@@ -134,11 +134,11 @@ namespace MASIC
             double[] originalIntensities;
             int dataCount = reporterIonIntensities.Count() - 1;
             originalIntensities = new double[dataCount + 1];
-            for (int index = 0, loopTo = dataCount; index <= loopTo; index++)
+            for (int index = 0; index <= dataCount; index++)
                 originalIntensities[index] = reporterIonIntensities[index];
             if (ApplyCorrection(originalIntensities, debugShowIntensities))
             {
-                for (int index = 0, loopTo1 = dataCount; index <= loopTo1; index++)
+                for (int index = 0; index <= dataCount; index++)
                     reporterIonIntensities[index] = Conversions.ToSingle(originalIntensities[index]);
                 return true;
             }
@@ -165,7 +165,7 @@ namespace MASIC
 
             var correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensities);
             var maxIntensity = default(double);
-            for (int index = 0, loopTo = matrixSize - 1; index <= loopTo; index++)
+            for (int index = 0; index <= matrixSize - 1; index++)
                 maxIntensity = Math.Max(maxIntensity, reporterIonIntensities[index]);
             if (debugShowIntensities)
             {
@@ -174,7 +174,7 @@ namespace MASIC
             }
 
             // Now update reporterIonIntensities
-            for (int index = 0, loopTo1 = matrixSize - 1; index <= loopTo1; index++)
+            for (int index = 0; index <= matrixSize - 1; index++)
             {
                 if (reporterIonIntensities[index] > 0)
                 {
@@ -828,9 +828,9 @@ namespace MASIC
             }
 
             // Now divide all of the weights by 100
-            for (int i = 0, loopTo = maxIndex; i <= loopTo; i++)
+            for (int i = 0; i <= maxIndex; i++)
             {
-                for (int j = 0, loopTo1 = maxIndex; j <= loopTo1; j++)
+                for (int j = 0; j <= maxIndex; j++)
                     mCoeffs[i, j] /= 100.0;
             }
 
@@ -839,13 +839,13 @@ namespace MASIC
                 // Print out the matrix
                 Console.WriteLine();
                 Console.WriteLine("Reporter Ion Correction Matrix; mode = " + mReporterIonMode.ToString());
-                for (int i = 0, loopTo2 = maxIndex; i <= loopTo2; i++)
+                for (int i = 0; i <= maxIndex; i++)
                 {
                     if (i == 0)
                     {
                         // Header line
                         Console.Write("     ");
-                        for (int j = 0, loopTo3 = maxIndex; j <= loopTo3; j++)
+                        for (int j = 0; j <= maxIndex; j++)
                         {
                             if (j < 10)
                             {
@@ -859,7 +859,7 @@ namespace MASIC
 
                         Console.WriteLine();
                         Console.Write("     ");
-                        for (int k = 0, loopTo4 = maxIndex; k <= loopTo4; k++)
+                        for (int k = 0; k <= maxIndex; k++)
                             Console.Write(" ------ ");
                         Console.WriteLine();
                     }
@@ -870,7 +870,7 @@ namespace MASIC
                     else
                         indexSpacer = " ";
                     Console.Write("  " + i.ToString() + indexSpacer);
-                    for (int j = 0, loopTo5 = maxIndex; j <= loopTo5; j++)
+                    for (int j = 0; j <= maxIndex; j++)
                     {
                         if (Math.Abs(mCoeffs[i, j]) < float.Epsilon)
                         {

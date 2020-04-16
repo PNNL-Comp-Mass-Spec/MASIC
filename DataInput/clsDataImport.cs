@@ -130,8 +130,7 @@ namespace MASIC.DataInput
                             if (noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0)
                             {
                                 ionCountNew = 0;
-                                var loopTo = msSpectrum.IonCount - 1;
-                                for (ionIndex = 0; ionIndex <= loopTo; ionIndex++)
+                                for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                                 {
                                     pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
                                     if (!pointPassesFilter)
@@ -166,8 +165,7 @@ namespace MASIC.DataInput
                             if (noiseThresholdOptions.MinimumSignalToNoiseRatio > 0)
                             {
                                 ionCountNew = 0;
-                                var loopTo1 = msSpectrum.IonCount - 1;
-                                for (ionIndex = 0; ionIndex <= loopTo1; ionIndex++)
+                                for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                                 {
                                     pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
                                     if (!pointPassesFilter)
@@ -240,8 +238,7 @@ namespace MASIC.DataInput
                     }
 
                     // Store the intensity values in objFilterDataArray
-                    var loopTo = msSpectrum.IonCount - 1;
-                    for (ionIndex = 0; ionIndex <= loopTo; ionIndex++)
+                    for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                     {
                         objFilterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
                         if (writeDebugData)
@@ -258,8 +255,7 @@ namespace MASIC.DataInput
                     // Call .FilterData, which will determine which data points to keep
                     objFilterDataArray.FilterData();
                     ionCountNew = 0;
-                    var loopTo1 = msSpectrum.IonCount - 1;
-                    for (ionIndex = 0; ionIndex <= loopTo1; ionIndex++)
+                    for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                     {
                         pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
                         if (!pointPassesFilter)
@@ -296,8 +292,7 @@ namespace MASIC.DataInput
                         postFilterWriter.WriteLine("m/z" + ControlChars.Tab + "Intensity");
 
                         // Store the intensity values in objFilterDataArray
-                        var loopTo2 = msSpectrum.IonCount - 1;
-                        for (ionIndex = 0; ionIndex <= loopTo2; ionIndex++)
+                        for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                             postFilterWriter.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + ControlChars.Tab + msSpectrum.IonsIntensity[ionIndex]);
                     }
                 }
@@ -414,7 +409,7 @@ namespace MASIC.DataInput
         {
             var mzList = new List<double>();
             var intensityList = new List<double>();
-            for (int i = 0, loopTo = ionCount - 1; i <= loopTo; i++)
+            for (int i = 0; i <= ionCount - 1; i++)
             {
                 mzList.Add(centroidedIonsMz[i]);
                 intensityList.Add(centroidedIonsIntensity[i]);
@@ -427,7 +422,7 @@ namespace MASIC.DataInput
         {
             mCachedPrecursorIons.Clear();
             int ionCount = centroidedIonsMz.Count;
-            for (int index = 0, loopTo = ionCount - 1; index <= loopTo; index++)
+            for (int index = 0; index <= ionCount - 1; index++)
             {
                 var newPeak = new InterDetect.Peak()
                 {

@@ -99,7 +99,7 @@ namespace MASIC
                 if (msSpectrum.IonsIntensity[index] < float.Epsilon)
                 {
                     int countCombined = 0;
-                    for (int comparisonIndex = index + 1, loopTo = msSpectrum.IonCount - 1; comparisonIndex <= loopTo; comparisonIndex++)
+                    for (int comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
                     {
                         if (msSpectrum.IonsIntensity[comparisonIndex] < float.Epsilon)
                         {
@@ -161,7 +161,7 @@ namespace MASIC
                     bool pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[index], mzIgnoreRangeStart, mzIgnoreRangeEnd);
                     if (!pointInIgnoreRange)
                     {
-                        for (int comparisonIndex = index + 1, loopTo1 = msSpectrum.IonCount - 1; comparisonIndex <= loopTo1; comparisonIndex++)
+                        for (int comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
                         {
                             if (clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[comparisonIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd))
                             {

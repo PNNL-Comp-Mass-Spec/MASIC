@@ -49,7 +49,7 @@ namespace MASIC
             {
                 int surveyScanIndexMatch = -1;
                 int scanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
-                for (int index = 0, loopTo = scanList.SurveyScans.Count - 1; index <= loopTo; index++)
+                for (int index = 0; index <= scanList.SurveyScans.Count - 1; index++)
                 {
                     if (scanList.SurveyScans[index].ScanNumber >= scanNumberToFind)
                     {

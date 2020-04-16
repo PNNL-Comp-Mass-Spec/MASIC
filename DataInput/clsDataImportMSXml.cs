@@ -431,7 +431,7 @@ namespace MASIC.DataInput
                         // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
                         var scanTimeDiffs = new List<double>();
                         var scanTimes = chromatogramItem.Times.ToList();
-                        for (int i = 0, loopTo = scanTimes.Count - 1; i <= loopTo; i++)
+                        for (int i = 0; i <= scanTimes.Count - 1; i++)
                         {
                             if (!elutionTimeToScanMap.ContainsKey(scanTimes[i]))
                             {
@@ -490,7 +490,7 @@ namespace MASIC.DataInput
                         // Fix duplicate scans (values) in elutionTimeToScanMap, if possible
                         // For Each elutionTime In (From item In elutionTimeToScanMap.Keys Order By item Select item)
 
-                        for (int i = 1, loopTo1 = elutionTimeToScanMap.Count - 1; i <= loopTo1; i++)
+                        for (int i = 1; i <= elutionTimeToScanMap.Count - 1; i++)
                         {
                             int previousScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i - 1);
                             int currentScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i);
@@ -556,7 +556,7 @@ namespace MASIC.DataInput
                         var intensities = chromatogramItem.Intensities.ToList();
                         var currentMz = chromatogramItem.Product.TargetMz;
                         int scanToStore;
-                        for (int i = 0, loopTo2 = scanTimes.Count - 1; i <= loopTo2; i++)
+                        for (int i = 0; i <= scanTimes.Count - 1; i++)
                         {
                             if (elutionTimeToScanMapMaster.TryGetValue(scanTimes[i], out scanToStore))
                             {
@@ -809,7 +809,7 @@ namespace MASIC.DataInput
                     double[] sourceIntensities;
                     sourceMzs = new double[msSpectrum.IonCount];
                     sourceIntensities = new double[msSpectrum.IonCount];
-                    for (int i = 0, loopTo = msSpectrum.IonCount - 1; i <= loopTo; i++)
+                    for (int i = 0; i <= msSpectrum.IonCount - 1; i++)
                     {
                         sourceMzs[i] = msSpectrum.IonsMZ[i];
                         sourceIntensities[i] = msSpectrum.IonsIntensity[i];
@@ -824,7 +824,7 @@ namespace MASIC.DataInput
                         mMostRecentPrecursorScan = scanInfo.ScanNumber;
                         mCentroidedPrecursorIonsMz.Clear();
                         mCentroidedPrecursorIonsIntensity.Clear();
-                        for (int i = 0, loopTo1 = centroidedPrecursorIonsMz.Length - 1; i <= loopTo1; i++)
+                        for (int i = 0; i <= centroidedPrecursorIonsMz.Length - 1; i++)
                         {
                             mCentroidedPrecursorIonsMz.Add(centroidedPrecursorIonsMz[i]);
                             mCentroidedPrecursorIonsIntensity.Add(centroidedPrecursorIonsIntensity[i]);
@@ -1011,7 +1011,7 @@ namespace MASIC.DataInput
                 double bpi = intensityList[0];
                 double mzMin = basePeakMz;
                 double mzMax = basePeakMz;
-                for (int i = 1, loopTo = mzXmlSourceSpectrum.DataCount - 1; i <= loopTo; i++)
+                for (int i = 1; i <= mzXmlSourceSpectrum.DataCount - 1; i++)
                 {
                     if (intensityList[i] > bpi)
                     {
@@ -1297,7 +1297,7 @@ namespace MASIC.DataInput
                 {
                     // Confirm the total scan intensity stored in the mzXML file
                     double totalIonIntensity = 0;
-                    for (int ionIndex = 0, loopTo = msSpectrum.IonCount - 1; ionIndex <= loopTo; ionIndex++)
+                    for (int ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                         totalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
                     if (scanInfo.TotalIonIntensity < float.Epsilon)
                     {
@@ -1322,7 +1322,7 @@ namespace MASIC.DataInput
             mMostRecentPrecursorScan = scanNumber;
             mCentroidedPrecursorIonsMz.Clear();
             mCentroidedPrecursorIonsIntensity.Clear();
-            for (int i = 0, loopTo = msSpectrum.IonCount - 1; i <= loopTo; i++)
+            for (int i = 0; i <= msSpectrum.IonCount - 1; i++)
             {
                 mCentroidedPrecursorIonsMz.Add(msSpectrum.IonsMZ[i]);
                 mCentroidedPrecursorIonsIntensity.Add(msSpectrum.IonsIntensity[i]);

@@ -103,11 +103,11 @@ namespace MASIC.DataInput
                         {
                             // Initialize eColumnMapping, setting the value for each column to -1, indicating the column is not present
                             eColumnMapping = new int[dataCols.Length];
-                            for (int colIndex = 0, loopTo = eColumnMapping.Length - 1; colIndex <= loopTo; colIndex++)
+                            for (int colIndex = 0; colIndex <= eColumnMapping.Length - 1; colIndex++)
                                 eColumnMapping[colIndex] = -1;
 
                             // The first row must be the header row; parse the values
-                            for (int colIndex = 0, loopTo1 = dataCols.Length - 1; colIndex <= loopTo1; colIndex++)
+                            for (int colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                             {
                                 var switchExpr = dataCols[colIndex].ToUpper();
                                 switch (switchExpr)
@@ -197,7 +197,7 @@ namespace MASIC.DataInput
                         mzSearchSpec.MZToleranceDa = 0;
                         mzSearchSpec.ScanOrAcqTimeCenter = 0;
                         mzSearchSpec.ScanOrAcqTimeTolerance = 0;
-                        for (int colIndex = 0, loopTo2 = dataCols.Length - 1; colIndex <= loopTo2; colIndex++)
+                        for (int colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                         {
                             if (colIndex >= eColumnMapping.Length)
                                 break;

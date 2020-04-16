@@ -633,7 +633,7 @@ namespace MASIC.DatasetStats
             var matchFound = default(bool);
 
             // Look for scan scanNumber in mDatasetScanStats
-            for (int index = 0, loopTo = mDatasetScanStats.Count - 1; index <= loopTo; index++)
+            for (int index = 0; index <= mDatasetScanStats.Count - 1; index++)
             {
                 if (mDatasetScanStats[index].ScanNumber == scanNumber)
                 {

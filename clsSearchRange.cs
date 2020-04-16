@@ -796,8 +796,7 @@ namespace MASIC
             if (arrayLength < 0)
                 arrayLength = 0;
             mPointerIndices = new int[arrayLength];
-            var loopTo = arrayLength - 1;
-            for (index = 0; index <= loopTo; index++)
+            for (index = 0; index <= arrayLength - 1; index++)
                 mPointerIndices[index] = index;
             if (arrayLength > 0)
             {

@@ -87,7 +87,7 @@ namespace MASIC.DataOutput
                 {
                     SICDataScanIntervals = new byte[sicDetails.SICDataCount];
                     var sicScanNumbers = sicDetails.SICScanNumbers;
-                    for (int scanIndex = 1, loopTo = sicDetails.SICDataCount - 1; scanIndex <= loopTo; scanIndex++)
+                    for (int scanIndex = 1; scanIndex <= sicDetails.SICDataCount - 1; scanIndex++)
                     {
                         int scanDelta = sicScanNumbers[scanIndex] - sicScanNumbers[scanIndex - 1];
                         // When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
@@ -107,7 +107,7 @@ namespace MASIC.DataOutput
                 var sicScanIndices = sicDetails.SICScanIndices;
 
                 // Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
-                for (int fragScanIndex = 0, loopTo1 = scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex <= loopTo1; fragScanIndex++)
+                for (int fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
                 {
                     lastGoodLoc = "fragScanIndex=" + fragScanIndex.ToString();
                     writer.WriteStartElement("ParentIon");
@@ -217,7 +217,7 @@ namespace MASIC.DataOutput
                         string scanIntervalList = string.Empty;
                         if (SICDataScanIntervals is object)
                         {
-                            for (int scanIntervalIndex = 0, loopTo2 = sicDetails.SICDataCount - 1; scanIntervalIndex <= loopTo2; scanIntervalIndex++)
+                            for (int scanIntervalIndex = 0; scanIntervalIndex <= sicDetails.SICDataCount - 1; scanIntervalIndex++)
                             {
                                 if (SICDataScanIntervals[scanIntervalIndex] <= 9)
                                 {
@@ -337,7 +337,7 @@ namespace MASIC.DataOutput
                                 sbPeakYDataSmoothed.Length = 0;
                                 if (smoothedYDataSubset.Data is object && smoothedYDataSubset.DataCount > 0)
                                 {
-                                    for (int index = 0, loopTo3 = smoothedYDataSubset.DataCount - 1; index <= loopTo3; index++)
+                                    for (int index = 0; index <= smoothedYDataSubset.DataCount - 1; index++)
                                         sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString() + ",");
 
                                     // Trim the trailing comma

@@ -70,7 +70,7 @@ namespace MASIC.DataOutput
                 }
 
                 UpdateProgress(0, "Exporting raw data");
-                for (int masterOrderIndex = 0, loopTo = scanList.MasterScanOrderCount - 1; masterOrderIndex <= loopTo; masterOrderIndex++)
+                for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                 {
                     int scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                     if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
@@ -163,7 +163,7 @@ namespace MASIC.DataOutput
                     int[] pointerArray;
                     intensities = new double[withBlock.IonCount];
                     pointerArray = new int[withBlock.IonCount];
-                    for (int ionIndex = 0, loopTo = withBlock.IonCount - 1; ionIndex <= loopTo; ionIndex++)
+                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
                     {
                         intensities[ionIndex] = withBlock.IonsIntensity[ionIndex];
                         pointerArray[ionIndex] = ionIndex;
@@ -196,7 +196,7 @@ namespace MASIC.DataOutput
                         minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
                     }
 
-                    for (int ionIndex = 0, loopTo1 = withBlock.IonCount - 1; ionIndex <= loopTo1; ionIndex++)
+                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
                     {
                         if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                         {
@@ -270,7 +270,7 @@ namespace MASIC.DataOutput
                     int[] pointerArray;
                     intensities = new double[withBlock.IonCount];
                     pointerArray = new int[withBlock.IonCount];
-                    for (int ionIndex = 0, loopTo = withBlock.IonCount - 1; ionIndex <= loopTo; ionIndex++)
+                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
                     {
                         intensities[ionIndex] = withBlock.IonsIntensity[ionIndex];
                         pointerArray[ionIndex] = ionIndex;
@@ -304,7 +304,7 @@ namespace MASIC.DataOutput
                     }
 
                     exportCount = 0;
-                    for (int ionIndex = 0, loopTo1 = withBlock.IonCount - 1; ionIndex <= loopTo1; ionIndex++)
+                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
                     {
                         if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                         {

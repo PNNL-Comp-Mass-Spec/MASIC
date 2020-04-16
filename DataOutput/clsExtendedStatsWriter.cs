@@ -168,7 +168,7 @@ namespace MASIC.DataOutput
             }
 
             // Initialize nonConstantHeaderIDs
-            for (int i = 0, loopTo = mExtendedHeaderNameMap.Count - 1; i <= loopTo; i++)
+            for (int i = 0; i <= mExtendedHeaderNameMap.Count - 1; i++)
                 nonConstantHeaderIDs.Add(i);
             if (!mOptions.ConsolidateConstantExtendedHeaderValues)
             {
@@ -289,7 +289,7 @@ namespace MASIC.DataOutput
 
             foreach (var keyName in keysToRemove)
             {
-                for (int headerIndex = 0, loopTo1 = mExtendedHeaderNameMap.Count - 1; headerIndex <= loopTo1; headerIndex++)
+                for (int headerIndex = 0; headerIndex <= mExtendedHeaderNameMap.Count - 1; headerIndex++)
                 {
                     if ((mExtendedHeaderNameMap[headerIndex].Key ?? "") == (keyName ?? ""))
                     {
@@ -390,7 +390,7 @@ namespace MASIC.DataOutput
                         writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), headerNames));
                     }
 
-                    for (int scanIndex = 0, loopTo = scanList.MasterScanOrderCount - 1; scanIndex <= loopTo; scanIndex++)
+                    for (int scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
                     {
                         var currentScan = GetScanByMasterScanIndex(scanList, scanIndex);
                         var dataColumns = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetID, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo);

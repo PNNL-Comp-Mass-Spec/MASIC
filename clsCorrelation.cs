@@ -280,7 +280,7 @@ namespace MASIC
                 bin2Offset = mBinningOptions.BinSize / 2;
 
                 // Initialize the bins
-                for (int i = 1, loopTo = binCount; i <= loopTo; i++)
+                for (int i = 1; i <= binCount; i++)
                 {
                     binnedYData.Add(0);
                     binnedOffsetYData.Add(0);
@@ -310,8 +310,7 @@ namespace MASIC
             try
             {
                 maximumIntensity = float.MinValue;
-                var loopTo = dataCount - 1;
-                for (index = 0; index <= loopTo; index++)
+                for (index = 0; index <= dataCount - 1; index++)
                 {
                     if (yData[index] >= NoiseThresholdIntensity)
                     {
@@ -352,8 +351,7 @@ namespace MASIC
                         intensityQuantizationValue = 1;
                     if (intensityQuantizationValue > 1)
                         intensityQuantizationValue = Conversions.ToSingle(Math.Round(intensityQuantizationValue, 0));
-                    var loopTo1 = binCount - 1;
-                    for (index = 0; index <= loopTo1; index++)
+                    for (index = 0; index <= binCount - 1; index++)
                     {
                         if (Math.Abs(binnedYData[index]) > float.Epsilon)
                         {
@@ -364,8 +362,7 @@ namespace MASIC
 
                 if (binningOptions.Normalize & maximumIntensity > 0)
                 {
-                    var loopTo2 = binCount - 1;
-                    for (index = 0; index <= loopTo2; index++)
+                    for (index = 0; index <= binCount - 1; index++)
                     {
                         if (Math.Abs(binnedYData[index]) > float.Epsilon)
                         {
@@ -421,8 +418,7 @@ namespace MASIC
 
                 // Determine the number of non-zero data points in the two spectra
                 nonZeroDataCount = 0;
-                var loopTo = dataCount - 1;
-                for (index = 0; index <= loopTo; index++)
+                for (index = 0; index <= dataCount - 1; index++)
                 {
                     if (dataList1.ElementAtOrDefault(index) > 0)
                         nonZeroDataCount += 1;
@@ -431,8 +427,7 @@ namespace MASIC
                 if (nonZeroDataCount < MIN_NON_ZERO_ION_COUNT)
                     return 0;
                 nonZeroDataCount = 0;
-                var loopTo1 = dataCount - 1;
-                for (index = 0; index <= loopTo1; index++)
+                for (index = 0; index <= dataCount - 1; index++)
                 {
                     if (dataList2.ElementAtOrDefault(index) > 0)
                         nonZeroDataCount += 1;
@@ -509,8 +504,7 @@ namespace MASIC
                 return;
 
             // Find the means
-            var loopTo = n - 1;
-            for (j = 0; j <= loopTo; j++)
+            for (j = 0; j <= n - 1; j++)
             {
                 ax += dataList1.ElementAtOrDefault(j);
                 ay += dataList2.ElementAtOrDefault(j);
@@ -520,8 +514,7 @@ namespace MASIC
             ay /= n;
 
             // Compute the correlation coefficient
-            var loopTo1 = n - 1;
-            for (j = 0; j <= loopTo1; j++)
+            for (j = 0; j <= n - 1; j++)
             {
                 xt = dataList1.ElementAtOrDefault(j) - ax;
                 yt = dataList2.ElementAtOrDefault(j) - ay;
@@ -570,11 +563,9 @@ namespace MASIC
 
             if (n <= 0)
                 return;
-            var loopTo = n - 2;
-            for (j = 0; j <= loopTo; j++)
+            for (j = 0; j <= n - 2; j++)
             {
-                var loopTo1 = n - 1;
-                for (k = j + 1; k <= loopTo1; k++)
+                for (k = j + 1; k <= n - 1; k++)
                 {
                     a1 = dataList1.ElementAtOrDefault(j) - dataList1.ElementAtOrDefault(k);
                     a2 = dataList2.ElementAtOrDefault(j) - dataList2.ElementAtOrDefault(k);
@@ -655,8 +646,7 @@ namespace MASIC
             Array.Sort(data2, data1);
             CRank(n, data2, out sg);
             DiffInRanksWork = 0.0;
-            var loopTo = n - 1;
-            for (j = 0; j <= loopTo; j++)
+            for (j = 0; j <= n - 1; j++)
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
             DiffInRanks = Conversions.ToSingle(DiffInRanksWork);
             en = n;
@@ -703,8 +693,7 @@ namespace MASIC
                     while (jt < n && Math.Abs(w[jt] - w[j]) < float.Epsilon)
                         jt += 1;
                     rank = 0.5F * (j + jt - 1) + 1;
-                    var loopTo = jt - 1;
-                    for (ji = j; ji <= loopTo; ji++)
+                    for (ji = j; ji <= jt - 1; ji++)
                         w[ji] = rank;
                     t = jt - j;
                     s += t * t * t - t;          // t^3 - t

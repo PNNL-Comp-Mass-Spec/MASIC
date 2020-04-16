@@ -188,7 +188,7 @@ namespace MASIC.DataOutput
             {
                 // Write an Escape character (Byte 1B)
                 writer.Write(Conversions.ToByte(27));
-                for (int scanIndex = 0, loopTo = scanCount - 1; scanIndex <= loopTo; scanIndex++)
+                for (int scanIndex = 0; scanIndex <= scanCount - 1; scanIndex++)
                 {
                     {
                         var withBlock = scanList[scanIndex];

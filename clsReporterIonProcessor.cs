@@ -52,7 +52,7 @@ namespace MASIC
                 {
                     // Processing a thermo .Raw file
                     // Check whether any of the frag scans has IsFTMS true
-                    for (int masterOrderIndex = 0, loopTo = scanList.MasterScanOrderCount - 1; masterOrderIndex <= loopTo; masterOrderIndex++)
+                    for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                     {
                         int scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                         if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
@@ -182,7 +182,7 @@ namespace MASIC
                     // Write the headers to the output file, separated by tabs
                     writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), headerColumns));
                     UpdateProgress(0, "Searching for reporter ions");
-                    for (int masterOrderIndex = 0, loopTo1 = scanList.MasterScanOrderCount - 1; masterOrderIndex <= loopTo1; masterOrderIndex++)
+                    for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                     {
                         int scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                         if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
@@ -292,7 +292,7 @@ namespace MASIC
             // Find the reporter ion intensities
             // Also keep track of the closest m/z for each reporter ion
             // Note that we're using the maximum intensity in the range (not the sum)
-            for (int reporterIonIndex = 0, loopTo = reporterIons.Count - 1; reporterIonIndex <= loopTo; reporterIonIndex++)
+            for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
                 int ionMatchCount;
                 {
@@ -315,7 +315,7 @@ namespace MASIC
 
                 // Find each reporter ion in ftLabelData
 
-                for (int reporterIonIndex = 0, loopTo1 = reporterIons.Count - 1; reporterIonIndex <= loopTo1; reporterIonIndex++)
+                for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
                 {
                     double mzToFind = reporterIons[reporterIonIndex].MZ;
                     double mzToleranceDa = reporterIons[reporterIonIndex].MZToleranceDa;
@@ -363,7 +363,7 @@ namespace MASIC
 
                     // Count the number of non-zero data points in reporterIntensitiesCorrected()
                     int positiveCount = 0;
-                    for (int reporterIonIndex = 0, loopTo2 = reporterIons.Count - 1; reporterIonIndex <= loopTo2; reporterIonIndex++)
+                    for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
                     {
                         if (reporterIntensitiesCorrected[reporterIonIndex] > 0)
                         {
@@ -385,7 +385,7 @@ namespace MASIC
             // Initialize the variables used to compute the weighted average percent change
             double pctChangeSum = 0;
             double originalIntensitySum = 0;
-            for (int reporterIonIndex = 0, loopTo3 = reporterIons.Count - 1; reporterIonIndex <= loopTo3; reporterIonIndex++)
+            for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
                 if (!reporterIons[reporterIonIndex].ContaminantIon)
                 {

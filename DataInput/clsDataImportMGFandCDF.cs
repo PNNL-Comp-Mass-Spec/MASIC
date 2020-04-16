@@ -76,7 +76,7 @@ namespace MASIC.DataInput
                 // Read all of the Survey scans from the CDF file
                 // CDF files created by the Agilent XCT list the first scan number as 0; use scanNumberCorrection to correct for this
                 int scanNumberCorrection = 0;
-                for (int msScanIndex = 0, loopTo = msScanCount - 1; msScanIndex <= loopTo; msScanIndex++)
+                for (int msScanIndex = 0; msScanIndex <= msScanCount - 1; msScanIndex++)
                 {
                     int scanNumber;
                     double scanTotalIntensity, massMin, massMax;
@@ -232,7 +232,7 @@ namespace MASIC.DataInput
                         // an older version of Agilent Chemstation.  These files typically have lines like ###MSMS: #13-29 instead of ###MSMS: #13/29/
                         // If this indexing error is found, then we'll set scanNumberCorrection = 1 and apply it to all subsequent MS/MS scans;
                         // we'll also need to correct prior MS/MS scans
-                        for (int surveyScanIndex = lastSurveyScanIndex, loopTo1 = scanList.SurveyScans.Count - 1; surveyScanIndex <= loopTo1; surveyScanIndex++)
+                        for (int surveyScanIndex = lastSurveyScanIndex; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
                         {
                             if (scanList.SurveyScans[surveyScanIndex].ScanNumber == spectrumInfo.ScanNumber)
                             {
@@ -322,7 +322,7 @@ namespace MASIC.DataInput
 
                         // Compute the total scan intensity
                         newFragScan.TotalIonIntensity = 0;
-                        for (int ionIndex = 0, loopTo2 = newFragScan.IonCount - 1; ionIndex <= loopTo2; ionIndex++)
+                        for (int ionIndex = 0; ionIndex <= newFragScan.IonCount - 1; ionIndex++)
                             newFragScan.TotalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
 
                         // Determine the minimum positive intensity in this scan
@@ -393,7 +393,7 @@ namespace MASIC.DataInput
                 ValidateMasterScanOrderSorting(scanList);
 
                 // Now that all of the data has been read, write out to the scan stats file, in order of scan number
-                for (int scanIndex = 0, loopTo3 = scanList.MasterScanOrderCount - 1; scanIndex <= loopTo3; scanIndex++)
+                for (int scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
                 {
                     var eScanType = scanList.MasterScanOrder[scanIndex].ScanType;
                     clsScanInfo currentScan;
@@ -434,8 +434,7 @@ namespace MASIC.DataInput
                 mzMin = mzList[0];
                 mzMax = mzList[0];
                 basePeakIndex = 0;
-                var loopTo = mzList.Count - 1;
-                for (dataIndex = 0; dataIndex <= loopTo; dataIndex++)
+                for (dataIndex = 0; dataIndex <= mzList.Count - 1; dataIndex++)
                 {
                     if (ionIntensity[dataIndex] > ionIntensity[basePeakIndex])
                     {
@@ -576,7 +575,7 @@ namespace MASIC.DataInput
             int[] masterScanOrderIndices;
             masterScanNumbers = new int[scanList.MasterScanOrderCount];
             masterScanOrderIndices = new int[scanList.MasterScanOrderCount];
-            for (int index = 0, loopTo = scanList.MasterScanOrderCount - 1; index <= loopTo; index++)
+            for (int index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
             {
                 masterScanNumbers[index] = scanList.MasterScanNumList[index];
                 masterScanOrderIndices[index] = index;
@@ -587,7 +586,7 @@ namespace MASIC.DataInput
 
             // Check whether we need to re-populate the lists
             bool needToSort = false;
-            for (int index = 1, loopTo1 = scanList.MasterScanOrderCount - 1; index <= loopTo1; index++)
+            for (int index = 1; index <= scanList.MasterScanOrderCount - 1; index++)
             {
                 if (masterScanOrderIndices[index] < masterScanOrderIndices[index - 1])
                 {
@@ -606,7 +605,7 @@ namespace MASIC.DataInput
                 masterScanTimeListCopy = new float[scanList.MasterScanOrder.Count];
                 Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount);
                 Array.Copy(scanList.MasterScanTimeList.ToArray(), masterScanTimeListCopy, scanList.MasterScanOrderCount);
-                for (int index = 0, loopTo2 = scanList.MasterScanOrderCount - 1; index <= loopTo2; index++)
+                for (int index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
                 {
                     scanList.MasterScanOrder[index] = udtMasterScanOrderListCopy[masterScanOrderIndices[index]];
                     scanList.MasterScanNumList[index] = masterScanNumbers[index];

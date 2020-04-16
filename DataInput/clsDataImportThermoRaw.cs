@@ -187,7 +187,7 @@ namespace MASIC.DataInput
                 UpdateProgress(string.Format("Reading Xcalibur data ({0:N0} scans){1}", scanCount, ControlChars.NewLine + Path.GetFileName(filePath)));
                 ReportMessage(string.Format("Reading Xcalibur data; Total scan count: {0:N0}", scanCount));
                 int scanCountToRead = scanEnd - scanStart + 1;
-                for (int scanNumber = scanStart, loopTo = scanEnd; scanNumber <= loopTo; scanNumber++)
+                for (int scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)
                 {
                     if (!mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
                     {
@@ -543,7 +543,7 @@ namespace MASIC.DataInput
                 double totalIonIntensity = 0;
                 double basePeakIntensity = 0;
                 double basePeakMz = 0;
-                for (int ionIndex = 0, loopTo = scanInfo.IonCountRaw - 1; ionIndex <= loopTo; ionIndex++)
+                for (int ionIndex = 0; ionIndex <= scanInfo.IonCountRaw - 1; ionIndex++)
                 {
                     totalIonIntensity += intensityList[ionIndex];
                     if (intensityList[ionIndex] > basePeakIntensity)
@@ -746,7 +746,7 @@ namespace MASIC.DataInput
             }
 
             bool sortRequired = false;
-            for (int index = 1, loopTo = ionCount - 1; index <= loopTo; index++)
+            for (int index = 1; index <= ionCount - 1; index++)
             {
                 // Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z,
                 // we have observed a few cases in certain scans of certain datasets that points with

@@ -71,8 +71,7 @@ namespace MASIC.DataOutput
             if (surveyScanCount > 0)
             {
                 scanListArray = new int[surveyScanCount];
-                var loopTo = surveyScanCount - 1;
-                for (index = 0; index <= loopTo; index++)
+                for (index = 0; index <= surveyScanCount - 1; index++)
                     scanListArray[index] = surveyScans[index].ScanNumber;
             }
             else
@@ -110,7 +109,7 @@ namespace MASIC.DataOutput
                     if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
                     {
                         // Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
-                        for (int fragScanIndex = 0, loopTo = scanList.FragScans.Count - 1; fragScanIndex <= loopTo; fragScanIndex++)
+                        for (int fragScanIndex = 0; fragScanIndex <= scanList.FragScans.Count - 1; fragScanIndex++)
                         {
                             var fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex);
                             int parentIonIndex = 0;
@@ -121,7 +120,7 @@ namespace MASIC.DataOutput
                     }
                     else
                     {
-                        for (int parentIonIndex = 0, loopTo1 = scanList.ParentIons.Count - 1; parentIonIndex <= loopTo1; parentIonIndex++)
+                        for (int parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                         {
                             bool includeParentIon;
                             if (masicOptions.CustomSICList.LimitSearchToCustomMZList)
@@ -135,7 +134,7 @@ namespace MASIC.DataOutput
 
                             if (includeParentIon)
                             {
-                                for (int fragScanIndex = 0, loopTo2 = scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex <= loopTo2; fragScanIndex++)
+                                for (int fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
                                 {
                                     var parentIon = scanList.ParentIons[parentIonIndex];
                                     int surveyScanNumber;

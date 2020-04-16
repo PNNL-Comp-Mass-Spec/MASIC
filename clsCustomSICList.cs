@@ -242,7 +242,7 @@ namespace MASIC
                 return true;
             }
 
-            for (int index = 0, loopTo = lstMZs.Count - 1; index <= loopTo; index++)
+            for (int index = 0; index <= lstMZs.Count - 1; index++)
             {
                 double targetMz;
                 if (!double.TryParse(lstMZs[index], out targetMz))
@@ -364,8 +364,7 @@ namespace MASIC
                 return true;
             }
 
-            var loopTo = mzList.Length - 1;
-            for (index = 0; index <= loopTo; index++)
+            for (index = 0; index <= mzList.Length - 1; index++)
             {
                 var mzSearchSpec = new clsCustomMZSearchSpec(mzList[index]);
                 if (mzToleranceList.Length > index && mzToleranceList[index] > 0)

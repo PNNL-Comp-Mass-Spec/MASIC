@@ -35,7 +35,7 @@ namespace MASIC
                     int indexFirst, indexLast;
                     if (SumIonsFindValueInRange(objMSSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out indexFirst, out indexLast))
                     {
-                        for (int ionIndex = indexFirst, loopTo = indexLast; ionIndex <= loopTo; ionIndex++)
+                        for (int ionIndex = indexFirst; ionIndex <= indexLast; ionIndex++)
                         {
                             if (returnMax)
                             {
@@ -121,8 +121,7 @@ namespace MASIC
             {
                 closestMatchIndex = -1;
                 highestIntensity = 0;
-                var loopTo = ionCount - 1;
-                for (dataIndex = 0; dataIndex <= loopTo; dataIndex++)
+                for (dataIndex = 0; dataIndex <= ionCount - 1; dataIndex++)
                 {
                     if (mzList[dataIndex] >= mzStart && mzList[dataIndex] <= mzEnd)
                     {
