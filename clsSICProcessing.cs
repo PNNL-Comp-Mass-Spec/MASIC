@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using MASIC.DataOutput;
 using MASICPeakFinder;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace MASIC
 {

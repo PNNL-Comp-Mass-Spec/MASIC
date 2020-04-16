@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using MASIC.DataOutput;
 using MASICPeakFinder;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using PRISM;
 using ThermoRawFileReader;
 

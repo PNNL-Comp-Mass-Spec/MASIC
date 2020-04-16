@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using MASIC.DataOutput;
 using MASIC.DatasetStats;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using PRISM;
 using PRISM.Logging;
 

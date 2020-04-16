@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Microsoft.VisualBasic;
 using PRISM;
 using PRISM.FileProcessor;
 #if GUI

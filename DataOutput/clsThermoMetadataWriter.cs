@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Microsoft.VisualBasic;
 using ThermoRawFileReader;
 
 namespace MASIC.DataOutput

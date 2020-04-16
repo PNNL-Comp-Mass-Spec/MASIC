@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using MASIC.DataOutput;
 using MASICPeakFinder;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using PRISM;
 using ThermoRawFileReader;
 

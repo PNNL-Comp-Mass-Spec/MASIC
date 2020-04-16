@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using MASIC.DatasetStats;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using PRISM;
 
 namespace MASIC.DataInput

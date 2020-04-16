@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using MASIC.DataOutput;
 using MASICPeakFinder;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using MSDataFileReader;
 using PRISM;
 using PSI_Interface.CV;
