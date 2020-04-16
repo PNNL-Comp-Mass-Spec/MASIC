@@ -91,7 +91,7 @@ namespace MASIC.DataInput
                         string dataLine = reader.ReadLine();
                         if (dataLine == null)
                             continue;
-                        if (linesRead == 0 && !dataLine.Contains(Conversions.ToString(ControlChars.Tab)))
+                        if (linesRead == 0 && !dataLine.Contains(Convert.ToString(ControlChars.Tab)))
                         {
                             // Split on commas instead of tab characters
                             delimiterList = new char[] { ',' };
@@ -220,7 +220,7 @@ namespace MASIC.DataInput
                                     {
                                         if (mCustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
                                         {
-                                            mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToInteger(dataCols[colIndex]);
+                                            mzSearchSpec.ScanOrAcqTimeTolerance = Convert.ToInt32(dataCols[colIndex]);
                                         }
                                         else
                                         {

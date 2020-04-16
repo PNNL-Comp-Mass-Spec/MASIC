@@ -120,7 +120,7 @@ namespace MASIC
                             }
                             else
                             {
-                                mzValue = Conversions.ToInteger(reporterIon.MZ).ToString();
+                                mzValue = Convert.ToInt32(reporterIon.MZ).ToString();
                             }
 
                             if (reporterIonMZsUnique.Contains(mzValue))
@@ -180,7 +180,7 @@ namespace MASIC
                     }
 
                     // Write the headers to the output file, separated by tabs
-                    writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), headerColumns));
+                    writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), headerColumns));
                     UpdateProgress(0, "Searching for reporter ions");
                     for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                     {
@@ -194,7 +194,7 @@ namespace MASIC
                         FindReporterIonsWork(xcaliburAccessor, dataAggregation, includeFtmsColumns, mOptions.SICOptions, scanList, spectraCache, scanList.FragScans[scanPointer], writer, reporterIons, cColDelimiter, saveUncorrectedIntensities, mOptions.ReporterIons.ReporterIonSaveObservedMasses);
                         if (scanList.MasterScanOrderCount > 1)
                         {
-                            UpdateProgress(Conversions.ToShort(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
+                            UpdateProgress(Convert.ToInt16(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
                         }
                         else
                         {
@@ -445,7 +445,7 @@ namespace MASIC
             float weightedAvgPctIntensityCorrection;
             if (originalIntensitySum > 0)
             {
-                weightedAvgPctIntensityCorrection = Conversions.ToSingle(pctChangeSum / originalIntensitySum * 100);
+                weightedAvgPctIntensityCorrection = Convert.ToSingle(pctChangeSum / originalIntensitySum * 100);
             }
             else
             {
@@ -487,7 +487,7 @@ namespace MASIC
                 // End If
             }
 
-            writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+            writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
         }
 
         protected class clsReportIonInfoComparer : IComparer

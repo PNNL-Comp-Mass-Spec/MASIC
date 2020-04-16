@@ -329,8 +329,8 @@ namespace MASIC
             {
                 if (!clsUtilities.CheckPointInMZIgnoreRange(fragSpectrum.IonsMZ[index], mReporterIons.MZIntensityFilterIgnoreRangeStart, mReporterIons.MZIntensityFilterIgnoreRangeEnd))
                 {
-                    xData.Add(Conversions.ToSingle(fragSpectrum.IonsMZ[index]));
-                    yData.Add(Conversions.ToSingle(fragSpectrum.IonsIntensity[index]));
+                    xData.Add(Convert.ToSingle(fragSpectrum.IonsMZ[index]));
+                    yData.Add(Convert.ToSingle(fragSpectrum.IonsIntensity[index]));
                 }
             }
 
@@ -598,7 +598,7 @@ namespace MASIC
                     {
                         if (parentIonIndex % 100 == 0)
                         {
-                            UpdateProgress(Conversions.ToShort(parentIonIndex / (double)(findSimilarIonsDataCount - 1) * 100));
+                            UpdateProgress(Convert.ToInt16(parentIonIndex / (double)(findSimilarIonsDataCount - 1) * 100));
                         }
                     }
                     else
@@ -679,7 +679,7 @@ namespace MASIC
                         if (scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon && uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
                         {
                             // Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                            timeDiff = Conversions.ToSingle(Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
+                            timeDiff = Convert.ToSingle(Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
                         }
                         else
                         {
@@ -689,7 +689,7 @@ namespace MASIC
                     else if (scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon && uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
                     {
                         // Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                        timeDiff = Conversions.ToSingle(Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
+                        timeDiff = Convert.ToSingle(Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
                     }
                     else
                     {

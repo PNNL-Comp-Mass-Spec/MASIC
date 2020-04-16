@@ -113,7 +113,7 @@ namespace MASIC
                 return float.MaxValue;
             if (value < float.MinValue)
                 return float.MinValue;
-            return Conversions.ToSingle(value);
+            return Convert.ToSingle(value);
         }
 
         public static bool IsNumber(string value)

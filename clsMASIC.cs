@@ -1150,13 +1150,13 @@ namespace MASIC
             var objProcess = Process.GetCurrentProcess();
 
             // The WorkingSet is the total physical memory usage
-            return Conversions.ToSingle(objProcess.WorkingSet64 / (double)1024 / 1024);
+            return Convert.ToSingle(objProcess.WorkingSet64 / (double)1024 / 1024);
         }
 
         private float GetTotalProcessingTimeSec()
         {
             var objProcess = Process.GetCurrentProcess();
-            return Conversions.ToSingle(objProcess.TotalProcessorTime.TotalSeconds);
+            return Convert.ToSingle(objProcess.TotalProcessorTime.TotalSeconds);
         }
 
         private void InitializeMemoryManagementOptions(clsProcessingStats processingStats)

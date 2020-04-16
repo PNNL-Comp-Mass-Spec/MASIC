@@ -320,7 +320,7 @@ namespace MASIC.DataInput
                 var precursorMissingPct = default(double);
                 if (scanList.FragScans.Count > 0)
                 {
-                    precursorMissingPct = mPrecursorNotFoundCount / Conversions.ToDouble(scanList.FragScans.Count) * 100;
+                    precursorMissingPct = mPrecursorNotFoundCount / Convert.ToDouble(scanList.FragScans.Count) * 100;
                 }
 
                 OnWarningEvent(string.Format("Could not find the precursor ion for {0:F1}% of the MS2 spectra ({1} / {2} scans). " + "These scans will have an Interference Score of 1 (to avoid accidentally filtering out low intensity results).", precursorMissingPct, mPrecursorNotFoundCount, scanList.FragScans.Count));
@@ -395,7 +395,7 @@ namespace MASIC.DataInput
                                                                                                                                                                                                                                                                                                                                                                                                                                                          // Number of peaks (aka ions) in the spectrum
                                                                                                                                                                                                                                                                                                                                                                                                                                                          // Number of peaks (aka ions) in the spectrum prior to any filtering
                                                                                                                                                                                                                                                                                                                                                                                                                                                          // Scan type name
-            writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+            writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
         }
 
         protected void UpdateCachedPrecursorScan(int precursorScanNumber, double[] centroidedIonsMz, double[] centroidedIonsIntensity, int ionCount)

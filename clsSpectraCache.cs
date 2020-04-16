@@ -145,7 +145,7 @@ namespace MASIC
                 if (mSpectrumIndexInPool.Contains(scanNumber))
                 {
                     // Replace the spectrum data with objMSSpectrum
-                    targetPoolIndex = Conversions.ToInteger(mSpectrumIndexInPool[scanNumber]);
+                    targetPoolIndex = Convert.ToInt32(mSpectrumIndexInPool[scanNumber]);
                 }
                 else
                 {
@@ -238,7 +238,7 @@ namespace MASIC
 
                                     // Wait 2, 4, or 8 seconds, then try again
                                     double sleepSeconds = Math.Pow(2, MAX_RETRIES - retryCount);
-                                    System.Threading.Thread.Sleep(Conversions.ToInteger(sleepSeconds * 1000));
+                                    System.Threading.Thread.Sleep(Convert.ToInt32(sleepSeconds * 1000));
                                     mPageFileWriter.BaseStream.Seek(initialOffset, SeekOrigin.Begin);
                                 }
                                 else
@@ -511,7 +511,7 @@ namespace MASIC
 
                 if (mSpectrumByteOffset.Contains(scanNumber))
                 {
-                    long byteOffset = Conversions.ToLong(mSpectrumByteOffset[scanNumber]);
+                    long byteOffset = Convert.ToInt64(mSpectrumByteOffset[scanNumber]);
 
                     // Make sure all previous spectra are flushed to disk
                     mPageFileWriter.Flush();
@@ -675,7 +675,7 @@ namespace MASIC
             {
                 if (mSpectrumIndexInPool.Contains(scanNumber))
                 {
-                    poolIndex = Conversions.ToInteger(mSpectrumIndexInPool[scanNumber]);
+                    poolIndex = Convert.ToInt32(mSpectrumIndexInPool[scanNumber]);
                     return true;
                 }
 

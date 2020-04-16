@@ -375,7 +375,7 @@ namespace MASIC.DataInput
                         var mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, thermoRawFile);
                         scanTimeMax = mzXmlSourceSpectrum.RetentionTimeMin;
                         var msSpectrum = new clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
-                        double percentComplete = scanList.MasterScanOrderCount / Conversions.ToDouble(xmlReader.NumSpectra) * 100;
+                        double percentComplete = scanList.MasterScanOrderCount / Convert.ToDouble(xmlReader.NumSpectra) * 100;
                         bool extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum, scanList, spectraCache, dataOutputHandler, percentComplete, mDatasetFileInfo.ScanCount);
                         if (!extractSuccess)
                         {
@@ -455,14 +455,14 @@ namespace MASIC.DataInput
                         if (DateTime.UtcNow.Subtract(lastProgress).TotalSeconds >= 2.5)
                         {
                             lastProgress = DateTime.UtcNow;
-                            double percentComplete = chromatogramsProcessed / Conversions.ToDouble(elutionTimeToScanMapByChromatogram.Count) * 100;
+                            double percentComplete = chromatogramsProcessed / Convert.ToDouble(elutionTimeToScanMapByChromatogram.Count) * 100;
                             Console.Write("{0:N0}% ", percentComplete);
                         }
 
                         var elutionTimeToScanMap = chromTimesEntry.Value;
                         foreach (var elutionTime in elutionTimeToScanMap.Keys.ToList())
                         {
-                            int nearestPseudoScan = Conversions.ToInteger(Math.Round(elutionTime / medianScanTimeDiff * 100)) + 1;
+                            int nearestPseudoScan = Convert.ToInt32(Math.Round(elutionTime / medianScanTimeDiff * 100)) + 1;
                             elutionTimeToScanMap[elutionTime] = nearestPseudoScan;
                         }
 
@@ -606,7 +606,7 @@ namespace MASIC.DataInput
                         var mzXmlSourceSpectrum = GetSpectrumInfoFromMzMLSpectrum(mzMLSpectrum, mzList, intensityList, thermoRawFile);
                         scanTimeMax = mzXmlSourceSpectrum.RetentionTimeMin;
                         var msSpectrum = new clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
-                        double percentComplete = scanList.MasterScanOrderCount / Conversions.ToDouble(simulatedSpectraByScan.Count) * 100;
+                        double percentComplete = scanList.MasterScanOrderCount / Convert.ToDouble(simulatedSpectraByScan.Count) * 100;
                         bool extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum, scanList, spectraCache, dataOutputHandler, percentComplete, mDatasetFileInfo.ScanCount);
                         if (!extractSuccess)
                         {
@@ -650,7 +650,7 @@ namespace MASIC.DataInput
 
             if (!double.IsNaN(percentComplete))
             {
-                UpdateProgress(Conversions.ToShort(Math.Round(percentComplete, 0)));
+                UpdateProgress(Convert.ToInt16(Math.Round(percentComplete, 0)));
             }
 
             UpdateCacheStats(spectraCache);
@@ -1099,7 +1099,7 @@ namespace MASIC.DataInput
                     }
                 }
 
-                mzXmlSourceSpectrum.ActivationMethod = string.Join(Conversions.ToString(','), activationMethods);
+                mzXmlSourceSpectrum.ActivationMethod = string.Join(Convert.ToString(','), activationMethods);
             }
 
             // Store the "filter string" in .FilterLine

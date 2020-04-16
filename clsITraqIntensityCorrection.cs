@@ -133,7 +133,7 @@ namespace MASIC
             if (ApplyCorrection(originalIntensities, debugShowIntensities))
             {
                 for (int index = 0; index <= dataCount; index++)
-                    reporterIonIntensities[index] = Conversions.ToSingle(originalIntensities[index]);
+                    reporterIonIntensities[index] = Convert.ToSingle(originalIntensities[index]);
                 return true;
             }
             else
@@ -186,7 +186,7 @@ namespace MASIC
                     {
                         // Compute percent change vs. the maximum reporter ion intensity
                         double percentChange = (newIntensity - reporterIonIntensities[index]) / maxIntensity * 100;
-                        int percentChangeRounded = Conversions.ToInteger(Math.Round(percentChange, 0));
+                        int percentChangeRounded = Convert.ToInt32(Math.Round(percentChange, 0));
                         string visualPercentChange;
                         if (percentChangeRounded > 0)
                         {

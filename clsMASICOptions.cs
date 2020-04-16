@@ -301,10 +301,10 @@ namespace MASIC
                     WriteMRMIntensityCrosstab = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab", WriteMRMIntensityCrosstab);
                     FastExistingXMLFileTest = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", FastExistingXMLFileTest);
                     ReporterIons.ReporterIonStatsEnabled = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled);
-                    clsReporterIons.eReporterIonMassModeConstants eReporterIonMassMode = (clsReporterIons.eReporterIonMassModeConstants)Conversions.ToInteger(reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", Conversions.ToInteger(ReporterIons.ReporterIonMassMode)));
+                    clsReporterIons.eReporterIonMassModeConstants eReporterIonMassMode = (clsReporterIons.eReporterIonMassModeConstants)Convert.ToInt32(reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", Convert.ToInt32(ReporterIons.ReporterIonMassMode)));
                     ReporterIons.ReporterIonToleranceDaDefault = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", ReporterIons.ReporterIonToleranceDaDefault);
                     ReporterIons.ReporterIonApplyAbundanceCorrection = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection);
-                    clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex eReporterIonITraq4PlexCorrectionFactorType = (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)Conversions.ToInteger(reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", Conversions.ToInteger(ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)));
+                    clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex eReporterIonITraq4PlexCorrectionFactorType = (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)Convert.ToInt32(reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", Convert.ToInt32(ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)));
                     ReporterIons.ReporterIonITraq4PlexCorrectionFactorType = eReporterIonITraq4PlexCorrectionFactorType;
                     ReporterIons.ReporterIonSaveObservedMasses = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", ReporterIons.ReporterIonSaveObservedMasses);
                     ReporterIons.ReporterIonSaveUncorrectedIntensities = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities);
@@ -312,7 +312,7 @@ namespace MASIC
 
                     // Raw data export options
                     RawDataExportOptions.ExportEnabled = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", RawDataExportOptions.ExportEnabled);
-                    RawDataExportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)Conversions.ToInteger(reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", Conversions.ToInteger(RawDataExportOptions.FileFormat)));
+                    RawDataExportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)Convert.ToInt32(reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", Convert.ToInt32(RawDataExportOptions.FileFormat)));
                     RawDataExportOptions.IncludeMSMS = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", RawDataExportOptions.IncludeMSMS);
                     RawDataExportOptions.RenumberScans = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", RawDataExportOptions.RenumberScans);
                     RawDataExportOptions.MinimumSignalToNoiseRatio = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", RawDataExportOptions.MinimumSignalToNoiseRatio);
@@ -365,7 +365,7 @@ namespace MASIC
                     SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = reader.GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum);
 
                     // Peak Finding Options
-                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", Conversions.ToInteger(SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode)));
+                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", Convert.ToInt32(SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode)));
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute);
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage);
 
@@ -383,7 +383,7 @@ namespace MASIC
                     SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = reader.GetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth", SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth);
                     SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder", SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder);
                     SICOptions.SaveSmoothedData = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", SICOptions.SaveSmoothedData);
-                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", Conversions.ToInteger(SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode)));
+                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", Convert.ToInt32(SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode)));
                     SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute);
                     SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage);
                     SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio ", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio);
@@ -436,12 +436,12 @@ namespace MASIC
                 {
                     if (withBlock.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
                     {
-                        withBlock.ScanOrAcqTimeTolerance = Conversions.ToInteger(scanTolerance);
+                        withBlock.ScanOrAcqTimeTolerance = Convert.ToInt32(scanTolerance);
                     }
                     else
                     {
                         // Includes .Relative and .AcquisitionTime
-                        withBlock.ScanOrAcqTimeTolerance = Conversions.ToSingle(scanTolerance);
+                        withBlock.ScanOrAcqTimeTolerance = Convert.ToSingle(scanTolerance);
                     }
                 }
                 else
@@ -631,13 +631,13 @@ namespace MASIC
                     }
                 }
 
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Join(Conversions.ToString(ControlChars.Tab), lstMzValues));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", string.Join(Conversions.ToString(ControlChars.Tab), lstMzTolerances));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", string.Join(Conversions.ToString(ControlChars.Tab), lstScanCenters));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", string.Join(Conversions.ToString(ControlChars.Tab), lstScanTolerances));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Join(Convert.ToString(ControlChars.Tab), lstMzValues));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", string.Join(Convert.ToString(ControlChars.Tab), lstMzTolerances));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", string.Join(Convert.ToString(ControlChars.Tab), lstScanCenters));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", string.Join(Convert.ToString(ControlChars.Tab), lstScanTolerances));
                 if (scanCommentsDefined)
                 {
-                    writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Join(Conversions.ToString(ControlChars.Tab), lstComments));
+                    writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Join(Convert.ToString(ControlChars.Tab), lstComments));
                 }
                 else
                 {

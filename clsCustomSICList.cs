@@ -189,7 +189,7 @@ namespace MASIC
                 {
                     // All of the entries had a custom scan or acq time tolerance defined
                     // Update mScanOrAcqTimeTolerance to the average of the values
-                    ScanOrAcqTimeTolerance = Conversions.ToSingle(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4));
+                    ScanOrAcqTimeTolerance = Convert.ToSingle(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4));
                 }
             }
             catch (Exception ex)
@@ -202,10 +202,10 @@ namespace MASIC
         {
             if (CustomMZSearchValues.Count > 0)
             {
-                RawTextMZList += Conversions.ToString(',');
-                RawTextMZToleranceDaList += Conversions.ToString(',');
-                RawTextScanOrAcqTimeCenterList += Conversions.ToString(',');
-                RawTextScanOrAcqTimeToleranceList += Conversions.ToString(',');
+                RawTextMZList += Convert.ToString(',');
+                RawTextMZToleranceDaList += Convert.ToString(',');
+                RawTextScanOrAcqTimeCenterList += Convert.ToString(',');
+                RawTextScanOrAcqTimeToleranceList += Convert.ToString(',');
             }
 
             RawTextMZList += mzSearchSpec.MZ.ToString();
@@ -265,12 +265,12 @@ namespace MASIC
                     {
                         if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
                         {
-                            mzSearchSpec.ScanOrAcqTimeCenter = Conversions.ToInteger(lstScanCenters[index]);
+                            mzSearchSpec.ScanOrAcqTimeCenter = Convert.ToInt32(lstScanCenters[index]);
                         }
                         else
                         {
                             // Includes .Relative and .AcquisitionTime
-                            mzSearchSpec.ScanOrAcqTimeCenter = Conversions.ToSingle(lstScanCenters[index]);
+                            mzSearchSpec.ScanOrAcqTimeCenter = Convert.ToSingle(lstScanCenters[index]);
                         }
                     }
                 }
@@ -281,12 +281,12 @@ namespace MASIC
                     {
                         if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
                         {
-                            mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToInteger(lstScanTolerances[index]);
+                            mzSearchSpec.ScanOrAcqTimeTolerance = Convert.ToInt32(lstScanTolerances[index]);
                         }
                         else
                         {
                             // Includes .Relative and .AcquisitionTime
-                            mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToSingle(lstScanTolerances[index]);
+                            mzSearchSpec.ScanOrAcqTimeTolerance = Convert.ToSingle(lstScanTolerances[index]);
                         }
                     }
                 }
@@ -295,7 +295,7 @@ namespace MASIC
                 {
                     if (clsUtilities.IsNumber(lstMZToleranceDa[index]))
                     {
-                        mzSearchSpec.MZToleranceDa = Conversions.ToDouble(lstMZToleranceDa[index]);
+                        mzSearchSpec.MZToleranceDa = Convert.ToDouble(lstMZToleranceDa[index]);
                     }
                 }
 

@@ -157,7 +157,7 @@ namespace MASIC.DataOutput
                             {
                                 if (parentIonIndex % 100 == 0)
                                 {
-                                    UpdateProgress(Conversions.ToShort(parentIonIndex / (double)(scanList.ParentIons.Count - 1) * 100));
+                                    UpdateProgress(Convert.ToInt16(parentIonIndex / (double)(scanList.ParentIons.Count - 1) * 100));
                                 }
                             }
                             else
@@ -291,7 +291,7 @@ namespace MASIC.DataOutput
                 dataValues.Add(StringUtilities.DblToString(optimalPeakApexScanTime, 5));   // OptimalPeakApexScanTime
             }
 
-            sicStatsWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataValues));
+            sicStatsWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataValues));
         }
     }
 }

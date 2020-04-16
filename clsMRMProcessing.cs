@@ -234,7 +234,7 @@ namespace MASIC
                             dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].StartMass.ToString("0.000"));
                             dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].EndMass.ToString("0.000"));
                             dataColumns.Add(withBlock.ScanCount.ToString());
-                            settingsWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+                            settingsWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
                         }
                     }
 
@@ -265,7 +265,7 @@ namespace MASIC
                             var headerNames = new List<string>() { "Scan_First", "ScanTime" };
                             for (int srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
                                 headerNames.Add(ConstructSRMMapKey(srmList[srmIndex]));
-                            crosstabWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), headerNames));
+                            crosstabWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), headerNames));
                         }
 
                         int scanFirst = int.MinValue;
@@ -323,7 +323,7 @@ namespace MASIC
                                         dataColumns.Add("0");
                                     }
 
-                                    dataWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+                                    dataWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
                                 }
 
                                 if (mOptions.WriteMRMIntensityCrosstab)
@@ -426,7 +426,7 @@ namespace MASIC
 
             if (nonZeroCount > 0 || forceWrite)
             {
-                writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+                writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
             }
         }
 
@@ -572,7 +572,7 @@ namespace MASIC
                     {
                         if (scanList.ParentIons.Count > 1)
                         {
-                            UpdateProgress(Conversions.ToShort(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
+                            UpdateProgress(Convert.ToInt16(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
                         }
                         else
                         {

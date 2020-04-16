@@ -533,7 +533,7 @@ namespace MASIC.DatasetStats
                 {
                     // Write the headers
                     var headerNames = new List<string>() { "Dataset", "ScanNumber", "ScanTime", "ScanType", "TotalIonIntensity", "BasePeakIntensity", "BasePeakMZ", "BasePeakSignalToNoiseRatio", "IonCount", "IonCountRaw", "ScanTypeName" };
-                    scanStatsWriter.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), headerNames));
+                    scanStatsWriter.WriteLine(string.Join(Convert.ToString(ControlChars.Tab), headerNames));
                     var dataValues = new List<string>();
                     foreach (var scanStatsEntry in scanStats)
                     {
@@ -571,7 +571,7 @@ namespace MASIC.DatasetStats
 
                         // Scan type name
                         dataValues.Add(scanStatsEntry.ScanTypeName);
-                        scanStatsWriter.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), dataValues));
+                        scanStatsWriter.WriteLine(string.Join(Convert.ToString(ControlChars.Tab), dataValues));
                     }
                 }
 
@@ -707,11 +707,11 @@ namespace MASIC.DatasetStats
                     {
                         // Write the header line
                         var headerNames = new List<string>() { "Dataset", "ScanCount", "ScanCountMS", "ScanCountMSn", "Elution_Time_Max", "AcqTimeMinutes", "StartTime", "EndTime", "FileSizeBytes", "SampleName", "Comment1", "Comment2" };
-                        writer.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), headerNames));
+                        writer.WriteLine(string.Join(Convert.ToString(ControlChars.Tab), headerNames));
                     }
 
                     var dataValues = new List<string>() { datasetName, (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(), summaryStats.MSStats.ScanCount.ToString(), summaryStats.MSnStats.ScanCount.ToString(), summaryStats.ElutionTimeMax.ToString("0.00"), datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"), datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING), datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING), datasetInfo.FileSizeBytes.ToString(), FixNull(oSampleInfo.SampleName), FixNull(oSampleInfo.Comment1), FixNull(oSampleInfo.Comment2) };
-                    writer.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), dataValues));
+                    writer.WriteLine(string.Join(Convert.ToString(ControlChars.Tab), dataValues));
                 }
 
                 return true;

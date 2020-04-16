@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using MASICPeakFinder;
@@ -18,9 +19,9 @@ namespace MASIC
 
         public double[] SICIntensities => (from item in SICData select item.Intensity).ToArray();
 
-        public float[] SICIntensitiesAsFloat => (from item in SICData select Conversions.ToSingle(item.Intensity)).ToArray();
+        public float[] SICIntensitiesAsFloat => (from item in SICData select Convert.ToSingle(item.Intensity)).ToArray();
 
-        public float[] SICMassesAsFloat => (from item in SICData select Conversions.ToSingle(item.Mass)).ToArray();
+        public float[] SICMassesAsFloat => (from item in SICData select Convert.ToSingle(item.Mass)).ToArray();
 
         public double[] SICMasses => (from item in SICData select item.Mass).ToArray();
 

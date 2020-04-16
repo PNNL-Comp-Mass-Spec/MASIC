@@ -361,17 +361,17 @@ namespace MASIC.DataOutput
                     if (includeHeaders)
                     {
                         var headerNames = ConstructExtendedStatsHeaders();
-                        writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), headerNames));
+                        writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), headerNames));
                     }
 
                     for (int scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
                     {
                         var currentScan = GetScanByMasterScanIndex(scanList, scanIndex);
                         var dataColumns = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetID, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo);
-                        writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+                        writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
                         if (scanIndex % 100 == 0)
                         {
-                            UpdateProgress(Conversions.ToShort(scanIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
+                            UpdateProgress(Convert.ToInt16(scanIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
                         }
                     }
                 }

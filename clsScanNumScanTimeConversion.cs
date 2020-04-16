@@ -108,7 +108,7 @@ namespace MASIC
                     case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
                         // scanOrAcqTime is an absolute scan number (or range of scan numbers)
                         // No conversion needed; simply return the value
-                        absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime);
+                        absoluteScanNumber = Convert.ToInt32(scanOrAcqTime);
                         break;
                     case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
                         // scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
@@ -117,7 +117,7 @@ namespace MASIC
                         if (scanList.MasterScanOrderCount > 0)
                         {
                             int totalScanRange = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
-                            absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime * totalScanRange + scanList.MasterScanNumList[0]);
+                            absoluteScanNumber = Convert.ToInt32(scanOrAcqTime * totalScanRange + scanList.MasterScanNumList[0]);
                         }
                         else
                         {
@@ -156,7 +156,7 @@ namespace MASIC
 
                     default:
                         // Unknown type; assume absolute scan number
-                        absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime);
+                        absoluteScanNumber = Convert.ToInt32(scanOrAcqTime);
                         break;
                 }
 
@@ -213,7 +213,7 @@ namespace MASIC
                         if (scanList.MasterScanOrderCount > 0)
                         {
                             float totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
-                            computedScanTime = Conversions.ToSingle(scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0]);
+                            computedScanTime = Convert.ToSingle(scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0]);
                         }
                         else
                         {

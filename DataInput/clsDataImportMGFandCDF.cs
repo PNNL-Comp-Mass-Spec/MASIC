@@ -102,15 +102,15 @@ namespace MASIC.DataInput
                         newSurveyScan.ScanNumber = scanNumber;
                         if (mOptions.CDFTimeInSeconds)
                         {
-                            newSurveyScan.ScanTime = Conversions.ToSingle(scanTime / 60);
+                            newSurveyScan.ScanTime = Convert.ToSingle(scanTime / 60);
                         }
                         else
                         {
-                            newSurveyScan.ScanTime = Conversions.ToSingle(scanTime);
+                            newSurveyScan.ScanTime = Convert.ToSingle(scanTime);
                         }
 
                         // Copy the Total Scan Intensity to .TotalIonIntensity
-                        newSurveyScan.TotalIonIntensity = Conversions.ToSingle(scanTotalIntensity);
+                        newSurveyScan.TotalIonIntensity = Convert.ToSingle(scanTotalIntensity);
 
                         // Survey scans typically lead to multiple parent ions; we do not record them here
                         newSurveyScan.FragScanInfo.ParentIonInfoIndex = -1;
@@ -169,7 +169,7 @@ namespace MASIC.DataInput
                     // Note: We need to take msScanCount * 2 since we have to read two different files
                     if (msScanCount > 1)
                     {
-                        UpdateProgress(Conversions.ToShort(msScanIndex / (double)(msScanCount * 2 - 1) * 100));
+                        UpdateProgress(Convert.ToInt16(msScanIndex / (double)(msScanCount * 2 - 1) * 100));
                     }
                     else
                     {
@@ -245,7 +245,7 @@ namespace MASIC.DataInput
                                     fragScan.ScanNumber += scanNumberCorrection;
                                     int argfragScanIteration = fragScan.FragScanInfo.FragScanNumber;
                                     float scanTimeInterpolated = InterpolateRTandFragScanNumber(scanList.SurveyScans, 0, fragScan.ScanNumber, out argfragScanIteration);
-                                    fragScan.ScanTime = Conversions.ToSingle(scanTimeInterpolated);
+                                    fragScan.ScanTime = Convert.ToSingle(scanTimeInterpolated);
                                 }
 
                                 break;
@@ -298,10 +298,10 @@ namespace MASIC.DataInput
                         }
                     }
 
-                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count, spectrumInfo.ScanNumber, Conversions.ToSingle(scanTime));
+                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count, spectrumInfo.ScanNumber, Convert.ToSingle(scanTime));
                     var newFragScan = new clsScanInfo();
                     newFragScan.ScanNumber = spectrumInfo.ScanNumber;
-                    newFragScan.ScanTime = Conversions.ToSingle(scanTime);
+                    newFragScan.ScanTime = Convert.ToSingle(scanTime);
                     newFragScan.FragScanInfo.FragScanNumber = fragScanIteration;
                     newFragScan.FragScanInfo.MSLevel = 2;
                     newFragScan.MRMScanInfo.MRMMassCount = 0;
@@ -343,7 +343,7 @@ namespace MASIC.DataInput
                     // Note: We need to take msScanCount * 2, in addition to adding msScanCount to lastSurveyScanIndex, since we have to read two different files
                     if (msScanCount > 1)
                     {
-                        UpdateProgress(Conversions.ToShort((lastSurveyScanIndex + msScanCount) / (double)(msScanCount * 2 - 1) * 100));
+                        UpdateProgress(Convert.ToInt16((lastSurveyScanIndex + msScanCount) / (double)(msScanCount * 2 - 1) * 100));
                     }
                     else
                     {
@@ -507,7 +507,7 @@ namespace MASIC.DataInput
                             fragScanIteration = fragScanNumber - withBlock.ScanNumber;
                             if (scanDiff > 0 && fragScanIteration > 0)
                             {
-                                elutionTime = Conversions.ToSingle(withBlock.ScanTime + fragScanIteration / (double)scanDiff * (withBlock.ScanTime - prevScanElutionTime));
+                                elutionTime = Convert.ToSingle(withBlock.ScanTime + fragScanIteration / (double)scanDiff * (withBlock.ScanTime - prevScanElutionTime));
                             }
                             else
                             {
@@ -541,7 +541,7 @@ namespace MASIC.DataInput
                     fragScanIteration = fragScanNumber - withBlock1.ScanNumber;
                     if (scanDiff > 0 && fragScanIteration > 0)
                     {
-                        elutionTime = Conversions.ToSingle(withBlock1.ScanTime + fragScanIteration / (double)scanDiff * (nextScanElutionTime - withBlock1.ScanTime));
+                        elutionTime = Convert.ToSingle(withBlock1.ScanTime + fragScanIteration / (double)scanDiff * (nextScanElutionTime - withBlock1.ScanTime));
                     }
                     else
                     {

@@ -132,7 +132,7 @@ namespace MASIC.DataOutput
                             switch (valueNode.Name)
                             {
                                 case "DatasetID":
-                                    sicOptionsCompare.DatasetID = Conversions.ToInteger(valueNode.InnerText);
+                                    sicOptionsCompare.DatasetID = Convert.ToInt32(valueNode.InnerText);
                                     break;
                                 case "SourceFilePath":
                                     sourceFilePathCheck = valueNode.InnerText;
@@ -141,7 +141,7 @@ namespace MASIC.DataOutput
                                     sourceFileDateTimeCheck = valueNode.InnerText;
                                     break;
                                 case "SourceFileSizeBytes":
-                                    sourceFileSizeBytes = Conversions.ToLong(valueNode.InnerText);
+                                    sourceFileSizeBytes = Convert.ToInt64(valueNode.InnerText);
                                     break;
                                 case "MASICVersion":
                                     masicVersion = valueNode.InnerText;
@@ -150,7 +150,7 @@ namespace MASIC.DataOutput
                                     masicPeakFinderDllVersion = valueNode.InnerText;
                                     break;
                                 case "SkipMSMSProcessing":
-                                    skipMSMSProcessing = Conversions.ToBoolean(valueNode.InnerText);
+                                    skipMSMSProcessing = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                             }
                         }
@@ -196,128 +196,128 @@ namespace MASIC.DataOutput
                             switch (valueNode.Name)
                             {
                                 case "SICToleranceDa":
-                                    sicOptionsCompare.SICTolerance = Conversions.ToDouble(valueNode.InnerText);            // Legacy name
+                                    sicOptionsCompare.SICTolerance = Convert.ToDouble(valueNode.InnerText);            // Legacy name
                                     break;
                                 case "SICTolerance":
-                                    sicOptionsCompare.SICTolerance = Conversions.ToDouble(valueNode.InnerText);
+                                    sicOptionsCompare.SICTolerance = Convert.ToDouble(valueNode.InnerText);
                                     break;
                                 case "SICToleranceIsPPM":
-                                    sicOptionsCompare.SICToleranceIsPPM = Conversions.ToBoolean(valueNode.InnerText);
+                                    sicOptionsCompare.SICToleranceIsPPM = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                                 case "RefineReportedParentIonMZ":
-                                    sicOptionsCompare.RefineReportedParentIonMZ = Conversions.ToBoolean(valueNode.InnerText);
+                                    sicOptionsCompare.RefineReportedParentIonMZ = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                                 case "ScanRangeEnd":
-                                    sicOptionsCompare.ScanRangeEnd = Conversions.ToInteger(valueNode.InnerText);
+                                    sicOptionsCompare.ScanRangeEnd = Convert.ToInt32(valueNode.InnerText);
                                     break;
                                 case "ScanRangeStart":
-                                    sicOptionsCompare.ScanRangeStart = Conversions.ToInteger(valueNode.InnerText);
+                                    sicOptionsCompare.ScanRangeStart = Convert.ToInt32(valueNode.InnerText);
                                     break;
                                 case "RTRangeEnd":
-                                    sicOptionsCompare.RTRangeEnd = Conversions.ToSingle(valueNode.InnerText);
+                                    sicOptionsCompare.RTRangeEnd = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "RTRangeStart":
-                                    sicOptionsCompare.RTRangeStart = Conversions.ToSingle(valueNode.InnerText);
+                                    sicOptionsCompare.RTRangeStart = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "CompressMSSpectraData":
-                                    sicOptionsCompare.CompressMSSpectraData = Conversions.ToBoolean(valueNode.InnerText);
+                                    sicOptionsCompare.CompressMSSpectraData = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                                 case "CompressMSMSSpectraData":
-                                    sicOptionsCompare.CompressMSMSSpectraData = Conversions.ToBoolean(valueNode.InnerText);
+                                    sicOptionsCompare.CompressMSMSSpectraData = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                                 case "CompressToleranceDivisorForDa":
-                                    sicOptionsCompare.CompressToleranceDivisorForDa = Conversions.ToDouble(valueNode.InnerText);
+                                    sicOptionsCompare.CompressToleranceDivisorForDa = Convert.ToDouble(valueNode.InnerText);
                                     break;
                                 case "CompressToleranceDivisorForPPM":
-                                    sicOptionsCompare.CompressToleranceDivisorForPPM = Conversions.ToDouble(valueNode.InnerText);
+                                    sicOptionsCompare.CompressToleranceDivisorForPPM = Convert.ToDouble(valueNode.InnerText);
                                     break;
                                 case "MaxSICPeakWidthMinutesBackward":
-                                    sicOptionsCompare.MaxSICPeakWidthMinutesBackward = Conversions.ToSingle(valueNode.InnerText);
+                                    sicOptionsCompare.MaxSICPeakWidthMinutesBackward = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "MaxSICPeakWidthMinutesForward":
-                                    sicOptionsCompare.MaxSICPeakWidthMinutesForward = Conversions.ToSingle(valueNode.InnerText);
+                                    sicOptionsCompare.MaxSICPeakWidthMinutesForward = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "ReplaceSICZeroesWithMinimumPositiveValueFromMSData":
-                                    sicOptionsCompare.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = Conversions.ToBoolean(valueNode.InnerText);
+                                    sicOptionsCompare.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                                 case "SaveSmoothedData":
-                                    sicOptionsCompare.SaveSmoothedData = Conversions.ToBoolean(valueNode.InnerText);
+                                    sicOptionsCompare.SaveSmoothedData = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                                 case "SimilarIonMZToleranceHalfWidth":
-                                    sicOptionsCompare.SimilarIonMZToleranceHalfWidth = Conversions.ToSingle(valueNode.InnerText);
+                                    sicOptionsCompare.SimilarIonMZToleranceHalfWidth = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "SimilarIonToleranceHalfWidthMinutes":
-                                    sicOptionsCompare.SimilarIonToleranceHalfWidthMinutes = Conversions.ToSingle(valueNode.InnerText);
+                                    sicOptionsCompare.SimilarIonToleranceHalfWidthMinutes = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "SpectrumSimilarityMinimum":
-                                    sicOptionsCompare.SpectrumSimilarityMinimum = Conversions.ToSingle(valueNode.InnerText);
+                                    sicOptionsCompare.SpectrumSimilarityMinimum = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 default:
                                     var withBlock = sicOptionsCompare.SICPeakFinderOptions;
                                     switch (valueNode.Name)
                                     {
                                         case "IntensityThresholdFractionMax":
-                                            withBlock.IntensityThresholdFractionMax = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.IntensityThresholdFractionMax = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "IntensityThresholdAbsoluteMinimum":
-                                            withBlock.IntensityThresholdAbsoluteMinimum = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.IntensityThresholdAbsoluteMinimum = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "SICNoiseThresholdMode":
-                                            withBlock.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(valueNode.InnerText);
+                                            withBlock.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "SICNoiseThresholdIntensity":
-                                            withBlock.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "SICNoiseFractionLowIntensityDataToAverage":
-                                            withBlock.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "SICNoiseMinimumSignalToNoiseRatio":
-                                            withBlock.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "MaxDistanceScansNoOverlap":
-                                            withBlock.MaxDistanceScansNoOverlap = Conversions.ToInteger(valueNode.InnerText);
+                                            withBlock.MaxDistanceScansNoOverlap = Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "MaxAllowedUpwardSpikeFractionMax":
-                                            withBlock.MaxAllowedUpwardSpikeFractionMax = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.MaxAllowedUpwardSpikeFractionMax = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "InitialPeakWidthScansScaler":
-                                            withBlock.InitialPeakWidthScansScaler = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.InitialPeakWidthScansScaler = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "InitialPeakWidthScansMaximum":
-                                            withBlock.InitialPeakWidthScansMaximum = Conversions.ToInteger(valueNode.InnerText);
+                                            withBlock.InitialPeakWidthScansMaximum = Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "FindPeaksOnSmoothedData":
-                                            withBlock.FindPeaksOnSmoothedData = Conversions.ToBoolean(valueNode.InnerText);
+                                            withBlock.FindPeaksOnSmoothedData = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "SmoothDataRegardlessOfMinimumPeakWidth":
-                                            withBlock.SmoothDataRegardlessOfMinimumPeakWidth = Conversions.ToBoolean(valueNode.InnerText);
+                                            withBlock.SmoothDataRegardlessOfMinimumPeakWidth = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "UseButterworthSmooth":
-                                            withBlock.UseButterworthSmooth = Conversions.ToBoolean(valueNode.InnerText);
+                                            withBlock.UseButterworthSmooth = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "ButterworthSamplingFrequency":
-                                            withBlock.ButterworthSamplingFrequency = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.ButterworthSamplingFrequency = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "ButterworthSamplingFrequencyDoubledForSIMData":
-                                            withBlock.ButterworthSamplingFrequencyDoubledForSIMData = Conversions.ToBoolean(valueNode.InnerText);
+                                            withBlock.ButterworthSamplingFrequencyDoubledForSIMData = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "UseSavitzkyGolaySmooth":
-                                            withBlock.UseSavitzkyGolaySmooth = Conversions.ToBoolean(valueNode.InnerText);
+                                            withBlock.UseSavitzkyGolaySmooth = Convert.ToBoolean(valueNode.InnerText);
                                             break;
                                         case "SavitzkyGolayFilterOrder":
-                                            withBlock.SavitzkyGolayFilterOrder = Conversions.ToShort(valueNode.InnerText);
+                                            withBlock.SavitzkyGolayFilterOrder = Convert.ToInt16(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseThresholdMode":
-                                            withBlock.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(valueNode.InnerText);
+                                            withBlock.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseThresholdIntensity":
-                                            withBlock.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseFractionLowIntensityDataToAverage":
-                                            withBlock.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseMinimumSignalToNoiseRatio":
-                                            withBlock.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = Conversions.ToSingle(valueNode.InnerText);
+                                            withBlock.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = Convert.ToSingle(valueNode.InnerText);
                                             break;
                                     }
 
@@ -335,25 +335,25 @@ namespace MASIC.DataOutput
                             switch (valueNode.Name)
                             {
                                 case "BinStartX":
-                                    binningOptionsCompare.StartX = Conversions.ToSingle(valueNode.InnerText);
+                                    binningOptionsCompare.StartX = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "BinEndX":
-                                    binningOptionsCompare.EndX = Conversions.ToSingle(valueNode.InnerText);
+                                    binningOptionsCompare.EndX = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "BinSize":
-                                    binningOptionsCompare.BinSize = Conversions.ToSingle(valueNode.InnerText);
+                                    binningOptionsCompare.BinSize = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "MaximumBinCount":
-                                    binningOptionsCompare.MaximumBinCount = Conversions.ToInteger(valueNode.InnerText);
+                                    binningOptionsCompare.MaximumBinCount = Convert.ToInt32(valueNode.InnerText);
                                     break;
                                 case "IntensityPrecisionPercent":
-                                    binningOptionsCompare.IntensityPrecisionPercent = Conversions.ToSingle(valueNode.InnerText);
+                                    binningOptionsCompare.IntensityPrecisionPercent = Convert.ToSingle(valueNode.InnerText);
                                     break;
                                 case "Normalize":
-                                    binningOptionsCompare.Normalize = Conversions.ToBoolean(valueNode.InnerText);
+                                    binningOptionsCompare.Normalize = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                                 case "SumAllIntensitiesForBin":
-                                    binningOptionsCompare.SumAllIntensitiesForBin = Conversions.ToBoolean(valueNode.InnerText);
+                                    binningOptionsCompare.SumAllIntensitiesForBin = Convert.ToBoolean(valueNode.InnerText);
                                     break;
                             }
                         }
@@ -385,7 +385,7 @@ namespace MASIC.DataOutput
                                         customSICListCompare.RawTextScanOrAcqTimeToleranceList = valueNode.InnerText;
                                         break;
                                     case "ScanTolerance":
-                                        customSICListCompare.ScanOrAcqTimeTolerance = Conversions.ToSingle(valueNode.InnerText);
+                                        customSICListCompare.ScanOrAcqTimeTolerance = Convert.ToSingle(valueNode.InnerText);
                                         break;
                                     case "ScanType":
                                         customSICListCompare.ScanToleranceType = masicOptions.GetScanToleranceTypeFromText(valueNode.InnerText);
@@ -633,7 +633,7 @@ namespace MASIC.DataOutput
                     break;
             }
 
-            return string.Join(Conversions.ToString(cColDelimiter), headerNames);
+            return string.Join(Convert.ToString(cColDelimiter), headerNames);
         }
 
         public bool InitializeSICDetailsTextFile(string inputFilePathFull, string outputDirectoryPath)

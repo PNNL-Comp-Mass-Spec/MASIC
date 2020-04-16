@@ -440,10 +440,10 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.SingleType:
-                        matchFound = FindValueRange(Conversions.ToSingle(searchValue), Conversions.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange(Convert.ToSingle(searchValue), Convert.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange(Conversions.ToDouble(searchValue), Conversions.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange(Convert.ToDouble(searchValue), Convert.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -498,10 +498,10 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange(Conversions.ToInteger(searchValue), Conversions.ToInteger(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange(Convert.ToInt32(searchValue), Convert.ToInt32(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
                         break;
                     case eDataTypeToUse.SingleType:
-                        matchFound = FindValueRange(Conversions.ToSingle(searchValue), Conversions.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange(Convert.ToSingle(searchValue), Convert.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -556,10 +556,10 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange(Conversions.ToInteger(searchValue), Conversions.ToInteger(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange(Convert.ToInt32(searchValue), Convert.ToInt32(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange(Conversions.ToDouble(searchValue), Conversions.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange(Convert.ToDouble(searchValue), Convert.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -608,7 +608,7 @@ namespace MASIC
         {
             try
             {
-                return Conversions.ToInteger(GetValueByIndex(index));
+                return Convert.ToInt32(GetValueByIndex(index));
             }
             catch (Exception ex)
             {
@@ -650,7 +650,7 @@ namespace MASIC
         {
             try
             {
-                return Conversions.ToSingle(GetValueByIndex(index));
+                return Convert.ToSingle(GetValueByIndex(index));
             }
             catch (Exception ex)
             {
@@ -664,7 +664,7 @@ namespace MASIC
         {
             try
             {
-                return Conversions.ToInteger(GetValueByOriginalIndex(index));
+                return Convert.ToInt32(GetValueByOriginalIndex(index));
             }
             catch (Exception ex)
             {
@@ -714,7 +714,7 @@ namespace MASIC
         {
             try
             {
-                return Conversions.ToSingle(GetValueByOriginalIndex(index));
+                return Convert.ToSingle(GetValueByOriginalIndex(index));
             }
             catch (Exception ex)
             {

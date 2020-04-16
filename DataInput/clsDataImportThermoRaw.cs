@@ -204,7 +204,7 @@ namespace MASIC.DataInput
                         break;
                     }
 
-                    double percentComplete = scanList.MasterScanOrderCount / Conversions.ToDouble(scanCountToRead) * 100;
+                    double percentComplete = scanList.MasterScanOrderCount / Convert.ToDouble(scanCountToRead) * 100;
                     bool extractSuccess = ExtractScanInfoCheckRange(xcaliburAccessor, thermoScanInfo, scanList, spectraCache, dataOutputHandler, percentComplete);
                     if (!extractSuccess)
                     {
@@ -241,7 +241,7 @@ namespace MASIC.DataInput
                 success = true;
             }
 
-            UpdateProgress(Conversions.ToShort(Math.Round(percentComplete, 0)));
+            UpdateProgress(Convert.ToInt16(Math.Round(percentComplete, 0)));
             UpdateCacheStats(spectraCache);
             if (mOptions.AbortProcessing)
             {
@@ -297,7 +297,7 @@ namespace MASIC.DataInput
             var scanInfo = new clsScanInfo()
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
-                ScanTime = Conversions.ToSingle(thermoScanInfo.RetentionTime),
+                ScanTime = Convert.ToSingle(thermoScanInfo.RetentionTime),
                 ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText),
                 ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText),
                 BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
@@ -394,7 +394,7 @@ namespace MASIC.DataInput
             var scanInfo = new clsScanInfo(thermoScanInfo.ParentIonMZ)
             {
                 ScanNumber = thermoScanInfo.ScanNumber,
-                ScanTime = Conversions.ToSingle(thermoScanInfo.RetentionTime),
+                ScanTime = Convert.ToSingle(thermoScanInfo.RetentionTime),
                 ScanHeaderText = XRawFileIO.MakeGenericThermoScanFilter(thermoScanInfo.FilterText),
                 ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(thermoScanInfo.FilterText),
                 BasePeakIonMZ = thermoScanInfo.BasePeakMZ,
@@ -700,7 +700,7 @@ namespace MASIC.DataInput
                         saveItem = true;
                     }
 
-                    if (string.IsNullOrWhiteSpace(statusEntry.Key) || statusEntry.Key == Conversions.ToString((char)1))
+                    if (string.IsNullOrWhiteSpace(statusEntry.Key) || statusEntry.Key == Convert.ToString((char)1))
                     {
                         // Name is null; skip it
                         saveItem = false;

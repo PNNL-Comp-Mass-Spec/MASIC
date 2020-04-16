@@ -78,7 +78,7 @@ namespace MASIC.DataOutput
 
                     if (scanList.MasterScanOrderCount > 1)
                     {
-                        UpdateProgress(Conversions.ToShort(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
+                        UpdateProgress(Convert.ToInt16(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
                     }
                     else
                     {
