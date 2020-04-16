@@ -209,8 +209,7 @@ namespace MASIC
                 // Only write this data if 1 or more fragmentation spectra are of type SRM
                 if (mrmSettings == null || mrmSettings.Count == 0)
                 {
-                    success = true;
-                    break;
+                    return true;
                 }
 
                 UpdateProgress(0, "Exporting MRM data");

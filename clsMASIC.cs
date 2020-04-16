@@ -1504,7 +1504,7 @@ namespace MASIC
                             if (!success)
                             {
                                 SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
-                                break;
+                                return false;
                             }
                         }
 
@@ -1515,7 +1515,7 @@ namespace MASIC
                         if (!success)
                         {
                             SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
-                            break;
+                            return false;
                         }
 
                         // ---------------------------------------------------------
@@ -1533,7 +1533,7 @@ namespace MASIC
                         if (!success)
                         {
                             SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, true);
-                            break;
+                            return false;
                         }
                     }
 
@@ -1551,7 +1551,7 @@ namespace MASIC
                         if (!success)
                         {
                             SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, true);
-                            break;
+                            return false;
                         }
                     }
                 }
@@ -1570,7 +1570,7 @@ namespace MASIC
                     if (!success)
                     {
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
-                        break;
+                        return false;
                     }
                 }
 
@@ -1590,7 +1590,7 @@ namespace MASIC
                     if (!success)
                     {
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
-                        break;
+                        return false;
                     }
                 }
 
@@ -1980,6 +1980,7 @@ namespace MASIC
             RegisterEvents(dataOutputHandler);
             try
             {
+                var keepProcessing = true;
                 // If a Custom SICList file is defined, then load the custom SIC values now
                 if (Options.CustomSICList.CustomSICListFileName.Length > 0)
                 {
@@ -1990,173 +1991,184 @@ namespace MASIC
                     if (!success)
                     {
                         SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues);
-                        break;
+                        keepProcessing = false;
                     }
                 }
 
-                Options.ReporterIons.UpdateMZIntensityFilterIgnoreRange();
-                LogMessage("Source data file: " + inputFilePath);
-                if (inputFilePath == null || inputFilePath.Length == 0)
+                if (keepProcessing)
                 {
-                    ShowErrorMessage("Input file name is empty");
-                    SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidInputFilePath);
-                    break;
-                }
-
-                mStatusMessage = "Parsing " + Path.GetFileName(inputFilePath);
-                success = CleanupFilePaths(ref inputFilePath, ref outputDirectoryPath);
-                Options.OutputDirectoryPath = outputDirectoryPath;
-                if (success)
-                {
-                    var dbAccessor = new clsDatabaseAccess(Options);
-                    RegisterEvents(dbAccessor);
-                    Options.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, Options.DatasetLookupFilePath, Options.SICOptions.DatasetID);
-                    if (LocalErrorCode != eMasicErrorCodes.NoError)
+                    Options.ReporterIons.UpdateMZIntensityFilterIgnoreRange();
+                    LogMessage("Source data file: " + inputFilePath);
+                    if (inputFilePath == null || inputFilePath.Length == 0)
                     {
-                        if (LocalErrorCode == eMasicErrorCodes.InvalidDatasetID || LocalErrorCode == eMasicErrorCodes.InvalidDatasetLookupFilePath)
-                        {
-                            // Ignore this error
-                            SetLocalErrorCode(eMasicErrorCodes.NoError);
-                            success = true;
-                        }
-                        else
-                        {
-                            success = false;
-                        }
+                        ShowErrorMessage("Input file name is empty");
+                        SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidInputFilePath);
+                        keepProcessing = false;
                     }
                 }
 
-                if (!success)
+                if (keepProcessing)
                 {
-                    if (mLocalErrorCode == eMasicErrorCodes.NoError)
-                        SetBaseClassErrorCode(ProcessFilesErrorCodes.FilePathError);
-                    break;
-                }
-
-                try
-                {
-                    // ---------------------------------------------------------
-                    // See if an output XML file already exists
-                    // If it does, open it and read the parameters used
-                    // If they match the current analysis parameters, and if the input file specs match the input file, then
-                    // do not reprocess
-                    // ---------------------------------------------------------
-
-                    // Obtain the full path to the input file
-                    inputFileInfo = new FileInfo(inputFilePath);
-                    inputFilePathFull = inputFileInfo.FullName;
-                    LogMessage("Checking for existing results in the output path: " + outputDirectoryPath);
-                    doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, Options);
-                    if (doNotProcess)
-                    {
-                        LogMessage("Existing results found; data will not be reprocessed");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    success = false;
-                    LogErrors("ProcessFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError);
-                }
-
-                if (doNotProcess)
-                {
-                    success = true;
-                    break;
-                }
-
-                try
-                {
-                    // ---------------------------------------------------------
-                    // Verify that we have write access to the output directory
-                    // ---------------------------------------------------------
-
-                    // The following should work for testing access permissions, but it doesn't
-                    // Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
-                    // ' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
-                    // objFilePermissionTest.Demand()
-                    // objFilePermissionTest.Assert()
-
-                    LogMessage("Checking for write permission in the output path: " + outputDirectoryPath);
-                    string outputFileTestPath = Path.Combine(outputDirectoryPath, "TestOutputFile" + DateTime.UtcNow.Ticks + ".tmp");
-                    using (var fsOutFileTest = new StreamWriter(outputFileTestPath, false))
-                    {
-                        fsOutFileTest.WriteLine("Test");
-                    }
-
-                    // Wait 250 msec, then delete the file
-                    System.Threading.Thread.Sleep(250);
-                    File.Delete(outputFileTestPath);
-                }
-                catch (Exception ex)
-                {
-                    success = false;
-                    LogErrors("ProcessFile", "The current user does not have write permission for the output directory: " + outputDirectoryPath, ex, eMasicErrorCodes.FileIOPermissionsError);
-                }
-
-                if (!success)
-                {
-                    SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError);
-                    break;
-                }
-
-                // ---------------------------------------------------------
-                // Reset the processing stats
-                // ---------------------------------------------------------
-
-                InitializeMemoryManagementOptions(mProcessingStats);
-
-                // ---------------------------------------------------------
-                // Instantiate the SpectraCache
-                // ---------------------------------------------------------
-
-                using (var spectraCache = new clsSpectraCache(Options.CacheOptions)
-                {
-                    DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
-                    CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
-                    CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
-                })
-                {
-                    RegisterEvents(spectraCache);
-                    spectraCache.InitializeSpectraPool();
-                    var datasetFileInfo = new DatasetFileInfo();
-                    var scanList = new clsScanList();
-                    RegisterEvents(scanList);
-                    var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
-                    RegisterEvents(parentIonProcessor);
-                    var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
-                    RegisterEvents(scanTracking);
-                    DataInput.clsDataImport dataImporterBase = null;
-
-                    // ---------------------------------------------------------
-                    // Load the mass spectral data
-                    // ---------------------------------------------------------
-
-                    success = LoadData(inputFilePathFull, outputDirectoryPath, dataOutputHandler, parentIonProcessor, scanTracking, scanList, spectraCache, out dataImporterBase, out datasetFileInfo);
-
-                    // Record that the file is finished loading
-                    mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
-                    if (!success)
-                    {
-                        if (mStatusMessage == null || mStatusMessage.Length == 0)
-                        {
-                            mStatusMessage = "Unable to parse file; unknown error";
-                        }
-                        else
-                        {
-                            mStatusMessage = "Unable to parse file: " + mStatusMessage;
-                        }
-
-                        ShowErrorMessage(mStatusMessage);
-                        break;
-                    }
-
+                    mStatusMessage = "Parsing " + Path.GetFileName(inputFilePath);
+                    success = CleanupFilePaths(ref inputFilePath, ref outputDirectoryPath);
+                    Options.OutputDirectoryPath = outputDirectoryPath;
                     if (success)
                     {
+                        var dbAccessor = new clsDatabaseAccess(Options);
+                        RegisterEvents(dbAccessor);
+                        Options.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, Options.DatasetLookupFilePath, Options.SICOptions.DatasetID);
+                        if (LocalErrorCode != eMasicErrorCodes.NoError)
+                        {
+                            if (LocalErrorCode == eMasicErrorCodes.InvalidDatasetID || LocalErrorCode == eMasicErrorCodes.InvalidDatasetLookupFilePath)
+                            {
+                                // Ignore this error
+                                SetLocalErrorCode(eMasicErrorCodes.NoError);
+                                success = true;
+                            }
+                            else
+                            {
+                                success = false;
+                            }
+                        }
+                    }
+
+                    if (!success)
+                    {
+                        if (mLocalErrorCode == eMasicErrorCodes.NoError)
+                            SetBaseClassErrorCode(ProcessFilesErrorCodes.FilePathError);
+                        keepProcessing = false;
+                    }
+                }
+
+                if (keepProcessing)
+                {
+                    try
+                    {
                         // ---------------------------------------------------------
-                        // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
+                        // See if an output XML file already exists
+                        // If it does, open it and read the parameters used
+                        // If they match the current analysis parameters, and if the input file specs match the input file, then
+                        // do not reprocess
                         // ---------------------------------------------------------
 
-                        success = FindSICsAndWriteOutput(inputFilePathFull, outputDirectoryPath, scanList, spectraCache, dataOutputHandler, scanTracking, datasetFileInfo, parentIonProcessor, dataImporterBase);
+                        // Obtain the full path to the input file
+                        inputFileInfo = new FileInfo(inputFilePath);
+                        inputFilePathFull = inputFileInfo.FullName;
+                        LogMessage("Checking for existing results in the output path: " + outputDirectoryPath);
+                        doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, Options);
+                        if (doNotProcess)
+                        {
+                            LogMessage("Existing results found; data will not be reprocessed");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        success = false;
+                        LogErrors("ProcessFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError);
+                    }
+
+                    if (doNotProcess)
+                    {
+                        success = true;
+                        keepProcessing = false;
+                    }
+                }
+
+                if (keepProcessing)
+                {
+                    try
+                    {
+                        // ---------------------------------------------------------
+                        // Verify that we have write access to the output directory
+                        // ---------------------------------------------------------
+
+                        // The following should work for testing access permissions, but it doesn't
+                        // Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
+                        // ' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
+                        // objFilePermissionTest.Demand()
+                        // objFilePermissionTest.Assert()
+
+                        LogMessage("Checking for write permission in the output path: " + outputDirectoryPath);
+                        string outputFileTestPath = Path.Combine(outputDirectoryPath, "TestOutputFile" + DateTime.UtcNow.Ticks + ".tmp");
+                        using (var fsOutFileTest = new StreamWriter(outputFileTestPath, false))
+                        {
+                            fsOutFileTest.WriteLine("Test");
+                        }
+
+                        // Wait 250 msec, then delete the file
+                        System.Threading.Thread.Sleep(250);
+                        File.Delete(outputFileTestPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        success = false;
+                        LogErrors("ProcessFile", "The current user does not have write permission for the output directory: " + outputDirectoryPath, ex, eMasicErrorCodes.FileIOPermissionsError);
+                    }
+
+                    if (!success)
+                    {
+                        SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError);
+                    }
+                    else
+                    {
+                        // ---------------------------------------------------------
+                        // Reset the processing stats
+                        // ---------------------------------------------------------
+
+                        InitializeMemoryManagementOptions(mProcessingStats);
+
+                        // ---------------------------------------------------------
+                        // Instantiate the SpectraCache
+                        // ---------------------------------------------------------
+
+                        using (var spectraCache = new clsSpectraCache(Options.CacheOptions)
+                        {
+                            DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
+                            CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
+                            CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
+                        })
+                        {
+                            RegisterEvents(spectraCache);
+                            spectraCache.InitializeSpectraPool();
+                            var datasetFileInfo = new DatasetFileInfo();
+                            var scanList = new clsScanList();
+                            RegisterEvents(scanList);
+                            var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
+                            RegisterEvents(parentIonProcessor);
+                            var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
+                            RegisterEvents(scanTracking);
+                            DataInput.clsDataImport dataImporterBase = null;
+
+                            // ---------------------------------------------------------
+                            // Load the mass spectral data
+                            // ---------------------------------------------------------
+
+                            success = LoadData(inputFilePathFull, outputDirectoryPath, dataOutputHandler, parentIonProcessor, scanTracking, scanList, spectraCache, out dataImporterBase, out datasetFileInfo);
+
+                            // Record that the file is finished loading
+                            mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
+                            if (!success)
+                            {
+                                if (mStatusMessage == null || mStatusMessage.Length == 0)
+                                {
+                                    mStatusMessage = "Unable to parse file; unknown error";
+                                }
+                                else
+                                {
+                                    mStatusMessage = "Unable to parse file: " + mStatusMessage;
+                                }
+
+                                ShowErrorMessage(mStatusMessage);
+                            }
+                            else
+                            {
+                                // ---------------------------------------------------------
+                                // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
+                                // ---------------------------------------------------------
+
+                                success = FindSICsAndWriteOutput(inputFilePathFull, outputDirectoryPath, scanList, spectraCache, dataOutputHandler, scanTracking, datasetFileInfo, parentIonProcessor, dataImporterBase);
+                            }
+                        }
                     }
                 }
             }

@@ -342,7 +342,8 @@ namespace MASIC.DataOutput
                 if (mExtendedHeaderNameMap.Count == 0)
                 {
                     // No extended stats to write; exit the function
-                    break;
+                    UpdateProgress(100);
+                    return true;
                 }
 
                 // Lookup extended stats values that are constants for all scans

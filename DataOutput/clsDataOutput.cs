@@ -115,14 +115,15 @@ namespace MASIC.DataOutput
                         // See if the ProcessingComplete node has a value of True
                         var matchingNodeList = rootElement.GetElementsByTagName("ProcessingComplete");
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
-                            break;
+                            return false;
                         if ((matchingNodeList.Item(0).InnerText.ToLower() ?? "") != "true")
-                            break;
+                            return false;
 
                         // Read the ProcessingSummary and populate
                         matchingNodeList = rootElement.GetElementsByTagName("ProcessingSummary");
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
-                            break;
+                            return false;
+
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
                             switch (valueNode.Name)
@@ -158,34 +159,35 @@ namespace MASIC.DataOutput
 
                         // Check if the MASIC version matches
                         if ((masicVersion ?? "") != (masicOptions.MASICVersion ?? ""))
-                            break;
+                            return false;
                         if ((masicPeakFinderDllVersion ?? "") != (masicOptions.PeakFinderVersion ?? ""))
-                            break;
+                            return false;
 
                         // Check the dataset number
                         if (sicOptionsCompare.DatasetID != masicOptions.SICOptions.DatasetID)
-                            break;
+                            return false;
 
                         // Check the filename in sourceFilePathCheck
                         if ((Path.GetFileName(sourceFilePathCheck) ?? "") != (Path.GetFileName(inputFilePathFull) ?? ""))
-                            break;
+                            return false;
 
                         // Check if the source file stats match
                         var inputFileInfo = new FileInfo(inputFilePathFull);
                         sourceFileDateTime = inputFileInfo.LastWriteTime;
                         if ((sourceFileDateTimeCheck ?? "") != (sourceFileDateTime.ToShortDateString() + " " + sourceFileDateTime.ToShortTimeString() ?? ""))
-                            break;
+                            return false;
                         if (sourceFileSizeBytes != inputFileInfo.Length)
-                            break;
+                            return false;
 
                         // Check that skipMSMSProcessing matches
                         if (skipMSMSProcessing != masicOptions.SkipMSMSProcessing)
-                            break;
+                            return false;
 
                         // Read the ProcessingOptions and populate
                         matchingNodeList = rootElement.GetElementsByTagName("ProcessingOptions");
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
-                            break;
+                            return false;
+
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
                             switch (valueNode.Name)
@@ -323,7 +325,8 @@ namespace MASIC.DataOutput
                         // Read the BinningOptions and populate
                         matchingNodeList = rootElement.GetElementsByTagName("BinningOptions");
                         if (matchingNodeList == null || matchingNodeList.Count != 1)
-                            break;
+                            return false;
+
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
                             switch (valueNode.Name)
@@ -431,15 +434,19 @@ namespace MASIC.DataOutput
                         {
                             // All of the options match, make sure the other output files exist
                             validExistingResultsFound = false;
+
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
                             if (!File.Exists(filePathToCheck))
-                                break;
+                                return false;
+
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.SICStatsFlatFile);
                             if (!File.Exists(filePathToCheck))
-                                break;
+                                return false;
+
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.BPIFile);
                             if (!File.Exists(filePathToCheck))
-                                break;
+                                return false;
+
                             validExistingResultsFound = true;
                         }
                     }
