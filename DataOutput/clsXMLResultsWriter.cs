@@ -620,7 +620,7 @@ namespace MASIC.DataOutput
                             if (charIndex > 0)
                             {
                                 string work = dataLineLCase.Substring(charIndex + INDEX_ATTRIBUTE_LCASE.Length + 1);
-                                charIndex = work.IndexOf(ControlChars.Quote);
+                                charIndex = work.IndexOf('"');
                                 if (charIndex > 0)
                                 {
                                     work = work.Substring(0, charIndex);

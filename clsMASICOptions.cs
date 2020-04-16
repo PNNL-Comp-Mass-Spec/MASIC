@@ -322,7 +322,7 @@ namespace MASIC
 
                 if (!reader.SectionPresent(XML_SECTION_SIC_OPTIONS))
                 {
-                    string errorMessage = "The node '<section name=" + ControlChars.Quote + XML_SECTION_SIC_OPTIONS + ControlChars.Quote + "> was not found in the parameter file: " + parameterFilePath;
+                    string errorMessage = "The node '<section name=" + "\"" + XML_SECTION_SIC_OPTIONS + "\"" + "> was not found in the parameter file: " + parameterFilePath;
                     ReportError(errorMessage);
                     return false;
                 }
@@ -398,7 +398,7 @@ namespace MASIC
                 // Binning Options
                 if (!reader.SectionPresent(XML_SECTION_BINNING_OPTIONS))
                 {
-                    string errorMessage = "The node '<section name=" + ControlChars.Quote + XML_SECTION_BINNING_OPTIONS + ControlChars.Quote + "> was not found in the parameter file: " + parameterFilePath;
+                    string errorMessage = "The node '<section name=" + "\"" + XML_SECTION_BINNING_OPTIONS + "\"" + "> was not found in the parameter file: " + parameterFilePath;
                     ReportError(errorMessage);
                     SetBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes.InvalidParameterFile);
                     return false;
@@ -701,7 +701,7 @@ namespace MASIC
             try
             {
                 // Split on the user-specified delimiter, plus also CR and LF
-                var items = matchSpecList.Split(new char[] { chDelimiter, ControlChars.Cr, ControlChars.Lf }).ToList();
+                var items = matchSpecList.Split(new char[] { chDelimiter, '\r', '\n' }).ToList();
                 var validatedItems = new List<string>();
                 if (items.Count > 0)
                 {
