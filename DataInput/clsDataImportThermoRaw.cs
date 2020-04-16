@@ -137,7 +137,7 @@ namespace MASIC.DataInput
             {
                 Console.Write("Reading Thermo .raw file ");
                 ReportMessage("Reading Thermo .raw file");
-                UpdateProgress(0, "Opening data file:" + ControlChars.NewLine + Path.GetFileName(filePath));
+                UpdateProgress(0, "Opening data file:" + Environment.NewLine + Path.GetFileName(filePath));
 
                 // Obtain the full path to the file
                 var rawFileInfo = new FileInfo(filePath);
@@ -184,7 +184,7 @@ namespace MASIC.DataInput
                 int scanStart = xcaliburAccessor.ScanStart;
                 int scanEnd = xcaliburAccessor.ScanEnd;
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra);
-                UpdateProgress(string.Format("Reading Xcalibur data ({0:N0} scans){1}", scanCount, ControlChars.NewLine + Path.GetFileName(filePath)));
+                UpdateProgress(string.Format("Reading Xcalibur data ({0:N0} scans){1}", scanCount, Environment.NewLine + Path.GetFileName(filePath)));
                 ReportMessage(string.Format("Reading Xcalibur data; Total scan count: {0:N0}", scanCount));
                 int scanCountToRead = scanEnd - scanStart + 1;
                 for (int scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)

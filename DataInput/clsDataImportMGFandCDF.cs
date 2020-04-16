@@ -29,7 +29,7 @@ namespace MASIC.DataInput
             {
                 Console.Write("Reading CDF/MGF data files ");
                 ReportMessage("Reading CDF/MGF data files");
-                UpdateProgress(0, "Opening data file: " + ControlChars.NewLine + Path.GetFileName(filePath));
+                UpdateProgress(0, "Opening data file: " + Environment.NewLine + Path.GetFileName(filePath));
 
                 // Obtain the full path to the file
                 var mgfFileInfo = new FileInfo(filePath);
@@ -70,7 +70,7 @@ namespace MASIC.DataInput
 
                 // Reserve memory for all of the Survey Scan data
                 scanList.Initialize();
-                UpdateProgress("Reading CDF/MGF data (" + msScanCount.ToString() + " scans)" + ControlChars.NewLine + Path.GetFileName(filePath));
+                UpdateProgress("Reading CDF/MGF data (" + msScanCount.ToString() + " scans)" + Environment.NewLine + Path.GetFileName(filePath));
                 ReportMessage("Reading CDF/MGF data; Total MS scan count: " + msScanCount.ToString());
 
                 // Read all of the Survey scans from the CDF file

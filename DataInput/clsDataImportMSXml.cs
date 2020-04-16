@@ -238,7 +238,7 @@ namespace MASIC.DataInput
             {
                 Console.Write("Reading MSXml data file ");
                 ReportMessage("Reading MSXml data file");
-                UpdateProgress(0, "Opening data file:" + ControlChars.NewLine + Path.GetFileName(filePath));
+                UpdateProgress(0, "Opening data file:" + Environment.NewLine + Path.GetFileName(filePath));
 
                 // Obtain the full path to the file
                 var msXmlFileInfo = new FileInfo(filePath);
@@ -261,7 +261,7 @@ namespace MASIC.DataInput
                 }
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra);
-                UpdateProgress("Reading XML data" + ControlChars.NewLine + Path.GetFileName(filePath));
+                UpdateProgress("Reading XML data" + Environment.NewLine + Path.GetFileName(filePath));
                 ReportMessage("Reading XML data from " + filePath);
                 double scanTimeMax = 0;
                 while (true)
@@ -322,7 +322,7 @@ namespace MASIC.DataInput
             {
                 Console.Write("Reading MSXml data file ");
                 ReportMessage("Reading MSXml data file");
-                UpdateProgress(0, "Opening data file:" + ControlChars.NewLine + mzMLFile.Name);
+                UpdateProgress(0, "Opening data file:" + Environment.NewLine + mzMLFile.Name);
                 int datasetID = mOptions.SICOptions.DatasetID;
                 if (!mzMLFile.Exists)
                 {
@@ -354,7 +354,7 @@ namespace MASIC.DataInput
                     }
                 }
 
-                UpdateProgress("Reading XML data" + ControlChars.NewLine + mzMLFile.Name);
+                UpdateProgress("Reading XML data" + Environment.NewLine + mzMLFile.Name);
                 ReportMessage("Reading XML data from " + mzMLFile.FullName);
                 double scanTimeMax = 0;
                 if (xmlReader.NumSpectra > 0)

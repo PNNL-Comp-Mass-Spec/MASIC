@@ -153,12 +153,12 @@ namespace MASIC
             }
             catch (NullReferenceException ex2)
             {
-                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + ControlChars.NewLine + avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + Environment.NewLine + avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
                 return false;
             }
             catch (Exception ex)
             {
-                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + ControlChars.NewLine + avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + Environment.NewLine + avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
                 return false;
             }
         }

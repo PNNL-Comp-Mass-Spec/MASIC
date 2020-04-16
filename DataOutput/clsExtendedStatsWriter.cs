@@ -286,7 +286,7 @@ namespace MASIC.DataOutput
             // Populate nonConstantHeaderIDs with the ID values in mExtendedHeaderNameMap
             foreach (var item in mExtendedHeaderNameMap)
                 nonConstantHeaderIDs.Add(item.Value);
-            return string.Join(ControlChars.NewLine, consolidatedValueList);
+            return string.Join(Environment.NewLine, consolidatedValueList);
         }
 
         private clsScanInfo GetScanByMasterScanIndex(clsScanList scanList, int masterScanIndex)

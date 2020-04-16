@@ -159,7 +159,7 @@ namespace MASIC
         {
             if (commaSeparatedList)
             {
-                return string.Join(ControlChars.NewLine, StatusLogKeyNameFilterList);
+                return string.Join(Environment.NewLine, StatusLogKeyNameFilterList);
             }
             else
             {

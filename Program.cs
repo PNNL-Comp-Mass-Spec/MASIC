@@ -366,7 +366,7 @@ namespace MASIC
                 Console.WriteLine();
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph("The /D switch can be used to specify the Dataset ID of the input file; if omitted, 0 will be used"));
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S). " + "The lookup file is a comma, space, or tab delimited file with two columns:" + ControlChars.NewLine + "Dataset Name and Dataset ID"));
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S). " + "The lookup file is a comma, space, or tab delimited file with two columns:" + Environment.NewLine + "Dataset Name and Dataset ID"));
                 Console.WriteLine();
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /S to process all valid files in the input directory and subdirectories. " + "Include a number after /S (like /S:2) to limit the level of subdirectories to examine."));
                 Console.WriteLine("When using /S, you can redirect the output of the results using /A.");

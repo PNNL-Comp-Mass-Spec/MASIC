@@ -1302,7 +1302,7 @@ namespace MASIC
         {
             string messageWithoutCRLF;
             Options.StatusMessage = message;
-            messageWithoutCRLF = Options.StatusMessage.Replace(ControlChars.NewLine, "; ");
+            messageWithoutCRLF = Options.StatusMessage.Replace(Environment.NewLine, "; ");
             if (ex == null)
             {
                 ex = new Exception("Error");
