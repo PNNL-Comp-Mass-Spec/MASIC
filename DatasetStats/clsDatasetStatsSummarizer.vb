@@ -1,4 +1,4 @@
-Option Strict On
+﻿Option Strict On
 
 ' This class computes aggregate stats for a dataset
 '

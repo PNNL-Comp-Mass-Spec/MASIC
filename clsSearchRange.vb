@@ -1,4 +1,4 @@
-Option Strict On
+﻿Option Strict On
 
 ''' <summary>
 ''' This class can be used to search a list of values for a given value, plus or minus a given tolerance

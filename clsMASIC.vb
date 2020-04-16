@@ -1,4 +1,4 @@
-Option Strict On
+﻿Option Strict On
 
 ' This class will read an LC-MS/MS data file and create selected ion chromatograms
 '   for each of the parent ion masses chosen for fragmentation

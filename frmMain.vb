@@ -1,4 +1,4 @@
-Option Strict On
+﻿Option Strict On
 
 ' -------------------------------------------------------------------------------
 ' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
