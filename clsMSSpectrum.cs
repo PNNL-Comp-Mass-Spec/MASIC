@@ -15,13 +15,7 @@ namespace MASIC
         /// <remarks>0 if not in use</remarks>
         public int ScanNumber { get; set; }
 
-        public int IonCount
-        {
-            get
-            {
-                return IonsMZ.Count;
-            }
-        }
+        public int IonCount => IonsMZ.Count;
 
         /// <summary>
         /// List of m/z's

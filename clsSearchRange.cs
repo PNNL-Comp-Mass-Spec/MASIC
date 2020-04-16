@@ -87,14 +87,8 @@ namespace MASIC
 
         public bool UsePointerIndexArray
         {
-            get
-            {
-                return mUsePointerIndexArray;
-            }
-            set
-            {
-                mUsePointerIndexArray = value;
-            }
+            get => mUsePointerIndexArray;
+            set => mUsePointerIndexArray = value;
         }
         #endregion
         #region // TODO

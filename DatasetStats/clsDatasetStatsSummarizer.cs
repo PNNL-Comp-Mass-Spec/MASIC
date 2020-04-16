@@ -38,10 +38,7 @@ namespace MASIC.DatasetStats
         // ReSharper disable once UnusedMember.Global
         public string DatasetStatsSummaryFileName
         {
-            get
-            {
-                return mDatasetStatsSummaryFileName;
-            }
+            get => mDatasetStatsSummaryFileName;
             set
             {
                 if (value != null)
@@ -61,13 +58,7 @@ namespace MASIC.DatasetStats
         /// Error message
         /// </summary>
         /// <returns></returns>
-        public string ErrorMessage
-        {
-            get
-            {
-                return mErrorMessage;
-            }
-        }
+        public string ErrorMessage => mErrorMessage;
 
         /// <summary>
         /// Dataset file modification time

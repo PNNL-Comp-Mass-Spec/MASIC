@@ -15,13 +15,7 @@ namespace MASIC.DataOutput
         public const string EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT = "Scan Filter Text";
         #endregion
         #region // TODO
-        public int ExtendedHeaderNameCount
-        {
-            get
-            {
-                return mExtendedHeaderNameMap.Count;
-            }
-        }
+        public int ExtendedHeaderNameCount => mExtendedHeaderNameMap.Count;
 
         #endregion
         #region // TODO

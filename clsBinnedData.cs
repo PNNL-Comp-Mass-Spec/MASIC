@@ -11,13 +11,7 @@ namespace MASIC
         /// Number of bins in BinnedIntensities
         /// </summary>
         /// <returns></returns>
-        public int BinCount
-        {
-            get
-            {
-                return BinnedIntensities.Count;
-            }
-        }
+        public int BinCount => BinnedIntensities.Count;
 
         /// <summary>
         /// List of binned intensities; First bin starts at BinnedDataStartX

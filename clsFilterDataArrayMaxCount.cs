@@ -30,13 +30,7 @@ namespace MASIC
         #region // TODO
         public int MaximumDataCountToLoad { get; set; }
 
-        public float Progress
-        {
-            get
-            {
-                return mProgress;
-            }
-        }
+        public float Progress => mProgress;
 
         public float SkipDataPointFlag { get; set; }
         public bool TotalIntensityPercentageFilterEnabled { get; set; }

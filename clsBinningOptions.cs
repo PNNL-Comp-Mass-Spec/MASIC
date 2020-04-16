@@ -8,10 +8,7 @@
 
         public float BinSize
         {
-            get
-            {
-                return mBinSize;
-            }
+            get => mBinSize;
             set
             {
                 if (value <= 0)
@@ -22,10 +19,7 @@
 
         public float IntensityPrecisionPercent
         {
-            get
-            {
-                return mIntensityPrecisionPercent;
-            }
+            get => mIntensityPrecisionPercent;
             set
             {
                 if (value < 0 || value > 100)
@@ -44,10 +38,7 @@
 
         public int MaximumBinCount
         {
-            get
-            {
-                return mMaximumBinCount;
-            }
+            get => mMaximumBinCount;
             set
             {
                 if (value < 2)

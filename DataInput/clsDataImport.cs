@@ -44,13 +44,7 @@ namespace MASIC.DataInput
 
         #endregion
         #region // TODO
-        public DatasetFileInfo DatasetFileInfo
-        {
-            get
-            {
-                return mDatasetFileInfo;
-            }
-        }
+        public DatasetFileInfo DatasetFileInfo => mDatasetFileInfo;
 
         #endregion
         #region // TODO

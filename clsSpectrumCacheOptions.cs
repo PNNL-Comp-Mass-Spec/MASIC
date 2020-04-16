@@ -17,10 +17,7 @@ namespace MASIC
 
         public int SpectraToRetainInMemory
         {
-            get
-            {
-                return mSpectraToRetainInMemory;
-            }
+            get => mSpectraToRetainInMemory;
             set
             {
                 if (value < 100)

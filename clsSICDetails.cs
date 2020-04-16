@@ -14,67 +14,19 @@ namespace MASIC
         public clsScanList.eScanTypeConstants SICScanType;
         public readonly List<clsSICDataPoint> SICData;
 
-        public int SICDataCount
-        {
-            get
-            {
-                return SICData.Count;
-            }
-        }
+        public int SICDataCount => SICData.Count;
 
-        public double[] SICIntensities
-        {
-            get
-            {
-                return (from item in SICData
-                        select item.Intensity).ToArray();
-            }
-        }
+        public double[] SICIntensities => (from item in SICData select item.Intensity).ToArray();
 
-        public float[] SICIntensitiesAsFloat
-        {
-            get
-            {
-                return (from item in SICData
-                        select Conversions.ToSingle(item.Intensity)).ToArray();
-            }
-        }
+        public float[] SICIntensitiesAsFloat => (from item in SICData select Conversions.ToSingle(item.Intensity)).ToArray();
 
-        public float[] SICMassesAsFloat
-        {
-            get
-            {
-                return (from item in SICData
-                        select Conversions.ToSingle(item.Mass)).ToArray();
-            }
-        }
+        public float[] SICMassesAsFloat => (from item in SICData select Conversions.ToSingle(item.Mass)).ToArray();
 
-        public double[] SICMasses
-        {
-            get
-            {
-                return (from item in SICData
-                        select item.Mass).ToArray();
-            }
-        }
+        public double[] SICMasses => (from item in SICData select item.Mass).ToArray();
 
-        public int[] SICScanNumbers
-        {
-            get
-            {
-                return (from item in SICData
-                        select item.ScanNumber).ToArray();
-            }
-        }
+        public int[] SICScanNumbers => (from item in SICData select item.ScanNumber).ToArray();
 
-        public int[] SICScanIndices
-        {
-            get
-            {
-                return (from item in SICData
-                        select item.ScanIndex).ToArray();
-            }
-        }
+        public int[] SICScanIndices => (from item in SICData select item.ScanIndex).ToArray();
 
         /// <summary>
         /// Constructor

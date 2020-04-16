@@ -64,14 +64,8 @@ namespace MASIC
 
         public eReporterIonMassModeConstants ReporterIonMassMode
         {
-            get
-            {
-                return mReporterIonMassMode;
-            }
-            set
-            {
-                SetReporterIonMassMode(value);
-            }
+            get => mReporterIonMassMode;
+            set => SetReporterIonMassMode(value);
         }
 
         /// <summary>

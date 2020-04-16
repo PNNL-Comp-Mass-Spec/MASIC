@@ -55,21 +55,10 @@ namespace MASIC
 
         #endregion
         #region // TODO
-        public clsReporterIons.eReporterIonMassModeConstants ReporterIonMode
-        {
-            get
-            {
-                return mReporterIonMode;
-            }
-        }
+        public clsReporterIons.eReporterIonMassModeConstants ReporterIonMode => mReporterIonMode;
 
-        public eCorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType
-        {
-            get
-            {
-                return mITraq4PlexCorrectionFactorType;
-            }
-        }
+        public eCorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType => mITraq4PlexCorrectionFactorType;
+
         #endregion
         /// <summary>
         /// Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex

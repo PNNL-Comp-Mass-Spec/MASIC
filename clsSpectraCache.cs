@@ -80,54 +80,27 @@ namespace MASIC
         private Hashtable mSpectrumByteOffset;         // Records the byte offset of the data in the page file for a given scan number
 
         #endregion
-        public int CacheEventCount
-        {
-            get
-            {
-                return mCacheEventCount;
-            }
-        }
+        public int CacheEventCount => mCacheEventCount;
 
-        public string CacheFileNameBase
-        {
-            get
-            {
-                return mCacheFileNameBase;
-            }
-        }
+        public string CacheFileNameBase => mCacheFileNameBase;
 
         public string CacheDirectoryPath
         {
-            get
-            {
-                return mCacheOptions.DirectoryPath;
-            }
-            set
-            {
-                mCacheOptions.DirectoryPath = value;
-            }
+            get => mCacheOptions.DirectoryPath;
+            set => mCacheOptions.DirectoryPath = value;
         }
 
         [Obsolete("Legacy parameter; no longer used")]
         public float CacheMaximumMemoryUsageMB
         {
-            get
-            {
-                return mCacheOptions.MaximumMemoryUsageMB;
-            }
-            set
-            {
-                mCacheOptions.MaximumMemoryUsageMB = value;
-            }
+            get => mCacheOptions.MaximumMemoryUsageMB;
+            set => mCacheOptions.MaximumMemoryUsageMB = value;
         }
 
         [Obsolete("Legacy parameter; no longer used")]
         public float CacheMinimumFreeMemoryMB
         {
-            get
-            {
-                return mCacheOptions.MinimumFreeMemoryMB;
-            }
+            get => mCacheOptions.MinimumFreeMemoryMB;
             set
             {
                 if (mCacheOptions.MinimumFreeMemoryMB < 10)
@@ -141,10 +114,7 @@ namespace MASIC
 
         public int CacheSpectraToRetainInMemory
         {
-            get
-            {
-                return mCacheOptions.SpectraToRetainInMemory;
-            }
+            get => mCacheOptions.SpectraToRetainInMemory;
             set
             {
                 if (value < 100)
@@ -155,23 +125,11 @@ namespace MASIC
 
         public bool DiskCachingAlwaysDisabled
         {
-            get
-            {
-                return mCacheOptions.DiskCachingAlwaysDisabled;
-            }
-            set
-            {
-                mCacheOptions.DiskCachingAlwaysDisabled = value;
-            }
+            get => mCacheOptions.DiskCachingAlwaysDisabled;
+            set => mCacheOptions.DiskCachingAlwaysDisabled = value;
         }
 
-        public int UnCacheEventCount
-        {
-            get
-            {
-                return mUnCacheEventCount;
-            }
-        }
+        public int UnCacheEventCount => mUnCacheEventCount;
 
         public bool AddSpectrumToPool(clsMSSpectrum spectrum, int scanNumber)
         {

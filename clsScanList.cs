@@ -68,13 +68,7 @@ namespace MASIC
         /// Number of items in MasterScanOrder
         /// </summary>
         /// <returns></returns>
-        public int MasterScanOrderCount
-        {
-            get
-            {
-                return MasterScanOrder.Count;
-            }
-        }
+        public int MasterScanOrderCount => MasterScanOrder.Count;
 
         /// <summary>
         /// Set to true if the user cancels any of the processing steps

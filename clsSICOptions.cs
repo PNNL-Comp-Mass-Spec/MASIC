@@ -38,10 +38,7 @@
                     return SICTolerance;
                 }
             }
-            set
-            {
-                SetSICTolerance(value, false);
-            }
+            set => SetSICTolerance(value, false);
         }
         /// <summary>
         /// If True, then will look through the m/z values in the parent ion spectrum data to find the closest match
@@ -95,10 +92,7 @@
         /// </summary>
         public float MaxSICPeakWidthMinutesBackward
         {
-            get
-            {
-                return mMaxSICPeakWidthMinutesBackward;
-            }
+            get => mMaxSICPeakWidthMinutesBackward;
             set
             {
                 if (value < 0 || value > 10000)
@@ -112,10 +106,7 @@
         /// </summary>
         public float MaxSICPeakWidthMinutesForward
         {
-            get
-            {
-                return mMaxSICPeakWidthMinutesForward;
-            }
+            get => mMaxSICPeakWidthMinutesForward;
             set
             {
                 if (value < 0 || value > 10000)
@@ -134,10 +125,7 @@
         /// <remarks>Defaults to 0.1</remarks>
         public float SimilarIonMZToleranceHalfWidth
         {
-            get
-            {
-                return mSimilarIonMZToleranceHalfWidth;
-            }
+            get => mSimilarIonMZToleranceHalfWidth;
             set
             {
                 if (value < 0.001 || value > 100)
@@ -152,10 +140,7 @@
         /// <remarks>Defaults to 5</remarks>
         public float SimilarIonToleranceHalfWidthMinutes
         {
-            get
-            {
-                return mSimilarIonToleranceHalfWidthMinutes;
-            }
+            get => mSimilarIonToleranceHalfWidthMinutes;
             set
             {
                 if (value < 0 || value > 100000)
@@ -169,10 +154,7 @@
         /// </summary>
         public float SpectrumSimilarityMinimum
         {
-            get
-            {
-                return mSpectrumSimilarityMinimum;
-            }
+            get => mSpectrumSimilarityMinimum;
             set
             {
                 if (value < 0 || value > 1)

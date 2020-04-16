@@ -43,13 +43,7 @@ namespace MASIC
         /// Number of items in MatchIndices
         /// </summary>
         /// <returns></returns>
-        public int MatchCount
-        {
-            get
-            {
-                return MatchIndices.Count;
-            }
-        }
+        public int MatchCount => MatchIndices.Count;
 
         /// <summary>
         /// Pointers to entries in scanList.ParentIons

@@ -55,34 +55,19 @@ namespace MASIC
         #region // TODO
         public float BinStartX
         {
-            get
-            {
-                return mBinningOptions.StartX;
-            }
-            set
-            {
-                mBinningOptions.StartX = value;
-            }
+            get => mBinningOptions.StartX;
+            set => mBinningOptions.StartX = value;
         }
 
         public float BinEndX
         {
-            get
-            {
-                return mBinningOptions.EndX;
-            }
-            set
-            {
-                mBinningOptions.EndX = value;
-            }
+            get => mBinningOptions.EndX;
+            set => mBinningOptions.EndX = value;
         }
 
         public float BinSize
         {
-            get
-            {
-                return mBinningOptions.BinSize;
-            }
+            get => mBinningOptions.BinSize;
             set
             {
                 if (value <= 0)
@@ -93,10 +78,7 @@ namespace MASIC
 
         public float BinnedDataIntensityPrecisionPercent
         {
-            get
-            {
-                return mBinningOptions.IntensityPrecisionPercent;
-            }
+            get => mBinningOptions.IntensityPrecisionPercent;
             set
             {
                 if (value < 0 || value > 100)
@@ -109,34 +91,19 @@ namespace MASIC
 
         public bool NormalizeBinnedData
         {
-            get
-            {
-                return mBinningOptions.Normalize;
-            }
-            set
-            {
-                mBinningOptions.Normalize = value;
-            }
+            get => mBinningOptions.Normalize;
+            set => mBinningOptions.Normalize = value;
         }
 
         public bool SumAllIntensitiesForBin
         {
-            get
-            {
-                return mBinningOptions.SumAllIntensitiesForBin;
-            }
-            set
-            {
-                mBinningOptions.SumAllIntensitiesForBin = value;
-            }
+            get => mBinningOptions.SumAllIntensitiesForBin;
+            set => mBinningOptions.SumAllIntensitiesForBin = value;
         }
 
         public int MaximumBinCount
         {
-            get
-            {
-                return mBinningOptions.MaximumBinCount;
-            }
+            get => mBinningOptions.MaximumBinCount;
             set
             {
                 if (value < 2)

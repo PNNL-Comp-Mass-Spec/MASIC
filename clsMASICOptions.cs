@@ -59,14 +59,8 @@ namespace MASIC
         [Obsolete("Use OutputDirectoryPath")]
         public string OutputFolderPath
         {
-            get
-            {
-                return OutputDirectoryPath;
-            }
-            set
-            {
-                OutputDirectoryPath = value;
-            }
+            get => OutputDirectoryPath;
+            set => OutputDirectoryPath = value;
         }
 
         public bool WriteDetailedSICDataFile { get; set; }

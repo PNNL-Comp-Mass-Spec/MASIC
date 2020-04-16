@@ -117,62 +117,32 @@ namespace MASIC
         [Obsolete("Use Property Options")]
         public string DatabaseConnectionString
         {
-            get
-            {
-                return Options.DatabaseConnectionString;
-            }
-            set
-            {
-                Options.DatabaseConnectionString = value;
-            }
+            get => Options.DatabaseConnectionString;
+            set => Options.DatabaseConnectionString = value;
         }
 
         [Obsolete("Use Property Options")]
         public string DatasetInfoQuerySql
         {
-            get
-            {
-                return Options.DatasetInfoQuerySql;
-            }
-            set
-            {
-                Options.DatasetInfoQuerySql = value;
-            }
+            get => Options.DatasetInfoQuerySql;
+            set => Options.DatasetInfoQuerySql = value;
         }
 
         [Obsolete("Use Property Options")]
         public string DatasetLookupFilePath
         {
-            get
-            {
-                return Options.DatasetLookupFilePath;
-            }
-            set
-            {
-                Options.DatasetLookupFilePath = value;
-            }
+            get => Options.DatasetLookupFilePath;
+            set => Options.DatasetLookupFilePath = value;
         }
 
         [Obsolete("Use Property Options")]
         public int DatasetNumber
         {
-            get
-            {
-                return Options.SICOptions.DatasetID;
-            }
-            set
-            {
-                Options.SICOptions.DatasetID = value;
-            }
+            get => Options.SICOptions.DatasetID;
+            set => Options.SICOptions.DatasetID = value;
         }
 
-        public eMasicErrorCodes LocalErrorCode
-        {
-            get
-            {
-                return mLocalErrorCode;
-            }
-        }
+        public eMasicErrorCodes LocalErrorCode => mLocalErrorCode;
 
         public string MASICPeakFinderDllVersion
         {
@@ -192,10 +162,7 @@ namespace MASIC
         [Obsolete("Use Property Options")]
         public string MASICStatusFilename
         {
-            get
-            {
-                return Options.MASICStatusFilename;
-            }
+            get => Options.MASICStatusFilename;
             set
             {
                 if (value == null || value.Trim().Length == 0)
@@ -211,286 +178,146 @@ namespace MASIC
 
         public clsMASICOptions Options { get; private set; }
 
-        public eProcessingStepConstants ProcessStep
-        {
-            get
-            {
-                return mProcessingStep;
-            }
-        }
+        public eProcessingStepConstants ProcessStep => mProcessingStep;
 
         /// <summary>
         /// Subtask progress percent complete
         /// </summary>
         /// <returns></returns>
         /// <remarks>Value between 0 and 100</remarks>
-        public float SubtaskProgressPercentComplete
-        {
-            get
-            {
-                return mSubtaskProcessingStepPct;
-            }
-        }
+        public float SubtaskProgressPercentComplete => mSubtaskProcessingStepPct;
 
-        public string SubtaskDescription
-        {
-            get
-            {
-                return mSubtaskDescription;
-            }
-        }
+        public string SubtaskDescription => mSubtaskDescription;
 
-        public string StatusMessage
-        {
-            get
-            {
-                return mStatusMessage;
-            }
-        }
+        public string StatusMessage => mStatusMessage;
+
         #endregion
         #region // TODO
         [Obsolete("Use Property Options")]
         public bool CDFTimeInSeconds
         {
-            get
-            {
-                return Options.CDFTimeInSeconds;
-            }
-            set
-            {
-                Options.CDFTimeInSeconds = value;
-            }
+            get => Options.CDFTimeInSeconds;
+            set => Options.CDFTimeInSeconds = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool CompressMSSpectraData
         {
-            get
-            {
-                return Options.SICOptions.CompressMSSpectraData;
-            }
-            set
-            {
-                Options.SICOptions.CompressMSSpectraData = value;
-            }
+            get => Options.SICOptions.CompressMSSpectraData;
+            set => Options.SICOptions.CompressMSSpectraData = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool CompressMSMSSpectraData
         {
-            get
-            {
-                return Options.SICOptions.CompressMSMSSpectraData;
-            }
-            set
-            {
-                Options.SICOptions.CompressMSMSSpectraData = value;
-            }
+            get => Options.SICOptions.CompressMSMSSpectraData;
+            set => Options.SICOptions.CompressMSMSSpectraData = value;
         }
 
         [Obsolete("Use Property Options")]
         public double CompressToleranceDivisorForDa
         {
-            get
-            {
-                return Options.SICOptions.CompressToleranceDivisorForDa;
-            }
-            set
-            {
-                Options.SICOptions.CompressToleranceDivisorForDa = value;
-            }
+            get => Options.SICOptions.CompressToleranceDivisorForDa;
+            set => Options.SICOptions.CompressToleranceDivisorForDa = value;
         }
 
         [Obsolete("Use Property Options")]
         public double CompressToleranceDivisorForPPM
         {
-            get
-            {
-                return Options.SICOptions.CompressToleranceDivisorForPPM;
-            }
-            set
-            {
-                Options.SICOptions.CompressToleranceDivisorForPPM = value;
-            }
+            get => Options.SICOptions.CompressToleranceDivisorForPPM;
+            set => Options.SICOptions.CompressToleranceDivisorForPPM = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool ConsolidateConstantExtendedHeaderValues
         {
-            get
-            {
-                return Options.ConsolidateConstantExtendedHeaderValues;
-            }
-            set
-            {
-                Options.ConsolidateConstantExtendedHeaderValues = value;
-            }
+            get => Options.ConsolidateConstantExtendedHeaderValues;
+            set => Options.ConsolidateConstantExtendedHeaderValues = value;
         }
 
         [Obsolete("Use Property Options")]
-        public clsCustomSICList.eCustomSICScanTypeConstants CustomSICListScanType
-        {
-            get
-            {
-                return Options.CustomSICList.ScanToleranceType;
-            }
-        }
+        public clsCustomSICList.eCustomSICScanTypeConstants CustomSICListScanType => Options.CustomSICList.ScanToleranceType;
 
         [Obsolete("Use Property Options")]
-        public float CustomSICListScanTolerance
-        {
-            get
-            {
-                return Options.CustomSICList.ScanOrAcqTimeTolerance;
-            }
-        }
+        public float CustomSICListScanTolerance => Options.CustomSICList.ScanOrAcqTimeTolerance;
 
         [Obsolete("Use Property Options")]
-        public List<clsCustomMZSearchSpec> CustomSICListSearchValues
-        {
-            get
-            {
-                return Options.CustomSICList.CustomMZSearchValues;
-            }
-        }
+        public List<clsCustomMZSearchSpec> CustomSICListSearchValues => Options.CustomSICList.CustomMZSearchValues;
 
         [Obsolete("Use Property Options")]
         public string CustomSICListFileName
         {
-            get
-            {
-                return Options.CustomSICList.CustomSICListFileName;
-            }
-            set
-            {
-                Options.CustomSICList.CustomSICListFileName = value;
-            }
+            get => Options.CustomSICList.CustomSICListFileName;
+            set => Options.CustomSICList.CustomSICListFileName = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool ExportRawDataOnly
         {
-            get
-            {
-                return Options.ExportRawDataOnly;
-            }
-            set
-            {
-                Options.ExportRawDataOnly = value;
-            }
+            get => Options.ExportRawDataOnly;
+            set => Options.ExportRawDataOnly = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool FastExistingXMLFileTest
         {
-            get
-            {
-                return Options.FastExistingXMLFileTest;
-            }
-            set
-            {
-                Options.FastExistingXMLFileTest = value;
-            }
+            get => Options.FastExistingXMLFileTest;
+            set => Options.FastExistingXMLFileTest = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool IncludeHeadersInExportFile
         {
-            get
-            {
-                return Options.IncludeHeadersInExportFile;
-            }
-            set
-            {
-                Options.IncludeHeadersInExportFile = value;
-            }
+            get => Options.IncludeHeadersInExportFile;
+            set => Options.IncludeHeadersInExportFile = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool IncludeScanTimesInSICStatsFile
         {
-            get
-            {
-                return Options.IncludeScanTimesInSICStatsFile;
-            }
-            set
-            {
-                Options.IncludeScanTimesInSICStatsFile = value;
-            }
+            get => Options.IncludeScanTimesInSICStatsFile;
+            set => Options.IncludeScanTimesInSICStatsFile = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool LimitSearchToCustomMZList
         {
-            get
-            {
-                return Options.CustomSICList.LimitSearchToCustomMZList;
-            }
-            set
-            {
-                Options.CustomSICList.LimitSearchToCustomMZList = value;
-            }
+            get => Options.CustomSICList.LimitSearchToCustomMZList;
+            set => Options.CustomSICList.LimitSearchToCustomMZList = value;
         }
 
         [Obsolete("Use Property Options")]
         public double ParentIonDecoyMassDa
         {
-            get
-            {
-                return Options.ParentIonDecoyMassDa;
-            }
-            set
-            {
-                Options.ParentIonDecoyMassDa = value;
-            }
+            get => Options.ParentIonDecoyMassDa;
+            set => Options.ParentIonDecoyMassDa = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool SkipMSMSProcessing
         {
-            get
-            {
-                return Options.SkipMSMSProcessing;
-            }
-            set
-            {
-                Options.SkipMSMSProcessing = value;
-            }
+            get => Options.SkipMSMSProcessing;
+            set => Options.SkipMSMSProcessing = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool SkipSICAndRawDataProcessing
         {
-            get
-            {
-                return Options.SkipSICAndRawDataProcessing;
-            }
-            set
-            {
-                Options.SkipSICAndRawDataProcessing = value;
-            }
+            get => Options.SkipSICAndRawDataProcessing;
+            set => Options.SkipSICAndRawDataProcessing = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool SuppressNoParentIonsError
         {
-            get
-            {
-                return Options.SuppressNoParentIonsError;
-            }
-            set
-            {
-                Options.SuppressNoParentIonsError = value;
-            }
+            get => Options.SuppressNoParentIonsError;
+            set => Options.SuppressNoParentIonsError = value;
         }
 
         [Obsolete("No longer supported")]
         public bool UseFinniganXRawAccessorFunctions
         {
-            get
-            {
-                return true;
-            }
+            get => true;
             set
             {
             }
@@ -499,79 +326,43 @@ namespace MASIC
         [Obsolete("Use Property Options")]
         public bool WriteDetailedSICDataFile
         {
-            get
-            {
-                return Options.WriteDetailedSICDataFile;
-            }
-            set
-            {
-                Options.WriteDetailedSICDataFile = value;
-            }
+            get => Options.WriteDetailedSICDataFile;
+            set => Options.WriteDetailedSICDataFile = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool WriteExtendedStats
         {
-            get
-            {
-                return Options.WriteExtendedStats;
-            }
-            set
-            {
-                Options.WriteExtendedStats = value;
-            }
+            get => Options.WriteExtendedStats;
+            set => Options.WriteExtendedStats = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool WriteExtendedStatsIncludeScanFilterText
         {
-            get
-            {
-                return Options.WriteExtendedStatsIncludeScanFilterText;
-            }
-            set
-            {
-                Options.WriteExtendedStatsIncludeScanFilterText = value;
-            }
+            get => Options.WriteExtendedStatsIncludeScanFilterText;
+            set => Options.WriteExtendedStatsIncludeScanFilterText = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool WriteExtendedStatsStatusLog
         {
-            get
-            {
-                return Options.WriteExtendedStatsStatusLog;
-            }
-            set
-            {
-                Options.WriteExtendedStatsStatusLog = value;
-            }
+            get => Options.WriteExtendedStatsStatusLog;
+            set => Options.WriteExtendedStatsStatusLog = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool WriteMSMethodFile
         {
-            get
-            {
-                return Options.WriteMSMethodFile;
-            }
-            set
-            {
-                Options.WriteMSMethodFile = value;
-            }
+            get => Options.WriteMSMethodFile;
+            set => Options.WriteMSMethodFile = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool WriteMSTuneFile
         {
-            get
-            {
-                return Options.WriteMSTuneFile;
-            }
-            set
-            {
-                Options.WriteMSTuneFile = value;
-            }
+            get => Options.WriteMSTuneFile;
+            set => Options.WriteMSTuneFile = value;
         }
 
         /// <summary>
@@ -581,14 +372,8 @@ namespace MASIC
         [Obsolete("Use Property Options.  Also, the SICToleranceDa setting should not be used; use SetSICTolerance and GetSICTolerance instead")]
         public double SICToleranceDa
         {
-            get
-            {
-                return Options.SICOptions.SICToleranceDa;
-            }
-            set
-            {
-                Options.SICOptions.SICToleranceDa = value;
-            }
+            get => Options.SICOptions.SICToleranceDa;
+            set => Options.SICOptions.SICToleranceDa = value;
         }
 
         [Obsolete("Use Property Options.SICOptions.GetSICTolerance")]
@@ -613,193 +398,106 @@ namespace MASIC
         [Obsolete("Use Property Options")]
         public bool SICToleranceIsPPM
         {
-            get
-            {
-                return Options.SICOptions.SICToleranceIsPPM;
-            }
-            set
-            {
-                Options.SICOptions.SICToleranceIsPPM = value;
-            }
+            get => Options.SICOptions.SICToleranceIsPPM;
+            set => Options.SICOptions.SICToleranceIsPPM = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool RefineReportedParentIonMZ
         {
-            get
-            {
-                return Options.SICOptions.RefineReportedParentIonMZ;
-            }
-            set
-            {
-                Options.SICOptions.RefineReportedParentIonMZ = value;
-            }
+            get => Options.SICOptions.RefineReportedParentIonMZ;
+            set => Options.SICOptions.RefineReportedParentIonMZ = value;
         }
 
         [Obsolete("Use Property Options")]
         public float RTRangeEnd
         {
-            get
-            {
-                return Options.SICOptions.RTRangeEnd;
-            }
-            set
-            {
-                Options.SICOptions.RTRangeEnd = value;
-            }
+            get => Options.SICOptions.RTRangeEnd;
+            set => Options.SICOptions.RTRangeEnd = value;
         }
 
         [Obsolete("Use Property Options")]
         public float RTRangeStart
         {
-            get
-            {
-                return Options.SICOptions.RTRangeStart;
-            }
-            set
-            {
-                Options.SICOptions.RTRangeStart = value;
-            }
+            get => Options.SICOptions.RTRangeStart;
+            set => Options.SICOptions.RTRangeStart = value;
         }
 
         [Obsolete("Use Property Options")]
         public int ScanRangeEnd
         {
-            get
-            {
-                return Options.SICOptions.ScanRangeEnd;
-            }
-            set
-            {
-                Options.SICOptions.ScanRangeEnd = value;
-            }
+            get => Options.SICOptions.ScanRangeEnd;
+            set => Options.SICOptions.ScanRangeEnd = value;
         }
 
         [Obsolete("Use Property Options")]
         public int ScanRangeStart
         {
-            get
-            {
-                return Options.SICOptions.ScanRangeStart;
-            }
-            set
-            {
-                Options.SICOptions.ScanRangeStart = value;
-            }
+            get => Options.SICOptions.ScanRangeStart;
+            set => Options.SICOptions.ScanRangeStart = value;
         }
 
         [Obsolete("Use Property Options")]
         public float MaxSICPeakWidthMinutesBackward
         {
-            get
-            {
-                return Options.SICOptions.MaxSICPeakWidthMinutesBackward;
-            }
-            set
-            {
-                Options.SICOptions.MaxSICPeakWidthMinutesBackward = value;
-            }
+            get => Options.SICOptions.MaxSICPeakWidthMinutesBackward;
+            set => Options.SICOptions.MaxSICPeakWidthMinutesBackward = value;
         }
 
         [Obsolete("Use Property Options")]
         public float MaxSICPeakWidthMinutesForward
         {
-            get
-            {
-                return Options.SICOptions.MaxSICPeakWidthMinutesForward;
-            }
-            set
-            {
-                Options.SICOptions.MaxSICPeakWidthMinutesForward = value;
-            }
+            get => Options.SICOptions.MaxSICPeakWidthMinutesForward;
+            set => Options.SICOptions.MaxSICPeakWidthMinutesForward = value;
         }
 
         [Obsolete("Use Property Options")]
         public double SICNoiseFractionLowIntensityDataToAverage
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage;
+            set => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
         }
 
         [Obsolete("Use Property Options")]
         public double SICNoiseMinimumSignalToNoiseRatio
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio;
-            }
-            set
-            {
-                // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
-                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio;
+            // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
+            set => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0;
         }
 
         [Obsolete("Use Property Options")]
         public double SICNoiseThresholdIntensity
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute;
+            set => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = value;
         }
 
         [Obsolete("Use Property Options")]
         public MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes SICNoiseThresholdMode
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode;
+            set => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = value;
         }
 
         [Obsolete("Use Property Options")]
         public double MassSpectraNoiseFractionLowIntensityDataToAverage
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage;
+            set => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
         }
 
         [Obsolete("Use Property Options")]
         public double MassSpectraNoiseMinimumSignalToNoiseRatio
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio;
+            set => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = value;
         }
 
         [Obsolete("Use Property Options")]
         public double MassSpectraNoiseThresholdIntensity
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute;
             set
             {
                 if (value < 0 || value > double.MaxValue)
@@ -811,119 +509,65 @@ namespace MASIC
         [Obsolete("Use Property Options")]
         public MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes MassSpectraNoiseThresholdMode
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode;
+            set => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool ReplaceSICZeroesWithMinimumPositiveValueFromMSData
         {
-            get
-            {
-                return Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData;
-            }
-            set
-            {
-                Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = value;
-            }
+            get => Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData;
+            set => Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = value;
         }
         #endregion
         #region // TODO
         [Obsolete("Use Property Options")]
         public bool ExportRawDataIncludeMSMS
         {
-            get
-            {
-                return Options.RawDataExportOptions.IncludeMSMS;
-            }
-            set
-            {
-                Options.RawDataExportOptions.IncludeMSMS = value;
-            }
+            get => Options.RawDataExportOptions.IncludeMSMS;
+            set => Options.RawDataExportOptions.IncludeMSMS = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool ExportRawDataRenumberScans
         {
-            get
-            {
-                return Options.RawDataExportOptions.RenumberScans;
-            }
-            set
-            {
-                Options.RawDataExportOptions.RenumberScans = value;
-            }
+            get => Options.RawDataExportOptions.RenumberScans;
+            set => Options.RawDataExportOptions.RenumberScans = value;
         }
 
         [Obsolete("Use Property Options")]
         public float ExportRawDataIntensityMinimum
         {
-            get
-            {
-                return Options.RawDataExportOptions.IntensityMinimum;
-            }
-            set
-            {
-                Options.RawDataExportOptions.IntensityMinimum = value;
-            }
+            get => Options.RawDataExportOptions.IntensityMinimum;
+            set => Options.RawDataExportOptions.IntensityMinimum = value;
         }
 
         [Obsolete("Use Property Options")]
         public int ExportRawDataMaxIonCountPerScan
         {
-            get
-            {
-                return Options.RawDataExportOptions.MaxIonCountPerScan;
-            }
-            set
-            {
-                Options.RawDataExportOptions.MaxIonCountPerScan = value;
-            }
+            get => Options.RawDataExportOptions.MaxIonCountPerScan;
+            set => Options.RawDataExportOptions.MaxIonCountPerScan = value;
         }
 
         [Obsolete("Use Property Options")]
         public clsRawDataExportOptions.eExportRawDataFileFormatConstants ExportRawDataFileFormat
         {
-            get
-            {
-                return Options.RawDataExportOptions.FileFormat;
-            }
-            set
-            {
-                Options.RawDataExportOptions.FileFormat = value;
-            }
+            get => Options.RawDataExportOptions.FileFormat;
+            set => Options.RawDataExportOptions.FileFormat = value;
         }
 
         [Obsolete("Use Property Options")]
         public float ExportRawDataMinimumSignalToNoiseRatio
         {
-            get
-            {
-                return Options.RawDataExportOptions.MinimumSignalToNoiseRatio;
-            }
-            set
-            {
-                Options.RawDataExportOptions.MinimumSignalToNoiseRatio = value;
-            }
+            get => Options.RawDataExportOptions.MinimumSignalToNoiseRatio;
+            set => Options.RawDataExportOptions.MinimumSignalToNoiseRatio = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool ExportRawSpectraData
         {
-            get
-            {
-                return Options.RawDataExportOptions.ExportEnabled;
-            }
-            set
-            {
-                Options.RawDataExportOptions.ExportEnabled = value;
-            }
+            get => Options.RawDataExportOptions.ExportEnabled;
+            set => Options.RawDataExportOptions.ExportEnabled = value;
         }
 
         #endregion
@@ -931,365 +575,200 @@ namespace MASIC
         [Obsolete("Use Property Options")]
         public double IntensityThresholdAbsoluteMinimum
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum;
+            set => Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = value;
         }
 
         [Obsolete("Use Property Options")]
         public double IntensityThresholdFractionMax
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax;
+            set => Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = value;
         }
 
         [Obsolete("Use Property Options")]
         public int MaxDistanceScansNoOverlap
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap;
+            set => Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool FindPeaksOnSmoothedData
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData;
+            set => Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool SmoothDataRegardlessOfMinimumPeakWidth
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth;
+            set => Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool UseButterworthSmooth
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth;
+            set => Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth = value;
         }
 
         [Obsolete("Use Property Options")]
         public double ButterworthSamplingFrequency
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency;
-            }
-            set
-            {
-                // Value should be between 0.01 and 0.99; this is checked for in the filter, so we don't need to check here
-                Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency;
+            // Value should be between 0.01 and 0.99; this is checked for in the filter, so we don't need to check here
+            set => Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool ButterworthSamplingFrequencyDoubledForSIMData
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData;
+            set => Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool UseSavitzkyGolaySmooth
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth;
+            set => Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = value;
         }
 
         [Obsolete("Use Property Options")]
         public short SavitzkyGolayFilterOrder
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder;
+            set => Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool SaveSmoothedData
         {
-            get
-            {
-                return Options.SICOptions.SaveSmoothedData;
-            }
-            set
-            {
-                Options.SICOptions.SaveSmoothedData = value;
-            }
+            get => Options.SICOptions.SaveSmoothedData;
+            set => Options.SICOptions.SaveSmoothedData = value;
         }
 
         [Obsolete("Use Property Options")]
         public double MaxAllowedUpwardSpikeFractionMax
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax;
+            set => Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = value;
         }
 
         [Obsolete("Use Property Options")]
         public double InitialPeakWidthScansScaler
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler;
+            set => Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = value;
         }
 
         [Obsolete("Use Property Options")]
         public int InitialPeakWidthScansMaximum
         {
-            get
-            {
-                return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum;
-            }
-            set
-            {
-                Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = value;
-            }
+            get => Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum;
+            set => Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = value;
         }
         #endregion
         #region // TODO
         [Obsolete("Use Property Options")]
         public float SimilarIonMZToleranceHalfWidth
         {
-            get
-            {
-                return Options.SICOptions.SimilarIonMZToleranceHalfWidth;
-            }
-            set
-            {
-                Options.SICOptions.SimilarIonMZToleranceHalfWidth = value;
-            }
+            get => Options.SICOptions.SimilarIonMZToleranceHalfWidth;
+            set => Options.SICOptions.SimilarIonMZToleranceHalfWidth = value;
         }
 
         [Obsolete("Use Property Options")]
         public float SimilarIonToleranceHalfWidthMinutes
         {
-            get
-            {
-                return Options.SICOptions.SimilarIonToleranceHalfWidthMinutes;
-            }
-            set
-            {
-                Options.SICOptions.SimilarIonToleranceHalfWidthMinutes = value;
-            }
+            get => Options.SICOptions.SimilarIonToleranceHalfWidthMinutes;
+            set => Options.SICOptions.SimilarIonToleranceHalfWidthMinutes = value;
         }
 
         [Obsolete("Use Property Options")]
         public float SpectrumSimilarityMinimum
         {
-            get
-            {
-                return Options.SICOptions.SpectrumSimilarityMinimum;
-            }
-            set
-            {
-                Options.SICOptions.SpectrumSimilarityMinimum = value;
-            }
+            get => Options.SICOptions.SpectrumSimilarityMinimum;
+            set => Options.SICOptions.SpectrumSimilarityMinimum = value;
         }
         #endregion
         #region // TODO
         [Obsolete("Use Property Options")]
         public float BinStartX
         {
-            get
-            {
-                return Options.BinningOptions.StartX;
-            }
-            set
-            {
-                Options.BinningOptions.StartX = value;
-            }
+            get => Options.BinningOptions.StartX;
+            set => Options.BinningOptions.StartX = value;
         }
 
         [Obsolete("Use Property Options")]
         public float BinEndX
         {
-            get
-            {
-                return Options.BinningOptions.EndX;
-            }
-            set
-            {
-                Options.BinningOptions.EndX = value;
-            }
+            get => Options.BinningOptions.EndX;
+            set => Options.BinningOptions.EndX = value;
         }
 
         [Obsolete("Use Property Options")]
         public float BinSize
         {
-            get
-            {
-                return Options.BinningOptions.BinSize;
-            }
-            set
-            {
-                Options.BinningOptions.BinSize = value;
-            }
+            get => Options.BinningOptions.BinSize;
+            set => Options.BinningOptions.BinSize = value;
         }
 
         [Obsolete("Use Property Options")]
         public float BinnedDataIntensityPrecisionPercent
         {
-            get
-            {
-                return Options.BinningOptions.IntensityPrecisionPercent;
-            }
-            set
-            {
-                Options.BinningOptions.IntensityPrecisionPercent = value;
-            }
+            get => Options.BinningOptions.IntensityPrecisionPercent;
+            set => Options.BinningOptions.IntensityPrecisionPercent = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool NormalizeBinnedData
         {
-            get
-            {
-                return Options.BinningOptions.Normalize;
-            }
-            set
-            {
-                Options.BinningOptions.Normalize = value;
-            }
+            get => Options.BinningOptions.Normalize;
+            set => Options.BinningOptions.Normalize = value;
         }
 
         [Obsolete("Use Property Options")]
         public bool SumAllIntensitiesForBin
         {
-            get
-            {
-                return Options.BinningOptions.SumAllIntensitiesForBin;
-            }
-            set
-            {
-                Options.BinningOptions.SumAllIntensitiesForBin = value;
-            }
+            get => Options.BinningOptions.SumAllIntensitiesForBin;
+            set => Options.BinningOptions.SumAllIntensitiesForBin = value;
         }
 
         [Obsolete("Use Property Options")]
         public int MaximumBinCount
         {
-            get
-            {
-                return Options.BinningOptions.MaximumBinCount;
-            }
-            set
-            {
-                Options.BinningOptions.MaximumBinCount = value;
-            }
+            get => Options.BinningOptions.MaximumBinCount;
+            set => Options.BinningOptions.MaximumBinCount = value;
         }
         #endregion
         #region // TODO
         [Obsolete("Use Property Options")]
         public bool DiskCachingAlwaysDisabled
         {
-            get
-            {
-                return Options.CacheOptions.DiskCachingAlwaysDisabled;
-            }
-            set
-            {
-                Options.CacheOptions.DiskCachingAlwaysDisabled = value;
-            }
+            get => Options.CacheOptions.DiskCachingAlwaysDisabled;
+            set => Options.CacheOptions.DiskCachingAlwaysDisabled = value;
         }
 
         [Obsolete("Use Property Options")]
         public string CacheDirectoryPath
         {
-            get
-            {
-                return Options.CacheOptions.DirectoryPath;
-            }
-            set
-            {
-                Options.CacheOptions.DirectoryPath = value;
-            }
+            get => Options.CacheOptions.DirectoryPath;
+            set => Options.CacheOptions.DirectoryPath = value;
         }
 
         [Obsolete("Legacy parameter; no longer used")]
         public float CacheMaximumMemoryUsageMB
         {
-            get
-            {
-                return Options.CacheOptions.MaximumMemoryUsageMB;
-            }
-            set
-            {
-                Options.CacheOptions.MaximumMemoryUsageMB = value;
-            }
+            get => Options.CacheOptions.MaximumMemoryUsageMB;
+            set => Options.CacheOptions.MaximumMemoryUsageMB = value;
         }
 
         [Obsolete("Legacy parameter; no longer used")]
         public float CacheMinimumFreeMemoryMB
         {
-            get
-            {
-                return Options.CacheOptions.MinimumFreeMemoryMB;
-            }
+            get => Options.CacheOptions.MinimumFreeMemoryMB;
             set
             {
                 if (Options.CacheOptions.MinimumFreeMemoryMB < 10)
@@ -1304,14 +783,8 @@ namespace MASIC
         [Obsolete("Legacy parameter; no longer used")]
         public int CacheSpectraToRetainInMemory
         {
-            get
-            {
-                return Options.CacheOptions.SpectraToRetainInMemory;
-            }
-            set
-            {
-                Options.CacheOptions.SpectraToRetainInMemory = value;
-            }
+            get => Options.CacheOptions.SpectraToRetainInMemory;
+            set => Options.CacheOptions.SpectraToRetainInMemory = value;
         }
 
         #endregion
