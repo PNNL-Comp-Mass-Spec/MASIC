@@ -12,7 +12,7 @@ namespace MASIC
 {
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Classwide variables"
         private readonly clsMASICOptions mOptions;
         #endregion
         /// <summary>

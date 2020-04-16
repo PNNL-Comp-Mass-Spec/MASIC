@@ -11,7 +11,7 @@ namespace MASIC
 {
     public class clsMASICOptions : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Constants and Enums"
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
         public const string XML_SECTION_IMPORT_OPTIONS = "MasicImportOptions";
         public const string XML_SECTION_EXPORT_OPTIONS = "MasicExportOptions";
@@ -21,7 +21,8 @@ namespace MASIC
         public const string XML_SECTION_CUSTOM_SIC_VALUES = "CustomSICValues";
         public const string DEFAULT_MASIC_STATUS_FILE_NAME = "MasicStatus.xml";
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
         /// <summary>
         /// Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
         /// </summary>
@@ -99,7 +100,9 @@ namespace MASIC
         public DateTime LastParentIonProcessingLogTime { get; set; }
 
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         public string StatusMessage { get; set; }
         #endregion
         /// <summary>

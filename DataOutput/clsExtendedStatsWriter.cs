@@ -10,15 +10,18 @@ namespace MASIC.DataOutput
 {
     public class clsExtendedStatsWriter : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Constants and enums"
         public const string EXTENDED_STATS_HEADER_COLLISION_MODE = "Collision Mode";
         public const string EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT = "Scan Filter Text";
         #endregion
-        #region // TODO
+
+        #region "Properties"
         public int ExtendedHeaderNameCount => mExtendedHeaderNameMap.Count;
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
+
         /// <summary>
         /// Keys are strings of extended info names
         /// Values are the assigned ID value for the extended info name

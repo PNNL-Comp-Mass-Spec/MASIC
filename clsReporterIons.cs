@@ -5,7 +5,7 @@ namespace MASIC
 {
     public class clsReporterIons
     {
-        #region // TODO
+        #region "Constants and Enums"
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES = 0.015;
@@ -35,12 +35,16 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
+
         private double mReporterIonToleranceDaDefault;
         private eReporterIonMassModeConstants mReporterIonMassMode;
 
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         /// <summary>
         /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
         /// will be populated with the m/z range of the reporter ions being processed

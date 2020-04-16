@@ -20,7 +20,7 @@ namespace MASIC.My
     {
         private static MySettings defaultInstance = (MySettings)Synchronized(new MySettings());
 
-        #region // TODO
+        #region "My.Settings Auto-Save Functionality"
 #if GUI
     Private Shared addedHandler As Boolean
 

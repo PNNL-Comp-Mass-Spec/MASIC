@@ -18,7 +18,7 @@ namespace MASIC
             InitializeLocalVariables();
         }
 
-        #region // TODO
+        #region "Constants and Enums"
         private enum eDataTypeToUse
         {
             NoDataPresent = 0,
@@ -27,7 +27,8 @@ namespace MASIC
             DoubleType = 3
         }
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
         private eDataTypeToUse mDataType;
         private int[] mDataInt;
         private float[] mDataSingle;
@@ -37,7 +38,8 @@ namespace MASIC
         private bool mUsePointerIndexArray;    // Set this to false to conserve memory usage
 
         #endregion
-        #region // TODO
+
+        #region "Interface Functions"
         public int DataCount
         {
             get
@@ -91,7 +93,9 @@ namespace MASIC
             set => mUsePointerIndexArray = value;
         }
         #endregion
-        #region // TODO
+
+        #region "Binary Search Range"
+
         private void BinarySearchRangeInt(int searchValue, int toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         {
             // Recursive search function
@@ -284,6 +288,7 @@ namespace MASIC
             }
         }
         #endregion
+
         private void ClearUnusedData()
         {
             if (mDataType != eDataTypeToUse.IntegerType)
@@ -304,7 +309,8 @@ namespace MASIC
             ClearUnusedData();
         }
 
-        #region // TODO
+        #region "Fill with Data"
+
         public bool FillWithData(ref int[] values)
         {
             bool success;
@@ -420,7 +426,8 @@ namespace MASIC
         }
         #endregion
 
-        #region // TODO
+        #region "Find Value Range"
+
         public bool FindValueRange(int searchValue, int toleranceHalfWidth, [Optional, DefaultParameterValue(0)] ref int matchIndexStart, [Optional, DefaultParameterValue(0)] ref int matchIndexEnd)
         {
             // Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
@@ -596,7 +603,7 @@ namespace MASIC
         }
         #endregion
 
-        #region // TODO
+        #region "Get Value by Index"
         public int GetValueByIndexInt(int index)
         {
             try
@@ -652,7 +659,7 @@ namespace MASIC
         }
         #endregion
 
-        #region // TODO
+        #region "Get Value by Original Index"
         public int GetValueByOriginalIndexInt(int index)
         {
             try

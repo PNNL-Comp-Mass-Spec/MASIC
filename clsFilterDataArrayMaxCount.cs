@@ -27,7 +27,7 @@ namespace MASIC
 
         public delegate void ProgressChangedEventHandler(float progressVal);
 
-        #region // TODO
+        #region "Properties"
         public int MaximumDataCountToLoad { get; set; }
 
         public float Progress => mProgress;

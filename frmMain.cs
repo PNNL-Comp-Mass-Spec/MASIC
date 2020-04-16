@@ -53,7 +53,8 @@ namespace MASIC
             RegisterEvents(mMasic);
         }
 
-        #region // TODO
+        #region "Constants and Enums"
+
         private const string XML_SETTINGS_FILE_NAME = "MASICParameters.xml";
         private const string CUSTOM_SIC_VALUES_DATA_TABLE = "PeakMatchingThresholds";
         private const string COL_NAME_MZ = "MZ";
@@ -64,7 +65,9 @@ namespace MASIC
         private const string COL_NAME_CUSTOM_SIC_VALUE_ROW_ID = "UniqueRowID";
 
         #endregion
-        #region // TODO
+
+        #region "Structures"
+
         private struct udtCustomSICEntryType
         {
             public double MZ;
@@ -73,7 +76,9 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
+
         private DataSet mCustomSICValuesDataset;
         private readonly List<udtCustomSICEntryType> mDefaultCustomSICList;
         private bool mWorking;
@@ -97,7 +102,9 @@ namespace MASIC
         private readonly Dictionary<int, clsReporterIons.eReporterIonMassModeConstants> mReporterIonIndexToModeMap;
 
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         private clsReporterIons.eReporterIonMassModeConstants SelectedReporterIonMode
         {
             get
@@ -121,7 +128,9 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Procedures"
+
         private void AddCustomSICRow(double mz, double mzToleranceDa, float scanOrAcqTimeCenter, float scanOrAcqTimeTolerance, string comment, [Optional, DefaultParameterValue(false)] ref bool existingRowFound)
         {
             foreach (DataRow myDataRow in mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows)
@@ -2032,7 +2041,9 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         }
 
         #endregion
-        #region // TODO
+
+        #region "Combobox Handlers"
+
         private void cboMassSpectraNoiseThresholdMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2043,7 +2054,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             EnableDisableControls();
         }
         #endregion
-        #region // TODO
+
+        #region "Button Handlers"
         private void cmdClearAllRangeFilters_Click(object sender, EventArgs e)
         {
             ClearAllRangeFilters();
@@ -2094,7 +2106,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             SetConnectionStringToPNNLServer();
         }
         #endregion
-        #region // TODO
+
+        #region "Checkbox Events"
         private void chkExportRawDataOnly_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2136,7 +2149,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         }
 
         #endregion
-        #region // TODO
+
+        #region "Radio Button Events"
         private void optUseButterworthSmooth_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2162,7 +2176,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             UpdateCustomSICDataGridTableStyle();
         }
         #endregion
-        #region // TODO
+
+        #region "Textbox Events"
         private void txtMassSpectraNoiseThresholdIntensity_KeyPress(object sender, KeyPressEventArgs e)
         {
             TextBoxKeyPressHandler[txtMassSpectraNoiseThresholdIntensity, e, true, true];
@@ -2346,7 +2361,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             TextBoxKeyPressHandler[txtTimeStart, e, true, true];
         }
         #endregion
-        #region // TODO
+
+        #region "Menu Handlers"
         private void mnuFileSelectInputFile_Click(object sender, EventArgs e)
         {
             SelectInputFile();
@@ -2394,7 +2410,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         }
 
         #endregion
-        #region // TODO
+
+        #region "Form and Masic Class Events"
         private void frmMain_Load(object sender, EventArgs e)
         {
             // Note that InitializeControls() is called in Sub New()

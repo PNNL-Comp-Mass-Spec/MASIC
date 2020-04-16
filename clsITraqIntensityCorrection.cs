@@ -16,7 +16,8 @@ namespace MASIC
 
     public class clsITraqIntensityCorrection
     {
-        #region // TODO
+        #region "Constants and Enums"
+
         private const int FOUR_PLEX_MATRIX_LENGTH = 4;
         private const int EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH = 8;
         private const int EIGHT_PLEX_LOW_RES_MATRIX_LENGTH = 9;
@@ -30,7 +31,8 @@ namespace MASIC
             BroadInstitute = 1          // Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
         }
         #endregion
-        #region // TODO
+
+        #region "Structures"
         private struct udtIsotopeContributionType
         {
             public float Minus2;
@@ -45,7 +47,8 @@ namespace MASIC
             }
         }
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
         private clsReporterIons.eReporterIonMassModeConstants mReporterIonMode;
         private eCorrectionFactorsiTRAQ4Plex mITraq4PlexCorrectionFactorType;
 
@@ -54,7 +57,9 @@ namespace MASIC
         private readonly MatrixDecompositionUtility.LUDecomposition mMatrixUtility;
 
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         public clsReporterIons.eReporterIonMassModeConstants ReporterIonMode => mReporterIonMode;
 
         public eCorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType => mITraq4PlexCorrectionFactorType;

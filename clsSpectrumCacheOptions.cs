@@ -4,7 +4,8 @@ namespace MASIC
 {
     public class clsSpectrumCacheOptions
     {
-        #region // TODO
+        #region "Properties"
+
         /// <summary>
         /// If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
         /// </summary>
@@ -32,9 +33,11 @@ namespace MASIC
         public float MaximumMemoryUsageMB { get; set; }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide variables"
         private int mSpectraToRetainInMemory = 1000;
         #endregion
+
         public void Reset()
         {
             var defaultOptions = clsSpectraCache.GetDefaultCacheOptions();

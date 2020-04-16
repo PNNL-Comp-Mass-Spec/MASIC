@@ -7,10 +7,11 @@ namespace MASIC.DataOutput
 {
     public class clsSpectrumDataWriter : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Classwide variables"
         private readonly clsBPIWriter mBPIWriter;
         private readonly clsMASICOptions mOptions;
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>

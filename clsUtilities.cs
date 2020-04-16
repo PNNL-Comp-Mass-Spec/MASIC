@@ -6,11 +6,13 @@ namespace MASIC
 {
     public class clsUtilities
     {
-        #region // TODO    // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
+        #region "Constants and Enums"
+        // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 
         public const double CHARGE_CARRIER_MASS_MONOISOTOPIC = 1.00727649;
 
         #endregion
+
         public static bool CheckPointInMZIgnoreRange(double mz, double mzIgnoreRangeStart, double mzIgnoreRangeEnd)
         {
             if (mzIgnoreRangeStart > 0 || mzIgnoreRangeEnd > 0)
@@ -171,7 +173,7 @@ namespace MASIC
             return false;
         }
 
-        #region // TODO
+        #region "PPMToMassConversion"
         public static double MassToPPM(double massToConvert, double currentMZ)
         {
             // Converts massToConvert to ppm, based on the value of currentMZ

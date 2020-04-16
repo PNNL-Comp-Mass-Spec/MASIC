@@ -2,12 +2,15 @@
 {
     public class clsSICOptions
     {
-        #region // TODO
+        #region "Constants and Enums"
+
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA = 5;
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM = 3;
 
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         /// <summary>
         /// Provided by the user at the command line or obtained from the database (if a connection string is defined)
         /// 0 if unknown
@@ -164,7 +167,8 @@
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
         private float mMaxSICPeakWidthMinutesBackward;
         private float mMaxSICPeakWidthMinutesForward;
         #endregion
@@ -250,7 +254,7 @@
             }
         }
 
-        #region // TODO
+        #region "Classwide variables"
         private float mSimilarIonMZToleranceHalfWidth = 0.1F;
         private float mSimilarIonToleranceHalfWidthMinutes = 5;
         private float mSpectrumSimilarityMinimum = 0.8F;

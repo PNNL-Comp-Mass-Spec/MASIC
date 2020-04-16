@@ -8,7 +8,7 @@ namespace MASIC
     /// </summary>
     public class clsScanList : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Constants and Enums"
         public enum eScanTypeConstants
         {
             SurveyScan = 0,
@@ -16,7 +16,9 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Structures"
+
         public struct udtScanOrderPointerType
         {
             public eScanTypeConstants ScanType;

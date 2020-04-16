@@ -2,7 +2,7 @@
 {
     public class clsCustomMZSearchSpec
     {
-        #region // TODO
+        #region "Properties"
         public double MZ { get; set; }
 
         /// <summary>
@@ -25,6 +25,7 @@
         public string Comment { get; set; }
 
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>

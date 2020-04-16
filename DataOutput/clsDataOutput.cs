@@ -10,7 +10,8 @@ namespace MASIC.DataOutput
 {
     public class clsDataOutput : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Constants and Enums"
+
         public enum eOutputFileTypeConstants
         {
             XMLFile = 0,
@@ -41,13 +42,15 @@ namespace MASIC.DataOutput
             SICDataFile = 25
         }
         #endregion
-        #region // TODO
+
+        #region "Properties"
         private readonly clsMASICOptions mOptions;
 
         public clsOutputFileHandles OutputFileHandles { get; private set; }
         public clsExtendedStatsWriter ExtendedStatsWriter { get; private set; }
 
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>

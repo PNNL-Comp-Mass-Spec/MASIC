@@ -10,7 +10,8 @@ namespace MASIC.DataInput
 {
     public abstract class clsDataImport : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Constants and Enums"
+
         public const string THERMO_RAW_FILE_EXTENSION = ".RAW";
         public const string MZ_ML_FILE_EXTENSION = ".MZML";
         public const string MZ_XML_FILE_EXTENSION1 = ".MZXML";
@@ -23,7 +24,8 @@ namespace MASIC.DataInput
         protected const int PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW = 5;
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
         protected readonly clsMASICOptions mOptions;
         protected readonly clsParentIonProcessing mParentIonProcessor;
         protected readonly MASICPeakFinder.clsMASICPeakFinder mPeakFinder;
@@ -43,11 +45,15 @@ namespace MASIC.DataInput
         protected int mScansOutOfRange;
 
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         public DatasetFileInfo DatasetFileInfo => mDatasetFileInfo;
 
         #endregion
-        #region // TODO
+
+        #region "Events"
+
         /// <summary>
         /// This event is used to signify to the calling class that it should update the status of the available memory usage
         /// </summary>

@@ -2,7 +2,7 @@
 {
     public class clsRawDataExportOptions
     {
-        #region // TODO
+        #region "Constants and Enums"
         public enum eExportRawDataFileFormatConstants
         {
             PEKFile = 0,

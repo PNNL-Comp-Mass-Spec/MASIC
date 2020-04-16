@@ -30,7 +30,8 @@ namespace MASIC
             RegisterEvents(Options);
         }
 
-        #region // TODO
+        #region "Constants and Enums"
+
         // Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
         public const bool DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD = false;
 
@@ -77,7 +78,9 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
+
         private bool mLoggedMASICVersion = false;
         private readonly MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
         private readonly clsProcessingStats mProcessingStats;
@@ -97,7 +100,8 @@ namespace MASIC
         private string mStatusMessage;
 
         #endregion
-        #region // TODO
+
+        #region "Events"
         /// <summary>
         /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
         /// Use ProgressSubtaskChanged when updating the sub task progress
@@ -111,9 +115,11 @@ namespace MASIC
         public delegate void ProgressResetKeypressAbortEventHandler();
 
         #endregion
+
         // ReSharper disable UnusedMember.Global
 
-        #region // TODO
+        #region "Processing Options and File Path Interface Functions"
+
         [Obsolete("Use Property Options")]
         public string DatabaseConnectionString
         {
@@ -192,7 +198,8 @@ namespace MASIC
         public string StatusMessage => mStatusMessage;
 
         #endregion
-        #region // TODO
+
+        #region "SIC Options Interface Functions"
         [Obsolete("Use Property Options")]
         public bool CDFTimeInSeconds
         {
@@ -520,7 +527,9 @@ namespace MASIC
             set => Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = value;
         }
         #endregion
-        #region // TODO
+
+        #region "Raw Data Export Options"
+
         [Obsolete("Use Property Options")]
         public bool ExportRawDataIncludeMSMS
         {
@@ -571,7 +580,8 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Peak Finding Options"
         [Obsolete("Use Property Options")]
         public double IntensityThresholdAbsoluteMinimum
         {
@@ -671,7 +681,8 @@ namespace MASIC
             set => Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = value;
         }
         #endregion
-        #region // TODO
+
+        #region "Spectrum Similarity Options"
         [Obsolete("Use Property Options")]
         public float SimilarIonMZToleranceHalfWidth
         {
@@ -693,7 +704,9 @@ namespace MASIC
             set => Options.SICOptions.SpectrumSimilarityMinimum = value;
         }
         #endregion
-        #region // TODO
+
+        #region "Binning Options Interface Functions"
+
         [Obsolete("Use Property Options")]
         public float BinStartX
         {
@@ -743,7 +756,9 @@ namespace MASIC
             set => Options.BinningOptions.MaximumBinCount = value;
         }
         #endregion
-        #region // TODO
+
+        #region "Memory Options Interface Functions"
+
         [Obsolete("Use Property Options")]
         public bool DiskCachingAlwaysDisabled
         {
@@ -1940,7 +1955,8 @@ namespace MASIC
             }
         }
 
-        #region // TODO
+        #region "Event Handlers"
+
         private void MessageEventHandler(string message)
         {
             LogMessage(message);

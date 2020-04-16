@@ -20,7 +20,7 @@ namespace MASIC.DataInput
     /// </summary>
     public class clsDataImportMSXml : clsDataImport
     {
-        #region // TODO
+        #region "Member variables"
         private readonly Centroider mCentroider;
         private int mWarnCount;
         private int mMostRecentPrecursorScan;

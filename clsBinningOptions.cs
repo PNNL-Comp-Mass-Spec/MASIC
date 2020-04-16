@@ -2,7 +2,8 @@
 {
     public class clsBinningOptions
     {
-        #region // TODO
+        #region "Properties"
+
         public float StartX { get; set; }
         public float EndX { get; set; }
 
@@ -50,11 +51,13 @@
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide variables"
         private float mBinSize = 1;
         private float mIntensityPrecisionPercent = 1;
         private int mMaximumBinCount = 100000;
         #endregion
+
         public void Reset()
         {
             var defaultOptions = clsCorrelation.GetDefaultBinningOptions();

@@ -7,7 +7,8 @@ namespace MASIC
     {
         private short mLastPercentComplete = 0;
 
-        #region // TODO
+        #region "Events"
+
         /// <summary>
         /// Provides information on the number of cache and uncache events in spectraCache
         /// </summary>
@@ -129,7 +130,8 @@ namespace MASIC
             OnProgressUpdate(progressMessage, percentComplete);
         }
 
-        #region // TODO
+        #region "Event Handlers"
+
         private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount)
         {
             OnUpdateCacheStats(cacheEventCount, unCacheEventCount);

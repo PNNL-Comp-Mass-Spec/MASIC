@@ -22,7 +22,7 @@ namespace MASIC
             DeleteSpectrumCacheFiles();
         }
 
-        #region // TODO
+        #region "Constants and Enums"
         private const string SPECTRUM_CACHE_FILE_PREFIX = "$SpecCache";
         private const string SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR = "_Temp";
         private const int SPECTRUM_CACHE_MAX_FILE_AGE_HOURS = 12;
@@ -54,7 +54,9 @@ namespace MASIC
         // 'End Enum
 
         #endregion
-        #region // TODO
+
+        #region "Structures"
+
         private struct udtSpectraPoolInfoType
         {
             public eCacheStateConstants CacheState;
@@ -62,7 +64,8 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
         public clsMSSpectrum[] SpectraPool;                   // Pool (collection) of currently loaded spectra; 0-based array
         private udtSpectraPoolInfoType[] SpectraPoolInfo;     // Parallel with SpectraPool(), but not publicly visible
         private readonly clsSpectrumCacheOptions mCacheOptions;

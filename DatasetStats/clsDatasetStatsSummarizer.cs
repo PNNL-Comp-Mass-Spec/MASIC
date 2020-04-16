@@ -11,7 +11,8 @@ namespace MASIC.DatasetStats
 {
     public class clsDatasetStatsSummarizer : EventNotifier
     {
-        #region // TODO
+        #region "Constants and Enums"
+
         public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";
 
         // ReSharper disable once UnusedMember.Global
@@ -26,7 +27,8 @@ namespace MASIC.DatasetStats
         public const string DATE_TIME_FORMAT_STRING = "yyyy-MM-dd hh:mm:ss tt";
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
         private readonly string mFileDate;
         private string mDatasetStatsSummaryFileName;
         private string mErrorMessage = string.Empty;
@@ -34,7 +36,9 @@ namespace MASIC.DatasetStats
         private bool mDatasetSummaryStatsUpToDate;
         private DatasetSummaryStats mDatasetSummaryStats;
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         // ReSharper disable once UnusedMember.Global
         public string DatasetStatsSummaryFileName
         {

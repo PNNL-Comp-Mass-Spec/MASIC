@@ -7,7 +7,7 @@ namespace MASIC
 {
     public class clsParentIonProcessing : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Classwide Variables"
         private readonly clsReporterIons mReporterIons;
         #endregion
         /// <summary>

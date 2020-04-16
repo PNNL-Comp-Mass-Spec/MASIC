@@ -12,7 +12,8 @@ namespace MASIC
 {
     public class clsMRMProcessing : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Structures"
+
         public struct udtSRMListType
         {
             public double ParentIonMZ;
@@ -25,7 +26,8 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide variables"
         private readonly clsMASICOptions mOptions;
         private readonly clsDataAggregation mDataAggregation;
         private readonly clsDataOutput mDataOutputHandler;

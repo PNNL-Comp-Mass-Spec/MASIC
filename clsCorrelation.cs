@@ -17,7 +17,8 @@ namespace MASIC
     /// </summary>
     public class clsCorrelation : EventNotifier
     {
-        #region // TODO
+        #region "Classwide variables"
+
         /// <summary>
         /// Coefficients used by GammaLn
         /// </summary>
@@ -38,7 +39,7 @@ namespace MASIC
             mCoefficients = new double[] { 76.180091729471457, -86.505320329416776, 24.014098240830911, -1.231739572450155, 0.001208650973866179, -0.000005395239384953 };
         }
 
-        #region // TODO
+        #region "Constants and Structures"
         private const int MIN_NON_ZERO_ION_COUNT = 5;
 
         public enum cmCorrelationMethodConstants
@@ -49,10 +50,13 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Local Member Variables"
         private clsBinningOptions mBinningOptions;
         #endregion
-        #region // TODO
+
+        #region "Property Interface Functions"
+
         public float BinStartX
         {
             get => mBinningOptions.StartX;

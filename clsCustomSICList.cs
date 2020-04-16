@@ -9,7 +9,8 @@ namespace MASIC
 {
     public class clsCustomSICList : EventNotifier
     {
-        #region // TODO
+        #region "Constants and Enums"
+
         public const string CUSTOM_SIC_TYPE_ABSOLUTE = "Absolute";
         public const string CUSTOM_SIC_TYPE_RELATIVE = "Relative";
         public const string CUSTOM_SIC_TYPE_ACQUISITION_TIME = "AcquisitionTime";
@@ -23,7 +24,9 @@ namespace MASIC
         }
 
         #endregion
-        #region // TODO
+
+        #region "Properties"
+
         public string CustomSICListFileName
         {
             get
@@ -65,7 +68,8 @@ namespace MASIC
         public string RawTextScanOrAcqTimeToleranceList { get; set; }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide variables"
         private string mCustomSICListFileName;
         #endregion
         /// <summary>

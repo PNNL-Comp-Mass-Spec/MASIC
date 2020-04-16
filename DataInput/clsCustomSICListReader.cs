@@ -8,7 +8,8 @@ namespace MASIC.DataInput
 {
     public class clsCustomSICListReader : clsMasicEventNotifier
     {
-        #region // TODO
+        #region "Constants and Enums"
+
         public const string CUSTOM_SIC_COLUMN_MZ = "MZ";
         public const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";
         public const string CUSTOM_SIC_COLUMN_SCAN_CENTER = "ScanCenter";
@@ -29,10 +30,13 @@ namespace MASIC.DataInput
         }
 
         #endregion
-        #region // TODO
+
+        #region "Classwide Variables"
+
         private readonly clsCustomSICList mCustomSICList;
 
         #endregion
+
         public static string GetCustomMZFileColumnHeaders(string cColDelimiter = ", ", bool includeAndBeforeLastItem = true)
         {
             var headerNames = new List<string>() { CUSTOM_SIC_COLUMN_MZ, CUSTOM_SIC_COLUMN_MZ_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_CENTER, CUSTOM_SIC_COLUMN_SCAN_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_TIME, CUSTOM_SIC_COLUMN_TIME_TOLERANCE };
