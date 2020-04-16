@@ -118,8 +118,7 @@ namespace MASIC.DataInput
                         double[] mzData = null;
                         double[] intensityData = null;
                         int intIonCount;
-                        bool argblnDoublePrecisionDataIsPresent = false;
-                        success = objCDFReader.GetMassSpectrum(msScanIndex, out mzData, out intensityData, out intIonCount, blnDoublePrecisionDataIsPresent: out argblnDoublePrecisionDataIsPresent);
+                        success = objCDFReader.GetMassSpectrum(msScanIndex, out mzData, out intensityData, out intIonCount, out _);
                         if (success && intIonCount > 0)
                         {
                             var msSpectrum = new clsMSSpectrum(scanNumber, mzData, intensityData, intIonCount);
@@ -130,8 +129,8 @@ namespace MASIC.DataInput
                             newSurveyScan.IonCountRaw = newSurveyScan.IonCount;
 
                             // Find the base peak ion mass and intensity
-                            double argbasePeakIonIntensity = newSurveyScan.BasePeakIonIntensity;
-                            newSurveyScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity, out argbasePeakIonIntensity, out mzMin, out mzMax);
+                            newSurveyScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity, out var basePeakIonIntensity, out mzMin, out mzMax);
+                            newSurveyScan.BasePeakIonIntensity = basePeakIonIntensity;
 
                             // Determine the minimum positive intensity in this scan
                             newSurveyScan.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
@@ -241,8 +240,8 @@ namespace MASIC.DataInput
                                 foreach (var fragScan in scanList.FragScans)
                                 {
                                     fragScan.ScanNumber += scanNumberCorrection;
-                                    int argfragScanIteration = fragScan.FragScanInfo.FragScanNumber;
-                                    float scanTimeInterpolated = InterpolateRTandFragScanNumber(scanList.SurveyScans, 0, fragScan.ScanNumber, out argfragScanIteration);
+                                    float scanTimeInterpolated = InterpolateRTandFragScanNumber(scanList.SurveyScans, 0, fragScan.ScanNumber, out var fragScanIterationOut);
+                                    fragScan.FragScanInfo.FragScanNumber = fragScanIterationOut;
                                     fragScan.ScanTime = Convert.ToSingle(scanTimeInterpolated);
                                 }
 
@@ -315,8 +314,8 @@ namespace MASIC.DataInput
                         double mzMax;
 
                         // Find the base peak ion mass and intensity
-                        double argbasePeakIonIntensity1 = newFragScan.BasePeakIonIntensity;
-                        newFragScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity, out argbasePeakIonIntensity1, out mzMin, out mzMax);
+                        newFragScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity, out var basePeakIonIntensity, out mzMin, out mzMax);
+                        newFragScan.BasePeakIonIntensity = basePeakIonIntensity;
 
                         // Compute the total scan intensity
                         newFragScan.TotalIonIntensity = 0;

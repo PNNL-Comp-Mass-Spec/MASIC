@@ -874,8 +874,8 @@ namespace MASIC.DataInput
                 if (!string.IsNullOrEmpty(mrmScan.FilterText))
                 {
                     // Parse out the MRM_QMS or SRM information for this scan
-                    var argmrmInfo = mrmScan.MRMInfo;
-                    XRawFileIO.ExtractMRMMasses(mrmScan.FilterText, mrmScan.MRMScanType, out argmrmInfo);
+                    XRawFileIO.ExtractMRMMasses(mrmScan.FilterText, mrmScan.MRMScanType, out var mrmInfo);
+                    mrmScan.MRMInfo = mrmInfo;
                 }
                 else
                 {

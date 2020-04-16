@@ -294,8 +294,7 @@ namespace MASIC
                 int ionMatchCount;
                 var withBlock = reporterIons[reporterIonIndex];
                 // Search for the reporter ion MZ in this mass spectrum
-                double argclosestMZ = closestMZ[reporterIonIndex];
-                reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex], withBlock.MZ, withBlock.MZToleranceDa, out ionMatchCount, out argclosestMZ, USE_MAX_ABUNDANCE_IN_WINDOW);
+                reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex], withBlock.MZ, withBlock.MZToleranceDa, out ionMatchCount, out closestMZ[reporterIonIndex], USE_MAX_ABUNDANCE_IN_WINDOW);
                 withBlock.SignalToNoise = 0;
                 withBlock.Resolution = 0;
                 withBlock.LabelDataMZ = 0;

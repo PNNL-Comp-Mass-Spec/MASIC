@@ -550,8 +550,8 @@ namespace MASIC
 
                     // Clear udtSICPotentialAreaStatsForPeak
                     withBlock1.SICStats.SICPotentialAreaStatsForPeak = new clsSICPotentialAreaStats();
-                    var argpotentialAreaStatsForPeak = withBlock1.SICStats.SICPotentialAreaStatsForPeak;
-                    bool peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData, out argpotentialAreaStatsForPeak, withBlock1.SICStats.Peak, out smoothedYDataSubset, mOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, false, scanList.SIMDataPresent, false);
+                    bool peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData, out var potentialAreaStatsForPeakOut, withBlock1.SICStats.Peak, out smoothedYDataSubset, mOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, false, scanList.SIMDataPresent, false);
+                    parentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
                     sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails, withBlock1.SICStats.SICPotentialAreaStatsForPeak, withBlock1.SICStats.Peak, peakIsValid);
 
                     // Step 3: store the results

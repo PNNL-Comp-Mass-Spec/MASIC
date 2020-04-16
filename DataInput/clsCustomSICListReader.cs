@@ -188,32 +188,33 @@ namespace MASIC.DataInput
                             switch (eColumnMapping[colIndex])
                             {
                                 case (int)eCustomSICFileColumns.MZ:
-                                    double argresult = mzSearchSpec.MZ;
-                                    if (!double.TryParse(dataCols[colIndex], out argresult))
+                                    if (!double.TryParse(dataCols[colIndex], out var mz))
                                     {
                                         throw new InvalidCastException("Non-numeric value for the MZ column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                     }
 
+                                    mzSearchSpec.MZ = mz;
                                     break;
 
                                 case (int)eCustomSICFileColumns.MZToleranceDa:
-                                    double argresult1 = mzSearchSpec.MZToleranceDa;
-                                    if (!double.TryParse(dataCols[colIndex], out argresult1))
+                                    if (!double.TryParse(dataCols[colIndex], out var mzTolDa))
                                     {
                                         throw new InvalidCastException("Non-numeric value for the MZToleranceDa column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                     }
 
+                                    mzSearchSpec.MZToleranceDa = mzTolDa;
                                     break;
 
                                 case (int)eCustomSICFileColumns.ScanCenter:
                                     // Do not use this value if both the ScanTime and the TimeTolerance columns were present
                                     if (!forceAcquisitionTimeMode)
                                     {
-                                        float argresult2 = mzSearchSpec.ScanOrAcqTimeCenter;
-                                        if (!float.TryParse(dataCols[colIndex], out argresult2))
+                                        if (!float.TryParse(dataCols[colIndex], out var scanActTimeCenter))
                                         {
                                             throw new InvalidCastException("Non-numeric value for the ScanCenter column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                         }
+
+                                        mzSearchSpec.ScanOrAcqTimeCenter = scanActTimeCenter;
                                     }
 
                                     break;
@@ -229,11 +230,12 @@ namespace MASIC.DataInput
                                         else
                                         {
                                             // Includes .Relative and .AcquisitionTime
-                                            float argresult3 = mzSearchSpec.ScanOrAcqTimeTolerance;
-                                            if (!float.TryParse(dataCols[colIndex], out argresult3))
+                                            if (!float.TryParse(dataCols[colIndex], out var scanAcqTimeTol))
                                             {
                                                 throw new InvalidCastException("Non-numeric value for the ScanTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                             }
+
+                                            mzSearchSpec.ScanOrAcqTimeTolerance = scanAcqTimeTol;
                                         }
                                     }
 
@@ -243,11 +245,12 @@ namespace MASIC.DataInput
                                     // Only use this value if both the ScanTime and the TimeTolerance columns were present
                                     if (forceAcquisitionTimeMode)
                                     {
-                                        float argresult4 = mzSearchSpec.ScanOrAcqTimeCenter;
-                                        if (!float.TryParse(dataCols[colIndex], out argresult4))
+                                        if (!float.TryParse(dataCols[colIndex], out var scanActTimeCenter))
                                         {
                                             throw new InvalidCastException("Non-numeric value for the ScanTime column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                         }
+
+                                        mzSearchSpec.ScanOrAcqTimeCenter = scanActTimeCenter;
                                     }
 
                                     break;
@@ -256,11 +259,12 @@ namespace MASIC.DataInput
                                     // Only use this value if both the ScanTime and the TimeTolerance columns were present
                                     if (forceAcquisitionTimeMode)
                                     {
-                                        float argresult5 = mzSearchSpec.ScanOrAcqTimeTolerance;
-                                        if (!float.TryParse(dataCols[colIndex], out argresult5))
+                                        if (!float.TryParse(dataCols[colIndex], out var scanAcqTimeTol))
                                         {
                                             throw new InvalidCastException("Non-numeric value for the TimeTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                         }
+
+                                        mzSearchSpec.ScanOrAcqTimeTolerance = scanAcqTimeTol;
                                     }
 
                                     break;

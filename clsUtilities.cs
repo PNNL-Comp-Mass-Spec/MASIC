@@ -119,8 +119,7 @@ namespace MASIC
         {
             try
             {
-                double argresult = 0;
-                return double.TryParse(value, out argresult);
+                return double.TryParse(value, out _);
             }
             catch (Exception ex)
             {

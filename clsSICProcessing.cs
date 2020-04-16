@@ -845,8 +845,8 @@ namespace MASIC
                     var sicStatsPeak = ExtractSICDetailsFromFullSIC(mzIndexWork, mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments, fullSICDataCount[mzIndexWork], fullSICScanIndices, fullSICIntensities, fullSICMasses, scanList, scanIndexObservedInFullSIC, sicDetails, masicOptions, scanNumScanConverter, currentParentIon.CustomSICPeak, currentParentIon.CustomSICPeakScanOrAcqTimeTolerance);
                     currentParentIon.SICStats.Peak = sicStatsPeak;
                     bool returnClosestPeak = !currentParentIon.CustomSICPeak;
-                    var argpotentialAreaStatsForPeak = currentParentIon.SICStats.SICPotentialAreaStatsForPeak;
-                    bool peakIsValid = mMASICPeakFinder.FindSICPeakAndArea(sicDetails.SICData, out argpotentialAreaStatsForPeak, sicStatsPeak, out smoothedYDataSubsetInSearchChunk, masicOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, returnClosestPeak, scanList.SIMDataPresent, false);
+                    bool peakIsValid = mMASICPeakFinder.FindSICPeakAndArea(sicDetails.SICData, out var potentialAreaStatsForPeakOut, sicStatsPeak, out smoothedYDataSubsetInSearchChunk, masicOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, returnClosestPeak, scanList.SIMDataPresent, false);
+                    currentParentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
                     StorePeakInParentIon(scanList, parentIonIndices[parentIonIndexPointer], sicDetails, currentParentIon.SICStats.SICPotentialAreaStatsForPeak, sicStatsPeak, peakIsValid);
 
                     // Possibly save the stats for this SIC to the SICData file
