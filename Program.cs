@@ -4,16 +4,16 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using PRISM;
 using PRISM.FileProcessor;
-#if // TODO
+#if GUI
+using System.Windows.Forms;
 using ProgressFormNET;
+#endif
 
 namespace MASIC
 {
-#endif
     // See clsMASIC for a program description
     //
     // -------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ namespace MASIC
         private static string mMASICStatusFilename = string.Empty;
         private static bool mQuietMode;
         private static clsMASIC mMASIC;
-#if // TODO
+#if GUI
         private static frmProgress mProgressForm;
 #endif
         private static DateTime mLastSubtaskProgressTime;
@@ -80,7 +80,7 @@ namespace MASIC
 
                 if (commandLineParser.ParameterCount + commandLineParser.NonSwitchParameterCount == 0 & !commandLineParser.NeedToShowHelp)
                 {
-#if // TODO
+#if GUI
                     ShowGUI();
 #else
                     ShowProgramHelp();
@@ -108,7 +108,7 @@ namespace MASIC
                 mMASIC.LogDirectoryPath = mLogDirectoryPath;
                 if (!mQuietMode)
                 {
-#if // TODO
+#if GUI
                     mProgressForm = new frmProgress();
                     mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
                     mProgressForm.InitializeSubtask("", 0, 100, false);
@@ -158,7 +158,7 @@ namespace MASIC
                 ProgRunner.SleepMilliseconds(1500);
                 return -1;
             }
-#if // TODO
+#if GUI
             finally
             {
                 if (mProgressForm != null)
@@ -166,8 +166,8 @@ namespace MASIC
                     mProgressForm.HideForm();
                     mProgressForm = null;
                 }
-#endif
             }
+#endif
         }
 
         private static void DisplayProgressPercent(int percentComplete, bool addCarriageReturn)
@@ -333,7 +333,7 @@ namespace MASIC
             ConsoleMsgUtils.ShowErrors(title, errorMessages);
         }
 
-#if // TODO
+#if GUI
         public static void ShowGUI()
         {
             frmMain objFormMain;
@@ -398,7 +398,7 @@ namespace MASIC
         {
             const int PROGRESS_DOT_INTERVAL_MSEC = 250;
 
-#if // TODO
+#if GUI
             const int PERCENT_REPORT_INTERVAL = 25;
 
             if (mProgressForm != null)
@@ -433,7 +433,7 @@ namespace MASIC
 
         private static void ProgressResetKeypressAbortHandler()
         {
-#if // TODO
+#if GUI
             if (mProgressForm != null)
             {
                 mProgressForm.ResetKeyPressAbortProcess();
@@ -443,7 +443,7 @@ namespace MASIC
 
         private static void ProgressSubtaskChangedHandler()
         {
-#if // TODO
+#if GUI
             if (mProgressForm != null)
             {
                 mProgressForm.UpdateCurrentSubTask(mMASIC.SubtaskDescription);

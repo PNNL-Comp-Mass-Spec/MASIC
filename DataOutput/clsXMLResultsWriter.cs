@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using System.Xml;
 using MASIC.DatasetStats;
 using Microsoft.VisualBasic;
@@ -697,10 +696,10 @@ namespace MASIC.DataOutput
 
                 UpdateProgress(100);
 
-#if // TODO
-                Application.DoEvents();
-            }
+#if GUI
+                System.Windows.Forms.Application.DoEvents();
 #endif
+            }
             catch (Exception ex)
             {
                 ReportError("Error updating the XML output file: " + xmlReadFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
