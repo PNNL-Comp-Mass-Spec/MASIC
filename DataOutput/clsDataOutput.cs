@@ -649,17 +649,16 @@ namespace MASIC.DataOutput
         public void OpenOutputFileHandles(string inputFileName, string outputDirectoryPath, bool writeHeaders)
         {
             string outputFilePath;
-            {
-                var withBlock = OutputFileHandles;
 
-                // Scan Stats file
-                outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
-                withBlock.ScanStats = new StreamWriter(outputFilePath, false);
-                if (writeHeaders)
-                    withBlock.ScanStats.WriteLine(GetHeadersForOutputFile(null, eOutputFileTypeConstants.ScanStatsFlatFile));
-                withBlock.MSMethodFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSMethodFile);
-                withBlock.MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSTuneFile);
-            }
+            var withBlock = OutputFileHandles;
+
+            // Scan Stats file
+            outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
+            withBlock.ScanStats = new StreamWriter(outputFilePath, false);
+            if (writeHeaders)
+                withBlock.ScanStats.WriteLine(GetHeadersForOutputFile(null, eOutputFileTypeConstants.ScanStatsFlatFile));
+            withBlock.MSMethodFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSMethodFile);
+            withBlock.MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSTuneFile);
         }
 
         public bool SaveHeaderGlossary(clsScanList scanList, string inputFileName, string outputDirectoryPath)

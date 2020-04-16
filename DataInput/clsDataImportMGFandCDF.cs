@@ -498,27 +498,26 @@ namespace MASIC.DataInput
                             // Use the scan numbers of the last 2 survey scans to extrapolate the scan number for this fragmentation scan
 
                             lastSurveyScanIndex = surveyScans.Count - 1;
+
+                            var withBlock = surveyScans[lastSurveyScanIndex];
+                            int scanDiff = withBlock.ScanNumber - surveyScans[lastSurveyScanIndex - 1].ScanNumber;
+                            float prevScanElutionTime = surveyScans[lastSurveyScanIndex - 1].ScanTime;
+
+                            // Compute fragScanIteration
+                            fragScanIteration = fragScanNumber - withBlock.ScanNumber;
+                            if (scanDiff > 0 && fragScanIteration > 0)
                             {
-                                var withBlock = surveyScans[lastSurveyScanIndex];
-                                int scanDiff = withBlock.ScanNumber - surveyScans[lastSurveyScanIndex - 1].ScanNumber;
-                                float prevScanElutionTime = surveyScans[lastSurveyScanIndex - 1].ScanTime;
-
-                                // Compute fragScanIteration
-                                fragScanIteration = fragScanNumber - withBlock.ScanNumber;
-                                if (scanDiff > 0 && fragScanIteration > 0)
-                                {
-                                    elutionTime = Conversions.ToSingle(withBlock.ScanTime + fragScanIteration / (double)scanDiff * (withBlock.ScanTime - prevScanElutionTime));
-                                }
-                                else
-                                {
-                                    // Adjacent survey scans have the same scan number
-                                    // This shouldn't happen
-                                    elutionTime = surveyScans[lastSurveyScanIndex].ScanTime;
-                                }
-
-                                if (fragScanIteration < 1)
-                                    fragScanIteration = 1;
+                                elutionTime = Conversions.ToSingle(withBlock.ScanTime + fragScanIteration / (double)scanDiff * (withBlock.ScanTime - prevScanElutionTime));
                             }
+                            else
+                            {
+                                // Adjacent survey scans have the same scan number
+                                // This shouldn't happen
+                                elutionTime = surveyScans[lastSurveyScanIndex].ScanTime;
+                            }
+
+                            if (fragScanIteration < 1)
+                                fragScanIteration = 1;
                         }
                         else
                         {
@@ -534,27 +533,25 @@ namespace MASIC.DataInput
                 else
                 {
                     // Interpolate retention time
+                    var withBlock1 = surveyScans[lastSurveyScanIndex];
+                    int scanDiff = surveyScans[lastSurveyScanIndex + 1].ScanNumber - withBlock1.ScanNumber;
+                    float nextScanElutionTime = surveyScans[lastSurveyScanIndex + 1].ScanTime;
+
+                    // Compute fragScanIteration
+                    fragScanIteration = fragScanNumber - withBlock1.ScanNumber;
+                    if (scanDiff > 0 && fragScanIteration > 0)
                     {
-                        var withBlock1 = surveyScans[lastSurveyScanIndex];
-                        int scanDiff = surveyScans[lastSurveyScanIndex + 1].ScanNumber - withBlock1.ScanNumber;
-                        float nextScanElutionTime = surveyScans[lastSurveyScanIndex + 1].ScanTime;
-
-                        // Compute fragScanIteration
-                        fragScanIteration = fragScanNumber - withBlock1.ScanNumber;
-                        if (scanDiff > 0 && fragScanIteration > 0)
-                        {
-                            elutionTime = Conversions.ToSingle(withBlock1.ScanTime + fragScanIteration / (double)scanDiff * (nextScanElutionTime - withBlock1.ScanTime));
-                        }
-                        else
-                        {
-                            // Adjacent survey scans have the same scan number
-                            // This shouldn't happen
-                            elutionTime = withBlock1.ScanTime;
-                        }
-
-                        if (fragScanIteration < 1)
-                            fragScanIteration = 1;
+                        elutionTime = Conversions.ToSingle(withBlock1.ScanTime + fragScanIteration / (double)scanDiff * (nextScanElutionTime - withBlock1.ScanTime));
                     }
+                    else
+                    {
+                        // Adjacent survey scans have the same scan number
+                        // This shouldn't happen
+                        elutionTime = withBlock1.ScanTime;
+                    }
+
+                    if (fragScanIteration < 1)
+                        fragScanIteration = 1;
                 }
             }
             catch (Exception ex)

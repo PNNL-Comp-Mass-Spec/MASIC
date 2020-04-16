@@ -436,18 +436,16 @@ namespace MASIC.DataInput
                     return false;
 
                 // Record the file size and Dataset ID
-                {
-                    var withBlock = mDatasetFileInfo;
-                    withBlock.FileSystemCreationTime = dataFileInfo.CreationTime;
-                    withBlock.FileSystemModificationTime = dataFileInfo.LastWriteTime;
-                    withBlock.AcqTimeStart = withBlock.FileSystemModificationTime;
-                    withBlock.AcqTimeEnd = withBlock.FileSystemModificationTime;
-                    withBlock.DatasetID = datasetID;
-                    withBlock.DatasetName = Path.GetFileNameWithoutExtension(dataFileInfo.Name);
-                    withBlock.FileExtension = dataFileInfo.Extension;
-                    withBlock.FileSizeBytes = dataFileInfo.Length;
-                    withBlock.ScanCount = 0;
-                }
+                var withBlock = mDatasetFileInfo;
+                withBlock.FileSystemCreationTime = dataFileInfo.CreationTime;
+                withBlock.FileSystemModificationTime = dataFileInfo.LastWriteTime;
+                withBlock.AcqTimeStart = withBlock.FileSystemModificationTime;
+                withBlock.AcqTimeEnd = withBlock.FileSystemModificationTime;
+                withBlock.DatasetID = datasetID;
+                withBlock.DatasetName = Path.GetFileNameWithoutExtension(dataFileInfo.Name);
+                withBlock.FileExtension = dataFileInfo.Extension;
+                withBlock.FileSizeBytes = dataFileInfo.Length;
+                withBlock.ScanCount = 0;
             }
             catch (Exception ex)
             {

@@ -433,25 +433,24 @@ namespace MASIC
                 CustomSICList.LimitSearchToCustomMZList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "LimitSearchToCustomMZList", CustomSICList.LimitSearchToCustomMZList);
                 var scanType = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", string.Empty);
                 var scanTolerance = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", string.Empty);
+
+                var withBlock = CustomSICList;
+                withBlock.ScanToleranceType = GetScanToleranceTypeFromText(scanType);
+                if (scanTolerance.Length > 0 && clsUtilities.IsNumber(scanTolerance))
                 {
-                    var withBlock = CustomSICList;
-                    withBlock.ScanToleranceType = GetScanToleranceTypeFromText(scanType);
-                    if (scanTolerance.Length > 0 && clsUtilities.IsNumber(scanTolerance))
+                    if (withBlock.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
                     {
-                        if (withBlock.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
-                        {
-                            withBlock.ScanOrAcqTimeTolerance = Conversions.ToInteger(scanTolerance);
-                        }
-                        else
-                        {
-                            // Includes .Relative and .AcquisitionTime
-                            withBlock.ScanOrAcqTimeTolerance = Conversions.ToSingle(scanTolerance);
-                        }
+                        withBlock.ScanOrAcqTimeTolerance = Conversions.ToInteger(scanTolerance);
                     }
                     else
                     {
-                        withBlock.ScanOrAcqTimeTolerance = 0;
+                        // Includes .Relative and .AcquisitionTime
+                        withBlock.ScanOrAcqTimeTolerance = Conversions.ToSingle(scanTolerance);
                     }
+                }
+                else
+                {
+                    withBlock.ScanOrAcqTimeTolerance = 0;
                 }
 
                 CustomSICList.CustomSICListFileName = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", string.Empty);

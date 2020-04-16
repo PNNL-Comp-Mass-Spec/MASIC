@@ -53,14 +53,13 @@ namespace MASIC.DataOutput
             newParentIon.SICStats.PeakScanIndexStart = fragScanIndex;
             newParentIon.SICStats.PeakScanIndexEnd = fragScanIndex;
             newParentIon.SICStats.PeakScanIndexMax = fragScanIndex;
-            {
-                var withBlock = newParentIon.SICStats.Peak;
-                withBlock.MaxIntensityValue = currentFragScan.BasePeakIonIntensity;
-                withBlock.SignalToNoiseRatio = 1;
-                withBlock.FWHMScanWidth = 1;
-                withBlock.Area = currentFragScan.BasePeakIonIntensity;
-                withBlock.ParentIonIntensity = currentFragScan.BasePeakIonIntensity;
-            }
+
+            var withBlock = newParentIon.SICStats.Peak;
+            withBlock.MaxIntensityValue = currentFragScan.BasePeakIonIntensity;
+            withBlock.SignalToNoiseRatio = 1;
+            withBlock.FWHMScanWidth = 1;
+            withBlock.Area = currentFragScan.BasePeakIonIntensity;
+            withBlock.ParentIonIntensity = currentFragScan.BasePeakIonIntensity;
 
             return newParentIon;
         }

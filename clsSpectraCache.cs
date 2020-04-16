@@ -253,22 +253,20 @@ namespace MASIC
                         {
                             try
                             {
-                                {
-                                    var withBlock = SpectraPool[poolIndexToCache];
-                                    // Write the scan number
-                                    mPageFileWriter.Write(scanNumber);
+                                var withBlock = SpectraPool[poolIndexToCache];
+                                // Write the scan number
+                                mPageFileWriter.Write(scanNumber);
 
-                                    // Write the ion count
-                                    mPageFileWriter.Write(withBlock.IonCount);
+                                // Write the ion count
+                                mPageFileWriter.Write(withBlock.IonCount);
 
-                                    // Write the m/z values
-                                    for (int index = 0; index <= withBlock.IonCount - 1; index++)
-                                        mPageFileWriter.Write(withBlock.IonsMZ[index]);
+                                // Write the m/z values
+                                for (int index = 0; index <= withBlock.IonCount - 1; index++)
+                                    mPageFileWriter.Write(withBlock.IonsMZ[index]);
 
-                                    // Write the intensity values
-                                    for (int index = 0; index <= withBlock.IonCount - 1; index++)
-                                        mPageFileWriter.Write(withBlock.IonsIntensity[index]);
-                                }
+                                // Write the intensity values
+                                for (int index = 0; index <= withBlock.IonCount - 1; index++)
+                                    mPageFileWriter.Write(withBlock.IonsIntensity[index]);
 
                                 // Write four blank bytes (not really necessary, but adds a little padding between spectra)
                                 mPageFileWriter.Write(0);

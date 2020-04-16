@@ -190,27 +190,25 @@ namespace MASIC.DataOutput
                 writer.Write(Conversions.ToByte(27));
                 for (int scanIndex = 0; scanIndex <= scanCount - 1; scanIndex++)
                 {
+                    var withBlock = scanList[scanIndex];
+                    // Note: Using CSng to assure that we write out single precision numbers
+
+                    if (saveElutionTimeInsteadOfScan)
                     {
-                        var withBlock = scanList[scanIndex];
-                        // Note: Using CSng to assure that we write out single precision numbers
+                        writer.Write(Conversions.ToSingle(withBlock.ScanTime));
+                    }
+                    else
+                    {
+                        writer.Write(Conversions.ToSingle(withBlock.ScanNumber));
+                    }
 
-                        if (saveElutionTimeInsteadOfScan)
-                        {
-                            writer.Write(Conversions.ToSingle(withBlock.ScanTime));
-                        }
-                        else
-                        {
-                            writer.Write(Conversions.ToSingle(withBlock.ScanNumber));
-                        }
-
-                        if (saveTICInsteadOfBPI)
-                        {
-                            writer.Write(clsUtilities.CSngSafe(withBlock.TotalIonIntensity));
-                        }
-                        else
-                        {
-                            writer.Write(clsUtilities.CSngSafe(withBlock.BasePeakIonIntensity));
-                        }
+                    if (saveTICInsteadOfBPI)
+                    {
+                        writer.Write(clsUtilities.CSngSafe(withBlock.TotalIonIntensity));
+                    }
+                    else
+                    {
+                        writer.Write(clsUtilities.CSngSafe(withBlock.BasePeakIonIntensity));
                     }
                 }
             }

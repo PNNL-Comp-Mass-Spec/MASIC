@@ -38,15 +38,13 @@ namespace MASIC.DataOutput
                     outputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase + methodNum + ".txt";
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
-                        {
-                            var withBlock = objXcaliburAccessor.FileInfo;
-                            writer.WriteLine("Instrument model: " + withBlock.InstModel);
-                            writer.WriteLine("Instrument name: " + withBlock.InstName);
-                            writer.WriteLine("Instrument description: " + withBlock.InstrumentDescription);
-                            writer.WriteLine("Instrument serial number: " + withBlock.InstSerialNumber);
-                            writer.WriteLine();
-                            writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods[index]);
-                        }
+                        var withBlock = objXcaliburAccessor.FileInfo;
+                        writer.WriteLine("Instrument model: " + withBlock.InstModel);
+                        writer.WriteLine("Instrument name: " + withBlock.InstName);
+                        writer.WriteLine("Instrument description: " + withBlock.InstrumentDescription);
+                        writer.WriteLine("Instrument serial number: " + withBlock.InstSerialNumber);
+                        writer.WriteLine();
+                        writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods[index]);
                     }
                 }
             }
@@ -92,12 +90,10 @@ namespace MASIC.DataOutput
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
                         writer.WriteLine("Category" + cColDelimiter + "Name" + cColDelimiter + "Value");
-                        {
-                            var withBlock = objXcaliburAccessor.FileInfo.TuneMethods[index];
-                            foreach (udtTuneMethodSetting setting in withBlock.Settings)
-                                writer.WriteLine(setting.Category + cColDelimiter + setting.Name + cColDelimiter + setting.Value);
-                            writer.WriteLine();
-                        }
+                        var withBlock = objXcaliburAccessor.FileInfo.TuneMethods[index];
+                        foreach (udtTuneMethodSetting setting in withBlock.Settings)
+                            writer.WriteLine(setting.Category + cColDelimiter + setting.Name + cColDelimiter + setting.Value);
+                        writer.WriteLine();
                     }
                 }
             }

@@ -295,15 +295,13 @@ namespace MASIC
             for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
                 int ionMatchCount;
-                {
-                    var withBlock = reporterIons[reporterIonIndex];
-                    // Search for the reporter ion MZ in this mass spectrum
-                    double argclosestMZ = closestMZ[reporterIonIndex];
-                    reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex], withBlock.MZ, withBlock.MZToleranceDa, out ionMatchCount, out argclosestMZ, USE_MAX_ABUNDANCE_IN_WINDOW);
-                    withBlock.SignalToNoise = 0;
-                    withBlock.Resolution = 0;
-                    withBlock.LabelDataMZ = 0;
-                }
+                var withBlock = reporterIons[reporterIonIndex];
+                // Search for the reporter ion MZ in this mass spectrum
+                double argclosestMZ = closestMZ[reporterIonIndex];
+                reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex], withBlock.MZ, withBlock.MZToleranceDa, out ionMatchCount, out argclosestMZ, USE_MAX_ABUNDANCE_IN_WINDOW);
+                withBlock.SignalToNoise = 0;
+                withBlock.Resolution = 0;
+                withBlock.LabelDataMZ = 0;
             }
 
             if (includeFtmsColumns && currentScan.IsFTMS)

@@ -143,64 +143,63 @@ namespace MASIC.DataOutput
             if (baselineNoiseLevel < 1)
                 baselineNoiseLevel = 1;
             mBPIWriter.WriteDecon2LSScanFileEntry(scanInfoWriter, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures);
+
+            var withBlock = spectraCache.SpectraPool[poolIndex];
+            // Now write an entry to the "_isos.csv" file
+
+            if (withBlock.IonCount > 0)
             {
-                var withBlock = spectraCache.SpectraPool[poolIndex];
-                // Now write an entry to the "_isos.csv" file
+                // Populate intensities and pointerArray()
 
-                if (withBlock.IonCount > 0)
+                double[] intensities;
+                int[] pointerArray;
+                intensities = new double[withBlock.IonCount];
+                pointerArray = new int[withBlock.IonCount];
+                for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
                 {
-                    // Populate intensities and pointerArray()
+                    intensities[ionIndex] = withBlock.IonsIntensity[ionIndex];
+                    pointerArray[ionIndex] = ionIndex;
+                }
 
-                    double[] intensities;
-                    int[] pointerArray;
-                    intensities = new double[withBlock.IonCount];
-                    pointerArray = new int[withBlock.IonCount];
-                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
-                    {
-                        intensities[ionIndex] = withBlock.IonsIntensity[ionIndex];
-                        pointerArray[ionIndex] = ionIndex;
-                    }
-
-                    // Sort pointerArray() based on the intensities in intensities
-                    Array.Sort(intensities, pointerArray);
-                    int startIndex;
-                    if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
-                    {
-                        // Possibly limit the number of ions to maxIonCount
-                        startIndex = withBlock.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
-                        if (startIndex < 0)
-                            startIndex = 0;
-                    }
-                    else
-                    {
+                // Sort pointerArray() based on the intensities in intensities
+                Array.Sort(intensities, pointerArray);
+                int startIndex;
+                if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
+                {
+                    // Possibly limit the number of ions to maxIonCount
+                    startIndex = withBlock.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
+                    if (startIndex < 0)
                         startIndex = 0;
-                    }
+                }
+                else
+                {
+                    startIndex = 0;
+                }
 
-                    // Define the minimum data point intensity value
-                    double minimumIntensityCurrentScan = withBlock.IonsIntensity[pointerArray[startIndex]];
+                // Define the minimum data point intensity value
+                double minimumIntensityCurrentScan = withBlock.IonsIntensity[pointerArray[startIndex]];
 
-                    // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
-                    minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
+                // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
+                minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
 
-                    // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
-                    if (mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0)
+                // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
+                if (mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0)
+                {
+                    minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
+                }
+
+                for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
+                {
+                    if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
-                        minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
-                    }
-
-                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
-                    {
-                        if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
-                        {
-                            int charge = 1;
-                            int isoFit = 0;
-                            double mass = clsUtilities.ConvoluteMass(withBlock.IonsMZ[ionIndex], 1, 0);
-                            int peakFWHM = 0;
-                            double signalToNoise = withBlock.IonsIntensity[ionIndex] / baselineNoiseLevel;
-                            int monoisotopicAbu = -10;
-                            int monoPlus2Abu = -10;
-                            mBPIWriter.WriteDecon2LSIsosFileEntry(dataWriter, scanNumber, charge, withBlock.IonsIntensity[ionIndex], withBlock.IonsMZ[ionIndex], isoFit, mass, mass, mass, peakFWHM, signalToNoise, monoisotopicAbu, monoPlus2Abu);
-                        }
+                        int charge = 1;
+                        int isoFit = 0;
+                        double mass = clsUtilities.ConvoluteMass(withBlock.IonsMZ[ionIndex], 1, 0);
+                        int peakFWHM = 0;
+                        double signalToNoise = withBlock.IonsIntensity[ionIndex] / baselineNoiseLevel;
+                        int monoisotopicAbu = -10;
+                        int monoPlus2Abu = -10;
+                        mBPIWriter.WriteDecon2LSIsosFileEntry(dataWriter, scanNumber, charge, withBlock.IonsIntensity[ionIndex], withBlock.IonsMZ[ionIndex], isoFit, mass, mass, mass, peakFWHM, signalToNoise, monoisotopicAbu, monoPlus2Abu);
                     }
                 }
             }
@@ -253,64 +252,63 @@ namespace MASIC.DataOutput
 
             writer.WriteLine("Charge state mass transform results:");
             writer.WriteLine("First CS,    Number of CS,   Abundance,   Mass,   Standard deviation");
+
+            var withBlock = spectraCache.SpectraPool[poolIndex];
+            if (withBlock.IonCount > 0)
             {
-                var withBlock = spectraCache.SpectraPool[poolIndex];
-                if (withBlock.IonCount > 0)
+                // Populate intensities and pointerArray()
+                double[] intensities;
+                int[] pointerArray;
+                intensities = new double[withBlock.IonCount];
+                pointerArray = new int[withBlock.IonCount];
+                for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
                 {
-                    // Populate intensities and pointerArray()
-                    double[] intensities;
-                    int[] pointerArray;
-                    intensities = new double[withBlock.IonCount];
-                    pointerArray = new int[withBlock.IonCount];
-                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
-                    {
-                        intensities[ionIndex] = withBlock.IonsIntensity[ionIndex];
-                        pointerArray[ionIndex] = ionIndex;
-                    }
-
-                    // Sort pointerArray() based on the intensities in intensities
-                    Array.Sort(intensities, pointerArray);
-                    int startIndex;
-                    if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
-                    {
-                        // Possibly limit the number of ions to maxIonCount
-                        startIndex = withBlock.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
-                        if (startIndex < 0)
-                            startIndex = 0;
-                    }
-                    else
-                    {
-                        startIndex = 0;
-                    }
-
-                    // Define the minimum data point intensity value
-                    double minimumIntensityCurrentScan = withBlock.IonsIntensity[pointerArray[startIndex]];
-
-                    // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
-                    minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
-
-                    // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
-                    if (mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0)
-                    {
-                        minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
-                    }
-
-                    exportCount = 0;
-                    for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
-                    {
-                        if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
-                        {
-                            string dataLine = "1" + ControlChars.Tab + "1" + ControlChars.Tab + withBlock.IonsIntensity[ionIndex] + ControlChars.Tab + withBlock.IonsMZ[ionIndex] + ControlChars.Tab + "0";
-                            writer.WriteLine(dataLine);
-                            exportCount += 1;
-                        }
-                    }
+                    intensities[ionIndex] = withBlock.IonsIntensity[ionIndex];
+                    pointerArray[ionIndex] = ionIndex;
                 }
 
-                writer.WriteLine("Number of peaks in spectrum = " + withBlock.IonCount.ToString());
-                writer.WriteLine("Number of isotopic distributions detected = " + exportCount.ToString());
-                writer.WriteLine();
+                // Sort pointerArray() based on the intensities in intensities
+                Array.Sort(intensities, pointerArray);
+                int startIndex;
+                if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
+                {
+                    // Possibly limit the number of ions to maxIonCount
+                    startIndex = withBlock.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
+                    if (startIndex < 0)
+                        startIndex = 0;
+                }
+                else
+                {
+                    startIndex = 0;
+                }
+
+                // Define the minimum data point intensity value
+                double minimumIntensityCurrentScan = withBlock.IonsIntensity[pointerArray[startIndex]];
+
+                // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
+                minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
+
+                // If mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio is > 0, then possibly update minimumIntensityCurrentScan
+                if (mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio > 0)
+                {
+                    minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
+                }
+
+                exportCount = 0;
+                for (int ionIndex = 0; ionIndex <= withBlock.IonCount - 1; ionIndex++)
+                {
+                    if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
+                    {
+                        string dataLine = "1" + ControlChars.Tab + "1" + ControlChars.Tab + withBlock.IonsIntensity[ionIndex] + ControlChars.Tab + withBlock.IonsMZ[ionIndex] + ControlChars.Tab + "0";
+                        writer.WriteLine(dataLine);
+                        exportCount += 1;
+                    }
+                }
             }
+
+            writer.WriteLine("Number of peaks in spectrum = " + withBlock.IonCount.ToString());
+            writer.WriteLine("Number of isotopic distributions detected = " + exportCount.ToString());
+            writer.WriteLine();
         }
 
         private void SaveRawDataToDiskWork(StreamWriter dataWriter, StreamWriter scanInfoWriter, clsScanInfo currentScan, clsSpectraCache spectraCache, string inputFileName, bool fragmentationScan, ref int spectrumExportCount)
