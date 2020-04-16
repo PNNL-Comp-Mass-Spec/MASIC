@@ -70,7 +70,6 @@ namespace MASIC.DataOutput
 
         public bool SaveDataToXML(clsScanList scanList, int parentIonIndex, clsSICDetails sicDetails, MASICPeakFinder.clsSmoothedYDataSubset smoothedYDataSubset, clsDataOutput dataOutputHandler)
         {
-
             // Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
             byte[] SICDataScanIntervals;
             string lastGoodLoc = "Start";
@@ -253,7 +252,6 @@ namespace MASIC.DataOutput
 
                     if (mOptions.UseBase64DataEncoding)
                     {
-
                         // Save intensity and mass data lists as base-64 encoded strings
                         // Note that these field names are purposely different than the DataList names used below for comma separated lists
                         lastGoodLoc = "Call SaveDataToXMLEncodeArray with SICIntensityData";
@@ -555,7 +553,6 @@ namespace MASIC.DataOutput
 
         private void XmlOutputFileReplaceSetting(TextWriter writer, string lineIn, string xmlElementName, int newValueToSave)
         {
-
             // xmlElementName should be the properly capitalized element name and should not start with "<"
 
             string work;
@@ -588,7 +585,6 @@ namespace MASIC.DataOutput
 
         public bool XmlOutputFileUpdateEntries(clsScanList scanList, string inputFileName, string outputDirectoryPath)
         {
-
             // ReSharper disable once StringLiteralTypo
             const string PARENT_ION_TAG_START_LCASE = "<parention";     // Note: this needs to be lowercase
             const string INDEX_ATTRIBUTE_LCASE = "index=";              // Note: this needs to be lowercase

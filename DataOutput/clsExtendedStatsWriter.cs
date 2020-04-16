@@ -351,7 +351,6 @@ namespace MASIC.DataOutput
 
         public bool SaveExtendedScanStatsFiles(clsScanList scanList, string inputFileName, string outputDirectoryPath, bool includeHeaders)
         {
-
             // Writes out a flat file containing the extended scan stats
 
             string extendedConstantHeaderOutputFilePath;

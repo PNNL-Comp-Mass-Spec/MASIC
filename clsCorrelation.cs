@@ -475,7 +475,6 @@ namespace MASIC
 
         private void CorrelatePearson(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, out float RValue, out float ProbOfSignificance, out float FishersZ)
         {
-
             // Performs a Pearson correlation (aka linear correlation) of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
             //
@@ -544,7 +543,6 @@ namespace MASIC
 
         private void CorrelateKendall(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, out float KendallsTau, out float Z, out float ProbOfSignificance)
         {
-
             // Performs a Kendall correlation (aka linear correlation) of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
             //
@@ -612,7 +610,6 @@ namespace MASIC
 
         private void CorrelateSpearman(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, out float DiffInRanks, out float ZD, out float ProbOfSignificance, out float RS, out float ProbRS)
         {
-
             // Performs a Spearman correlation of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
             //
@@ -685,7 +682,6 @@ namespace MASIC
 
         private void CRank(int n, IList<float> w, out float s)
         {
-
             // Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including mid-ranking of ties,
             // and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
 

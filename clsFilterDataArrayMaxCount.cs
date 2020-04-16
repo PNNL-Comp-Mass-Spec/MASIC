@@ -7,7 +7,7 @@ namespace MASIC
     {
         // This class can be used to select the top N data points in a list, sorting descending
         // It does not require a full sort of the data, which allows for faster filtering of the data
-        // 
+        //
         // To use, first call AddDataPoint() for each source data point, specifying the value to sort on and a data point index
         // When done, call FilterData()
         // This routine will determine which data points to retain

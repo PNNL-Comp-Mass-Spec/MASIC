@@ -9,7 +9,6 @@ namespace MASIC
 {
     public class clsCustomSICList : EventNotifier
     {
-
         #region // TODO
         public const string CUSTOM_SIC_TYPE_ABSOLUTE = "Absolute";
         public const string CUSTOM_SIC_TYPE_RELATIVE = "Relative";
@@ -93,7 +92,6 @@ namespace MASIC
                 RegisterEvents(scanNumScanConverter);
                 foreach (var customMzSearchValue in CustomMZSearchValues)
                 {
-
                     // Add a new parent ion entry to .ParentIons() for this custom MZ value
                     var currentParentIon = new clsParentIonInfo(customMzSearchValue.MZ);
                     if (customMzSearchValue.ScanOrAcqTimeCenter < float.Epsilon)
@@ -332,7 +330,6 @@ namespace MASIC
         [Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")]
         public bool SetCustomSICListValues(eCustomSICScanTypeConstants eScanType, double mzToleranceDa, float scanOrAcqTimeToleranceValue, double[] mzList, double[] mzToleranceList, float[] scanOrAcqTimeCenterList, float[] scanOrAcqTimeToleranceList, string[] scanComments)
         {
-
             // Returns True if success
 
             int index;
@@ -416,7 +413,6 @@ namespace MASIC
 
         public bool SetCustomSICListValues(eCustomSICScanTypeConstants eScanType, float scanOrAcqTimeToleranceValue, List<clsCustomMZSearchSpec> mzSearchSpecs)
         {
-
             // Returns True if success
 
             ResetMzSearchValues();

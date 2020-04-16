@@ -55,7 +55,6 @@ namespace MASIC
 
         private bool DetermineMRMSettings(clsScanList scanList, out List<clsMRMScanInfo> mrmSettings, out List<udtSRMListType> srmList)
         {
-
             // Returns true if this dataset has MRM data and if it is parsed successfully
             // Returns false if the dataset does not have MRM data, or if an error occurs
 
@@ -92,13 +91,11 @@ namespace MASIC
                             mrmSettings.Add(mrmInfoForHash);
                             mrmHashToIndexMap.Add(mrmInfoHash, mrmInfoForHash);
 
-
                             // Append the new entries to srmList
 
                             var loopTo = mrmInfoForHash.MRMMassCount - 1;
                             for (mrmMassIndex = 0; mrmMassIndex <= loopTo; mrmMassIndex++)
                             {
-
                                 // Add this new transition to srmList() only if not already present
                                 matchFound = false;
                                 foreach (var srmItem in srmList)
@@ -201,7 +198,6 @@ namespace MASIC
 
         private bool ExportMRMDataToDisk(clsScanList scanList, clsSpectraCache spectraCache, IReadOnlyList<clsMRMScanInfo> mrmSettings, IReadOnlyList<udtSRMListType> srmList, string inputFileName, string outputDirectoryPath)
         {
-
             // Returns true if the MRM data is successfully written to disk
             // Note that it will also return true if udtMRMSettings() is empty
 
@@ -246,7 +242,6 @@ namespace MASIC
 
                     if (mOptions.WriteMRMDataList | mOptions.WriteMRMIntensityCrosstab)
                     {
-
                         // Populate srmKeyToIndexMap
                         var srmKeyToIndexMap = new Dictionary<string, int>();
                         for (int srmIndex = 0, loopTo2 = srmList.Count - 1; srmIndex <= loopTo2; srmIndex++)
@@ -407,7 +402,6 @@ namespace MASIC
 
         private void ExportMRMDataWriteLine(TextWriter writer, int scanFirst, float scanTimeFirst, IList<double> crosstabColumnValue, IList<bool> crosstabColumnFlag, char cColDelimiter, bool forceWrite)
         {
-
             // If forceWrite = False, then will only write out the line if 1 or more columns is non-zero
 
             int index;
@@ -472,7 +466,6 @@ namespace MASIC
         {
             try
             {
-
                 // Initialize sicDetails
                 var sicDetails = new clsSICDetails();
                 sicDetails.Reset();
@@ -526,7 +519,6 @@ namespace MASIC
                         }
                     }
 
-
                     // Step 2: Find the largest peak in the SIC
 
                     // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
@@ -570,7 +562,6 @@ namespace MASIC
                         bool peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData, out argpotentialAreaStatsForPeak, withBlock1.SICStats.Peak, out smoothedYDataSubset, mOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, false, scanList.SIMDataPresent, false);
                         sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails, withBlock1.SICStats.SICPotentialAreaStatsForPeak, withBlock1.SICStats.Peak, peakIsValid);
                     }
-
 
                     // Step 3: store the results
 

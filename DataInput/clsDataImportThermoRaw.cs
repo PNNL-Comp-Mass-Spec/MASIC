@@ -120,7 +120,6 @@ namespace MASIC.DataInput
         /// <remarks>Assumes filePath exists</remarks>
         public bool ExtractScanInfoFromXcaliburDataFile(string filePath, clsScanList scanList, clsSpectraCache spectraCache, clsDataOutput dataOutputHandler, bool keepRawSpectra, bool keepMSMSSpectra)
         {
-
             // Use XrawFileIO to read the .Raw files (it uses ThermoFisher.CommonCore)
 
             var readerOptions = new ThermoReaderOptions()
@@ -286,7 +285,6 @@ namespace MASIC.DataInput
             }
             else
             {
-
                 // Fragmentation Scan
                 success = ExtractXcaliburFragmentationScan(xcaliburAccessor, scanList, spectraCache, dataOutputHandler, sicOptions, mOptions.BinningOptions, thermoScanInfo);
             }
@@ -391,7 +389,6 @@ namespace MASIC.DataInput
 
         private bool ExtractXcaliburFragmentationScan(XRawFileIO xcaliburAccessor, clsScanList scanList, clsSpectraCache spectraCache, clsDataOutput dataOutputHandler, clsSICOptions sicOptions, clsBinningOptions binningOptions, ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
-
             // Note that MinimumPositiveIntensity will be determined in LoadSpectraForThermoRawFile
 
             var scanInfo = new clsScanInfo(thermoScanInfo.ParentIonMZ)
@@ -516,7 +513,6 @@ namespace MASIC.DataInput
             string lastKnownLocation = "Start";
             try
             {
-
                 // Load the ions for this scan
 
                 lastKnownLocation = "xcaliburAccessor.GetScanData for scan " + scanInfo.ScanNumber;

@@ -6,7 +6,6 @@ namespace MASIC
 {
     public class clsUtilities
     {
-
         #region // TODO    // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 
         public const double CHARGE_CARRIER_MASS_MONOISOTOPIC = 1.00727649;
@@ -49,7 +48,6 @@ namespace MASIC
 
         public static double ConvoluteMass(double massMZ, short currentCharge, short desiredCharge = 1, double chargeCarrierMass = 0)
         {
-
             // Converts massMZ to the MZ that would appear at the given desiredCharge
             // To return the neutral mass, set desiredCharge to 0
 

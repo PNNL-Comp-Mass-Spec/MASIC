@@ -1,5 +1,4 @@
-﻿
-namespace MASIC
+﻿namespace MASIC
 {
     public class clsMzBinInfo
     {

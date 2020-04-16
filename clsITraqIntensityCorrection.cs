@@ -7,9 +7,9 @@ namespace MASIC
     // This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
     // It supports 4-plex and 8-plex iTraq
     // It also supports TMT10, TMT11, and TMT16 (aka TMTpro)
-    // 
+    //
     // The isotopic distribution weights are provided by the iTraq or TMT manufacturer
-    // 
+    //
     // There are two options for the iTRAQ 4-plex weights:
     // eCorrectionFactorsiTRAQ4Plex.ABSciex
     // eCorrectionFactorsiTRAQ4Plex.BroadInstitute
@@ -265,7 +265,6 @@ namespace MASIC
         /// <param name="debugShowMatrixTable">When true, show a table of the coefficients at the console</param>
         private void InitializeCoefficients(bool debugShowMatrixTable)
         {
-
             // iTraq reporter ions
             udtIsotopeContributionType udtIsoPct113;
             udtIsotopeContributionType udtIsoPct114;
@@ -313,7 +312,6 @@ namespace MASIC
                         }
                         else if (mITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.BroadInstitute)
                         {
-
                             // 4-plex ITraq, isotope contribution table
                             // Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
 
@@ -342,7 +340,6 @@ namespace MASIC
                         // 2     0    0.045  0.957  0.014
                         // 3     0      0    0.034  0.986
 
-
                         mCoeffs = new double[maxIndex + 1, maxIndex + 1];
                         mCoeffs[0, 0] = udtIsoPct114.Zero;
                         mCoeffs[0, 1] = udtIsoPct115.Minus1;
@@ -363,7 +360,6 @@ namespace MASIC
 
                 case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes:
                     {
-
                         // 8-plex ITraq, isotope contribution table for High Res MS/MS
                         // Source percentages provided by Applied Biosystems
                         // Note there is a 2 Da jump between 119 and 121, which is why 7.44 and 0.87 are not included in mCoeffs()
@@ -388,7 +384,6 @@ namespace MASIC
                         // 5     0       0       0     0.0007  0.0288  0.9332  0.0566    0
                         // 6     0       0       0       0       0     0.0188  0.9334  0.0027
                         // 7     0       0       0       0       0       0       0     0.9211
-
 
                         mCoeffs = new double[maxIndex + 1, maxIndex + 1];
                         mCoeffs[0, 0] = udtIsoPct113.Zero;
@@ -429,7 +424,6 @@ namespace MASIC
 
                 case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes:
                     {
-
                         // 8-plex ITraq, isotope contribution table for Low Res MS/MS
 
                         // ReSharper disable CommentTypo
@@ -509,7 +503,6 @@ namespace MASIC
                 case clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ:
                 case clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ:
                     {
-
                         // 10-plex TMT and 11-plex TMT, isotope contribution table for High Res MS/MS
                         // Source percentages provided by Thermo
 
@@ -527,7 +520,6 @@ namespace MASIC
                         // udtIsoPct131N = DefineIsotopeContribution(0.2, 2, 95.6, 2.2, 0)
                         // udtIsoPct131C = DefineIsotopeContribution(0, 2.6, 94.5, 2.9, 0)
 
-
                         // TMT10plex lot A37725
                         // TMT11plex lot TB265130
                         // udtIsoPct126 = DefineIsotopeContribution(0, 0, 92.081, 7.551, 0.368)
@@ -541,7 +533,6 @@ namespace MASIC
                         // udtIsoPct130C = DefineIsotopeContribution(0, 1.628, 95.785, 2.586, 0)
                         // udtIsoPct131N = DefineIsotopeContribution(0, 3.625, 92.937, 3.439, 0)
                         // udtIsoPct131C = DefineIsotopeContribution(0, 3.471, 93.809, 2.72, 0)
-
 
                         // TMT10plex lot SG252258
                         // TMT11plex lot T4259309
@@ -571,7 +562,7 @@ namespace MASIC
                         // 8     0       0       0       0       0       0     0.0430    0     0.9340    0     0.0370
                         // 9     0       0       0       0       0       0       0     0.0390    0     0.9330    0
                         // 10    0       0       0       0       0       0       0       0     0.0330    0     0.9340
-                        // 
+                        //
 
                         mCoeffs = new double[maxIndex + 1, maxIndex + 1];
                         mCoeffs[0, 0] = udtIsoPct126.Zero;
@@ -662,7 +653,6 @@ namespace MASIC
 
                 case clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ:
                     {
-
                         // 16-plex TMT, isotope contribution table for High Res MS/MS
                         // Source percentages provided by Thermo
 

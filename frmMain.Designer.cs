@@ -9,7 +9,6 @@ namespace MASIC
     [DesignerGenerated()]
     public partial class frmMain : Form
     {
-
         // Form overrides dispose to clean up the component list.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing)
@@ -331,25 +330,25 @@ namespace MASIC
             _TabPageLog.SuspendLayout();
             _fraOutputDirectoryPath.SuspendLayout();
             SuspendLayout();
-            // 
+            //
             // txtInputFilePath
-            // 
+            //
             _txtInputFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _txtInputFilePath.Location = new System.Drawing.Point(125, 30);
             _txtInputFilePath.Name = "txtInputFilePath";
             _txtInputFilePath.Size = new System.Drawing.Size(741, 22);
             _txtInputFilePath.TabIndex = 1;
-            // 
+            //
             // cmdSelectFile
-            // 
+            //
             _cmdSelectFile.Location = new System.Drawing.Point(10, 28);
             _cmdSelectFile.Name = "cmdSelectFile";
             _cmdSelectFile.Size = new System.Drawing.Size(96, 27);
             _cmdSelectFile.TabIndex = 0;
             _cmdSelectFile.Text = "&Select File";
-            // 
+            //
             // fraInputFilePath
-            // 
+            //
             _fraInputFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _fraInputFilePath.Controls.Add(_cmdSelectFile);
             _fraInputFilePath.Controls.Add(_txtInputFilePath);
@@ -359,91 +358,91 @@ namespace MASIC
             _fraInputFilePath.TabIndex = 0;
             _fraInputFilePath.TabStop = false;
             _fraInputFilePath.Text = "Input File Path (Thermo .Raw or Agilent .CDF/.MGF combo or mzXML or mz" + "Data)";
-            // 
+            //
             // MainMenuControl
-            // 
+            //
             _MainMenuControl.MenuItems.AddRange(new MenuItem[] { _mnuFile, _mnuEdit, _mnuHelp });
-            // 
+            //
             // mnuFile
-            // 
+            //
             _mnuFile.Index = 0;
             _mnuFile.MenuItems.AddRange(new MenuItem[] { _mnuFileSelectInputFile, _mnuFileSelectOutputDirectory, _mnuFileSep1, _mnuFileLoadOptions, _mnuFileSaveOptions, _mnuFileSep2, _mnuFileExit });
             _mnuFile.Text = "&File";
-            // 
+            //
             // mnuFileSelectInputFile
-            // 
+            //
             _mnuFileSelectInputFile.Index = 0;
             _mnuFileSelectInputFile.Text = "&Select Input File ...";
-            // 
+            //
             // mnuFileSelectOutputDirectory
-            // 
+            //
             _mnuFileSelectOutputDirectory.Index = 1;
             _mnuFileSelectOutputDirectory.Text = "Select Output &Directory ...";
-            // 
+            //
             // mnuFileSep1
-            // 
+            //
             _mnuFileSep1.Index = 2;
             _mnuFileSep1.Text = "-";
-            // 
+            //
             // mnuFileLoadOptions
-            // 
+            //
             _mnuFileLoadOptions.Index = 3;
             _mnuFileLoadOptions.Text = "&Load Options ...";
-            // 
+            //
             // mnuFileSaveOptions
-            // 
+            //
             _mnuFileSaveOptions.Index = 4;
             _mnuFileSaveOptions.Text = "Sa&ve Options ...";
-            // 
+            //
             // mnuFileSep2
-            // 
+            //
             _mnuFileSep2.Index = 5;
             _mnuFileSep2.Text = "-";
-            // 
+            //
             // mnuFileExit
-            // 
+            //
             _mnuFileExit.Index = 6;
             _mnuFileExit.Text = "E&xit";
-            // 
+            //
             // mnuEdit
-            // 
+            //
             _mnuEdit.Index = 1;
             _mnuEdit.MenuItems.AddRange(new MenuItem[] { _mnuEditProcessFile, _mnuEditSep1, _mnuEditSaveDefaultOptions, _mnuEditResetOptions });
             _mnuEdit.Text = "&Edit";
-            // 
+            //
             // mnuEditProcessFile
-            // 
+            //
             _mnuEditProcessFile.Index = 0;
             _mnuEditProcessFile.Text = "&Process File";
-            // 
+            //
             // mnuEditSep1
-            // 
+            //
             _mnuEditSep1.Index = 1;
             _mnuEditSep1.Text = "-";
-            // 
+            //
             // mnuEditSaveDefaultOptions
-            // 
+            //
             _mnuEditSaveDefaultOptions.Index = 2;
             _mnuEditSaveDefaultOptions.Text = "&Save current options as Default ...";
-            // 
+            //
             // mnuEditResetOptions
-            // 
+            //
             _mnuEditResetOptions.Index = 3;
             _mnuEditResetOptions.Text = "&Reset options to Defaults";
-            // 
+            //
             // mnuHelp
-            // 
+            //
             _mnuHelp.Index = 2;
             _mnuHelp.MenuItems.AddRange(new MenuItem[] { _mnuHelpAbout });
             _mnuHelp.Text = "&Help";
-            // 
+            //
             // mnuHelpAbout
-            // 
+            //
             _mnuHelpAbout.Index = 0;
             _mnuHelpAbout.Text = "&About";
-            // 
+            //
             // tbsOptions
-            // 
+            //
             _tbsOptions.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _tbsOptions.Controls.Add(_TabPageMasicExportOptions);
             _tbsOptions.Controls.Add(_TabPageSICOptions);
@@ -458,9 +457,9 @@ namespace MASIC
             _tbsOptions.SelectedIndex = 0;
             _tbsOptions.Size = new System.Drawing.Size(890, 356);
             _tbsOptions.TabIndex = 2;
-            // 
+            //
             // TabPageMasicExportOptions
-            // 
+            //
             _TabPageMasicExportOptions.Controls.Add(_chkWriteDetailedSICDataFile);
             _TabPageMasicExportOptions.Controls.Add(_chkIncludeScanTimesInSICStatsFile);
             _TabPageMasicExportOptions.Controls.Add(_txtDatasetID);
@@ -474,17 +473,17 @@ namespace MASIC
             _TabPageMasicExportOptions.TabIndex = 4;
             _TabPageMasicExportOptions.Text = "Export Options";
             _TabPageMasicExportOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // chkWriteDetailedSICDataFile
-            // 
+            //
             _chkWriteDetailedSICDataFile.Location = new System.Drawing.Point(19, 62);
             _chkWriteDetailedSICDataFile.Name = "chkWriteDetailedSICDataFile";
             _chkWriteDetailedSICDataFile.Size = new System.Drawing.Size(250, 19);
             _chkWriteDetailedSICDataFile.TabIndex = 7;
             _chkWriteDetailedSICDataFile.Text = "Write detailed SIC data file";
-            // 
+            //
             // chkIncludeScanTimesInSICStatsFile
-            // 
+            //
             _chkIncludeScanTimesInSICStatsFile.Checked = true;
             _chkIncludeScanTimesInSICStatsFile.CheckState = CheckState.Checked;
             _chkIncludeScanTimesInSICStatsFile.Location = new System.Drawing.Point(19, 37);
@@ -492,33 +491,33 @@ namespace MASIC
             _chkIncludeScanTimesInSICStatsFile.Size = new System.Drawing.Size(250, 18);
             _chkIncludeScanTimesInSICStatsFile.TabIndex = 6;
             _chkIncludeScanTimesInSICStatsFile.Text = "Include scan times in SIC stats file";
-            // 
+            //
             // txtDatasetID
-            // 
+            //
             _txtDatasetID.Location = new System.Drawing.Point(605, 18);
             _txtDatasetID.Name = "txtDatasetID";
             _txtDatasetID.Size = new System.Drawing.Size(105, 22);
             _txtDatasetID.TabIndex = 4;
             _txtDatasetID.Text = "0";
-            // 
+            //
             // lblDatasetID
-            // 
+            //
             _lblDatasetID.Location = new System.Drawing.Point(432, 18);
             _lblDatasetID.Name = "lblDatasetID";
             _lblDatasetID.Size = new System.Drawing.Size(182, 19);
             _lblDatasetID.TabIndex = 3;
             _lblDatasetID.Text = "Input File Dataset Number";
-            // 
+            //
             // lblRawDataExportOverview
-            // 
+            //
             _lblRawDataExportOverview.Location = new System.Drawing.Point(442, 55);
             _lblRawDataExportOverview.Name = "lblRawDataExportOverview";
             _lblRawDataExportOverview.Size = new System.Drawing.Size(307, 268);
             _lblRawDataExportOverview.TabIndex = 5;
             _lblRawDataExportOverview.Text = "Raw Data Export Options Overview";
-            // 
+            //
             // fraExportAllSpectraDataPoints
-            // 
+            //
             _fraExportAllSpectraDataPoints.Controls.Add(_txtExportRawDataSignalToNoiseRatioMinimum);
             _fraExportAllSpectraDataPoints.Controls.Add(_lblExportRawDataSignalToNoiseRatioMinimum);
             _fraExportAllSpectraDataPoints.Controls.Add(_chkExportRawDataRenumberScans);
@@ -536,97 +535,97 @@ namespace MASIC
             _fraExportAllSpectraDataPoints.TabIndex = 2;
             _fraExportAllSpectraDataPoints.TabStop = false;
             _fraExportAllSpectraDataPoints.Text = "Raw Data Point Export Options";
-            // 
+            //
             // txtExportRawDataSignalToNoiseRatioMinimum
-            // 
+            //
             _txtExportRawDataSignalToNoiseRatioMinimum.Location = new System.Drawing.Point(240, 129);
             _txtExportRawDataSignalToNoiseRatioMinimum.Name = "txtExportRawDataSignalToNoiseRatioMinimum";
             _txtExportRawDataSignalToNoiseRatioMinimum.Size = new System.Drawing.Size(48, 22);
             _txtExportRawDataSignalToNoiseRatioMinimum.TabIndex = 6;
             _txtExportRawDataSignalToNoiseRatioMinimum.Text = "1";
-            // 
+            //
             // lblExportRawDataSignalToNoiseRatioMinimum
-            // 
+            //
             _lblExportRawDataSignalToNoiseRatioMinimum.Location = new System.Drawing.Point(19, 132);
             _lblExportRawDataSignalToNoiseRatioMinimum.Name = "lblExportRawDataSignalToNoiseRatioMinimum";
             _lblExportRawDataSignalToNoiseRatioMinimum.Size = new System.Drawing.Size(211, 18);
             _lblExportRawDataSignalToNoiseRatioMinimum.TabIndex = 5;
             _lblExportRawDataSignalToNoiseRatioMinimum.Text = "Minimum Signal to Noise Ratio";
-            // 
+            //
             // chkExportRawDataRenumberScans
-            // 
+            //
             _chkExportRawDataRenumberScans.Location = new System.Drawing.Point(19, 76);
             _chkExportRawDataRenumberScans.Name = "chkExportRawDataRenumberScans";
             _chkExportRawDataRenumberScans.Size = new System.Drawing.Size(375, 19);
             _chkExportRawDataRenumberScans.TabIndex = 3;
             _chkExportRawDataRenumberScans.Text = "Renumber survey scan spectra to make sequential";
-            // 
+            //
             // txtExportRawDataMaxIonCountPerScan
-            // 
+            //
             _txtExportRawDataMaxIonCountPerScan.Location = new System.Drawing.Point(240, 157);
             _txtExportRawDataMaxIonCountPerScan.Name = "txtExportRawDataMaxIonCountPerScan";
             _txtExportRawDataMaxIonCountPerScan.Size = new System.Drawing.Size(67, 22);
             _txtExportRawDataMaxIonCountPerScan.TabIndex = 8;
             _txtExportRawDataMaxIonCountPerScan.Text = "200";
-            // 
+            //
             // lblExportRawDataMaxIonCountPerScan
-            // 
+            //
             _lblExportRawDataMaxIonCountPerScan.Location = new System.Drawing.Point(19, 159);
             _lblExportRawDataMaxIonCountPerScan.Name = "lblExportRawDataMaxIonCountPerScan";
             _lblExportRawDataMaxIonCountPerScan.Size = new System.Drawing.Size(221, 19);
             _lblExportRawDataMaxIonCountPerScan.TabIndex = 7;
             _lblExportRawDataMaxIonCountPerScan.Text = "Maximum Ion Count per Scan";
-            // 
+            //
             // txtExportRawDataIntensityMinimum
-            // 
+            //
             _txtExportRawDataIntensityMinimum.Location = new System.Drawing.Point(240, 185);
             _txtExportRawDataIntensityMinimum.Name = "txtExportRawDataIntensityMinimum";
             _txtExportRawDataIntensityMinimum.Size = new System.Drawing.Size(106, 22);
             _txtExportRawDataIntensityMinimum.TabIndex = 10;
             _txtExportRawDataIntensityMinimum.Text = "0";
-            // 
+            //
             // lblExportRawDataIntensityMinimum
-            // 
+            //
             _lblExportRawDataIntensityMinimum.Location = new System.Drawing.Point(19, 187);
             _lblExportRawDataIntensityMinimum.Name = "lblExportRawDataIntensityMinimum";
             _lblExportRawDataIntensityMinimum.Size = new System.Drawing.Size(183, 18);
             _lblExportRawDataIntensityMinimum.TabIndex = 9;
             _lblExportRawDataIntensityMinimum.Text = "Minimum Intensity (counts)";
-            // 
+            //
             // chkExportRawDataIncludeMSMS
-            // 
+            //
             _chkExportRawDataIncludeMSMS.Location = new System.Drawing.Point(19, 99);
             _chkExportRawDataIncludeMSMS.Name = "chkExportRawDataIncludeMSMS";
             _chkExportRawDataIncludeMSMS.Size = new System.Drawing.Size(384, 19);
             _chkExportRawDataIncludeMSMS.TabIndex = 4;
             _chkExportRawDataIncludeMSMS.Text = "Export MS/MS Spectra, in addition to survey scan spectra";
-            // 
+            //
             // cboExportRawDataFileFormat
-            // 
+            //
             _cboExportRawDataFileFormat.DropDownStyle = ComboBoxStyle.DropDownList;
             _cboExportRawDataFileFormat.Location = new System.Drawing.Point(106, 46);
             _cboExportRawDataFileFormat.Name = "cboExportRawDataFileFormat";
             _cboExportRawDataFileFormat.Size = new System.Drawing.Size(172, 24);
             _cboExportRawDataFileFormat.TabIndex = 2;
-            // 
+            //
             // lblExportDataPointsFormat
-            // 
+            //
             _lblExportDataPointsFormat.Location = new System.Drawing.Point(38, 51);
             _lblExportDataPointsFormat.Name = "lblExportDataPointsFormat";
             _lblExportDataPointsFormat.Size = new System.Drawing.Size(87, 18);
             _lblExportDataPointsFormat.TabIndex = 1;
             _lblExportDataPointsFormat.Text = "Format:";
-            // 
+            //
             // chkExportRawSpectraData
-            // 
+            //
             _chkExportRawSpectraData.Location = new System.Drawing.Point(19, 28);
             _chkExportRawSpectraData.Name = "chkExportRawSpectraData";
             _chkExportRawSpectraData.Size = new System.Drawing.Size(288, 18);
             _chkExportRawSpectraData.TabIndex = 0;
             _chkExportRawSpectraData.Text = "Export All Spectra Data Points";
-            // 
+            //
             // chkIncludeHeaders
-            // 
+            //
             _chkIncludeHeaders.Checked = true;
             _chkIncludeHeaders.CheckState = CheckState.Checked;
             _chkIncludeHeaders.Location = new System.Drawing.Point(19, 12);
@@ -634,9 +633,9 @@ namespace MASIC
             _chkIncludeHeaders.Size = new System.Drawing.Size(192, 18);
             _chkIncludeHeaders.TabIndex = 0;
             _chkIncludeHeaders.Text = "Include Column Headers";
-            // 
+            //
             // TabPageSICOptions
-            // 
+            //
             _TabPageSICOptions.Controls.Add(_fraInputFileRangeFilters);
             _TabPageSICOptions.Controls.Add(_lblSICOptionsOverview);
             _TabPageSICOptions.Controls.Add(_fraSICSearchThresholds);
@@ -646,9 +645,9 @@ namespace MASIC
             _TabPageSICOptions.TabIndex = 5;
             _TabPageSICOptions.Text = "SIC Options";
             _TabPageSICOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // fraInputFileRangeFilters
-            // 
+            //
             _fraInputFileRangeFilters.Controls.Add(_lblTimeEndUnits);
             _fraInputFileRangeFilters.Controls.Add(_lblTimeStartUnits);
             _fraInputFileRangeFilters.Controls.Add(_txtTimeEnd);
@@ -666,105 +665,105 @@ namespace MASIC
             _fraInputFileRangeFilters.TabIndex = 1;
             _fraInputFileRangeFilters.TabStop = false;
             _fraInputFileRangeFilters.Text = "Input File Range Filters";
-            // 
+            //
             // lblTimeEndUnits
-            // 
+            //
             _lblTimeEndUnits.Location = new System.Drawing.Point(499, 52);
             _lblTimeEndUnits.Name = "lblTimeEndUnits";
             _lblTimeEndUnits.Size = new System.Drawing.Size(77, 18);
             _lblTimeEndUnits.TabIndex = 10;
             _lblTimeEndUnits.Text = "minutes";
-            // 
+            //
             // lblTimeStartUnits
-            // 
+            //
             _lblTimeStartUnits.Location = new System.Drawing.Point(499, 24);
             _lblTimeStartUnits.Name = "lblTimeStartUnits";
             _lblTimeStartUnits.Size = new System.Drawing.Size(77, 18);
             _lblTimeStartUnits.TabIndex = 7;
             _lblTimeStartUnits.Text = "minutes";
-            // 
+            //
             // txtTimeEnd
-            // 
+            //
             _txtTimeEnd.Location = new System.Drawing.Point(422, 49);
             _txtTimeEnd.Name = "txtTimeEnd";
             _txtTimeEnd.Size = new System.Drawing.Size(68, 22);
             _txtTimeEnd.TabIndex = 9;
             _txtTimeEnd.Text = "0";
-            // 
+            //
             // txtTimeStart
-            // 
+            //
             _txtTimeStart.Location = new System.Drawing.Point(422, 22);
             _txtTimeStart.Name = "txtTimeStart";
             _txtTimeStart.Size = new System.Drawing.Size(68, 22);
             _txtTimeStart.TabIndex = 6;
             _txtTimeStart.Text = "0";
-            // 
+            //
             // lblTimeEnd
-            // 
+            //
             _lblTimeEnd.Location = new System.Drawing.Point(336, 52);
             _lblTimeEnd.Name = "lblTimeEnd";
             _lblTimeEnd.Size = new System.Drawing.Size(86, 18);
             _lblTimeEnd.TabIndex = 8;
             _lblTimeEnd.Text = "End Time";
-            // 
+            //
             // lblTimeStart
-            // 
+            //
             _lblTimeStart.Location = new System.Drawing.Point(336, 24);
             _lblTimeStart.Name = "lblTimeStart";
             _lblTimeStart.Size = new System.Drawing.Size(77, 18);
             _lblTimeStart.TabIndex = 5;
             _lblTimeStart.Text = "Start Time";
-            // 
+            //
             // txtScanEnd
-            // 
+            //
             _txtScanEnd.Location = new System.Drawing.Point(230, 49);
             _txtScanEnd.Name = "txtScanEnd";
             _txtScanEnd.Size = new System.Drawing.Size(68, 22);
             _txtScanEnd.TabIndex = 4;
             _txtScanEnd.Text = "0";
-            // 
+            //
             // txtScanStart
-            // 
+            //
             _txtScanStart.Location = new System.Drawing.Point(230, 22);
             _txtScanStart.Name = "txtScanStart";
             _txtScanStart.Size = new System.Drawing.Size(68, 22);
             _txtScanStart.TabIndex = 2;
             _txtScanStart.Text = "0";
-            // 
+            //
             // lblScanEnd
-            // 
+            //
             _lblScanEnd.Location = new System.Drawing.Point(144, 52);
             _lblScanEnd.Name = "lblScanEnd";
             _lblScanEnd.Size = new System.Drawing.Size(86, 18);
             _lblScanEnd.TabIndex = 3;
             _lblScanEnd.Text = "End Scan";
-            // 
+            //
             // lblScanStart
-            // 
+            //
             _lblScanStart.Location = new System.Drawing.Point(144, 24);
             _lblScanStart.Name = "lblScanStart";
             _lblScanStart.Size = new System.Drawing.Size(77, 18);
             _lblScanStart.TabIndex = 1;
             _lblScanStart.Text = "Start Scan";
-            // 
+            //
             // cmdClearAllRangeFilters
-            // 
+            //
             _cmdClearAllRangeFilters.Location = new System.Drawing.Point(19, 31);
             _cmdClearAllRangeFilters.Name = "cmdClearAllRangeFilters";
             _cmdClearAllRangeFilters.Size = new System.Drawing.Size(106, 28);
             _cmdClearAllRangeFilters.TabIndex = 0;
             _cmdClearAllRangeFilters.Text = "Clear Filters";
-            // 
+            //
             // lblSICOptionsOverview
-            // 
+            //
             _lblSICOptionsOverview.Location = new System.Drawing.Point(374, 28);
             _lblSICOptionsOverview.Name = "lblSICOptionsOverview";
             _lblSICOptionsOverview.Size = new System.Drawing.Size(426, 175);
             _lblSICOptionsOverview.TabIndex = 2;
             _lblSICOptionsOverview.Text = "SIC Options Overview";
-            // 
+            //
             // fraSICSearchThresholds
-            // 
+            //
             _fraSICSearchThresholds.Controls.Add(_optSICTolerancePPM);
             _fraSICSearchThresholds.Controls.Add(_optSICToleranceDa);
             _fraSICSearchThresholds.Controls.Add(_chkRefineReportedParentIonMZ);
@@ -786,17 +785,17 @@ namespace MASIC
             _fraSICSearchThresholds.TabIndex = 0;
             _fraSICSearchThresholds.TabStop = false;
             _fraSICSearchThresholds.Text = "SIC Search Thresholds";
-            // 
+            //
             // optSICTolerancePPM
-            // 
+            //
             _optSICTolerancePPM.Location = new System.Drawing.Point(230, 32);
             _optSICTolerancePPM.Name = "optSICTolerancePPM";
             _optSICTolerancePPM.Size = new System.Drawing.Size(87, 21);
             _optSICTolerancePPM.TabIndex = 14;
             _optSICTolerancePPM.Text = "ppm";
-            // 
+            //
             // optSICToleranceDa
-            // 
+            //
             _optSICToleranceDa.Checked = true;
             _optSICToleranceDa.Location = new System.Drawing.Point(230, 12);
             _optSICToleranceDa.Name = "optSICToleranceDa";
@@ -804,17 +803,17 @@ namespace MASIC
             _optSICToleranceDa.TabIndex = 13;
             _optSICToleranceDa.TabStop = true;
             _optSICToleranceDa.Text = "Da";
-            // 
+            //
             // chkRefineReportedParentIonMZ
-            // 
+            //
             _chkRefineReportedParentIonMZ.Location = new System.Drawing.Point(10, 183);
             _chkRefineReportedParentIonMZ.Name = "chkRefineReportedParentIonMZ";
             _chkRefineReportedParentIonMZ.Size = new System.Drawing.Size(316, 20);
             _chkRefineReportedParentIonMZ.TabIndex = 12;
             _chkRefineReportedParentIonMZ.Text = "Refine reported parent ion m/z values";
-            // 
+            //
             // chkReplaceSICZeroesWithMinimumPositiveValueFromMSData
-            // 
+            //
             _chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked = true;
             _chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.CheckState = CheckState.Checked;
             _chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Location = new System.Drawing.Point(10, 157);
@@ -822,97 +821,97 @@ namespace MASIC
             _chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Size = new System.Drawing.Size(316, 20);
             _chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.TabIndex = 11;
             _chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Text = "Replace SIC zeroes with min MS data values";
-            // 
+            //
             // txtMaxPeakWidthMinutesForward
-            // 
+            //
             _txtMaxPeakWidthMinutesForward.Location = new System.Drawing.Point(250, 65);
             _txtMaxPeakWidthMinutesForward.Name = "txtMaxPeakWidthMinutesForward";
             _txtMaxPeakWidthMinutesForward.Size = new System.Drawing.Size(67, 22);
             _txtMaxPeakWidthMinutesForward.TabIndex = 6;
             _txtMaxPeakWidthMinutesForward.Text = "3";
-            // 
+            //
             // txtMaxPeakWidthMinutesBackward
-            // 
+            //
             _txtMaxPeakWidthMinutesBackward.Location = new System.Drawing.Point(96, 65);
             _txtMaxPeakWidthMinutesBackward.Name = "txtMaxPeakWidthMinutesBackward";
             _txtMaxPeakWidthMinutesBackward.Size = new System.Drawing.Size(67, 22);
             _txtMaxPeakWidthMinutesBackward.TabIndex = 4;
             _txtMaxPeakWidthMinutesBackward.Text = "3";
-            // 
+            //
             // txtIntensityThresholdFractionMax
-            // 
+            //
             _txtIntensityThresholdFractionMax.Location = new System.Drawing.Point(250, 92);
             _txtIntensityThresholdFractionMax.Name = "txtIntensityThresholdFractionMax";
             _txtIntensityThresholdFractionMax.Size = new System.Drawing.Size(67, 22);
             _txtIntensityThresholdFractionMax.TabIndex = 8;
             _txtIntensityThresholdFractionMax.Text = "0.01";
-            // 
+            //
             // lblIntensityThresholdFractionMax
-            // 
+            //
             _lblIntensityThresholdFractionMax.Location = new System.Drawing.Point(10, 92);
             _lblIntensityThresholdFractionMax.Name = "lblIntensityThresholdFractionMax";
             _lblIntensityThresholdFractionMax.Size = new System.Drawing.Size(240, 19);
             _lblIntensityThresholdFractionMax.TabIndex = 7;
             _lblIntensityThresholdFractionMax.Text = "Intensity Threshold Fraction Max Peak";
-            // 
+            //
             // txtIntensityThresholdAbsoluteMinimum
-            // 
+            //
             _txtIntensityThresholdAbsoluteMinimum.Location = new System.Drawing.Point(250, 120);
             _txtIntensityThresholdAbsoluteMinimum.Name = "txtIntensityThresholdAbsoluteMinimum";
             _txtIntensityThresholdAbsoluteMinimum.Size = new System.Drawing.Size(67, 22);
             _txtIntensityThresholdAbsoluteMinimum.TabIndex = 10;
             _txtIntensityThresholdAbsoluteMinimum.Text = "0";
-            // 
+            //
             // lblIntensityThresholdAbsoluteMinimum
-            // 
+            //
             _lblIntensityThresholdAbsoluteMinimum.Location = new System.Drawing.Point(10, 120);
             _lblIntensityThresholdAbsoluteMinimum.Name = "lblIntensityThresholdAbsoluteMinimum";
             _lblIntensityThresholdAbsoluteMinimum.Size = new System.Drawing.Size(240, 18);
             _lblIntensityThresholdAbsoluteMinimum.TabIndex = 9;
             _lblIntensityThresholdAbsoluteMinimum.Text = "Intensity Threshold Absolute Minimum";
-            // 
+            //
             // lblMaxPeakWidthMinutesForward
-            // 
+            //
             _lblMaxPeakWidthMinutesForward.Location = new System.Drawing.Point(182, 65);
             _lblMaxPeakWidthMinutesForward.Name = "lblMaxPeakWidthMinutesForward";
             _lblMaxPeakWidthMinutesForward.Size = new System.Drawing.Size(77, 18);
             _lblMaxPeakWidthMinutesForward.TabIndex = 5;
             _lblMaxPeakWidthMinutesForward.Text = "Forward";
-            // 
+            //
             // lblMaxPeakWidthMinutesBackward
-            // 
+            //
             _lblMaxPeakWidthMinutesBackward.Location = new System.Drawing.Point(19, 65);
             _lblMaxPeakWidthMinutesBackward.Name = "lblMaxPeakWidthMinutesBackward";
             _lblMaxPeakWidthMinutesBackward.Size = new System.Drawing.Size(77, 18);
             _lblMaxPeakWidthMinutesBackward.TabIndex = 3;
             _lblMaxPeakWidthMinutesBackward.Text = "Backward";
-            // 
+            //
             // lblMaxPeakWidthMinutes
-            // 
+            //
             _lblMaxPeakWidthMinutes.Location = new System.Drawing.Point(10, 46);
             _lblMaxPeakWidthMinutes.Name = "lblMaxPeakWidthMinutes";
             _lblMaxPeakWidthMinutes.Size = new System.Drawing.Size(201, 19);
             _lblMaxPeakWidthMinutes.TabIndex = 2;
             _lblMaxPeakWidthMinutes.Text = "Maximum Peak Width (minutes)";
-            // 
+            //
             // txtSICTolerance
-            // 
+            //
             _txtSICTolerance.Location = new System.Drawing.Point(154, 18);
             _txtSICTolerance.Name = "txtSICTolerance";
             _txtSICTolerance.Size = new System.Drawing.Size(57, 22);
             _txtSICTolerance.TabIndex = 1;
             _txtSICTolerance.Text = "0.60";
-            // 
+            //
             // lblSICToleranceDa
-            // 
+            //
             _lblSICToleranceDa.Location = new System.Drawing.Point(10, 18);
             _lblSICToleranceDa.Name = "lblSICToleranceDa";
             _lblSICToleranceDa.Size = new System.Drawing.Size(144, 19);
             _lblSICToleranceDa.TabIndex = 0;
             _lblSICToleranceDa.Text = "SIC Tolerance (Da)";
-            // 
+            //
             // TabPagePeakFindingOptions
-            // 
+            //
             _TabPagePeakFindingOptions.Controls.Add(_fraSICNoiseThresholds);
             _TabPagePeakFindingOptions.Controls.Add(_fraSmoothingOptions);
             _TabPagePeakFindingOptions.Controls.Add(_fraPeakFindingOptions);
@@ -922,9 +921,9 @@ namespace MASIC
             _TabPagePeakFindingOptions.TabIndex = 7;
             _TabPagePeakFindingOptions.Text = "Peak Finding Options";
             _TabPagePeakFindingOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // fraSICNoiseThresholds
-            // 
+            //
             _fraSICNoiseThresholds.Controls.Add(_cboSICNoiseThresholdMode);
             _fraSICNoiseThresholds.Controls.Add(_lblNoiseThresholdMode);
             _fraSICNoiseThresholds.Controls.Add(_txtSICNoiseFractionLowIntensityDataToAverage);
@@ -937,57 +936,57 @@ namespace MASIC
             _fraSICNoiseThresholds.TabIndex = 0;
             _fraSICNoiseThresholds.TabStop = false;
             _fraSICNoiseThresholds.Text = "Initial Noise Threshold Determination for SICs";
-            // 
+            //
             // cboSICNoiseThresholdMode
-            // 
+            //
             _cboSICNoiseThresholdMode.DropDownStyle = ComboBoxStyle.DropDownList;
             _cboSICNoiseThresholdMode.Location = new System.Drawing.Point(144, 28);
             _cboSICNoiseThresholdMode.Name = "cboSICNoiseThresholdMode";
             _cboSICNoiseThresholdMode.Size = new System.Drawing.Size(211, 24);
             _cboSICNoiseThresholdMode.TabIndex = 1;
-            // 
+            //
             // lblNoiseThresholdMode
-            // 
+            //
             _lblNoiseThresholdMode.Location = new System.Drawing.Point(19, 30);
             _lblNoiseThresholdMode.Name = "lblNoiseThresholdMode";
             _lblNoiseThresholdMode.Size = new System.Drawing.Size(115, 18);
             _lblNoiseThresholdMode.TabIndex = 0;
             _lblNoiseThresholdMode.Text = "Threshold Mode:";
-            // 
+            //
             // txtSICNoiseFractionLowIntensityDataToAverage
-            // 
+            //
             _txtSICNoiseFractionLowIntensityDataToAverage.Location = new System.Drawing.Point(298, 92);
             _txtSICNoiseFractionLowIntensityDataToAverage.Name = "txtSICNoiseFractionLowIntensityDataToAverage";
             _txtSICNoiseFractionLowIntensityDataToAverage.Size = new System.Drawing.Size(67, 22);
             _txtSICNoiseFractionLowIntensityDataToAverage.TabIndex = 5;
             _txtSICNoiseFractionLowIntensityDataToAverage.Text = "0.75";
-            // 
+            //
             // lblSICNoiseFractionLowIntensityDataToAverage
-            // 
+            //
             _lblSICNoiseFractionLowIntensityDataToAverage.Location = new System.Drawing.Point(19, 95);
             _lblSICNoiseFractionLowIntensityDataToAverage.Name = "lblSICNoiseFractionLowIntensityDataToAverage";
             _lblSICNoiseFractionLowIntensityDataToAverage.Size = new System.Drawing.Size(231, 16);
             _lblSICNoiseFractionLowIntensityDataToAverage.TabIndex = 4;
             _lblSICNoiseFractionLowIntensityDataToAverage.Text = "Fraction low intensity data to average";
-            // 
+            //
             // txtSICNoiseThresholdIntensity
-            // 
+            //
             _txtSICNoiseThresholdIntensity.Location = new System.Drawing.Point(298, 65);
             _txtSICNoiseThresholdIntensity.Name = "txtSICNoiseThresholdIntensity";
             _txtSICNoiseThresholdIntensity.Size = new System.Drawing.Size(67, 22);
             _txtSICNoiseThresholdIntensity.TabIndex = 3;
             _txtSICNoiseThresholdIntensity.Text = "0";
-            // 
+            //
             // lblSICNoiseThresholdIntensity
-            // 
+            //
             _lblSICNoiseThresholdIntensity.Location = new System.Drawing.Point(19, 67);
             _lblSICNoiseThresholdIntensity.Name = "lblSICNoiseThresholdIntensity";
             _lblSICNoiseThresholdIntensity.Size = new System.Drawing.Size(240, 18);
             _lblSICNoiseThresholdIntensity.TabIndex = 2;
             _lblSICNoiseThresholdIntensity.Text = "Absolute Noise Thereshold Intensity";
-            // 
+            //
             // fraSmoothingOptions
-            // 
+            //
             _fraSmoothingOptions.Controls.Add(_chkSmoothDataRegardlessOfMinimumPeakWidth);
             _fraSmoothingOptions.Controls.Add(_chkFindPeaksOnSmoothedData);
             _fraSmoothingOptions.Controls.Add(_optUseSavitzkyGolaySmooth);
@@ -1002,9 +1001,9 @@ namespace MASIC
             _fraSmoothingOptions.TabIndex = 2;
             _fraSmoothingOptions.TabStop = false;
             _fraSmoothingOptions.Text = "Smoothing Options";
-            // 
+            //
             // chkSmoothDataRegardlessOfMinimumPeakWidth
-            // 
+            //
             _chkSmoothDataRegardlessOfMinimumPeakWidth.Checked = true;
             _chkSmoothDataRegardlessOfMinimumPeakWidth.CheckState = CheckState.Checked;
             _chkSmoothDataRegardlessOfMinimumPeakWidth.Location = new System.Drawing.Point(29, 203);
@@ -1012,9 +1011,9 @@ namespace MASIC
             _chkSmoothDataRegardlessOfMinimumPeakWidth.Size = new System.Drawing.Size(192, 46);
             _chkSmoothDataRegardlessOfMinimumPeakWidth.TabIndex = 7;
             _chkSmoothDataRegardlessOfMinimumPeakWidth.Text = "Smooth Data Regardless Of Minimum Peak Width";
-            // 
+            //
             // chkFindPeaksOnSmoothedData
-            // 
+            //
             _chkFindPeaksOnSmoothedData.Checked = true;
             _chkFindPeaksOnSmoothedData.CheckState = CheckState.Checked;
             _chkFindPeaksOnSmoothedData.Location = new System.Drawing.Point(29, 175);
@@ -1022,49 +1021,49 @@ namespace MASIC
             _chkFindPeaksOnSmoothedData.Size = new System.Drawing.Size(249, 19);
             _chkFindPeaksOnSmoothedData.TabIndex = 6;
             _chkFindPeaksOnSmoothedData.Text = "Find Peaks On Smoothed Data";
-            // 
+            //
             // optUseSavitzkyGolaySmooth
-            // 
+            //
             _optUseSavitzkyGolaySmooth.Location = new System.Drawing.Point(19, 92);
             _optUseSavitzkyGolaySmooth.Name = "optUseSavitzkyGolaySmooth";
             _optUseSavitzkyGolaySmooth.Size = new System.Drawing.Size(240, 19);
             _optUseSavitzkyGolaySmooth.TabIndex = 3;
             _optUseSavitzkyGolaySmooth.Text = "Use Savitzky Golay Smooth";
-            // 
+            //
             // txtButterworthSamplingFrequency
-            // 
+            //
             _txtButterworthSamplingFrequency.Location = new System.Drawing.Point(134, 55);
             _txtButterworthSamplingFrequency.Name = "txtButterworthSamplingFrequency";
             _txtButterworthSamplingFrequency.Size = new System.Drawing.Size(58, 22);
             _txtButterworthSamplingFrequency.TabIndex = 2;
             _txtButterworthSamplingFrequency.Text = "0.25";
-            // 
+            //
             // lblButterworthSamplingFrequency
-            // 
+            //
             _lblButterworthSamplingFrequency.Location = new System.Drawing.Point(38, 55);
             _lblButterworthSamplingFrequency.Name = "lblButterworthSamplingFrequency";
             _lblButterworthSamplingFrequency.Size = new System.Drawing.Size(87, 19);
             _lblButterworthSamplingFrequency.TabIndex = 1;
             _lblButterworthSamplingFrequency.Text = "Filter Order";
-            // 
+            //
             // txtSavitzkyGolayFilterOrder
-            // 
+            //
             _txtSavitzkyGolayFilterOrder.Location = new System.Drawing.Point(134, 120);
             _txtSavitzkyGolayFilterOrder.Name = "txtSavitzkyGolayFilterOrder";
             _txtSavitzkyGolayFilterOrder.Size = new System.Drawing.Size(58, 22);
             _txtSavitzkyGolayFilterOrder.TabIndex = 5;
             _txtSavitzkyGolayFilterOrder.Text = "0";
-            // 
+            //
             // lblSavitzkyGolayFilterOrder
-            // 
+            //
             _lblSavitzkyGolayFilterOrder.Location = new System.Drawing.Point(38, 120);
             _lblSavitzkyGolayFilterOrder.Name = "lblSavitzkyGolayFilterOrder";
             _lblSavitzkyGolayFilterOrder.Size = new System.Drawing.Size(87, 18);
             _lblSavitzkyGolayFilterOrder.TabIndex = 4;
             _lblSavitzkyGolayFilterOrder.Text = "Filter Order";
-            // 
+            //
             // optUseButterworthSmooth
-            // 
+            //
             _optUseButterworthSmooth.Checked = true;
             _optUseButterworthSmooth.Location = new System.Drawing.Point(19, 28);
             _optUseButterworthSmooth.Name = "optUseButterworthSmooth";
@@ -1072,9 +1071,9 @@ namespace MASIC
             _optUseButterworthSmooth.TabIndex = 0;
             _optUseButterworthSmooth.TabStop = true;
             _optUseButterworthSmooth.Text = "Use Butterworth Smooth";
-            // 
+            //
             // fraPeakFindingOptions
-            // 
+            //
             _fraPeakFindingOptions.Controls.Add(_txtInitialPeakWidthScansMaximum);
             _fraPeakFindingOptions.Controls.Add(_lblInitialPeakWidthScansMaximum);
             _fraPeakFindingOptions.Controls.Add(_txtInitialPeakWidthScansScaler);
@@ -1089,73 +1088,73 @@ namespace MASIC
             _fraPeakFindingOptions.TabIndex = 1;
             _fraPeakFindingOptions.TabStop = false;
             _fraPeakFindingOptions.Text = "Fine Tuning Peak Finding";
-            // 
+            //
             // txtInitialPeakWidthScansMaximum
-            // 
+            //
             _txtInitialPeakWidthScansMaximum.Location = new System.Drawing.Point(288, 111);
             _txtInitialPeakWidthScansMaximum.Name = "txtInitialPeakWidthScansMaximum";
             _txtInitialPeakWidthScansMaximum.Size = new System.Drawing.Size(67, 22);
             _txtInitialPeakWidthScansMaximum.TabIndex = 7;
             _txtInitialPeakWidthScansMaximum.Text = "30";
-            // 
+            //
             // lblInitialPeakWidthScansMaximum
-            // 
+            //
             _lblInitialPeakWidthScansMaximum.Location = new System.Drawing.Point(19, 113);
             _lblInitialPeakWidthScansMaximum.Name = "lblInitialPeakWidthScansMaximum";
             _lblInitialPeakWidthScansMaximum.Size = new System.Drawing.Size(240, 19);
             _lblInitialPeakWidthScansMaximum.TabIndex = 6;
             _lblInitialPeakWidthScansMaximum.Text = "Initial Peak Width Maximum (Scans)";
-            // 
+            //
             // txtInitialPeakWidthScansScaler
-            // 
+            //
             _txtInitialPeakWidthScansScaler.Location = new System.Drawing.Point(288, 83);
             _txtInitialPeakWidthScansScaler.Name = "txtInitialPeakWidthScansScaler";
             _txtInitialPeakWidthScansScaler.Size = new System.Drawing.Size(67, 22);
             _txtInitialPeakWidthScansScaler.TabIndex = 5;
             _txtInitialPeakWidthScansScaler.Text = "1";
-            // 
+            //
             // lblInitialPeakWidthScansScaler
-            // 
+            //
             _lblInitialPeakWidthScansScaler.Location = new System.Drawing.Point(19, 85);
             _lblInitialPeakWidthScansScaler.Name = "lblInitialPeakWidthScansScaler";
             _lblInitialPeakWidthScansScaler.Size = new System.Drawing.Size(240, 19);
             _lblInitialPeakWidthScansScaler.TabIndex = 4;
             _lblInitialPeakWidthScansScaler.Text = "Initial Peak Width Scaler (Scans)";
-            // 
+            //
             // txtMaxAllowedUpwardSpikeFractionMax
-            // 
+            //
             _txtMaxAllowedUpwardSpikeFractionMax.Location = new System.Drawing.Point(288, 55);
             _txtMaxAllowedUpwardSpikeFractionMax.Name = "txtMaxAllowedUpwardSpikeFractionMax";
             _txtMaxAllowedUpwardSpikeFractionMax.Size = new System.Drawing.Size(67, 22);
             _txtMaxAllowedUpwardSpikeFractionMax.TabIndex = 3;
             _txtMaxAllowedUpwardSpikeFractionMax.Text = "0.2";
-            // 
+            //
             // lblMaxAllowedUpwardSpikeFractionMax
-            // 
+            //
             _lblMaxAllowedUpwardSpikeFractionMax.Location = new System.Drawing.Point(19, 58);
             _lblMaxAllowedUpwardSpikeFractionMax.Name = "lblMaxAllowedUpwardSpikeFractionMax";
             _lblMaxAllowedUpwardSpikeFractionMax.Size = new System.Drawing.Size(279, 18);
             _lblMaxAllowedUpwardSpikeFractionMax.TabIndex = 2;
             _lblMaxAllowedUpwardSpikeFractionMax.Text = "Max Allowed Upward Spike (Fraction Max)";
-            // 
+            //
             // txtMaxDistanceScansNoOverlap
-            // 
+            //
             _txtMaxDistanceScansNoOverlap.Location = new System.Drawing.Point(288, 28);
             _txtMaxDistanceScansNoOverlap.Name = "txtMaxDistanceScansNoOverlap";
             _txtMaxDistanceScansNoOverlap.Size = new System.Drawing.Size(67, 22);
             _txtMaxDistanceScansNoOverlap.TabIndex = 1;
             _txtMaxDistanceScansNoOverlap.Text = "0";
-            // 
+            //
             // lblMaxDistanceScansNoOverlap
-            // 
+            //
             _lblMaxDistanceScansNoOverlap.Location = new System.Drawing.Point(19, 30);
             _lblMaxDistanceScansNoOverlap.Name = "lblMaxDistanceScansNoOverlap";
             _lblMaxDistanceScansNoOverlap.Size = new System.Drawing.Size(240, 18);
             _lblMaxDistanceScansNoOverlap.TabIndex = 0;
             _lblMaxDistanceScansNoOverlap.Text = "Max Distance No Overlap (Scans)";
-            // 
+            //
             // TabPageBinningAndSimilarityOptions
-            // 
+            //
             _TabPageBinningAndSimilarityOptions.Controls.Add(_fraMassSpectraNoiseThresholds);
             _TabPageBinningAndSimilarityOptions.Controls.Add(_fraBinningIntensityOptions);
             _TabPageBinningAndSimilarityOptions.Controls.Add(_fraSpectrumSimilarityOptions);
@@ -1166,9 +1165,9 @@ namespace MASIC
             _TabPageBinningAndSimilarityOptions.TabIndex = 6;
             _TabPageBinningAndSimilarityOptions.Text = "Binning and Similarity";
             _TabPageBinningAndSimilarityOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // fraMassSpectraNoiseThresholds
-            // 
+            //
             _fraMassSpectraNoiseThresholds.Controls.Add(_txtMassSpectraNoiseMinimumSignalToNoiseRatio);
             _fraMassSpectraNoiseThresholds.Controls.Add(_lblMassSpectraNoiseMinimumSignalToNoiseRatio);
             _fraMassSpectraNoiseThresholds.Controls.Add(_txtMassSpectraNoiseThresholdIntensity);
@@ -1183,73 +1182,73 @@ namespace MASIC
             _fraMassSpectraNoiseThresholds.TabIndex = 0;
             _fraMassSpectraNoiseThresholds.TabStop = false;
             _fraMassSpectraNoiseThresholds.Text = "Noise Threshold Determination for Mass Spectra";
-            // 
+            //
             // txtMassSpectraNoiseMinimumSignalToNoiseRatio
-            // 
+            //
             _txtMassSpectraNoiseMinimumSignalToNoiseRatio.Location = new System.Drawing.Point(250, 120);
             _txtMassSpectraNoiseMinimumSignalToNoiseRatio.Name = "txtMassSpectraNoiseMinimumSignalToNoiseRatio";
             _txtMassSpectraNoiseMinimumSignalToNoiseRatio.Size = new System.Drawing.Size(67, 22);
             _txtMassSpectraNoiseMinimumSignalToNoiseRatio.TabIndex = 9;
             _txtMassSpectraNoiseMinimumSignalToNoiseRatio.Text = "2";
-            // 
+            //
             // lblMassSpectraNoiseMinimumSignalToNoiseRatio
-            // 
+            //
             _lblMassSpectraNoiseMinimumSignalToNoiseRatio.Location = new System.Drawing.Point(10, 120);
             _lblMassSpectraNoiseMinimumSignalToNoiseRatio.Name = "lblMassSpectraNoiseMinimumSignalToNoiseRatio";
             _lblMassSpectraNoiseMinimumSignalToNoiseRatio.Size = new System.Drawing.Size(230, 16);
             _lblMassSpectraNoiseMinimumSignalToNoiseRatio.TabIndex = 8;
             _lblMassSpectraNoiseMinimumSignalToNoiseRatio.Text = "Minimum Signal to Noise Ratio";
-            // 
+            //
             // txtMassSpectraNoiseThresholdIntensity
-            // 
+            //
             _txtMassSpectraNoiseThresholdIntensity.Location = new System.Drawing.Point(250, 65);
             _txtMassSpectraNoiseThresholdIntensity.Name = "txtMassSpectraNoiseThresholdIntensity";
             _txtMassSpectraNoiseThresholdIntensity.Size = new System.Drawing.Size(67, 22);
             _txtMassSpectraNoiseThresholdIntensity.TabIndex = 3;
             _txtMassSpectraNoiseThresholdIntensity.Text = "0";
-            // 
+            //
             // txtMassSpectraNoiseFractionLowIntensityDataToAverage
-            // 
+            //
             _txtMassSpectraNoiseFractionLowIntensityDataToAverage.Location = new System.Drawing.Point(250, 92);
             _txtMassSpectraNoiseFractionLowIntensityDataToAverage.Name = "txtMassSpectraNoiseFractionLowIntensityDataToAverage";
             _txtMassSpectraNoiseFractionLowIntensityDataToAverage.Size = new System.Drawing.Size(67, 22);
             _txtMassSpectraNoiseFractionLowIntensityDataToAverage.TabIndex = 5;
             _txtMassSpectraNoiseFractionLowIntensityDataToAverage.Text = "0.5";
-            // 
+            //
             // lblMassSpectraNoiseFractionLowIntensityDataToAverage
-            // 
+            //
             _lblMassSpectraNoiseFractionLowIntensityDataToAverage.Location = new System.Drawing.Point(10, 92);
             _lblMassSpectraNoiseFractionLowIntensityDataToAverage.Name = "lblMassSpectraNoiseFractionLowIntensityDataToAverage";
             _lblMassSpectraNoiseFractionLowIntensityDataToAverage.Size = new System.Drawing.Size(230, 26);
             _lblMassSpectraNoiseFractionLowIntensityDataToAverage.TabIndex = 4;
             _lblMassSpectraNoiseFractionLowIntensityDataToAverage.Text = "Fraction low intensity data to average";
-            // 
+            //
             // cboMassSpectraNoiseThresholdMode
-            // 
+            //
             _cboMassSpectraNoiseThresholdMode.DropDownStyle = ComboBoxStyle.DropDownList;
             _cboMassSpectraNoiseThresholdMode.Location = new System.Drawing.Point(163, 28);
             _cboMassSpectraNoiseThresholdMode.Name = "cboMassSpectraNoiseThresholdMode";
             _cboMassSpectraNoiseThresholdMode.Size = new System.Drawing.Size(211, 24);
             _cboMassSpectraNoiseThresholdMode.TabIndex = 1;
-            // 
+            //
             // lblMassSpectraNoiseThresholdMode
-            // 
+            //
             _lblMassSpectraNoiseThresholdMode.Location = new System.Drawing.Point(10, 37);
             _lblMassSpectraNoiseThresholdMode.Name = "lblMassSpectraNoiseThresholdMode";
             _lblMassSpectraNoiseThresholdMode.Size = new System.Drawing.Size(163, 18);
             _lblMassSpectraNoiseThresholdMode.TabIndex = 0;
             _lblMassSpectraNoiseThresholdMode.Text = "Noise Threshold Mode:";
-            // 
+            //
             // lblMassSpectraNoiseThresholdIntensity
-            // 
+            //
             _lblMassSpectraNoiseThresholdIntensity.Location = new System.Drawing.Point(10, 65);
             _lblMassSpectraNoiseThresholdIntensity.Name = "lblMassSpectraNoiseThresholdIntensity";
             _lblMassSpectraNoiseThresholdIntensity.Size = new System.Drawing.Size(220, 18);
             _lblMassSpectraNoiseThresholdIntensity.TabIndex = 2;
             _lblMassSpectraNoiseThresholdIntensity.Text = "Absolute Noise Threshold Intensity";
-            // 
+            //
             // fraBinningIntensityOptions
-            // 
+            //
             _fraBinningIntensityOptions.Controls.Add(_lblBinnedDataIntensityPrecisionPctUnits);
             _fraBinningIntensityOptions.Controls.Add(_chkBinnedDataSumAllIntensitiesForBin);
             _fraBinningIntensityOptions.Controls.Add(_chkBinnedDataNormalize);
@@ -1261,49 +1260,49 @@ namespace MASIC
             _fraBinningIntensityOptions.TabIndex = 3;
             _fraBinningIntensityOptions.TabStop = false;
             _fraBinningIntensityOptions.Text = "Binning Intensity Options";
-            // 
+            //
             // lblBinnedDataIntensityPrecisionPctUnits
-            // 
+            //
             _lblBinnedDataIntensityPrecisionPctUnits.Location = new System.Drawing.Point(259, 28);
             _lblBinnedDataIntensityPrecisionPctUnits.Name = "lblBinnedDataIntensityPrecisionPctUnits";
             _lblBinnedDataIntensityPrecisionPctUnits.Size = new System.Drawing.Size(19, 18);
             _lblBinnedDataIntensityPrecisionPctUnits.TabIndex = 8;
             _lblBinnedDataIntensityPrecisionPctUnits.Text = "%";
-            // 
+            //
             // chkBinnedDataSumAllIntensitiesForBin
-            // 
+            //
             _chkBinnedDataSumAllIntensitiesForBin.Location = new System.Drawing.Point(10, 92);
             _chkBinnedDataSumAllIntensitiesForBin.Name = "chkBinnedDataSumAllIntensitiesForBin";
             _chkBinnedDataSumAllIntensitiesForBin.Size = new System.Drawing.Size(192, 19);
             _chkBinnedDataSumAllIntensitiesForBin.TabIndex = 10;
             _chkBinnedDataSumAllIntensitiesForBin.Text = "Sum All Intensities For Bin";
-            // 
+            //
             // chkBinnedDataNormalize
-            // 
+            //
             _chkBinnedDataNormalize.Location = new System.Drawing.Point(10, 65);
             _chkBinnedDataNormalize.Name = "chkBinnedDataNormalize";
             _chkBinnedDataNormalize.Size = new System.Drawing.Size(163, 18);
             _chkBinnedDataNormalize.TabIndex = 9;
             _chkBinnedDataNormalize.Text = "Normalize Intensities";
-            // 
+            //
             // txtBinnedDataIntensityPrecisionPct
-            // 
+            //
             _txtBinnedDataIntensityPrecisionPct.Location = new System.Drawing.Point(211, 28);
             _txtBinnedDataIntensityPrecisionPct.Name = "txtBinnedDataIntensityPrecisionPct";
             _txtBinnedDataIntensityPrecisionPct.Size = new System.Drawing.Size(48, 22);
             _txtBinnedDataIntensityPrecisionPct.TabIndex = 7;
             _txtBinnedDataIntensityPrecisionPct.Text = "1";
-            // 
+            //
             // lblBinnedDataIntensityPrecisionPct
-            // 
+            //
             _lblBinnedDataIntensityPrecisionPct.Location = new System.Drawing.Point(10, 30);
             _lblBinnedDataIntensityPrecisionPct.Name = "lblBinnedDataIntensityPrecisionPct";
             _lblBinnedDataIntensityPrecisionPct.Size = new System.Drawing.Size(201, 18);
             _lblBinnedDataIntensityPrecisionPct.TabIndex = 6;
             _lblBinnedDataIntensityPrecisionPct.Text = "Intensity Precision (0.1 to 100)";
-            // 
+            //
             // fraSpectrumSimilarityOptions
-            // 
+            //
             _fraSpectrumSimilarityOptions.Controls.Add(_lblSimilarIonTimeToleranceHalfWidthUnits);
             _fraSpectrumSimilarityOptions.Controls.Add(_txtSpectrumSimilarityMinimum);
             _fraSpectrumSimilarityOptions.Controls.Add(_lblSpectrumSimilarityMinimum);
@@ -1317,65 +1316,65 @@ namespace MASIC
             _fraSpectrumSimilarityOptions.TabIndex = 1;
             _fraSpectrumSimilarityOptions.TabStop = false;
             _fraSpectrumSimilarityOptions.Text = "Spectrum Similarity Options";
-            // 
+            //
             // lblSimilarIonTimeToleranceHalfWidthUnits
-            // 
+            //
             _lblSimilarIonTimeToleranceHalfWidthUnits.Location = new System.Drawing.Point(259, 58);
             _lblSimilarIonTimeToleranceHalfWidthUnits.Name = "lblSimilarIonTimeToleranceHalfWidthUnits";
             _lblSimilarIonTimeToleranceHalfWidthUnits.Size = new System.Drawing.Size(58, 18);
             _lblSimilarIonTimeToleranceHalfWidthUnits.TabIndex = 6;
             _lblSimilarIonTimeToleranceHalfWidthUnits.Text = "minutes";
-            // 
+            //
             // txtSpectrumSimilarityMinimum
-            // 
+            //
             _txtSpectrumSimilarityMinimum.Location = new System.Drawing.Point(202, 83);
             _txtSpectrumSimilarityMinimum.Name = "txtSpectrumSimilarityMinimum";
             _txtSpectrumSimilarityMinimum.Size = new System.Drawing.Size(48, 22);
             _txtSpectrumSimilarityMinimum.TabIndex = 5;
             _txtSpectrumSimilarityMinimum.Text = "0.7";
-            // 
+            //
             // lblSpectrumSimilarityMinimum
-            // 
+            //
             _lblSpectrumSimilarityMinimum.Location = new System.Drawing.Point(10, 85);
             _lblSpectrumSimilarityMinimum.Name = "lblSpectrumSimilarityMinimum";
             _lblSpectrumSimilarityMinimum.Size = new System.Drawing.Size(180, 19);
             _lblSpectrumSimilarityMinimum.TabIndex = 4;
             _lblSpectrumSimilarityMinimum.Text = "Minimum Similarity (0 to 1)";
-            // 
+            //
             // txtSimilarIonToleranceHalfWidthMinutes
-            // 
+            //
             _txtSimilarIonToleranceHalfWidthMinutes.Location = new System.Drawing.Point(202, 55);
             _txtSimilarIonToleranceHalfWidthMinutes.Name = "txtSimilarIonToleranceHalfWidthMinutes";
             _txtSimilarIonToleranceHalfWidthMinutes.Size = new System.Drawing.Size(48, 22);
             _txtSimilarIonToleranceHalfWidthMinutes.TabIndex = 3;
             _txtSimilarIonToleranceHalfWidthMinutes.Text = "5";
-            // 
+            //
             // lblSimilarIonTimeToleranceHalfWidth
-            // 
+            //
             _lblSimilarIonTimeToleranceHalfWidth.Location = new System.Drawing.Point(10, 58);
             _lblSimilarIonTimeToleranceHalfWidth.Name = "lblSimilarIonTimeToleranceHalfWidth";
             _lblSimilarIonTimeToleranceHalfWidth.Size = new System.Drawing.Size(180, 18);
             _lblSimilarIonTimeToleranceHalfWidth.TabIndex = 2;
             _lblSimilarIonTimeToleranceHalfWidth.Text = "Time Tolerance Half Width";
-            // 
+            //
             // txtSimilarIonMZToleranceHalfWidth
-            // 
+            //
             _txtSimilarIonMZToleranceHalfWidth.Location = new System.Drawing.Point(202, 28);
             _txtSimilarIonMZToleranceHalfWidth.Name = "txtSimilarIonMZToleranceHalfWidth";
             _txtSimilarIonMZToleranceHalfWidth.Size = new System.Drawing.Size(48, 22);
             _txtSimilarIonMZToleranceHalfWidth.TabIndex = 1;
             _txtSimilarIonMZToleranceHalfWidth.Text = "0.1";
-            // 
+            //
             // lblSimilarIonMZToleranceHalfWidth
-            // 
+            //
             _lblSimilarIonMZToleranceHalfWidth.Location = new System.Drawing.Point(10, 30);
             _lblSimilarIonMZToleranceHalfWidth.Name = "lblSimilarIonMZToleranceHalfWidth";
             _lblSimilarIonMZToleranceHalfWidth.Size = new System.Drawing.Size(180, 18);
             _lblSimilarIonMZToleranceHalfWidth.TabIndex = 0;
             _lblSimilarIonMZToleranceHalfWidth.Text = "m/z Tolerance Half Width";
-            // 
+            //
             // fraBinningMZOptions
-            // 
+            //
             _fraBinningMZOptions.Controls.Add(_txtMaximumBinCount);
             _fraBinningMZOptions.Controls.Add(_lblMaximumBinCount);
             _fraBinningMZOptions.Controls.Add(_txtBinSize);
@@ -1390,73 +1389,73 @@ namespace MASIC
             _fraBinningMZOptions.TabIndex = 2;
             _fraBinningMZOptions.TabStop = false;
             _fraBinningMZOptions.Text = "Binning m/z Options";
-            // 
+            //
             // txtMaximumBinCount
-            // 
+            //
             _txtMaximumBinCount.Location = new System.Drawing.Point(182, 111);
             _txtMaximumBinCount.Name = "txtMaximumBinCount";
             _txtMaximumBinCount.Size = new System.Drawing.Size(68, 22);
             _txtMaximumBinCount.TabIndex = 7;
             _txtMaximumBinCount.Text = "100000";
-            // 
+            //
             // lblMaximumBinCount
-            // 
+            //
             _lblMaximumBinCount.Location = new System.Drawing.Point(19, 113);
             _lblMaximumBinCount.Name = "lblMaximumBinCount";
             _lblMaximumBinCount.Size = new System.Drawing.Size(154, 19);
             _lblMaximumBinCount.TabIndex = 6;
             _lblMaximumBinCount.Text = "Maximum Bin Count";
-            // 
+            //
             // txtBinSize
-            // 
+            //
             _txtBinSize.Location = new System.Drawing.Point(182, 83);
             _txtBinSize.Name = "txtBinSize";
             _txtBinSize.Size = new System.Drawing.Size(68, 22);
             _txtBinSize.TabIndex = 5;
             _txtBinSize.Text = "1";
-            // 
+            //
             // lblBinSize
-            // 
+            //
             _lblBinSize.Location = new System.Drawing.Point(19, 85);
             _lblBinSize.Name = "lblBinSize";
             _lblBinSize.Size = new System.Drawing.Size(154, 19);
             _lblBinSize.TabIndex = 4;
             _lblBinSize.Text = "Bin Size (m/z units)";
-            // 
+            //
             // txtBinEndX
-            // 
+            //
             _txtBinEndX.Location = new System.Drawing.Point(182, 55);
             _txtBinEndX.Name = "txtBinEndX";
             _txtBinEndX.Size = new System.Drawing.Size(68, 22);
             _txtBinEndX.TabIndex = 3;
             _txtBinEndX.Text = "2000";
-            // 
+            //
             // lblBinEndX
-            // 
+            //
             _lblBinEndX.Location = new System.Drawing.Point(19, 58);
             _lblBinEndX.Name = "lblBinEndX";
             _lblBinEndX.Size = new System.Drawing.Size(144, 18);
             _lblBinEndX.TabIndex = 2;
             _lblBinEndX.Text = "Bin End m/z";
-            // 
+            //
             // txtBinStartX
-            // 
+            //
             _txtBinStartX.Location = new System.Drawing.Point(182, 28);
             _txtBinStartX.Name = "txtBinStartX";
             _txtBinStartX.Size = new System.Drawing.Size(68, 22);
             _txtBinStartX.TabIndex = 1;
             _txtBinStartX.Text = "50";
-            // 
+            //
             // lblBinStartX
-            // 
+            //
             _lblBinStartX.Location = new System.Drawing.Point(19, 30);
             _lblBinStartX.Name = "lblBinStartX";
             _lblBinStartX.Size = new System.Drawing.Size(144, 18);
             _lblBinStartX.TabIndex = 0;
             _lblBinStartX.Text = "Bin Start m/z";
-            // 
+            //
             // TabPageCustomSICOptions
-            // 
+            //
             _TabPageCustomSICOptions.Controls.Add(_txtCustomSICFileDescription);
             _TabPageCustomSICOptions.Controls.Add(_cmdSelectCustomSICFile);
             _TabPageCustomSICOptions.Controls.Add(_txtCustomSICFileName);
@@ -1468,9 +1467,9 @@ namespace MASIC
             _TabPageCustomSICOptions.TabIndex = 3;
             _TabPageCustomSICOptions.Text = "Custom SIC Options";
             _TabPageCustomSICOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // txtCustomSICFileDescription
-            // 
+            //
             _txtCustomSICFileDescription.Location = new System.Drawing.Point(10, 6);
             _txtCustomSICFileDescription.Multiline = true;
             _txtCustomSICFileDescription.Name = "txtCustomSICFileDescription";
@@ -1479,25 +1478,25 @@ namespace MASIC
             _txtCustomSICFileDescription.Size = new System.Drawing.Size(582, 59);
             _txtCustomSICFileDescription.TabIndex = 0;
             _txtCustomSICFileDescription.Text = "Custom SIC description ... populated via code.";
-            // 
+            //
             // cmdSelectCustomSICFile
-            // 
+            //
             _cmdSelectCustomSICFile.Location = new System.Drawing.Point(10, 74);
             _cmdSelectCustomSICFile.Name = "cmdSelectCustomSICFile";
             _cmdSelectCustomSICFile.Size = new System.Drawing.Size(96, 28);
             _cmdSelectCustomSICFile.TabIndex = 1;
             _cmdSelectCustomSICFile.Text = "&Select File";
-            // 
+            //
             // txtCustomSICFileName
-            // 
+            //
             _txtCustomSICFileName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _txtCustomSICFileName.Location = new System.Drawing.Point(125, 74);
             _txtCustomSICFileName.Name = "txtCustomSICFileName";
             _txtCustomSICFileName.Size = new System.Drawing.Size(534, 22);
             _txtCustomSICFileName.TabIndex = 2;
-            // 
+            //
             // fraCustomSICControls
-            // 
+            //
             _fraCustomSICControls.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             _fraCustomSICControls.Controls.Add(_lblCustomSICToleranceType);
             _fraCustomSICControls.Controls.Add(_optCustomSICScanToleranceAcqTime);
@@ -1514,17 +1513,17 @@ namespace MASIC
             _fraCustomSICControls.Size = new System.Drawing.Size(201, 305);
             _fraCustomSICControls.TabIndex = 4;
             _fraCustomSICControls.TabStop = false;
-            // 
+            //
             // lblCustomSICToleranceType
-            // 
+            //
             _lblCustomSICToleranceType.Location = new System.Drawing.Point(6, 145);
             _lblCustomSICToleranceType.Name = "lblCustomSICToleranceType";
             _lblCustomSICToleranceType.Size = new System.Drawing.Size(106, 19);
             _lblCustomSICToleranceType.TabIndex = 5;
             _lblCustomSICToleranceType.Text = "Tolerance Type:";
-            // 
+            //
             // optCustomSICScanToleranceAcqTime
-            // 
+            //
             _optCustomSICScanToleranceAcqTime.AutoSize = true;
             _optCustomSICScanToleranceAcqTime.Location = new System.Drawing.Point(13, 215);
             _optCustomSICScanToleranceAcqTime.Name = "optCustomSICScanToleranceAcqTime";
@@ -1532,9 +1531,9 @@ namespace MASIC
             _optCustomSICScanToleranceAcqTime.TabIndex = 8;
             _optCustomSICScanToleranceAcqTime.Text = "Acquisition time (minutes)";
             _optCustomSICScanToleranceAcqTime.UseVisualStyleBackColor = true;
-            // 
+            //
             // optCustomSICScanToleranceRelative
-            // 
+            //
             _optCustomSICScanToleranceRelative.AutoSize = true;
             _optCustomSICScanToleranceRelative.Location = new System.Drawing.Point(13, 190);
             _optCustomSICScanToleranceRelative.Name = "optCustomSICScanToleranceRelative";
@@ -1542,9 +1541,9 @@ namespace MASIC
             _optCustomSICScanToleranceRelative.TabIndex = 7;
             _optCustomSICScanToleranceRelative.Text = "Relative time (0 to 1)";
             _optCustomSICScanToleranceRelative.UseVisualStyleBackColor = true;
-            // 
+            //
             // optCustomSICScanToleranceAbsolute
-            // 
+            //
             _optCustomSICScanToleranceAbsolute.AutoSize = true;
             _optCustomSICScanToleranceAbsolute.Checked = true;
             _optCustomSICScanToleranceAbsolute.Location = new System.Drawing.Point(13, 166);
@@ -1554,57 +1553,57 @@ namespace MASIC
             _optCustomSICScanToleranceAbsolute.TabStop = true;
             _optCustomSICScanToleranceAbsolute.Text = "Absolute scan number";
             _optCustomSICScanToleranceAbsolute.UseVisualStyleBackColor = true;
-            // 
+            //
             // chkLimitSearchToCustomMZs
-            // 
+            //
             _chkLimitSearchToCustomMZs.Location = new System.Drawing.Point(10, 249);
             _chkLimitSearchToCustomMZs.Name = "chkLimitSearchToCustomMZs";
             _chkLimitSearchToCustomMZs.Size = new System.Drawing.Size(182, 51);
             _chkLimitSearchToCustomMZs.TabIndex = 9;
             _chkLimitSearchToCustomMZs.Text = "Limit search to only use custom m/z values (skip auto-fragmented m/z's)";
-            // 
+            //
             // txtCustomSICScanOrAcqTimeTolerance
-            // 
+            //
             _txtCustomSICScanOrAcqTimeTolerance.Location = new System.Drawing.Point(119, 114);
             _txtCustomSICScanOrAcqTimeTolerance.Name = "txtCustomSICScanOrAcqTimeTolerance";
             _txtCustomSICScanOrAcqTimeTolerance.Size = new System.Drawing.Size(67, 22);
             _txtCustomSICScanOrAcqTimeTolerance.TabIndex = 4;
             _txtCustomSICScanOrAcqTimeTolerance.Text = "3";
-            // 
+            //
             // lblCustomSICScanTolerance
-            // 
+            //
             _lblCustomSICScanTolerance.Location = new System.Drawing.Point(6, 118);
             _lblCustomSICScanTolerance.Name = "lblCustomSICScanTolerance";
             _lblCustomSICScanTolerance.Size = new System.Drawing.Size(106, 18);
             _lblCustomSICScanTolerance.TabIndex = 3;
             _lblCustomSICScanTolerance.Text = "Scan Tolerance";
-            // 
+            //
             // cmdPasteCustomSICList
-            // 
+            //
             _cmdPasteCustomSICList.Location = new System.Drawing.Point(10, 18);
             _cmdPasteCustomSICList.Name = "cmdPasteCustomSICList";
             _cmdPasteCustomSICList.Size = new System.Drawing.Size(80, 47);
             _cmdPasteCustomSICList.TabIndex = 0;
             _cmdPasteCustomSICList.Text = "Paste Values";
-            // 
+            //
             // cmdCustomSICValuesPopulate
-            // 
+            //
             _cmdCustomSICValuesPopulate.Location = new System.Drawing.Point(7, 72);
             _cmdCustomSICValuesPopulate.Name = "cmdCustomSICValuesPopulate";
             _cmdCustomSICValuesPopulate.Size = new System.Drawing.Size(183, 27);
             _cmdCustomSICValuesPopulate.TabIndex = 2;
             _cmdCustomSICValuesPopulate.Text = "Auto-Populate with Defaults";
-            // 
+            //
             // cmdClearCustomSICList
-            // 
+            //
             _cmdClearCustomSICList.Location = new System.Drawing.Point(107, 18);
             _cmdClearCustomSICList.Name = "cmdClearCustomSICList";
             _cmdClearCustomSICList.Size = new System.Drawing.Size(77, 47);
             _cmdClearCustomSICList.TabIndex = 1;
             _cmdClearCustomSICList.Text = "Clear List";
-            // 
+            //
             // dgCustomSICValues
-            // 
+            //
             _dgCustomSICValues.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _dgCustomSICValues.CaptionText = "Custom SIC Values";
             _dgCustomSICValues.DataMember = "";
@@ -1613,9 +1612,9 @@ namespace MASIC
             _dgCustomSICValues.Name = "dgCustomSICValues";
             _dgCustomSICValues.Size = new System.Drawing.Size(649, 194);
             _dgCustomSICValues.TabIndex = 3;
-            // 
+            //
             // TabPageReporterIons
-            // 
+            //
             _TabPageReporterIons.Controls.Add(_fraDecoyOptions);
             _TabPageReporterIons.Controls.Add(_fraMRMOptions);
             _TabPageReporterIons.Controls.Add(_fraReporterIonMassMode);
@@ -1626,9 +1625,9 @@ namespace MASIC
             _TabPageReporterIons.TabIndex = 9;
             _TabPageReporterIons.Text = "Reporter Ions / MRM";
             _TabPageReporterIons.UseVisualStyleBackColor = true;
-            // 
+            //
             // fraDecoyOptions
-            // 
+            //
             _fraDecoyOptions.Controls.Add(_lblParentIonDecoyMassDaUnits);
             _fraDecoyOptions.Controls.Add(_txtParentIonDecoyMassDa);
             _fraDecoyOptions.Controls.Add(_lblParentIonDecoyMassDa);
@@ -1638,33 +1637,33 @@ namespace MASIC
             _fraDecoyOptions.TabIndex = 3;
             _fraDecoyOptions.TabStop = false;
             _fraDecoyOptions.Text = "Decoy Options";
-            // 
+            //
             // lblParentIonDecoyMassDaUnits
-            // 
+            //
             _lblParentIonDecoyMassDaUnits.Location = new System.Drawing.Point(86, 52);
             _lblParentIonDecoyMassDaUnits.Name = "lblParentIonDecoyMassDaUnits";
             _lblParentIonDecoyMassDaUnits.Size = new System.Drawing.Size(41, 20);
             _lblParentIonDecoyMassDaUnits.TabIndex = 2;
             _lblParentIonDecoyMassDaUnits.Text = "Da";
-            // 
+            //
             // txtParentIonDecoyMassDa
-            // 
+            //
             _txtParentIonDecoyMassDa.Location = new System.Drawing.Point(12, 48);
             _txtParentIonDecoyMassDa.Name = "txtParentIonDecoyMassDa";
             _txtParentIonDecoyMassDa.Size = new System.Drawing.Size(67, 22);
             _txtParentIonDecoyMassDa.TabIndex = 1;
             _txtParentIonDecoyMassDa.Text = "0";
-            // 
+            //
             // lblParentIonDecoyMassDa
-            // 
+            //
             _lblParentIonDecoyMassDa.Location = new System.Drawing.Point(8, 27);
             _lblParentIonDecoyMassDa.Name = "lblParentIonDecoyMassDa";
             _lblParentIonDecoyMassDa.Size = new System.Drawing.Size(170, 18);
             _lblParentIonDecoyMassDa.TabIndex = 0;
             _lblParentIonDecoyMassDa.Text = "Parent Ion Decoy Mass";
-            // 
+            //
             // fraMRMOptions
-            // 
+            //
             _fraMRMOptions.Controls.Add(_chkMRMWriteIntensityCrosstab);
             _fraMRMOptions.Controls.Add(_lblMRMInfo);
             _fraMRMOptions.Controls.Add(_chkMRMWriteDataList);
@@ -1674,33 +1673,33 @@ namespace MASIC
             _fraMRMOptions.TabIndex = 2;
             _fraMRMOptions.TabStop = false;
             _fraMRMOptions.Text = "MRM Options";
-            // 
+            //
             // chkMRMWriteIntensityCrosstab
-            // 
+            //
             _chkMRMWriteIntensityCrosstab.Location = new System.Drawing.Point(23, 120);
             _chkMRMWriteIntensityCrosstab.Name = "chkMRMWriteIntensityCrosstab";
             _chkMRMWriteIntensityCrosstab.Size = new System.Drawing.Size(366, 21);
             _chkMRMWriteIntensityCrosstab.TabIndex = 2;
             _chkMRMWriteIntensityCrosstab.Text = "Save MRM intensity crosstab (wide, rectangular file)";
-            // 
+            //
             // lblMRMInfo
-            // 
+            //
             _lblMRMInfo.Location = new System.Drawing.Point(7, 18);
             _lblMRMInfo.Name = "lblMRMInfo";
             _lblMRMInfo.Size = new System.Drawing.Size(395, 71);
             _lblMRMInfo.TabIndex = 0;
             _lblMRMInfo.Text = resources.GetString("lblMRMInfo.Text");
-            // 
+            //
             // chkMRMWriteDataList
-            // 
+            //
             _chkMRMWriteDataList.Location = new System.Drawing.Point(23, 92);
             _chkMRMWriteDataList.Name = "chkMRMWriteDataList";
             _chkMRMWriteDataList.Size = new System.Drawing.Size(366, 21);
             _chkMRMWriteDataList.TabIndex = 1;
             _chkMRMWriteDataList.Text = "Save MRM data list (long, narrow file)";
-            // 
+            //
             // fraReporterIonMassMode
-            // 
+            //
             _fraReporterIonMassMode.Controls.Add(_cboReporterIonMassMode);
             _fraReporterIonMassMode.Location = new System.Drawing.Point(19, 181);
             _fraReporterIonMassMode.Name = "fraReporterIonMassMode";
@@ -1708,17 +1707,17 @@ namespace MASIC
             _fraReporterIonMassMode.TabIndex = 1;
             _fraReporterIonMassMode.TabStop = false;
             _fraReporterIonMassMode.Text = "Reporter Ion Mass Mode";
-            // 
+            //
             // cboReporterIonMassMode
-            // 
+            //
             _cboReporterIonMassMode.DropDownStyle = ComboBoxStyle.DropDownList;
             _cboReporterIonMassMode.Location = new System.Drawing.Point(9, 27);
             _cboReporterIonMassMode.Name = "cboReporterIonMassMode";
             _cboReporterIonMassMode.Size = new System.Drawing.Size(592, 24);
             _cboReporterIonMassMode.TabIndex = 13;
-            // 
+            //
             // fraReporterIonOptions
-            // 
+            //
             _fraReporterIonOptions.Controls.Add(_chkReporterIonApplyAbundanceCorrection);
             _fraReporterIonOptions.Controls.Add(_chkReporterIonSaveUncorrectedIntensities);
             _fraReporterIonOptions.Controls.Add(_chkReporterIonSaveObservedMasses);
@@ -1731,57 +1730,57 @@ namespace MASIC
             _fraReporterIonOptions.TabIndex = 0;
             _fraReporterIonOptions.TabStop = false;
             _fraReporterIonOptions.Text = "Reporter Ion Options";
-            // 
+            //
             // chkReporterIonApplyAbundanceCorrection
-            // 
+            //
             _chkReporterIonApplyAbundanceCorrection.Location = new System.Drawing.Point(19, 103);
             _chkReporterIonApplyAbundanceCorrection.Name = "chkReporterIonApplyAbundanceCorrection";
             _chkReporterIonApplyAbundanceCorrection.Size = new System.Drawing.Size(301, 20);
             _chkReporterIonApplyAbundanceCorrection.TabIndex = 4;
             _chkReporterIonApplyAbundanceCorrection.Text = "Apply iTraq isotopic abundance correction";
-            // 
+            //
             // chkReporterIonSaveUncorrectedIntensities
-            // 
+            //
             _chkReporterIonSaveUncorrectedIntensities.Location = new System.Drawing.Point(38, 127);
             _chkReporterIonSaveUncorrectedIntensities.Name = "chkReporterIonSaveUncorrectedIntensities";
             _chkReporterIonSaveUncorrectedIntensities.Size = new System.Drawing.Size(269, 21);
             _chkReporterIonSaveUncorrectedIntensities.TabIndex = 5;
             _chkReporterIonSaveUncorrectedIntensities.Text = "Write original uncorrected intensities";
-            // 
+            //
             // chkReporterIonSaveObservedMasses
-            // 
+            //
             _chkReporterIonSaveObservedMasses.Location = new System.Drawing.Point(19, 78);
             _chkReporterIonSaveObservedMasses.Name = "chkReporterIonSaveObservedMasses";
             _chkReporterIonSaveObservedMasses.Size = new System.Drawing.Size(301, 21);
             _chkReporterIonSaveObservedMasses.TabIndex = 3;
             _chkReporterIonSaveObservedMasses.Text = "Write observed m/z values to Reporter Ions file";
-            // 
+            //
             // txtReporterIonMZToleranceDa
-            // 
+            //
             _txtReporterIonMZToleranceDa.Location = new System.Drawing.Point(205, 48);
             _txtReporterIonMZToleranceDa.Name = "txtReporterIonMZToleranceDa";
             _txtReporterIonMZToleranceDa.Size = new System.Drawing.Size(48, 22);
             _txtReporterIonMZToleranceDa.TabIndex = 2;
             _txtReporterIonMZToleranceDa.Text = "0.5";
-            // 
+            //
             // lblReporterIonMZToleranceDa
-            // 
+            //
             _lblReporterIonMZToleranceDa.Location = new System.Drawing.Point(16, 52);
             _lblReporterIonMZToleranceDa.Name = "lblReporterIonMZToleranceDa";
             _lblReporterIonMZToleranceDa.Size = new System.Drawing.Size(182, 18);
             _lblReporterIonMZToleranceDa.TabIndex = 1;
             _lblReporterIonMZToleranceDa.Text = "m/z Tolerance Half Width";
-            // 
+            //
             // chkReporterIonStatsEnabled
-            // 
+            //
             _chkReporterIonStatsEnabled.Location = new System.Drawing.Point(19, 28);
             _chkReporterIonStatsEnabled.Name = "chkReporterIonStatsEnabled";
             _chkReporterIonStatsEnabled.Size = new System.Drawing.Size(240, 20);
             _chkReporterIonStatsEnabled.TabIndex = 0;
             _chkReporterIonStatsEnabled.Text = "Generate Reporter Ion Stats";
-            // 
+            //
             // TabPageAdvancedOptions
-            // 
+            //
             _TabPageAdvancedOptions.Controls.Add(_fraAdditionalInfoFiles);
             _TabPageAdvancedOptions.Controls.Add(_fraDatasetLookupInfo);
             _TabPageAdvancedOptions.Controls.Add(_fraMemoryConservationOptions);
@@ -1791,9 +1790,9 @@ namespace MASIC
             _TabPageAdvancedOptions.TabIndex = 8;
             _TabPageAdvancedOptions.Text = "Advanced";
             _TabPageAdvancedOptions.UseVisualStyleBackColor = true;
-            // 
+            //
             // fraAdditionalInfoFiles
-            // 
+            //
             _fraAdditionalInfoFiles.Controls.Add(_chkConsolidateConstantExtendedHeaderValues);
             _fraAdditionalInfoFiles.Controls.Add(_lblStatusLogKeyNameFilterList);
             _fraAdditionalInfoFiles.Controls.Add(_txtStatusLogKeyNameFilterList);
@@ -1808,9 +1807,9 @@ namespace MASIC
             _fraAdditionalInfoFiles.TabIndex = 1;
             _fraAdditionalInfoFiles.TabStop = false;
             _fraAdditionalInfoFiles.Text = "Thermo Info Files";
-            // 
+            //
             // chkConsolidateConstantExtendedHeaderValues
-            // 
+            //
             _chkConsolidateConstantExtendedHeaderValues.Checked = true;
             _chkConsolidateConstantExtendedHeaderValues.CheckState = CheckState.Checked;
             _chkConsolidateConstantExtendedHeaderValues.Location = new System.Drawing.Point(38, 112);
@@ -1818,34 +1817,34 @@ namespace MASIC
             _chkConsolidateConstantExtendedHeaderValues.Size = new System.Drawing.Size(192, 21);
             _chkConsolidateConstantExtendedHeaderValues.TabIndex = 5;
             _chkConsolidateConstantExtendedHeaderValues.Text = "Consolidate constant values";
-            // 
+            //
             // lblStatusLogKeyNameFilterList
-            // 
+            //
             _lblStatusLogKeyNameFilterList.Location = new System.Drawing.Point(230, 31);
             _lblStatusLogKeyNameFilterList.Name = "lblStatusLogKeyNameFilterList";
             _lblStatusLogKeyNameFilterList.Size = new System.Drawing.Size(176, 20);
             _lblStatusLogKeyNameFilterList.TabIndex = 6;
             _lblStatusLogKeyNameFilterList.Text = "Status Log Keys to Include";
-            // 
+            //
             // txtStatusLogKeyNameFilterList
-            // 
+            //
             _txtStatusLogKeyNameFilterList.Location = new System.Drawing.Point(234, 54);
             _txtStatusLogKeyNameFilterList.Multiline = true;
             _txtStatusLogKeyNameFilterList.Name = "txtStatusLogKeyNameFilterList";
             _txtStatusLogKeyNameFilterList.ScrollBars = ScrollBars.Vertical;
             _txtStatusLogKeyNameFilterList.Size = new System.Drawing.Size(179, 58);
             _txtStatusLogKeyNameFilterList.TabIndex = 7;
-            // 
+            //
             // chkSaveExtendedStatsFileIncludeStatusLog
-            // 
+            //
             _chkSaveExtendedStatsFileIncludeStatusLog.Location = new System.Drawing.Point(38, 92);
             _chkSaveExtendedStatsFileIncludeStatusLog.Name = "chkSaveExtendedStatsFileIncludeStatusLog";
             _chkSaveExtendedStatsFileIncludeStatusLog.Size = new System.Drawing.Size(192, 21);
             _chkSaveExtendedStatsFileIncludeStatusLog.TabIndex = 4;
             _chkSaveExtendedStatsFileIncludeStatusLog.Text = "Include voltage, temp., etc.";
-            // 
+            //
             // chkSaveExtendedStatsFileIncludeFilterText
-            // 
+            //
             _chkSaveExtendedStatsFileIncludeFilterText.Checked = true;
             _chkSaveExtendedStatsFileIncludeFilterText.CheckState = CheckState.Checked;
             _chkSaveExtendedStatsFileIncludeFilterText.Location = new System.Drawing.Point(38, 74);
@@ -1853,17 +1852,17 @@ namespace MASIC
             _chkSaveExtendedStatsFileIncludeFilterText.Size = new System.Drawing.Size(192, 18);
             _chkSaveExtendedStatsFileIncludeFilterText.TabIndex = 3;
             _chkSaveExtendedStatsFileIncludeFilterText.Text = "Include Scan Filter Text";
-            // 
+            //
             // chkSaveMSTuneFile
-            // 
+            //
             _chkSaveMSTuneFile.Location = new System.Drawing.Point(19, 37);
             _chkSaveMSTuneFile.Name = "chkSaveMSTuneFile";
             _chkSaveMSTuneFile.Size = new System.Drawing.Size(211, 18);
             _chkSaveMSTuneFile.TabIndex = 1;
             _chkSaveMSTuneFile.Text = "Save MS Tune File";
-            // 
+            //
             // chkSaveMSMethodFile
-            // 
+            //
             _chkSaveMSMethodFile.Checked = true;
             _chkSaveMSMethodFile.CheckState = CheckState.Checked;
             _chkSaveMSMethodFile.Location = new System.Drawing.Point(19, 18);
@@ -1871,9 +1870,9 @@ namespace MASIC
             _chkSaveMSMethodFile.Size = new System.Drawing.Size(211, 19);
             _chkSaveMSMethodFile.TabIndex = 0;
             _chkSaveMSMethodFile.Text = "Save MS Method File";
-            // 
+            //
             // chkSaveExtendedStatsFile
-            // 
+            //
             _chkSaveExtendedStatsFile.Checked = true;
             _chkSaveExtendedStatsFile.CheckState = CheckState.Checked;
             _chkSaveExtendedStatsFile.Location = new System.Drawing.Point(19, 55);
@@ -1881,9 +1880,9 @@ namespace MASIC
             _chkSaveExtendedStatsFile.Size = new System.Drawing.Size(211, 19);
             _chkSaveExtendedStatsFile.TabIndex = 2;
             _chkSaveExtendedStatsFile.Text = "Save Extended Stats File";
-            // 
+            //
             // fraDatasetLookupInfo
-            // 
+            //
             _fraDatasetLookupInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _fraDatasetLookupInfo.Controls.Add(_cmdSetConnectionStringToPNNLServer);
             _fraDatasetLookupInfo.Controls.Add(_txtDatasetInfoQuerySQL);
@@ -1899,71 +1898,71 @@ namespace MASIC
             _fraDatasetLookupInfo.TabIndex = 1;
             _fraDatasetLookupInfo.TabStop = false;
             _fraDatasetLookupInfo.Text = "Dataset ID lookup information";
-            // 
+            //
             // cmdSetConnectionStringToPNNLServer
-            // 
+            //
             _cmdSetConnectionStringToPNNLServer.Location = new System.Drawing.Point(19, 23);
             _cmdSetConnectionStringToPNNLServer.Name = "cmdSetConnectionStringToPNNLServer";
             _cmdSetConnectionStringToPNNLServer.Size = new System.Drawing.Size(144, 23);
             _cmdSetConnectionStringToPNNLServer.TabIndex = 0;
             _cmdSetConnectionStringToPNNLServer.Text = "Set to PNNL Server";
-            // 
+            //
             // txtDatasetInfoQuerySQL
-            // 
+            //
             _txtDatasetInfoQuerySQL.Location = new System.Drawing.Point(202, 74);
             _txtDatasetInfoQuerySQL.Name = "txtDatasetInfoQuerySQL";
             _txtDatasetInfoQuerySQL.Size = new System.Drawing.Size(499, 22);
             _txtDatasetInfoQuerySQL.TabIndex = 4;
-            // 
+            //
             // lblDatasetInfoQuerySQL
-            // 
+            //
             _lblDatasetInfoQuerySQL.Location = new System.Drawing.Point(10, 80);
             _lblDatasetInfoQuerySQL.Name = "lblDatasetInfoQuerySQL";
             _lblDatasetInfoQuerySQL.Size = new System.Drawing.Size(192, 18);
             _lblDatasetInfoQuerySQL.TabIndex = 3;
             _lblDatasetInfoQuerySQL.Text = "Dataset Info Query SQL:";
-            // 
+            //
             // txtDatabaseConnectionString
-            // 
+            //
             _txtDatabaseConnectionString.Location = new System.Drawing.Point(202, 46);
             _txtDatabaseConnectionString.Name = "txtDatabaseConnectionString";
             _txtDatabaseConnectionString.Size = new System.Drawing.Size(499, 22);
             _txtDatabaseConnectionString.TabIndex = 2;
-            // 
+            //
             // lblDatabaseConnectionString
-            // 
+            //
             _lblDatabaseConnectionString.Location = new System.Drawing.Point(10, 52);
             _lblDatabaseConnectionString.Name = "lblDatabaseConnectionString";
             _lblDatabaseConnectionString.Size = new System.Drawing.Size(192, 18);
             _lblDatabaseConnectionString.TabIndex = 1;
             _lblDatabaseConnectionString.Text = "SQL Server Connection String:";
-            // 
+            //
             // lblDatasetLookupFilePath
-            // 
+            //
             _lblDatasetLookupFilePath.Location = new System.Drawing.Point(10, 111);
             _lblDatasetLookupFilePath.Name = "lblDatasetLookupFilePath";
             _lblDatasetLookupFilePath.Size = new System.Drawing.Size(633, 18);
             _lblDatasetLookupFilePath.TabIndex = 5;
             _lblDatasetLookupFilePath.Text = "Dataset lookup file (dataset name and dataset ID number, tab-separated); used if " + "DB not available";
-            // 
+            //
             // cmdSelectDatasetLookupFile
-            // 
+            //
             _cmdSelectDatasetLookupFile.Location = new System.Drawing.Point(10, 138);
             _cmdSelectDatasetLookupFile.Name = "cmdSelectDatasetLookupFile";
             _cmdSelectDatasetLookupFile.Size = new System.Drawing.Size(96, 28);
             _cmdSelectDatasetLookupFile.TabIndex = 6;
             _cmdSelectDatasetLookupFile.Text = "Select File";
-            // 
+            //
             // txtDatasetLookupFilePath
-            // 
+            //
             _txtDatasetLookupFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _txtDatasetLookupFilePath.Location = new System.Drawing.Point(125, 138);
             _txtDatasetLookupFilePath.Name = "txtDatasetLookupFilePath";
             _txtDatasetLookupFilePath.Size = new System.Drawing.Size(708, 22);
             _txtDatasetLookupFilePath.TabIndex = 7;
-            // 
+            //
             // fraMemoryConservationOptions
-            // 
+            //
             _fraMemoryConservationOptions.Controls.Add(_chkSkipMSMSProcessing);
             _fraMemoryConservationOptions.Controls.Add(_chkSkipSICAndRawDataProcessing);
             _fraMemoryConservationOptions.Controls.Add(_chkExportRawDataOnly);
@@ -1973,33 +1972,33 @@ namespace MASIC
             _fraMemoryConservationOptions.TabIndex = 0;
             _fraMemoryConservationOptions.TabStop = false;
             _fraMemoryConservationOptions.Text = "Memory Usage and Speed Options";
-            // 
+            //
             // chkSkipMSMSProcessing
-            // 
+            //
             _chkSkipMSMSProcessing.Location = new System.Drawing.Point(19, 22);
             _chkSkipMSMSProcessing.Name = "chkSkipMSMSProcessing";
             _chkSkipMSMSProcessing.Size = new System.Drawing.Size(317, 21);
             _chkSkipMSMSProcessing.TabIndex = 0;
             _chkSkipMSMSProcessing.Text = "Skip MS/MS Processing (no similarity testing)";
-            // 
+            //
             // chkSkipSICAndRawDataProcessing
-            // 
+            //
             _chkSkipSICAndRawDataProcessing.Location = new System.Drawing.Point(19, 46);
             _chkSkipSICAndRawDataProcessing.Name = "chkSkipSICAndRawDataProcessing";
             _chkSkipSICAndRawDataProcessing.Size = new System.Drawing.Size(261, 39);
             _chkSkipSICAndRawDataProcessing.TabIndex = 1;
             _chkSkipSICAndRawDataProcessing.Text = "Only Export Chromatograms and Scan Stats (no SICs or raw data)";
-            // 
+            //
             // chkExportRawDataOnly
-            // 
+            //
             _chkExportRawDataOnly.Location = new System.Drawing.Point(19, 91);
             _chkExportRawDataOnly.Name = "chkExportRawDataOnly";
             _chkExportRawDataOnly.Size = new System.Drawing.Size(240, 21);
             _chkExportRawDataOnly.TabIndex = 2;
             _chkExportRawDataOnly.Text = "Export Raw Data Only (No SICs)";
-            // 
+            //
             // TabPageLog
-            // 
+            //
             _TabPageLog.Controls.Add(_txtLogMessages);
             _TabPageLog.Location = new System.Drawing.Point(4, 25);
             _TabPageLog.Name = "TabPageLog";
@@ -2008,9 +2007,9 @@ namespace MASIC
             _TabPageLog.TabIndex = 10;
             _TabPageLog.Text = "Log";
             _TabPageLog.UseVisualStyleBackColor = true;
-            // 
+            //
             // txtLogMessages
-            // 
+            //
             _txtLogMessages.Location = new System.Drawing.Point(6, 6);
             _txtLogMessages.Multiline = true;
             _txtLogMessages.Name = "txtLogMessages";
@@ -2019,9 +2018,9 @@ namespace MASIC
             _txtLogMessages.Size = new System.Drawing.Size(870, 315);
             _txtLogMessages.TabIndex = 1;
             _txtLogMessages.Text = "No log messages.";
-            // 
+            //
             // fraOutputDirectoryPath
-            // 
+            //
             _fraOutputDirectoryPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _fraOutputDirectoryPath.Controls.Add(_cmdStartProcessing);
             _fraOutputDirectoryPath.Controls.Add(_cmdSelectOutputDirectory);
@@ -2032,33 +2031,33 @@ namespace MASIC
             _fraOutputDirectoryPath.TabIndex = 1;
             _fraOutputDirectoryPath.TabStop = false;
             _fraOutputDirectoryPath.Text = "Output Folder Path";
-            // 
+            //
             // cmdStartProcessing
-            // 
+            //
             _cmdStartProcessing.Location = new System.Drawing.Point(326, 65);
             _cmdStartProcessing.Name = "cmdStartProcessing";
             _cmdStartProcessing.Size = new System.Drawing.Size(133, 27);
             _cmdStartProcessing.TabIndex = 2;
             _cmdStartProcessing.Text = "Start &Processing";
-            // 
+            //
             // cmdSelectOutputDirectory
-            // 
+            //
             _cmdSelectOutputDirectory.Location = new System.Drawing.Point(10, 28);
             _cmdSelectOutputDirectory.Name = "cmdSelectOutputDirectory";
             _cmdSelectOutputDirectory.Size = new System.Drawing.Size(96, 44);
             _cmdSelectOutputDirectory.TabIndex = 0;
             _cmdSelectOutputDirectory.Text = "Select &Directory";
-            // 
+            //
             // txtOutputDirectoryPath
-            // 
+            //
             _txtOutputDirectoryPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             _txtOutputDirectoryPath.Location = new System.Drawing.Point(125, 30);
             _txtOutputDirectoryPath.Name = "txtOutputDirectoryPath";
             _txtOutputDirectoryPath.Size = new System.Drawing.Size(741, 22);
             _txtOutputDirectoryPath.TabIndex = 1;
-            // 
+            //
             // frmMain
-            // 
+            //
             AutoScaleBaseSize = new System.Drawing.Size(6, 15);
             ClientSize = new System.Drawing.Size(904, 585);
             Controls.Add(_fraOutputDirectoryPath);

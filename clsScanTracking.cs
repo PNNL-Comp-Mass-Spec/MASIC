@@ -7,7 +7,6 @@ namespace MASIC
 {
     public class clsScanTracking : clsMasicEventNotifier
     {
-
         #region // TODO
         // Absolute maximum number of ions that will be tracked for a mass spectrum
         private const int MAX_ALLOWABLE_ION_COUNT = 50000;
@@ -54,7 +53,6 @@ namespace MASIC
             return true;
         }
 
-
         /// <summary>
         /// Check whether the scan number and elution time are within the ranges specified by sicOptions
         /// </summary>
@@ -82,10 +80,9 @@ namespace MASIC
 
         private void CompressSpectraData(clsMSSpectrum msSpectrum, double msDataResolution, double mzIgnoreRangeStart, double mzIgnoreRangeEnd)
         {
-
             // First, look for blocks of data points that consecutively have an intensity value of 0
             // For each block of data found, reduce the data to only retain the first data point and last data point in the block
-            // 
+            //
             // Next, look for data points in msSpectrum that are within msDataResolution units of one another (m/z units)
             // If found, combine into just one data point, keeping the largest intensity and the m/z value corresponding to the largest intensity
 
@@ -229,7 +226,6 @@ namespace MASIC
             string lastKnownLocation = "Start";
             try
             {
-
                 // Determine the noise threshold intensity for this spectrum
                 // Stored in scanInfo.BaselineNoiseStats
                 lastKnownLocation = "Call ComputeNoiseLevelForMassSpectrum";

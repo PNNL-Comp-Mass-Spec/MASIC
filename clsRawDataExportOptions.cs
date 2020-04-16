@@ -1,9 +1,7 @@
-﻿
-namespace MASIC
+﻿namespace MASIC
 {
     public class clsRawDataExportOptions
     {
-
         #region // TODO
         public enum eExportRawDataFileFormatConstants
         {

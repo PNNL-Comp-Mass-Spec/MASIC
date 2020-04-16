@@ -225,7 +225,6 @@ namespace MASIC
                 }
                 else
                 {
-
                     // Query commandLineParser to see if various parameters are present
                     if (commandLineParser.RetrieveValueForParameter("I", out value))
                     {

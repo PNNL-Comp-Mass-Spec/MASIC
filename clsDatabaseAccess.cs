@@ -108,7 +108,6 @@ namespace MASIC
                     var success = dbTools.GetQueryResults(sqlQuery, out lstResults);
                     if (success)
                     {
-
                         // Find the row in the lstResults that matches fileNameCompare
                         foreach (var datasetItem in lstResults)
                         {

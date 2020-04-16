@@ -1456,7 +1456,6 @@ namespace MASIC
                 }
                 else
                 {
-
                     // ---------------------------------------------------------
                     // Optionally, export the raw mass spectra data
                     // ---------------------------------------------------------
@@ -1490,12 +1489,10 @@ namespace MASIC
 
                     if (!Options.ExportRawDataOnly)
                     {
-
                         // ---------------------------------------------------------
                         // Add the custom SIC values to scanList
                         // ---------------------------------------------------------
                         Options.CustomSICList.AddCustomSICValues(scanList, Options.SICOptions.SICTolerance, Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance);
-
 
                         // ---------------------------------------------------------
                         // Possibly create the Tab-separated values SIC details output file
@@ -1541,7 +1538,6 @@ namespace MASIC
 
                     if (!(Options.SkipMSMSProcessing || Options.ExportRawDataOnly))
                     {
-
                         // ---------------------------------------------------------
                         // Find Similar Parent Ions
                         // ---------------------------------------------------------
@@ -1577,7 +1573,6 @@ namespace MASIC
                     }
                 }
 
-
                 // ---------------------------------------------------------
                 // Save SIC Stats Flat File
                 // ---------------------------------------------------------
@@ -1603,7 +1598,6 @@ namespace MASIC
                 UpdatePeakMemoryUsage();
                 if (!(Options.SkipSICAndRawDataProcessing || Options.ExportRawDataOnly))
                 {
-
                     // ---------------------------------------------------------
                     // Write processing stats to the XML output file
                     // ---------------------------------------------------------
@@ -1811,7 +1805,6 @@ namespace MASIC
 
         private float GetProcessMemoryUsageMB()
         {
-
             // Obtain a handle to the current process
             var objProcess = Process.GetCurrentProcess();
 
@@ -1846,7 +1839,6 @@ namespace MASIC
             datasetFileInfo = new DatasetFileInfo();
             try
             {
-
                 // ---------------------------------------------------------
                 // Define inputFileName (which is referenced several times below)
                 // ---------------------------------------------------------
@@ -1877,7 +1869,6 @@ namespace MASIC
                 {
                     case var @case when @case == DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper():
                         {
-
                             // Open the .Raw file and obtain the scan information
 
                             var dataImporter = new DataInput.clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
@@ -1890,7 +1881,6 @@ namespace MASIC
 
                     case var case1 when case1 == DataInput.clsDataImport.MZ_ML_FILE_EXTENSION.ToUpper():
                         {
-
                             // Open the .mzML file and obtain the scan information
 
                             var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
@@ -1904,7 +1894,6 @@ namespace MASIC
                     case var case2 when case2 == DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper():
                     case var case3 when case3 == DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper():
                         {
-
                             // Open the .mzXML file and obtain the scan information
 
                             var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
@@ -1918,7 +1907,6 @@ namespace MASIC
                     case var case4 when case4 == DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper():
                     case var case5 when case5 == DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper():
                         {
-
                             // Open the .mzData file and obtain the scan information
 
                             var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
@@ -1932,7 +1920,6 @@ namespace MASIC
                     case var case6 when case6 == DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper():
                     case var case7 when case7 == DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper():
                         {
-
                             // Open the .MGF and .CDF files to obtain the scan information
 
                             var dataImporter = new DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
@@ -2255,7 +2242,6 @@ namespace MASIC
             }
             finally
             {
-
                 // Record the final processing stats (before the output file handles are closed)
                 {
                     var withBlock = mProcessingStats;
@@ -2525,7 +2511,6 @@ namespace MASIC
 
         private void UpdateOverallProgress(string message)
         {
-
             // Update the processing progress, storing the value in mProgressPercentComplete
 
             // NewTask = 0

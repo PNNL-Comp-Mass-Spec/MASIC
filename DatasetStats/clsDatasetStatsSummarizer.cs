@@ -537,7 +537,6 @@ namespace MASIC.DatasetStats
                 mErrorMessage = string.Empty;
                 using (var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
                 {
-
                     // Write the headers
                     var headerNames = new List<string>() { "Dataset", "ScanNumber", "ScanTime", "ScanType", "TotalIonIntensity", "BasePeakIntensity", "BasePeakMZ", "BasePeakSignalToNoiseRatio", "IonCount", "IonCountRaw", "ScanTypeName" };
                     scanStatsWriter.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), headerNames));

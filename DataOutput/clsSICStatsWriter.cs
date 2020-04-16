@@ -83,7 +83,6 @@ namespace MASIC.DataOutput
 
         public bool SaveSICStatsFlatFile(clsScanList scanList, string inputFileName, string outputDirectoryPath, clsMASICOptions masicOptions, clsDataOutput dataOutputHandler)
         {
-
             // Writes out a flat file containing identified peaks and statistics
 
             string outputFilePath = string.Empty;
@@ -99,7 +98,6 @@ namespace MASIC.DataOutput
                 ReportMessage("Saving SIC flat file to disk: " + Path.GetFileName(outputFilePath));
                 using (var writer = new StreamWriter(outputFilePath, false))
                 {
-
                     // Write the SIC stats to the output file
                     // The file is tab delimited
 

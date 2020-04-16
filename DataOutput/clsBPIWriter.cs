@@ -26,7 +26,6 @@ namespace MASIC.DataOutput
 
         public bool SaveBPIs(clsScanList scanList, clsSpectraCache spectraCache, string inputFilePathFull, string outputDirectoryPath)
         {
-
             // This function creates an ICR-2LS compatible .TIC file (using only the MS1 scans), plus
             // two Decon2LS compatible .CSV files (one for the MS1 scans and one for the MS2, MS3, etc. scans)
 
@@ -50,7 +49,6 @@ namespace MASIC.DataOutput
                 stepsCompleted += 1;
                 UpdateProgress(Conversions.ToShort(stepsCompleted / (double)bpiStepCount * 100));
 
-
                 // Second, write an MS-based _scans.csv file (readable with Decon2LS)
                 string msScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSChromatogramFile);
                 currentFilePath = string.Copy(msScansFilePath);
@@ -58,7 +56,6 @@ namespace MASIC.DataOutput
                 SaveDecon2LSChromatogram(scanList.SurveyScans, spectraCache, msScansFilePath);
                 stepsCompleted += 1;
                 UpdateProgress(Conversions.ToShort(stepsCompleted / (double)bpiStepCount * 100));
-
 
                 // Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
                 string msmsScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
@@ -81,7 +78,6 @@ namespace MASIC.DataOutput
             var lastStatus = DateTime.UtcNow;
             using (var writer = new StreamWriter(outputFilePath))
             {
-
                 // Write the file headers
                 WriteDecon2LSScanFileHeaders(writer);
 
@@ -109,7 +105,6 @@ namespace MASIC.DataOutput
         {
             using (var writer = new StreamWriter(outputFilePath))
             {
-
                 // ReSharper disable StringLiteralTypo
 
                 // Write the Header text
@@ -185,14 +180,12 @@ namespace MASIC.DataOutput
                 writer.WriteLine("End");
 
                 // ReSharper restore StringLiteralTypo
-
             }
 
             // Wait 500 msec, then re-open the file using Binary IO
             System.Threading.Thread.Sleep(500);
             using (var writer = new BinaryWriter(new FileStream(outputFilePath, FileMode.Append)))
             {
-
                 // Write an Escape character (Byte 1B)
                 writer.Write(Conversions.ToByte(27));
                 for (int scanIndex = 0, loopTo = scanCount - 1; scanIndex <= loopTo; scanIndex++)

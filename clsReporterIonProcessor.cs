@@ -12,7 +12,6 @@ namespace MASIC
 {
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
-
         #region // TODO
         private readonly clsMASICOptions mOptions;
         #endregion
@@ -40,7 +39,6 @@ namespace MASIC
             string outputFilePath = "??";
             try
             {
-
                 // Use Xraw to read the .Raw files
                 var readerOptions = new ThermoReaderOptions()
                 {
@@ -52,7 +50,6 @@ namespace MASIC
                 bool includeFtmsColumns = false;
                 if (inputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper()))
                 {
-
                     // Processing a thermo .Raw file
                     // Check whether any of the frag scans has IsFTMS true
                     for (int masterOrderIndex = 0, loopTo = scanList.MasterScanOrderCount - 1; masterOrderIndex <= loopTo; masterOrderIndex++)
@@ -97,7 +94,6 @@ namespace MASIC
                 outputFilePath = clsDataOutput.ConstructOutputFilePath(Path.GetFileName(inputFilePathFull), outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ReporterIonsFile);
                 using (var writer = new StreamWriter(outputFilePath))
                 {
-
                     // Write the file headers
                     var reporterIonMZsUnique = new SortedSet<string>();
                     var headerColumns = new List<string>() { "Dataset", "ScanNumber", "Collision Mode", "ParentIonMZ", "BasePeakIntensity", "BasePeakMZ", "ReporterIonIntensityMax" };
@@ -249,7 +245,7 @@ namespace MASIC
         {
             const bool USE_MAX_ABUNDANCE_IN_WINDOW = true;
 #error Cannot convert LocalDeclarationStatementSyntax - see comment for details
-            /* 
+            /*
                     Static intensityCorrector As New Global.MASIC.clsITraqIntensityCorrection(
                         Global.MASIC.clsReporterIons.eReporterIonMassModeConstants.CustomOrNone,
                         Global.MASIC.clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
@@ -312,7 +308,6 @@ namespace MASIC
 
             if (includeFtmsColumns && currentScan.IsFTMS)
             {
-
                 // Retrieve the label data for this spectrum
 
                 udtFTLabelInfoType[] ftLabelData = null;
@@ -329,7 +324,6 @@ namespace MASIC
                     bool matchFound = false;
                     foreach (var labelItem in ftLabelData)
                     {
-
                         // Compare labelItem.Mass (which is m/z of the ion in labelItem) to the m/z of the current reporter ion
                         if (Math.Abs(mzToFind - labelItem.Mass) > mzToleranceDa)
                         {
@@ -360,7 +354,6 @@ namespace MASIC
             {
                 if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ)
                 {
-
                     // Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 
                     if (intensityCorrector.ReporterIonMode != mOptions.ReporterIons.ReporterIonMassMode || intensityCorrector.ITraq4PlexCorrectionFactorType != mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)

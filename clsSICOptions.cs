@@ -1,9 +1,7 @@
-﻿
-namespace MASIC
+﻿namespace MASIC
 {
     public class clsSICOptions
     {
-
         #region // TODO
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA = 5;
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM = 3;

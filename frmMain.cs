@@ -9,11 +9,10 @@ using System.Collections.Generic;
 // E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
 // Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
 // -------------------------------------------------------------------------------
-// 
+//
 // Licensed under the 2-Clause BSD License; you may not use this file except
 // in compliance with the License.  You may obtain a copy of the License at
 // https://opensource.org/licenses/BSD-2-Clause
-
 
 using System.ComponentModel;
 using System.Data;
@@ -40,7 +39,6 @@ namespace MASIC
     {
         public frmMain() : base()
         {
-
             // This call is required by the Windows Form Designer.
             InitializeComponent();
 
@@ -688,7 +686,6 @@ namespace MASIC
 
             try
             {
-
                 // Utilize MASIC's built-in LoadParameters function, then call ResetToDefaults
                 var objMasic = new clsMASIC();
                 bool success = objMasic.LoadParameterFileSettings(filePath);
@@ -885,7 +882,6 @@ namespace MASIC
 
         private void InitializeCustomSICDataGrid()
         {
-
             // Make the Peak Matching Thresholds data table
             var customSICValues = new DataTable(CUSTOM_SIC_VALUES_DATA_TABLE);
 
@@ -1252,7 +1248,6 @@ namespace MASIC
                 txtExportRawDataMaxIonCountPerScan.Text = exportOptions.MaxIonCountPerScan.ToString();
                 txtExportRawDataIntensityMinimum.Text = exportOptions.IntensityMinimum.ToString();
 
-
                 // Thermo .raw info file options
                 chkSaveMSMethodFile.Checked = masicOptions.WriteMSMethodFile;
                 chkSaveMSTuneFile.Checked = masicOptions.WriteMSTuneFile;
@@ -1316,7 +1311,6 @@ namespace MASIC
                 chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked = sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData;
                 chkRefineReportedParentIonMZ.Checked = sicOptions.RefineReportedParentIonMZ;
                 // ' chkUseSICStatsFromLargestPeak.checked = sicOptions.UseSICStatsFromLargestPeak
-
 
                 // Peak Finding Options
                 cboSICNoiseThresholdMode.SelectedIndex = (int)peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode;
@@ -1871,7 +1865,6 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                 sicOptions.RTRangeEnd = ParseTextBoxValueFloat[txtTimeEnd, lblTimeEnd.Text + " must be a value", parseError];
                 if (parseError)
                     break;
-
 
                 // Note: the following 5 options are not graphically editable
                 masicOptions.SuppressNoParentIonsError = mSuppressNoParentIonsError;

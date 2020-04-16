@@ -5,7 +5,6 @@ namespace MASIC
 {
     public class clsReporterIons
     {
-
         #region // TODO
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
@@ -189,7 +188,7 @@ namespace MASIC
                         // TMT 11-plex Isobaric tags (from Thermo), aka TMT11
                         // These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                         // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                        reporterIons.Add(new clsReporterIonInfo(126.127726));        // 
+                        reporterIons.Add(new clsReporterIonInfo(126.127726));        //
                         reporterIons.Add(new clsReporterIonInfo(127.124761));        // 127N
                         reporterIons.Add(new clsReporterIonInfo(127.131081));        // 127C
                         reporterIons.Add(new clsReporterIonInfo(128.128116));        // 128N
@@ -208,7 +207,7 @@ namespace MASIC
                         // ReSharper disable once CommentTypo
                         // TMT 16-plex Isobaric tags (from Thermo), aka TMT16 or TMTpro
                         // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
-                        reporterIons.Add(new clsReporterIonInfo(126.127726));        // 
+                        reporterIons.Add(new clsReporterIonInfo(126.127726));        //
                         reporterIons.Add(new clsReporterIonInfo(127.124761));        // 127N
                         reporterIons.Add(new clsReporterIonInfo(127.131081));        // 127C
                         reporterIons.Add(new clsReporterIonInfo(128.128116));        // 128N
@@ -229,7 +228,6 @@ namespace MASIC
 
                 case eReporterIonMassModeConstants.ITraqEightMZHighRes:
                     {
-
                         // ITRAQ eight-plex Isobaric tags (iTRAQ8), High-Res MS/MS
                         reporterIons.Add(new clsReporterIonInfo(113.107873));
                         reporterIons.Add(new clsReporterIonInfo(114.111228));
@@ -244,7 +242,6 @@ namespace MASIC
 
                 case eReporterIonMassModeConstants.ITraqEightMZLowRes:
                     {
-
                         // ITRAQ eight-plex Isobaric tags (iTRAQ8), Low-Res MS/MS
                         reporterIons.Add(new clsReporterIonInfo(113.107873));
                         reporterIons.Add(new clsReporterIonInfo(114.111228));
@@ -262,7 +259,6 @@ namespace MASIC
 
                 case eReporterIonMassModeConstants.PCGalnaz:
                     {
-
                         // ReSharper disable CommentTypo
 
                         // Custom reporter ions for Josh Alfaro
@@ -274,7 +270,6 @@ namespace MASIC
 
                 case eReporterIonMassModeConstants.HemeCFragment:
                     {
-
                         // Custom reporter ions for Eric Merkley
                         reporterIons.Add(new clsReporterIonInfo(616.1767));
                         reporterIons.Add(new clsReporterIonInfo(617.1845));
@@ -283,7 +278,6 @@ namespace MASIC
 
                 case eReporterIonMassModeConstants.LycAcetFragment:
                     {
-
                         // Custom reporter ions for Ernesto Nakayasu
                         reporterIons.Add(new clsReporterIonInfo(126.09134));
                         reporterIons.Add(new clsReporterIonInfo(127.094695));
@@ -507,7 +501,6 @@ namespace MASIC
 
         public void SetReporterIonMassMode(eReporterIonMassModeConstants eReporterIonMassMode, double mzToleranceDa)
         {
-
             // Note: If eReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone then nothing is changed
 
             if (eReporterIonMassMode != eReporterIonMassModeConstants.CustomOrNone)
@@ -555,7 +548,6 @@ namespace MASIC
 
         public void SetReporterIons(double[] reporterIonMZList, double mzToleranceDa, bool customReporterIons)
         {
-
             // mzToleranceDa is the search tolerance (half width)
 
             if (mzToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM)

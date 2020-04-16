@@ -1,9 +1,7 @@
-﻿
-namespace MASIC
+﻿namespace MASIC
 {
     public class clsCustomMZSearchSpec
     {
-
         #region // TODO
         public double MZ { get; set; }
 

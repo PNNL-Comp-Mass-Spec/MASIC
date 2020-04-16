@@ -4,7 +4,6 @@ namespace MASIC
 {
     public class clsSpectrumCacheOptions
     {
-
         #region // TODO
         /// <summary>
         /// If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed

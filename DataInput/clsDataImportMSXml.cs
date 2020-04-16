@@ -248,7 +248,6 @@ namespace MASIC.DataInput
 
         private bool ExtractScanInfoFromMSXMLDataFile(string filePath, clsMSDataFileReaderBaseClass xmlReader, clsScanList scanList, clsSpectraCache spectraCache, clsDataOutput dataOutputHandler, bool keepRawSpectra, bool keepMSMSSpectra)
         {
-
             // Returns True if Success, False if failure
             // Note: This function assumes filePath exists
 
@@ -1253,7 +1252,6 @@ namespace MASIC.DataInput
 
         private bool StoreSimulatedDataPoint(IDictionary<int, Dictionary<double, double>> simulatedSpectraByScan, IDictionary<int, double> simulatedSpectraTimes, int scanToStore, double elutionTime, double mz, double intensity)
         {
-
             // Keys in this dictionary are m/z; values are intensity for the m/z
             Dictionary<double, double> mzListForScan = null;
             if (!simulatedSpectraByScan.TryGetValue(scanToStore, out mzListForScan))
@@ -1334,7 +1332,6 @@ namespace MASIC.DataInput
         [CLSCompliant(false)]
         protected bool UpdateDatasetFileStats(FileInfo rawFileInfo, int datasetID, SimpleMzMLReader xmlReader)
         {
-
             // Read the file info from the file system
             bool success = UpdateDatasetFileStats(rawFileInfo, datasetID);
             if (!success)

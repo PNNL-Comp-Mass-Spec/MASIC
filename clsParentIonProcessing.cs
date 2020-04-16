@@ -7,7 +7,6 @@ namespace MASIC
 {
     public class clsParentIonProcessing : clsMasicEventNotifier
     {
-
         #region // TODO
         private readonly clsReporterIons mReporterIons;
         #endregion
@@ -206,7 +205,6 @@ namespace MASIC
 
         private float CompareFragSpectraForParentIons(clsScanList scanList, clsSpectraCache spectraCache, int parentIonIndex1, int parentIonIndex2, clsBinningOptions binningOptions, MASICPeakFinder.clsBaselineNoiseOptions noiseThresholdOptions, DataInput.clsDataImport dataImportUtilities)
         {
-
             // Compare the fragmentation spectra for the two parent ions
             // Returns the highest similarity score (ranging from 0 to 1)
             // Returns 0 if no similarity or no spectra to compare
@@ -281,7 +279,6 @@ namespace MASIC
 
         private float CompareSpectra(clsMSSpectrum fragSpectrum1, clsMSSpectrum fragSpectrum2, clsBinningOptions binningOptions, bool considerOffsetBinnedData = true)
         {
-
             // Compares the two spectra and returns a similarity score (ranging from 0 to 1)
             // Perfect match is 1; no similarity is 0
             // Note that both the standard binned data and the offset binned data are compared
@@ -389,7 +386,6 @@ namespace MASIC
 
         private bool FindClosestMZ(IList<double> mzList, int ionCount, double searchMZ, double toleranceMZ, out double bestMatchMZ)
         {
-
             // Searches mzList for the closest match to searchMZ within tolerance bestMatchMZ
             // If a match is found, then updates bestMatchMZ to the m/z of the match and returns True
 
@@ -434,7 +430,6 @@ namespace MASIC
 
         public bool FindSimilarParentIons(clsScanList scanList, clsSpectraCache spectraCache, clsMASICOptions masicOptions, DataInput.clsDataImport dataImportUtilities, ref int ionUpdateCount)
         {
-
             // Look for parent ions that have similar m/z values and are nearby one another in time
             // For the groups of similar ions, assign the scan number of the highest intensity parent ion to the other similar parent ions
 

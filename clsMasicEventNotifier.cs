@@ -129,7 +129,6 @@ namespace MASIC
             OnProgressUpdate(progressMessage, percentComplete);
         }
 
-
         #region // TODO
         private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount)
         {

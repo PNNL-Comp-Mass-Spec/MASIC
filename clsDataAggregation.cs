@@ -73,7 +73,6 @@ namespace MASIC
 
         public bool FindMaxValueInMZRange(clsSpectraCache spectraCache, clsScanInfo currentScan, double mzStart, double mzEnd, out double bestMatchMZ, out double matchIntensity)
         {
-
             // Searches currentScan.IonsMZ for the maximum value between mzStart and mzEnd
             // If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
             // and returns True
@@ -107,7 +106,6 @@ namespace MASIC
 
         private bool FindMaxValueInMZRange(IList<double> mzList, IList<double> intensityList, int ionCount, double mzStart, double mzEnd, out double bestMatchMZ, out double matchIntensity)
         {
-
             // Searches mzList for the maximum value between mzStart and mzEnd
             // If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
             // and returns True
@@ -163,7 +161,6 @@ namespace MASIC
 
         private bool SumIonsFindValueInRange(IReadOnlyList<double> dataValues, double searchValue, double toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
-
             // Searches dataValues for searchValue with a tolerance of +/-toleranceHalfWidth
             // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
             // Otherwise, returns false
@@ -204,7 +201,6 @@ namespace MASIC
 
         private void SumIonsBinarySearchRangeDbl(IReadOnlyList<double> dataValues, double searchValue, double toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         {
-
             // Recursive search function
 
             int indexMidpoint;

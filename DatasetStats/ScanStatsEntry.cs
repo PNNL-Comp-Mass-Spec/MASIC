@@ -1,9 +1,7 @@
-﻿
-namespace MASIC.DatasetStats
+﻿namespace MASIC.DatasetStats
 {
     public class ScanStatsEntry
     {
-
         /// <summary>
         /// Scan number
         /// </summary>

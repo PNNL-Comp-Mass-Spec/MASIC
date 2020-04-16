@@ -180,7 +180,6 @@ namespace MASIC
 
         public bool AddSpectrumToPool(clsMSSpectrum spectrum, int scanNumber)
         {
-
             // Adds spectrum to the spectrum pool
             // Returns the index of the spectrum in the pool in targetPoolIndex
 

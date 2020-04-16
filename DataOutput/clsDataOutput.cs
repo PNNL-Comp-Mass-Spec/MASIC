@@ -10,7 +10,6 @@ namespace MASIC.DataOutput
 {
     public class clsDataOutput : clsMasicEventNotifier
     {
-
         #region // TODO
         public enum eOutputFileTypeConstants
         {
@@ -63,7 +62,6 @@ namespace MASIC.DataOutput
 
         public bool CheckForExistingResults(string inputFilePathFull, string outputDirectoryPath, clsMASICOptions masicOptions)
         {
-
             // Returns True if existing results already exist for the given input file path, SIC Options, and Binning options
 
             string filePathToCheck;
@@ -953,7 +951,6 @@ namespace MASIC.DataOutput
                 ReportMessage("Saving Header Glossary to " + Path.GetFileName(outputFilePath));
                 using (var writer = new StreamWriter(outputFilePath, false))
                 {
-
                     // ScanStats
                     writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) + ":");
                     writer.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsFlatFile));
@@ -998,7 +995,6 @@ namespace MASIC.DataOutput
                 var loopTo = scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1;
                 for (fragScanIndex = 0; fragScanIndex <= loopTo; fragScanIndex++)
                 {
-
                     // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
                     prefix = sicOptions.DatasetID.ToString() + ControlChars.Tab + parentIonIndex.ToString() + ControlChars.Tab + fragScanIndex.ToString() + ControlChars.Tab + StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4) + ControlChars.Tab;
                     if (sicDetails.SICDataCount == 0)

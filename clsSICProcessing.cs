@@ -199,7 +199,6 @@ namespace MASIC
 
         private clsSICStatsPeak ExtractSICDetailsFromFullSIC(int mzIndexWork, List<clsBaselineNoiseStatsSegment> baselineNoiseStatSegments, int fullSICDataCount, int[,] fullSICScanIndices, double[,] fullSICIntensities, double[,] fullSICMasses, clsScanList scanList, int scanIndexObservedInFullSIC, clsSICDetails sicDetails, clsMASICOptions masicOptions, clsScanNumScanTimeConversion scanNumScanConverter, bool customSICPeak, float customSICPeakScanOrAcqTimeTolerance)
         {
-
             // Minimum number of scans to extend left or right of the scan that meets the minimum intensity threshold requirement
             const int MINIMUM_NOISE_SCANS_TO_INCLUDE = 10;
             var customSICScanToleranceMinutesHalfWidth = default(float);
@@ -221,7 +220,6 @@ namespace MASIC
             // Limit the data examined to a portion of fullSICScanIndices() and fullSICIntensities, populating udtSICDetails
             try
             {
-
                 // Initialize customSICScanToleranceHalfWidth
                 if (customSICPeakScanOrAcqTimeTolerance < float.Epsilon)
                 {
@@ -264,7 +262,6 @@ namespace MASIC
                         maxSICPeakWidthMinutesForward = customSICScanToleranceMinutesHalfWidth;
                     }
                 }
-
 
                 // Initially use just 3 survey scans, centered around scanIndexObservedInFullSIC
                 if (scanIndexObservedInFullSIC > 0)
@@ -477,7 +474,6 @@ namespace MASIC
 
             try
             {
-
                 // Copy the scan index values from fullSICScanIndices to .SICScanIndices()
                 // Copy the intensity values from fullSICIntensities() to .SICData()
                 // Copy the mz values from fullSICMasses() to .SICMasses()
@@ -511,7 +507,6 @@ namespace MASIC
 
         private bool ProcessMZList(clsScanList scanList, clsSpectraCache spectraCache, clsMASICOptions masicOptions, clsDataOutput dataOutputHandler, clsXMLResultsWriter xmlResultsWriter, IReadOnlyList<clsMzBinInfo> mzBinList, bool processSIMScans, int simIndex, ref int parentIonsProcessed)
         {
-
             // Step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
             // Note that mzBinList and parentIonIndices() are parallel arrays, with mzBinList() sorted on ascending m/z
             const int MAX_RAW_DATA_MEMORY_USAGE_MB = 50;
@@ -561,7 +556,6 @@ namespace MASIC
                 int mzIndex = 0;
                 while (mzIndex < mzBinList.Count)
                 {
-
                     // ---------------------------------------------------------
                     // Find the next group of m/z values to use, starting with mzIndex
                     // ---------------------------------------------------------
@@ -613,7 +607,6 @@ namespace MASIC
                     mzSearchChunks.Add(mzSearchChunk);
                     if (mzSearchChunks.Count >= maxMZCountInChunk || mzIndex == mzBinList.Count - 1)
                     {
-
                         // ---------------------------------------------------------
                         // Reached maxMZCountInChunk m/z value
                         // Process all of the m/z values in udtMZSearchChunk
@@ -649,7 +642,6 @@ namespace MASIC
 
         private bool ProcessMzSearchChunk(clsMASICOptions masicOptions, clsScanList scanList, clsDataAggregation dataAggregation, clsDataOutput dataOutputHandler, clsXMLResultsWriter xmlResultsWriter, clsSpectraCache spectraCache, clsScanNumScanTimeConversion scanNumScanConverter, IReadOnlyList<clsMzSearchInfo> mzSearchChunk, IList<int> parentIonIndices, bool processSIMScans, int simIndex, IList<bool> parentIonUpdated, ref int parentIonsProcessed)
         {
-
             // The following are 2D arrays, ranging from 0 to mzSearchChunkCount-1 in the first dimension and 0 to .SurveyScans.Count - 1 in the second dimension
             // We could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
             int[,] fullSICScanIndices;     // Pointer into .SurveyScans
@@ -777,7 +769,6 @@ namespace MASIC
             // ---------------------------------------------------------
             for (int mzIndexWork = 0, loopTo4 = mzSearchChunk.Count - 1; mzIndexWork <= loopTo4; mzIndexWork++)
             {
-
                 // Use this for debugging
                 if (Math.Abs(mzSearchChunk[mzIndexWork].SearchMZ - DebugMZToFind) < 0.1)
                 {

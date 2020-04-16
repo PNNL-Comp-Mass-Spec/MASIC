@@ -10,7 +10,6 @@ namespace MASIC.DataInput
 {
     public abstract class clsDataImport : clsMasicEventNotifier
     {
-
         #region // TODO
         public const string THERMO_RAW_FILE_EXTENSION = ".RAW";
         public const string MZ_ML_FILE_EXTENSION = ".MZML";
@@ -255,7 +254,6 @@ namespace MASIC.DataInput
                     {
                         writer.Close();
                     }
-
 
                     // Call .FilterData, which will determine which data points to keep
                     objFilterDataArray.FilterData();

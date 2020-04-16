@@ -42,7 +42,6 @@ namespace MASIC
 
         public int FindNearestSurveyScanIndex(clsScanList scanList, float scanOrAcqTime, clsCustomSICList.eCustomSICScanTypeConstants eScanType)
         {
-
             // Finds the index of the survey scan closest to scanOrAcqTime
             // Note that scanOrAcqTime can be absolute, relative, or AcquisitionTime; eScanType specifies which it is
 

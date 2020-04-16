@@ -11,7 +11,6 @@ namespace MASIC
 {
     public class clsMASICOptions : clsMasicEventNotifier
     {
-
         #region // TODO
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
         public const string XML_SECTION_IMPORT_OPTIONS = "MasicImportOptions";
@@ -504,11 +503,9 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString", DatabaseConnectionString);
                 writer.SetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql", DatasetInfoQuerySql);
 
-
                 // Import Options
                 writer.SetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", CDFTimeInSeconds);
                 writer.SetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", ParentIonDecoyMassDa);
-
 
                 // Masic Export Options
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", IncludeHeadersInExportFile);
@@ -542,7 +539,6 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", RawDataExportOptions.MinimumSignalToNoiseRatio);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", RawDataExportOptions.MaxIonCountPerScan);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", RawDataExportOptions.IntensityMinimum);
-
 
                 // SIC Options
                 // Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
@@ -606,7 +602,6 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_BINNING_OPTIONS, "IntensityPrecisionPercent", BinningOptions.IntensityPrecisionPercent);
                 writer.SetParam(XML_SECTION_BINNING_OPTIONS, "Normalize", BinningOptions.Normalize);
                 writer.SetParam(XML_SECTION_BINNING_OPTIONS, "SumAllIntensitiesForBin", BinningOptions.SumAllIntensitiesForBin);
-
 
                 // Memory management options
                 writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", CacheOptions.DiskCachingAlwaysDisabled);
@@ -724,7 +719,6 @@ namespace MASIC
                 var validatedItems = new List<string>();
                 if (items.Count > 0)
                 {
-
                     // Populate validatedItems using any non-blank entries in items
                     foreach (var item in items)
                     {

@@ -1,9 +1,7 @@
-﻿
-namespace MASIC
+﻿namespace MASIC
 {
     public class clsBinningOptions
     {
-
         #region // TODO
         public float StartX { get; set; }
         public float EndX { get; set; }

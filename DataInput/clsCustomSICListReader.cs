@@ -8,7 +8,6 @@ namespace MASIC.DataInput
 {
     public class clsCustomSICListReader : clsMasicEventNotifier
     {
-
         #region // TODO
         public const string CUSTOM_SIC_COLUMN_MZ = "MZ";
         public const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";
@@ -28,7 +27,6 @@ namespace MASIC.DataInput
             TimeTolerance = 5,           // Only used for acquisition Time
             Comment = 6
         }
-
 
         #endregion
         #region // TODO
@@ -103,7 +101,6 @@ namespace MASIC.DataInput
                         linesRead += 1;
                         if (linesRead == 1)
                         {
-
                             // Initialize eColumnMapping, setting the value for each column to -1, indicating the column is not present
                             eColumnMapping = new int[dataCols.Length];
                             for (int colIndex = 0, loopTo = eColumnMapping.Length - 1; colIndex <= loopTo; colIndex++)

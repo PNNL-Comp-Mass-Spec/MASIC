@@ -14,7 +14,6 @@ namespace MASIC.DataInput
 
         public bool ExtractScanInfoFromMGFandCDF(string filePath, clsScanList scanList, clsSpectraCache spectraCache, DataOutput.clsDataOutput dataOutputHandler, bool keepRawSpectra, bool keepMSMSSpectra)
         {
-
             // Returns True if Success, False if failure
             // Note: This function assumes filePath exists
             //
@@ -165,7 +164,6 @@ namespace MASIC.DataInput
                         }
 
                         // Note: Since we're reading all of the Survey Scan data, we cannot update .MasterScanOrder() at this time
-
                     }
 
                     // Note: We need to take msScanCount * 2 since we have to read two different files
@@ -382,7 +380,6 @@ namespace MASIC.DataInput
                     // Note that scanTime is the scan time of the most recent survey scan processed in the above Do loop, so it's not accurate
                     if (mScanTracking.CheckScanInRange(scanList.SurveyScans[lastSurveyScanIndex].ScanNumber, scanTime, sicOptions))
                     {
-
                         // Add the given SurveyScan to .MasterScanOrder, though only if it hasn't yet been added
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
                         {
@@ -426,7 +423,6 @@ namespace MASIC.DataInput
 
         private double FindBasePeakIon(IReadOnlyList<double> mzList, IReadOnlyList<double> ionIntensity, out double basePeakIonIntensity, out double mzMin, out double mzMax)
         {
-
             // Finds the base peak ion
             // Also determines the minimum and maximum m/z values in mzList
             int basePeakIndex;
@@ -484,7 +480,6 @@ namespace MASIC.DataInput
             fragScanIteration = 1;
             try
             {
-
                 // Decrement lastSurveyScanIndex if the corresponding SurveyScan's scan number is larger than fragScanNumber
                 while (lastSurveyScanIndex > 0 && surveyScans[lastSurveyScanIndex].ScanNumber > fragScanNumber)
                     // This code will generally not be reached, provided the calling function passed the correct lastSurveyScanIndex value to this function

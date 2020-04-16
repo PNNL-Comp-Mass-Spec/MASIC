@@ -1,5 +1,4 @@
-﻿
-namespace MASIC.DatasetStats
+﻿namespace MASIC.DatasetStats
 {
     public class SampleInfo
     {
