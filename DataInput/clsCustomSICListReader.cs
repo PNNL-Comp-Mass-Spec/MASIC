@@ -111,35 +111,41 @@ namespace MASIC.DataInput
                             // The first row must be the header row; parse the values
                             for (int colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                             {
-                                switch (dataCols[colIndex].ToUpper())
+                                var colName = dataCols[colIndex];
+                                if (colName.Equals(CUSTOM_SIC_COLUMN_MZ, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    case var @case when @case == CUSTOM_SIC_COLUMN_MZ.ToUpper():
-                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZ;
-                                        mzHeaderFound = true;
-                                        break;
-                                    case var case1 when case1 == CUSTOM_SIC_COLUMN_MZ_TOLERANCE.ToUpper():
-                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZToleranceDa;
-                                        break;
-                                    case var case2 when case2 == CUSTOM_SIC_COLUMN_SCAN_CENTER.ToUpper():
-                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanCenter;
-                                        break;
-                                    case var case3 when case3 == CUSTOM_SIC_COLUMN_SCAN_TOLERANCE.ToUpper():
-                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTolerance;
-                                        break;
-                                    case var case4 when case4 == CUSTOM_SIC_COLUMN_SCAN_TIME.ToUpper():
-                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTime;
-                                        scanTimeHeaderFound = true;
-                                        break;
-                                    case var case5 when case5 == CUSTOM_SIC_COLUMN_TIME_TOLERANCE.ToUpper():
-                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.TimeTolerance;
-                                        timeToleranceHeaderFound = true;
-                                        break;
-                                    case var case6 when case6 == CUSTOM_SIC_COLUMN_COMMENT.ToUpper():
-                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.Comment;
-                                        break;
-                                    default:
-                                        // Unknown column name; ignore it
-                                        break;
+                                    eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZ;
+                                    mzHeaderFound = true;
+                                }
+                                else if (colName.Equals(CUSTOM_SIC_COLUMN_MZ_TOLERANCE, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZToleranceDa;
+                                }
+                                else if (colName.Equals(CUSTOM_SIC_COLUMN_SCAN_CENTER, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanCenter;
+                                }
+                                else if (colName.Equals(CUSTOM_SIC_COLUMN_SCAN_TOLERANCE, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTolerance;
+                                }
+                                else if (colName.Equals(CUSTOM_SIC_COLUMN_SCAN_TIME, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTime;
+                                    scanTimeHeaderFound = true;
+                                }
+                                else if (colName.Equals(CUSTOM_SIC_COLUMN_TIME_TOLERANCE, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    eColumnMapping[colIndex] = (int)eCustomSICFileColumns.TimeTolerance;
+                                    timeToleranceHeaderFound = true;
+                                }
+                                else if (colName.Equals(CUSTOM_SIC_COLUMN_COMMENT, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    eColumnMapping[colIndex] = (int) eCustomSICFileColumns.Comment;
+                                }
+                                else
+                                {
+                                    // Unknown column name; ignore it
                                 }
                             }
 
