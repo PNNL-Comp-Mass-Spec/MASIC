@@ -106,67 +106,58 @@ namespace MASIC
                 switch (eScanType)
                 {
                     case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
-                        {
-                            // scanOrAcqTime is an absolute scan number (or range of scan numbers)
-                            // No conversion needed; simply return the value
-                            absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime);
-                            break;
-                        }
-
+                        // scanOrAcqTime is an absolute scan number (or range of scan numbers)
+                        // No conversion needed; simply return the value
+                        absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime);
+                        break;
                     case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
+                        // scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
+
+                        // Use the total range of scan numbers
+                        if (scanList.MasterScanOrderCount > 0)
                         {
-                            // scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
-
-                            // Use the total range of scan numbers
-                            if (scanList.MasterScanOrderCount > 0)
-                            {
-                                int totalScanRange = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
-                                absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime * totalScanRange + scanList.MasterScanNumList[0]);
-                            }
-                            else
-                            {
-                                absoluteScanNumber = 0;
-                            }
-
-                            break;
+                            int totalScanRange = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
+                            absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime * totalScanRange + scanList.MasterScanNumList[0]);
                         }
+                        else
+                        {
+                            absoluteScanNumber = 0;
+                        }
+
+                        break;
 
                     case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
+                        // scanOrAcqTime is an elution time value
+                        // If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
+                        // If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
+                        // call this function again with that relative time
+
+                        if (convertingRangeOrTolerance)
                         {
-                            // scanOrAcqTime is an elution time value
-                            // If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
-                            // If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
-                            // call this function again with that relative time
-
-                            if (convertingRangeOrTolerance)
+                            float totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
+                            if (totalRunTime < 0.1)
                             {
-                                float totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
-                                if (totalRunTime < 0.1)
-                                {
-                                    totalRunTime = 1;
-                                }
-
-                                float relativeTime = scanOrAcqTime / totalRunTime;
-                                absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
-                            }
-                            else
-                            {
-                                int masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
-                                if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
-                                {
-                                    absoluteScanNumber = scanList.MasterScanNumList[masterScanIndex];
-                                }
+                                totalRunTime = 1;
                             }
 
-                            break;
+                            float relativeTime = scanOrAcqTime / totalRunTime;
+                            absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
                         }
+                        else
+                        {
+                            int masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
+                            if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
+                            {
+                                absoluteScanNumber = scanList.MasterScanNumList[masterScanIndex];
+                            }
+                        }
+
+                        break;
 
                     default:
-                        {
-                            // Unknown type; assume absolute scan number
-                            absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime);
-                            break;
-                        }
+                        // Unknown type; assume absolute scan number
+                        absoluteScanNumber = Conversions.ToInteger(scanOrAcqTime);
+                        break;
                 }
 
                 return absoluteScanNumber;
@@ -186,69 +177,60 @@ namespace MASIC
                 switch (eScanType)
                 {
                     case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
+                        // scanOrAcqTime is an absolute scan number (or range of scan numbers)
+
+                        // If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
+                        // If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
+                        // call this function again with that relative time
+
+                        if (convertingRangeOrTolerance)
                         {
-                            // scanOrAcqTime is an absolute scan number (or range of scan numbers)
-
-                            // If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
-                            // If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
-                            // call this function again with that relative time
-
-                            if (convertingRangeOrTolerance)
+                            int totalScans;
+                            totalScans = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
+                            if (totalScans < 1)
                             {
-                                int totalScans;
-                                totalScans = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
-                                if (totalScans < 1)
-                                {
-                                    totalScans = 1;
-                                }
-
-                                float relativeTime = scanOrAcqTime / totalScans;
-                                computedScanTime = ScanOrAcqTimeToScanTime(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
-                            }
-                            else
-                            {
-                                int masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
-                                if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
-                                {
-                                    computedScanTime = scanList.MasterScanTimeList[masterScanIndex];
-                                }
+                                totalScans = 1;
                             }
 
-                            break;
+                            float relativeTime = scanOrAcqTime / totalScans;
+                            computedScanTime = ScanOrAcqTimeToScanTime(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
                         }
+                        else
+                        {
+                            int masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
+                            if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
+                            {
+                                computedScanTime = scanList.MasterScanTimeList[masterScanIndex];
+                            }
+                        }
+
+                        break;
 
                     case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
+                        // scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
+
+                        // Use the total range of scan times
+                        if (scanList.MasterScanOrderCount > 0)
                         {
-                            // scanOrAcqTime is a fraction of the total number of scans (for example, 0.5)
-
-                            // Use the total range of scan times
-                            if (scanList.MasterScanOrderCount > 0)
-                            {
-                                float totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
-                                computedScanTime = Conversions.ToSingle(scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0]);
-                            }
-                            else
-                            {
-                                computedScanTime = 0;
-                            }
-
-                            break;
+                            float totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
+                            computedScanTime = Conversions.ToSingle(scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0]);
                         }
+                        else
+                        {
+                            computedScanTime = 0;
+                        }
+
+                        break;
 
                     case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
-                        {
-                            // scanOrAcqTime is an elution time value (or elution time range)
-                            // No conversion needed; simply return the value
-                            computedScanTime = scanOrAcqTime;
-                            break;
-                        }
-
+                        // scanOrAcqTime is an elution time value (or elution time range)
+                        // No conversion needed; simply return the value
+                        computedScanTime = scanOrAcqTime;
+                        break;
                     default:
-                        {
-                            // Unknown type; assume already a scan time
-                            computedScanTime = scanOrAcqTime;
-                            break;
-                        }
+                        // Unknown type; assume already a scan time
+                        computedScanTime = scanOrAcqTime;
+                        break;
                 }
 
                 return computedScanTime;

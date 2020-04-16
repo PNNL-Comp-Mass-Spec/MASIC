@@ -125,78 +125,72 @@ namespace MASIC.DataInput
                 switch (noiseThresholdOptions.BaselineNoiseMode)
                 {
                     case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold:
+                        if (noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0)
                         {
-                            if (noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0)
+                            ionCountNew = 0;
+                            for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                             {
-                                ionCountNew = 0;
-                                for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                                pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                                if (!pointPassesFilter)
                                 {
-                                    pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
-                                    if (!pointPassesFilter)
+                                    // Check the point's intensity against .BaselineNoiseLevelAbsolute
+                                    if (msSpectrum.IonsIntensity[ionIndex] >= noiseThresholdOptions.BaselineNoiseLevelAbsolute)
                                     {
-                                        // Check the point's intensity against .BaselineNoiseLevelAbsolute
-                                        if (msSpectrum.IonsIntensity[ionIndex] >= noiseThresholdOptions.BaselineNoiseLevelAbsolute)
-                                        {
-                                            pointPassesFilter = true;
-                                        }
-                                    }
-
-                                    if (pointPassesFilter)
-                                    {
-                                        msSpectrum.IonsMZ[ionCountNew] = msSpectrum.IonsMZ[ionIndex];
-                                        msSpectrum.IonsIntensity[ionCountNew] = msSpectrum.IonsIntensity[ionIndex];
-                                        ionCountNew += 1;
+                                        pointPassesFilter = true;
                                     }
                                 }
-                            }
-                            else
-                            {
-                                ionCountNew = msSpectrum.IonCount;
-                            }
 
-                            break;
+                                if (pointPassesFilter)
+                                {
+                                    msSpectrum.IonsMZ[ionCountNew] = msSpectrum.IonsMZ[ionIndex];
+                                    msSpectrum.IonsIntensity[ionCountNew] = msSpectrum.IonsIntensity[ionIndex];
+                                    ionCountNew += 1;
+                                }
+                            }
                         }
+                        else
+                        {
+                            ionCountNew = msSpectrum.IonCount;
+                        }
+
+                        break;
 
                     case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance:
                     case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount:
                     case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance:
+                        if (noiseThresholdOptions.MinimumSignalToNoiseRatio > 0)
                         {
-                            if (noiseThresholdOptions.MinimumSignalToNoiseRatio > 0)
+                            ionCountNew = 0;
+                            for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                             {
-                                ionCountNew = 0;
-                                for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                                pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                                if (!pointPassesFilter)
                                 {
-                                    pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
-                                    if (!pointPassesFilter)
+                                    // Check the point's intensity against .BaselineNoiseLevelAbsolute
+                                    if (MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(msSpectrum.IonsIntensity[ionIndex], noiseThresholdIntensity) >= noiseThresholdOptions.MinimumSignalToNoiseRatio)
                                     {
-                                        // Check the point's intensity against .BaselineNoiseLevelAbsolute
-                                        if (MASICPeakFinder.clsMASICPeakFinder.ComputeSignalToNoise(msSpectrum.IonsIntensity[ionIndex], noiseThresholdIntensity) >= noiseThresholdOptions.MinimumSignalToNoiseRatio)
-                                        {
-                                            pointPassesFilter = true;
-                                        }
-                                    }
-
-                                    if (pointPassesFilter)
-                                    {
-                                        msSpectrum.IonsMZ[ionCountNew] = msSpectrum.IonsMZ[ionIndex];
-                                        msSpectrum.IonsIntensity[ionCountNew] = msSpectrum.IonsIntensity[ionIndex];
-                                        ionCountNew += 1;
+                                        pointPassesFilter = true;
                                     }
                                 }
-                            }
-                            else
-                            {
-                                ionCountNew = msSpectrum.IonCount;
-                            }
 
-                            break;
+                                if (pointPassesFilter)
+                                {
+                                    msSpectrum.IonsMZ[ionCountNew] = msSpectrum.IonsMZ[ionIndex];
+                                    msSpectrum.IonsIntensity[ionCountNew] = msSpectrum.IonsIntensity[ionIndex];
+                                    ionCountNew += 1;
+                                }
+                            }
                         }
+                        else
+                        {
+                            ionCountNew = msSpectrum.IonCount;
+                        }
+
+                        break;
 
                     default:
-                        {
-                            ReportError("Unknown BaselineNoiseMode encountered in DiscardDataBelowNoiseThreshold: " + noiseThresholdOptions.BaselineNoiseMode.ToString());
-                            break;
-                        }
+                        ReportError("Unknown BaselineNoiseMode encountered in DiscardDataBelowNoiseThreshold: " + noiseThresholdOptions.BaselineNoiseMode.ToString());
+                        break;
                 }
 
                 if (ionCountNew < msSpectrum.IonCount)

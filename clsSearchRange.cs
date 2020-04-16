@@ -45,30 +45,16 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        {
-                            return mDataInt.Length;
-                        }
-
+                        return mDataInt.Length;
                     case eDataTypeToUse.SingleType:
-                        {
-                            return mDataSingle.Length;
-                        }
-
+                        return mDataSingle.Length;
                     case eDataTypeToUse.DoubleType:
-                        {
-                            return mDataDouble.Length;
-                        }
-
+                        return mDataDouble.Length;
                     case eDataTypeToUse.NoDataPresent:
-                        {
-                            return 0;
-                        }
-
+                        return 0;
                     default:
-                        {
-                            throw new Exception("Unknown data type encountered: " + mDataType.ToString());
-                            break;
-                        }
+                        throw new Exception("Unknown data type encountered: " + mDataType.ToString());
+                        break;
                 }
             }
         }
@@ -454,22 +440,14 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.SingleType:
-                        {
-                            matchFound = FindValueRange(Conversions.ToSingle(searchValue), Conversions.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
-                            break;
-                        }
-
+                        matchFound = FindValueRange(Conversions.ToSingle(searchValue), Conversions.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        break;
                     case eDataTypeToUse.DoubleType:
-                        {
-                            matchFound = FindValueRange(Conversions.ToDouble(searchValue), Conversions.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
-                            break;
-                        }
-
+                        matchFound = FindValueRange(Conversions.ToDouble(searchValue), Conversions.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        break;
                     default:
-                        {
-                            matchFound = false;
-                            break;
-                        }
+                        matchFound = false;
+                        break;
                 }
             }
             else
@@ -520,22 +498,14 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        {
-                            matchFound = FindValueRange(Conversions.ToInteger(searchValue), Conversions.ToInteger(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
-                            break;
-                        }
-
+                        matchFound = FindValueRange(Conversions.ToInteger(searchValue), Conversions.ToInteger(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        break;
                     case eDataTypeToUse.SingleType:
-                        {
-                            matchFound = FindValueRange(Conversions.ToSingle(searchValue), Conversions.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
-                            break;
-                        }
-
+                        matchFound = FindValueRange(Conversions.ToSingle(searchValue), Conversions.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        break;
                     default:
-                        {
-                            matchFound = false;
-                            break;
-                        }
+                        matchFound = false;
+                        break;
                 }
             }
             else
@@ -586,22 +556,14 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        {
-                            matchFound = FindValueRange(Conversions.ToInteger(searchValue), Conversions.ToInteger(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
-                            break;
-                        }
-
+                        matchFound = FindValueRange(Conversions.ToInteger(searchValue), Conversions.ToInteger(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        break;
                     case eDataTypeToUse.DoubleType:
-                        {
-                            matchFound = FindValueRange(Conversions.ToDouble(searchValue), Conversions.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
-                            break;
-                        }
-
+                        matchFound = FindValueRange(Conversions.ToDouble(searchValue), Conversions.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        break;
                     default:
-                        {
-                            matchFound = false;
-                            break;
-                        }
+                        matchFound = false;
+                        break;
                 }
             }
             else
@@ -667,19 +629,11 @@ namespace MASIC
                     switch (mDataType)
                     {
                         case eDataTypeToUse.IntegerType:
-                            {
-                                return mDataInt[index];
-                            }
-
+                            return mDataInt[index];
                         case eDataTypeToUse.SingleType:
-                            {
-                                return mDataSingle[index];
-                            }
-
+                            return mDataSingle[index];
                         case eDataTypeToUse.DoubleType:
-                            {
-                                return mDataDouble[index];
-                            }
+                            return mDataDouble[index];
                     }
                 }
             }
@@ -735,19 +689,11 @@ namespace MASIC
                         switch (mDataType)
                         {
                             case eDataTypeToUse.IntegerType:
-                                {
-                                    return mDataInt[mPointerIndices[index]];
-                                }
-
+                                return mDataInt[mPointerIndices[index]];
                             case eDataTypeToUse.SingleType:
-                                {
-                                    return mDataSingle[mPointerIndices[index]];
-                                }
-
+                                return mDataSingle[mPointerIndices[index]];
                             case eDataTypeToUse.DoubleType:
-                                {
-                                    return mDataDouble[mPointerIndices[index]];
-                                }
+                                return mDataDouble[mPointerIndices[index]];
                         }
                     }
                     else

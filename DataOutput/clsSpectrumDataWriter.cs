@@ -30,32 +30,25 @@ namespace MASIC.DataOutput
                 switch (mOptions.RawDataExportOptions.FileFormat)
                 {
                     case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
-                        {
-                            outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.PEKFile);
-                            dataWriter = new StreamWriter(outputFilePath);
-                            scanInfoWriter = null;
-                            break;
-                        }
-
+                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.PEKFile);
+                        dataWriter = new StreamWriter(outputFilePath);
+                        scanInfoWriter = null;
+                        break;
                     case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
-                        {
-                            outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsIsosFile);
-                            string outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsScansFile);
-                            dataWriter = new StreamWriter(outputFilePath);
-                            scanInfoWriter = new StreamWriter(outputFilePath2);
+                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsIsosFile);
+                        string outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsScansFile);
+                        dataWriter = new StreamWriter(outputFilePath);
+                        scanInfoWriter = new StreamWriter(outputFilePath2);
 
-                            // Write the file headers
-                            mBPIWriter.WriteDecon2LSIsosFileHeaders(dataWriter);
-                            mBPIWriter.WriteDecon2LSScanFileHeaders(scanInfoWriter);
-                            break;
-                        }
+                        // Write the file headers
+                        mBPIWriter.WriteDecon2LSIsosFileHeaders(dataWriter);
+                        mBPIWriter.WriteDecon2LSScanFileHeaders(scanInfoWriter);
+                        break;
 
                     default:
-                        {
-                            // Unknown format
-                            ReportError("Unknown raw data file format: " + mOptions.RawDataExportOptions.FileFormat.ToString());
-                            return false;
-                        }
+                        // Unknown format
+                        ReportError("Unknown raw data file format: " + mOptions.RawDataExportOptions.FileFormat.ToString());
+                        return false;
                 }
 
                 int spectrumExportCount = 0;
@@ -325,23 +318,15 @@ namespace MASIC.DataOutput
             switch (mOptions.RawDataExportOptions.FileFormat)
             {
                 case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
-                    {
-                        SavePEKFileToDiskWork(dataWriter, currentScan, spectraCache, inputFileName, fragmentationScan, ref spectrumExportCount);
-                        break;
-                    }
-
+                    SavePEKFileToDiskWork(dataWriter, currentScan, spectraCache, inputFileName, fragmentationScan, ref spectrumExportCount);
+                    break;
                 case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
-                    {
-                        SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, spectraCache, fragmentationScan, ref spectrumExportCount);
-                        break;
-                    }
-
+                    SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, spectraCache, fragmentationScan, ref spectrumExportCount);
+                    break;
                 default:
-                    {
-                        break;
-                    }
                     // Unknown format
                     // This code should never be reached
+                    break;
             }
         }
     }

@@ -438,27 +438,16 @@ namespace MASIC
                 switch (eCorrelationMethod)
                 {
                     case cmCorrelationMethodConstants.Pearson:
-                        {
-                            CorrelatePearson(dataList1, dataList2, out RValue, out ProbOfSignificance, out FishersZ);
-                            return RValue;
-                        }
-
+                        CorrelatePearson(dataList1, dataList2, out RValue, out ProbOfSignificance, out FishersZ);
+                        return RValue;
                     case cmCorrelationMethodConstants.Spearman:
-                        {
-                            CorrelateSpearman(dataList1, dataList2, out DiffInRanks, out ZD, out ProbOfSignificance, out RS, out ProbRS);
-                            return RS;
-                        }
-
+                        CorrelateSpearman(dataList1, dataList2, out DiffInRanks, out ZD, out ProbOfSignificance, out RS, out ProbRS);
+                        return RS;
                     case cmCorrelationMethodConstants.Kendall:
-                        {
-                            CorrelateKendall(dataList1, dataList2, out KendallsTau, out Z, out ProbOfSignificance);
-                            return KendallsTau;
-                        }
-
+                        CorrelateKendall(dataList1, dataList2, out KendallsTau, out Z, out ProbOfSignificance);
+                        return KendallsTau;
                     default:
-                        {
-                            return -1;
-                        }
+                        return -1;
                 }
             }
             catch (Exception ex)

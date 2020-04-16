@@ -184,27 +184,19 @@ namespace MASIC
             switch (messageType)
             {
                 case EventLogEntryType.Error:
-                    {
-                        textToAppend = "Error: " + message;
-                        tbsOptions.SelectTab(tbsOptions.TabCount - 1);
-                        doEvents = true;
-                        break;
-                    }
-
+                    textToAppend = "Error: " + message;
+                    tbsOptions.SelectTab(tbsOptions.TabCount - 1);
+                    doEvents = true;
+                    break;
                 case EventLogEntryType.Warning:
-                    {
-                        textToAppend = "Warning: " + message;
-                        tbsOptions.SelectTab(tbsOptions.TabCount - 1);
-                        doEvents = true;
-                        break;
-                    }
-
+                    textToAppend = "Warning: " + message;
+                    tbsOptions.SelectTab(tbsOptions.TabCount - 1);
+                    doEvents = true;
+                    break;
                 default:
-                    {
-                        // Includes Case EventLogEntryType.Information
-                        textToAppend = message;
-                        break;
-                    }
+                    // Includes Case EventLogEntryType.Information
+                    textToAppend = message;
+                    break;
             }
 
             mLogMessages.Insert(0, textToAppend);
@@ -1470,22 +1462,14 @@ namespace MASIC
                 switch (fileExtension.ToLower())
                 {
                     case ".txt":
-                        {
-                            objOpenFile.FilterIndex = 1;
-                            break;
-                        }
-
+                        objOpenFile.FilterIndex = 1;
+                        break;
                     case "csv":
-                        {
-                            objOpenFile.FilterIndex = 2;
-                            break;
-                        }
-
+                        objOpenFile.FilterIndex = 2;
+                        break;
                     default:
-                        {
-                            objOpenFile.FilterIndex = 1;
-                            break;
-                        }
+                        objOpenFile.FilterIndex = 1;
+                        break;
                 }
 
                 if (txtCustomSICFileName.TextLength > 0)
@@ -1538,41 +1522,24 @@ namespace MASIC
                 int filterIndex;
                 switch (fileExtension.ToLower())
                 {
-                    case var @case when @case == ".mzXml".ToLower():
-                        {
-                            filterIndex = 2;
-                            break;
-                        }
-
-                    case var case1 when case1 == "mzML".ToLower():
-                        {
-                            filterIndex = 3;
-                            break;
-                        }
-
-                    case var case2 when case2 == ".mzData".ToLower():
-                        {
-                            filterIndex = 4;
-                            break;
-                        }
-
+                    case ".mzxml":
+                        filterIndex = 2;
+                        break;
+                    case "mzml":
+                        filterIndex = 3;
+                        break;
+                    case ".mzdata":
+                        filterIndex = 4;
+                        break;
                     case ".mgf":
-                        {
-                            filterIndex = 5;
-                            break;
-                        }
-
+                        filterIndex = 5;
+                        break;
                     case ".cdf":
-                        {
-                            filterIndex = 6;
-                            break;
-                        }
-
+                        filterIndex = 6;
+                        break;
                     default:
-                        {
-                            filterIndex = 1;
-                            break;
-                        }
+                        filterIndex = 1;
+                        break;
                 }
 
                 objOpenFile.FilterIndex = filterIndex;
@@ -1632,28 +1599,17 @@ namespace MASIC
             switch (eCustomSICScanToleranceType)
             {
                 case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
-                    {
-                        optCustomSICScanToleranceAbsolute.Checked = true;
-                        break;
-                    }
-
+                    optCustomSICScanToleranceAbsolute.Checked = true;
+                    break;
                 case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
-                    {
-                        optCustomSICScanToleranceRelative.Checked = true;
-                        break;
-                    }
-
+                    optCustomSICScanToleranceRelative.Checked = true;
+                    break;
                 case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
-                    {
-                        optCustomSICScanToleranceAcqTime.Checked = true;
-                        break;
-                    }
-
+                    optCustomSICScanToleranceAcqTime.Checked = true;
+                    break;
                 default:
-                    {
-                        optCustomSICScanToleranceAbsolute.Checked = true;
-                        break;
-                    }
+                    optCustomSICScanToleranceAbsolute.Checked = true;
+                    break;
             }
         }
 
@@ -1721,27 +1677,19 @@ namespace MASIC
             switch (GetCustomSICScanToleranceType())
             {
                 case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
-                    {
-                        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Relative Scan Number (0 to 1)", 170);
-                        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
-                        break;
-                    }
-
+                    DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Relative Scan Number (0 to 1)", 170);
+                    DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
+                    break;
                 case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
-                    {
-                        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Acq time (minutes)", 110);
-                        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Time Tolerance", 90);
-                        timeTolerance = true;
-                        break;
-                    }
-
+                    DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Acq time (minutes)", 110);
+                    DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Time Tolerance", 90);
+                    timeTolerance = true;
+                    break;
                 default:
-                    {
-                        // Includes eCustomSICScanTypeConstants.Absolute
-                        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Scan Number", 90);
-                        DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
-                        break;
-                    }
+                    // Includes eCustomSICScanTypeConstants.Absolute
+                    DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Scan Number", 90);
+                    DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
+                    break;
             }
 
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_COMMENT, "Comment", 90);

@@ -653,23 +653,15 @@ namespace MASIC
                 switch (CustomSICList.ScanToleranceType)
                 {
                     case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
-                        {
-                            writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE);
-                            break;
-                        }
-
+                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE);
+                        break;
                     case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
-                        {
-                            writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME);
-                            break;
-                        }
-
+                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME);
+                        break;
                     default:
-                        {
-                            // Assume absolute
-                            writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ABSOLUTE);
-                            break;
-                        }
+                        // Assume absolute
+                        writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ABSOLUTE);
+                        break;
                 }
 
                 writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", CustomSICList.CustomSICListFileName);

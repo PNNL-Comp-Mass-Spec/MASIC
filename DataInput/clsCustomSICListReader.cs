@@ -112,55 +112,32 @@ namespace MASIC.DataInput
                                 switch (dataCols[colIndex].ToUpper())
                                 {
                                     case var @case when @case == CUSTOM_SIC_COLUMN_MZ.ToUpper():
-                                        {
-                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZ;
-                                            mzHeaderFound = true;
-                                            break;
-                                        }
-
+                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZ;
+                                        mzHeaderFound = true;
+                                        break;
                                     case var case1 when case1 == CUSTOM_SIC_COLUMN_MZ_TOLERANCE.ToUpper():
-                                        {
-                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZToleranceDa;
-                                            break;
-                                        }
-
+                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZToleranceDa;
+                                        break;
                                     case var case2 when case2 == CUSTOM_SIC_COLUMN_SCAN_CENTER.ToUpper():
-                                        {
-                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanCenter;
-                                            break;
-                                        }
-
+                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanCenter;
+                                        break;
                                     case var case3 when case3 == CUSTOM_SIC_COLUMN_SCAN_TOLERANCE.ToUpper():
-                                        {
-                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTolerance;
-                                            break;
-                                        }
-
+                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTolerance;
+                                        break;
                                     case var case4 when case4 == CUSTOM_SIC_COLUMN_SCAN_TIME.ToUpper():
-                                        {
-                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTime;
-                                            scanTimeHeaderFound = true;
-                                            break;
-                                        }
-
+                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTime;
+                                        scanTimeHeaderFound = true;
+                                        break;
                                     case var case5 when case5 == CUSTOM_SIC_COLUMN_TIME_TOLERANCE.ToUpper():
-                                        {
-                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.TimeTolerance;
-                                            timeToleranceHeaderFound = true;
-                                            break;
-                                        }
-
+                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.TimeTolerance;
+                                        timeToleranceHeaderFound = true;
+                                        break;
                                     case var case6 when case6 == CUSTOM_SIC_COLUMN_COMMENT.ToUpper():
-                                        {
-                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.Comment;
-                                            break;
-                                        }
-
+                                        eColumnMapping[colIndex] = (int)eCustomSICFileColumns.Comment;
+                                        break;
                                     default:
-                                        {
-                                            break;
-                                        }
                                         // Unknown column name; ignore it
+                                        break;
                                 }
                             }
 
@@ -203,106 +180,89 @@ namespace MASIC.DataInput
                             switch (eColumnMapping[colIndex])
                             {
                                 case (int)eCustomSICFileColumns.MZ:
+                                    double argresult = mzSearchSpec.MZ;
+                                    if (!double.TryParse(dataCols[colIndex], out argresult))
                                     {
-                                        double argresult = mzSearchSpec.MZ;
-                                        if (!double.TryParse(dataCols[colIndex], out argresult))
-                                        {
-                                            throw new InvalidCastException("Non-numeric value for the MZ column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
-                                        }
-
-                                        break;
+                                        throw new InvalidCastException("Non-numeric value for the MZ column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                     }
+
+                                    break;
 
                                 case (int)eCustomSICFileColumns.MZToleranceDa:
+                                    double argresult1 = mzSearchSpec.MZToleranceDa;
+                                    if (!double.TryParse(dataCols[colIndex], out argresult1))
                                     {
-                                        double argresult1 = mzSearchSpec.MZToleranceDa;
-                                        if (!double.TryParse(dataCols[colIndex], out argresult1))
-                                        {
-                                            throw new InvalidCastException("Non-numeric value for the MZToleranceDa column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
-                                        }
-
-                                        break;
+                                        throw new InvalidCastException("Non-numeric value for the MZToleranceDa column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                     }
+
+                                    break;
 
                                 case (int)eCustomSICFileColumns.ScanCenter:
+                                    // Do not use this value if both the ScanTime and the TimeTolerance columns were present
+                                    if (!forceAcquisitionTimeMode)
                                     {
-                                        // Do not use this value if both the ScanTime and the TimeTolerance columns were present
-                                        if (!forceAcquisitionTimeMode)
+                                        float argresult2 = mzSearchSpec.ScanOrAcqTimeCenter;
+                                        if (!float.TryParse(dataCols[colIndex], out argresult2))
                                         {
-                                            float argresult2 = mzSearchSpec.ScanOrAcqTimeCenter;
-                                            if (!float.TryParse(dataCols[colIndex], out argresult2))
-                                            {
-                                                throw new InvalidCastException("Non-numeric value for the ScanCenter column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
-                                            }
+                                            throw new InvalidCastException("Non-numeric value for the ScanCenter column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                         }
-
-                                        break;
                                     }
+
+                                    break;
 
                                 case (int)eCustomSICFileColumns.ScanTolerance:
+                                    // Do not use this value if both the ScanTime and the TimeTolerance columns were present
+                                    if (!forceAcquisitionTimeMode)
                                     {
-                                        // Do not use this value if both the ScanTime and the TimeTolerance columns were present
-                                        if (!forceAcquisitionTimeMode)
+                                        if (mCustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
                                         {
-                                            if (mCustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
+                                            mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToInteger(dataCols[colIndex]);
+                                        }
+                                        else
+                                        {
+                                            // Includes .Relative and .AcquisitionTime
+                                            float argresult3 = mzSearchSpec.ScanOrAcqTimeTolerance;
+                                            if (!float.TryParse(dataCols[colIndex], out argresult3))
                                             {
-                                                mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToInteger(dataCols[colIndex]);
-                                            }
-                                            else
-                                            {
-                                                // Includes .Relative and .AcquisitionTime
-                                                float argresult3 = mzSearchSpec.ScanOrAcqTimeTolerance;
-                                                if (!float.TryParse(dataCols[colIndex], out argresult3))
-                                                {
-                                                    throw new InvalidCastException("Non-numeric value for the ScanTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
-                                                }
+                                                throw new InvalidCastException("Non-numeric value for the ScanTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                             }
                                         }
-
-                                        break;
                                     }
+
+                                    break;
 
                                 case (int)eCustomSICFileColumns.ScanTime:
+                                    // Only use this value if both the ScanTime and the TimeTolerance columns were present
+                                    if (forceAcquisitionTimeMode)
                                     {
-                                        // Only use this value if both the ScanTime and the TimeTolerance columns were present
-                                        if (forceAcquisitionTimeMode)
+                                        float argresult4 = mzSearchSpec.ScanOrAcqTimeCenter;
+                                        if (!float.TryParse(dataCols[colIndex], out argresult4))
                                         {
-                                            float argresult4 = mzSearchSpec.ScanOrAcqTimeCenter;
-                                            if (!float.TryParse(dataCols[colIndex], out argresult4))
-                                            {
-                                                throw new InvalidCastException("Non-numeric value for the ScanTime column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
-                                            }
+                                            throw new InvalidCastException("Non-numeric value for the ScanTime column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                         }
-
-                                        break;
                                     }
+
+                                    break;
 
                                 case (int)eCustomSICFileColumns.TimeTolerance:
+                                    // Only use this value if both the ScanTime and the TimeTolerance columns were present
+                                    if (forceAcquisitionTimeMode)
                                     {
-                                        // Only use this value if both the ScanTime and the TimeTolerance columns were present
-                                        if (forceAcquisitionTimeMode)
+                                        float argresult5 = mzSearchSpec.ScanOrAcqTimeTolerance;
+                                        if (!float.TryParse(dataCols[colIndex], out argresult5))
                                         {
-                                            float argresult5 = mzSearchSpec.ScanOrAcqTimeTolerance;
-                                            if (!float.TryParse(dataCols[colIndex], out argresult5))
-                                            {
-                                                throw new InvalidCastException("Non-numeric value for the TimeTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
-                                            }
+                                            throw new InvalidCastException("Non-numeric value for the TimeTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
                                         }
-
-                                        break;
                                     }
+
+                                    break;
 
                                 case (int)eCustomSICFileColumns.Comment:
-                                    {
-                                        mzSearchSpec.Comment = string.Copy(dataCols[colIndex]);
-                                        break;
-                                    }
-
+                                    mzSearchSpec.Comment = string.Copy(dataCols[colIndex]);
+                                    break;
                                 default:
-                                    {
-                                        break;
-                                    }
                                     // Unknown column code
+                                    break;
                             }
                         }
 

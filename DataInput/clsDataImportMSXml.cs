@@ -74,28 +74,17 @@ namespace MASIC.DataInput
                     switch (cvParam.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_isolation_width_OBSOLETE:
-                            {
-                                isolationWidthText = cvParam.Value;
-                                break;
-                            }
-
+                            isolationWidthText = cvParam.Value;
+                            break;
                         case CV.CVID.MS_isolation_window_target_m_z:
-                            {
-                                isolationWindowTargetMzText = cvParam.Value;
-                                break;
-                            }
-
+                            isolationWindowTargetMzText = cvParam.Value;
+                            break;
                         case CV.CVID.MS_isolation_window_lower_offset:
-                            {
-                                isolationWindowLowerOffsetText = cvParam.Value;
-                                break;
-                            }
-
+                            isolationWindowLowerOffsetText = cvParam.Value;
+                            break;
                         case CV.CVID.MS_isolation_window_upper_offset:
-                            {
-                                isolationWindowUpperOffsetText = cvParam.Value;
-                                break;
-                            }
+                            isolationWindowUpperOffsetText = cvParam.Value;
+                            break;
                     }
                 }
             }
@@ -108,16 +97,11 @@ namespace MASIC.DataInput
                     {
                         case CV.CVID.MS_selected_ion_m_z:
                         case CV.CVID.MS_selected_precursor_m_z:
-                            {
-                                monoMzText = cvParam.Value;
-                                break;
-                            }
-
+                            monoMzText = cvParam.Value;
+                            break;
                         case CV.CVID.MS_charge_state:
-                            {
-                                chargeStateText = cvParam.Value;
-                                break;
-                            }
+                            chargeStateText = cvParam.Value;
+                            break;
                     }
                 }
             }
@@ -365,10 +349,8 @@ namespace MASIC.DataInput
                         case CV.CVID.MS_Thermo_nativeID_format:
                         case CV.CVID.MS_Thermo_nativeID_format__combined_spectra:
                         case CV.CVID.MS_Thermo_RAW_format:
-                            {
-                                thermoRawFile = true;
-                                break;
-                            }
+                            thermoRawFile = true;
+                            break;
                     }
                 }
 
@@ -1051,102 +1033,55 @@ namespace MASIC.DataInput
                         case CV.CVID.MS_low_energy_collision_induced_dissociation:
                         case CV.CVID.MS_in_source_collision_induced_dissociation:
                         case CV.CVID.MS_trap_type_collision_induced_dissociation:
-                            {
-                                activationMethods.Add("CID");
-                                break;
-                            }
-
+                            activationMethods.Add("CID");
+                            break;
                         case CV.CVID.MS_plasma_desorption:
-                            {
-                                activationMethods.Add("PD");
-                                break;
-                            }
-
+                            activationMethods.Add("PD");
+                            break;
                         case CV.CVID.MS_post_source_decay:
-                            {
-                                activationMethods.Add("PSD");
-                                break;
-                            }
-
+                            activationMethods.Add("PSD");
+                            break;
                         case CV.CVID.MS_surface_induced_dissociation:
-                            {
-                                activationMethods.Add("SID");
-                                break;
-                            }
-
+                            activationMethods.Add("SID");
+                            break;
                         case CV.CVID.MS_blackbody_infrared_radiative_dissociation:
-                            {
-                                activationMethods.Add("BIRD");
-                                break;
-                            }
-
+                            activationMethods.Add("BIRD");
+                            break;
                         case CV.CVID.MS_electron_capture_dissociation:
-                            {
-                                activationMethods.Add("ECD");
-                                break;
-                            }
-
+                            activationMethods.Add("ECD");
+                            break;
                         case CV.CVID.MS_infrared_multiphoton_dissociation:
-                            {
-                                // ReSharper disable once StringLiteralTypo
-                                activationMethods.Add("IRPD");
-                                break;
-                            }
-
+                            // ReSharper disable once StringLiteralTypo
+                            activationMethods.Add("IRPD");
+                            break;
                         case CV.CVID.MS_sustained_off_resonance_irradiation:
-                            {
-                                activationMethods.Add("ORI");
-                                break;
-                            }
-
+                            activationMethods.Add("ORI");
+                            break;
                         case CV.CVID.MS_beam_type_collision_induced_dissociation:
-                            {
-                                activationMethods.Add("HCD");
-                                break;
-                            }
-
+                            activationMethods.Add("HCD");
+                            break;
                         case CV.CVID.MS_photodissociation:
-                            {
-                                // ReSharper disable once StringLiteralTypo
-                                activationMethods.Add("UVPD");
-                                break;
-                            }
-
+                            // ReSharper disable once StringLiteralTypo
+                            activationMethods.Add("UVPD");
+                            break;
                         case CV.CVID.MS_electron_transfer_dissociation:
-                            {
-                                activationMethods.Add("ETD");
-                                break;
-                            }
-
+                            activationMethods.Add("ETD");
+                            break;
                         case CV.CVID.MS_pulsed_q_dissociation:
-                            {
-                                activationMethods.Add("PQD");
-                                break;
-                            }
-
+                            activationMethods.Add("PQD");
+                            break;
                         case CV.CVID.MS_LIFT:
-                            {
-                                activationMethods.Add("LIFT");
-                                break;
-                            }
-
+                            activationMethods.Add("LIFT");
+                            break;
                         case CV.CVID.MS_Electron_Transfer_Higher_Energy_Collision_Dissociation__EThcD_:
-                            {
-                                activationMethods.Add("EThcD");
-                                break;
-                            }
-
+                            activationMethods.Add("EThcD");
+                            break;
                         case CV.CVID.MS_supplemental_beam_type_collision_induced_dissociation:
-                            {
-                                supplementalMethods.Add("HCD");
-                                break;
-                            }
-
+                            supplementalMethods.Add("HCD");
+                            break;
                         case CV.CVID.MS_supplemental_collision_induced_dissociation:
-                            {
-                                supplementalMethods.Add("CID");
-                                break;
-                            }
+                            supplementalMethods.Add("CID");
+                            break;
                     }
                 }
 
@@ -1227,17 +1162,12 @@ namespace MASIC.DataInput
                     switch (item.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_total_ion_current_chromatogram:
-                            {
-                                // Skip this chromatogram
-                                return false;
-                            }
-
+                            // Skip this chromatogram
+                            return false;
                         case CV.CVID.MS_selected_ion_current_chromatogram:
                         case CV.CVID.MS_selected_ion_monitoring_chromatogram:
                         case CV.CVID.MS_selected_reaction_monitoring_chromatogram:
-                            {
-                                return true;
-                            }
+                            return true;
                     }
                 }
             }
@@ -1396,44 +1326,31 @@ namespace MASIC.DataInput
                 switch (scanInfo.ScanTypeName.ToLower())
                 {
                     case var @case when @case == clsSpectrumInfoMzXML.ScanTypeNames.Full.ToLower():
+                        if (msLevel <= 1)
                         {
-                            if (msLevel <= 1)
-                            {
-                                scanInfo.ScanTypeName = "MS";
-                            }
-                            else
-                            {
-                                scanInfo.ScanTypeName = "MSn";
-                            }
-
-                            break;
+                            scanInfo.ScanTypeName = "MS";
                         }
+                        else
+                        {
+                            scanInfo.ScanTypeName = "MSn";
+                        }
+
+                        break;
 
                     case var case1 when case1 == clsSpectrumInfoMzXML.ScanTypeNames.zoom.ToLower():
-                        {
-                            scanInfo.ScanTypeName = "Zoom-MS";
-                            break;
-                        }
-
+                        scanInfo.ScanTypeName = "Zoom-MS";
+                        break;
                     case var case2 when case2 == clsSpectrumInfoMzXML.ScanTypeNames.MRM.ToLower():
-                        {
-                            scanInfo.ScanTypeName = "MRM";
-                            scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
-                            break;
-                        }
-
+                        scanInfo.ScanTypeName = "MRM";
+                        scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
+                        break;
                     case var case3 when case3 == clsSpectrumInfoMzXML.ScanTypeNames.SRM.ToLower():
-                        {
-                            scanInfo.ScanTypeName = "CID-SRM";
-                            scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
-                            break;
-                        }
-
+                        scanInfo.ScanTypeName = "CID-SRM";
+                        scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
+                        break;
                     default:
-                        {
-                            break;
-                        }
                         // Leave .ScanTypeName unchanged
+                        break;
                 }
             }
 

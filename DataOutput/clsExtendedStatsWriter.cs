@@ -65,34 +65,20 @@ namespace MASIC.DataOutput
                             switch (value)
                             {
                                 case "ff":
-                                    {
-                                        value = "Off";
-                                        break;
-                                    }
-
+                                    value = "Off";
+                                    break;
                                 case "n":
-                                    {
-                                        value = "On";
-                                        break;
-                                    }
-
+                                    value = "On";
+                                    break;
                                 case "eady":
-                                    {
-                                        value = "Ready";
-                                        break;
-                                    }
-
+                                    value = "Ready";
+                                    break;
                                 case "cquiring":
-                                    {
-                                        value = "Acquiring";
-                                        break;
-                                    }
-
+                                    value = "Acquiring";
+                                    break;
                                 case "oad":
-                                    {
-                                        value = "Load";
-                                        break;
-                                    }
+                                    value = "Load";
+                                    break;
                             }
                             // ReSharper restore StringLiteralTypo
                         }
@@ -323,24 +309,16 @@ namespace MASIC.DataOutput
                 switch (scanList.MasterScanOrder[masterScanIndex].ScanType)
                 {
                     case clsScanList.eScanTypeConstants.SurveyScan:
-                        {
-                            // Survey scan
-                            currentScan = scanList.SurveyScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
-                            break;
-                        }
-
+                        // Survey scan
+                        currentScan = scanList.SurveyScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
+                        break;
                     case clsScanList.eScanTypeConstants.FragScan:
-                        {
-                            // Frag Scan
-                            currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
-                            break;
-                        }
-
+                        // Frag Scan
+                        currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
+                        break;
                     default:
-                        {
-                            break;
-                        }
                         // Unknown scan type
+                        break;
                 }
             }
 

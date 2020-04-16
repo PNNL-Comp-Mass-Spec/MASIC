@@ -1659,131 +1659,69 @@ namespace MASIC
                 switch (mLocalErrorCode)
                 {
                     case eMasicErrorCodes.NoError:
-                        {
-                            errorMessage = string.Empty;
-                            break;
-                        }
-
+                        errorMessage = string.Empty;
+                        break;
                     case eMasicErrorCodes.InvalidDatasetLookupFilePath:
-                        {
-                            errorMessage = "Invalid dataset lookup file path";
-                            break;
-                        }
-
+                        errorMessage = "Invalid dataset lookup file path";
+                        break;
                     case eMasicErrorCodes.UnknownFileExtension:
-                        {
-                            errorMessage = "Unknown file extension";
-                            break;
-                        }
-
+                        errorMessage = "Unknown file extension";
+                        break;
                     case eMasicErrorCodes.InputFileAccessError:
-                        {
-                            errorMessage = "Input file access error";
-                            break;
-                        }
-
+                        errorMessage = "Input file access error";
+                        break;
                     case eMasicErrorCodes.InvalidDatasetID:
-                        {
-                            errorMessage = "Invalid dataset number";
-                            break;
-                        }
-
+                        errorMessage = "Invalid dataset number";
+                        break;
                     case eMasicErrorCodes.CreateSICsError:
-                        {
-                            errorMessage = "Create SIC's error";
-                            break;
-                        }
-
+                        errorMessage = "Create SIC's error";
+                        break;
                     case eMasicErrorCodes.FindSICPeaksError:
-                        {
-                            errorMessage = "Error finding SIC peaks";
-                            break;
-                        }
-
+                        errorMessage = "Error finding SIC peaks";
+                        break;
                     case eMasicErrorCodes.InvalidCustomSICValues:
-                        {
-                            errorMessage = "Invalid custom SIC values";
-                            break;
-                        }
-
+                        errorMessage = "Invalid custom SIC values";
+                        break;
                     case eMasicErrorCodes.NoParentIonsFoundInInputFile:
-                        {
-                            errorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)";
-                            break;
-                        }
-
+                        errorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)";
+                        break;
                     case eMasicErrorCodes.NoSurveyScansFoundInInputFile:
-                        {
-                            errorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)";
-                            break;
-                        }
-
+                        errorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)";
+                        break;
                     case eMasicErrorCodes.FindSimilarParentIonsError:
-                        {
-                            errorMessage = "Find similar parent ions error";
-                            break;
-                        }
-
-                    case var @case when @case == eMasicErrorCodes.FindSimilarParentIonsError:
-                        {
-                            errorMessage = "Find similar parent ions error";
-                            break;
-                        }
-
+                        errorMessage = "Find similar parent ions error";
+                        break;
+                    case eMasicErrorCodes.FindSimilarParentIonsError:
+                        errorMessage = "Find similar parent ions error";
+                        break;
                     case eMasicErrorCodes.InputFileDataReadError:
-                        {
-                            errorMessage = "Error reading data from input file";
-                            break;
-                        }
-
+                        errorMessage = "Error reading data from input file";
+                        break;
                     case eMasicErrorCodes.OutputFileWriteError:
-                        {
-                            errorMessage = "Error writing data to output file";
-                            break;
-                        }
-
+                        errorMessage = "Error writing data to output file";
+                        break;
                     case eMasicErrorCodes.FileIOPermissionsError:
-                        {
-                            errorMessage = "File IO Permissions Error";
-                            break;
-                        }
-
+                        errorMessage = "File IO Permissions Error";
+                        break;
                     case eMasicErrorCodes.ErrorCreatingSpectrumCacheDirectory:
-                        {
-                            errorMessage = "Error creating spectrum cache directory";
-                            break;
-                        }
-
+                        errorMessage = "Error creating spectrum cache directory";
+                        break;
                     case eMasicErrorCodes.ErrorCachingSpectrum:
-                        {
-                            errorMessage = "Error caching spectrum";
-                            break;
-                        }
-
+                        errorMessage = "Error caching spectrum";
+                        break;
                     case eMasicErrorCodes.ErrorUncachingSpectrum:
-                        {
-                            errorMessage = "Error uncaching spectrum";
-                            break;
-                        }
-
+                        errorMessage = "Error uncaching spectrum";
+                        break;
                     case eMasicErrorCodes.ErrorDeletingCachedSpectrumFiles:
-                        {
-                            errorMessage = "Error deleting cached spectrum files";
-                            break;
-                        }
-
+                        errorMessage = "Error deleting cached spectrum files";
+                        break;
                     case eMasicErrorCodes.UnspecifiedError:
-                        {
-                            errorMessage = "Unspecified localized error";
-                            break;
-                        }
-
+                        errorMessage = "Unspecified localized error";
+                        break;
                     default:
-                        {
-                            // This shouldn't happen
-                            errorMessage = "Unknown error state";
-                            break;
-                        }
+                        // This shouldn't happen
+                        errorMessage = "Unknown error state";
+                        break;
                 }
             }
             else
@@ -1865,81 +1803,69 @@ namespace MASIC
                 Options.SICOptions.ValidateSICOptions();
                 switch (Path.GetExtension(inputFileName).ToUpper())
                 {
-                    case var @case when @case == DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper():
-                        {
-                            // Open the .Raw file and obtain the scan information
+                    case DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION:
+                        // Open the .Raw file and obtain the scan information
 
-                            var dataImporter = new DataInput.clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                            RegisterDataImportEvents(dataImporter);
-                            dataImporterBase = dataImporter;
-                            success = dataImporter.ExtractScanInfoFromXcaliburDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                            datasetFileInfo = dataImporter.DatasetFileInfo;
-                            break;
-                        }
+                        var dataImporter = new DataInput.clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporter);
+                        dataImporterBase = dataImporter;
+                        success = dataImporter.ExtractScanInfoFromXcaliburDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        break;
 
-                    case var case1 when case1 == DataInput.clsDataImport.MZ_ML_FILE_EXTENSION.ToUpper():
-                        {
-                            // Open the .mzML file and obtain the scan information
+                    case DataInput.clsDataImport.MZ_ML_FILE_EXTENSION:
+                        // Open the .mzML file and obtain the scan information
 
-                            var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                            RegisterDataImportEvents(dataImporter);
-                            dataImporterBase = dataImporter;
-                            success = dataImporter.ExtractScanInfoFromMzMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                            datasetFileInfo = dataImporter.DatasetFileInfo;
-                            break;
-                        }
+                        var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporter);
+                        dataImporterBase = dataImporter;
+                        success = dataImporter.ExtractScanInfoFromMzMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        break;
 
-                    case var case2 when case2 == DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper():
-                    case var case3 when case3 == DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper():
-                        {
-                            // Open the .mzXML file and obtain the scan information
+                    case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1:
+                    case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2:
+                        // Open the .mzXML file and obtain the scan information
 
-                            var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                            RegisterDataImportEvents(dataImporter);
-                            dataImporterBase = dataImporter;
-                            success = dataImporter.ExtractScanInfoFromMzXMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                            datasetFileInfo = dataImporter.DatasetFileInfo;
-                            break;
-                        }
+                        var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporter);
+                        dataImporterBase = dataImporter;
+                        success = dataImporter.ExtractScanInfoFromMzXMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        break;
 
-                    case var case4 when case4 == DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper():
-                    case var case5 when case5 == DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper():
-                        {
-                            // Open the .mzData file and obtain the scan information
+                    case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1:
+                    case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2:
+                        // Open the .mzData file and obtain the scan information
 
-                            var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                            RegisterDataImportEvents(dataImporter);
-                            dataImporterBase = dataImporter;
-                            success = dataImporter.ExtractScanInfoFromMzDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                            datasetFileInfo = dataImporter.DatasetFileInfo;
-                            break;
-                        }
+                        var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporter);
+                        dataImporterBase = dataImporter;
+                        success = dataImporter.ExtractScanInfoFromMzDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        break;
 
-                    case var case6 when case6 == DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper():
-                    case var case7 when case7 == DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper():
-                        {
-                            // Open the .MGF and .CDF files to obtain the scan information
+                    case DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION:
+                    case DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION:
+                        // Open the .MGF and .CDF files to obtain the scan information
 
-                            var dataImporter = new DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                            RegisterDataImportEvents(dataImporter);
-                            dataImporterBase = dataImporter;
-                            success = dataImporter.ExtractScanInfoFromMGFandCDF(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                            datasetFileInfo = dataImporter.DatasetFileInfo;
-                            break;
-                        }
+                        var dataImporter = new DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporter);
+                        dataImporterBase = dataImporter;
+                        success = dataImporter.ExtractScanInfoFromMGFandCDF(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        break;
 
                     default:
-                        {
-                            mStatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePathFull);
-                            SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension);
-                            success = false;
+                        mStatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePathFull);
+                        SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension);
+                        success = false;
 
-                            // Instantiate this object to avoid a warning below about the object potentially not being initialized
-                            // In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
-                            datasetFileInfo = new DatasetFileInfo();
-                            dataImporterBase = null;
-                            break;
-                        }
+                        // Instantiate this object to avoid a warning below about the object potentially not being initialized
+                        // In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
+                        datasetFileInfo = new DatasetFileInfo();
+                        dataImporterBase = null;
+                        break;
                 }
 
                 if (!success)
