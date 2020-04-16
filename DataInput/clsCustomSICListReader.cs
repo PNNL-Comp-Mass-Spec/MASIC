@@ -62,7 +62,7 @@ namespace MASIC.DataInput
 
         public bool LoadCustomSICListFromFile(string customSICValuesFileName)
         {
-            var delimiterList = new char[] { ControlChars.Tab };
+            var delimiterList = new char[] { '\t' };
             var forceAcquisitionTimeMode = default(bool);
             try
             {
@@ -91,7 +91,7 @@ namespace MASIC.DataInput
                         string dataLine = reader.ReadLine();
                         if (dataLine == null)
                             continue;
-                        if (linesRead == 0 && !dataLine.Contains(Convert.ToString(ControlChars.Tab)))
+                        if (linesRead == 0 && !dataLine.Contains("\t"))
                         {
                             // Split on commas instead of tab characters
                             delimiterList = new char[] { ',' };

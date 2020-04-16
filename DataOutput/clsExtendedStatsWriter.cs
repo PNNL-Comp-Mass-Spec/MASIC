@@ -328,7 +328,7 @@ namespace MASIC.DataOutput
 
             string extendedConstantHeaderOutputFilePath;
             string extendedNonConstantHeaderOutputFilePath = string.Empty;
-            const char cColDelimiter = ControlChars.Tab;
+            const char cColDelimiter = '\t';
             List<int> nonConstantHeaderIDs = null;
             try
             {

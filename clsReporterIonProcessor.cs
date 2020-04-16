@@ -35,7 +35,7 @@ namespace MASIC
         /// <remarks></remarks>
         public bool FindReporterIons(clsScanList scanList, clsSpectraCache spectraCache, string inputFilePathFull, string outputDirectoryPath)
         {
-            const char cColDelimiter = ControlChars.Tab;
+            const char cColDelimiter = '\t';
             string outputFilePath = "??";
             try
             {

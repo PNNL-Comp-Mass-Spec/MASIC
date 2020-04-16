@@ -631,13 +631,13 @@ namespace MASIC
                     }
                 }
 
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Join(Convert.ToString(ControlChars.Tab), lstMzValues));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", string.Join(Convert.ToString(ControlChars.Tab), lstMzTolerances));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", string.Join(Convert.ToString(ControlChars.Tab), lstScanCenters));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", string.Join(Convert.ToString(ControlChars.Tab), lstScanTolerances));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Join("\t", lstMzValues));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", string.Join("\t", lstMzTolerances));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", string.Join("\t", lstScanCenters));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", string.Join("\t", lstScanTolerances));
                 if (scanCommentsDefined)
                 {
-                    writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Join(Convert.ToString(ControlChars.Tab), lstComments));
+                    writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Join("\t", lstComments));
                 }
                 else
                 {

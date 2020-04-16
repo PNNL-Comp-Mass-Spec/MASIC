@@ -217,7 +217,7 @@ namespace MASIC.DataOutput
             }
 
             spectrumExportCount += 1;
-            writer.WriteLine("Time domain signal level:" + ControlChars.Tab + currentScan.BasePeakIonIntensity.ToString("0.000"));          // Store the base peak ion intensity as the time domain signal level value
+            writer.WriteLine("Time domain signal level:" + "\t" + currentScan.BasePeakIonIntensity.ToString("0.000"));          // Store the base peak ion intensity as the time domain signal level value
             writer.WriteLine("MASIC " + mOptions.MASICVersion);                     // Software version
             string dataLine = "MS/MS-based PEK file";
             if (mOptions.RawDataExportOptions.IncludeMSMS)
@@ -300,7 +300,7 @@ namespace MASIC.DataOutput
                 {
                     if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
-                        string dataLine1 = "1" + ControlChars.Tab + "1" + ControlChars.Tab + withBlock.IonsIntensity[ionIndex] + ControlChars.Tab + withBlock.IonsMZ[ionIndex] + ControlChars.Tab + "0";
+                        string dataLine1 = "1" + "\t" + "1" + "\t" + withBlock.IonsIntensity[ionIndex] + "\t" + withBlock.IonsMZ[ionIndex] + "\t" + "0";
                         writer.WriteLine(dataLine1);
                         exportCount += 1;
                     }

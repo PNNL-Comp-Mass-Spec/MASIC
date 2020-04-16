@@ -217,12 +217,12 @@ namespace MASIC
 
         public bool ParseCustomSICList(string mzList, string mzToleranceDaList, string scanCenterList, string scanToleranceList, string scanCommentList)
         {
-            var delimiters = new char[] { ',', ControlChars.Tab };
+            var delimiters = new char[] { ',', '\t' };
 
             // Trim any trailing tab characters
-            mzList = mzList.TrimEnd(ControlChars.Tab);
-            mzToleranceDaList = mzToleranceDaList.TrimEnd(ControlChars.Tab);
-            scanCenterList = scanCenterList.TrimEnd(ControlChars.Tab);
+            mzList = mzList.TrimEnd('\t');
+            mzToleranceDaList = mzToleranceDaList.TrimEnd('\t');
+            scanCenterList = scanCenterList.TrimEnd('\t');
             scanCommentList = scanCommentList.TrimEnd(delimiters);
             var lstMZs = mzList.Split(delimiters).ToList();
             var lstMZToleranceDa = mzToleranceDaList.Split(delimiters).ToList();

@@ -202,7 +202,7 @@ namespace MASIC
             // Returns true if the MRM data is successfully written to disk
             // Note that it will also return true if udtMRMSettings() is empty
 
-            const char cColDelimiter = ControlChars.Tab;
+            const char cColDelimiter = '\t';
             StreamWriter dataWriter = null;
             StreamWriter crosstabWriter = null;
             bool success;

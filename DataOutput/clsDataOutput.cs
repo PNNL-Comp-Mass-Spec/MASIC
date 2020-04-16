@@ -583,7 +583,7 @@ namespace MASIC.DataOutput
 
         public string GetHeadersForOutputFile(clsScanList scanList, eOutputFileTypeConstants eOutputFileType)
         {
-            return GetHeadersForOutputFile(scanList, eOutputFileType, ControlChars.Tab);
+            return GetHeadersForOutputFile(scanList, eOutputFileType, '\t');
         }
 
         public string GetHeadersForOutputFile(clsScanList scanList, eOutputFileTypeConstants eOutputFileType, char cColDelimiter)
@@ -645,7 +645,7 @@ namespace MASIC.DataOutput
                 OutputFileHandles.SICDataFile = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
                 // Write the header line
-                OutputFileHandles.SICDataFile.WriteLine("Dataset" + ControlChars.Tab + "ParentIonIndex" + ControlChars.Tab + "FragScanIndex" + ControlChars.Tab + "ParentIonMZ" + ControlChars.Tab + "Scan" + ControlChars.Tab + "MZ" + ControlChars.Tab + "Intensity");
+                OutputFileHandles.SICDataFile.WriteLine("Dataset" + "\t" + "ParentIonIndex" + "\t" + "FragScanIndex" + "\t" + "ParentIonMZ" + "\t" + "Scan" + "\t" + "MZ" + "\t" + "Intensity");
             }
             catch (Exception ex)
             {
@@ -724,16 +724,16 @@ namespace MASIC.DataOutput
                 for (fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
                 {
                     // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
-                    prefix = sicOptions.DatasetID.ToString() + ControlChars.Tab + parentIonIndex.ToString() + ControlChars.Tab + fragScanIndex.ToString() + ControlChars.Tab + StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4) + ControlChars.Tab;
+                    prefix = sicOptions.DatasetID.ToString() + "\t" + parentIonIndex.ToString() + "\t" + fragScanIndex.ToString() + "\t" + StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4) + "\t";
                     if (sicDetails.SICDataCount == 0)
                     {
                         // Nothing to write
-                        OutputFileHandles.SICDataFile.WriteLine(prefix + "0" + ControlChars.Tab + "0" + ControlChars.Tab + "0");
+                        OutputFileHandles.SICDataFile.WriteLine(prefix + "0" + "\t" + "0" + "\t" + "0");
                     }
                     else
                     {
                         foreach (var dataPoint in sicDetails.SICData)
-                            OutputFileHandles.SICDataFile.WriteLine(prefix + dataPoint.ScanNumber + ControlChars.Tab + dataPoint.Mass + ControlChars.Tab + dataPoint.Intensity);
+                            OutputFileHandles.SICDataFile.WriteLine(prefix + dataPoint.ScanNumber + "\t" + dataPoint.Mass + "\t" + dataPoint.Intensity);
                     }
                 }
             }

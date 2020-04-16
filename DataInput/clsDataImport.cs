@@ -227,7 +227,7 @@ namespace MASIC.DataInput
                     if (writeDebugData)
                     {
                         writer = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
-                        writer.WriteLine("m/z" + ControlChars.Tab + "Intensity");
+                        writer.WriteLine("m/z" + "\t" + "Intensity");
                     }
 
                     // Store the intensity values in objFilterDataArray
@@ -236,7 +236,7 @@ namespace MASIC.DataInput
                         objFilterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
                         if (writeDebugData)
                         {
-                            writer.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + ControlChars.Tab + msSpectrum.IonsIntensity[ionIndex]);
+                            writer.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" + msSpectrum.IonsIntensity[ionIndex]);
                         }
                     }
 
@@ -282,11 +282,11 @@ namespace MASIC.DataInput
                 {
                     using (var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read)))
                     {
-                        postFilterWriter.WriteLine("m/z" + ControlChars.Tab + "Intensity");
+                        postFilterWriter.WriteLine("m/z" + "\t" + "Intensity");
 
                         // Store the intensity values in objFilterDataArray
                         for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
-                            postFilterWriter.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + ControlChars.Tab + msSpectrum.IonsIntensity[ionIndex]);
+                            postFilterWriter.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" + msSpectrum.IonsIntensity[ionIndex]);
                     }
                 }
             }
@@ -350,7 +350,7 @@ namespace MASIC.DataInput
 
         protected void SaveScanStatEntry(StreamWriter writer, clsScanList.eScanTypeConstants eScanType, clsScanInfo currentScan, int datasetID)
         {
-            const char cColDelimiter = ControlChars.Tab;
+            const char cColDelimiter = '\t';
             var scanStatsEntry = new ScanStatsEntry() { ScanNumber = currentScan.ScanNumber };
             if (eScanType == clsScanList.eScanTypeConstants.SurveyScan)
             {

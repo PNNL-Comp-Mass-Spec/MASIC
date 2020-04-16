@@ -84,7 +84,7 @@ namespace MASIC.DataOutput
             // Writes out a flat file containing identified peaks and statistics
 
             string outputFilePath = string.Empty;
-            const char cColDelimiter = ControlChars.Tab;
+            const char cColDelimiter = '\t';
             int[] scanListArray = null;
 
             // Populate scanListArray with the scan numbers in scanList.SurveyScans

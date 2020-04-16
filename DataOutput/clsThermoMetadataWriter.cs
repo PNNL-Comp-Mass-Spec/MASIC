@@ -59,7 +59,7 @@ namespace MASIC.DataOutput
 
         public bool SaveMSTuneFile(XRawFileIO objXcaliburAccessor, clsDataOutput dataOutputHandler)
         {
-            const char cColDelimiter = ControlChars.Tab;
+            const char cColDelimiter = '\t';
             int tuneMethodCount;
             string outputFilePath = "?UndefinedFile?";
             try

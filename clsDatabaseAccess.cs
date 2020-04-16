@@ -173,7 +173,7 @@ namespace MASIC
         /// <returns></returns>
         private bool GetDatasetIDFromFile(string datasetLookupFilePath, string datasetName, out int newDatasetId)
         {
-            var delimiterList = new char[] { ' ', ',', ControlChars.Tab };
+            var delimiterList = new char[] { ' ', ',', '\t' };
             newDatasetId = 0;
             try
             {
