@@ -224,6 +224,10 @@ namespace MASIC
             }
         }
 
+        private clsITraqIntensityCorrection intensityCorrector = new clsITraqIntensityCorrection(
+            clsReporterIons.eReporterIonMassModeConstants.CustomOrNone,
+            clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex);
+
         /// <summary>
         /// Looks for the reporter ion m/z values, +/- a tolerance
         /// Calls AggregateIonsInRange with returnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
@@ -244,12 +248,7 @@ namespace MASIC
         private void FindReporterIonsWork(XRawFileIO xcaliburAccessor, clsDataAggregation dataAggregation, bool includeFtmsColumns, clsSICOptions sicOptions, clsScanList scanList, clsSpectraCache spectraCache, clsScanInfo currentScan, TextWriter writer, IList<clsReporterIonInfo> reporterIons, char cColDelimiter, bool saveUncorrectedIntensities, bool saveObservedMasses)
         {
             const bool USE_MAX_ABUNDANCE_IN_WINDOW = true;
-#error Cannot convert LocalDeclarationStatementSyntax - see comment for details
-            /*
-                    Static intensityCorrector As New Global.MASIC.clsITraqIntensityCorrection(
-                        Global.MASIC.clsReporterIons.eReporterIonMassModeConstants.CustomOrNone,
-                        Global.MASIC.clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
-             */
+
             double[] reporterIntensities;
             double[] reporterIntensitiesCorrected;
             double[] closestMZ;

@@ -2386,6 +2386,8 @@ namespace MASIC
             SetSubtaskProcessingStepPct(subtaskPercentComplete, false);
         }
 
+        private DateTime SetSubtaskProcessingStepPctLastFileWriteTime = DateTime.UtcNow;
+
         /// <summary>
         /// Update subtask progress
         /// </summary>
@@ -2395,11 +2397,6 @@ namespace MASIC
         {
             const int MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250;
             var raiseEventNow = default(bool);
-            ;
-#error Cannot convert LocalDeclarationStatementSyntax - see comment for details
-            /*
-                    Static LastFileWriteTime As Global.System.DateTime = Global.System.DateTime.UtcNow
-             */
             if (Math.Abs(subtaskPercentComplete) < float.Epsilon)
             {
                 AbortProcessing = false;
@@ -2413,9 +2410,9 @@ namespace MASIC
                 mSubtaskProcessingStepPct = subtaskPercentComplete;
             }
 
-            if (forceUpdate || raiseEventNow || DateTime.UtcNow.Subtract(LastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS)
+            if (forceUpdate || raiseEventNow || DateTime.UtcNow.Subtract(SetSubtaskProcessingStepPctLastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS)
             {
-                LastFileWriteTime = DateTime.UtcNow;
+                SetSubtaskProcessingStepPctLastFileWriteTime = DateTime.UtcNow;
                 UpdateOverallProgress();
                 UpdateStatusFile();
                 ProgressSubtaskChanged?.Invoke();
@@ -2503,42 +2500,13 @@ namespace MASIC
             UpdateStatusFile(forceStatusFileUpdate);
         }
 
+        private DateTime UpdateStatusFileLastFileWriteTime = DateTime.UtcNow;
+
         private void UpdateStatusFile(bool forceUpdate = false)
         {
-            ;
-#error Cannot convert LocalDeclarationStatementSyntax - see comment for details
-            /* Cannot convert LocalDeclarationStatementSyntax, System.NotSupportedException: StaticKeyword not supported!
-               at ICSharpCode.CodeConverter.CSharp.SyntaxKindExtensions.ConvertToken(SyntaxKind t, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifier(SyntaxToken m, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.<ConvertModifiersCore>d__38.MoveNext()
-               at System.Linq.Enumerable.<ConcatIterator>d__59`1.MoveNext()
-               at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
-               at System.Linq.Buffer`1..ctor(IEnumerable`1 source)
-               at System.Linq.OrderedEnumerable`1.<GetEnumerator>d__1.MoveNext()
-               at Microsoft.CodeAnalysis.SyntaxTokenList.CreateNode(IEnumerable`1 tokens)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifiers(SyntaxNode node, IReadOnlyCollection`1 modifiers, TokenContext context, Boolean isVariableOrConst, SyntaxKind[] extraCsModifierKinds)
-               at ICSharpCode.CodeConverter.CSharp.MethodBodyExecutableStatementVisitor.<VisitLocalDeclarationStatement>d__28.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<CreateLocals>d__7.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<AddLocalVariables>d__6.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.CommentConvertingMethodBodyVisitor.<DefaultVisitInnerAsync>d__3.MoveNext()
-
-            Input:
-
-                    Static LastFileWriteTime As Global.System.DateTime = Global.System.DateTime.UtcNow
-
-             */
-            if (forceUpdate || DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= (double)MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS)
+            if (forceUpdate || DateTime.UtcNow.Subtract(UpdateStatusFileLastFileWriteTime).TotalSeconds >= (double)MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS)
             {
-                LastFileWriteTime = DateTime.UtcNow;
+                UpdateStatusFileLastFileWriteTime = DateTime.UtcNow;
                 try
                 {
                     string tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
