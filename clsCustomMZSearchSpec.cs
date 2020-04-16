@@ -1,40 +1,44 @@
-﻿Public Class clsCustomMZSearchSpec
+﻿
+namespace MASIC
+{
+    public class clsCustomMZSearchSpec
+    {
 
-#Region "Properties"
-    Public Property MZ As Double
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public double MZ { get; set; }
 
-    ''' <summary>
-    ''' If 0, then uses the global search tolerance defined
-    ''' </summary>
-    Public Property MZToleranceDa As Double
+        /// <summary>
+    /// If 0, then uses the global search tolerance defined
+    /// </summary>
+        public double MZToleranceDa { get; set; }
 
-    ''' <summary>
-    ''' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
-    ''' It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
-    ''' </summary>
-    Public Property ScanOrAcqTimeCenter As Single
+        /// <summary>
+    /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
+    /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
+    /// </summary>
+        public float ScanOrAcqTimeCenter { get; set; }
 
-    ''' <summary>
-    ''' This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
-    ''' It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
-    ''' </summary>
-    ''' <remarks>Set to 0 to search the entire file for the given mass</remarks>
-    Public Property ScanOrAcqTimeTolerance As Single
+        /// <summary>
+    /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
+    /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
+    /// </summary>
+    /// <remarks>Set to 0 to search the entire file for the given mass</remarks>
+        public float ScanOrAcqTimeTolerance { get; set; }
+        public string Comment { get; set; }
 
-    Public Property Comment As String
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="targetMz"></param>
+        public clsCustomMZSearchSpec(double targetMz)
+        {
+            MZ = targetMz;
+        }
 
-#End Region
-
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    ''' <param name="targetMz"></param>
-    Public Sub New(targetMz As Double)
-        MZ = targetMz
-    End Sub
-
-    Public Overrides Function ToString() As String
-        Return "m/z: " & MZ.ToString("0.0000") & " ±" & MZToleranceDa.ToString("0.0000")
-    End Function
-
-End Class
+        public override string ToString()
+        {
+            return "m/z: " + MZ.ToString("0.0000") + " ±" + MZToleranceDa.ToString("0.0000");
+        }
+    }
+}

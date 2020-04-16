@@ -1,134 +1,137 @@
-﻿Imports ThermoRawFileReader
+﻿using System.Collections.Generic;
+using ThermoRawFileReader;
 
-Public Class clsScanInfo
+namespace MASIC
+{
+    public class clsScanInfo
+    {
 
-    ''' <summary>
-    ''' Ranges from 1 to the number of scans in the datafile
-    ''' </summary>
-    Public Property ScanNumber As Integer
+        /// <summary>
+    /// Ranges from 1 to the number of scans in the datafile
+    /// </summary>
+        public int ScanNumber { get; set; }
 
-    ''' <summary>
-    ''' Retention (elution) Time (in minutes)
-    ''' </summary>
-    Public Property ScanTime As Single
+        /// <summary>
+    /// Retention (elution) Time (in minutes)
+    /// </summary>
+        public float ScanTime { get; set; }
 
-    ''' <summary>
-    ''' String description of the scan mode for the given scan; only used for Thermo .Raw files
-    ''' </summary>
-    ''' <remarks>Typical values are: FTMS + p NSI Full ms, ITMS + c ESI Full ms,
-    ''' ITMS + p ESI d Z ms, ITMS + c NSI d Full ms2, ITMS + c NSI d Full ms2,
-    ''' ITMS + c NSI d Full ms2, FTMS + c NSI d Full ms2, ITMS + c NSI d Full ms3</remarks>
-    Public Property ScanHeaderText As String
+        /// <summary>
+    /// String description of the scan mode for the given scan; only used for Thermo .Raw files
+    /// </summary>
+    /// <remarks>Typical values are: FTMS + p NSI Full ms, ITMS + c ESI Full ms,
+    /// ITMS + p ESI d Z ms, ITMS + c NSI d Full ms2, ITMS + c NSI d Full ms2,
+    /// ITMS + c NSI d Full ms2, FTMS + c NSI d Full ms2, ITMS + c NSI d Full ms3</remarks>
+        public string ScanHeaderText { get; set; }
 
-    ''' <summary>
-    ''' Scan type name
-    ''' </summary>
-    ''' <remarks>Typical values: MS, HMS, Zoom, CID-MSn, or PQD-MSn</remarks>
-    Public Property ScanTypeName As String
+        /// <summary>
+    /// Scan type name
+    /// </summary>
+    /// <remarks>Typical values: MS, HMS, Zoom, CID-MSn, or PQD-MSn</remarks>
+        public string ScanTypeName { get; set; }
 
-    ''' <summary>
-    ''' m/z of the most intense ion in this scan
-    ''' </summary>
-    Public Property BasePeakIonMZ As Double
+        /// <summary>
+    /// m/z of the most intense ion in this scan
+    /// </summary>
+        public double BasePeakIonMZ { get; set; }
 
-    ''' <summary>
-    ''' Intensity of the most intense ion in this scan
-    ''' </summary>
-    Public Property BasePeakIonIntensity As Double
+        /// <summary>
+    /// Intensity of the most intense ion in this scan
+    /// </summary>
+        public double BasePeakIonIntensity { get; set; }
 
-    ''' <summary>
-    ''' Intensity of all of the ions for this scan
-    ''' </summary>
-    Public Property TotalIonIntensity As Double
+        /// <summary>
+    /// Intensity of all of the ions for this scan
+    /// </summary>
+        public double TotalIonIntensity { get; set; }
 
-    ''' <summary>
-    ''' Minimum intensity > 0 in this scan (using profile-mode data)
-    ''' </summary>
-    Public Property MinimumPositiveIntensity As Double
+        /// <summary>
+    /// Minimum intensity > 0 in this scan (using profile-mode data)
+    /// </summary>
+        public double MinimumPositiveIntensity { get; set; }
 
-    ''' <summary>
-    ''' True if the scan is a Zoom scan
-    ''' </summary>
-    Public Property ZoomScan As Boolean
+        /// <summary>
+    /// True if the scan is a Zoom scan
+    /// </summary>
+        public bool ZoomScan { get; set; }
 
-    ''' <summary>
-    ''' True if the scan was a SIM scan
-    ''' </summary>
-    Public Property SIMScan As Boolean
+        /// <summary>
+    /// True if the scan was a SIM scan
+    /// </summary>
+        public bool SIMScan { get; set; }
+        public MRMScanTypeConstants MRMScanType { get; set; }
 
-    Public Property MRMScanType As MRMScanTypeConstants
+        /// <summary>
+    /// For SIM scans, allows one to quickly find all of the SIM scans with the same mass range, since they'll all have the same SIMIndex
+    /// </summary>
+        public int SIMIndex { get; set; }
 
-    ''' <summary>
-    ''' For SIM scans, allows one to quickly find all of the SIM scans with the same mass range, since they'll all have the same SIMIndex
-    ''' </summary>
-    Public Property SIMIndex As Integer
+        /// <summary>
+    /// Useful for SIMScans to find similar SIM scans
+    /// </summary>
+        public double LowMass { get; set; }
 
-    ''' <summary>
-    ''' Useful for SIMScans to find similar SIM scans
-    ''' </summary>
-    Public Property LowMass As Double
+        /// <summary>
+    /// Useful for SIMScans to find similar SIM scans
+    /// </summary>
+        public double HighMass { get; set; }
 
-    ''' <summary>
-    ''' Useful for SIMScans to find similar SIM scans
-    ''' </summary>
-    Public Property HighMass As Double
+        /// <summary>
+    /// True if the scan was collected in the FT cell of a Thermo instrument
+    /// </summary>
+    /// <returns></returns>
+        public bool IsFTMS { get; set; }
 
-    ''' <summary>
-    ''' True if the scan was collected in the FT cell of a Thermo instrument
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property IsFTMS As Boolean
+        /// <summary>
+    /// Information specific to fragmentation scans
+    /// </summary>
+        public clsFragScanInfo FragScanInfo { get; private set; }
 
-    ''' <summary>
-    ''' Information specific to fragmentation scans
-    ''' </summary>
-    Public ReadOnly Property FragScanInfo As clsFragScanInfo
+        /// <summary>
+    /// Information specific to MRM/SRM scans
+    /// </summary>
+        public clsMRMScanInfo MRMScanInfo { get; set; }
 
-    ''' <summary>
-    ''' Information specific to MRM/SRM scans
-    ''' </summary>
-    Public Property MRMScanInfo As clsMRMScanInfo
+        /// <summary>
+    /// Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
+    /// </summary>
+        public Dictionary<int, string> ExtendedHeaderInfo { get; private set; }
 
-    ''' <summary>
-    ''' Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
-    ''' </summary>
-    Public ReadOnly Property ExtendedHeaderInfo As Dictionary(Of Integer, String)
+        /// <summary>
+    /// Number of ions that remain after filtering / condensing the data loaded via GetScanData
+    /// The mass spectral data for this scan is tracked by a clsSpectraCache object
+    /// </summary>
+        public int IonCount { get; set; }
 
-    ''' <summary>
-    ''' Number of ions that remain after filtering / condensing the data loaded via GetScanData
-    ''' The mass spectral data for this scan is tracked by a clsSpectraCache object
-    ''' </summary>
-    Public Property IonCount As Integer
+        /// <summary>
+    /// Number of data points loaded via GetScanData
+    /// (typically we load profile mode data)
+    /// </summary>
+    /// <returns></returns>
+        public int IonCountRaw { get; set; }
+        public MASICPeakFinder.clsBaselineNoiseStats BaselineNoiseStats { get; set; }
 
-    ''' <summary>
-    ''' Number of data points loaded via GetScanData
-    ''' (typically we load profile mode data)
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property IonCountRaw As Integer
+        /// <summary>
+    /// Constructor for a MS1 scan
+    /// </summary>
+        public clsScanInfo() : this(0)
+        {
+        }
 
-    Public Property BaselineNoiseStats As MASICPeakFinder.clsBaselineNoiseStats
+        /// <summary>
+    /// Constructor for a MS2 scan
+    /// </summary>
+        public clsScanInfo(double fragScanParentIonMz)
+        {
+            MRMScanType = MRMScanTypeConstants.NotMRM;
+            FragScanInfo = new clsFragScanInfo(fragScanParentIonMz);
+            MRMScanInfo = new clsMRMScanInfo();
+            ExtendedHeaderInfo = new Dictionary<int, string>();
+        }
 
-    ''' <summary>
-    ''' Constructor for a MS1 scan
-    ''' </summary>
-    Public Sub New()
-        Me.New(0)
-    End Sub
-
-    ''' <summary>
-    ''' Constructor for a MS2 scan
-    ''' </summary>
-    Public Sub New(fragScanParentIonMz As Double)
-        MRMScanType = MRMScanTypeConstants.NotMRM
-
-        FragScanInfo = New clsFragScanInfo(fragScanParentIonMz)
-        MRMScanInfo = New clsMRMScanInfo()
-
-        ExtendedHeaderInfo = New Dictionary(Of Integer, String)
-    End Sub
-
-    Public Overrides Function ToString() As String
-        Return "Scan " & ScanNumber & ", " & ScanTypeName
-    End Function
-End Class
+        public override string ToString()
+        {
+            return "Scan " + ScanNumber + ", " + ScanTypeName;
+        }
+    }
+}

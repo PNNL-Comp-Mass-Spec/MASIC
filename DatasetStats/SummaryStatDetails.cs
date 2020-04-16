@@ -1,48 +1,53 @@
 ﻿
-Namespace DatasetStats
-    Public Class SummaryStatDetails
-        ''' <summary>
-        ''' Scan count
-        ''' </summary>
-        Public Property ScanCount As Integer
+namespace MASIC.DatasetStats
+{
+    public class SummaryStatDetails
+    {
+        /// <summary>
+        /// Scan count
+        /// </summary>
+        public int ScanCount { get; set; }
 
-        ''' <summary>
-        ''' Max TIC
-        ''' </summary>
-        Public Property TICMax As Double
+        /// <summary>
+        /// Max TIC
+        /// </summary>
+        public double TICMax { get; set; }
 
-        ''' <summary>
-        ''' Max BPI
-        ''' </summary>
-        Public Property BPIMax As Double
+        /// <summary>
+        /// Max BPI
+        /// </summary>
+        public double BPIMax { get; set; }
 
-        ''' <summary>
-        ''' Median TIC
-        ''' </summary>
-        Public Property TICMedian As Double
+        /// <summary>
+        /// Median TIC
+        /// </summary>
+        public double TICMedian { get; set; }
 
-        ''' <summary>
-        ''' Median BPI
-        ''' </summary>
-        Public Property BPIMedian As Double
+        /// <summary>
+        /// Median BPI
+        /// </summary>
+        public double BPIMedian { get; set; }
 
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New()
-            Clear()
-        End Sub
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public SummaryStatDetails()
+        {
+            Clear();
+        }
 
-        Public Sub Clear()
-            ScanCount = 0
-            TICMax = 0
-            BPIMax = 0
-            TICMedian = 0
-            BPIMedian = 0
-        End Sub
+        public void Clear()
+        {
+            ScanCount = 0;
+            TICMax = 0;
+            BPIMax = 0;
+            TICMedian = 0;
+            BPIMedian = 0;
+        }
 
-        Public Overrides Function ToString() As String
-            Return string.Format("ScanCount: {0}", ScanCount)
-        End Function
-    End Class
-End Namespace
+        public override string ToString()
+        {
+            return string.Format("ScanCount: {0}", ScanCount);
+        }
+    }
+}

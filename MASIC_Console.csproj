@@ -51,6 +51,7 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="InterDetect">
       <HintPath>Lib\InterDetect.dll</HintPath>
     </Reference>
@@ -101,6 +102,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\MyNamespace.Static.1.Designer.cs" />
+    <Compile Include="Properties\MyNamespace.Static.2.Designer.cs" />
+    <Compile Include="Properties\MyNamespace.Static.3.Designer.cs" />
     <Compile Include="clsBinarySearch.cs" />
     <Compile Include="clsBinnedData.cs" />
     <Compile Include="clsBinningOptions.cs" />
@@ -180,9 +184,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -193,7 +196,6 @@
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
-      <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="App.config" />

@@ -1,40 +1,42 @@
-﻿Namespace DatasetStats
-    Public Class DatasetSummaryStats
+﻿using System.Collections.Generic;
 
-        Public Property ElutionTimeMax As Double
+namespace MASIC.DatasetStats
+{
+    public class DatasetSummaryStats
+    {
+        public double ElutionTimeMax { get; set; }
+        public SummaryStatDetails MSStats { get; private set; }
+        public SummaryStatDetails MSnStats { get; private set; }
 
-        Public ReadOnly Property MSStats As SummaryStatDetails
+        /// <summary>
+        /// Keeps track of each ScanType in the dataset, along with the number of scans of this type
+        /// </summary>
+        /// <remarks>
+        /// Examples
+        /// FTMS + p NSI Full ms
+        /// ITMS + c ESI Full ms
+        /// ITMS + p ESI d Z ms
+        /// ITMS + c ESI d Full ms2 @cid35.00
+        /// </remarks>
+        public Dictionary<string, int> ScanTypeStats { get; private set; }
 
-        Public ReadOnly Property MSnStats As SummaryStatDetails
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public DatasetSummaryStats()
+        {
+            MSStats = new SummaryStatDetails();
+            MSnStats = new SummaryStatDetails();
+            ScanTypeStats = new Dictionary<string, int>();
+            Clear();
+        }
 
-        ''' <summary>
-        ''' Keeps track of each ScanType in the dataset, along with the number of scans of this type
-        ''' </summary>
-        ''' <remarks>
-        ''' Examples
-        '''   FTMS + p NSI Full ms
-        '''   ITMS + c ESI Full ms
-        '''   ITMS + p ESI d Z ms
-        '''   ITMS + c ESI d Full ms2 @cid35.00
-        ''' </remarks>
-        Public ReadOnly Property ScanTypeStats As Dictionary(Of String, Integer)
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New()
-            MSStats = New SummaryStatDetails()
-            MSnStats = New SummaryStatDetails()
-            ScanTypeStats = New Dictionary(Of String, Integer)()
-            Clear()
-        End Sub
-
-        Public Sub Clear()
-            ElutionTimeMax = 0
-            MSStats.Clear()
-            MSnStats.Clear()
-            ScanTypeStats.Clear()
-        End Sub
-
-    End Class
-End Namespace
+        public void Clear()
+        {
+            ElutionTimeMax = 0;
+            MSStats.Clear();
+            MSnStats.Clear();
+            ScanTypeStats.Clear();
+        }
+    }
+}

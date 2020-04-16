@@ -1,830 +1,754 @@
-﻿Option Strict On
-
-' This class computes aggregate stats for a dataset
-'
-' -------------------------------------------------------------------------------
-' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-' Program started May 7, 2009
-' Ported from clsMASICScanStatsParser to clsDatasetStatsSummarizer in February 2010
-'
-' E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
-' Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
-' -------------------------------------------------------------------------------
-'
-' Licensed under the 2-Clause BSD License; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at
-' https://opensource.org/licenses/BSD-2-Clause
-
-Imports System.Runtime.InteropServices
-Imports System.Text
-Imports System.Xml
-Imports PRISM
-
-Namespace DatasetStats
-
-    Public Class clsDatasetStatsSummarizer
-        Inherits EventNotifier
-
-#Region "Constants and Enums"
-
-        Public Const SCAN_TYPE_STATS_SEP_CHAR As String = "::###::"
-
-        ' ReSharper disable once UnusedMember.Global
-        Public Const DATASET_INFO_FILE_SUFFIX As String = "_DatasetInfo.xml"
-
-        ' ReSharper disable once UnusedMember.Global
-        Public Const DEFAULT_DATASET_STATS_FILENAME As String = "MSFileInfo_DatasetStats.txt"
-
-        ''' <summary>
-        ''' Date/time format string
-        ''' </summary>
-        Public Const DATE_TIME_FORMAT_STRING As String = "yyyy-MM-dd hh:mm:ss tt"
-
-#End Region
-
-#Region "Classwide Variables"
-        Private ReadOnly mFileDate As String
-        Private mDatasetStatsSummaryFileName As String
-        Private mErrorMessage As String = String.Empty
-
-        Private ReadOnly mDatasetScanStats As List(Of ScanStatsEntry)
-
-        Private mDatasetSummaryStatsUpToDate As Boolean
-        Private mDatasetSummaryStats As DatasetSummaryStats
-#End Region
-
-#Region "Properties"
-
-        ' ReSharper disable once UnusedMember.Global
-        Public Property DatasetStatsSummaryFileName As String
-            Get
-                Return mDatasetStatsSummaryFileName
-            End Get
-            Set
-                If Not Value Is Nothing Then
-                    mDatasetStatsSummaryFileName = Value
-                End If
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Dataset file info
-        ''' </summary>
-        ''' <returns></returns>
-        Public ReadOnly Property DatasetFileInfo As DatasetFileInfo
-
-        ''' <summary>
-        ''' Error message
-        ''' </summary>
-        ''' <returns></returns>
-        Public ReadOnly Property ErrorMessage As String
-            Get
-                Return mErrorMessage
-            End Get
-        End Property
-
-        ''' <summary>
-        ''' Dataset file modification time
-        ''' </summary>
-        ''' <returns></returns>
-        Public ReadOnly Property FileDate As String
-            Get
-                FileDate = mFileDate
-            End Get
-        End Property
-
-        ''' <summary>
-        ''' Sample info
-        ''' </summary>
-        ''' <returns></returns>
-        Public ReadOnly Property SampleInfo As SampleInfo
-
-#End Region
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New()
-            mFileDate = "February 11, 2020"
-
-            mErrorMessage = String.Empty
-
-            mDatasetScanStats = New List(Of ScanStatsEntry)
-            mDatasetSummaryStats = New DatasetSummaryStats()
-
-            mDatasetSummaryStatsUpToDate = False
-
-            DatasetFileInfo = New DatasetFileInfo()
-            SampleInfo = New SampleInfo()
-
-            ClearCachedData()
-        End Sub
-
-        ' ReSharper disable once UnusedMember.Global
-        '''<summary>
-        ''' Add a New scan
-        ''' </summary>
-        ''' <param name="scanStats"></param>
-        Public Sub AddDatasetScan(scanStats As ScanStatsEntry)
-
-            mDatasetScanStats.Add(scanStats)
-            mDatasetSummaryStatsUpToDate = False
-
-        End Sub
-
-        ''' <summary>
-        ''' Clear cached data
-        ''' </summary>
-        Public Sub ClearCachedData()
-            mDatasetScanStats.Clear()
-            mDatasetSummaryStats.Clear()
-
-            DatasetFileInfo.Clear()
-            SampleInfo.Clear()
-
-            mDatasetSummaryStatsUpToDate = False
-        End Sub
-
-        ''' <summary>
-        ''' Summarizes the scan info in scanStats()
-        ''' </summary>
-        ''' <param name="scanStats">ScanStats data to parse</param>
-        ''' <param name="summaryStats">Stats output (initialized if nothing)</param>
-        ''' <returns>>True if success, false if error</returns>
-        ''' <remarks></remarks>
-        Public Function ComputeScanStatsSummary(scanStats As List(Of ScanStatsEntry), <Out> ByRef summaryStats As DatasetSummaryStats) As Boolean
-
-            summaryStats = New DatasetSummaryStats()
-
-            Try
-
-                If scanStats Is Nothing Then
-                    ReportError("scanStats is Nothing; unable to continue in ComputeScanStatsSummary")
-                    Return False
-                End If
-
-                mErrorMessage = String.Empty
-
-                Dim scanStatsCount = scanStats.Count
-
-                ' Initialize the TIC and BPI Lists
-                Dim ticListMS = New List(Of Double)(scanStatsCount)
-                Dim ticListMSn = New List(Of Double)(scanStatsCount)
-
-                Dim bpiListMS = New List(Of Double)(scanStatsCount)
-                Dim bpiListMSn = New List(Of Double)(scanStatsCount)
-
-                For Each statEntry In scanStats
-
-                    If statEntry.ScanType > 1 Then
-                        ' MSn spectrum
-                        ComputeScanStatsUpdateDetails(statEntry,
-                                                      summaryStats,
-                                                      summaryStats.MSnStats,
-                                                      ticListMSn,
-                                                      bpiListMSn)
-                    Else
-                        ' MS spectrum
-                        ComputeScanStatsUpdateDetails(statEntry,
-                                                      summaryStats,
-                                                      summaryStats.MSStats,
-                                                      ticListMS,
-                                                      bpiListMS)
-                    End If
-
-                    Dim scanTypeKey = statEntry.ScanTypeName & SCAN_TYPE_STATS_SEP_CHAR & statEntry.ScanFilterText
-                    If summaryStats.ScanTypeStats.ContainsKey(scanTypeKey) Then
-                        summaryStats.ScanTypeStats.Item(scanTypeKey) += 1
-                    Else
-                        summaryStats.ScanTypeStats.Add(scanTypeKey, 1)
-                    End If
-                Next
-
-                summaryStats.MSStats.TICMedian = clsUtilities.ComputeMedian(ticListMS)
-                summaryStats.MSStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMS)
-
-                summaryStats.MSnStats.TICMedian = clsUtilities.ComputeMedian(ticListMSn)
-                summaryStats.MSnStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMSn)
-
-                Return True
-
-            Catch ex As Exception
-                ReportError("Error in ComputeScanStatsSummary", ex)
-                Return False
-            End Try
-
-        End Function
-
-        Private Sub ComputeScanStatsUpdateDetails(
-          scanStats As ScanStatsEntry,
-          summaryStats As DatasetSummaryStats,
-          summaryStatDetails As SummaryStatDetails,
-          ticList As ICollection(Of Double),
-          bpiList As ICollection(Of Double))
-
-            Dim elutionTime As Double
-            Dim totalIonCurrent As Double
-            Dim basePeakIntensity As Double
-
-            If Not String.IsNullOrWhiteSpace(scanStats.ElutionTime) Then
-                If Double.TryParse(scanStats.ElutionTime, elutionTime) Then
-                    If elutionTime > summaryStats.ElutionTimeMax Then
-                        summaryStats.ElutionTimeMax = elutionTime
-                    End If
-                End If
-            End If
-
-            If Double.TryParse(scanStats.TotalIonIntensity, totalIonCurrent) Then
-                If totalIonCurrent > summaryStatDetails.TICMax Then
-                    summaryStatDetails.TICMax = totalIonCurrent
-                End If
-
-                ticList.Add(totalIonCurrent)
-            End If
-
-            If Double.TryParse(scanStats.BasePeakIntensity, basePeakIntensity) Then
-                If basePeakIntensity > summaryStatDetails.BPIMax Then
-                    summaryStatDetails.BPIMax = basePeakIntensity
-                End If
-
-                bpiList.Add(basePeakIntensity)
-            End If
-
-            summaryStatDetails.ScanCount += 1
-
-        End Sub
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Creates an XML file summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
-        ''' <returns>True if success; False if failure</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoFile(datasetName As String, datasetInfoFilePath As String) As Boolean
-            Return CreateDatasetInfoFile(datasetName, datasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
-        End Function
-
-        ''' <summary>
-        ''' Creates an XML file summarizing the data in scanStats and datasetInfo
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
-        ''' <param name="scanStats">Scan stats to parse</param>
-        ''' <param name="datasetInfo">Dataset Info</param>
-        ''' <param name="oSampleInfo">Sample Info</param>
-        ''' <returns>True if success; False if failure</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoFile(
-          datasetName As String,
-          datasetInfoFilePath As String,
-          scanStats As List(Of ScanStatsEntry),
-          datasetInfo As DatasetFileInfo,
-          oSampleInfo As SampleInfo) As Boolean
-
-            Try
-                If scanStats Is Nothing Then
-                    ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoFile")
-                    Return False
-                End If
-
-                mErrorMessage = String.Empty
-
-                ' If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, we would have to use System.Encoding.Unicode
-                ' However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
-                Using writer = New StreamWriter(New FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8)
-
-                    writer.WriteLine(CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, oSampleInfo))
-
-                End Using
-
-                Return True
-
-            Catch ex As Exception
-                ReportError("Error in CreateDatasetInfoFile", ex)
-                Return False
-            End Try
-
-        End Function
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
-        ''' Auto-determines the dataset name using Me.DatasetFileInfo.DatasetName
-        ''' </summary>
-        ''' <returns>XML (as string)</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoXML() As String
-            Return CreateDatasetInfoXML(Me.DatasetFileInfo.DatasetName, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
-        End Function
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <returns>XML (as string)</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoXML(datasetName As String) As String
-            Return CreateDatasetInfoXML(datasetName, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
-        End Function
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Creates XML summarizing the data in scanStats and datasetInfo
-        ''' Auto-determines the dataset name using datasetInfo.DatasetName
-        ''' </summary>
-        ''' <param name="scanStats">Scan stats to parse</param>
-        ''' <param name="datasetInfo">Dataset Info</param>
-        ''' <returns>XML (as string)</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoXML(scanStats As List(Of ScanStatsEntry), datasetInfo As DatasetFileInfo) As String
-            Return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo)
-        End Function
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Creates XML summarizing the data in scanStats, datasetInfo, and oSampleInfo
-        ''' Auto-determines the dataset name using datasetInfo.DatasetName
-        ''' </summary>
-        ''' <param name="scanStats">Scan stats to parse</param>
-        ''' <param name="datasetInfo">Dataset Info</param>
-        ''' <param name="oSampleInfo">Sample Info</param>
-        ''' <returns>XML (as string)</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoXML(
-          scanStats As List(Of ScanStatsEntry),
-          datasetInfo As DatasetFileInfo,
-          oSampleInfo As SampleInfo) As String
-
-            Return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo, oSampleInfo)
-        End Function
-
-        ''' <summary>
-        ''' Creates XML summarizing the data in scanStats and datasetInfo
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="scanStats">Scan stats to parse</param>
-        ''' <param name="datasetInfo">Dataset Info</param>
-        ''' <returns>XML (as string)</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoXML(
-          datasetName As String,
-          scanStats As List(Of ScanStatsEntry),
-          datasetInfo As DatasetFileInfo) As String
-
-            Return CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, New SampleInfo())
-        End Function
-
-        ''' <summary>
-        ''' Creates XML summarizing the data in scanStats and datasetInfo
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="scanStats">Scan stats to parse</param>
-        ''' <param name="datasetInfo">Dataset Info</param>
-        ''' <returns>XML (as string)</returns>
-        ''' <remarks></remarks>
-        Public Function CreateDatasetInfoXML(
-          datasetName As String,
-          scanStats As List(Of ScanStatsEntry),
-          datasetInfo As DatasetFileInfo,
-          oSampleInfo As SampleInfo) As String
-
-            Try
-
-                If scanStats Is Nothing Then
-                    ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoXML")
-                    Return String.Empty
-                End If
-
-                mErrorMessage = String.Empty
-
-                Dim summaryStats As DatasetSummaryStats
-
-                If scanStats Is mDatasetScanStats Then
-                    summaryStats = GetDatasetSummaryStats()
-                Else
-                    summaryStats = New DatasetSummaryStats()
-
-                    ' Parse the data in scanStats to compute the bulk values
-                    Me.ComputeScanStatsSummary(scanStats, summaryStats)
-                End If
-
-                Dim xmlSettings = New XmlWriterSettings() With {
-                    .CheckCharacters = True,
-                    .Indent = True,
-                    .IndentChars = "  ",
-                    .Encoding = Encoding.UTF8,
-                    .CloseOutput = False        ' Do not close output automatically so that the MemoryStream can be read after the XmlWriter has been closed
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Xml;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using PRISM;
+
+namespace MASIC.DatasetStats
+{
+    public class clsDatasetStatsSummarizer : EventNotifier
+    {
+
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";
+
+        // ReSharper disable once UnusedMember.Global
+        public const string DATASET_INFO_FILE_SUFFIX = "_DatasetInfo.xml";
+
+        // ReSharper disable once UnusedMember.Global
+        public const string DEFAULT_DATASET_STATS_FILENAME = "MSFileInfo_DatasetStats.txt";
+
+        /// <summary>
+        /// Date/time format string
+        /// </summary>
+        public const string DATE_TIME_FORMAT_STRING = "yyyy-MM-dd hh:mm:ss tt";
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private readonly string mFileDate;
+        private string mDatasetStatsSummaryFileName;
+        private string mErrorMessage = string.Empty;
+        private readonly List<ScanStatsEntry> mDatasetScanStats;
+        private bool mDatasetSummaryStatsUpToDate;
+        private DatasetSummaryStats mDatasetSummaryStats;
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        // ReSharper disable once UnusedMember.Global
+        public string DatasetStatsSummaryFileName
+        {
+            get
+            {
+                return mDatasetStatsSummaryFileName;
+            }
+
+            set
+            {
+                if (value is object)
+                {
+                    mDatasetStatsSummaryFileName = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Dataset file info
+        /// </summary>
+        /// <returns></returns>
+        public DatasetFileInfo DatasetFileInfo { get; private set; }
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        /// <returns></returns>
+        public string ErrorMessage
+        {
+            get
+            {
+                return mErrorMessage;
+            }
+        }
+
+        /// <summary>
+        /// Dataset file modification time
+        /// </summary>
+        /// <returns></returns>
+        public string FileDate
+        {
+            get
+            {
+                string FileDateRet = default;
+                FileDateRet = mFileDate;
+                return FileDateRet;
+            }
+        }
+
+        /// <summary>
+        /// Sample info
+        /// </summary>
+        /// <returns></returns>
+        public SampleInfo SampleInfo { get; private set; }
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public clsDatasetStatsSummarizer()
+        {
+            mFileDate = "February 11, 2020";
+            mErrorMessage = string.Empty;
+            mDatasetScanStats = new List<ScanStatsEntry>();
+            mDatasetSummaryStats = new DatasetSummaryStats();
+            mDatasetSummaryStatsUpToDate = false;
+            DatasetFileInfo = new DatasetFileInfo();
+            SampleInfo = new SampleInfo();
+            ClearCachedData();
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Add a New scan
+        /// </summary>
+        /// <param name="scanStats"></param>
+        public void AddDatasetScan(ScanStatsEntry scanStats)
+        {
+            mDatasetScanStats.Add(scanStats);
+            mDatasetSummaryStatsUpToDate = false;
+        }
+
+        /// <summary>
+        /// Clear cached data
+        /// </summary>
+        public void ClearCachedData()
+        {
+            mDatasetScanStats.Clear();
+            mDatasetSummaryStats.Clear();
+            DatasetFileInfo.Clear();
+            SampleInfo.Clear();
+            mDatasetSummaryStatsUpToDate = false;
+        }
+
+        /// <summary>
+        /// Summarizes the scan info in scanStats()
+        /// </summary>
+        /// <param name="scanStats">ScanStats data to parse</param>
+        /// <param name="summaryStats">Stats output (initialized if nothing)</param>
+        /// <returns>>True if success, false if error</returns>
+        /// <remarks></remarks>
+        public bool ComputeScanStatsSummary(List<ScanStatsEntry> scanStats, out DatasetSummaryStats summaryStats)
+        {
+            summaryStats = new DatasetSummaryStats();
+            try
+            {
+                if (scanStats is null)
+                {
+                    ReportError("scanStats is Nothing; unable to continue in ComputeScanStatsSummary");
+                    return false;
                 }
 
-                ' We could cache the text using a StringBuilder, like this:
-                '
-                ' Dim sbDatasetInfo As New System.StringBuilder
-                ' Dim objStringWriter As = StringWriter
-                ' objStringWriter = New StringWriter(sbDatasetInfo)
-                ' writer = New System.Xml.XmlTextWriter(objStringWriter)
-                ' writer.Formatting = System.Xml.Formatting.Indented
-                ' writer.Indentation = 2
-
-                ' However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16)
-                '  since this is the only character encoding used in the .NET Framework for String values,
-                '  and thus you'll see the attribute encoding="utf-16" in the opening XML declaration
-                ' The alternative is to use a MemoryStream.  Here, the stream encoding is set by the XmlWriter
-                '  and so you see the attribute encoding="utf-8" in the opening XML declaration encoding
-                '  (since we used objXMLSettings.Encoding = System.Encoding.UTF8)
-                '
-                Dim memStream = New MemoryStream()
-                Dim writer = XmlWriter.Create(memStream, xmlSettings)
-
-                writer.WriteStartDocument(True)
-
-                'Write the beginning of the "Root" element.
-                writer.WriteStartElement("DatasetInfo")
-
-                writer.WriteElementString("Dataset", datasetName)
-
-                writer.WriteStartElement("ScanTypes")
-
-                For Each scanTypeEntry In summaryStats.ScanTypeStats
-
-                    Dim scanType = scanTypeEntry.Key
-                    Dim indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal)
-                    Dim scanFilterText As String
-
-                    If indexMatch >= 0 Then
-                        scanFilterText = scanType.Substring(indexMatch + SCAN_TYPE_STATS_SEP_CHAR.Length)
-                        If indexMatch > 0 Then
-                            scanType = scanType.Substring(0, indexMatch)
-                        Else
-                            scanType = String.Empty
-                        End If
-                    Else
-                        scanFilterText = String.Empty
-                    End If
-
-                    writer.WriteStartElement("ScanType")
-                    writer.WriteAttributeString("ScanCount", scanTypeEntry.Value.ToString())
-                    writer.WriteAttributeString("ScanFilterText", FixNull(scanFilterText))
-                    writer.WriteString(scanType)
-                    writer.WriteEndElement()     ' ScanType
-                Next
-
-                writer.WriteEndElement()       ' ScanTypes
-
-                writer.WriteStartElement("AcquisitionInfo")
-
-                Dim scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount
-                If scanCountTotal = 0 AndAlso datasetInfo.ScanCount > 0 Then
-                    scanCountTotal = datasetInfo.ScanCount
-                End If
-
-                writer.WriteElementString("ScanCount", scanCountTotal.ToString())
-
-                writer.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString())
-                writer.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString())
-                writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString())
-
-                writer.WriteElementString("AcqTimeMinutes", datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"))
-                writer.WriteElementString("StartTime", datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING))
-                writer.WriteElementString("EndTime", datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING))
-
-                writer.WriteElementString("FileSizeBytes", datasetInfo.FileSizeBytes.ToString())
-
-                writer.WriteEndElement()       ' AcquisitionInfo
-
-                writer.WriteStartElement("TICInfo")
-                writer.WriteElementString("TIC_Max_MS", ValueToString(summaryStats.MSStats.TICMax, 5, 0))
-                writer.WriteElementString("TIC_Max_MSn", ValueToString(summaryStats.MSnStats.TICMax, 5, 0))
-                writer.WriteElementString("BPI_Max_MS", ValueToString(summaryStats.MSStats.BPIMax, 5, 0))
-                writer.WriteElementString("BPI_Max_MSn", ValueToString(summaryStats.MSnStats.BPIMax, 5, 0))
-                writer.WriteElementString("TIC_Median_MS", ValueToString(summaryStats.MSStats.TICMedian, 5, 0))
-                writer.WriteElementString("TIC_Median_MSn", ValueToString(summaryStats.MSnStats.TICMedian, 5, 0))
-                writer.WriteElementString("BPI_Median_MS", ValueToString(summaryStats.MSStats.BPIMedian, 5, 0))
-                writer.WriteElementString("BPI_Median_MSn", ValueToString(summaryStats.MSnStats.BPIMedian, 5, 0))
-                writer.WriteEndElement()       ' TICInfo
-
-                ' Only write the oSampleInfo block if oSampleInfo contains entries
-                If oSampleInfo.HasData() Then
-                    writer.WriteStartElement("SampleInfo")
-                    writer.WriteElementString("SampleName", FixNull(oSampleInfo.SampleName))
-                    writer.WriteElementString("Comment1", FixNull(oSampleInfo.Comment1))
-                    writer.WriteElementString("Comment2", FixNull(oSampleInfo.Comment2))
-                    writer.WriteEndElement()       ' SampleInfo
-                End If
-
-
-                writer.WriteEndElement()  'End the "Root" element (DatasetInfo)
-                writer.WriteEndDocument() 'End the document
-
-                writer.Close()
-
-                ' Now Rewind the memory stream and output as a string
-                memStream.Position = 0
-                Dim reader = New StreamReader(memStream)
-
-                ' Return the XML as text
-                Return reader.ReadToEnd()
-
-            Catch ex As Exception
-                ReportError("Error in CreateDatasetInfoXML", ex)
-            End Try
-
-            ' This code will only be reached if an exception occurs
-            Return String.Empty
-
-        End Function
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="scanStatsFilePath">File path to write the text file to</param>
-        ''' <returns>True if success; False if failure</returns>
-        ''' <remarks></remarks>
-        Public Function CreateScanStatsFile(datasetName As String, scanStatsFilePath As String) As Boolean
-            Return CreateScanStatsFile(datasetName, scanStatsFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
-        End Function
-
-        ''' <summary>
-        ''' Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="scanStatsFilePath">File path to write the text file to</param>
-        ''' <param name="scanStats">Scan stats to parse</param>
-        ''' <param name="datasetInfo">Dataset Info</param>
-        ''' <param name="oSampleInfo">Sample Info</param>
-        ''' <returns>True if success; False if failure</returns>
-        ''' <remarks></remarks>
-        Public Function CreateScanStatsFile(
-          datasetName As String,
-          scanStatsFilePath As String,
-          scanStats As List(Of ScanStatsEntry),
-          datasetInfo As DatasetFileInfo,
-          oSampleInfo As SampleInfo) As Boolean
-
-
-            Dim datasetID = 0
-
-            Try
-                If scanStats Is Nothing Then
-                    ReportError("scanStats is Nothing; unable to continue in CreateScanStatsFile")
-                    Return False
-                End If
-
-                mErrorMessage = String.Empty
-
-                Using scanStatsWriter = New StreamWriter(New FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
-
-                    ' Write the headers
-                    Dim headerNames = New List(Of String) From {
-                            "Dataset",
-                            "ScanNumber",
-                            "ScanTime",
-                            "ScanType",
-                            "TotalIonIntensity",
-                            "BasePeakIntensity",
-                            "BasePeakMZ",
-                            "BasePeakSignalToNoiseRatio",
-                            "IonCount",
-                            "IonCountRaw",
-                            "ScanTypeName"
-                            }
-
-                    scanStatsWriter.WriteLine(String.Join(ControlChars.Tab, headerNames))
-
-                    Dim dataValues As New List(Of String)
-
-                    For Each scanStatsEntry In scanStats
-
-                        dataValues.Clear()
-
-                        ' Dataset ID
-                        dataValues.Add(datasetID.ToString())
-
-                        ' Scan number
-                        dataValues.Add(scanStatsEntry.ScanNumber.ToString())
-
-                        ' Scan time (minutes)
-                        dataValues.Add(scanStatsEntry.ElutionTime)
-
-                        ' Scan type (1 for MS, 2 for MS2, etc.)
-                        dataValues.Add(scanStatsEntry.ScanType.ToString())
-
-                        ' Total ion intensity
-                        dataValues.Add(scanStatsEntry.TotalIonIntensity)
-
-                        ' Base peak ion intensity
-                        dataValues.Add(scanStatsEntry.BasePeakIntensity)
-
-                        ' Base peak ion m/z
-                        dataValues.Add(scanStatsEntry.BasePeakMZ)
-
-                        ' Base peak signal to noise ratio
-                        dataValues.Add(scanStatsEntry.BasePeakSignalToNoiseRatio)
-
-                        ' Number of peaks (aka ions) in the spectrum
-                        dataValues.Add(scanStatsEntry.IonCount.ToString())
-
-                        ' Number of peaks (aka ions) in the spectrum prior to any filtering
-                        dataValues.Add(scanStatsEntry.IonCountRaw.ToString())
-
-                        ' Scan type name
-                        dataValues.Add(scanStatsEntry.ScanTypeName)
-
-                        scanStatsWriter.WriteLine(String.Join(ControlChars.Tab, dataValues))
-
-                    Next
-
-                End Using
-
-                Return True
-
-            Catch ex As Exception
-                ReportError("Error in CreateScanStatsFile", ex)
-                Return False
-            End Try
-
-        End Function
-
-        Private Function FixNull(item As String) As String
-            If String.IsNullOrEmpty(item) Then
-                Return String.Empty
-            Else
-                Return item
-            End If
-        End Function
-
-        Public Function GetDatasetSummaryStats() As DatasetSummaryStats
-
-            If Not mDatasetSummaryStatsUpToDate Then
-                ComputeScanStatsSummary(mDatasetScanStats, mDatasetSummaryStats)
-                mDatasetSummaryStatsUpToDate = True
-            End If
-
-            Return mDatasetSummaryStats
-
-        End Function
-
-        Private Sub ReportError(message As String, Optional ex As Exception = Nothing)
-            mErrorMessage = String.Copy(message)
-            OnErrorEvent(mErrorMessage, ex)
-        End Sub
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Updates the scan type information for the specified scan number
-        ''' </summary>
-        ''' <param name="scanNumber"></param>
-        ''' <param name="scanType"></param>
-        ''' <param name="scanTypeName"></param>
-        ''' <returns>True if the scan was found and updated; otherwise false</returns>
-        ''' <remarks></remarks>
-        Public Function UpdateDatasetScanType(scanNumber As Integer, scanType As Integer, scanTypeName As String) As Boolean
-
-            Dim matchFound As Boolean
-
-            ' Look for scan scanNumber in mDatasetScanStats
-            For index = 0 To mDatasetScanStats.Count - 1
-                If mDatasetScanStats(index).ScanNumber = scanNumber Then
-                    mDatasetScanStats(index).ScanType = scanType
-                    mDatasetScanStats(index).ScanTypeName = scanTypeName
-                    mDatasetSummaryStatsUpToDate = False
-
-                    matchFound = True
-                    Exit For
-                End If
-            Next
-
-            Return matchFound
-
-        End Function
-
-        ' ReSharper disable once UnusedMember.Global
-        ''' <summary>
-        ''' Updates a tab-delimited text file, adding a new line summarizing the data stored in this class (in mDatasetScanStats and Me.DatasetFileInfo)
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="datasetInfoFilePath">File path to write the XML to</param>
-        ''' <returns>True if success; False if failure</returns>
-        ''' <remarks></remarks>
-        Public Function UpdateDatasetStatsTextFile(datasetName As String, datasetInfoFilePath As String) As Boolean
-            Return UpdateDatasetStatsTextFile(datasetName, datasetInfoFilePath, mDatasetScanStats, Me.DatasetFileInfo, Me.SampleInfo)
-        End Function
-
-        ''' <summary>
-        ''' Updates a tab-delimited text file, adding a new line summarizing the data in scanStats and datasetInfo
-        ''' </summary>
-        ''' <param name="datasetName">Dataset Name</param>
-        ''' <param name="datasetStatsFilePath">Tab-delimited file to create/update</param>
-        ''' <param name="scanStats">Scan stats to parse</param>
-        ''' <param name="datasetInfo">Dataset Info</param>
-        ''' <param name="oSampleInfo">Sample Info</param>
-        ''' <returns>True if success; False if failure</returns>
-        ''' <remarks></remarks>
-        Public Function UpdateDatasetStatsTextFile(
-          datasetName As String,
-          datasetStatsFilePath As String,
-          scanStats As List(Of ScanStatsEntry),
-          datasetInfo As DatasetFileInfo,
-          oSampleInfo As SampleInfo) As Boolean
-
-            Dim writeHeaders As Boolean
-
-            Dim summaryStats As DatasetSummaryStats
-
-            Try
-
-                If scanStats Is Nothing Then
-                    ReportError("scanStats is Nothing; unable to continue in UpdateDatasetStatsTextFile")
-                    Return False
-                End If
-
-                mErrorMessage = String.Empty
-
-                If scanStats Is mDatasetScanStats Then
-                    summaryStats = GetDatasetSummaryStats()
-                Else
-                    summaryStats = New DatasetSummaryStats()
-
-                    ' Parse the data in scanStats to compute the bulk values
-                    Dim summarySuccess = Me.ComputeScanStatsSummary(scanStats, summaryStats)
-                    If Not summarySuccess Then
-                        ReportError("ComputeScanStatsSummary returned false; unable to continue in UpdateDatasetStatsTextFile")
-                        Return False
-                    End If
-                End If
-
-                If Not File.Exists(datasetStatsFilePath) Then
-                    writeHeaders = True
-                End If
-
-                ' Create or open the output file
-                Using writer = New StreamWriter(New FileStream(datasetStatsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read))
-
-                    If writeHeaders Then
-                        ' Write the header line
-                        Dim headerNames = New List(Of String) From {
-                                "Dataset",
-                                "ScanCount",
-                                "ScanCountMS",
-                                "ScanCountMSn",
-                                "Elution_Time_Max",
-                                "AcqTimeMinutes",
-                                "StartTime",
-                                "EndTime",
-                                "FileSizeBytes",
-                                "SampleName",
-                                "Comment1",
-                                "Comment2"
-                                }
-
-                        writer.WriteLine(String.Join(ControlChars.Tab, headerNames))
-                    End If
-
-                    Dim dataValues = New List(Of String) From {
-                            datasetName,
-                            (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),
-                            summaryStats.MSStats.ScanCount.ToString(),
-                            summaryStats.MSnStats.ScanCount.ToString(),
-                            summaryStats.ElutionTimeMax.ToString("0.00"),
-                            datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
-                            datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING),
-                            datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING),
-                            datasetInfo.FileSizeBytes.ToString(),
-                            FixNull(oSampleInfo.SampleName),
-                            FixNull(oSampleInfo.Comment1),
-                            FixNull(oSampleInfo.Comment2)
-                            }
-
-                    writer.WriteLine(String.Join(ControlChars.Tab, dataValues))
-
-                End Using
-
-                Return True
-
-            Catch ex As Exception
-                ReportError("Error in UpdateDatasetStatsTextFile", ex)
-                Return False
-            End Try
-
-        End Function
-
-        Private Function ValueToString(value As Double, digitsOfPrecision As Byte, valueIfNaN As Double) As String
-
-            If Double.IsNaN(value) Then
-                Return StringUtilities.ValueToString(valueIfNaN, digitsOfPrecision)
-            ElseIf Double.IsNegativeInfinity(value) Then
-                Return StringUtilities.ValueToString(Double.MinValue, digitsOfPrecision)
-            ElseIf Double.IsPositiveInfinity(value) Then
-                Return StringUtilities.ValueToString(Double.MaxValue, digitsOfPrecision)
-            Else
-                Return StringUtilities.ValueToString(value, 5)
-            End If
-
-        End Function
-    End Class
-
-End Namespace
+                mErrorMessage = string.Empty;
+                int scanStatsCount = scanStats.Count;
+
+                // Initialize the TIC and BPI Lists
+                var ticListMS = new List<double>(scanStatsCount);
+                var ticListMSn = new List<double>(scanStatsCount);
+                var bpiListMS = new List<double>(scanStatsCount);
+                var bpiListMSn = new List<double>(scanStatsCount);
+                foreach (var statEntry in scanStats)
+                {
+                    if (statEntry.ScanType > 1)
+                    {
+                        // MSn spectrum
+                        ComputeScanStatsUpdateDetails(statEntry, summaryStats, summaryStats.MSnStats, ticListMSn, bpiListMSn);
+                    }
+                    else
+                    {
+                        // MS spectrum
+                        ComputeScanStatsUpdateDetails(statEntry, summaryStats, summaryStats.MSStats, ticListMS, bpiListMS);
+                    }
+
+                    string scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + statEntry.ScanFilterText;
+                    if (summaryStats.ScanTypeStats.ContainsKey(scanTypeKey))
+                    {
+                        summaryStats.ScanTypeStats[scanTypeKey] += 1;
+                    }
+                    else
+                    {
+                        summaryStats.ScanTypeStats.Add(scanTypeKey, 1);
+                    }
+                }
+
+                summaryStats.MSStats.TICMedian = clsUtilities.ComputeMedian(ticListMS);
+                summaryStats.MSStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMS);
+                summaryStats.MSnStats.TICMedian = clsUtilities.ComputeMedian(ticListMSn);
+                summaryStats.MSnStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMSn);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error in ComputeScanStatsSummary", ex);
+                return false;
+            }
+        }
+
+        private void ComputeScanStatsUpdateDetails(ScanStatsEntry scanStats, DatasetSummaryStats summaryStats, SummaryStatDetails summaryStatDetails, ICollection<double> ticList, ICollection<double> bpiList)
+        {
+            double elutionTime;
+            double totalIonCurrent;
+            double basePeakIntensity;
+            if (!string.IsNullOrWhiteSpace(scanStats.ElutionTime))
+            {
+                if (double.TryParse(scanStats.ElutionTime, out elutionTime))
+                {
+                    if (elutionTime > summaryStats.ElutionTimeMax)
+                    {
+                        summaryStats.ElutionTimeMax = elutionTime;
+                    }
+                }
+            }
+
+            if (double.TryParse(scanStats.TotalIonIntensity, out totalIonCurrent))
+            {
+                if (totalIonCurrent > summaryStatDetails.TICMax)
+                {
+                    summaryStatDetails.TICMax = totalIonCurrent;
+                }
+
+                ticList.Add(totalIonCurrent);
+            }
+
+            if (double.TryParse(scanStats.BasePeakIntensity, out basePeakIntensity))
+            {
+                if (basePeakIntensity > summaryStatDetails.BPIMax)
+                {
+                    summaryStatDetails.BPIMax = basePeakIntensity;
+                }
+
+                bpiList.Add(basePeakIntensity);
+            }
+
+            summaryStatDetails.ScanCount += 1;
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Creates an XML file summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="datasetInfoFilePath">File path to write the XML to</param>
+        /// <returns>True if success; False if failure</returns>
+        /// <remarks></remarks>
+        public bool CreateDatasetInfoFile(string datasetName, string datasetInfoFilePath)
+        {
+            return CreateDatasetInfoFile(datasetName, datasetInfoFilePath, mDatasetScanStats, DatasetFileInfo, SampleInfo);
+        }
+
+        /// <summary>
+        /// Creates an XML file summarizing the data in scanStats and datasetInfo
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="datasetInfoFilePath">File path to write the XML to</param>
+        /// <param name="scanStats">Scan stats to parse</param>
+        /// <param name="datasetInfo">Dataset Info</param>
+        /// <param name="oSampleInfo">Sample Info</param>
+        /// <returns>True if success; False if failure</returns>
+        /// <remarks></remarks>
+        public bool CreateDatasetInfoFile(string datasetName, string datasetInfoFilePath, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        {
+            try
+            {
+                if (scanStats is null)
+                {
+                    ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoFile");
+                    return false;
+                }
+
+                mErrorMessage = string.Empty;
+
+                // If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, we would have to use System.Encoding.Unicode
+                // However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
+                using (var writer = new StreamWriter(new FileStream(datasetInfoFilePath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8))
+                {
+                    writer.WriteLine(CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, oSampleInfo));
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error in CreateDatasetInfoFile", ex);
+                return false;
+            }
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
+        /// Auto-determines the dataset name using Me.DatasetFileInfo.DatasetName
+        /// </summary>
+        /// <returns>XML (as string)</returns>
+        /// <remarks></remarks>
+        public string CreateDatasetInfoXML()
+        {
+            return CreateDatasetInfoXML(DatasetFileInfo.DatasetName, mDatasetScanStats, DatasetFileInfo, SampleInfo);
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Creates XML summarizing the data stored in this class (in mDatasetScanStats, Me.DatasetFileInfo, and Me.SampleInfo)
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <returns>XML (as string)</returns>
+        /// <remarks></remarks>
+        public string CreateDatasetInfoXML(string datasetName)
+        {
+            return CreateDatasetInfoXML(datasetName, mDatasetScanStats, DatasetFileInfo, SampleInfo);
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Creates XML summarizing the data in scanStats and datasetInfo
+        /// Auto-determines the dataset name using datasetInfo.DatasetName
+        /// </summary>
+        /// <param name="scanStats">Scan stats to parse</param>
+        /// <param name="datasetInfo">Dataset Info</param>
+        /// <returns>XML (as string)</returns>
+        /// <remarks></remarks>
+        public string CreateDatasetInfoXML(List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo)
+        {
+            return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo);
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Creates XML summarizing the data in scanStats, datasetInfo, and oSampleInfo
+        /// Auto-determines the dataset name using datasetInfo.DatasetName
+        /// </summary>
+        /// <param name="scanStats">Scan stats to parse</param>
+        /// <param name="datasetInfo">Dataset Info</param>
+        /// <param name="oSampleInfo">Sample Info</param>
+        /// <returns>XML (as string)</returns>
+        /// <remarks></remarks>
+        public string CreateDatasetInfoXML(List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        {
+            return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo, oSampleInfo);
+        }
+
+        /// <summary>
+        /// Creates XML summarizing the data in scanStats and datasetInfo
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="scanStats">Scan stats to parse</param>
+        /// <param name="datasetInfo">Dataset Info</param>
+        /// <returns>XML (as string)</returns>
+        /// <remarks></remarks>
+        public string CreateDatasetInfoXML(string datasetName, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo)
+        {
+            return CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, new SampleInfo());
+        }
+
+        /// <summary>
+        /// Creates XML summarizing the data in scanStats and datasetInfo
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="scanStats">Scan stats to parse</param>
+        /// <param name="datasetInfo">Dataset Info</param>
+        /// <returns>XML (as string)</returns>
+        /// <remarks></remarks>
+        public string CreateDatasetInfoXML(string datasetName, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        {
+            try
+            {
+                if (scanStats is null)
+                {
+                    ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoXML");
+                    return string.Empty;
+                }
+
+                mErrorMessage = string.Empty;
+                DatasetSummaryStats summaryStats;
+                if (scanStats == mDatasetScanStats)
+                {
+                    summaryStats = GetDatasetSummaryStats();
+                }
+                else
+                {
+                    summaryStats = new DatasetSummaryStats();
+
+                    // Parse the data in scanStats to compute the bulk values
+                    ComputeScanStatsSummary(scanStats, out summaryStats);
+                }
+
+                var xmlSettings = new XmlWriterSettings()
+                {
+                    CheckCharacters = true,
+                    Indent = true,
+                    IndentChars = "  ",
+                    Encoding = Encoding.UTF8,
+                    CloseOutput = false        // Do not close output automatically so that the MemoryStream can be read after the XmlWriter has been closed
+                };
+
+                // We could cache the text using a StringBuilder, like this:
+                //
+                // Dim sbDatasetInfo As New System.StringBuilder
+                // Dim objStringWriter As = StringWriter
+                // objStringWriter = New StringWriter(sbDatasetInfo)
+                // writer = New System.Xml.XmlTextWriter(objStringWriter)
+                // writer.Formatting = System.Xml.Formatting.Indented
+                // writer.Indentation = 2
+
+                // However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16)
+                // since this is the only character encoding used in the .NET Framework for String values,
+                // and thus you'll see the attribute encoding="utf-16" in the opening XML declaration
+                // The alternative is to use a MemoryStream.  Here, the stream encoding is set by the XmlWriter
+                // and so you see the attribute encoding="utf-8" in the opening XML declaration encoding
+                // (since we used objXMLSettings.Encoding = System.Encoding.UTF8)
+                //
+                var memStream = new MemoryStream();
+                var writer = XmlWriter.Create(memStream, xmlSettings);
+                writer.WriteStartDocument(true);
+
+                // Write the beginning of the "Root" element.
+                writer.WriteStartElement("DatasetInfo");
+                writer.WriteElementString("Dataset", datasetName);
+                writer.WriteStartElement("ScanTypes");
+                foreach (var scanTypeEntry in summaryStats.ScanTypeStats)
+                {
+                    string scanType = scanTypeEntry.Key;
+                    int indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal);
+                    string scanFilterText;
+                    if (indexMatch >= 0)
+                    {
+                        scanFilterText = scanType.Substring(indexMatch + SCAN_TYPE_STATS_SEP_CHAR.Length);
+                        if (indexMatch > 0)
+                        {
+                            scanType = scanType.Substring(0, indexMatch);
+                        }
+                        else
+                        {
+                            scanType = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        scanFilterText = string.Empty;
+                    }
+
+                    writer.WriteStartElement("ScanType");
+                    writer.WriteAttributeString("ScanCount", scanTypeEntry.Value.ToString());
+                    writer.WriteAttributeString("ScanFilterText", FixNull(scanFilterText));
+                    writer.WriteString(scanType);
+                    writer.WriteEndElement();     // ScanType
+                }
+
+                writer.WriteEndElement();       // ScanTypes
+                writer.WriteStartElement("AcquisitionInfo");
+                int scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount;
+                if (scanCountTotal == 0 && datasetInfo.ScanCount > 0)
+                {
+                    scanCountTotal = datasetInfo.ScanCount;
+                }
+
+                writer.WriteElementString("ScanCount", scanCountTotal.ToString());
+                writer.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString());
+                writer.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString());
+                writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString());
+                writer.WriteElementString("AcqTimeMinutes", datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"));
+                writer.WriteElementString("StartTime", datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING));
+                writer.WriteElementString("EndTime", datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING));
+                writer.WriteElementString("FileSizeBytes", datasetInfo.FileSizeBytes.ToString());
+                writer.WriteEndElement();       // AcquisitionInfo
+                writer.WriteStartElement("TICInfo");
+                writer.WriteElementString("TIC_Max_MS", ValueToString(summaryStats.MSStats.TICMax, 5, 0));
+                writer.WriteElementString("TIC_Max_MSn", ValueToString(summaryStats.MSnStats.TICMax, 5, 0));
+                writer.WriteElementString("BPI_Max_MS", ValueToString(summaryStats.MSStats.BPIMax, 5, 0));
+                writer.WriteElementString("BPI_Max_MSn", ValueToString(summaryStats.MSnStats.BPIMax, 5, 0));
+                writer.WriteElementString("TIC_Median_MS", ValueToString(summaryStats.MSStats.TICMedian, 5, 0));
+                writer.WriteElementString("TIC_Median_MSn", ValueToString(summaryStats.MSnStats.TICMedian, 5, 0));
+                writer.WriteElementString("BPI_Median_MS", ValueToString(summaryStats.MSStats.BPIMedian, 5, 0));
+                writer.WriteElementString("BPI_Median_MSn", ValueToString(summaryStats.MSnStats.BPIMedian, 5, 0));
+                writer.WriteEndElement();       // TICInfo
+
+                // Only write the oSampleInfo block if oSampleInfo contains entries
+                if (oSampleInfo.HasData())
+                {
+                    writer.WriteStartElement("SampleInfo");
+                    writer.WriteElementString("SampleName", FixNull(oSampleInfo.SampleName));
+                    writer.WriteElementString("Comment1", FixNull(oSampleInfo.Comment1));
+                    writer.WriteElementString("Comment2", FixNull(oSampleInfo.Comment2));
+                    writer.WriteEndElement();       // SampleInfo
+                }
+
+                writer.WriteEndElement();  // End the "Root" element (DatasetInfo)
+                writer.WriteEndDocument(); // End the document
+                writer.Close();
+
+                // Now Rewind the memory stream and output as a string
+                memStream.Position = 0;
+                var reader = new StreamReader(memStream);
+
+                // Return the XML as text
+                return reader.ReadToEnd();
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error in CreateDatasetInfoXML", ex);
+            }
+
+            // This code will only be reached if an exception occurs
+            return string.Empty;
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="scanStatsFilePath">File path to write the text file to</param>
+        /// <returns>True if success; False if failure</returns>
+        /// <remarks></remarks>
+        public bool CreateScanStatsFile(string datasetName, string scanStatsFilePath)
+        {
+            return CreateScanStatsFile(datasetName, scanStatsFilePath, mDatasetScanStats, DatasetFileInfo, SampleInfo);
+        }
+
+        /// <summary>
+        /// Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="scanStatsFilePath">File path to write the text file to</param>
+        /// <param name="scanStats">Scan stats to parse</param>
+        /// <param name="datasetInfo">Dataset Info</param>
+        /// <param name="oSampleInfo">Sample Info</param>
+        /// <returns>True if success; False if failure</returns>
+        /// <remarks></remarks>
+        public bool CreateScanStatsFile(string datasetName, string scanStatsFilePath, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        {
+            int datasetID = 0;
+            try
+            {
+                if (scanStats is null)
+                {
+                    ReportError("scanStats is Nothing; unable to continue in CreateScanStatsFile");
+                    return false;
+                }
+
+                mErrorMessage = string.Empty;
+                using (var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+                {
+
+                    // Write the headers
+                    var headerNames = new List<string>() { "Dataset", "ScanNumber", "ScanTime", "ScanType", "TotalIonIntensity", "BasePeakIntensity", "BasePeakMZ", "BasePeakSignalToNoiseRatio", "IonCount", "IonCountRaw", "ScanTypeName" };
+                    scanStatsWriter.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), headerNames));
+                    var dataValues = new List<string>();
+                    foreach (var scanStatsEntry in scanStats)
+                    {
+                        dataValues.Clear();
+
+                        // Dataset ID
+                        dataValues.Add(datasetID.ToString());
+
+                        // Scan number
+                        dataValues.Add(scanStatsEntry.ScanNumber.ToString());
+
+                        // Scan time (minutes)
+                        dataValues.Add(scanStatsEntry.ElutionTime);
+
+                        // Scan type (1 for MS, 2 for MS2, etc.)
+                        dataValues.Add(scanStatsEntry.ScanType.ToString());
+
+                        // Total ion intensity
+                        dataValues.Add(scanStatsEntry.TotalIonIntensity);
+
+                        // Base peak ion intensity
+                        dataValues.Add(scanStatsEntry.BasePeakIntensity);
+
+                        // Base peak ion m/z
+                        dataValues.Add(scanStatsEntry.BasePeakMZ);
+
+                        // Base peak signal to noise ratio
+                        dataValues.Add(scanStatsEntry.BasePeakSignalToNoiseRatio);
+
+                        // Number of peaks (aka ions) in the spectrum
+                        dataValues.Add(scanStatsEntry.IonCount.ToString());
+
+                        // Number of peaks (aka ions) in the spectrum prior to any filtering
+                        dataValues.Add(scanStatsEntry.IonCountRaw.ToString());
+
+                        // Scan type name
+                        dataValues.Add(scanStatsEntry.ScanTypeName);
+                        scanStatsWriter.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), dataValues));
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error in CreateScanStatsFile", ex);
+                return false;
+            }
+        }
+
+        private string FixNull(string item)
+        {
+            if (string.IsNullOrEmpty(item))
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return item;
+            }
+        }
+
+        public DatasetSummaryStats GetDatasetSummaryStats()
+        {
+            if (!mDatasetSummaryStatsUpToDate)
+            {
+                ComputeScanStatsSummary(mDatasetScanStats, out mDatasetSummaryStats);
+                mDatasetSummaryStatsUpToDate = true;
+            }
+
+            return mDatasetSummaryStats;
+        }
+
+        private void ReportError(string message, Exception ex = null)
+        {
+            mErrorMessage = string.Copy(message);
+            OnErrorEvent(mErrorMessage, ex);
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Updates the scan type information for the specified scan number
+        /// </summary>
+        /// <param name="scanNumber"></param>
+        /// <param name="scanType"></param>
+        /// <param name="scanTypeName"></param>
+        /// <returns>True if the scan was found and updated; otherwise false</returns>
+        /// <remarks></remarks>
+        public bool UpdateDatasetScanType(int scanNumber, int scanType, string scanTypeName)
+        {
+            var matchFound = default(bool);
+
+            // Look for scan scanNumber in mDatasetScanStats
+            for (int index = 0, loopTo = mDatasetScanStats.Count - 1; index <= loopTo; index++)
+            {
+                if (mDatasetScanStats[index].ScanNumber == scanNumber)
+                {
+                    mDatasetScanStats[index].ScanType = scanType;
+                    mDatasetScanStats[index].ScanTypeName = scanTypeName;
+                    mDatasetSummaryStatsUpToDate = false;
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            return matchFound;
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Updates a tab-delimited text file, adding a new line summarizing the data stored in this class (in mDatasetScanStats and Me.DatasetFileInfo)
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="datasetInfoFilePath">File path to write the XML to</param>
+        /// <returns>True if success; False if failure</returns>
+        /// <remarks></remarks>
+        public bool UpdateDatasetStatsTextFile(string datasetName, string datasetInfoFilePath)
+        {
+            return UpdateDatasetStatsTextFile(datasetName, datasetInfoFilePath, mDatasetScanStats, DatasetFileInfo, SampleInfo);
+        }
+
+        /// <summary>
+        /// Updates a tab-delimited text file, adding a new line summarizing the data in scanStats and datasetInfo
+        /// </summary>
+        /// <param name="datasetName">Dataset Name</param>
+        /// <param name="datasetStatsFilePath">Tab-delimited file to create/update</param>
+        /// <param name="scanStats">Scan stats to parse</param>
+        /// <param name="datasetInfo">Dataset Info</param>
+        /// <param name="oSampleInfo">Sample Info</param>
+        /// <returns>True if success; False if failure</returns>
+        /// <remarks></remarks>
+        public bool UpdateDatasetStatsTextFile(string datasetName, string datasetStatsFilePath, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        {
+            var writeHeaders = default(bool);
+            DatasetSummaryStats summaryStats;
+            try
+            {
+                if (scanStats is null)
+                {
+                    ReportError("scanStats is Nothing; unable to continue in UpdateDatasetStatsTextFile");
+                    return false;
+                }
+
+                mErrorMessage = string.Empty;
+                if (scanStats == mDatasetScanStats)
+                {
+                    summaryStats = GetDatasetSummaryStats();
+                }
+                else
+                {
+                    summaryStats = new DatasetSummaryStats();
+
+                    // Parse the data in scanStats to compute the bulk values
+                    bool summarySuccess = ComputeScanStatsSummary(scanStats, out summaryStats);
+                    if (!summarySuccess)
+                    {
+                        ReportError("ComputeScanStatsSummary returned false; unable to continue in UpdateDatasetStatsTextFile");
+                        return false;
+                    }
+                }
+
+                if (!File.Exists(datasetStatsFilePath))
+                {
+                    writeHeaders = true;
+                }
+
+                // Create or open the output file
+                using (var writer = new StreamWriter(new FileStream(datasetStatsFilePath, FileMode.Append, FileAccess.Write, FileShare.Read)))
+                {
+                    if (writeHeaders)
+                    {
+                        // Write the header line
+                        var headerNames = new List<string>() { "Dataset", "ScanCount", "ScanCountMS", "ScanCountMSn", "Elution_Time_Max", "AcqTimeMinutes", "StartTime", "EndTime", "FileSizeBytes", "SampleName", "Comment1", "Comment2" };
+                        writer.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), headerNames));
+                    }
+
+                    var dataValues = new List<string>() { datasetName, (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(), summaryStats.MSStats.ScanCount.ToString(), summaryStats.MSnStats.ScanCount.ToString(), summaryStats.ElutionTimeMax.ToString("0.00"), datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"), datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING), datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING), datasetInfo.FileSizeBytes.ToString(), FixNull(oSampleInfo.SampleName), FixNull(oSampleInfo.Comment1), FixNull(oSampleInfo.Comment2) };
+                    writer.WriteLine(string.Join(Conversions.ToString(ControlChars.Tab), dataValues));
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error in UpdateDatasetStatsTextFile", ex);
+                return false;
+            }
+        }
+
+        private string ValueToString(double value, byte digitsOfPrecision, double valueIfNaN)
+        {
+            if (double.IsNaN(value))
+            {
+                return StringUtilities.ValueToString(valueIfNaN, digitsOfPrecision);
+            }
+            else if (double.IsNegativeInfinity(value))
+            {
+                return StringUtilities.ValueToString(double.MinValue, digitsOfPrecision);
+            }
+            else if (double.IsPositiveInfinity(value))
+            {
+                return StringUtilities.ValueToString(double.MaxValue, digitsOfPrecision);
+            }
+            else
+            {
+                return StringUtilities.ValueToString(value, 5);
+            }
+        }
+    }
+}

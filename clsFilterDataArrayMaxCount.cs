@@ -1,358 +1,419 @@
-﻿Option Strict On
-
-Public Class clsFilterDataArrayMaxCount
-
-    ' This class can be used to select the top N data points in a list, sorting descending
-    ' It does not require a full sort of the data, which allows for faster filtering of the data
-    '
-    ' To use, first call AddDataPoint() for each source data point, specifying the value to sort on and a data point index
-    ' When done, call FilterData()
-    '  This routine will determine which data points to retain
-    '  For the remaining points, their data values will be changed to mSkipDataPointFlag (defaults to -1)
-
-    Private Const INITIAL_MEMORY_RESERVE As Integer = 50000
-
-    Private Const DEFAULT_SKIP_DATA_POINT_FLAG As Single = -1
-
-    ' 4 steps in Sub FilterDataByMaxDataCountToLoad
-    Private Const SUBTASK_STEP_COUNT As Integer = 4
-
-    Private mDataCount As Integer
-    Private mDataValues() As Double
-    Private mDataIndices() As Integer
-
-    Private mProgress As Single     ' Value between 0 and 100
-
-    Public Event ProgressChanged(progressVal As Single)
-
-#Region "Properties"
-    Public Property MaximumDataCountToLoad As Integer
-
-    Public ReadOnly Property Progress As Single
-        Get
-            Return mProgress
-        End Get
-    End Property
-
-    Public Property SkipDataPointFlag As Single
-
-    Public Property TotalIntensityPercentageFilterEnabled As Boolean
-
-    Public Property TotalIntensityPercentageFilter As Single
-#End Region
-
-    Public Sub New()
-        Me.New(INITIAL_MEMORY_RESERVE)
-    End Sub
-
-    Public Sub New(initialCapacity As Integer)
-        SkipDataPointFlag = DEFAULT_SKIP_DATA_POINT_FLAG
-        Me.Clear(initialCapacity)
-    End Sub
-
-    Public Sub AddDataPoint(abundance As Double, dataPointIndex As Integer)
-
-        If mDataCount >= mDataValues.Length Then
-            ReDim Preserve mDataValues(CInt(Math.Floor(mDataValues.Length * 1.5)) - 1)
-            ReDim Preserve mDataIndices(mDataValues.Length - 1)
-        End If
-
-        mDataValues(mDataCount) = abundance
-        mDataIndices(mDataCount) = dataPointIndex
-
-        mDataCount += 1
-    End Sub
-
-    Public Sub Clear(initialCapacity As Integer)
-        MaximumDataCountToLoad = 400000
-
-        TotalIntensityPercentageFilterEnabled = False
-        TotalIntensityPercentageFilter = 90
-
-        If initialCapacity < 4 Then
-            initialCapacity = 4
-        End If
-
-        mDataCount = 0
-        ReDim mDataValues(initialCapacity - 1)
-        ReDim mDataIndices(initialCapacity - 1)
-    End Sub
-
-    Public Function GetAbundanceByIndex(dataPointIndex As Integer) As Double
-        If dataPointIndex >= 0 And dataPointIndex < mDataCount Then
-            Return mDataValues(dataPointIndex)
-        Else
-            ' Invalid data point index value
-            Return -1
-        End If
-    End Function
-
-    Public Sub FilterData()
-
-        If mDataCount <= 0 Then
-            ' Nothing to do
-        Else
-            ' Shrink the arrays to mDataCount
-            If mDataCount < mDataValues.Length Then
-                ReDim Preserve mDataValues(mDataCount - 1)
-                ReDim Preserve mDataIndices(mDataCount - 1)
-            End If
-
-            FilterDataByMaxDataCountToKeep()
-
-        End If
-
-    End Sub
-
-    Private Sub FilterDataByMaxDataCountToKeep()
-
-        Const HISTOGRAM_BIN_COUNT = 5000
-
-        Try
-
-            Dim binToSortAbundances() As Double
-            Dim binToSortDataIndices() As Integer
-
-            ReDim binToSortAbundances(9)
-            ReDim binToSortDataIndices(9)
-
-            UpdateProgress(0)
-
-            Dim useFullDataSort = False
-            If mDataCount = 0 Then
-                ' No data loaded
-                UpdateProgress(4 / SUBTASK_STEP_COUNT * 100.0#)
-                Exit Sub
-            ElseIf mDataCount <= MaximumDataCountToLoad Then
-                ' Loaded less than mMaximumDataCountToKeep data points
-                ' Nothing to filter
-                UpdateProgress(4 / SUBTASK_STEP_COUNT * 100.0#)
-                Exit Sub
-            End If
-
-            ' In order to speed up the sorting, we're first going to make a histogram
-            '  (aka frequency distribution) of the abundances in mDataValues
-
-            ' First, determine the maximum abundance value in mDataValues
-            Dim maxAbundance = Double.MinValue
-            For index = 0 To mDataCount - 1
-                If mDataValues(index) > maxAbundance Then
-                    maxAbundance = mDataValues(index)
-                End If
-            Next
-
-            ' Round maxAbundance up to the next highest integer
-            maxAbundance = CLng(Math.Ceiling(maxAbundance))
-
-            ' Now determine the histogram bin size
-            Dim binSize = maxAbundance / HISTOGRAM_BIN_COUNT
-            If binSize < 1 Then binSize = 1
-
-            ' Initialize histogramData
-            Dim binCount = CInt(maxAbundance / binSize) + 1
-
-            Dim histogramBinCounts() As Integer
-            Dim histogramBinStartIntensity() As Double
-
-            ReDim histogramBinCounts(binCount - 1)
-            ReDim histogramBinStartIntensity(binCount - 1)
-
-            For index = 0 To binCount - 1
-                histogramBinStartIntensity(index) = index * binSize
-            Next
-
-            ' Parse mDataValues to populate histogramBinCounts
-            For index = 0 To mDataCount - 1
-
-                Dim targetBin As Integer
-                If mDataValues(index) <= 0 Then
-                    targetBin = 0
-                Else
-                    targetBin = CInt(Math.Floor(mDataValues(index) / binSize))
-                End If
-
-                If targetBin < binCount - 1 Then
-                    If mDataValues(index) >= histogramBinStartIntensity(targetBin + 1) Then
-                        targetBin += 1
-                    End If
-                End If
-
-                histogramBinCounts(targetBin) += 1
-
-                If mDataValues(index) < histogramBinStartIntensity(targetBin) Then
-                    If mDataValues(index) < histogramBinStartIntensity(targetBin) - binSize / 1000 Then
-                        ' This is unexpected
-                        mDataValues(index) = mDataValues(index)
-                    End If
-                End If
-
-                If index Mod 10000 = 0 Then
-                    UpdateProgress(CSng((0 + (index + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
-                End If
-            Next
-
-            ' Now examine the frequencies in histogramBinCounts() to determine the minimum value to consider when sorting
-            Dim pointTotal = 0
-            Dim binToSort = -1
-            For index = binCount - 1 To 0 Step -1
-                pointTotal = pointTotal + histogramBinCounts(index)
-                If pointTotal >= MaximumDataCountToLoad Then
-                    binToSort = index
-                    Exit For
-                End If
-            Next
-
-            UpdateProgress(1 / SUBTASK_STEP_COUNT * 100.0#)
-
-            If binToSort >= 0 Then
-                ' Find the data with intensity >= histogramBinStartIntensity(binToSort)
-                ' We actually only need to sort the data in bin binToSort
-
-                Dim binToSortAbundanceMinimum As Double = histogramBinStartIntensity(binToSort)
-                Dim binToSortAbundanceMaximum As Double = maxAbundance + 1
-
-                If binToSort < binCount - 1 Then
-                    binToSortAbundanceMaximum = histogramBinStartIntensity(binToSort + 1)
-                End If
-
-                If Math.Abs(binToSortAbundanceMaximum - binToSortAbundanceMinimum) < Single.Epsilon Then
-                    ' Is this code ever reached?
-                    ' If yes, then the code below won't populate binToSortAbundances() and binToSortDataIndices() with any data
-                    useFullDataSort = True
-                End If
-
-                Dim binToSortDataCount = 0
-
-                If Not useFullDataSort Then
-                    If histogramBinCounts(binToSort) > 0 Then
-                        ReDim binToSortAbundances(histogramBinCounts(binToSort) - 1)
-                        ReDim binToSortDataIndices(histogramBinCounts(binToSort) - 1)
-                    Else
-                        ' Is this code ever reached?
-                        useFullDataSort = True
-                    End If
-                End If
-
-                If Not useFullDataSort Then
-                    Dim dataCountImplicitlyIncluded = 0
-                    For index = 0 To mDataCount - 1
-                        If mDataValues(index) < binToSortAbundanceMinimum Then
-                            ' Skip this data point when re-reading the input data file
-                            mDataValues(index) = SkipDataPointFlag
-                        ElseIf mDataValues(index) < binToSortAbundanceMaximum Then
-                            ' Value is in the bin to sort; add to the BinToSort arrays
-
-                            If binToSortDataCount >= binToSortAbundances.Length Then
-                                ' Need to reserve more space (this is unexpected)
-                                ReDim Preserve binToSortAbundances(binToSortAbundances.Length * 2 - 1)
-                                ReDim Preserve binToSortDataIndices(binToSortAbundances.Length - 1)
-                            End If
-
-                            binToSortAbundances(binToSortDataCount) = mDataValues(index)
-                            binToSortDataIndices(binToSortDataCount) = mDataIndices(index)
-                            binToSortDataCount += 1
-                        Else
-                            dataCountImplicitlyIncluded = dataCountImplicitlyIncluded + 1
-                        End If
-
-                        If index Mod 10000 = 0 Then
-                            UpdateProgress(CSng((1 + (index + 1) / CDbl(mDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
-                        End If
-                    Next
-
-                    If binToSortDataCount > 0 Then
-                        If binToSortDataCount < binToSortAbundances.Length Then
-                            ReDim Preserve binToSortAbundances(binToSortDataCount - 1)
-                            ReDim Preserve binToSortDataIndices(binToSortDataCount - 1)
-                        End If
-                    Else
-                        ' This code shouldn't be reached
-                    End If
-
-                    If MaximumDataCountToLoad - dataCountImplicitlyIncluded - binToSortDataCount = 0 Then
-                        ' No need to sort and examine the data for BinToSort since we'll ultimately include all of it
-                    Else
-                        SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, MaximumDataCountToLoad - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT)
-                    End If
-
-                    ' Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataValues
-                    ' mDataValues and mDataIndices have not been sorted and therefore mDataIndices should currently be sorted ascending on "valid data point index"
-                    ' binToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
-
-                    Dim originalDataArrayIndex = 0
-                    For index = 0 To binToSortDataCount - 1
-                        Do While binToSortDataIndices(index) > mDataIndices(originalDataArrayIndex)
-                            originalDataArrayIndex += 1
-                        Loop
-
-                        If Math.Abs(binToSortAbundances(index) - SkipDataPointFlag) < Single.Epsilon Then
-                            If mDataIndices(originalDataArrayIndex) = binToSortDataIndices(index) Then
-                                mDataValues(originalDataArrayIndex) = SkipDataPointFlag
-                            Else
-                                ' This code shouldn't be reached
-                            End If
-                        End If
-                        originalDataArrayIndex += 1
-
-                        If binToSortDataCount < 1000 Or binToSortDataCount Mod 100 = 0 Then
-                            UpdateProgress(CSng((3 + (index + 1) / CDbl(binToSortDataCount)) / SUBTASK_STEP_COUNT * 100.0#))
-                        End If
-                    Next
-                End If
-            Else
-                useFullDataSort = True
-            End If
-
-            If useFullDataSort Then
-                ' This shouldn't normally be necessary
-
-                ' We have to sort all of the data; this can be quite slow
-                SortAndMarkPointsToSkip(mDataValues, mDataIndices, mDataCount, MaximumDataCountToLoad, SUBTASK_STEP_COUNT)
-            End If
-
-            UpdateProgress(4 / SUBTASK_STEP_COUNT * 100.0#)
-
-            Exit Sub
-
-        Catch ex As Exception
-            Throw New Exception("Error in FilterDataByMaxDataCountToKeep: " & ex.Message, ex)
-        End Try
-
-    End Sub
-
-    ' This is sub uses a full sort to filter the data
-    ' This will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible
-    Private Sub SortAndMarkPointsToSkip(ByRef abundances() As Double, ByRef dataIndices() As Integer, dataCount As Integer, maximumDataCountInArraysToLoad As Integer, subtaskStepCount As Integer)
-
-        Dim index As Integer
-
-        If dataCount > 0 Then
-            ' Sort abundances ascending, sorting dataIndices in parallel
-            Array.Sort(abundances, dataIndices, 0, dataCount)
-
-            UpdateProgress(CSng((2.333 / subtaskStepCount) * 100.0))
-
-            ' Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
-            For index = 0 To dataCount - maximumDataCountInArraysToLoad - 1
-                abundances(index) = SkipDataPointFlag
-            Next
-
-            UpdateProgress(CSng((2.666 / subtaskStepCount) * 100.0#))
-
-            ' Re-sort, this time on dataIndices with abundances in parallel
-            Array.Sort(dataIndices, abundances, 0, dataCount)
-
-        End If
-
-        UpdateProgress(CSng(3 / subtaskStepCount * 100.0#))
-
-    End Sub
-
-    Private Sub UpdateProgress(progressValue As Single)
-        mProgress = progressValue
-
-        RaiseEvent ProgressChanged(mProgress)
-    End Sub
-End Class
-
-
+﻿using System;
+using Microsoft.VisualBasic.CompilerServices;
+
+namespace MASIC
+{
+    public class clsFilterDataArrayMaxCount
+    {
+
+        // This class can be used to select the top N data points in a list, sorting descending
+        // It does not require a full sort of the data, which allows for faster filtering of the data
+        // 
+        // To use, first call AddDataPoint() for each source data point, specifying the value to sort on and a data point index
+        // When done, call FilterData()
+        // This routine will determine which data points to retain
+        // For the remaining points, their data values will be changed to mSkipDataPointFlag (defaults to -1)
+
+        private const int INITIAL_MEMORY_RESERVE = 50000;
+        private const float DEFAULT_SKIP_DATA_POINT_FLAG = -1;
+
+        // 4 steps in Sub FilterDataByMaxDataCountToLoad
+        private const int SUBTASK_STEP_COUNT = 4;
+        private int mDataCount;
+        private double[] mDataValues;
+        private int[] mDataIndices;
+        private float mProgress;     // Value between 0 and 100
+
+        public event ProgressChangedEventHandler ProgressChanged;
+
+        public delegate void ProgressChangedEventHandler(float progressVal);
+
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public int MaximumDataCountToLoad { get; set; }
+
+        public float Progress
+        {
+            get
+            {
+                return mProgress;
+            }
+        }
+
+        public float SkipDataPointFlag { get; set; }
+        public bool TotalIntensityPercentageFilterEnabled { get; set; }
+        public float TotalIntensityPercentageFilter { get; set; }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        public clsFilterDataArrayMaxCount() : this(INITIAL_MEMORY_RESERVE)
+        {
+        }
+
+        public clsFilterDataArrayMaxCount(int initialCapacity)
+        {
+            SkipDataPointFlag = DEFAULT_SKIP_DATA_POINT_FLAG;
+            Clear(initialCapacity);
+        }
+
+        public void AddDataPoint(double abundance, int dataPointIndex)
+        {
+            if (mDataCount >= mDataValues.Length)
+            {
+                var oldMDataValues = mDataValues;
+                mDataValues = new double[(Conversions.ToInteger(Math.Floor(mDataValues.Length * 1.5)))];
+                if (oldMDataValues is object)
+                    Array.Copy(oldMDataValues, mDataValues, Math.Min(Conversions.ToInteger(Math.Floor(mDataValues.Length * 1.5)), oldMDataValues.Length));
+                var oldMDataIndices = mDataIndices;
+                mDataIndices = new int[mDataValues.Length];
+                if (oldMDataIndices is object)
+                    Array.Copy(oldMDataIndices, mDataIndices, Math.Min(mDataValues.Length, oldMDataIndices.Length));
+            }
+
+            mDataValues[mDataCount] = abundance;
+            mDataIndices[mDataCount] = dataPointIndex;
+            mDataCount += 1;
+        }
+
+        public void Clear(int initialCapacity)
+        {
+            MaximumDataCountToLoad = 400000;
+            TotalIntensityPercentageFilterEnabled = false;
+            TotalIntensityPercentageFilter = 90;
+            if (initialCapacity < 4)
+            {
+                initialCapacity = 4;
+            }
+
+            mDataCount = 0;
+            mDataValues = new double[initialCapacity];
+            mDataIndices = new int[initialCapacity];
+        }
+
+        public double GetAbundanceByIndex(int dataPointIndex)
+        {
+            if (dataPointIndex >= 0 & dataPointIndex < mDataCount)
+            {
+                return mDataValues[dataPointIndex];
+            }
+            else
+            {
+                // Invalid data point index value
+                return -1;
+            }
+        }
+
+        public void FilterData()
+        {
+            if (mDataCount <= 0)
+            {
+            }
+            // Nothing to do
+            else
+            {
+                // Shrink the arrays to mDataCount
+                if (mDataCount < mDataValues.Length)
+                {
+                    var oldMDataValues = mDataValues;
+                    mDataValues = new double[mDataCount];
+                    if (oldMDataValues is object)
+                        Array.Copy(oldMDataValues, mDataValues, Math.Min(mDataCount, oldMDataValues.Length));
+                    var oldMDataIndices = mDataIndices;
+                    mDataIndices = new int[mDataCount];
+                    if (oldMDataIndices is object)
+                        Array.Copy(oldMDataIndices, mDataIndices, Math.Min(mDataCount, oldMDataIndices.Length));
+                }
+
+                FilterDataByMaxDataCountToKeep();
+            }
+        }
+
+        private void FilterDataByMaxDataCountToKeep()
+        {
+            const int HISTOGRAM_BIN_COUNT = 5000;
+            try
+            {
+                double[] binToSortAbundances;
+                int[] binToSortDataIndices;
+                binToSortAbundances = new double[10];
+                binToSortDataIndices = new int[10];
+                UpdateProgress(0);
+                bool useFullDataSort = false;
+                if (mDataCount == 0)
+                {
+                    // No data loaded
+                    UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
+                    return;
+                }
+                else if (mDataCount <= MaximumDataCountToLoad)
+                {
+                    // Loaded less than mMaximumDataCountToKeep data points
+                    // Nothing to filter
+                    UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
+                    return;
+                }
+
+                // In order to speed up the sorting, we're first going to make a histogram
+                // (aka frequency distribution) of the abundances in mDataValues
+
+                // First, determine the maximum abundance value in mDataValues
+                double maxAbundance = double.MinValue;
+                for (int index = 0, loopTo = mDataCount - 1; index <= loopTo; index++)
+                {
+                    if (mDataValues[index] > maxAbundance)
+                    {
+                        maxAbundance = mDataValues[index];
+                    }
+                }
+
+                // Round maxAbundance up to the next highest integer
+                maxAbundance = Conversions.ToLong(Math.Ceiling(maxAbundance));
+
+                // Now determine the histogram bin size
+                double binSize = maxAbundance / HISTOGRAM_BIN_COUNT;
+                if (binSize < 1)
+                    binSize = 1;
+
+                // Initialize histogramData
+                int binCount = Conversions.ToInteger(maxAbundance / binSize) + 1;
+                int[] histogramBinCounts;
+                double[] histogramBinStartIntensity;
+                histogramBinCounts = new int[binCount];
+                histogramBinStartIntensity = new double[binCount];
+                for (int index = 0, loopTo1 = binCount - 1; index <= loopTo1; index++)
+                    histogramBinStartIntensity[index] = index * binSize;
+
+                // Parse mDataValues to populate histogramBinCounts
+                for (int index = 0, loopTo2 = mDataCount - 1; index <= loopTo2; index++)
+                {
+                    int targetBin;
+                    if (mDataValues[index] <= 0)
+                    {
+                        targetBin = 0;
+                    }
+                    else
+                    {
+                        targetBin = Conversions.ToInteger(Math.Floor(mDataValues[index] / binSize));
+                    }
+
+                    if (targetBin < binCount - 1)
+                    {
+                        if (mDataValues[index] >= histogramBinStartIntensity[targetBin + 1])
+                        {
+                            targetBin += 1;
+                        }
+                    }
+
+                    histogramBinCounts[targetBin] += 1;
+                    if (mDataValues[index] < histogramBinStartIntensity[targetBin])
+                    {
+                        if (mDataValues[index] < histogramBinStartIntensity[targetBin] - binSize / 1000)
+                        {
+                            // This is unexpected
+                            mDataValues[index] = mDataValues[index];
+                        }
+                    }
+
+                    if (index % 10000 == 0)
+                    {
+                        UpdateProgress(Conversions.ToSingle((0 + (index + 1) / Conversions.ToDouble(mDataCount)) / SUBTASK_STEP_COUNT * 100.0D));
+                    }
+                }
+
+                // Now examine the frequencies in histogramBinCounts() to determine the minimum value to consider when sorting
+                int pointTotal = 0;
+                int binToSort = -1;
+                for (int index = binCount - 1; index >= 0; index += -1)
+                {
+                    pointTotal = pointTotal + histogramBinCounts[index];
+                    if (pointTotal >= MaximumDataCountToLoad)
+                    {
+                        binToSort = index;
+                        break;
+                    }
+                }
+
+                UpdateProgress((float)(1 / (double)SUBTASK_STEP_COUNT * 100.0D));
+                if (binToSort >= 0)
+                {
+                    // Find the data with intensity >= histogramBinStartIntensity(binToSort)
+                    // We actually only need to sort the data in bin binToSort
+
+                    double binToSortAbundanceMinimum = histogramBinStartIntensity[binToSort];
+                    double binToSortAbundanceMaximum = maxAbundance + 1;
+                    if (binToSort < binCount - 1)
+                    {
+                        binToSortAbundanceMaximum = histogramBinStartIntensity[binToSort + 1];
+                    }
+
+                    if (Math.Abs(binToSortAbundanceMaximum - binToSortAbundanceMinimum) < float.Epsilon)
+                    {
+                        // Is this code ever reached?
+                        // If yes, then the code below won't populate binToSortAbundances() and binToSortDataIndices() with any data
+                        useFullDataSort = true;
+                    }
+
+                    int binToSortDataCount = 0;
+                    if (!useFullDataSort)
+                    {
+                        if (histogramBinCounts[binToSort] > 0)
+                        {
+                            binToSortAbundances = new double[(histogramBinCounts[binToSort])];
+                            binToSortDataIndices = new int[(histogramBinCounts[binToSort])];
+                        }
+                        else
+                        {
+                            // Is this code ever reached?
+                            useFullDataSort = true;
+                        }
+                    }
+
+                    if (!useFullDataSort)
+                    {
+                        int dataCountImplicitlyIncluded = 0;
+                        for (int index = 0, loopTo3 = mDataCount - 1; index <= loopTo3; index++)
+                        {
+                            if (mDataValues[index] < binToSortAbundanceMinimum)
+                            {
+                                // Skip this data point when re-reading the input data file
+                                mDataValues[index] = SkipDataPointFlag;
+                            }
+                            else if (mDataValues[index] < binToSortAbundanceMaximum)
+                            {
+                                // Value is in the bin to sort; add to the BinToSort arrays
+
+                                if (binToSortDataCount >= binToSortAbundances.Length)
+                                {
+                                    // Need to reserve more space (this is unexpected)
+                                    var oldBinToSortAbundances = binToSortAbundances;
+                                    binToSortAbundances = new double[(binToSortAbundances.Length * 2)];
+                                    if (oldBinToSortAbundances is object)
+                                        Array.Copy(oldBinToSortAbundances, binToSortAbundances, Math.Min(binToSortAbundances.Length * 2, oldBinToSortAbundances.Length));
+                                    var oldBinToSortDataIndices = binToSortDataIndices;
+                                    binToSortDataIndices = new int[binToSortAbundances.Length];
+                                    if (oldBinToSortDataIndices is object)
+                                        Array.Copy(oldBinToSortDataIndices, binToSortDataIndices, Math.Min(binToSortAbundances.Length, oldBinToSortDataIndices.Length));
+                                }
+
+                                binToSortAbundances[binToSortDataCount] = mDataValues[index];
+                                binToSortDataIndices[binToSortDataCount] = mDataIndices[index];
+                                binToSortDataCount += 1;
+                            }
+                            else
+                            {
+                                dataCountImplicitlyIncluded = dataCountImplicitlyIncluded + 1;
+                            }
+
+                            if (index % 10000 == 0)
+                            {
+                                UpdateProgress(Conversions.ToSingle((1 + (index + 1) / Conversions.ToDouble(mDataCount)) / SUBTASK_STEP_COUNT * 100.0D));
+                            }
+                        }
+
+                        if (binToSortDataCount > 0)
+                        {
+                            if (binToSortDataCount < binToSortAbundances.Length)
+                            {
+                                var oldBinToSortAbundances1 = binToSortAbundances;
+                                binToSortAbundances = new double[binToSortDataCount];
+                                if (oldBinToSortAbundances1 is object)
+                                    Array.Copy(oldBinToSortAbundances1, binToSortAbundances, Math.Min(binToSortDataCount, oldBinToSortAbundances1.Length));
+                                var oldBinToSortDataIndices1 = binToSortDataIndices;
+                                binToSortDataIndices = new int[binToSortDataCount];
+                                if (oldBinToSortDataIndices1 is object)
+                                    Array.Copy(oldBinToSortDataIndices1, binToSortDataIndices, Math.Min(binToSortDataCount, oldBinToSortDataIndices1.Length));
+                            }
+                        }
+                        else
+                        {
+                            // This code shouldn't be reached
+                        }
+
+                        if (MaximumDataCountToLoad - dataCountImplicitlyIncluded - binToSortDataCount == 0)
+                        {
+                        }
+                        // No need to sort and examine the data for BinToSort since we'll ultimately include all of it
+                        else
+                        {
+                            SortAndMarkPointsToSkip(ref binToSortAbundances, ref binToSortDataIndices, binToSortDataCount, MaximumDataCountToLoad - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT);
+                        }
+
+                        // Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataValues
+                        // mDataValues and mDataIndices have not been sorted and therefore mDataIndices should currently be sorted ascending on "valid data point index"
+                        // binToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
+
+                        int originalDataArrayIndex = 0;
+                        for (int index = 0, loopTo4 = binToSortDataCount - 1; index <= loopTo4; index++)
+                        {
+                            while (binToSortDataIndices[index] > mDataIndices[originalDataArrayIndex])
+                                originalDataArrayIndex += 1;
+                            if (Math.Abs(binToSortAbundances[index] - SkipDataPointFlag) < float.Epsilon)
+                            {
+                                if (mDataIndices[originalDataArrayIndex] == binToSortDataIndices[index])
+                                {
+                                    mDataValues[originalDataArrayIndex] = SkipDataPointFlag;
+                                }
+                                else
+                                {
+                                    // This code shouldn't be reached
+                                }
+                            }
+
+                            originalDataArrayIndex += 1;
+                            if (binToSortDataCount < 1000 | binToSortDataCount % 100 == 0)
+                            {
+                                UpdateProgress(Conversions.ToSingle((3 + (index + 1) / Conversions.ToDouble(binToSortDataCount)) / SUBTASK_STEP_COUNT * 100.0D));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    useFullDataSort = true;
+                }
+
+                if (useFullDataSort)
+                {
+                    // This shouldn't normally be necessary
+
+                    // We have to sort all of the data; this can be quite slow
+                    SortAndMarkPointsToSkip(ref mDataValues, ref mDataIndices, mDataCount, MaximumDataCountToLoad, SUBTASK_STEP_COUNT);
+                }
+
+                UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
+                return;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in FilterDataByMaxDataCountToKeep: " + ex.Message, ex);
+            }
+        }
+
+        // This is sub uses a full sort to filter the data
+        // This will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible
+        private void SortAndMarkPointsToSkip(ref double[] abundances, ref int[] dataIndices, int dataCount, int maximumDataCountInArraysToLoad, int subtaskStepCount)
+        {
+            int index;
+            if (dataCount > 0)
+            {
+                // Sort abundances ascending, sorting dataIndices in parallel
+                Array.Sort(abundances, dataIndices, 0, dataCount);
+                UpdateProgress(Conversions.ToSingle(2.333 / subtaskStepCount * 100.0));
+
+                // Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
+                var loopTo = dataCount - maximumDataCountInArraysToLoad - 1;
+                for (index = 0; index <= loopTo; index++)
+                    abundances[index] = SkipDataPointFlag;
+                UpdateProgress(Conversions.ToSingle(2.666 / subtaskStepCount * 100.0D));
+
+                // Re-sort, this time on dataIndices with abundances in parallel
+                Array.Sort(dataIndices, abundances, 0, dataCount);
+            }
+
+            UpdateProgress(Conversions.ToSingle(3 / (double)subtaskStepCount * 100.0D));
+        }
+
+        private void UpdateProgress(float progressValue)
+        {
+            mProgress = progressValue;
+            ProgressChanged?.Invoke(mProgress);
+        }
+    }
+}

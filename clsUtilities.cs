@@ -1,157 +1,192 @@
-﻿
-Public Class clsUtilities
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.VisualBasic.CompilerServices;
 
-#Region "Constants and Enums"
-    ' Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
+namespace MASIC
+{
+    public class clsUtilities
+    {
 
-    Public Const CHARGE_CARRIER_MASS_MONOISOTOPIC As Double = 1.00727649
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */    // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 
-#End Region
+        public const double CHARGE_CARRIER_MASS_MONOISOTOPIC = 1.00727649;
 
-    Public Shared Function CheckPointInMZIgnoreRange(
-      mz As Double,
-      mzIgnoreRangeStart As Double,
-      mzIgnoreRangeEnd As Double) As Boolean
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        public static bool CheckPointInMZIgnoreRange(double mz, double mzIgnoreRangeStart, double mzIgnoreRangeEnd)
+        {
+            if (mzIgnoreRangeStart > 0 || mzIgnoreRangeEnd > 0)
+            {
+                if (mz <= mzIgnoreRangeEnd && mz >= mzIgnoreRangeStart)
+                {
+                    // The m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-        If mzIgnoreRangeStart > 0 OrElse mzIgnoreRangeEnd > 0 Then
-            If mz <= mzIgnoreRangeEnd AndAlso mz >= mzIgnoreRangeStart Then
-                ' The m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd
-                Return True
-            Else
-                Return False
-            End If
-        Else
-            Return False
-        End If
+        /// <summary>
+    /// Compute the median value in a list of doubles
+    /// </summary>
+    /// <param name="values"></param>
+    /// <returns>The median value, or 0 if the list is empty or null</returns>
+        public static double ComputeMedian(IReadOnlyCollection<double> values)
+        {
+            if (values is null || values.Count == 0)
+            {
+                return 0;
+            }
 
-    End Function
+            return MathNet.Numerics.Statistics.Statistics.Median(values);
+        }
 
-    ''' <summary>
-    ''' Compute the median value in a list of doubles
-    ''' </summary>
-    ''' <param name="values"></param>
-    ''' <returns>The median value, or 0 if the list is empty or null</returns>
-    Public Shared Function ComputeMedian(values As IReadOnlyCollection(Of Double)) As Double
-        If values Is Nothing OrElse values.Count = 0 Then
-            Return 0
-        End If
+        public static double ConvoluteMass(double massMZ, short currentCharge, short desiredCharge = 1, double chargeCarrierMass = 0)
+        {
 
-        Return MathNet.Numerics.Statistics.Statistics.Median(values)
-    End Function
+            // Converts massMZ to the MZ that would appear at the given desiredCharge
+            // To return the neutral mass, set desiredCharge to 0
 
-    Public Shared Function ConvoluteMass(
-      massMZ As Double,
-      currentCharge As Short,
-      Optional desiredCharge As Short = 1,
-      Optional chargeCarrierMass As Double = 0) As Double
+            // If chargeCarrierMass is 0, uses CHARGE_CARRIER_MASS_MONOISOTOPIC
 
-        ' Converts massMZ to the MZ that would appear at the given desiredCharge
-        ' To return the neutral mass, set desiredCharge to 0
+            double newMZ;
+            if (Math.Abs(chargeCarrierMass) < double.Epsilon)
+                chargeCarrierMass = CHARGE_CARRIER_MASS_MONOISOTOPIC;
+            if (currentCharge == desiredCharge)
+            {
+                newMZ = massMZ;
+            }
+            else
+            {
+                if (currentCharge == 1)
+                {
+                    newMZ = massMZ;
+                }
+                else if (currentCharge > 1)
+                {
+                    // Convert massMZ to M+H
+                    newMZ = massMZ * currentCharge - chargeCarrierMass * (currentCharge - 1);
+                }
+                else if (currentCharge == 0)
+                {
+                    // Convert massMZ (which is neutral) to M+H and store in newMZ
+                    newMZ = massMZ + chargeCarrierMass;
+                }
+                else
+                {
+                    // Negative charges are not supported; return 0
+                    return 0;
+                }
 
-        ' If chargeCarrierMass is 0, uses CHARGE_CARRIER_MASS_MONOISOTOPIC
+                if (desiredCharge > 1)
+                {
+                    newMZ = (newMZ + chargeCarrierMass * (desiredCharge - 1)) / desiredCharge;
+                }
+                else if (desiredCharge == 1)
+                {
+                }
+                // Return M+H, which is currently stored in newMZ
+                else if (desiredCharge == 0)
+                {
+                    // Return the neutral mass
+                    newMZ -= chargeCarrierMass;
+                }
+                else
+                {
+                    // Negative charges are not supported; return 0
+                    newMZ = 0;
+                }
+            }
 
-        Dim newMZ As Double
+            return newMZ;
+        }
 
-        If Math.Abs(chargeCarrierMass) < Double.Epsilon Then chargeCarrierMass = CHARGE_CARRIER_MASS_MONOISOTOPIC
+        public static float CSngSafe(double value)
+        {
+            if (value > float.MaxValue)
+                return float.MaxValue;
+            if (value < float.MinValue)
+                return float.MinValue;
+            return Conversions.ToSingle(value);
+        }
 
-        If currentCharge = desiredCharge Then
-            newMZ = massMZ
-        Else
-            If currentCharge = 1 Then
-                newMZ = massMZ
-            ElseIf currentCharge > 1 Then
-                ' Convert massMZ to M+H
-                newMZ = (massMZ * currentCharge) - chargeCarrierMass * (currentCharge - 1)
-            ElseIf currentCharge = 0 Then
-                ' Convert massMZ (which is neutral) to M+H and store in newMZ
-                newMZ = massMZ + chargeCarrierMass
-            Else
-                ' Negative charges are not supported; return 0
-                Return 0
-            End If
+        public static bool IsNumber(string value)
+        {
+            try
+            {
+                double argresult = 0;
+                return double.TryParse(value, out argresult);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
 
-            If desiredCharge > 1 Then
-                newMZ = (newMZ + chargeCarrierMass * (desiredCharge - 1)) / desiredCharge
-            ElseIf desiredCharge = 1 Then
-                ' Return M+H, which is currently stored in newMZ
-            ElseIf desiredCharge = 0 Then
-                ' Return the neutral mass
-                newMZ -= chargeCarrierMass
-            Else
-                ' Negative charges are not supported; return 0
-                newMZ = 0
-            End If
-        End If
+        public static bool ValuesMatch(float value1, float value2)
+        {
+            return ValuesMatch(value1, value2, -1);
+        }
 
-        Return newMZ
+        public static bool ValuesMatch(float value1, float value2, int digitsOfPrecision)
+        {
+            if (digitsOfPrecision < 0)
+            {
+                if (Math.Abs(value1 - value2) < float.Epsilon)
+                {
+                    return true;
+                }
+            }
+            else if (Math.Abs(Math.Round(value1, digitsOfPrecision) - Math.Round(value2, digitsOfPrecision)) < float.Epsilon)
+            {
+                return true;
+            }
 
-    End Function
+            return false;
+        }
 
-    Public Shared Function CSngSafe(value As Double) As Single
-        If value > Single.MaxValue Then Return Single.MaxValue
-        If value < Single.MinValue Then Return Single.MinValue
-        Return CSng(value)
-    End Function
+        public static bool ValuesMatch(double value1, double value2)
+        {
+            return ValuesMatch(value1, value2, -1);
+        }
 
-    Public Shared Function IsNumber(value As String) As Boolean
-        Try
-            Return Double.TryParse(value, 0)
-        Catch ex As Exception
-            Return False
-        End Try
-    End Function
+        public static bool ValuesMatch(double value1, double value2, int digitsOfPrecision)
+        {
+            if (digitsOfPrecision < 0)
+            {
+                if (Math.Abs(value1 - value2) < double.Epsilon)
+                {
+                    return true;
+                }
+            }
+            else if (Math.Abs(Math.Round(value1, digitsOfPrecision) - Math.Round(value2, digitsOfPrecision)) < double.Epsilon)
+            {
+                return true;
+            }
 
-    Public Shared Function ValuesMatch(value1 As Single, value2 As Single) As Boolean
-        Return ValuesMatch(value1, value2, -1)
-    End Function
+            return false;
+        }
 
-    Public Shared Function ValuesMatch(value1 As Single, value2 As Single, digitsOfPrecision As Integer) As Boolean
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public static double MassToPPM(double massToConvert, double currentMZ)
+        {
+            // Converts massToConvert to ppm, based on the value of currentMZ
 
-        If digitsOfPrecision < 0 Then
-            If Math.Abs(value1 - value2) < Single.Epsilon Then
-                Return True
-            End If
-        Else
-            If Math.Abs(Math.Round(value1, digitsOfPrecision) - Math.Round(value2, digitsOfPrecision)) < Single.Epsilon Then
-                Return True
-            End If
+            return massToConvert * 1000000.0 / currentMZ;
+        }
 
-        End If
+        public static double PPMToMass(double ppmToConvert, double currentMZ)
+        {
+            // Converts ppmToConvert to a mass value, which is dependent on currentMZ
 
-        Return False
-
-    End Function
-
-    Public Shared Function ValuesMatch(value1 As Double, value2 As Double) As Boolean
-        Return ValuesMatch(value1, value2, -1)
-    End Function
-
-    Public Shared Function ValuesMatch(value1 As Double, value2 As Double, digitsOfPrecision As Integer) As Boolean
-        If digitsOfPrecision < 0 Then
-            If Math.Abs(value1 - value2) < Double.Epsilon Then
-                Return True
-            End If
-        Else
-            If Math.Abs(Math.Round(value1, digitsOfPrecision) - Math.Round(value2, digitsOfPrecision)) < Double.Epsilon Then
-                Return True
-            End If
-
-        End If
-
-        Return False
-    End Function
-
-#Region "PPMToMassConversion"
-    Public Shared Function MassToPPM(massToConvert As Double, currentMZ As Double) As Double
-        ' Converts massToConvert to ppm, based on the value of currentMZ
-
-        Return massToConvert * 1000000.0 / currentMZ
-    End Function
-
-    Public Shared Function PPMToMass(ppmToConvert As Double, currentMZ As Double) As Double
-        ' Converts ppmToConvert to a mass value, which is dependent on currentMZ
-
-        Return ppmToConvert / 1000000.0 * currentMZ
-    End Function
-#End Region
-End Class
+            return ppmToConvert / 1000000.0 * currentMZ;
+        }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+    }
+}

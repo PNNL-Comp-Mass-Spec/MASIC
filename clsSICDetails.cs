@@ -1,76 +1,105 @@
-﻿Imports MASICPeakFinder
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using MASICPeakFinder;
+using Microsoft.VisualBasic.CompilerServices;
 
-Public Class clsSICDetails
+namespace MASIC
+{
+    public class clsSICDetails
+    {
 
-    ''' <summary>
-    ''' Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
-    ''' </summary>
-    Public SICScanType As clsScanList.eScanTypeConstants
+        /// <summary>
+    /// Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
+    /// </summary>
+        public clsScanList.eScanTypeConstants SICScanType;
+        public readonly List<clsSICDataPoint> SICData;
 
-    Public ReadOnly SICData As List(Of clsSICDataPoint)
+        public int SICDataCount
+        {
+            get
+            {
+                return SICData.Count;
+            }
+        }
 
-    Public ReadOnly Property SICDataCount As Integer
-        Get
-            Return SICData.Count
-        End Get
-    End Property
+        public double[] SICIntensities
+        {
+            get
+            {
+                return (from item in SICData
+                        select item.Intensity).ToArray();
+            }
+        }
 
-    Public ReadOnly Property SICIntensities As Double()
-        Get
-            Return (From item In SICData Select item.Intensity).ToArray()
-        End Get
-    End Property
+        public float[] SICIntensitiesAsFloat
+        {
+            get
+            {
+                return (from item in SICData
+                        select Conversions.ToSingle(item.Intensity)).ToArray();
+            }
+        }
 
-    Public ReadOnly Property SICIntensitiesAsFloat As Single()
-        Get
-            Return (From item In SICData Select CSng(item.Intensity)).ToArray()
-        End Get
-    End Property
+        public float[] SICMassesAsFloat
+        {
+            get
+            {
+                return (from item in SICData
+                        select Conversions.ToSingle(item.Mass)).ToArray();
+            }
+        }
 
+        public double[] SICMasses
+        {
+            get
+            {
+                return (from item in SICData
+                        select item.Mass).ToArray();
+            }
+        }
 
-    Public ReadOnly Property SICMassesAsFloat As Single()
-        Get
-            Return (From item In SICData Select CSng(item.Mass)).ToArray()
-        End Get
-    End Property
+        public int[] SICScanNumbers
+        {
+            get
+            {
+                return (from item in SICData
+                        select item.ScanNumber).ToArray();
+            }
+        }
 
-    Public ReadOnly Property SICMasses As Double()
-        Get
-            Return (From item In SICData Select item.Mass).ToArray()
-        End Get
-    End Property
+        public int[] SICScanIndices
+        {
+            get
+            {
+                return (from item in SICData
+                        select item.ScanIndex).ToArray();
+            }
+        }
 
-    Public ReadOnly Property SICScanNumbers As Integer()
-        Get
-            Return (From item In SICData Select item.ScanNumber).ToArray()
-        End Get
-    End Property
+        /// <summary>
+    /// Constructor
+    /// </summary>
+        public clsSICDetails()
+        {
+            SICData = new List<clsSICDataPoint>();
+        }
 
-    Public ReadOnly Property SICScanIndices As Integer()
-        Get
-            Return (From item In SICData Select item.ScanIndex).ToArray()
-        End Get
-    End Property
+        public void AddData(int scanNumber, double intensity, double mass, int scanIndex)
+        {
+            var dataPoint = new clsSICDataPoint(scanNumber, intensity, mass, scanIndex);
+            SICData.Add(dataPoint);
+        }
 
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    Public Sub New()
-        SICData = New List(Of clsSICDataPoint)
-    End Sub
+        public void Reset()
+        {
+            SICData.Clear();
+            SICScanType = clsScanList.eScanTypeConstants.SurveyScan;
+        }
 
-    Public Sub AddData(scanNumber As Integer, intensity As Double, mass As Double, scanIndex As Integer)
-        Dim dataPoint = New clsSICDataPoint(scanNumber, intensity, mass, scanIndex)
-        SICData.Add(dataPoint)
-    End Sub
-
-    Public Sub Reset()
-        SICData.Clear()
-        SICScanType = clsScanList.eScanTypeConstants.SurveyScan
-    End Sub
-
-    Public Overrides Function ToString() As String
-        Return "SICDataCount: " & SICData.Count
-    End Function
-
-End Class
+        public override string ToString()
+        {
+            return "SICDataCount: " + SICData.Count;
+        }
+    }
+}

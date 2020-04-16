@@ -1,29 +1,34 @@
-﻿Imports ThermoRawFileReader
+﻿using System.Collections.Generic;
+using ThermoRawFileReader;
 
-Public Class clsMRMScanInfo
-    Public Property ParentIonMZ As Double
-    ''' <summary>
-    ''' List of mass ranges monitored by the first quadrupole
-    ''' </summary>
-    Public Property MRMMassCount As Integer
+namespace MASIC
+{
+    public class clsMRMScanInfo
+    {
+        public double ParentIonMZ { get; set; }
+        /// <summary>
+    /// List of mass ranges monitored by the first quadrupole
+    /// </summary>
+        public int MRMMassCount { get; set; }
 
-    ''' <summary>
-    ''' Daughter m/z values monitored for this parent m/z
-    ''' </summary>
-    Public Property MRMMassList As List(Of udtMRMMassRangeType)
+        /// <summary>
+    /// Daughter m/z values monitored for this parent m/z
+    /// </summary>
+        public List<udtMRMMassRangeType> MRMMassList { get; set; }
 
-    ''' <summary>
-    ''' Number of spectra that used these MRM search values
-    ''' </summary>
-    Public Property ScanCount As Integer
+        /// <summary>
+    /// Number of spectra that used these MRM search values
+    /// </summary>
+        public int ScanCount { get; set; }
+        public int ParentIonInfoIndex { get; set; }
 
-    Public Property ParentIonInfoIndex As Integer
-
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    Public Sub New()
-        MRMMassList = New List(Of udtMRMMassRangeType)
-        ScanCount = 0
-    End Sub
-End Class
+        /// <summary>
+    /// Constructor
+    /// </summary>
+        public clsMRMScanInfo()
+        {
+            MRMMassList = new List<udtMRMMassRangeType>();
+            ScanCount = 0;
+        }
+    }
+}

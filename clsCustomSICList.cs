@@ -1,466 +1,495 @@
-﻿Imports PRISM
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using PRISM;
 
-Public Class clsCustomSICList
-    Inherits EventNotifier
+namespace MASIC
+{
+    public class clsCustomSICList : EventNotifier
+    {
 
-#Region "Constants and Enums"
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public const string CUSTOM_SIC_TYPE_ABSOLUTE = "Absolute";
+        public const string CUSTOM_SIC_TYPE_RELATIVE = "Relative";
+        public const string CUSTOM_SIC_TYPE_ACQUISITION_TIME = "AcquisitionTime";
 
-    Public Const CUSTOM_SIC_TYPE_ABSOLUTE As String = "Absolute"
-    Public Const CUSTOM_SIC_TYPE_RELATIVE As String = "Relative"
-    Public Const CUSTOM_SIC_TYPE_ACQUISITION_TIME As String = "AcquisitionTime"
+        public enum eCustomSICScanTypeConstants
+        {
+            Absolute = 0,            // Absolute scan number
+            Relative = 1,            // Relative scan number (ranging from 0 to 1, where 0 is the first scan and 1 is the last scan)
+            AcquisitionTime = 2,     // The scan's acquisition time (aka elution time if using liquid chromatography)
+            Undefined = 3
+        }
 
-
-    Public Enum eCustomSICScanTypeConstants
-        Absolute = 0            ' Absolute scan number
-        Relative = 1            ' Relative scan number (ranging from 0 to 1, where 0 is the first scan and 1 is the last scan)
-        AcquisitionTime = 2     ' The scan's acquisition time (aka elution time if using liquid chromatography)
-        Undefined = 3
-    End Enum
-
-#End Region
-
-#Region "Properties"
-
-    Public Property CustomSICListFileName As String
-        Get
-            If mCustomSICListFileName Is Nothing Then Return String.Empty
-            Return mCustomSICListFileName
-        End Get
-        Set
-            If Value Is Nothing Then
-                mCustomSICListFileName = String.Empty
-            Else
-                mCustomSICListFileName = Value.Trim()
-            End If
-        End Set
-    End Property
-
-    Public Property ScanToleranceType As eCustomSICScanTypeConstants
-
-    ''' <summary>
-    ''' This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute
-    ''' It is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime
-    ''' Set to 0 to search the entire file for the given mass
-    ''' </summary>
-    Public Property ScanOrAcqTimeTolerance As Single
-
-    Public ReadOnly Property CustomMZSearchValues As List(Of clsCustomMZSearchSpec)
-
-    ''' <summary>
-    ''' When True, then will only search for the m/z values listed in the custom m/z list
-    ''' </summary>
-    Public Property LimitSearchToCustomMZList As Boolean
-
-    Public Property RawTextMZList As String
-    Public Property RawTextMZToleranceDaList As String
-    Public Property RawTextScanOrAcqTimeCenterList As String
-    Public Property RawTextScanOrAcqTimeToleranceList As String
-
-#End Region
-
-#Region "Classwide variables"
-    Private mCustomSICListFileName As String
-#End Region
-
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    Public Sub New()
-        CustomMZSearchValues = New List(Of clsCustomMZSearchSpec)
-    End Sub
-
-    Public Sub AddCustomSICValues(
-      scanList As clsScanList,
-      defaultSICTolerance As Double,
-      sicToleranceIsPPM As Boolean,
-      defaultScanOrAcqTimeTolerance As Single)
-
-        Dim scanOrAcqTimeSumCount = 0
-        Dim scanOrAcqTimeSumForAveraging As Single = 0
-
-        Try
-            If CustomMZSearchValues.Count = 0 Then
-                Exit Sub
-            End If
-
-            Dim scanNumScanConverter = New clsScanNumScanTimeConversion()
-            RegisterEvents(scanNumScanConverter)
-
-            For Each customMzSearchValue In CustomMZSearchValues
-
-                ' Add a new parent ion entry to .ParentIons() for this custom MZ value
-                Dim currentParentIon = New clsParentIonInfo(customMzSearchValue.MZ)
-
-                If customMzSearchValue.ScanOrAcqTimeCenter < Single.Epsilon Then
-                    ' Set the SurveyScanIndex to the center of the analysis
-                    currentParentIon.SurveyScanIndex = scanNumScanConverter.FindNearestSurveyScanIndex(
-                        scanList, 0.5, eCustomSICScanTypeConstants.Relative)
-                Else
-                    currentParentIon.SurveyScanIndex = scanNumScanConverter.FindNearestSurveyScanIndex(
-                        scanList, customMzSearchValue.ScanOrAcqTimeCenter, ScanToleranceType)
-                End If
-
-                ' Find the next MS2 scan that occurs after the survey scan (parent scan)
-                Dim surveyScanNumberAbsolute = 0
-                If currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count Then
-                    surveyScanNumberAbsolute = scanList.SurveyScans(currentParentIon.SurveyScanIndex).ScanNumber + 1
-                End If
-
-                If scanList.MasterScanOrderCount = 0 Then
-                    currentParentIon.FragScanIndices.Add(0)
-                Else
-                    Dim fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
-
-                    While fragScanIndexMatch < scanList.MasterScanOrderCount AndAlso scanList.MasterScanOrder(fragScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.SurveyScan
-                        fragScanIndexMatch += 1
-                    End While
-
-                    If fragScanIndexMatch = scanList.MasterScanOrderCount Then
-                        ' Did not find the next frag scan; find the previous frag scan
-                        fragScanIndexMatch -= 1
-                        While fragScanIndexMatch > 0 AndAlso scanList.MasterScanOrder(fragScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.SurveyScan
-                            fragScanIndexMatch -= 1
-                        End While
-                        If fragScanIndexMatch < 0 Then fragScanIndexMatch = 0
-                    End If
-
-                    ' This is a custom SIC-based parent ion
-                    ' Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
-                    ' This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
-                    If scanList.MasterScanOrder(fragScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.FragScan Then
-                        currentParentIon.FragScanIndices.Add(scanList.MasterScanOrder(fragScanIndexMatch).ScanIndexPointer)
-                    Else
-                        currentParentIon.FragScanIndices.Add(0)
-                    End If
-                End If
-
-                currentParentIon.CustomSICPeak = True
-                currentParentIon.CustomSICPeakComment = customMzSearchValue.Comment
-                currentParentIon.CustomSICPeakMZToleranceDa = customMzSearchValue.MZToleranceDa
-                currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = customMzSearchValue.ScanOrAcqTimeTolerance
-
-                If currentParentIon.CustomSICPeakMZToleranceDa < Double.Epsilon Then
-                    If sicToleranceIsPPM Then
-                        currentParentIon.CustomSICPeakMZToleranceDa = clsUtilities.PPMToMass(defaultSICTolerance, currentParentIon.MZ)
-                    Else
-                        currentParentIon.CustomSICPeakMZToleranceDa = defaultSICTolerance
-                    End If
-                End If
-
-                If currentParentIon.CustomSICPeakScanOrAcqTimeTolerance < Single.Epsilon Then
-                    currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance
-                Else
-                    scanOrAcqTimeSumForAveraging += currentParentIon.CustomSICPeakScanOrAcqTimeTolerance
-                    scanOrAcqTimeSumCount += 1
-                End If
-
-
-                If currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count Then
-                    currentParentIon.OptimalPeakApexScanNumber =
-                        scanList.SurveyScans(currentParentIon.SurveyScanIndex).ScanNumber
-                Else
-                    currentParentIon.OptimalPeakApexScanNumber = 1
-                End If
-
-                currentParentIon.PeakApexOverrideParentIonIndex = -1
-
-                scanList.ParentIons.Add(currentParentIon)
-
-            Next
-
-            If scanOrAcqTimeSumCount = CustomMZSearchValues.Count AndAlso scanOrAcqTimeSumForAveraging > 0 Then
-                ' All of the entries had a custom scan or acq time tolerance defined
-                ' Update mScanOrAcqTimeTolerance to the average of the values
-                ScanOrAcqTimeTolerance = CSng(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4))
-            End If
-
-        Catch ex As Exception
-            OnErrorEvent("Error in AddCustomSICValues", ex)
-        End Try
-
-    End Sub
-
-    Public Sub AddMzSearchTarget(mzSearchSpec As clsCustomMZSearchSpec)
-
-        If CustomMZSearchValues.Count > 0 Then
-            RawTextMZList &= ","c
-            RawTextMZToleranceDaList &= ","c
-            RawTextScanOrAcqTimeCenterList &= ","c
-            RawTextScanOrAcqTimeToleranceList &= ","c
-        End If
-
-        RawTextMZList &= mzSearchSpec.MZ.ToString()
-        RawTextMZToleranceDaList &= mzSearchSpec.MZToleranceDa.ToString()
-        RawTextScanOrAcqTimeCenterList &= mzSearchSpec.ScanOrAcqTimeCenter.ToString()
-        RawTextScanOrAcqTimeToleranceList &= mzSearchSpec.ScanOrAcqTimeTolerance.ToString()
-
-        CustomMZSearchValues.Add(mzSearchSpec)
-
-    End Sub
-
-    Public Function ParseCustomSICList(
-      mzList As String,
-      mzToleranceDaList As String,
-      scanCenterList As String,
-      scanToleranceList As String,
-      scanCommentList As String) As Boolean
-
-        Dim delimiters = New Char() {","c, ControlChars.Tab}
-
-        ' Trim any trailing tab characters
-        mzList = mzList.TrimEnd(ControlChars.Tab)
-        mzToleranceDaList = mzToleranceDaList.TrimEnd(ControlChars.Tab)
-        scanCenterList = scanCenterList.TrimEnd(ControlChars.Tab)
-        scanCommentList = scanCommentList.TrimEnd(delimiters)
-
-        Dim lstMZs = mzList.Split(delimiters).ToList()
-        Dim lstMZToleranceDa = mzToleranceDaList.Split(delimiters).ToList()
-        Dim lstScanCenters = scanCenterList.Split(delimiters).ToList()
-        Dim lstScanTolerances = scanToleranceList.Split(delimiters).ToList()
-        Dim lstScanComments As List(Of String)
-
-        If scanCommentList.Length > 0 Then
-            lstScanComments = scanCommentList.Split(delimiters).ToList()
-        Else
-            lstScanComments = New List(Of String)
-        End If
-
-        ResetMzSearchValues()
-
-        If lstMZs.Count <= 0 Then
-            ' Nothing to parse; return true
-            Return True
-        End If
-
-        For index = 0 To lstMZs.Count - 1
-
-            Dim targetMz As Double
-
-            If Not Double.TryParse(lstMZs(index), targetMz) Then
-                Continue For
-            End If
-
-            Dim mzSearchSpec = New clsCustomMZSearchSpec(targetMz) With {
-                .MZToleranceDa = 0,
-                .ScanOrAcqTimeCenter = 0,                 ' Set to 0 to indicate that the entire file should be searched
-                .ScanOrAcqTimeTolerance = 0
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public string CustomSICListFileName
+        {
+            get
+            {
+                if (mCustomSICListFileName is null)
+                    return string.Empty;
+                return mCustomSICListFileName;
             }
 
-            If lstScanCenters.Count > index Then
-                If clsUtilities.IsNumber(lstScanCenters(index)) Then
-                    If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-                        mzSearchSpec.ScanOrAcqTimeCenter = CInt(lstScanCenters(index))
-                    Else
-                        ' Includes .Relative and .AcquisitionTime
-                        mzSearchSpec.ScanOrAcqTimeCenter = CSng(lstScanCenters(index))
-                    End If
-                End If
-            End If
+            set
+            {
+                if (value is null)
+                {
+                    mCustomSICListFileName = string.Empty;
+                }
+                else
+                {
+                    mCustomSICListFileName = value.Trim();
+                }
+            }
+        }
 
-            If lstScanTolerances.Count > index Then
-                If clsUtilities.IsNumber(lstScanTolerances(index)) Then
-                    If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-                        mzSearchSpec.ScanOrAcqTimeTolerance = CInt(lstScanTolerances(index))
-                    Else
-                        ' Includes .Relative and .AcquisitionTime
-                        mzSearchSpec.ScanOrAcqTimeTolerance = CSng(lstScanTolerances(index))
-                    End If
-                End If
-            End If
+        public eCustomSICScanTypeConstants ScanToleranceType { get; set; }
 
-            If lstMZToleranceDa.Count > index Then
-                If clsUtilities.IsNumber(lstMZToleranceDa(index)) Then
-                    mzSearchSpec.MZToleranceDa = CDbl(lstMZToleranceDa(index))
-                End If
-            End If
+        /// <summary>
+    /// This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute
+    /// It is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime
+    /// Set to 0 to search the entire file for the given mass
+    /// </summary>
+        public float ScanOrAcqTimeTolerance { get; set; }
+        public List<clsCustomMZSearchSpec> CustomMZSearchValues { get; private set; }
 
-            If lstScanComments.Count > index Then
-                mzSearchSpec.Comment = lstScanComments(index)
-            Else
-                mzSearchSpec.Comment = String.Empty
-            End If
+        /// <summary>
+    /// When True, then will only search for the m/z values listed in the custom m/z list
+    /// </summary>
+        public bool LimitSearchToCustomMZList { get; set; }
+        public string RawTextMZList { get; set; }
+        public string RawTextMZToleranceDaList { get; set; }
+        public string RawTextScanOrAcqTimeCenterList { get; set; }
+        public string RawTextScanOrAcqTimeToleranceList { get; set; }
 
-            AddMzSearchTarget(mzSearchSpec)
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private string mCustomSICListFileName;
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /// <summary>
+    /// Constructor
+    /// </summary>
+        public clsCustomSICList()
+        {
+            CustomMZSearchValues = new List<clsCustomMZSearchSpec>();
+        }
 
-        Next
+        public void AddCustomSICValues(clsScanList scanList, double defaultSICTolerance, bool sicToleranceIsPPM, float defaultScanOrAcqTimeTolerance)
+        {
+            int scanOrAcqTimeSumCount = 0;
+            float scanOrAcqTimeSumForAveraging = 0;
+            try
+            {
+                if (CustomMZSearchValues.Count == 0)
+                {
+                    return;
+                }
 
-        Return True
+                var scanNumScanConverter = new clsScanNumScanTimeConversion();
+                RegisterEvents(scanNumScanConverter);
+                foreach (var customMzSearchValue in CustomMZSearchValues)
+                {
 
-    End Function
+                    // Add a new parent ion entry to .ParentIons() for this custom MZ value
+                    var currentParentIon = new clsParentIonInfo(customMzSearchValue.MZ);
+                    if (customMzSearchValue.ScanOrAcqTimeCenter < float.Epsilon)
+                    {
+                        // Set the SurveyScanIndex to the center of the analysis
+                        currentParentIon.SurveyScanIndex = scanNumScanConverter.FindNearestSurveyScanIndex(scanList, 0.5F, eCustomSICScanTypeConstants.Relative);
+                    }
+                    else
+                    {
+                        currentParentIon.SurveyScanIndex = scanNumScanConverter.FindNearestSurveyScanIndex(scanList, customMzSearchValue.ScanOrAcqTimeCenter, ScanToleranceType);
+                    }
 
-    Public Sub Reset()
+                    // Find the next MS2 scan that occurs after the survey scan (parent scan)
+                    int surveyScanNumberAbsolute = 0;
+                    if (currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count)
+                    {
+                        surveyScanNumberAbsolute = scanList.SurveyScans[currentParentIon.SurveyScanIndex].ScanNumber + 1;
+                    }
 
-        ScanToleranceType = eCustomSICScanTypeConstants.Absolute
-        ScanOrAcqTimeTolerance = 1000
+                    if (scanList.MasterScanOrderCount == 0)
+                    {
+                        currentParentIon.FragScanIndices.Add(0);
+                    }
+                    else
+                    {
+                        int fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                        while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
+                            fragScanIndexMatch += 1;
+                        if (fragScanIndexMatch == scanList.MasterScanOrderCount)
+                        {
+                            // Did not find the next frag scan; find the previous frag scan
+                            fragScanIndexMatch -= 1;
+                            while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
+                                fragScanIndexMatch -= 1;
+                            if (fragScanIndexMatch < 0)
+                                fragScanIndexMatch = 0;
+                        }
 
-        ResetMzSearchValues()
+                        // This is a custom SIC-based parent ion
+                        // Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
+                        // This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
+                        if (scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.FragScan)
+                        {
+                            currentParentIon.FragScanIndices.Add(scanList.MasterScanOrder[fragScanIndexMatch].ScanIndexPointer);
+                        }
+                        else
+                        {
+                            currentParentIon.FragScanIndices.Add(0);
+                        }
+                    }
 
-    End Sub
+                    currentParentIon.CustomSICPeak = true;
+                    currentParentIon.CustomSICPeakComment = customMzSearchValue.Comment;
+                    currentParentIon.CustomSICPeakMZToleranceDa = customMzSearchValue.MZToleranceDa;
+                    currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = customMzSearchValue.ScanOrAcqTimeTolerance;
+                    if (currentParentIon.CustomSICPeakMZToleranceDa < double.Epsilon)
+                    {
+                        if (sicToleranceIsPPM)
+                        {
+                            currentParentIon.CustomSICPeakMZToleranceDa = clsUtilities.PPMToMass(defaultSICTolerance, currentParentIon.MZ);
+                        }
+                        else
+                        {
+                            currentParentIon.CustomSICPeakMZToleranceDa = defaultSICTolerance;
+                        }
+                    }
 
-    Public Sub ResetMzSearchValues()
+                    if (currentParentIon.CustomSICPeakScanOrAcqTimeTolerance < float.Epsilon)
+                    {
+                        currentParentIon.CustomSICPeakScanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance;
+                    }
+                    else
+                    {
+                        scanOrAcqTimeSumForAveraging += currentParentIon.CustomSICPeakScanOrAcqTimeTolerance;
+                        scanOrAcqTimeSumCount += 1;
+                    }
 
-        CustomMZSearchValues.Clear()
+                    if (currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count)
+                    {
+                        currentParentIon.OptimalPeakApexScanNumber = scanList.SurveyScans[currentParentIon.SurveyScanIndex].ScanNumber;
+                    }
+                    else
+                    {
+                        currentParentIon.OptimalPeakApexScanNumber = 1;
+                    }
 
-        RawTextMZList = String.Empty
-        RawTextMZToleranceDaList = String.Empty
-        RawTextScanOrAcqTimeCenterList = String.Empty
-        RawTextScanOrAcqTimeToleranceList = String.Empty
+                    currentParentIon.PeakApexOverrideParentIonIndex = -1;
+                    scanList.ParentIons.Add(currentParentIon);
+                }
 
-    End Sub
+                if (scanOrAcqTimeSumCount == CustomMZSearchValues.Count && scanOrAcqTimeSumForAveraging > 0)
+                {
+                    // All of the entries had a custom scan or acq time tolerance defined
+                    // Update mScanOrAcqTimeTolerance to the average of the values
+                    ScanOrAcqTimeTolerance = Conversions.ToSingle(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4));
+                }
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Error in AddCustomSICValues", ex);
+            }
+        }
 
-    <Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")>
-    Public Function SetCustomSICListValues(
-      eScanType As eCustomSICScanTypeConstants,
-      mzToleranceDa As Double,
-      scanOrAcqTimeToleranceValue As Single,
-      mzList() As Double,
-      mzToleranceList() As Double,
-      scanOrAcqTimeCenterList() As Single,
-      scanOrAcqTimeToleranceList() As Single,
-      scanComments() As String) As Boolean
+        public void AddMzSearchTarget(clsCustomMZSearchSpec mzSearchSpec)
+        {
+            if (CustomMZSearchValues.Count > 0)
+            {
+                RawTextMZList += Conversions.ToString(',');
+                RawTextMZToleranceDaList += Conversions.ToString(',');
+                RawTextScanOrAcqTimeCenterList += Conversions.ToString(',');
+                RawTextScanOrAcqTimeToleranceList += Conversions.ToString(',');
+            }
 
-        ' Returns True if success
+            RawTextMZList += mzSearchSpec.MZ.ToString();
+            RawTextMZToleranceDaList += mzSearchSpec.MZToleranceDa.ToString();
+            RawTextScanOrAcqTimeCenterList += mzSearchSpec.ScanOrAcqTimeCenter.ToString();
+            RawTextScanOrAcqTimeToleranceList += mzSearchSpec.ScanOrAcqTimeTolerance.ToString();
+            CustomMZSearchValues.Add(mzSearchSpec);
+        }
 
-        Dim index As Integer
+        public bool ParseCustomSICList(string mzList, string mzToleranceDaList, string scanCenterList, string scanToleranceList, string scanCommentList)
+        {
+            var delimiters = new char[] { ',', ControlChars.Tab };
 
-        If mzToleranceList.Length > 0 AndAlso mzToleranceList.Length <> mzList.Length Then
-            ' Invalid Custom SIC comment list; number of entries doesn't match
-            Return False
-        ElseIf scanOrAcqTimeCenterList.Length > 0 AndAlso scanOrAcqTimeCenterList.Length <> mzList.Length Then
-            ' Invalid Custom SIC scan center list; number of entries doesn't match
-            Return False
-        ElseIf scanOrAcqTimeToleranceList.Length > 0 AndAlso scanOrAcqTimeToleranceList.Length <> mzList.Length Then
-            ' Invalid Custom SIC scan center list; number of entries doesn't match
-            Return False
-        ElseIf scanComments.Length > 0 AndAlso scanComments.Length <> mzList.Length Then
-            ' Invalid Custom SIC comment list; number of entries doesn't match
-            Return False
-        End If
+            // Trim any trailing tab characters
+            mzList = mzList.TrimEnd(ControlChars.Tab);
+            mzToleranceDaList = mzToleranceDaList.TrimEnd(ControlChars.Tab);
+            scanCenterList = scanCenterList.TrimEnd(ControlChars.Tab);
+            scanCommentList = scanCommentList.TrimEnd(delimiters);
+            var lstMZs = mzList.Split(delimiters).ToList();
+            var lstMZToleranceDa = mzToleranceDaList.Split(delimiters).ToList();
+            var lstScanCenters = scanCenterList.Split(delimiters).ToList();
+            var lstScanTolerances = scanToleranceList.Split(delimiters).ToList();
+            List<string> lstScanComments;
+            if (scanCommentList.Length > 0)
+            {
+                lstScanComments = scanCommentList.Split(delimiters).ToList();
+            }
+            else
+            {
+                lstScanComments = new List<string>();
+            }
 
-        ResetMzSearchValues()
+            ResetMzSearchValues();
+            if (lstMZs.Count <= 0)
+            {
+                // Nothing to parse; return true
+                return true;
+            }
 
-        ScanToleranceType = eScanType
+            for (int index = 0, loopTo = lstMZs.Count - 1; index <= loopTo; index++)
+            {
+                double targetMz;
+                if (!double.TryParse(lstMZs[index], out targetMz))
+                {
+                    continue;
+                }
 
-        ' This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
-        ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue
+                var mzSearchSpec = new clsCustomMZSearchSpec(targetMz)
+                {
+                    MZToleranceDa = 0,
+                    ScanOrAcqTimeCenter = 0,                 // Set to 0 to indicate that the entire file should be searched
+                    ScanOrAcqTimeTolerance = 0
+                };
+                if (lstScanCenters.Count > index)
+                {
+                    if (clsUtilities.IsNumber(lstScanCenters[index]))
+                    {
+                        if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
+                        {
+                            mzSearchSpec.ScanOrAcqTimeCenter = Conversions.ToInteger(lstScanCenters[index]);
+                        }
+                        else
+                        {
+                            // Includes .Relative and .AcquisitionTime
+                            mzSearchSpec.ScanOrAcqTimeCenter = Conversions.ToSingle(lstScanCenters[index]);
+                        }
+                    }
+                }
 
-        If mzList.Length = 0 Then
-            Return True
-        End If
+                if (lstScanTolerances.Count > index)
+                {
+                    if (clsUtilities.IsNumber(lstScanTolerances[index]))
+                    {
+                        if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
+                        {
+                            mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToInteger(lstScanTolerances[index]);
+                        }
+                        else
+                        {
+                            // Includes .Relative and .AcquisitionTime
+                            mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToSingle(lstScanTolerances[index]);
+                        }
+                    }
+                }
 
-        For index = 0 To mzList.Length - 1
+                if (lstMZToleranceDa.Count > index)
+                {
+                    if (clsUtilities.IsNumber(lstMZToleranceDa[index]))
+                    {
+                        mzSearchSpec.MZToleranceDa = Conversions.ToDouble(lstMZToleranceDa[index]);
+                    }
+                }
 
-            Dim mzSearchSpec = New clsCustomMZSearchSpec(mzList(index))
-            With mzSearchSpec
+                if (lstScanComments.Count > index)
+                {
+                    mzSearchSpec.Comment = lstScanComments[index];
+                }
+                else
+                {
+                    mzSearchSpec.Comment = string.Empty;
+                }
 
-                If mzToleranceList.Length > index AndAlso mzToleranceList(index) > 0 Then
-                    .MZToleranceDa = mzToleranceList(index)
-                Else
-                    .MZToleranceDa = mzToleranceDa
-                End If
+                AddMzSearchTarget(mzSearchSpec);
+            }
 
-                If scanOrAcqTimeCenterList.Length > index Then
-                    .ScanOrAcqTimeCenter = scanOrAcqTimeCenterList(index)
-                Else
-                    .ScanOrAcqTimeCenter = 0         ' Set to 0 to indicate that the entire file should be searched
-                End If
+            return true;
+        }
 
-                If scanOrAcqTimeToleranceList.Length > index AndAlso scanOrAcqTimeToleranceList(index) > 0 Then
-                    .ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceList(index)
-                Else
-                    .ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue
-                End If
+        public void Reset()
+        {
+            ScanToleranceType = eCustomSICScanTypeConstants.Absolute;
+            ScanOrAcqTimeTolerance = 1000;
+            ResetMzSearchValues();
+        }
 
-                If scanComments.Length > 0 AndAlso scanComments.Length > index Then
-                    .Comment = scanComments(index)
-                Else
-                    .Comment = String.Empty
-                End If
-            End With
+        public void ResetMzSearchValues()
+        {
+            CustomMZSearchValues.Clear();
+            RawTextMZList = string.Empty;
+            RawTextMZToleranceDaList = string.Empty;
+            RawTextScanOrAcqTimeCenterList = string.Empty;
+            RawTextScanOrAcqTimeToleranceList = string.Empty;
+        }
 
-            AddMzSearchTarget(mzSearchSpec)
+        [Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")]
+        public bool SetCustomSICListValues(eCustomSICScanTypeConstants eScanType, double mzToleranceDa, float scanOrAcqTimeToleranceValue, double[] mzList, double[] mzToleranceList, float[] scanOrAcqTimeCenterList, float[] scanOrAcqTimeToleranceList, string[] scanComments)
+        {
 
-        Next
+            // Returns True if success
 
-        ValidateCustomSICList()
+            int index;
+            if (mzToleranceList.Length > 0 && mzToleranceList.Length != mzList.Length)
+            {
+                // Invalid Custom SIC comment list; number of entries doesn't match
+                return false;
+            }
+            else if (scanOrAcqTimeCenterList.Length > 0 && scanOrAcqTimeCenterList.Length != mzList.Length)
+            {
+                // Invalid Custom SIC scan center list; number of entries doesn't match
+                return false;
+            }
+            else if (scanOrAcqTimeToleranceList.Length > 0 && scanOrAcqTimeToleranceList.Length != mzList.Length)
+            {
+                // Invalid Custom SIC scan center list; number of entries doesn't match
+                return false;
+            }
+            else if (scanComments.Length > 0 && scanComments.Length != mzList.Length)
+            {
+                // Invalid Custom SIC comment list; number of entries doesn't match
+                return false;
+            }
 
-        Return True
+            ResetMzSearchValues();
+            ScanToleranceType = eScanType;
 
-    End Function
+            // This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
+            ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue;
+            if (mzList.Length == 0)
+            {
+                return true;
+            }
 
-    Public Function SetCustomSICListValues(
-      eScanType As eCustomSICScanTypeConstants,
-      scanOrAcqTimeToleranceValue As Single,
-      mzSearchSpecs As List(Of clsCustomMZSearchSpec)) As Boolean
+            var loopTo = mzList.Length - 1;
+            for (index = 0; index <= loopTo; index++)
+            {
+                var mzSearchSpec = new clsCustomMZSearchSpec(mzList[index]);
+                if (mzToleranceList.Length > index && mzToleranceList[index] > 0)
+                {
+                    mzSearchSpec.MZToleranceDa = mzToleranceList[index];
+                }
+                else
+                {
+                    mzSearchSpec.MZToleranceDa = mzToleranceDa;
+                }
 
-        ' Returns True if success
+                if (scanOrAcqTimeCenterList.Length > index)
+                {
+                    mzSearchSpec.ScanOrAcqTimeCenter = scanOrAcqTimeCenterList[index];
+                }
+                else
+                {
+                    mzSearchSpec.ScanOrAcqTimeCenter = 0;
+                }         // Set to 0 to indicate that the entire file should be searched
 
-        ResetMzSearchValues()
+                if (scanOrAcqTimeToleranceList.Length > index && scanOrAcqTimeToleranceList[index] > 0)
+                {
+                    mzSearchSpec.ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceList[index];
+                }
+                else
+                {
+                    mzSearchSpec.ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue;
+                }
 
-        ScanToleranceType = eScanType
+                if (scanComments.Length > 0 && scanComments.Length > index)
+                {
+                    mzSearchSpec.Comment = scanComments[index];
+                }
+                else
+                {
+                    mzSearchSpec.Comment = string.Empty;
+                }
 
-        ' This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
-        ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue
+                AddMzSearchTarget(mzSearchSpec);
+            }
 
-        If mzSearchSpecs.Count = 0 Then
-            Return True
-        End If
+            ValidateCustomSICList();
+            return true;
+        }
 
-        For Each mzSearchSpec In mzSearchSpecs
-            AddMzSearchTarget(mzSearchSpec)
-        Next
+        public bool SetCustomSICListValues(eCustomSICScanTypeConstants eScanType, float scanOrAcqTimeToleranceValue, List<clsCustomMZSearchSpec> mzSearchSpecs)
+        {
 
-        ValidateCustomSICList()
+            // Returns True if success
 
-        Return True
+            ResetMzSearchValues();
+            ScanToleranceType = eScanType;
 
-    End Function
+            // This value is used if scanOrAcqTimeToleranceList is blank or for any entries in scanOrAcqTimeToleranceList() that are zero
+            ScanOrAcqTimeTolerance = scanOrAcqTimeToleranceValue;
+            if (mzSearchSpecs.Count == 0)
+            {
+                return true;
+            }
 
-    Public Sub ValidateCustomSICList()
+            foreach (var mzSearchSpec in mzSearchSpecs)
+                AddMzSearchTarget(mzSearchSpec);
+            ValidateCustomSICList();
+            return true;
+        }
 
-        If CustomMZSearchValues Is Nothing OrElse
-           CustomMZSearchValues.Count = 0 Then
-            Return
-        End If
+        public void ValidateCustomSICList()
+        {
+            if (CustomMZSearchValues is null || CustomMZSearchValues.Count == 0)
+            {
+                return;
+            }
 
-        ' Check whether all of the values are between 0 and 1
-        ' If they are, then auto-switch .ScanToleranceType to "Relative"
+            // Check whether all of the values are between 0 and 1
+            // If they are, then auto-switch .ScanToleranceType to "Relative"
 
-        Dim countBetweenZeroAndOne = 0
-        Dim countOverOne = 0
+            int countBetweenZeroAndOne = 0;
+            int countOverOne = 0;
+            foreach (var customMzValue in CustomMZSearchValues)
+            {
+                if (customMzValue.ScanOrAcqTimeCenter > 1)
+                {
+                    countOverOne += 1;
+                }
+                else
+                {
+                    countBetweenZeroAndOne += 1;
+                }
+            }
 
-        For Each customMzValue In CustomMZSearchValues
-            If customMzValue.ScanOrAcqTimeCenter > 1 Then
-                countOverOne += 1
-            Else
-                countBetweenZeroAndOne += 1
-            End If
-        Next
+            if (countOverOne == 0 & countBetweenZeroAndOne > 0)
+            {
+                if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
+                {
+                    // No values were greater than 1 but at least one value is between 0 and 1
+                    // Change the ScanToleranceType mode from Absolute to Relative
+                    ScanToleranceType = eCustomSICScanTypeConstants.Relative;
+                }
+            }
 
-        If countOverOne = 0 And countBetweenZeroAndOne > 0 Then
-            If ScanToleranceType = eCustomSICScanTypeConstants.Absolute Then
-                ' No values were greater than 1 but at least one value is between 0 and 1
-                ' Change the ScanToleranceType mode from Absolute to Relative
-                ScanToleranceType = eCustomSICScanTypeConstants.Relative
-            End If
-        End If
+            if (countOverOne > 0 & countBetweenZeroAndOne == 0)
+            {
+                if (ScanToleranceType == eCustomSICScanTypeConstants.Relative)
+                {
+                    // The ScanOrAcqTimeCenter values cannot be relative
+                    // Change the ScanToleranceType mode from Relative to Absolute
+                    ScanToleranceType = eCustomSICScanTypeConstants.Absolute;
+                }
+            }
+        }
 
-        If countOverOne > 0 And countBetweenZeroAndOne = 0 Then
-            If ScanToleranceType = eCustomSICScanTypeConstants.Relative Then
-                ' The ScanOrAcqTimeCenter values cannot be relative
-                ' Change the ScanToleranceType mode from Relative to Absolute
-                ScanToleranceType = eCustomSICScanTypeConstants.Absolute
-            End If
-        End If
-
-    End Sub
-
-    Public Overrides Function ToString() As String
-        If CustomMZSearchValues Is Nothing OrElse CustomMZSearchValues.Count = 0 Then
-            Return "0 custom m/z search values"
-        Else
-            Return CustomMZSearchValues.Count & " custom m/z search values"
-        End If
-    End Function
-
-End Class
+        public override string ToString()
+        {
+            if (CustomMZSearchValues is null || CustomMZSearchValues.Count == 0)
+            {
+                return "0 custom m/z search values";
+            }
+            else
+            {
+                return CustomMZSearchValues.Count + " custom m/z search values";
+            }
+        }
+    }
+}

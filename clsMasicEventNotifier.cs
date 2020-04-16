@@ -1,139 +1,150 @@
-﻿Imports MASIC.clsMASIC
-Imports PRISM
+﻿using System;
+using PRISM;
 
-Public MustInherit Class clsMasicEventNotifier
-    Inherits EventNotifier
+namespace MASIC
+{
+    public abstract class clsMasicEventNotifier : EventNotifier
+    {
+        private short mLastPercentComplete = 0;
 
-    Private mLastPercentComplete As Short = 0
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        /// <summary>
+    /// Provides information on the number of cache and uncache events in spectraCache
+    /// </summary>
+    /// <param name="cacheEventCount"></param>
+    /// <param name="unCacheEventCount"></param>
+        public event UpdateCacheStatsEventEventHandler UpdateCacheStatsEvent;
 
-#Region "Events"
+        public delegate void UpdateCacheStatsEventEventHandler(int cacheEventCount, int unCacheEventCount);
 
-    ''' <summary>
-    ''' Provides information on the number of cache and uncache events in spectraCache
-    ''' </summary>
-    ''' <param name="cacheEventCount"></param>
-    ''' <param name="unCacheEventCount"></param>
-    Public Event UpdateCacheStatsEvent(cacheEventCount As Integer, unCacheEventCount As Integer)
+        /// <summary>
+    /// Update the code associated with an error
+    /// </summary>
+    /// <param name="eNewErrorCode"></param>
+        public event UpdateBaseClassErrorCodeEventEventHandler UpdateBaseClassErrorCodeEvent;
 
-    ''' <summary>
-    ''' Update the code associated with an error
-    ''' </summary>
-    ''' <param name="eNewErrorCode"></param>
-    Public Event UpdateBaseClassErrorCodeEvent(eNewErrorCode As ProcessFilesErrorCodes)
+        public delegate void UpdateBaseClassErrorCodeEventEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode);
 
-    ''' <summary>
-    ''' Update the code associated with an error
-    ''' </summary>
-    ''' <param name="eNewErrorCode"></param>
-    ''' <param name="leaveExistingErrorCodeUnchanged"></param>
-    Public Event UpdateErrorCodeEvent(eNewErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
+        /// <summary>
+    /// Update the code associated with an error
+    /// </summary>
+    /// <param name="eNewErrorCode"></param>
+    /// <param name="leaveExistingErrorCodeUnchanged"></param>
+        public event UpdateErrorCodeEventEventHandler UpdateErrorCodeEvent;
 
-#End Region
+        public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
 
-    Private Sub OnUpdateCacheStats(cacheEventCount As Integer, unCacheEventCount As Integer)
-        RaiseEvent UpdateCacheStatsEvent(cacheEventCount, unCacheEventCount)
-    End Sub
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount)
+        {
+            UpdateCacheStatsEvent?.Invoke(cacheEventCount, unCacheEventCount);
+        }
 
-    Private Sub OnUpdateBaseClassErrorCode(eNewErrorCode As ProcessFilesErrorCodes)
-        RaiseEvent UpdateBaseClassErrorCodeEvent(eNewErrorCode)
-    End Sub
+        private void OnUpdateBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode)
+        {
+            UpdateBaseClassErrorCodeEvent?.Invoke(eNewErrorCode);
+        }
 
-    Private Sub OnUpdateErrorCode(eNewErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
-        RaiseEvent UpdateErrorCodeEvent(eNewErrorCode, leaveExistingErrorCodeUnchanged)
-    End Sub
+        private void OnUpdateErrorCode(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged)
+        {
+            UpdateErrorCodeEvent?.Invoke(eNewErrorCode, leaveExistingErrorCodeUnchanged);
+        }
 
-    Protected Overloads Sub RegisterEvents(oClass As clsMasicEventNotifier)
-        MyBase.RegisterEvents(oClass)
+        protected void RegisterEvents(clsMasicEventNotifier oClass)
+        {
+            base.RegisterEvents(oClass);
+            oClass.UpdateCacheStatsEvent += UpdatedCacheStatsEventHandler;
+            oClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
+            oClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
+        }
 
-        AddHandler oClass.UpdateCacheStatsEvent, AddressOf UpdatedCacheStatsEventHandler
-        AddHandler oClass.UpdateBaseClassErrorCodeEvent, AddressOf UpdateBaseClassErrorCodeEventHandler
-        AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
-    End Sub
+        protected void ReportMessage(string message)
+        {
+            OnStatusEvent(message);
+        }
 
-    Protected Sub ReportMessage(message As String)
-        OnStatusEvent(message)
-    End Sub
+        protected void ReportError(string message, clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+        {
+            if (eNewErrorCode != clsMASIC.eMasicErrorCodes.NoError)
+            {
+                OnUpdateErrorCode(eNewErrorCode, false);
+            }
 
-    Protected Sub ReportError(message As String,
-                              Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
+            OnErrorEvent(message);
+        }
 
-        If eNewErrorCode <> eMasicErrorCodes.NoError Then
-            OnUpdateErrorCode(eNewErrorCode, False)
-        End If
+        protected void ReportError(string message, Exception ex, clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+        {
+            if (eNewErrorCode != clsMASIC.eMasicErrorCodes.NoError)
+            {
+                OnUpdateErrorCode(eNewErrorCode, false);
+            }
 
-        OnErrorEvent(message)
-    End Sub
+            OnErrorEvent(message, ex);
+        }
 
-    Protected Sub ReportError(message As String,
-                              ex As Exception,
-                              Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
+        [Obsolete("Source, allowInformUser, and allowThrowException are no longer supported")]
+        protected void ReportError(string source, string message, Exception ex, bool allowInformUser, bool allowThrowException = true, clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+        {
+            ReportError(message, ex, eNewErrorCode);
+        }
 
-        If eNewErrorCode <> eMasicErrorCodes.NoError Then
-            OnUpdateErrorCode(eNewErrorCode, False)
-        End If
+        protected void ReportWarning(string message)
+        {
+            OnWarningEvent(message);
+        }
 
-        OnErrorEvent(message, ex)
-    End Sub
+        protected void SetBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode)
+        {
+            OnUpdateBaseClassErrorCode(eNewErrorCode);
+        }
 
-    <Obsolete("Source, allowInformUser, and allowThrowException are no longer supported")>
-    Protected Sub ReportError(
-      source As String,
-      message As String,
-      ex As Exception,
-      allowInformUser As Boolean,
-      Optional allowThrowException As Boolean = True,
-      Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
+        protected void SetLocalErrorCode(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged = false)
+        {
+            OnUpdateErrorCode(eNewErrorCode, leaveExistingErrorCodeUnchanged);
+        }
 
-        ReportError(message, ex, eNewErrorCode)
-    End Sub
+        protected void UpdateCacheStats(clsSpectraCache spectraCache)
+        {
+            OnUpdateCacheStats(spectraCache.CacheEventCount, spectraCache.UnCacheEventCount);
+        }
 
-    Protected Sub ReportWarning(message As String)
-        OnWarningEvent(message)
-    End Sub
+        /// <summary>
+    /// Update the progress of a given subtask
+    /// </summary>
+    /// <param name="percentComplete"></param>
+        protected void UpdateProgress(short percentComplete)
+        {
+            OnProgressUpdate(string.Empty, percentComplete);
+        }
 
-    Protected Sub SetBaseClassErrorCode(eNewErrorCode As ProcessFilesErrorCodes)
-        OnUpdateBaseClassErrorCode(eNewErrorCode)
-    End Sub
+        protected void UpdateProgress(string progressMessage)
+        {
+            OnProgressUpdate(progressMessage, mLastPercentComplete);
+        }
 
-    Protected Sub SetLocalErrorCode(eNewErrorCode As eMasicErrorCodes, Optional leaveExistingErrorCodeUnchanged As Boolean = False)
-        OnUpdateErrorCode(eNewErrorCode, leaveExistingErrorCodeUnchanged)
-    End Sub
-
-    Protected Sub UpdateCacheStats(spectraCache As clsSpectraCache)
-        OnUpdateCacheStats(spectraCache.CacheEventCount, spectraCache.UnCacheEventCount)
-    End Sub
-
-    ''' <summary>
-    ''' Update the progress of a given subtask
-    ''' </summary>
-    ''' <param name="percentComplete"></param>
-    Protected Sub UpdateProgress(percentComplete As Short)
-        OnProgressUpdate(String.Empty, percentComplete)
-    End Sub
-
-    Protected Sub UpdateProgress(progressMessage As String)
-        OnProgressUpdate(progressMessage, mLastPercentComplete)
-    End Sub
-
-    Protected Sub UpdateProgress(percentComplete As Short, progressMessage As String)
-        mLastPercentComplete = percentComplete
-        OnProgressUpdate(progressMessage, percentComplete)
-    End Sub
+        protected void UpdateProgress(short percentComplete, string progressMessage)
+        {
+            mLastPercentComplete = percentComplete;
+            OnProgressUpdate(progressMessage, percentComplete);
+        }
 
 
-#Region "Event Handlers"
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount)
+        {
+            OnUpdateCacheStats(cacheEventCount, unCacheEventCount);
+        }
 
-    Private Sub UpdatedCacheStatsEventHandler(cacheEventCount As Integer, unCacheEventCount As Integer)
-        OnUpdateCacheStats(cacheEventCount, unCacheEventCount)
-    End Sub
+        private void UpdateBaseClassErrorCodeEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eErrorCode)
+        {
+            SetBaseClassErrorCode(eErrorCode);
+        }
 
-    Private Sub UpdateBaseClassErrorCodeEventHandler(eErrorCode As ProcessFilesErrorCodes)
-        SetBaseClassErrorCode(eErrorCode)
-    End Sub
-
-    Private Sub UpdateErrorCodeEventHandler(eErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
-        SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged)
-    End Sub
-#End Region
-
-End Class
+        private void UpdateErrorCodeEventHandler(clsMASIC.eMasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
+        {
+            SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
+        }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+    }
+}

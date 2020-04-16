@@ -1,34 +1,42 @@
-﻿Namespace DatasetStats
-    Public Class SampleInfo
-        Public Property SampleName As String
-        Public Property Comment1 As String
-        Public Property Comment2 As String
+﻿
+namespace MASIC.DatasetStats
+{
+    public class SampleInfo
+    {
+        public string SampleName { get; set; }
+        public string Comment1 { get; set; }
+        public string Comment2 { get; set; }
 
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New()
-            Clear()
-        End Sub
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public SampleInfo()
+        {
+            Clear();
+        }
 
-        Public Sub Clear()
-            SampleName = String.Empty
-            Comment1 = String.Empty
-            Comment2 = String.Empty
-        End Sub
+        public void Clear()
+        {
+            SampleName = string.Empty;
+            Comment1 = string.Empty;
+            Comment2 = string.Empty;
+        }
 
-        Public Function HasData() As Boolean
-            If Not String.IsNullOrWhiteSpace(SampleName) OrElse
-               Not String.IsNullOrWhiteSpace(Comment1) OrElse
-               Not String.IsNullOrWhiteSpace(Comment2) Then
-                Return True
-            Else
-                Return False
-            End If
-        End Function
+        public bool HasData()
+        {
+            if (!string.IsNullOrWhiteSpace(SampleName) || !string.IsNullOrWhiteSpace(Comment1) || !string.IsNullOrWhiteSpace(Comment2))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-        Public Overrides Function ToString() As String
-            Return SampleName
-        End Function
-    End Class
-End Namespace
+        public override string ToString()
+        {
+            return SampleName;
+        }
+    }
+}

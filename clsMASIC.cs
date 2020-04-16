@@ -1,2319 +1,2762 @@
-﻿Option Strict On
-
-' This class will read an LC-MS/MS data file and create selected ion chromatograms
-'   for each of the parent ion masses chosen for fragmentation
-' It will create several output files, including a BPI for the survey scan,
-'   a BPI for the fragmentation scans, an XML file containing the SIC data
-'   for each parent ion, and a "flat file" ready for import into the database
-'   containing summaries of the SIC data statistics
-' Supported file types are Thermo .Raw files (LCQ, LTQ, LTQ-FT),
-'   Agilent Ion Trap (.MGF and .CDF files), and mzXML files
-
-' -------------------------------------------------------------------------------
-' Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
-' Program started October 11, 2003
-' Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
-
-' E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
-' Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
-' -------------------------------------------------------------------------------
-'
-' Licensed under the 2-Clause BSD License; you may not use this file except
-' in compliance with the License.  You may obtain a copy of the License at
-' https://opensource.org/licenses/BSD-2-Clause
-
-Imports System.Runtime.InteropServices
-Imports MASIC.DataOutput
-Imports MASIC.DatasetStats
-Imports PRISM
-Imports PRISM.Logging
-
-Public Class clsMASIC
-    Inherits FileProcessor.ProcessFilesBase
-
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    Public Sub New()
-        MyBase.mFileDate = "March 27, 2020"
-
-        mLocalErrorCode = eMasicErrorCodes.NoError
-        mStatusMessage = String.Empty
-
-        mProcessingStats = New clsProcessingStats()
-        InitializeMemoryManagementOptions(mProcessingStats)
-
-        mMASICPeakFinder = New MASICPeakFinder.clsMASICPeakFinder()
-        RegisterEvents(mMASICPeakFinder)
-
-        Options = New clsMASICOptions(Me.FileVersion(), mMASICPeakFinder.ProgramVersion)
-        Options.InitializeVariables()
-        RegisterEvents(Options)
-
-    End Sub
-
-#Region "Constants and Enums"
-
-    ' Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
-    Public Const DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD As Boolean = False
-
-    ' Disabling this will slow down the correlation process (slightly)
-    Public Const DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD As Boolean = True
-
-    Private Const MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS As Integer = 3
-
-    Public Enum eProcessingStepConstants
-        NewTask = 0
-        ReadDataFile = 1
-        SaveBPI = 2
-        CreateSICsAndFindPeaks = 3
-        FindSimilarParentIons = 4
-        SaveExtendedScanStatsFiles = 5
-        SaveSICStatsFlatFile = 6
-        CloseOpenFileHandles = 7
-        UpdateXMLFileWithNewOptimalPeakApexValues = 8
-        Cancelled = 99
-        Complete = 100
-    End Enum
-
-    Public Enum eMasicErrorCodes
-        NoError = 0
-        InvalidDatasetLookupFilePath = 1
-        UnknownFileExtension = 2            ' This error code matches the identical code in clsFilterMsMsSpectra
-        InputFileAccessError = 4            ' This error code matches the identical code in clsFilterMsMsSpectra
-        InvalidDatasetID = 8
-        CreateSICsError = 16
-        FindSICPeaksError = 32
-        InvalidCustomSICValues = 64
-        NoParentIonsFoundInInputFile = 128
-        NoSurveyScansFoundInInputFile = 256
-        FindSimilarParentIonsError = 512
-        InputFileDataReadError = 1024
-        OutputFileWriteError = 2048
-        FileIOPermissionsError = 4096
-        ErrorCreatingSpectrumCacheDirectory = 8192
-        ErrorCachingSpectrum = 16384
-        ErrorUncachingSpectrum = 32768
-        ErrorDeletingCachedSpectrumFiles = 65536
-        UnspecifiedError = -1
-    End Enum
-
-#End Region
-
-#Region "Classwide Variables"
-
-    Private mLoggedMASICVersion As Boolean = False
-
-    Private ReadOnly mMASICPeakFinder As MASICPeakFinder.clsMASICPeakFinder
-
-    Private ReadOnly mProcessingStats As clsProcessingStats
-
-    ''' <summary>
-    ''' Current processing step
-    ''' </summary>
-    Private mProcessingStep As eProcessingStepConstants
-
-    ''' <summary>
-    ''' Percent completion for the current sub task
-    ''' </summary>
-    ''' <remarks>Value between 0 and 100</remarks>
-    Private mSubtaskProcessingStepPct As Single
-
-    Private mSubtaskDescription As String = String.Empty
-
-    Private mLocalErrorCode As eMasicErrorCodes
-    Private mStatusMessage As String
-
-#End Region
-
-#Region "Events"
-    ''' <summary>
-    ''' Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
-    ''' Use ProgressSubtaskChanged when updating the sub task progress
-    ''' </summary>
-    Public Event ProgressSubtaskChanged()
-
-    Public Event ProgressResetKeypressAbort()
-
-#End Region
-
-    ' ReSharper disable UnusedMember.Global
-
-#Region "Processing Options and File Path Interface Functions"
-
-    <Obsolete("Use Property Options")>
-    Public Property DatabaseConnectionString As String
-        Get
-            Return Options.DatabaseConnectionString
-        End Get
-        Set
-            Options.DatabaseConnectionString = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property DatasetInfoQuerySql As String
-        Get
-            Return Options.DatasetInfoQuerySql
-        End Get
-        Set
-            Options.DatasetInfoQuerySql = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property DatasetLookupFilePath As String
-        Get
-            Return Options.DatasetLookupFilePath
-        End Get
-        Set
-            Options.DatasetLookupFilePath = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property DatasetNumber As Integer
-        Get
-            Return Options.SICOptions.DatasetID
-        End Get
-        Set
-            Options.SICOptions.DatasetID = Value
-        End Set
-    End Property
-
-    Public ReadOnly Property LocalErrorCode As eMasicErrorCodes
-        Get
-            Return mLocalErrorCode
-        End Get
-    End Property
-
-    Public ReadOnly Property MASICPeakFinderDllVersion As String
-        Get
-            If Not mMASICPeakFinder Is Nothing Then
-                Return mMASICPeakFinder.ProgramVersion
-            Else
-                Return String.Empty
-            End If
-        End Get
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MASICStatusFilename As String
-        Get
-            Return Options.MASICStatusFilename
-        End Get
-        Set
-            If Value Is Nothing OrElse Value.Trim.Length = 0 Then
-                Options.MASICStatusFilename = clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME
-            Else
-                Options.MASICStatusFilename = Value
-            End If
-        End Set
-    End Property
-
-    Public ReadOnly Property Options As clsMASICOptions
-
-    Public ReadOnly Property ProcessStep As eProcessingStepConstants
-        Get
-            Return mProcessingStep
-        End Get
-    End Property
-
-    ''' <summary>
-    ''' Subtask progress percent complete
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>Value between 0 and 100</remarks>
-    Public ReadOnly Property SubtaskProgressPercentComplete As Single
-        Get
-            Return mSubtaskProcessingStepPct
-        End Get
-    End Property
-
-    Public ReadOnly Property SubtaskDescription As String
-        Get
-            Return mSubtaskDescription
-        End Get
-    End Property
-
-    Public ReadOnly Property StatusMessage As String
-        Get
-            Return mStatusMessage
-        End Get
-    End Property
-#End Region
-
-#Region "SIC Options Interface Functions"
-    <Obsolete("Use Property Options")>
-    Public Property CDFTimeInSeconds As Boolean
-        Get
-            Return Options.CDFTimeInSeconds
-        End Get
-        Set
-            Options.CDFTimeInSeconds = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property CompressMSSpectraData As Boolean
-        Get
-            Return Options.SICOptions.CompressMSSpectraData
-        End Get
-        Set
-            Options.SICOptions.CompressMSSpectraData = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property CompressMSMSSpectraData As Boolean
-        Get
-            Return Options.SICOptions.CompressMSMSSpectraData
-        End Get
-        Set
-            Options.SICOptions.CompressMSMSSpectraData = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property CompressToleranceDivisorForDa As Double
-        Get
-            Return Options.SICOptions.CompressToleranceDivisorForDa
-        End Get
-        Set
-            Options.SICOptions.CompressToleranceDivisorForDa = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property CompressToleranceDivisorForPPM As Double
-        Get
-            Return Options.SICOptions.CompressToleranceDivisorForPPM
-        End Get
-        Set
-            Options.SICOptions.CompressToleranceDivisorForPPM = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ConsolidateConstantExtendedHeaderValues As Boolean
-        Get
-            Return Options.ConsolidateConstantExtendedHeaderValues
-        End Get
-        Set
-            Options.ConsolidateConstantExtendedHeaderValues = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public ReadOnly Property CustomSICListScanType As clsCustomSICList.eCustomSICScanTypeConstants
-        Get
-            Return Options.CustomSICList.ScanToleranceType
-        End Get
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public ReadOnly Property CustomSICListScanTolerance As Single
-        Get
-            Return Options.CustomSICList.ScanOrAcqTimeTolerance
-        End Get
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public ReadOnly Property CustomSICListSearchValues As List(Of clsCustomMZSearchSpec)
-        Get
-            Return Options.CustomSICList.CustomMZSearchValues
-        End Get
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property CustomSICListFileName As String
-        Get
-            Return Options.CustomSICList.CustomSICListFileName
-        End Get
-        Set
-            Options.CustomSICList.CustomSICListFileName = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawDataOnly As Boolean
-        Get
-            Return Options.ExportRawDataOnly
-        End Get
-        Set
-            Options.ExportRawDataOnly = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property FastExistingXMLFileTest As Boolean
-        Get
-            Return Options.FastExistingXMLFileTest
-        End Get
-        Set
-            Options.FastExistingXMLFileTest = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property IncludeHeadersInExportFile As Boolean
-        Get
-            Return Options.IncludeHeadersInExportFile
-        End Get
-        Set
-            Options.IncludeHeadersInExportFile = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property IncludeScanTimesInSICStatsFile As Boolean
-        Get
-            Return Options.IncludeScanTimesInSICStatsFile
-        End Get
-        Set
-            Options.IncludeScanTimesInSICStatsFile = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property LimitSearchToCustomMZList As Boolean
-        Get
-            Return Options.CustomSICList.LimitSearchToCustomMZList
-        End Get
-        Set
-            Options.CustomSICList.LimitSearchToCustomMZList = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ParentIonDecoyMassDa As Double
-        Get
-            Return Options.ParentIonDecoyMassDa
-        End Get
-        Set
-            Options.ParentIonDecoyMassDa = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SkipMSMSProcessing As Boolean
-        Get
-            Return Options.SkipMSMSProcessing
-        End Get
-        Set
-            Options.SkipMSMSProcessing = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SkipSICAndRawDataProcessing As Boolean
-        Get
-            Return Options.SkipSICAndRawDataProcessing
-        End Get
-        Set
-            Options.SkipSICAndRawDataProcessing = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SuppressNoParentIonsError As Boolean
-        Get
-            Return Options.SuppressNoParentIonsError
-        End Get
-        Set
-            Options.SuppressNoParentIonsError = Value
-        End Set
-    End Property
-
-    <Obsolete("No longer supported")>
-    Public Property UseFinniganXRawAccessorFunctions As Boolean
-        Get
-            Return True
-        End Get
-        Set
-
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property WriteDetailedSICDataFile As Boolean
-        Get
-            Return Options.WriteDetailedSICDataFile
-        End Get
-        Set
-            Options.WriteDetailedSICDataFile = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property WriteExtendedStats As Boolean
-        Get
-            Return Options.WriteExtendedStats
-        End Get
-        Set
-            Options.WriteExtendedStats = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property WriteExtendedStatsIncludeScanFilterText As Boolean
-        Get
-            Return Options.WriteExtendedStatsIncludeScanFilterText
-        End Get
-        Set
-            Options.WriteExtendedStatsIncludeScanFilterText = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property WriteExtendedStatsStatusLog As Boolean
-        Get
-            Return Options.WriteExtendedStatsStatusLog
-        End Get
-        Set
-            Options.WriteExtendedStatsStatusLog = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property WriteMSMethodFile As Boolean
-        Get
-            Return Options.WriteMSMethodFile
-        End Get
-        Set
-            Options.WriteMSMethodFile = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property WriteMSTuneFile As Boolean
-        Get
-            Return Options.WriteMSTuneFile
-        End Get
-        Set
-            Options.WriteMSTuneFile = Value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' This property is included for historical reasons since SIC tolerance can now be Da or PPM
-    ''' </summary>
-    ''' <returns></returns>
-    <Obsolete("Use Property Options.  Also, the SICToleranceDa setting should not be used; use SetSICTolerance and GetSICTolerance instead")>
-    Public Property SICToleranceDa As Double
-        Get
-            Return Options.SICOptions.SICToleranceDa
-        End Get
-        Set
-            Options.SICOptions.SICToleranceDa = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options.SICOptions.GetSICTolerance")>
-    Public Function GetSICTolerance() As Double
-        Dim toleranceIsPPM As Boolean
-        Return Options.SICOptions.GetSICTolerance(toleranceIsPPM)
-    End Function
-
-    <Obsolete("Use Property Options.SICOptions.GetSICTolerance")>
-    Public Function GetSICTolerance(<Out> ByRef toleranceIsPPM As Boolean) As Double
-        Return Options.SICOptions.GetSICTolerance(toleranceIsPPM)
-    End Function
-
-    <Obsolete("Use Property Options.SICOptions.SetSICTolerance")>
-    Public Sub SetSICTolerance(sicTolerance As Double, toleranceIsPPM As Boolean)
-        Options.SICOptions.SetSICTolerance(sicTolerance, toleranceIsPPM)
-    End Sub
-
-    <Obsolete("Use Property Options")>
-    Public Property SICToleranceIsPPM As Boolean
-        Get
-            Return Options.SICOptions.SICToleranceIsPPM
-        End Get
-        Set
-            Options.SICOptions.SICToleranceIsPPM = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property RefineReportedParentIonMZ As Boolean
-        Get
-            Return Options.SICOptions.RefineReportedParentIonMZ
-        End Get
-        Set
-            Options.SICOptions.RefineReportedParentIonMZ = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property RTRangeEnd As Single
-        Get
-            Return Options.SICOptions.RTRangeEnd
-        End Get
-        Set
-            Options.SICOptions.RTRangeEnd = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property RTRangeStart As Single
-        Get
-            Return Options.SICOptions.RTRangeStart
-        End Get
-        Set
-            Options.SICOptions.RTRangeStart = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ScanRangeEnd As Integer
-        Get
-            Return Options.SICOptions.ScanRangeEnd
-        End Get
-        Set
-            Options.SICOptions.ScanRangeEnd = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ScanRangeStart As Integer
-        Get
-            Return Options.SICOptions.ScanRangeStart
-        End Get
-        Set
-            Options.SICOptions.ScanRangeStart = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MaxSICPeakWidthMinutesBackward As Single
-        Get
-            Return Options.SICOptions.MaxSICPeakWidthMinutesBackward
-        End Get
-        Set
-            Options.SICOptions.MaxSICPeakWidthMinutesBackward = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MaxSICPeakWidthMinutesForward As Single
-        Get
-            Return Options.SICOptions.MaxSICPeakWidthMinutesForward
-        End Get
-        Set
-            Options.SICOptions.MaxSICPeakWidthMinutesForward = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SICNoiseFractionLowIntensityDataToAverage As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SICNoiseMinimumSignalToNoiseRatio As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio
-        End Get
-        Set
-            ' This value isn't utilized by MASIC for SICs so we'll force it to always be zero
-            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SICNoiseThresholdIntensity As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SICNoiseThresholdMode As MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MassSpectraNoiseFractionLowIntensityDataToAverage As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MassSpectraNoiseMinimumSignalToNoiseRatio As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MassSpectraNoiseThresholdIntensity As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute
-        End Get
-        Set
-            If Value < 0 Or Value > Double.MaxValue Then Value = 0
-            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MassSpectraNoiseThresholdMode As MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ReplaceSICZeroesWithMinimumPositiveValueFromMSData As Boolean
-        Get
-            Return Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData
-        End Get
-        Set
-            Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = Value
-        End Set
-    End Property
-#End Region
-
-#Region "Raw Data Export Options"
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawDataIncludeMSMS As Boolean
-        Get
-            Return Options.RawDataExportOptions.IncludeMSMS
-        End Get
-        Set
-            Options.RawDataExportOptions.IncludeMSMS = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawDataRenumberScans As Boolean
-        Get
-            Return Options.RawDataExportOptions.RenumberScans
-        End Get
-        Set
-            Options.RawDataExportOptions.RenumberScans = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawDataIntensityMinimum As Single
-        Get
-            Return Options.RawDataExportOptions.IntensityMinimum
-        End Get
-        Set
-            Options.RawDataExportOptions.IntensityMinimum = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawDataMaxIonCountPerScan As Integer
-        Get
-            Return Options.RawDataExportOptions.MaxIonCountPerScan
-        End Get
-        Set
-            Options.RawDataExportOptions.MaxIonCountPerScan = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawDataFileFormat As clsRawDataExportOptions.eExportRawDataFileFormatConstants
-        Get
-            Return Options.RawDataExportOptions.FileFormat
-        End Get
-        Set
-            Options.RawDataExportOptions.FileFormat = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawDataMinimumSignalToNoiseRatio As Single
-        Get
-            Return Options.RawDataExportOptions.MinimumSignalToNoiseRatio
-        End Get
-        Set
-            Options.RawDataExportOptions.MinimumSignalToNoiseRatio = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ExportRawSpectraData As Boolean
-        Get
-            Return Options.RawDataExportOptions.ExportEnabled
-        End Get
-        Set
-            Options.RawDataExportOptions.ExportEnabled = Value
-        End Set
-    End Property
-
-#End Region
-
-#Region "Peak Finding Options"
-    <Obsolete("Use Property Options")>
-    Public Property IntensityThresholdAbsoluteMinimum As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property IntensityThresholdFractionMax As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MaxDistanceScansNoOverlap As Integer
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property FindPeaksOnSmoothedData As Boolean
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SmoothDataRegardlessOfMinimumPeakWidth As Boolean
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property UseButterworthSmooth As Boolean
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ButterworthSamplingFrequency As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency
-        End Get
-        Set
-            ' Value should be between 0.01 and 0.99; this is checked for in the filter, so we don't need to check here
-            Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property ButterworthSamplingFrequencyDoubledForSIMData As Boolean
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property UseSavitzkyGolaySmooth As Boolean
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SavitzkyGolayFilterOrder As Short
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SaveSmoothedData As Boolean
-        Get
-            Return Options.SICOptions.SaveSmoothedData
-        End Get
-        Set
-            Options.SICOptions.SaveSmoothedData = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MaxAllowedUpwardSpikeFractionMax As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property InitialPeakWidthScansScaler As Double
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property InitialPeakWidthScansMaximum As Integer
-        Get
-            Return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum
-        End Get
-        Set
-            Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = Value
-        End Set
-    End Property
-#End Region
-
-#Region "Spectrum Similarity Options"
-    <Obsolete("Use Property Options")>
-    Public Property SimilarIonMZToleranceHalfWidth As Single
-        Get
-            Return Options.SICOptions.SimilarIonMZToleranceHalfWidth
-        End Get
-        Set
-            Options.SICOptions.SimilarIonMZToleranceHalfWidth = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SimilarIonToleranceHalfWidthMinutes As Single
-        Get
-            Return Options.SICOptions.SimilarIonToleranceHalfWidthMinutes
-        End Get
-        Set
-            Options.SICOptions.SimilarIonToleranceHalfWidthMinutes = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SpectrumSimilarityMinimum As Single
-        Get
-            Return Options.SICOptions.SpectrumSimilarityMinimum
-        End Get
-        Set
-            Options.SICOptions.SpectrumSimilarityMinimum = Value
-        End Set
-    End Property
-#End Region
-
-#Region "Binning Options Interface Functions"
-
-    <Obsolete("Use Property Options")>
-    Public Property BinStartX As Single
-        Get
-            Return Options.BinningOptions.StartX
-        End Get
-        Set
-            Options.BinningOptions.StartX = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property BinEndX As Single
-        Get
-            Return Options.BinningOptions.EndX
-        End Get
-        Set
-            Options.BinningOptions.EndX = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property BinSize As Single
-        Get
-            Return Options.BinningOptions.BinSize
-        End Get
-        Set
-            Options.BinningOptions.BinSize = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property BinnedDataIntensityPrecisionPercent As Single
-        Get
-            Return Options.BinningOptions.IntensityPrecisionPercent
-        End Get
-        Set
-            Options.BinningOptions.IntensityPrecisionPercent = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property NormalizeBinnedData As Boolean
-        Get
-            Return Options.BinningOptions.Normalize
-        End Get
-        Set
-            Options.BinningOptions.Normalize = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property SumAllIntensitiesForBin As Boolean
-        Get
-            Return Options.BinningOptions.SumAllIntensitiesForBin
-        End Get
-        Set
-            Options.BinningOptions.SumAllIntensitiesForBin = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property MaximumBinCount As Integer
-        Get
-            Return Options.BinningOptions.MaximumBinCount
-        End Get
-        Set
-            Options.BinningOptions.MaximumBinCount = Value
-        End Set
-    End Property
-#End Region
-
-#Region "Memory Options Interface Functions"
-
-    <Obsolete("Use Property Options")>
-    Public Property DiskCachingAlwaysDisabled As Boolean
-        Get
-            Return Options.CacheOptions.DiskCachingAlwaysDisabled
-        End Get
-        Set
-            Options.CacheOptions.DiskCachingAlwaysDisabled = Value
-        End Set
-    End Property
-
-    <Obsolete("Use Property Options")>
-    Public Property CacheDirectoryPath As String
-        Get
-            Return Options.CacheOptions.DirectoryPath
-        End Get
-        Set
-            Options.CacheOptions.DirectoryPath = Value
-        End Set
-    End Property
-
-    <Obsolete("Legacy parameter; no longer used")>
-    Public Property CacheMaximumMemoryUsageMB As Single
-        Get
-            Return Options.CacheOptions.MaximumMemoryUsageMB
-        End Get
-        Set
-            Options.CacheOptions.MaximumMemoryUsageMB = Value
-        End Set
-    End Property
-
-    <Obsolete("Legacy parameter; no longer used")>
-    Public Property CacheMinimumFreeMemoryMB As Single
-        Get
-            Return Options.CacheOptions.MinimumFreeMemoryMB
-        End Get
-        Set
-            If Options.CacheOptions.MinimumFreeMemoryMB < 10 Then
-                Options.CacheOptions.MinimumFreeMemoryMB = 10
-            End If
-            Options.CacheOptions.MinimumFreeMemoryMB = Value
-        End Set
-    End Property
-
-    <Obsolete("Legacy parameter; no longer used")>
-    Public Property CacheSpectraToRetainInMemory As Integer
-        Get
-            Return Options.CacheOptions.SpectraToRetainInMemory
-        End Get
-        Set
-            Options.CacheOptions.SpectraToRetainInMemory = Value
-        End Set
-    End Property
-
-#End Region
-
-    ' ReSharper restore UnusedMember.Global
-
-    Public Overrides Sub AbortProcessingNow()
-        AbortProcessing = True
-        Options.AbortProcessing = True
-    End Sub
-
-    Private Function FindSICsAndWriteOutput(
-      inputFilePathFull As String,
-      outputDirectoryPath As String,
-      scanList As clsScanList,
-      spectraCache As clsSpectraCache,
-      dataOutputHandler As clsDataOutput,
-      scanTracking As clsScanTracking,
-      datasetFileInfo As DatasetFileInfo,
-      parentIonProcessor As clsParentIonProcessing,
-      dataImporterBase As DataInput.clsDataImport
-      ) As Boolean
-
-        Dim success = True
-        Dim inputFileName = Path.GetFileName(inputFilePathFull)
-        Dim similarParentIonUpdateCount As Integer
-
-        Try
-            Dim bpiWriter = New clsBPIWriter()
-            RegisterEvents(bpiWriter)
-
-            Dim xmlResultsWriter = New clsXMLResultsWriter(Options)
-            RegisterEvents(xmlResultsWriter)
-
-            '---------------------------------------------------------
-            ' Save the BPIs and TICs
-            '---------------------------------------------------------
-
-            UpdateProcessingStep(eProcessingStepConstants.SaveBPI)
-            UpdateOverallProgress("Processing Data for " & inputFileName)
-            SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk")
-            UpdatePeakMemoryUsage()
-
-            If Options.SkipSICAndRawDataProcessing OrElse Not Options.ExportRawDataOnly Then
-                LogMessage("ProcessFile: Call SaveBPIs")
-                bpiWriter.SaveBPIs(scanList, spectraCache, inputFilePathFull, outputDirectoryPath)
-            End If
-
-            '---------------------------------------------------------
-            ' Close the ScanStats file handle
-            '---------------------------------------------------------
-            Try
-                LogMessage("ProcessFile: Close outputFileHandles.ScanStats")
-
-                dataOutputHandler.OutputFileHandles.CloseScanStats()
-
-            Catch ex As Exception
-                ' Ignore errors here
-            End Try
-
-            '---------------------------------------------------------
-            ' Create the DatasetInfo XML file
-            '---------------------------------------------------------
-
-            LogMessage("ProcessFile: Create DatasetInfo File")
-            dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputDirectoryPath, scanTracking, datasetFileInfo)
-
-            If Options.SkipSICAndRawDataProcessing Then
-                LogMessage("ProcessFile: Skipping SIC Processing")
-
-                SetDefaultPeakLocValues(scanList)
-            Else
-
-                '---------------------------------------------------------
-                ' Optionally, export the raw mass spectra data
-                '---------------------------------------------------------
-
-                If Options.RawDataExportOptions.ExportEnabled Then
-                    Dim rawDataExporter = New clsSpectrumDataWriter(bpiWriter, Options)
-                    RegisterEvents(rawDataExporter)
-
-                    rawDataExporter.ExportRawDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath)
-                End If
-
-                If Options.ReporterIons.ReporterIonStatsEnabled Then
-                    ' Look for Reporter Ions in the Fragmentation spectra
-
-                    Dim reporterIonProcessor = New clsReporterIonProcessor(Options)
-                    RegisterEvents(reporterIonProcessor)
-                    reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath)
-                End If
-
-                Dim mrmProcessor = New clsMRMProcessing(Options, dataOutputHandler)
-                RegisterEvents(mrmProcessor)
-
-                '---------------------------------------------------------
-                ' If MRM data is present, save the MRM values to disk
-                '---------------------------------------------------------
-                If scanList.MRMDataPresent Then
-                    mrmProcessor.ExportMRMDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath)
-                End If
-
-                If Not Options.ExportRawDataOnly Then
-
-                    '---------------------------------------------------------
-                    ' Add the custom SIC values to scanList
-                    '---------------------------------------------------------
-                    Options.CustomSICList.AddCustomSICValues(scanList, Options.SICOptions.SICTolerance,
-                                                             Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance)
-
-
-                    '---------------------------------------------------------
-                    ' Possibly create the Tab-separated values SIC details output file
-                    '---------------------------------------------------------
-                    If Options.WriteDetailedSICDataFile Then
-                        success = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath)
-                        If Not success Then
-                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
-                            Exit Try
-                        End If
-                    End If
-
-                    '---------------------------------------------------------
-                    ' Create the XML output file
-                    '---------------------------------------------------------
-                    success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, spectraCache, Options.SICOptions, Options.BinningOptions)
-                    If Not success Then
-                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError)
-                        Exit Try
-                    End If
-
-                    '---------------------------------------------------------
-                    ' Create the selected ion chromatograms (SICs)
-                    ' For each one, find the peaks and make an entry to the XML output file
-                    '---------------------------------------------------------
-
-                    UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks)
-                    SetSubtaskProcessingStepPct(0)
-                    UpdatePeakMemoryUsage()
-
-                    LogMessage("ProcessFile: Call CreateParentIonSICs")
-                    Dim sicProcessor = New clsSICProcessing(mMASICPeakFinder, mrmProcessor)
-                    RegisterEvents(sicProcessor)
-
-                    success = sicProcessor.CreateParentIonSICs(scanList, spectraCache, Options, dataOutputHandler, sicProcessor, xmlResultsWriter)
-
-                    If Not success Then
-                        SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, True)
-                        Exit Try
-                    End If
-
-                End If
-
-                If Not (Options.SkipMSMSProcessing OrElse Options.ExportRawDataOnly) Then
-
-                    '---------------------------------------------------------
-                    ' Find Similar Parent Ions
-                    '---------------------------------------------------------
-
-                    UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons)
-                    SetSubtaskProcessingStepPct(0)
-                    UpdatePeakMemoryUsage()
-
-                    LogMessage("ProcessFile: Call FindSimilarParentIons")
-                    success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, Options, dataImporterBase, similarParentIonUpdateCount)
-
-                    If Not success Then
-                        SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, True)
-                        Exit Try
-                    End If
-                End If
-
-            End If
-
-            If Options.WriteExtendedStats AndAlso Not Options.ExportRawDataOnly Then
-                '---------------------------------------------------------
-                ' Save Extended Scan Stats Files
-                '---------------------------------------------------------
-
-                UpdateProcessingStep(eProcessingStepConstants.SaveExtendedScanStatsFiles)
-                SetSubtaskProcessingStepPct(0)
-                UpdatePeakMemoryUsage()
-
-                LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles")
-                success = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
-                    scanList, inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile)
-
-                If Not success Then
-                    SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
-                    Exit Try
-                End If
-            End If
-
-
-            '---------------------------------------------------------
-            ' Save SIC Stats Flat File
-            '---------------------------------------------------------
-
-            UpdateProcessingStep(eProcessingStepConstants.SaveSICStatsFlatFile)
-            SetSubtaskProcessingStepPct(0)
-            UpdatePeakMemoryUsage()
-
-            If Not Options.ExportRawDataOnly Then
-
-                Dim sicStatsWriter = New clsSICStatsWriter()
-                RegisterEvents(sicStatsWriter)
-
-                LogMessage("ProcessFile: Call SaveSICStatsFlatFile")
-                success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, Options, dataOutputHandler)
-
-                If Not success Then
-                    SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, True)
-                    Exit Try
-                End If
-            End If
-
-
-            UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles)
-            SetSubtaskProcessingStepPct(0)
-            UpdatePeakMemoryUsage()
-
-            If Not (Options.SkipSICAndRawDataProcessing OrElse Options.ExportRawDataOnly) Then
-
-                '---------------------------------------------------------
-                ' Write processing stats to the XML output file
-                '---------------------------------------------------------
-
-                LogMessage("ProcessFile: Call FinalizeXMLFile")
-                Dim processingTimeSec = GetTotalProcessingTimeSec()
-                success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, spectraCache,
-                                                                 mProcessingStats, processingTimeSec)
-
-            End If
-
-            '---------------------------------------------------------
-            ' Close any open output files
-            '---------------------------------------------------------
-            dataOutputHandler.OutputFileHandles.CloseAll()
-
-            '---------------------------------------------------------
-            ' Save a text file containing the headers used in the text files
-            '---------------------------------------------------------
-            If Not Options.IncludeHeadersInExportFile Then
-                LogMessage("ProcessFile: Call SaveHeaderGlossary")
-                dataOutputHandler.SaveHeaderGlossary(scanList, inputFileName, outputDirectoryPath)
-            End If
-
-            If Not (Options.SkipSICAndRawDataProcessing OrElse Options.ExportRawDataOnly) AndAlso similarParentIonUpdateCount > 0 Then
-                '---------------------------------------------------------
-                ' Reopen the XML file and update the entries for those ions in scanList that had their
-                ' Optimal peak apex scan numbers updated
-                '---------------------------------------------------------
-
-                UpdateProcessingStep(eProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues)
-                SetSubtaskProcessingStepPct(0)
-                UpdatePeakMemoryUsage()
-
-                LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries")
-                xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, inputFileName, outputDirectoryPath)
-            End If
-
-        Catch ex As Exception
-            success = False
-            LogErrors("FindSICsAndWriteOutput", "Error saving results to: " & outputDirectoryPath, ex, eMasicErrorCodes.OutputFileWriteError)
-        End Try
-
-        Return success
-
-    End Function
-
-    Public Overrides Function GetDefaultExtensionsToParse() As IList(Of String)
-        Return DataInput.clsDataImport.GetDefaultExtensionsToParse()
-    End Function
-
-    Public Overrides Function GetErrorMessage() As String
-        ' Returns String.Empty if no error
-
-        Dim errorMessage As String
-
-        If MyBase.ErrorCode = ProcessFilesErrorCodes.LocalizedError OrElse
-           MyBase.ErrorCode = ProcessFilesErrorCodes.NoError Then
-            Select Case mLocalErrorCode
-                Case eMasicErrorCodes.NoError
-                    errorMessage = String.Empty
-                Case eMasicErrorCodes.InvalidDatasetLookupFilePath
-                    errorMessage = "Invalid dataset lookup file path"
-                Case eMasicErrorCodes.UnknownFileExtension
-                    errorMessage = "Unknown file extension"
-                Case eMasicErrorCodes.InputFileAccessError
-                    errorMessage = "Input file access error"
-                Case eMasicErrorCodes.InvalidDatasetID
-                    errorMessage = "Invalid dataset number"
-                Case eMasicErrorCodes.CreateSICsError
-                    errorMessage = "Create SIC's error"
-                Case eMasicErrorCodes.FindSICPeaksError
-                    errorMessage = "Error finding SIC peaks"
-                Case eMasicErrorCodes.InvalidCustomSICValues
-                    errorMessage = "Invalid custom SIC values"
-                Case eMasicErrorCodes.NoParentIonsFoundInInputFile
-                    errorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)"
-                Case eMasicErrorCodes.NoSurveyScansFoundInInputFile
-                    errorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)"
-                Case eMasicErrorCodes.FindSimilarParentIonsError
-                    errorMessage = "Find similar parent ions error"
-                Case eMasicErrorCodes.FindSimilarParentIonsError
-                    errorMessage = "Find similar parent ions error"
-                Case eMasicErrorCodes.InputFileDataReadError
-                    errorMessage = "Error reading data from input file"
-                Case eMasicErrorCodes.OutputFileWriteError
-                    errorMessage = "Error writing data to output file"
-                Case eMasicErrorCodes.FileIOPermissionsError
-                    errorMessage = "File IO Permissions Error"
-                Case eMasicErrorCodes.ErrorCreatingSpectrumCacheDirectory
-                    errorMessage = "Error creating spectrum cache directory"
-                Case eMasicErrorCodes.ErrorCachingSpectrum
-                    errorMessage = "Error caching spectrum"
-                Case eMasicErrorCodes.ErrorUncachingSpectrum
-                    errorMessage = "Error uncaching spectrum"
-                Case eMasicErrorCodes.ErrorDeletingCachedSpectrumFiles
-                    errorMessage = "Error deleting cached spectrum files"
-                Case eMasicErrorCodes.UnspecifiedError
-                    errorMessage = "Unspecified localized error"
-                Case Else
-                    ' This shouldn't happen
-                    errorMessage = "Unknown error state"
-            End Select
-        Else
-            errorMessage = MyBase.GetBaseClassErrorMessage()
-        End If
-
-        Return errorMessage
-
-    End Function
-
-    Private Function GetFreeMemoryMB() As Single
-        ' Returns the amount of free memory, in MB
-
-        Dim freeMemoryMB = SystemInfo.GetFreeMemoryMB()
-
-        Return freeMemoryMB
-
-    End Function
-
-    Private Function GetProcessMemoryUsageMB() As Single
-
-        ' Obtain a handle to the current process
-        Dim objProcess = Process.GetCurrentProcess()
-
-        ' The WorkingSet is the total physical memory usage
-        Return CSng(objProcess.WorkingSet64 / 1024 / 1024)
-
-    End Function
-
-    Private Function GetTotalProcessingTimeSec() As Single
-
-        Dim objProcess = Process.GetCurrentProcess()
-
-        Return CSng(objProcess.TotalProcessorTime().TotalSeconds)
-
-    End Function
-
-    Private Sub InitializeMemoryManagementOptions(processingStats As clsProcessingStats)
-
-        With processingStats
-            .PeakMemoryUsageMB = GetProcessMemoryUsageMB()
-            .TotalProcessingTimeAtStart = GetTotalProcessingTimeSec()
-            .CacheEventCount = 0
-            .UnCacheEventCount = 0
-
-            .FileLoadStartTime = DateTime.UtcNow
-            .FileLoadEndTime = .FileLoadStartTime
-
-            .ProcessingStartTime = .FileLoadStartTime
-            .ProcessingEndTime = .FileLoadStartTime
-
-            .MemoryUsageMBAtStart = .PeakMemoryUsageMB
-            .MemoryUsageMBDuringLoad = .PeakMemoryUsageMB
-            .MemoryUsageMBAtEnd = .PeakMemoryUsageMB
-        End With
-
-    End Sub
-
-    Private Function LoadData(
-      inputFilePathFull As String,
-      outputDirectoryPath As String,
-      dataOutputHandler As clsDataOutput,
-      parentIonProcessor As clsParentIonProcessing,
-      scanTracking As clsScanTracking,
-      scanList As clsScanList,
-      spectraCache As clsSpectraCache,
-      <Out> ByRef dataImporterBase As DataInput.clsDataImport,
-      <Out> ByRef datasetFileInfo As DatasetFileInfo
-      ) As Boolean
-
-        Dim success As Boolean
-        datasetFileInfo = New DatasetFileInfo()
-
-        Try
-
-            '---------------------------------------------------------
-            ' Define inputFileName (which is referenced several times below)
-            '---------------------------------------------------------
-            Dim inputFileName = Path.GetFileName(inputFilePathFull)
-
-            '---------------------------------------------------------
-            ' Create the _ScanStats.txt file
-            '---------------------------------------------------------
-            dataOutputHandler.OpenOutputFileHandles(inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile)
-
-            '---------------------------------------------------------
-            ' Read the mass spectra from the input data file
-            '---------------------------------------------------------
-
-            UpdateProcessingStep(eProcessingStepConstants.ReadDataFile)
-            SetSubtaskProcessingStepPct(0)
-            UpdatePeakMemoryUsage()
-            mStatusMessage = String.Empty
-
-            If Options.SkipSICAndRawDataProcessing Then
-                Options.ExportRawDataOnly = False
-            End If
-
-            Dim keepRawMSSpectra = Not Options.SkipSICAndRawDataProcessing OrElse Options.ExportRawDataOnly
-
-            Options.SICOptions.ValidateSICOptions()
-
-            Select Case Path.GetExtension(inputFileName).ToUpper()
-                Case DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper()
-
-                    ' Open the .Raw file and obtain the scan information
-
-                    Dim dataImporter = New DataInput.clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                    RegisterDataImportEvents(dataImporter)
-                    dataImporterBase = dataImporter
-
-                    success = dataImporter.ExtractScanInfoFromXcaliburDataFile(
-                      inputFilePathFull,
-                      scanList, spectraCache, dataOutputHandler,
-                      keepRawMSSpectra,
-                      Not Options.SkipMSMSProcessing)
-
-                    datasetFileInfo = dataImporter.DatasetFileInfo
-
-                Case DataInput.clsDataImport.MZ_ML_FILE_EXTENSION.ToUpper()
-
-                    ' Open the .mzML file and obtain the scan information
-
-                    Dim dataImporter = New DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                    RegisterDataImportEvents(dataImporter)
-                    dataImporterBase = dataImporter
-
-                    success = dataImporter.ExtractScanInfoFromMzMLDataFile(
-                        inputFilePathFull,
-                        scanList, spectraCache, dataOutputHandler,
-                        keepRawMSSpectra,
-                        Not Options.SkipMSMSProcessing)
-
-                    datasetFileInfo = dataImporter.DatasetFileInfo
-
-                Case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper(),
-                     DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper()
-
-                    ' Open the .mzXML file and obtain the scan information
-
-                    Dim dataImporter = New DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                    RegisterDataImportEvents(dataImporter)
-                    dataImporterBase = dataImporter
-
-                    success = dataImporter.ExtractScanInfoFromMzXMLDataFile(
-                      inputFilePathFull,
-                      scanList, spectraCache, dataOutputHandler,
-                      keepRawMSSpectra,
-                      Not Options.SkipMSMSProcessing)
-
-                    datasetFileInfo = dataImporter.DatasetFileInfo
-
-                Case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper(),
-                     DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper()
-
-                    ' Open the .mzData file and obtain the scan information
-
-                    Dim dataImporter = New DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                    RegisterDataImportEvents(dataImporter)
-                    dataImporterBase = dataImporter
-
-                    success = dataImporter.ExtractScanInfoFromMzDataFile(
-                      inputFilePathFull,
-                      scanList, spectraCache, dataOutputHandler,
-                      keepRawMSSpectra, Not Options.SkipMSMSProcessing)
-
-                    datasetFileInfo = dataImporter.DatasetFileInfo
-
-                Case DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper(),
-                     DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper()
-
-                    ' Open the .MGF and .CDF files to obtain the scan information
-
-                    Dim dataImporter = New DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking)
-                    RegisterDataImportEvents(dataImporter)
-                    dataImporterBase = dataImporter
-
-                    success = dataImporter.ExtractScanInfoFromMGFandCDF(
-                      inputFilePathFull,
-                      scanList, spectraCache, dataOutputHandler,
-                      keepRawMSSpectra, Not Options.SkipMSMSProcessing)
-
-                    datasetFileInfo = dataImporter.DatasetFileInfo
-
-                Case Else
-                    mStatusMessage = "Unknown file extension: " & Path.GetExtension(inputFilePathFull)
-                    SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension)
-                    success = False
-
-                    ' Instantiate this object to avoid a warning below about the object potentially not being initialized
-                    ' In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
-                    datasetFileInfo = New DatasetFileInfo()
-                    dataImporterBase = Nothing
-            End Select
-
-            If Not success Then
-                If mLocalErrorCode = eMasicErrorCodes.NoParentIonsFoundInInputFile AndAlso String.IsNullOrWhiteSpace(mStatusMessage) Then
-                    mStatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range"
-                End If
-                SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, True)
-            End If
-
-        Catch ex As Exception
-            success = False
-            LogErrors("ProcessFile", "Error accessing input data file: " & inputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError)
-            dataImporterBase = Nothing
-        End Try
-
-        Return success
-
-    End Function
-
-    Public Function LoadParameterFileSettings(parameterFilePath As String) As Boolean
-        Dim success = Options.LoadParameterFileSettings(parameterFilePath)
-        Return success
-    End Function
-
-    Private Sub LogErrors(
-      source As String,
-      message As String,
-      ex As Exception,
-      Optional eNewErrorCode As eMasicErrorCodes = eMasicErrorCodes.NoError)
-
-        Dim messageWithoutCRLF As String
-
-        Options.StatusMessage = message
-
-        messageWithoutCRLF = Options.StatusMessage.Replace(ControlChars.NewLine, "; ")
-
-        If ex Is Nothing Then
-            ex = New Exception("Error")
-        Else
-            If Not ex.Message Is Nothing AndAlso ex.Message.Length > 0 AndAlso Not message.Contains(ex.Message) Then
-                messageWithoutCRLF &= "; " & ex.Message
-            End If
-        End If
-
-        ' Show the message and log to the clsProcessFilesBaseClass logger
-        If String.IsNullOrEmpty(source) Then
-            ShowErrorMessage(messageWithoutCRLF, True)
-        Else
-            ShowErrorMessage(source & ": " & messageWithoutCRLF, True)
-        End If
-
-        If Not ex Is Nothing Then
-            Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex))
-        End If
-
-        If Not eNewErrorCode = eMasicErrorCodes.NoError Then
-            SetLocalErrorCode(eNewErrorCode, True)
-        End If
-
-    End Sub
-
-    ''' <summary>
-    ''' Main processing function
-    ''' </summary>
-    ''' <param name="inputFilePath"></param>
-    ''' <param name="outputDirectoryPath"></param>
-    ''' <param name="parameterFilePath"></param>
-    ''' <param name="resetErrorCode"></param>
-    ''' <returns></returns>
-    Public Overloads Overrides Function ProcessFile(
-      inputFilePath As String,
-      outputDirectoryPath As String,
-      parameterFilePath As String,
-      resetErrorCode As Boolean) As Boolean
-
-        Dim inputFileInfo As FileInfo
-
-        Dim success, doNotProcess As Boolean
-
-        Dim inputFilePathFull As String = String.Empty
-
-        If Not mLoggedMASICVersion Then
-            LogMessage("Starting MASIC v" & GetAppVersion(mFileDate))
-            Console.WriteLine()
-            mLoggedMASICVersion = True
-        End If
-
-        If resetErrorCode Then
-            SetLocalErrorCode(eMasicErrorCodes.NoError)
-        End If
-
-        Options.OutputDirectoryPath = outputDirectoryPath
-
-        mSubtaskProcessingStepPct = 0
-        UpdateProcessingStep(eProcessingStepConstants.NewTask, True)
-        MyBase.ResetProgress("Starting calculations")
-
-        mStatusMessage = String.Empty
-
-        UpdateStatusFile(True)
-
-        If Not Options.LoadParameterFileSettings(parameterFilePath, inputFilePath) Then
-            MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile)
-            mStatusMessage = "Parameter file load error: " & parameterFilePath
-
-            MyBase.ShowErrorMessage(mStatusMessage)
-
-            If MyBase.ErrorCode = ProcessFilesErrorCodes.NoError Then
-                MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile)
-            End If
-            UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
-
-            LogMessage("Processing ended in error")
-            Return False
-        End If
-
-        Dim dataOutputHandler = New clsDataOutput(Options)
-        RegisterEvents(dataOutputHandler)
-
-        Try
-            ' If a Custom SICList file is defined, then load the custom SIC values now
-            If Options.CustomSICList.CustomSICListFileName.Length > 0 Then
-                Dim sicListReader = New DataInput.clsCustomSICListReader(Options.CustomSICList)
-                RegisterEvents(sicListReader)
-
-                LogMessage("ProcessFile: Reading custom SIC values file: " & Options.CustomSICList.CustomSICListFileName)
-                success = sicListReader.LoadCustomSICListFromFile(Options.CustomSICList.CustomSICListFileName)
-                If Not success Then
-                    SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues)
-                    Exit Try
-                End If
-            End If
-
-            Options.ReporterIons.UpdateMZIntensityFilterIgnoreRange()
-
-            LogMessage("Source data file: " & inputFilePath)
-
-            If inputFilePath Is Nothing OrElse inputFilePath.Length = 0 Then
-                ShowErrorMessage("Input file name is empty")
-                MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidInputFilePath)
-                Exit Try
-            End If
-
-            mStatusMessage = "Parsing " & Path.GetFileName(inputFilePath)
-
-            success = CleanupFilePaths(inputFilePath, outputDirectoryPath)
-            Options.OutputDirectoryPath = outputDirectoryPath
-
-            If success Then
-                Dim dbAccessor = New clsDatabaseAccess(Options)
-                RegisterEvents(dbAccessor)
-
-                Options.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, Options.DatasetLookupFilePath, Options.SICOptions.DatasetID)
-
-                If Me.LocalErrorCode <> eMasicErrorCodes.NoError Then
-                    If Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetID OrElse Me.LocalErrorCode = eMasicErrorCodes.InvalidDatasetLookupFilePath Then
-                        ' Ignore this error
-                        Me.SetLocalErrorCode(eMasicErrorCodes.NoError)
-                        success = True
-                    Else
-                        success = False
-                    End If
-                End If
-            End If
-
-            If Not success Then
-                If mLocalErrorCode = eMasicErrorCodes.NoError Then MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.FilePathError)
-                Exit Try
-            End If
-
-            Try
-                '---------------------------------------------------------
-                ' See if an output XML file already exists
-                ' If it does, open it and read the parameters used
-                ' If they match the current analysis parameters, and if the input file specs match the input file, then
-                '  do not reprocess
-                '---------------------------------------------------------
-
-                ' Obtain the full path to the input file
-                inputFileInfo = New FileInfo(inputFilePath)
-                inputFilePathFull = inputFileInfo.FullName
-
-                LogMessage("Checking for existing results in the output path: " & outputDirectoryPath)
-
-                doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, Options)
-
-                If doNotProcess Then
-                    LogMessage("Existing results found; data will not be reprocessed")
-                End If
-
-            Catch ex As Exception
-                success = False
-                LogErrors("ProcessFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError)
-            End Try
-
-            If doNotProcess Then
-                success = True
-                Exit Try
-            End If
-
-            Try
-                '---------------------------------------------------------
-                ' Verify that we have write access to the output directory
-                '---------------------------------------------------------
-
-                ' The following should work for testing access permissions, but it doesn't
-                'Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
-                '' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
-                'objFilePermissionTest.Demand()
-                'objFilePermissionTest.Assert()
-
-                LogMessage("Checking for write permission in the output path: " & outputDirectoryPath)
-
-                Dim outputFileTestPath As String = Path.Combine(outputDirectoryPath, "TestOutputFile" & DateTime.UtcNow.Ticks & ".tmp")
-
-                Using fsOutFileTest As New StreamWriter(outputFileTestPath, False)
-                    fsOutFileTest.WriteLine("Test")
-                End Using
-
-                ' Wait 250 msec, then delete the file
-                Threading.Thread.Sleep(250)
-                File.Delete(outputFileTestPath)
-
-            Catch ex As Exception
-                success = False
-                LogErrors("ProcessFile", "The current user does not have write permission for the output directory: " & outputDirectoryPath, ex, eMasicErrorCodes.FileIOPermissionsError)
-            End Try
-
-            If Not success Then
-                SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError)
-                Exit Try
-            End If
-
-            '---------------------------------------------------------
-            ' Reset the processing stats
-            '---------------------------------------------------------
-
-            InitializeMemoryManagementOptions(mProcessingStats)
-
-            '---------------------------------------------------------
-            ' Instantiate the SpectraCache
-            '---------------------------------------------------------
-
-            Using spectraCache = New clsSpectraCache(Options.CacheOptions) With {
-                .DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
-                .CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
-                .CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using MASIC.DataOutput;
+using MASIC.DatasetStats;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using PRISM;
+using PRISM.Logging;
+
+namespace MASIC
+{
+    public class clsMASIC : PRISM.FileProcessor.ProcessFilesBase
+    {
+
+        /// <summary>
+    /// Constructor
+    /// </summary>
+        public clsMASIC()
+        {
+            mFileDate = "March 27, 2020";
+            mLocalErrorCode = eMasicErrorCodes.NoError;
+            mStatusMessage = string.Empty;
+            mProcessingStats = new clsProcessingStats();
+            InitializeMemoryManagementOptions(mProcessingStats);
+            mMASICPeakFinder = new MASICPeakFinder.clsMASICPeakFinder();
+            RegisterEvents(mMASICPeakFinder);
+            Options = new clsMASICOptions(FileVersion, mMASICPeakFinder.ProgramVersion);
+            Options.InitializeVariables();
+            RegisterEvents(Options);
+        }
+
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        // Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
+        public const bool DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD = false;
+
+        // Disabling this will slow down the correlation process (slightly)
+        public const bool DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD = true;
+        private const int MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS = 3;
+
+        public enum eProcessingStepConstants
+        {
+            NewTask = 0,
+            ReadDataFile = 1,
+            SaveBPI = 2,
+            CreateSICsAndFindPeaks = 3,
+            FindSimilarParentIons = 4,
+            SaveExtendedScanStatsFiles = 5,
+            SaveSICStatsFlatFile = 6,
+            CloseOpenFileHandles = 7,
+            UpdateXMLFileWithNewOptimalPeakApexValues = 8,
+            Cancelled = 99,
+            Complete = 100
+        }
+
+        public enum eMasicErrorCodes
+        {
+            NoError = 0,
+            InvalidDatasetLookupFilePath = 1,
+            UnknownFileExtension = 2,            // This error code matches the identical code in clsFilterMsMsSpectra
+            InputFileAccessError = 4,            // This error code matches the identical code in clsFilterMsMsSpectra
+            InvalidDatasetID = 8,
+            CreateSICsError = 16,
+            FindSICPeaksError = 32,
+            InvalidCustomSICValues = 64,
+            NoParentIonsFoundInInputFile = 128,
+            NoSurveyScansFoundInInputFile = 256,
+            FindSimilarParentIonsError = 512,
+            InputFileDataReadError = 1024,
+            OutputFileWriteError = 2048,
+            FileIOPermissionsError = 4096,
+            ErrorCreatingSpectrumCacheDirectory = 8192,
+            ErrorCachingSpectrum = 16384,
+            ErrorUncachingSpectrum = 32768,
+            ErrorDeletingCachedSpectrumFiles = 65536,
+            UnspecifiedError = -1
+        }
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private bool mLoggedMASICVersion = false;
+        private readonly MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
+        private readonly clsProcessingStats mProcessingStats;
+
+        /// <summary>
+    /// Current processing step
+    /// </summary>
+        private eProcessingStepConstants mProcessingStep;
+
+        /// <summary>
+    /// Percent completion for the current sub task
+    /// </summary>
+    /// <remarks>Value between 0 and 100</remarks>
+        private float mSubtaskProcessingStepPct;
+        private string mSubtaskDescription = string.Empty;
+        private eMasicErrorCodes mLocalErrorCode;
+        private string mStatusMessage;
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */    /// <summary>
+    /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
+    /// Use ProgressSubtaskChanged when updating the sub task progress
+    /// </summary>
+        public event ProgressSubtaskChangedEventHandler ProgressSubtaskChanged;
+
+        public delegate void ProgressSubtaskChangedEventHandler();
+
+        public event ProgressResetKeypressAbortEventHandler ProgressResetKeypressAbort;
+
+        public delegate void ProgressResetKeypressAbortEventHandler();
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        // ReSharper disable UnusedMember.Global
+
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        [Obsolete("Use Property Options")]
+        public string DatabaseConnectionString
+        {
+            get
+            {
+                return Options.DatabaseConnectionString;
             }
-                RegisterEvents(spectraCache)
-
-                spectraCache.InitializeSpectraPool()
-
-                Dim datasetFileInfo = New DatasetFileInfo()
-
-                Dim scanList = New clsScanList()
-                RegisterEvents(scanList)
-
-                Dim parentIonProcessor = New clsParentIonProcessing(Options.ReporterIons)
-                RegisterEvents(parentIonProcessor)
-
-                Dim scanTracking = New clsScanTracking(Options.ReporterIons, mMASICPeakFinder)
-                RegisterEvents(scanTracking)
-
-                Dim dataImporterBase As DataInput.clsDataImport = Nothing
-
-                '---------------------------------------------------------
-                ' Load the mass spectral data
-                '---------------------------------------------------------
-
-                success = LoadData(inputFilePathFull,
-                                   outputDirectoryPath,
-                                   dataOutputHandler,
-                                   parentIonProcessor,
-                                   scanTracking,
-                                   scanList,
-                                   spectraCache,
-                                   dataImporterBase,
-                                   datasetFileInfo)
-
-                ' Record that the file is finished loading
-                mProcessingStats.FileLoadEndTime = DateTime.UtcNow
-
-                If Not success Then
-                    If mStatusMessage Is Nothing OrElse mStatusMessage.Length = 0 Then
-                        mStatusMessage = "Unable to parse file; unknown error"
-                    Else
-                        mStatusMessage = "Unable to parse file: " & mStatusMessage
-                    End If
-
-                    ShowErrorMessage(mStatusMessage)
-                    Exit Try
-                End If
-
-                If success Then
-                    '---------------------------------------------------------
-                    ' Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
-                    '---------------------------------------------------------
-
-                    success = FindSICsAndWriteOutput(
-                        inputFilePathFull, outputDirectoryPath,
-                        scanList, spectraCache, dataOutputHandler, scanTracking,
-                        datasetFileInfo, parentIonProcessor, dataImporterBase)
-                End If
-
-            End Using
-
-        Catch ex As Exception
-            success = False
-            LogErrors("ProcessFile", "Error in ProcessFile", ex, eMasicErrorCodes.UnspecifiedError)
-        Finally
-
-            ' Record the final processing stats (before the output file handles are closed)
-            With mProcessingStats
-                .ProcessingEndTime = DateTime.UtcNow
-                .MemoryUsageMBAtEnd = GetProcessMemoryUsageMB()
-            End With
-
-            '---------------------------------------------------------
-            ' Make sure the output file handles are closed
-            '---------------------------------------------------------
-
-            dataOutputHandler.OutputFileHandles.CloseAll()
-        End Try
-
-        Try
-            '---------------------------------------------------------
-            ' Cleanup after processing or error
-            '---------------------------------------------------------
-
-            LogMessage("ProcessFile: Processing nearly complete")
-
-            Console.WriteLine()
-            If doNotProcess Then
-                mStatusMessage = "Existing valid results were found; processing was not repeated."
-                ShowMessage(mStatusMessage)
-            ElseIf success Then
-                mStatusMessage = "Processing complete.  Results can be found in directory: " & outputDirectoryPath
-                ShowMessage(mStatusMessage)
-            Else
-                If Me.LocalErrorCode = eMasicErrorCodes.NoError Then
-                    mStatusMessage = "Error Code " & MyBase.ErrorCode & ": " & Me.GetErrorMessage()
-                    ShowErrorMessage(mStatusMessage)
-                Else
-                    mStatusMessage = "Error Code " & Me.LocalErrorCode & ": " & Me.GetErrorMessage()
-                    ShowErrorMessage(mStatusMessage)
-                End If
-            End If
-
-            With mProcessingStats
-                LogMessage("ProcessingStats: Memory Usage At Start (MB) = " & .MemoryUsageMBAtStart.ToString())
-                LogMessage("ProcessingStats: Peak memory usage (MB) = " & .PeakMemoryUsageMB.ToString())
 
-                LogMessage("ProcessingStats: File Load Time (seconds) = " & .FileLoadEndTime.Subtract(.FileLoadStartTime).TotalSeconds.ToString())
-                LogMessage("ProcessingStats: Memory Usage During Load (MB) = " & .MemoryUsageMBDuringLoad.ToString())
-
-                LogMessage("ProcessingStats: Processing Time (seconds) = " & .ProcessingEndTime.Subtract(.ProcessingStartTime).TotalSeconds.ToString())
-                LogMessage("ProcessingStats: Memory Usage At End (MB) = " & .MemoryUsageMBAtEnd.ToString())
-
-                LogMessage("ProcessingStats: Cache Event Count = " & .CacheEventCount.ToString())
-                LogMessage("ProcessingStats: UncCache Event Count = " & .UnCacheEventCount.ToString())
-            End With
-
-            If success Then
-                LogMessage("Processing complete")
-            Else
-                LogMessage("Processing ended in error")
-            End If
-
-        Catch ex As Exception
-            success = False
-            LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, eMasicErrorCodes.UnspecifiedError)
-        End Try
-
-        If success Then
-            Options.SICOptions.DatasetID += 1
-        End If
-
-        If success Then
-            UpdateProcessingStep(eProcessingStepConstants.Complete, True)
-        Else
-            UpdateProcessingStep(eProcessingStepConstants.Cancelled, True)
-        End If
-
-        Return success
-
-    End Function
-
-    Private Sub RegisterDataImportEvents(dataImporter As DataInput.clsDataImport)
-        RegisterEvents(dataImporter)
-        AddHandler dataImporter.UpdateMemoryUsageEvent, AddressOf UpdateMemoryUsageEventHandler
-    End Sub
-
-    Private Sub RegisterEventsBase(oClass As IEventNotifier)
-        AddHandler oClass.StatusEvent, AddressOf MessageEventHandler
-        AddHandler oClass.ErrorEvent, AddressOf ErrorEventHandler
-        AddHandler oClass.WarningEvent, AddressOf WarningEventHandler
-        AddHandler oClass.ProgressUpdate, AddressOf ProgressUpdateHandler
-    End Sub
-
-    Private Overloads Sub RegisterEvents(oClass As clsMasicEventNotifier)
-        RegisterEventsBase(oClass)
-
-        AddHandler oClass.UpdateCacheStatsEvent, AddressOf UpdatedCacheStatsEventHandler
-        AddHandler oClass.UpdateBaseClassErrorCodeEvent, AddressOf UpdateBaseClassErrorCodeEventHandler
-        AddHandler oClass.UpdateErrorCodeEvent, AddressOf UpdateErrorCodeEventHandler
-    End Sub
-
-    ' ReSharper disable UnusedMember.Global
-
-    <Obsolete("Use Options.SaveParameterFileSettings")>
-    Public Function SaveParameterFileSettings(parameterFilePath As String) As Boolean
-        Dim success = Options.SaveParameterFileSettings(parameterFilePath)
-        Return success
-    End Function
-
-    <Obsolete("Use Options.ReporterIons.SetReporterIons")>
-    Public Sub SetReporterIons(reporterIonMZList() As Double)
-        Options.ReporterIons.SetReporterIons(reporterIonMZList)
-    End Sub
-
-    <Obsolete("Use Options.ReporterIons.SetReporterIons")>
-    Public Sub SetReporterIons(reporterIonMZList() As Double, mzToleranceDa As Double)
-        Options.ReporterIons.SetReporterIons(reporterIonMZList, mzToleranceDa)
-    End Sub
-
-    <Obsolete("Use Options.ReporterIons.SetReporterIons")>
-    Public Sub SetReporterIons(reporterIons As List(Of clsReporterIonInfo))
-        Options.ReporterIons.SetReporterIons(reporterIons, True)
-    End Sub
-
-    <Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")>
-    Public Sub SetReporterIonMassMode(eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants)
-        Options.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode)
-    End Sub
-
-    <Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")>
-    Public Sub SetReporterIonMassMode(
-      eReporterIonMassMode As clsReporterIons.eReporterIonMassModeConstants,
-      mzToleranceDa As Double)
-
-        Options.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode, mzToleranceDa)
-
-    End Sub
-
-    ' ReSharper restore UnusedMember.Global
-
-    Private Sub SetDefaultPeakLocValues(scanList As clsScanList)
-
-        Dim parentIonIndex As Integer
-        Dim scanIndexObserved As Integer
-
-        Try
-            For parentIonIndex = 0 To scanList.ParentIons.Count - 1
-                With scanList.ParentIons(parentIonIndex)
-                    scanIndexObserved = .SurveyScanIndex
-
-                    With .SICStats
-                        .ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan
-                        .PeakScanIndexStart = scanIndexObserved
-                        .PeakScanIndexEnd = scanIndexObserved
-                        .PeakScanIndexMax = scanIndexObserved
-                    End With
-                End With
-            Next
-        Catch ex As Exception
-            LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex)
-        End Try
-
-    End Sub
-
-    Private Sub SetLocalErrorCode(eNewErrorCode As eMasicErrorCodes)
-        SetLocalErrorCode(eNewErrorCode, False)
-    End Sub
-
-    Private Sub SetLocalErrorCode(
-      eNewErrorCode As eMasicErrorCodes,
-      leaveExistingErrorCodeUnchanged As Boolean)
-
-        If leaveExistingErrorCodeUnchanged AndAlso mLocalErrorCode <> eMasicErrorCodes.NoError Then
-            ' An error code is already defined; do not change it
-        Else
-            mLocalErrorCode = eNewErrorCode
-
-            If eNewErrorCode = eMasicErrorCodes.NoError Then
-                If MyBase.ErrorCode = ProcessFilesErrorCodes.LocalizedError Then
-                    MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.NoError)
-                End If
-            Else
-                MyBase.SetBaseClassErrorCode(ProcessFilesErrorCodes.LocalizedError)
-            End If
-        End If
-
-    End Sub
-
-    ''' <summary>
-    ''' Update subtask progress
-    ''' </summary>
-    ''' <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single)
-        SetSubtaskProcessingStepPct(subtaskPercentComplete, False)
-    End Sub
-
-    ''' <summary>
-    '''  Update subtask progress
-    ''' </summary>
-    ''' <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-    ''' <param name="forceUpdate"></param>
-    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single, forceUpdate As Boolean)
-        Const MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250
-
-        Dim raiseEventNow As Boolean
-        Static LastFileWriteTime As DateTime = DateTime.UtcNow
-
-        If Math.Abs(subtaskPercentComplete) < Single.Epsilon Then
-            AbortProcessing = False
-            RaiseEvent ProgressResetKeypressAbort()
-            raiseEventNow = True
-        End If
-
-        If Math.Abs(subtaskPercentComplete - mSubtaskProcessingStepPct) > Single.Epsilon Then
-            raiseEventNow = True
-            mSubtaskProcessingStepPct = subtaskPercentComplete
-        End If
-
-        If forceUpdate OrElse raiseEventNow OrElse
-            DateTime.UtcNow.Subtract(LastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS Then
-            LastFileWriteTime = DateTime.UtcNow
-
-            UpdateOverallProgress()
-            UpdateStatusFile()
-            RaiseEvent ProgressSubtaskChanged()
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Update subtask progress and description
-    ''' </summary>
-    ''' <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-    ''' <param name="message"></param>
-    Private Sub SetSubtaskProcessingStepPct(subtaskPercentComplete As Single, message As String)
-        mSubtaskDescription = message
-        SetSubtaskProcessingStepPct(subtaskPercentComplete, True)
-    End Sub
-
-    Private Sub UpdateOverallProgress()
-        UpdateOverallProgress(ProgressStepDescription)
-    End Sub
-
-    Private Sub UpdateOverallProgress(message As String)
-
-        ' Update the processing progress, storing the value in mProgressPercentComplete
-
-        'NewTask = 0
-        'ReadDataFile = 1
-        'SaveBPI = 2
-        'CreateSICsAndFindPeaks = 3
-        'FindSimilarParentIons = 4
-        'SaveExtendedScanStatsFiles = 5
-        'SaveSICStatsFlatFile = 6
-        'CloseOpenFileHandles = 7
-        'UpdateXMLFileWithNewOptimalPeakApexValues = 8
-        'Cancelled = 99
-        'Complete = 100
-
-        Dim weightingFactors() As Single
-
-        If Options.SkipMSMSProcessing Then
-            ' Step                           0   1     2     3  4   5      6      7      8
-            weightingFactors = New Single() {0, 0.97, 0.002, 0, 0, 0.001, 0.025, 0.001, 0.001}            ' The sum of these factors should be 1.00
-        Else
-            ' Step                           0   1      2      3     4     5      6      7      8
-            weightingFactors = New Single() {0, 0.194, 0.003, 0.65, 0.09, 0.001, 0.006, 0.001, 0.055}     ' The sum of these factors should be 1.00
-        End If
-
-        Dim currentStep, index As Integer
-        Dim overallPctCompleted As Single
-
-        Try
-            currentStep = mProcessingStep
-            If currentStep >= weightingFactors.Length Then currentStep = weightingFactors.Length - 1
-
-            overallPctCompleted = 0
-            For index = 0 To currentStep - 1
-                overallPctCompleted += weightingFactors(index) * 100
-            Next
-
-            overallPctCompleted += weightingFactors(currentStep) * mSubtaskProcessingStepPct
-
-            mProgressPercentComplete = overallPctCompleted
-
-        Catch ex As Exception
-            LogErrors("UpdateOverallProgress", "Bug in UpdateOverallProgress", ex)
-        End Try
-
-        MyBase.UpdateProgress(message, mProgressPercentComplete)
-    End Sub
-
-    Private Sub UpdatePeakMemoryUsage()
-
-        Dim memoryUsageMB As Single
-
-        memoryUsageMB = GetProcessMemoryUsageMB()
-        If memoryUsageMB > mProcessingStats.PeakMemoryUsageMB Then
-            mProcessingStats.PeakMemoryUsageMB = memoryUsageMB
-        End If
-
-    End Sub
-
-    Private Sub UpdateProcessingStep(eNewProcessingStep As eProcessingStepConstants, Optional forceStatusFileUpdate As Boolean = False)
-
-        mProcessingStep = eNewProcessingStep
-        UpdateStatusFile(forceStatusFileUpdate)
-
-    End Sub
-
-    Private Sub UpdateStatusFile(Optional forceUpdate As Boolean = False)
-
-        Static LastFileWriteTime As DateTime = DateTime.UtcNow
-
-        If forceUpdate OrElse DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS Then
-            LastFileWriteTime = DateTime.UtcNow
-
-            Try
-                Dim tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" & Options.MASICStatusFilename)
-                Dim statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename)
-
-                Using writer = New Xml.XmlTextWriter(tempPath, Text.Encoding.UTF8)
-
-                    writer.Formatting = Xml.Formatting.Indented
-                    writer.Indentation = 2
-
-                    writer.WriteStartDocument(True)
-                    writer.WriteComment("MASIC processing status")
-
-                    'Write the beginning of the "Root" element.
-                    writer.WriteStartElement("Root")
-
-                    writer.WriteStartElement("General")
-                    writer.WriteElementString("LastUpdate", DateTime.Now.ToString())
-                    writer.WriteElementString("ProcessingStep", mProcessingStep.ToString())
-                    writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2))
-                    writer.WriteElementString("Error", GetErrorMessage())
-                    writer.WriteEndElement()
-
-                    writer.WriteStartElement("Statistics")
-                    writer.WriteElementString("FreeMemoryMB", StringUtilities.DblToString(GetFreeMemoryMB(), 1))
-                    writer.WriteElementString("MemoryUsageMB", StringUtilities.DblToString(GetProcessMemoryUsageMB, 1))
-                    writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(mProcessingStats.PeakMemoryUsageMB, 1))
-
-                    With mProcessingStats
-                        writer.WriteElementString("CacheEventCount", .CacheEventCount.ToString())
-                        writer.WriteElementString("UnCacheEventCount", .UnCacheEventCount.ToString())
-                    End With
-
-                    writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 2))
-                    writer.WriteEndElement()
-
-                    writer.WriteEndElement()  'End the "Root" element.
-                    writer.WriteEndDocument() 'End the document
-
-                End Using
-
-                'Copy the temporary file to the real one
-                File.Copy(tempPath, statusFilePath, True)
-                File.Delete(tempPath)
-
-            Catch ex As Exception
-                ' Ignore any errors
-            End Try
-
-        End If
-
-    End Sub
-
-#Region "Event Handlers"
-
-    Private Sub MessageEventHandler(message As String)
-        LogMessage(message)
-    End Sub
-
-    Private Sub ErrorEventHandler(message As String, ex As Exception)
-        LogErrors(String.Empty, message, ex)
-    End Sub
-
-    Private Sub WarningEventHandler(message As String)
-        LogMessage(message, MessageTypeConstants.Warning)
-    End Sub
-
-    ''' <summary>
-    ''' Update progress
-    ''' </summary>
-    ''' <param name="progressMessage">Progress message (can be empty)</param>
-    ''' <param name="percentComplete">Value between 0 and 100</param>
-    Private Sub ProgressUpdateHandler(progressMessage As String, percentComplete As Single)
-        If String.IsNullOrEmpty(progressMessage) Then
-            SetSubtaskProcessingStepPct(percentComplete)
-        Else
-            SetSubtaskProcessingStepPct(percentComplete, progressMessage)
-        End If
-
-    End Sub
-
-    Private Sub UpdatedCacheStatsEventHandler(cacheEventCount As Integer, unCacheEventCount As Integer)
-        mProcessingStats.CacheEventCount = cacheEventCount
-        mProcessingStats.UnCacheEventCount = unCacheEventCount
-    End Sub
-
-    Private Sub UpdateBaseClassErrorCodeEventHandler(eErrorCode As ProcessFilesErrorCodes)
-        SetBaseClassErrorCode(eErrorCode)
-    End Sub
-
-    Private Sub UpdateErrorCodeEventHandler(eErrorCode As eMasicErrorCodes, leaveExistingErrorCodeUnchanged As Boolean)
-        SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged)
-    End Sub
-
-    Private Sub UpdateMemoryUsageEventHandler()
-        ' Record the current memory usage
-        Dim memoryUsageMB = GetProcessMemoryUsageMB()
-        If memoryUsageMB > mProcessingStats.MemoryUsageMBDuringLoad Then
-            mProcessingStats.MemoryUsageMBDuringLoad = memoryUsageMB
-        End If
-
-    End Sub
-
-#End Region
-
-End Class
+            set
+            {
+                Options.DatabaseConnectionString = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public string DatasetInfoQuerySql
+        {
+            get
+            {
+                return Options.DatasetInfoQuerySql;
+            }
+
+            set
+            {
+                Options.DatasetInfoQuerySql = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public string DatasetLookupFilePath
+        {
+            get
+            {
+                return Options.DatasetLookupFilePath;
+            }
+
+            set
+            {
+                Options.DatasetLookupFilePath = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public int DatasetNumber
+        {
+            get
+            {
+                return Options.SICOptions.DatasetID;
+            }
+
+            set
+            {
+                Options.SICOptions.DatasetID = value;
+            }
+        }
+
+        public eMasicErrorCodes LocalErrorCode
+        {
+            get
+            {
+                return mLocalErrorCode;
+            }
+        }
+
+        public string MASICPeakFinderDllVersion
+        {
+            get
+            {
+                if (mMASICPeakFinder is object)
+                {
+                    return mMASICPeakFinder.ProgramVersion;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public string MASICStatusFilename
+        {
+            get
+            {
+                return Options.MASICStatusFilename;
+            }
+
+            set
+            {
+                if (value is null || value.Trim().Length == 0)
+                {
+                    Options.MASICStatusFilename = clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME;
+                }
+                else
+                {
+                    Options.MASICStatusFilename = value;
+                }
+            }
+        }
+
+        public clsMASICOptions Options { get; private set; }
+
+        public eProcessingStepConstants ProcessStep
+        {
+            get
+            {
+                return mProcessingStep;
+            }
+        }
+
+        /// <summary>
+    /// Subtask progress percent complete
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks>Value between 0 and 100</remarks>
+        public float SubtaskProgressPercentComplete
+        {
+            get
+            {
+                return mSubtaskProcessingStepPct;
+            }
+        }
+
+        public string SubtaskDescription
+        {
+            get
+            {
+                return mSubtaskDescription;
+            }
+        }
+
+        public string StatusMessage
+        {
+            get
+            {
+                return mStatusMessage;
+            }
+        }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        [Obsolete("Use Property Options")]
+        public bool CDFTimeInSeconds
+        {
+            get
+            {
+                return Options.CDFTimeInSeconds;
+            }
+
+            set
+            {
+                Options.CDFTimeInSeconds = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool CompressMSSpectraData
+        {
+            get
+            {
+                return Options.SICOptions.CompressMSSpectraData;
+            }
+
+            set
+            {
+                Options.SICOptions.CompressMSSpectraData = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool CompressMSMSSpectraData
+        {
+            get
+            {
+                return Options.SICOptions.CompressMSMSSpectraData;
+            }
+
+            set
+            {
+                Options.SICOptions.CompressMSMSSpectraData = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double CompressToleranceDivisorForDa
+        {
+            get
+            {
+                return Options.SICOptions.CompressToleranceDivisorForDa;
+            }
+
+            set
+            {
+                Options.SICOptions.CompressToleranceDivisorForDa = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double CompressToleranceDivisorForPPM
+        {
+            get
+            {
+                return Options.SICOptions.CompressToleranceDivisorForPPM;
+            }
+
+            set
+            {
+                Options.SICOptions.CompressToleranceDivisorForPPM = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool ConsolidateConstantExtendedHeaderValues
+        {
+            get
+            {
+                return Options.ConsolidateConstantExtendedHeaderValues;
+            }
+
+            set
+            {
+                Options.ConsolidateConstantExtendedHeaderValues = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public clsCustomSICList.eCustomSICScanTypeConstants CustomSICListScanType
+        {
+            get
+            {
+                return Options.CustomSICList.ScanToleranceType;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float CustomSICListScanTolerance
+        {
+            get
+            {
+                return Options.CustomSICList.ScanOrAcqTimeTolerance;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public List<clsCustomMZSearchSpec> CustomSICListSearchValues
+        {
+            get
+            {
+                return Options.CustomSICList.CustomMZSearchValues;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public string CustomSICListFileName
+        {
+            get
+            {
+                return Options.CustomSICList.CustomSICListFileName;
+            }
+
+            set
+            {
+                Options.CustomSICList.CustomSICListFileName = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool ExportRawDataOnly
+        {
+            get
+            {
+                return Options.ExportRawDataOnly;
+            }
+
+            set
+            {
+                Options.ExportRawDataOnly = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool FastExistingXMLFileTest
+        {
+            get
+            {
+                return Options.FastExistingXMLFileTest;
+            }
+
+            set
+            {
+                Options.FastExistingXMLFileTest = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool IncludeHeadersInExportFile
+        {
+            get
+            {
+                return Options.IncludeHeadersInExportFile;
+            }
+
+            set
+            {
+                Options.IncludeHeadersInExportFile = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool IncludeScanTimesInSICStatsFile
+        {
+            get
+            {
+                return Options.IncludeScanTimesInSICStatsFile;
+            }
+
+            set
+            {
+                Options.IncludeScanTimesInSICStatsFile = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool LimitSearchToCustomMZList
+        {
+            get
+            {
+                return Options.CustomSICList.LimitSearchToCustomMZList;
+            }
+
+            set
+            {
+                Options.CustomSICList.LimitSearchToCustomMZList = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double ParentIonDecoyMassDa
+        {
+            get
+            {
+                return Options.ParentIonDecoyMassDa;
+            }
+
+            set
+            {
+                Options.ParentIonDecoyMassDa = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool SkipMSMSProcessing
+        {
+            get
+            {
+                return Options.SkipMSMSProcessing;
+            }
+
+            set
+            {
+                Options.SkipMSMSProcessing = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool SkipSICAndRawDataProcessing
+        {
+            get
+            {
+                return Options.SkipSICAndRawDataProcessing;
+            }
+
+            set
+            {
+                Options.SkipSICAndRawDataProcessing = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool SuppressNoParentIonsError
+        {
+            get
+            {
+                return Options.SuppressNoParentIonsError;
+            }
+
+            set
+            {
+                Options.SuppressNoParentIonsError = value;
+            }
+        }
+
+        [Obsolete("No longer supported")]
+        public bool UseFinniganXRawAccessorFunctions
+        {
+            get
+            {
+                return true;
+            }
+
+            set
+            {
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool WriteDetailedSICDataFile
+        {
+            get
+            {
+                return Options.WriteDetailedSICDataFile;
+            }
+
+            set
+            {
+                Options.WriteDetailedSICDataFile = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool WriteExtendedStats
+        {
+            get
+            {
+                return Options.WriteExtendedStats;
+            }
+
+            set
+            {
+                Options.WriteExtendedStats = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool WriteExtendedStatsIncludeScanFilterText
+        {
+            get
+            {
+                return Options.WriteExtendedStatsIncludeScanFilterText;
+            }
+
+            set
+            {
+                Options.WriteExtendedStatsIncludeScanFilterText = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool WriteExtendedStatsStatusLog
+        {
+            get
+            {
+                return Options.WriteExtendedStatsStatusLog;
+            }
+
+            set
+            {
+                Options.WriteExtendedStatsStatusLog = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool WriteMSMethodFile
+        {
+            get
+            {
+                return Options.WriteMSMethodFile;
+            }
+
+            set
+            {
+                Options.WriteMSMethodFile = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool WriteMSTuneFile
+        {
+            get
+            {
+                return Options.WriteMSTuneFile;
+            }
+
+            set
+            {
+                Options.WriteMSTuneFile = value;
+            }
+        }
+
+        /// <summary>
+    /// This property is included for historical reasons since SIC tolerance can now be Da or PPM
+    /// </summary>
+    /// <returns></returns>
+        [Obsolete("Use Property Options.  Also, the SICToleranceDa setting should not be used; use SetSICTolerance and GetSICTolerance instead")]
+        public double SICToleranceDa
+        {
+            get
+            {
+                return Options.SICOptions.SICToleranceDa;
+            }
+
+            set
+            {
+                Options.SICOptions.SICToleranceDa = value;
+            }
+        }
+
+        [Obsolete("Use Property Options.SICOptions.GetSICTolerance")]
+        public double GetSICTolerance()
+        {
+            bool toleranceIsPPM;
+            return Options.SICOptions.GetSICTolerance(out toleranceIsPPM);
+        }
+
+        [Obsolete("Use Property Options.SICOptions.GetSICTolerance")]
+        public double GetSICTolerance(out bool toleranceIsPPM)
+        {
+            return Options.SICOptions.GetSICTolerance(out toleranceIsPPM);
+        }
+
+        [Obsolete("Use Property Options.SICOptions.SetSICTolerance")]
+        public void SetSICTolerance(double sicTolerance, bool toleranceIsPPM)
+        {
+            Options.SICOptions.SetSICTolerance(sicTolerance, toleranceIsPPM);
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool SICToleranceIsPPM
+        {
+            get
+            {
+                return Options.SICOptions.SICToleranceIsPPM;
+            }
+
+            set
+            {
+                Options.SICOptions.SICToleranceIsPPM = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool RefineReportedParentIonMZ
+        {
+            get
+            {
+                return Options.SICOptions.RefineReportedParentIonMZ;
+            }
+
+            set
+            {
+                Options.SICOptions.RefineReportedParentIonMZ = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float RTRangeEnd
+        {
+            get
+            {
+                return Options.SICOptions.RTRangeEnd;
+            }
+
+            set
+            {
+                Options.SICOptions.RTRangeEnd = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float RTRangeStart
+        {
+            get
+            {
+                return Options.SICOptions.RTRangeStart;
+            }
+
+            set
+            {
+                Options.SICOptions.RTRangeStart = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public int ScanRangeEnd
+        {
+            get
+            {
+                return Options.SICOptions.ScanRangeEnd;
+            }
+
+            set
+            {
+                Options.SICOptions.ScanRangeEnd = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public int ScanRangeStart
+        {
+            get
+            {
+                return Options.SICOptions.ScanRangeStart;
+            }
+
+            set
+            {
+                Options.SICOptions.ScanRangeStart = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float MaxSICPeakWidthMinutesBackward
+        {
+            get
+            {
+                return Options.SICOptions.MaxSICPeakWidthMinutesBackward;
+            }
+
+            set
+            {
+                Options.SICOptions.MaxSICPeakWidthMinutesBackward = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float MaxSICPeakWidthMinutesForward
+        {
+            get
+            {
+                return Options.SICOptions.MaxSICPeakWidthMinutesForward;
+            }
+
+            set
+            {
+                Options.SICOptions.MaxSICPeakWidthMinutesForward = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double SICNoiseFractionLowIntensityDataToAverage
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double SICNoiseMinimumSignalToNoiseRatio
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio;
+            }
+
+            set
+            {
+                // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
+                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double SICNoiseThresholdIntensity
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes SICNoiseThresholdMode
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double MassSpectraNoiseFractionLowIntensityDataToAverage
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double MassSpectraNoiseMinimumSignalToNoiseRatio
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double MassSpectraNoiseThresholdIntensity
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute;
+            }
+
+            set
+            {
+                if (value < 0 | value > double.MaxValue)
+                    value = 0;
+                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes MassSpectraNoiseThresholdMode
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool ReplaceSICZeroesWithMinimumPositiveValueFromMSData
+        {
+            get
+            {
+                return Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData;
+            }
+
+            set
+            {
+                Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = value;
+            }
+        }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        [Obsolete("Use Property Options")]
+        public bool ExportRawDataIncludeMSMS
+        {
+            get
+            {
+                return Options.RawDataExportOptions.IncludeMSMS;
+            }
+
+            set
+            {
+                Options.RawDataExportOptions.IncludeMSMS = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool ExportRawDataRenumberScans
+        {
+            get
+            {
+                return Options.RawDataExportOptions.RenumberScans;
+            }
+
+            set
+            {
+                Options.RawDataExportOptions.RenumberScans = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float ExportRawDataIntensityMinimum
+        {
+            get
+            {
+                return Options.RawDataExportOptions.IntensityMinimum;
+            }
+
+            set
+            {
+                Options.RawDataExportOptions.IntensityMinimum = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public int ExportRawDataMaxIonCountPerScan
+        {
+            get
+            {
+                return Options.RawDataExportOptions.MaxIonCountPerScan;
+            }
+
+            set
+            {
+                Options.RawDataExportOptions.MaxIonCountPerScan = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public clsRawDataExportOptions.eExportRawDataFileFormatConstants ExportRawDataFileFormat
+        {
+            get
+            {
+                return Options.RawDataExportOptions.FileFormat;
+            }
+
+            set
+            {
+                Options.RawDataExportOptions.FileFormat = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float ExportRawDataMinimumSignalToNoiseRatio
+        {
+            get
+            {
+                return Options.RawDataExportOptions.MinimumSignalToNoiseRatio;
+            }
+
+            set
+            {
+                Options.RawDataExportOptions.MinimumSignalToNoiseRatio = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool ExportRawSpectraData
+        {
+            get
+            {
+                return Options.RawDataExportOptions.ExportEnabled;
+            }
+
+            set
+            {
+                Options.RawDataExportOptions.ExportEnabled = value;
+            }
+        }
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        [Obsolete("Use Property Options")]
+        public double IntensityThresholdAbsoluteMinimum
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double IntensityThresholdFractionMax
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public int MaxDistanceScansNoOverlap
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool FindPeaksOnSmoothedData
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool SmoothDataRegardlessOfMinimumPeakWidth
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool UseButterworthSmooth
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.UseButterworthSmooth = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double ButterworthSamplingFrequency
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency;
+            }
+
+            set
+            {
+                // Value should be between 0.01 and 0.99; this is checked for in the filter, so we don't need to check here
+                Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool ButterworthSamplingFrequencyDoubledForSIMData
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool UseSavitzkyGolaySmooth
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public short SavitzkyGolayFilterOrder
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool SaveSmoothedData
+        {
+            get
+            {
+                return Options.SICOptions.SaveSmoothedData;
+            }
+
+            set
+            {
+                Options.SICOptions.SaveSmoothedData = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double MaxAllowedUpwardSpikeFractionMax
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public double InitialPeakWidthScansScaler
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public int InitialPeakWidthScansMaximum
+        {
+            get
+            {
+                return Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum;
+            }
+
+            set
+            {
+                Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = value;
+            }
+        }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        [Obsolete("Use Property Options")]
+        public float SimilarIonMZToleranceHalfWidth
+        {
+            get
+            {
+                return Options.SICOptions.SimilarIonMZToleranceHalfWidth;
+            }
+
+            set
+            {
+                Options.SICOptions.SimilarIonMZToleranceHalfWidth = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float SimilarIonToleranceHalfWidthMinutes
+        {
+            get
+            {
+                return Options.SICOptions.SimilarIonToleranceHalfWidthMinutes;
+            }
+
+            set
+            {
+                Options.SICOptions.SimilarIonToleranceHalfWidthMinutes = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float SpectrumSimilarityMinimum
+        {
+            get
+            {
+                return Options.SICOptions.SpectrumSimilarityMinimum;
+            }
+
+            set
+            {
+                Options.SICOptions.SpectrumSimilarityMinimum = value;
+            }
+        }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        [Obsolete("Use Property Options")]
+        public float BinStartX
+        {
+            get
+            {
+                return Options.BinningOptions.StartX;
+            }
+
+            set
+            {
+                Options.BinningOptions.StartX = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float BinEndX
+        {
+            get
+            {
+                return Options.BinningOptions.EndX;
+            }
+
+            set
+            {
+                Options.BinningOptions.EndX = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float BinSize
+        {
+            get
+            {
+                return Options.BinningOptions.BinSize;
+            }
+
+            set
+            {
+                Options.BinningOptions.BinSize = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public float BinnedDataIntensityPrecisionPercent
+        {
+            get
+            {
+                return Options.BinningOptions.IntensityPrecisionPercent;
+            }
+
+            set
+            {
+                Options.BinningOptions.IntensityPrecisionPercent = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool NormalizeBinnedData
+        {
+            get
+            {
+                return Options.BinningOptions.Normalize;
+            }
+
+            set
+            {
+                Options.BinningOptions.Normalize = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public bool SumAllIntensitiesForBin
+        {
+            get
+            {
+                return Options.BinningOptions.SumAllIntensitiesForBin;
+            }
+
+            set
+            {
+                Options.BinningOptions.SumAllIntensitiesForBin = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public int MaximumBinCount
+        {
+            get
+            {
+                return Options.BinningOptions.MaximumBinCount;
+            }
+
+            set
+            {
+                Options.BinningOptions.MaximumBinCount = value;
+            }
+        }
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        [Obsolete("Use Property Options")]
+        public bool DiskCachingAlwaysDisabled
+        {
+            get
+            {
+                return Options.CacheOptions.DiskCachingAlwaysDisabled;
+            }
+
+            set
+            {
+                Options.CacheOptions.DiskCachingAlwaysDisabled = value;
+            }
+        }
+
+        [Obsolete("Use Property Options")]
+        public string CacheDirectoryPath
+        {
+            get
+            {
+                return Options.CacheOptions.DirectoryPath;
+            }
+
+            set
+            {
+                Options.CacheOptions.DirectoryPath = value;
+            }
+        }
+
+        [Obsolete("Legacy parameter; no longer used")]
+        public float CacheMaximumMemoryUsageMB
+        {
+            get
+            {
+                return Options.CacheOptions.MaximumMemoryUsageMB;
+            }
+
+            set
+            {
+                Options.CacheOptions.MaximumMemoryUsageMB = value;
+            }
+        }
+
+        [Obsolete("Legacy parameter; no longer used")]
+        public float CacheMinimumFreeMemoryMB
+        {
+            get
+            {
+                return Options.CacheOptions.MinimumFreeMemoryMB;
+            }
+
+            set
+            {
+                if (Options.CacheOptions.MinimumFreeMemoryMB < 10)
+                {
+                    Options.CacheOptions.MinimumFreeMemoryMB = 10;
+                }
+
+                Options.CacheOptions.MinimumFreeMemoryMB = value;
+            }
+        }
+
+        [Obsolete("Legacy parameter; no longer used")]
+        public int CacheSpectraToRetainInMemory
+        {
+            get
+            {
+                return Options.CacheOptions.SpectraToRetainInMemory;
+            }
+
+            set
+            {
+                Options.CacheOptions.SpectraToRetainInMemory = value;
+            }
+        }
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        // ReSharper restore UnusedMember.Global
+
+        public override void AbortProcessingNow()
+        {
+            AbortProcessing = true;
+            Options.AbortProcessing = true;
+        }
+
+        private bool FindSICsAndWriteOutput(string inputFilePathFull, string outputDirectoryPath, clsScanList scanList, clsSpectraCache spectraCache, clsDataOutput dataOutputHandler, clsScanTracking scanTracking, DatasetFileInfo datasetFileInfo, clsParentIonProcessing parentIonProcessor, DataInput.clsDataImport dataImporterBase)
+        {
+            bool success = true;
+            string inputFileName = Path.GetFileName(inputFilePathFull);
+            var similarParentIonUpdateCount = default(int);
+            try
+            {
+                var bpiWriter = new clsBPIWriter();
+                RegisterEvents(bpiWriter);
+                var xmlResultsWriter = new clsXMLResultsWriter(Options);
+                RegisterEvents(xmlResultsWriter);
+
+                // ---------------------------------------------------------
+                // Save the BPIs and TICs
+                // ---------------------------------------------------------
+
+                UpdateProcessingStep(eProcessingStepConstants.SaveBPI);
+                UpdateOverallProgress("Processing Data for " + inputFileName);
+                SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk");
+                UpdatePeakMemoryUsage();
+                if (Options.SkipSICAndRawDataProcessing || !Options.ExportRawDataOnly)
+                {
+                    LogMessage("ProcessFile: Call SaveBPIs");
+                    bpiWriter.SaveBPIs(scanList, spectraCache, inputFilePathFull, outputDirectoryPath);
+                }
+
+                // ---------------------------------------------------------
+                // Close the ScanStats file handle
+                // ---------------------------------------------------------
+                try
+                {
+                    LogMessage("ProcessFile: Close outputFileHandles.ScanStats");
+                    dataOutputHandler.OutputFileHandles.CloseScanStats();
+                }
+                catch (Exception ex)
+                {
+                    // Ignore errors here
+                }
+
+                // ---------------------------------------------------------
+                // Create the DatasetInfo XML file
+                // ---------------------------------------------------------
+
+                LogMessage("ProcessFile: Create DatasetInfo File");
+                dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputDirectoryPath, scanTracking, datasetFileInfo);
+                if (Options.SkipSICAndRawDataProcessing)
+                {
+                    LogMessage("ProcessFile: Skipping SIC Processing");
+                    SetDefaultPeakLocValues(scanList);
+                }
+                else
+                {
+
+                    // ---------------------------------------------------------
+                    // Optionally, export the raw mass spectra data
+                    // ---------------------------------------------------------
+
+                    if (Options.RawDataExportOptions.ExportEnabled)
+                    {
+                        var rawDataExporter = new clsSpectrumDataWriter(bpiWriter, Options);
+                        RegisterEvents(rawDataExporter);
+                        rawDataExporter.ExportRawDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath);
+                    }
+
+                    if (Options.ReporterIons.ReporterIonStatsEnabled)
+                    {
+                        // Look for Reporter Ions in the Fragmentation spectra
+
+                        var reporterIonProcessor = new clsReporterIonProcessor(Options);
+                        RegisterEvents(reporterIonProcessor);
+                        reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath);
+                    }
+
+                    var mrmProcessor = new clsMRMProcessing(Options, dataOutputHandler);
+                    RegisterEvents(mrmProcessor);
+
+                    // ---------------------------------------------------------
+                    // If MRM data is present, save the MRM values to disk
+                    // ---------------------------------------------------------
+                    if (scanList.MRMDataPresent)
+                    {
+                        mrmProcessor.ExportMRMDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath);
+                    }
+
+                    if (!Options.ExportRawDataOnly)
+                    {
+
+                        // ---------------------------------------------------------
+                        // Add the custom SIC values to scanList
+                        // ---------------------------------------------------------
+                        Options.CustomSICList.AddCustomSICValues(scanList, Options.SICOptions.SICTolerance, Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance);
+
+
+                        // ---------------------------------------------------------
+                        // Possibly create the Tab-separated values SIC details output file
+                        // ---------------------------------------------------------
+                        if (Options.WriteDetailedSICDataFile)
+                        {
+                            success = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath);
+                            if (!success)
+                            {
+                                SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                                break;
+                            }
+                        }
+
+                        // ---------------------------------------------------------
+                        // Create the XML output file
+                        // ---------------------------------------------------------
+                        success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, spectraCache, Options.SICOptions, Options.BinningOptions);
+                        if (!success)
+                        {
+                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                            break;
+                        }
+
+                        // ---------------------------------------------------------
+                        // Create the selected ion chromatograms (SICs)
+                        // For each one, find the peaks and make an entry to the XML output file
+                        // ---------------------------------------------------------
+
+                        UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks);
+                        SetSubtaskProcessingStepPct(0);
+                        UpdatePeakMemoryUsage();
+                        LogMessage("ProcessFile: Call CreateParentIonSICs");
+                        var sicProcessor = new clsSICProcessing(mMASICPeakFinder, mrmProcessor);
+                        RegisterEvents(sicProcessor);
+                        success = sicProcessor.CreateParentIonSICs(scanList, spectraCache, Options, dataOutputHandler, sicProcessor, xmlResultsWriter);
+                        if (!success)
+                        {
+                            SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, true);
+                            break;
+                        }
+                    }
+
+                    if (!(Options.SkipMSMSProcessing || Options.ExportRawDataOnly))
+                    {
+
+                        // ---------------------------------------------------------
+                        // Find Similar Parent Ions
+                        // ---------------------------------------------------------
+
+                        UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons);
+                        SetSubtaskProcessingStepPct(0);
+                        UpdatePeakMemoryUsage();
+                        LogMessage("ProcessFile: Call FindSimilarParentIons");
+                        success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, Options, dataImporterBase, ref similarParentIonUpdateCount);
+                        if (!success)
+                        {
+                            SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, true);
+                            break;
+                        }
+                    }
+                }
+
+                if (Options.WriteExtendedStats && !Options.ExportRawDataOnly)
+                {
+                    // ---------------------------------------------------------
+                    // Save Extended Scan Stats Files
+                    // ---------------------------------------------------------
+
+                    UpdateProcessingStep(eProcessingStepConstants.SaveExtendedScanStatsFiles);
+                    SetSubtaskProcessingStepPct(0);
+                    UpdatePeakMemoryUsage();
+                    LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles");
+                    success = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(scanList, inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile);
+                    if (!success)
+                    {
+                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
+                        break;
+                    }
+                }
+
+
+                // ---------------------------------------------------------
+                // Save SIC Stats Flat File
+                // ---------------------------------------------------------
+
+                UpdateProcessingStep(eProcessingStepConstants.SaveSICStatsFlatFile);
+                SetSubtaskProcessingStepPct(0);
+                UpdatePeakMemoryUsage();
+                if (!Options.ExportRawDataOnly)
+                {
+                    var sicStatsWriter = new clsSICStatsWriter();
+                    RegisterEvents(sicStatsWriter);
+                    LogMessage("ProcessFile: Call SaveSICStatsFlatFile");
+                    success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, Options, dataOutputHandler);
+                    if (!success)
+                    {
+                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
+                        break;
+                    }
+                }
+
+                UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles);
+                SetSubtaskProcessingStepPct(0);
+                UpdatePeakMemoryUsage();
+                if (!(Options.SkipSICAndRawDataProcessing || Options.ExportRawDataOnly))
+                {
+
+                    // ---------------------------------------------------------
+                    // Write processing stats to the XML output file
+                    // ---------------------------------------------------------
+
+                    LogMessage("ProcessFile: Call FinalizeXMLFile");
+                    float processingTimeSec = GetTotalProcessingTimeSec();
+                    success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, spectraCache, mProcessingStats, processingTimeSec);
+                }
+
+                // ---------------------------------------------------------
+                // Close any open output files
+                // ---------------------------------------------------------
+                dataOutputHandler.OutputFileHandles.CloseAll();
+
+                // ---------------------------------------------------------
+                // Save a text file containing the headers used in the text files
+                // ---------------------------------------------------------
+                if (!Options.IncludeHeadersInExportFile)
+                {
+                    LogMessage("ProcessFile: Call SaveHeaderGlossary");
+                    dataOutputHandler.SaveHeaderGlossary(scanList, inputFileName, outputDirectoryPath);
+                }
+
+                if (!(Options.SkipSICAndRawDataProcessing || Options.ExportRawDataOnly) && similarParentIonUpdateCount > 0)
+                {
+                    // ---------------------------------------------------------
+                    // Reopen the XML file and update the entries for those ions in scanList that had their
+                    // Optimal peak apex scan numbers updated
+                    // ---------------------------------------------------------
+
+                    UpdateProcessingStep(eProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues);
+                    SetSubtaskProcessingStepPct(0);
+                    UpdatePeakMemoryUsage();
+                    LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries");
+                    xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, inputFileName, outputDirectoryPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                LogErrors("FindSICsAndWriteOutput", "Error saving results to: " + outputDirectoryPath, ex, eMasicErrorCodes.OutputFileWriteError);
+            }
+
+            return success;
+        }
+
+        public override IList<string> GetDefaultExtensionsToParse()
+        {
+            return DataInput.clsDataImport.GetDefaultExtensionsToParse();
+        }
+
+        public override string GetErrorMessage()
+        {
+            // Returns String.Empty if no error
+
+            string errorMessage;
+            if (ErrorCode == ProcessFilesErrorCodes.LocalizedError || ErrorCode == ProcessFilesErrorCodes.NoError)
+            {
+                var switchExpr = mLocalErrorCode;
+                switch (switchExpr)
+                {
+                    case eMasicErrorCodes.NoError:
+                        {
+                            errorMessage = string.Empty;
+                            break;
+                        }
+
+                    case eMasicErrorCodes.InvalidDatasetLookupFilePath:
+                        {
+                            errorMessage = "Invalid dataset lookup file path";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.UnknownFileExtension:
+                        {
+                            errorMessage = "Unknown file extension";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.InputFileAccessError:
+                        {
+                            errorMessage = "Input file access error";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.InvalidDatasetID:
+                        {
+                            errorMessage = "Invalid dataset number";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.CreateSICsError:
+                        {
+                            errorMessage = "Create SIC's error";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.FindSICPeaksError:
+                        {
+                            errorMessage = "Error finding SIC peaks";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.InvalidCustomSICValues:
+                        {
+                            errorMessage = "Invalid custom SIC values";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.NoParentIonsFoundInInputFile:
+                        {
+                            errorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.NoSurveyScansFoundInInputFile:
+                        {
+                            errorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.FindSimilarParentIonsError:
+                        {
+                            errorMessage = "Find similar parent ions error";
+                            break;
+                        }
+
+                    case var @case when @case == eMasicErrorCodes.FindSimilarParentIonsError:
+                        {
+                            errorMessage = "Find similar parent ions error";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.InputFileDataReadError:
+                        {
+                            errorMessage = "Error reading data from input file";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.OutputFileWriteError:
+                        {
+                            errorMessage = "Error writing data to output file";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.FileIOPermissionsError:
+                        {
+                            errorMessage = "File IO Permissions Error";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.ErrorCreatingSpectrumCacheDirectory:
+                        {
+                            errorMessage = "Error creating spectrum cache directory";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.ErrorCachingSpectrum:
+                        {
+                            errorMessage = "Error caching spectrum";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.ErrorUncachingSpectrum:
+                        {
+                            errorMessage = "Error uncaching spectrum";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.ErrorDeletingCachedSpectrumFiles:
+                        {
+                            errorMessage = "Error deleting cached spectrum files";
+                            break;
+                        }
+
+                    case eMasicErrorCodes.UnspecifiedError:
+                        {
+                            errorMessage = "Unspecified localized error";
+                            break;
+                        }
+
+                    default:
+                        {
+                            // This shouldn't happen
+                            errorMessage = "Unknown error state";
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                errorMessage = GetBaseClassErrorMessage();
+            }
+
+            return errorMessage;
+        }
+
+        private float GetFreeMemoryMB()
+        {
+            // Returns the amount of free memory, in MB
+
+            var freeMemoryMB = SystemInfo.GetFreeMemoryMB();
+            return freeMemoryMB;
+        }
+
+        private float GetProcessMemoryUsageMB()
+        {
+
+            // Obtain a handle to the current process
+            var objProcess = Process.GetCurrentProcess();
+
+            // The WorkingSet is the total physical memory usage
+            return Conversions.ToSingle(objProcess.WorkingSet64 / (double)1024 / 1024);
+        }
+
+        private float GetTotalProcessingTimeSec()
+        {
+            var objProcess = Process.GetCurrentProcess();
+            return Conversions.ToSingle(objProcess.TotalProcessorTime.TotalSeconds);
+        }
+
+        private void InitializeMemoryManagementOptions(clsProcessingStats processingStats)
+        {
+            processingStats.PeakMemoryUsageMB = GetProcessMemoryUsageMB();
+            processingStats.TotalProcessingTimeAtStart = GetTotalProcessingTimeSec();
+            processingStats.CacheEventCount = 0;
+            processingStats.UnCacheEventCount = 0;
+            processingStats.FileLoadStartTime = DateTime.UtcNow;
+            processingStats.FileLoadEndTime = processingStats.FileLoadStartTime;
+            processingStats.ProcessingStartTime = processingStats.FileLoadStartTime;
+            processingStats.ProcessingEndTime = processingStats.FileLoadStartTime;
+            processingStats.MemoryUsageMBAtStart = processingStats.PeakMemoryUsageMB;
+            processingStats.MemoryUsageMBDuringLoad = processingStats.PeakMemoryUsageMB;
+            processingStats.MemoryUsageMBAtEnd = processingStats.PeakMemoryUsageMB;
+        }
+
+        private bool LoadData(string inputFilePathFull, string outputDirectoryPath, clsDataOutput dataOutputHandler, clsParentIonProcessing parentIonProcessor, clsScanTracking scanTracking, clsScanList scanList, clsSpectraCache spectraCache, out DataInput.clsDataImport dataImporterBase, out DatasetFileInfo datasetFileInfo)
+        {
+            bool success;
+            datasetFileInfo = new DatasetFileInfo();
+            try
+            {
+
+                // ---------------------------------------------------------
+                // Define inputFileName (which is referenced several times below)
+                // ---------------------------------------------------------
+                string inputFileName = Path.GetFileName(inputFilePathFull);
+
+                // ---------------------------------------------------------
+                // Create the _ScanStats.txt file
+                // ---------------------------------------------------------
+                dataOutputHandler.OpenOutputFileHandles(inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile);
+
+                // ---------------------------------------------------------
+                // Read the mass spectra from the input data file
+                // ---------------------------------------------------------
+
+                UpdateProcessingStep(eProcessingStepConstants.ReadDataFile);
+                SetSubtaskProcessingStepPct(0);
+                UpdatePeakMemoryUsage();
+                mStatusMessage = string.Empty;
+                if (Options.SkipSICAndRawDataProcessing)
+                {
+                    Options.ExportRawDataOnly = false;
+                }
+
+                bool keepRawMSSpectra = !Options.SkipSICAndRawDataProcessing || Options.ExportRawDataOnly;
+                Options.SICOptions.ValidateSICOptions();
+                var switchExpr = Path.GetExtension(inputFileName).ToUpper();
+                switch (switchExpr)
+                {
+                    case var @case when @case == DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper():
+                        {
+
+                            // Open the .Raw file and obtain the scan information
+
+                            var dataImporter = new DataInput.clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                            RegisterDataImportEvents(dataImporter);
+                            dataImporterBase = dataImporter;
+                            success = dataImporter.ExtractScanInfoFromXcaliburDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                            datasetFileInfo = dataImporter.DatasetFileInfo;
+                            break;
+                        }
+
+                    case var case1 when case1 == DataInput.clsDataImport.MZ_ML_FILE_EXTENSION.ToUpper():
+                        {
+
+                            // Open the .mzML file and obtain the scan information
+
+                            var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                            RegisterDataImportEvents(dataImporter);
+                            dataImporterBase = dataImporter;
+                            success = dataImporter.ExtractScanInfoFromMzMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                            datasetFileInfo = dataImporter.DatasetFileInfo;
+                            break;
+                        }
+
+                    case var case2 when case2 == DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1.ToUpper():
+                    case var case3 when case3 == DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2.ToUpper():
+                        {
+
+                            // Open the .mzXML file and obtain the scan information
+
+                            var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                            RegisterDataImportEvents(dataImporter);
+                            dataImporterBase = dataImporter;
+                            success = dataImporter.ExtractScanInfoFromMzXMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                            datasetFileInfo = dataImporter.DatasetFileInfo;
+                            break;
+                        }
+
+                    case var case4 when case4 == DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1.ToUpper():
+                    case var case5 when case5 == DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2.ToUpper():
+                        {
+
+                            // Open the .mzData file and obtain the scan information
+
+                            var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                            RegisterDataImportEvents(dataImporter);
+                            dataImporterBase = dataImporter;
+                            success = dataImporter.ExtractScanInfoFromMzDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                            datasetFileInfo = dataImporter.DatasetFileInfo;
+                            break;
+                        }
+
+                    case var case6 when case6 == DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION.ToUpper():
+                    case var case7 when case7 == DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION.ToUpper():
+                        {
+
+                            // Open the .MGF and .CDF files to obtain the scan information
+
+                            var dataImporter = new DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                            RegisterDataImportEvents(dataImporter);
+                            dataImporterBase = dataImporter;
+                            success = dataImporter.ExtractScanInfoFromMGFandCDF(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                            datasetFileInfo = dataImporter.DatasetFileInfo;
+                            break;
+                        }
+
+                    default:
+                        {
+                            mStatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePathFull);
+                            SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension);
+                            success = false;
+
+                            // Instantiate this object to avoid a warning below about the object potentially not being initialized
+                            // In reality, an Exit Try statement will be reached and the potentially problematic use will therefore not get encountered
+                            datasetFileInfo = new DatasetFileInfo();
+                            dataImporterBase = null;
+                            break;
+                        }
+                }
+
+                if (!success)
+                {
+                    if (mLocalErrorCode == eMasicErrorCodes.NoParentIonsFoundInInputFile && string.IsNullOrWhiteSpace(mStatusMessage))
+                    {
+                        mStatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range";
+                    }
+
+                    SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                LogErrors("ProcessFile", "Error accessing input data file: " + inputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError);
+                dataImporterBase = null;
+            }
+
+            return success;
+        }
+
+        public bool LoadParameterFileSettings(string parameterFilePath)
+        {
+            bool success = Options.LoadParameterFileSettings(parameterFilePath);
+            return success;
+        }
+
+        private void LogErrors(string source, string message, Exception ex, eMasicErrorCodes eNewErrorCode = eMasicErrorCodes.NoError)
+        {
+            string messageWithoutCRLF;
+            Options.StatusMessage = message;
+            messageWithoutCRLF = Options.StatusMessage.Replace(ControlChars.NewLine, "; ");
+            if (ex is null)
+            {
+                ex = new Exception("Error");
+            }
+            else if (ex.Message is object && ex.Message.Length > 0 && !message.Contains(ex.Message))
+            {
+                messageWithoutCRLF += "; " + ex.Message;
+            }
+
+            // Show the message and log to the clsProcessFilesBaseClass logger
+            if (string.IsNullOrEmpty(source))
+            {
+                ShowErrorMessage(messageWithoutCRLF, true);
+            }
+            else
+            {
+                ShowErrorMessage(source + ": " + messageWithoutCRLF, true);
+            }
+
+            if (ex is object)
+            {
+                Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
+            }
+
+            if (!(eNewErrorCode == eMasicErrorCodes.NoError))
+            {
+                SetLocalErrorCode(eNewErrorCode, true);
+            }
+        }
+
+        /// <summary>
+    /// Main processing function
+    /// </summary>
+    /// <param name="inputFilePath"></param>
+    /// <param name="outputDirectoryPath"></param>
+    /// <param name="parameterFilePath"></param>
+    /// <param name="resetErrorCode"></param>
+    /// <returns></returns>
+        public override bool ProcessFile(string inputFilePath, string outputDirectoryPath, string parameterFilePath, bool resetErrorCode)
+        {
+            FileInfo inputFileInfo;
+            bool success = default, doNotProcess = default;
+            string inputFilePathFull = string.Empty;
+            if (!mLoggedMASICVersion)
+            {
+                LogMessage("Starting MASIC v" + GetAppVersion(mFileDate));
+                Console.WriteLine();
+                mLoggedMASICVersion = true;
+            }
+
+            if (resetErrorCode)
+            {
+                SetLocalErrorCode(eMasicErrorCodes.NoError);
+            }
+
+            Options.OutputDirectoryPath = outputDirectoryPath;
+            mSubtaskProcessingStepPct = 0;
+            UpdateProcessingStep(eProcessingStepConstants.NewTask, true);
+            ResetProgress("Starting calculations");
+            mStatusMessage = string.Empty;
+            UpdateStatusFile(true);
+            if (!Options.LoadParameterFileSettings(parameterFilePath, inputFilePath))
+            {
+                SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile);
+                mStatusMessage = "Parameter file load error: " + parameterFilePath;
+                ShowErrorMessage(mStatusMessage);
+                if (ErrorCode == ProcessFilesErrorCodes.NoError)
+                {
+                    SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile);
+                }
+
+                UpdateProcessingStep(eProcessingStepConstants.Cancelled, true);
+                LogMessage("Processing ended in error");
+                return false;
+            }
+
+            var dataOutputHandler = new clsDataOutput(Options);
+            RegisterEvents(dataOutputHandler);
+            try
+            {
+                // If a Custom SICList file is defined, then load the custom SIC values now
+                if (Options.CustomSICList.CustomSICListFileName.Length > 0)
+                {
+                    var sicListReader = new DataInput.clsCustomSICListReader(Options.CustomSICList);
+                    RegisterEvents(sicListReader);
+                    LogMessage("ProcessFile: Reading custom SIC values file: " + Options.CustomSICList.CustomSICListFileName);
+                    success = sicListReader.LoadCustomSICListFromFile(Options.CustomSICList.CustomSICListFileName);
+                    if (!success)
+                    {
+                        SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues);
+                        break;
+                    }
+                }
+
+                Options.ReporterIons.UpdateMZIntensityFilterIgnoreRange();
+                LogMessage("Source data file: " + inputFilePath);
+                if (inputFilePath is null || inputFilePath.Length == 0)
+                {
+                    ShowErrorMessage("Input file name is empty");
+                    SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidInputFilePath);
+                    break;
+                }
+
+                mStatusMessage = "Parsing " + Path.GetFileName(inputFilePath);
+                success = CleanupFilePaths(ref inputFilePath, ref outputDirectoryPath);
+                Options.OutputDirectoryPath = outputDirectoryPath;
+                if (success)
+                {
+                    var dbAccessor = new clsDatabaseAccess(Options);
+                    RegisterEvents(dbAccessor);
+                    Options.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, Options.DatasetLookupFilePath, Options.SICOptions.DatasetID);
+                    if (LocalErrorCode != eMasicErrorCodes.NoError)
+                    {
+                        if (LocalErrorCode == eMasicErrorCodes.InvalidDatasetID || LocalErrorCode == eMasicErrorCodes.InvalidDatasetLookupFilePath)
+                        {
+                            // Ignore this error
+                            SetLocalErrorCode(eMasicErrorCodes.NoError);
+                            success = true;
+                        }
+                        else
+                        {
+                            success = false;
+                        }
+                    }
+                }
+
+                if (!success)
+                {
+                    if (mLocalErrorCode == eMasicErrorCodes.NoError)
+                        SetBaseClassErrorCode(ProcessFilesErrorCodes.FilePathError);
+                    break;
+                }
+
+                try
+                {
+                    // ---------------------------------------------------------
+                    // See if an output XML file already exists
+                    // If it does, open it and read the parameters used
+                    // If they match the current analysis parameters, and if the input file specs match the input file, then
+                    // do not reprocess
+                    // ---------------------------------------------------------
+
+                    // Obtain the full path to the input file
+                    inputFileInfo = new FileInfo(inputFilePath);
+                    inputFilePathFull = inputFileInfo.FullName;
+                    LogMessage("Checking for existing results in the output path: " + outputDirectoryPath);
+                    doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, Options);
+                    if (doNotProcess)
+                    {
+                        LogMessage("Existing results found; data will not be reprocessed");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    success = false;
+                    LogErrors("ProcessFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError);
+                }
+
+                if (doNotProcess)
+                {
+                    success = true;
+                    break;
+                }
+
+                try
+                {
+                    // ---------------------------------------------------------
+                    // Verify that we have write access to the output directory
+                    // ---------------------------------------------------------
+
+                    // The following should work for testing access permissions, but it doesn't
+                    // Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
+                    // ' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
+                    // objFilePermissionTest.Demand()
+                    // objFilePermissionTest.Assert()
+
+                    LogMessage("Checking for write permission in the output path: " + outputDirectoryPath);
+                    string outputFileTestPath = Path.Combine(outputDirectoryPath, "TestOutputFile" + DateTime.UtcNow.Ticks + ".tmp");
+                    using (var fsOutFileTest = new StreamWriter(outputFileTestPath, false))
+                    {
+                        fsOutFileTest.WriteLine("Test");
+                    }
+
+                    // Wait 250 msec, then delete the file
+                    System.Threading.Thread.Sleep(250);
+                    File.Delete(outputFileTestPath);
+                }
+                catch (Exception ex)
+                {
+                    success = false;
+                    LogErrors("ProcessFile", "The current user does not have write permission for the output directory: " + outputDirectoryPath, ex, eMasicErrorCodes.FileIOPermissionsError);
+                }
+
+                if (!success)
+                {
+                    SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError);
+                    break;
+                }
+
+                // ---------------------------------------------------------
+                // Reset the processing stats
+                // ---------------------------------------------------------
+
+                InitializeMemoryManagementOptions(mProcessingStats);
+
+                // ---------------------------------------------------------
+                // Instantiate the SpectraCache
+                // ---------------------------------------------------------
+
+                using (var spectraCache = new clsSpectraCache(Options.CacheOptions)
+                {
+                    DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
+                    CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
+                    CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
+                })
+                {
+                    RegisterEvents(spectraCache);
+                    spectraCache.InitializeSpectraPool();
+                    var datasetFileInfo = new DatasetFileInfo();
+                    var scanList = new clsScanList();
+                    RegisterEvents(scanList);
+                    var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
+                    RegisterEvents(parentIonProcessor);
+                    var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
+                    RegisterEvents(scanTracking);
+                    DataInput.clsDataImport dataImporterBase = null;
+
+                    // ---------------------------------------------------------
+                    // Load the mass spectral data
+                    // ---------------------------------------------------------
+
+                    success = LoadData(inputFilePathFull, outputDirectoryPath, dataOutputHandler, parentIonProcessor, scanTracking, scanList, spectraCache, out dataImporterBase, out datasetFileInfo);
+
+                    // Record that the file is finished loading
+                    mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
+                    if (!success)
+                    {
+                        if (mStatusMessage is null || mStatusMessage.Length == 0)
+                        {
+                            mStatusMessage = "Unable to parse file; unknown error";
+                        }
+                        else
+                        {
+                            mStatusMessage = "Unable to parse file: " + mStatusMessage;
+                        }
+
+                        ShowErrorMessage(mStatusMessage);
+                        break;
+                    }
+
+                    if (success)
+                    {
+                        // ---------------------------------------------------------
+                        // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
+                        // ---------------------------------------------------------
+
+                        success = FindSICsAndWriteOutput(inputFilePathFull, outputDirectoryPath, scanList, spectraCache, dataOutputHandler, scanTracking, datasetFileInfo, parentIonProcessor, dataImporterBase);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                LogErrors("ProcessFile", "Error in ProcessFile", ex, eMasicErrorCodes.UnspecifiedError);
+            }
+            finally
+            {
+
+                // Record the final processing stats (before the output file handles are closed)
+                {
+                    var withBlock = mProcessingStats;
+                    withBlock.ProcessingEndTime = DateTime.UtcNow;
+                    withBlock.MemoryUsageMBAtEnd = GetProcessMemoryUsageMB();
+                }
+
+                // ---------------------------------------------------------
+                // Make sure the output file handles are closed
+                // ---------------------------------------------------------
+
+                dataOutputHandler.OutputFileHandles.CloseAll();
+            }
+
+            try
+            {
+                // ---------------------------------------------------------
+                // Cleanup after processing or error
+                // ---------------------------------------------------------
+
+                LogMessage("ProcessFile: Processing nearly complete");
+                Console.WriteLine();
+                if (doNotProcess)
+                {
+                    mStatusMessage = "Existing valid results were found; processing was not repeated.";
+                    ShowMessage(mStatusMessage);
+                }
+                else if (success)
+                {
+                    mStatusMessage = "Processing complete.  Results can be found in directory: " + outputDirectoryPath;
+                    ShowMessage(mStatusMessage);
+                }
+                else if (LocalErrorCode == eMasicErrorCodes.NoError)
+                {
+                    mStatusMessage = "Error Code " + ErrorCode + ": " + GetErrorMessage();
+                    ShowErrorMessage(mStatusMessage);
+                }
+                else
+                {
+                    mStatusMessage = "Error Code " + LocalErrorCode + ": " + GetErrorMessage();
+                    ShowErrorMessage(mStatusMessage);
+                }
+
+                {
+                    var withBlock = mProcessingStats;
+                    LogMessage("ProcessingStats: Memory Usage At Start (MB) = " + withBlock.MemoryUsageMBAtStart.ToString());
+                    LogMessage("ProcessingStats: Peak memory usage (MB) = " + withBlock.PeakMemoryUsageMB.ToString());
+                    LogMessage("ProcessingStats: File Load Time (seconds) = " + withBlock.FileLoadEndTime.Subtract(withBlock.FileLoadStartTime).TotalSeconds.ToString());
+                    LogMessage("ProcessingStats: Memory Usage During Load (MB) = " + withBlock.MemoryUsageMBDuringLoad.ToString());
+                    LogMessage("ProcessingStats: Processing Time (seconds) = " + withBlock.ProcessingEndTime.Subtract(withBlock.ProcessingStartTime).TotalSeconds.ToString());
+                    LogMessage("ProcessingStats: Memory Usage At End (MB) = " + withBlock.MemoryUsageMBAtEnd.ToString());
+                    LogMessage("ProcessingStats: Cache Event Count = " + withBlock.CacheEventCount.ToString());
+                    LogMessage("ProcessingStats: UncCache Event Count = " + withBlock.UnCacheEventCount.ToString());
+                }
+
+                if (success)
+                {
+                    LogMessage("Processing complete");
+                }
+                else
+                {
+                    LogMessage("Processing ended in error");
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, eMasicErrorCodes.UnspecifiedError);
+            }
+
+            if (success)
+            {
+                Options.SICOptions.DatasetID += 1;
+            }
+
+            if (success)
+            {
+                UpdateProcessingStep(eProcessingStepConstants.Complete, true);
+            }
+            else
+            {
+                UpdateProcessingStep(eProcessingStepConstants.Cancelled, true);
+            }
+
+            return success;
+        }
+
+        private void RegisterDataImportEvents(DataInput.clsDataImport dataImporter)
+        {
+            RegisterEvents(dataImporter);
+            dataImporter.UpdateMemoryUsageEvent += UpdateMemoryUsageEventHandler;
+        }
+
+        private void RegisterEventsBase(IEventNotifier oClass)
+        {
+            oClass.StatusEvent += MessageEventHandler;
+            oClass.ErrorEvent += ErrorEventHandler;
+            oClass.WarningEvent += WarningEventHandler;
+            oClass.ProgressUpdate += ProgressUpdateHandler;
+        }
+
+        private void RegisterEvents(clsMasicEventNotifier oClass)
+        {
+            RegisterEventsBase(oClass);
+            oClass.UpdateCacheStatsEvent += UpdatedCacheStatsEventHandler;
+            oClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
+            oClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
+        }
+
+        // ReSharper disable UnusedMember.Global
+
+        [Obsolete("Use Options.SaveParameterFileSettings")]
+        public bool SaveParameterFileSettings(string parameterFilePath)
+        {
+            bool success = Options.SaveParameterFileSettings(parameterFilePath);
+            return success;
+        }
+
+        [Obsolete("Use Options.ReporterIons.SetReporterIons")]
+        public void SetReporterIons(double[] reporterIonMZList)
+        {
+            Options.ReporterIons.SetReporterIons(reporterIonMZList);
+        }
+
+        [Obsolete("Use Options.ReporterIons.SetReporterIons")]
+        public void SetReporterIons(double[] reporterIonMZList, double mzToleranceDa)
+        {
+            Options.ReporterIons.SetReporterIons(reporterIonMZList, mzToleranceDa);
+        }
+
+        [Obsolete("Use Options.ReporterIons.SetReporterIons")]
+        public void SetReporterIons(List<clsReporterIonInfo> reporterIons)
+        {
+            Options.ReporterIons.SetReporterIons(reporterIons, true);
+        }
+
+        [Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")]
+        public void SetReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMassMode)
+        {
+            Options.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode);
+        }
+
+        [Obsolete("Use Options.ReporterIons.SetReporterIonMassMode")]
+        public void SetReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMassMode, double mzToleranceDa)
+        {
+            Options.ReporterIons.SetReporterIonMassMode(eReporterIonMassMode, mzToleranceDa);
+        }
+
+        // ReSharper restore UnusedMember.Global
+
+        private void SetDefaultPeakLocValues(clsScanList scanList)
+        {
+            int parentIonIndex;
+            int scanIndexObserved;
+            try
+            {
+                var loopTo = scanList.ParentIons.Count - 1;
+                for (parentIonIndex = 0; parentIonIndex <= loopTo; parentIonIndex++)
+                {
+                    {
+                        var withBlock = scanList.ParentIons[parentIonIndex];
+                        scanIndexObserved = withBlock.SurveyScanIndex;
+                        {
+                            var withBlock1 = withBlock.SICStats;
+                            withBlock1.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan;
+                            withBlock1.PeakScanIndexStart = scanIndexObserved;
+                            withBlock1.PeakScanIndexEnd = scanIndexObserved;
+                            withBlock1.PeakScanIndexMax = scanIndexObserved;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogErrors("SetDefaultPeakLocValues", "Error in clsMasic->SetDefaultPeakLocValues ", ex);
+            }
+        }
+
+        private void SetLocalErrorCode(eMasicErrorCodes eNewErrorCode)
+        {
+            SetLocalErrorCode(eNewErrorCode, false);
+        }
+
+        private void SetLocalErrorCode(eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged)
+        {
+            if (leaveExistingErrorCodeUnchanged && mLocalErrorCode != eMasicErrorCodes.NoError)
+            {
+            }
+            // An error code is already defined; do not change it
+            else
+            {
+                mLocalErrorCode = eNewErrorCode;
+                if (eNewErrorCode == eMasicErrorCodes.NoError)
+                {
+                    if (ErrorCode == ProcessFilesErrorCodes.LocalizedError)
+                    {
+                        SetBaseClassErrorCode(ProcessFilesErrorCodes.NoError);
+                    }
+                }
+                else
+                {
+                    SetBaseClassErrorCode(ProcessFilesErrorCodes.LocalizedError);
+                }
+            }
+        }
+
+        /// <summary>
+    /// Update subtask progress
+    /// </summary>
+    /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
+        private void SetSubtaskProcessingStepPct(float subtaskPercentComplete)
+        {
+            SetSubtaskProcessingStepPct(subtaskPercentComplete, false);
+        }
+
+        /// <summary>
+    /// Update subtask progress
+    /// </summary>
+    /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
+    /// <param name="forceUpdate"></param>
+        private void SetSubtaskProcessingStepPct(float subtaskPercentComplete, bool forceUpdate)
+        {
+            const int MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250;
+            var raiseEventNow = default(bool);
+            ;
+#error Cannot convert LocalDeclarationStatementSyntax - see comment for details
+            /* Cannot convert LocalDeclarationStatementSyntax, System.NotSupportedException: StaticKeyword not supported!
+               at ICSharpCode.CodeConverter.CSharp.SyntaxKindExtensions.ConvertToken(SyntaxKind t, TokenContext context)
+               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifier(SyntaxToken m, TokenContext context)
+               at ICSharpCode.CodeConverter.CSharp.CommonConversions.<ConvertModifiersCore>d__38.MoveNext()
+               at System.Linq.Enumerable.<ConcatIterator>d__59`1.MoveNext()
+               at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
+               at System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+               at System.Linq.OrderedEnumerable`1.<GetEnumerator>d__1.MoveNext()
+               at Microsoft.CodeAnalysis.SyntaxTokenList.CreateNode(IEnumerable`1 tokens)
+               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifiers(SyntaxNode node, IReadOnlyCollection`1 modifiers, TokenContext context, Boolean isVariableOrConst, SyntaxKind[] extraCsModifierKinds)
+               at ICSharpCode.CodeConverter.CSharp.MethodBodyExecutableStatementVisitor.<VisitLocalDeclarationStatement>d__28.MoveNext()
+            --- End of stack trace from previous location where exception was thrown ---
+               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<CreateLocals>d__7.MoveNext()
+            --- End of stack trace from previous location where exception was thrown ---
+               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<AddLocalVariables>d__6.MoveNext()
+            --- End of stack trace from previous location where exception was thrown ---
+               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+               at ICSharpCode.CodeConverter.CSharp.CommentConvertingMethodBodyVisitor.<DefaultVisitInnerAsync>d__3.MoveNext()
+
+            Input:
+                    Static LastFileWriteTime As Global.System.DateTime = Global.System.DateTime.UtcNow
+
+             */
+            if (Math.Abs(subtaskPercentComplete) < float.Epsilon)
+            {
+                AbortProcessing = false;
+                ProgressResetKeypressAbort?.Invoke();
+                raiseEventNow = true;
+            }
+
+            if (Math.Abs(subtaskPercentComplete - mSubtaskProcessingStepPct) > float.Epsilon)
+            {
+                raiseEventNow = true;
+                mSubtaskProcessingStepPct = subtaskPercentComplete;
+            }
+
+            if (forceUpdate || raiseEventNow || DateTime.UtcNow.Subtract(LastFileWriteTime).TotalMilliseconds >= MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS)
+            {
+                LastFileWriteTime = DateTime.UtcNow;
+                UpdateOverallProgress();
+                UpdateStatusFile();
+                ProgressSubtaskChanged?.Invoke();
+            }
+        }
+
+        /// <summary>
+    /// Update subtask progress and description
+    /// </summary>
+    /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
+    /// <param name="message"></param>
+        private void SetSubtaskProcessingStepPct(float subtaskPercentComplete, string message)
+        {
+            mSubtaskDescription = message;
+            SetSubtaskProcessingStepPct(subtaskPercentComplete, true);
+        }
+
+        private void UpdateOverallProgress()
+        {
+            UpdateOverallProgress(ProgressStepDescription);
+        }
+
+        private void UpdateOverallProgress(string message)
+        {
+
+            // Update the processing progress, storing the value in mProgressPercentComplete
+
+            // NewTask = 0
+            // ReadDataFile = 1
+            // SaveBPI = 2
+            // CreateSICsAndFindPeaks = 3
+            // FindSimilarParentIons = 4
+            // SaveExtendedScanStatsFiles = 5
+            // SaveSICStatsFlatFile = 6
+            // CloseOpenFileHandles = 7
+            // UpdateXMLFileWithNewOptimalPeakApexValues = 8
+            // Cancelled = 99
+            // Complete = 100
+
+            float[] weightingFactors;
+            if (Options.SkipMSMSProcessing)
+            {
+                // Step                           0   1     2     3  4   5      6      7      8
+                weightingFactors = new float[] { 0, 0.97F, 0.002F, 0, 0, 0.001F, 0.025F, 0.001F, 0.001F };            // The sum of these factors should be 1.00
+            }
+            else
+            {
+                // Step                           0   1      2      3     4     5      6      7      8
+                weightingFactors = new float[] { 0, 0.194F, 0.003F, 0.65F, 0.09F, 0.001F, 0.006F, 0.001F, 0.055F };
+            }     // The sum of these factors should be 1.00
+
+            int currentStep, index;
+            float overallPctCompleted;
+            try
+            {
+                currentStep = (int)mProcessingStep;
+                if (currentStep >= weightingFactors.Length)
+                    currentStep = weightingFactors.Length - 1;
+                overallPctCompleted = 0;
+                var loopTo = currentStep - 1;
+                for (index = 0; index <= loopTo; index++)
+                    overallPctCompleted += weightingFactors[index] * 100;
+                overallPctCompleted += weightingFactors[currentStep] * mSubtaskProcessingStepPct;
+                mProgressPercentComplete = overallPctCompleted;
+            }
+            catch (Exception ex)
+            {
+                LogErrors("UpdateOverallProgress", "Bug in UpdateOverallProgress", ex);
+            }
+
+            UpdateProgress(message, mProgressPercentComplete);
+        }
+
+        private void UpdatePeakMemoryUsage()
+        {
+            float memoryUsageMB;
+            memoryUsageMB = GetProcessMemoryUsageMB();
+            if (memoryUsageMB > mProcessingStats.PeakMemoryUsageMB)
+            {
+                mProcessingStats.PeakMemoryUsageMB = memoryUsageMB;
+            }
+        }
+
+        private void UpdateProcessingStep(eProcessingStepConstants eNewProcessingStep, bool forceStatusFileUpdate = false)
+        {
+            mProcessingStep = eNewProcessingStep;
+            UpdateStatusFile(forceStatusFileUpdate);
+        }
+
+        private void UpdateStatusFile(bool forceUpdate = false)
+        {
+            ;
+#error Cannot convert LocalDeclarationStatementSyntax - see comment for details
+            /* Cannot convert LocalDeclarationStatementSyntax, System.NotSupportedException: StaticKeyword not supported!
+               at ICSharpCode.CodeConverter.CSharp.SyntaxKindExtensions.ConvertToken(SyntaxKind t, TokenContext context)
+               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifier(SyntaxToken m, TokenContext context)
+               at ICSharpCode.CodeConverter.CSharp.CommonConversions.<ConvertModifiersCore>d__38.MoveNext()
+               at System.Linq.Enumerable.<ConcatIterator>d__59`1.MoveNext()
+               at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
+               at System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+               at System.Linq.OrderedEnumerable`1.<GetEnumerator>d__1.MoveNext()
+               at Microsoft.CodeAnalysis.SyntaxTokenList.CreateNode(IEnumerable`1 tokens)
+               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifiers(SyntaxNode node, IReadOnlyCollection`1 modifiers, TokenContext context, Boolean isVariableOrConst, SyntaxKind[] extraCsModifierKinds)
+               at ICSharpCode.CodeConverter.CSharp.MethodBodyExecutableStatementVisitor.<VisitLocalDeclarationStatement>d__28.MoveNext()
+            --- End of stack trace from previous location where exception was thrown ---
+               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<CreateLocals>d__7.MoveNext()
+            --- End of stack trace from previous location where exception was thrown ---
+               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<AddLocalVariables>d__6.MoveNext()
+            --- End of stack trace from previous location where exception was thrown ---
+               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+               at ICSharpCode.CodeConverter.CSharp.CommentConvertingMethodBodyVisitor.<DefaultVisitInnerAsync>d__3.MoveNext()
+
+            Input:
+
+                    Static LastFileWriteTime As Global.System.DateTime = Global.System.DateTime.UtcNow
+
+             */
+            if (forceUpdate || DateTime.UtcNow.Subtract(LastFileWriteTime).TotalSeconds >= (double)MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS)
+            {
+                LastFileWriteTime = DateTime.UtcNow;
+                try
+                {
+                    string tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
+                    string statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename);
+                    using (var writer = new System.Xml.XmlTextWriter(tempPath, System.Text.Encoding.UTF8))
+                    {
+                        writer.Formatting = System.Xml.Formatting.Indented;
+                        writer.Indentation = 2;
+                        writer.WriteStartDocument(true);
+                        writer.WriteComment("MASIC processing status");
+
+                        // Write the beginning of the "Root" element.
+                        writer.WriteStartElement("Root");
+                        writer.WriteStartElement("General");
+                        writer.WriteElementString("LastUpdate", DateTime.Now.ToString());
+                        writer.WriteElementString("ProcessingStep", mProcessingStep.ToString());
+                        writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2));
+                        writer.WriteElementString("Error", GetErrorMessage());
+                        writer.WriteEndElement();
+                        writer.WriteStartElement("Statistics");
+                        writer.WriteElementString("FreeMemoryMB", StringUtilities.DblToString(GetFreeMemoryMB(), 1));
+                        writer.WriteElementString("MemoryUsageMB", StringUtilities.DblToString(GetProcessMemoryUsageMB(), 1));
+                        writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(mProcessingStats.PeakMemoryUsageMB, 1));
+                        {
+                            var withBlock = mProcessingStats;
+                            writer.WriteElementString("CacheEventCount", withBlock.CacheEventCount.ToString());
+                            writer.WriteElementString("UnCacheEventCount", withBlock.UnCacheEventCount.ToString());
+                        }
+
+                        writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 2));
+                        writer.WriteEndElement();
+                        writer.WriteEndElement();  // End the "Root" element.
+                        writer.WriteEndDocument(); // End the document
+                    }
+
+                    // Copy the temporary file to the real one
+                    File.Copy(tempPath, statusFilePath, true);
+                    File.Delete(tempPath);
+                }
+                catch (Exception ex)
+                {
+                    // Ignore any errors
+                }
+            }
+        }
+
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private void MessageEventHandler(string message)
+        {
+            LogMessage(message);
+        }
+
+        private void ErrorEventHandler(string message, Exception ex)
+        {
+            LogErrors(string.Empty, message, ex);
+        }
+
+        private void WarningEventHandler(string message)
+        {
+            LogMessage(message, MessageTypeConstants.Warning);
+        }
+
+        /// <summary>
+    /// Update progress
+    /// </summary>
+    /// <param name="progressMessage">Progress message (can be empty)</param>
+    /// <param name="percentComplete">Value between 0 and 100</param>
+        private void ProgressUpdateHandler(string progressMessage, float percentComplete)
+        {
+            if (string.IsNullOrEmpty(progressMessage))
+            {
+                SetSubtaskProcessingStepPct(percentComplete);
+            }
+            else
+            {
+                SetSubtaskProcessingStepPct(percentComplete, progressMessage);
+            }
+        }
+
+        private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount)
+        {
+            mProcessingStats.CacheEventCount = cacheEventCount;
+            mProcessingStats.UnCacheEventCount = unCacheEventCount;
+        }
+
+        private void UpdateBaseClassErrorCodeEventHandler(ProcessFilesErrorCodes eErrorCode)
+        {
+            SetBaseClassErrorCode(eErrorCode);
+        }
+
+        private void UpdateErrorCodeEventHandler(eMasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
+        {
+            SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
+        }
+
+        private void UpdateMemoryUsageEventHandler()
+        {
+            // Record the current memory usage
+            float memoryUsageMB = GetProcessMemoryUsageMB();
+            if (memoryUsageMB > mProcessingStats.MemoryUsageMBDuringLoad)
+            {
+                mProcessingStats.MemoryUsageMBDuringLoad = memoryUsageMB;
+            }
+        }
+
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+    }
+}

@@ -1,694 +1,631 @@
-﻿Imports System.Runtime.InteropServices
-Imports MASIC.clsMASIC
-Imports MASIC.DataOutput
-Imports MASICPeakFinder
-Imports PRISM
-Imports ThermoRawFileReader
-
-Public Class clsMRMProcessing
-    Inherits clsMasicEventNotifier
-
-#Region "Structures"
-
-    Public Structure udtSRMListType
-        Public ParentIonMZ As Double
-        Public CentralMass As Double
-
-        Public Overrides Function ToString() As String
-            Return "m/z " & ParentIonMZ.ToString("0.00")
-        End Function
-    End Structure
-
-#End Region
-
-#Region "Classwide variables"
-    Private ReadOnly mOptions As clsMASICOptions
-    Private ReadOnly mDataAggregation As clsDataAggregation
-    Private ReadOnly mDataOutputHandler As clsDataOutput
-#End Region
-
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    Public Sub New(masicOptions As clsMASICOptions, dataOutputHandler As clsDataOutput)
-        mOptions = masicOptions
-        mDataAggregation = New clsDataAggregation()
-        RegisterEvents(mDataAggregation)
-
-        mDataOutputHandler = dataOutputHandler
-    End Sub
-
-    Private Function ConstructSRMMapKey(udtSRMListEntry As udtSRMListType) As String
-        Return ConstructSRMMapKey(udtSRMListEntry.ParentIonMZ, udtSRMListEntry.CentralMass)
-    End Function
-
-    Private Function ConstructSRMMapKey(parentIonMZ As Double, centralMass As Double) As String
-        Dim mapKey As String
-
-        mapKey = parentIonMZ.ToString("0.000") & "_to_" & centralMass.ToString("0.000")
-
-        Return mapKey
-    End Function
-
-    Private Function DetermineMRMSettings(
-      scanList As clsScanList,
-      <Out> ByRef mrmSettings As List(Of clsMRMScanInfo),
-      <Out> ByRef srmList As List(Of udtSRMListType)) As Boolean
-
-        ' Returns true if this dataset has MRM data and if it is parsed successfully
-        ' Returns false if the dataset does not have MRM data, or if an error occurs
-
-        Dim mrmInfoHash As String
-
-        Dim mrmMassIndex As Integer
-
-        Dim mrmDataPresent As Boolean
-        Dim matchFound As Boolean
-
-        mrmSettings = New List(Of clsMRMScanInfo)
-        srmList = New List(Of udtSRMListType)
-
-        Try
-            mrmDataPresent = False
-
-            UpdateProgress(0, "Determining MRM settings")
-
-            ' Initialize the tracking arrays
-            Dim mrmHashToIndexMap = New Dictionary(Of String, clsMRMScanInfo)
-
-            ' Construct a list of the MRM search values used
-            For Each fragScan In scanList.FragScans
-                If fragScan.MRMScanType = MRMScanTypeConstants.SRM Then
-                    mrmDataPresent = True
-
-                    ' See if this MRM spec is already in mrmSettings
-
-                    mrmInfoHash = GenerateMRMInfoHash(fragScan.MRMScanInfo)
-
-                    Dim mrmInfoForHash As clsMRMScanInfo = Nothing
-                    If Not mrmHashToIndexMap.TryGetValue(mrmInfoHash, mrmInfoForHash) Then
-
-                        mrmInfoForHash = DuplicateMRMInfo(fragScan.MRMScanInfo)
-
-                        mrmInfoForHash.ScanCount = 1
-                        mrmInfoForHash.ParentIonInfoIndex = fragScan.FragScanInfo.ParentIonInfoIndex
-
-                        mrmSettings.Add(mrmInfoForHash)
-                        mrmHashToIndexMap.Add(mrmInfoHash, mrmInfoForHash)
-
-
-                        ' Append the new entries to srmList
-
-                        For mrmMassIndex = 0 To mrmInfoForHash.MRMMassCount - 1
-
-                            ' Add this new transition to srmList() only if not already present
-                            matchFound = False
-                            For Each srmItem In srmList
-                                If MRMParentDaughterMatch(srmItem, mrmInfoForHash, mrmMassIndex) Then
-                                    matchFound = True
-                                    Exit For
-                                End If
-                            Next
-
-                            If Not matchFound Then
-                                ' Entry is not yet present; add it
-
-                                Dim newSRMItem = New udtSRMListType() With {
-                                    .ParentIonMZ = mrmInfoForHash.ParentIonMZ,
-                                    .CentralMass = mrmInfoForHash.MRMMassList(mrmMassIndex).CentralMass
-                                }
-
-                                srmList.Add(newSRMItem)
-                            End If
-                        Next
-                    Else
-                        mrmInfoForHash.ScanCount += 1
-                    End If
-
-                End If
-            Next
-
-            If mrmDataPresent Then
-                Return True
-            Else
-                Return False
-            End If
-
-        Catch ex As Exception
-            ReportError("Error determining the MRM settings", ex, eMasicErrorCodes.OutputFileWriteError)
-            Return False
-        End Try
-
-    End Function
-
-    Public Shared Function DuplicateMRMInfo(
-      oSource As MRMInfo,
-      parentIonMZ As Double) As clsMRMScanInfo
-
-        Dim oTarget = New clsMRMScanInfo()
-
-        oTarget.ParentIonMZ = parentIonMZ
-        oTarget.MRMMassCount = oSource.MRMMassList.Count
-
-        If oSource.MRMMassList Is Nothing Then
-            oTarget.MRMMassList = New List(Of udtMRMMassRangeType)
-        Else
-            oTarget.MRMMassList = New List(Of udtMRMMassRangeType)(oSource.MRMMassList.Count)
-            oTarget.MRMMassList.AddRange(oSource.MRMMassList)
-        End If
-
-        oTarget.ScanCount = 0
-        oTarget.ParentIonInfoIndex = -1
-
-        Return oTarget
-    End Function
-
-    Private Function DuplicateMRMInfo(oSource As clsMRMScanInfo) As clsMRMScanInfo
-        Dim oTarget = New clsMRMScanInfo()
-
-        oTarget.ParentIonMZ = oSource.ParentIonMZ
-        oTarget.MRMMassCount = oSource.MRMMassCount
-
-        If oSource.MRMMassList Is Nothing Then
-            oTarget.MRMMassList = New List(Of udtMRMMassRangeType)
-        Else
-            oTarget.MRMMassList = New List(Of udtMRMMassRangeType)(oSource.MRMMassList.Count)
-            oTarget.MRMMassList.AddRange(oSource.MRMMassList)
-        End If
-
-        oTarget.ScanCount = oSource.ScanCount
-        oTarget.ParentIonInfoIndex = oSource.ParentIonInfoIndex
-
-        Return oTarget
-
-    End Function
-
-    Public Function ExportMRMDataToDisk(
-      scanList As clsScanList,
-      spectraCache As clsSpectraCache,
-      inputFileName As String,
-      outputDirectoryPath As String) As Boolean
-
-        Dim mrmSettings As List(Of clsMRMScanInfo) = Nothing
-        Dim srmList As List(Of udtSRMListType) = Nothing
-
-        If Not DetermineMRMSettings(scanList, mrmSettings, srmList) Then
-            Return False
-        End If
-
-        Dim success = ExportMRMDataToDisk(scanList, spectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath)
-
-        Return success
-
-    End Function
-
-    Private Function ExportMRMDataToDisk(
-      scanList As clsScanList,
-      spectraCache As clsSpectraCache,
-      mrmSettings As IReadOnlyList(Of clsMRMScanInfo),
-      srmList As IReadOnlyList(Of udtSRMListType),
-      inputFileName As String,
-      outputDirectoryPath As String) As Boolean
-
-        ' Returns true if the MRM data is successfully written to disk
-        ' Note that it will also return true if udtMRMSettings() is empty
-
-        Const cColDelimiter As Char = ControlChars.Tab
-
-        Dim dataWriter As StreamWriter = Nothing
-        Dim crosstabWriter As StreamWriter = Nothing
-
-        Dim success As Boolean
-
-        Try
-            ' Only write this data if 1 or more fragmentation spectra are of type SRM
-            If mrmSettings Is Nothing OrElse mrmSettings.Count = 0 Then
-                success = True
-                Exit Try
-            End If
-
-            UpdateProgress(0, "Exporting MRM data")
-
-            ' Write out the MRM Settings
-            Dim mrmSettingsFilePath = clsDataOutput.ConstructOutputFilePath(
-                inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile)
-
-            Using settingsWriter = New StreamWriter(mrmSettingsFilePath)
-
-                settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile))
-
-                Dim dataColumns = New List(Of String)
-
-                For mrmInfoIndex = 0 To mrmSettings.Count - 1
-                    With mrmSettings(mrmInfoIndex)
-                        For mrmMassIndex = 0 To .MRMMassCount - 1
-                            dataColumns.Clear()
-
-                            dataColumns.Add(mrmInfoIndex.ToString())
-                            dataColumns.Add(.ParentIonMZ.ToString("0.000"))
-                            dataColumns.Add(.MRMMassList(mrmMassIndex).CentralMass.ToString("0.000"))
-                            dataColumns.Add(.MRMMassList(mrmMassIndex).StartMass.ToString("0.000"))
-                            dataColumns.Add(.MRMMassList(mrmMassIndex).EndMass.ToString("0.000"))
-                            dataColumns.Add(.ScanCount.ToString())
-
-                            settingsWriter.WriteLine(String.Join(cColDelimiter, dataColumns))
-                        Next
-
-                    End With
-                Next
-
-                If mOptions.WriteMRMDataList Or mOptions.WriteMRMIntensityCrosstab Then
-
-                    ' Populate srmKeyToIndexMap
-                    Dim srmKeyToIndexMap = New Dictionary(Of String, Integer)
-                    For srmIndex = 0 To srmList.Count - 1
-                        srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList(srmIndex)), srmIndex)
-                    Next
-
-                    If mOptions.WriteMRMDataList Then
-                        ' Write out the raw MRM Data
-                        Dim dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMDatafile)
-                        dataWriter = New StreamWriter(dataFilePath)
-
-                        ' Write the file headers
-                        dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMDatafile))
-                    End If
-
-                    If mOptions.WriteMRMIntensityCrosstab Then
-                        ' Write out the raw MRM Data
-                        Dim crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMCrosstabFile)
-                        crosstabWriter = New StreamWriter(crosstabFilePath)
-
-                        ' Initialize the crosstab header variable using the data in udtSRMList()
-
-                        Dim headerNames = New List(Of String) From {
-                            "Scan_First",
-                            "ScanTime"
-                        }
-
-                        For srmIndex = 0 To srmList.Count - 1
-                            headerNames.Add(ConstructSRMMapKey(srmList(srmIndex)))
-                        Next
-
-                        crosstabWriter.WriteLine(String.Join(cColDelimiter, headerNames))
-                    End If
-
-                    Dim scanFirst = Integer.MinValue
-                    Dim scanTimeFirst As Single
-                    Dim srmIndexLast = 0
-
-                    Dim crosstabColumnValue() As Double
-                    Dim crosstabColumnFlag() As Boolean
-
-                    ReDim crosstabColumnValue(srmList.Count - 1)
-                    ReDim crosstabColumnFlag(srmList.Count - 1)
-
-                    'For scanIndex = 0 To scanList.FragScanCount - 1
-                    For Each fragScan In scanList.FragScans
-                        If fragScan.MRMScanType <> MRMScanTypeConstants.SRM Then
-                            Continue For
-                        End If
-
-                        If scanFirst = Integer.MinValue Then
-                            scanFirst = fragScan.ScanNumber
-                            scanTimeFirst = fragScan.ScanTime
-                        End If
-
-                        ' Look for each of the m/z values specified in fragScan.MRMScanInfo.MRMMassList
-                        For mrmMassIndex = 0 To fragScan.MRMScanInfo.MRMMassCount - 1
-                            ' Find the maximum value between fragScan.StartMass and fragScan.EndMass
-                            ' Need to define a tolerance to account for numeric rounding artifacts in the variables
-
-                            Dim mzStart = fragScan.MRMScanInfo.MRMMassList(mrmMassIndex).StartMass
-                            Dim mzEnd = fragScan.MRMScanInfo.MRMMassList(mrmMassIndex).EndMass
-                            Dim mrmToleranceHalfWidth = Math.Round((mzEnd - mzStart) / 2, 6)
-                            If mrmToleranceHalfWidth < 0.001 Then
-                                mrmToleranceHalfWidth = 0.001
-                            End If
-
-                            Dim closestMZ As Double
-                            Dim matchIntensity As Double
-
-                            Dim matchFound = mDataAggregation.FindMaxValueInMZRange(
-                                spectraCache, fragScan,
-                                mzStart - mrmToleranceHalfWidth,
-                                mzEnd + mrmToleranceHalfWidth,
-                                closestMZ, matchIntensity)
-
-                            If mOptions.WriteMRMDataList Then
-                                dataColumns.Clear()
-                                dataColumns.Add(fragScan.ScanNumber.ToString())
-                                dataColumns.Add(fragScan.MRMScanInfo.ParentIonMZ.ToString("0.000"))
-
-                                If matchFound Then
-                                    dataColumns.Add(fragScan.MRMScanInfo.MRMMassList(mrmMassIndex).CentralMass.ToString("0.000"))
-                                    dataColumns.Add(matchIntensity.ToString("0.000"))
-
-                                Else
-                                    dataColumns.Add(fragScan.MRMScanInfo.MRMMassList(mrmMassIndex).CentralMass.ToString("0.000"))
-                                    dataColumns.Add("0")
-                                End If
-
-                                dataWriter.WriteLine(String.Join(cColDelimiter, dataColumns))
-                            End If
-
-
-                            If mOptions.WriteMRMIntensityCrosstab Then
-                                Dim srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList(mrmMassIndex).CentralMass)
-                                Dim srmIndex As Integer
-
-                                ' Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
-                                If srmKeyToIndexMap.TryGetValue(srmMapKey, srmIndex) Then
-
-                                    If crosstabColumnFlag(srmIndex) OrElse
-                                       (srmIndex = 0 And srmIndexLast = srmList.Count - 1) Then
-                                        ' Either the column is already populated, or the SRMIndex has cycled back to zero
-                                        ' Write out the current crosstab line and reset the crosstab column arrays
-                                        ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst,
-                                                               crosstabColumnValue,
-                                                               crosstabColumnFlag,
-                                                               cColDelimiter, True)
-
-                                        scanFirst = fragScan.ScanNumber
-                                        scanTimeFirst = fragScan.ScanTime
-                                    End If
-
-                                    If matchFound Then
-                                        crosstabColumnValue(srmIndex) = matchIntensity
-                                    End If
-                                    crosstabColumnFlag(srmIndex) = True
-                                    srmIndexLast = srmIndex
-                                Else
-                                    ' Unknown combination of parent ion m/z and daughter m/z; this is unexpected
-                                    ' We won't write this entry out
-                                    srmIndexLast = srmIndexLast
-                                End If
-                            End If
-
-                        Next
-
-                        UpdateCacheStats(spectraCache)
-                        If mOptions.AbortProcessing Then
-                            Exit For
-                        End If
-                    Next
-
-                    If mOptions.WriteMRMIntensityCrosstab Then
-                        ' Write out any remaining crosstab values
-                        ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst, crosstabColumnValue, crosstabColumnFlag, cColDelimiter, False)
-                    End If
-
-                End If
-
-            End Using
-
-            success = True
-
-        Catch ex As Exception
-            ReportError("Error writing the SRM data to disk", ex, eMasicErrorCodes.OutputFileWriteError)
-            success = False
-        Finally
-            If Not dataWriter Is Nothing Then
-                dataWriter.Close()
-            End If
-
-            If Not crosstabWriter Is Nothing Then
-                crosstabWriter.Close()
-            End If
-        End Try
-
-        Return success
-
-    End Function
-
-    Private Sub ExportMRMDataWriteLine(
-      writer As TextWriter,
-      scanFirst As Integer,
-      scanTimeFirst As Single,
-      crosstabColumnValue As IList(Of Double),
-      crosstabColumnFlag As IList(Of Boolean),
-      cColDelimiter As Char,
-      forceWrite As Boolean)
-
-        ' If forceWrite = False, then will only write out the line if 1 or more columns is non-zero
-
-        Dim index As Integer
-        Dim nonZeroCount = 0
-
-        Dim dataColumns = New List(Of String) From {
-            scanFirst.ToString(),
-            StringUtilities.DblToString(scanTimeFirst, 5)
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using MASIC.DataOutput;
+using MASICPeakFinder;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using PRISM;
+using ThermoRawFileReader;
+
+namespace MASIC
+{
+    public class clsMRMProcessing : clsMasicEventNotifier
+    {
+
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public struct udtSRMListType
+        {
+            public double ParentIonMZ;
+            public double CentralMass;
+
+            public override string ToString()
+            {
+                return "m/z " + ParentIonMZ.ToString("0.00");
+            }
         }
 
-        ' Construct a tab-delimited list of the values
-        ' At the same time, clear the arrays
-        For index = 0 To crosstabColumnValue.Count - 1
-            If crosstabColumnValue(index) > 0 Then
-                dataColumns.Add(crosstabColumnValue(index).ToString("0.000"))
-                nonZeroCount += 1
-            Else
-                dataColumns.Add("0")
-            End If
-
-            crosstabColumnValue(index) = 0
-            crosstabColumnFlag(index) = False
-        Next
-
-        If nonZeroCount > 0 OrElse forceWrite Then
-            writer.WriteLine(String.Join(cColDelimiter, dataColumns))
-        End If
-
-    End Sub
-
-    Private Function GenerateMRMInfoHash(mrmScanInfo As clsMRMScanInfo) As String
-        Dim hashValue As String
-        Dim index As Integer
-
-        hashValue = mrmScanInfo.ParentIonMZ & "_" & mrmScanInfo.MRMMassCount
-
-        For index = 0 To mrmScanInfo.MRMMassCount - 1
-            hashValue &= "_" &
-              mrmScanInfo.MRMMassList(index).CentralMass.ToString("0.000") & "_" &
-              mrmScanInfo.MRMMassList(index).StartMass.ToString("0.000") & "_" &
-              mrmScanInfo.MRMMassList(index).EndMass.ToString("0.000")
-
-        Next
-
-        Return hashValue
-
-    End Function
-
-    Private Function MRMParentDaughterMatch(
-      ByRef udtSRMListEntry As udtSRMListType,
-      mrmSettingsEntry As clsMRMScanInfo,
-      mrmMassIndex As Integer) As Boolean
-
-        Return MRMParentDaughterMatch(
-          udtSRMListEntry.ParentIonMZ,
-          udtSRMListEntry.CentralMass,
-          mrmSettingsEntry.ParentIonMZ,
-          mrmSettingsEntry.MRMMassList(mrmMassIndex).CentralMass)
-    End Function
-
-    Private Function MRMParentDaughterMatch(
-      parentIonMZ1 As Double,
-      mrmDaughterMZ1 As Double,
-      parentIonMZ2 As Double,
-      mrmDaughterMZ2 As Double) As Boolean
-
-        Const COMPARISON_TOLERANCE = 0.01
-
-        If Math.Abs(parentIonMZ1 - parentIonMZ2) <= COMPARISON_TOLERANCE AndAlso
-           Math.Abs(mrmDaughterMZ1 - mrmDaughterMZ2) <= COMPARISON_TOLERANCE Then
-            Return True
-        Else
-            Return False
-        End If
-
-    End Function
-
-    Public Function ProcessMRMList(
-      scanList As clsScanList,
-      spectraCache As clsSpectraCache,
-      sicProcessor As clsSICProcessing,
-      xmlResultsWriter As clsXMLResultsWriter,
-      peakFinder As clsMASICPeakFinder,
-      ByRef parentIonsProcessed As Integer) As Boolean
-
-        Try
-
-            ' Initialize sicDetails
-            Dim sicDetails = New clsSICDetails()
-            sicDetails.Reset()
-            sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan
-
-            Dim noiseStatsSegments = New List(Of clsBaselineNoiseStatsSegment)
-
-            For parentIonIndex = 0 To scanList.ParentIons.Count - 1
-
-                If scanList.ParentIons(parentIonIndex).MRMDaughterMZ <= 0 Then
-                    Continue For
-                End If
-
-                ' Step 1: Create the SIC for this MRM Parent/Daughter pair
-
-                Dim parentIonMZ = scanList.ParentIons(parentIonIndex).MZ
-                Dim mrmDaughterMZ = scanList.ParentIons(parentIonIndex).MRMDaughterMZ
-                Dim searchToleranceHalfWidth = scanList.ParentIons(parentIonIndex).MRMToleranceHalfWidth
-
-                ' Reset SICData
-                sicDetails.SICData.Clear()
-
-                ' Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
-                For scanIndex = 0 To scanList.FragScans.Count - 1
-                    If scanList.FragScans(scanIndex).MRMScanType <> MRMScanTypeConstants.SRM Then
-                        Continue For
-                    End If
-
-                    With scanList.FragScans(scanIndex)
-
-                        Dim useScan = False
-                        For mrmMassIndex = 0 To .MRMScanInfo.MRMMassCount - 1
-                            If _
-                                MRMParentDaughterMatch(.MRMScanInfo.ParentIonMZ,
-                                                       .MRMScanInfo.MRMMassList(mrmMassIndex).CentralMass,
-                                                       parentIonMZ, mrmDaughterMZ) Then
-                                useScan = True
-                                Exit For
-                            End If
-                        Next
-
-                        If Not useScan Then Continue For
-
-                        ' Include this scan in the SIC for this parent ion
-
-                        Dim matchIntensity As Double
-                        Dim closestMZ As Double
-
-                        mDataAggregation.FindMaxValueInMZRange(spectraCache,
-                                                              scanList.FragScans(scanIndex),
-                                                              mrmDaughterMZ - searchToleranceHalfWidth,
-                                                              mrmDaughterMZ + searchToleranceHalfWidth,
-                                                              closestMZ, matchIntensity)
-
-                        sicDetails.AddData(.ScanNumber, matchIntensity, closestMZ, scanIndex)
-
-                    End With
-
-                Next
-
-
-                ' Step 2: Find the largest peak in the SIC
-
-                ' Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
-                Dim success = peakFinder.ComputeDualTrimmedNoiseLevelTTest(sicDetails.SICIntensities, 0,
-                                                                          sicDetails.SICDataCount - 1,
-                                                                          mOptions.SICOptions.SICPeakFinderOptions.
-                                                                             SICBaselineNoiseOptions,
-                                                                          noiseStatsSegments)
-
-                If Not success Then
-                    SetLocalErrorCode(eMasicErrorCodes.FindSICPeaksError, True)
-                    Return False
-                End If
-
-                ' Initialize the peak
-                scanList.ParentIons(parentIonIndex).SICStats.Peak = New clsSICStatsPeak()
-
-                ' Find the data point with the maximum intensity
-                Dim maximumIntensity As Double = 0
-                scanList.ParentIons(parentIonIndex).SICStats.Peak.IndexObserved = 0
-                For scanIndex = 0 To sicDetails.SICDataCount - 1
-                    Dim intensity = sicDetails.SICIntensities(scanIndex)
-                    If intensity > maximumIntensity Then
-                        maximumIntensity = intensity
-                        scanList.ParentIons(parentIonIndex).SICStats.Peak.IndexObserved = scanIndex
-                    End If
-                Next
-
-                Dim potentialAreaStatsInFullSIC As clsSICPotentialAreaStats = Nothing
-
-                ' Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
-                peakFinder.FindPotentialPeakArea(sicDetails.SICData,
-                                                 potentialAreaStatsInFullSIC,
-                                                 mOptions.SICOptions.SICPeakFinderOptions)
-
-                ' Update .BaselineNoiseStats in scanList.ParentIons(parentIonIndex).SICStats.Peak
-                scanList.ParentIons(parentIonIndex).SICStats.Peak.BaselineNoiseStats =
-                    peakFinder.LookupNoiseStatsUsingSegments(
-                        scanList.ParentIons(parentIonIndex).SICStats.Peak.IndexObserved,
-                        noiseStatsSegments)
-
-                Dim smoothedYDataSubset As clsSmoothedYDataSubset = Nothing
-
-                With scanList.ParentIons(parentIonIndex)
-
-                    ' Clear udtSICPotentialAreaStatsForPeak
-                    .SICStats.SICPotentialAreaStatsForPeak = New clsSICPotentialAreaStats()
-
-                    Dim peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData,
-                                                                    .SICStats.SICPotentialAreaStatsForPeak,
-                                                                    .SICStats.Peak, smoothedYDataSubset,
-                                                                    mOptions.SICOptions.SICPeakFinderOptions,
-                                                                    potentialAreaStatsInFullSIC, False,
-                                                                    scanList.SIMDataPresent, False)
-
-
-                    sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails,
-                                                      .SICStats.SICPotentialAreaStatsForPeak,
-                                                      .SICStats.Peak, peakIsValid)
-                End With
-
-
-                ' Step 3: store the results
-
-                ' Possibly save the stats for this SIC to the SICData file
-                mDataOutputHandler.SaveSICDataToText(mOptions.SICOptions, scanList, parentIonIndex, sicDetails)
-
-                ' Save the stats for this SIC to the XML file
-                xmlResultsWriter.SaveDataToXML(scanList, parentIonIndex, sicDetails, smoothedYDataSubset,
-                                               mDataOutputHandler)
-
-                parentIonsProcessed += 1
-
-                '---------------------------------------------------------
-                ' Update progress
-                '---------------------------------------------------------
-                Try
-
-                    If scanList.ParentIons.Count > 1 Then
-                        UpdateProgress(CShort(parentIonsProcessed / (scanList.ParentIons.Count - 1) * 100))
-                    Else
-                        UpdateProgress(0)
-                    End If
-
-                    UpdateCacheStats(spectraCache)
-                    If mOptions.AbortProcessing Then
-                        scanList.ProcessingIncomplete = True
-                        Exit For
-                    End If
-
-                    If parentIonsProcessed Mod 100 = 0 Then
-                        If DateTime.UtcNow.Subtract(mOptions.LastParentIonProcessingLogTime).TotalSeconds >= 10 OrElse parentIonsProcessed Mod 500 = 0 Then
-                            ReportMessage("Parent Ions Processed: " & parentIonsProcessed.ToString())
-                            Console.Write(".")
-                            mOptions.LastParentIonProcessingLogTime = DateTime.UtcNow
-                        End If
-                    End If
-
-                Catch ex As Exception
-                    ReportError("Error updating progress", ex, eMasicErrorCodes.CreateSICsError)
-                End Try
-
-            Next
-
-            Return True
-
-        Catch ex As Exception
-            ReportError("Error creating SICs for MRM spectra", ex, eMasicErrorCodes.CreateSICsError)
-            Return False
-        End Try
-
-    End Function
-
-End Class
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private readonly clsMASICOptions mOptions;
+        private readonly clsDataAggregation mDataAggregation;
+        private readonly clsDataOutput mDataOutputHandler;
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /// <summary>
+    /// Constructor
+    /// </summary>
+        public clsMRMProcessing(clsMASICOptions masicOptions, clsDataOutput dataOutputHandler)
+        {
+            mOptions = masicOptions;
+            mDataAggregation = new clsDataAggregation();
+            RegisterEvents(mDataAggregation);
+            mDataOutputHandler = dataOutputHandler;
+        }
+
+        private string ConstructSRMMapKey(udtSRMListType udtSRMListEntry)
+        {
+            return ConstructSRMMapKey(udtSRMListEntry.ParentIonMZ, udtSRMListEntry.CentralMass);
+        }
+
+        private string ConstructSRMMapKey(double parentIonMZ, double centralMass)
+        {
+            string mapKey;
+            mapKey = parentIonMZ.ToString("0.000") + "_to_" + centralMass.ToString("0.000");
+            return mapKey;
+        }
+
+        private bool DetermineMRMSettings(clsScanList scanList, out List<clsMRMScanInfo> mrmSettings, out List<udtSRMListType> srmList)
+        {
+
+            // Returns true if this dataset has MRM data and if it is parsed successfully
+            // Returns false if the dataset does not have MRM data, or if an error occurs
+
+            string mrmInfoHash;
+            int mrmMassIndex;
+            bool mrmDataPresent;
+            bool matchFound;
+            mrmSettings = new List<clsMRMScanInfo>();
+            srmList = new List<udtSRMListType>();
+            try
+            {
+                mrmDataPresent = false;
+                UpdateProgress(0, "Determining MRM settings");
+
+                // Initialize the tracking arrays
+                var mrmHashToIndexMap = new Dictionary<string, clsMRMScanInfo>();
+
+                // Construct a list of the MRM search values used
+                foreach (var fragScan in scanList.FragScans)
+                {
+                    if (fragScan.MRMScanType == MRMScanTypeConstants.SRM)
+                    {
+                        mrmDataPresent = true;
+
+                        // See if this MRM spec is already in mrmSettings
+
+                        mrmInfoHash = GenerateMRMInfoHash(fragScan.MRMScanInfo);
+                        clsMRMScanInfo mrmInfoForHash = null;
+                        if (!mrmHashToIndexMap.TryGetValue(mrmInfoHash, out mrmInfoForHash))
+                        {
+                            mrmInfoForHash = DuplicateMRMInfo(fragScan.MRMScanInfo);
+                            mrmInfoForHash.ScanCount = 1;
+                            mrmInfoForHash.ParentIonInfoIndex = fragScan.FragScanInfo.ParentIonInfoIndex;
+                            mrmSettings.Add(mrmInfoForHash);
+                            mrmHashToIndexMap.Add(mrmInfoHash, mrmInfoForHash);
+
+
+                            // Append the new entries to srmList
+
+                            var loopTo = mrmInfoForHash.MRMMassCount - 1;
+                            for (mrmMassIndex = 0; mrmMassIndex <= loopTo; mrmMassIndex++)
+                            {
+
+                                // Add this new transition to srmList() only if not already present
+                                matchFound = false;
+                                foreach (var srmItem in srmList)
+                                {
+                                    if (MRMParentDaughterMatch(ref srmItem, mrmInfoForHash, mrmMassIndex))
+                                    {
+                                        matchFound = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!matchFound)
+                                {
+                                    // Entry is not yet present; add it
+
+                                    var newSRMItem = new udtSRMListType()
+                                    {
+                                        ParentIonMZ = mrmInfoForHash.ParentIonMZ,
+                                        CentralMass = mrmInfoForHash.MRMMassList[mrmMassIndex].CentralMass
+                                    };
+                                    srmList.Add(newSRMItem);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            mrmInfoForHash.ScanCount += 1;
+                        }
+                    }
+                }
+
+                if (mrmDataPresent)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error determining the MRM settings", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                return false;
+            }
+        }
+
+        public static clsMRMScanInfo DuplicateMRMInfo(MRMInfo oSource, double parentIonMZ)
+        {
+            var oTarget = new clsMRMScanInfo();
+            oTarget.ParentIonMZ = parentIonMZ;
+            oTarget.MRMMassCount = oSource.MRMMassList.Count;
+            if (oSource.MRMMassList is null)
+            {
+                oTarget.MRMMassList = new List<udtMRMMassRangeType>();
+            }
+            else
+            {
+                oTarget.MRMMassList = new List<udtMRMMassRangeType>(oSource.MRMMassList.Count);
+                oTarget.MRMMassList.AddRange(oSource.MRMMassList);
+            }
+
+            oTarget.ScanCount = 0;
+            oTarget.ParentIonInfoIndex = -1;
+            return oTarget;
+        }
+
+        private clsMRMScanInfo DuplicateMRMInfo(clsMRMScanInfo oSource)
+        {
+            var oTarget = new clsMRMScanInfo();
+            oTarget.ParentIonMZ = oSource.ParentIonMZ;
+            oTarget.MRMMassCount = oSource.MRMMassCount;
+            if (oSource.MRMMassList is null)
+            {
+                oTarget.MRMMassList = new List<udtMRMMassRangeType>();
+            }
+            else
+            {
+                oTarget.MRMMassList = new List<udtMRMMassRangeType>(oSource.MRMMassList.Count);
+                oTarget.MRMMassList.AddRange(oSource.MRMMassList);
+            }
+
+            oTarget.ScanCount = oSource.ScanCount;
+            oTarget.ParentIonInfoIndex = oSource.ParentIonInfoIndex;
+            return oTarget;
+        }
+
+        public bool ExportMRMDataToDisk(clsScanList scanList, clsSpectraCache spectraCache, string inputFileName, string outputDirectoryPath)
+        {
+            List<clsMRMScanInfo> mrmSettings = null;
+            List<udtSRMListType> srmList = null;
+            if (!DetermineMRMSettings(scanList, out mrmSettings, out srmList))
+            {
+                return false;
+            }
+
+            bool success = ExportMRMDataToDisk(scanList, spectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath);
+            return success;
+        }
+
+        private bool ExportMRMDataToDisk(clsScanList scanList, clsSpectraCache spectraCache, IReadOnlyList<clsMRMScanInfo> mrmSettings, IReadOnlyList<udtSRMListType> srmList, string inputFileName, string outputDirectoryPath)
+        {
+
+            // Returns true if the MRM data is successfully written to disk
+            // Note that it will also return true if udtMRMSettings() is empty
+
+            const char cColDelimiter = ControlChars.Tab;
+            StreamWriter dataWriter = null;
+            StreamWriter crosstabWriter = null;
+            bool success;
+            try
+            {
+                // Only write this data if 1 or more fragmentation spectra are of type SRM
+                if (mrmSettings is null || mrmSettings.Count == 0)
+                {
+                    success = true;
+                    break;
+                }
+
+                UpdateProgress(0, "Exporting MRM data");
+
+                // Write out the MRM Settings
+                string mrmSettingsFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile);
+                using (var settingsWriter = new StreamWriter(mrmSettingsFilePath))
+                {
+                    settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile));
+                    var dataColumns = new List<string>();
+                    for (int mrmInfoIndex = 0, loopTo = mrmSettings.Count - 1; mrmInfoIndex <= loopTo; mrmInfoIndex++)
+                    {
+                        {
+                            var withBlock = mrmSettings[mrmInfoIndex];
+                            for (int mrmMassIndex = 0, loopTo1 = withBlock.MRMMassCount - 1; mrmMassIndex <= loopTo1; mrmMassIndex++)
+                            {
+                                dataColumns.Clear();
+                                dataColumns.Add(mrmInfoIndex.ToString());
+                                dataColumns.Add(withBlock.ParentIonMZ.ToString("0.000"));
+                                dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
+                                dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].StartMass.ToString("0.000"));
+                                dataColumns.Add(withBlock.MRMMassList[mrmMassIndex].EndMass.ToString("0.000"));
+                                dataColumns.Add(withBlock.ScanCount.ToString());
+                                settingsWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+                            }
+                        }
+                    }
+
+                    if (mOptions.WriteMRMDataList | mOptions.WriteMRMIntensityCrosstab)
+                    {
+
+                        // Populate srmKeyToIndexMap
+                        var srmKeyToIndexMap = new Dictionary<string, int>();
+                        for (int srmIndex = 0, loopTo2 = srmList.Count - 1; srmIndex <= loopTo2; srmIndex++)
+                            srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList[srmIndex]), srmIndex);
+                        if (mOptions.WriteMRMDataList)
+                        {
+                            // Write out the raw MRM Data
+                            string dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMDatafile);
+                            dataWriter = new StreamWriter(dataFilePath);
+
+                            // Write the file headers
+                            dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMDatafile));
+                        }
+
+                        if (mOptions.WriteMRMIntensityCrosstab)
+                        {
+                            // Write out the raw MRM Data
+                            string crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMCrosstabFile);
+                            crosstabWriter = new StreamWriter(crosstabFilePath);
+
+                            // Initialize the crosstab header variable using the data in udtSRMList()
+
+                            var headerNames = new List<string>() { "Scan_First", "ScanTime" };
+                            for (int srmIndex = 0, loopTo3 = srmList.Count - 1; srmIndex <= loopTo3; srmIndex++)
+                                headerNames.Add(ConstructSRMMapKey(srmList[srmIndex]));
+                            crosstabWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), headerNames));
+                        }
+
+                        int scanFirst = int.MinValue;
+                        var scanTimeFirst = default(float);
+                        int srmIndexLast = 0;
+                        double[] crosstabColumnValue;
+                        bool[] crosstabColumnFlag;
+                        crosstabColumnValue = new double[srmList.Count];
+                        crosstabColumnFlag = new bool[srmList.Count];
+
+                        // For scanIndex = 0 To scanList.FragScanCount - 1
+                        foreach (var fragScan in scanList.FragScans)
+                        {
+                            if (fragScan.MRMScanType != MRMScanTypeConstants.SRM)
+                            {
+                                continue;
+                            }
+
+                            if (scanFirst == int.MinValue)
+                            {
+                                scanFirst = fragScan.ScanNumber;
+                                scanTimeFirst = fragScan.ScanTime;
+                            }
+
+                            // Look for each of the m/z values specified in fragScan.MRMScanInfo.MRMMassList
+                            for (int mrmMassIndex = 0, loopTo4 = fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex <= loopTo4; mrmMassIndex++)
+                            {
+                                // Find the maximum value between fragScan.StartMass and fragScan.EndMass
+                                // Need to define a tolerance to account for numeric rounding artifacts in the variables
+
+                                double mzStart = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].StartMass;
+                                double mzEnd = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].EndMass;
+                                double mrmToleranceHalfWidth = Math.Round((mzEnd - mzStart) / 2, 6);
+                                if (mrmToleranceHalfWidth < 0.001)
+                                {
+                                    mrmToleranceHalfWidth = 0.001;
+                                }
+
+                                double closestMZ;
+                                double matchIntensity;
+                                bool matchFound = mDataAggregation.FindMaxValueInMZRange(spectraCache, fragScan, mzStart - mrmToleranceHalfWidth, mzEnd + mrmToleranceHalfWidth, out closestMZ, out matchIntensity);
+                                if (mOptions.WriteMRMDataList)
+                                {
+                                    dataColumns.Clear();
+                                    dataColumns.Add(fragScan.ScanNumber.ToString());
+                                    dataColumns.Add(fragScan.MRMScanInfo.ParentIonMZ.ToString("0.000"));
+                                    if (matchFound)
+                                    {
+                                        dataColumns.Add(fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
+                                        dataColumns.Add(matchIntensity.ToString("0.000"));
+                                    }
+                                    else
+                                    {
+                                        dataColumns.Add(fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass.ToString("0.000"));
+                                        dataColumns.Add("0");
+                                    }
+
+                                    dataWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+                                }
+
+                                if (mOptions.WriteMRMIntensityCrosstab)
+                                {
+                                    string srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
+                                    int srmIndex;
+
+                                    // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
+                                    if (srmKeyToIndexMap.TryGetValue(srmMapKey, out srmIndex))
+                                    {
+                                        if (crosstabColumnFlag[srmIndex] || srmIndex == 0 & srmIndexLast == srmList.Count - 1)
+                                        {
+                                            // Either the column is already populated, or the SRMIndex has cycled back to zero
+                                            // Write out the current crosstab line and reset the crosstab column arrays
+                                            ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst, crosstabColumnValue, crosstabColumnFlag, cColDelimiter, true);
+                                            scanFirst = fragScan.ScanNumber;
+                                            scanTimeFirst = fragScan.ScanTime;
+                                        }
+
+                                        if (matchFound)
+                                        {
+                                            crosstabColumnValue[srmIndex] = matchIntensity;
+                                        }
+
+                                        crosstabColumnFlag[srmIndex] = true;
+                                        srmIndexLast = srmIndex;
+                                    }
+                                    else
+                                    {
+                                        // Unknown combination of parent ion m/z and daughter m/z; this is unexpected
+                                        // We won't write this entry out
+                                        srmIndexLast = srmIndexLast;
+                                    }
+                                }
+                            }
+
+                            UpdateCacheStats(spectraCache);
+                            if (mOptions.AbortProcessing)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (mOptions.WriteMRMIntensityCrosstab)
+                        {
+                            // Write out any remaining crosstab values
+                            ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst, crosstabColumnValue, crosstabColumnFlag, cColDelimiter, false);
+                        }
+                    }
+                }
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error writing the SRM data to disk", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                success = false;
+            }
+            finally
+            {
+                if (dataWriter is object)
+                {
+                    dataWriter.Close();
+                }
+
+                if (crosstabWriter is object)
+                {
+                    crosstabWriter.Close();
+                }
+            }
+
+            return success;
+        }
+
+        private void ExportMRMDataWriteLine(TextWriter writer, int scanFirst, float scanTimeFirst, IList<double> crosstabColumnValue, IList<bool> crosstabColumnFlag, char cColDelimiter, bool forceWrite)
+        {
+
+            // If forceWrite = False, then will only write out the line if 1 or more columns is non-zero
+
+            int index;
+            int nonZeroCount = 0;
+            var dataColumns = new List<string>() { scanFirst.ToString(), StringUtilities.DblToString(scanTimeFirst, 5) };
+
+            // Construct a tab-delimited list of the values
+            // At the same time, clear the arrays
+            var loopTo = crosstabColumnValue.Count - 1;
+            for (index = 0; index <= loopTo; index++)
+            {
+                if (crosstabColumnValue[index] > 0)
+                {
+                    dataColumns.Add(crosstabColumnValue[index].ToString("0.000"));
+                    nonZeroCount += 1;
+                }
+                else
+                {
+                    dataColumns.Add("0");
+                }
+
+                crosstabColumnValue[index] = 0;
+                crosstabColumnFlag[index] = false;
+            }
+
+            if (nonZeroCount > 0 || forceWrite)
+            {
+                writer.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataColumns));
+            }
+        }
+
+        private string GenerateMRMInfoHash(clsMRMScanInfo mrmScanInfo)
+        {
+            string hashValue;
+            int index;
+            hashValue = mrmScanInfo.ParentIonMZ + "_" + mrmScanInfo.MRMMassCount;
+            var loopTo = mrmScanInfo.MRMMassCount - 1;
+            for (index = 0; index <= loopTo; index++)
+                hashValue += "_" + mrmScanInfo.MRMMassList[index].CentralMass.ToString("0.000") + "_" + mrmScanInfo.MRMMassList[index].StartMass.ToString("0.000") + "_" + mrmScanInfo.MRMMassList[index].EndMass.ToString("0.000");
+            return hashValue;
+        }
+
+        private bool MRMParentDaughterMatch(ref udtSRMListType udtSRMListEntry, clsMRMScanInfo mrmSettingsEntry, int mrmMassIndex)
+        {
+            return MRMParentDaughterMatch(udtSRMListEntry.ParentIonMZ, udtSRMListEntry.CentralMass, mrmSettingsEntry.ParentIonMZ, mrmSettingsEntry.MRMMassList[mrmMassIndex].CentralMass);
+        }
+
+        private bool MRMParentDaughterMatch(double parentIonMZ1, double mrmDaughterMZ1, double parentIonMZ2, double mrmDaughterMZ2)
+        {
+            const double COMPARISON_TOLERANCE = 0.01;
+            if (Math.Abs(parentIonMZ1 - parentIonMZ2) <= COMPARISON_TOLERANCE && Math.Abs(mrmDaughterMZ1 - mrmDaughterMZ2) <= COMPARISON_TOLERANCE)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool ProcessMRMList(clsScanList scanList, clsSpectraCache spectraCache, clsSICProcessing sicProcessor, clsXMLResultsWriter xmlResultsWriter, clsMASICPeakFinder peakFinder, ref int parentIonsProcessed)
+        {
+            try
+            {
+
+                // Initialize sicDetails
+                var sicDetails = new clsSICDetails();
+                sicDetails.Reset();
+                sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan;
+                var noiseStatsSegments = new List<clsBaselineNoiseStatsSegment>();
+                for (int parentIonIndex = 0, loopTo = scanList.ParentIons.Count - 1; parentIonIndex <= loopTo; parentIonIndex++)
+                {
+                    if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ <= 0)
+                    {
+                        continue;
+                    }
+
+                    // Step 1: Create the SIC for this MRM Parent/Daughter pair
+
+                    double parentIonMZ = scanList.ParentIons[parentIonIndex].MZ;
+                    double mrmDaughterMZ = scanList.ParentIons[parentIonIndex].MRMDaughterMZ;
+                    double searchToleranceHalfWidth = scanList.ParentIons[parentIonIndex].MRMToleranceHalfWidth;
+
+                    // Reset SICData
+                    sicDetails.SICData.Clear();
+
+                    // Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
+                    for (int scanIndex = 0, loopTo1 = scanList.FragScans.Count - 1; scanIndex <= loopTo1; scanIndex++)
+                    {
+                        if (scanList.FragScans[scanIndex].MRMScanType != MRMScanTypeConstants.SRM)
+                        {
+                            continue;
+                        }
+
+                        {
+                            var withBlock = scanList.FragScans[scanIndex];
+                            bool useScan = false;
+                            for (int mrmMassIndex = 0, loopTo2 = withBlock.MRMScanInfo.MRMMassCount - 1; mrmMassIndex <= loopTo2; mrmMassIndex++)
+                            {
+                                if (MRMParentDaughterMatch(withBlock.MRMScanInfo.ParentIonMZ, withBlock.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass, parentIonMZ, mrmDaughterMZ))
+                                {
+                                    useScan = true;
+                                    break;
+                                }
+                            }
+
+                            if (!useScan)
+                                continue;
+
+                            // Include this scan in the SIC for this parent ion
+
+                            double matchIntensity;
+                            double closestMZ;
+                            mDataAggregation.FindMaxValueInMZRange(spectraCache, scanList.FragScans[scanIndex], mrmDaughterMZ - searchToleranceHalfWidth, mrmDaughterMZ + searchToleranceHalfWidth, out closestMZ, out matchIntensity);
+                            sicDetails.AddData(withBlock.ScanNumber, matchIntensity, closestMZ, scanIndex);
+                        }
+                    }
+
+
+                    // Step 2: Find the largest peak in the SIC
+
+                    // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
+                    bool success = peakFinder.ComputeDualTrimmedNoiseLevelTTest(sicDetails.SICIntensities, 0, sicDetails.SICDataCount - 1, mOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, out noiseStatsSegments);
+                    if (!success)
+                    {
+                        SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, true);
+                        return false;
+                    }
+
+                    // Initialize the peak
+                    scanList.ParentIons[parentIonIndex].SICStats.Peak = new clsSICStatsPeak();
+
+                    // Find the data point with the maximum intensity
+                    double maximumIntensity = 0;
+                    scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved = 0;
+                    for (int scanIndex = 0, loopTo3 = sicDetails.SICDataCount - 1; scanIndex <= loopTo3; scanIndex++)
+                    {
+                        double intensity = sicDetails.SICIntensities[scanIndex];
+                        if (intensity > maximumIntensity)
+                        {
+                            maximumIntensity = intensity;
+                            scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved = scanIndex;
+                        }
+                    }
+
+                    clsSICPotentialAreaStats potentialAreaStatsInFullSIC = null;
+
+                    // Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
+                    peakFinder.FindPotentialPeakArea(sicDetails.SICData, out potentialAreaStatsInFullSIC, mOptions.SICOptions.SICPeakFinderOptions);
+
+                    // Update .BaselineNoiseStats in scanList.ParentIons(parentIonIndex).SICStats.Peak
+                    scanList.ParentIons[parentIonIndex].SICStats.Peak.BaselineNoiseStats = peakFinder.LookupNoiseStatsUsingSegments(scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved, noiseStatsSegments);
+                    clsSmoothedYDataSubset smoothedYDataSubset = null;
+                    {
+                        var withBlock1 = scanList.ParentIons[parentIonIndex];
+
+                        // Clear udtSICPotentialAreaStatsForPeak
+                        withBlock1.SICStats.SICPotentialAreaStatsForPeak = new clsSICPotentialAreaStats();
+                        var argpotentialAreaStatsForPeak = withBlock1.SICStats.SICPotentialAreaStatsForPeak;
+                        bool peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData, out argpotentialAreaStatsForPeak, withBlock1.SICStats.Peak, out smoothedYDataSubset, mOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, false, scanList.SIMDataPresent, false);
+                        sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails, withBlock1.SICStats.SICPotentialAreaStatsForPeak, withBlock1.SICStats.Peak, peakIsValid);
+                    }
+
+
+                    // Step 3: store the results
+
+                    // Possibly save the stats for this SIC to the SICData file
+                    mDataOutputHandler.SaveSICDataToText(mOptions.SICOptions, scanList, parentIonIndex, sicDetails);
+
+                    // Save the stats for this SIC to the XML file
+                    xmlResultsWriter.SaveDataToXML(scanList, parentIonIndex, sicDetails, smoothedYDataSubset, mDataOutputHandler);
+                    parentIonsProcessed += 1;
+
+                    // ---------------------------------------------------------
+                    // Update progress
+                    // ---------------------------------------------------------
+                    try
+                    {
+                        if (scanList.ParentIons.Count > 1)
+                        {
+                            UpdateProgress(Conversions.ToShort(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
+                        }
+                        else
+                        {
+                            UpdateProgress(0);
+                        }
+
+                        UpdateCacheStats(spectraCache);
+                        if (mOptions.AbortProcessing)
+                        {
+                            scanList.ProcessingIncomplete = true;
+                            break;
+                        }
+
+                        if (parentIonsProcessed % 100 == 0)
+                        {
+                            if (DateTime.UtcNow.Subtract(mOptions.LastParentIonProcessingLogTime).TotalSeconds >= 10 || parentIonsProcessed % 500 == 0)
+                            {
+                                ReportMessage("Parent Ions Processed: " + parentIonsProcessed.ToString());
+                                Console.Write(".");
+                                mOptions.LastParentIonProcessingLogTime = DateTime.UtcNow;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ReportError("Error updating progress", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error creating SICs for MRM spectra", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                return false;
+            }
+        }
+    }
+}

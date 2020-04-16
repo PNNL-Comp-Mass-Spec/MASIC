@@ -1,254 +1,286 @@
-﻿Imports System.Runtime.InteropServices
+﻿
+namespace MASIC
+{
+    public class clsSICOptions
+    {
 
-Public Class clsSICOptions
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA = 5;
+        public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM = 3;
 
-#Region "Constants and Enums"
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        /// <summary>
+    /// Provided by the user at the command line or obtained from the database (if a connection string is defined)
+    /// 0 if unknown
+    /// </summary>
+        public int DatasetID { get; set; }
 
-    Public Const DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA As Double = 5
-    Public Const DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM As Double = 3
+        /// <summary>
+    /// Defaults to 10 ppm
+    /// </summary>
+        public double SICTolerance { get; set; }
 
-#End Region
+        /// <summary>
+    /// When true, then SICTolerance is treated as a PPM value
+    /// </summary>
+        public bool SICToleranceIsPPM { get; set; }
 
-#Region "Properties"
+        public double SICToleranceDa
+        {
+            get
+            {
+                if (SICToleranceIsPPM)
+                {
+                    // Return the Da tolerance value that will result for the given ppm tolerance at 1000 m/z
+                    return clsParentIonProcessing.GetParentIonToleranceDa(this, 1000);
+                }
+                else
+                {
+                    return SICTolerance;
+                }
+            }
 
-    ''' <summary>
-    ''' Provided by the user at the command line or obtained from the database (if a connection string is defined)
-    ''' 0 if unknown
-    ''' </summary>
-    Public Property DatasetID As Integer
+            set
+            {
+                SetSICTolerance(value, false);
+            }
+        }
+        /// <summary>
+    /// If True, then will look through the m/z values in the parent ion spectrum data to find the closest match
+    /// (within SICToleranceDa / sicOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
+    /// </summary>
+        public bool RefineReportedParentIonMZ { get; set; }
 
-    ''' <summary>
-    ''' Defaults to 10 ppm
-    ''' </summary>
-    Public Property SICTolerance As Double
+        /// <summary>
+    /// If both ScanRangeStart >=0 and ScanRangeEnd > 0 then will only process data between those scan numbers
+    /// </summary>
+        public int ScanRangeStart { get; set; }
+        public int ScanRangeEnd { get; set; }
 
-    ''' <summary>
-    ''' When true, then SICTolerance is treated as a PPM value
-    ''' </summary>
-    Public Property SICToleranceIsPPM As Boolean
+        /// <summary>
+    /// If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
+    /// </summary>
+        public float RTRangeStart { get; set; }
+        public float RTRangeEnd { get; set; }
 
-    Public Property SICToleranceDa As Double
-        Get
-            If SICToleranceIsPPM Then
-                ' Return the Da tolerance value that will result for the given ppm tolerance at 1000 m/z
-                Return clsParentIonProcessing.GetParentIonToleranceDa(Me, 1000)
-            Else
-                Return SICTolerance
-            End If
-        End Get
-        Set
-            SetSICTolerance(Value, False)
-        End Set
-    End Property
-    ''' <summary>
-    ''' If True, then will look through the m/z values in the parent ion spectrum data to find the closest match
-    ''' (within SICToleranceDa / sicOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
-    ''' </summary>
-    Public Property RefineReportedParentIonMZ As Boolean
+        /// <summary>
+    /// If true, then combines data points that have similar m/z values (within tolerance) when loading
+    /// Tolerance is sicOptions.SICToleranceDa / sicOptions.CompressToleranceDivisorForDa
+    /// (or divided by sicOptions.CompressToleranceDivisorForPPM if sicOptions.SICToleranceIsPPM=True)
+    /// </summary>
+        public bool CompressMSSpectraData { get; set; }
 
-    ''' <summary>
-    ''' If both ScanRangeStart >=0 and ScanRangeEnd > 0 then will only process data between those scan numbers
-    ''' </summary>
-    Public Property ScanRangeStart As Integer
-    Public Property ScanRangeEnd As Integer
+        /// <summary>
+    /// If true, then combines data points that have similar m/z values (within tolerance) when loading
+    /// Tolerance is binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
+    /// </summary>
+        public bool CompressMSMSSpectraData { get; set; }
 
-    ''' <summary>
-    ''' If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
-    ''' </summary>
-    Public Property RTRangeStart As Single
-    Public Property RTRangeEnd As Single
+        /// <summary>
+    /// When compressing spectra, sicOptions.SICTolerance and binningOptions.BinSize will be divided by this value
+    /// to determine the resolution to compress the data to
+    /// </summary>
+        public double CompressToleranceDivisorForDa { get; set; }
 
-    ''' <summary>
-    ''' If true, then combines data points that have similar m/z values (within tolerance) when loading
-    ''' Tolerance is sicOptions.SICToleranceDa / sicOptions.CompressToleranceDivisorForDa
-    ''' (or divided by sicOptions.CompressToleranceDivisorForPPM if sicOptions.SICToleranceIsPPM=True)
-    ''' </summary>
-    Public Property CompressMSSpectraData As Boolean
+        /// <summary>
+    /// If sicOptions.SICToleranceIsPPM is True, then this divisor is used instead of CompressToleranceDivisorForDa
+    /// </summary>
+        public double CompressToleranceDivisorForPPM { get; set; }
 
-    ''' <summary>
-    ''' If true, then combines data points that have similar m/z values (within tolerance) when loading
-    ''' Tolerance is binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
-    ''' </summary>
-    Public Property CompressMSMSSpectraData As Boolean
+        // The SIC is extended left and right until:
+        // 1) the SIC intensity falls below IntensityThresholdAbsoluteMinimum,
+        // 2) the SIC intensity falls below the maximum value observed times IntensityThresholdFractionMax,
+        // or 3) the distance exceeds MaxSICPeakWidthMinutesBackward or MaxSICPeakWidthMinutesForward
 
-    ''' <summary>
-    ''' When compressing spectra, sicOptions.SICTolerance and binningOptions.BinSize will be divided by this value
-    ''' to determine the resolution to compress the data to
-    ''' </summary>
-    Public Property CompressToleranceDivisorForDa As Double
+        /// <summary>
+    /// Defaults to 5
+    /// </summary>
+        public float MaxSICPeakWidthMinutesBackward
+        {
+            get
+            {
+                return mMaxSICPeakWidthMinutesBackward;
+            }
 
-    ''' <summary>
-    ''' If sicOptions.SICToleranceIsPPM is True, then this divisor is used instead of CompressToleranceDivisorForDa
-    ''' </summary>
-    Public Property CompressToleranceDivisorForPPM As Double
+            set
+            {
+                if (value < 0 | value > 10000)
+                    value = 5;
+                mMaxSICPeakWidthMinutesBackward = value;
+            }
+        }
 
-    ' The SIC is extended left and right until:
-    '      1) the SIC intensity falls below IntensityThresholdAbsoluteMinimum,
-    '      2) the SIC intensity falls below the maximum value observed times IntensityThresholdFractionMax,
-    '   or 3) the distance exceeds MaxSICPeakWidthMinutesBackward or MaxSICPeakWidthMinutesForward
+        /// <summary>
+    /// Defaults to 5
+    /// </summary>
+        public float MaxSICPeakWidthMinutesForward
+        {
+            get
+            {
+                return mMaxSICPeakWidthMinutesForward;
+            }
 
-    ''' <summary>
-    ''' Defaults to 5
-    ''' </summary>
-    Public Property MaxSICPeakWidthMinutesBackward As Single
-        Get
-            Return mMaxSICPeakWidthMinutesBackward
-        End Get
-        Set
-            If Value < 0 Or Value > 10000 Then Value = 5
-            mMaxSICPeakWidthMinutesBackward = Value
-        End Set
-    End Property
+            set
+            {
+                if (value < 0 | value > 10000)
+                    value = 5;
+                mMaxSICPeakWidthMinutesForward = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Defaults to 5
-    ''' </summary>
-    Public Property MaxSICPeakWidthMinutesForward As Single
-        Get
-            Return mMaxSICPeakWidthMinutesForward
-        End Get
-        Set
-            If Value < 0 Or Value > 10000 Then Value = 5
-            mMaxSICPeakWidthMinutesForward = Value
-        End Set
-    End Property
-    Public Property SICPeakFinderOptions As MASICPeakFinder.clsSICPeakFinderOptions
+        public MASICPeakFinder.clsSICPeakFinderOptions SICPeakFinderOptions { get; set; }
+        public bool ReplaceSICZeroesWithMinimumPositiveValueFromMSData { get; set; }
+        public bool SaveSmoothedData { get; set; }
 
-    Public Property ReplaceSICZeroesWithMinimumPositiveValueFromMSData As Boolean
+        /// <summary>
+    /// m/z Tolerance for finding similar parent ions; full tolerance is +/- this value
+    /// </summary>
+    /// <remarks>Defaults to 0.1</remarks>
+        public float SimilarIonMZToleranceHalfWidth
+        {
+            get
+            {
+                return mSimilarIonMZToleranceHalfWidth;
+            }
 
-    Public Property SaveSmoothedData As Boolean
+            set
+            {
+                if (value < 0.001 | value > 100)
+                    value = 0.1F;
+                mSimilarIonMZToleranceHalfWidth = value;
+            }
+        }
 
-    ''' <summary>
-    ''' m/z Tolerance for finding similar parent ions; full tolerance is +/- this value
-    ''' </summary>
-    ''' <remarks>Defaults to 0.1</remarks>
-    Public Property SimilarIonMZToleranceHalfWidth As Single
-        Get
-            Return mSimilarIonMZToleranceHalfWidth
-        End Get
-        Set
-            If Value < 0.001 Or Value > 100 Then Value = 0.1
-            mSimilarIonMZToleranceHalfWidth = Value
-        End Set
-    End Property
+        /// <summary>
+    /// Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
+    /// </summary>
+    /// <remarks>Defaults to 5</remarks>
+        public float SimilarIonToleranceHalfWidthMinutes
+        {
+            get
+            {
+                return mSimilarIonToleranceHalfWidthMinutes;
+            }
 
-    ''' <summary>
-    ''' Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
-    ''' </summary>
-    ''' <remarks>Defaults to 5</remarks>
-    Public Property SimilarIonToleranceHalfWidthMinutes As Single
-        Get
-            Return mSimilarIonToleranceHalfWidthMinutes
-        End Get
-        Set
-            If Value < 0 Or Value > 100000 Then Value = 5
-            mSimilarIonToleranceHalfWidthMinutes = Value
-        End Set
-    End Property
+            set
+            {
+                if (value < 0 | value > 100000)
+                    value = 5;
+                mSimilarIonToleranceHalfWidthMinutes = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Defaults to 0.8
-    ''' </summary>
-    Public Property SpectrumSimilarityMinimum As Single
-        Get
-            Return mSpectrumSimilarityMinimum
-        End Get
-        Set
-            If Value < 0 Or Value > 1 Then Value = 0.8
-            mSpectrumSimilarityMinimum = Value
-        End Set
-    End Property
+        /// <summary>
+    /// Defaults to 0.8
+    /// </summary>
+        public float SpectrumSimilarityMinimum
+        {
+            get
+            {
+                return mSpectrumSimilarityMinimum;
+            }
 
-#End Region
+            set
+            {
+                if (value < 0 | value > 1)
+                    value = 0.8F;
+                mSpectrumSimilarityMinimum = value;
+            }
+        }
 
-#Region "Classwide Variables"
-    Private mMaxSICPeakWidthMinutesBackward As Single
-    Private mMaxSICPeakWidthMinutesForward As Single
-#End Region
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private float mMaxSICPeakWidthMinutesBackward;
+        private float mMaxSICPeakWidthMinutesForward;
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        public double GetSICTolerance()
+        {
+            bool toleranceIsPPM;
+            return GetSICTolerance(out toleranceIsPPM);
+        }
 
-    Public Function GetSICTolerance() As Double
-        Dim toleranceIsPPM As Boolean
-        Return GetSICTolerance(toleranceIsPPM)
-    End Function
+        public double GetSICTolerance(out bool toleranceIsPPM)
+        {
+            toleranceIsPPM = SICToleranceIsPPM;
+            return SICTolerance;
+        }
 
-    Public Function GetSICTolerance(<Out> ByRef toleranceIsPPM As Boolean) As Double
-        toleranceIsPPM = SICToleranceIsPPM
-        Return SICTolerance
-    End Function
+        public void Reset()
+        {
+            SICTolerance = 10;
+            SICToleranceIsPPM = true;
 
-    Public Sub Reset()
-        SICTolerance = 10
-        SICToleranceIsPPM = True
+            // Typically only useful when using a small value for .SICTolerance
+            RefineReportedParentIonMZ = false;
+            ScanRangeStart = 0;
+            ScanRangeEnd = 0;
+            RTRangeStart = 0;
+            RTRangeEnd = 0;
+            CompressMSSpectraData = true;
+            CompressMSMSSpectraData = true;
+            CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA;
+            CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM;
+            MaxSICPeakWidthMinutesBackward = 5;
+            MaxSICPeakWidthMinutesForward = 5;
+            ReplaceSICZeroesWithMinimumPositiveValueFromMSData = true;
+            SICPeakFinderOptions = MASICPeakFinder.clsMASICPeakFinder.GetDefaultSICPeakFinderOptions();
+            SaveSmoothedData = false;
 
-        ' Typically only useful when using a small value for .SICTolerance
-        RefineReportedParentIonMZ = False
+            // Note: When using narrow SIC tolerances, be sure to SimilarIonMZToleranceHalfWidth to a smaller value
+            // However, with very small values, the SpectraCache file will be much larger
+            // The default for SimilarIonMZToleranceHalfWidth is 0.1
+            // Consider using 0.05 when using ppm-based SIC tolerances
+            SimilarIonMZToleranceHalfWidth = 0.05F;
 
-        ScanRangeStart = 0
-        ScanRangeEnd = 0
-        RTRangeStart = 0
-        RTRangeEnd = 0
+            // SimilarIonScanToleranceHalfWidth = 100
+            SimilarIonToleranceHalfWidthMinutes = 5;
+            SpectrumSimilarityMinimum = 0.8F;
+        }
 
-        CompressMSSpectraData = True
-        CompressMSMSSpectraData = True
+        public void SetSICTolerance(double toleranceValue, bool toleranceIsPPM)
+        {
+            SICToleranceIsPPM = toleranceIsPPM;
+            if (SICToleranceIsPPM)
+            {
+                if (toleranceValue < 0 | toleranceValue > 1000000)
+                    toleranceValue = 100;
+            }
+            else if (toleranceValue < 0 | toleranceValue > 10000)
+                toleranceValue = 0.6;
+            SICTolerance = toleranceValue;
+        }
 
-        CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA
-        CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM
+        public void ValidateSICOptions()
+        {
+            if (CompressToleranceDivisorForDa < 1)
+            {
+                CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA;
+            }
 
-        MaxSICPeakWidthMinutesBackward = 5
-        MaxSICPeakWidthMinutesForward = 5
+            if (CompressToleranceDivisorForPPM < 1)
+            {
+                CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM;
+            }
+        }
 
-        ReplaceSICZeroesWithMinimumPositiveValueFromMSData = True
+        public override string ToString()
+        {
+            if (SICToleranceIsPPM)
+            {
+                return "SIC Tolerance: " + SICTolerance.ToString("0.00") + " ppm";
+            }
+            else
+            {
+                return "SIC Tolerance: " + SICTolerance.ToString("0.0000") + " Da";
+            }
+        }
 
-        SICPeakFinderOptions = MASICPeakFinder.clsMASICPeakFinder.GetDefaultSICPeakFinderOptions
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private float mSimilarIonMZToleranceHalfWidth = 0.1F;
+        private float mSimilarIonToleranceHalfWidthMinutes = 5;
+        private float mSpectrumSimilarityMinimum = 0.8F;
 
-        SaveSmoothedData = False
-
-        ' Note: When using narrow SIC tolerances, be sure to SimilarIonMZToleranceHalfWidth to a smaller value
-        ' However, with very small values, the SpectraCache file will be much larger
-        ' The default for SimilarIonMZToleranceHalfWidth is 0.1
-        ' Consider using 0.05 when using ppm-based SIC tolerances
-        SimilarIonMZToleranceHalfWidth = 0.05
-
-        ' SimilarIonScanToleranceHalfWidth = 100
-        SimilarIonToleranceHalfWidthMinutes = 5
-        SpectrumSimilarityMinimum = 0.8
-    End Sub
-
-    Public Sub SetSICTolerance(toleranceValue As Double, toleranceIsPPM As Boolean)
-        SICToleranceIsPPM = toleranceIsPPM
-
-        If SICToleranceIsPPM Then
-            If toleranceValue < 0 Or toleranceValue > 1000000 Then toleranceValue = 100
-        Else
-            If toleranceValue < 0 Or toleranceValue > 10000 Then toleranceValue = 0.6
-        End If
-        SICTolerance = toleranceValue
-    End Sub
-
-    Public Sub ValidateSICOptions()
-
-        If CompressToleranceDivisorForDa < 1 Then
-            CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA
-        End If
-
-        If CompressToleranceDivisorForPPM < 1 Then
-            CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM
-        End If
-
-    End Sub
-
-    Public Overrides Function ToString() As String
-        If SICToleranceIsPPM Then
-            Return "SIC Tolerance: " & SICTolerance.ToString("0.00") & " ppm"
-        Else
-            Return "SIC Tolerance: " & SICTolerance.ToString("0.0000") & " Da"
-        End If
-    End Function
-
-#Region "Classwide variables"
-    Private mSimilarIonMZToleranceHalfWidth As Single = 0.1
-    Private mSimilarIonToleranceHalfWidthMinutes As Single = 5
-    Private mSpectrumSimilarityMinimum As Single = 0.8
-
-#End Region
-End Class
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+    }
+}

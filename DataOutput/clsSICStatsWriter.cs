@@ -1,320 +1,301 @@
-﻿Imports System.Runtime.InteropServices
-Imports MASIC.clsMASIC
-Imports PRISM
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using PRISM;
 
-Namespace DataOutput
-    Public Class clsSICStatsWriter
-        Inherits clsMasicEventNotifier
+namespace MASIC.DataOutput
+{
+    public class clsSICStatsWriter : clsMasicEventNotifier
+    {
+        private clsParentIonInfo GetFakeParentIonForFragScan(clsScanList scanList, int fragScanIndex)
+        {
+            var currentFragScan = scanList.FragScans[fragScanIndex];
+            var newParentIon = new clsParentIonInfo(currentFragScan.BasePeakIonMZ) { SurveyScanIndex = 0 };
 
-        Private Function GetFakeParentIonForFragScan(scanList As clsScanList, fragScanIndex As Integer) As clsParentIonInfo
+            // Find the previous MS1 scan that occurs before the frag scan
+            int surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1;
+            newParentIon.FragScanIndices.Add(fragScanIndex);
+            if (scanList.MasterScanOrderCount > 0)
+            {
+                int surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                while (surveyScanIndexMatch >= 0 && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.FragScan)
+                    surveyScanIndexMatch -= 1;
+                if (surveyScanIndexMatch < 0)
+                {
+                    // Did not find the previous survey scan; find the next survey scan
+                    surveyScanIndexMatch += 1;
+                    while (surveyScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.FragScan)
+                        surveyScanIndexMatch += 1;
+                    if (surveyScanIndexMatch >= scanList.MasterScanOrderCount)
+                    {
+                        surveyScanIndexMatch = 0;
+                    }
+                }
 
-            Dim currentFragScan = scanList.FragScans(fragScanIndex)
-
-            Dim newParentIon = New clsParentIonInfo(currentFragScan.BasePeakIonMZ) With {
-                .SurveyScanIndex = 0
+                newParentIon.SurveyScanIndex = scanList.MasterScanOrder[surveyScanIndexMatch].ScanIndexPointer;
             }
 
-            ' Find the previous MS1 scan that occurs before the frag scan
-            Dim surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1
-
-            newParentIon.FragScanIndices.Add(fragScanIndex)
-
-            If scanList.MasterScanOrderCount > 0 Then
-                Dim surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint)
-
-                While surveyScanIndexMatch >= 0 AndAlso scanList.MasterScanOrder(surveyScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.FragScan
-                    surveyScanIndexMatch -= 1
-                End While
-
-                If surveyScanIndexMatch < 0 Then
-                    ' Did not find the previous survey scan; find the next survey scan
-                    surveyScanIndexMatch += 1
-                    While surveyScanIndexMatch < scanList.MasterScanOrderCount AndAlso scanList.MasterScanOrder(surveyScanIndexMatch).ScanType = clsScanList.eScanTypeConstants.FragScan
-                        surveyScanIndexMatch += 1
-                    End While
-
-                    If surveyScanIndexMatch >= scanList.MasterScanOrderCount Then
-                        surveyScanIndexMatch = 0
-                    End If
-                End If
-
-                newParentIon.SurveyScanIndex = scanList.MasterScanOrder(surveyScanIndexMatch).ScanIndexPointer
-            End If
-
-            If newParentIon.SurveyScanIndex < scanList.SurveyScans.Count Then
-                newParentIon.OptimalPeakApexScanNumber = scanList.SurveyScans(newParentIon.SurveyScanIndex).ScanNumber
-            Else
-                newParentIon.OptimalPeakApexScanNumber = surveyScanNumberAbsolute
-            End If
-
-            newParentIon.PeakApexOverrideParentIonIndex = -1
-
-            newParentIon.SICStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan
-            newParentIon.SICStats.PeakScanIndexStart = fragScanIndex
-            newParentIon.SICStats.PeakScanIndexEnd = fragScanIndex
-            newParentIon.SICStats.PeakScanIndexMax = fragScanIndex
-
-            With newParentIon.SICStats.Peak
-                .MaxIntensityValue = currentFragScan.BasePeakIonIntensity
-                .SignalToNoiseRatio = 1
-                .FWHMScanWidth = 1
-                .Area = currentFragScan.BasePeakIonIntensity
-                .ParentIonIntensity = currentFragScan.BasePeakIonIntensity
-            End With
-
-            Return newParentIon
-
-        End Function
-
-        Private Sub PopulateScanListPointerArray(
-          surveyScans As IList(Of clsScanInfo),
-          surveyScanCount As Integer,
-          <Out> ByRef scanListArray() As Integer)
-
-            Dim index As Integer
-
-            If surveyScanCount > 0 Then
-                ReDim scanListArray(surveyScanCount - 1)
-
-                For index = 0 To surveyScanCount - 1
-                    scanListArray(index) = surveyScans(index).ScanNumber
-                Next
-            Else
-                ReDim scanListArray(0)
-            End If
-
-        End Sub
-
-        Public Function SaveSICStatsFlatFile(
-          scanList As clsScanList,
-          inputFileName As String,
-          outputDirectoryPath As String,
-          masicOptions As clsMASICOptions,
-          dataOutputHandler As clsDataOutput) As Boolean
-
-            ' Writes out a flat file containing identified peaks and statistics
-
-            Dim outputFilePath As String = String.Empty
-
-            Const cColDelimiter As Char = ControlChars.Tab
-
-            Dim scanListArray() As Integer = Nothing
-
-            ' Populate scanListArray with the scan numbers in scanList.SurveyScans
-            PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScans.Count, scanListArray)
-
-            Try
-
-                UpdateProgress(0, "Saving SIC data to flat file")
-
-                outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile)
-                ReportMessage("Saving SIC flat file to disk: " & Path.GetFileName(outputFilePath))
-
-                Using writer = New StreamWriter(outputFilePath, False)
-
-                    ' Write the SIC stats to the output file
-                    ' The file is tab delimited
-
-                    Dim includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile
-
-                    If masicOptions.IncludeHeadersInExportFile Then
-                        writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter))
-                    End If
-
-                    If scanList.SurveyScans.Count = 0 AndAlso scanList.ParentIons.Count = 0 Then
-                        ' Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
-                        For fragScanIndex = 0 To scanList.FragScans.Count - 1
-
-                            Dim fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex)
-                            Dim parentIonIndex = 0
-
-                            Dim surveyScanNumber As Integer
-                            Dim surveyScanTime As Single
-
-                            WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList,
-                                                   fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
-                                                   0, includeScanTimesInSICStatsFile)
-                        Next
-                    Else
-
-                        For parentIonIndex = 0 To scanList.ParentIons.Count - 1
-                            Dim includeParentIon As Boolean
-
-                            If masicOptions.CustomSICList.LimitSearchToCustomMZList Then
-                                includeParentIon = scanList.ParentIons(parentIonIndex).CustomSICPeak
-                            Else
-                                includeParentIon = True
-                            End If
-
-                            If includeParentIon Then
-                                For fragScanIndex = 0 To scanList.ParentIons(parentIonIndex).FragScanIndices.Count - 1
-
-                                    Dim parentIon = scanList.ParentIons(parentIonIndex)
-                                    Dim surveyScanNumber As Integer
-                                    Dim surveyScanTime As Single
-
-                                    If parentIon.SurveyScanIndex >= 0 AndAlso parentIon.SurveyScanIndex < scanList.SurveyScans.Count Then
-                                        surveyScanNumber = scanList.SurveyScans(parentIon.SurveyScanIndex).ScanNumber
-                                        surveyScanTime = scanList.SurveyScans(parentIon.SurveyScanIndex).ScanTime
-                                    Else
-                                        surveyScanNumber = -1
-                                        surveyScanTime = 0
-                                    End If
-
-                                    WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList,
-                                                           parentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
-                                                           fragScanIndex, includeScanTimesInSICStatsFile)
-
-                                Next
-                            End If
-
-                            If scanList.ParentIons.Count > 1 Then
-                                If parentIonIndex Mod 100 = 0 Then
-                                    UpdateProgress(CShort(parentIonIndex / (scanList.ParentIons.Count - 1) * 100))
-                                End If
-                            Else
-                                UpdateProgress(1)
-                            End If
-                            If masicOptions.AbortProcessing Then
-                                scanList.ProcessingIncomplete = True
-                                Exit For
-                            End If
-                        Next
-
-                    End If
-
-                End Using
-
-            Catch ex As Exception
-                Console.WriteLine(ex.StackTrace)
-                ReportError("Error writing the Peak Stats to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
-                Return False
-            End Try
-
-            Return True
-
-        End Function
-
-        Private Function ScanNumberToScanTime(
-          scanList As clsScanList,
-          scanNumber As Integer) As Single
-
-            Dim surveyScanMatches = (From item In scanList.SurveyScans Where item.ScanNumber = scanNumber Select item).ToList()
-
-            If surveyScanMatches.Count > 0 Then
-                Return surveyScanMatches.First.ScanTime
-            End If
-
-            Dim fragScanMatches = (From item In scanList.FragScans Where item.ScanNumber = scanNumber Select item).ToList()
-            If fragScanMatches.Count > 0 Then
-                Return fragScanMatches.First.ScanTime
-            End If
-
-            Return 0
-
-        End Function
-
-        Private Sub WriteSICStatsFlatFileEntry(
-          sicStatsWriter As TextWriter,
-          cColDelimiter As Char,
-          sicOptions As clsSICOptions,
-          scanList As clsScanList,
-          parentIon As clsParentIonInfo,
-          parentIonIndex As Integer,
-          surveyScanNumber As Integer,
-          surveyScanTime As Single,
-          fragScanIndex As Integer,
-          includeScanTimesInSICStatsFile As Boolean)
-
-            Dim dataValues = New List(Of String)
-
-            Dim fragScanTime As Single = 0
-            Dim optimalPeakApexScanTime As Single = 0
-
-            dataValues.Add(sicOptions.DatasetID.ToString())                 ' Dataset ID
-            dataValues.Add(parentIonIndex.ToString())                       ' Parent Ion Index
-
-            dataValues.Add(StringUtilities.DblToString(parentIon.MZ, 4))    ' MZ
-
-            dataValues.Add(surveyScanNumber.ToString())                     ' Survey scan number
-
-            Dim interferenceScore As Double
-            Dim fragScanNumber As Integer
-
-            If fragScanIndex < scanList.FragScans.Count Then
-                fragScanNumber = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).ScanNumber
-                dataValues.Add(fragScanNumber.ToString())  ' Fragmentation scan number
-                interferenceScore = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).FragScanInfo.InterferenceScore
-            Else
-                dataValues.Add("0")    ' Fragmentation scan does not exist
-                interferenceScore = 0
-            End If
-
-            dataValues.Add(parentIon.OptimalPeakApexScanNumber.ToString())                ' Optimal peak apex scan number
-
-            If includeScanTimesInSICStatsFile Then
-                If fragScanIndex < scanList.FragScans.Count Then
-                    fragScanTime = scanList.FragScans(parentIon.FragScanIndices(fragScanIndex)).ScanTime
-                Else
-                    fragScanTime = 0                ' Fragmentation scan does not exist
-                End If
-
-                optimalPeakApexScanTime = ScanNumberToScanTime(scanList, parentIon.OptimalPeakApexScanNumber)
-            End If
-
-            dataValues.Add(parentIon.PeakApexOverrideParentIonIndex.ToString())           ' Parent Ion Index that supplied the optimal peak apex scan number
-            If parentIon.CustomSICPeak Then
-                dataValues.Add("1")   ' Custom SIC peak, record 1
-            Else
-                dataValues.Add("0")   ' Not a Custom SIC peak, record 0
-            End If
-
-            Dim currentSIC = parentIon.SICStats
-
-            If currentSIC.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan Then
-                dataValues.Add(scanList.FragScans(currentSIC.PeakScanIndexStart).ScanNumber.ToString())    ' Peak Scan Start
-                dataValues.Add(scanList.FragScans(currentSIC.PeakScanIndexEnd).ScanNumber.ToString())      ' Peak Scan End
-                dataValues.Add(scanList.FragScans(currentSIC.PeakScanIndexMax).ScanNumber.ToString())      ' Peak Scan Max Intensity
-            Else
-                dataValues.Add(scanList.SurveyScans(currentSIC.PeakScanIndexStart).ScanNumber.ToString())  ' Peak Scan Start
-                dataValues.Add(scanList.SurveyScans(currentSIC.PeakScanIndexEnd).ScanNumber.ToString())    ' Peak Scan End
-                dataValues.Add(scanList.SurveyScans(currentSIC.PeakScanIndexMax).ScanNumber.ToString())    ' Peak Scan Max Intensity
-            End If
-
-            Dim currentPeak = currentSIC.Peak
-            dataValues.Add(StringUtilities.ValueToString(currentPeak.MaxIntensityValue, 5))          ' Peak Intensity
-            dataValues.Add(StringUtilities.ValueToString(currentPeak.SignalToNoiseRatio, 4))         ' Peak signal to noise ratio
-            dataValues.Add(currentPeak.FWHMScanWidth.ToString())                                     ' Full width at half max (in scans)
-            dataValues.Add(StringUtilities.ValueToString(currentPeak.Area, 5))                       ' Peak area
-
-            dataValues.Add(StringUtilities.ValueToString(currentPeak.ParentIonIntensity, 5))         ' Intensity of the parent ion (just before the fragmentation scan)
-            dataValues.Add(StringUtilities.ValueToString(currentPeak.BaselineNoiseStats.NoiseLevel, 5))
-            dataValues.Add(StringUtilities.ValueToString(currentPeak.BaselineNoiseStats.NoiseStDev, 3))
-            dataValues.Add(currentPeak.BaselineNoiseStats.PointsUsed.ToString())
-
-            Dim statMoments = currentPeak.StatisticalMoments
-
-            dataValues.Add(StringUtilities.ValueToString(statMoments.Area, 5))
-            dataValues.Add(statMoments.CenterOfMassScan.ToString())
-            dataValues.Add(StringUtilities.ValueToString(statMoments.StDev, 3))
-            dataValues.Add(StringUtilities.ValueToString(statMoments.Skew, 4))
-            dataValues.Add(StringUtilities.ValueToString(statMoments.KSStat, 4))
-            dataValues.Add(statMoments.DataCountUsed.ToString())
-
-
-            dataValues.Add(StringUtilities.ValueToString(interferenceScore, 4))     ' Interference Score
-
-            If includeScanTimesInSICStatsFile Then
-                dataValues.Add(StringUtilities.DblToString(surveyScanTime, 5))         ' SurveyScanTime
-                dataValues.Add(StringUtilities.DblToString(fragScanTime, 5))              ' FragScanTime
-                dataValues.Add(StringUtilities.DblToString(optimalPeakApexScanTime, 5))   ' OptimalPeakApexScanTime
-            End If
-
-            sicStatsWriter.WriteLine(String.Join(cColDelimiter, dataValues))
-
-        End Sub
-
-
-    End Class
-
-End Namespace
+            if (newParentIon.SurveyScanIndex < scanList.SurveyScans.Count)
+            {
+                newParentIon.OptimalPeakApexScanNumber = scanList.SurveyScans[newParentIon.SurveyScanIndex].ScanNumber;
+            }
+            else
+            {
+                newParentIon.OptimalPeakApexScanNumber = surveyScanNumberAbsolute;
+            }
+
+            newParentIon.PeakApexOverrideParentIonIndex = -1;
+            newParentIon.SICStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan;
+            newParentIon.SICStats.PeakScanIndexStart = fragScanIndex;
+            newParentIon.SICStats.PeakScanIndexEnd = fragScanIndex;
+            newParentIon.SICStats.PeakScanIndexMax = fragScanIndex;
+            {
+                var withBlock = newParentIon.SICStats.Peak;
+                withBlock.MaxIntensityValue = currentFragScan.BasePeakIonIntensity;
+                withBlock.SignalToNoiseRatio = 1;
+                withBlock.FWHMScanWidth = 1;
+                withBlock.Area = currentFragScan.BasePeakIonIntensity;
+                withBlock.ParentIonIntensity = currentFragScan.BasePeakIonIntensity;
+            }
+
+            return newParentIon;
+        }
+
+        private void PopulateScanListPointerArray(IList<clsScanInfo> surveyScans, int surveyScanCount, out int[] scanListArray)
+        {
+            int index;
+            if (surveyScanCount > 0)
+            {
+                scanListArray = new int[surveyScanCount];
+                var loopTo = surveyScanCount - 1;
+                for (index = 0; index <= loopTo; index++)
+                    scanListArray[index] = surveyScans[index].ScanNumber;
+            }
+            else
+            {
+                scanListArray = new int[1];
+            }
+        }
+
+        public bool SaveSICStatsFlatFile(clsScanList scanList, string inputFileName, string outputDirectoryPath, clsMASICOptions masicOptions, clsDataOutput dataOutputHandler)
+        {
+
+            // Writes out a flat file containing identified peaks and statistics
+
+            string outputFilePath = string.Empty;
+            const char cColDelimiter = ControlChars.Tab;
+            int[] scanListArray = null;
+
+            // Populate scanListArray with the scan numbers in scanList.SurveyScans
+            PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScans.Count, out scanListArray);
+            try
+            {
+                UpdateProgress(0, "Saving SIC data to flat file");
+                outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile);
+                ReportMessage("Saving SIC flat file to disk: " + Path.GetFileName(outputFilePath));
+                using (var writer = new StreamWriter(outputFilePath, false))
+                {
+
+                    // Write the SIC stats to the output file
+                    // The file is tab delimited
+
+                    bool includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile;
+                    if (masicOptions.IncludeHeadersInExportFile)
+                    {
+                        writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter));
+                    }
+
+                    if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
+                    {
+                        // Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
+                        for (int fragScanIndex = 0, loopTo = scanList.FragScans.Count - 1; fragScanIndex <= loopTo; fragScanIndex++)
+                        {
+                            var fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex);
+                            int parentIonIndex = 0;
+                            var surveyScanNumber = default(int);
+                            var surveyScanTime = default(float);
+                            WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList, fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime, 0, includeScanTimesInSICStatsFile);
+                        }
+                    }
+                    else
+                    {
+                        for (int parentIonIndex = 0, loopTo1 = scanList.ParentIons.Count - 1; parentIonIndex <= loopTo1; parentIonIndex++)
+                        {
+                            bool includeParentIon;
+                            if (masicOptions.CustomSICList.LimitSearchToCustomMZList)
+                            {
+                                includeParentIon = scanList.ParentIons[parentIonIndex].CustomSICPeak;
+                            }
+                            else
+                            {
+                                includeParentIon = true;
+                            }
+
+                            if (includeParentIon)
+                            {
+                                for (int fragScanIndex = 0, loopTo2 = scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex <= loopTo2; fragScanIndex++)
+                                {
+                                    var parentIon = scanList.ParentIons[parentIonIndex];
+                                    int surveyScanNumber;
+                                    float surveyScanTime;
+                                    if (parentIon.SurveyScanIndex >= 0 && parentIon.SurveyScanIndex < scanList.SurveyScans.Count)
+                                    {
+                                        surveyScanNumber = scanList.SurveyScans[parentIon.SurveyScanIndex].ScanNumber;
+                                        surveyScanTime = scanList.SurveyScans[parentIon.SurveyScanIndex].ScanTime;
+                                    }
+                                    else
+                                    {
+                                        surveyScanNumber = -1;
+                                        surveyScanTime = 0;
+                                    }
+
+                                    WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList, parentIon, parentIonIndex, surveyScanNumber, surveyScanTime, fragScanIndex, includeScanTimesInSICStatsFile);
+                                }
+                            }
+
+                            if (scanList.ParentIons.Count > 1)
+                            {
+                                if (parentIonIndex % 100 == 0)
+                                {
+                                    UpdateProgress(Conversions.ToShort(parentIonIndex / (double)(scanList.ParentIons.Count - 1) * 100));
+                                }
+                            }
+                            else
+                            {
+                                UpdateProgress(1);
+                            }
+
+                            if (masicOptions.AbortProcessing)
+                            {
+                                scanList.ProcessingIncomplete = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                ReportError("Error writing the Peak Stats to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                return false;
+            }
+
+            return true;
+        }
+
+        private float ScanNumberToScanTime(clsScanList scanList, int scanNumber)
+        {
+            var surveyScanMatches = (from item in scanList.SurveyScans
+                                     where item.ScanNumber == scanNumber
+                                     select item).ToList();
+            if (surveyScanMatches.Count > 0)
+            {
+                return surveyScanMatches.First().ScanTime;
+            }
+
+            var fragScanMatches = (from item in scanList.FragScans
+                                   where item.ScanNumber == scanNumber
+                                   select item).ToList();
+            if (fragScanMatches.Count > 0)
+            {
+                return fragScanMatches.First().ScanTime;
+            }
+
+            return 0;
+        }
+
+        private void WriteSICStatsFlatFileEntry(TextWriter sicStatsWriter, char cColDelimiter, clsSICOptions sicOptions, clsScanList scanList, clsParentIonInfo parentIon, int parentIonIndex, int surveyScanNumber, float surveyScanTime, int fragScanIndex, bool includeScanTimesInSICStatsFile)
+        {
+            var dataValues = new List<string>();
+            float fragScanTime = 0;
+            float optimalPeakApexScanTime = 0;
+            dataValues.Add(sicOptions.DatasetID.ToString());                 // Dataset ID
+            dataValues.Add(parentIonIndex.ToString());                       // Parent Ion Index
+            dataValues.Add(StringUtilities.DblToString(parentIon.MZ, 4));    // MZ
+            dataValues.Add(surveyScanNumber.ToString());                     // Survey scan number
+            double interferenceScore;
+            int fragScanNumber;
+            if (fragScanIndex < scanList.FragScans.Count)
+            {
+                fragScanNumber = scanList.FragScans[parentIon.FragScanIndices[fragScanIndex]].ScanNumber;
+                dataValues.Add(fragScanNumber.ToString());  // Fragmentation scan number
+                interferenceScore = scanList.FragScans[parentIon.FragScanIndices[fragScanIndex]].FragScanInfo.InterferenceScore;
+            }
+            else
+            {
+                dataValues.Add("0");    // Fragmentation scan does not exist
+                interferenceScore = 0;
+            }
+
+            dataValues.Add(parentIon.OptimalPeakApexScanNumber.ToString());                // Optimal peak apex scan number
+            if (includeScanTimesInSICStatsFile)
+            {
+                if (fragScanIndex < scanList.FragScans.Count)
+                {
+                    fragScanTime = scanList.FragScans[parentIon.FragScanIndices[fragScanIndex]].ScanTime;
+                }
+                else
+                {
+                    fragScanTime = 0;
+                }                // Fragmentation scan does not exist
+
+                optimalPeakApexScanTime = ScanNumberToScanTime(scanList, parentIon.OptimalPeakApexScanNumber);
+            }
+
+            dataValues.Add(parentIon.PeakApexOverrideParentIonIndex.ToString());           // Parent Ion Index that supplied the optimal peak apex scan number
+            if (parentIon.CustomSICPeak)
+            {
+                dataValues.Add("1");   // Custom SIC peak, record 1
+            }
+            else
+            {
+                dataValues.Add("0");
+            }   // Not a Custom SIC peak, record 0
+
+            var currentSIC = parentIon.SICStats;
+            if (currentSIC.ScanTypeForPeakIndices == clsScanList.eScanTypeConstants.FragScan)
+            {
+                dataValues.Add(scanList.FragScans[currentSIC.PeakScanIndexStart].ScanNumber.ToString());    // Peak Scan Start
+                dataValues.Add(scanList.FragScans[currentSIC.PeakScanIndexEnd].ScanNumber.ToString());      // Peak Scan End
+                dataValues.Add(scanList.FragScans[currentSIC.PeakScanIndexMax].ScanNumber.ToString());      // Peak Scan Max Intensity
+            }
+            else
+            {
+                dataValues.Add(scanList.SurveyScans[currentSIC.PeakScanIndexStart].ScanNumber.ToString());  // Peak Scan Start
+                dataValues.Add(scanList.SurveyScans[currentSIC.PeakScanIndexEnd].ScanNumber.ToString());    // Peak Scan End
+                dataValues.Add(scanList.SurveyScans[currentSIC.PeakScanIndexMax].ScanNumber.ToString());
+            }    // Peak Scan Max Intensity
+
+            var currentPeak = currentSIC.Peak;
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.MaxIntensityValue, 5));          // Peak Intensity
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.SignalToNoiseRatio, 4));         // Peak signal to noise ratio
+            dataValues.Add(currentPeak.FWHMScanWidth.ToString());                                     // Full width at half max (in scans)
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.Area, 5));                       // Peak area
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.ParentIonIntensity, 5));         // Intensity of the parent ion (just before the fragmentation scan)
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.BaselineNoiseStats.NoiseLevel, 5));
+            dataValues.Add(StringUtilities.ValueToString(currentPeak.BaselineNoiseStats.NoiseStDev, 3));
+            dataValues.Add(currentPeak.BaselineNoiseStats.PointsUsed.ToString());
+            var statMoments = currentPeak.StatisticalMoments;
+            dataValues.Add(StringUtilities.ValueToString(statMoments.Area, 5));
+            dataValues.Add(statMoments.CenterOfMassScan.ToString());
+            dataValues.Add(StringUtilities.ValueToString(statMoments.StDev, 3));
+            dataValues.Add(StringUtilities.ValueToString(statMoments.Skew, 4));
+            dataValues.Add(StringUtilities.ValueToString(statMoments.KSStat, 4));
+            dataValues.Add(statMoments.DataCountUsed.ToString());
+            dataValues.Add(StringUtilities.ValueToString(interferenceScore, 4));     // Interference Score
+            if (includeScanTimesInSICStatsFile)
+            {
+                dataValues.Add(StringUtilities.DblToString(surveyScanTime, 5));         // SurveyScanTime
+                dataValues.Add(StringUtilities.DblToString(fragScanTime, 5));              // FragScanTime
+                dataValues.Add(StringUtilities.DblToString(optimalPeakApexScanTime, 5));   // OptimalPeakApexScanTime
+            }
+
+            sicStatsWriter.WriteLine(string.Join(Conversions.ToString(cColDelimiter), dataValues));
+        }
+    }
+}

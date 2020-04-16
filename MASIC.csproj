@@ -52,6 +52,7 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="InterDetect">
       <HintPath>Lib\InterDetect.dll</HintPath>
     </Reference>
@@ -111,6 +112,9 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\MyNamespace.Static.1.Designer.cs" />
+    <Compile Include="Properties\MyNamespace.Static.2.Designer.cs" />
+    <Compile Include="Properties\MyNamespace.Static.3.Designer.cs" />
     <Compile Include="clsBinarySearch.cs" />
     <Compile Include="clsBinnedData.cs" />
     <Compile Include="clsBinningOptions.cs" />

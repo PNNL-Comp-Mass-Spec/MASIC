@@ -1,68 +1,84 @@
-﻿Public Class clsBinningOptions
+﻿
+namespace MASIC
+{
+    public class clsBinningOptions
+    {
 
-#Region "Properties"
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public float StartX { get; set; }
+        public float EndX { get; set; }
 
-    Public Property StartX As Single
+        public float BinSize
+        {
+            get
+            {
+                return mBinSize;
+            }
 
-    Public Property EndX As Single
+            set
+            {
+                if (value <= 0)
+                    value = 1;
+                mBinSize = value;
+            }
+        }
 
-    Public Property BinSize As Single
-        Get
-            Return mBinSize
-        End Get
-        Set
-            If Value <= 0 Then Value = 1
-            mBinSize = Value
-        End Set
-    End Property
-    Public Property IntensityPrecisionPercent As Single
-        Get
-            Return mIntensityPrecisionPercent
-        End Get
-        Set
-            If Value < 0 Or Value > 100 Then Value = 1
-            mIntensityPrecisionPercent = Value
-        End Set
-    End Property
+        public float IntensityPrecisionPercent
+        {
+            get
+            {
+                return mIntensityPrecisionPercent;
+            }
 
-    Public Property Normalize As Boolean
+            set
+            {
+                if (value < 0 | value > 100)
+                    value = 1;
+                mIntensityPrecisionPercent = value;
+            }
+        }
 
-    ''' <summary>
-    ''' Sum all of the intensities for binned ions of the same bin together
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property SumAllIntensitiesForBin As Boolean
+        public bool Normalize { get; set; }
 
-    Public Property MaximumBinCount As Integer
-        Get
-            Return mMaximumBinCount
-        End Get
-        Set
-            If Value < 2 Then Value = 10
-            If Value > 1000000 Then Value = 1000000
-            mMaximumBinCount = Value
-        End Set
-    End Property
+        /// <summary>
+    /// Sum all of the intensities for binned ions of the same bin together
+    /// </summary>
+    /// <returns></returns>
+        public bool SumAllIntensitiesForBin { get; set; }
 
-#End Region
+        public int MaximumBinCount
+        {
+            get
+            {
+                return mMaximumBinCount;
+            }
 
-#Region "Classwide variables"
-    Dim mBinSize As Single = 1
-    Dim mIntensityPrecisionPercent As Single = 1
-    Dim mMaximumBinCount As Integer = 100000
-#End Region
+            set
+            {
+                if (value < 2)
+                    value = 10;
+                if (value > 1000000)
+                    value = 1000000;
+                mMaximumBinCount = value;
+            }
+        }
 
-    Public Sub Reset()
-        Dim defaultOptions = clsCorrelation.GetDefaultBinningOptions()
-
-        With defaultOptions
-            StartX = .StartX
-            EndX = .EndX
-            BinSize = .BinSize
-            IntensityPrecisionPercent = .IntensityPrecisionPercent
-            Normalize = .Normalize
-            SumAllIntensitiesForBin = .SumAllIntensitiesForBin
-            MaximumBinCount = .MaximumBinCount
-        End With
-    End Sub
-End Class
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private float mBinSize = 1;
+        private float mIntensityPrecisionPercent = 1;
+        private int mMaximumBinCount = 100000;
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        public void Reset()
+        {
+            var defaultOptions = clsCorrelation.GetDefaultBinningOptions();
+            StartX = defaultOptions.StartX;
+            EndX = defaultOptions.EndX;
+            BinSize = defaultOptions.BinSize;
+            IntensityPrecisionPercent = defaultOptions.IntensityPrecisionPercent;
+            Normalize = defaultOptions.Normalize;
+            SumAllIntensitiesForBin = defaultOptions.SumAllIntensitiesForBin;
+            MaximumBinCount = defaultOptions.MaximumBinCount;
+        }
+    }
+}

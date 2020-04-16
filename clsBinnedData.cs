@@ -1,38 +1,46 @@
-﻿Public Class clsBinnedData
+﻿using System.Collections.Generic;
 
-    Public Property BinnedDataStartX As Single
-    Public Property BinSize As Single
+namespace MASIC
+{
+    public class clsBinnedData
+    {
+        public float BinnedDataStartX { get; set; }
+        public float BinSize { get; set; }
 
-    ''' <summary>
-    ''' Number of bins in BinnedIntensities
-    ''' </summary>
-    ''' <returns></returns>
-    Public ReadOnly Property BinCount As Integer
-        Get
-            Return BinnedIntensities.Count
-        End Get
-    End Property
+        /// <summary>
+    /// Number of bins in BinnedIntensities
+    /// </summary>
+    /// <returns></returns>
+        public int BinCount
+        {
+            get
+            {
+                return BinnedIntensities.Count;
+            }
+        }
 
-    ''' <summary>
-    ''' List of binned intensities; First bin starts at BinnedDataStartX
-    ''' </summary>
-    Public ReadOnly BinnedIntensities As List(Of Single)
+        /// <summary>
+    /// List of binned intensities; First bin starts at BinnedDataStartX
+    /// </summary>
+        public readonly List<float> BinnedIntensities;
 
-    ''' <summary>
-    ''' List of binned intensity offsets; First bin starts at BinnedDataStartX + BinSize/2
-    ''' </summary>
-    Public ReadOnly BinnedIntensitiesOffset As List(Of Single)
+        /// <summary>
+    /// List of binned intensity offsets; First bin starts at BinnedDataStartX + BinSize/2
+    /// </summary>
+        public readonly List<float> BinnedIntensitiesOffset;
 
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    Public Sub New()
-        BinnedIntensities = New List(Of Single)
-        BinnedIntensitiesOffset = New List(Of Single)
-    End Sub
+        /// <summary>
+    /// Constructor
+    /// </summary>
+        public clsBinnedData()
+        {
+            BinnedIntensities = new List<float>();
+            BinnedIntensitiesOffset = new List<float>();
+        }
 
-    Public Overrides Function ToString() As String
-        Return "BinCount: " & BinCount & ", BinSize: " & BinSize.ToString("0.0") & ", StartX: " & BinnedDataStartX.ToString("0.0")
-    End Function
-
-End Class
+        public override string ToString()
+        {
+            return "BinCount: " + BinCount + ", BinSize: " + BinSize.ToString("0.0") + ", StartX: " + BinnedDataStartX.ToString("0.0");
+        }
+    }
+}

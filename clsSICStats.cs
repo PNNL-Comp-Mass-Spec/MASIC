@@ -1,35 +1,38 @@
-﻿Public Class clsSICStats
+﻿
+namespace MASIC
+{
+    public class clsSICStats
+    {
+        public MASICPeakFinder.clsSICStatsPeak Peak { get; set; }
+        public clsScanList.eScanTypeConstants ScanTypeForPeakIndices { get; set; }
 
-    Public Property Peak As MASICPeakFinder.clsSICStatsPeak
+        /// <summary>
+    /// Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
+    /// </summary>
+    /// <returns></returns>
+        public int PeakScanIndexStart { get; set; }
 
-    Public Property ScanTypeForPeakIndices As clsScanList.eScanTypeConstants
+        /// <summary>
+    /// Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
+    /// </summary>
+    /// <returns></returns>
+        public int PeakScanIndexEnd { get; set; }
 
-    ''' <summary>
-    ''' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property PeakScanIndexStart As Integer
+        /// <summary>
+    /// Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
+    /// </summary>
+    /// <returns></returns>
+        public int PeakScanIndexMax { get; set; }
+        public MASICPeakFinder.clsSICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }
 
-    ''' <summary>
-    ''' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property PeakScanIndexEnd As Integer
+        public clsSICStats()
+        {
+            Peak = new MASICPeakFinder.clsSICStatsPeak();
+        }
 
-    ''' <summary>
-    ''' Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property PeakScanIndexMax As Integer
-
-    Public Property SICPotentialAreaStatsForPeak As MASICPeakFinder.clsSICPotentialAreaStats
-
-    Public Sub New()
-        Peak = New MASICPeakFinder.clsSICStatsPeak()
-    End Sub
-
-    Public Overrides Function ToString() As String
-        Return "Peak at index " & Peak.IndexMax & ", area " & Peak.Area
-    End Function
-
-End Class
+        public override string ToString()
+        {
+            return "Peak at index " + Peak.IndexMax + ", area " + Peak.Area;
+        }
+    }
+}

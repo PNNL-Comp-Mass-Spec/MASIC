@@ -1,279 +1,333 @@
-﻿Imports MASIC.clsMASIC
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
 
-Namespace DataInput
+namespace MASIC.DataInput
+{
+    public class clsCustomSICListReader : clsMasicEventNotifier
+    {
 
-    Public Class clsCustomSICListReader
-        Inherits clsMasicEventNotifier
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        public const string CUSTOM_SIC_COLUMN_MZ = "MZ";
+        public const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";
+        public const string CUSTOM_SIC_COLUMN_SCAN_CENTER = "ScanCenter";
+        public const string CUSTOM_SIC_COLUMN_SCAN_TOLERANCE = "ScanTolerance";
+        public const string CUSTOM_SIC_COLUMN_SCAN_TIME = "ScanTime";
+        public const string CUSTOM_SIC_COLUMN_TIME_TOLERANCE = "TimeTolerance";
+        public const string CUSTOM_SIC_COLUMN_COMMENT = "Comment";
 
-#Region "Constants and Enums"
-
-        Public Const CUSTOM_SIC_COLUMN_MZ As String = "MZ"
-        Public Const CUSTOM_SIC_COLUMN_MZ_TOLERANCE As String = "MZToleranceDa"
-        Public Const CUSTOM_SIC_COLUMN_SCAN_CENTER As String = "ScanCenter"
-        Public Const CUSTOM_SIC_COLUMN_SCAN_TOLERANCE As String = "ScanTolerance"
-        Public Const CUSTOM_SIC_COLUMN_SCAN_TIME As String = "ScanTime"
-        Public Const CUSTOM_SIC_COLUMN_TIME_TOLERANCE As String = "TimeTolerance"
-        Public Const CUSTOM_SIC_COLUMN_COMMENT As String = "Comment"
-
-        Private Enum eCustomSICFileColumns
-            MZ = 0
-            MZToleranceDa = 1
-            ScanCenter = 2              ' Absolute scan or Relative Scan, or Acquisition Time
-            ScanTolerance = 3           ' Absolute scan or Relative Scan, or Acquisition Time
-            ScanTime = 4                ' Only used for acquisition Time
-            TimeTolerance = 5           ' Only used for acquisition Time
+        private enum eCustomSICFileColumns
+        {
+            MZ = 0,
+            MZToleranceDa = 1,
+            ScanCenter = 2,              // Absolute scan or Relative Scan, or Acquisition Time
+            ScanTolerance = 3,           // Absolute scan or Relative Scan, or Acquisition Time
+            ScanTime = 4,                // Only used for acquisition Time
+            TimeTolerance = 5,           // Only used for acquisition Time
             Comment = 6
-        End Enum
+        }
 
 
-#End Region
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private readonly clsCustomSICList mCustomSICList;
 
-#Region "Classwide Variables"
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        public static string GetCustomMZFileColumnHeaders(string cColDelimiter = ", ", bool includeAndBeforeLastItem = true)
+        {
+            var headerNames = new List<string>() { CUSTOM_SIC_COLUMN_MZ, CUSTOM_SIC_COLUMN_MZ_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_CENTER, CUSTOM_SIC_COLUMN_SCAN_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_TIME, CUSTOM_SIC_COLUMN_TIME_TOLERANCE };
+            if (includeAndBeforeLastItem)
+            {
+                headerNames.Add("and " + CUSTOM_SIC_COLUMN_COMMENT);
+            }
+            else
+            {
+                headerNames.Add(CUSTOM_SIC_COLUMN_COMMENT);
+            }
 
-        Private ReadOnly mCustomSICList As clsCustomSICList
+            return string.Join(cColDelimiter, headerNames);
+        }
 
-#End Region
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public clsCustomSICListReader(clsCustomSICList customSicList)
+        {
+            mCustomSICList = customSicList;
+        }
 
-        Public Shared Function GetCustomMZFileColumnHeaders(
-                                                            Optional cColDelimiter As String = ", ",
-                                                            Optional includeAndBeforeLastItem As Boolean = True) As String
+        public bool LoadCustomSICListFromFile(string customSICValuesFileName)
+        {
+            var delimiterList = new char[] { ControlChars.Tab };
+            var forceAcquisitionTimeMode = default(bool);
+            try
+            {
+                bool mzHeaderFound = false;
+                bool scanTimeHeaderFound = false;
+                bool timeToleranceHeaderFound = false;
+                mCustomSICList.ResetMzSearchValues();
 
-            Dim headerNames = New List(Of String) From {
-                    CUSTOM_SIC_COLUMN_MZ,
-                    CUSTOM_SIC_COLUMN_MZ_TOLERANCE,
-                    CUSTOM_SIC_COLUMN_SCAN_CENTER,
-                    CUSTOM_SIC_COLUMN_SCAN_TOLERANCE,
-                    CUSTOM_SIC_COLUMN_SCAN_TIME,
-                    CUSTOM_SIC_COLUMN_TIME_TOLERANCE
+                // eColumnMapping will be initialized when the headers are read
+                int[] eColumnMapping;
+                eColumnMapping = new int[0];
+                if (!File.Exists(customSICValuesFileName))
+                {
+                    // Custom SIC file not found
+                    string errorMessage = "Custom MZ List file not found: " + customSICValuesFileName;
+                    ReportError(errorMessage);
+                    mCustomSICList.CustomMZSearchValues.Clear();
+                    return false;
+                }
+
+                using (var reader = new StreamReader(new FileStream(customSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read)))
+                {
+                    int linesRead = 0;
+                    while (!reader.EndOfStream)
+                    {
+                        string dataLine = reader.ReadLine();
+                        if (dataLine is null)
+                            continue;
+                        if (linesRead == 0 && !dataLine.Contains(Conversions.ToString(ControlChars.Tab)))
+                        {
+                            // Split on commas instead of tab characters
+                            delimiterList = new char[] { ',' };
+                        }
+
+                        var dataCols = dataLine.Split(delimiterList);
+                        if (dataCols is null || dataCols.Length <= 0)
+                            continue;
+
+                        // This is the first non-blank line
+                        linesRead += 1;
+                        if (linesRead == 1)
+                        {
+
+                            // Initialize eColumnMapping, setting the value for each column to -1, indicating the column is not present
+                            eColumnMapping = new int[dataCols.Length];
+                            for (int colIndex = 0, loopTo = eColumnMapping.Length - 1; colIndex <= loopTo; colIndex++)
+                                eColumnMapping[colIndex] = -1;
+
+                            // The first row must be the header row; parse the values
+                            for (int colIndex = 0, loopTo1 = dataCols.Length - 1; colIndex <= loopTo1; colIndex++)
+                            {
+                                var switchExpr = dataCols[colIndex].ToUpper();
+                                switch (switchExpr)
+                                {
+                                    case var @case when @case == CUSTOM_SIC_COLUMN_MZ.ToUpper():
+                                        {
+                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZ;
+                                            mzHeaderFound = true;
+                                            break;
+                                        }
+
+                                    case var case1 when case1 == CUSTOM_SIC_COLUMN_MZ_TOLERANCE.ToUpper():
+                                        {
+                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.MZToleranceDa;
+                                            break;
+                                        }
+
+                                    case var case2 when case2 == CUSTOM_SIC_COLUMN_SCAN_CENTER.ToUpper():
+                                        {
+                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanCenter;
+                                            break;
+                                        }
+
+                                    case var case3 when case3 == CUSTOM_SIC_COLUMN_SCAN_TOLERANCE.ToUpper():
+                                        {
+                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTolerance;
+                                            break;
+                                        }
+
+                                    case var case4 when case4 == CUSTOM_SIC_COLUMN_SCAN_TIME.ToUpper():
+                                        {
+                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.ScanTime;
+                                            scanTimeHeaderFound = true;
+                                            break;
+                                        }
+
+                                    case var case5 when case5 == CUSTOM_SIC_COLUMN_TIME_TOLERANCE.ToUpper():
+                                        {
+                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.TimeTolerance;
+                                            timeToleranceHeaderFound = true;
+                                            break;
+                                        }
+
+                                    case var case6 when case6 == CUSTOM_SIC_COLUMN_COMMENT.ToUpper():
+                                        {
+                                            eColumnMapping[colIndex] = (int)eCustomSICFileColumns.Comment;
+                                            break;
+                                        }
+
+                                    default:
+                                        {
+                                            break;
+                                        }
+                                        // Unknown column name; ignore it
+                                }
+                            }
+
+                            // Make sure that, at a minimum, the MZ column is present
+                            if (!mzHeaderFound)
+                            {
+                                string errorMessage = "Custom M/Z List file " + customSICValuesFileName + "does not have a column header named " + CUSTOM_SIC_COLUMN_MZ + " in the first row; this header is required (valid column headers are: " + GetCustomMZFileColumnHeaders() + ")";
+                                ReportError(errorMessage);
+                                mCustomSICList.CustomMZSearchValues.Clear();
+                                return false;
+                            }
+
+                            if (scanTimeHeaderFound && timeToleranceHeaderFound)
+                            {
+                                forceAcquisitionTimeMode = true;
+                                mCustomSICList.ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime;
+                            }
+                            else
+                            {
+                                forceAcquisitionTimeMode = false;
+                            }
+
+                            continue;
+                        }
+
+                        // Parse this line's data if dataCols(0) is numeric
+                        if (!clsUtilities.IsNumber(dataCols[0]))
+                        {
+                            continue;
+                        }
+
+                        var mzSearchSpec = new clsCustomMZSearchSpec(0);
+                        mzSearchSpec.MZToleranceDa = 0;
+                        mzSearchSpec.ScanOrAcqTimeCenter = 0;
+                        mzSearchSpec.ScanOrAcqTimeTolerance = 0;
+                        for (int colIndex = 0, loopTo2 = dataCols.Length - 1; colIndex <= loopTo2; colIndex++)
+                        {
+                            if (colIndex >= eColumnMapping.Length)
+                                break;
+                            var switchExpr1 = eColumnMapping[colIndex];
+                            switch (switchExpr1)
+                            {
+                                case (int)eCustomSICFileColumns.MZ:
+                                    {
+                                        double argresult = mzSearchSpec.MZ;
+                                        if (!double.TryParse(dataCols[colIndex], out argresult))
+                                        {
+                                            throw new InvalidCastException("Non-numeric value for the MZ column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
+                                        }
+
+                                        break;
+                                    }
+
+                                case (int)eCustomSICFileColumns.MZToleranceDa:
+                                    {
+                                        double argresult1 = mzSearchSpec.MZToleranceDa;
+                                        if (!double.TryParse(dataCols[colIndex], out argresult1))
+                                        {
+                                            throw new InvalidCastException("Non-numeric value for the MZToleranceDa column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
+                                        }
+
+                                        break;
+                                    }
+
+                                case (int)eCustomSICFileColumns.ScanCenter:
+                                    {
+                                        // Do not use this value if both the ScanTime and the TimeTolerance columns were present
+                                        if (!forceAcquisitionTimeMode)
+                                        {
+                                            float argresult2 = mzSearchSpec.ScanOrAcqTimeCenter;
+                                            if (!float.TryParse(dataCols[colIndex], out argresult2))
+                                            {
+                                                throw new InvalidCastException("Non-numeric value for the ScanCenter column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
+                                            }
+                                        }
+
+                                        break;
+                                    }
+
+                                case (int)eCustomSICFileColumns.ScanTolerance:
+                                    {
+                                        // Do not use this value if both the ScanTime and the TimeTolerance columns were present
+                                        if (!forceAcquisitionTimeMode)
+                                        {
+                                            if (mCustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
+                                            {
+                                                mzSearchSpec.ScanOrAcqTimeTolerance = Conversions.ToInteger(dataCols[colIndex]);
+                                            }
+                                            else
+                                            {
+                                                // Includes .Relative and .AcquisitionTime
+                                                float argresult3 = mzSearchSpec.ScanOrAcqTimeTolerance;
+                                                if (!float.TryParse(dataCols[colIndex], out argresult3))
+                                                {
+                                                    throw new InvalidCastException("Non-numeric value for the ScanTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
+                                                }
+                                            }
+                                        }
+
+                                        break;
+                                    }
+
+                                case (int)eCustomSICFileColumns.ScanTime:
+                                    {
+                                        // Only use this value if both the ScanTime and the TimeTolerance columns were present
+                                        if (forceAcquisitionTimeMode)
+                                        {
+                                            float argresult4 = mzSearchSpec.ScanOrAcqTimeCenter;
+                                            if (!float.TryParse(dataCols[colIndex], out argresult4))
+                                            {
+                                                throw new InvalidCastException("Non-numeric value for the ScanTime column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
+                                            }
+                                        }
+
+                                        break;
+                                    }
+
+                                case (int)eCustomSICFileColumns.TimeTolerance:
+                                    {
+                                        // Only use this value if both the ScanTime and the TimeTolerance columns were present
+                                        if (forceAcquisitionTimeMode)
+                                        {
+                                            float argresult5 = mzSearchSpec.ScanOrAcqTimeTolerance;
+                                            if (!float.TryParse(dataCols[colIndex], out argresult5))
+                                            {
+                                                throw new InvalidCastException("Non-numeric value for the TimeTolerance column in row " + (linesRead + 1) + ", column " + (colIndex + 1));
+                                            }
+                                        }
+
+                                        break;
+                                    }
+
+                                case (int)eCustomSICFileColumns.Comment:
+                                    {
+                                        mzSearchSpec.Comment = string.Copy(dataCols[colIndex]);
+                                        break;
+                                    }
+
+                                default:
+                                    {
+                                        break;
+                                    }
+                                    // Unknown column code
+                            }
+                        }
+
+                        mCustomSICList.AddMzSearchTarget(mzSearchSpec);
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error in LoadCustomSICListFromFile", ex, clsMASIC.eMasicErrorCodes.InvalidCustomSICValues);
+                mCustomSICList.CustomMZSearchValues.Clear();
+                return false;
+            }
 
-            If includeAndBeforeLastItem Then
-                headerNames.Add("and " & CUSTOM_SIC_COLUMN_COMMENT)
-            Else
-                headerNames.Add(CUSTOM_SIC_COLUMN_COMMENT)
-            End If
+            if (!forceAcquisitionTimeMode)
+            {
+                mCustomSICList.ValidateCustomSICList();
+            }
 
-            Return String.Join(cColDelimiter, headerNames)
-
-        End Function
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New(customSicList As clsCustomSICList)
-            mCustomSICList = customSicList
-        End Sub
-
-        Public Function LoadCustomSICListFromFile(customSICValuesFileName As String) As Boolean
-
-
-            Dim delimiterList = New Char() {ControlChars.Tab}
-            Dim forceAcquisitionTimeMode As Boolean
-
-            Try
-                Dim mzHeaderFound = False
-                Dim scanTimeHeaderFound = False
-                Dim timeToleranceHeaderFound = False
-
-                mCustomSICList.ResetMzSearchValues()
-
-                ' eColumnMapping will be initialized when the headers are read
-                Dim eColumnMapping() As Integer
-                ReDim eColumnMapping(-1)
-
-                If Not File.Exists(customSICValuesFileName) Then
-                    ' Custom SIC file not found
-                    Dim errorMessage = "Custom MZ List file not found: " & customSICValuesFileName
-                    ReportError(errorMessage)
-                    mCustomSICList.CustomMZSearchValues.Clear()
-                    Return False
-                End If
-
-                Using reader = New StreamReader(New FileStream(customSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-
-                    Dim linesRead = 0
-                    Do While Not reader.EndOfStream
-                        Dim dataLine = reader.ReadLine
-                        If dataLine Is Nothing Then Continue Do
-
-                        If linesRead = 0 AndAlso Not dataLine.Contains(ControlChars.Tab) Then
-                            ' Split on commas instead of tab characters
-                            delimiterList = New Char() {","c}
-                        End If
-
-                        Dim dataCols = dataLine.Split(delimiterList)
-
-                        If (dataCols Is Nothing) OrElse dataCols.Length <= 0 Then Continue Do
-
-                        ' This is the first non-blank line
-                        linesRead += 1
-
-                        If linesRead = 1 Then
-
-                            ' Initialize eColumnMapping, setting the value for each column to -1, indicating the column is not present
-                            ReDim eColumnMapping(dataCols.Length - 1)
-                            For colIndex = 0 To eColumnMapping.Length - 1
-                                eColumnMapping(colIndex) = -1
-                            Next
-
-                            ' The first row must be the header row; parse the values
-                            For colIndex = 0 To dataCols.Length - 1
-                                Select Case dataCols(colIndex).ToUpper()
-                                    Case CUSTOM_SIC_COLUMN_MZ.ToUpper()
-                                        eColumnMapping(colIndex) = eCustomSICFileColumns.MZ
-                                        mzHeaderFound = True
-
-                                    Case CUSTOM_SIC_COLUMN_MZ_TOLERANCE.ToUpper()
-                                        eColumnMapping(colIndex) = eCustomSICFileColumns.MZToleranceDa
-
-                                    Case CUSTOM_SIC_COLUMN_SCAN_CENTER.ToUpper()
-                                        eColumnMapping(colIndex) = eCustomSICFileColumns.ScanCenter
-
-                                    Case CUSTOM_SIC_COLUMN_SCAN_TOLERANCE.ToUpper()
-                                        eColumnMapping(colIndex) = eCustomSICFileColumns.ScanTolerance
-
-                                    Case CUSTOM_SIC_COLUMN_SCAN_TIME.ToUpper()
-                                        eColumnMapping(colIndex) = eCustomSICFileColumns.ScanTime
-                                        scanTimeHeaderFound = True
-
-                                    Case CUSTOM_SIC_COLUMN_TIME_TOLERANCE.ToUpper()
-                                        eColumnMapping(colIndex) = eCustomSICFileColumns.TimeTolerance
-                                        timeToleranceHeaderFound = True
-
-                                    Case CUSTOM_SIC_COLUMN_COMMENT.ToUpper()
-                                        eColumnMapping(colIndex) = eCustomSICFileColumns.Comment
-
-                                    Case Else
-                                        ' Unknown column name; ignore it
-                                End Select
-                            Next
-
-                            ' Make sure that, at a minimum, the MZ column is present
-                            If Not mzHeaderFound Then
-
-                                Dim errorMessage = "Custom M/Z List file " & customSICValuesFileName & "does not have a column header named " & CUSTOM_SIC_COLUMN_MZ & " in the first row; this header is required (valid column headers are: " & GetCustomMZFileColumnHeaders() & ")"
-                                ReportError(errorMessage)
-
-                                mCustomSICList.CustomMZSearchValues.Clear()
-                                Return False
-                            End If
-
-                            If scanTimeHeaderFound AndAlso timeToleranceHeaderFound Then
-                                forceAcquisitionTimeMode = True
-                                mCustomSICList.ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime
-                            Else
-                                forceAcquisitionTimeMode = False
-                            End If
-
-                            Continue Do
-                        End If
-
-                        ' Parse this line's data if dataCols(0) is numeric
-                        If Not clsUtilities.IsNumber(dataCols(0)) Then
-                            Continue Do
-                        End If
-
-                        Dim mzSearchSpec = New clsCustomMZSearchSpec(0)
-
-                        With mzSearchSpec
-
-                            .MZToleranceDa = 0
-                            .ScanOrAcqTimeCenter = 0
-                            .ScanOrAcqTimeTolerance = 0
-
-                            For colIndex = 0 To dataCols.Length - 1
-
-                                If colIndex >= eColumnMapping.Length Then Exit For
-
-                                Select Case eColumnMapping(colIndex)
-                                    Case eCustomSICFileColumns.MZ
-                                        If Not Double.TryParse(dataCols(colIndex), .MZ) Then
-                                            Throw New InvalidCastException(
-                                                    "Non-numeric value for the MZ column in row " & linesRead + 1 &
-                                                    ", column " & colIndex + 1)
-                                        End If
-
-                                    Case eCustomSICFileColumns.MZToleranceDa
-                                        If Not Double.TryParse(dataCols(colIndex), .MZToleranceDa) Then
-                                            Throw New InvalidCastException(
-                                                    "Non-numeric value for the MZToleranceDa column in row " &
-                                                    linesRead + 1 & ", column " & colIndex + 1)
-                                        End If
-
-                                    Case eCustomSICFileColumns.ScanCenter
-                                        ' Do not use this value if both the ScanTime and the TimeTolerance columns were present
-                                        If Not forceAcquisitionTimeMode Then
-                                            If Not Single.TryParse(dataCols(colIndex), .ScanOrAcqTimeCenter) Then
-                                                Throw New InvalidCastException(
-                                                        "Non-numeric value for the ScanCenter column in row " &
-                                                        linesRead + 1 & ", column " & colIndex + 1)
-                                            End If
-                                        End If
-
-                                    Case eCustomSICFileColumns.ScanTolerance
-                                        ' Do not use this value if both the ScanTime and the TimeTolerance columns were present
-                                        If Not forceAcquisitionTimeMode Then
-                                            If mCustomSICList.ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute Then
-                                                .ScanOrAcqTimeTolerance = CInt(dataCols(colIndex))
-                                            Else
-                                                ' Includes .Relative and .AcquisitionTime
-                                                If Not Single.TryParse(dataCols(colIndex), .ScanOrAcqTimeTolerance) Then
-                                                    Throw New InvalidCastException(
-                                                            "Non-numeric value for the ScanTolerance column in row " &
-                                                            linesRead + 1 & ", column " & colIndex + 1)
-                                                End If
-                                            End If
-                                        End If
-
-                                    Case eCustomSICFileColumns.ScanTime
-                                        ' Only use this value if both the ScanTime and the TimeTolerance columns were present
-                                        If forceAcquisitionTimeMode Then
-                                            If Not Single.TryParse(dataCols(colIndex), .ScanOrAcqTimeCenter) Then
-                                                Throw New InvalidCastException(
-                                                        "Non-numeric value for the ScanTime column in row " &
-                                                        linesRead + 1 & ", column " & colIndex + 1)
-                                            End If
-                                        End If
-
-                                    Case eCustomSICFileColumns.TimeTolerance
-                                        ' Only use this value if both the ScanTime and the TimeTolerance columns were present
-                                        If forceAcquisitionTimeMode Then
-                                            If Not Single.TryParse(dataCols(colIndex), .ScanOrAcqTimeTolerance) Then
-                                                Throw New InvalidCastException(
-                                                        "Non-numeric value for the TimeTolerance column in row " &
-                                                        linesRead + 1 & ", column " & colIndex + 1)
-                                            End If
-                                        End If
-
-                                    Case eCustomSICFileColumns.Comment
-                                        .Comment = String.Copy(dataCols(colIndex))
-                                    Case Else
-                                        ' Unknown column code
-                                End Select
-
-                            Next
-
-                        End With
-
-                        mCustomSICList.AddMzSearchTarget(mzSearchSpec)
-
-                    Loop
-
-                End Using
-
-            Catch ex As Exception
-                ReportError("Error in LoadCustomSICListFromFile", ex, eMasicErrorCodes.InvalidCustomSICValues)
-                mCustomSICList.CustomMZSearchValues.Clear()
-                Return False
-            End Try
-
-            If Not forceAcquisitionTimeMode Then
-                mCustomSICList.ValidateCustomSICList()
-            End If
-
-            Return True
-
-        End Function
-
-    End Class
-End Namespace
+            return true;
+        }
+    }
+}

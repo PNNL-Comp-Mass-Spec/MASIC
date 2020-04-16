@@ -1,208 +1,226 @@
-﻿Imports System.Runtime.InteropServices
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.VisualBasic;
 
-Public Class clsDatabaseAccess
-    Inherits clsMasicEventNotifier
+namespace MASIC
+{
+    public class clsDatabaseAccess : clsMasicEventNotifier
+    {
 
-#Region "Constants and Enums"
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        // frmMain uses these constants
 
-    ' frmMain uses these constants
+        // ReSharper disable UnusedMember.Global
 
-    ' ReSharper disable UnusedMember.Global
+        public const string DATABASE_CONNECTION_STRING_DEFAULT = "Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=dms4fun";
+        public const string DATABASE_DATASET_INFO_QUERY_DEFAULT = "Select Dataset, ID FROM V_Dataset_Export";
 
-    Public Const DATABASE_CONNECTION_STRING_DEFAULT As String = "Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=dms4fun"
-    Public Const DATABASE_DATASET_INFO_QUERY_DEFAULT As String = "Select Dataset, ID FROM V_Dataset_Export"
+        // ReSharper restore UnusedMember.Global
 
-    ' ReSharper restore UnusedMember.Global
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        private readonly clsMASICOptions mOptions;
+        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="masicOptions"></param>
+        public clsDatabaseAccess(clsMASICOptions masicOptions)
+        {
+            mOptions = masicOptions;
+        }
 
-#End Region
+        /// <summary>
+    /// Lookup the dataset ID given the dataset name
+    /// First contacts the database using the specified connection string and query
+    /// If not found, looks for the dataset name in the file specified by mDatasetLookupFilePath
+    /// </summary>
+    /// <param name="inputFilePath"></param>
+    /// <param name="datasetLookupFilePath"></param>
+    /// <param name="defaultDatasetID"></param>
+    /// <returns></returns>
+        public int LookupDatasetID(string inputFilePath, string datasetLookupFilePath, int defaultDatasetID)
+        {
+            string datasetName = Path.GetFileNameWithoutExtension(inputFilePath);
+            int newDatasetID;
 
-#Region "Classwide Variables"
-    Private ReadOnly mOptions As clsMASICOptions
-#End Region
+            // ReSharper disable once CommentTypo
+            // Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=...
+            if (!string.IsNullOrWhiteSpace(mOptions.DatabaseConnectionString))
+            {
+                bool datasetFoundInDB = GetDatasetIDFromDatabase(mOptions, datasetName, out newDatasetID);
+                if (datasetFoundInDB)
+                {
+                    return newDatasetID;
+                }
+            }
 
-    ''' <summary>
-    ''' Constructor
-    ''' </summary>
-    ''' <param name="masicOptions"></param>
-    Public Sub New(masicOptions As clsMASICOptions)
-        mOptions = masicOptions
-    End Sub
+            if (!string.IsNullOrWhiteSpace(datasetLookupFilePath))
+            {
+                bool datasetFoundInFile = GetDatasetIDFromFile(datasetLookupFilePath, datasetName, out newDatasetID);
+                if (datasetFoundInFile)
+                {
+                    return newDatasetID;
+                }
+            }
 
-    ''' <summary>
-    ''' Lookup the dataset ID given the dataset name
-    ''' First contacts the database using the specified connection string and query
-    ''' If not found, looks for the dataset name in the file specified by mDatasetLookupFilePath
-    ''' </summary>
-    ''' <param name="inputFilePath"></param>
-    ''' <param name="datasetLookupFilePath"></param>
-    ''' <param name="defaultDatasetID"></param>
-    ''' <returns></returns>
-    Public Function LookupDatasetID(
-      inputFilePath As String,
-      datasetLookupFilePath As String,
-      defaultDatasetID As Integer) As Integer
+            return defaultDatasetID;
+        }
 
-        Dim datasetName = Path.GetFileNameWithoutExtension(inputFilePath)
-        Dim newDatasetID As Integer
+        /// <summary>
+    /// Attempt to lookup the Dataset ID in the database
+    /// </summary>
+    /// <param name="masicOptions"></param>
+    /// <param name="datasetName"></param>
+    /// <returns></returns>
+        private bool GetDatasetIDFromDatabase(clsMASICOptions masicOptions, string datasetName, out int newDatasetID)
+        {
+            string avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " + "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " + "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " + "for parameters ConnectionString and DatasetInfoQuerySql.";
+            newDatasetID = 0;
+            try
+            {
+                var dbTools = PRISMDatabaseUtils.DbToolsFactory.GetDBTools(masicOptions.DatabaseConnectionString);
+                bool queryingSingleDataset = false;
+                for (int iteration = 1; iteration <= 2; iteration++)
+                {
+                    string sqlQuery = masicOptions.DatasetInfoQuerySql;
+                    if (string.IsNullOrEmpty(sqlQuery))
+                    {
+                        sqlQuery = "Select Dataset, ID FROM V_Dataset_Export";
+                    }
 
-        ' ReSharper disable once CommentTypo
-        ' Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=...
-        If Not String.IsNullOrWhiteSpace(mOptions.DatabaseConnectionString) Then
-            Dim datasetFoundInDB = GetDatasetIDFromDatabase(mOptions, datasetName, newDatasetID)
-            If datasetFoundInDB Then
-                Return newDatasetID
-            End If
-        End If
+                    if (sqlQuery.StartsWith("SELECT Dataset", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Add a where clause to the query
+                        if (iteration == 1)
+                        {
+                            sqlQuery += " WHERE Dataset = '" + datasetName + "'";
+                            queryingSingleDataset = true;
+                        }
+                        else
+                        {
+                            sqlQuery += " WHERE Dataset Like '" + datasetName + "%'";
+                        }
+                    }
 
-        If Not String.IsNullOrWhiteSpace(datasetLookupFilePath) Then
-            Dim datasetFoundInFile = GetDatasetIDFromFile(datasetLookupFilePath, datasetName, newDatasetID)
-            If datasetFoundInFile Then
-                Return newDatasetID
-            End If
-        End If
+                    List<List<string>> lstResults = null;
+                    var success = dbTools.GetQueryResults(sqlQuery, out lstResults);
+                    if (success)
+                    {
 
-        Return defaultDatasetID
+                        // Find the row in the lstResults that matches fileNameCompare
+                        foreach (var datasetItem in lstResults)
+                        {
+                            if (string.Equals(datasetItem[0], datasetName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Match found
+                                if (int.TryParse(datasetItem[1], out newDatasetID))
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    ReportError("Error converting Dataset ID '" + datasetItem[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                                }
 
-    End Function
+                                break;
+                            }
+                        }
 
-    ''' <summary>
-    ''' Attempt to lookup the Dataset ID in the database
-    ''' </summary>
-    ''' <param name="masicOptions"></param>
-    ''' <param name="datasetName"></param>
-    ''' <returns></returns>
-    Private Function GetDatasetIDFromDatabase(masicOptions As clsMASICOptions, datasetName As String, <Out> ByRef newDatasetID As Integer) As Boolean
+                        if (lstResults.Count > 0)
+                        {
+                            try
+                            {
+                                if (queryingSingleDataset || lstResults.First()[0].StartsWith(datasetName))
+                                {
+                                    if (int.TryParse(lstResults.First()[1], out newDatasetID))
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // Ignore errors here
+                            }
+                        }
+                    }
+                }
 
-        Dim avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " &
-                                "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " &
-                                "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " &
-                                "for parameters ConnectionString and DatasetInfoQuerySql."
+                return false;
+            }
+            catch (NullReferenceException ex2)
+            {
+                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + ControlChars.NewLine + avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + ControlChars.NewLine + avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                return false;
+            }
+        }
 
-        newDatasetID = 0
+        /// <summary>
+    /// Lookup the dataset ID in the dataset lookup file
+    /// This is a comma, space, or tab delimited file with two columns: Dataset Name and Dataset ID
+    /// </summary>
+    /// <param name="datasetLookupFilePath"></param>
+    /// <param name="datasetName"></param>
+    /// <param name="newDatasetId"></param>
+    /// <returns></returns>
+        private bool GetDatasetIDFromFile(string datasetLookupFilePath, string datasetName, out int newDatasetId)
+        {
+            var delimiterList = new char[] { ' ', ',', ControlChars.Tab };
+            newDatasetId = 0;
+            try
+            {
+                using (var reader = new StreamReader(datasetLookupFilePath))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        string dataLine = reader.ReadLine();
+                        if (string.IsNullOrWhiteSpace(dataLine))
+                        {
+                            continue;
+                        }
 
-        Try
-            Dim dbTools = PRISMDatabaseUtils.DbToolsFactory.GetDBTools(masicOptions.DatabaseConnectionString)
+                        if (dataLine.Length < datasetName.Length)
+                        {
+                            continue;
+                        }
 
-            Dim queryingSingleDataset = False
+                        var dataValues = dataLine.Split(delimiterList);
+                        if (dataValues.Length < 2)
+                        {
+                            continue;
+                        }
 
-            For iteration = 1 To 2
+                        if (!string.Equals(dataValues[0], datasetName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
 
-                Dim sqlQuery = masicOptions.DatasetInfoQuerySql
+                        if (int.TryParse(dataValues[1], out newDatasetId))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            ReportError("Error converting Dataset ID '" + dataValues[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                        }
+                    }
+                }
 
-                If String.IsNullOrEmpty(sqlQuery) Then
-                    sqlQuery = "Select Dataset, ID FROM V_Dataset_Export"
-                End If
-
-                If sqlQuery.StartsWith("SELECT Dataset", StringComparison.OrdinalIgnoreCase) Then
-                    ' Add a where clause to the query
-                    If iteration = 1 Then
-                        sqlQuery &= " WHERE Dataset = '" & datasetName & "'"
-                        queryingSingleDataset = True
-                    Else
-                        sqlQuery &= " WHERE Dataset Like '" & datasetName & "%'"
-                    End If
-                End If
-
-                Dim lstResults As List(Of List(Of String)) = Nothing
-
-                Dim success = dbTools.GetQueryResults(sqlQuery, lstResults)
-                If success Then
-
-                    ' Find the row in the lstResults that matches fileNameCompare
-                    For Each datasetItem In lstResults
-                        If String.Equals(datasetItem(0), datasetName, StringComparison.OrdinalIgnoreCase) Then
-                            ' Match found
-                            If Integer.TryParse(datasetItem(1), newDatasetID) Then
-                                Return True
-                            Else
-                                ReportError("Error converting Dataset ID '" & datasetItem(1) & "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID)
-                            End If
-                            Exit For
-                        End If
-                    Next
-
-                    If lstResults.Count > 0 Then
-
-                        Try
-                            If queryingSingleDataset OrElse lstResults.First().Item(0).StartsWith(datasetName) Then
-                                If Integer.TryParse(lstResults.First().Item(1), newDatasetID) Then
-                                    Return True
-                                End If
-                            End If
-
-                        Catch ex As Exception
-                            ' Ignore errors here
-                        End Try
-
-                    End If
-
-                End If
-
-            Next
-
-            Return False
-
-        Catch ex2 As NullReferenceException
-            ReportError("Error connecting to database: " & masicOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetID)
-            Return False
-        Catch ex As Exception
-            ReportError("Error connecting to database: " & masicOptions.DatabaseConnectionString & ControlChars.NewLine & avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetID)
-            Return False
-        End Try
-
-    End Function
-
-    ''' <summary>
-    ''' Lookup the dataset ID in the dataset lookup file
-    ''' This is a comma, space, or tab delimited file with two columns: Dataset Name and Dataset ID
-    ''' </summary>
-    ''' <param name="datasetLookupFilePath"></param>
-    ''' <param name="datasetName"></param>
-    ''' <param name="newDatasetId"></param>
-    ''' <returns></returns>
-    Private Function GetDatasetIDFromFile(datasetLookupFilePath As String, datasetName As String, <Out> ByRef newDatasetId As Integer) As Boolean
-
-        Dim delimiterList = New Char() {" "c, ","c, ControlChars.Tab}
-
-        newDatasetId = 0
-
-        Try
-            Using reader = New StreamReader(datasetLookupFilePath)
-                Do While Not reader.EndOfStream
-                    Dim dataLine = reader.ReadLine()
-                    If String.IsNullOrWhiteSpace(dataLine) Then
-                        Continue Do
-                    End If
-
-                    If dataLine.Length < datasetName.Length Then
-                        Continue Do
-                    End If
-
-                    Dim dataValues = dataLine.Split(delimiterList)
-                    If dataValues.Length < 2 Then
-                        Continue Do
-                    End If
-
-                    If Not String.Equals(dataValues(0), datasetName, StringComparison.OrdinalIgnoreCase) Then
-                        Continue Do
-                    End If
-
-                    If Integer.TryParse(dataValues(1), newDatasetId) Then
-                        Return True
-                    Else
-                        ReportError("Error converting Dataset ID '" & dataValues(1) & "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID)
-                    End If
-                Loop
-
-            End Using
-
-            Return False
-
-        Catch ex As Exception
-            ReportError("Error reading the dataset lookup file", ex, clsMASIC.eMasicErrorCodes.InvalidDatasetLookupFilePath)
-            Return False
-        End Try
-
-    End Function
-
-End Class
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error reading the dataset lookup file", ex, clsMASIC.eMasicErrorCodes.InvalidDatasetLookupFilePath);
+                return false;
+            }
+        }
+    }
+}

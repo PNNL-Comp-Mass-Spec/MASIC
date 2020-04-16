@@ -1,111 +1,113 @@
-﻿Imports MASIC.clsMASIC
-Imports ThermoRawFileReader
+﻿using System;
+using System.IO;
+using Microsoft.VisualBasic;
+using ThermoRawFileReader;
 
-Namespace DataOutput
-    Public Class clsThermoMetadataWriter
-        Inherits clsMasicEventNotifier
+namespace MASIC.DataOutput
+{
+    public class clsThermoMetadataWriter : clsMasicEventNotifier
+    {
+        public bool SaveMSMethodFile(XRawFileIO objXcaliburAccessor, clsDataOutput dataOutputHandler)
+        {
+            int instMethodCount;
+            string outputFilePath = "?UndefinedFile?";
+            try
+            {
+                instMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error looking up InstMethod length in objXcaliburAccessor.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                return false;
+            }
 
-        Public Function SaveMSMethodFile(
-          objXcaliburAccessor As XRawFileIO,
-          dataOutputHandler As clsDataOutput) As Boolean
+            try
+            {
+                for (int index = 0, loopTo = instMethodCount - 1; index <= loopTo; index++)
+                {
+                    string methodNum;
+                    if (index == 0 & objXcaliburAccessor.FileInfo.InstMethods.Count == 1)
+                    {
+                        methodNum = string.Empty;
+                    }
+                    else
+                    {
+                        methodNum = (index + 1).ToString().Trim();
+                    }
 
-            Dim instMethodCount As Integer
-            Dim outputFilePath = "?UndefinedFile?"
+                    outputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase + methodNum + ".txt";
+                    using (var writer = new StreamWriter(outputFilePath, false))
+                    {
+                        {
+                            var withBlock = objXcaliburAccessor.FileInfo;
+                            writer.WriteLine("Instrument model: " + withBlock.InstModel);
+                            writer.WriteLine("Instrument name: " + withBlock.InstName);
+                            writer.WriteLine("Instrument description: " + withBlock.InstrumentDescription);
+                            writer.WriteLine("Instrument serial number: " + withBlock.InstSerialNumber);
+                            writer.WriteLine();
+                            writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods[index]);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error writing the MS Method to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                return false;
+            }
 
-            Try
-                instMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count
-            Catch ex As Exception
-                ReportError("Error looking up InstMethod length in objXcaliburAccessor.FileInfo", ex, eMasicErrorCodes.OutputFileWriteError)
-                Return False
-            End Try
+            return true;
+        }
 
-            Try
-                For index = 0 To instMethodCount - 1
+        public bool SaveMSTuneFile(XRawFileIO objXcaliburAccessor, clsDataOutput dataOutputHandler)
+        {
+            const char cColDelimiter = ControlChars.Tab;
+            int tuneMethodCount;
+            string outputFilePath = "?UndefinedFile?";
+            try
+            {
+                tuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error looking up TuneMethods length in objXcaliburAccessor.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                return false;
+            }
 
-                    Dim methodNum As String
-                    If index = 0 And objXcaliburAccessor.FileInfo.InstMethods.Count = 1 Then
-                        methodNum = String.Empty
-                    Else
-                        methodNum = (index + 1).ToString.Trim
-                    End If
+            try
+            {
+                for (int index = 0, loopTo = tuneMethodCount - 1; index <= loopTo; index++)
+                {
+                    string tuneInfoNum;
+                    if (index == 0 & objXcaliburAccessor.FileInfo.TuneMethods.Count == 1)
+                    {
+                        tuneInfoNum = string.Empty;
+                    }
+                    else
+                    {
+                        tuneInfoNum = (index + 1).ToString().Trim();
+                    }
 
-                    outputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase & methodNum & ".txt"
+                    outputFilePath = dataOutputHandler.OutputFileHandles.MSTuneFilePathBase + tuneInfoNum + ".txt";
+                    using (var writer = new StreamWriter(outputFilePath, false))
+                    {
+                        writer.WriteLine("Category" + cColDelimiter + "Name" + cColDelimiter + "Value");
+                        {
+                            var withBlock = objXcaliburAccessor.FileInfo.TuneMethods[index];
+                            foreach (udtTuneMethodSetting setting in withBlock.Settings)
+                                writer.WriteLine(setting.Category + cColDelimiter + setting.Name + cColDelimiter + setting.Value);
+                            writer.WriteLine();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error writing the MS Tune Settings to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                return false;
+            }
 
-                    Using writer = New StreamWriter(outputFilePath, False)
-
-                        With objXcaliburAccessor.FileInfo
-                            writer.WriteLine("Instrument model: " & .InstModel)
-                            writer.WriteLine("Instrument name: " & .InstName)
-                            writer.WriteLine("Instrument description: " & .InstrumentDescription)
-                            writer.WriteLine("Instrument serial number: " & .InstSerialNumber)
-                            writer.WriteLine()
-
-                            writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods(index))
-                        End With
-
-                    End Using
-                Next
-
-            Catch ex As Exception
-                ReportError("Error writing the MS Method to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
-                Return False
-            End Try
-
-            Return True
-
-        End Function
-
-        Public Function SaveMSTuneFile(
-          objXcaliburAccessor As XRawFileIO,
-          dataOutputHandler As clsDataOutput) As Boolean
-
-            Const cColDelimiter As Char = ControlChars.Tab
-
-            Dim tuneMethodCount As Integer
-            Dim outputFilePath = "?UndefinedFile?"
-
-            Try
-                tuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count
-            Catch ex As Exception
-                ReportError("Error looking up TuneMethods length in objXcaliburAccessor.FileInfo", ex, eMasicErrorCodes.OutputFileWriteError)
-                Return False
-            End Try
-
-            Try
-                For index = 0 To tuneMethodCount - 1
-
-                    Dim tuneInfoNum As String
-                    If index = 0 And objXcaliburAccessor.FileInfo.TuneMethods.Count = 1 Then
-                        tuneInfoNum = String.Empty
-                    Else
-                        tuneInfoNum = (index + 1).ToString.Trim
-                    End If
-                    outputFilePath = dataOutputHandler.OutputFileHandles.MSTuneFilePathBase & tuneInfoNum & ".txt"
-
-                    Using writer = New StreamWriter(outputFilePath, False)
-
-                        writer.WriteLine("Category" & cColDelimiter & "Name" & cColDelimiter & "Value")
-
-                        With objXcaliburAccessor.FileInfo.TuneMethods(index)
-                            For Each setting As udtTuneMethodSetting In .Settings
-                                writer.WriteLine(setting.Category & cColDelimiter & setting.Name & cColDelimiter & setting.Value)
-                            Next
-                            writer.WriteLine()
-                        End With
-
-                    End Using
-
-                Next
-
-            Catch ex As Exception
-                ReportError("Error writing the MS Tune Settings to: " & outputFilePath, ex, eMasicErrorCodes.OutputFileWriteError)
-                Return False
-            End Try
-
-            Return True
-        End Function
-
-
-    End Class
-
-End Namespace
+            return true;
+        }
+    }
+}

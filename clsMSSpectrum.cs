@@ -1,117 +1,130 @@
-﻿Option Strict On
+﻿using System;
+using System.Collections.Generic;
 
-''' <summary>
-''' Used to track the m/z and intensity values of a given mass spectrum
-''' </summary>
-Public Class clsMSSpectrum
+namespace MASIC
+{
 
-    ''' <summary>
-    ''' Scan number
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks>0 if not in use</remarks>
-    Public Property ScanNumber As Integer
+    /// <summary>
+/// Used to track the m/z and intensity values of a given mass spectrum
+/// </summary>
+    public class clsMSSpectrum
+    {
 
-    Public ReadOnly Property IonCount As Integer
-        Get
-            Return IonsMZ.Count
-        End Get
-    End Property
+        /// <summary>
+    /// Scan number
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks>0 if not in use</remarks>
+        public int ScanNumber { get; set; }
 
-    ''' <summary>
-    ''' List of m/z's
-    ''' </summary>
-    Public ReadOnly IonsMZ As List(Of Double)
+        public int IonCount
+        {
+            get
+            {
+                return IonsMZ.Count;
+            }
+        }
 
-    ''' <summary>
-    ''' List of intensities
-    ''' </summary>
-    Public ReadOnly IonsIntensity As List(Of Double)
+        /// <summary>
+    /// List of m/z's
+    /// </summary>
+        public readonly List<double> IonsMZ;
 
-    ''' <summary>
-    ''' Constructor that only sets the scan number
-    ''' </summary>
-    Public Sub New(intScanNumber As Integer)
-        ScanNumber = intScanNumber
+        /// <summary>
+    /// List of intensities
+    /// </summary>
+        public readonly List<double> IonsIntensity;
 
-        IonsMZ = New List(Of Double)
-        IonsIntensity = New List(Of Double)
-    End Sub
+        /// <summary>
+    /// Constructor that only sets the scan number
+    /// </summary>
+        public clsMSSpectrum(int intScanNumber)
+        {
+            ScanNumber = intScanNumber;
+            IonsMZ = new List<double>();
+            IonsIntensity = new List<double>();
+        }
 
-    ''' <summary>
-    ''' Constructor that sets the scan number and stores m/z and intensity data (float intensities)
-    ''' </summary>
-    Public Sub New(intScanNumber As Integer, mzList As IList(Of Double), intensityList As IList(Of Single), dataCount As Integer)
-        Me.New(intScanNumber)
+        /// <summary>
+    /// Constructor that sets the scan number and stores m/z and intensity data (float intensities)
+    /// </summary>
+        public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<float> intensityList, int dataCount) : this(intScanNumber)
+        {
+            for (int i = 0, loopTo = dataCount - 1; i <= loopTo; i++)
+            {
+                IonsMZ.Add(mzList[i]);
+                IonsIntensity.Add(intensityList[i]);
+            }
+        }
 
-        For i = 0 To dataCount - 1
-            IonsMZ.Add(mzList(i))
-            IonsIntensity.Add(intensityList(i))
-        Next
-    End Sub
+        /// <summary>
+    /// Constructor that sets the scan number and stores m/z and intensity data (double intensities)
+    /// </summary>
+        public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<double> intensityList, int dataCount) : this(intScanNumber)
+        {
+            for (int i = 0, loopTo = dataCount - 1; i <= loopTo; i++)
+            {
+                IonsMZ.Add(mzList[i]);
+                IonsIntensity.Add(intensityList[i]);
+            }
+        }
 
-    ''' <summary>
-    ''' Constructor that sets the scan number and stores m/z and intensity data (double intensities)
-    ''' </summary>
-    Public Sub New(intScanNumber As Integer, mzList As IList(Of Double), intensityList As IList(Of Double), dataCount As Integer)
-        Me.New(intScanNumber)
+        /// <summary>
+    /// Clear the m/z and intensity values (but leave the scan number unchanged)
+    /// </summary>
+        public void Clear()
+        {
+            IonsMZ.Clear();
+            IonsIntensity.Clear();
+        }
 
-        For i = 0 To dataCount - 1
-            IonsMZ.Add(mzList(i))
-            IonsIntensity.Add(intensityList(i))
-        Next
-    End Sub
+        /// <summary>
+    /// Clear the m/z and intensity values, and update the scan number
+    /// </summary>
+        public void Clear(int newScanNumber)
+        {
+            IonsMZ.Clear();
+            IonsIntensity.Clear();
+            ScanNumber = newScanNumber;
+        }
 
-    ''' <summary>
-    ''' Clear the m/z and intensity values (but leave the scan number unchanged)
-    ''' </summary>
-    Public Sub Clear()
-        IonsMZ.Clear()
-        IonsIntensity.Clear()
-    End Sub
+        public clsMSSpectrum Clone()
+        {
+            return Copy(this);
+        }
 
-    ''' <summary>
-    ''' Clear the m/z and intensity values, and update the scan number
-    ''' </summary>
-    Public Sub Clear(newScanNumber As Integer)
-        IonsMZ.Clear()
-        IonsIntensity.Clear()
-        ScanNumber = newScanNumber
-    End Sub
+        public clsMSSpectrum Copy(clsMSSpectrum objSource)
+        {
+            var newSpectrum = new clsMSSpectrum(objSource.ScanNumber, objSource.IonsMZ, objSource.IonsIntensity, objSource.IonsMZ.Count);
+            return newSpectrum;
+        }
 
-    Public Function Clone() As clsMSSpectrum
-        Return Copy(Me)
-    End Function
+        public void ReplaceData(clsMSSpectrum spectrum, int scanNumberOverride)
+        {
+            ScanNumber = spectrum.ScanNumber;
+            if (ScanNumber != scanNumberOverride)
+            {
+                ScanNumber = scanNumberOverride;
+            }
 
-    Public Function Copy(objSource As clsMSSpectrum) As clsMSSpectrum
-        Dim newSpectrum = New clsMSSpectrum(objSource.ScanNumber, objSource.IonsMZ, objSource.IonsIntensity, objSource.IonsMZ.Count)
-        Return newSpectrum
-    End Function
+            IonsMZ.Clear();
+            IonsMZ.AddRange(spectrum.IonsMZ);
+            IonsIntensity.Clear();
+            IonsIntensity.AddRange(spectrum.IonsIntensity);
+        }
 
-    Public Sub ReplaceData(spectrum As clsMSSpectrum, scanNumberOverride As Integer)
+        public void ShrinkArrays(int ionCountNew)
+        {
+            if (ionCountNew > IonsMZ.Count)
+            {
+                throw new Exception("ShrinkArrays should only be called with a length less than or equal to the current length");
+            }
 
-        ScanNumber = spectrum.ScanNumber
-        If ScanNumber <> scanNumberOverride Then
-            ScanNumber = scanNumberOverride
-        End If
-
-        IonsMZ.Clear()
-        IonsMZ.AddRange(spectrum.IonsMZ)
-
-        IonsIntensity.Clear()
-        IonsIntensity.AddRange(spectrum.IonsIntensity)
-    End Sub
-
-    Public Sub ShrinkArrays(ionCountNew As Integer)
-        If ionCountNew > IonsMZ.Count Then
-            Throw New Exception("ShrinkArrays should only be called with a length less than or equal to the current length")
-        End If
-
-        Dim countToRemove = IonsMZ.Count - ionCountNew
-        If countToRemove = 0 Then Exit Sub
-
-        IonsMZ.RemoveRange(ionCountNew, countToRemove)
-        IonsIntensity.RemoveRange(ionCountNew, countToRemove)
-    End Sub
-
-End Class
+            int countToRemove = IonsMZ.Count - ionCountNew;
+            if (countToRemove == 0)
+                return;
+            IonsMZ.RemoveRange(ionCountNew, countToRemove);
+            IonsIntensity.RemoveRange(ionCountNew, countToRemove);
+        }
+    }
+}

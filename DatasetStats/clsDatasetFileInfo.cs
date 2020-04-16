@@ -1,36 +1,43 @@
-﻿Namespace DatasetStats
-    Public Class DatasetFileInfo
-        Public Property FileSystemCreationTime As DateTime
-        Public Property FileSystemModificationTime As DateTime
-        Public Property DatasetID As Integer
-        Public Property DatasetName As String
-        Public Property FileExtension As String
-        Public Property AcqTimeStart As DateTime
-        Public Property AcqTimeEnd As DateTime
-        Public Property ScanCount As Integer
-        Public Property FileSizeBytes As Long
+﻿using System;
 
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        Public Sub New()
-            Clear()
-        End Sub
+namespace MASIC.DatasetStats
+{
+    public class DatasetFileInfo
+    {
+        public DateTime FileSystemCreationTime { get; set; }
+        public DateTime FileSystemModificationTime { get; set; }
+        public int DatasetID { get; set; }
+        public string DatasetName { get; set; }
+        public string FileExtension { get; set; }
+        public DateTime AcqTimeStart { get; set; }
+        public DateTime AcqTimeEnd { get; set; }
+        public int ScanCount { get; set; }
+        public long FileSizeBytes { get; set; }
 
-        Public Sub Clear()
-            FileSystemCreationTime = DateTime.MinValue
-            FileSystemModificationTime = DateTime.MinValue
-            DatasetID = 0
-            DatasetName = String.Empty
-            FileExtension = String.Empty
-            AcqTimeStart = DateTime.MinValue
-            AcqTimeEnd = DateTime.MinValue
-            ScanCount = 0
-            FileSizeBytes = 0
-        End Sub
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public DatasetFileInfo()
+        {
+            Clear();
+        }
 
-        Public Overrides Function ToString() As String
-            Return string.Format("Dataset {0}, ScanCount={1}", DatasetName, ScanCount)
-        End Function
-    End Class
-End Namespace
+        public void Clear()
+        {
+            FileSystemCreationTime = DateTime.MinValue;
+            FileSystemModificationTime = DateTime.MinValue;
+            DatasetID = 0;
+            DatasetName = string.Empty;
+            FileExtension = string.Empty;
+            AcqTimeStart = DateTime.MinValue;
+            AcqTimeEnd = DateTime.MinValue;
+            ScanCount = 0;
+            FileSizeBytes = 0;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Dataset {0}, ScanCount={1}", DatasetName, ScanCount);
+        }
+    }
+}

@@ -1,149 +1,133 @@
-﻿Imports System.Runtime.InteropServices
+﻿using System;
+using System.Linq;
 
-Public Class Centroider
+namespace MASIC
+{
+    public class Centroider
+    {
 
-    ''' <summary>
-    ''' Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
-    ''' </summary>
-    ''' <param name="scanInfo"></param>
-    ''' <param name="masses"></param>
-    ''' <param name="intensities"></param>
-    ''' <param name="centroidedPrecursorIonsMz"></param>
-    ''' <param name="centroidedPrecursorIonsIntensity"></param>
-    ''' <returns></returns>
-    Public Function CentroidData(scanInfo As clsScanInfo,
-        masses As Double(),
-        intensities As Double(),
-        <Out> ByRef centroidedPrecursorIonsMz As Double(),
-        <Out> ByRef centroidedPrecursorIonsIntensity As Double()) As Boolean
+        /// <summary>
+    /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
+    /// </summary>
+    /// <param name="scanInfo"></param>
+    /// <param name="masses"></param>
+    /// <param name="intensities"></param>
+    /// <param name="centroidedPrecursorIonsMz"></param>
+    /// <param name="centroidedPrecursorIonsIntensity"></param>
+    /// <returns></returns>
+        public bool CentroidData(clsScanInfo scanInfo, double[] masses, double[] intensities, out double[] centroidedPrecursorIonsMz, out double[] centroidedPrecursorIonsIntensity)
+        {
+            const double massResolution = 10000;
+            return CentroidData(scanInfo, masses, intensities, massResolution, out centroidedPrecursorIonsMz, out centroidedPrecursorIonsIntensity);
+        }
 
-        Const massResolution As Double = 10000
+        /// <summary>
+    /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
+    /// </summary>
+    /// <param name="scanInfo"></param>
+    /// <param name="masses"></param>
+    /// <param name="intensities"></param>
+    /// <param name="centroidedPrecursorIonsMz"></param>
+    /// <param name="centroidedPrecursorIonsIntensity"></param>
+    /// <returns></returns>
+        public bool CentroidData(clsScanInfo scanInfo, double[] masses, double[] intensities, double massResolution, out double[] centroidedPrecursorIonsMz, out double[] centroidedPrecursorIonsIntensity)
+        {
+            try
+            {
+                var segmentedScan = ThermoFisher.CommonCore.Data.Business.SegmentedScan.FromMassesAndIntensities(masses, intensities);
+                var scanStats = new ThermoFisher.CommonCore.Data.Business.ScanStatistics()
+                {
+                    PacketType = 2 + (2 << 16),
+                    ScanNumber = scanInfo.ScanNumber,
+                    StartTime = scanInfo.ScanTime,
+                    BasePeakIntensity = scanInfo.BasePeakIonIntensity,
+                    BasePeakMass = scanInfo.BasePeakIonMZ,
+                    LowMass = masses.First(),
+                    HighMass = masses.Last(),
+                    TIC = scanInfo.TotalIonIntensity
+                };
+                var scan = new ThermoFisher.CommonCore.Data.Business.Scan()
+                {
+                    MassResolution = massResolution,
+                    ScanType = scanInfo.ScanTypeName,
+                    ToleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm,     // Options are None, Amu, Mmu, Ppm
+                    ScanStatistics = scanStats,
+                    SegmentedScan = segmentedScan
+                };
+                var centroidScan = ThermoFisher.CommonCore.Data.Business.Scan.ToCentroid(scan);
+                centroidedPrecursorIonsMz = centroidScan.PreferredMasses;
+                centroidedPrecursorIonsIntensity = centroidScan.PreferredIntensities;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                centroidedPrecursorIonsMz = new double[1];
+                centroidedPrecursorIonsIntensity = new double[1];
+                return false;
+            }
+        }
 
-        Return CentroidData(scanInfo, masses, intensities, massResolution, centroidedPrecursorIonsMz, centroidedPrecursorIonsIntensity)
+        public double EstimateResolution(double mass, double defaultMassTolerance, bool isOrbitrapData)
+        {
+            double toleranceFactor = GetDefaultToleranceFactor(isOrbitrapData);
+            var toleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Amu;
+            return EstimateResolution(mass, toleranceFactor, defaultMassTolerance, isOrbitrapData, toleranceUnit);
+        }
 
-    End Function
-
-    ''' <summary>
-    ''' Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
-    ''' </summary>
-    ''' <param name="scanInfo"></param>
-    ''' <param name="masses"></param>
-    ''' <param name="intensities"></param>
-    ''' <param name="centroidedPrecursorIonsMz"></param>
-    ''' <param name="centroidedPrecursorIonsIntensity"></param>
-    ''' <returns></returns>
-    Public Function CentroidData(
-       scanInfo As clsScanInfo,
-       masses As Double(),
-       intensities As Double(),
-       massResolution As Double,
-       <Out> ByRef centroidedPrecursorIonsMz As Double(),
-       <Out> ByRef centroidedPrecursorIonsIntensity As Double()) As Boolean
-
-        Try
-
-            Dim segmentedScan = ThermoFisher.CommonCore.Data.Business.SegmentedScan.FromMassesAndIntensities(masses, intensities)
-
-            Dim scanStats = New ThermoFisher.CommonCore.Data.Business.ScanStatistics With {
-                    .PacketType = 2 + (2 << 16),
-                    .ScanNumber = scanInfo.ScanNumber,
-                    .StartTime = scanInfo.ScanTime,
-                    .BasePeakIntensity = scanInfo.BasePeakIonIntensity,
-                    .BasePeakMass = scanInfo.BasePeakIonMZ,
-                    .LowMass = masses.First(),
-                    .HighMass = masses.Last(),
-                    .TIC = scanInfo.TotalIonIntensity
+        /// <summary>Calculates the mass tolerance for the profile peak</summary>
+    /// <param name="mass">current mass tolerance value</param>
+    /// <param name="toleranceFactor">tolerance factor</param>
+    /// <param name="defaultMassTolerance">previous mass tolerance value</param>
+    /// <param name="isOrbitrapData">True if processing LTQ-FT Or Orbitrap data</param>
+    /// <param name="toleranceUnit">tolerance unit</param>
+    /// <returns>The calculated mass resolution for the profile peak</returns>
+        public double EstimateResolution(double mass, double toleranceFactor, double defaultMassTolerance, bool isOrbitrapData, ThermoFisher.CommonCore.Data.Business.ToleranceMode toleranceUnit)
+        {
+            double massResolution;
+            if (toleranceUnit == ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm || toleranceUnit == ThermoFisher.CommonCore.Data.Business.ToleranceMode.Mmu)
+            {
+                double massToleranceDa;
+                if (toleranceUnit == ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm)
+                {
+                    massToleranceDa = mass * 0.000001 * defaultMassTolerance;
+                }
+                else
+                {
+                    massToleranceDa = mass * 0.001 * defaultMassTolerance;
                 }
 
-            Dim scan = New ThermoFisher.CommonCore.Data.Business.Scan With {
-                    .MassResolution = massResolution,
-                    .ScanType = scanInfo.ScanTypeName,
-                    .ToleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm,     ' Options are None, Amu, Mmu, Ppm
-                    .ScanStatistics = scanStats,
-                    .SegmentedScan = segmentedScan
+                double deltaM = mass * mass * toleranceFactor;
+                if (deltaM > massToleranceDa)
+                {
+                    massResolution = deltaM;
                 }
+                else
+                {
+                    massResolution = massToleranceDa;
+                }
+            }
+            else if (isOrbitrapData)
+            {
+                massResolution = mass * Math.Sqrt(mass) * toleranceFactor;
+            }
+            else
+            {
+                massResolution = mass * mass * toleranceFactor;
+            }
 
-            Dim centroidScan = ThermoFisher.CommonCore.Data.Business.Scan.ToCentroid(scan)
+            return massResolution;
+        }
 
-            centroidedPrecursorIonsMz = centroidScan.PreferredMasses
-            centroidedPrecursorIonsIntensity = centroidScan.PreferredIntensities
-
-            Return True
-
-        Catch ex As Exception
-            ReDim centroidedPrecursorIonsMz(0)
-            ReDim centroidedPrecursorIonsIntensity(0)
-            Return False
-        End Try
-
-    End Function
-
-    Public Function EstimateResolution(
-      mass As Double,
-      defaultMassTolerance As Double,
-      isOrbitrapData As Boolean) As Double
-
-        Dim toleranceFactor = GetDefaultToleranceFactor(isOrbitrapData)
-        Dim toleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Amu
-
-        Return EstimateResolution(mass, toleranceFactor, defaultMassTolerance, isOrbitrapData, toleranceUnit)
-    End Function
-
-    ''' <summary>Calculates the mass tolerance for the profile peak</summary>
-    ''' <param name="mass">current mass tolerance value</param>
-    ''' <param name="toleranceFactor">tolerance factor</param>
-    ''' <param name="defaultMassTolerance">previous mass tolerance value</param>
-    ''' <param name="isOrbitrapData">True if processing LTQ-FT Or Orbitrap data</param>
-    ''' <param name="toleranceUnit">tolerance unit</param>
-    ''' <returns>The calculated mass resolution for the profile peak</returns>
-    Public Function EstimateResolution(
-      mass As Double,
-      toleranceFactor As Double,
-      defaultMassTolerance As Double,
-      isOrbitrapData As Boolean,
-      toleranceUnit As ThermoFisher.CommonCore.Data.Business.ToleranceMode) As Double
-
-        Dim massResolution As Double
-
-        If toleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm OrElse
-           toleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Mmu Then
-
-            Dim massToleranceDa As Double
-            If toleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Ppm Then
-                massToleranceDa = mass * 0.000001 * defaultMassTolerance
-            Else
-                massToleranceDa = mass * 0.001 * defaultMassTolerance
-            End If
-
-            Dim deltaM As Double = mass * mass * toleranceFactor
-
-            If deltaM > massToleranceDa Then
-                massResolution = deltaM
-            Else
-                massResolution = massToleranceDa
-            End If
-
-        Else
-            If isOrbitrapData Then
-                massResolution = mass * Math.Sqrt(mass) * toleranceFactor
-            Else
-                massResolution = mass * mass * toleranceFactor
-            End If
-
-        End If
-
-        Return massResolution
-
-    End Function
-
-    Private Function GetDefaultToleranceFactor(isOrbitrapData As Boolean) As Double
-
-        If isOrbitrapData Then
-            Return 0.0000001
-        Else
-            Return 0.000002
-        End If
-
-    End Function
-
-End Class
+        private double GetDefaultToleranceFactor(bool isOrbitrapData)
+        {
+            if (isOrbitrapData)
+            {
+                return 0.0000001;
+            }
+            else
+            {
+                return 0.000002;
+            }
+        }
+    }
+}

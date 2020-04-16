@@ -1,27 +1,31 @@
-﻿Public Class clsMzSearchInfo
-    Public Property SearchMZ As Double
+﻿using System.Collections.Generic;
 
-    Public Property MZIndexStart As Integer
-    Public Property MZIndexEnd As Integer
-    Public Property MZIndexMidpoint As Integer
+namespace MASIC
+{
+    public class clsMzSearchInfo
+    {
+        public double SearchMZ { get; set; }
+        public int MZIndexStart { get; set; }
+        public int MZIndexEnd { get; set; }
+        public int MZIndexMidpoint { get; set; }
+        public double MZTolerance { get; set; }
+        public bool MZToleranceIsPPM { get; set; }
+        public double MaximumIntensity { get; set; }
+        public int ScanIndexMax { get; set; }
+        public List<MASICPeakFinder.clsBaselineNoiseStatsSegment> BaselineNoiseStatSegments { get; set; }
 
-    Public Property MZTolerance As Double
-    Public Property MZToleranceIsPPM As Boolean
+        public override string ToString()
+        {
+            return "m/z: " + SearchMZ.ToString("0.0") + ", Intensity: " + MaximumIntensity.ToString("0.0");
+        }
 
-    Public Property MaximumIntensity As Double
-    Public Property ScanIndexMax As Integer
-
-    Public Property BaselineNoiseStatSegments As List(Of MASICPeakFinder.clsBaselineNoiseStatsSegment)
-
-    Public Overrides Function ToString() As String
-        Return "m/z: " & SearchMZ.ToString("0.0") & ", Intensity: " & MaximumIntensity.ToString("0.0")
-    End Function
-
-    ''' <summary>
-    ''' Reset MaximumIntensity and ScanIndexMax to defaults
-    ''' </summary>
-    Public Sub ResetMaxIntensity()
-        MaximumIntensity = 0
-        ScanIndexMax = 0
-    End Sub
-End Class
+        /// <summary>
+    /// Reset MaximumIntensity and ScanIndexMax to defaults
+    /// </summary>
+        public void ResetMaxIntensity()
+        {
+            MaximumIntensity = 0;
+            ScanIndexMax = 0;
+        }
+    }
+}

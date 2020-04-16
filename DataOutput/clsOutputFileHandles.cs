@@ -1,41 +1,49 @@
-﻿Namespace DataOutput
-    Public Class clsOutputFileHandles
-        Inherits clsMasicEventNotifier
+﻿using System;
+using System.IO;
 
-        Public Property ScanStats As StreamWriter
-        Public Property SICDataFile As StreamWriter
-        Public Property XMLFileForSICs As Xml.XmlTextWriter
-        Public Property MSMethodFilePathBase As String
-        Public Property MSTuneFilePathBase As String
+namespace MASIC.DataOutput
+{
+    public class clsOutputFileHandles : clsMasicEventNotifier
+    {
+        public StreamWriter ScanStats { get; set; }
+        public StreamWriter SICDataFile { get; set; }
+        public System.Xml.XmlTextWriter XMLFileForSICs { get; set; }
+        public string MSMethodFilePathBase { get; set; }
+        public string MSTuneFilePathBase { get; set; }
 
-        Public Sub CloseScanStats()
-            If Not ScanStats Is Nothing Then
-                ScanStats.Close()
-                ScanStats = Nothing
-            End If
-        End Sub
+        public void CloseScanStats()
+        {
+            if (ScanStats is object)
+            {
+                ScanStats.Close();
+                ScanStats = null;
+            }
+        }
 
-        Public Function CloseAll() As Boolean
+        public bool CloseAll()
+        {
+            try
+            {
+                CloseScanStats();
+                if (SICDataFile is object)
+                {
+                    SICDataFile.Close();
+                    SICDataFile = null;
+                }
 
-            Try
-                CloseScanStats()
+                if (XMLFileForSICs is object)
+                {
+                    XMLFileForSICs.Close();
+                    XMLFileForSICs = null;
+                }
 
-                If Not SICDataFile Is Nothing Then
-                    SICDataFile.Close()
-                    SICDataFile = Nothing
-                End If
-
-                If Not XMLFileForSICs Is Nothing Then
-                    XMLFileForSICs.Close()
-                    XMLFileForSICs = Nothing
-                End If
-
-                Return True
-            Catch ex As Exception
-                ReportError("Error in CloseOutputFileHandles", ex)
-                Return False
-            End Try
-        End Function
-    End Class
-
-End Namespace
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ReportError("Error in CloseOutputFileHandles", ex);
+                return false;
+            }
+        }
+    }
+}
