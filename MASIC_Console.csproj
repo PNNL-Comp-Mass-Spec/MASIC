@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B8F6182D-7381-4624-9DF7-B5F4A44CC70D}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>Sub Main</StartupObject>
+    <StartupObject>MASIC.Program</StartupObject>
     <RootNamespace>MASIC</RootNamespace>
     <AssemblyName>MASIC_Console</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -102,9 +102,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\MyNamespace.Static.1.Designer.cs" />
-    <Compile Include="Properties\MyNamespace.Static.2.Designer.cs" />
-    <Compile Include="Properties\MyNamespace.Static.3.Designer.cs" />
     <Compile Include="clsBinarySearch.cs" />
     <Compile Include="clsBinnedData.cs" />
     <Compile Include="clsBinningOptions.cs" />

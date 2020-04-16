@@ -121,7 +121,7 @@ namespace MASIC.DataInput
                         double[] intensityData = null;
                         int intIonCount;
                         bool argblnDoublePrecisionDataIsPresent = false;
-                        success = objCDFReader.GetMassSpectrum(msScanIndex, out mzData, out intensityData, out intIonCount, blnDoublePrecisionDataIsPresent: ref argblnDoublePrecisionDataIsPresent);
+                        success = objCDFReader.GetMassSpectrum(msScanIndex, out mzData, out intensityData, out intIonCount, blnDoublePrecisionDataIsPresent: out argblnDoublePrecisionDataIsPresent);
                         if (success && intIonCount > 0)
                         {
                             var msSpectrum = new clsMSSpectrum(scanNumber, mzData, intensityData, intIonCount);

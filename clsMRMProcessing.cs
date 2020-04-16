@@ -99,7 +99,7 @@ namespace MASIC
                                 matchFound = false;
                                 foreach (var srmItem in srmList)
                                 {
-                                    if (MRMParentDaughterMatch(ref srmItem, mrmInfoForHash, mrmMassIndex))
+                                    if (MRMParentDaughterMatch(srmItem, mrmInfoForHash, mrmMassIndex))
                                     {
                                         matchFound = true;
                                         break;
@@ -438,7 +438,7 @@ namespace MASIC
             return hashValue;
         }
 
-        private bool MRMParentDaughterMatch(ref udtSRMListType udtSRMListEntry, clsMRMScanInfo mrmSettingsEntry, int mrmMassIndex)
+        private bool MRMParentDaughterMatch(udtSRMListType udtSRMListEntry, clsMRMScanInfo mrmSettingsEntry, int mrmMassIndex)
         {
             return MRMParentDaughterMatch(udtSRMListEntry.ParentIonMZ, udtSRMListEntry.CentralMass, mrmSettingsEntry.ParentIonMZ, mrmSettingsEntry.MRMMassList[mrmMassIndex].CentralMass);
         }

@@ -1692,9 +1692,6 @@ namespace MASIC
                     case eMasicErrorCodes.FindSimilarParentIonsError:
                         errorMessage = "Find similar parent ions error";
                         break;
-                    case eMasicErrorCodes.FindSimilarParentIonsError:
-                        errorMessage = "Find similar parent ions error";
-                        break;
                     case eMasicErrorCodes.InputFileDataReadError:
                         errorMessage = "Error reading data from input file";
                         break;
@@ -1817,44 +1814,44 @@ namespace MASIC
                     case DataInput.clsDataImport.MZ_ML_FILE_EXTENSION:
                         // Open the .mzML file and obtain the scan information
 
-                        var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                        RegisterDataImportEvents(dataImporter);
-                        dataImporterBase = dataImporter;
-                        success = dataImporter.ExtractScanInfoFromMzMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        var dataImporterMzML = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporterMzML);
+                        dataImporterBase = dataImporterMzML;
+                        success = dataImporterMzML.ExtractScanInfoFromMzMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporterMzML.DatasetFileInfo;
                         break;
 
                     case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1:
                     case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2:
                         // Open the .mzXML file and obtain the scan information
 
-                        var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                        RegisterDataImportEvents(dataImporter);
-                        dataImporterBase = dataImporter;
-                        success = dataImporter.ExtractScanInfoFromMzXMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        var dataImporterMzXML = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporterMzXML);
+                        dataImporterBase = dataImporterMzXML;
+                        success = dataImporterMzXML.ExtractScanInfoFromMzXMLDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporterMzXML.DatasetFileInfo;
                         break;
 
                     case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1:
                     case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2:
                         // Open the .mzData file and obtain the scan information
 
-                        var dataImporter = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                        RegisterDataImportEvents(dataImporter);
-                        dataImporterBase = dataImporter;
-                        success = dataImporter.ExtractScanInfoFromMzDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        var dataImporterMzData = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporterMzData);
+                        dataImporterBase = dataImporterMzData;
+                        success = dataImporterMzData.ExtractScanInfoFromMzDataFile(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporterMzData.DatasetFileInfo;
                         break;
 
                     case DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION:
                     case DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION:
                         // Open the .MGF and .CDF files to obtain the scan information
 
-                        var dataImporter = new DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
-                        RegisterDataImportEvents(dataImporter);
-                        dataImporterBase = dataImporter;
-                        success = dataImporter.ExtractScanInfoFromMGFandCDF(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
-                        datasetFileInfo = dataImporter.DatasetFileInfo;
+                        var dataImporterMGF = new DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        RegisterDataImportEvents(dataImporterMGF);
+                        dataImporterBase = dataImporterMGF;
+                        success = dataImporterMGF.ExtractScanInfoFromMGFandCDF(inputFilePathFull, scanList, spectraCache, dataOutputHandler, keepRawMSSpectra, !Options.SkipMSMSProcessing);
+                        datasetFileInfo = dataImporterMGF.DatasetFileInfo;
                         break;
 
                     default:

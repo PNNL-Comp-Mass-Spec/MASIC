@@ -299,8 +299,8 @@ namespace MASIC.DataOutput
                 {
                     if (withBlock.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
-                        string dataLine = "1" + ControlChars.Tab + "1" + ControlChars.Tab + withBlock.IonsIntensity[ionIndex] + ControlChars.Tab + withBlock.IonsMZ[ionIndex] + ControlChars.Tab + "0";
-                        writer.WriteLine(dataLine);
+                        string dataLine1 = "1" + ControlChars.Tab + "1" + ControlChars.Tab + withBlock.IonsIntensity[ionIndex] + ControlChars.Tab + withBlock.IonsMZ[ionIndex] + ControlChars.Tab + "0";
+                        writer.WriteLine(dataLine1);
                         exportCount += 1;
                     }
                 }
