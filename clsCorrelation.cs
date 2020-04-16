@@ -19,13 +19,13 @@ namespace MASIC
     public class clsCorrelation : EventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         /// <summary>
     /// Coefficients used by GammaLn
     /// </summary>
         private readonly double[] mCoefficients;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>
@@ -40,7 +40,7 @@ namespace MASIC
             mCoefficients = new double[] { 76.180091729471457, -86.505320329416776, 24.014098240830911, -1.231739572450155, 0.001208650973866179, -0.000005395239384953 };
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private const int MIN_NON_ZERO_ION_COUNT = 5;
 
         public enum cmCorrelationMethodConstants
@@ -50,11 +50,11 @@ namespace MASIC
             Kendall = 2
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private clsBinningOptions mBinningOptions;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public float BinStartX
         {
             get
@@ -155,7 +155,7 @@ namespace MASIC
                 mBinningOptions.MaximumBinCount = value;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         private double BetaCF(double a, double b, double x)
         {
             const int MAX_ITERATIONS = 100;

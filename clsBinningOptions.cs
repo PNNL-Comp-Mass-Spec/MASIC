@@ -4,7 +4,7 @@ namespace MASIC
     public class clsBinningOptions
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public float StartX { get; set; }
         public float EndX { get; set; }
 
@@ -63,12 +63,12 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private float mBinSize = 1;
         private float mIntensityPrecisionPercent = 1;
         private int mMaximumBinCount = 100000;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public void Reset()
         {
             var defaultOptions = clsCorrelation.GetDefaultBinningOptions();

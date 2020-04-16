@@ -55,7 +55,7 @@ namespace MASIC
             RegisterEvents(mMasic);
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private const string XML_SETTINGS_FILE_NAME = "MASICParameters.xml";
         private const string CUSTOM_SIC_VALUES_DATA_TABLE = "PeakMatchingThresholds";
         private const string COL_NAME_MZ = "MZ";
@@ -65,8 +65,8 @@ namespace MASIC
         private const string COL_NAME_SCAN_COMMENT = "Scan_Comment";
         private const string COL_NAME_CUSTOM_SIC_VALUE_ROW_ID = "UniqueRowID";
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private struct udtCustomSICEntryType
         {
             public double MZ;
@@ -74,8 +74,8 @@ namespace MASIC
             public string Comment;
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private DataSet mCustomSICValuesDataset;
         private readonly List<udtCustomSICEntryType> mDefaultCustomSICList;
         private bool mWorking;
@@ -98,8 +98,8 @@ namespace MASIC
         private readonly List<string> mLogMessages;
         private readonly Dictionary<int, clsReporterIons.eReporterIonMassModeConstants> mReporterIonIndexToModeMap;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private clsReporterIons.eReporterIonMassModeConstants SelectedReporterIonMode
         {
             get
@@ -122,8 +122,8 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void AddCustomSICRow(double mz, double mzToleranceDa, float scanOrAcqTimeCenter, float scanOrAcqTimeTolerance, string comment, [Optional, DefaultParameterValue(false)] ref bool existingRowFound)
         {
             foreach (DataRow myDataRow in mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows)
@@ -2093,8 +2093,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             return true;
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void cboMassSpectraNoiseThresholdMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2104,8 +2104,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         {
             EnableDisableControls();
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void cmdClearAllRangeFilters_Click(object sender, EventArgs e)
         {
             ClearAllRangeFilters();
@@ -2155,8 +2155,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         {
             SetConnectionStringToPNNLServer();
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void chkExportRawDataOnly_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2197,8 +2197,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             EnableDisableControls();
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void optUseButterworthSmooth_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2223,8 +2223,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         {
             UpdateCustomSICDataGridTableStyle();
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void txtMassSpectraNoiseThresholdIntensity_KeyPress(object sender, KeyPressEventArgs e)
         {
             TextBoxKeyPressHandler[txtMassSpectraNoiseThresholdIntensity, e, true, true];
@@ -2407,8 +2407,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         {
             TextBoxKeyPressHandler[txtTimeStart, e, true, true];
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void mnuFileSelectInputFile_Click(object sender, EventArgs e)
         {
             SelectInputFile();
@@ -2455,8 +2455,8 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             ShowAboutBox();
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void frmMain_Load(object sender, EventArgs e)
         {
             // Note that InitializeControls() is called in Sub New()
@@ -2527,7 +2527,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             AppendToLog(EventLogEntryType.Warning, message);
             ConsoleMsgUtils.ShowWarning(message);
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         private void cboReporterIonMassMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             AutoToggleReporterIonStatsEnabled();

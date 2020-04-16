@@ -10,15 +10,15 @@ namespace MASIC
     public class clsScanList : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public enum eScanTypeConstants
         {
             SurveyScan = 0,
             FragScan = 1
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public struct udtScanOrderPointerType
         {
             public eScanTypeConstants ScanType;
@@ -30,7 +30,7 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
 
         // Note: We're keeping the Survey Scans separate from the Fragmentation Scans to make the creation of the
         // survey scan based SIC's easier (and faster)

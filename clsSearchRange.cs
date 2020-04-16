@@ -19,7 +19,7 @@ namespace MASIC
             InitializeLocalVariables();
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private enum eDataTypeToUse
         {
             NoDataPresent = 0,
@@ -27,8 +27,8 @@ namespace MASIC
             SingleType = 2,
             DoubleType = 3
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private eDataTypeToUse mDataType;
         private int[] mDataInt;
         private float[] mDataSingle;
@@ -37,8 +37,8 @@ namespace MASIC
         private bool mPointerArrayIsValid;
         private bool mUsePointerIndexArray;    // Set this to false to conserve memory usage
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public int DataCount
         {
             get
@@ -113,8 +113,8 @@ namespace MASIC
                 mUsePointerIndexArray = value;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private void BinarySearchRangeInt(int searchValue, int toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         {
             // Recursive search function
@@ -306,7 +306,7 @@ namespace MASIC
                 matchIndexEnd = rightIndex - 1;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         private void ClearUnusedData()
         {
             if (mDataType != eDataTypeToUse.IntegerType)
@@ -327,7 +327,7 @@ namespace MASIC
             ClearUnusedData();
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public bool FillWithData(ref int[] values)
         {
             bool success;
@@ -441,9 +441,9 @@ namespace MASIC
                 ClearUnusedData();
             return success;
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public bool FindValueRange(int searchValue, int toleranceHalfWidth, [Optional, DefaultParameterValue(0)] ref int matchIndexStart, [Optional, DefaultParameterValue(0)] ref int matchIndexEnd)
         {
             // Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
@@ -644,9 +644,9 @@ namespace MASIC
 
             return matchFound;
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public int GetValueByIndexInt(int index)
         {
             try
@@ -709,9 +709,9 @@ namespace MASIC
                 return 0;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public int GetValueByOriginalIndexInt(int index)
         {
             try
@@ -782,7 +782,7 @@ namespace MASIC
                 return 0;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         private void InitializeLocalVariables()
         {
             mDataType = eDataTypeToUse.NoDataPresent;

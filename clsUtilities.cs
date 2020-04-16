@@ -7,11 +7,11 @@ namespace MASIC
     public class clsUtilities
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */    // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
+        #region // TODO    // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 
         public const double CHARGE_CARRIER_MASS_MONOISOTOPIC = 1.00727649;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public static bool CheckPointInMZIgnoreRange(double mz, double mzIgnoreRangeStart, double mzIgnoreRangeEnd)
         {
             if (mzIgnoreRangeStart > 0 || mzIgnoreRangeEnd > 0)
@@ -173,7 +173,7 @@ namespace MASIC
             return false;
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public static double MassToPPM(double massToConvert, double currentMZ)
         {
             // Converts massToConvert to ppm, based on the value of currentMZ
@@ -187,6 +187,6 @@ namespace MASIC
 
             return ppmToConvert / 1000000.0 * currentMZ;
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
     }
 }

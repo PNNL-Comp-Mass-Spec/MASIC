@@ -20,13 +20,19 @@ namespace MASIC.My
     {
         private static MySettings defaultInstance = (MySettings)Synchronized(new MySettings());
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia *//* TODO ERROR: Skipped IfDirectiveTrivia *//* TODO ERROR: Skipped DisabledTextTrivia *//* TODO ERROR: Skipped EndIfDirectiveTrivia *//* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #region // TODO
+#if // TODO
+        /* TODO ERROR: Skipped DisabledTextTrivia */
+#endif
+        #endregion
         public static MySettings Default
         {
             get
             {
 
-                /* TODO ERROR: Skipped IfDirectiveTrivia *//* TODO ERROR: Skipped DisabledTextTrivia *//* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#if // TODO
+                /* TODO ERROR: Skipped DisabledTextTrivia */
+#endif
                 return defaultInstance;
             }
         }

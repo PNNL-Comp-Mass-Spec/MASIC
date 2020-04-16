@@ -4,13 +4,13 @@ namespace MASIC
     public class clsRawDataExportOptions
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public enum eExportRawDataFileFormatConstants
         {
             PEKFile = 0,
             CSVFile = 1
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public bool ExportEnabled { get; set; }
         public eExportRawDataFileFormatConstants FileFormat { get; set; }
         public bool IncludeMSMS { get; set; }

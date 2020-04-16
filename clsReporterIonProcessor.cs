@@ -13,9 +13,9 @@ namespace MASIC
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private readonly clsMASICOptions mOptions;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

@@ -8,10 +8,10 @@ namespace MASIC.DataOutput
     public class clsSpectrumDataWriter : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private readonly clsBPIWriter mBPIWriter;
         private readonly clsMASICOptions mOptions;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
         /// Constructor
         /// </summary>

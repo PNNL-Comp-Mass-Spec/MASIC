@@ -18,7 +18,7 @@ namespace MASIC
     public class clsITraqIntensityCorrection
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private const int FOUR_PLEX_MATRIX_LENGTH = 4;
         private const int EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH = 8;
         private const int EIGHT_PLEX_LOW_RES_MATRIX_LENGTH = 9;
@@ -31,8 +31,8 @@ namespace MASIC
             ABSciex = 0,
             BroadInstitute = 1          // Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private struct udtIsotopeContributionType
         {
             public float Minus2;
@@ -46,8 +46,8 @@ namespace MASIC
                 return string.Format("{0:F2}  {1:F2}  {2:F2}  {3:F2}  {4:F2}", Minus2, Minus1, Zero, Plus1, Plus2);
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private clsReporterIons.eReporterIonMassModeConstants mReporterIonMode;
         private eCorrectionFactorsiTRAQ4Plex mITraq4PlexCorrectionFactorType;
 
@@ -55,8 +55,8 @@ namespace MASIC
         private double[,] mCoeffs;
         private readonly MatrixDecompositionUtility.LUDecomposition mMatrixUtility;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public clsReporterIons.eReporterIonMassModeConstants ReporterIonMode
         {
             get
@@ -72,7 +72,7 @@ namespace MASIC
                 return mITraq4PlexCorrectionFactorType;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
     /// </summary>

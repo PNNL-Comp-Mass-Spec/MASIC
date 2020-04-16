@@ -11,7 +11,7 @@ namespace MASIC.DataOutput
     public class clsDataOutput : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public enum eOutputFileTypeConstants
         {
             XMLFile = 0,
@@ -41,14 +41,14 @@ namespace MASIC.DataOutput
             DatasetInfoFile = 24,
             SICDataFile = 25
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private readonly clsMASICOptions mOptions;
 
         public clsOutputFileHandles OutputFileHandles { get; private set; }
         public clsExtendedStatsWriter ExtendedStatsWriter { get; private set; }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
         /// Constructor
         /// </summary>

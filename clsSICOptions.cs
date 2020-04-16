@@ -4,12 +4,12 @@ namespace MASIC
     public class clsSICOptions
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA = 5;
         public const double DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM = 3;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         /// <summary>
     /// Provided by the user at the command line or obtained from the database (if a connection string is defined)
     /// 0 if unknown
@@ -189,11 +189,11 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private float mMaxSICPeakWidthMinutesBackward;
         private float mMaxSICPeakWidthMinutesForward;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public double GetSICTolerance()
         {
             bool toleranceIsPPM;
@@ -276,11 +276,11 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private float mSimilarIonMZToleranceHalfWidth = 0.1F;
         private float mSimilarIonToleranceHalfWidthMinutes = 5;
         private float mSpectrumSimilarityMinimum = 0.8F;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
     }
 }

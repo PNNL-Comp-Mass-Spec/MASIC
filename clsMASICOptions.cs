@@ -12,7 +12,7 @@ namespace MASIC
     public class clsMASICOptions : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
         public const string XML_SECTION_IMPORT_OPTIONS = "MasicImportOptions";
         public const string XML_SECTION_EXPORT_OPTIONS = "MasicExportOptions";
@@ -21,8 +21,8 @@ namespace MASIC
         public const string XML_SECTION_MEMORY_OPTIONS = "MemoryOptions";
         public const string XML_SECTION_CUSTOM_SIC_VALUES = "CustomSICValues";
         public const string DEFAULT_MASIC_STATUS_FILE_NAME = "MasicStatus.xml";
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         /// <summary>
     /// Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
     /// </summary>
@@ -106,10 +106,10 @@ namespace MASIC
         public string PeakFinderVersion { get; private set; }
         public DateTime LastParentIonProcessingLogTime { get; set; }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public string StatusMessage { get; set; }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

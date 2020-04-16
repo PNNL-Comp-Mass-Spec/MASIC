@@ -23,7 +23,7 @@ namespace MASIC
             DeleteSpectrumCacheFiles();
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private const string SPECTRUM_CACHE_FILE_PREFIX = "$SpecCache";
         private const string SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR = "_Temp";
         private const int SPECTRUM_CACHE_MAX_FILE_AGE_HOURS = 12;
@@ -54,16 +54,16 @@ namespace MASIC
         // '    UnlockAllSpectra = 6
         // 'End Enum
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private struct udtSpectraPoolInfoType
         {
             public eCacheStateConstants CacheState;
             // Public LockInMemory As Boolean
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public clsMSSpectrum[] SpectraPool;                   // Pool (collection) of currently loaded spectra; 0-based array
         private udtSpectraPoolInfoType[] SpectraPoolInfo;     // Parallel with SpectraPool(), but not publicly visible
         private readonly clsSpectrumCacheOptions mCacheOptions;
@@ -80,7 +80,7 @@ namespace MASIC
         private Hashtable mSpectrumIndexInPool;
         private Hashtable mSpectrumByteOffset;         // Records the byte offset of the data in the page file for a given scan number
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public int CacheEventCount
         {
             get

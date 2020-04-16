@@ -6,7 +6,7 @@ namespace MASIC
     public class clsReporterIons
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES = 0.015;
@@ -35,13 +35,13 @@ namespace MASIC
             NativeOGlcNAc = 19
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private double mReporterIonToleranceDaDefault;
         private eReporterIonMassModeConstants mReporterIonMassMode;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         /// <summary>
     /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
     /// will be populated with the m/z range of the reporter ions being processed
@@ -98,7 +98,7 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

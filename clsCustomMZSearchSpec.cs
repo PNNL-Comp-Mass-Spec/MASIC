@@ -4,7 +4,7 @@ namespace MASIC
     public class clsCustomMZSearchSpec
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public double MZ { get; set; }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace MASIC
         public float ScanOrAcqTimeTolerance { get; set; }
         public string Comment { get; set; }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

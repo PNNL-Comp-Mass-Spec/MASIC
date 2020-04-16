@@ -5,7 +5,7 @@ namespace MASIC
     public class clsSpectrumCacheOptions
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         /// <summary>
     /// If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
     /// </summary>
@@ -36,10 +36,10 @@ namespace MASIC
         [Obsolete("Legacy parameter; no longer used")]
         public float MaximumMemoryUsageMB { get; set; }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private int mSpectraToRetainInMemory = 1000;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public void Reset()
         {
             var defaultOptions = clsSpectraCache.GetDefaultCacheOptions();

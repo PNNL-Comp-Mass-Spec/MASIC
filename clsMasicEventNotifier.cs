@@ -7,7 +7,7 @@ namespace MASIC
     {
         private short mLastPercentComplete = 0;
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         /// <summary>
     /// Provides information on the number of cache and uncache events in spectraCache
     /// </summary>
@@ -34,7 +34,7 @@ namespace MASIC
 
         public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount)
         {
             UpdateCacheStatsEvent?.Invoke(cacheEventCount, unCacheEventCount);
@@ -130,7 +130,7 @@ namespace MASIC
         }
 
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount)
         {
             OnUpdateCacheStats(cacheEventCount, unCacheEventCount);
@@ -145,6 +145,6 @@ namespace MASIC
         {
             SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
     }
 }

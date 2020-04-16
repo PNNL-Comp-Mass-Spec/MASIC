@@ -31,7 +31,7 @@ namespace MASIC
             RegisterEvents(Options);
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         // Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
         public const bool DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD = false;
 
@@ -77,8 +77,8 @@ namespace MASIC
             UnspecifiedError = -1
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private bool mLoggedMASICVersion = false;
         private readonly MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
         private readonly clsProcessingStats mProcessingStats;
@@ -97,8 +97,8 @@ namespace MASIC
         private eMasicErrorCodes mLocalErrorCode;
         private string mStatusMessage;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */    /// <summary>
+        #endregion
+        #region // TODO    /// <summary>
     /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
     /// Use ProgressSubtaskChanged when updating the sub task progress
     /// </summary>
@@ -110,10 +110,10 @@ namespace MASIC
 
         public delegate void ProgressResetKeypressAbortEventHandler();
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         // ReSharper disable UnusedMember.Global
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         [Obsolete("Use Property Options")]
         public string DatabaseConnectionString
         {
@@ -252,8 +252,8 @@ namespace MASIC
                 return mStatusMessage;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         [Obsolete("Use Property Options")]
         public bool CDFTimeInSeconds
         {
@@ -879,8 +879,8 @@ namespace MASIC
                 Options.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = value;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         [Obsolete("Use Property Options")]
         public bool ExportRawDataIncludeMSMS
         {
@@ -979,8 +979,8 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         [Obsolete("Use Property Options")]
         public double IntensityThresholdAbsoluteMinimum
         {
@@ -1177,8 +1177,8 @@ namespace MASIC
                 Options.SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = value;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         [Obsolete("Use Property Options")]
         public float SimilarIonMZToleranceHalfWidth
         {
@@ -1220,8 +1220,8 @@ namespace MASIC
                 Options.SICOptions.SpectrumSimilarityMinimum = value;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         [Obsolete("Use Property Options")]
         public float BinStartX
         {
@@ -1319,8 +1319,8 @@ namespace MASIC
                 Options.BinningOptions.MaximumBinCount = value;
             }
         }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         [Obsolete("Use Property Options")]
         public bool DiskCachingAlwaysDisabled
         {
@@ -1396,7 +1396,7 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         // ReSharper restore UnusedMember.Global
 
         public override void AbortProcessingNow()
@@ -2698,7 +2698,7 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private void MessageEventHandler(string message)
         {
             LogMessage(message);
@@ -2757,6 +2757,6 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
     }
 }

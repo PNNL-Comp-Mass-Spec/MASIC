@@ -13,7 +13,7 @@ namespace MASIC
     public class clsMRMProcessing : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public struct udtSRMListType
         {
             public double ParentIonMZ;
@@ -25,12 +25,12 @@ namespace MASIC
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private readonly clsMASICOptions mOptions;
         private readonly clsDataAggregation mDataAggregation;
         private readonly clsDataOutput mDataOutputHandler;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

@@ -13,9 +13,9 @@ namespace MASIC.DataOutput
     public class clsXMLResultsWriter : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private readonly clsMASICOptions mOptions;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
         /// Constructor
         /// </summary>
@@ -702,10 +702,10 @@ namespace MASIC.DataOutput
 
                 UpdateProgress(100);
 
-                /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
                 Application.DoEvents();
             }
-            /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
             catch (Exception ex)
             {
                 ReportError("Error updating the XML output file: " + xmlReadFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);

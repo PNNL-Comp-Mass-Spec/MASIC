@@ -8,12 +8,12 @@ using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using PRISM;
 using PRISM.FileProcessor;
-/* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
 using ProgressFormNET;
 
 namespace MASIC
 {
-    /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
     // See clsMASIC for a program description
     //
     // -------------------------------------------------------------------------------
@@ -47,9 +47,9 @@ namespace MASIC
         private static string mMASICStatusFilename = string.Empty;
         private static bool mQuietMode;
         private static clsMASIC mMASIC;
-        /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
         private static frmProgress mProgressForm;
-        /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
         private static DateTime mLastSubtaskProgressTime;
         private static DateTime mLastProgressReportTime;
         private static int mLastProgressReportValue;
@@ -80,11 +80,11 @@ namespace MASIC
 
                 if (commandLineParser.ParameterCount + commandLineParser.NonSwitchParameterCount == 0 & !commandLineParser.NeedToShowHelp)
                 {
-                    /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
                     ShowGUI();
-                    /* TODO ERROR: Skipped ElseDirectiveTrivia */
+#else
                     ShowProgramHelp();
-                    /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
                     return 0;
                 }
 
@@ -108,16 +108,16 @@ namespace MASIC
                 mMASIC.LogDirectoryPath = mLogDirectoryPath;
                 if (!mQuietMode)
                 {
-                    /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
                     mProgressForm = new frmProgress();
                     mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
                     mProgressForm.InitializeSubtask("", 0, 100, false);
                     mProgressForm.ResetKeyPressAbortProcess();
                     mProgressForm.Show();
                     Application.DoEvents();
-                    /* TODO ERROR: Skipped ElseDirectiveTrivia */
+#else
                     Console.WriteLine("Parsing " + Path.GetFileName(mInputFilePath));
-                    /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
                 }
 
                 int returnCode;
@@ -158,7 +158,7 @@ namespace MASIC
                 ProgRunner.SleepMilliseconds(1500);
                 return -1;
             }
-            /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
             finally
             {
                 if (mProgressForm is object)
@@ -166,7 +166,7 @@ namespace MASIC
                     mProgressForm.HideForm();
                     mProgressForm = null;
                 }
-                /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
             }
         }
 
@@ -334,7 +334,7 @@ namespace MASIC
             ConsoleMsgUtils.ShowErrors(title, errorMessages);
         }
 
-        /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
         public static void ShowGUI()
         {
             frmMain objFormMain;
@@ -346,7 +346,7 @@ namespace MASIC
             objFormMain.SetHeightAdjustForce(objFormMain.Height);
             objFormMain.ShowDialog();
         }
-        /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
         private static void ShowProgramHelp()
         {
             try
@@ -399,7 +399,7 @@ namespace MASIC
         {
             const int PROGRESS_DOT_INTERVAL_MSEC = 250;
 
-            /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
             const int PERCENT_REPORT_INTERVAL = 25;
             if (mProgressForm is object)
             {
@@ -413,9 +413,9 @@ namespace MASIC
                 Application.DoEvents();
                 return;
             }
-            /* TODO ERROR: Skipped ElseDirectiveTrivia */
+#else
             const int PERCENT_REPORT_INTERVAL = 5;
-            /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
             if (percentComplete >= mLastProgressReportValue)
             {
                 Console.WriteLine();
@@ -433,17 +433,17 @@ namespace MASIC
 
         private static void ProgressResetKeypressAbortHandler()
         {
-            /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
             if (mProgressForm is object)
             {
                 mProgressForm.ResetKeyPressAbortProcess();
             }
-            /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
         }
 
         private static void ProgressSubtaskChangedHandler()
         {
-            /* TODO ERROR: Skipped IfDirectiveTrivia */
+#if // TODO
             if (mProgressForm is object)
             {
                 mProgressForm.UpdateCurrentSubTask(mMASIC.SubtaskDescription);
@@ -456,7 +456,7 @@ namespace MASIC
                 Application.DoEvents();
                 return;
             }
-            /* TODO ERROR: Skipped EndIfDirectiveTrivia */
+#endif
             if (DateTime.UtcNow.Subtract(mLastSubtaskProgressTime).TotalSeconds < 10)
                 return;
             mLastSubtaskProgressTime = DateTime.UtcNow;

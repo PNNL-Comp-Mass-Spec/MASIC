@@ -12,7 +12,7 @@ namespace MASIC.DatasetStats
     public class clsDatasetStatsSummarizer : EventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";
 
         // ReSharper disable once UnusedMember.Global
@@ -26,16 +26,16 @@ namespace MASIC.DatasetStats
         /// </summary>
         public const string DATE_TIME_FORMAT_STRING = "yyyy-MM-dd hh:mm:ss tt";
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private readonly string mFileDate;
         private string mDatasetStatsSummaryFileName;
         private string mErrorMessage = string.Empty;
         private readonly List<ScanStatsEntry> mDatasetScanStats;
         private bool mDatasetSummaryStatsUpToDate;
         private DatasetSummaryStats mDatasetSummaryStats;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         // ReSharper disable once UnusedMember.Global
         public string DatasetStatsSummaryFileName
         {
@@ -91,7 +91,7 @@ namespace MASIC.DatasetStats
         /// <returns></returns>
         public SampleInfo SampleInfo { get; private set; }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
         /// Constructor
         /// </summary>

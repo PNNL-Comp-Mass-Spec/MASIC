@@ -8,21 +8,21 @@ namespace MASIC
     public class clsScanTracking : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         // Absolute maximum number of ions that will be tracked for a mass spectrum
         private const int MAX_ALLOWABLE_ION_COUNT = 50000;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public List<ScanStatsEntry> ScanStats { get; private set; }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private readonly clsReporterIons mReporterIons;
         private readonly clsMASICPeakFinder mPeakFinder;
         private int mSpectraFoundExceedingMaxIonCount = 0;
         private int mMaxIonCountReported = 0;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

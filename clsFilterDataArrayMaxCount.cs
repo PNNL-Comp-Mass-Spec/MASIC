@@ -28,7 +28,7 @@ namespace MASIC
 
         public delegate void ProgressChangedEventHandler(float progressVal);
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public int MaximumDataCountToLoad { get; set; }
 
         public float Progress
@@ -42,7 +42,7 @@ namespace MASIC
         public float SkipDataPointFlag { get; set; }
         public bool TotalIntensityPercentageFilterEnabled { get; set; }
         public float TotalIntensityPercentageFilter { get; set; }
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public clsFilterDataArrayMaxCount() : this(INITIAL_MEMORY_RESERVE)
         {
         }

@@ -8,9 +8,9 @@ namespace MASIC
     public class clsParentIonProcessing : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private readonly clsReporterIons mReporterIons;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

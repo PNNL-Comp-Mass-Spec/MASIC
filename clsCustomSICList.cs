@@ -10,7 +10,7 @@ namespace MASIC
     public class clsCustomSICList : EventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const string CUSTOM_SIC_TYPE_ABSOLUTE = "Absolute";
         public const string CUSTOM_SIC_TYPE_RELATIVE = "Relative";
         public const string CUSTOM_SIC_TYPE_ACQUISITION_TIME = "AcquisitionTime";
@@ -23,8 +23,8 @@ namespace MASIC
             Undefined = 3
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public string CustomSICListFileName
         {
             get
@@ -66,10 +66,10 @@ namespace MASIC
         public string RawTextScanOrAcqTimeCenterList { get; set; }
         public string RawTextScanOrAcqTimeToleranceList { get; set; }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private string mCustomSICListFileName;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

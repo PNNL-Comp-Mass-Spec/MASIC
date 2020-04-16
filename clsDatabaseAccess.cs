@@ -9,7 +9,7 @@ namespace MASIC
     public class clsDatabaseAccess : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         // frmMain uses these constants
 
         // ReSharper disable UnusedMember.Global
@@ -19,10 +19,10 @@ namespace MASIC
 
         // ReSharper restore UnusedMember.Global
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private readonly clsMASICOptions mOptions;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
     /// Constructor
     /// </summary>

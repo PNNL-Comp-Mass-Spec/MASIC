@@ -9,7 +9,7 @@ namespace MASIC.DataInput
     public class clsCustomSICListReader : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const string CUSTOM_SIC_COLUMN_MZ = "MZ";
         public const string CUSTOM_SIC_COLUMN_MZ_TOLERANCE = "MZToleranceDa";
         public const string CUSTOM_SIC_COLUMN_SCAN_CENTER = "ScanCenter";
@@ -30,11 +30,11 @@ namespace MASIC.DataInput
         }
 
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         private readonly clsCustomSICList mCustomSICList;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         public static string GetCustomMZFileColumnHeaders(string cColDelimiter = ", ", bool includeAndBeforeLastItem = true)
         {
             var headerNames = new List<string>() { CUSTOM_SIC_COLUMN_MZ, CUSTOM_SIC_COLUMN_MZ_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_CENTER, CUSTOM_SIC_COLUMN_SCAN_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_TIME, CUSTOM_SIC_COLUMN_TIME_TOLERANCE };

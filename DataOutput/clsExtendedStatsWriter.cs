@@ -11,11 +11,11 @@ namespace MASIC.DataOutput
     public class clsExtendedStatsWriter : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const string EXTENDED_STATS_HEADER_COLLISION_MODE = "Collision Mode";
         public const string EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT = "Scan Filter Text";
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public int ExtendedHeaderNameCount
         {
             get
@@ -24,8 +24,8 @@ namespace MASIC.DataOutput
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         /// <summary>
         /// Keys are strings of extended info names
         /// Values are the assigned ID value for the extended info name
@@ -33,7 +33,7 @@ namespace MASIC.DataOutput
         /// <remarks>The order of the values defines the appropriate output order for the names</remarks>
         private readonly List<KeyValuePair<string, int>> mExtendedHeaderNameMap;
         private readonly clsMASICOptions mOptions;
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
         /// Constructor
         /// </summary>

@@ -22,13 +22,13 @@ namespace MASIC.DataInput
     public class clsDataImportMSXml : clsDataImport
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         private readonly Centroider mCentroider;
         private int mWarnCount;
         private int mMostRecentPrecursorScan;
         private readonly List<double> mCentroidedPrecursorIonsMz = new List<double>();
         private readonly List<double> mCentroidedPrecursorIonsIntensity = new List<double>();
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
         /// Constructor
         /// </summary>

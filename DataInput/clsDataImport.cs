@@ -11,7 +11,7 @@ namespace MASIC.DataInput
     public abstract class clsDataImport : clsMasicEventNotifier
     {
 
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #region // TODO
         public const string THERMO_RAW_FILE_EXTENSION = ".RAW";
         public const string MZ_ML_FILE_EXTENSION = ".MZML";
         public const string MZ_XML_FILE_EXTENSION1 = ".MZXML";
@@ -23,8 +23,8 @@ namespace MASIC.DataInput
         private const int ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW = 5;
         protected const int PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW = 5;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         protected readonly clsMASICOptions mOptions;
         protected readonly clsParentIonProcessing mParentIonProcessor;
         protected readonly MASICPeakFinder.clsMASICPeakFinder mPeakFinder;
@@ -43,8 +43,8 @@ namespace MASIC.DataInput
         private int mNextPrecursorNotFoundCountThreshold;
         protected int mScansOutOfRange;
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         public DatasetFileInfo DatasetFileInfo
         {
             get
@@ -53,8 +53,8 @@ namespace MASIC.DataInput
             }
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
-        /* TODO ERROR: Skipped RegionDirectiveTrivia */
+        #endregion
+        #region // TODO
         /// <summary>
         /// This event is used to signify to the calling class that it should update the status of the available memory usage
         /// </summary>
@@ -67,7 +67,7 @@ namespace MASIC.DataInput
             UpdateMemoryUsageEvent?.Invoke();
         }
 
-        /* TODO ERROR: Skipped EndRegionDirectiveTrivia */
+        #endregion
         /// <summary>
         /// Constructor
         /// </summary>
