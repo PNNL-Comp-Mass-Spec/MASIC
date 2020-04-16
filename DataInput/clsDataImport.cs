@@ -122,8 +122,7 @@ namespace MASIC.DataInput
             bool pointPassesFilter;
             try
             {
-                var switchExpr = noiseThresholdOptions.BaselineNoiseMode;
-                switch (switchExpr)
+                switch (noiseThresholdOptions.BaselineNoiseMode)
                 {
                     case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold:
                         {

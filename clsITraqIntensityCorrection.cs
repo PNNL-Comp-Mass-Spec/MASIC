@@ -295,8 +295,7 @@ namespace MASIC
             udtIsotopeContributionType udtIsoPct134N;
             int matrixSize = GetMatrixLength(mReporterIonMode);
             int maxIndex = matrixSize - 1;
-            var switchExpr = mReporterIonMode;
-            switch (switchExpr)
+            switch (mReporterIonMode)
             {
                 case clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ:
                     {

@@ -27,8 +27,7 @@ namespace MASIC.DataOutput
             {
                 StreamWriter dataWriter;
                 StreamWriter scanInfoWriter;
-                var switchExpr = mOptions.RawDataExportOptions.FileFormat;
-                switch (switchExpr)
+                switch (mOptions.RawDataExportOptions.FileFormat)
                 {
                     case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
                         {
@@ -323,8 +322,7 @@ namespace MASIC.DataOutput
 
         private void SaveRawDataToDiskWork(StreamWriter dataWriter, StreamWriter scanInfoWriter, clsScanInfo currentScan, clsSpectraCache spectraCache, string inputFileName, bool fragmentationScan, ref int spectrumExportCount)
         {
-            var switchExpr = mOptions.RawDataExportOptions.FileFormat;
-            switch (switchExpr)
+            switch (mOptions.RawDataExportOptions.FileFormat)
             {
                 case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
                     {

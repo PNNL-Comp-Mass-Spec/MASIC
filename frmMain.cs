@@ -1467,8 +1467,7 @@ namespace MASIC
                     fileExtension = Path.GetExtension(txtCustomSICFileName.Text);
                 }
 
-                var switchExpr = fileExtension.ToLower();
-                switch (switchExpr)
+                switch (fileExtension.ToLower())
                 {
                     case ".txt":
                         {
@@ -1537,8 +1536,7 @@ namespace MASIC
                 }
 
                 int filterIndex;
-                var switchExpr = fileExtension.ToLower();
-                switch (switchExpr)
+                switch (fileExtension.ToLower())
                 {
                     case var @case when @case == ".mzXml".ToLower():
                         {
@@ -1720,8 +1718,7 @@ namespace MASIC
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ, "Custom m/z", 90);
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ_TOLERANCE, "m/z tolerance (Da)", 110);
             timeTolerance = false;
-            var switchExpr = GetCustomSICScanToleranceType();
-            switch (switchExpr)
+            switch (GetCustomSICScanToleranceType())
             {
                 case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
                     {

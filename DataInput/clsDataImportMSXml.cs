@@ -71,8 +71,7 @@ namespace MASIC.DataInput
             {
                 foreach (var cvParam in mzMLSpectrum.Precursors[0].IsolationWindow.CVParams)
                 {
-                    var switchExpr = cvParam.TermInfo.Cvid;
-                    switch (switchExpr)
+                    switch (cvParam.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_isolation_width_OBSOLETE:
                             {
@@ -105,8 +104,7 @@ namespace MASIC.DataInput
             {
                 foreach (var cvParam in mzMLSpectrum.Precursors[0].SelectedIons[0].CVParams)
                 {
-                    var switchExpr1 = cvParam.TermInfo.Cvid;
-                    switch (switchExpr1)
+                    switch (cvParam.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_selected_ion_m_z:
                         case CV.CVID.MS_selected_precursor_m_z:
@@ -362,8 +360,7 @@ namespace MASIC.DataInput
                 bool thermoRawFile = false;
                 foreach (var cvParam in xmlReader.SourceFileParams.CVParams)
                 {
-                    var switchExpr = cvParam.TermInfo.Cvid;
-                    switch (switchExpr)
+                    switch (cvParam.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_Thermo_nativeID_format:
                         case CV.CVID.MS_Thermo_nativeID_format__combined_spectra:
@@ -1048,8 +1045,7 @@ namespace MASIC.DataInput
                 var supplementalMethods = new SortedSet<string>();
                 foreach (var cvParam in precursorParams)
                 {
-                    var switchExpr = cvParam.TermInfo.Cvid;
-                    switch (switchExpr)
+                    switch (cvParam.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_collision_induced_dissociation:
                         case CV.CVID.MS_low_energy_collision_induced_dissociation:
@@ -1228,8 +1224,7 @@ namespace MASIC.DataInput
             {
                 foreach (var item in chromatogramItem.CVParams)
                 {
-                    var switchExpr = item.TermInfo.Cvid;
-                    switch (switchExpr)
+                    switch (item.TermInfo.Cvid)
                     {
                         case CV.CVID.MS_total_ion_current_chromatogram:
                             {
@@ -1398,8 +1393,7 @@ namespace MASIC.DataInput
             else
             {
                 // Possibly update .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromThermoScanFilterText()
-                var switchExpr = scanInfo.ScanTypeName.ToLower();
-                switch (switchExpr)
+                switch (scanInfo.ScanTypeName.ToLower())
                 {
                     case var @case when @case == clsSpectrumInfoMzXML.ScanTypeNames.Full.ToLower():
                         {

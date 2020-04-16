@@ -1656,8 +1656,7 @@ namespace MASIC
             string errorMessage;
             if (ErrorCode == ProcessFilesErrorCodes.LocalizedError || ErrorCode == ProcessFilesErrorCodes.NoError)
             {
-                var switchExpr = mLocalErrorCode;
-                switch (switchExpr)
+                switch (mLocalErrorCode)
                 {
                     case eMasicErrorCodes.NoError:
                         {
@@ -1864,8 +1863,7 @@ namespace MASIC
 
                 bool keepRawMSSpectra = !Options.SkipSICAndRawDataProcessing || Options.ExportRawDataOnly;
                 Options.SICOptions.ValidateSICOptions();
-                var switchExpr = Path.GetExtension(inputFileName).ToUpper();
-                switch (switchExpr)
+                switch (Path.GetExtension(inputFileName).ToUpper())
                 {
                     case var @case when @case == DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper():
                         {

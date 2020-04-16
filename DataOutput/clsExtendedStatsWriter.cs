@@ -62,8 +62,7 @@ namespace MASIC.DataOutput
                         else
                         {
                             // ReSharper disable StringLiteralTypo
-                            var switchExpr = value;
-                            switch (switchExpr)
+                            switch (value)
                             {
                                 case "ff":
                                     {
@@ -321,8 +320,7 @@ namespace MASIC.DataOutput
                     masterScanIndex = scanList.MasterScanOrderCount - 1;
                 }
 
-                var switchExpr = scanList.MasterScanOrder[masterScanIndex].ScanType;
-                switch (switchExpr)
+                switch (scanList.MasterScanOrder[masterScanIndex].ScanType)
                 {
                     case clsScanList.eScanTypeConstants.SurveyScan:
                         {

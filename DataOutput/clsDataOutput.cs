@@ -125,8 +125,7 @@ namespace MASIC.DataOutput
                             break;
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
-                            var switchExpr = valueNode.Name;
-                            switch (switchExpr)
+                            switch (valueNode.Name)
                             {
                                 case "DatasetID":
                                     {
@@ -209,8 +208,7 @@ namespace MASIC.DataOutput
                             break;
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
-                            var switchExpr1 = valueNode.Name;
-                            switch (switchExpr1)
+                            switch (valueNode.Name)
                             {
                                 case "SICToleranceDa":
                                     {
@@ -330,8 +328,7 @@ namespace MASIC.DataOutput
                                     {
                                         {
                                             var withBlock = sicOptionsCompare.SICPeakFinderOptions;
-                                            var switchExpr2 = valueNode.Name;
-                                            switch (switchExpr2)
+                                            switch (valueNode.Name)
                                             {
                                                 case "IntensityThresholdFractionMax":
                                                     {
@@ -472,8 +469,7 @@ namespace MASIC.DataOutput
                             break;
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
-                            var switchExpr3 = valueNode.Name;
-                            switch (switchExpr3)
+                            switch (valueNode.Name)
                             {
                                 case "BinStartX":
                                     {
@@ -531,8 +527,7 @@ namespace MASIC.DataOutput
                         {
                             foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                             {
-                                var switchExpr4 = valueNode.Name;
-                                switch (switchExpr4)
+                                switch (valueNode.Name)
                                 {
                                     case "MZList":
                                         {

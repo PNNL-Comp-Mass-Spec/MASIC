@@ -650,8 +650,7 @@ namespace MASIC
                 }
 
                 writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", CustomSICList.ScanOrAcqTimeTolerance.ToString());
-                var switchExpr = CustomSICList.ScanToleranceType;
-                switch (switchExpr)
+                switch (CustomSICList.ScanToleranceType)
                 {
                     case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
                         {

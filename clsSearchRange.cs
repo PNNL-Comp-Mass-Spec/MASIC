@@ -42,8 +42,7 @@ namespace MASIC
         {
             get
             {
-                var switchExpr = mDataType;
-                switch (switchExpr)
+                switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
                         {
@@ -452,8 +451,7 @@ namespace MASIC
             bool matchFound;
             if (mDataType != eDataTypeToUse.IntegerType)
             {
-                var switchExpr = mDataType;
-                switch (switchExpr)
+                switch (mDataType)
                 {
                     case eDataTypeToUse.SingleType:
                         {
@@ -519,8 +517,7 @@ namespace MASIC
             bool matchFound;
             if (mDataType != eDataTypeToUse.DoubleType)
             {
-                var switchExpr = mDataType;
-                switch (switchExpr)
+                switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
                         {
@@ -586,8 +583,7 @@ namespace MASIC
             bool matchFound;
             if (mDataType != eDataTypeToUse.SingleType)
             {
-                var switchExpr = mDataType;
-                switch (switchExpr)
+                switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
                         {
@@ -668,8 +664,7 @@ namespace MASIC
                 }
                 else
                 {
-                    var switchExpr = mDataType;
-                    switch (switchExpr)
+                    switch (mDataType)
                     {
                         case eDataTypeToUse.IntegerType:
                             {
@@ -737,8 +732,7 @@ namespace MASIC
                     index = Array.IndexOf(mPointerIndices, indexOriginal);
                     if (index >= 0)
                     {
-                        var switchExpr = mDataType;
-                        switch (switchExpr)
+                        switch (mDataType)
                         {
                             case eDataTypeToUse.IntegerType:
                                 {

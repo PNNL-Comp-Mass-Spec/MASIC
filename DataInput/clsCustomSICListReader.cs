@@ -109,8 +109,7 @@ namespace MASIC.DataInput
                             // The first row must be the header row; parse the values
                             for (int colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                             {
-                                var switchExpr = dataCols[colIndex].ToUpper();
-                                switch (switchExpr)
+                                switch (dataCols[colIndex].ToUpper())
                                 {
                                     case var @case when @case == CUSTOM_SIC_COLUMN_MZ.ToUpper():
                                         {
@@ -201,8 +200,7 @@ namespace MASIC.DataInput
                         {
                             if (colIndex >= eColumnMapping.Length)
                                 break;
-                            var switchExpr1 = eColumnMapping[colIndex];
-                            switch (switchExpr1)
+                            switch (eColumnMapping[colIndex])
                             {
                                 case (int)eCustomSICFileColumns.MZ:
                                     {
