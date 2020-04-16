@@ -101,100 +101,100 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsBinarySearch.vb" />
-    <Compile Include="clsBinnedData.vb" />
-    <Compile Include="clsBinningOptions.vb" />
-    <Compile Include="clsCorrelation.vb" />
-    <Compile Include="clsCustomMZSearchSpec.vb" />
-    <Compile Include="clsCustomSICList.vb" />
-    <Compile Include="clsDataAggregation.vb" />
-    <Compile Include="clsDatabaseAccess.vb" />
-    <Compile Include="clsFilterDataArrayMaxCount.vb" />
-    <Compile Include="clsFragScanInfo.vb" />
-    <Compile Include="clsITraqIntensityCorrection.vb" />
-    <Compile Include="clsMASIC.vb" />
-    <Compile Include="clsMasicEventNotifier.vb" />
-    <Compile Include="clsMASICOptions.vb" />
-    <Compile Include="clsMRMProcessing.vb" />
-    <Compile Include="clsMRMScanInfo.vb" />
-    <Compile Include="clsMSSpectrum.vb" />
-    <Compile Include="clsMzBinInfo.vb" />
-    <Compile Include="clsMzSearchInfo.vb" />
-    <Compile Include="clsParentIonInfo.vb" />
-    <Compile Include="clsParentIonProcessing.vb" />
-    <Compile Include="clsProcessingStats.vb" />
-    <Compile Include="clsRawDataExportOptions.vb" />
-    <Compile Include="clsReporterIonInfo.vb" />
-    <Compile Include="clsReporterIonProcessor.vb" />
-    <Compile Include="clsReporterIons.vb" />
-    <Compile Include="clsScanInfo.vb" />
-    <Compile Include="clsScanList.vb" />
-    <Compile Include="clsScanNumScanTimeConversion.vb" />
-    <Compile Include="clsScanTracking.vb" />
-    <Compile Include="clsSearchRange.vb" />
-    <Compile Include="clsSICDetails.vb" />
-    <Compile Include="clsSICOptions.vb" />
-    <Compile Include="clsSICProcessing.vb" />
-    <Compile Include="clsSICStats.vb" />
-    <Compile Include="clsSimilarParentIonsData.vb" />
-    <Compile Include="clsSpectraCache.vb" />
-    <Compile Include="clsSpectrumCacheOptions.vb" />
-    <Compile Include="clsUniqueMZListItem.vb" />
-    <Compile Include="clsUtilities.vb" />
-    <Compile Include="DataInput\Centroider.vb" />
-    <Compile Include="DataInput\clsCustomSICListReader.vb" />
-    <Compile Include="DataInput\clsDataImport.vb" />
-    <Compile Include="DataInput\clsDataImportMGFandCDF.vb" />
-    <Compile Include="DataInput\clsDataImportMSXml.vb" />
-    <Compile Include="DataInput\clsDataImportThermoRaw.vb" />
-    <Compile Include="DataOutput\clsBPIWriter.vb" />
-    <Compile Include="DataOutput\clsDataOutput.vb" />
-    <Compile Include="DataOutput\clsExtendedStatsWriter.vb" />
-    <Compile Include="DataOutput\clsOutputFileHandles.vb" />
-    <Compile Include="DataOutput\clsSICStatsWriter.vb" />
-    <Compile Include="DataOutput\clsSpectrumDataWriter.vb" />
-    <Compile Include="DataOutput\clsThermoMetadataWriter.vb" />
-    <Compile Include="DataOutput\clsXMLResultsWriter.vb" />
-    <Compile Include="DatasetStats\clsDatasetFileInfo.vb" />
-    <Compile Include="DatasetStats\clsDatasetStatsSummarizer.vb" />
-    <Compile Include="DatasetStats\clsSampleInfo.vb" />
-    <Compile Include="DatasetStats\DatasetSummaryStats.vb" />
-    <Compile Include="DatasetStats\ScanStatsEntry.vb" />
-    <Compile Include="DatasetStats\SummaryStatDetails.vb" />
-    <Compile Include="modMain.vb" />
-    <Compile Include="My Project\AssemblyInfo.vb" />
-    <Compile Include="My Project\Application.Designer.vb">
+    <Compile Include="clsBinarySearch.cs" />
+    <Compile Include="clsBinnedData.cs" />
+    <Compile Include="clsBinningOptions.cs" />
+    <Compile Include="clsCorrelation.cs" />
+    <Compile Include="clsCustomMZSearchSpec.cs" />
+    <Compile Include="clsCustomSICList.cs" />
+    <Compile Include="clsDataAggregation.cs" />
+    <Compile Include="clsDatabaseAccess.cs" />
+    <Compile Include="clsFilterDataArrayMaxCount.cs" />
+    <Compile Include="clsFragScanInfo.cs" />
+    <Compile Include="clsITraqIntensityCorrection.cs" />
+    <Compile Include="clsMASIC.cs" />
+    <Compile Include="clsMasicEventNotifier.cs" />
+    <Compile Include="clsMASICOptions.cs" />
+    <Compile Include="clsMRMProcessing.cs" />
+    <Compile Include="clsMRMScanInfo.cs" />
+    <Compile Include="clsMSSpectrum.cs" />
+    <Compile Include="clsMzBinInfo.cs" />
+    <Compile Include="clsMzSearchInfo.cs" />
+    <Compile Include="clsParentIonInfo.cs" />
+    <Compile Include="clsParentIonProcessing.cs" />
+    <Compile Include="clsProcessingStats.cs" />
+    <Compile Include="clsRawDataExportOptions.cs" />
+    <Compile Include="clsReporterIonInfo.cs" />
+    <Compile Include="clsReporterIonProcessor.cs" />
+    <Compile Include="clsReporterIons.cs" />
+    <Compile Include="clsScanInfo.cs" />
+    <Compile Include="clsScanList.cs" />
+    <Compile Include="clsScanNumScanTimeConversion.cs" />
+    <Compile Include="clsScanTracking.cs" />
+    <Compile Include="clsSearchRange.cs" />
+    <Compile Include="clsSICDetails.cs" />
+    <Compile Include="clsSICOptions.cs" />
+    <Compile Include="clsSICProcessing.cs" />
+    <Compile Include="clsSICStats.cs" />
+    <Compile Include="clsSimilarParentIonsData.cs" />
+    <Compile Include="clsSpectraCache.cs" />
+    <Compile Include="clsSpectrumCacheOptions.cs" />
+    <Compile Include="clsUniqueMZListItem.cs" />
+    <Compile Include="clsUtilities.cs" />
+    <Compile Include="DataInput\Centroider.cs" />
+    <Compile Include="DataInput\clsCustomSICListReader.cs" />
+    <Compile Include="DataInput\clsDataImport.cs" />
+    <Compile Include="DataInput\clsDataImportMGFandCDF.cs" />
+    <Compile Include="DataInput\clsDataImportMSXml.cs" />
+    <Compile Include="DataInput\clsDataImportThermoRaw.cs" />
+    <Compile Include="DataOutput\clsBPIWriter.cs" />
+    <Compile Include="DataOutput\clsDataOutput.cs" />
+    <Compile Include="DataOutput\clsExtendedStatsWriter.cs" />
+    <Compile Include="DataOutput\clsOutputFileHandles.cs" />
+    <Compile Include="DataOutput\clsSICStatsWriter.cs" />
+    <Compile Include="DataOutput\clsSpectrumDataWriter.cs" />
+    <Compile Include="DataOutput\clsThermoMetadataWriter.cs" />
+    <Compile Include="DataOutput\clsXMLResultsWriter.cs" />
+    <Compile Include="DatasetStats\clsDatasetFileInfo.cs" />
+    <Compile Include="DatasetStats\clsDatasetStatsSummarizer.cs" />
+    <Compile Include="DatasetStats\clsSampleInfo.cs" />
+    <Compile Include="DatasetStats\DatasetSummaryStats.cs" />
+    <Compile Include="DatasetStats\ScanStatsEntry.cs" />
+    <Compile Include="DatasetStats\SummaryStatDetails.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Application.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
     </Compile>
-    <Compile Include="My Project\Resources.Designer.vb">
+    <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="My Project\Settings.Designer.vb">
+    <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="My Project\Resources.resx">
+    <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="My Project\Application.myapp">
+    <None Include="Properties\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
-      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+      <LastGenOutput>Application.Designer.cs</LastGenOutput>
     </None>
-    <None Include="My Project\Settings.settings">
+    <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <CustomToolNamespace>My</CustomToolNamespace>
-      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="App.config" />
   </ItemGroup>
@@ -222,7 +222,7 @@
       <Version>2.3.0</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)Lib\netcdf.dll" "$(TargetDir)" /D /Y</PostBuildEvent>
   </PropertyGroup>

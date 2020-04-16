@@ -22,7 +22,7 @@ Imports ProgressFormNET
 ' in compliance with the License.  You may obtain a copy of the License at
 ' https://opensource.org/licenses/BSD-2-Clause
 
-Public Module modMain
+Public Module Program
 
     Public Const PROGRAM_DATE As String = "March 27, 2020"
 
@@ -149,7 +149,7 @@ Public Module modMain
             Return returnCode
 
         Catch ex As Exception
-            ShowErrorMessage("Error occurred in modMain->Main: " & Environment.NewLine & ex.Message)
+            ShowErrorMessage("Error occurred in Program->Main: " & Environment.NewLine & ex.Message)
             ProgRunner.SleepMilliseconds(1500)
             Return -1
 #If GUI Then
