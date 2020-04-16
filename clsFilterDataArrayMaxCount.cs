@@ -5,7 +5,6 @@ namespace MASIC
 {
     public class clsFilterDataArrayMaxCount
     {
-
         // This class can be used to select the top N data points in a list, sorting descending
         // It does not require a full sort of the data, which allows for faster filtering of the data
         // 

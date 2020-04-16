@@ -7,7 +7,6 @@ namespace MASIC.DataOutput
 {
     public class clsSpectrumDataWriter : clsMasicEventNotifier
     {
-
         #region // TODO
         private readonly clsBPIWriter mBPIWriter;
         private readonly clsMASICOptions mOptions;

@@ -7,28 +7,26 @@ using PRISM;
 
 namespace MASIC
 {
-
     /// <summary>
-/// This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
-/// The lists of numbers must have the same number of values
-/// Use the BinData function to bin a list of X,Y pairs into bins ranging from .BinStartX to .BinEndX
-///
-/// These functions were originally written in VB6 and required the use of a C DLL
-/// They have since been ported to VB.NET
-/// </summary>
+    /// This class can be used to correlate two lists of numbers (typically mass spectra) to determine their similarity
+    /// The lists of numbers must have the same number of values
+    /// Use the BinData function to bin a list of X,Y pairs into bins ranging from .BinStartX to .BinEndX
+    ///
+    /// These functions were originally written in VB6 and required the use of a C DLL
+    /// They have since been ported to VB.NET
+    /// </summary>
     public class clsCorrelation : EventNotifier
     {
-
         #region // TODO
         /// <summary>
-    /// Coefficients used by GammaLn
-    /// </summary>
+        /// Coefficients used by GammaLn
+        /// </summary>
         private readonly double[] mCoefficients;
 
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsCorrelation() : this(GetDefaultBinningOptions())
         {
         }
@@ -239,13 +237,13 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Bins the data in xData() according to startBinXValue and binSize
-    /// </summary>
-    /// <param name="xData"></param>
-    /// <param name="yData"></param>
-    /// <param name="binnedYData">Binned y data (the calling class must instantiate this)</param>
-    /// <param name="binnedOffsetYData">Binned y data, where the StartX value is offset by 50% of the bin size vs. binnedYData</param>
-    /// <returns>True if successful, otherwise false</returns>
+        /// Bins the data in xData() according to startBinXValue and binSize
+        /// </summary>
+        /// <param name="xData"></param>
+        /// <param name="yData"></param>
+        /// <param name="binnedYData">Binned y data (the calling class must instantiate this)</param>
+        /// <param name="binnedOffsetYData">Binned y data, where the StartX value is offset by 50% of the bin size vs. binnedYData</param>
+        /// <returns>True if successful, otherwise false</returns>
         public bool BinData(List<float> xData, List<float> yData, List<float> binnedYData, List<float> binnedOffsetYData)
         {
             int dataCount;
@@ -383,15 +381,15 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Finds the correlation value between the two lists of data
-    /// The lists must have the same number of data points
-    /// If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, the correlation value returned will be 0
-    /// </summary>
-    /// <param name="dataList1"></param>
-    /// <param name="dataList2"></param>
-    /// <param name="eCorrelationMethod"></param>
-    /// <returns>Correlation value (0 to 1), or -1 if an error</returns>
-    /// <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
+        /// Finds the correlation value between the two lists of data
+        /// The lists must have the same number of data points
+        /// If they have fewer than MIN_NON_ZERO_ION_COUNT non-zero values, the correlation value returned will be 0
+        /// </summary>
+        /// <param name="dataList1"></param>
+        /// <param name="dataList2"></param>
+        /// <param name="eCorrelationMethod"></param>
+        /// <returns>Correlation value (0 to 1), or -1 if an error</returns>
+        /// <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
         public float Correlate(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, cmCorrelationMethodConstants eCorrelationMethod)
         {
             int index;
@@ -741,10 +739,10 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Computes the natural logarithm of the Gamma Function
-    /// </summary>
-    /// <param name="xx"></param>
-    /// <returns></returns>
+        /// Computes the natural logarithm of the Gamma Function
+        /// </summary>
+        /// <param name="xx"></param>
+        /// <returns></returns>
         private double GammaLn(double xx)
         {
             double x, y, tmp, ser;

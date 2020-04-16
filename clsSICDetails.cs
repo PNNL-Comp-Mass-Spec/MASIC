@@ -8,10 +8,9 @@ namespace MASIC
 {
     public class clsSICDetails
     {
-
         /// <summary>
-    /// Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
-    /// </summary>
+        /// Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
+        /// </summary>
         public clsScanList.eScanTypeConstants SICScanType;
         public readonly List<clsSICDataPoint> SICData;
 
@@ -78,8 +77,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsSICDetails()
         {
             SICData = new List<clsSICDataPoint>();

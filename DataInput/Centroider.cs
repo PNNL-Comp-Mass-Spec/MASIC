@@ -5,16 +5,15 @@ namespace MASIC
 {
     public class Centroider
     {
-
         /// <summary>
-    /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
-    /// </summary>
-    /// <param name="scanInfo"></param>
-    /// <param name="masses"></param>
-    /// <param name="intensities"></param>
-    /// <param name="centroidedPrecursorIonsMz"></param>
-    /// <param name="centroidedPrecursorIonsIntensity"></param>
-    /// <returns></returns>
+        /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
+        /// </summary>
+        /// <param name="scanInfo"></param>
+        /// <param name="masses"></param>
+        /// <param name="intensities"></param>
+        /// <param name="centroidedPrecursorIonsMz"></param>
+        /// <param name="centroidedPrecursorIonsIntensity"></param>
+        /// <returns></returns>
         public bool CentroidData(clsScanInfo scanInfo, double[] masses, double[] intensities, out double[] centroidedPrecursorIonsMz, out double[] centroidedPrecursorIonsIntensity)
         {
             const double massResolution = 10000;
@@ -22,14 +21,14 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
-    /// </summary>
-    /// <param name="scanInfo"></param>
-    /// <param name="masses"></param>
-    /// <param name="intensities"></param>
-    /// <param name="centroidedPrecursorIonsMz"></param>
-    /// <param name="centroidedPrecursorIonsIntensity"></param>
-    /// <returns></returns>
+        /// Centroid a profile mode spectrum using the ThermoFisher.CommonCore.Data centroiding logic
+        /// </summary>
+        /// <param name="scanInfo"></param>
+        /// <param name="masses"></param>
+        /// <param name="intensities"></param>
+        /// <param name="centroidedPrecursorIonsMz"></param>
+        /// <param name="centroidedPrecursorIonsIntensity"></param>
+        /// <returns></returns>
         public bool CentroidData(clsScanInfo scanInfo, double[] masses, double[] intensities, double massResolution, out double[] centroidedPrecursorIonsMz, out double[] centroidedPrecursorIonsIntensity)
         {
             try
@@ -75,12 +74,12 @@ namespace MASIC
         }
 
         /// <summary>Calculates the mass tolerance for the profile peak</summary>
-    /// <param name="mass">current mass tolerance value</param>
-    /// <param name="toleranceFactor">tolerance factor</param>
-    /// <param name="defaultMassTolerance">previous mass tolerance value</param>
-    /// <param name="isOrbitrapData">True if processing LTQ-FT Or Orbitrap data</param>
-    /// <param name="toleranceUnit">tolerance unit</param>
-    /// <returns>The calculated mass resolution for the profile peak</returns>
+        /// <param name="mass">current mass tolerance value</param>
+        /// <param name="toleranceFactor">tolerance factor</param>
+        /// <param name="defaultMassTolerance">previous mass tolerance value</param>
+        /// <param name="isOrbitrapData">True if processing LTQ-FT Or Orbitrap data</param>
+        /// <param name="toleranceUnit">tolerance unit</param>
+        /// <returns>The calculated mass resolution for the profile peak</returns>
         public double EstimateResolution(double mass, double toleranceFactor, double defaultMassTolerance, bool isOrbitrapData, ThermoFisher.CommonCore.Data.Business.ToleranceMode toleranceUnit)
         {
             double massResolution;

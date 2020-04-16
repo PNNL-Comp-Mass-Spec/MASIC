@@ -10,8 +10,8 @@ namespace MASIC
         public List<clsUniqueMZListItem> UniqueMZList { get; private set; }
 
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsSimilarParentIonsData(int parentIonCount)
         {
             MZPointerArray = new int[parentIonCount];

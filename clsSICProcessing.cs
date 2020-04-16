@@ -15,8 +15,8 @@ namespace MASIC
         private readonly clsMRMProcessing mMRMProcessor;
 
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsSICProcessing(clsMASICPeakFinder peakFinder, clsMRMProcessing mrmProcessor)
         {
             mMASICPeakFinder = peakFinder;

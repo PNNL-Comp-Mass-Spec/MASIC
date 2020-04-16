@@ -9,27 +9,27 @@ namespace MASIC
 
         #region // TODO
         /// <summary>
-    /// Provides information on the number of cache and uncache events in spectraCache
-    /// </summary>
-    /// <param name="cacheEventCount"></param>
-    /// <param name="unCacheEventCount"></param>
+        /// Provides information on the number of cache and uncache events in spectraCache
+        /// </summary>
+        /// <param name="cacheEventCount"></param>
+        /// <param name="unCacheEventCount"></param>
         public event UpdateCacheStatsEventEventHandler UpdateCacheStatsEvent;
 
         public delegate void UpdateCacheStatsEventEventHandler(int cacheEventCount, int unCacheEventCount);
 
         /// <summary>
-    /// Update the code associated with an error
-    /// </summary>
-    /// <param name="eNewErrorCode"></param>
+        /// Update the code associated with an error
+        /// </summary>
+        /// <param name="eNewErrorCode"></param>
         public event UpdateBaseClassErrorCodeEventEventHandler UpdateBaseClassErrorCodeEvent;
 
         public delegate void UpdateBaseClassErrorCodeEventEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode);
 
         /// <summary>
-    /// Update the code associated with an error
-    /// </summary>
-    /// <param name="eNewErrorCode"></param>
-    /// <param name="leaveExistingErrorCodeUnchanged"></param>
+        /// Update the code associated with an error
+        /// </summary>
+        /// <param name="eNewErrorCode"></param>
+        /// <param name="leaveExistingErrorCodeUnchanged"></param>
         public event UpdateErrorCodeEventEventHandler UpdateErrorCodeEvent;
 
         public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
@@ -110,9 +110,9 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Update the progress of a given subtask
-    /// </summary>
-    /// <param name="percentComplete"></param>
+        /// Update the progress of a given subtask
+        /// </summary>
+        /// <param name="percentComplete"></param>
         protected void UpdateProgress(short percentComplete)
         {
             OnProgressUpdate(string.Empty, percentComplete);

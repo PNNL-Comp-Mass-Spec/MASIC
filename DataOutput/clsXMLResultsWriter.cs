@@ -12,7 +12,6 @@ namespace MASIC.DataOutput
 {
     public class clsXMLResultsWriter : clsMasicEventNotifier
     {
-
         #region // TODO
         private readonly clsMASICOptions mOptions;
         #endregion

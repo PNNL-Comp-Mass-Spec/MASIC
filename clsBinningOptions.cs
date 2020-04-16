@@ -41,9 +41,9 @@ namespace MASIC
         public bool Normalize { get; set; }
 
         /// <summary>
-    /// Sum all of the intensities for binned ions of the same bin together
-    /// </summary>
-    /// <returns></returns>
+        /// Sum all of the intensities for binned ions of the same bin together
+        /// </summary>
+        /// <returns></returns>
         public bool SumAllIntensitiesForBin { get; set; }
 
         public int MaximumBinCount

@@ -6,23 +6,22 @@ namespace MASIC
 {
     public class clsDataAggregation : EventNotifier
     {
-
         /// <summary>
-    /// When returnMax is false, determine the sum of the data within the search mass tolerance
-    /// When returnMaxis true, determine the maximum of the data within the search mass tolerance
-    /// </summary>
-    /// <param name="objMSSpectrum"></param>
-    /// <param name="searchMZ"></param>
-    /// <param name="searchToleranceHalfWidth"></param>
-    /// <param name="ionMatchCount"></param>
-    /// <param name="closestMZ"></param>
-    /// <param name="returnMax"></param>
-    /// <returns>The sum or maximum of the matching data; 0 if no matches</returns>
-    /// <remarks>
-    /// Note that this function performs a recursive search of objMSSpectrum.IonsMZ
-    /// It is therefore very efficient regardless of the number of data points in the spectrum
-    /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
-    /// </remarks>
+        /// When returnMax is false, determine the sum of the data within the search mass tolerance
+        /// When returnMaxis true, determine the maximum of the data within the search mass tolerance
+        /// </summary>
+        /// <param name="objMSSpectrum"></param>
+        /// <param name="searchMZ"></param>
+        /// <param name="searchToleranceHalfWidth"></param>
+        /// <param name="ionMatchCount"></param>
+        /// <param name="closestMZ"></param>
+        /// <param name="returnMax"></param>
+        /// <returns>The sum or maximum of the matching data; 0 if no matches</returns>
+        /// <remarks>
+        /// Note that this function performs a recursive search of objMSSpectrum.IonsMZ
+        /// It is therefore very efficient regardless of the number of data points in the spectrum
+        /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
+        /// </remarks>
         public double AggregateIonsInRange(clsMSSpectrum objMSSpectrum, double searchMZ, double searchToleranceHalfWidth, out int ionMatchCount, out double closestMZ, bool returnMax)
         {
             ionMatchCount = 0;

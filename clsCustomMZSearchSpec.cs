@@ -8,29 +8,29 @@ namespace MASIC
         public double MZ { get; set; }
 
         /// <summary>
-    /// If 0, then uses the global search tolerance defined
-    /// </summary>
+        /// If 0, then uses the global search tolerance defined
+        /// </summary>
         public double MZToleranceDa { get; set; }
 
         /// <summary>
-    /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
-    /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
-    /// </summary>
+        /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
+        /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
+        /// </summary>
         public float ScanOrAcqTimeCenter { get; set; }
 
         /// <summary>
-    /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
-    /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
-    /// </summary>
-    /// <remarks>Set to 0 to search the entire file for the given mass</remarks>
+        /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
+        /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
+        /// </summary>
+        /// <remarks>Set to 0 to search the entire file for the given mass</remarks>
         public float ScanOrAcqTimeTolerance { get; set; }
         public string Comment { get; set; }
 
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="targetMz"></param>
+        /// Constructor
+        /// </summary>
+        /// <param name="targetMz"></param>
         public clsCustomMZSearchSpec(double targetMz)
         {
             MZ = targetMz;

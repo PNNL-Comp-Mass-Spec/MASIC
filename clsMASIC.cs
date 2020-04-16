@@ -13,10 +13,9 @@ namespace MASIC
 {
     public class clsMASIC : PRISM.FileProcessor.ProcessFilesBase
     {
-
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsMASIC()
         {
             mFileDate = "March 27, 2020";
@@ -84,14 +83,14 @@ namespace MASIC
         private readonly clsProcessingStats mProcessingStats;
 
         /// <summary>
-    /// Current processing step
-    /// </summary>
+        /// Current processing step
+        /// </summary>
         private eProcessingStepConstants mProcessingStep;
 
         /// <summary>
-    /// Percent completion for the current sub task
-    /// </summary>
-    /// <remarks>Value between 0 and 100</remarks>
+        /// Percent completion for the current sub task
+        /// </summary>
+        /// <remarks>Value between 0 and 100</remarks>
         private float mSubtaskProcessingStepPct;
         private string mSubtaskDescription = string.Empty;
         private eMasicErrorCodes mLocalErrorCode;
@@ -99,9 +98,9 @@ namespace MASIC
 
         #endregion
         #region // TODO    /// <summary>
-    /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
-    /// Use ProgressSubtaskChanged when updating the sub task progress
-    /// </summary>
+        /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
+        /// Use ProgressSubtaskChanged when updating the sub task progress
+        /// </summary>
         public event ProgressSubtaskChangedEventHandler ProgressSubtaskChanged;
 
         public delegate void ProgressSubtaskChangedEventHandler();
@@ -225,10 +224,10 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Subtask progress percent complete
-    /// </summary>
-    /// <returns></returns>
-    /// <remarks>Value between 0 and 100</remarks>
+        /// Subtask progress percent complete
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Value between 0 and 100</remarks>
         public float SubtaskProgressPercentComplete
         {
             get
@@ -603,9 +602,9 @@ namespace MASIC
         }
 
         /// <summary>
-    /// This property is included for historical reasons since SIC tolerance can now be Da or PPM
-    /// </summary>
-    /// <returns></returns>
+        /// This property is included for historical reasons since SIC tolerance can now be Da or PPM
+        /// </summary>
+        /// <returns></returns>
         [Obsolete("Use Property Options.  Also, the SICToleranceDa setting should not be used; use SetSICTolerance and GetSICTolerance instead")]
         public double SICToleranceDa
         {
@@ -2020,13 +2019,13 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Main processing function
-    /// </summary>
-    /// <param name="inputFilePath"></param>
-    /// <param name="outputDirectoryPath"></param>
-    /// <param name="parameterFilePath"></param>
-    /// <param name="resetErrorCode"></param>
-    /// <returns></returns>
+        /// Main processing function
+        /// </summary>
+        /// <param name="inputFilePath"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="parameterFilePath"></param>
+        /// <param name="resetErrorCode"></param>
+        /// <returns></returns>
         public override bool ProcessFile(string inputFilePath, string outputDirectoryPath, string parameterFilePath, bool resetErrorCode)
         {
             FileInfo inputFileInfo;
@@ -2464,52 +2463,27 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Update subtask progress
-    /// </summary>
-    /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
+        /// Update subtask progress
+        /// </summary>
+        /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
         private void SetSubtaskProcessingStepPct(float subtaskPercentComplete)
         {
             SetSubtaskProcessingStepPct(subtaskPercentComplete, false);
         }
 
         /// <summary>
-    /// Update subtask progress
-    /// </summary>
-    /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-    /// <param name="forceUpdate"></param>
+        /// Update subtask progress
+        /// </summary>
+        /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
+        /// <param name="forceUpdate"></param>
         private void SetSubtaskProcessingStepPct(float subtaskPercentComplete, bool forceUpdate)
         {
             const int MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250;
             var raiseEventNow = default(bool);
             ;
 #error Cannot convert LocalDeclarationStatementSyntax - see comment for details
-            /* Cannot convert LocalDeclarationStatementSyntax, System.NotSupportedException: StaticKeyword not supported!
-               at ICSharpCode.CodeConverter.CSharp.SyntaxKindExtensions.ConvertToken(SyntaxKind t, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifier(SyntaxToken m, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.<ConvertModifiersCore>d__38.MoveNext()
-               at System.Linq.Enumerable.<ConcatIterator>d__59`1.MoveNext()
-               at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
-               at System.Linq.Buffer`1..ctor(IEnumerable`1 source)
-               at System.Linq.OrderedEnumerable`1.<GetEnumerator>d__1.MoveNext()
-               at Microsoft.CodeAnalysis.SyntaxTokenList.CreateNode(IEnumerable`1 tokens)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifiers(SyntaxNode node, IReadOnlyCollection`1 modifiers, TokenContext context, Boolean isVariableOrConst, SyntaxKind[] extraCsModifierKinds)
-               at ICSharpCode.CodeConverter.CSharp.MethodBodyExecutableStatementVisitor.<VisitLocalDeclarationStatement>d__28.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<CreateLocals>d__7.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<AddLocalVariables>d__6.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.CommentConvertingMethodBodyVisitor.<DefaultVisitInnerAsync>d__3.MoveNext()
-
-            Input:
+            /*
                     Static LastFileWriteTime As Global.System.DateTime = Global.System.DateTime.UtcNow
-
              */
             if (Math.Abs(subtaskPercentComplete) < float.Epsilon)
             {
@@ -2534,10 +2508,10 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Update subtask progress and description
-    /// </summary>
-    /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-    /// <param name="message"></param>
+        /// Update subtask progress and description
+        /// </summary>
+        /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
+        /// <param name="message"></param>
         private void SetSubtaskProcessingStepPct(float subtaskPercentComplete, string message)
         {
             mSubtaskDescription = message;
@@ -2715,10 +2689,10 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Update progress
-    /// </summary>
-    /// <param name="progressMessage">Progress message (can be empty)</param>
-    /// <param name="percentComplete">Value between 0 and 100</param>
+        /// Update progress
+        /// </summary>
+        /// <param name="progressMessage">Progress message (can be empty)</param>
+        /// <param name="percentComplete">Value between 0 and 100</param>
         private void ProgressUpdateHandler(string progressMessage, float percentComplete)
         {
             if (string.IsNullOrEmpty(progressMessage))

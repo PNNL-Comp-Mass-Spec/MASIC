@@ -4,14 +4,13 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace MASIC
 {
-
     /// <summary>
-/// This class can be used to search a list of values for a given value, plus or minus a given tolerance
-/// The input list need not be sorted, since mPointerIndices() will be populated when the data is loaded,
-/// after which the data array will be sorted
-/// 
-/// To prevent this behavior, and save memory by not populating mPointerIndices, set mUsePointerIndexArray = False
-/// </summary>
+    /// This class can be used to search a list of values for a given value, plus or minus a given tolerance
+    /// The input list need not be sorted, since mPointerIndices() will be populated when the data is loaded,
+    /// after which the data array will be sorted
+    /// 
+    /// To prevent this behavior, and save memory by not populating mPointerIndices, set mUsePointerIndexArray = False
+    /// </summary>
     public class clsSearchRange
     {
         public clsSearchRange()

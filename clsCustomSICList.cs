@@ -50,16 +50,16 @@ namespace MASIC
         public eCustomSICScanTypeConstants ScanToleranceType { get; set; }
 
         /// <summary>
-    /// This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute
-    /// It is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime
-    /// Set to 0 to search the entire file for the given mass
-    /// </summary>
+        /// This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute
+        /// It is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime
+        /// Set to 0 to search the entire file for the given mass
+        /// </summary>
         public float ScanOrAcqTimeTolerance { get; set; }
         public List<clsCustomMZSearchSpec> CustomMZSearchValues { get; private set; }
 
         /// <summary>
-    /// When True, then will only search for the m/z values listed in the custom m/z list
-    /// </summary>
+        /// When True, then will only search for the m/z values listed in the custom m/z list
+        /// </summary>
         public bool LimitSearchToCustomMZList { get; set; }
         public string RawTextMZList { get; set; }
         public string RawTextMZToleranceDaList { get; set; }
@@ -71,8 +71,8 @@ namespace MASIC
         private string mCustomSICListFileName;
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsCustomSICList()
         {
             CustomMZSearchValues = new List<clsCustomMZSearchSpec>();

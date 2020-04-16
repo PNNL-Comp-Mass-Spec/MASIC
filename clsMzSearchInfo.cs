@@ -20,8 +20,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Reset MaximumIntensity and ScanIndexMax to defaults
-    /// </summary>
+        /// Reset MaximumIntensity and ScanIndexMax to defaults
+        /// </summary>
         public void ResetMaxIntensity()
         {
             MaximumIntensity = 0;

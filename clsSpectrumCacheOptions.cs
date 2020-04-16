@@ -7,13 +7,13 @@ namespace MASIC
 
         #region // TODO
         /// <summary>
-    /// If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
-    /// </summary>
+        /// If True, then spectra will never be cached to disk and the spectra pool will consequently be increased as needed
+        /// </summary>
         public bool DiskCachingAlwaysDisabled { get; set; }
 
         /// <summary>
-    /// Path to the cache directory (can be relative or absolute, aka rooted); if empty, then the user's AppData directory is used
-    /// </summary>
+        /// Path to the cache directory (can be relative or absolute, aka rooted); if empty, then the user's AppData directory is used
+        /// </summary>
         public string DirectoryPath { get; set; }
 
         public int SpectraToRetainInMemory

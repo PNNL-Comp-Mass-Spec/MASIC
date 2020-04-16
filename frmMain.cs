@@ -93,8 +93,8 @@ namespace MASIC
         private frmProgress mProgressForm;
 
         /// <summary>
-    /// Log messages, including warnings and errors, with the newest message at the top
-    /// </summary>
+        /// Log messages, including warnings and errors, with the newest message at the top
+        /// </summary>
         private readonly List<string> mLogMessages;
         private readonly Dictionary<int, clsReporterIons.eReporterIonMassModeConstants> mReporterIonIndexToModeMap;
 

@@ -12,9 +12,9 @@ namespace MASIC
         private readonly clsReporterIons mReporterIons;
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="reporterIons"></param>
+        /// Constructor
+        /// </summary>
+        /// <param name="reporterIons"></param>
         public clsParentIonProcessing(clsReporterIons reporterIons)
         {
             mReporterIons = reporterIons;

@@ -24,13 +24,13 @@ namespace MASIC
         #endregion
         #region // TODO
         /// <summary>
-    /// Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
-    /// </summary>
+        /// Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
+        /// </summary>
         public clsSICOptions SICOptions { get; private set; }
 
         /// <summary>
-    /// Binning options for MS/MS spectra; only applies to spectrum similarity testing
-    /// </summary>
+        /// Binning options for MS/MS spectra; only applies to spectrum similarity testing
+        /// </summary>
         public clsBinningOptions BinningOptions { get; private set; }
         public clsCustomSICList CustomSICList { get; private set; }
         public bool AbortProcessing { get; set; }
@@ -42,18 +42,18 @@ namespace MASIC
         public bool FastExistingXMLFileTest { get; set; }
 
         /// <summary>
-    /// Using this will reduce memory usage, but not as much as when mSkipSICAndRawDataProcessing = True
-    /// </summary>
+        /// Using this will reduce memory usage, but not as much as when mSkipSICAndRawDataProcessing = True
+        /// </summary>
         public bool SkipMSMSProcessing { get; set; }
 
         /// <summary>
-    /// Using this will drastically reduce memory usage since raw mass spec data is not retained
-    /// </summary>
+        /// Using this will drastically reduce memory usage since raw mass spec data is not retained
+        /// </summary>
         public bool SkipSICAndRawDataProcessing { get; set; }
 
         /// <summary>
-    /// When True, then will not create any SICs; automatically set to false if mSkipSICAndRawDataProcessing = True
-    /// </summary>
+        /// When True, then will not create any SICs; automatically set to false if mSkipSICAndRawDataProcessing = True
+        /// </summary>
         public bool ExportRawDataOnly { get; set; }
         public string OutputDirectoryPath { get; set; }
 
@@ -77,23 +77,23 @@ namespace MASIC
         public bool WriteExtendedStats { get; set; }
 
         /// <summary>
-    /// When enabled, the scan filter text will also be included in the extended stats file
-    /// (e.g. ITMS + c NSI Full ms [300.00-2000.00] or ITMS + c NSI d Full ms2 756.98@35.00 [195.00-2000.00])
-    /// </summary>
+        /// When enabled, the scan filter text will also be included in the extended stats file
+        /// (e.g. ITMS + c NSI Full ms [300.00-2000.00] or ITMS + c NSI d Full ms2 756.98@35.00 [195.00-2000.00])
+        /// </summary>
         public bool WriteExtendedStatsIncludeScanFilterText { get; set; }
 
         /// <summary>
-    /// Adds a large number of additional columns with information like voltage, current, temperature, pressure, and gas flow rate
-    /// If StatusLogKeyNameFilterList contains any entries, only the entries matching the specs in StatusLogKeyNameFilterList will be saved
-    /// </summary>
+        /// Adds a large number of additional columns with information like voltage, current, temperature, pressure, and gas flow rate
+        /// If StatusLogKeyNameFilterList contains any entries, only the entries matching the specs in StatusLogKeyNameFilterList will be saved
+        /// </summary>
         public bool WriteExtendedStatsStatusLog { get; set; }
         public bool ConsolidateConstantExtendedHeaderValues { get; set; }
         public bool WriteMRMDataList { get; set; }
         public bool WriteMRMIntensityCrosstab { get; set; }
 
         /// <summary>
-    /// If this is true, then an error will not be raised if the input file contains no parent ions or no survey scans
-    /// </summary>
+        /// If this is true, then an error will not be raised if the input file contains no parent ions or no survey scans
+        /// </summary>
         public bool SuppressNoParentIonsError { get; set; }
         public clsRawDataExportOptions RawDataExportOptions { get; private set; }
         public clsReporterIons ReporterIons { get; private set; }
@@ -111,8 +111,8 @@ namespace MASIC
         public string StatusMessage { get; set; }
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsMASICOptions(string masicVersionInfo, string peakFinderVersionInfo)
         {
             MASICVersion = masicVersionInfo;
@@ -148,18 +148,18 @@ namespace MASIC
         }
 
         /// <summary>
-    /// When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
-    /// Use this property to filter the items written in the StatusLog file to only include the entries in this list
-    /// </summary>
-    /// <returns></returns>
+        /// When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
+        /// Use this property to filter the items written in the StatusLog file to only include the entries in this list
+        /// </summary>
+        /// <returns></returns>
         public SortedSet<string> StatusLogKeyNameFilterList { get; private set; }
 
         /// <summary>
-    /// Returns the contents of StatusLogKeyNameFilterList
-    /// </summary>
-    /// <param name="commaSeparatedList">When true, returns a comma separated list; when false, returns a Newline separated list</param>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Returns the contents of StatusLogKeyNameFilterList
+        /// </summary>
+        /// <param name="commaSeparatedList">When true, returns a comma separated list; when false, returns a Newline separated list</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public string GetStatusLogKeyNameFilterListAsText(bool commaSeparatedList)
         {
             if (commaSeparatedList)
@@ -692,10 +692,10 @@ namespace MASIC
         }
 
         /// <summary>
-    /// When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
-    /// Use this method to filter the items written in the StatusLog file to only include the entries in matchSpecList
-    /// </summary>
-    /// <param name="matchSpecList"></param>
+        /// When WriteExtendedStatsStatusLog is true, a file with extra info like voltage, current, temperature, pressure, etc. is created
+        /// Use this method to filter the items written in the StatusLog file to only include the entries in matchSpecList
+        /// </summary>
+        /// <param name="matchSpecList"></param>
         public void SetStatusLogKeyNameFilterList(List<string> matchSpecList)
         {
             try

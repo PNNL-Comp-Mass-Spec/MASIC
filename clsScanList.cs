@@ -3,13 +3,11 @@ using ThermoRawFileReader;
 
 namespace MASIC
 {
-
     /// <summary>
-/// Used to track all spectra (scans) in the instrument data file
-/// </summary>
+    /// Used to track all spectra (scans) in the instrument data file
+    /// </summary>
     public class clsScanList : clsMasicEventNotifier
     {
-
         #region // TODO
         public enum eScanTypeConstants
         {
@@ -37,39 +35,39 @@ namespace MASIC
         // The MasterScanOrder array allows us to step through the data scan-by-scan, using both SurveyScans and FragScans
 
         /// <summary>
-    /// List of survey scans, the order is the same as in the original data file, and thus is by increasing scan number
-    /// </summary>
+        /// List of survey scans, the order is the same as in the original data file, and thus is by increasing scan number
+        /// </summary>
         public readonly List<clsScanInfo> SurveyScans;
 
         /// <summary>
-    /// List of fragmentation scans, the order is the same as in the original data file, and thus is by increasing scan number
-    /// </summary>
+        /// List of fragmentation scans, the order is the same as in the original data file, and thus is by increasing scan number
+        /// </summary>
         public readonly List<clsScanInfo> FragScans;
 
         /// <summary>
-    /// List holding pointers to either the SurveyScans or FragScans lists, in order of scan number
-    /// </summary>
+        /// List holding pointers to either the SurveyScans or FragScans lists, in order of scan number
+        /// </summary>
         public readonly List<udtScanOrderPointerType> MasterScanOrder;
 
         /// <summary>
-    /// List of scan numbers, parallel to MasterScanOrder
-    /// </summary>
+        /// List of scan numbers, parallel to MasterScanOrder
+        /// </summary>
         public readonly List<int> MasterScanNumList;
 
         /// <summary>
-    /// List of scan times (elution timers), parallel to MasterScanOrder
-    /// </summary>
+        /// List of scan times (elution timers), parallel to MasterScanOrder
+        /// </summary>
         public readonly List<float> MasterScanTimeList;
 
         /// <summary>
-    /// List of parent ions
-    /// </summary>
+        /// List of parent ions
+        /// </summary>
         public readonly List<clsParentIonInfo> ParentIons;
 
         /// <summary>
-    /// Number of items in MasterScanOrder
-    /// </summary>
-    /// <returns></returns>
+        /// Number of items in MasterScanOrder
+        /// </summary>
+        /// <returns></returns>
         public int MasterScanOrderCount
         {
             get
@@ -79,25 +77,25 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Set to true if the user cancels any of the processing steps
-    /// </summary>
+        /// Set to true if the user cancels any of the processing steps
+        /// </summary>
         public bool ProcessingIncomplete { get; set; }
 
         /// <summary>
-    /// Will be true if SIM data is present
-    /// </summary>
-    /// <returns></returns>
+        /// Will be true if SIM data is present
+        /// </summary>
+        /// <returns></returns>
         public bool SIMDataPresent { get; set; }
 
         /// <summary>
-    /// Will be true if MRM data is present
-    /// </summary>
-    /// <returns></returns>
+        /// Will be true if MRM data is present
+        /// </summary>
+        /// <returns></returns>
         public bool MRMDataPresent { get; set; }
 
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsScanList()
         {
             SurveyScans = new List<clsScanInfo>();
@@ -116,11 +114,11 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Adds a "fake" survey scan with the given scan number and scan time
-    /// </summary>
-    /// <param name="scanNumber"></param>
-    /// <param name="scanTime"></param>
-    /// <returns>The index in SurveyScans() at which the new scan was added</returns>
+        /// Adds a "fake" survey scan with the given scan number and scan time
+        /// </summary>
+        /// <param name="scanNumber"></param>
+        /// <param name="scanTime"></param>
+        /// <returns>The index in SurveyScans() at which the new scan was added</returns>
         private int AddFakeSurveyScan(int scanNumber, float scanTime)
         {
             var surveyScan = GetFakeSurveyScan(scanNumber, scanTime);

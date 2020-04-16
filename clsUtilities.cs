@@ -33,10 +33,10 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Compute the median value in a list of doubles
-    /// </summary>
-    /// <param name="values"></param>
-    /// <returns>The median value, or 0 if the list is empty or null</returns>
+        /// Compute the median value in a list of doubles
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns>The median value, or 0 if the list is empty or null</returns>
         public static double ComputeMedian(IReadOnlyCollection<double> values)
         {
             if (values is null || values.Count == 0)

@@ -17,23 +17,23 @@ namespace MASIC
         private readonly clsMASICOptions mOptions;
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="masicOptions"></param>
+        /// Constructor
+        /// </summary>
+        /// <param name="masicOptions"></param>
         public clsReporterIonProcessor(clsMASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }
 
         /// <summary>
-    /// Looks for the reporter ion peaks using FindReporterIonsWork
-    /// </summary>
-    /// <param name="scanList"></param>
-    /// <param name="spectraCache"></param>
-    /// <param name="inputFilePathFull">Full path to the input file</param>
-    /// <param name="outputDirectoryPath"></param>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Looks for the reporter ion peaks using FindReporterIonsWork
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="inputFilePathFull">Full path to the input file</param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public bool FindReporterIons(clsScanList scanList, clsSpectraCache spectraCache, string inputFilePathFull, string outputDirectoryPath)
         {
             const char cColDelimiter = ControlChars.Tab;
@@ -229,57 +229,30 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Looks for the reporter ion m/z values, +/- a tolerance
-    /// Calls AggregateIonsInRange with returnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
-    /// </summary>
-    /// <param name="xcaliburAccessor"></param>
-    /// <param name="dataAggregation"></param>
-    /// <param name="includeFtmsColumns"></param>
-    /// <param name="sicOptions"></param>
-    /// <param name="scanList"></param>
-    /// <param name="spectraCache"></param>
-    /// <param name="currentScan"></param>
-    /// <param name="writer"></param>
-    /// <param name="reporterIons"></param>
-    /// <param name="cColDelimiter"></param>
-    /// <param name="saveUncorrectedIntensities"></param>
-    /// <param name="saveObservedMasses"></param>
-    /// <remarks></remarks>
+        /// Looks for the reporter ion m/z values, +/- a tolerance
+        /// Calls AggregateIonsInRange with returnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
+        /// </summary>
+        /// <param name="xcaliburAccessor"></param>
+        /// <param name="dataAggregation"></param>
+        /// <param name="includeFtmsColumns"></param>
+        /// <param name="sicOptions"></param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="currentScan"></param>
+        /// <param name="writer"></param>
+        /// <param name="reporterIons"></param>
+        /// <param name="cColDelimiter"></param>
+        /// <param name="saveUncorrectedIntensities"></param>
+        /// <param name="saveObservedMasses"></param>
+        /// <remarks></remarks>
         private void FindReporterIonsWork(XRawFileIO xcaliburAccessor, clsDataAggregation dataAggregation, bool includeFtmsColumns, clsSICOptions sicOptions, clsScanList scanList, clsSpectraCache spectraCache, clsScanInfo currentScan, TextWriter writer, IList<clsReporterIonInfo> reporterIons, char cColDelimiter, bool saveUncorrectedIntensities, bool saveObservedMasses)
         {
             const bool USE_MAX_ABUNDANCE_IN_WINDOW = true;
-            ;
 #error Cannot convert LocalDeclarationStatementSyntax - see comment for details
-            /* Cannot convert LocalDeclarationStatementSyntax, System.NotSupportedException: StaticKeyword not supported!
-               at ICSharpCode.CodeConverter.CSharp.SyntaxKindExtensions.ConvertToken(SyntaxKind t, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifier(SyntaxToken m, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.<ConvertModifiersCore>d__38.MoveNext()
-               at System.Linq.Enumerable.<ConcatIterator>d__59`1.MoveNext()
-               at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
-               at System.Linq.Buffer`1..ctor(IEnumerable`1 source)
-               at System.Linq.OrderedEnumerable`1.<GetEnumerator>d__1.MoveNext()
-               at Microsoft.CodeAnalysis.SyntaxTokenList.CreateNode(IEnumerable`1 tokens)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifiers(SyntaxNode node, IReadOnlyCollection`1 modifiers, TokenContext context, Boolean isVariableOrConst, SyntaxKind[] extraCsModifierKinds)
-               at ICSharpCode.CodeConverter.CSharp.MethodBodyExecutableStatementVisitor.<VisitLocalDeclarationStatement>d__28.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<CreateLocals>d__7.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<AddLocalVariables>d__6.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.CommentConvertingMethodBodyVisitor.<DefaultVisitInnerAsync>d__3.MoveNext()
-
-            Input:
-
+            /* 
                     Static intensityCorrector As New Global.MASIC.clsITraqIntensityCorrection(
                         Global.MASIC.clsReporterIons.eReporterIonMassModeConstants.CustomOrNone,
                         Global.MASIC.clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex)
-
              */
             double[] reporterIntensities;
             double[] reporterIntensitiesCorrected;

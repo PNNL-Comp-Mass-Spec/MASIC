@@ -11,19 +11,19 @@ namespace MASIC
         #endregion
         #region // TODO
         /// <summary>
-    /// Provided by the user at the command line or obtained from the database (if a connection string is defined)
-    /// 0 if unknown
-    /// </summary>
+        /// Provided by the user at the command line or obtained from the database (if a connection string is defined)
+        /// 0 if unknown
+        /// </summary>
         public int DatasetID { get; set; }
 
         /// <summary>
-    /// Defaults to 10 ppm
-    /// </summary>
+        /// Defaults to 10 ppm
+        /// </summary>
         public double SICTolerance { get; set; }
 
         /// <summary>
-    /// When true, then SICTolerance is treated as a PPM value
-    /// </summary>
+        /// When true, then SICTolerance is treated as a PPM value
+        /// </summary>
         public bool SICToleranceIsPPM { get; set; }
 
         public double SICToleranceDa
@@ -47,45 +47,45 @@ namespace MASIC
             }
         }
         /// <summary>
-    /// If True, then will look through the m/z values in the parent ion spectrum data to find the closest match
-    /// (within SICToleranceDa / sicOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
-    /// </summary>
+        /// If True, then will look through the m/z values in the parent ion spectrum data to find the closest match
+        /// (within SICToleranceDa / sicOptions.CompressToleranceDivisorForDa); will update the reported m/z value to the one found
+        /// </summary>
         public bool RefineReportedParentIonMZ { get; set; }
 
         /// <summary>
-    /// If both ScanRangeStart >=0 and ScanRangeEnd > 0 then will only process data between those scan numbers
-    /// </summary>
+        /// If both ScanRangeStart >=0 and ScanRangeEnd > 0 then will only process data between those scan numbers
+        /// </summary>
         public int ScanRangeStart { get; set; }
         public int ScanRangeEnd { get; set; }
 
         /// <summary>
-    /// If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
-    /// </summary>
+        /// If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
+        /// </summary>
         public float RTRangeStart { get; set; }
         public float RTRangeEnd { get; set; }
 
         /// <summary>
-    /// If true, then combines data points that have similar m/z values (within tolerance) when loading
-    /// Tolerance is sicOptions.SICToleranceDa / sicOptions.CompressToleranceDivisorForDa
-    /// (or divided by sicOptions.CompressToleranceDivisorForPPM if sicOptions.SICToleranceIsPPM=True)
-    /// </summary>
+        /// If true, then combines data points that have similar m/z values (within tolerance) when loading
+        /// Tolerance is sicOptions.SICToleranceDa / sicOptions.CompressToleranceDivisorForDa
+        /// (or divided by sicOptions.CompressToleranceDivisorForPPM if sicOptions.SICToleranceIsPPM=True)
+        /// </summary>
         public bool CompressMSSpectraData { get; set; }
 
         /// <summary>
-    /// If true, then combines data points that have similar m/z values (within tolerance) when loading
-    /// Tolerance is binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
-    /// </summary>
+        /// If true, then combines data points that have similar m/z values (within tolerance) when loading
+        /// Tolerance is binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa
+        /// </summary>
         public bool CompressMSMSSpectraData { get; set; }
 
         /// <summary>
-    /// When compressing spectra, sicOptions.SICTolerance and binningOptions.BinSize will be divided by this value
-    /// to determine the resolution to compress the data to
-    /// </summary>
+        /// When compressing spectra, sicOptions.SICTolerance and binningOptions.BinSize will be divided by this value
+        /// to determine the resolution to compress the data to
+        /// </summary>
         public double CompressToleranceDivisorForDa { get; set; }
 
         /// <summary>
-    /// If sicOptions.SICToleranceIsPPM is True, then this divisor is used instead of CompressToleranceDivisorForDa
-    /// </summary>
+        /// If sicOptions.SICToleranceIsPPM is True, then this divisor is used instead of CompressToleranceDivisorForDa
+        /// </summary>
         public double CompressToleranceDivisorForPPM { get; set; }
 
         // The SIC is extended left and right until:
@@ -94,8 +94,8 @@ namespace MASIC
         // or 3) the distance exceeds MaxSICPeakWidthMinutesBackward or MaxSICPeakWidthMinutesForward
 
         /// <summary>
-    /// Defaults to 5
-    /// </summary>
+        /// Defaults to 5
+        /// </summary>
         public float MaxSICPeakWidthMinutesBackward
         {
             get
@@ -112,8 +112,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Defaults to 5
-    /// </summary>
+        /// Defaults to 5
+        /// </summary>
         public float MaxSICPeakWidthMinutesForward
         {
             get
@@ -134,9 +134,9 @@ namespace MASIC
         public bool SaveSmoothedData { get; set; }
 
         /// <summary>
-    /// m/z Tolerance for finding similar parent ions; full tolerance is +/- this value
-    /// </summary>
-    /// <remarks>Defaults to 0.1</remarks>
+        /// m/z Tolerance for finding similar parent ions; full tolerance is +/- this value
+        /// </summary>
+        /// <remarks>Defaults to 0.1</remarks>
         public float SimilarIonMZToleranceHalfWidth
         {
             get
@@ -153,9 +153,9 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
-    /// </summary>
-    /// <remarks>Defaults to 5</remarks>
+        /// Time Tolerance (in minutes) for finding similar parent ions; full tolerance is +/- this value
+        /// </summary>
+        /// <remarks>Defaults to 5</remarks>
         public float SimilarIonToleranceHalfWidthMinutes
         {
             get
@@ -172,8 +172,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Defaults to 0.8
-    /// </summary>
+        /// Defaults to 0.8
+        /// </summary>
         public float SpectrumSimilarityMinimum
         {
             get

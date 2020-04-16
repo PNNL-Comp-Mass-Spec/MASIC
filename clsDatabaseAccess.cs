@@ -8,7 +8,6 @@ namespace MASIC
 {
     public class clsDatabaseAccess : clsMasicEventNotifier
     {
-
         #region // TODO
         // frmMain uses these constants
 
@@ -24,23 +23,23 @@ namespace MASIC
         private readonly clsMASICOptions mOptions;
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="masicOptions"></param>
+        /// Constructor
+        /// </summary>
+        /// <param name="masicOptions"></param>
         public clsDatabaseAccess(clsMASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }
 
         /// <summary>
-    /// Lookup the dataset ID given the dataset name
-    /// First contacts the database using the specified connection string and query
-    /// If not found, looks for the dataset name in the file specified by mDatasetLookupFilePath
-    /// </summary>
-    /// <param name="inputFilePath"></param>
-    /// <param name="datasetLookupFilePath"></param>
-    /// <param name="defaultDatasetID"></param>
-    /// <returns></returns>
+        /// Lookup the dataset ID given the dataset name
+        /// First contacts the database using the specified connection string and query
+        /// If not found, looks for the dataset name in the file specified by mDatasetLookupFilePath
+        /// </summary>
+        /// <param name="inputFilePath"></param>
+        /// <param name="datasetLookupFilePath"></param>
+        /// <param name="defaultDatasetID"></param>
+        /// <returns></returns>
         public int LookupDatasetID(string inputFilePath, string datasetLookupFilePath, int defaultDatasetID)
         {
             string datasetName = Path.GetFileNameWithoutExtension(inputFilePath);
@@ -70,11 +69,11 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Attempt to lookup the Dataset ID in the database
-    /// </summary>
-    /// <param name="masicOptions"></param>
-    /// <param name="datasetName"></param>
-    /// <returns></returns>
+        /// Attempt to lookup the Dataset ID in the database
+        /// </summary>
+        /// <param name="masicOptions"></param>
+        /// <param name="datasetName"></param>
+        /// <returns></returns>
         private bool GetDatasetIDFromDatabase(clsMASICOptions masicOptions, string datasetName, out int newDatasetID)
         {
             string avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " + "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " + "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " + "for parameters ConnectionString and DatasetInfoQuerySql.";
@@ -164,13 +163,13 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Lookup the dataset ID in the dataset lookup file
-    /// This is a comma, space, or tab delimited file with two columns: Dataset Name and Dataset ID
-    /// </summary>
-    /// <param name="datasetLookupFilePath"></param>
-    /// <param name="datasetName"></param>
-    /// <param name="newDatasetId"></param>
-    /// <returns></returns>
+        /// Lookup the dataset ID in the dataset lookup file
+        /// This is a comma, space, or tab delimited file with two columns: Dataset Name and Dataset ID
+        /// </summary>
+        /// <param name="datasetLookupFilePath"></param>
+        /// <param name="datasetName"></param>
+        /// <param name="newDatasetId"></param>
+        /// <returns></returns>
         private bool GetDatasetIDFromFile(string datasetLookupFilePath, string datasetName, out int newDatasetId)
         {
             var delimiterList = new char[] { ' ', ',', ControlChars.Tab };

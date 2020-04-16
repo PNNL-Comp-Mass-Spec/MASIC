@@ -4,7 +4,6 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace MASIC
 {
-
     // This class corrects the intensities of iTraq or TMT data, based on the expected overlapping isotopic distributions
     // It supports 4-plex and 8-plex iTraq
     // It also supports TMT10, TMT11, and TMT16 (aka TMTpro)
@@ -17,7 +16,6 @@ namespace MASIC
 
     public class clsITraqIntensityCorrection
     {
-
         #region // TODO
         private const int FOUR_PLEX_MATRIX_LENGTH = 4;
         private const int EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH = 8;
@@ -74,20 +72,20 @@ namespace MASIC
         }
         #endregion
         /// <summary>
-    /// Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
-    /// </summary>
-    /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
-    /// <remarks></remarks>
+        /// Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
+        /// </summary>
+        /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
+        /// <remarks></remarks>
         public clsITraqIntensityCorrection(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode) : this(eReporterIonMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
         {
         }
 
         /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
-    /// <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
-    /// <remarks>The iTraqCorrectionFactorType parameter is only used if eReporterIonMode is ITraqFourMZ</remarks>
+        /// Constructor
+        /// </summary>
+        /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
+        /// <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
+        /// <remarks>The iTraqCorrectionFactorType parameter is only used if eReporterIonMode is ITraqFourMZ</remarks>
         public clsITraqIntensityCorrection(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode, eCorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
             mReporterIonMode = eReporterIonMode;
@@ -102,19 +100,19 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Change the reporter ion mode
-    /// </summary>
-    /// <param name="eReporterIonMode"></param>
+        /// Change the reporter ion mode
+        /// </summary>
+        /// <param name="eReporterIonMode"></param>
         public void UpdateReporterIonMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode)
         {
             UpdateReporterIonMode(eReporterIonMode, mITraq4PlexCorrectionFactorType);
         }
 
         /// <summary>
-    /// Change the reporter ion mode
-    /// </summary>
-    /// <param name="eReporterIonMode"></param>
-    /// <param name="iTraqCorrectionFactorType"></param>
+        /// Change the reporter ion mode
+        /// </summary>
+        /// <param name="eReporterIonMode"></param>
+        /// <param name="iTraqCorrectionFactorType"></param>
         public void UpdateReporterIonMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode, eCorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
             if (mReporterIonMode != eReporterIonMode || mITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
@@ -126,11 +124,11 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Apply the correction factors to the reporter ions
-    /// </summary>
-    /// <param name="reporterIonIntensities"></param>
-    /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
-    /// <returns></returns>
+        /// Apply the correction factors to the reporter ions
+        /// </summary>
+        /// <param name="reporterIonIntensities"></param>
+        /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
+        /// <returns></returns>
         public bool ApplyCorrection(ref float[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             double[] originalIntensities;
@@ -151,11 +149,11 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Apply the correction factors to the reporter ions
-    /// </summary>
-    /// <param name="reporterIonIntensities"></param>
-    /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
-    /// <returns></returns>
+        /// Apply the correction factors to the reporter ions
+        /// </summary>
+        /// <param name="reporterIonIntensities"></param>
+        /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
+        /// <returns></returns>
         public bool ApplyCorrection(double[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             int matrixSize = GetMatrixLength(mReporterIonMode);
@@ -262,9 +260,9 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Initialize the coefficients
-    /// </summary>
-    /// <param name="debugShowMatrixTable">When true, show a table of the coefficients at the console</param>
+        /// Initialize the coefficients
+        /// </summary>
+        /// <param name="debugShowMatrixTable">When true, show a table of the coefficients at the console</param>
         private void InitializeCoefficients(bool debugShowMatrixTable)
         {
 
@@ -902,15 +900,15 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Given a set of isotope correction values
-    /// </summary>
-    /// <param name="minus2">Value between 0 and 100, but typically close to 0</param>
-    /// <param name="minus1">Value between 0 and 100, but typically close to 0</param>
-    /// <param name="zero">Value between 0 and 100, but typically close to 98; if this is 0 or 100, it is auto-computed</param>
-    /// <param name="plus1">Value between 0 and 100, but typically close to 0</param>
-    /// <param name="plus2">Value between 0 and 100, but typically close to 0</param>
-    /// <returns></returns>
-    /// <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
+        /// Given a set of isotope correction values
+        /// </summary>
+        /// <param name="minus2">Value between 0 and 100, but typically close to 0</param>
+        /// <param name="minus1">Value between 0 and 100, but typically close to 0</param>
+        /// <param name="zero">Value between 0 and 100, but typically close to 98; if this is 0 or 100, it is auto-computed</param>
+        /// <param name="plus1">Value between 0 and 100, but typically close to 0</param>
+        /// <param name="plus2">Value between 0 and 100, but typically close to 0</param>
+        /// <returns></returns>
+        /// <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
         private udtIsotopeContributionType DefineIsotopeContribution(float minus2, float minus1, float zero, float plus1, float plus2)
         {
             udtIsotopeContributionType udtIsotopePct;

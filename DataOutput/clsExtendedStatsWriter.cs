@@ -10,7 +10,6 @@ namespace MASIC.DataOutput
 {
     public class clsExtendedStatsWriter : clsMasicEventNotifier
     {
-
         #region // TODO
         public const string EXTENDED_STATS_HEADER_COLLISION_MODE = "Collision Mode";
         public const string EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT = "Scan Filter Text";

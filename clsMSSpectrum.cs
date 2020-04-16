@@ -3,18 +3,16 @@ using System.Collections.Generic;
 
 namespace MASIC
 {
-
     /// <summary>
-/// Used to track the m/z and intensity values of a given mass spectrum
-/// </summary>
+    /// Used to track the m/z and intensity values of a given mass spectrum
+    /// </summary>
     public class clsMSSpectrum
     {
-
         /// <summary>
-    /// Scan number
-    /// </summary>
-    /// <returns></returns>
-    /// <remarks>0 if not in use</remarks>
+        /// Scan number
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>0 if not in use</remarks>
         public int ScanNumber { get; set; }
 
         public int IonCount
@@ -26,18 +24,18 @@ namespace MASIC
         }
 
         /// <summary>
-    /// List of m/z's
-    /// </summary>
+        /// List of m/z's
+        /// </summary>
         public readonly List<double> IonsMZ;
 
         /// <summary>
-    /// List of intensities
-    /// </summary>
+        /// List of intensities
+        /// </summary>
         public readonly List<double> IonsIntensity;
 
         /// <summary>
-    /// Constructor that only sets the scan number
-    /// </summary>
+        /// Constructor that only sets the scan number
+        /// </summary>
         public clsMSSpectrum(int intScanNumber)
         {
             ScanNumber = intScanNumber;
@@ -46,8 +44,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Constructor that sets the scan number and stores m/z and intensity data (float intensities)
-    /// </summary>
+        /// Constructor that sets the scan number and stores m/z and intensity data (float intensities)
+        /// </summary>
         public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<float> intensityList, int dataCount) : this(intScanNumber)
         {
             for (int i = 0, loopTo = dataCount - 1; i <= loopTo; i++)
@@ -58,8 +56,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Constructor that sets the scan number and stores m/z and intensity data (double intensities)
-    /// </summary>
+        /// Constructor that sets the scan number and stores m/z and intensity data (double intensities)
+        /// </summary>
         public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<double> intensityList, int dataCount) : this(intScanNumber)
         {
             for (int i = 0, loopTo = dataCount - 1; i <= loopTo; i++)
@@ -70,8 +68,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Clear the m/z and intensity values (but leave the scan number unchanged)
-    /// </summary>
+        /// Clear the m/z and intensity values (but leave the scan number unchanged)
+        /// </summary>
         public void Clear()
         {
             IonsMZ.Clear();
@@ -79,8 +77,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Clear the m/z and intensity values, and update the scan number
-    /// </summary>
+        /// Clear the m/z and intensity values, and update the scan number
+        /// </summary>
         public void Clear(int newScanNumber)
         {
             IonsMZ.Clear();

@@ -6,15 +6,14 @@ namespace MASIC
 {
     public class clsScanNumScanTimeConversion : EventNotifier
     {
-
         /// <summary>
-    /// Returns the index of the scan closest to scanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
-    /// </summary>
-    /// <param name="scanList"></param>
-    /// <param name="scanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
-    /// <param name="eScanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Returns the index of the scan closest to scanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="scanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
+        /// <param name="eScanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
         private int FindNearestScanNumIndex(clsScanList scanList, float scanOrAcqTime, clsCustomSICList.eCustomSICScanTypeConstants eScanType)
         {
             try
@@ -92,14 +91,14 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Converts a scan number of acquisition time to an actual scan number
-    /// </summary>
-    /// <param name="scanList"></param>
-    /// <param name="scanOrAcqTime">Value to convert</param>
-    /// <param name="eScanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
-    /// <param name="convertingRangeOrTolerance">True when converting a range</param>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Converts a scan number of acquisition time to an actual scan number
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="scanOrAcqTime">Value to convert</param>
+        /// <param name="eScanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
+        /// <param name="convertingRangeOrTolerance">True when converting a range</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public int ScanOrAcqTimeToAbsolute(clsScanList scanList, float scanOrAcqTime, clsCustomSICList.eCustomSICScanTypeConstants eScanType, bool convertingRangeOrTolerance)
         {
             try

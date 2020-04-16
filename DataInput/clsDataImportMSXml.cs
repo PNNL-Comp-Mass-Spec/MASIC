@@ -15,13 +15,11 @@ using ThermoRawFileReader;
 
 namespace MASIC.DataInput
 {
-
     /// <summary>
     /// Import data from .mzXML, .mzData, or .mzML files
     /// </summary>
     public class clsDataImportMSXml : clsDataImport
     {
-
         #region // TODO
         private readonly Centroider mCentroider;
         private int mWarnCount;

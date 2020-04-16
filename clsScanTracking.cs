@@ -24,10 +24,10 @@ namespace MASIC
 
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="reporterIons"></param>
-    /// <param name="peakFinder"></param>
+        /// Constructor
+        /// </summary>
+        /// <param name="reporterIons"></param>
+        /// <param name="peakFinder"></param>
         public clsScanTracking(clsReporterIons reporterIons, clsMASICPeakFinder peakFinder)
         {
             mReporterIons = reporterIons;
@@ -36,11 +36,11 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Check whether the scan number is within the range specified by sicOptions
-    /// </summary>
-    /// <param name="scanNumber"></param>
-    /// <param name="sicOptions"></param>
-    /// <returns>True if filtering is disabled, or if scanNumber is within the limits</returns>
+        /// Check whether the scan number is within the range specified by sicOptions
+        /// </summary>
+        /// <param name="scanNumber"></param>
+        /// <param name="sicOptions"></param>
+        /// <returns>True if filtering is disabled, or if scanNumber is within the limits</returns>
         public bool CheckScanInRange(int scanNumber, clsSICOptions sicOptions)
         {
             if (sicOptions.ScanRangeStart >= 0 && sicOptions.ScanRangeEnd > sicOptions.ScanRangeStart)
@@ -56,12 +56,12 @@ namespace MASIC
 
 
         /// <summary>
-    /// Check whether the scan number and elution time are within the ranges specified by sicOptions
-    /// </summary>
-    /// <param name="scanNumber"></param>
-    /// <param name="elutionTime"></param>
-    /// <param name="sicOptions"></param>
-    /// <returns>True if filtering is disabled, or if scanNumber and elutionTime are within the limits</returns>
+        /// Check whether the scan number and elution time are within the ranges specified by sicOptions
+        /// </summary>
+        /// <param name="scanNumber"></param>
+        /// <param name="elutionTime"></param>
+        /// <param name="sicOptions"></param>
+        /// <returns>True if filtering is disabled, or if scanNumber and elutionTime are within the limits</returns>
         public bool CheckScanInRange(int scanNumber, double elutionTime, clsSICOptions sicOptions)
         {
             if (!CheckScanInRange(scanNumber, sicOptions))

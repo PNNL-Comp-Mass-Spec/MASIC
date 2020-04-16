@@ -20,14 +20,14 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Looks through arrayToSearch for itemToSearchFor
-    /// </summary>
-    /// <param name="arrayToSearch"></param>
-    /// <param name="itemToSearchFor"></param>
-    /// <param name="dataCount"></param>
-    /// <param name="eMissingDataMode"></param>
-    /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-    /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        /// Looks through arrayToSearch for itemToSearchFor
+        /// </summary>
+        /// <param name="arrayToSearch"></param>
+        /// <param name="itemToSearchFor"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="eMissingDataMode"></param>
+        /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(IList<int> arrayToSearch, int itemToSearchFor, int dataCount, eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int indexFirst;
@@ -178,14 +178,14 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Looks through arrayToSearch for itemToSearchFor
-    /// </summary>
-    /// <param name="arrayToSearch"></param>
-    /// <param name="itemToSearchFor"></param>
-    /// <param name="dataCount"></param>
-    /// <param name="eMissingDataMode"></param>
-    /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-    /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        /// Looks through arrayToSearch for itemToSearchFor
+        /// </summary>
+        /// <param name="arrayToSearch"></param>
+        /// <param name="itemToSearchFor"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="eMissingDataMode"></param>
+        /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(IList<float> arrayToSearch, float itemToSearchFor, int dataCount, eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int indexFirst;
@@ -337,14 +337,14 @@ namespace MASIC
 
         // ReSharper disable once UnusedMember.Global
         /// <summary>
-    /// Looks through arrayToSearch for itemToSearchFor
-    /// </summary>
-    /// <param name="arrayToSearch"></param>
-    /// <param name="itemToSearchFor"></param>
-    /// <param name="dataCount"></param>
-    /// <param name="eMissingDataMode"></param>
-    /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-    /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        /// Looks through arrayToSearch for itemToSearchFor
+        /// </summary>
+        /// <param name="arrayToSearch"></param>
+        /// <param name="itemToSearchFor"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="eMissingDataMode"></param>
+        /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
+        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(IList<double> arrayToSearch, double itemToSearchFor, int dataCount, eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int indexFirst;

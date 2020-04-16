@@ -12,7 +12,6 @@ namespace MASIC
 {
     public class clsMRMProcessing : clsMasicEventNotifier
     {
-
         #region // TODO
         public struct udtSRMListType
         {
@@ -32,8 +31,8 @@ namespace MASIC
         private readonly clsDataOutput mDataOutputHandler;
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsMRMProcessing(clsMASICOptions masicOptions, clsDataOutput dataOutputHandler)
         {
             mOptions = masicOptions;

@@ -5,10 +5,9 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace MASIC
 {
-
     /// <summary>
-/// Utilizes a spectrum pool to store mass spectra
-/// </summary>
+    /// Utilizes a spectrum pool to store mass spectra
+    /// </summary>
     public class clsSpectraCache : clsMasicEventNotifier, IDisposable
     {
         public clsSpectraCache(clsSpectrumCacheOptions cacheOptions)
@@ -212,13 +211,13 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Cache the spectrum at the given pool index
-    /// </summary>
-    /// <param name="poolIndexToCache"></param>
-    /// <return>
-    /// True if already cached or if successfully cached
-    /// False if an error
-    /// </return>
+        /// Cache the spectrum at the given pool index
+        /// </summary>
+        /// <param name="poolIndexToCache"></param>
+        /// <return>
+        /// True if already cached or if successfully cached
+        /// False if an error
+        /// </return>
         private void CacheSpectrum(int poolIndexToCache)
         {
             const int MAX_RETRIES = 3;
@@ -539,11 +538,11 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Load the spectrum from disk and cache in SpectraPool
-    /// </summary>
-    /// <param name="scanNumber">Scan number to load</param>
-    /// <param name="targetPoolIndex">Output: index in the array that contains the given spectrum</param>
-    /// <returns>True if successfully uncached, false if an error</returns>
+        /// Load the spectrum from disk and cache in SpectraPool
+        /// </summary>
+        /// <param name="scanNumber">Scan number to load</param>
+        /// <param name="targetPoolIndex">Output: index in the array that contains the given spectrum</param>
+        /// <returns>True if successfully uncached, false if an error</returns>
         private bool UnCacheSpectrum(int scanNumber, out int targetPoolIndex)
         {
             var success = default(bool);
@@ -711,12 +710,12 @@ namespace MASIC
         }
 
         /// <summary>
-    /// Make sure the spectrum given by scanNumber is present in FragScanSpectra
-    /// When doing this, update the Pool Access History with this scan number to assure it doesn't get purged from the pool anytime soon
-    /// </summary>
-    /// <param name="scanNumber">Scan number to load</param>
-    /// <param name="poolIndex">Output: index in the array that contains the given spectrum; -1 if no match</param>
-    /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
+        /// Make sure the spectrum given by scanNumber is present in FragScanSpectra
+        /// When doing this, update the Pool Access History with this scan number to assure it doesn't get purged from the pool anytime soon
+        /// </summary>
+        /// <param name="scanNumber">Scan number to load</param>
+        /// <param name="poolIndex">Output: index in the array that contains the given spectrum; -1 if no match</param>
+        /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
         public bool ValidateSpectrumInPool(int scanNumber, out int poolIndex)
         {
             try

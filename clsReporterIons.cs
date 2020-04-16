@@ -43,15 +43,15 @@ namespace MASIC
         #endregion
         #region // TODO
         /// <summary>
-    /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
-    /// will be populated with the m/z range of the reporter ions being processed
-    /// </summary>
+        /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
+        /// will be populated with the m/z range of the reporter ions being processed
+        /// </summary>
         public double MZIntensityFilterIgnoreRangeStart { get; set; }
 
         /// <summary>
-    /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
-    /// will be populated with the m/z range of the reporter ions being processed
-    /// </summary>
+        /// When ReporterIonStatsEnabled = True, MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd
+        /// will be populated with the m/z range of the reporter ions being processed
+        /// </summary>
         public double MZIntensityFilterIgnoreRangeEnd { get; set; }
         public List<clsReporterIonInfo> ReporterIonList { get; private set; }
         public bool ReporterIonStatsEnabled { get; set; }
@@ -59,8 +59,8 @@ namespace MASIC
         public clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex ReporterIonITraq4PlexCorrectionFactorType { get; set; }
 
         /// <summary>
-    /// This is ignored if mReporterIonApplyAbundanceCorrection is False
-    /// </summary>
+        /// This is ignored if mReporterIonApplyAbundanceCorrection is False
+        /// </summary>
         public bool ReporterIonSaveUncorrectedIntensities { get; set; }
 
         public eReporterIonMassModeConstants ReporterIonMassMode
@@ -77,8 +77,8 @@ namespace MASIC
         }
 
         /// <summary>
-    /// When true, observed m/z values of the reporter ions will be included in the _ReporterIons.txt file
-    /// </summary>
+        /// When true, observed m/z values of the reporter ions will be included in the _ReporterIons.txt file
+        /// </summary>
         public bool ReporterIonSaveObservedMasses { get; set; }
 
         public double ReporterIonToleranceDaDefault
@@ -100,8 +100,8 @@ namespace MASIC
 
         #endregion
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsReporterIons()
         {
             ReporterIonList = new List<clsReporterIonInfo>();

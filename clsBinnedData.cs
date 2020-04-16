@@ -8,9 +8,9 @@ namespace MASIC
         public float BinSize { get; set; }
 
         /// <summary>
-    /// Number of bins in BinnedIntensities
-    /// </summary>
-    /// <returns></returns>
+        /// Number of bins in BinnedIntensities
+        /// </summary>
+        /// <returns></returns>
         public int BinCount
         {
             get
@@ -20,18 +20,18 @@ namespace MASIC
         }
 
         /// <summary>
-    /// List of binned intensities; First bin starts at BinnedDataStartX
-    /// </summary>
+        /// List of binned intensities; First bin starts at BinnedDataStartX
+        /// </summary>
         public readonly List<float> BinnedIntensities;
 
         /// <summary>
-    /// List of binned intensity offsets; First bin starts at BinnedDataStartX + BinSize/2
-    /// </summary>
+        /// List of binned intensity offsets; First bin starts at BinnedDataStartX + BinSize/2
+        /// </summary>
         public readonly List<float> BinnedIntensitiesOffset;
 
         /// <summary>
-    /// Constructor
-    /// </summary>
+        /// Constructor
+        /// </summary>
         public clsBinnedData()
         {
             BinnedIntensities = new List<float>();

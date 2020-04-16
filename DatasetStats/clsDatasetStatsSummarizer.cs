@@ -11,7 +11,6 @@ namespace MASIC.DatasetStats
 {
     public class clsDatasetStatsSummarizer : EventNotifier
     {
-
         #region // TODO
         public const string SCAN_TYPE_STATS_SEP_CHAR = "::###::";
 
