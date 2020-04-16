@@ -88,7 +88,7 @@ namespace MASIC
 
         public double GetAbundanceByIndex(int dataPointIndex)
         {
-            if (dataPointIndex >= 0 & dataPointIndex < mDataCount)
+            if (dataPointIndex >= 0 && dataPointIndex < mDataCount)
             {
                 return mDataValues[dataPointIndex];
             }
@@ -356,7 +356,7 @@ namespace MASIC
                             }
 
                             originalDataArrayIndex += 1;
-                            if (binToSortDataCount < 1000 | binToSortDataCount % 100 == 0)
+                            if (binToSortDataCount < 1000 || binToSortDataCount % 100 == 0)
                             {
                                 UpdateProgress(Conversions.ToSingle((3 + (index + 1) / Conversions.ToDouble(binToSortDataCount)) / SUBTASK_STEP_COUNT * 100.0D));
                             }

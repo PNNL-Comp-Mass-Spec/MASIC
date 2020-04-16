@@ -42,7 +42,7 @@ namespace MASIC.DataOutput
                 // Disabled in April 2015 since not used
                 // ' First, write a true TIC file (in ICR-2LS format)
                 // outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
-                // LogMessage("Saving ICR Tools TIC to " & Path.GetFileName(outputFilePath))
+                // LogMessage("Saving ICR Tools TIC to " + Path.GetFileName(outputFilePath))
 
                 // SaveICRToolsChromatogramByScan(scanList.SurveyScans, scanList.SurveyScans.Count, outputFilePath, False, True, inputFilePathFull)
 

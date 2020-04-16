@@ -349,7 +349,7 @@ namespace MASIC
             bestMatchMZ = 0;
             try
             {
-                if (scanList[spectrumIndex].IonCount == 0 & scanList[spectrumIndex].IonCountRaw == 0)
+                if (scanList[spectrumIndex].IonCount == 0 && scanList[spectrumIndex].IonCountRaw == 0)
                 {
                     // No data in this spectrum
                     success = false;

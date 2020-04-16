@@ -236,7 +236,7 @@ namespace MASIC
                         }
                     }
 
-                    if (mOptions.WriteMRMDataList | mOptions.WriteMRMIntensityCrosstab)
+                    if (mOptions.WriteMRMDataList || mOptions.WriteMRMIntensityCrosstab)
                     {
                         // Populate srmKeyToIndexMap
                         var srmKeyToIndexMap = new Dictionary<string, int>();
@@ -332,7 +332,7 @@ namespace MASIC
                                     // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
                                     if (srmKeyToIndexMap.TryGetValue(srmMapKey, out srmIndex))
                                     {
-                                        if (crosstabColumnFlag[srmIndex] || srmIndex == 0 & srmIndexLast == srmList.Count - 1)
+                                        if (crosstabColumnFlag[srmIndex] || srmIndex == 0 && srmIndexLast == srmList.Count - 1)
                                         {
                                             // Either the column is already populated, or the SRMIndex has cycled back to zero
                                             // Write out the current crosstab line and reset the crosstab column arrays

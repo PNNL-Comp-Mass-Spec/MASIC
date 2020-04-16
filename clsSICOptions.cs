@@ -103,7 +103,7 @@
 
             set
             {
-                if (value < 0 | value > 10000)
+                if (value < 0 || value > 10000)
                     value = 5;
                 mMaxSICPeakWidthMinutesBackward = value;
             }
@@ -121,7 +121,7 @@
 
             set
             {
-                if (value < 0 | value > 10000)
+                if (value < 0 || value > 10000)
                     value = 5;
                 mMaxSICPeakWidthMinutesForward = value;
             }
@@ -144,7 +144,7 @@
 
             set
             {
-                if (value < 0.001 | value > 100)
+                if (value < 0.001 || value > 100)
                     value = 0.1F;
                 mSimilarIonMZToleranceHalfWidth = value;
             }
@@ -163,7 +163,7 @@
 
             set
             {
-                if (value < 0 | value > 100000)
+                if (value < 0 || value > 100000)
                     value = 5;
                 mSimilarIonToleranceHalfWidthMinutes = value;
             }
@@ -181,7 +181,7 @@
 
             set
             {
-                if (value < 0 | value > 1)
+                if (value < 0 || value > 1)
                     value = 0.8F;
                 mSpectrumSimilarityMinimum = value;
             }
@@ -241,10 +241,10 @@
             SICToleranceIsPPM = toleranceIsPPM;
             if (SICToleranceIsPPM)
             {
-                if (toleranceValue < 0 | toleranceValue > 1000000)
+                if (toleranceValue < 0 || toleranceValue > 1000000)
                     toleranceValue = 100;
             }
-            else if (toleranceValue < 0 | toleranceValue > 10000)
+            else if (toleranceValue < 0 || toleranceValue > 10000)
                 toleranceValue = 0.6;
             SICTolerance = toleranceValue;
         }

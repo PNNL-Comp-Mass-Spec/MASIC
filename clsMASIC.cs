@@ -846,7 +846,7 @@ namespace MASIC
 
             set
             {
-                if (value < 0 | value > double.MaxValue)
+                if (value < 0 || value > double.MaxValue)
                     value = 0;
                 Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = value;
             }

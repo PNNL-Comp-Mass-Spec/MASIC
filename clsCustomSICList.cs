@@ -454,7 +454,7 @@ namespace MASIC
                 }
             }
 
-            if (countOverOne == 0 & countBetweenZeroAndOne > 0)
+            if (countOverOne == 0 && countBetweenZeroAndOne > 0)
             {
                 if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
                 {
@@ -464,7 +464,7 @@ namespace MASIC
                 }
             }
 
-            if (countOverOne > 0 & countBetweenZeroAndOne == 0)
+            if (countOverOne > 0 && countBetweenZeroAndOne == 0)
             {
                 if (ScanToleranceType == eCustomSICScanTypeConstants.Relative)
                 {

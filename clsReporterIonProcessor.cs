@@ -154,7 +154,7 @@ namespace MASIC
 
                             // Uncomment to include the label data m/z value in the _ReporterIons.txt file
                             // ' This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                            // ftmsLabelDataMz.Add("Ion_" & mzValue & "_LabelDataMZ")
+                            // ftmsLabelDataMz.Add("Ion_" + mzValue + "_LabelDataMZ")
                         }
                     }
 

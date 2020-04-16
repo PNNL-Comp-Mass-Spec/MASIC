@@ -19,7 +19,7 @@ namespace MASIC
             try
             {
                 int scanIndexMatch;
-                if (eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute | eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Relative)
+                if (eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute || eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Relative)
                 {
                     int absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
                     scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, absoluteScanNumber, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);

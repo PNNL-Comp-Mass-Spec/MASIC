@@ -26,7 +26,7 @@ namespace MASIC.DataOutput
                 for (int index = 0; index <= instMethodCount - 1; index++)
                 {
                     string methodNum;
-                    if (index == 0 & objXcaliburAccessor.FileInfo.InstMethods.Count == 1)
+                    if (index == 0 && objXcaliburAccessor.FileInfo.InstMethods.Count == 1)
                     {
                         methodNum = string.Empty;
                     }
@@ -77,7 +77,7 @@ namespace MASIC.DataOutput
                 for (int index = 0; index <= tuneMethodCount - 1; index++)
                 {
                     string tuneInfoNum;
-                    if (index == 0 & objXcaliburAccessor.FileInfo.TuneMethods.Count == 1)
+                    if (index == 0 && objXcaliburAccessor.FileInfo.TuneMethods.Count == 1)
                     {
                         tuneInfoNum = string.Empty;
                     }

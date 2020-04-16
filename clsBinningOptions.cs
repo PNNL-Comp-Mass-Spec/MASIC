@@ -30,7 +30,7 @@
 
             set
             {
-                if (value < 0 | value > 100)
+                if (value < 0 || value > 100)
                     value = 1;
                 mIntensityPrecisionPercent = value;
             }

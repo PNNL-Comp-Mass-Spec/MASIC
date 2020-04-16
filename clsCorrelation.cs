@@ -103,7 +103,7 @@ namespace MASIC
 
             set
             {
-                if (value < 0 | value > 100)
+                if (value < 0 || value > 100)
                     value = 1;
                 mBinningOptions.IntensityPrecisionPercent = value;
             }
@@ -210,13 +210,13 @@ namespace MASIC
         private double BetaI(double a, double b, double x)
         {
             double bt;
-            if (x < 0.0 | x > 1.0)
+            if (x < 0.0 || x > 1.0)
             {
                 throw new Exception("Bad x in routine clsCorrelation->BetaI; should be between 0 and 1");
             }
             else
             {
-                if (Math.Abs(x) < double.Epsilon | Math.Abs(x - 1.0) < double.Epsilon)
+                if (Math.Abs(x) < double.Epsilon || Math.Abs(x - 1.0) < double.Epsilon)
                 {
                     bt = 0.0;
                 }
@@ -315,7 +315,7 @@ namespace MASIC
                     if (yData[index] >= NoiseThresholdIntensity)
                     {
                         binNumber = ValueToBinNumber(xData[index], binningOptions.StartX + offset, binningOptions.BinSize);
-                        if (binNumber >= 0 & binNumber < binCount)
+                        if (binNumber >= 0 && binNumber < binCount)
                         {
                             if (binningOptions.SumAllIntensitiesForBin)
                             {
@@ -360,7 +360,7 @@ namespace MASIC
                     }
                 }
 
-                if (binningOptions.Normalize & maximumIntensity > 0)
+                if (binningOptions.Normalize && maximumIntensity > 0)
                 {
                     for (index = 0; index <= binCount - 1; index++)
                     {

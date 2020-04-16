@@ -78,7 +78,7 @@ namespace MASIC
                         proceed = true;
                 }
 
-                if (commandLineParser.ParameterCount + commandLineParser.NonSwitchParameterCount == 0 & !commandLineParser.NeedToShowHelp)
+                if (commandLineParser.ParameterCount + commandLineParser.NonSwitchParameterCount == 0 && !commandLineParser.NeedToShowHelp)
                 {
 #if GUI
                     ShowGUI();

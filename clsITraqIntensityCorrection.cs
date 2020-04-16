@@ -869,7 +869,7 @@ namespace MASIC
         private udtIsotopeContributionType DefineIsotopeContribution(float minus2, float minus1, float zero, float plus1, float plus2)
         {
             udtIsotopeContributionType udtIsotopePct;
-            if (Math.Abs(zero) < float.Epsilon || zero < 0 || minus2 + minus1 + plus1 + plus2 > 0 & Math.Abs(zero - 100) < float.Epsilon)
+            if (Math.Abs(zero) < float.Epsilon || zero < 0 || minus2 + minus1 + plus1 + plus2 > 0 && Math.Abs(zero - 100) < float.Epsilon)
             {
                 // Auto-compute the monoisotopic abundance
                 zero = 100 - minus2 - minus1 - plus1 - plus2;

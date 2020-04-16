@@ -150,7 +150,7 @@ namespace MASIC
                     success = ProcessMZList(scanList, spectraCache, masicOptions, dataOutputHandler, xmlResultsWriter, mzBinList, false, 0, ref parentIonsProcessed);
                 }
 
-                if (success & !masicOptions.CustomSICList.LimitSearchToCustomMZList)
+                if (success && !masicOptions.CustomSICList.LimitSearchToCustomMZList)
                 {
                     // Now process the SIM scans (if any)
                     // First, see if any SIMScans are present and determine the maximum SIM Index
