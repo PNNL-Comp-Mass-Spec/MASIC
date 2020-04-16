@@ -14,7 +14,7 @@
             get => mIntensityThresholdFractionMax;
             set
             {
-                if (value < 0 | value > 1)
+                if (value < 0 || value > 1)
                     value = 0.01;
                 mIntensityThresholdFractionMax = value;
             }
@@ -39,7 +39,7 @@
             get => mMaxDistanceScansNoOverlap;
             set
             {
-                if (value < 0 | value > 10000)
+                if (value < 0 || value > 10000)
                     value = 0;
                 mMaxDistanceScansNoOverlap = value;
             }
@@ -55,7 +55,7 @@
             get => mMaxAllowedUpwardSpikeFractionMax;
             set
             {
-                if (value < 0 | value > 1)
+                if (value < 0 || value > 1)
                     value = 0.2;
                 mMaxAllowedUpwardSpikeFractionMax = value;
             }
@@ -71,7 +71,7 @@
             get => mInitialPeakWidthScansScaler;
             set
             {
-                if (value < 0.001 | value > 1000)
+                if (value < 0.001 || value > 1000)
                     value = 0.5;
                 mInitialPeakWidthScansScaler = value;
             }
@@ -87,7 +87,7 @@
             get => mInitialPeakWidthScansMaximum;
             set
             {
-                if (value < 3 | value > 1000)
+                if (value < 3 || value > 1000)
                     value = 6;
                 mInitialPeakWidthScansMaximum = value;
             }
@@ -124,7 +124,7 @@
             set
             {
                 // Polynomial order should be between 0 and 6
-                if (value < 0 | value > 6)
+                if (value < 0 || value > 6)
                     value = 0;
 
                 // Polynomial order should be even

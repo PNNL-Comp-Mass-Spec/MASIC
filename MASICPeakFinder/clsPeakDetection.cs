@@ -170,7 +170,7 @@ namespace MASICPeakFinder
                     if (firstDerivative[index] > 0 && firstDerivative[index + 1] < 0)
                     {
                         // Possible peak
-                        if (yValuesZeroBased[index] >= intensityThreshold | yValuesZeroBased[index + 1] >= intensityThreshold)
+                        if (yValuesZeroBased[index] >= intensityThreshold || yValuesZeroBased[index + 1] >= intensityThreshold)
                         {
                             // Actual peak
 
