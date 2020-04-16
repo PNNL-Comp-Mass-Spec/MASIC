@@ -317,7 +317,7 @@ namespace MASIC
             bool success;
             try
             {
-                if (values is null || values.Length == 0)
+                if (values == null || values.Length == 0)
                 {
                     success = false;
                 }
@@ -355,7 +355,7 @@ namespace MASIC
             bool success;
             try
             {
-                if (values is null || values.Length == 0)
+                if (values == null || values.Length == 0)
                 {
                     success = false;
                 }
@@ -393,7 +393,7 @@ namespace MASIC
             bool success;
             try
             {
-                if (values is null || values.Length == 0)
+                if (values == null || values.Length == 0)
                 {
                     success = false;
                 }

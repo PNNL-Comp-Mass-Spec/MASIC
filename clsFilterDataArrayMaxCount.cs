@@ -58,11 +58,11 @@ namespace MASIC
             {
                 var oldMDataValues = mDataValues;
                 mDataValues = new double[(Conversions.ToInteger(Math.Floor(mDataValues.Length * 1.5)))];
-                if (oldMDataValues is object)
+                if (oldMDataValues != null)
                     Array.Copy(oldMDataValues, mDataValues, Math.Min(Conversions.ToInteger(Math.Floor(mDataValues.Length * 1.5)), oldMDataValues.Length));
                 var oldMDataIndices = mDataIndices;
                 mDataIndices = new int[mDataValues.Length];
-                if (oldMDataIndices is object)
+                if (oldMDataIndices != null)
                     Array.Copy(oldMDataIndices, mDataIndices, Math.Min(mDataValues.Length, oldMDataIndices.Length));
             }
 
@@ -112,11 +112,11 @@ namespace MASIC
                 {
                     var oldMDataValues = mDataValues;
                     mDataValues = new double[mDataCount];
-                    if (oldMDataValues is object)
+                    if (oldMDataValues != null)
                         Array.Copy(oldMDataValues, mDataValues, Math.Min(mDataCount, oldMDataValues.Length));
                     var oldMDataIndices = mDataIndices;
                     mDataIndices = new int[mDataCount];
-                    if (oldMDataIndices is object)
+                    if (oldMDataIndices != null)
                         Array.Copy(oldMDataIndices, mDataIndices, Math.Min(mDataCount, oldMDataIndices.Length));
                 }
 
@@ -283,11 +283,11 @@ namespace MASIC
                                     // Need to reserve more space (this is unexpected)
                                     var oldBinToSortAbundances = binToSortAbundances;
                                     binToSortAbundances = new double[(binToSortAbundances.Length * 2)];
-                                    if (oldBinToSortAbundances is object)
+                                    if (oldBinToSortAbundances != null)
                                         Array.Copy(oldBinToSortAbundances, binToSortAbundances, Math.Min(binToSortAbundances.Length * 2, oldBinToSortAbundances.Length));
                                     var oldBinToSortDataIndices = binToSortDataIndices;
                                     binToSortDataIndices = new int[binToSortAbundances.Length];
-                                    if (oldBinToSortDataIndices is object)
+                                    if (oldBinToSortDataIndices != null)
                                         Array.Copy(oldBinToSortDataIndices, binToSortDataIndices, Math.Min(binToSortAbundances.Length, oldBinToSortDataIndices.Length));
                                 }
 
@@ -312,11 +312,11 @@ namespace MASIC
                             {
                                 var oldBinToSortAbundances1 = binToSortAbundances;
                                 binToSortAbundances = new double[binToSortDataCount];
-                                if (oldBinToSortAbundances1 is object)
+                                if (oldBinToSortAbundances1 != null)
                                     Array.Copy(oldBinToSortAbundances1, binToSortAbundances, Math.Min(binToSortDataCount, oldBinToSortAbundances1.Length));
                                 var oldBinToSortDataIndices1 = binToSortDataIndices;
                                 binToSortDataIndices = new int[binToSortDataCount];
-                                if (oldBinToSortDataIndices1 is object)
+                                if (oldBinToSortDataIndices1 != null)
                                     Array.Copy(oldBinToSortDataIndices1, binToSortDataIndices, Math.Min(binToSortDataCount, oldBinToSortDataIndices1.Length));
                             }
                         }

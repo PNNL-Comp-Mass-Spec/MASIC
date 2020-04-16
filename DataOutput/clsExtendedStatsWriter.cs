@@ -45,7 +45,7 @@ namespace MASIC.DataOutput
         private IEnumerable<string> ConcatenateExtendedStats(IEnumerable<int> nonConstantHeaderIDs, int datasetID, int scanNumber, IReadOnlyDictionary<int, string> extendedHeaderInfo)
         {
             var dataValues = new List<string>() { datasetID.ToString(), scanNumber.ToString() };
-            if (extendedHeaderInfo is object && nonConstantHeaderIDs is object)
+            if (extendedHeaderInfo != null && nonConstantHeaderIDs != null)
             {
                 foreach (var headerID in from item in nonConstantHeaderIDs
                                          orderby item
@@ -174,7 +174,7 @@ namespace MASIC.DataOutput
                 return string.Empty;
             }
 
-            if (consolidatedValuesByID is null)
+            if (consolidatedValuesByID == null)
             {
                 return string.Empty;
             }
@@ -195,7 +195,7 @@ namespace MASIC.DataOutput
             // to the values in consolidatedValuesByID, looking to see if they match
             foreach (var surveyScan in surveyScans)
             {
-                if (surveyScan.ExtendedHeaderInfo is object)
+                if (surveyScan.ExtendedHeaderInfo != null)
                 {
                     foreach (var dataItem in surveyScan.ExtendedHeaderInfo)
                     {
@@ -219,7 +219,7 @@ namespace MASIC.DataOutput
             // to the values in consolidatedValuesByID, looking to see if they match
             foreach (var fragScan in fragScans)
             {
-                if (fragScan.ExtendedHeaderInfo is object)
+                if (fragScan.ExtendedHeaderInfo != null)
                 {
                     foreach (var item in fragScan.ExtendedHeaderInfo)
                     {
@@ -239,7 +239,7 @@ namespace MASIC.DataOutput
                 }
             }
 
-            if (consolidatedValuesByID is null || consolidatedValuesByID.Count == 0)
+            if (consolidatedValuesByID == null || consolidatedValuesByID.Count == 0)
             {
                 return string.Empty;
             }
@@ -295,7 +295,7 @@ namespace MASIC.DataOutput
         private clsScanInfo GetScanByMasterScanIndex(clsScanList scanList, int masterScanIndex)
         {
             var currentScan = new clsScanInfo();
-            if (scanList.MasterScanOrder is object)
+            if (scanList.MasterScanOrder != null)
             {
                 if (masterScanIndex < 0)
                 {
@@ -348,7 +348,7 @@ namespace MASIC.DataOutput
                 // Lookup extended stats values that are constants for all scans
                 // The following will also remove the constant header values from mExtendedHeaderNameMap
                 string constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(out nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter);
-                if (constantExtendedHeaderValues is null)
+                if (constantExtendedHeaderValues == null)
                     constantExtendedHeaderValues = string.Empty;
 
                 // Write the constant extended stats values to a text file

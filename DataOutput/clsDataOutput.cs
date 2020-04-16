@@ -114,14 +114,14 @@ namespace MASIC.DataOutput
                     {
                         // See if the ProcessingComplete node has a value of True
                         var matchingNodeList = rootElement.GetElementsByTagName("ProcessingComplete");
-                        if (matchingNodeList is null || matchingNodeList.Count != 1)
+                        if (matchingNodeList == null || matchingNodeList.Count != 1)
                             break;
                         if ((matchingNodeList.Item(0).InnerText.ToLower() ?? "") != "true")
                             break;
 
                         // Read the ProcessingSummary and populate
                         matchingNodeList = rootElement.GetElementsByTagName("ProcessingSummary");
-                        if (matchingNodeList is null || matchingNodeList.Count != 1)
+                        if (matchingNodeList == null || matchingNodeList.Count != 1)
                             break;
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
@@ -151,9 +151,9 @@ namespace MASIC.DataOutput
                             }
                         }
 
-                        if (masicVersion is null)
+                        if (masicVersion == null)
                             masicVersion = string.Empty;
-                        if (masicPeakFinderDllVersion is null)
+                        if (masicPeakFinderDllVersion == null)
                             masicPeakFinderDllVersion = string.Empty;
 
                         // Check if the MASIC version matches
@@ -184,7 +184,7 @@ namespace MASIC.DataOutput
 
                         // Read the ProcessingOptions and populate
                         matchingNodeList = rootElement.GetElementsByTagName("ProcessingOptions");
-                        if (matchingNodeList is null || matchingNodeList.Count != 1)
+                        if (matchingNodeList == null || matchingNodeList.Count != 1)
                             break;
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
@@ -322,7 +322,7 @@ namespace MASIC.DataOutput
 
                         // Read the BinningOptions and populate
                         matchingNodeList = rootElement.GetElementsByTagName("BinningOptions");
-                        if (matchingNodeList is null || matchingNodeList.Count != 1)
+                        if (matchingNodeList == null || matchingNodeList.Count != 1)
                             break;
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)
                         {
@@ -356,7 +356,7 @@ namespace MASIC.DataOutput
 
                         var customSICListCompare = new clsCustomSICList();
                         matchingNodeList = rootElement.GetElementsByTagName("CustomSICValues");
-                        if (matchingNodeList is null || matchingNodeList.Count != 1)
+                        if (matchingNodeList == null || matchingNodeList.Count != 1)
                         {
                         }
                         // Custom values not defined; that's OK
@@ -704,7 +704,7 @@ namespace MASIC.DataOutput
             string prefix;
             try
             {
-                if (OutputFileHandles.SICDataFile is null)
+                if (OutputFileHandles.SICDataFile == null)
                 {
                     return true;
                 }

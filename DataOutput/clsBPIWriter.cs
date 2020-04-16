@@ -238,7 +238,7 @@ namespace MASIC.DataOutput
         private void WriteDecon2LSScanFileEntry(StreamWriter writer, clsScanInfo currentScan, clsSpectraCache spectraCache)
         {
             int numPeaks;
-            if (spectraCache is null)
+            if (spectraCache == null)
             {
                 numPeaks = 0;
             }

@@ -413,7 +413,7 @@ namespace MASIC
         public void SetReporterIons(List<clsReporterIonInfo> reporterIons, bool customReporterIons)
         {
             ReporterIonList.Clear();
-            if (reporterIons is null || reporterIons.Count == 0)
+            if (reporterIons == null || reporterIons.Count == 0)
             {
                 return;
             }
@@ -454,7 +454,7 @@ namespace MASIC
             }
 
             ReporterIonList.Clear();
-            if (reporterIonMZList is null || reporterIonMZList.Length == 0)
+            if (reporterIonMZList == null || reporterIonMZList.Length == 0)
             {
                 mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone;
                 return;

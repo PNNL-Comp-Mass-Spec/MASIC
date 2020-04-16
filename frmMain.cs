@@ -133,7 +133,7 @@ namespace MASIC
                 }
             }
 
-            if (comment is null)
+            if (comment == null)
                 comment = string.Empty;
             if (!existingRowFound)
             {
@@ -374,7 +374,7 @@ namespace MASIC
         {
             try
             {
-                if (item is null)
+                if (item == null)
                 {
                     return string.Empty;
                 }
@@ -911,7 +911,7 @@ namespace MASIC
 
             // Examine the clipboard contents
             var objData = Clipboard.GetDataObject();
-            if (objData is null)
+            if (objData == null)
             {
                 return;
             }
@@ -1153,7 +1153,7 @@ namespace MASIC
                 }
                 finally
                 {
-                    if (mProgressForm is object)
+                    if (mProgressForm != null)
                     {
                         mProgressForm.HideForm();
                         mProgressForm = null;
@@ -1187,7 +1187,7 @@ namespace MASIC
                     return;
             }
 
-            if (objMasic is null)
+            if (objMasic == null)
             {
                 objMasic = new clsMASIC();
                 existingMasicObjectUsed = false;
@@ -2407,7 +2407,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
 
         private void MASIC_ProgressUpdate(string taskDescription, float percentComplete)
         {
-            if (mProgressForm is object)
+            if (mProgressForm != null)
             {
                 mProgressForm.UpdateCurrentTask(mMasic.ProgressStepDescription);
                 mProgressForm.UpdateProgressBar(percentComplete);
@@ -2422,7 +2422,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
 
         private void MASIC_ProgressResetKeypressAbort()
         {
-            if (mProgressForm is object)
+            if (mProgressForm != null)
             {
                 mProgressForm.ResetKeyPressAbortProcess();
             }
@@ -2430,7 +2430,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
 
         private void MASIC_ProgressSubtaskChanged()
         {
-            if (mProgressForm is object)
+            if (mProgressForm != null)
             {
                 mProgressForm.UpdateCurrentSubTask(mMasic.SubtaskDescription);
                 mProgressForm.UpdateSubtaskProgressBar(mMasic.SubtaskProgressPercentComplete);

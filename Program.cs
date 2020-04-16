@@ -98,7 +98,7 @@ namespace MASIC
                 RegisterMasicEvents(mMASIC);
                 mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath;
                 mMASIC.Options.SICOptions.DatasetID = mDatasetID;
-                if (mMASICStatusFilename is object && mMASICStatusFilename.Length > 0)
+                if (mMASICStatusFilename != null && mMASICStatusFilename.Length > 0)
                 {
                     mMASIC.Options.MASICStatusFilename = mMASICStatusFilename;
                 }
@@ -161,7 +161,7 @@ namespace MASIC
 #if // TODO
             finally
             {
-                if (mProgressForm is object)
+                if (mProgressForm != null)
                 {
                     mProgressForm.HideForm();
                     mProgressForm = null;
@@ -400,7 +400,8 @@ namespace MASIC
 
 #if // TODO
             const int PERCENT_REPORT_INTERVAL = 25;
-            if (mProgressForm is object)
+
+            if (mProgressForm != null)
             {
                 mProgressForm.UpdateCurrentTask(mMASIC.ProgressStepDescription);
                 mProgressForm.UpdateProgressBar(percentComplete);
@@ -433,7 +434,7 @@ namespace MASIC
         private static void ProgressResetKeypressAbortHandler()
         {
 #if // TODO
-            if (mProgressForm is object)
+            if (mProgressForm != null)
             {
                 mProgressForm.ResetKeyPressAbortProcess();
             }
@@ -443,7 +444,7 @@ namespace MASIC
         private static void ProgressSubtaskChangedHandler()
         {
 #if // TODO
-            if (mProgressForm is object)
+            if (mProgressForm != null)
             {
                 mProgressForm.UpdateCurrentSubTask(mMASIC.SubtaskDescription);
                 mProgressForm.UpdateSubtaskProgressBar(mMASIC.SubtaskProgressPercentComplete);

@@ -41,7 +41,7 @@ namespace MASIC.DataInput
 
         private double ComputeInterference(SimpleMzMLReader.SimpleSpectrum mzMLSpectrum, clsScanInfo scanInfo, int precursorScanNumber)
         {
-            if (mzMLSpectrum is null)
+            if (mzMLSpectrum == null)
             {
                 return 0;
             }
@@ -67,7 +67,7 @@ namespace MASIC.DataInput
             string isolationWindowTargetMzText = string.Empty;
             string isolationWindowLowerOffsetText = string.Empty;
             string isolationWindowUpperOffsetText = string.Empty;
-            if (mzMLSpectrum.Precursors.Count > 0 && mzMLSpectrum.Precursors[0].IsolationWindow is object)
+            if (mzMLSpectrum.Precursors.Count > 0 && mzMLSpectrum.Precursors[0].IsolationWindow != null)
             {
                 foreach (var cvParam in mzMLSpectrum.Precursors[0].IsolationWindow.CVParams)
                 {
@@ -89,7 +89,7 @@ namespace MASIC.DataInput
                 }
             }
 
-            if (mzMLSpectrum.Precursors.Count > 0 && mzMLSpectrum.Precursors[0].SelectedIons is object && mzMLSpectrum.Precursors[0].SelectedIons.Count > 0)
+            if (mzMLSpectrum.Precursors.Count > 0 && mzMLSpectrum.Precursors[0].SelectedIons != null && mzMLSpectrum.Precursors[0].SelectedIons.Count > 0)
             {
                 foreach (var cvParam in mzMLSpectrum.Precursors[0].SelectedIons[0].CVParams)
                 {
@@ -300,7 +300,7 @@ namespace MASIC.DataInput
             }
 
             // Close the handle to the data file
-            if (xmlReader is object)
+            if (xmlReader != null)
             {
                 try
                 {
@@ -734,7 +734,7 @@ namespace MASIC.DataInput
                 LowMass = spectrumInfo.mzRangeStart,
                 HighMass = spectrumInfo.mzRangeEnd
             };
-            if (mzXmlSourceSpectrum is object && !string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
+            if (mzXmlSourceSpectrum != null && !string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
             {
                 scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
             }
@@ -774,7 +774,7 @@ namespace MASIC.DataInput
 
             // Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             StoreSpectrum(msSpectrum, scanInfo, spectraCache, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, clsMASIC.DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, msDataResolution, mKeepRawSpectra);
-            if (msSpectrum.IonsMZ is object && msSpectrum.IonsIntensity is object)
+            if (msSpectrum.IonsMZ != null && msSpectrum.IonsIntensity != null)
             {
                 if (mzXmlSourceSpectrum.Centroided)
                 {
@@ -1202,7 +1202,7 @@ namespace MASIC.DataInput
         {
             try
             {
-                if (msSpectrum.IonsMZ is null || msSpectrum.IonsIntensity is null)
+                if (msSpectrum.IonsMZ == null || msSpectrum.IonsIntensity == null)
                 {
                     scanInfo.IonCount = 0;
                     scanInfo.IonCountRaw = 0;
@@ -1280,7 +1280,7 @@ namespace MASIC.DataInput
                 // Use the defaults
                 if (string.IsNullOrWhiteSpace(scanInfo.ScanHeaderText))
                 {
-                    if (mzXmlSourceSpectrum is null || string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
+                    if (mzXmlSourceSpectrum == null || string.IsNullOrWhiteSpace(mzXmlSourceSpectrum.FilterLine))
                     {
                         scanInfo.ScanHeaderText = string.Empty;
                     }

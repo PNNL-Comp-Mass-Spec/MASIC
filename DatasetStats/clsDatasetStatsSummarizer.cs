@@ -45,7 +45,7 @@ namespace MASIC.DatasetStats
 
             set
             {
-                if (value is object)
+                if (value != null)
                 {
                     mDatasetStatsSummaryFileName = value;
                 }
@@ -141,7 +141,7 @@ namespace MASIC.DatasetStats
             summaryStats = new DatasetSummaryStats();
             try
             {
-                if (scanStats is null)
+                if (scanStats == null)
                 {
                     ReportError("scanStats is Nothing; unable to continue in ComputeScanStatsSummary");
                     return false;
@@ -258,7 +258,7 @@ namespace MASIC.DatasetStats
         {
             try
             {
-                if (scanStats is null)
+                if (scanStats == null)
                 {
                     ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoFile");
                     return false;
@@ -360,7 +360,7 @@ namespace MASIC.DatasetStats
         {
             try
             {
-                if (scanStats is null)
+                if (scanStats == null)
                 {
                     ReportError("scanStats is Nothing; unable to continue in CreateDatasetInfoXML");
                     return string.Empty;
@@ -528,7 +528,7 @@ namespace MASIC.DatasetStats
             int datasetID = 0;
             try
             {
-                if (scanStats is null)
+                if (scanStats == null)
                 {
                     ReportError("scanStats is Nothing; unable to continue in CreateScanStatsFile");
                     return false;
@@ -677,7 +677,7 @@ namespace MASIC.DatasetStats
             DatasetSummaryStats summaryStats;
             try
             {
-                if (scanStats is null)
+                if (scanStats == null)
                 {
                     ReportError("scanStats is Nothing; unable to continue in UpdateDatasetStatsTextFile");
                     return false;

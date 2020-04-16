@@ -37,7 +37,7 @@ namespace MASIC
             int matchIndex;
             try
             {
-                if (arrayToSearch is null)
+                if (arrayToSearch == null)
                     return -1;
                 indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
@@ -195,7 +195,7 @@ namespace MASIC
             int matchIndex;
             try
             {
-                if (arrayToSearch is null)
+                if (arrayToSearch == null)
                     return -1;
                 indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
@@ -354,7 +354,7 @@ namespace MASIC
             int matchIndex;
             try
             {
-                if (arrayToSearch is null)
+                if (arrayToSearch == null)
                     return -1;
                 indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)

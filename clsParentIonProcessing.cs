@@ -488,19 +488,19 @@ namespace MASIC
                 {
                     var oldMZPointerArray = similarParentIonsData.MZPointerArray;
                     similarParentIonsData.MZPointerArray = new int[findSimilarIonsDataCount];
-                    if (oldMZPointerArray is object)
+                    if (oldMZPointerArray != null)
                         Array.Copy(oldMZPointerArray, similarParentIonsData.MZPointerArray, Math.Min(findSimilarIonsDataCount, oldMZPointerArray.Length));
                     var oldMzList = mzList;
                     mzList = new double[findSimilarIonsDataCount];
-                    if (oldMzList is object)
+                    if (oldMzList != null)
                         Array.Copy(oldMzList, mzList, Math.Min(findSimilarIonsDataCount, oldMzList.Length));
                     var oldIntensityPointerArray = intensityPointerArray;
                     intensityPointerArray = new int[findSimilarIonsDataCount];
-                    if (oldIntensityPointerArray is object)
+                    if (oldIntensityPointerArray != null)
                         Array.Copy(oldIntensityPointerArray, intensityPointerArray, Math.Min(findSimilarIonsDataCount, oldIntensityPointerArray.Length));
                     var oldIntensityList = intensityList;
                     intensityList = new double[findSimilarIonsDataCount];
-                    if (oldIntensityList is object)
+                    if (oldIntensityList != null)
                         Array.Copy(oldIntensityList, intensityList, Math.Min(findSimilarIonsDataCount, oldIntensityList.Length));
                 }
 

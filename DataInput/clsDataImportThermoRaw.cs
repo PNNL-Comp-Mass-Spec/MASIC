@@ -151,7 +151,7 @@ namespace MASIC.DataInput
                     return false;
                 }
 
-                if (xcaliburAccessor is null)
+                if (xcaliburAccessor == null)
                 {
                     ReportError("Error opening input data file: " + inputFileFullPath + " (xcaliburAccessor is Nothing)");
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
@@ -645,7 +645,7 @@ namespace MASIC.DataInput
 
         private void StoreExtendedHeaderInfo(clsDataOutput dataOutputHandler, clsScanInfo scanInfo, string entryName, string entryValue)
         {
-            if (entryValue is null)
+            if (entryValue == null)
             {
                 entryValue = string.Empty;
             }
@@ -665,9 +665,9 @@ namespace MASIC.DataInput
             bool saveItem;
             try
             {
-                if (statusEntries is null)
+                if (statusEntries == null)
                     return;
-                if (keyNameFilterList is object && keyNameFilterList.Count > 0)
+                if (keyNameFilterList != null && keyNameFilterList.Count > 0)
                 {
                     if (keyNameFilterList.Any(item => item.Length > 0))
                     {

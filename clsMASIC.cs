@@ -97,7 +97,8 @@ namespace MASIC
         private string mStatusMessage;
 
         #endregion
-        #region // TODO    /// <summary>
+        #region // TODO
+        /// <summary>
         /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
         /// Use ProgressSubtaskChanged when updating the sub task progress
         /// </summary>
@@ -181,7 +182,7 @@ namespace MASIC
         {
             get
             {
-                if (mMASICPeakFinder is object)
+                if (mMASICPeakFinder != null)
                 {
                     return mMASICPeakFinder.ProgramVersion;
                 }
@@ -202,7 +203,7 @@ namespace MASIC
 
             set
             {
-                if (value is null || value.Trim().Length == 0)
+                if (value == null || value.Trim().Length == 0)
                 {
                     Options.MASICStatusFilename = clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME;
                 }
@@ -1899,11 +1900,11 @@ namespace MASIC
             string messageWithoutCRLF;
             Options.StatusMessage = message;
             messageWithoutCRLF = Options.StatusMessage.Replace(ControlChars.NewLine, "; ");
-            if (ex is null)
+            if (ex == null)
             {
                 ex = new Exception("Error");
             }
-            else if (ex.Message is object && ex.Message.Length > 0 && !message.Contains(ex.Message))
+            else if (ex.Message != null && ex.Message.Length > 0 && !message.Contains(ex.Message))
             {
                 messageWithoutCRLF += "; " + ex.Message;
             }
@@ -1918,7 +1919,7 @@ namespace MASIC
                 ShowErrorMessage(source + ": " + messageWithoutCRLF, true);
             }
 
-            if (ex is object)
+            if (ex != null)
             {
                 Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
             }
@@ -1995,7 +1996,7 @@ namespace MASIC
 
                 Options.ReporterIons.UpdateMZIntensityFilterIgnoreRange();
                 LogMessage("Source data file: " + inputFilePath);
-                if (inputFilePath is null || inputFilePath.Length == 0)
+                if (inputFilePath == null || inputFilePath.Length == 0)
                 {
                     ShowErrorMessage("Input file name is empty");
                     SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidInputFilePath);
@@ -2136,7 +2137,7 @@ namespace MASIC
                     mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
                     if (!success)
                     {
-                        if (mStatusMessage is null || mStatusMessage.Length == 0)
+                        if (mStatusMessage == null || mStatusMessage.Length == 0)
                         {
                             mStatusMessage = "Unable to parse file; unknown error";
                         }

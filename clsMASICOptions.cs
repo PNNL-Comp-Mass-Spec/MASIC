@@ -128,7 +128,7 @@ namespace MASIC
 
         public clsCustomSICList.eCustomSICScanTypeConstants GetScanToleranceTypeFromText(string scanType)
         {
-            if (scanType is null)
+            if (scanType == null)
                 scanType = string.Empty;
             string scanTypeTrimmed = scanType.Trim();
             if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase))
@@ -295,7 +295,7 @@ namespace MASIC
                     WriteExtendedStatsIncludeScanFilterText = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsIncludeScanFilterText", WriteExtendedStatsIncludeScanFilterText);
                     WriteExtendedStatsStatusLog = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsStatusLog", WriteExtendedStatsStatusLog);
                     var filterList = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", string.Empty);
-                    if (filterList is object && filterList.Length > 0)
+                    if (filterList != null && filterList.Length > 0)
                     {
                         SetStatusLogKeyNameFilterList(filterList, ',');
                     }
@@ -484,7 +484,7 @@ namespace MASIC
             var writer = new XmlSettingsFileAccessor();
             try
             {
-                if (parameterFilePath is null || parameterFilePath.Length == 0)
+                if (parameterFilePath == null || parameterFilePath.Length == 0)
                 {
                     // No parameter file specified; unable to save
                     ReportError("Empty parameter file path sent to SaveParameterFileSettings");
@@ -620,7 +620,7 @@ namespace MASIC
                     lstMzTolerances.Add(mzSearchValue.MZToleranceDa.ToString());
                     lstScanCenters.Add(mzSearchValue.ScanOrAcqTimeCenter.ToString());
                     lstScanTolerances.Add(mzSearchValue.ScanOrAcqTimeTolerance.ToString());
-                    if (mzSearchValue.Comment is null)
+                    if (mzSearchValue.Comment == null)
                     {
                         lstComments.Add(string.Empty);
                     }
@@ -686,7 +686,7 @@ namespace MASIC
             try
             {
                 StatusLogKeyNameFilterList.Clear();
-                if (matchSpecList is object)
+                if (matchSpecList != null)
                 {
                     var query = (from item in matchSpecList
                                  select item).Distinct();

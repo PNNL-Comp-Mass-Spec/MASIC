@@ -85,7 +85,7 @@ namespace MASIC.DataInput
                     while (!reader.EndOfStream)
                     {
                         string dataLine = reader.ReadLine();
-                        if (dataLine is null)
+                        if (dataLine == null)
                             continue;
                         if (linesRead == 0 && !dataLine.Contains(Conversions.ToString(ControlChars.Tab)))
                         {
@@ -94,7 +94,7 @@ namespace MASIC.DataInput
                         }
 
                         var dataCols = dataLine.Split(delimiterList);
-                        if (dataCols is null || dataCols.Length <= 0)
+                        if (dataCols == null || dataCols.Length <= 0)
                             continue;
 
                         // This is the first non-blank line

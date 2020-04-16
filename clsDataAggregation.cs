@@ -30,7 +30,7 @@ namespace MASIC
             try
             {
                 double smallestDifference = double.MaxValue;
-                if (objMSSpectrum.IonsMZ is object && objMSSpectrum.IonCount > 0)
+                if (objMSSpectrum.IonsMZ != null && objMSSpectrum.IonCount > 0)
                 {
                     int indexFirst, indexLast;
                     if (SumIonsFindValueInRange(objMSSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out indexFirst, out indexLast))

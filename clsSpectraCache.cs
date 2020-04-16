@@ -311,14 +311,14 @@ namespace MASIC
             try
             {
                 var garbageCollect = default(bool);
-                if (mPageFileReader is object)
+                if (mPageFileReader != null)
                 {
                     mPageFileReader.Close();
                     mPageFileReader = null;
                     garbageCollect = true;
                 }
 
-                if (mPageFileWriter is object)
+                if (mPageFileWriter != null)
                 {
                     mPageFileWriter.Close();
                     mPageFileWriter = null;
@@ -337,7 +337,7 @@ namespace MASIC
                 // Ignore errors here
             }
 
-            if (mSpectrumByteOffset is null)
+            if (mSpectrumByteOffset == null)
             {
                 mSpectrumByteOffset = new Hashtable();
             }
@@ -402,7 +402,7 @@ namespace MASIC
             {
                 string filePathMatch = SPECTRUM_CACHE_FILE_PREFIX + "*" + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + "*";
                 var cacheDirectory = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())));
-                if (cacheDirectory is object)
+                if (cacheDirectory != null)
                 {
                     foreach (var candidateFile in cacheDirectory.GetFiles(filePathMatch))
                     {
@@ -427,11 +427,11 @@ namespace MASIC
             {
                 var oldSpectraPool = SpectraPool;
                 SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
-                if (oldSpectraPool is object)
+                if (oldSpectraPool != null)
                     Array.Copy(oldSpectraPool, SpectraPool, Math.Min(mMaximumPoolLength, oldSpectraPool.Length));
                 var oldSpectraPoolInfo = SpectraPoolInfo;
                 SpectraPoolInfo = new udtSpectraPoolInfoType[mMaximumPoolLength];
-                if (oldSpectraPoolInfo is object)
+                if (oldSpectraPoolInfo != null)
                     Array.Copy(oldSpectraPoolInfo, SpectraPoolInfo, Math.Min(mMaximumPoolLength, oldSpectraPoolInfo.Length));
                 for (int index = currentPoolLength; index <= mMaximumPoolLength - 1; index++)
                 {
@@ -479,7 +479,7 @@ namespace MASIC
             mDirectoryPathValidated = false;
             mCacheFileNameBase = string.Empty;
             ClosePageFile();
-            if (mSpectrumIndexInPool is null)
+            if (mSpectrumIndexInPool == null)
             {
                 mSpectrumIndexInPool = new Hashtable();
             }
@@ -494,7 +494,7 @@ namespace MASIC
             // '    mPoolAccessHistory.Clear()
             // 'End If
 
-            if (SpectraPool is null)
+            if (SpectraPool == null)
             {
                 SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
                 SpectraPoolInfo = new udtSpectraPoolInfoType[mMaximumPoolLength];
@@ -591,7 +591,7 @@ namespace MASIC
             {
                 // Scan not found; create a new, blank mass spectrum
                 // Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
-                if (SpectraPool[targetPoolIndex] is null)
+                if (SpectraPool[targetPoolIndex] == null)
                 {
                     SpectraPool[targetPoolIndex] = new clsMSSpectrum(scanNumber);
                 }
@@ -669,7 +669,7 @@ namespace MASIC
             // Validates that we can read and write from a Page file
             // Opens the page file reader and writer if not yet opened
 
-            if (mPageFileReader is object)
+            if (mPageFileReader != null)
             {
                 return true;
             }

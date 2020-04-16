@@ -28,14 +28,14 @@ namespace MASIC
         {
             get
             {
-                if (mCustomSICListFileName is null)
+                if (mCustomSICListFileName == null)
                     return string.Empty;
                 return mCustomSICListFileName;
             }
 
             set
             {
-                if (value is null)
+                if (value == null)
                 {
                     mCustomSICListFileName = string.Empty;
                 }
@@ -432,7 +432,7 @@ namespace MASIC
 
         public void ValidateCustomSICList()
         {
-            if (CustomMZSearchValues is null || CustomMZSearchValues.Count == 0)
+            if (CustomMZSearchValues == null || CustomMZSearchValues.Count == 0)
             {
                 return;
             }
@@ -477,7 +477,7 @@ namespace MASIC
 
         public override string ToString()
         {
-            if (CustomMZSearchValues is null || CustomMZSearchValues.Count == 0)
+            if (CustomMZSearchValues == null || CustomMZSearchValues.Count == 0)
             {
                 return "0 custom m/z search values";
             }

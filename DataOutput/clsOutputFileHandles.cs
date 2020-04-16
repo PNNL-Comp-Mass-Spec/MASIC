@@ -13,7 +13,7 @@ namespace MASIC.DataOutput
 
         public void CloseScanStats()
         {
-            if (ScanStats is object)
+            if (ScanStats != null)
             {
                 ScanStats.Close();
                 ScanStats = null;
@@ -25,13 +25,13 @@ namespace MASIC.DataOutput
             try
             {
                 CloseScanStats();
-                if (SICDataFile is object)
+                if (SICDataFile != null)
                 {
                     SICDataFile.Close();
                     SICDataFile = null;
                 }
 
-                if (XMLFileForSICs is object)
+                if (XMLFileForSICs != null)
                 {
                     XMLFileForSICs.Close();
                     XMLFileForSICs = null;

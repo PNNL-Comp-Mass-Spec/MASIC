@@ -97,7 +97,7 @@ namespace MASIC.DataOutput
                 }
 
                 var writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs;
-                if (writer is null)
+                if (writer == null)
                     return false;
 
                 // Initialize the StringBuilder objects
@@ -215,7 +215,7 @@ namespace MASIC.DataOutput
 
                         lastGoodLoc = "Populate scanIntervalList";
                         string scanIntervalList = string.Empty;
-                        if (SICDataScanIntervals is object)
+                        if (SICDataScanIntervals != null)
                         {
                             for (int scanIntervalIndex = 0; scanIntervalIndex <= sicDetails.SICDataCount - 1; scanIntervalIndex++)
                             {
@@ -335,7 +335,7 @@ namespace MASIC.DataOutput
                             {
                                 lastGoodLoc = "Populate sbPeakYDataSmoothed";
                                 sbPeakYDataSmoothed.Length = 0;
-                                if (smoothedYDataSubset.Data is object && smoothedYDataSubset.DataCount > 0)
+                                if (smoothedYDataSubset.Data != null && smoothedYDataSubset.DataCount > 0)
                                 {
                                     for (int index = 0; index <= smoothedYDataSubset.DataCount - 1; index++)
                                         sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString() + ",");
@@ -393,7 +393,7 @@ namespace MASIC.DataOutput
         public bool XMLOutputFileFinalize(clsDataOutput dataOutputHandler, clsScanList scanList, clsSpectraCache spectraCache, clsProcessingStats processingStats, float processingTimeSec)
         {
             var writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs;
-            if (writer is null)
+            if (writer == null)
                 return false;
             try
             {
@@ -611,7 +611,7 @@ namespace MASIC.DataOutput
                     while (!reader.EndOfStream)
                     {
                         string dataLine = reader.ReadLine();
-                        if (dataLine is null)
+                        if (dataLine == null)
                             continue;
                         string dataLineLCase = dataLine.Trim().ToLower();
                         if (dataLineLCase.StartsWith(PARENT_ION_TAG_START_LCASE))

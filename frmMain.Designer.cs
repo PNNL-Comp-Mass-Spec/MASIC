@@ -15,7 +15,7 @@ namespace MASIC
         {
             try
             {
-                if (disposing && components is object)
+                if (disposing && components != null)
                 {
                     components.Dispose();
                 }

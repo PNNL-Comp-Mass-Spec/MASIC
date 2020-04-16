@@ -147,7 +147,7 @@ namespace MASIC
             var oTarget = new clsMRMScanInfo();
             oTarget.ParentIonMZ = parentIonMZ;
             oTarget.MRMMassCount = oSource.MRMMassList.Count;
-            if (oSource.MRMMassList is null)
+            if (oSource.MRMMassList == null)
             {
                 oTarget.MRMMassList = new List<udtMRMMassRangeType>();
             }
@@ -167,7 +167,7 @@ namespace MASIC
             var oTarget = new clsMRMScanInfo();
             oTarget.ParentIonMZ = oSource.ParentIonMZ;
             oTarget.MRMMassCount = oSource.MRMMassCount;
-            if (oSource.MRMMassList is null)
+            if (oSource.MRMMassList == null)
             {
                 oTarget.MRMMassList = new List<udtMRMMassRangeType>();
             }
@@ -207,7 +207,7 @@ namespace MASIC
             try
             {
                 // Only write this data if 1 or more fragmentation spectra are of type SRM
-                if (mrmSettings is null || mrmSettings.Count == 0)
+                if (mrmSettings == null || mrmSettings.Count == 0)
                 {
                     success = true;
                     break;
@@ -383,12 +383,12 @@ namespace MASIC
             }
             finally
             {
-                if (dataWriter is object)
+                if (dataWriter != null)
                 {
                     dataWriter.Close();
                 }
 
-                if (crosstabWriter is object)
+                if (crosstabWriter != null)
                 {
                     crosstabWriter.Close();
                 }

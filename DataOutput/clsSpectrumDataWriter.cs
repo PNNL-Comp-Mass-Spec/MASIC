@@ -91,9 +91,9 @@ namespace MASIC.DataOutput
                     }
                 }
 
-                if (dataWriter is object)
+                if (dataWriter != null)
                     dataWriter.Close();
-                if (scanInfoWriter is object)
+                if (scanInfoWriter != null)
                     scanInfoWriter.Close();
                 return true;
             }
