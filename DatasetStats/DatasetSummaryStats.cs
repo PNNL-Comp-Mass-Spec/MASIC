@@ -5,7 +5,9 @@ namespace MASIC.DatasetStats
     public class DatasetSummaryStats
     {
         public double ElutionTimeMax { get; set; }
+
         public SummaryStatDetails MSStats { get; private set; }
+
         public SummaryStatDetails MSnStats { get; private set; }
 
         /// <summary>

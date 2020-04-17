@@ -101,16 +101,20 @@
         {
             ScanNumber = 0;
             ScanType = 0;
+
             ScanFilterText = string.Empty;
             ScanTypeName = string.Empty;
+
             ElutionTime = "0";
             DriftTimeMsec = "0";
             TotalIonIntensity = "0";
             BasePeakIntensity = "0";
             BasePeakMZ = "0";
             BasePeakSignalToNoiseRatio = "0";
+
             IonCount = 0;
             IonCountRaw = 0;
+
             MzMin = 0;
             MzMax = 0;
         }

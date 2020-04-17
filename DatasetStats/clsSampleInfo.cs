@@ -23,7 +23,9 @@
 
         public bool HasData()
         {
-            if (!string.IsNullOrWhiteSpace(SampleName) || !string.IsNullOrWhiteSpace(Comment1) || !string.IsNullOrWhiteSpace(Comment2))
+            if (!string.IsNullOrWhiteSpace(SampleName) ||
+                !string.IsNullOrWhiteSpace(Comment1) ||
+                !string.IsNullOrWhiteSpace(Comment2))
             {
                 return true;
             }

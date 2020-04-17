@@ -26,8 +26,10 @@ namespace MASIC.DataOutput
         /// </summary>
         /// <remarks>The order of the values defines the appropriate output order for the names</remarks>
         private readonly List<KeyValuePair<string, int>> mExtendedHeaderNameMap;
+
         private readonly clsMASICOptions mOptions;
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -37,14 +39,21 @@ namespace MASIC.DataOutput
             mOptions = masicOptions;
         }
 
-        private IEnumerable<string> ConcatenateExtendedStats(IEnumerable<int> nonConstantHeaderIDs, int datasetID, int scanNumber, IReadOnlyDictionary<int, string> extendedHeaderInfo)
+        private IEnumerable<string> ConcatenateExtendedStats(
+            IEnumerable<int> nonConstantHeaderIDs,
+            int datasetID,
+            int scanNumber,
+            IReadOnlyDictionary<int, string> extendedHeaderInfo)
         {
-            var dataValues = new List<string>() { datasetID.ToString(), scanNumber.ToString() };
+            var dataValues = new List<string>()
+            {
+                datasetID.ToString(),
+                scanNumber.ToString()
+            };
+
             if (extendedHeaderInfo != null && nonConstantHeaderIDs != null)
             {
-                foreach (var headerID in from item in nonConstantHeaderIDs
-                                         orderby item
-                                         select item)
+                foreach (var headerID in from item in nonConstantHeaderIDs orderby item select item)
                 {
                     string value = null;
                     if (extendedHeaderInfo.TryGetValue(headerID, out value))
@@ -93,7 +102,12 @@ namespace MASIC.DataOutput
         public List<string> ConstructExtendedStatsHeaders()
         {
             var cTrimChars = new char[] { ':', ' ' };
-            var headerNames = new List<string>() { "Dataset", "ScanNumber" };
+
+            var headerNames = new List<string>()
+            {
+                "Dataset",
+                "ScanNumber"
+            };
 
             // Populate headerNames
 
@@ -103,20 +117,23 @@ namespace MASIC.DataOutput
             }
 
             var headerNamesByID = new Dictionary<int, string>();
+
             foreach (var item in mExtendedHeaderNameMap)
                 headerNamesByID.Add(item.Value, item.Key);
-            foreach (var headerItem in from item in headerNamesByID
-                                       orderby item.Key
-                                       select item.Value)
+
+            foreach (var headerItem in from item in headerNamesByID orderby item.Key select item.Value)
                 headerNames.Add(headerItem.TrimEnd(cTrimChars));
+
             return headerNames;
         }
 
         private Dictionary<int, string> DeepCopyHeaderInfoDictionary(Dictionary<int, string> sourceTable)
         {
             var newTable = new Dictionary<int, string>();
+
             foreach (var item in sourceTable)
                 newTable.Add(item.Key, item.Value);
+
             return newTable;
         }
 
@@ -132,16 +149,25 @@ namespace MASIC.DataOutput
         /// Each line is in the form ParameterName_ColumnDelimiter_ParameterValue
         /// </returns>
         /// <remarks>mExtendedHeaderNameMap is updated so that constant header values are removed from it</remarks>
-        public string ExtractConstantExtendedHeaderValues(out List<int> nonConstantHeaderIDs, IList<clsScanInfo> surveyScans, IList<clsScanInfo> fragScans, char cColDelimiter)
+        public string ExtractConstantExtendedHeaderValues(
+            out List<int> nonConstantHeaderIDs,
+            IList<clsScanInfo> surveyScans,
+            IList<clsScanInfo> fragScans,
+            char cColDelimiter)
         {
             var cTrimChars = new char[] { ':', ' ' };
+
             string value = string.Empty;
 
             // Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
             Dictionary<int, string> consolidatedValuesByID;
+
             var constantHeaderIDs = new List<int>();
+
             int scanFilterTextHeaderID;
+
             nonConstantHeaderIDs = new List<int>();
+
             if (mExtendedHeaderNameMap.Count == 0)
             {
                 return string.Empty;
@@ -150,6 +176,7 @@ namespace MASIC.DataOutput
             // Initialize nonConstantHeaderIDs
             for (int i = 0; i <= mExtendedHeaderNameMap.Count - 1; i++)
                 nonConstantHeaderIDs.Add(i);
+
             if (!mOptions.ConsolidateConstantExtendedHeaderValues)
             {
                 // Do not try to consolidate anything
@@ -245,13 +272,17 @@ namespace MASIC.DataOutput
             // Need to first populate constantHeaderIDs with the ID values and sort the list so that the values are
             // stored in consolidatedValueList in the correct order
 
-            var consolidatedValueList = new List<string>() { "Setting" + cColDelimiter + "Value" };
+            var consolidatedValueList = new List<string>()
+            {
+                "Setting" + cColDelimiter + "Value"
+            };
+
             foreach (var item in consolidatedValuesByID)
                 constantHeaderIDs.Add(item.Key);
+
             var keysToRemove = new List<string>();
-            foreach (var headerId in from item in constantHeaderIDs
-                                     orderby item
-                                     select item)
+
+            foreach (var headerId in from item in constantHeaderIDs orderby item select item)
             {
                 foreach (var item in mExtendedHeaderNameMap)
                 {
@@ -284,6 +315,7 @@ namespace MASIC.DataOutput
             // Populate nonConstantHeaderIDs with the ID values in mExtendedHeaderNameMap
             foreach (var item in mExtendedHeaderNameMap)
                 nonConstantHeaderIDs.Add(item.Value);
+
             return string.Join(Environment.NewLine, consolidatedValueList);
         }
 
@@ -320,20 +352,30 @@ namespace MASIC.DataOutput
             return currentScan;
         }
 
-        public bool SaveExtendedScanStatsFiles(clsScanList scanList, string inputFileName, string outputDirectoryPath, bool includeHeaders)
+        public bool SaveExtendedScanStatsFiles(
+            clsScanList scanList,
+            string inputFileName,
+            string outputDirectoryPath,
+            bool includeHeaders)
         {
             // Writes out a flat file containing the extended scan stats
 
             string extendedConstantHeaderOutputFilePath;
             string extendedNonConstantHeaderOutputFilePath = string.Empty;
+
             const char cColDelimiter = '\t';
+
             List<int> nonConstantHeaderIDs = null;
+
             try
             {
                 UpdateProgress(0, "Saving extended scan stats to flat file");
+
                 extendedConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile);
                 extendedNonConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ScanStatsExtendedFlatFile);
+
                 ReportMessage("Saving extended scan stats flat file to disk: " + Path.GetFileName(extendedNonConstantHeaderOutputFilePath));
+
                 if (mExtendedHeaderNameMap.Count == 0)
                 {
                     // No extended stats to write; exit the function
@@ -365,8 +407,10 @@ namespace MASIC.DataOutput
                     for (int scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
                     {
                         var currentScan = GetScanByMasterScanIndex(scanList, scanIndex);
+
                         var dataColumns = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetID, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo);
                         writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
+
                         if (scanIndex % 100 == 0)
                         {
                             UpdateProgress(Convert.ToInt16(scanIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
@@ -387,10 +431,11 @@ namespace MASIC.DataOutput
         public int GetExtendedHeaderInfoIdByName(string keyName)
         {
             int idValue;
+
             if (TryGetExtendedHeaderInfoValue(keyName, out idValue))
             {
+                // Match found
             }
-            // Match found
             else
             {
                 // Match not found; add it
@@ -403,10 +448,9 @@ namespace MASIC.DataOutput
 
         private bool TryGetExtendedHeaderInfoValue(string keyName, out int headerIndex)
         {
-            var query = (from item in mExtendedHeaderNameMap
-                         where (item.Key ?? "") == (keyName ?? "")
-                         select item.Value).ToList();
+            var query = (from item in mExtendedHeaderNameMap where (item.Key ?? "") == (keyName ?? "") select item.Value).ToList();
             headerIndex = 0;
+
             if (query.Count == 0)
             {
                 return false;

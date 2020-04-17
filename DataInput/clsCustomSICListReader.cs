@@ -35,9 +35,20 @@ namespace MASIC.DataInput
 
         #endregion
 
-        public static string GetCustomMZFileColumnHeaders(string cColDelimiter = ", ", bool includeAndBeforeLastItem = true)
+        public static string GetCustomMZFileColumnHeaders(
+                                                          string cColDelimiter = ", ",
+                                                          bool includeAndBeforeLastItem = true)
         {
-            var headerNames = new List<string>() { CUSTOM_SIC_COLUMN_MZ, CUSTOM_SIC_COLUMN_MZ_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_CENTER, CUSTOM_SIC_COLUMN_SCAN_TOLERANCE, CUSTOM_SIC_COLUMN_SCAN_TIME, CUSTOM_SIC_COLUMN_TIME_TOLERANCE };
+            var headerNames = new List<string>()
+            {
+                CUSTOM_SIC_COLUMN_MZ,
+                CUSTOM_SIC_COLUMN_MZ_TOLERANCE,
+                CUSTOM_SIC_COLUMN_SCAN_CENTER,
+                CUSTOM_SIC_COLUMN_SCAN_TOLERANCE,
+                CUSTOM_SIC_COLUMN_SCAN_TIME,
+                CUSTOM_SIC_COLUMN_TIME_TOLERANCE
+            };
+
             if (includeAndBeforeLastItem)
             {
                 headerNames.Add("and " + CUSTOM_SIC_COLUMN_COMMENT);
@@ -62,16 +73,19 @@ namespace MASIC.DataInput
         {
             var delimiterList = new char[] { '\t' };
             var forceAcquisitionTimeMode = default(bool);
+
             try
             {
                 bool mzHeaderFound = false;
                 bool scanTimeHeaderFound = false;
                 bool timeToleranceHeaderFound = false;
+
                 mCustomSICList.ResetMzSearchValues();
 
                 // eColumnMapping will be initialized when the headers are read
                 int[] eColumnMapping;
                 eColumnMapping = new int[0];
+
                 if (!File.Exists(customSICValuesFileName))
                 {
                     // Custom SIC file not found
@@ -89,6 +103,7 @@ namespace MASIC.DataInput
                         string dataLine = reader.ReadLine();
                         if (dataLine == null)
                             continue;
+
                         if (linesRead == 0 && !dataLine.Contains("\t"))
                         {
                             // Split on commas instead of tab characters
@@ -96,11 +111,13 @@ namespace MASIC.DataInput
                         }
 
                         var dataCols = dataLine.Split(delimiterList);
+
                         if (dataCols == null || dataCols.Length <= 0)
                             continue;
 
                         // This is the first non-blank line
                         linesRead += 1;
+
                         if (linesRead == 1)
                         {
                             // Initialize eColumnMapping, setting the value for each column to -1, indicating the column is not present
@@ -154,6 +171,7 @@ namespace MASIC.DataInput
                             {
                                 string errorMessage = "Custom M/Z List file " + customSICValuesFileName + "does not have a column header named " + CUSTOM_SIC_COLUMN_MZ + " in the first row; this header is required (valid column headers are: " + GetCustomMZFileColumnHeaders() + ")";
                                 ReportError(errorMessage);
+
                                 mCustomSICList.CustomMZSearchValues.Clear();
                                 return false;
                             }
@@ -178,9 +196,11 @@ namespace MASIC.DataInput
                         }
 
                         var mzSearchSpec = new clsCustomMZSearchSpec(0);
+
                         mzSearchSpec.MZToleranceDa = 0;
                         mzSearchSpec.ScanOrAcqTimeCenter = 0;
                         mzSearchSpec.ScanOrAcqTimeTolerance = 0;
+
                         for (int colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                         {
                             if (colIndex >= eColumnMapping.Length)

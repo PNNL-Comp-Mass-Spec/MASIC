@@ -6,11 +6,22 @@ namespace MASIC.DataInput
 {
     public class clsDataImportMGFandCDF : clsDataImport
     {
-        public clsDataImportMGFandCDF(clsMASICOptions masicOptions, MASICPeakFinder.clsMASICPeakFinder peakFinder, clsParentIonProcessing parentIonProcessor, clsScanTracking scanTracking) : base(masicOptions, peakFinder, parentIonProcessor, scanTracking)
+        public clsDataImportMGFandCDF(
+            clsMASICOptions masicOptions,
+            MASICPeakFinder.clsMASICPeakFinder peakFinder,
+            clsParentIonProcessing parentIonProcessor,
+            clsScanTracking scanTracking)
+            : base(masicOptions, peakFinder, parentIonProcessor, scanTracking)
         {
         }
 
-        public bool ExtractScanInfoFromMGFandCDF(string filePath, clsScanList scanList, clsSpectraCache spectraCache, DataOutput.clsDataOutput dataOutputHandler, bool keepRawSpectra, bool keepMSMSSpectra)
+        public bool ExtractScanInfoFromMGFandCDF(
+            string filePath,
+            clsScanList scanList,
+            clsSpectraCache spectraCache,
+            DataOutput.clsDataOutput dataOutputHandler,
+            bool keepRawSpectra,
+            bool keepMSMSSpectra)
         {
             // Returns True if Success, False if failure
             // Note: This function assumes filePath exists
@@ -21,12 +32,15 @@ namespace MASIC.DataInput
             // then the two files will be looked for separately
 
             var scanTime = default(double);
+
             var objCDFReader = new NetCDFReader.clsMSNetCdf();
             var objMGFReader = new MSDataFileReader.clsMGFFileReader();
+
             try
             {
                 Console.Write("Reading CDF/MGF data files ");
                 ReportMessage("Reading CDF/MGF data files");
+
                 UpdateProgress(0, "Opening data file: " + Environment.NewLine + Path.GetFileName(filePath));
 
                 // Obtain the full path to the file
@@ -36,8 +50,10 @@ namespace MASIC.DataInput
                 // Make sure the extension for mgfInputFilePathFull is .MGF
                 mgfInputFilePathFull = Path.ChangeExtension(mgfInputFilePathFull, AGILENT_MSMS_FILE_EXTENSION);
                 string cdfInputFilePathFull = Path.ChangeExtension(mgfInputFilePathFull, AGILENT_MS_FILE_EXTENSION);
+
                 int datasetID = mOptions.SICOptions.DatasetID;
                 var sicOptions = mOptions.SICOptions;
+
                 bool success = UpdateDatasetFileStats(mgfFileInfo, datasetID);
                 mDatasetFileInfo.ScanCount = 0;
 
@@ -58,6 +74,7 @@ namespace MASIC.DataInput
 
                 int msScanCount = objCDFReader.GetScanCount();
                 mDatasetFileInfo.ScanCount = msScanCount;
+
                 if (msScanCount <= 0)
                 {
                     // No scans found
@@ -68,6 +85,7 @@ namespace MASIC.DataInput
 
                 // Reserve memory for all of the Survey Scan data
                 scanList.Initialize();
+
                 UpdateProgress("Reading CDF/MGF data (" + msScanCount.ToString() + " scans)" + Environment.NewLine + Path.GetFileName(filePath));
                 ReportMessage("Reading CDF/MGF data; Total MS scan count: " + msScanCount.ToString());
 
@@ -78,7 +96,9 @@ namespace MASIC.DataInput
                 {
                     int scanNumber;
                     double scanTotalIntensity, massMin, massMax;
+
                     success = objCDFReader.GetScanInfo(msScanIndex, out scanNumber, out scanTotalIntensity, out scanTime, out massMin, out massMax);
+
                     if (msScanIndex == 0 && scanNumber == 0)
                     {
                         scanNumberCorrection = 1;
@@ -94,6 +114,7 @@ namespace MASIC.DataInput
 
                     if (scanNumberCorrection > 0)
                         scanNumber += scanNumberCorrection;
+
                     if (mScanTracking.CheckScanInRange(scanNumber, scanTime, sicOptions))
                     {
                         var newSurveyScan = new clsScanInfo();
@@ -112,39 +133,53 @@ namespace MASIC.DataInput
 
                         // Survey scans typically lead to multiple parent ions; we do not record them here
                         newSurveyScan.FragScanInfo.ParentIonInfoIndex = -1;
+
                         newSurveyScan.ScanHeaderText = string.Empty;
                         newSurveyScan.ScanTypeName = "MS";
+
                         scanList.SurveyScans.Add(newSurveyScan);
+
                         double[] mzData = null;
                         double[] intensityData = null;
                         int intIonCount;
-                        success = objCDFReader.GetMassSpectrum(msScanIndex, out mzData, out intensityData, out intIonCount, out _);
+
+                        success = objCDFReader.GetMassSpectrum(msScanIndex, out mzData,
+                                                               out intensityData,
+                                                               out intIonCount, out _);
+
                         if (success && intIonCount > 0)
                         {
                             var msSpectrum = new clsMSSpectrum(scanNumber, mzData, intensityData, intIonCount);
-                            double mzMin;
-                            double mzMax;
+
+                            double mzMin, mzMax;
                             double msDataResolution;
+
                             newSurveyScan.IonCount = msSpectrum.IonCount;
                             newSurveyScan.IonCountRaw = newSurveyScan.IonCount;
 
                             // Find the base peak ion mass and intensity
-                            newSurveyScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity, out var basePeakIonIntensity, out mzMin, out mzMax);
+                            newSurveyScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ,
+                                msSpectrum.IonsIntensity,
+                                out var basePeakIonIntensity,
+                                out mzMin, out mzMax);
                             newSurveyScan.BasePeakIonIntensity = basePeakIonIntensity;
 
                             // Determine the minimum positive intensity in this scan
                             newSurveyScan.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
+
                             if (sicOptions.SICToleranceIsPPM)
                             {
                                 // Define MSDataResolution based on the tolerance value that will be used at the lowest m/z in this spectrum, divided by COMPRESS_TOLERANCE_DIVISOR
                                 // However, if the lowest m/z value is < 100, then use 100 m/z
                                 if (mzMin < 100)
                                 {
-                                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) / sicOptions.CompressToleranceDivisorForPPM;
+                                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, 100) /
+                                        sicOptions.CompressToleranceDivisorForPPM;
                                 }
                                 else
                                 {
-                                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, mzMin) / sicOptions.CompressToleranceDivisorForPPM;
+                                    msDataResolution = clsParentIonProcessing.GetParentIonToleranceDa(sicOptions, mzMin) /
+                                        sicOptions.CompressToleranceDivisorForPPM;
                                 }
                             }
                             else
@@ -152,7 +187,14 @@ namespace MASIC.DataInput
                                 msDataResolution = sicOptions.SICTolerance / sicOptions.CompressToleranceDivisorForDa;
                             }
 
-                            mScanTracking.ProcessAndStoreSpectrum(newSurveyScan, this, spectraCache, msSpectrum, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, clsMASIC.DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD, sicOptions.CompressMSSpectraData, msDataResolution, keepRawSpectra);
+                            mScanTracking.ProcessAndStoreSpectrum(
+                                newSurveyScan, this,
+                                spectraCache, msSpectrum,
+                                sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                                clsMASIC.DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD,
+                                sicOptions.CompressMSSpectraData,
+                                msDataResolution,
+                                keepRawSpectra);
                         }
                         else
                         {
@@ -189,13 +231,19 @@ namespace MASIC.DataInput
 
                 // Record the current memory usage (before we close the .CDF file)
                 OnUpdateMemoryUsage();
+
                 objCDFReader.CloseMSCdfFile();
 
                 // We loaded all of the survey scan data above
                 // We can now initialize .MasterScanOrder()
                 int lastSurveyScanIndex = 0;
+
                 scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex);
-                var surveyScansRecorded = new SortedSet<int>() { lastSurveyScanIndex };
+
+                var surveyScansRecorded = new SortedSet<int>()
+                {
+                    lastSurveyScanIndex
+                };
 
                 // Reset scanNumberCorrection; we might also apply it to MS/MS data
                 scanNumberCorrection = 0;
@@ -207,7 +255,9 @@ namespace MASIC.DataInput
                     bool fragScanFound = objMGFReader.ReadNextSpectrum(out spectrumInfo);
                     if (!fragScanFound)
                         break;
+
                     mDatasetFileInfo.ScanCount += 1;
+
                     if (spectrumInfo.ScanNumber < scanList.SurveyScans[lastSurveyScanIndex].ScanNumber)
                     {
                         // The scan number for the current MS/MS spectrum is less than the last survey scan index scan number
@@ -240,8 +290,10 @@ namespace MASIC.DataInput
                                 foreach (var fragScan in scanList.FragScans)
                                 {
                                     fragScan.ScanNumber += scanNumberCorrection;
-                                    float scanTimeInterpolated = InterpolateRTandFragScanNumber(scanList.SurveyScans, 0, fragScan.ScanNumber, out var fragScanIterationOut);
+                                    float scanTimeInterpolated = InterpolateRTandFragScanNumber(
+                                        scanList.SurveyScans, 0, fragScan.ScanNumber, out var fragScanIterationOut);
                                     fragScan.FragScanInfo.FragScanNumber = fragScanIterationOut;
+
                                     fragScan.ScanTime = Convert.ToSingle(scanTimeInterpolated);
                                 }
 
@@ -261,7 +313,9 @@ namespace MASIC.DataInput
                     }
 
                     int fragScanIteration;
-                    scanTime = InterpolateRTandFragScanNumber(scanList.SurveyScans, lastSurveyScanIndex, spectrumInfo.ScanNumber, out fragScanIteration);
+
+                    scanTime = InterpolateRTandFragScanNumber(
+                        scanList.SurveyScans, lastSurveyScanIndex, spectrumInfo.ScanNumber, out fragScanIteration);
 
                     // Make sure this fragmentation scan isn't present yet in scanList.FragScans
                     // This can occur in Agilent .MGF files if the scan is listed both singly and grouped with other MS/MS scans
@@ -283,7 +337,8 @@ namespace MASIC.DataInput
 
                     // See if lastSurveyScanIndex needs to be updated
                     // At the same time, populate .MasterScanOrder
-                    while (lastSurveyScanIndex < scanList.SurveyScans.Count - 1 && spectrumInfo.ScanNumber > scanList.SurveyScans[lastSurveyScanIndex + 1].ScanNumber)
+                    while (lastSurveyScanIndex < scanList.SurveyScans.Count - 1 &&
+                           spectrumInfo.ScanNumber > scanList.SurveyScans[lastSurveyScanIndex + 1].ScanNumber)
                     {
                         lastSurveyScanIndex += 1;
 
@@ -291,30 +346,39 @@ namespace MASIC.DataInput
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
                         {
                             surveyScansRecorded.Add(lastSurveyScanIndex);
-                            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex);
+                            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan,
+                                lastSurveyScanIndex);
                         }
                     }
 
-                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count, spectrumInfo.ScanNumber, Convert.ToSingle(scanTime));
+                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count,
+                        spectrumInfo.ScanNumber, Convert.ToSingle(scanTime));
+
                     var newFragScan = new clsScanInfo();
                     newFragScan.ScanNumber = spectrumInfo.ScanNumber;
                     newFragScan.ScanTime = Convert.ToSingle(scanTime);
                     newFragScan.FragScanInfo.FragScanNumber = fragScanIteration;
                     newFragScan.FragScanInfo.MSLevel = 2;
                     newFragScan.MRMScanInfo.MRMMassCount = 0;
+
                     newFragScan.ScanHeaderText = string.Empty;
                     newFragScan.ScanTypeName = "MSn";
+
                     scanList.FragScans.Add(newFragScan);
+
                     var msSpectrum = new clsMSSpectrum(newFragScan.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount);
+
                     if (spectrumInfo.DataCount > 0)
                     {
                         newFragScan.IonCount = msSpectrum.IonCount;
                         newFragScan.IonCountRaw = newFragScan.IonCount;
-                        double mzMin;
-                        double mzMax;
+
+                        double mzMin, mzMax;
 
                         // Find the base peak ion mass and intensity
-                        newFragScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity, out var basePeakIonIntensity, out mzMin, out mzMax);
+                        newFragScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
+                                                                    out var basePeakIonIntensity,
+                                                                    out mzMin, out mzMax);
                         newFragScan.BasePeakIonIntensity = basePeakIonIntensity;
 
                         // Compute the total scan intensity
@@ -324,9 +388,18 @@ namespace MASIC.DataInput
 
                         // Determine the minimum positive intensity in this scan
                         newFragScan.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
+
                         double msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
                         bool keepRawSpectrum = keepRawSpectra && keepMSMSSpectra;
-                        mScanTracking.ProcessAndStoreSpectrum(newFragScan, this, spectraCache, msSpectrum, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD, sicOptions.CompressMSMSSpectraData, msDataResolution, keepRawSpectrum);
+
+                        mScanTracking.ProcessAndStoreSpectrum(
+                            newFragScan, this,
+                            spectraCache, msSpectrum,
+                            sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions,
+                            clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD,
+                            sicOptions.CompressMSMSSpectraData,
+                            msDataResolution,
+                            keepRawSpectrum);
                     }
                     else
                     {
@@ -335,7 +408,8 @@ namespace MASIC.DataInput
                         newFragScan.TotalIonIntensity = 0;
                     }
 
-                    mParentIonProcessor.AddUpdateParentIons(scanList, lastSurveyScanIndex, spectrumInfo.ParentIonMZ, scanList.FragScans.Count - 1, spectraCache, sicOptions);
+                    mParentIonProcessor.AddUpdateParentIons(scanList, lastSurveyScanIndex, spectrumInfo.ParentIonMZ,
+                                                            scanList.FragScans.Count - 1, spectraCache, sicOptions);
 
                     // Note: We need to take msScanCount * 2, in addition to adding msScanCount to lastSurveyScanIndex, since we have to read two different files
                     if (msScanCount > 1)
@@ -364,6 +438,7 @@ namespace MASIC.DataInput
 
                 // Record the current memory usage (before we close the .MGF file)
                 OnUpdateMemoryUsage();
+
                 objMGFReader.CloseFile();
 
                 // Check for any other survey scans that need to be added to MasterScanOrder
@@ -381,6 +456,7 @@ namespace MASIC.DataInput
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
                         {
                             surveyScansRecorded.Add(lastSurveyScanIndex);
+
                             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex);
                         }
                     }
@@ -394,6 +470,7 @@ namespace MASIC.DataInput
                 {
                     var eScanType = scanList.MasterScanOrder[scanIndex].ScanType;
                     clsScanInfo currentScan;
+
                     if (eScanType == clsScanList.eScanTypeConstants.SurveyScan)
                     {
                         // Survey scan
@@ -409,6 +486,7 @@ namespace MASIC.DataInput
                 }
 
                 Console.WriteLine();
+
                 return success;
             }
             catch (Exception ex)
@@ -418,18 +496,26 @@ namespace MASIC.DataInput
             }
         }
 
-        private double FindBasePeakIon(IReadOnlyList<double> mzList, IReadOnlyList<double> ionIntensity, out double basePeakIonIntensity, out double mzMin, out double mzMax)
+        private double FindBasePeakIon(
+            IReadOnlyList<double> mzList,
+            IReadOnlyList<double> ionIntensity,
+            out double basePeakIonIntensity,
+            out double mzMin,
+            out double mzMax)
         {
             // Finds the base peak ion
             // Also determines the minimum and maximum m/z values in mzList
             int basePeakIndex;
             int dataIndex;
+
             mzMin = 0;
             mzMax = 0;
+
             try
             {
                 mzMin = mzList[0];
                 mzMax = mzList[0];
+
                 basePeakIndex = 0;
                 for (dataIndex = 0; dataIndex <= mzList.Count - 1; dataIndex++)
                 {
@@ -470,10 +556,16 @@ namespace MASIC.DataInput
         /// <param name="fragScanNumber"></param>
         /// <param name="fragScanIteration"></param>
         /// <returns>Closest elution time</returns>
-        private float InterpolateRTandFragScanNumber(IList<clsScanInfo> surveyScans, int lastSurveyScanIndex, int fragScanNumber, out int fragScanIteration)
+        private float InterpolateRTandFragScanNumber(
+            IList<clsScanInfo> surveyScans,
+            int lastSurveyScanIndex,
+            int fragScanNumber,
+            out int fragScanIteration)
         {
             var elutionTime = default(float);
+
             fragScanIteration = 1;
+
             try
             {
                 // Decrement lastSurveyScanIndex if the corresponding SurveyScan's scan number is larger than fragScanNumber
@@ -485,6 +577,7 @@ namespace MASIC.DataInput
                 while (lastSurveyScanIndex < surveyScans.Count - 1 && surveyScans[lastSurveyScanIndex + 1].ScanNumber < fragScanNumber)
                     // This code will generally not be reached, provided the calling function passed the correct lastSurveyScanIndex value to this function
                     lastSurveyScanIndex += 1;
+
                 if (lastSurveyScanIndex >= surveyScans.Count - 1)
                 {
                     // Cannot easily interpolate since FragScanNumber is greater than the last survey scan number
@@ -502,6 +595,7 @@ namespace MASIC.DataInput
 
                             // Compute fragScanIteration
                             fragScanIteration = fragScanNumber - surveyScan.ScanNumber;
+
                             if (scanDiff > 0 && fragScanIteration > 0)
                             {
                                 elutionTime = Convert.ToSingle(surveyScan.ScanTime + fragScanIteration / (double)scanDiff * (surveyScan.ScanTime - prevScanElutionTime));
@@ -536,6 +630,7 @@ namespace MASIC.DataInput
 
                     // Compute fragScanIteration
                     fragScanIteration = fragScanNumber - surveyScan.ScanNumber;
+
                     if (scanDiff > 0 && fragScanIteration > 0)
                     {
                         elutionTime = Convert.ToSingle(surveyScan.ScanTime + fragScanIteration / (double)scanDiff * (nextScanElutionTime - surveyScan.ScanTime));
@@ -567,8 +662,10 @@ namespace MASIC.DataInput
 
             int[] masterScanNumbers;
             int[] masterScanOrderIndices;
+
             masterScanNumbers = new int[scanList.MasterScanOrderCount];
             masterScanOrderIndices = new int[scanList.MasterScanOrderCount];
+
             for (int index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
             {
                 masterScanNumbers[index] = scanList.MasterScanNumList[index];
@@ -595,10 +692,13 @@ namespace MASIC.DataInput
 
                 clsScanList.udtScanOrderPointerType[] udtMasterScanOrderListCopy;
                 float[] masterScanTimeListCopy;
+
                 udtMasterScanOrderListCopy = new clsScanList.udtScanOrderPointerType[scanList.MasterScanOrder.Count];
                 masterScanTimeListCopy = new float[scanList.MasterScanOrder.Count];
+
                 Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount);
                 Array.Copy(scanList.MasterScanTimeList.ToArray(), masterScanTimeListCopy, scanList.MasterScanOrderCount);
+
                 for (int index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
                 {
                     scanList.MasterScanOrder[index] = udtMasterScanOrderListCopy[masterScanOrderIndices[index]];

@@ -19,13 +19,19 @@ namespace MASIC.DataOutput
             mOptions = masicOptions;
         }
 
-        public bool ExportRawDataToDisk(clsScanList scanList, clsSpectraCache spectraCache, string inputFileName, string outputDirectoryPath)
+        public bool ExportRawDataToDisk(
+            clsScanList scanList,
+            clsSpectraCache spectraCache,
+            string inputFileName,
+            string outputDirectoryPath)
         {
             string outputFilePath = "??";
+
             try
             {
                 StreamWriter dataWriter;
                 StreamWriter scanInfoWriter;
+
                 switch (mOptions.RawDataExportOptions.FileFormat)
                 {
                     case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
@@ -35,7 +41,9 @@ namespace MASIC.DataOutput
                         break;
                     case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
                         outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsIsosFile);
+
                         string outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsScansFile);
+
                         dataWriter = new StreamWriter(outputFilePath);
                         scanInfoWriter = new StreamWriter(outputFilePath2);
 
@@ -51,6 +59,7 @@ namespace MASIC.DataOutput
                 }
 
                 int spectrumExportCount = 0;
+
                 if (!mOptions.RawDataExportOptions.IncludeMSMS && mOptions.RawDataExportOptions.RenumberScans)
                 {
                     mOptions.RawDataExportOptions.RenumberScans = true;
@@ -61,6 +70,7 @@ namespace MASIC.DataOutput
                 }
 
                 UpdateProgress(0, "Exporting raw data");
+
                 for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                 {
                     int scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
@@ -68,7 +78,8 @@ namespace MASIC.DataOutput
                     {
                         SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.SurveyScans[scanPointer], spectraCache, inputFileName, false, ref spectrumExportCount);
                     }
-                    else if (mOptions.RawDataExportOptions.IncludeMSMS || !(scanList.FragScans[scanPointer].MRMScanType == ThermoRawFileReader.MRMScanTypeConstants.NotMRM))
+                    else if (mOptions.RawDataExportOptions.IncludeMSMS ||
+                        scanList.FragScans[scanPointer].MRMScanType != ThermoRawFileReader.MRMScanTypeConstants.NotMRM)
                     {
                         // Either we're writing out MS/MS data or this is an MRM scan
                         SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.FragScans[scanPointer], spectraCache, inputFileName, true, ref spectrumExportCount);
@@ -84,6 +95,7 @@ namespace MASIC.DataOutput
                     }
 
                     UpdateCacheStats(spectraCache);
+
                     if (mOptions.AbortProcessing)
                     {
                         break;
@@ -94,6 +106,7 @@ namespace MASIC.DataOutput
                     dataWriter.Close();
                 if (scanInfoWriter != null)
                     scanInfoWriter.Close();
+
                 return true;
             }
             catch (Exception ex)
@@ -103,11 +116,18 @@ namespace MASIC.DataOutput
             }
         }
 
-        private void SaveCSVFilesToDiskWork(StreamWriter dataWriter, StreamWriter scanInfoWriter, clsScanInfo currentScan, clsSpectraCache spectraCache, bool fragmentationScan, ref int spectrumExportCount)
+        private void SaveCSVFilesToDiskWork(
+            StreamWriter dataWriter,
+            StreamWriter scanInfoWriter,
+            clsScanInfo currentScan,
+            clsSpectraCache spectraCache,
+            bool fragmentationScan,
+            ref int spectrumExportCount)
         {
             int poolIndex;
             int scanNumber;
             double baselineNoiseLevel;
+
             if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out poolIndex))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
@@ -115,6 +135,7 @@ namespace MASIC.DataOutput
             }
 
             spectrumExportCount += 1;
+
             // First, write an entry to the "_scans.csv" file
 
             if (mOptions.RawDataExportOptions.RenumberScans)
@@ -138,9 +159,11 @@ namespace MASIC.DataOutput
 
             int numIsotopicSignatures = 0;
             int numPeaks = spectraCache.SpectraPool[poolIndex].IonCount;
+
             baselineNoiseLevel = currentScan.BaselineNoiseStats.NoiseLevel;
             if (baselineNoiseLevel < 1)
                 baselineNoiseLevel = 1;
+
             mBPIWriter.WriteDecon2LSScanFileEntry(scanInfoWriter, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures);
 
             var spectraPool = spectraCache.SpectraPool[poolIndex];
@@ -152,6 +175,7 @@ namespace MASIC.DataOutput
 
                 double[] intensities;
                 int[] pointerArray;
+
                 intensities = new double[spectraPool.IonCount];
                 pointerArray = new int[spectraPool.IonCount];
                 for (int ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
@@ -162,6 +186,7 @@ namespace MASIC.DataOutput
 
                 // Sort pointerArray() based on the intensities in intensities
                 Array.Sort(intensities, pointerArray);
+
                 int startIndex;
                 if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
                 {
@@ -198,16 +223,28 @@ namespace MASIC.DataOutput
                         double signalToNoise = spectraPool.IonsIntensity[ionIndex] / baselineNoiseLevel;
                         int monoisotopicAbu = -10;
                         int monoPlus2Abu = -10;
-                        mBPIWriter.WriteDecon2LSIsosFileEntry(dataWriter, scanNumber, charge, spectraPool.IonsIntensity[ionIndex], spectraPool.IonsMZ[ionIndex], isoFit, mass, mass, mass, peakFWHM, signalToNoise, monoisotopicAbu, monoPlus2Abu);
+
+                        mBPIWriter.WriteDecon2LSIsosFileEntry(
+                            dataWriter, scanNumber, charge,
+                            spectraPool.IonsIntensity[ionIndex], spectraPool.IonsMZ[ionIndex],
+                            isoFit, mass, mass, mass,
+                            peakFWHM, signalToNoise, monoisotopicAbu, monoPlus2Abu);
                     }
                 }
             }
         }
 
-        private void SavePEKFileToDiskWork(TextWriter writer, clsScanInfo currentScan, clsSpectraCache spectraCache, string inputFileName, bool fragmentationScan, ref int spectrumExportCount)
+        private void SavePEKFileToDiskWork(
+            TextWriter writer,
+            clsScanInfo currentScan,
+            clsSpectraCache spectraCache,
+            string inputFileName,
+            bool fragmentationScan,
+            ref int spectrumExportCount)
         {
             int poolIndex;
             int exportCount = 0;
+
             if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out poolIndex))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
@@ -215,7 +252,9 @@ namespace MASIC.DataOutput
             }
 
             spectrumExportCount += 1;
+
             writer.WriteLine("Time domain signal level:" + "\t" + currentScan.BasePeakIonIntensity.ToString("0.000"));          // Store the base peak ion intensity as the time domain signal level value
+
             writer.WriteLine("MASIC " + mOptions.MASICVersion);                     // Software version
             string dataLine = "MS/MS-based PEK file";
             if (mOptions.RawDataExportOptions.IncludeMSMS)
@@ -228,6 +267,7 @@ namespace MASIC.DataOutput
             }
 
             writer.WriteLine(dataLine);
+
             int scanNumber;
             if (mOptions.RawDataExportOptions.RenumberScans)
             {
@@ -240,6 +280,7 @@ namespace MASIC.DataOutput
 
             dataLine = "Filename: " + inputFileName + "." + scanNumber.ToString("00000");
             writer.WriteLine(dataLine);
+
             if (fragmentationScan)
             {
                 writer.WriteLine("ScanType: Fragmentation Scan");
@@ -253,11 +294,13 @@ namespace MASIC.DataOutput
             writer.WriteLine("First CS,    Number of CS,   Abundance,   Mass,   Standard deviation");
 
             var spectraPool = spectraCache.SpectraPool[poolIndex];
+
             if (spectraPool.IonCount > 0)
             {
                 // Populate intensities and pointerArray()
                 double[] intensities;
                 int[] pointerArray;
+
                 intensities = new double[spectraPool.IonCount];
                 pointerArray = new int[spectraPool.IonCount];
                 for (int ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
@@ -268,7 +311,9 @@ namespace MASIC.DataOutput
 
                 // Sort pointerArray() based on the intensities in intensities
                 Array.Sort(intensities, pointerArray);
+
                 int startIndex;
+
                 if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
                 {
                     // Possibly limit the number of ions to maxIonCount
@@ -298,7 +343,13 @@ namespace MASIC.DataOutput
                 {
                     if (spectraPool.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
-                        string dataLine1 = "1" + "\t" + "1" + "\t" + spectraPool.IonsIntensity[ionIndex] + "\t" + spectraPool.IonsMZ[ionIndex] + "\t" + "0";
+                        string dataLine1 =
+                            "1" + "\t" +
+                            "1" + "\t" +
+                            spectraPool.IonsIntensity[ionIndex] + "\t" +
+                            spectraPool.IonsMZ[ionIndex] + "\t" +
+                            "0";
+
                         writer.WriteLine(dataLine1);
                         exportCount += 1;
                     }
@@ -310,7 +361,14 @@ namespace MASIC.DataOutput
             writer.WriteLine();
         }
 
-        private void SaveRawDataToDiskWork(StreamWriter dataWriter, StreamWriter scanInfoWriter, clsScanInfo currentScan, clsSpectraCache spectraCache, string inputFileName, bool fragmentationScan, ref int spectrumExportCount)
+        private void SaveRawDataToDiskWork(
+            StreamWriter dataWriter,
+            StreamWriter scanInfoWriter,
+            clsScanInfo currentScan,
+            clsSpectraCache spectraCache,
+            string inputFileName,
+            bool fragmentationScan,
+            ref int spectrumExportCount)
         {
             switch (mOptions.RawDataExportOptions.FileFormat)
             {

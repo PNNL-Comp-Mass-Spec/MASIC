@@ -6,10 +6,13 @@ namespace MASIC.DataOutput
 {
     public class clsThermoMetadataWriter : clsMasicEventNotifier
     {
-        public bool SaveMSMethodFile(XRawFileIO objXcaliburAccessor, clsDataOutput dataOutputHandler)
+        public bool SaveMSMethodFile(
+            XRawFileIO objXcaliburAccessor,
+            clsDataOutput dataOutputHandler)
         {
             int instMethodCount;
             string outputFilePath = "?UndefinedFile?";
+
             try
             {
                 instMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count;
@@ -35,6 +38,7 @@ namespace MASIC.DataOutput
                     }
 
                     outputFilePath = dataOutputHandler.OutputFileHandles.MSMethodFilePathBase + methodNum + ".txt";
+
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
                         var fileInfo = objXcaliburAccessor.FileInfo;
@@ -43,6 +47,7 @@ namespace MASIC.DataOutput
                         writer.WriteLine("Instrument description: " + fileInfo.InstrumentDescription);
                         writer.WriteLine("Instrument serial number: " + fileInfo.InstSerialNumber);
                         writer.WriteLine();
+
                         writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods[index]);
                     }
                 }
@@ -56,9 +61,12 @@ namespace MASIC.DataOutput
             return true;
         }
 
-        public bool SaveMSTuneFile(XRawFileIO objXcaliburAccessor, clsDataOutput dataOutputHandler)
+        public bool SaveMSTuneFile(
+            XRawFileIO objXcaliburAccessor,
+            clsDataOutput dataOutputHandler)
         {
             const char cColDelimiter = '\t';
+
             int tuneMethodCount;
             string outputFilePath = "?UndefinedFile?";
             try
@@ -86,9 +94,11 @@ namespace MASIC.DataOutput
                     }
 
                     outputFilePath = dataOutputHandler.OutputFileHandles.MSTuneFilePathBase + tuneInfoNum + ".txt";
+
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
                         writer.WriteLine("Category" + cColDelimiter + "Name" + cColDelimiter + "Value");
+
                         foreach (udtTuneMethodSetting setting in objXcaliburAccessor.FileInfo.TuneMethods[index].Settings)
                             writer.WriteLine(setting.Category + cColDelimiter + setting.Name + cColDelimiter + setting.Value);
                         writer.WriteLine();

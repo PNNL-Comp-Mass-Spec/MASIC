@@ -1,4 +1,19 @@
-﻿using System;
+﻿// This class computes aggregate stats for a dataset
+//
+// -------------------------------------------------------------------------------
+// Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
+// Program started May 7, 2009
+// Ported from clsMASICScanStatsParser to clsDatasetStatsSummarizer in February 2010
+//
+// E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
+// Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
+// -------------------------------------------------------------------------------
+//
+// Licensed under the 2-Clause BSD License; you may not use this file except
+// in compliance with the License.  You may obtain a copy of the License at
+// https://opensource.org/licenses/BSD-2-Clause
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -30,7 +45,9 @@ namespace MASIC.DatasetStats
         private readonly string mFileDate;
         private string mDatasetStatsSummaryFileName;
         private string mErrorMessage = string.Empty;
+
         private readonly List<ScanStatsEntry> mDatasetScanStats;
+
         private bool mDatasetSummaryStatsUpToDate;
         private DatasetSummaryStats mDatasetSummaryStats;
         #endregion
@@ -66,15 +83,7 @@ namespace MASIC.DatasetStats
         /// Dataset file modification time
         /// </summary>
         /// <returns></returns>
-        public string FileDate
-        {
-            get
-            {
-                string FileDateRet = default;
-                FileDateRet = mFileDate;
-                return FileDateRet;
-            }
-        }
+        public string FileDate => mFileDate;
 
         /// <summary>
         /// Sample info
@@ -83,18 +92,24 @@ namespace MASIC.DatasetStats
         public SampleInfo SampleInfo { get; private set; }
 
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>
         public clsDatasetStatsSummarizer()
         {
             mFileDate = "February 11, 2020";
+
             mErrorMessage = string.Empty;
+
             mDatasetScanStats = new List<ScanStatsEntry>();
             mDatasetSummaryStats = new DatasetSummaryStats();
+
             mDatasetSummaryStatsUpToDate = false;
+
             DatasetFileInfo = new DatasetFileInfo();
             SampleInfo = new SampleInfo();
+
             ClearCachedData();
         }
 
@@ -116,8 +131,10 @@ namespace MASIC.DatasetStats
         {
             mDatasetScanStats.Clear();
             mDatasetSummaryStats.Clear();
+
             DatasetFileInfo.Clear();
             SampleInfo.Clear();
+
             mDatasetSummaryStatsUpToDate = false;
         }
 
@@ -131,6 +148,7 @@ namespace MASIC.DatasetStats
         public bool ComputeScanStatsSummary(List<ScanStatsEntry> scanStats, out DatasetSummaryStats summaryStats)
         {
             summaryStats = new DatasetSummaryStats();
+
             try
             {
                 if (scanStats == null)
@@ -140,24 +158,35 @@ namespace MASIC.DatasetStats
                 }
 
                 mErrorMessage = string.Empty;
+
                 int scanStatsCount = scanStats.Count;
 
                 // Initialize the TIC and BPI Lists
                 var ticListMS = new List<double>(scanStatsCount);
                 var ticListMSn = new List<double>(scanStatsCount);
+
                 var bpiListMS = new List<double>(scanStatsCount);
                 var bpiListMSn = new List<double>(scanStatsCount);
+
                 foreach (var statEntry in scanStats)
                 {
                     if (statEntry.ScanType > 1)
                     {
                         // MSn spectrum
-                        ComputeScanStatsUpdateDetails(statEntry, summaryStats, summaryStats.MSnStats, ticListMSn, bpiListMSn);
+                        ComputeScanStatsUpdateDetails(statEntry,
+                                                      summaryStats,
+                                                      summaryStats.MSnStats,
+                                                      ticListMSn,
+                                                      bpiListMSn);
                     }
                     else
                     {
                         // MS spectrum
-                        ComputeScanStatsUpdateDetails(statEntry, summaryStats, summaryStats.MSStats, ticListMS, bpiListMS);
+                        ComputeScanStatsUpdateDetails(statEntry,
+                                                      summaryStats,
+                                                      summaryStats.MSStats,
+                                                      ticListMS,
+                                                      bpiListMS);
                     }
 
                     string scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + statEntry.ScanFilterText;
@@ -173,8 +202,10 @@ namespace MASIC.DatasetStats
 
                 summaryStats.MSStats.TICMedian = clsUtilities.ComputeMedian(ticListMS);
                 summaryStats.MSStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMS);
+
                 summaryStats.MSnStats.TICMedian = clsUtilities.ComputeMedian(ticListMSn);
                 summaryStats.MSnStats.BPIMedian = clsUtilities.ComputeMedian(bpiListMSn);
+
                 return true;
             }
             catch (Exception ex)
@@ -184,11 +215,17 @@ namespace MASIC.DatasetStats
             }
         }
 
-        private void ComputeScanStatsUpdateDetails(ScanStatsEntry scanStats, DatasetSummaryStats summaryStats, SummaryStatDetails summaryStatDetails, ICollection<double> ticList, ICollection<double> bpiList)
+        private void ComputeScanStatsUpdateDetails(
+            ScanStatsEntry scanStats,
+            DatasetSummaryStats summaryStats,
+            SummaryStatDetails summaryStatDetails,
+            ICollection<double> ticList,
+            ICollection<double> bpiList)
         {
             double elutionTime;
             double totalIonCurrent;
             double basePeakIntensity;
+
             if (!string.IsNullOrWhiteSpace(scanStats.ElutionTime))
             {
                 if (double.TryParse(scanStats.ElutionTime, out elutionTime))
@@ -246,7 +283,12 @@ namespace MASIC.DatasetStats
         /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
         /// <remarks></remarks>
-        public bool CreateDatasetInfoFile(string datasetName, string datasetInfoFilePath, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        public bool CreateDatasetInfoFile(
+            string datasetName,
+            string datasetInfoFilePath,
+            List<ScanStatsEntry> scanStats,
+            DatasetFileInfo datasetInfo,
+            SampleInfo oSampleInfo)
         {
             try
             {
@@ -322,7 +364,10 @@ namespace MASIC.DatasetStats
         /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>XML (as string)</returns>
         /// <remarks></remarks>
-        public string CreateDatasetInfoXML(List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        public string CreateDatasetInfoXML(
+            List<ScanStatsEntry> scanStats,
+            DatasetFileInfo datasetInfo,
+            SampleInfo oSampleInfo)
         {
             return CreateDatasetInfoXML(datasetInfo.DatasetName, scanStats, datasetInfo, oSampleInfo);
         }
@@ -335,7 +380,10 @@ namespace MASIC.DatasetStats
         /// <param name="datasetInfo">Dataset Info</param>
         /// <returns>XML (as string)</returns>
         /// <remarks></remarks>
-        public string CreateDatasetInfoXML(string datasetName, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo)
+        public string CreateDatasetInfoXML(
+            string datasetName,
+            List<ScanStatsEntry> scanStats,
+            DatasetFileInfo datasetInfo)
         {
             return CreateDatasetInfoXML(datasetName, scanStats, datasetInfo, new SampleInfo());
         }
@@ -348,7 +396,11 @@ namespace MASIC.DatasetStats
         /// <param name="datasetInfo">Dataset Info</param>
         /// <returns>XML (as string)</returns>
         /// <remarks></remarks>
-        public string CreateDatasetInfoXML(string datasetName, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        public string CreateDatasetInfoXML(
+            string datasetName,
+            List<ScanStatsEntry> scanStats,
+            DatasetFileInfo datasetInfo,
+            SampleInfo oSampleInfo)
         {
             try
             {
@@ -359,7 +411,9 @@ namespace MASIC.DatasetStats
                 }
 
                 mErrorMessage = string.Empty;
+
                 DatasetSummaryStats summaryStats;
+
                 if (scanStats == mDatasetScanStats)
                 {
                     summaryStats = GetDatasetSummaryStats();
@@ -399,17 +453,22 @@ namespace MASIC.DatasetStats
                 //
                 var memStream = new MemoryStream();
                 var writer = XmlWriter.Create(memStream, xmlSettings);
+
                 writer.WriteStartDocument(true);
 
                 // Write the beginning of the "Root" element.
                 writer.WriteStartElement("DatasetInfo");
+
                 writer.WriteElementString("Dataset", datasetName);
+
                 writer.WriteStartElement("ScanTypes");
+
                 foreach (var scanTypeEntry in summaryStats.ScanTypeStats)
                 {
                     string scanType = scanTypeEntry.Key;
                     int indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal);
                     string scanFilterText;
+
                     if (indexMatch >= 0)
                     {
                         scanFilterText = scanType.Substring(indexMatch + SCAN_TYPE_STATS_SEP_CHAR.Length);
@@ -435,7 +494,9 @@ namespace MASIC.DatasetStats
                 }
 
                 writer.WriteEndElement();       // ScanTypes
+
                 writer.WriteStartElement("AcquisitionInfo");
+
                 int scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount;
                 if (scanCountTotal == 0 && datasetInfo.ScanCount > 0)
                 {
@@ -443,14 +504,19 @@ namespace MASIC.DatasetStats
                 }
 
                 writer.WriteElementString("ScanCount", scanCountTotal.ToString());
+
                 writer.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString());
                 writer.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString());
                 writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString());
+
                 writer.WriteElementString("AcqTimeMinutes", datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"));
                 writer.WriteElementString("StartTime", datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING));
                 writer.WriteElementString("EndTime", datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING));
+
                 writer.WriteElementString("FileSizeBytes", datasetInfo.FileSizeBytes.ToString());
+
                 writer.WriteEndElement();       // AcquisitionInfo
+
                 writer.WriteStartElement("TICInfo");
                 writer.WriteElementString("TIC_Max_MS", ValueToString(summaryStats.MSStats.TICMax, 5, 0));
                 writer.WriteElementString("TIC_Max_MSn", ValueToString(summaryStats.MSnStats.TICMax, 5, 0));
@@ -474,6 +540,7 @@ namespace MASIC.DatasetStats
 
                 writer.WriteEndElement();  // End the "Root" element (DatasetInfo)
                 writer.WriteEndDocument(); // End the document
+
                 writer.Close();
 
                 // Now Rewind the memory stream and output as a string
@@ -515,9 +582,15 @@ namespace MASIC.DatasetStats
         /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
         /// <remarks></remarks>
-        public bool CreateScanStatsFile(string datasetName, string scanStatsFilePath, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        public bool CreateScanStatsFile(
+            string datasetName,
+            string scanStatsFilePath,
+            List<ScanStatsEntry> scanStats,
+            DatasetFileInfo datasetInfo,
+            SampleInfo oSampleInfo)
         {
             int datasetID = 0;
+
             try
             {
                 if (scanStats == null)
@@ -527,12 +600,29 @@ namespace MASIC.DatasetStats
                 }
 
                 mErrorMessage = string.Empty;
+
                 using (var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
                 {
                     // Write the headers
-                    var headerNames = new List<string>() { "Dataset", "ScanNumber", "ScanTime", "ScanType", "TotalIonIntensity", "BasePeakIntensity", "BasePeakMZ", "BasePeakSignalToNoiseRatio", "IonCount", "IonCountRaw", "ScanTypeName" };
+                    var headerNames = new List<string>()
+                    {
+                        "Dataset",
+                        "ScanNumber",
+                        "ScanTime",
+                        "ScanType",
+                        "TotalIonIntensity",
+                        "BasePeakIntensity",
+                        "BasePeakMZ",
+                        "BasePeakSignalToNoiseRatio",
+                        "IonCount",
+                        "IonCountRaw",
+                        "ScanTypeName"
+                    };
+
                     scanStatsWriter.WriteLine(string.Join("\t", headerNames));
+
                     var dataValues = new List<string>();
+
                     foreach (var scanStatsEntry in scanStats)
                     {
                         dataValues.Clear();
@@ -569,6 +659,7 @@ namespace MASIC.DatasetStats
 
                         // Scan type name
                         dataValues.Add(scanStatsEntry.ScanTypeName);
+
                         scanStatsWriter.WriteLine(string.Join("\t", dataValues));
                     }
                 }
@@ -632,6 +723,7 @@ namespace MASIC.DatasetStats
                     mDatasetScanStats[index].ScanType = scanType;
                     mDatasetScanStats[index].ScanTypeName = scanTypeName;
                     mDatasetSummaryStatsUpToDate = false;
+
                     matchFound = true;
                     break;
                 }
@@ -663,10 +755,17 @@ namespace MASIC.DatasetStats
         /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
         /// <remarks></remarks>
-        public bool UpdateDatasetStatsTextFile(string datasetName, string datasetStatsFilePath, List<ScanStatsEntry> scanStats, DatasetFileInfo datasetInfo, SampleInfo oSampleInfo)
+        public bool UpdateDatasetStatsTextFile(
+            string datasetName,
+            string datasetStatsFilePath,
+            List<ScanStatsEntry> scanStats,
+            DatasetFileInfo datasetInfo,
+            SampleInfo oSampleInfo)
         {
             var writeHeaders = default(bool);
+
             DatasetSummaryStats summaryStats;
+
             try
             {
                 if (scanStats == null)
@@ -676,6 +775,7 @@ namespace MASIC.DatasetStats
                 }
 
                 mErrorMessage = string.Empty;
+
                 if (scanStats == mDatasetScanStats)
                 {
                     summaryStats = GetDatasetSummaryStats();
@@ -704,11 +804,41 @@ namespace MASIC.DatasetStats
                     if (writeHeaders)
                     {
                         // Write the header line
-                        var headerNames = new List<string>() { "Dataset", "ScanCount", "ScanCountMS", "ScanCountMSn", "Elution_Time_Max", "AcqTimeMinutes", "StartTime", "EndTime", "FileSizeBytes", "SampleName", "Comment1", "Comment2" };
+                        var headerNames = new List<string>()
+                        {
+                            "Dataset",
+                            "ScanCount",
+                            "ScanCountMS",
+                            "ScanCountMSn",
+                            "Elution_Time_Max",
+                            "AcqTimeMinutes",
+                            "StartTime",
+                            "EndTime",
+                            "FileSizeBytes",
+                            "SampleName",
+                            "Comment1",
+                            "Comment2"
+                        };
+
                         writer.WriteLine(string.Join("\t", headerNames));
                     }
 
-                    var dataValues = new List<string>() { datasetName, (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(), summaryStats.MSStats.ScanCount.ToString(), summaryStats.MSnStats.ScanCount.ToString(), summaryStats.ElutionTimeMax.ToString("0.00"), datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"), datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING), datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING), datasetInfo.FileSizeBytes.ToString(), FixNull(oSampleInfo.SampleName), FixNull(oSampleInfo.Comment1), FixNull(oSampleInfo.Comment2) };
+                    var dataValues = new List<string>()
+                    {
+                        datasetName,
+                        (summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount).ToString(),
+                        summaryStats.MSStats.ScanCount.ToString(),
+                        summaryStats.MSnStats.ScanCount.ToString(),
+                        summaryStats.ElutionTimeMax.ToString("0.00"),
+                        datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"),
+                        datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING),
+                        datasetInfo.AcqTimeEnd.ToString(DATE_TIME_FORMAT_STRING),
+                        datasetInfo.FileSizeBytes.ToString(),
+                        FixNull(oSampleInfo.SampleName),
+                        FixNull(oSampleInfo.Comment1),
+                        FixNull(oSampleInfo.Comment2)
+                    };
+
                     writer.WriteLine(string.Join("\t", dataValues));
                 }
 
