@@ -1320,34 +1320,34 @@ namespace MASIC.DataInput
             else
             {
                 // Possibly update .ScanTypeName to match the values returned by XRawFileIO.GetScanTypeNameFromThermoScanFilterText()
-                switch (scanInfo.ScanTypeName.ToLower())
+                if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.Full, StringComparison.OrdinalIgnoreCase))
                 {
-                    case var @case when @case == clsSpectrumInfoMzXML.ScanTypeNames.Full.ToLower():
-                        if (msLevel <= 1)
-                        {
-                            scanInfo.ScanTypeName = "MS";
-                        }
-                        else
-                        {
-                            scanInfo.ScanTypeName = "MSn";
-                        }
-
-                        break;
-
-                    case var case1 when case1 == clsSpectrumInfoMzXML.ScanTypeNames.zoom.ToLower():
-                        scanInfo.ScanTypeName = "Zoom-MS";
-                        break;
-                    case var case2 when case2 == clsSpectrumInfoMzXML.ScanTypeNames.MRM.ToLower():
-                        scanInfo.ScanTypeName = "MRM";
-                        scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
-                        break;
-                    case var case3 when case3 == clsSpectrumInfoMzXML.ScanTypeNames.SRM.ToLower():
-                        scanInfo.ScanTypeName = "CID-SRM";
-                        scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
-                        break;
-                    default:
-                        // Leave .ScanTypeName unchanged
-                        break;
+                    if (msLevel <= 1)
+                    {
+                        scanInfo.ScanTypeName = "MS";
+                    }
+                    else
+                    {
+                        scanInfo.ScanTypeName = "MSn";
+                    }
+                }
+                else if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.zoom, StringComparison.OrdinalIgnoreCase))
+                {
+                    scanInfo.ScanTypeName = "Zoom-MS";
+                }
+                else if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.MRM, StringComparison.OrdinalIgnoreCase))
+                {
+                    scanInfo.ScanTypeName = "MRM";
+                    scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
+                }
+                else if (scanInfo.ScanTypeName.Equals(clsSpectrumInfoMzXML.ScanTypeNames.SRM, StringComparison.OrdinalIgnoreCase))
+                {
+                    scanInfo.ScanTypeName = "CID-SRM";
+                    scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
+                }
+                else
+                {
+                    // Leave .ScanTypeName unchanged
                 }
             }
 
