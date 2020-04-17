@@ -200,10 +200,10 @@ namespace MASIC
         {
             if (CustomMZSearchValues.Count > 0)
             {
-                RawTextMZList += Convert.ToString(',');
-                RawTextMZToleranceDaList += Convert.ToString(',');
-                RawTextScanOrAcqTimeCenterList += Convert.ToString(',');
-                RawTextScanOrAcqTimeToleranceList += Convert.ToString(',');
+                RawTextMZList += ",";
+                RawTextMZToleranceDaList += ",";
+                RawTextScanOrAcqTimeCenterList += ",";
+                RawTextScanOrAcqTimeToleranceList += ",";
             }
 
             RawTextMZList += mzSearchSpec.MZ.ToString();

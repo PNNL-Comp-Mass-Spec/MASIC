@@ -1096,7 +1096,7 @@ namespace MASIC.DataInput
                     }
                 }
 
-                mzXmlSourceSpectrum.ActivationMethod = string.Join(Convert.ToString(','), activationMethods);
+                mzXmlSourceSpectrum.ActivationMethod = string.Join(",", activationMethods);
             }
 
             // Store the "filter string" in .FilterLine
