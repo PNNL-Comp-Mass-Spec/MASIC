@@ -22,6 +22,7 @@
         /// </summary>
         /// <remarks>Set to 0 to search the entire file for the given mass</remarks>
         public float ScanOrAcqTimeTolerance { get; set; }
+
         public string Comment { get; set; }
 
         #endregion

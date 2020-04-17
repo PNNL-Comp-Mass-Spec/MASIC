@@ -21,6 +21,7 @@ namespace MASIC
         #region "Classwide variables"
         private readonly clsReporterIons mReporterIons;
         private readonly clsMASICPeakFinder mPeakFinder;
+
         private int mSpectraFoundExceedingMaxIonCount = 0;
         private int mMaxIonCountReported = 0;
 
@@ -35,6 +36,7 @@ namespace MASIC
         {
             mReporterIons = reporterIons;
             mPeakFinder = peakFinder;
+
             ScanStats = new List<ScanStatsEntry>();
         }
 
@@ -44,7 +46,9 @@ namespace MASIC
         /// <param name="scanNumber"></param>
         /// <param name="sicOptions"></param>
         /// <returns>True if filtering is disabled, or if scanNumber is within the limits</returns>
-        public bool CheckScanInRange(int scanNumber, clsSICOptions sicOptions)
+        public bool CheckScanInRange(
+            int scanNumber,
+            clsSICOptions sicOptions)
         {
             if (sicOptions.ScanRangeStart >= 0 && sicOptions.ScanRangeEnd > sicOptions.ScanRangeStart)
             {
@@ -64,7 +68,10 @@ namespace MASIC
         /// <param name="elutionTime"></param>
         /// <param name="sicOptions"></param>
         /// <returns>True if filtering is disabled, or if scanNumber and elutionTime are within the limits</returns>
-        public bool CheckScanInRange(int scanNumber, double elutionTime, clsSICOptions sicOptions)
+        public bool CheckScanInRange(
+            int scanNumber,
+            double elutionTime,
+            clsSICOptions sicOptions)
         {
             if (!CheckScanInRange(scanNumber, sicOptions))
             {
@@ -82,7 +89,11 @@ namespace MASIC
             return true;
         }
 
-        private void CompressSpectraData(clsMSSpectrum msSpectrum, double msDataResolution, double mzIgnoreRangeStart, double mzIgnoreRangeEnd)
+        private void CompressSpectraData(
+            clsMSSpectrum msSpectrum,
+            double msDataResolution,
+            double mzIgnoreRangeStart,
+            double mzIgnoreRangeEnd)
         {
             // First, look for blocks of data points that consecutively have an intensity value of 0
             // For each block of data found, reduce the data to only retain the first data point and last data point in the block
@@ -98,6 +109,7 @@ namespace MASIC
             // Look for blocks of data points that all have an intensity value of 0
             int targetIndex = 0;
             int index = 0;
+
             while (index < msSpectrum.IonCount)
             {
                 if (msSpectrum.IonsIntensity[index] < float.Epsilon)
@@ -121,9 +133,11 @@ namespace MASIC
 
                         msSpectrum.IonsMZ[targetIndex] = msSpectrum.IonsMZ[index];
                         msSpectrum.IonsIntensity[targetIndex] = msSpectrum.IonsIntensity[index];
+
                         targetIndex += 1;
                         msSpectrum.IonsMZ[targetIndex] = msSpectrum.IonsMZ[index + countCombined];
                         msSpectrum.IonsIntensity[targetIndex] = msSpectrum.IonsIntensity[index + countCombined];
+
                         index += countCombined;
                     }
                     // Keep this data point since a single zero
@@ -133,6 +147,7 @@ namespace MASIC
                         msSpectrum.IonsIntensity[targetIndex] = msSpectrum.IonsIntensity[index];
                     }
                 }
+
                 // Note: targetIndex will be the same as index until the first time that data is combined (countCombined > 0)
                 // After that, targetIndex will always be less than index and we will thus always need to copy data
                 else if (targetIndex != index)
@@ -154,6 +169,7 @@ namespace MASIC
 
             targetIndex = 0;
             index = 0;
+
             while (index < msSpectrum.IonCount)
             {
                 int countCombined = 0;
@@ -163,6 +179,7 @@ namespace MASIC
                 if (msSpectrum.IonsIntensity[index] > 0)
                 {
                     bool pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[index], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+
                     if (!pointInIgnoreRange)
                     {
                         for (int comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
@@ -197,6 +214,7 @@ namespace MASIC
                 {
                     msSpectrum.IonsMZ[targetIndex] = bestMz;
                     msSpectrum.IonsIntensity[targetIndex] = msSpectrum.IonsIntensity[index];
+
                     index += countCombined;
                 }
 
@@ -208,10 +226,15 @@ namespace MASIC
             msSpectrum.ShrinkArrays(targetIndex);
         }
 
-        private void ComputeNoiseLevelForMassSpectrum(clsScanInfo scanInfo, clsMSSpectrum msSpectrum, clsBaselineNoiseOptions noiseThresholdOptions)
+        private void ComputeNoiseLevelForMassSpectrum(
+            clsScanInfo scanInfo,
+            clsMSSpectrum msSpectrum,
+            clsBaselineNoiseOptions noiseThresholdOptions)
         {
             const bool IGNORE_NON_POSITIVE_DATA = true;
+
             scanInfo.BaselineNoiseStats = clsMASICPeakFinder.InitializeBaselineNoiseStats(0, noiseThresholdOptions.BaselineNoiseMode);
+
             if (noiseThresholdOptions.BaselineNoiseMode == clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold)
             {
                 scanInfo.BaselineNoiseStats.NoiseLevel = noiseThresholdOptions.BaselineNoiseLevelAbsolute;
@@ -220,20 +243,36 @@ namespace MASIC
             else if (msSpectrum.IonCount > 0)
             {
                 clsBaselineNoiseStats newBaselineNoiseStats = null;
-                mPeakFinder.ComputeTrimmedNoiseLevel(msSpectrum.IonsIntensity, 0, msSpectrum.IonCount - 1, noiseThresholdOptions, IGNORE_NON_POSITIVE_DATA, out newBaselineNoiseStats);
+
+                mPeakFinder.ComputeTrimmedNoiseLevel(
+                    msSpectrum.IonsIntensity, 0, msSpectrum.IonCount - 1,
+                    noiseThresholdOptions, IGNORE_NON_POSITIVE_DATA,
+                    out newBaselineNoiseStats);
+
                 scanInfo.BaselineNoiseStats = newBaselineNoiseStats;
             }
         }
 
-        public bool ProcessAndStoreSpectrum(clsScanInfo scanInfo, DataInput.clsDataImport dataImportUtilities, clsSpectraCache spectraCache, clsMSSpectrum msSpectrum, clsBaselineNoiseOptions noiseThresholdOptions, bool discardLowIntensityData, bool compressData, double msDataResolution, bool keepRawSpectrum)
+        public bool ProcessAndStoreSpectrum(
+            clsScanInfo scanInfo,
+            DataInput.clsDataImport dataImportUtilities,
+            clsSpectraCache spectraCache,
+            clsMSSpectrum msSpectrum,
+            clsBaselineNoiseOptions noiseThresholdOptions,
+            bool discardLowIntensityData,
+            bool compressData,
+            double msDataResolution,
+            bool keepRawSpectrum)
         {
             string lastKnownLocation = "Start";
+
             try
             {
                 // Determine the noise threshold intensity for this spectrum
                 // Stored in scanInfo.BaselineNoiseStats
                 lastKnownLocation = "Call ComputeNoiseLevelForMassSpectrum";
                 ComputeNoiseLevelForMassSpectrum(scanInfo, msSpectrum, noiseThresholdOptions);
+
                 if (!keepRawSpectrum)
                 {
                     return true;
@@ -245,7 +284,12 @@ namespace MASIC
                     // Discard data below the noise level or below the minimum S/N level
                     // If we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
                     lastKnownLocation = "Call DiscardDataBelowNoiseThreshold";
-                    dataImportUtilities.DiscardDataBelowNoiseThreshold(msSpectrum, scanInfo.BaselineNoiseStats.NoiseLevel, mReporterIons.MZIntensityFilterIgnoreRangeStart, mReporterIons.MZIntensityFilterIgnoreRangeEnd, noiseThresholdOptions);
+                    dataImportUtilities.DiscardDataBelowNoiseThreshold(msSpectrum,
+                                                                       scanInfo.BaselineNoiseStats.NoiseLevel,
+                                                                       mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                                                                       mReporterIons.MZIntensityFilterIgnoreRangeEnd,
+                                                                       noiseThresholdOptions);
+
                     scanInfo.IonCount = msSpectrum.IonCount;
                 }
 
@@ -253,7 +297,9 @@ namespace MASIC
                 {
                     lastKnownLocation = "Call CompressSpectraData";
                     // Again, if we are searching for Reporter ions, then it is important to not discard any of the ions in the region of the reporter ion m/z values
-                    CompressSpectraData(msSpectrum, msDataResolution, mReporterIons.MZIntensityFilterIgnoreRangeStart, mReporterIons.MZIntensityFilterIgnoreRangeEnd);
+                    CompressSpectraData(msSpectrum, msDataResolution,
+                                        mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                                        mReporterIons.MZIntensityFilterIgnoreRangeEnd);
                 }
 
                 if (msSpectrum.IonCount > MAX_ALLOWABLE_ION_COUNT)
@@ -267,16 +313,25 @@ namespace MASIC
                     if (mSpectraFoundExceedingMaxIonCount <= 10 || msSpectrum.IonCount > mMaxIonCountReported)
                     {
                         Console.WriteLine();
-                        Console.WriteLine("Note: Scan " + scanInfo.ScanNumber + " has " + msSpectrum.IonCount + " ions; " + "will only retain " + MAX_ALLOWABLE_ION_COUNT + " (trimmed " + mSpectraFoundExceedingMaxIonCount.ToString() + " spectra)");
+                        Console.WriteLine(
+                            "Note: Scan " + scanInfo.ScanNumber + " has " + msSpectrum.IonCount + " ions; " +
+                            "will only retain " + MAX_ALLOWABLE_ION_COUNT + " (trimmed " +
+                            mSpectraFoundExceedingMaxIonCount.ToString() + " spectra)");
+
                         mMaxIonCountReported = msSpectrum.IonCount;
                     }
 
-                    dataImportUtilities.DiscardDataToLimitIonCount(msSpectrum, mReporterIons.MZIntensityFilterIgnoreRangeStart, mReporterIons.MZIntensityFilterIgnoreRangeEnd, MAX_ALLOWABLE_ION_COUNT);
+                    dataImportUtilities.DiscardDataToLimitIonCount(msSpectrum,
+                                                                   mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                                                                   mReporterIons.MZIntensityFilterIgnoreRangeEnd,
+                                                                   MAX_ALLOWABLE_ION_COUNT);
+
                     scanInfo.IonCount = msSpectrum.IonCount;
                 }
 
                 lastKnownLocation = "Call AddSpectrumToPool";
                 bool success = spectraCache.AddSpectrumToPool(msSpectrum, scanInfo.ScanNumber);
+
                 return success;
             }
             catch (Exception ex)

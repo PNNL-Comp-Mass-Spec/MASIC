@@ -58,6 +58,7 @@ namespace MASIC
         /// True if the scan was a SIM scan
         /// </summary>
         public bool SIMScan { get; set; }
+
         public MRMScanTypeConstants MRMScanType { get; set; }
 
         /// <summary>
@@ -108,12 +109,14 @@ namespace MASIC
         /// </summary>
         /// <returns></returns>
         public int IonCountRaw { get; set; }
+
         public MASICPeakFinder.clsBaselineNoiseStats BaselineNoiseStats { get; set; }
 
         /// <summary>
         /// Constructor for a MS1 scan
         /// </summary>
-        public clsScanInfo() : this(0)
+        public clsScanInfo()
+            : this(0)
         {
         }
 
@@ -123,8 +126,10 @@ namespace MASIC
         public clsScanInfo(double fragScanParentIonMz)
         {
             MRMScanType = MRMScanTypeConstants.NotMRM;
+
             FragScanInfo = new clsFragScanInfo(fragScanParentIonMz);
             MRMScanInfo = new clsMRMScanInfo();
+
             ExtendedHeaderInfo = new Dictionary<int, string>();
         }
 

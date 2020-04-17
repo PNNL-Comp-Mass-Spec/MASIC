@@ -20,6 +20,7 @@ namespace MASIC
         /// Number of spectra that used these MRM search values
         /// </summary>
         public int ScanCount { get; set; }
+
         public int ParentIonInfoIndex { get; set; }
 
         /// <summary>

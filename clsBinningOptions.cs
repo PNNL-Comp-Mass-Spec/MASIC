@@ -5,6 +5,7 @@
         #region "Properties"
 
         public float StartX { get; set; }
+
         public float EndX { get; set; }
 
         public float BinSize
@@ -61,6 +62,7 @@
         public void Reset()
         {
             var defaultOptions = clsCorrelation.GetDefaultBinningOptions();
+
             StartX = defaultOptions.StartX;
             EndX = defaultOptions.EndX;
             BinSize = defaultOptions.BinSize;

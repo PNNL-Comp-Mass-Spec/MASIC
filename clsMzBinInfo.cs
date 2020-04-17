@@ -3,8 +3,11 @@
     public class clsMzBinInfo
     {
         public double MZ { get; set; }
+
         public double MZTolerance { get; set; }
+
         public bool MZToleranceIsPPM { get; set; }
+
         public int ParentIonIndex { get; set; }
 
         public override string ToString()

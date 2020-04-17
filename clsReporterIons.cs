@@ -8,6 +8,7 @@ namespace MASIC
         #region "Constants and Enums"
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
+
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES = 0.015;
 
         public enum eReporterIonMassModeConstants
@@ -39,6 +40,7 @@ namespace MASIC
         #region "Classwide Variables"
 
         private double mReporterIonToleranceDaDefault;
+
         private eReporterIonMassModeConstants mReporterIonMassMode;
 
         #endregion
@@ -56,9 +58,13 @@ namespace MASIC
         /// will be populated with the m/z range of the reporter ions being processed
         /// </summary>
         public double MZIntensityFilterIgnoreRangeEnd { get; set; }
+
         public List<clsReporterIonInfo> ReporterIonList { get; private set; }
+
         public bool ReporterIonStatsEnabled { get; set; }
+
         public bool ReporterIonApplyAbundanceCorrection { get; set; }
+
         public clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex ReporterIonITraq4PlexCorrectionFactorType { get; set; }
 
         /// <summary>
@@ -115,9 +121,12 @@ namespace MASIC
             }
         }
 
-        public static List<clsReporterIonInfo> GetDefaultReporterIons(eReporterIonMassModeConstants eReporterIonMassMode, double mzToleranceDa)
+        public static List<clsReporterIonInfo> GetDefaultReporterIons(
+            eReporterIonMassModeConstants eReporterIonMassMode,
+            double mzToleranceDa)
         {
             var reporterIons = new List<clsReporterIonInfo>();
+
             switch (eReporterIonMassMode)
             {
                 case eReporterIonMassModeConstants.ITraqFourMZ:
@@ -232,6 +241,7 @@ namespace MASIC
 
                     // This corresponds to immonium ion loss from Phenylalanine (147.06841 - 26.9871 since Immonium is CO minus H)
                     reporterIons.Add(new clsReporterIonInfo(120.08131, true));
+
                     reporterIons.Add(new clsReporterIonInfo(121.122072));
                     break;
 
@@ -317,6 +327,7 @@ namespace MASIC
 
             foreach (var reporterIon in reporterIons)
                 reporterIon.MZToleranceDa = mzToleranceDa;
+
             return reporterIons;
         }
 
@@ -373,10 +384,13 @@ namespace MASIC
         private void InitializeReporterIonInfo()
         {
             ReporterIonList.Clear();
+
             SetReporterIonMassMode(eReporterIonMassModeConstants.CustomOrNone);
+
             ReporterIonToleranceDaDefault = REPORTER_ION_TOLERANCE_DA_DEFAULT;
             ReporterIonApplyAbundanceCorrection = true;
             ReporterIonITraq4PlexCorrectionFactorType = clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex;
+
             ReporterIonSaveObservedMasses = false;
             ReporterIonSaveUncorrectedIntensities = false;
         }
@@ -393,20 +407,26 @@ namespace MASIC
             }
         }
 
-        public void SetReporterIonMassMode(eReporterIonMassModeConstants eReporterIonMassMode, double mzToleranceDa)
+        public void SetReporterIonMassMode(
+            eReporterIonMassModeConstants eReporterIonMassMode,
+            double mzToleranceDa)
         {
             // Note: If eReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone then nothing is changed
 
             if (eReporterIonMassMode != eReporterIonMassModeConstants.CustomOrNone)
             {
                 ReporterIonToleranceDaDefault = mzToleranceDa;
+
                 var reporterIonInfo = GetDefaultReporterIons(eReporterIonMassMode, mzToleranceDa);
+
                 SetReporterIons(reporterIonInfo, false);
                 mReporterIonMassMode = eReporterIonMassMode;
             }
         }
 
-        public void SetReporterIons(List<clsReporterIonInfo> reporterIons, bool customReporterIons)
+        public void SetReporterIons(
+            List<clsReporterIonInfo> reporterIons,
+            bool customReporterIons)
         {
             ReporterIonList.Clear();
             if (reporterIons == null || reporterIons.Count == 0)
@@ -430,17 +450,23 @@ namespace MASIC
             }
         }
 
-        public void SetReporterIons(double[] reporterIonMZList)
+        public void SetReporterIons(
+            double[] reporterIonMZList)
         {
             SetReporterIons(reporterIonMZList, REPORTER_ION_TOLERANCE_DA_DEFAULT);
         }
 
-        public void SetReporterIons(double[] reporterIonMZList, double mzToleranceDa)
+        public void SetReporterIons(
+            double[] reporterIonMZList,
+            double mzToleranceDa)
         {
             SetReporterIons(reporterIonMZList, mzToleranceDa, true);
         }
 
-        public void SetReporterIons(double[] reporterIonMZList, double mzToleranceDa, bool customReporterIons)
+        public void SetReporterIons(
+            double[] reporterIonMZList,
+            double mzToleranceDa,
+            bool customReporterIons)
         {
             // mzToleranceDa is the search tolerance (half width)
 
@@ -460,6 +486,7 @@ namespace MASIC
             {
                 var newReporterIon = new clsReporterIonInfo(reporterIonMZ);
                 newReporterIon.MZToleranceDa = mzToleranceDa;
+
                 ReporterIonList.Add(newReporterIon);
             }
 
@@ -479,10 +506,12 @@ namespace MASIC
             {
                 MZIntensityFilterIgnoreRangeStart = ReporterIonList[0].MZ - ReporterIonList[0].MZToleranceDa * 2;
                 MZIntensityFilterIgnoreRangeEnd = ReporterIonList[0].MZ + ReporterIonList[0].MZToleranceDa * 2;
+
                 foreach (var reporterIon in ReporterIonList)
                 {
                     double mzStart = reporterIon.MZ - reporterIon.MZToleranceDa * 2;
                     MZIntensityFilterIgnoreRangeStart = Math.Min(MZIntensityFilterIgnoreRangeStart, mzStart);
+
                     double mzEnd = reporterIon.MZ + reporterIon.MZToleranceDa * 2;
                     MZIntensityFilterIgnoreRangeEnd = Math.Max(MZIntensityFilterIgnoreRangeEnd, mzEnd);
                 }

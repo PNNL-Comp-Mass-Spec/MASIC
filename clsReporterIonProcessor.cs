@@ -13,6 +13,7 @@ namespace MASIC
         #region "Classwide variables"
         private readonly clsMASICOptions mOptions;
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -31,10 +32,16 @@ namespace MASIC
         /// <param name="outputDirectoryPath"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool FindReporterIons(clsScanList scanList, clsSpectraCache spectraCache, string inputFilePathFull, string outputDirectoryPath)
+        public bool FindReporterIons(
+            clsScanList scanList,
+            clsSpectraCache spectraCache,
+            string inputFilePathFull,
+            string outputDirectoryPath)
         {
             const char cColDelimiter = '\t';
+
             string outputFilePath = "??";
+
             try
             {
                 // Use Xraw to read the .Raw files
@@ -43,9 +50,12 @@ namespace MASIC
                     LoadMSMethodInfo = false,
                     LoadMSTuneInfo = false
                 };
+
                 var xcaliburAccessor = new XRawFileIO(readerOptions);
                 RegisterEvents(xcaliburAccessor);
+
                 bool includeFtmsColumns = false;
+
                 if (inputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper()))
                 {
                     // Processing a thermo .Raw file
@@ -81,6 +91,7 @@ namespace MASIC
                 // Populate array reporterIons, which we will sort by m/z
                 clsReporterIonInfo[] reporterIons;
                 reporterIons = new clsReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
+
                 int reporterIonIndex = 0;
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
                 {
@@ -89,21 +100,39 @@ namespace MASIC
                 }
 
                 Array.Sort(reporterIons, new clsReportIonInfoComparer());
-                outputFilePath = clsDataOutput.ConstructOutputFilePath(Path.GetFileName(inputFilePathFull), outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ReporterIonsFile);
+
+                outputFilePath = clsDataOutput.ConstructOutputFilePath(
+                    Path.GetFileName(inputFilePathFull),
+                    outputDirectoryPath,
+                    clsDataOutput.eOutputFileTypeConstants.ReporterIonsFile);
+
                 using (var writer = new StreamWriter(outputFilePath))
                 {
                     // Write the file headers
                     var reporterIonMZsUnique = new SortedSet<string>();
-                    var headerColumns = new List<string>() { "Dataset", "ScanNumber", "Collision Mode", "ParentIonMZ", "BasePeakIntensity", "BasePeakMZ", "ReporterIonIntensityMax" };
+                    var headerColumns = new List<string>()
+                    {
+                        "Dataset",
+                        "ScanNumber",
+                        "Collision Mode",
+                        "ParentIonMZ",
+                        "BasePeakIntensity",
+                        "BasePeakMZ",
+                        "ReporterIonIntensityMax"
+                    };
+
                     var obsMZHeaders = new List<string>();
                     var uncorrectedIntensityHeaders = new List<string>();
                     var ftmsSignalToNoise = new List<string>();
                     var ftmsResolution = new List<string>();
                     // Dim ftmsLabelDataMz = New List(Of String)
 
-                    bool saveUncorrectedIntensities = mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection && mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities;
+                    bool saveUncorrectedIntensities =
+                        mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection && mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities;
+
                     var dataAggregation = new clsDataAggregation();
                     RegisterEvents(dataAggregation);
+
                     foreach (var reporterIon in reporterIons)
                     {
                         if (!reporterIon.ContaminantIon || saveUncorrectedIntensities)
@@ -112,7 +141,9 @@ namespace MASIC
                             // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
 
                             string mzValue;
-                            if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ)
+                            if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ ||
+                                mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ ||
+                                mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ)
                             {
                                 mzValue = reporterIon.MZ.ToString("#0.000");
                             }
@@ -151,12 +182,13 @@ namespace MASIC
                             ftmsResolution.Add("Ion_" + mzValue + "_Resolution");
 
                             // Uncomment to include the label data m/z value in the _ReporterIons.txt file
-                            // ' This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                            // ftmsLabelDataMz.Add("Ion_" + mzValue + "_LabelDataMZ")
+                            // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
+                            // ftmsLabelDataMz.Add("Ion_" + mzValue + "_LabelDataMZ");
                         }
                     }
 
                     headerColumns.Add("Weighted Avg Pct Intensity Correction");
+
                     if (mOptions.ReporterIons.ReporterIonSaveObservedMasses)
                     {
                         headerColumns.AddRange(obsMZHeaders);
@@ -179,7 +211,9 @@ namespace MASIC
 
                     // Write the headers to the output file, separated by tabs
                     writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), headerColumns));
+
                     UpdateProgress(0, "Searching for reporter ions");
+
                     for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                     {
                         int scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
@@ -189,7 +223,20 @@ namespace MASIC
                             continue;
                         }
 
-                        FindReporterIonsWork(xcaliburAccessor, dataAggregation, includeFtmsColumns, mOptions.SICOptions, scanList, spectraCache, scanList.FragScans[scanPointer], writer, reporterIons, cColDelimiter, saveUncorrectedIntensities, mOptions.ReporterIons.ReporterIonSaveObservedMasses);
+                        FindReporterIonsWork(
+                            xcaliburAccessor,
+                            dataAggregation,
+                            includeFtmsColumns,
+                            mOptions.SICOptions,
+                            scanList,
+                            spectraCache,
+                            scanList.FragScans[scanPointer],
+                            writer,
+                            reporterIons,
+                            cColDelimiter,
+                            saveUncorrectedIntensities,
+                            mOptions.ReporterIons.ReporterIonSaveObservedMasses);
+
                         if (scanList.MasterScanOrderCount > 1)
                         {
                             UpdateProgress(Convert.ToInt16(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
@@ -243,7 +290,19 @@ namespace MASIC
         /// <param name="saveUncorrectedIntensities"></param>
         /// <param name="saveObservedMasses"></param>
         /// <remarks></remarks>
-        private void FindReporterIonsWork(XRawFileIO xcaliburAccessor, clsDataAggregation dataAggregation, bool includeFtmsColumns, clsSICOptions sicOptions, clsScanList scanList, clsSpectraCache spectraCache, clsScanInfo currentScan, TextWriter writer, IList<clsReporterIonInfo> reporterIons, char cColDelimiter, bool saveUncorrectedIntensities, bool saveObservedMasses)
+        private void FindReporterIonsWork(
+            XRawFileIO xcaliburAccessor,
+            clsDataAggregation dataAggregation,
+            bool includeFtmsColumns,
+            clsSICOptions sicOptions,
+            clsScanList scanList,
+            clsSpectraCache spectraCache,
+            clsScanInfo currentScan,
+            TextWriter writer,
+            IList<clsReporterIonInfo> reporterIons,
+            char cColDelimiter,
+            bool saveUncorrectedIntensities,
+            bool saveObservedMasses)
         {
             const bool USE_MAX_ABUNDANCE_IN_WINDOW = true;
 
@@ -254,6 +313,7 @@ namespace MASIC
             // The following will be a value between 0 and 100
             // Using Absolute Value of percent change to avoid averaging both negative and positive values
             double parentIonMZ;
+
             if (currentScan.FragScanInfo.ParentIonInfoIndex >= 0 && currentScan.FragScanInfo.ParentIonInfoIndex < scanList.ParentIons.Count)
             {
                 parentIonMZ = scanList.ParentIons[currentScan.FragScanInfo.ParentIonInfoIndex].MZ;
@@ -276,10 +336,20 @@ namespace MASIC
             closestMZ = new double[reporterIons.Count];
 
             // Initialize the output variables
-            var dataColumns = new List<string>() { sicOptions.DatasetID.ToString(), currentScan.ScanNumber.ToString(), currentScan.FragScanInfo.CollisionMode, StringUtilities.DblToString(parentIonMZ, 2), StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2), StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4) };
+            var dataColumns = new List<string>()
+            {
+                sicOptions.DatasetID.ToString(),
+                currentScan.ScanNumber.ToString(),
+                currentScan.FragScanInfo.CollisionMode,
+                StringUtilities.DblToString(parentIonMZ, 2),
+                StringUtilities.DblToString(currentScan.BasePeakIonIntensity, 2),
+                StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
+            };
+
             var reporterIntensityList = new List<string>();
             var obsMZList = new List<string>();
             var uncorrectedIntensityList = new List<string>();
+
             var ftmsSignalToNoise = new List<string>();
             var ftmsResolution = new List<string>();
             // Dim ftmsLabelDataMz = New List(Of String)
@@ -292,9 +362,17 @@ namespace MASIC
             for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
                 int ionMatchCount;
+
                 var ion = reporterIons[reporterIonIndex];
                 // Search for the reporter ion MZ in this mass spectrum
-                reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex], ion.MZ, ion.MZToleranceDa, out ionMatchCount, out closestMZ[reporterIonIndex], USE_MAX_ABUNDANCE_IN_WINDOW);
+                reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(
+                    spectraCache.SpectraPool[poolIndex],
+                    ion.MZ,
+                    ion.MZToleranceDa,
+                    out ionMatchCount,
+                    out closestMZ[reporterIonIndex],
+                    USE_MAX_ABUNDANCE_IN_WINDOW);
+
                 ion.SignalToNoise = 0;
                 ion.Resolution = 0;
                 ion.LabelDataMZ = 0;
@@ -316,6 +394,7 @@ namespace MASIC
                     double highestIntensity = 0.0;
                     var udtBestMatch = new udtFTLabelInfoType();
                     bool matchFound = false;
+
                     foreach (var labelItem in ftLabelData)
                     {
                         // Compare labelItem.Mass (which is m/z of the ion in labelItem) to the m/z of the current reporter ion
@@ -346,13 +425,21 @@ namespace MASIC
             Array.Copy(reporterIntensities, reporterIntensitiesCorrected, reporterIntensities.Length);
             if (mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection)
             {
-                if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ || mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ)
+                if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ ||
+                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes ||
+                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes ||
+                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ ||
+                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ ||
+                    mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ)
                 {
                     // Correct the reporter ion intensities using the Reporter Ion Intensity Corrector class
 
-                    if (intensityCorrector.ReporterIonMode != mOptions.ReporterIons.ReporterIonMassMode || intensityCorrector.ITraq4PlexCorrectionFactorType != mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
+                    if (intensityCorrector.ReporterIonMode != mOptions.ReporterIons.ReporterIonMassMode ||
+                        intensityCorrector.ITraq4PlexCorrectionFactorType != mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)
                     {
-                        intensityCorrector.UpdateReporterIonMode(mOptions.ReporterIons.ReporterIonMassMode, mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
+                        intensityCorrector.UpdateReporterIonMode(
+                            mOptions.ReporterIons.ReporterIonMassMode,
+                            mOptions.ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
                     }
 
                     // Count the number of non-zero data points in reporterIntensitiesCorrected()
@@ -379,6 +466,7 @@ namespace MASIC
             // Initialize the variables used to compute the weighted average percent change
             double pctChangeSum = 0;
             double originalIntensitySum = 0;
+
             for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
                 if (!reporterIons[reporterIonIndex].ContaminantIon)
@@ -386,10 +474,13 @@ namespace MASIC
                     // Update the PctChange variables and the IntensityMax variable only if this is not a Contaminant Ion
 
                     originalIntensitySum += reporterIntensities[reporterIonIndex];
+
                     if (reporterIntensities[reporterIonIndex] > 0)
                     {
                         // Compute the percent change, then update pctChangeSum
-                        double pctChange = (reporterIntensitiesCorrected[reporterIonIndex] - reporterIntensities[reporterIonIndex]) / reporterIntensities[reporterIonIndex];
+                        double pctChange =
+                            (reporterIntensitiesCorrected[reporterIonIndex] - reporterIntensities[reporterIonIndex]) /
+                            reporterIntensities[reporterIonIndex];
 
                         // Using Absolute Value here to prevent negative changes from cancelling out positive changes
                         pctChangeSum += Math.Abs(pctChange * reporterIntensities[reporterIonIndex]);
@@ -407,6 +498,7 @@ namespace MASIC
                     // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
 
                     reporterIntensityList.Add(StringUtilities.DblToString(reporterIntensitiesCorrected[reporterIonIndex], 2));
+
                     if (saveObservedMasses)
                     {
                         // Append the observed reporter mass value to obsMZList
@@ -421,13 +513,15 @@ namespace MASIC
 
                     if (includeFtmsColumns)
                     {
-                        if (Math.Abs(reporterIons[reporterIonIndex].SignalToNoise) < float.Epsilon && Math.Abs(reporterIons[reporterIonIndex].Resolution) < float.Epsilon && Math.Abs(reporterIons[reporterIonIndex].LabelDataMZ) < float.Epsilon)
+                        if (Math.Abs(reporterIons[reporterIonIndex].SignalToNoise) < float.Epsilon &&
+                            Math.Abs(reporterIons[reporterIonIndex].Resolution) < float.Epsilon &&
+                            Math.Abs(reporterIons[reporterIonIndex].LabelDataMZ) < float.Epsilon)
                         {
                             // A match was not found in the label data; display blanks (not zeroes)
                             ftmsSignalToNoise.Add(string.Empty);
                             ftmsResolution.Add(string.Empty);
+                            // ftmsLabelDataMz.Add(String.Empty)
                         }
-                        // ftmsLabelDataMz.Add(String.Empty)
                         else
                         {
                             ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons[reporterIonIndex].SignalToNoise, 2));
@@ -479,9 +573,8 @@ namespace MASIC
                 dataColumns.AddRange(ftmsResolution);
 
                 // Uncomment to include the label data m/z value in the _ReporterIons.txt file
-                // If saveObservedMasses Then
-                // dataColumns.AddRange(ftmsLabelDataMz)
-                // End If
+                //if (saveObservedMasses)
+                //    dataColumns.AddRange(ftmsLabelDataMz)
             }
 
             writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
@@ -493,8 +586,10 @@ namespace MASIC
             {
                 clsReporterIonInfo reporterIonInfoA;
                 clsReporterIonInfo reporterIonInfoB;
+
                 reporterIonInfoA = (clsReporterIonInfo)x;
                 reporterIonInfoB = (clsReporterIonInfo)y;
+
                 if (reporterIonInfoA.MZ > reporterIonInfoB.MZ)
                 {
                     return 1;

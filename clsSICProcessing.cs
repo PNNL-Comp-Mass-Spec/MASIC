@@ -10,6 +10,7 @@ namespace MASIC
     public class clsSICProcessing : clsMasicEventNotifier
     {
         private const string CREATING_SICS = "Creating SIC's for parent ions";
+
         private readonly clsMASICPeakFinder mMASICPeakFinder;
         private readonly clsMRMProcessing mMRMProcessor;
 
@@ -22,12 +23,20 @@ namespace MASIC
             mMRMProcessor = mrmProcessor;
         }
 
-        private List<clsMzBinInfo> CreateMZLookupList(clsMASICOptions masicOptions, clsScanList scanList, bool processSIMScans, int simIndex)
+        private List<clsMzBinInfo> CreateMZLookupList(
+            clsMASICOptions masicOptions,
+            clsScanList scanList,
+            bool processSIMScans,
+            int simIndex)
         {
             int parentIonIndex;
+
             bool includeParentIon;
+
             var mzBinList = new List<clsMzBinInfo>(scanList.ParentIons.Count - 1);
+
             var sicOptions = masicOptions.SICOptions;
+
             for (parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
             {
                 if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ > 0)
@@ -74,6 +83,7 @@ namespace MASIC
                         MZ = scanList.ParentIons[parentIonIndex].MZ,
                         ParentIonIndex = parentIonIndex
                     };
+
                     if (scanList.ParentIons[parentIonIndex].CustomSICPeak)
                     {
                         newMzBin.MZTolerance = scanList.ParentIons[parentIonIndex].CustomSICPeakMZToleranceDa;
@@ -95,11 +105,18 @@ namespace MASIC
             return sortedMzBins;
         }
 
-        public bool CreateParentIonSICs(clsScanList scanList, clsSpectraCache spectraCache, clsMASICOptions masicOptions, clsDataOutput dataOutputHandler, clsSICProcessing sicProcessor, clsXMLResultsWriter xmlResultsWriter)
+        public bool CreateParentIonSICs(
+            clsScanList scanList,
+            clsSpectraCache spectraCache,
+            clsMASICOptions masicOptions,
+            clsDataOutput dataOutputHandler,
+            clsSICProcessing sicProcessor,
+            clsXMLResultsWriter xmlResultsWriter)
         {
             var success = default(bool);
             int parentIonIndex;
             int parentIonsProcessed;
+
             if (scanList.ParentIons.Count <= 0)
             {
                 // No parent ions
@@ -131,6 +148,7 @@ namespace MASIC
             {
                 parentIonsProcessed = 0;
                 masicOptions.LastParentIonProcessingLogTime = DateTime.UtcNow;
+
                 UpdateProgress(0, CREATING_SICS);
                 Console.Write(CREATING_SICS);
                 ReportMessage(CREATING_SICS);
@@ -146,7 +164,9 @@ namespace MASIC
                 var mzBinList = CreateMZLookupList(masicOptions, scanList, false, 0);
                 if (mzBinList.Count > 0)
                 {
-                    success = ProcessMZList(scanList, spectraCache, masicOptions, dataOutputHandler, xmlResultsWriter, mzBinList, false, 0, ref parentIonsProcessed);
+                    success = ProcessMZList(scanList, spectraCache, masicOptions,
+                                            dataOutputHandler, xmlResultsWriter,
+                                            mzBinList, false, 0, ref parentIonsProcessed);
                 }
 
                 if (success && !masicOptions.CustomSICList.LimitSearchToCustomMZList)
@@ -172,7 +192,9 @@ namespace MASIC
                         var mzBinListSIM = CreateMZLookupList(masicOptions, scanList, true, simIndex);
                         if (mzBinListSIM.Count > 0)
                         {
-                            ProcessMZList(scanList, spectraCache, masicOptions, dataOutputHandler, xmlResultsWriter, mzBinListSIM, true, simIndex, ref parentIonsProcessed);
+                            ProcessMZList(scanList, spectraCache, masicOptions,
+                                          dataOutputHandler, xmlResultsWriter,
+                                          mzBinListSIM, true, simIndex, ref parentIonsProcessed);
                         }
                     }
                 }
@@ -193,21 +215,40 @@ namespace MASIC
             }
         }
 
-        private clsSICStatsPeak ExtractSICDetailsFromFullSIC(int mzIndexWork, List<clsBaselineNoiseStatsSegment> baselineNoiseStatSegments, int fullSICDataCount, int[,] fullSICScanIndices, double[,] fullSICIntensities, double[,] fullSICMasses, clsScanList scanList, int scanIndexObservedInFullSIC, clsSICDetails sicDetails, clsMASICOptions masicOptions, clsScanNumScanTimeConversion scanNumScanConverter, bool customSICPeak, float customSICPeakScanOrAcqTimeTolerance)
+        private clsSICStatsPeak ExtractSICDetailsFromFullSIC(
+            int mzIndexWork,
+            List<clsBaselineNoiseStatsSegment> baselineNoiseStatSegments,
+            int fullSICDataCount,
+            int[,] fullSICScanIndices,
+            double[,] fullSICIntensities,
+            double[,] fullSICMasses,
+            clsScanList scanList,
+            int scanIndexObservedInFullSIC,
+            clsSICDetails sicDetails,
+            clsMASICOptions masicOptions,
+            clsScanNumScanTimeConversion scanNumScanConverter,
+            bool customSICPeak,
+            float customSICPeakScanOrAcqTimeTolerance)
         {
             // Minimum number of scans to extend left or right of the scan that meets the minimum intensity threshold requirement
             const int MINIMUM_NOISE_SCANS_TO_INCLUDE = 10;
+
             var customSICScanToleranceMinutesHalfWidth = default(float);
 
             // Pointers to entries in fullSICScanIndices() and fullSICIntensities()
-            var scanIndexStart = default(int);
-            var scanIndexEnd = default(int);
+            int scanIndexStart = default(int), scanIndexEnd = default(int);
+
             var maximumIntensity = default(double);
+
             var sicOptions = masicOptions.SICOptions;
+
             var baselineNoiseStats = mMASICPeakFinder.LookupNoiseStatsUsingSegments(scanIndexObservedInFullSIC, baselineNoiseStatSegments);
 
             // Initialize the peak
-            var sicPeak = new clsSICStatsPeak() { BaselineNoiseStats = baselineNoiseStats };
+            var sicPeak = new clsSICStatsPeak()
+            {
+                BaselineNoiseStats = baselineNoiseStats
+            };
 
             // Initialize the values for the maximum width of the SIC peak; these might get altered for custom SIC values
             float maxSICPeakWidthMinutesBackward = sicOptions.MaxSICPeakWidthMinutesBackward;
@@ -243,7 +284,8 @@ namespace MASIC
                         customSICPeakScanOrAcqTimeTolerance = 10;
                     }
 
-                    customSICScanToleranceMinutesHalfWidth = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, customSICPeakScanOrAcqTimeTolerance / 2, masicOptions.CustomSICList.ScanToleranceType, true);
+                    customSICScanToleranceMinutesHalfWidth = scanNumScanConverter.ScanOrAcqTimeToScanTime(
+                        scanList, customSICPeakScanOrAcqTimeTolerance / 2, masicOptions.CustomSICList.ScanToleranceType, true);
                 }
 
                 if (customSICPeak)
@@ -311,6 +353,7 @@ namespace MASIC
 
                 // The index of the first scan found to be below threshold (on the right)
                 int scanIndexBelowThresholdRight = -1;
+
                 while (scanIndexStart > 0 && !leftDone || scanIndexEnd < fullSICDataCount - 1 && !rightDone)
                 {
                     try
@@ -318,7 +361,9 @@ namespace MASIC
                         // Extend the SIC to the left until the threshold is reached
                         if (scanIndexStart > 0 && !leftDone)
                         {
-                            if (fullSICIntensities[mzIndexWork, scanIndexStart] < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum || fullSICIntensities[mzIndexWork, scanIndexStart] < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * maximumIntensity || fullSICIntensities[mzIndexWork, scanIndexStart] < sicPeak.BaselineNoiseStats.NoiseLevel)
+                            if (fullSICIntensities[mzIndexWork, scanIndexStart] < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum ||
+                                fullSICIntensities[mzIndexWork, scanIndexStart] < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * maximumIntensity ||
+                                fullSICIntensities[mzIndexWork, scanIndexStart] < sicPeak.BaselineNoiseStats.NoiseLevel)
                             {
                                 if (scanIndexBelowThresholdLeft < 0)
                                 {
@@ -336,7 +381,9 @@ namespace MASIC
                                 scanIndexBelowThresholdLeft = -1;
                             }
 
-                            float peakWidthMinutesBackward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime - scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexStart]].ScanTime;
+                            float peakWidthMinutesBackward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime -
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexStart]].ScanTime;
+
                             if (leftDone)
                             {
                                 // Require a minimum distance of InitialPeakWidthScansMaximum data points to the left of scanIndexObservedInFullSIC and to the left of scanIndexMax
@@ -372,7 +419,9 @@ namespace MASIC
                                 }
                             }
 
-                            peakWidthMinutesBackward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime - scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexStart]].ScanTime;
+                            peakWidthMinutesBackward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime -
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexStart]].ScanTime;
+
                             if (peakWidthMinutesBackward >= maxSICPeakWidthMinutesBackward)
                             {
                                 leftDone = true;
@@ -389,7 +438,9 @@ namespace MASIC
                         // Extend the SIC to the right until the threshold is reached
                         if (scanIndexEnd < fullSICDataCount - 1 && !rightDone)
                         {
-                            if (fullSICIntensities[mzIndexWork, scanIndexEnd] < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum || fullSICIntensities[mzIndexWork, scanIndexEnd] < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * maximumIntensity || fullSICIntensities[mzIndexWork, scanIndexEnd] < sicPeak.BaselineNoiseStats.NoiseLevel)
+                            if (fullSICIntensities[mzIndexWork, scanIndexEnd] < sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum ||
+                                fullSICIntensities[mzIndexWork, scanIndexEnd] < sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax * maximumIntensity ||
+                                fullSICIntensities[mzIndexWork, scanIndexEnd] < sicPeak.BaselineNoiseStats.NoiseLevel)
                             {
                                 if (scanIndexBelowThresholdRight < 0)
                                 {
@@ -407,7 +458,9 @@ namespace MASIC
                                 scanIndexBelowThresholdRight = -1;
                             }
 
-                            float peakWidthMinutesForward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexEnd]].ScanTime - scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime;
+                            float peakWidthMinutesForward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexEnd]].ScanTime -
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime;
+
                             if (rightDone)
                             {
                                 // Require a minimum distance of InitialPeakWidthScansMaximum data points to the right of scanIndexObservedInFullSIC and to the right of scanIndexMax
@@ -443,7 +496,9 @@ namespace MASIC
                                 }
                             }
 
-                            peakWidthMinutesForward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexEnd]].ScanTime - scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime;
+                            peakWidthMinutesForward = scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexEnd]].ScanTime -
+                                scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndexObservedInFullSIC]].ScanTime;
+
                             if (peakWidthMinutesForward >= maxSICPeakWidthMinutesForward)
                             {
                                 rightDone = true;
@@ -462,6 +517,7 @@ namespace MASIC
                 scanIndexStart = 0;
             if (scanIndexEnd >= fullSICDataCount)
                 scanIndexEnd = fullSICDataCount - 1;
+
             if (scanIndexEnd < scanIndexStart)
             {
                 ReportError("Programming error: scanIndexEnd < scanIndexStart", clsMASIC.eMasicErrorCodes.FindSICPeaksError);
@@ -476,12 +532,17 @@ namespace MASIC
 
                 sicDetails.SICScanType = clsScanList.eScanTypeConstants.SurveyScan;
                 sicDetails.SICData.Clear();
+
                 sicPeak.IndexObserved = 0;
                 for (int scanIndex = scanIndexStart; scanIndex <= scanIndexEnd; scanIndex++)
                 {
                     if (fullSICScanIndices[mzIndexWork, scanIndex] >= 0)
                     {
-                        sicDetails.AddData(scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndex]].ScanNumber, fullSICIntensities[mzIndexWork, scanIndex], fullSICMasses[mzIndexWork, scanIndex], fullSICScanIndices[mzIndexWork, scanIndex]);
+                        sicDetails.AddData(scanList.SurveyScans[fullSICScanIndices[mzIndexWork, scanIndex]].ScanNumber,
+                            fullSICIntensities[mzIndexWork, scanIndex],
+                            fullSICMasses[mzIndexWork, scanIndex],
+                            fullSICScanIndices[mzIndexWork, scanIndex]);
+
                         if (scanIndex == scanIndexObservedInFullSIC)
                         {
                             sicPeak.IndexObserved = sicDetails.SICDataCount - 1;
@@ -501,14 +562,27 @@ namespace MASIC
             return sicPeak;
         }
 
-        private bool ProcessMZList(clsScanList scanList, clsSpectraCache spectraCache, clsMASICOptions masicOptions, clsDataOutput dataOutputHandler, clsXMLResultsWriter xmlResultsWriter, IReadOnlyList<clsMzBinInfo> mzBinList, bool processSIMScans, int simIndex, ref int parentIonsProcessed)
+        private bool ProcessMZList(
+            clsScanList scanList,
+            clsSpectraCache spectraCache,
+            clsMASICOptions masicOptions,
+            clsDataOutput dataOutputHandler,
+            clsXMLResultsWriter xmlResultsWriter,
+            IReadOnlyList<clsMzBinInfo> mzBinList,
+            bool processSIMScans,
+            int simIndex,
+            ref int parentIonsProcessed)
         {
             // Step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
             // Note that mzBinList and parentIonIndices() are parallel arrays, with mzBinList() sorted on ascending m/z
             const int MAX_RAW_DATA_MEMORY_USAGE_MB = 50;
+
             int maxMZCountInChunk;
+
             var mzSearchChunks = new List<clsMzSearchInfo>();
+
             bool[] parentIonUpdated;
+
             try
             {
                 // Determine the maximum number of m/z values to process simultaneously
@@ -545,10 +619,12 @@ namespace MASIC
             {
                 var dataAggregation = new clsDataAggregation();
                 RegisterEvents(dataAggregation);
+
                 var scanNumScanConverter = new clsScanNumScanTimeConversion();
                 RegisterEvents(scanNumScanConverter);
-                var parentIonIndices = (from item in mzBinList
-                                        select item.ParentIonIndex).ToList();
+
+                var parentIonIndices = (from item in mzBinList select item.ParentIonIndex).ToList();
+
                 int mzIndex = 0;
                 while (mzIndex < mzBinList.Count)
                 {
@@ -568,6 +644,7 @@ namespace MASIC
                         MZTolerance = mzBinList[mzIndex].MZTolerance,
                         MZToleranceIsPPM = mzBinList[mzIndex].MZToleranceIsPPM
                     };
+
                     double mzToleranceDa;
                     if (mzSearchChunk.MZToleranceIsPPM)
                     {
@@ -578,9 +655,14 @@ namespace MASIC
                         mzToleranceDa = mzSearchChunk.MZTolerance;
                     }
 
-                    while (mzIndex < mzBinList.Count - 2 && Math.Abs(mzBinList[mzIndex + 1].MZTolerance - mzSearchChunk.MZTolerance) < double.Epsilon && mzBinList[mzIndex + 1].MZToleranceIsPPM == mzSearchChunk.MZToleranceIsPPM && mzBinList[mzIndex + 1].MZ - mzBinList[mzSearchChunk.MZIndexStart].MZ <= mzToleranceDa / 2)
+                    while (mzIndex < mzBinList.Count - 2 &&
+                           Math.Abs(mzBinList[mzIndex + 1].MZTolerance - mzSearchChunk.MZTolerance) < double.Epsilon &&
+                           mzBinList[mzIndex + 1].MZToleranceIsPPM == mzSearchChunk.MZToleranceIsPPM &&
+                           mzBinList[mzIndex + 1].MZ - mzBinList[mzSearchChunk.MZIndexStart].MZ <= mzToleranceDa / 2)
                         mzIndex += 1;
+
                     mzSearchChunk.MZIndexEnd = mzIndex;
+
                     if (mzSearchChunk.MZIndexEnd == mzSearchChunk.MZIndexStart)
                     {
                         mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexEnd;
@@ -601,6 +683,7 @@ namespace MASIC
                     }
 
                     mzSearchChunks.Add(mzSearchChunk);
+
                     if (mzSearchChunks.Count >= maxMZCountInChunk || mzIndex == mzBinList.Count - 1)
                     {
                         // ---------------------------------------------------------
@@ -608,7 +691,18 @@ namespace MASIC
                         // Process all of the m/z values in udtMZSearchChunk
                         // ---------------------------------------------------------
 
-                        bool success = ProcessMzSearchChunk(masicOptions, scanList, dataAggregation, dataOutputHandler, xmlResultsWriter, spectraCache, scanNumScanConverter, mzSearchChunks, parentIonIndices, processSIMScans, simIndex, parentIonUpdated, ref parentIonsProcessed);
+                        bool success = ProcessMzSearchChunk(
+                            masicOptions,
+                            scanList,
+                            dataAggregation, dataOutputHandler, xmlResultsWriter,
+                            spectraCache, scanNumScanConverter,
+                            mzSearchChunks,
+                            parentIonIndices,
+                            processSIMScans,
+                            simIndex,
+                            parentIonUpdated,
+                            ref parentIonsProcessed);
+
                         if (!success)
                         {
                             return false;
@@ -636,7 +730,20 @@ namespace MASIC
             }
         }
 
-        private bool ProcessMzSearchChunk(clsMASICOptions masicOptions, clsScanList scanList, clsDataAggregation dataAggregation, clsDataOutput dataOutputHandler, clsXMLResultsWriter xmlResultsWriter, clsSpectraCache spectraCache, clsScanNumScanTimeConversion scanNumScanConverter, IReadOnlyList<clsMzSearchInfo> mzSearchChunk, IList<int> parentIonIndices, bool processSIMScans, int simIndex, IList<bool> parentIonUpdated, ref int parentIonsProcessed)
+        private bool ProcessMzSearchChunk(
+            clsMASICOptions masicOptions,
+            clsScanList scanList,
+            clsDataAggregation dataAggregation,
+            clsDataOutput dataOutputHandler,
+            clsXMLResultsWriter xmlResultsWriter,
+            clsSpectraCache spectraCache,
+            clsScanNumScanTimeConversion scanNumScanConverter,
+            IReadOnlyList<clsMzSearchInfo> mzSearchChunk,
+            IList<int> parentIonIndices,
+            bool processSIMScans,
+            int simIndex,
+            IList<bool> parentIonUpdated,
+            ref int parentIonsProcessed)
         {
             // The following are 2D arrays, ranging from 0 to mzSearchChunkCount-1 in the first dimension and 0 to .SurveyScans.Count - 1 in the second dimension
             // We could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
@@ -653,6 +760,7 @@ namespace MASIC
             fullSICScanIndices = new int[mzSearchChunk.Count, scanList.SurveyScans.Count];
             fullSICIntensities = new double[mzSearchChunk.Count, scanList.SurveyScans.Count];
             fullSICMasses = new double[mzSearchChunk.Count, scanList.SurveyScans.Count];
+
             fullSICIntensities1D = new double[scanList.SurveyScans.Count];
 
             // Initialize .MaximumIntensity and .ScanIndexMax
@@ -660,6 +768,7 @@ namespace MASIC
             for (int mzIndexWork = 0; mzIndexWork <= mzSearchChunk.Count - 1; mzIndexWork++)
             {
                 mzSearchChunk[mzIndexWork].ResetMaxIntensity();
+
                 fullSICDataCount[mzIndexWork] = 0;
                 for (int surveyScanIndex = 0; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
                     fullSICScanIndices[mzIndexWork, surveyScanIndex] = -1;
@@ -672,9 +781,11 @@ namespace MASIC
             for (int surveyScanIndex = 0; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
             {
                 bool useScan;
+
                 if (processSIMScans)
                 {
-                    if (scanList.SurveyScans[surveyScanIndex].SIMScan && scanList.SurveyScans[surveyScanIndex].SIMIndex == simIndex)
+                    if (scanList.SurveyScans[surveyScanIndex].SIMScan &&
+                        scanList.SurveyScans[surveyScanIndex].SIMIndex == simIndex)
                     {
                         useScan = true;
                     }
@@ -686,6 +797,7 @@ namespace MASIC
                 else
                 {
                     useScan = !scanList.SurveyScans[surveyScanIndex].SIMScan;
+
                     if (scanList.SurveyScans[surveyScanIndex].ZoomScan)
                     {
                         useScan = false;
@@ -698,6 +810,7 @@ namespace MASIC
                 }
 
                 int poolIndex;
+
                 if (!spectraCache.ValidateSpectrumInPool(scanList.SurveyScans[surveyScanIndex].ScanNumber, out poolIndex))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
@@ -707,7 +820,9 @@ namespace MASIC
                 for (int mzIndexWork = 0; mzIndexWork <= mzSearchChunk.Count - 1; mzIndexWork++)
                 {
                     var current = mzSearchChunk[mzIndexWork];
+
                     double mzToleranceDa;
+
                     if (current.MZToleranceIsPPM)
                     {
                         mzToleranceDa = clsUtilities.PPMToMass(current.MZTolerance, current.SearchMZ);
@@ -719,10 +834,15 @@ namespace MASIC
 
                     int ionMatchCount;
                     double closestMZ;
-                    double ionSum = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex], current.SearchMZ, mzToleranceDa, out ionMatchCount, out closestMZ, false);
+
+                    double ionSum = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex],
+                                                                         current.SearchMZ, mzToleranceDa,
+                                                                         out ionMatchCount, out closestMZ, false);
+
                     int dataIndex = fullSICDataCount[mzIndexWork];
                     fullSICScanIndices[mzIndexWork, dataIndex] = surveyScanIndex;
                     fullSICIntensities[mzIndexWork, dataIndex] = ionSum;
+
                     if (ionSum < float.Epsilon && masicOptions.SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData)
                     {
                         fullSICIntensities[mzIndexWork, dataIndex] = scanList.SurveyScans[surveyScanIndex].MinimumPositiveIntensity;
@@ -750,6 +870,7 @@ namespace MASIC
             }
 
             UpdateProgress(CREATING_SICS);
+
             if (masicOptions.AbortProcessing)
             {
                 scanList.ProcessingIncomplete = true;
@@ -778,7 +899,12 @@ namespace MASIC
 
                 // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
                 List<clsBaselineNoiseStatsSegment> noiseStatSegments = null;
-                bool success = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(fullSICIntensities1D, 0, fullSICDataCount[mzIndexWork] - 1, masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions, out noiseStatSegments);
+
+                bool success = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(
+                    fullSICIntensities1D, 0, fullSICDataCount[mzIndexWork] - 1,
+                    masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions,
+                    out noiseStatSegments);
+
                 if (!success)
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, true);
@@ -786,20 +912,50 @@ namespace MASIC
                 }
 
                 mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments = noiseStatSegments;
+
                 clsSICPotentialAreaStats potentialAreaStatsInFullSIC = null;
 
                 // Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
-                mMASICPeakFinder.FindPotentialPeakArea(fullSICDataCount[mzIndexWork], fullSICIntensities1D, out potentialAreaStatsInFullSIC, masicOptions.SICOptions.SICPeakFinderOptions);
+                mMASICPeakFinder.FindPotentialPeakArea(
+                    fullSICDataCount[mzIndexWork],
+                    fullSICIntensities1D,
+                    out potentialAreaStatsInFullSIC,
+                    masicOptions.SICOptions.SICPeakFinderOptions);
+
                 clsSICPotentialAreaStats potentialAreaStatsForPeak = null;
+
                 int scanIndexObservedInFullSIC = mzSearchChunk[mzIndexWork].ScanIndexMax;
 
                 // Initialize sicDetails
-                var sicDetails = new clsSICDetails() { SICScanType = clsScanList.eScanTypeConstants.SurveyScan };
+                var sicDetails = new clsSICDetails()
+                {
+                    SICScanType = clsScanList.eScanTypeConstants.SurveyScan
+                };
 
                 // Populate sicDetails using the data centered around the highest intensity in fullSICIntensities
                 // Note that this function will update sicPeak.IndexObserved
-                var sicPeak = ExtractSICDetailsFromFullSIC(mzIndexWork, mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments, fullSICDataCount[mzIndexWork], fullSICScanIndices, fullSICIntensities, fullSICMasses, scanList, scanIndexObservedInFullSIC, sicDetails, masicOptions, scanNumScanConverter, false, 0);
-                UpdateSICStatsUsingLargestPeak(sicDetails, potentialAreaStatsForPeak, sicPeak, masicOptions, potentialAreaStatsInFullSIC, scanList, mzSearchChunk, mzIndexWork, parentIonIndices, debugParentIonIndexToFind, dataOutputHandler, xmlResultsWriter, parentIonUpdated, ref parentIonsProcessed);
+                var sicPeak = ExtractSICDetailsFromFullSIC(
+                    mzIndexWork, mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments,
+                    fullSICDataCount[mzIndexWork], fullSICScanIndices, fullSICIntensities, fullSICMasses,
+                    scanList, scanIndexObservedInFullSIC,
+                    sicDetails,
+                    masicOptions, scanNumScanConverter, false, 0);
+
+                UpdateSICStatsUsingLargestPeak(
+                    sicDetails,
+                    potentialAreaStatsForPeak,
+                    sicPeak,
+                    masicOptions,
+                    potentialAreaStatsInFullSIC,
+                    scanList,
+                    mzSearchChunk,
+                    mzIndexWork,
+                    parentIonIndices,
+                    debugParentIonIndexToFind,
+                    dataOutputHandler,
+                    xmlResultsWriter,
+                    parentIonUpdated,
+                    ref parentIonsProcessed);
 
                 // --------------------------------------------------------
                 // Now step through the parent ions and process those that were not updated using sicPeak
@@ -809,6 +965,7 @@ namespace MASIC
                 {
                     if (parentIonUpdated[parentIonIndexPointer])
                         continue;
+
                     if (parentIonIndices[parentIonIndexPointer] == debugParentIonIndexToFind)
                     {
                         // ReSharper disable once RedundantAssignment
@@ -816,6 +973,7 @@ namespace MASIC
                     }
 
                     clsSmoothedYDataSubset smoothedYDataSubsetInSearchChunk = null;
+
                     var currentParentIon = scanList.ParentIons[parentIonIndices[parentIonIndexPointer]];
 
                     // Clear udtSICPotentialAreaStatsForPeak
@@ -842,18 +1000,46 @@ namespace MASIC
 
                     // Populate udtSICDetails using the data centered around scanIndexObservedInFullSIC
                     // Note that this function will update sicStatsPeak.IndexObserved
-                    var sicStatsPeak = ExtractSICDetailsFromFullSIC(mzIndexWork, mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments, fullSICDataCount[mzIndexWork], fullSICScanIndices, fullSICIntensities, fullSICMasses, scanList, scanIndexObservedInFullSIC, sicDetails, masicOptions, scanNumScanConverter, currentParentIon.CustomSICPeak, currentParentIon.CustomSICPeakScanOrAcqTimeTolerance);
+                    var sicStatsPeak = ExtractSICDetailsFromFullSIC(
+                        mzIndexWork, mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments,
+                        fullSICDataCount[mzIndexWork], fullSICScanIndices, fullSICIntensities, fullSICMasses,
+                        scanList, scanIndexObservedInFullSIC,
+                        sicDetails,
+                        masicOptions, scanNumScanConverter,
+                        currentParentIon.CustomSICPeak, currentParentIon.CustomSICPeakScanOrAcqTimeTolerance);
+
                     currentParentIon.SICStats.Peak = sicStatsPeak;
+
                     bool returnClosestPeak = !currentParentIon.CustomSICPeak;
-                    bool peakIsValid = mMASICPeakFinder.FindSICPeakAndArea(sicDetails.SICData, out var potentialAreaStatsForPeakOut, sicStatsPeak, out smoothedYDataSubsetInSearchChunk, masicOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, returnClosestPeak, scanList.SIMDataPresent, false);
+
+                    bool peakIsValid = mMASICPeakFinder.FindSICPeakAndArea(
+                        sicDetails.SICData,
+                        out var potentialAreaStatsForPeakOut,
+                        sicStatsPeak,
+                        out smoothedYDataSubsetInSearchChunk,
+                        masicOptions.SICOptions.SICPeakFinderOptions,
+                        potentialAreaStatsInFullSIC,
+                        returnClosestPeak,
+                        scanList.SIMDataPresent,
+                        false);
                     currentParentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
-                    StorePeakInParentIon(scanList, parentIonIndices[parentIonIndexPointer], sicDetails, currentParentIon.SICStats.SICPotentialAreaStatsForPeak, sicStatsPeak, peakIsValid);
+
+                    StorePeakInParentIon(scanList,
+                                         parentIonIndices[parentIonIndexPointer],
+                                         sicDetails,
+                                         currentParentIon.SICStats.SICPotentialAreaStatsForPeak,
+                                         sicStatsPeak,
+                                         peakIsValid);
 
                     // Possibly save the stats for this SIC to the SICData file
-                    dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList, parentIonIndices[parentIonIndexPointer], sicDetails);
+                    dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
+                        parentIonIndices[parentIonIndexPointer], sicDetails);
 
                     // Save the stats for this SIC to the XML file
-                    xmlResultsWriter.SaveDataToXML(scanList, parentIonIndices[parentIonIndexPointer], sicDetails, smoothedYDataSubsetInSearchChunk, dataOutputHandler);
+                    xmlResultsWriter.SaveDataToXML(scanList,
+                                                   parentIonIndices[parentIonIndexPointer], sicDetails,
+                                                   smoothedYDataSubsetInSearchChunk, dataOutputHandler);
+
                     parentIonUpdated[parentIonIndexPointer] = true;
                     parentIonsProcessed += 1;
                 }
@@ -898,12 +1084,32 @@ namespace MASIC
             return true;
         }
 
-        private void UpdateSICStatsUsingLargestPeak(clsSICDetails sicDetails, clsSICPotentialAreaStats potentialAreaStatsForPeak, clsSICStatsPeak sicPeak, clsMASICOptions masicOptions, clsSICPotentialAreaStats potentialAreaStatsInFullSIC, clsScanList scanList, IReadOnlyList<clsMzSearchInfo> mzSearchChunk, int mzIndexWork, IList<int> parentIonIndices, int debugParentIonIndexToFind, clsDataOutput dataOutputHandler, clsXMLResultsWriter xmlResultsWriter, IList<bool> parentIonUpdated, ref int parentIonsProcessed)
+        private void UpdateSICStatsUsingLargestPeak(
+            clsSICDetails sicDetails,
+            clsSICPotentialAreaStats potentialAreaStatsForPeak,
+            clsSICStatsPeak sicPeak,
+            clsMASICOptions masicOptions,
+            clsSICPotentialAreaStats potentialAreaStatsInFullSIC,
+            clsScanList scanList,
+            IReadOnlyList<clsMzSearchInfo> mzSearchChunk,
+            int mzIndexWork,
+            IList<int> parentIonIndices,
+            int debugParentIonIndexToFind,
+            clsDataOutput dataOutputHandler,
+            clsXMLResultsWriter xmlResultsWriter,
+            IList<bool> parentIonUpdated,
+            ref int parentIonsProcessed)
         {
             clsSmoothedYDataSubset smoothedYDataSubset = null;
 
             // Find the largest peak in the SIC for this m/z
-            bool largestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(sicDetails.SICData, out potentialAreaStatsForPeak, sicPeak, out smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions, potentialAreaStatsInFullSIC, true, scanList.SIMDataPresent, false);
+            bool largestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
+                sicDetails.SICData,
+                out potentialAreaStatsForPeak, sicPeak,
+                out smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
+                potentialAreaStatsInFullSIC,
+                true, scanList.SIMDataPresent, false);
+
             if (!largestPeakFound)
             {
                 return;
@@ -915,6 +1121,7 @@ namespace MASIC
             // --------------------------------------------------------
 
             var mzIndexSICIndices = sicDetails.SICScanIndices;
+
             for (int parentIonIndexPointer = mzSearchChunk[mzIndexWork].MZIndexStart; parentIonIndexPointer <= mzSearchChunk[mzIndexWork].MZIndexEnd; parentIonIndexPointer++)
             {
                 bool storePeak = false;
@@ -930,31 +1137,46 @@ namespace MASIC
 
                 // Assign the stats of the largest peak to each parent ion with .SurveyScanIndex contained in the peak
                 var currentParentIon = scanList.ParentIons[parentIonIndices[parentIonIndexPointer]];
-                if (currentParentIon.SurveyScanIndex >= mzIndexSICIndices[sicPeak.IndexBaseLeft] && currentParentIon.SurveyScanIndex <= mzIndexSICIndices[sicPeak.IndexBaseRight])
+                if (currentParentIon.SurveyScanIndex >= mzIndexSICIndices[sicPeak.IndexBaseLeft] &&
+                    currentParentIon.SurveyScanIndex <= mzIndexSICIndices[sicPeak.IndexBaseRight])
                 {
                     storePeak = true;
                 }
 
                 if (!storePeak)
                     continue;
-                StorePeakInParentIon(scanList, parentIonIndices[parentIonIndexPointer], sicDetails, potentialAreaStatsForPeak, sicPeak, true);
+
+                StorePeakInParentIon(scanList, parentIonIndices[parentIonIndexPointer],
+                                     sicDetails, potentialAreaStatsForPeak, sicPeak, true);
 
                 // Possibly save the stats for this SIC to the SICData file
-                dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList, parentIonIndices[parentIonIndexPointer], sicDetails);
+                dataOutputHandler.SaveSICDataToText(masicOptions.SICOptions, scanList,
+                                                    parentIonIndices[parentIonIndexPointer], sicDetails);
 
                 // Save the stats for this SIC to the XML file
-                xmlResultsWriter.SaveDataToXML(scanList, parentIonIndices[parentIonIndexPointer], sicDetails, smoothedYDataSubset, dataOutputHandler);
+                xmlResultsWriter.SaveDataToXML(scanList,
+                                               parentIonIndices[parentIonIndexPointer], sicDetails,
+                                               smoothedYDataSubset, dataOutputHandler);
+
                 parentIonUpdated[parentIonIndexPointer] = true;
                 parentIonsProcessed += 1;
             }
         }
 
-        public bool StorePeakInParentIon(clsScanList scanList, int parentIonIndex, clsSICDetails sicDetails, clsSICPotentialAreaStats potentialAreaStatsForPeak, clsSICStatsPeak sicPeak, bool peakIsValid)
+        public bool StorePeakInParentIon(
+            clsScanList scanList,
+            int parentIonIndex,
+            clsSICDetails sicDetails,
+            clsSICPotentialAreaStats potentialAreaStatsForPeak,
+            clsSICStatsPeak sicPeak,
+            bool peakIsValid)
         {
             int dataIndex;
             int scanIndexObserved;
             int fragScanNumber;
+
             bool processingMRMPeak;
+
             try
             {
                 if (sicDetails.SICDataCount == 0)
@@ -962,18 +1184,23 @@ namespace MASIC
                     // Either .SICData is nothing or no SIC data exists
                     // Cannot find peaks for this parent ion
                     var sicStatsPeak = scanList.ParentIons[parentIonIndex].SICStats.Peak;
+
                     sicStatsPeak.IndexObserved = 0;
                     sicStatsPeak.IndexBaseLeft = 0;
                     sicStatsPeak.IndexBaseRight = 0;
                     sicStatsPeak.IndexMax = 0;
+
                     return true;
                 }
 
                 var sicData = sicDetails.SICData;
+
                 var currentParentIon = scanList.ParentIons[parentIonIndex];
+
                 scanIndexObserved = currentParentIon.SurveyScanIndex;
                 if (scanIndexObserved < 0)
                     scanIndexObserved = 0;
+
                 if (currentParentIon.MRMDaughterMZ > 0)
                 {
                     processingMRMPeak = true;
@@ -984,10 +1211,12 @@ namespace MASIC
                 }
 
                 var sicStats = currentParentIon.SICStats;
+
                 sicStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeak;
 
                 // Clone sicPeak since it will be updated to include the ParentIonIntensity for this parent ion's fragmentation scan
                 sicStats.Peak = sicPeak.Clone();
+
                 sicStats.ScanTypeForPeakIndices = sicDetails.SICScanType;
                 if (processingMRMPeak)
                 {
@@ -1046,7 +1275,10 @@ namespace MASIC
                 else
                 {
                     // Determine the value for .ParentIonIntensity
-                    mMASICPeakFinder.ComputeParentIonIntensity(sicData, sicStats.Peak, fragScanNumber);
+                    mMASICPeakFinder.ComputeParentIonIntensity(
+                        sicData,
+                        sicStats.Peak,
+                        fragScanNumber);
                 }
 
                 if (peakIsValid)
@@ -1063,7 +1295,9 @@ namespace MASIC
                     sicStats.PeakScanIndexMax = sicData[sicStats.Peak.IndexMax].ScanIndex;
                     sicStats.PeakScanIndexStart = sicStats.PeakScanIndexMax;
                     sicStats.PeakScanIndexEnd = sicStats.PeakScanIndexMax;
+
                     var sicStatsPeak = sicStats.Peak;
+
                     sicStatsPeak.MaxIntensityValue = sicData[sicStatsPeak.IndexMax].Intensity;
                     sicStatsPeak.IndexBaseLeft = sicStatsPeak.IndexMax;
                     sicStatsPeak.IndexBaseRight = sicStatsPeak.IndexMax;
@@ -1071,7 +1305,10 @@ namespace MASIC
 
                     // Assign the intensity of the peak at the observed maximum to the area
                     sicStatsPeak.Area = sicStatsPeak.MaxIntensityValue;
-                    sicStatsPeak.SignalToNoiseRatio = clsMASICPeakFinder.ComputeSignalToNoise(sicStatsPeak.MaxIntensityValue, sicStatsPeak.BaselineNoiseStats.NoiseLevel);
+
+                    sicStatsPeak.SignalToNoiseRatio = clsMASICPeakFinder.ComputeSignalToNoise(
+                        sicStatsPeak.MaxIntensityValue,
+                        sicStatsPeak.BaselineNoiseStats.NoiseLevel);
                 }
 
                 // Update .OptimalPeakApexScanNumber

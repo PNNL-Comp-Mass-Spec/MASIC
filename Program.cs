@@ -30,24 +30,31 @@ namespace MASIC
     public static class Program
     {
         public const string PROGRAM_DATE = "March 27, 2020";
+
         private static string mInputFilePath;
         private static string mOutputDirectoryPath;                          // Optional
         private static string mParameterFilePath;                            // Optional
         private static string mOutputDirectoryAlternatePath;                 // Optional
         private static bool mRecreateDirectoryHierarchyInAlternatePath;   // Optional
+
         private static string mDatasetLookupFilePath;                        // Optional
         private static int mDatasetID;
+
         private static bool mRecurseDirectories;
         private static int mMaxLevelsToRecurse;
+
         private static bool mLogMessagesToFile;
         private static string mLogFilePath = string.Empty;
         private static string mLogDirectoryPath = string.Empty;
+
         private static string mMASICStatusFilename = string.Empty;
         private static bool mQuietMode;
+
         private static clsMASIC mMASIC;
 #if GUI
         private static frmProgress mProgressForm;
 #endif
+
         private static DateTime mLastSubtaskProgressTime;
         private static DateTime mLastProgressReportTime;
         private static int mLastProgressReportValue;
@@ -58,15 +65,20 @@ namespace MASIC
 
             var commandLineParser = new clsParseCommandLine();
             bool proceed;
+
             mInputFilePath = string.Empty;
             mOutputDirectoryPath = string.Empty;
             mParameterFilePath = string.Empty;
+
             mRecurseDirectories = false;
             mMaxLevelsToRecurse = 0;
+
             mQuietMode = false;
             mLogMessagesToFile = false;
             mLogFilePath = string.Empty;
+
             mLastSubtaskProgressTime = DateTime.UtcNow;
+
             try
             {
                 proceed = false;
@@ -94,8 +106,10 @@ namespace MASIC
 
                 mMASIC = new clsMASIC();
                 RegisterMasicEvents(mMASIC);
+
                 mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath;
                 mMASIC.Options.SICOptions.DatasetID = mDatasetID;
+
                 if (mMASICStatusFilename != null && mMASICStatusFilename.Length > 0)
                 {
                     mMASIC.Options.MASICStatusFilename = mMASICStatusFilename;
@@ -104,10 +118,12 @@ namespace MASIC
                 mMASIC.LogMessagesToFile = mLogMessagesToFile;
                 mMASIC.LogFilePath = mLogFilePath;
                 mMASIC.LogDirectoryPath = mLogDirectoryPath;
+
                 if (!mQuietMode)
                 {
 #if GUI
                     mProgressForm = new frmProgress();
+
                     mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
                     mProgressForm.InitializeSubtask("", 0, 100, false);
                     mProgressForm.ResetKeyPressAbortProcess();
@@ -119,9 +135,12 @@ namespace MASIC
                 }
 
                 int returnCode;
+
                 if (mRecurseDirectories)
                 {
-                    if (mMASIC.ProcessFilesAndRecurseDirectories(mInputFilePath, mOutputDirectoryPath, mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath, mParameterFilePath, mMaxLevelsToRecurse))
+                    if (mMASIC.ProcessFilesAndRecurseDirectories(mInputFilePath, mOutputDirectoryPath,
+                                                                 mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath,
+                                                                 mParameterFilePath, mMaxLevelsToRecurse))
                     {
                         returnCode = 0;
                     }
@@ -177,6 +196,7 @@ namespace MASIC
 
             if (percentComplete > 100)
                 percentComplete = 100;
+
             Console.Write("Processing: " + percentComplete.ToString() + "% ");
             if (addCarriageReturn)
             {
@@ -200,6 +220,7 @@ namespace MASIC
         private static void RegisterMasicEvents(clsMASIC oClass)
         {
             RegisterEvents(oClass);
+
             oClass.ProgressUpdate += ProgressUpdateHandler;
             oClass.ProgressResetKeypressAbort += ProgressResetKeypressAbortHandler;
             oClass.ProgressSubtaskChanged += ProgressSubtaskChangedHandler;
@@ -212,13 +233,14 @@ namespace MASIC
             string value = string.Empty;
             var lstValidParameters = new List<string>() { "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q" };
             int intValue;
+
             try
             {
                 // Make sure no invalid parameters are present
                 if (commandLineParser.InvalidParametersPresent(lstValidParameters))
                 {
-                    ShowErrorMessage("Invalid command line parameters", (from item in commandLineParser.InvalidParameters(lstValidParameters)
-                                                                         select ("/" + item)).ToList());
+                    ShowErrorMessage("Invalid command line parameters",
+                        (from item in commandLineParser.InvalidParameters(lstValidParameters) select ("/" + item)).ToList());
                     return false;
                 }
                 else
@@ -265,8 +287,10 @@ namespace MASIC
                         mOutputDirectoryAlternatePath = value;
                     if (commandLineParser.IsParameterPresent("R"))
                         mRecreateDirectoryHierarchyInAlternatePath = true;
+
                     string logFileName = string.Empty;
                     bool logToFile = false;
+
                     if (commandLineParser.IsParameterPresent("L"))
                     {
                         logToFile = commandLineParser.RetrieveValueForParameter("L", out logFileName);
@@ -310,6 +334,7 @@ namespace MASIC
 
                     if (commandLineParser.IsParameterPresent("Q"))
                         mQuietMode = true;
+
                     return true;
                 }
             }
@@ -335,50 +360,88 @@ namespace MASIC
         public static void ShowGUI()
         {
             frmMain objFormMain;
+
             Application.EnableVisualStyles();
             Application.DoEvents();
+
             objFormMain = new frmMain();
 
             // The following call is needed because the .ShowDialog() call is inexplicably increasing the size of the form
             objFormMain.SetHeightAdjustForce(objFormMain.Height);
+
             objFormMain.ShowDialog();
         }
 #endif
+
         private static void ShowProgramHelp()
         {
             try
             {
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("This program will read a Thermo .RAW file, .mzML file, .mzXML file, or Agilent LC/MSD .CDF/.MGF file combo " + "and create a selected ion chromatogram (SIC) for each parent ion. " + "It also supports extracting reporter ion intensities (e.g. iTRAQ or TMT), " + "and additional metadata from mass spectrometer data files."));
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "This program will read a Thermo .RAW file, .mzML file, .mzXML file, or Agilent LC/MSD .CDF/.MGF file combo " +
+                    "and create a selected ion chromatogram (SIC) for each parent ion. " +
+                    "It also supports extracting reporter ion intensities (e.g. iTRAQ or TMT), " +
+                    "and additional metadata from mass spectrometer data files."));
+
                 Console.WriteLine();
+
                 Console.WriteLine("Program syntax:" + Environment.NewLine + Path.GetFileName(ProcessFilesOrDirectoriesBase.GetAppPath()));
                 Console.WriteLine(" /I:InputFilePath.raw [/O:OutputDirectoryPath]");
                 Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath] ");
                 Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]");
                 Console.WriteLine(" [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]");
                 Console.WriteLine();
+
                 Console.WriteLine("The input file path can contain the wildcard character *");
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("The output directory name is optional. " + "If omitted, the output files will be created in the same directory as the input file. " + "If included, then a subdirectory is created with the name OutputDirectoryName."));
+
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "The output directory name is optional. " +
+                    "If omitted, the output files will be created in the same directory as the input file. " +
+                    "If included, then a subdirectory is created with the name OutputDirectoryName."));
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("The parameter file switch /P is optional. " + "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used."));
+
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "The parameter file switch /P is optional. " +
+                    "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used."));
+
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("The /D switch can be used to specify the Dataset ID of the input file; if omitted, 0 will be used"));
+
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "The /D switch can be used to specify the Dataset ID of the input file; if omitted, 0 will be used"));
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S). " + "The lookup file is a comma, space, or tab delimited file with two columns:" + Environment.NewLine + "Dataset Name and Dataset ID"));
+
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "Alternatively, a lookup file can be specified with the /D switch (useful if processing multiple files using * or /S). " +
+                    "The lookup file is a comma, space, or tab delimited file with two columns:" + Environment.NewLine + "Dataset Name and Dataset ID"));
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /S to process all valid files in the input directory and subdirectories. " + "Include a number after /S (like /S:2) to limit the level of subdirectories to examine."));
+
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "Use /S to process all valid files in the input directory and subdirectories. " +
+                    "Include a number after /S (like /S:2) to limit the level of subdirectories to examine."));
+
                 Console.WriteLine("When using /S, you can redirect the output of the results using /A.");
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("When using /S, you can use /R to re-create the input directory hierarchy in the alternate output directory (if defined)."));
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "When using /S, you can use /R to re-create the input directory hierarchy in the alternate output directory (if defined)."));
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /L or /Log to specify that a log file should be created. " + "Use /L:LogFilePath to specify the name (or full path) for the log file."));
+
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "Use /L or /Log to specify that a log file should be created. " +
+                    "Use /L:LogFilePath to specify the name (or full path) for the log file."));
                 Console.WriteLine();
-                Console.WriteLine(ConsoleMsgUtils.WrapParagraph("Use /SF to specify the name to use for the Masic Status file (default is " + clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME + ")."));
+
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    "Use /SF to specify the name to use for the Masic Status file (default is " + clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME + ")."));
                 Console.WriteLine();
+
                 Console.WriteLine("The optional /Q switch will prevent the progress window from being shown");
                 Console.WriteLine();
+
                 Console.WriteLine("Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003");
                 Console.WriteLine("Version: " + GetAppVersion());
+
                 Console.WriteLine();
+
                 Console.WriteLine("E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov");
                 Console.WriteLine("Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/");
                 Console.WriteLine();
@@ -414,6 +477,7 @@ namespace MASIC
 #else
             const int PERCENT_REPORT_INTERVAL = 5;
 #endif
+
             if (percentComplete >= mLastProgressReportValue)
             {
                 Console.WriteLine();
@@ -455,9 +519,11 @@ namespace MASIC
                 return;
             }
 #endif
+
             if (DateTime.UtcNow.Subtract(mLastSubtaskProgressTime).TotalSeconds < 10)
                 return;
             mLastSubtaskProgressTime = DateTime.UtcNow;
+
             ConsoleMsgUtils.ShowDebug("{0}: {1}%", mMASIC.SubtaskDescription, mMASIC.SubtaskProgressPercentComplete);
         }
 

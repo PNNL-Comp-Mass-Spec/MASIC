@@ -29,6 +29,7 @@ namespace MASIC
 
         [Obsolete("Legacy parameter; no longer used")]
         public float MinimumFreeMemoryMB { get; set; }
+
         [Obsolete("Legacy parameter; no longer used")]
         public float MaximumMemoryUsageMB { get; set; }
 
@@ -41,6 +42,7 @@ namespace MASIC
         public void Reset()
         {
             var defaultOptions = clsSpectraCache.GetDefaultCacheOptions();
+
             DiskCachingAlwaysDisabled = defaultOptions.DiskCachingAlwaysDisabled;
             DirectoryPath = defaultOptions.DirectoryPath;
             SpectraToRetainInMemory = defaultOptions.SpectraToRetainInMemory;

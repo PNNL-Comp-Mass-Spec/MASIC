@@ -33,6 +33,7 @@ namespace MASIC
         public clsMSSpectrum(int intScanNumber)
         {
             ScanNumber = intScanNumber;
+
             IonsMZ = new List<double>();
             IonsIntensity = new List<double>();
         }
@@ -40,7 +41,8 @@ namespace MASIC
         /// <summary>
         /// Constructor that sets the scan number and stores m/z and intensity data (float intensities)
         /// </summary>
-        public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<float> intensityList, int dataCount) : this(intScanNumber)
+        public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<float> intensityList, int dataCount)
+            : this(intScanNumber)
         {
             for (int i = 0; i <= dataCount - 1; i++)
             {
@@ -52,7 +54,8 @@ namespace MASIC
         /// <summary>
         /// Constructor that sets the scan number and stores m/z and intensity data (double intensities)
         /// </summary>
-        public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<double> intensityList, int dataCount) : this(intScanNumber)
+        public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<double> intensityList, int dataCount)
+            : this(intScanNumber)
         {
             for (int i = 0; i <= dataCount - 1; i++)
             {
@@ -101,6 +104,7 @@ namespace MASIC
 
             IonsMZ.Clear();
             IonsMZ.AddRange(spectrum.IonsMZ);
+
             IonsIntensity.Clear();
             IonsIntensity.AddRange(spectrum.IonsIntensity);
         }
@@ -115,6 +119,7 @@ namespace MASIC
             int countToRemove = IonsMZ.Count - ionCountNew;
             if (countToRemove == 0)
                 return;
+
             IonsMZ.RemoveRange(ionCountNew, countToRemove);
             IonsIntensity.RemoveRange(ionCountNew, countToRemove);
         }

@@ -3,6 +3,7 @@
     public class clsSICStats
     {
         public MASICPeakFinder.clsSICStatsPeak Peak { get; set; }
+
         public clsScanList.eScanTypeConstants ScanTypeForPeakIndices { get; set; }
 
         /// <summary>
@@ -22,6 +23,7 @@
         /// </summary>
         /// <returns></returns>
         public int PeakScanIndexMax { get; set; }
+
         public MASICPeakFinder.clsSICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }
 
         public clsSICStats()

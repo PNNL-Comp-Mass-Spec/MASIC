@@ -11,6 +11,7 @@ namespace MASIC
         /// Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
         /// </summary>
         public clsScanList.eScanTypeConstants SICScanType;
+
         public readonly List<clsSICDataPoint> SICData;
 
         public int SICDataCount => SICData.Count;

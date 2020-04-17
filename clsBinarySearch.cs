@@ -27,18 +27,20 @@ namespace MASIC
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes arrayToSearch is already sorted</remarks>
-        public static int BinarySearchFindNearest(IList<int> arrayToSearch, int itemToSearchFor, int dataCount, eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
+        public static int BinarySearchFindNearest(
+            IList<int> arrayToSearch, int itemToSearchFor, int dataCount,
+            eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int indexFirst;
-            int indexLast;
+            int indexFirst, indexLast;
             int midIndex;
-            int currentFirst;
-            int currentLast;
+            int currentFirst, currentLast;
             int matchIndex;
+
             try
             {
                 if (arrayToSearch == null)
                     return -1;
+
                 indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
                 {
@@ -46,8 +48,10 @@ namespace MASIC
                 }
 
                 indexLast = dataCount - 1;
+
                 currentFirst = indexFirst;
                 currentLast = indexLast;
+
                 if (currentFirst > currentLast)
                 {
                     // Invalid indices were provided
@@ -63,6 +67,7 @@ namespace MASIC
                     midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
                     if (midIndex < currentFirst)
                         midIndex = currentFirst;
+
                     while (currentFirst <= currentLast && arrayToSearch[midIndex] != itemToSearchFor)
                     {
                         if (itemToSearchFor < arrayToSearch[midIndex])
@@ -109,7 +114,8 @@ namespace MASIC
                             {
                                 if (midIndex < indexLast)
                                 {
-                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <= Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
+                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
                                     {
                                         matchIndex = midIndex;
                                     }
@@ -126,7 +132,8 @@ namespace MASIC
                             // ArrayToSearch(midIndex) >= ItemToSearchFor
                             else if (midIndex > indexFirst)
                             {
-                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <= Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
+                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
                                 {
                                     matchIndex = midIndex - 1;
                                 }
@@ -185,18 +192,20 @@ namespace MASIC
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes arrayToSearch is already sorted</remarks>
-        public static int BinarySearchFindNearest(IList<float> arrayToSearch, float itemToSearchFor, int dataCount, eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
+        public static int BinarySearchFindNearest(
+            IList<float> arrayToSearch, float itemToSearchFor, int dataCount,
+            eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int indexFirst;
-            int indexLast;
+            int indexFirst, indexLast;
             int midIndex;
-            int currentFirst;
-            int currentLast;
+            int currentFirst, currentLast;
             int matchIndex;
+
             try
             {
                 if (arrayToSearch == null)
                     return -1;
+
                 indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
                 {
@@ -204,8 +213,10 @@ namespace MASIC
                 }
 
                 indexLast = dataCount - 1;
+
                 currentFirst = indexFirst;
                 currentLast = indexLast;
+
                 if (currentFirst > currentLast)
                 {
                     // Invalid indices were provided
@@ -221,6 +232,7 @@ namespace MASIC
                     midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
                     if (midIndex < currentFirst)
                         midIndex = currentFirst;
+
                     while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
                     {
                         if (itemToSearchFor < arrayToSearch[midIndex])
@@ -267,7 +279,8 @@ namespace MASIC
                             {
                                 if (midIndex < indexLast)
                                 {
-                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <= Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
+                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
                                     {
                                         matchIndex = midIndex;
                                     }
@@ -284,7 +297,8 @@ namespace MASIC
                             // ArrayToSearch(midIndex) >= ItemToSearchFor
                             else if (midIndex > indexFirst)
                             {
-                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <= Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
+                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
                                 {
                                     matchIndex = midIndex - 1;
                                 }
@@ -344,18 +358,19 @@ namespace MASIC
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes arrayToSearch is already sorted</remarks>
-        public static int BinarySearchFindNearest(IList<double> arrayToSearch, double itemToSearchFor, int dataCount, eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
+        public static int BinarySearchFindNearest(
+            IList<double> arrayToSearch, double itemToSearchFor, int dataCount,
+            eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int indexFirst;
-            int indexLast;
+            int indexFirst, indexLast;
             int midIndex;
-            int currentFirst;
-            int currentLast;
+            int currentFirst, currentLast;
             int matchIndex;
             try
             {
                 if (arrayToSearch == null)
                     return -1;
+
                 indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
                 {
@@ -363,8 +378,10 @@ namespace MASIC
                 }
 
                 indexLast = dataCount - 1;
+
                 currentFirst = indexFirst;
                 currentLast = indexLast;
+
                 if (currentFirst > currentLast)
                 {
                     // Invalid indices were provided
@@ -380,6 +397,7 @@ namespace MASIC
                     midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
                     if (midIndex < currentFirst)
                         midIndex = currentFirst;
+
                     while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
                     {
                         if (itemToSearchFor < arrayToSearch[midIndex])
@@ -426,7 +444,8 @@ namespace MASIC
                             {
                                 if (midIndex < indexLast)
                                 {
-                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <= Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
+                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
                                     {
                                         matchIndex = midIndex;
                                     }
@@ -443,7 +462,8 @@ namespace MASIC
                             // ArrayToSearch(midIndex) >= ItemToSearchFor
                             else if (midIndex > indexFirst)
                             {
-                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <= Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
+                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
                                 {
                                     matchIndex = midIndex - 1;
                                 }

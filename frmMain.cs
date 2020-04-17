@@ -29,13 +29,12 @@ using PRISM;
 using PRISM.FileProcessor;
 using PRISMDatabaseUtils;
 using PRISMWin;
-using PRISMWin.TextBoxUtils;
 using ProgressFormNET;
 using ShFolderBrowser.FolderBrowser;
 
 namespace MASIC
 {
-    public partial class frmMain
+    public partial class frmMain : Form
     {
         public frmMain() : base()
         {
@@ -56,7 +55,9 @@ namespace MASIC
         #region "Constants and Enums"
 
         private const string XML_SETTINGS_FILE_NAME = "MASICParameters.xml";
+
         private const string CUSTOM_SIC_VALUES_DATA_TABLE = "PeakMatchingThresholds";
+
         private const string COL_NAME_MZ = "MZ";
         private const string COL_NAME_MZ_TOLERANCE = "MZToleranceDa";
         private const string COL_NAME_SCAN_CENTER = "Scan_Center";
@@ -80,18 +81,25 @@ namespace MASIC
         #region "Classwide Variables"
 
         private DataSet mCustomSICValuesDataset;
+
         private readonly List<udtCustomSICEntryType> mDefaultCustomSICList;
         private bool mWorking;
+
         private string mXmlSettingsFilePath;
         private string mPreferredInputFileExtension;
+
         private readonly clsSpectrumCacheOptions mCacheOptions;
+
         private bool mSuppressNoParentIonsError;
         private bool mCompressMSSpectraData;
         private bool mCompressMSMSSpectraData;
+
         private double mCompressToleranceDivisorForDa;
         private double mCompressToleranceDivisorForPPM;
+
         private int mHeightAdjustForce;
         private DateTime mHeightAdjustTime;
+
         private clsMASIC mMasic;
         private frmProgress mProgressForm;
 
@@ -99,6 +107,7 @@ namespace MASIC
         /// Log messages, including warnings and errors, with the newest message at the top
         /// </summary>
         private readonly List<string> mLogMessages;
+
         private readonly Dictionary<int, clsReporterIons.eReporterIonMassModeConstants> mReporterIonIndexToModeMap;
 
         #endregion
@@ -112,7 +121,6 @@ namespace MASIC
                 var reporterIonMode = GetSelectedReporterIonMode();
                 return reporterIonMode;
             }
-
             set
             {
                 try
@@ -131,8 +139,15 @@ namespace MASIC
 
         #region "Procedures"
 
-        private void AddCustomSICRow(double mz, double mzToleranceDa, float scanOrAcqTimeCenter, float scanOrAcqTimeTolerance, string comment, [Optional, DefaultParameterValue(false)] ref bool existingRowFound)
+        private void AddCustomSICRow(
+            double mz,
+            double mzToleranceDa,
+            float scanOrAcqTimeCenter,
+            float scanOrAcqTimeTolerance,
+            string comment,
+            [Optional, DefaultParameterValue(false)] out bool existingRowFound)
         {
+            existingRowFound = false;
             foreach (DataRow myDataRow in mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows)
             {
                 if (Math.Abs(Conversions.ToDouble(myDataRow[0]) - mz) < float.Epsilon & Math.Abs(Conversions.ToSingle(myDataRow[1]) - scanOrAcqTimeCenter) < float.Epsilon)
@@ -144,6 +159,7 @@ namespace MASIC
 
             if (comment == null)
                 comment = string.Empty;
+
             if (!existingRowFound)
             {
                 var newDataRow = mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].NewRow();
@@ -234,44 +250,15 @@ namespace MASIC
                 txtCustomSICScanOrAcqTimeTolerance.Text = defaultScanOrAcqTimeTolerance.ToString();
                 foreach (var item in mDefaultCustomSICList)
                 {
-                    bool argexistingRowFound = false;
-                    AddCustomSICRow(item.MZ, defaultMZTolerance, item.ScanCenter, defaultScanOrAcqTimeTolerance, item.Comment, existingRowFound: ref argexistingRowFound);
+                    AddCustomSICRow(item.MZ, defaultMZTolerance, item.ScanCenter, defaultScanOrAcqTimeTolerance, item.Comment, out _);
                 }
             }
         }
 
+        private bool updating = false;
+
         private void CatchUnrequestedHeightChange()
         {
-            ;
-#error Cannot convert LocalDeclarationStatementSyntax - see comment for details
-            /* Cannot convert LocalDeclarationStatementSyntax, System.NotSupportedException: StaticKeyword not supported!
-               at ICSharpCode.CodeConverter.CSharp.SyntaxKindExtensions.ConvertToken(SyntaxKind t, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifier(SyntaxToken m, TokenContext context)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.<ConvertModifiersCore>d__38.MoveNext()
-               at System.Linq.Enumerable.<ConcatIterator>d__59`1.MoveNext()
-               at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
-               at System.Linq.Buffer`1..ctor(IEnumerable`1 source)
-               at System.Linq.OrderedEnumerable`1.<GetEnumerator>d__1.MoveNext()
-               at Microsoft.CodeAnalysis.SyntaxTokenList.CreateNode(IEnumerable`1 tokens)
-               at ICSharpCode.CodeConverter.CSharp.CommonConversions.ConvertModifiers(SyntaxNode node, IReadOnlyCollection`1 modifiers, TokenContext context, Boolean isVariableOrConst, SyntaxKind[] extraCsModifierKinds)
-               at ICSharpCode.CodeConverter.CSharp.MethodBodyExecutableStatementVisitor.<VisitLocalDeclarationStatement>d__28.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<CreateLocals>d__7.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.ByRefParameterVisitor.<AddLocalVariables>d__6.MoveNext()
-            --- End of stack trace from previous location where exception was thrown ---
-               at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
-               at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
-               at ICSharpCode.CodeConverter.CSharp.CommentConvertingMethodBodyVisitor.<DefaultVisitInnerAsync>d__3.MoveNext()
-
-            Input:
-                    Static updating As Boolean
-
-             */
             if (!updating)
             {
                 if (mHeightAdjustForce != 0 && DateTime.UtcNow.Subtract(mHeightAdjustTime).TotalSeconds <= (double)5)
@@ -338,6 +325,7 @@ namespace MASIC
             // Returns false if the user is queried about clearing and they do not click Yes
 
             var eResult = default(DialogResult);
+
             if (mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows.Count > 0)
             {
                 if (confirmReplaceExistingResults)
@@ -379,7 +367,7 @@ namespace MASIC
             }
         }
 
-        private string CStrSafe(ref object item)
+        private string CStrSafe(object item)
         {
             try
             {
@@ -405,6 +393,7 @@ namespace MASIC
         private void DefineDefaultCustomSICList()
         {
             mDefaultCustomSICList.Clear();
+
             this.AppendCustomSICListItem(824.47422, 0.176F, "Pep-09");
             this.AppendCustomSICListItem(412.74102, 0.176F, "Pep-09");
             this.AppendCustomSICListItem(484.28137, 0.092F, "Pep-11");
@@ -419,53 +408,75 @@ namespace MASIC
         private void DefineOverviewText()
         {
             var msg = new StringBuilder();
+
             msg.Append("When Export All Spectra Data Points is enabled, a separate file is created containing the raw data points (scan number, m/z, and intensity), using the specified file format. ");
             msg.Append("If Export MS/MS Spectra is enabled, then the fragmentation spectra are included, in addition to the survey scan spectra (MS1 scans). ");
             msg.Append("If MS/MS spectra are not included, then one can optionally renumber the survey scan spectra so that they increase in steps of 1, regardless of the number of MS/MS scans between each survey scan. ");
             msg.Append("The Minimum Intensity and Maximum Ion Count options allow you to limit the number of data points exported for each spectrum.");
+
             lblRawDataExportOverview.Text = msg.ToString();
+
             msg.Clear();
             msg.Append("These options control how the selected ion chromatogram (SIC) is created for each parent ion mass or custom SIC search mass. ");
             msg.Append("The data in the survey scan spectra (MS1 scans) are searched +/- the SIC Tolerance, looking forward and backward in time until ");
             msg.Append("the intensity of the matching data 1) falls below the Intensity Threshold Fraction Max Peak value, 2) falls below the Intensity ");
             msg.Append("Threshold Absolute Minimum, or 3) spans more than the Maximum Peak Width forward or backward limits defined.");
+
             lblSICOptionsOverview.Text = msg.ToString();
+
             msg.Clear();
             msg.Append("When processing Thermo MRM data files, a file named _MRMSettings.txt will be created listing the ");
             msg.Append("parent and daughter m/z values monitored via SRM. ");
             msg.Append("You can optionally export detailed MRM intensity data using these options:");
             lblMRMInfo.Text = msg.ToString();
+
             msg.Clear();
             msg.Append("Select a comma or tab delimited file to read custom SIC search values from, ");
             msg.Append("or define them in the Custom SIC Values table below.  If using the file, ");
             msg.Append("allowed column names are: " + clsCustomSICListReader.GetCustomMZFileColumnHeaders() + ".  ");
-            msg.Append("Note: use " + clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TIME + " and " + clsCustomSICListReader.CUSTOM_SIC_COLUMN_TIME_TOLERANCE + " only when specifying ");
-            msg.Append("acquisition time-based values.  When doing so, do not include " + clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_CENTER + " and " + clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TOLERANCE + ".");
+            msg.Append("Note: use " +
+                clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TIME + " and " +
+                clsCustomSICListReader.CUSTOM_SIC_COLUMN_TIME_TOLERANCE + " only when specifying ");
+
+            msg.Append("acquisition time-based values.  When doing so, do not include " +
+                clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_CENTER + " and " +
+                clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TOLERANCE + ".");
+
             txtCustomSICFileDescription.Text = msg.ToString();
         }
 
         private void EnableDisableControls()
         {
             bool rawExportEnabled;
+
             bool createSICsAndRawData = !chkSkipSICAndRawDataProcessing.Checked;
             bool msmsProcessingEnabled = !chkSkipMSMSProcessing.Checked;
             bool exportRawDataOnly = chkExportRawDataOnly.Checked && chkExportRawSpectraData.Checked;
+
             chkSkipMSMSProcessing.Enabled = createSICsAndRawData;
             chkExportRawDataOnly.Enabled = createSICsAndRawData && chkExportRawSpectraData.Checked;
+
             fraExportAllSpectraDataPoints.Enabled = createSICsAndRawData;
+
             fraSICNoiseThresholds.Enabled = createSICsAndRawData && !exportRawDataOnly;
             fraPeakFindingOptions.Enabled = fraSICNoiseThresholds.Enabled;
             fraSmoothingOptions.Enabled = fraSICNoiseThresholds.Enabled;
             fraSICSearchThresholds.Enabled = fraSICNoiseThresholds.Enabled;
+
             fraMassSpectraNoiseThresholds.Enabled = createSICsAndRawData;
+
             fraBinningIntensityOptions.Enabled = createSICsAndRawData && msmsProcessingEnabled && !exportRawDataOnly;
             fraBinningMZOptions.Enabled = fraBinningIntensityOptions.Enabled;
             fraSpectrumSimilarityOptions.Enabled = fraBinningIntensityOptions.Enabled;
+
             fraCustomSICControls.Enabled = createSICsAndRawData && !exportRawDataOnly;
             dgCustomSICValues.Enabled = createSICsAndRawData && !exportRawDataOnly;
+
             rawExportEnabled = chkExportRawSpectraData.Checked;
+
             cboExportRawDataFileFormat.Enabled = rawExportEnabled;
             chkExportRawDataIncludeMSMS.Enabled = rawExportEnabled;
+
             if (chkExportRawDataIncludeMSMS.Checked)
             {
                 chkExportRawDataRenumberScans.Enabled = false;
@@ -478,12 +489,15 @@ namespace MASIC
             txtExportRawDataSignalToNoiseRatioMinimum.Enabled = rawExportEnabled;
             txtExportRawDataMaxIonCountPerScan.Enabled = rawExportEnabled;
             txtExportRawDataIntensityMinimum.Enabled = rawExportEnabled;
+
             if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold)
             {
                 txtSICNoiseThresholdIntensity.Enabled = true;
                 txtSICNoiseFractionLowIntensityDataToAverage.Enabled = false;
             }
-            else if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance || cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount || cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance)
+            else if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance ||
+                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount ||
+                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance)
             {
                 txtSICNoiseThresholdIntensity.Enabled = false;
                 txtSICNoiseFractionLowIntensityDataToAverage.Enabled = true;
@@ -497,13 +511,16 @@ namespace MASIC
 
             txtButterworthSamplingFrequency.Enabled = optUseButterworthSmooth.Checked;
             txtSavitzkyGolayFilterOrder.Enabled = optUseSavitzkyGolaySmooth.Checked;
+
             if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold)
             {
                 txtMassSpectraNoiseThresholdIntensity.Enabled = true;
                 txtMassSpectraNoiseFractionLowIntensityDataToAverage.Enabled = false;
                 txtMassSpectraNoiseMinimumSignalToNoiseRatio.Enabled = false;
             }
-            else if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance || cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount || cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance)
+            else if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance ||
+                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount ||
+                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance)
             {
                 txtMassSpectraNoiseThresholdIntensity.Enabled = false;
                 txtMassSpectraNoiseFractionLowIntensityDataToAverage.Enabled = true;
@@ -520,13 +537,16 @@ namespace MASIC
             chkSaveExtendedStatsFileIncludeFilterText.Enabled = chkSaveExtendedStatsFile.Checked;
             chkSaveExtendedStatsFileIncludeStatusLog.Enabled = chkSaveExtendedStatsFile.Checked;
             txtStatusLogKeyNameFilterList.Enabled = chkSaveExtendedStatsFile.Checked && chkSaveExtendedStatsFileIncludeStatusLog.Checked;
+
             chkConsolidateConstantExtendedHeaderValues.Enabled = chkSaveExtendedStatsFile.Checked;
+
             EnableDisableCustomSICValueGrid();
         }
 
         private void EnableDisableCustomSICValueGrid()
         {
             bool enableGrid;
+
             if (txtCustomSICFileName.TextLength > 0)
             {
                 enableGrid = false;
@@ -554,6 +574,7 @@ namespace MASIC
             try
             {
                 defaultMZTolerance = double.Parse(txtSICTolerance.Text);
+
                 if (optSICTolerancePPM.Checked)
                 {
                     defaultMZTolerance = clsUtilities.PPMToMass(defaultMZTolerance, 1000);
@@ -634,6 +655,7 @@ namespace MASIC
             // Prompts the user to select a file to load the options from
 
             string filePath;
+
             using (var objOpenFile = new OpenFileDialog()
             {
                 AddExtension = true,
@@ -648,6 +670,7 @@ namespace MASIC
             })
             {
                 filePath = mXmlSettingsFilePath;
+
                 if (filePath.Length > 0)
                 {
                     try
@@ -670,12 +693,15 @@ namespace MASIC
                 }
 
                 objOpenFile.Title = "Specify file to load options from";
+
                 var result = objOpenFile.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
+
                 if (objOpenFile.FileName.Length > 0)
                 {
                     mXmlSettingsFilePath = objOpenFile.FileName;
+
                     IniFileLoadOptions(mXmlSettingsFilePath, updateIOPaths);
                 }
             }
@@ -689,6 +715,7 @@ namespace MASIC
             {
                 // Utilize MASIC's built-in LoadParameters function, then call ResetToDefaults
                 var objMasic = new clsMASIC();
+
                 bool success = objMasic.LoadParameterFileSettings(filePath);
                 if (!success)
                 {
@@ -705,6 +732,7 @@ namespace MASIC
 
                 // Pass True to .LoadSettings() to turn off case sensitive matching
                 objXmlFile.LoadSettings(filePath, false);
+
                 try
                 {
                     txtDatasetLookupFilePath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
@@ -727,6 +755,7 @@ namespace MASIC
 
                     Width = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
                     Height = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
+
                     if (updateIOPaths)
                     {
                         txtOutputDirectoryPath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
@@ -746,13 +775,15 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading settings from file: " + filePath + "; " + ControlChars.NewLine + ex.Message + ";" + ControlChars.NewLine, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Error loading settings from file: " + filePath + "; " + ControlChars.NewLine +
+                    ex.Message + ";" + ControlChars.NewLine, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
         private void IniFileSaveDefaultOptions()
         {
             DialogResult eResponse;
+
             eResponse = MessageBox.Show("Save the current options as defaults?", "Save Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
             if (eResponse == DialogResult.Yes)
             {
@@ -765,6 +796,7 @@ namespace MASIC
             // Prompts the user to select a file to load the options from
 
             string filePath;
+
             using (var objSaveFile = new SaveFileDialog()
             {
                 AddExtension = true,
@@ -801,12 +833,15 @@ namespace MASIC
                 }
 
                 objSaveFile.Title = "Specify file to save options to";
+
                 var result = objSaveFile.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
+
                 if (objSaveFile.FileName.Length > 0)
                 {
                     mXmlSettingsFilePath = objSaveFile.FileName;
+
                     IniFileSaveOptions(mXmlSettingsFilePath, false);
                 }
             }
@@ -819,7 +854,9 @@ namespace MASIC
                 if (!saveWindowDimensionsOnly)
                 {
                     var objMasic = new clsMASIC();
+
                     UpdateMasicSettings(ref objMasic);
+
                     objMasic.Options.SaveParameterFileSettings(filePath);
 
                     // Sleep for 100 msec, just to be safe
@@ -828,7 +865,9 @@ namespace MASIC
 
                 // Pass True to .LoadSettings() here so that newly made Xml files will have the correct capitalization
                 var objXmlFile = new XmlSettingsFileAccessor();
+
                 objXmlFile.LoadSettings(filePath, true);
+
                 try
                 {
                     if (!saveWindowDimensionsOnly)
@@ -850,6 +889,7 @@ namespace MASIC
 
                     objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
                     objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
+
                     objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
                     objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
                 }
@@ -869,14 +909,21 @@ namespace MASIC
         private void InitializeControls()
         {
             DefineDefaultCustomSICList();
+
             PopulateComboBoxes();
+
             InitializeCustomSICDataGrid();
+
             DefineOverviewText();
+
             mXmlSettingsFilePath = GetSettingsFilePath();
             ProcessFilesBase.CreateSettingsFileIfMissing(mXmlSettingsFilePath);
+
             mPreferredInputFileExtension = ".Raw";
+
             mHeightAdjustForce = 0;
             mHeightAdjustTime = DateTime.Parse("1900-01-01");
+
             IniFileLoadOptions(mXmlSettingsFilePath, true);
             SetToolTips();
         }
@@ -893,6 +940,7 @@ namespace MASIC
             DataTableUtils.AppendColumnDoubleToTable(customSICValues, COL_NAME_SCAN_TOLERANCE);
             DataTableUtils.AppendColumnStringToTable(customSICValues, COL_NAME_SCAN_COMMENT, string.Empty);
             DataTableUtils.AppendColumnIntegerToTable(customSICValues, COL_NAME_CUSTOM_SIC_VALUE_ROW_ID, 0, true, true);
+
             var primaryKeyColumn = new DataColumn[] { customSICValues.Columns[COL_NAME_CUSTOM_SIC_VALUE_ROW_ID] };
             customSICValues.PrimaryKey = primaryKeyColumn;
 
@@ -920,6 +968,7 @@ namespace MASIC
 
             // Examine the clipboard contents
             var objData = Clipboard.GetDataObject();
+
             if (objData == null)
             {
                 return;
@@ -935,6 +984,7 @@ namespace MASIC
             // Split data on carriage return or line feed characters
             // Lines that end in CrLf will give two separate lines; one with the text, and one blank; that's OK
             var dataLines = data.Split(lineDelimiters, 50000);
+
             if (dataLines.Length == 0)
             {
                 return;
@@ -942,7 +992,9 @@ namespace MASIC
 
             var defaultMZTolerance = default(double);
             var defaultScanOrAcqTimeTolerance = default(float);
+
             GetCurrentCustomSICTolerances(ref defaultMZTolerance, ref defaultScanOrAcqTimeTolerance);
+
             if (clearList)
             {
                 if (!ClearCustomSICList(true))
@@ -951,6 +1003,7 @@ namespace MASIC
 
             int rowsAlreadyPresent = 0;
             int rowsSkipped = 0;
+
             foreach (var dataLine in dataLines)
             {
                 if (string.IsNullOrWhiteSpace(dataLine))
@@ -972,13 +1025,15 @@ namespace MASIC
                     string comment = string.Empty;
                     double mzToleranceDa = defaultMZTolerance;
                     float scanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance;
+
                     if (columns.Length == 2)
                     {
                         // Assume pasted data is m/z and scan
                         mz = double.Parse(columns[0]);
                         scanOrAcqTime = float.Parse(columns[1]);
                     }
-                    else if (columns.Length >= 3 && columns[2].Length > 0 && !DataUtils.StringToValueUtils.IsNumber(columns[2][0]))
+                    else if (columns.Length >= 3 && columns[2].Length > 0 &&
+                        !PRISM.DataUtils.StringToValueUtils.IsNumber(columns[2][0].ToString()))
                     {
                         // Assume pasted data is m/z, scan, and comment
                         mz = double.Parse(columns[0]);
@@ -996,6 +1051,7 @@ namespace MASIC
                         }
 
                         scanOrAcqTime = float.Parse(columns[2]);
+
                         if (columns.Length >= 4)
                         {
                             scanOrAcqTimeTolerance = float.Parse(columns[3]);
@@ -1018,7 +1074,9 @@ namespace MASIC
                     if (mz > 0)
                     {
                         bool existingRowFound = false;
-                        AddCustomSICRow(mz, mzToleranceDa, scanOrAcqTime, scanOrAcqTimeTolerance, comment, ref existingRowFound);
+                        AddCustomSICRow(mz, mzToleranceDa, scanOrAcqTime, scanOrAcqTimeTolerance, comment,
+                                        out existingRowFound);
+
                         if (existingRowFound)
                         {
                             rowsAlreadyPresent += 1;
@@ -1069,6 +1127,7 @@ namespace MASIC
             cboExportRawDataFileFormat.Items.Insert((int)clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile, "PEK File");
             cboExportRawDataFileFormat.Items.Insert((int)clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File");
             cboExportRawDataFileFormat.SelectedIndex = (int)clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile;
+
             cboSICNoiseThresholdMode.Items.Clear();
             cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
             cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance");
@@ -1076,15 +1135,19 @@ namespace MASIC
             cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance");
             cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance, "Dual Trimmed Mean By Abundance");
             cboSICNoiseThresholdMode.SelectedIndex = (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance;
+
             cboMassSpectraNoiseThresholdMode.Items.Clear();
             cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
             cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance");
             cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count");
             cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance");
             cboMassSpectraNoiseThresholdMode.SelectedIndex = (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance;
+
             cboReporterIonMassMode.Items.Clear();
             mReporterIonIndexToModeMap.Clear();
+
             AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.CustomOrNone, "None");
+
             AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.Acetylation, "Acetylated K");
             AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059");
             AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl");
@@ -1104,6 +1167,7 @@ namespace MASIC
             AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131");
             AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C");
             AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N");
+
             SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone;
         }
 
@@ -1111,7 +1175,9 @@ namespace MASIC
         {
             string outputDirectoryPath;
             bool success;
+
             DateTime startTime;
+
             if (!mWorking && ConfirmPaths())
             {
                 try
@@ -1121,23 +1187,28 @@ namespace MASIC
                     // Configure settings
                     success = UpdateMasicSettings(ref mMasic);
                     if (!success)
-                        break;
+                        return;
 
                     // Validate settings
                     success = ValidateSettings(ref mMasic);
                     if (!success)
-                        break;
+                        return;
+
                     mProgressForm = new frmProgress();
+
                     mProgressForm.InitializeProgressForm("Creating SIC's for the parent ions", 0, 100, false, true);
                     mProgressForm.InitializeSubtask("", 0, 100, false);
                     mProgressForm.ResetKeyPressAbortProcess();
                     mProgressForm.Show();
                     Application.DoEvents();
+
                     Cursor.Current = Cursors.WaitCursor;
                     mWorking = true;
                     cmdStartProcessing.Enabled = false;
                     Application.DoEvents();
+
                     startTime = DateTime.UtcNow;
+
                     outputDirectoryPath = txtOutputDirectoryPath.Text;
                     success = mMasic.ProcessFile(txtInputFilePath.Text, outputDirectoryPath);
                     Cursor.Current = Cursors.Default;
@@ -1153,7 +1224,9 @@ namespace MASIC
                     }
                     else
                     {
-                        MessageBox.Show("Error analyzing input file with MASIC: " + ControlChars.NewLine + mMasic.GetErrorMessage() + ControlChars.NewLine + mMasic.StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        MessageBox.Show("Error analyzing input file with MASIC: " + ControlChars.NewLine +
+                                        mMasic.GetErrorMessage() + ControlChars.NewLine +
+                                        mMasic.StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
                 }
                 catch (Exception ex)
@@ -1180,6 +1253,7 @@ namespace MASIC
             oClass.DebugEvent += DebugEventHandler;
             oClass.ErrorEvent += ErrorEventHandler;
             oClass.WarningEvent += WarningEventHandler;
+
             oClass.ProgressUpdate += MASIC_ProgressUpdate;
             oClass.ProgressResetKeypressAbort += MASIC_ProgressResetKeypressAbort;
             oClass.ProgressSubtaskChanged += MASIC_ProgressSubtaskChanged;
@@ -1189,6 +1263,7 @@ namespace MASIC
         {
             DialogResult eResponse;
             bool existingMasicObjectUsed;
+
             if (confirmReset)
             {
                 eResponse = MessageBox.Show("Are you sure you want to reset all settings to their default values?", "Reset to Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
@@ -1235,6 +1310,7 @@ namespace MASIC
                 // Masic Export Options
                 chkIncludeHeaders.Checked = masicOptions.IncludeHeadersInExportFile;
                 chkIncludeScanTimesInSICStatsFile.Checked = masicOptions.IncludeScanTimesInSICStatsFile;
+
                 chkSkipMSMSProcessing.Checked = masicOptions.SkipMSMSProcessing;
                 chkSkipSICAndRawDataProcessing.Checked = masicOptions.SkipSICAndRawDataProcessing;
                 chkExportRawDataOnly.Checked = masicOptions.ExportRawDataOnly;
@@ -1243,8 +1319,10 @@ namespace MASIC
                 var exportOptions = masicOptions.RawDataExportOptions;
                 chkExportRawSpectraData.Checked = exportOptions.ExportEnabled;                 // Create .PEK file, or similar
                 cboExportRawDataFileFormat.SelectedIndex = (int)exportOptions.FileFormat;
+
                 chkExportRawDataIncludeMSMS.Checked = exportOptions.IncludeMSMS;
                 chkExportRawDataRenumberScans.Checked = exportOptions.RenumberScans;
+
                 txtExportRawDataSignalToNoiseRatioMinimum.Text = exportOptions.MinimumSignalToNoiseRatio.ToString();
                 txtExportRawDataMaxIonCountPerScan.Text = exportOptions.MaxIonCountPerScan.ToString();
                 txtExportRawDataIntensityMinimum.Text = exportOptions.IntensityMinimum.ToString();
@@ -1257,12 +1335,14 @@ namespace MASIC
                 chkSaveExtendedStatsFileIncludeFilterText.Checked = masicOptions.WriteExtendedStatsIncludeScanFilterText;
                 chkSaveExtendedStatsFileIncludeStatusLog.Checked = masicOptions.WriteExtendedStatsStatusLog;
                 txtStatusLogKeyNameFilterList.Text = masicOptions.GetStatusLogKeyNameFilterListAsText(false);
+
                 chkConsolidateConstantExtendedHeaderValues.Checked = masicOptions.ConsolidateConstantExtendedHeaderValues;
 
                 // Dataset and Database Options
                 txtDatasetID.Text = "0";
                 txtDatabaseConnectionString.Text = masicOptions.DatabaseConnectionString;
                 txtDatasetInfoQuerySQL.Text = masicOptions.DatasetInfoQuerySql;
+
                 try
                 {
                     if (File.Exists(masicOptions.DatasetLookupFilePath))
@@ -1282,8 +1362,10 @@ namespace MASIC
                 // SIC Options
                 var sicOptions = masicOptions.SICOptions;
                 var peakFinderOptions = masicOptions.SICOptions.SICPeakFinderOptions;
+
                 bool sicToleranceIsPPM;
-                double sicTolerance = sicOptions.GetSICTolerance(ref sicToleranceIsPPM);
+                double sicTolerance = sicOptions.GetSICTolerance(out sicToleranceIsPPM);
+
                 txtSICTolerance.Text = StringUtilities.DblToString(sicTolerance, 6);
                 if (sicToleranceIsPPM)
                 {
@@ -1301,26 +1383,32 @@ namespace MASIC
 
                 // Note: the following 5 options are not graphically editable
                 mSuppressNoParentIonsError = masicOptions.SuppressNoParentIonsError;
+
                 mCompressMSSpectraData = sicOptions.CompressMSSpectraData;
                 mCompressMSMSSpectraData = sicOptions.CompressMSMSSpectraData;
                 mCompressToleranceDivisorForDa = sicOptions.CompressToleranceDivisorForDa;
                 mCompressToleranceDivisorForPPM = sicOptions.CompressToleranceDivisorForPPM;
+
                 txtMaxPeakWidthMinutesBackward.Text = sicOptions.MaxSICPeakWidthMinutesBackward.ToString();
                 txtMaxPeakWidthMinutesForward.Text = sicOptions.MaxSICPeakWidthMinutesForward.ToString();
+
                 txtIntensityThresholdFractionMax.Text = peakFinderOptions.IntensityThresholdFractionMax.ToString();
                 txtIntensityThresholdAbsoluteMinimum.Text = peakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString();
+
                 chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked = sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData;
                 chkRefineReportedParentIonMZ.Checked = sicOptions.RefineReportedParentIonMZ;
-                // ' chkUseSICStatsFromLargestPeak.checked = sicOptions.UseSICStatsFromLargestPeak
+                //chkUseSICStatsFromLargestPeak.checked = sicOptions.UseSICStatsFromLargestPeak;
 
                 // Peak Finding Options
                 cboSICNoiseThresholdMode.SelectedIndex = (int)peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode;
                 txtSICNoiseThresholdIntensity.Text = peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString();
                 txtSICNoiseFractionLowIntensityDataToAverage.Text = peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString();
+
                 txtMaxDistanceScansNoOverlap.Text = peakFinderOptions.MaxDistanceScansNoOverlap.ToString();
                 txtMaxAllowedUpwardSpikeFractionMax.Text = peakFinderOptions.MaxAllowedUpwardSpikeFractionMax.ToString();
                 txtInitialPeakWidthScansScaler.Text = peakFinderOptions.InitialPeakWidthScansScaler.ToString();
                 txtInitialPeakWidthScansMaximum.Text = peakFinderOptions.InitialPeakWidthScansMaximum.ToString();
+
                 if (peakFinderOptions.UseButterworthSmooth)
                 {
                     optUseButterworthSmooth.Checked = true;
@@ -1334,6 +1422,7 @@ namespace MASIC
 
                 txtButterworthSamplingFrequency.Text = peakFinderOptions.ButterworthSamplingFrequency.ToString();
                 txtSavitzkyGolayFilterOrder.Text = peakFinderOptions.SavitzkyGolayFilterOrder.ToString();
+
                 chkFindPeaksOnSmoothedData.Checked = peakFinderOptions.FindPeaksOnSmoothedData;
                 chkSmoothDataRegardlessOfMinimumPeakWidth.Checked = peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth;
 
@@ -1347,6 +1436,7 @@ namespace MASIC
                 txtSimilarIonMZToleranceHalfWidth.Text = sicOptions.SimilarIonMZToleranceHalfWidth.ToString();
                 txtSimilarIonToleranceHalfWidthMinutes.Text = sicOptions.SimilarIonToleranceHalfWidthMinutes.ToString();
                 txtSpectrumSimilarityMinimum.Text = sicOptions.SpectrumSimilarityMinimum.ToString();
+
                 var binningOptions = masicOptions.BinningOptions;
 
                 // Binning Options
@@ -1354,7 +1444,9 @@ namespace MASIC
                 txtBinEndX.Text = binningOptions.EndX.ToString();
                 txtBinSize.Text = binningOptions.BinSize.ToString();
                 txtMaximumBinCount.Text = binningOptions.MaximumBinCount.ToString();
+
                 txtBinnedDataIntensityPrecisionPct.Text = binningOptions.IntensityPrecisionPercent.ToString();
+
                 chkBinnedDataNormalize.Checked = binningOptions.Normalize;
                 chkBinnedDataSumAllIntensitiesForBin.Checked = binningOptions.SumAllIntensitiesForBin;
 
@@ -1362,34 +1454,41 @@ namespace MASIC
                 mCacheOptions.DiskCachingAlwaysDisabled = masicOptions.CacheOptions.DiskCachingAlwaysDisabled;
                 mCacheOptions.DirectoryPath = masicOptions.CacheOptions.DirectoryPath;
                 mCacheOptions.SpectraToRetainInMemory = masicOptions.CacheOptions.SpectraToRetainInMemory;
+
                 var reporterIonOptions = masicOptions.ReporterIons;
 
                 // Reporter ion options
                 txtReporterIonMZToleranceDa.Text = StringUtilities.DblToString(reporterIonOptions.ReporterIonToleranceDaDefault, 6);
+
                 SelectedReporterIonMode = reporterIonOptions.ReporterIonMassMode;
+
                 chkReporterIonStatsEnabled.Checked = reporterIonOptions.ReporterIonStatsEnabled;
                 chkReporterIonApplyAbundanceCorrection.Checked = reporterIonOptions.ReporterIonApplyAbundanceCorrection;
+
                 chkReporterIonSaveObservedMasses.Checked = reporterIonOptions.ReporterIonSaveObservedMasses;
                 chkReporterIonSaveUncorrectedIntensities.Checked = reporterIonOptions.ReporterIonSaveUncorrectedIntensities;
 
                 // MRM Options
                 chkMRMWriteDataList.Checked = masicOptions.WriteMRMDataList;
                 chkMRMWriteIntensityCrosstab.Checked = masicOptions.WriteMRMIntensityCrosstab;
+
                 var customSICOptions = masicOptions.CustomSICList;
 
                 // Custom SIC Options
                 txtCustomSICFileName.Text = customSICOptions.CustomSICListFileName;
+
                 chkLimitSearchToCustomMZs.Checked = customSICOptions.LimitSearchToCustomMZList;
                 SetCustomSICToleranceType(customSICOptions.ScanToleranceType);
+
                 txtCustomSICScanOrAcqTimeTolerance.Text = customSICOptions.ScanOrAcqTimeTolerance.ToString();
 
                 // Load the Custom m/z values from mCustomSICList
                 var customMzList = masicOptions.CustomSICList.CustomMZSearchValues;
+
                 ClearCustomSICList(false);
                 foreach (var customMzSpec in customMzList)
                 {
-                    bool argexistingRowFound = false;
-                    AddCustomSICRow(customMzSpec.MZ, customMzSpec.MZToleranceDa, customMzSpec.ScanOrAcqTimeCenter, customMzSpec.ScanOrAcqTimeTolerance, customMzSpec.Comment, existingRowFound: ref argexistingRowFound);
+                    AddCustomSICRow(customMzSpec.MZ, customMzSpec.MZToleranceDa, customMzSpec.ScanOrAcqTimeCenter, customMzSpec.ScanOrAcqTimeTolerance, customMzSpec.Comment, out _);
                 }
             }
             catch (Exception ex)
@@ -1438,9 +1537,11 @@ namespace MASIC
                 }
 
                 objOpenFile.Title = "Select dataset lookup file";
+
                 var result = objOpenFile.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
+
                 if (objOpenFile.FileName.Length > 0)
                 {
                     txtDatasetLookupFilePath.Text = objOpenFile.FileName;
@@ -1459,10 +1560,13 @@ namespace MASIC
                 DereferenceLinks = true,
                 Multiselect = false,
                 ValidateNames = true,
-                Filter = "Text files (*.txt)|*.txt|" + "CSV files (*.csv)|*.csv|" + "All files (*.*)|*.*"
+                Filter = "Text files (*.txt)|*.txt|" +
+                         "CSV files (*.csv)|*.csv|" +
+                         "All files (*.*)|*.*"
             })
             {
                 string fileExtension = ".txt";
+
                 if (txtCustomSICFileName.TextLength > 0)
                 {
                     fileExtension = Path.GetExtension(txtCustomSICFileName.Text);
@@ -1498,9 +1602,11 @@ namespace MASIC
                 }
 
                 objOpenFile.Title = "Select custom SIC values file";
+
                 var result = objOpenFile.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
+
                 if (objOpenFile.FileName.Length > 0)
                 {
                     txtCustomSICFileName.Text = objOpenFile.FileName;
@@ -1519,10 +1625,17 @@ namespace MASIC
                 DereferenceLinks = true,
                 Multiselect = false,
                 ValidateNames = true,
-                Filter = "Xcalibur Raw files (*.raw)|*.raw|" + "mzXML files (*.mzXML)|*.mzXML|" + "mzML files (*.mzML)|*.mzML|" + "mzData files (*.mzData)|*.mzData|" + "Mascot Generic Format files (*.mgf)|*.mgf|" + "CDF files (*.cdf)|*.cdf|" + "All files (*.*)|*.*"
+                Filter = "Xcalibur Raw files (*.raw)|*.raw|" +
+                         "mzXML files (*.mzXML)|*.mzXML|" +
+                         "mzML files (*.mzML)|*.mzML|" +
+                         "mzData files (*.mzData)|*.mzData|" +
+                         "Mascot Generic Format files (*.mgf)|*.mgf|" +
+                         "CDF files (*.cdf)|*.cdf|" +
+                         "All files (*.*)|*.*"
             })
             {
                 string fileExtension = string.Copy(mPreferredInputFileExtension);
+
                 if (txtInputFilePath.TextLength > 0)
                 {
                     fileExtension = Path.GetExtension(txtInputFilePath.Text);
@@ -1552,6 +1665,7 @@ namespace MASIC
                 }
 
                 objOpenFile.FilterIndex = filterIndex;
+
                 if (txtInputFilePath.TextLength > 0)
                 {
                     try
@@ -1569,9 +1683,11 @@ namespace MASIC
                 }
 
                 objOpenFile.Title = "Select input file";
+
                 var result = objOpenFile.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
+
                 if (objOpenFile.FileName.Length > 0)
                 {
                     txtInputFilePath.Text = objOpenFile.FileName;
@@ -1634,18 +1750,22 @@ namespace MASIC
         private void SetToolTips()
         {
             var objToolTipControl = new ToolTip();
+
             objToolTipControl.SetToolTip(txtDatasetID, "The dataset ID is included as the first column in the output file.");
+
             objToolTipControl.SetToolTip(txtIntensityThresholdAbsoluteMinimum, "Threshold for extending SIC");
             objToolTipControl.SetToolTip(txtMaxDistanceScansNoOverlap, "Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion.");
             objToolTipControl.SetToolTip(txtMaxAllowedUpwardSpikeFractionMax, "Maximum fraction of the peak maximum that an upward spike can be to be included in the peak");
             objToolTipControl.SetToolTip(txtInitialPeakWidthScansScaler, "Multiplied by the S/N for the given spectrum to determine the initial minimum peak width (in scans) to try");
             objToolTipControl.SetToolTip(txtInitialPeakWidthScansMaximum, "Maximum initial peak width to allow");
+
             objToolTipControl.SetToolTip(txtSICTolerance, "Search tolerance for creating SIC; suggest 0.6 Da for ion traps and 20 ppm for TOF, FT or Orbitrap instruments");
             objToolTipControl.SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.25");
             objToolTipControl.SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter");
+
             objToolTipControl.SetToolTip(chkRefineReportedParentIonMZ, "If enabled, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / " + clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA.ToString() + "); will update the reported m/z value to the one found");
 
-            // ' objToolTipControl.SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram")
+            //objToolTipControl.SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram");
 
             objToolTipControl.SetToolTip(txtStatusLogKeyNameFilterList, "Enter a comma and/or NewLine separated list of Status Log Key names to match (will match any part of the key name to the text you enter).  Leave blank to include all Status Log entries.");
         }
@@ -1653,15 +1773,21 @@ namespace MASIC
         private void ShowAboutBox()
         {
             string message;
+
             message = string.Empty;
+
             message += "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" + ControlChars.NewLine;
             message += "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." + ControlChars.NewLine + ControlChars.NewLine;
+
             message += "This is version " + Application.ProductVersion + " (" + Program.PROGRAM_DATE + "). ";
             message += "Using MASIC PeakFinder DLL version " + mMasic.MASICPeakFinderDllVersion + ControlChars.NewLine + ControlChars.NewLine;
+
             message += "E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov" + ControlChars.NewLine;
             message += "Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/" + ControlChars.NewLine + ControlChars.NewLine;
+
             message += "Licensed under the 2-Clause BSD License; you may not use this file except in compliance with the License.  ";
             message += "You may obtain a copy of the License at https://opensource.org/licenses/BSD-2-Clause" + ControlChars.NewLine + ControlChars.NewLine;
+
             MessageBox.Show(message, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -1680,8 +1806,10 @@ namespace MASIC
                 RowHeadersVisible = true,
                 ReadOnly = false
             };
+
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ, "Custom m/z", 90);
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ_TOLERANCE, "m/z tolerance (Da)", 110);
+
             timeTolerance = false;
             switch (GetCustomSICScanToleranceType())
             {
@@ -1689,11 +1817,13 @@ namespace MASIC
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Relative Scan Number (0 to 1)", 170);
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
                     break;
+
                 case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Acq time (minutes)", 110);
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Time Tolerance", 90);
                     timeTolerance = true;
                     break;
+
                 default:
                     // Includes eCustomSICScanTypeConstants.Absolute
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Scan Number", 90);
@@ -1702,14 +1832,18 @@ namespace MASIC
             }
 
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_COMMENT, "Comment", 90);
+
             fraCustomSICControls.Left = dgCustomSICValues.Left + dgCustomSICValues.Width + 15;
+
             dgCustomSICValues.TableStyles.Clear();
+
             if (!dgCustomSICValues.TableStyles.Contains(tsCustomSICValues))
             {
                 dgCustomSICValues.TableStyles.Add(tsCustomSICValues);
             }
 
             dgCustomSICValues.Refresh();
+
             if (timeTolerance)
             {
                 lblCustomSICScanTolerance.Text = "Time Tolerance";
@@ -1723,41 +1857,46 @@ namespace MASIC
         private bool UpdateMasicSettings(ref clsMASIC objMasic)
         {
             var parseError = default(bool);
+
             try
             {
                 var masicOptions = objMasic.Options;
 
                 // Import options
 
-                masicOptions.ParentIonDecoyMassDa = ParseTextBoxValueDbl[txtParentIonDecoyMassDa, lblParentIonDecoyMassDa.Text + " must be a value", parseError];
+                masicOptions.ParentIonDecoyMassDa = TextBoxUtils.ParseTextBoxValueDbl(txtParentIonDecoyMassDa, lblParentIonDecoyMassDa.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
 
                 // Masic Export Options
                 masicOptions.IncludeHeadersInExportFile = chkIncludeHeaders.Checked;
                 masicOptions.IncludeScanTimesInSICStatsFile = chkIncludeScanTimesInSICStatsFile.Checked;
+
                 masicOptions.SkipMSMSProcessing = chkSkipMSMSProcessing.Checked;
                 masicOptions.SkipSICAndRawDataProcessing = chkSkipSICAndRawDataProcessing.Checked;
                 masicOptions.ExportRawDataOnly = chkExportRawDataOnly.Checked;
 
                 // Raw data export options
                 var exportOptions = masicOptions.RawDataExportOptions;
+
                 exportOptions.ExportEnabled = chkExportRawSpectraData.Checked;
                 exportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)Conversions.ToInteger(cboExportRawDataFileFormat.SelectedIndex);
+
                 exportOptions.IncludeMSMS = chkExportRawDataIncludeMSMS.Checked;
                 exportOptions.RenumberScans = chkExportRawDataRenumberScans.Checked;
-                exportOptions.MinimumSignalToNoiseRatio = ParseTextBoxValueFloat[txtExportRawDataSignalToNoiseRatioMinimum,
-lblExportRawDataSignalToNoiseRatioMinimum.Text + " must be a value", parseError];
+
+                exportOptions.MinimumSignalToNoiseRatio = TextBoxUtils.ParseTextBoxValueFloat(txtExportRawDataSignalToNoiseRatioMinimum,
+                                                                                              lblExportRawDataSignalToNoiseRatioMinimum.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                exportOptions.MaxIonCountPerScan = ParseTextBoxValueInt[txtExportRawDataMaxIonCountPerScan,
-lblExportRawDataMaxIonCountPerScan.Text + " must be an integer value", parseError];
+                    return false;
+                exportOptions.MaxIonCountPerScan = TextBoxUtils.ParseTextBoxValueInt(txtExportRawDataMaxIonCountPerScan,
+                                                                                     lblExportRawDataMaxIonCountPerScan.Text + " must be an integer value", out parseError);
                 if (parseError)
-                    break;
-                exportOptions.IntensityMinimum = ParseTextBoxValueFloat[txtExportRawDataIntensityMinimum,
-lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
+                    return false;
+                exportOptions.IntensityMinimum = TextBoxUtils.ParseTextBoxValueFloat(txtExportRawDataIntensityMinimum,
+                                                                                     lblExportRawDataIntensityMinimum.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
 
                 // Thermo .raw info file options
                 masicOptions.WriteMSMethodFile = chkSaveMSMethodFile.Checked;
@@ -1767,14 +1906,17 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                 masicOptions.WriteExtendedStatsIncludeScanFilterText = chkSaveExtendedStatsFileIncludeFilterText.Checked;
                 masicOptions.WriteExtendedStatsStatusLog = chkSaveExtendedStatsFileIncludeStatusLog.Checked;
                 masicOptions.SetStatusLogKeyNameFilterList(txtStatusLogKeyNameFilterList.Text, ',');
+
                 masicOptions.ConsolidateConstantExtendedHeaderValues = chkConsolidateConstantExtendedHeaderValues.Checked;
+
                 var sicOptions = masicOptions.SICOptions;
                 var peakFinderOptions = masicOptions.SICOptions.SICPeakFinderOptions;
 
                 // Dataset and Database options
-                sicOptions.DatasetID = ParseTextBoxValueInt[txtDatasetID, lblDatasetID.Text + " must be an integer value", parseError];
+                sicOptions.DatasetID = TextBoxUtils.ParseTextBoxValueInt(txtDatasetID, lblDatasetID.Text + " must be an integer value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 if (txtDatabaseConnectionString.TextLength > 0 & txtDatasetInfoQuerySQL.TextLength > 0)
                 {
                     masicOptions.DatabaseConnectionString = txtDatabaseConnectionString.Text;
@@ -1803,41 +1945,49 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                 }
 
                 // SIC Options
-                var sicTolerance = ParseTextBoxValueDbl[txtSICTolerance, lblSICToleranceDa.Text + " must be a value", parseError];
+                var sicTolerance = TextBoxUtils.ParseTextBoxValueDbl(txtSICTolerance, lblSICToleranceDa.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 sicOptions.SetSICTolerance(sicTolerance, optSICTolerancePPM.Checked);
-                sicOptions.ScanRangeStart = ParseTextBoxValueInt[txtScanStart, lblScanStart.Text + " must be a value", parseError];
+
+                sicOptions.ScanRangeStart = TextBoxUtils.ParseTextBoxValueInt(txtScanStart, lblScanStart.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                sicOptions.ScanRangeEnd = ParseTextBoxValueInt[txtScanEnd, lblScanEnd.Text + " must be a value", parseError];
+                    return false;
+                sicOptions.ScanRangeEnd = TextBoxUtils.ParseTextBoxValueInt(txtScanEnd, lblScanEnd.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                sicOptions.RTRangeStart = ParseTextBoxValueFloat[txtTimeStart, lblTimeStart.Text + " must be a value", parseError];
+                    return false;
+
+                sicOptions.RTRangeStart = TextBoxUtils.ParseTextBoxValueFloat(txtTimeStart, lblTimeStart.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                sicOptions.RTRangeEnd = ParseTextBoxValueFloat[txtTimeEnd, lblTimeEnd.Text + " must be a value", parseError];
+                    return false;
+                sicOptions.RTRangeEnd = TextBoxUtils.ParseTextBoxValueFloat(txtTimeEnd, lblTimeEnd.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
 
                 // Note: the following 5 options are not graphically editable
                 masicOptions.SuppressNoParentIonsError = mSuppressNoParentIonsError;
+
                 sicOptions.CompressMSSpectraData = mCompressMSSpectraData;
                 sicOptions.CompressMSMSSpectraData = mCompressMSMSSpectraData;
                 sicOptions.CompressToleranceDivisorForDa = mCompressToleranceDivisorForDa;
                 sicOptions.CompressToleranceDivisorForPPM = mCompressToleranceDivisorForPPM;
-                sicOptions.MaxSICPeakWidthMinutesBackward = ParseTextBoxValueFloat[txtMaxPeakWidthMinutesBackward, lblMaxPeakWidthMinutes.Text + " " + lblMaxPeakWidthMinutesBackward.Text + " must be a value", parseError];
+
+                sicOptions.MaxSICPeakWidthMinutesBackward = TextBoxUtils.ParseTextBoxValueFloat(txtMaxPeakWidthMinutesBackward, lblMaxPeakWidthMinutes.Text + " " + lblMaxPeakWidthMinutesBackward.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                sicOptions.MaxSICPeakWidthMinutesForward = ParseTextBoxValueFloat[txtMaxPeakWidthMinutesForward, lblMaxPeakWidthMinutes.Text + " " + lblMaxPeakWidthMinutesForward.Text + " must be a value", parseError];
+                    return false;
+                sicOptions.MaxSICPeakWidthMinutesForward = TextBoxUtils.ParseTextBoxValueFloat(txtMaxPeakWidthMinutesForward, lblMaxPeakWidthMinutes.Text + " " + lblMaxPeakWidthMinutesForward.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.IntensityThresholdFractionMax = ParseTextBoxValueFloat[txtIntensityThresholdFractionMax, lblIntensityThresholdFractionMax.Text + " must be a value", parseError];
+                    return false;
+
+                peakFinderOptions.IntensityThresholdFractionMax = TextBoxUtils.ParseTextBoxValueFloat(txtIntensityThresholdFractionMax, lblIntensityThresholdFractionMax.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.IntensityThresholdAbsoluteMinimum = ParseTextBoxValueFloat[txtIntensityThresholdAbsoluteMinimum, lblIntensityThresholdAbsoluteMinimum.Text + " must be a value", parseError];
+                    return false;
+
+                peakFinderOptions.IntensityThresholdAbsoluteMinimum = TextBoxUtils.ParseTextBoxValueFloat(txtIntensityThresholdAbsoluteMinimum, lblIntensityThresholdAbsoluteMinimum.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked;
                 sicOptions.RefineReportedParentIonMZ = chkRefineReportedParentIonMZ.Checked;
 
@@ -1845,78 +1995,88 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
 
                 // Peak Finding Options
                 peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(cboSICNoiseThresholdMode.SelectedIndex);
-                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat[txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text + " must be a value", parseError];
+                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat[txtSICNoiseFractionLowIntensityDataToAverage, lblSICNoiseFractionLowIntensityDataToAverage.Text + " must be a value", parseError];
+                    return false;
+
+                peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = TextBoxUtils.ParseTextBoxValueFloat(txtSICNoiseFractionLowIntensityDataToAverage, lblSICNoiseFractionLowIntensityDataToAverage.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
 
                 // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
                 peakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0;
-                peakFinderOptions.MaxDistanceScansNoOverlap = ParseTextBoxValueInt[txtMaxDistanceScansNoOverlap, lblMaxDistanceScansNoOverlap.Text + " must be an integer value", parseError];
+
+                peakFinderOptions.MaxDistanceScansNoOverlap = TextBoxUtils.ParseTextBoxValueInt(txtMaxDistanceScansNoOverlap, lblMaxDistanceScansNoOverlap.Text + " must be an integer value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.MaxAllowedUpwardSpikeFractionMax = ParseTextBoxValueFloat[txtMaxAllowedUpwardSpikeFractionMax, lblMaxAllowedUpwardSpikeFractionMax.Text + " must be a value", parseError];
+                    return false;
+                peakFinderOptions.MaxAllowedUpwardSpikeFractionMax = TextBoxUtils.ParseTextBoxValueFloat(txtMaxAllowedUpwardSpikeFractionMax, lblMaxAllowedUpwardSpikeFractionMax.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.InitialPeakWidthScansScaler = ParseTextBoxValueFloat[txtInitialPeakWidthScansScaler, lblInitialPeakWidthScansScaler.Text + " must be a value", parseError];
+                    return false;
+                peakFinderOptions.InitialPeakWidthScansScaler = TextBoxUtils.ParseTextBoxValueFloat(txtInitialPeakWidthScansScaler, lblInitialPeakWidthScansScaler.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.InitialPeakWidthScansMaximum = ParseTextBoxValueInt[txtInitialPeakWidthScansMaximum, lblInitialPeakWidthScansMaximum.Text + " must be an integer value", parseError];
+                    return false;
+                peakFinderOptions.InitialPeakWidthScansMaximum = TextBoxUtils.ParseTextBoxValueInt(txtInitialPeakWidthScansMaximum, lblInitialPeakWidthScansMaximum.Text + " must be an integer value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 peakFinderOptions.UseButterworthSmooth = optUseButterworthSmooth.Checked;
-                peakFinderOptions.ButterworthSamplingFrequency = ParseTextBoxValueFloat[txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text + " must be a value", parseError];
+                peakFinderOptions.ButterworthSamplingFrequency = TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 peakFinderOptions.UseSavitzkyGolaySmooth = optUseSavitzkyGolaySmooth.Checked;
-                peakFinderOptions.SavitzkyGolayFilterOrder = Conversions.ToShort(ParseTextBoxValueInt[txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text + " must be an integer value", parseError]);
+                peakFinderOptions.SavitzkyGolayFilterOrder = Conversions.ToShort(TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text + " must be an integer value", out parseError));
                 if (parseError)
-                    break;
+                    return false;
+
                 peakFinderOptions.FindPeaksOnSmoothedData = chkFindPeaksOnSmoothedData.Checked;
                 peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = chkSmoothDataRegardlessOfMinimumPeakWidth.Checked;
 
                 // Mass Spectra Noise Threshold Options
                 peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(cboMassSpectraNoiseThresholdMode.SelectedIndex);
-                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = ParseTextBoxValueFloat[txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text + " must be a value", parseError];
+                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = ParseTextBoxValueFloat[txtMassSpectraNoiseFractionLowIntensityDataToAverage, lblMassSpectraNoiseFractionLowIntensityDataToAverage.Text + " must be a value", parseError];
+                    return false;
+
+                peakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = TextBoxUtils.ParseTextBoxValueFloat(txtMassSpectraNoiseFractionLowIntensityDataToAverage, lblMassSpectraNoiseFractionLowIntensityDataToAverage.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                peakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = ParseTextBoxValueFloat[txtMassSpectraNoiseMinimumSignalToNoiseRatio, lblMassSpectraNoiseMinimumSignalToNoiseRatio.Text + " must be a value", parseError];
+                    return false;
+
+                peakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = TextBoxUtils.ParseTextBoxValueFloat(txtMassSpectraNoiseMinimumSignalToNoiseRatio, lblMassSpectraNoiseMinimumSignalToNoiseRatio.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
 
                 // Similarity Options
-                sicOptions.SimilarIonMZToleranceHalfWidth = ParseTextBoxValueFloat[txtSimilarIonMZToleranceHalfWidth, lblSimilarIonMZToleranceHalfWidth.Text + " must be a value", parseError];
+                sicOptions.SimilarIonMZToleranceHalfWidth = TextBoxUtils.ParseTextBoxValueFloat(txtSimilarIonMZToleranceHalfWidth, lblSimilarIonMZToleranceHalfWidth.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                sicOptions.SimilarIonToleranceHalfWidthMinutes = ParseTextBoxValueInt[txtSimilarIonToleranceHalfWidthMinutes, lblSimilarIonTimeToleranceHalfWidth.Text + " must be a value", parseError];
+                    return false;
+                sicOptions.SimilarIonToleranceHalfWidthMinutes = TextBoxUtils.ParseTextBoxValueInt(txtSimilarIonToleranceHalfWidthMinutes, lblSimilarIonTimeToleranceHalfWidth.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                sicOptions.SpectrumSimilarityMinimum = ParseTextBoxValueFloat[txtSpectrumSimilarityMinimum, lblSpectrumSimilarityMinimum.Text + " must be a value", parseError];
+                    return false;
+                sicOptions.SpectrumSimilarityMinimum = TextBoxUtils.ParseTextBoxValueFloat(txtSpectrumSimilarityMinimum, lblSpectrumSimilarityMinimum.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 var binningOptions = masicOptions.BinningOptions;
 
                 // Binning Options
-                binningOptions.StartX = ParseTextBoxValueFloat[txtBinStartX, lblBinStartX.Text + " must be a value", parseError];
+                binningOptions.StartX = TextBoxUtils.ParseTextBoxValueFloat(txtBinStartX, lblBinStartX.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                binningOptions.EndX = ParseTextBoxValueFloat[txtBinEndX, lblBinEndX.Text + " must be a value", parseError];
+                    return false;
+                binningOptions.EndX = TextBoxUtils.ParseTextBoxValueFloat(txtBinEndX, lblBinEndX.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                binningOptions.BinSize = ParseTextBoxValueFloat[txtBinSize, lblBinSize.Text + " must be a value", parseError];
+                    return false;
+                binningOptions.BinSize = TextBoxUtils.ParseTextBoxValueFloat(txtBinSize, lblBinSize.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
-                binningOptions.MaximumBinCount = ParseTextBoxValueInt[txtMaximumBinCount, lblMaximumBinCount.Text + " must be an integer value", parseError];
+                    return false;
+                binningOptions.MaximumBinCount = TextBoxUtils.ParseTextBoxValueInt(txtMaximumBinCount, lblMaximumBinCount.Text + " must be an integer value", out parseError);
                 if (parseError)
-                    break;
-                binningOptions.IntensityPrecisionPercent = ParseTextBoxValueFloat[txtBinnedDataIntensityPrecisionPct, lblBinnedDataIntensityPrecisionPct.Text + " must be a value", parseError];
+                    return false;
+
+                binningOptions.IntensityPrecisionPercent = TextBoxUtils.ParseTextBoxValueFloat(txtBinnedDataIntensityPrecisionPct, lblBinnedDataIntensityPrecisionPct.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 binningOptions.Normalize = chkBinnedDataNormalize.Checked;
                 binningOptions.SumAllIntensitiesForBin = chkBinnedDataSumAllIntensitiesForBin.Checked;
 
@@ -1924,6 +2084,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                 masicOptions.CacheOptions.DiskCachingAlwaysDisabled = mCacheOptions.DiskCachingAlwaysDisabled;
                 masicOptions.CacheOptions.DirectoryPath = mCacheOptions.DirectoryPath;
                 masicOptions.CacheOptions.SpectraToRetainInMemory = mCacheOptions.SpectraToRetainInMemory;
+
                 var reporterIonOptions = masicOptions.ReporterIons;
 
                 // Reporter ion options
@@ -1933,10 +2094,12 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                 reporterIonOptions.ReporterIonMassMode = SelectedReporterIonMode;
 
                 // Update .ReporterIonToleranceDa based on txtReporterIonMZToleranceDa
-                reporterIonOptions.ReporterIonToleranceDaDefault = ParseTextBoxValueDbl[txtReporterIonMZToleranceDa, "", parseError,
-    clsReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, false];
+                reporterIonOptions.ReporterIonToleranceDaDefault = TextBoxUtils.ParseTextBoxValueDbl(txtReporterIonMZToleranceDa, "", out parseError,
+                                                                                                     clsReporterIons.REPORTER_ION_TOLERANCE_DA_DEFAULT, false);
                 reporterIonOptions.SetReporterIonMassMode(reporterIonOptions.ReporterIonMassMode, reporterIonOptions.ReporterIonToleranceDaDefault);
+
                 reporterIonOptions.ReporterIonApplyAbundanceCorrection = chkReporterIonApplyAbundanceCorrection.Checked;
+
                 reporterIonOptions.ReporterIonSaveObservedMasses = chkReporterIonSaveObservedMasses.Checked;
                 reporterIonOptions.ReporterIonSaveUncorrectedIntensities = chkReporterIonSaveUncorrectedIntensities.Checked;
 
@@ -1951,6 +2114,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
 
                 string customSICFileName = txtCustomSICFileName.Text.Trim();
                 masicOptions.CustomSICList.CustomSICListFileName = customSICFileName;
+
                 var mzSearchSpecs = new List<clsCustomMZSearchSpec>();
 
                 // Only use the data in table CUSTOM_SIC_VALUES_DATA_TABLE if the CustomSicFileName is empty
@@ -1961,14 +2125,14 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                         if (Information.IsNumeric(currentRow[0]) & Information.IsNumeric(currentRow[1]))
                         {
                             double targetMz = Conversions.ToDouble(currentRow[0]);
-                            var argitem = currentRow[4];
                             var mzSearchSpec = new clsCustomMZSearchSpec(targetMz)
                             {
                                 MZToleranceDa = Conversions.ToDouble(currentRow[1]),
                                 ScanOrAcqTimeCenter = Conversions.ToSingle(currentRow[2]),
                                 ScanOrAcqTimeTolerance = Conversions.ToSingle(currentRow[3]),
-                                Comment = CStrSafe(ref argitem)
+                                Comment = CStrSafe(currentRow[4])
                             };
+
                             mzSearchSpecs.Add(mzSearchSpec);
                         }
                     }
@@ -1993,9 +2157,10 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                     scanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
                 }
 
-                var scanOrAcqTimeTolerance = ParseTextBoxValueFloat[txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text + " must be a value", parseError];
+                var scanOrAcqTimeTolerance = TextBoxUtils.ParseTextBoxValueFloat(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text + " must be a value", out parseError);
                 if (parseError)
-                    break;
+                    return false;
+
                 masicOptions.CustomSICList.SetCustomSICListValues(scanType, scanOrAcqTimeTolerance, mzSearchSpecs);
             }
             catch (Exception ex)
@@ -2009,6 +2174,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         private bool ValidateSettings(ref clsMASIC objMasic)
         {
             DialogResult eResponse;
+
             if (objMasic.Options.ReporterIons.ReporterIonMassMode != clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
             {
                 if (objMasic.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes)
@@ -2017,6 +2183,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                     if (objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault > 0.03)
                     {
                         eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be less than 0.03 m/z when using 'iTraq8 for High Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z.  If using a low resolution instrument, you should choose the 'iTraq 8 for Low Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+
                         if (eResponse != DialogResult.Yes)
                         {
                             return false;
@@ -2029,6 +2196,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
                     if (objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault < 0.1)
                     {
                         eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be at least 0.1 m/z when using 'iTraq8 for Low Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z. If using a high resolution instrument, you should choose the 'iTraq 8 for High Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+
                         if (eResponse != DialogResult.Yes)
                         {
                             return false;
@@ -2180,42 +2348,42 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         #region "Textbox Events"
         private void txtMassSpectraNoiseThresholdIntensity_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtMassSpectraNoiseThresholdIntensity, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtMassSpectraNoiseThresholdIntensity, e, true, true);
         }
 
         private void txtMassSpectraNoiseFractionLowIntensityDataToAverage_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtMassSpectraNoiseFractionLowIntensityDataToAverage, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtMassSpectraNoiseFractionLowIntensityDataToAverage, e, true, true);
         }
 
         private void txtBinnedDataIntensityPrecisionPct_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtBinnedDataIntensityPrecisionPct, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtBinnedDataIntensityPrecisionPct, e, true, true);
         }
 
         private void txtBinSize_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtBinSize, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtBinSize, e, true, true);
         }
 
         private void txtBinStartX_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtBinStartX, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtBinStartX, e, true, true);
         }
 
         private void txtBinEndX_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtBinEndX, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtBinEndX, e, true, true);
         }
 
         private void txtButterworthSamplingFrequency_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtButterworthSamplingFrequency, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtButterworthSamplingFrequency, e, true, true);
         }
 
         private void txtButterworthSamplingFrequency_Validating(object sender, CancelEventArgs e)
         {
-            ValidateTextBoxFloat[txtButterworthSamplingFrequency, 0.01, 0.99, 0.25];
+            TextBoxUtils.ValidateTextBoxFloat(txtButterworthSamplingFrequency, 0.01f, 0.99f, 0.25f);
         }
 
         private void txtCustomSICFileDescription_KeyDown(object sender, KeyEventArgs e)
@@ -2233,132 +2401,132 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
 
         private void txtCustomSICScanOrAcqTimeTolerance_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtCustomSICScanOrAcqTimeTolerance, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtCustomSICScanOrAcqTimeTolerance, e, true, true);
         }
 
         private void txtDatasetID_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtDatasetID, e, true, false];
+            TextBoxUtils.TextBoxKeyPressHandler(txtDatasetID, e, true, false);
         }
 
         private void txtExportRawDataIntensityMinimum_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtExportRawDataIntensityMinimum, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtExportRawDataIntensityMinimum, e, true, true);
         }
 
         private void txtExportRawDataMaxIonCountPerScan_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtExportRawDataMaxIonCountPerScan, e];
+            TextBoxUtils.TextBoxKeyPressHandler(txtExportRawDataMaxIonCountPerScan, e);
         }
 
         private void txtExportRawDataSignalToNoiseRatioMinimum_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtExportRawDataSignalToNoiseRatioMinimum, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtExportRawDataSignalToNoiseRatioMinimum, e, true, true);
         }
 
         private void txtInitialPeakWidthScansMaximum_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtInitialPeakWidthScansMaximum, e];
+            TextBoxUtils.TextBoxKeyPressHandler(txtInitialPeakWidthScansMaximum, e);
         }
 
         private void txtInitialPeakWidthScansScaler_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtInitialPeakWidthScansScaler, e];
+            TextBoxUtils.TextBoxKeyPressHandler(txtInitialPeakWidthScansScaler, e);
         }
 
         private void txtIntensityThresholdAbsoluteMinimum_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtIntensityThresholdAbsoluteMinimum, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtIntensityThresholdAbsoluteMinimum, e, true, true);
         }
 
         private void txtIntensityThresholdFractionMax_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtIntensityThresholdFractionMax, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtIntensityThresholdFractionMax, e, true, true);
         }
 
         private void txtMaxAllowedUpwardSpikeFractionMax_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtMaxAllowedUpwardSpikeFractionMax, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtMaxAllowedUpwardSpikeFractionMax, e, true, true);
         }
 
         private void txtMaxDistanceScansNoOverlap_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtMaxDistanceScansNoOverlap, e];
+            TextBoxUtils.TextBoxKeyPressHandler(txtMaxDistanceScansNoOverlap, e);
         }
 
         private void txtMaximumBinCount_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtMaximumBinCount, e];
+            TextBoxUtils.TextBoxKeyPressHandler(txtMaximumBinCount, e);
         }
 
         private void txtMaxPeakWidthMinutesBackward_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtMaxPeakWidthMinutesBackward, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtMaxPeakWidthMinutesBackward, e, true, true);
         }
 
         private void txtMaxPeakWidthMinutesForward_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtMaxPeakWidthMinutesForward, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtMaxPeakWidthMinutesForward, e, true, true);
         }
 
         private void txtSICNoiseThresholdIntensity_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtSICNoiseThresholdIntensity, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtSICNoiseThresholdIntensity, e, true, true);
         }
 
         private void txtSICNoiseFractionLowIntensityDataToAverage_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtSICNoiseFractionLowIntensityDataToAverage, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtSICNoiseFractionLowIntensityDataToAverage, e, true, true);
         }
 
         private void txtSavitzkyGolayFilterOrder_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtSavitzkyGolayFilterOrder, e];
+            TextBoxUtils.TextBoxKeyPressHandler(txtSavitzkyGolayFilterOrder, e);
         }
 
         private void txtSavitzkyGolayFilterOrder_Validating(object sender, CancelEventArgs e)
         {
-            ValidateTextBoxInt[txtSavitzkyGolayFilterOrder, 0, 20, 0];
+            TextBoxUtils.ValidateTextBoxInt(txtSavitzkyGolayFilterOrder, 0, 20, 0);
         }
 
         private void txtSICTolerance_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtSICTolerance, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtSICTolerance, e, true, true);
         }
 
         private void txtSimilarIonMZToleranceHalfWidth_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtSimilarIonMZToleranceHalfWidth, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtSimilarIonMZToleranceHalfWidth, e, true, true);
         }
 
         private void txtSimilarIonToleranceHalfWidthMinutes_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtSimilarIonToleranceHalfWidthMinutes, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtSimilarIonToleranceHalfWidthMinutes, e, true, true);
         }
 
         private void txtSpectrumSimilarityMinimum_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtSpectrumSimilarityMinimum, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtSpectrumSimilarityMinimum, e, true, true);
         }
 
         private void txtScanEnd_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtScanEnd, e, true, false];
+            TextBoxUtils.TextBoxKeyPressHandler(txtScanEnd, e, true, false);
         }
 
         private void txtScanStart_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtScanStart, e, true, false];
+            TextBoxUtils.TextBoxKeyPressHandler(txtScanStart, e, true, false);
         }
 
         private void txtTimeEnd_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtTimeEnd, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtTimeEnd, e, true, true);
         }
 
         private void txtTimeStart_KeyPress(object sender, KeyPressEventArgs e)
         {
-            TextBoxKeyPressHandler[txtTimeStart, e, true, true];
+            TextBoxUtils.TextBoxKeyPressHandler(txtTimeStart, e, true, true);
         }
         #endregion
 
@@ -2396,7 +2564,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
         private void mnuEditResetOptions_Click(object sender, EventArgs e)
         {
             clsMASIC argobjMasic = null;
-            ResetToDefaults(true, objMasic: ref argobjMasic);
+            ResetToDefaults(true, ref argobjMasic);
         }
 
         private void mnuEditSaveDefaultOptions_Click(object sender, EventArgs e)
@@ -2483,6 +2651,7 @@ lblExportRawDataIntensityMinimum.Text + " must be a value", parseError];
             ConsoleMsgUtils.ShowWarning(message);
         }
         #endregion
+
         private void cboReporterIonMassMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             AutoToggleReporterIonStatsEnabled();

@@ -96,9 +96,11 @@ namespace MASIC
         {
             SurveyScans = new List<clsScanInfo>();
             FragScans = new List<clsScanInfo>();
+
             MasterScanOrder = new List<udtScanOrderPointerType>();
             MasterScanNumList = new List<int>();
             MasterScanTimeList = new List<float>();
+
             ParentIons = new List<clsParentIonInfo>();
         }
 
@@ -106,6 +108,7 @@ namespace MASIC
         {
             const int scanNumber = 0;
             const float scanTime = 0;
+
             return AddFakeSurveyScan(scanNumber, scanTime);
         }
 
@@ -115,12 +118,18 @@ namespace MASIC
         /// <param name="scanNumber"></param>
         /// <param name="scanTime"></param>
         /// <returns>The index in SurveyScans() at which the new scan was added</returns>
-        private int AddFakeSurveyScan(int scanNumber, float scanTime)
+        private int AddFakeSurveyScan(
+            int scanNumber,
+            float scanTime)
         {
             var surveyScan = GetFakeSurveyScan(scanNumber, scanTime);
+
             int surveyScanIndex = SurveyScans.Count;
+
             SurveyScans.Add(surveyScan);
+
             AddMasterScanEntry(eScanTypeConstants.SurveyScan, surveyScanIndex);
+
             return surveyScanIndex;
         }
 
@@ -161,14 +170,20 @@ namespace MASIC
             }
         }
 
-        public void AddMasterScanEntry(eScanTypeConstants eScanType, int scanIndex, int scanNumber, float scanTime)
+        public void AddMasterScanEntry(
+            eScanTypeConstants eScanType,
+            int scanIndex,
+            int scanNumber,
+            float scanTime)
         {
             var newScanEntry = new udtScanOrderPointerType()
             {
                 ScanType = eScanType,
                 ScanIndexPointer = scanIndex
             };
+
             MasterScanOrder.Add(newScanEntry);
+
             MasterScanNumList.Add(scanNumber);
             MasterScanTimeList.Add(scanTime);
         }
@@ -197,16 +212,20 @@ namespace MASIC
 
             // Store the collision mode and possibly the scan filter text
             surveyScan.FragScanInfo.CollisionMode = string.Empty;
+
             return surveyScan;
         }
 
         public void Initialize()
         {
             SurveyScans.Clear();
+
             FragScans.Clear();
+
             MasterScanOrder.Clear();
             MasterScanNumList.Clear();
             MasterScanTimeList.Clear();
+
             ParentIons.Clear();
         }
     }

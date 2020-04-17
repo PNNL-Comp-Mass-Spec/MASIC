@@ -3,6 +3,7 @@
     public class clsReporterIonInfo
     {
         public double MZ;
+
         public double MZToleranceDa;
 
         /// <summary>

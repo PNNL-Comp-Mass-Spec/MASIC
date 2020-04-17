@@ -29,10 +29,13 @@ namespace MASIC
 
         #region "Classwide Variables"
         private eDataTypeToUse mDataType;
+
         private int[] mDataInt;
         private float[] mDataSingle;
         private double[] mDataDouble;
+
         private int[] mPointerIndices;        // Pointers to the original index of the data point in the source array
+
         private bool mPointerArrayIsValid;
         private bool mUsePointerIndexArray;    // Set this to false to conserve memory usage
 
@@ -104,6 +107,7 @@ namespace MASIC
             var rightDone = default(bool);
             int leftIndex;
             int rightIndex;
+
             indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
@@ -154,6 +158,7 @@ namespace MASIC
                         rightDone = true;
                 }
                 while (!rightDone);
+
                 matchIndexStart = leftIndex + 1;
                 matchIndexEnd = rightIndex - 1;
             }
@@ -168,6 +173,7 @@ namespace MASIC
             var rightDone = default(bool);
             int leftIndex;
             int rightIndex;
+
             indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
@@ -232,6 +238,7 @@ namespace MASIC
             var rightDone = default(bool);
             int leftIndex;
             int rightIndex;
+
             indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
@@ -323,6 +330,7 @@ namespace MASIC
                 {
                     mDataInt = new int[values.Length];
                     values.CopyTo(mDataInt, 0);
+
                     if (mUsePointerIndexArray)
                     {
                         InitializePointerIndexArray(mDataInt.Length);
@@ -361,6 +369,7 @@ namespace MASIC
                 {
                     mDataSingle = new float[values.Length];
                     values.CopyTo(mDataSingle, 0);
+
                     if (mUsePointerIndexArray)
                     {
                         InitializePointerIndexArray(mDataSingle.Length);
@@ -399,6 +408,7 @@ namespace MASIC
                 {
                     mDataDouble = new double[values.Length];
                     values.CopyTo(mDataDouble, 0);
+
                     if (mUsePointerIndexArray)
                     {
                         InitializePointerIndexArray(mDataDouble.Length);
@@ -434,6 +444,7 @@ namespace MASIC
             // Otherwise, returns false
 
             bool matchFound;
+
             if (mDataType != eDataTypeToUse.IntegerType)
             {
                 switch (mDataType)
@@ -453,6 +464,7 @@ namespace MASIC
             {
                 matchIndexStart = 0;
                 matchIndexEnd = mDataInt.Length - 1;
+
                 if (mDataInt.Length == 0)
                 {
                     matchIndexEnd = -1;
@@ -492,6 +504,7 @@ namespace MASIC
             // Otherwise, returns false
 
             bool matchFound;
+
             if (mDataType != eDataTypeToUse.DoubleType)
             {
                 switch (mDataType)
@@ -511,6 +524,7 @@ namespace MASIC
             {
                 matchIndexStart = 0;
                 matchIndexEnd = mDataDouble.Length - 1;
+
                 if (mDataDouble.Length == 0)
                 {
                     matchIndexEnd = -1;
@@ -550,6 +564,7 @@ namespace MASIC
             // Otherwise, returns false
 
             bool matchFound;
+
             if (mDataType != eDataTypeToUse.SingleType)
             {
                 switch (mDataType)
@@ -569,6 +584,7 @@ namespace MASIC
             {
                 matchIndexStart = 0;
                 matchIndexEnd = mDataSingle.Length - 1;
+
                 if (mDataSingle.Length == 0)
                 {
                     matchIndexEnd = -1;
@@ -674,6 +690,7 @@ namespace MASIC
         public double GetValueByOriginalIndex(int indexOriginal)
         {
             int index;
+
             if (!mPointerArrayIsValid || mDataType == eDataTypeToUse.NoDataPresent)
             {
                 return 0;
@@ -721,10 +738,12 @@ namespace MASIC
             }
         }
         #endregion
+
         private void InitializeLocalVariables()
         {
             mDataType = eDataTypeToUse.NoDataPresent;
             ClearUnusedData();
+
             mUsePointerIndexArray = true;
             InitializePointerIndexArray(0);
         }
@@ -732,11 +751,14 @@ namespace MASIC
         private void InitializePointerIndexArray(int arrayLength)
         {
             int index;
+
             if (arrayLength < 0)
                 arrayLength = 0;
             mPointerIndices = new int[arrayLength];
+
             for (index = 0; index <= arrayLength - 1; index++)
                 mPointerIndices[index] = index;
+
             if (arrayLength > 0)
             {
                 mPointerArrayIsValid = true;

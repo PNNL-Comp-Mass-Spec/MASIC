@@ -22,14 +22,22 @@ namespace MASIC
         /// It is therefore very efficient regardless of the number of data points in the spectrum
         /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
         /// </remarks>
-        public double AggregateIonsInRange(clsMSSpectrum objMSSpectrum, double searchMZ, double searchToleranceHalfWidth, out int ionMatchCount, out double closestMZ, bool returnMax)
+        public double AggregateIonsInRange(
+        clsMSSpectrum objMSSpectrum,
+        double searchMZ,
+        double searchToleranceHalfWidth,
+        out int ionMatchCount,
+        out double closestMZ,
+        bool returnMax)
         {
             ionMatchCount = 0;
             closestMZ = 0;
             double ionSumOrMax = 0;
+
             try
             {
                 double smallestDifference = double.MaxValue;
+
                 if (objMSSpectrum.IonsMZ != null && objMSSpectrum.IonCount > 0)
                 {
                     int indexFirst, indexLast;
@@ -71,7 +79,13 @@ namespace MASIC
             return ionSumOrMax;
         }
 
-        public bool FindMaxValueInMZRange(clsSpectraCache spectraCache, clsScanInfo currentScan, double mzStart, double mzEnd, out double bestMatchMZ, out double matchIntensity)
+        public bool FindMaxValueInMZRange(
+            clsSpectraCache spectraCache,
+            clsScanInfo currentScan,
+            double mzStart,
+            double mzEnd,
+            out double bestMatchMZ,
+            out double matchIntensity)
         {
             // Searches currentScan.IonsMZ for the maximum value between mzStart and mzEnd
             // If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
@@ -82,6 +96,7 @@ namespace MASIC
             // As an alternative to this function, use AggregateIonsInRange
 
             int poolIndex;
+
             bestMatchMZ = 0;
             matchIntensity = 0;
             try
@@ -93,7 +108,13 @@ namespace MASIC
                 }
                 else
                 {
-                    bool success = FindMaxValueInMZRange(spectraCache.SpectraPool[poolIndex].IonsMZ, spectraCache.SpectraPool[poolIndex].IonsIntensity, spectraCache.SpectraPool[poolIndex].IonCount, mzStart, mzEnd, out bestMatchMZ, out matchIntensity);
+                    bool success = FindMaxValueInMZRange(
+                        spectraCache.SpectraPool[poolIndex].IonsMZ,
+                        spectraCache.SpectraPool[poolIndex].IonsIntensity,
+                        spectraCache.SpectraPool[poolIndex].IonCount,
+                        mzStart, mzEnd,
+                        out bestMatchMZ, out matchIntensity);
+
                     return success;
                 }
             }
@@ -104,7 +125,14 @@ namespace MASIC
             }
         }
 
-        private bool FindMaxValueInMZRange(IList<double> mzList, IList<double> intensityList, int ionCount, double mzStart, double mzEnd, out double bestMatchMZ, out double matchIntensity)
+        private bool FindMaxValueInMZRange(
+            IList<double> mzList,
+            IList<double> intensityList,
+            int ionCount,
+            double mzStart,
+            double mzEnd,
+            out double bestMatchMZ,
+            out double matchIntensity)
         {
             // Searches mzList for the maximum value between mzStart and mzEnd
             // If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
@@ -117,10 +145,12 @@ namespace MASIC
             int dataIndex;
             int closestMatchIndex;
             var highestIntensity = default(double);
+
             try
             {
                 closestMatchIndex = -1;
                 highestIntensity = 0;
+
                 for (dataIndex = 0; dataIndex <= ionCount - 1; dataIndex++)
                 {
                     if (mzList[dataIndex] >= mzStart && mzList[dataIndex] <= mzEnd)
@@ -158,15 +188,22 @@ namespace MASIC
             }
         }
 
-        private bool SumIonsFindValueInRange(IReadOnlyList<double> dataValues, double searchValue, double toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
+        private bool SumIonsFindValueInRange(
+            IReadOnlyList<double> dataValues,
+            double searchValue,
+            double toleranceHalfWidth,
+            out int matchIndexStart,
+            out int matchIndexEnd)
         {
             // Searches dataValues for searchValue with a tolerance of +/-toleranceHalfWidth
             // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
             // Otherwise, returns false
 
             bool matchFound;
+
             matchIndexStart = 0;
             matchIndexEnd = dataValues.Count - 1;
+
             if (dataValues.Count == 0)
             {
                 matchIndexEnd = -1;
@@ -198,7 +235,12 @@ namespace MASIC
             return matchFound;
         }
 
-        private void SumIonsBinarySearchRangeDbl(IReadOnlyList<double> dataValues, double searchValue, double toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
+        private void SumIonsBinarySearchRangeDbl(
+            IReadOnlyList<double> dataValues,
+            double searchValue,
+            double toleranceHalfWidth,
+            ref int matchIndexStart,
+            ref int matchIndexEnd)
         {
             // Recursive search function
 
@@ -207,6 +249,7 @@ namespace MASIC
             var rightDone = default(bool);
             int leftIndex;
             int rightIndex;
+
             indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
@@ -246,6 +289,7 @@ namespace MASIC
                 }
                 while (!leftDone);
                 rightIndex = indexMidpoint;
+
                 do
                 {
                     rightIndex = rightIndex + 1;
@@ -257,6 +301,7 @@ namespace MASIC
                         rightDone = true;
                 }
                 while (!rightDone);
+
                 matchIndexStart = leftIndex + 1;
                 matchIndexEnd = rightIndex - 1;
             }

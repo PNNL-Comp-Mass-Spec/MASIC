@@ -119,7 +119,9 @@
         }
 
         public MASICPeakFinder.clsSICPeakFinderOptions SICPeakFinderOptions { get; set; }
+
         public bool ReplaceSICZeroesWithMinimumPositiveValueFromMSData { get; set; }
+
         public bool SaveSmoothedData { get; set; }
 
         /// <summary>
@@ -172,6 +174,7 @@
         private float mMaxSICPeakWidthMinutesBackward;
         private float mMaxSICPeakWidthMinutesForward;
         #endregion
+
         public double GetSICTolerance()
         {
             bool toleranceIsPPM;
@@ -191,18 +194,25 @@
 
             // Typically only useful when using a small value for .SICTolerance
             RefineReportedParentIonMZ = false;
+
             ScanRangeStart = 0;
             ScanRangeEnd = 0;
             RTRangeStart = 0;
             RTRangeEnd = 0;
+
             CompressMSSpectraData = true;
             CompressMSMSSpectraData = true;
+
             CompressToleranceDivisorForDa = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA;
             CompressToleranceDivisorForPPM = DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_PPM;
+
             MaxSICPeakWidthMinutesBackward = 5;
             MaxSICPeakWidthMinutesForward = 5;
+
             ReplaceSICZeroesWithMinimumPositiveValueFromMSData = true;
+
             SICPeakFinderOptions = MASICPeakFinder.clsMASICPeakFinder.GetDefaultSICPeakFinderOptions();
+
             SaveSmoothedData = false;
 
             // Note: When using narrow SIC tolerances, be sure to SimilarIonMZToleranceHalfWidth to a smaller value
@@ -219,6 +229,7 @@
         public void SetSICTolerance(double toleranceValue, bool toleranceIsPPM)
         {
             SICToleranceIsPPM = toleranceIsPPM;
+
             if (SICToleranceIsPPM)
             {
                 if (toleranceValue < 0 || toleranceValue > 1000000)

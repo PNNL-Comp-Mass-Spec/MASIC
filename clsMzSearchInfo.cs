@@ -5,13 +5,17 @@ namespace MASIC
     public class clsMzSearchInfo
     {
         public double SearchMZ { get; set; }
+
         public int MZIndexStart { get; set; }
         public int MZIndexEnd { get; set; }
         public int MZIndexMidpoint { get; set; }
+
         public double MZTolerance { get; set; }
         public bool MZToleranceIsPPM { get; set; }
+
         public double MaximumIntensity { get; set; }
         public int ScanIndexMax { get; set; }
+
         public List<MASICPeakFinder.clsBaselineNoiseStatsSegment> BaselineNoiseStatSegments { get; set; }
 
         public override string ToString()

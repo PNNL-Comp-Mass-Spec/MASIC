@@ -225,8 +225,8 @@ namespace MASIC.DataOutput
                         {
                             if (string.Equals(value, dataItem.Value))
                             {
+                                // Value matches; nothing to do
                             }
-                            // Value matches; nothing to do
                             else
                             {
                                 // Value differs; remove the key from consolidatedValuesByID
@@ -249,8 +249,8 @@ namespace MASIC.DataOutput
                         {
                             if (string.Equals(value, item.Value))
                             {
+                                // Value matches; nothing to do
                             }
-                            // Value matches; nothing to do
                             else
                             {
                                 // Value differs; remove key from consolidatedValuesByID

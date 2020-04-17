@@ -23,10 +23,12 @@ namespace MASIC
         private readonly double[] mCoefficients;
 
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsCorrelation() : this(GetDefaultBinningOptions())
+        public clsCorrelation()
+            : this(GetDefaultBinningOptions())
         {
         }
 
@@ -34,7 +36,10 @@ namespace MASIC
         {
             mBinningOptions = binningOptions;
             NoiseThresholdIntensity = 0;
-            mCoefficients = new double[] { 76.180091729471457, -86.505320329416776, 24.014098240830911, -1.231739572450155, 0.001208650973866179, -0.000005395239384953 };
+
+            mCoefficients = new double[] { 76.180091729471457, -86.505320329416776,
+                                           24.014098240830911, -1.231739572450155,
+                                           0.001208650973866179, -0.000005395239384953 };
         }
 
         #region "Constants and Structures"
@@ -116,13 +121,16 @@ namespace MASIC
             }
         }
         #endregion
+
         private double BetaCF(double a, double b, double x)
         {
             const int MAX_ITERATIONS = 100;
             double EPS = 0.0000003;
             const double FPMIN = 1.0E-30;
+
             int m, m2;
             double aa, c, d, del, h, qab, qam, qap;
+
             qab = a + b;
             qap = a + 1.0;
             qam = a - 1.0;
@@ -172,6 +180,7 @@ namespace MASIC
         private double BetaI(double a, double b, double x)
         {
             double bt;
+
             if (x < 0.0 || x > 1.0)
             {
                 throw new Exception("Bad x in routine clsCorrelation->BetaI; should be between 0 and 1");
@@ -206,12 +215,19 @@ namespace MASIC
         /// <param name="binnedYData">Binned y data (the calling class must instantiate this)</param>
         /// <param name="binnedOffsetYData">Binned y data, where the StartX value is offset by 50% of the bin size vs. binnedYData</param>
         /// <returns>True if successful, otherwise false</returns>
-        public bool BinData(List<float> xData, List<float> yData, List<float> binnedYData, List<float> binnedOffsetYData)
+        public bool BinData(
+            List<float> xData,
+            List<float> yData,
+            List<float> binnedYData,
+            List<float> binnedOffsetYData)
         {
             int dataCount;
+
             float bin2Offset;
+
             binnedYData.Clear();
             binnedOffsetYData.Clear();
+
             try
             {
                 dataCount = xData.Count;
@@ -233,6 +249,7 @@ namespace MASIC
                 int binCount = Convert.ToInt32((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
                 if (binCount < 1)
                     binCount = 1;
+
                 if (binCount > mBinningOptions.MaximumBinCount)
                 {
                     mBinningOptions.BinSize = (mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.MaximumBinCount;
@@ -263,12 +280,15 @@ namespace MASIC
             return true;
         }
 
-        private void BinDataWork(IList<float> xData, IList<float> yData, int dataCount, IList<float> binnedYData, int binCount, clsBinningOptions binningOptions, float offset)
+        private void BinDataWork(IList<float> xData, IList<float> yData, int dataCount,
+                                 IList<float> binnedYData, int binCount, clsBinningOptions binningOptions, float offset)
         {
             int index;
             int binNumber;
+
             float maximumIntensity;
             float intensityQuantizationValue;
+
             try
             {
                 maximumIntensity = float.MinValue;
@@ -305,6 +325,7 @@ namespace MASIC
 
                 if (!(maximumIntensity > float.MinValue))
                     maximumIntensity = 0;
+
                 if (binningOptions.IntensityPrecisionPercent > 0)
                 {
                     // Quantize the intensities to .IntensityPrecisionPercent of maximumIntensity
@@ -313,6 +334,7 @@ namespace MASIC
                         intensityQuantizationValue = 1;
                     if (intensityQuantizationValue > 1)
                         intensityQuantizationValue = Convert.ToSingle(Math.Round(intensityQuantizationValue, 0));
+
                     for (index = 0; index <= binCount - 1; index++)
                     {
                         if (Math.Abs(binnedYData[index]) > float.Epsilon)
@@ -349,20 +371,18 @@ namespace MASIC
         /// <param name="eCorrelationMethod"></param>
         /// <returns>Correlation value (0 to 1), or -1 if an error</returns>
         /// <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
-        public float Correlate(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, cmCorrelationMethodConstants eCorrelationMethod)
+        public float Correlate(
+            IReadOnlyCollection<float> dataList1,
+            IReadOnlyCollection<float> dataList2,
+            cmCorrelationMethodConstants eCorrelationMethod)
         {
             int index;
             int dataCount;
             int nonZeroDataCount;
-            float RValue;
-            float ProbOfSignificance;
-            float FishersZ;
-            float DiffInRanks;
-            float ZD;
-            float RS;
-            float ProbRS;
-            float KendallsTau;
-            float Z;
+
+            float RValue, ProbOfSignificance, FishersZ;
+            float DiffInRanks, ZD, RS, ProbRS;
+            float KendallsTau, Z;
 
             // '  Dim dataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
             // '  Dim dataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
@@ -372,6 +392,7 @@ namespace MASIC
                 RValue = 0;
                 RS = 0;
                 KendallsTau = 0;
+
                 dataCount = dataList1.Count;
                 if (dataList2.Count != dataList1.Count)
                 {
@@ -388,6 +409,7 @@ namespace MASIC
 
                 if (nonZeroDataCount < MIN_NON_ZERO_ION_COUNT)
                     return 0;
+
                 nonZeroDataCount = 0;
                 for (index = 0; index <= dataCount - 1; index++)
                 {
@@ -397,6 +419,7 @@ namespace MASIC
 
                 if (nonZeroDataCount < MIN_NON_ZERO_ION_COUNT)
                     return 0;
+
                 switch (eCorrelationMethod)
                 {
                     case cmCorrelationMethodConstants.Pearson:
@@ -419,7 +442,10 @@ namespace MASIC
             }
         }
 
-        private void CorrelatePearson(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, out float RValue, out float ProbOfSignificance, out float FishersZ)
+        private void CorrelatePearson(
+            IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2,
+            out float RValue,
+            out float ProbOfSignificance, out float FishersZ)
         {
             // Performs a Pearson correlation (aka linear correlation) of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
@@ -442,9 +468,11 @@ namespace MASIC
             double sxx = 0.0;
             double ay = 0.0;
             double ax = 0.0;
+
             RValue = 0;
             ProbOfSignificance = 0;
             FishersZ = 0;
+
             n = dataList1.Count;
             if (n != dataList2.Count)
             {
@@ -479,13 +507,19 @@ namespace MASIC
             // Fisher's z transformation
             FishersZ = Convert.ToSingle(0.5 * Math.Log((1.0 + RValue + TINY) / (1.0 - RValue + TINY)));
             df = n - 2;
+
             t = RValue * Math.Sqrt(df / ((1.0 - RValue + TINY) * (1.0 + RValue + TINY)));
 
             // Student's t probability
             ProbOfSignificance = Convert.ToSingle(BetaI(0.5 * df, 0.5, df / (df + t * t)));
         }
 
-        private void CorrelateKendall(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, out float KendallsTau, out float Z, out float ProbOfSignificance)
+        private void CorrelateKendall(
+            IReadOnlyCollection<float> dataList1,
+            IReadOnlyCollection<float> dataList2,
+            out float KendallsTau,
+            out float Z,
+            out float ProbOfSignificance)
         {
             // Performs a Kendall correlation (aka linear correlation) of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
@@ -502,10 +536,13 @@ namespace MASIC
             long n1 = 0;
             int k, j;
             int intIS = 0;
+
             double svar, aa, a2, a1;
+
             KendallsTau = 0;
             Z = 0;
             ProbOfSignificance = 0;
+
             n = dataList1.Count;
             if (n != dataList2.Count)
             {
@@ -514,6 +551,7 @@ namespace MASIC
 
             if (n <= 0)
                 return;
+
             for (j = 0; j <= n - 2; j++)
             {
                 for (k = j + 1; k <= n - 1; k++)
@@ -545,12 +583,20 @@ namespace MASIC
             }
 
             KendallsTau = Convert.ToSingle(intIS / (Math.Sqrt(n1) * Math.Sqrt(n2)));
+
             svar = (4.0 * n + 10.0) / (9.0 * n * (n - 1.0));
             Z = Convert.ToSingle(KendallsTau / Math.Sqrt(svar));
             ProbOfSignificance = Convert.ToSingle(ErfCC(Math.Abs(Z) / 1.4142136));
         }
 
-        private void CorrelateSpearman(IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2, out float DiffInRanks, out float ZD, out float ProbOfSignificance, out float RS, out float ProbRS)
+        private void CorrelateSpearman(
+            IReadOnlyCollection<float> dataList1,
+            IReadOnlyCollection<float> dataList2,
+            out float DiffInRanks,
+            out float ZD,
+            out float ProbOfSignificance,
+            out float RS,
+            out float ProbRS)
         {
             // Performs a Spearman correlation of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
@@ -568,14 +614,17 @@ namespace MASIC
 
             int n;
             int j;
+
             float sg, sf;
             double vard, t, fac, en3n, en, df, AvgD;
             double DiffInRanksWork;
+
             DiffInRanks = 0;
             ZD = 0;
             ProbOfSignificance = 0;
             RS = 0;
             ProbRS = 0;
+
             n = dataList1.Count;
             if (n != dataList2.Count)
             {
@@ -596,19 +645,26 @@ namespace MASIC
             // Sort data2, sorting data1 parallel to it
             Array.Sort(data2, data1);
             CRank(n, data2, out sg);
+
             DiffInRanksWork = 0.0;
             for (j = 0; j <= n - 1; j++)
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
+
             DiffInRanks = Convert.ToSingle(DiffInRanksWork);
+
             en = n;
+
             en3n = en * en * en - en;
             AvgD = en3n / 6.0 - (sf + sg) / 12.0;
             fac = (1.0 - sf / en3n) * (1.0 - sg / en3n);
             vard = (en - 1.0) * en * en * SquareNum(en + 1.0) / 36.0 * fac;
             ZD = Convert.ToSingle((DiffInRanks - AvgD) / Math.Sqrt(vard));
+
             ProbOfSignificance = Convert.ToSingle(ErfCC(Math.Abs(ZD) / 1.4142136));
             RS = Convert.ToSingle((1.0 - 6.0 / en3n * (DiffInRanks + (sf + sg) / 12.0)) / Math.Sqrt(fac));
+
             fac = (RS + 1.0) * (1.0 - RS);
+
             if (fac > 0.0)
             {
                 t = RS * Math.Sqrt((en - 2.0) / fac);
@@ -629,6 +685,7 @@ namespace MASIC
             int j;
             int ji, jt;
             float t, rank;
+
             s = 0;
             j = 0;
             while (j < n - 1)
@@ -643,9 +700,12 @@ namespace MASIC
                     jt = j + 1;
                     while (jt < n && Math.Abs(w[jt] - w[j]) < float.Epsilon)
                         jt += 1;
+
                     rank = 0.5F * (j + jt - 1) + 1;
+
                     for (ji = j; ji <= jt - 1; ji++)
                         w[ji] = rank;
+
                     t = jt - j;
                     s += t * t * t - t;          // t^3 - t
                     j = jt;
@@ -661,9 +721,14 @@ namespace MASIC
         private double ErfCC(double x)
         {
             double t, z, ans;
+
             z = Math.Abs(x);
             t = 1.0 / (1.0 + 0.5 * z);
-            ans = t * Math.Exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+
+            ans = t * Math.Exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
+                               t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
+                               t * (-0.82215223 + t * 0.17087277)))))))));
+
             if (x >= 0.0)
             {
                 return ans;
@@ -683,11 +748,14 @@ namespace MASIC
         {
             double x, y, tmp, ser;
             int j;
+
             x = xx;
             y = x;
+
             tmp = x + 5.5;
             tmp -= (x + 0.5) * Math.Log(tmp);
             ser = 1.0000000001900149;
+
             for (j = 0; j <= 5; j++)
             {
                 y += 1;
@@ -700,6 +768,7 @@ namespace MASIC
         public static clsBinningOptions GetDefaultBinningOptions()
         {
             var binningOptions = new clsBinningOptions();
+
             binningOptions.StartX = 50;
             binningOptions.EndX = 2000;
             binningOptions.BinSize = 1;
@@ -707,6 +776,7 @@ namespace MASIC
             binningOptions.Normalize = false;
             binningOptions.SumAllIntensitiesForBin = true;                     // Sum all of the intensities for binned ions of the same bin together
             binningOptions.MaximumBinCount = 100000;
+
             return binningOptions;
         }
 
@@ -746,8 +816,7 @@ namespace MASIC
             // actually gives the bin
             // For example, given WorkingValue = 0.28 and BinSize = 0.1, Bin = CInt(Round(2.8,0)) = 3
             // Or, given WorkingValue = 30.83 and BinSize = 0.1, Bin = CInt(Round(308.3,0)) = 308
-            ValueToBinNumberRet = Convert.ToInt32(Math.Round(workingValue / histogramBinSize, 0));
-            return ValueToBinNumberRet;
+            return Convert.ToInt32(Math.Round(workingValue / histogramBinSize, 0));
         }
     }
 }

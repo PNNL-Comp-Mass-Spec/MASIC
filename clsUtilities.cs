@@ -12,7 +12,10 @@ namespace MASIC
 
         #endregion
 
-        public static bool CheckPointInMZIgnoreRange(double mz, double mzIgnoreRangeStart, double mzIgnoreRangeEnd)
+        public static bool CheckPointInMZIgnoreRange(
+            double mz,
+            double mzIgnoreRangeStart,
+            double mzIgnoreRangeEnd)
         {
             if (mzIgnoreRangeStart > 0 || mzIgnoreRangeEnd > 0)
             {
@@ -47,7 +50,11 @@ namespace MASIC
             return MathNet.Numerics.Statistics.Statistics.Median(values);
         }
 
-        public static double ConvoluteMass(double massMZ, short currentCharge, short desiredCharge = 1, double chargeCarrierMass = 0)
+        public static double ConvoluteMass(
+            double massMZ,
+            short currentCharge,
+            short desiredCharge = 1,
+            double chargeCarrierMass = 0)
         {
             // Converts massMZ to the MZ that would appear at the given desiredCharge
             // To return the neutral mass, set desiredCharge to 0
@@ -57,6 +64,7 @@ namespace MASIC
             double newMZ;
             if (Math.Abs(chargeCarrierMass) < double.Epsilon)
                 chargeCarrierMass = CHARGE_CARRIER_MASS_MONOISOTOPIC;
+
             if (currentCharge == desiredCharge)
             {
                 newMZ = massMZ;
@@ -89,8 +97,8 @@ namespace MASIC
                 }
                 else if (desiredCharge == 1)
                 {
+                    // Return M+H, which is currently stored in newMZ
                 }
-                // Return M+H, which is currently stored in newMZ
                 else if (desiredCharge == 0)
                 {
                     // Return the neutral mass

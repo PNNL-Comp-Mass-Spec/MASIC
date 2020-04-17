@@ -5,8 +5,11 @@ namespace MASIC
     public class clsSimilarParentIonsData
     {
         public int[] MZPointerArray { get; set; }
+
         public int IonInUseCount { get; set; }
+
         public bool[] IonUsed { get; private set; }
+
         public List<clsUniqueMZListItem> UniqueMZList { get; private set; }
 
         /// <summary>
@@ -16,6 +19,7 @@ namespace MASIC
         {
             MZPointerArray = new int[parentIonCount];
             IonUsed = new bool[parentIonCount];
+
             UniqueMZList = new List<clsUniqueMZListItem>();
         }
 

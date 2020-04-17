@@ -36,6 +36,7 @@ namespace MASIC
         public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
 
         #endregion
+
         private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount)
         {
             UpdateCacheStatsEvent?.Invoke(cacheEventCount, unCacheEventCount);
@@ -54,6 +55,7 @@ namespace MASIC
         protected void RegisterEvents(clsMasicEventNotifier oClass)
         {
             base.RegisterEvents(oClass);
+
             oClass.UpdateCacheStatsEvent += UpdatedCacheStatsEventHandler;
             oClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
             oClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
@@ -64,7 +66,8 @@ namespace MASIC
             OnStatusEvent(message);
         }
 
-        protected void ReportError(string message, clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+        protected void ReportError(string message,
+                                   clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
         {
             if (eNewErrorCode != clsMASIC.eMasicErrorCodes.NoError)
             {
@@ -74,7 +77,9 @@ namespace MASIC
             OnErrorEvent(message);
         }
 
-        protected void ReportError(string message, Exception ex, clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+        protected void ReportError(string message,
+                                   Exception ex,
+                                   clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
         {
             if (eNewErrorCode != clsMASIC.eMasicErrorCodes.NoError)
             {
@@ -85,7 +90,13 @@ namespace MASIC
         }
 
         [Obsolete("Source, allowInformUser, and allowThrowException are no longer supported")]
-        protected void ReportError(string source, string message, Exception ex, bool allowInformUser, bool allowThrowException = true, clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+        protected void ReportError(
+            string source,
+            string message,
+            Exception ex,
+            bool allowInformUser,
+            bool allowThrowException = true,
+            clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
         {
             ReportError(message, ex, eNewErrorCode);
         }

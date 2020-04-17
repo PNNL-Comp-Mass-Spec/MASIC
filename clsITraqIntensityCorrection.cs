@@ -49,10 +49,12 @@ namespace MASIC
 
         #region "Classwide Variables"
         private clsReporterIons.eReporterIonMassModeConstants mReporterIonMode;
+
         private eCorrectionFactorsiTRAQ4Plex mITraq4PlexCorrectionFactorType;
 
         // Matrix of coefficients, derived from the isotope contribution table
         private double[,] mCoeffs;
+
         private readonly MatrixDecompositionUtility.LUDecomposition mMatrixUtility;
 
         #endregion
@@ -64,12 +66,14 @@ namespace MASIC
         public eCorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType => mITraq4PlexCorrectionFactorType;
 
         #endregion
+
         /// <summary>
         /// Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
         /// </summary>
         /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
         /// <remarks></remarks>
-        public clsITraqIntensityCorrection(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode) : this(eReporterIonMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
+        public clsITraqIntensityCorrection(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode)
+            : this(eReporterIonMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
         {
         }
 
@@ -83,7 +87,9 @@ namespace MASIC
         {
             mReporterIonMode = eReporterIonMode;
             mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
+
             mMatrixUtility = new MatrixDecompositionUtility.LUDecomposition();
+
             if (mReporterIonMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
             {
                 return;
@@ -126,13 +132,16 @@ namespace MASIC
         {
             double[] originalIntensities;
             int dataCount = reporterIonIntensities.Count() - 1;
+
             originalIntensities = new double[dataCount + 1];
             for (int index = 0; index <= dataCount; index++)
                 originalIntensities[index] = reporterIonIntensities[index];
+
             if (ApplyCorrection(originalIntensities, debugShowIntensities))
             {
                 for (int index = 0; index <= dataCount; index++)
                     reporterIonIntensities[index] = Convert.ToSingle(originalIntensities[index]);
+
                 return true;
             }
             else
@@ -151,15 +160,19 @@ namespace MASIC
         {
             int matrixSize = GetMatrixLength(mReporterIonMode);
             string eReporterIonMode = clsReporterIons.GetReporterIonModeDescription(mReporterIonMode);
+
             if (reporterIonIntensities.Length != matrixSize)
             {
-                throw new InvalidOperationException("Length of ReporterIonIntensities array must be " + matrixSize.ToString() + " when using the " + eReporterIonMode + " mode");
+                throw new InvalidOperationException("Length of ReporterIonIntensities array must be " + matrixSize.ToString() +
+                                                    " when using the " + eReporterIonMode + " mode");
             }
 
             var correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensities);
+
             var maxIntensity = default(double);
             for (int index = 0; index <= matrixSize - 1; index++)
                 maxIntensity = Math.Max(maxIntensity, reporterIonIntensities[index]);
+
             if (debugShowIntensities)
             {
                 Console.WriteLine();
@@ -186,6 +199,7 @@ namespace MASIC
                         // Compute percent change vs. the maximum reporter ion intensity
                         double percentChange = (newIntensity - reporterIonIntensities[index]) / maxIntensity * 100;
                         int percentChangeRounded = Convert.ToInt32(Math.Round(percentChange, 0));
+
                         string visualPercentChange;
                         if (percentChangeRounded > 0)
                         {
@@ -261,13 +275,16 @@ namespace MASIC
             udtIsotopeContributionType udtIsoPct130C;
             udtIsotopeContributionType udtIsoPct131N;
             udtIsotopeContributionType udtIsoPct131C;
+
             udtIsotopeContributionType udtIsoPct132N;
             udtIsotopeContributionType udtIsoPct132C;
             udtIsotopeContributionType udtIsoPct133N;
             udtIsotopeContributionType udtIsoPct133C;
             udtIsotopeContributionType udtIsoPct134N;
+
             int matrixSize = GetMatrixLength(mReporterIonMode);
             int maxIndex = matrixSize - 1;
+
             switch (mReporterIonMode)
             {
                 case clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ:
@@ -312,17 +329,21 @@ namespace MASIC
                     // 3     0      0    0.034  0.986
 
                     mCoeffs = new double[maxIndex + 1, maxIndex + 1];
+
                     mCoeffs[0, 0] = udtIsoPct114.Zero;
                     mCoeffs[0, 1] = udtIsoPct115.Minus1;
                     mCoeffs[0, 2] = udtIsoPct116.Minus2;
+
                     mCoeffs[1, 0] = udtIsoPct114.Plus1;
                     mCoeffs[1, 1] = udtIsoPct115.Zero;
                     mCoeffs[1, 2] = udtIsoPct116.Minus1;
                     mCoeffs[1, 3] = udtIsoPct117.Minus2;
+
                     mCoeffs[2, 0] = udtIsoPct114.Plus2;
                     mCoeffs[2, 2] = udtIsoPct116.Zero;
                     mCoeffs[2, 1] = udtIsoPct115.Plus1;
                     mCoeffs[2, 3] = udtIsoPct117.Minus1;
+
                     mCoeffs[3, 1] = udtIsoPct115.Plus2;
                     mCoeffs[3, 2] = udtIsoPct116.Plus1;
                     mCoeffs[3, 3] = udtIsoPct117.Zero;
@@ -355,37 +376,45 @@ namespace MASIC
                     // 7     0       0       0       0       0       0       0     0.9211
 
                     mCoeffs = new double[maxIndex + 1, maxIndex + 1];
+
                     mCoeffs[0, 0] = udtIsoPct113.Zero;
                     mCoeffs[0, 1] = udtIsoPct114.Minus1;
                     mCoeffs[0, 2] = udtIsoPct115.Minus2;
+
                     mCoeffs[1, 0] = udtIsoPct113.Plus1;
                     mCoeffs[1, 1] = udtIsoPct114.Zero;
                     mCoeffs[1, 2] = udtIsoPct115.Minus1;
                     mCoeffs[1, 3] = udtIsoPct116.Minus2;
+
                     mCoeffs[2, 0] = udtIsoPct113.Plus2;
                     mCoeffs[2, 1] = udtIsoPct114.Plus1;
                     mCoeffs[2, 2] = udtIsoPct115.Zero;
                     mCoeffs[2, 3] = udtIsoPct116.Minus1;
                     mCoeffs[2, 4] = udtIsoPct117.Minus2;
+
                     mCoeffs[3, 1] = udtIsoPct114.Plus2;
                     mCoeffs[3, 2] = udtIsoPct115.Plus1;
                     mCoeffs[3, 3] = udtIsoPct116.Zero;
                     mCoeffs[3, 4] = udtIsoPct117.Minus1;
                     mCoeffs[3, 5] = udtIsoPct118.Minus2;
+
                     mCoeffs[4, 2] = udtIsoPct115.Plus2;
                     mCoeffs[4, 3] = udtIsoPct116.Plus1;
                     mCoeffs[4, 4] = udtIsoPct117.Zero;
                     mCoeffs[4, 5] = udtIsoPct118.Minus1;
                     mCoeffs[4, 6] = udtIsoPct119.Minus2;
+
                     mCoeffs[5, 3] = udtIsoPct116.Plus2;
                     mCoeffs[5, 4] = udtIsoPct117.Plus1;
                     mCoeffs[5, 5] = udtIsoPct118.Zero;
                     mCoeffs[5, 6] = udtIsoPct119.Minus1;
                     mCoeffs[5, 7] = 0;
+
                     mCoeffs[6, 4] = udtIsoPct117.Plus2;
                     mCoeffs[6, 5] = udtIsoPct118.Plus1;
                     mCoeffs[6, 6] = udtIsoPct119.Zero;
                     mCoeffs[6, 7] = udtIsoPct121.Minus2;
+
                     mCoeffs[7, 5] = 0;           // udtIsoPct118.Plus2
                     mCoeffs[7, 7] = udtIsoPct121.Zero;
                     break;
@@ -425,42 +454,51 @@ namespace MASIC
                     // 8     0       0       0       0       0       0       0     0.0862  0.9211
 
                     mCoeffs = new double[maxIndex + 1, maxIndex + 1];
+
                     mCoeffs[0, 0] = udtIsoPct113.Zero;
                     mCoeffs[0, 1] = udtIsoPct114.Minus1;
                     mCoeffs[0, 2] = udtIsoPct115.Minus2;
+
                     mCoeffs[1, 0] = udtIsoPct113.Plus1;
                     mCoeffs[1, 1] = udtIsoPct114.Zero;
                     mCoeffs[1, 2] = udtIsoPct115.Minus1;
                     mCoeffs[1, 3] = udtIsoPct116.Minus2;
+
                     mCoeffs[2, 0] = udtIsoPct113.Plus2;
                     mCoeffs[2, 1] = udtIsoPct114.Plus1;
                     mCoeffs[2, 2] = udtIsoPct115.Zero;
                     mCoeffs[2, 3] = udtIsoPct116.Minus1;
                     mCoeffs[2, 4] = udtIsoPct117.Minus2;
+
                     mCoeffs[3, 1] = udtIsoPct114.Plus2;
                     mCoeffs[3, 2] = udtIsoPct115.Plus1;
                     mCoeffs[3, 3] = udtIsoPct116.Zero;
                     mCoeffs[3, 4] = udtIsoPct117.Minus1;
                     mCoeffs[3, 5] = udtIsoPct118.Minus2;
+
                     mCoeffs[4, 2] = udtIsoPct115.Plus2;
                     mCoeffs[4, 3] = udtIsoPct116.Plus1;
                     mCoeffs[4, 4] = udtIsoPct117.Zero;
                     mCoeffs[4, 5] = udtIsoPct118.Minus1;
                     mCoeffs[4, 6] = udtIsoPct119.Minus2;
+
                     mCoeffs[5, 3] = udtIsoPct116.Plus2;
                     mCoeffs[5, 4] = udtIsoPct117.Plus1;
                     mCoeffs[5, 5] = udtIsoPct118.Zero;
                     mCoeffs[5, 6] = udtIsoPct119.Minus1;
                     mCoeffs[5, 7] = 0;
+
                     mCoeffs[6, 4] = udtIsoPct117.Plus2;
                     mCoeffs[6, 5] = udtIsoPct118.Plus1;
                     mCoeffs[6, 6] = udtIsoPct119.Zero;
                     mCoeffs[6, 7] = 0;
                     mCoeffs[6, 8] = udtIsoPct121.Minus2;
+
                     mCoeffs[7, 5] = 0;
                     mCoeffs[7, 6] = udtIsoPct119.Plus1;
                     mCoeffs[7, 7] = udtIsoPct120.Zero;
                     mCoeffs[7, 8] = udtIsoPct121.Minus1;
+
                     mCoeffs[8, 6] = udtIsoPct119.Plus2;
                     mCoeffs[8, 7] = udtIsoPct120.Plus1;
                     mCoeffs[8, 8] = udtIsoPct121.Zero;
@@ -530,17 +568,20 @@ namespace MASIC
                     //
 
                     mCoeffs = new double[maxIndex + 1, maxIndex + 1];
+
                     mCoeffs[0, 0] = udtIsoPct126.Zero;
                     mCoeffs[0, 1] = 0;
                     mCoeffs[0, 2] = udtIsoPct127C.Minus1;
                     mCoeffs[0, 3] = 0;
                     mCoeffs[0, 4] = udtIsoPct128C.Minus2;
+
                     mCoeffs[1, 0] = 0;
                     mCoeffs[1, 1] = udtIsoPct127N.Zero;
                     mCoeffs[1, 2] = 0;
                     mCoeffs[1, 3] = udtIsoPct128N.Minus1;
                     mCoeffs[1, 4] = 0;
                     mCoeffs[1, 5] = udtIsoPct129N.Minus2;
+
                     mCoeffs[2, 0] = udtIsoPct126.Plus1;
                     mCoeffs[2, 1] = 0;
                     mCoeffs[2, 2] = udtIsoPct127C.Zero;
@@ -548,6 +589,7 @@ namespace MASIC
                     mCoeffs[2, 4] = udtIsoPct128C.Minus1;
                     mCoeffs[2, 5] = 0;
                     mCoeffs[2, 6] = udtIsoPct129C.Minus2;
+
                     mCoeffs[3, 0] = 0;
                     mCoeffs[3, 1] = udtIsoPct127N.Plus1;
                     mCoeffs[3, 2] = 0;
@@ -556,6 +598,7 @@ namespace MASIC
                     mCoeffs[3, 5] = udtIsoPct129N.Minus1;
                     mCoeffs[3, 6] = 0;
                     mCoeffs[3, 7] = udtIsoPct130N.Minus2;
+
                     mCoeffs[4, 0] = udtIsoPct126.Plus2;
                     mCoeffs[4, 1] = 0;
                     mCoeffs[4, 2] = udtIsoPct127C.Plus1;
@@ -565,6 +608,7 @@ namespace MASIC
                     mCoeffs[4, 6] = udtIsoPct129C.Minus1;
                     mCoeffs[4, 7] = 0;
                     mCoeffs[4, 8] = udtIsoPct130C.Minus2;
+
                     mCoeffs[5, 1] = udtIsoPct127N.Plus2;
                     mCoeffs[5, 2] = 0;
                     mCoeffs[5, 3] = udtIsoPct128N.Plus1;
@@ -574,6 +618,7 @@ namespace MASIC
                     mCoeffs[5, 7] = udtIsoPct130N.Minus1;
                     mCoeffs[5, 8] = 0;
                     mCoeffs[5, 9] = udtIsoPct131N.Minus2;
+
                     mCoeffs[6, 2] = udtIsoPct127C.Plus2;
                     mCoeffs[6, 3] = 0;
                     mCoeffs[6, 4] = udtIsoPct128C.Plus1;
@@ -581,6 +626,7 @@ namespace MASIC
                     mCoeffs[6, 6] = udtIsoPct129C.Zero;
                     mCoeffs[6, 7] = 0;
                     mCoeffs[6, 8] = udtIsoPct130C.Minus1;
+
                     mCoeffs[7, 3] = udtIsoPct128N.Plus2;
                     mCoeffs[7, 4] = 0;
                     mCoeffs[7, 5] = udtIsoPct129N.Plus1;
@@ -588,6 +634,7 @@ namespace MASIC
                     mCoeffs[7, 7] = udtIsoPct130N.Zero;
                     mCoeffs[7, 8] = 0;
                     mCoeffs[7, 9] = udtIsoPct131N.Minus1;
+
                     mCoeffs[8, 4] = udtIsoPct128C.Plus2;
                     mCoeffs[8, 5] = 0;
                     mCoeffs[8, 6] = udtIsoPct129C.Plus1;
@@ -604,6 +651,7 @@ namespace MASIC
                     mCoeffs[9, 7] = udtIsoPct130N.Plus1;
                     mCoeffs[9, 8] = 0;
                     mCoeffs[9, 9] = udtIsoPct131N.Zero;
+
                     if (maxIndex >= 10)
                     {
                         mCoeffs[10, 6] = udtIsoPct129C.Plus2;
@@ -658,17 +706,20 @@ namespace MASIC
                     // 15
 
                     mCoeffs = new double[maxIndex + 1, maxIndex + 1];
+
                     mCoeffs[0, 0] = udtIsoPct126.Zero;
                     mCoeffs[0, 1] = 0;
                     mCoeffs[0, 2] = udtIsoPct127C.Minus1;
                     mCoeffs[0, 3] = 0;
                     mCoeffs[0, 4] = udtIsoPct128C.Minus2;
+
                     mCoeffs[1, 0] = 0;
                     mCoeffs[1, 1] = udtIsoPct127N.Zero;
                     mCoeffs[1, 2] = 0;
                     mCoeffs[1, 3] = udtIsoPct128N.Minus1;
                     mCoeffs[1, 4] = 0;
                     mCoeffs[1, 5] = udtIsoPct129N.Minus2;
+
                     mCoeffs[2, 0] = udtIsoPct126.Plus1;
                     mCoeffs[2, 1] = 0;
                     mCoeffs[2, 2] = udtIsoPct127C.Zero;
@@ -676,6 +727,7 @@ namespace MASIC
                     mCoeffs[2, 4] = udtIsoPct128C.Minus1;
                     mCoeffs[2, 5] = 0;
                     mCoeffs[2, 6] = udtIsoPct129C.Minus2;
+
                     mCoeffs[3, 0] = 0;
                     mCoeffs[3, 1] = udtIsoPct127N.Plus1;
                     mCoeffs[3, 2] = 0;
@@ -684,6 +736,7 @@ namespace MASIC
                     mCoeffs[3, 5] = udtIsoPct129N.Minus1;
                     mCoeffs[3, 6] = 0;
                     mCoeffs[3, 7] = udtIsoPct130N.Minus2;
+
                     mCoeffs[4, 0] = udtIsoPct126.Plus2;
                     mCoeffs[4, 1] = 0;
                     mCoeffs[4, 2] = udtIsoPct127C.Plus1;
@@ -693,6 +746,7 @@ namespace MASIC
                     mCoeffs[4, 6] = udtIsoPct129C.Minus1;
                     mCoeffs[4, 7] = 0;
                     mCoeffs[4, 8] = udtIsoPct130C.Minus2;
+
                     mCoeffs[5, 1] = udtIsoPct127N.Plus2;
                     mCoeffs[5, 2] = 0;
                     mCoeffs[5, 3] = udtIsoPct128N.Plus1;
@@ -702,6 +756,7 @@ namespace MASIC
                     mCoeffs[5, 7] = udtIsoPct130N.Minus1;
                     mCoeffs[5, 8] = 0;
                     mCoeffs[5, 9] = udtIsoPct131N.Minus2;
+
                     mCoeffs[6, 2] = udtIsoPct127C.Plus2;
                     mCoeffs[6, 3] = 0;
                     mCoeffs[6, 4] = udtIsoPct128C.Plus1;
@@ -711,6 +766,7 @@ namespace MASIC
                     mCoeffs[6, 8] = udtIsoPct130C.Minus1;
                     mCoeffs[6, 9] = 0;
                     mCoeffs[6, 10] = udtIsoPct130C.Minus2;
+
                     mCoeffs[7, 3] = udtIsoPct128N.Plus2;
                     mCoeffs[7, 4] = 0;
                     mCoeffs[7, 5] = udtIsoPct129N.Plus1;
@@ -720,6 +776,7 @@ namespace MASIC
                     mCoeffs[7, 9] = udtIsoPct131N.Minus1;
                     mCoeffs[7, 10] = 0;
                     mCoeffs[7, 11] = udtIsoPct131N.Minus2;
+
                     mCoeffs[8, 4] = udtIsoPct128C.Plus2;
                     mCoeffs[8, 5] = 0;
                     mCoeffs[8, 6] = udtIsoPct129C.Plus1;
@@ -729,6 +786,7 @@ namespace MASIC
                     mCoeffs[8, 10] = udtIsoPct131C.Minus1;
                     mCoeffs[8, 11] = 0;
                     mCoeffs[8, 12] = udtIsoPct131C.Minus2;
+
                     mCoeffs[9, 5] = udtIsoPct129N.Plus2;
                     mCoeffs[9, 6] = 0;
                     mCoeffs[9, 7] = udtIsoPct130N.Plus1;
@@ -738,6 +796,7 @@ namespace MASIC
                     mCoeffs[9, 11] = udtIsoPct131N.Minus1;
                     mCoeffs[9, 12] = 0;
                     mCoeffs[9, 13] = udtIsoPct131N.Minus2;
+
                     mCoeffs[10, 6] = udtIsoPct129C.Plus2;
                     mCoeffs[10, 7] = 0;
                     mCoeffs[10, 8] = udtIsoPct130C.Plus1;
@@ -747,6 +806,7 @@ namespace MASIC
                     mCoeffs[10, 12] = udtIsoPct131C.Minus1;
                     mCoeffs[10, 13] = 0;
                     mCoeffs[10, 14] = udtIsoPct131C.Minus2;
+
                     mCoeffs[11, 7] = udtIsoPct129C.Plus2;
                     mCoeffs[11, 8] = 0;
                     mCoeffs[11, 9] = udtIsoPct130C.Plus1;
@@ -756,6 +816,7 @@ namespace MASIC
                     mCoeffs[11, 13] = udtIsoPct131C.Minus1;
                     mCoeffs[11, 14] = 0;
                     mCoeffs[11, 15] = udtIsoPct131C.Minus2;
+
                     mCoeffs[12, 8] = udtIsoPct129C.Plus2;
                     mCoeffs[12, 9] = 0;
                     mCoeffs[12, 10] = udtIsoPct130C.Plus1;
@@ -763,6 +824,7 @@ namespace MASIC
                     mCoeffs[12, 12] = udtIsoPct131C.Zero;
                     mCoeffs[12, 13] = 0;
                     mCoeffs[12, 14] = udtIsoPct131C.Minus1;
+
                     mCoeffs[13, 9] = udtIsoPct129C.Plus2;
                     mCoeffs[13, 10] = 0;
                     mCoeffs[13, 11] = udtIsoPct130C.Plus1;
@@ -770,11 +832,13 @@ namespace MASIC
                     mCoeffs[13, 13] = udtIsoPct131C.Zero;
                     mCoeffs[13, 14] = 0;
                     mCoeffs[13, 15] = udtIsoPct131C.Minus1;
+
                     mCoeffs[14, 10] = udtIsoPct129C.Plus2;
                     mCoeffs[14, 11] = 0;
                     mCoeffs[14, 12] = udtIsoPct130C.Plus1;
                     mCoeffs[14, 13] = 0;
                     mCoeffs[14, 14] = udtIsoPct131C.Zero;
+
                     mCoeffs[15, 11] = udtIsoPct129C.Plus2;
                     mCoeffs[15, 12] = 0;
                     mCoeffs[15, 13] = udtIsoPct130C.Plus1;
@@ -818,9 +882,11 @@ namespace MASIC
                         }
 
                         Console.WriteLine();
+
                         Console.Write("     ");
                         for (int k = 0; k <= maxIndex; k++)
                             Console.Write(" ------ ");
+
                         Console.WriteLine();
                     }
 
@@ -829,6 +895,7 @@ namespace MASIC
                         indexSpacer = "  ";
                     else
                         indexSpacer = " ";
+
                     Console.Write("  " + i.ToString() + indexSpacer);
                     for (int j = 0; j <= maxIndex; j++)
                     {
@@ -859,10 +926,18 @@ namespace MASIC
         /// <param name="plus2">Value between 0 and 100, but typically close to 0</param>
         /// <returns></returns>
         /// <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
-        private udtIsotopeContributionType DefineIsotopeContribution(float minus2, float minus1, float zero, float plus1, float plus2)
+        private udtIsotopeContributionType DefineIsotopeContribution(
+            float minus2,
+            float minus1,
+            float zero,
+            float plus1,
+            float plus2)
         {
             udtIsotopeContributionType udtIsotopePct;
-            if (Math.Abs(zero) < float.Epsilon || zero < 0 || minus2 + minus1 + plus1 + plus2 > 0 && Math.Abs(zero - 100) < float.Epsilon)
+
+            if (Math.Abs(zero) < float.Epsilon ||
+                zero < 0 ||
+                minus2 + minus1 + plus1 + plus2 > 0 && Math.Abs(zero - 100) < float.Epsilon)
             {
                 // Auto-compute the monoisotopic abundance
                 zero = 100 - minus2 - minus1 - plus1 - plus2;
@@ -879,6 +954,7 @@ namespace MASIC
             udtIsotopePct.Zero = zero;
             udtIsotopePct.Plus1 = plus1;
             udtIsotopePct.Plus2 = plus2;
+
             return udtIsotopePct;
         }
     }

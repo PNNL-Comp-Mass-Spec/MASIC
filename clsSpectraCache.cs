@@ -24,6 +24,7 @@ namespace MASIC
         #region "Constants and Enums"
         private const string SPECTRUM_CACHE_FILE_PREFIX = "$SpecCache";
         private const string SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR = "_Temp";
+
         private const int SPECTRUM_CACHE_MAX_FILE_AGE_HOURS = 12;
         private const int DEFAULT_SPECTRUM_ION_COUNT = 500;
 
@@ -31,26 +32,28 @@ namespace MASIC
         {
             UnusedSlot = 0,              // No data present
             NeverCached = 1,             // In memory, but never cached
-            LoadedFromCache = 2         // Loaded from cache, and in memory; or, loaded using XRaw; safe to purge without caching
+            LoadedFromCache = 2,         // Loaded from cache, and in memory; or, loaded using XRaw; safe to purge without caching
         }
 
-        // 'Private Enum eCacheRequestStateConstants
-        // '    NoRequest = 0               ' Undefined
-        // '    SafeToCache = 1             ' In memory, but safe to cache or purge
-        // '    RequestUncache = 2          ' Not in memory, need to uncache
-        // '    RequestUncacheAndLock = 3   ' Not in memory, need to uncache and lock in memory
-        // '    LockedInMemory = 4          ' In memory and should not cache
-        // 'End Enum
+        //private enum eCacheRequestStateConstants
+        //{
+        //    NoRequest = 0,               // Undefined
+        //    SafeToCache = 1,             // In memory, but safe to cache or purge
+        //    RequestUncache = 2,          // Not in memory, need to uncache
+        //    RequestUncacheAndLock = 3,   // Not in memory, need to uncache and lock in memory
+        //    LockedInMemory = 4,          // In memory and should not cache
+        //}
 
-        // 'Private Enum eCacheCommandConstants
-        // '    CacheAllSpectraOutOfRange = 0
-        // '    CacheSurveyScansOutOfRange = 1
-        // '    CacheFragScansOutOfRange = 2
-        // '    CacheAllSpectraOutOfRangeDoNotUncache = 3
-        // '    ValidateSurveyScanUncached = 4
-        // '    ValidateFragScanUncached = 5
-        // '    UnlockAllSpectra = 6
-        // 'End Enum
+        //private enum eCacheCommandConstants
+        //{
+        //    CacheAllSpectraOutOfRange = 0,
+        //    CacheSurveyScansOutOfRange = 1,
+        //    CacheFragScansOutOfRange = 2,
+        //    CacheAllSpectraOutOfRangeDoNotUncache = 3,
+        //    ValidateSurveyScanUncached = 4,
+        //    ValidateFragScanUncached = 5,
+        //    UnlockAllSpectra = 6
+        //}
 
         #endregion
 
@@ -67,21 +70,28 @@ namespace MASIC
         #region "Classwide Variables"
         public clsMSSpectrum[] SpectraPool;                   // Pool (collection) of currently loaded spectra; 0-based array
         private udtSpectraPoolInfoType[] SpectraPoolInfo;     // Parallel with SpectraPool(), but not publicly visible
+
         private readonly clsSpectrumCacheOptions mCacheOptions;
+
         private BinaryReader mPageFileReader;
         private BinaryWriter mPageFileWriter;
+
         private bool mDirectoryPathValidated;
 
         // Base filename for this instance of clsMasic, includes a timestamp to allow multiple instances to write to the same cache directory
         private string mCacheFileNameBase;
+
         private int mCacheEventCount;
         private int mUnCacheEventCount;
+
         private int mMaximumPoolLength;
         private int mNextAvailablePoolIndex;
+
         private Hashtable mSpectrumIndexInPool;
         private Hashtable mSpectrumByteOffset;         // Records the byte offset of the data in the page file for a given scan number
 
         #endregion
+
         public int CacheEventCount => mCacheEventCount;
 
         public string CacheFileNameBase => mCacheFileNameBase;
@@ -133,7 +143,9 @@ namespace MASIC
 
         public int UnCacheEventCount => mUnCacheEventCount;
 
-        public bool AddSpectrumToPool(clsMSSpectrum spectrum, int scanNumber)
+        public bool AddSpectrumToPool(
+            clsMSSpectrum spectrum,
+            int scanNumber)
         {
             // Adds spectrum to the spectrum pool
             // Returns the index of the spectrum in the pool in targetPoolIndex
@@ -141,6 +153,7 @@ namespace MASIC
             try
             {
                 int targetPoolIndex;
+
                 if (mSpectrumIndexInPool.Contains(scanNumber))
                 {
                     // Replace the spectrum data with objMSSpectrum
@@ -154,7 +167,9 @@ namespace MASIC
                 }
 
                 SpectraPool[targetPoolIndex].ReplaceData(spectrum, scanNumber);
+
                 SpectraPoolInfo[targetPoolIndex].CacheState = eCacheStateConstants.NeverCached;
+
                 return true;
             }
             catch (Exception ex)
@@ -175,16 +190,17 @@ namespace MASIC
         private void CacheSpectrum(int poolIndexToCache)
         {
             const int MAX_RETRIES = 3;
+
             if (SpectraPoolInfo[poolIndexToCache].CacheState == eCacheStateConstants.UnusedSlot)
             {
+                // Nothing to do; slot is already empty
             }
-            // Nothing to do; slot is already empty
             else
             {
                 if (SpectraPoolInfo[poolIndexToCache].CacheState == eCacheStateConstants.LoadedFromCache)
                 {
+                    // Already cached previously, simply reset the slot
                 }
-                // Already cached previously, simply reset the slot
 
                 // Store all of the spectra in one large file
 
@@ -194,8 +210,8 @@ namespace MASIC
                     int scanNumber = SpectraPool[poolIndexToCache].ScanNumber;
                     if (mSpectrumByteOffset.Contains(scanNumber))
                     {
+                        // Page file already contains the given scan; do not re-write
                     }
-                    // Page file already contains the given scan; do not re-write
                     else
                     {
                         long initialOffset = mPageFileWriter.BaseStream.Position;
@@ -203,6 +219,7 @@ namespace MASIC
                         // Write the spectrum to the page file
                         // Record the current offset in the hashtable
                         mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position);
+
                         int retryCount = MAX_RETRIES;
                         while (retryCount >= 0)
                         {
@@ -238,6 +255,7 @@ namespace MASIC
                                     // Wait 2, 4, or 8 seconds, then try again
                                     double sleepSeconds = Math.Pow(2, MAX_RETRIES - retryCount);
                                     System.Threading.Thread.Sleep(Convert.ToInt32(sleepSeconds * 1000));
+
                                     mPageFileWriter.BaseStream.Seek(initialOffset, SeekOrigin.Begin);
                                 }
                                 else
@@ -254,7 +272,9 @@ namespace MASIC
 
                 // Reset .ScanNumber, .IonCount, and .CacheState
                 SpectraPool[poolIndexToCache].Clear(0);
+
                 SpectraPoolInfo[poolIndexToCache].CacheState = eCacheStateConstants.UnusedSlot;
+
                 mCacheEventCount += 1;
             }
 
@@ -266,6 +286,7 @@ namespace MASIC
             try
             {
                 var garbageCollect = default(bool);
+
                 if (mPageFileReader != null)
                 {
                     mPageFileReader.Close();
@@ -321,6 +342,7 @@ namespace MASIC
             }
 
             string fileName = mCacheFileNameBase + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + ".bin";
+
             return Path.Combine(mCacheOptions.DirectoryPath, fileName);
         }
 
@@ -334,6 +356,7 @@ namespace MASIC
             {
                 // Delete the cached files for this instance of clsMasic
                 string filePathMatch = ConstructCachedSpectrumPath();
+
                 int charIndex = filePathMatch.IndexOf(SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR, StringComparison.Ordinal);
                 if (charIndex < 0)
                 {
@@ -343,6 +366,7 @@ namespace MASIC
 
                 filePathMatch = filePathMatch.Substring(0, charIndex);
                 var files = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(filePathMatch) + "*");
+
                 for (int index = 0; index <= files.Length - 1; index++)
                     File.Delete(files[index]);
             }
@@ -356,7 +380,9 @@ namespace MASIC
             try
             {
                 string filePathMatch = SPECTRUM_CACHE_FILE_PREFIX + "*" + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + "*";
+
                 var cacheDirectory = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())));
+
                 if (cacheDirectory != null)
                 {
                     foreach (var candidateFile in cacheDirectory.GetFiles(filePathMatch))
@@ -378,16 +404,16 @@ namespace MASIC
         {
             int currentPoolLength = Math.Min(mMaximumPoolLength, SpectraPool.Length);
             mMaximumPoolLength = newPoolLength;
+
             if (newPoolLength > currentPoolLength)
             {
                 var oldSpectraPool = SpectraPool;
                 SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
-                if (oldSpectraPool != null)
-                    Array.Copy(oldSpectraPool, SpectraPool, Math.Min(mMaximumPoolLength, oldSpectraPool.Length));
+                Array.Copy(oldSpectraPool, SpectraPool, Math.Min(mMaximumPoolLength, oldSpectraPool.Length));
                 var oldSpectraPoolInfo = SpectraPoolInfo;
                 SpectraPoolInfo = new udtSpectraPoolInfoType[mMaximumPoolLength];
-                if (oldSpectraPoolInfo != null)
-                    Array.Copy(oldSpectraPoolInfo, SpectraPoolInfo, Math.Min(mMaximumPoolLength, oldSpectraPoolInfo.Length));
+                Array.Copy(oldSpectraPoolInfo, SpectraPoolInfo, Math.Min(mMaximumPoolLength, oldSpectraPoolInfo.Length));
+
                 for (int index = currentPoolLength; index <= mMaximumPoolLength - 1; index++)
                 {
                     SpectraPool[index] = new clsMSSpectrum(0);
@@ -402,7 +428,9 @@ namespace MASIC
 
             // Need to cache the spectrum stored at mNextAvailablePoolIndex
             CacheSpectrum(mNextAvailablePoolIndex);
+
             nextPoolIndex = mNextAvailablePoolIndex;
+
             mNextAvailablePoolIndex += 1;
             if (mNextAvailablePoolIndex >= mMaximumPoolLength)
             {
@@ -414,6 +442,7 @@ namespace MASIC
                 else
                 {
                     mNextAvailablePoolIndex = 0;
+
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     System.Threading.Thread.Sleep(50);
@@ -428,12 +457,17 @@ namespace MASIC
             mMaximumPoolLength = mCacheOptions.SpectraToRetainInMemory;
             if (mMaximumPoolLength < 1)
                 mMaximumPoolLength = 1;
+
             mNextAvailablePoolIndex = 0;
+
             mCacheEventCount = 0;
             mUnCacheEventCount = 0;
+
             mDirectoryPathValidated = false;
             mCacheFileNameBase = string.Empty;
+
             ClosePageFile();
+
             if (mSpectrumIndexInPool == null)
             {
                 mSpectrumIndexInPool = new Hashtable();
@@ -443,11 +477,10 @@ namespace MASIC
                 mSpectrumIndexInPool.Clear();
             }
 
-            // 'If mPoolAccessHistory Is Nothing Then
-            // '    mPoolAccessHistory = New System.Collections.Hashtable
-            // 'Else
-            // '    mPoolAccessHistory.Clear()
-            // 'End If
+            //if (mPoolAccessHistory == null)
+            //    mPoolAccessHistory = new Hashtable();
+            //else
+            //    mPoolAccessHistory.Clear();
 
             if (SpectraPool == null)
             {
@@ -471,15 +504,19 @@ namespace MASIC
         private void InitializeVariables()
         {
             mCacheOptions.Reset();
+
             InitializeSpectraPool();
         }
 
         public static clsSpectrumCacheOptions GetDefaultCacheOptions()
         {
-            var udtCacheOptions = new clsSpectrumCacheOptions();
-            udtCacheOptions.DiskCachingAlwaysDisabled = false;
-            udtCacheOptions.DirectoryPath = Path.GetTempPath();
-            udtCacheOptions.SpectraToRetainInMemory = 1000;
+            var udtCacheOptions = new clsSpectrumCacheOptions
+            {
+                DiskCachingAlwaysDisabled = false,
+                DirectoryPath = Path.GetTempPath(),
+                SpectraToRetainInMemory = 1000
+            };
+
             return udtCacheOptions;
         }
 
@@ -517,19 +554,25 @@ namespace MASIC
 
                     // Read the spectrum from the page file
                     mPageFileReader.BaseStream.Seek(byteOffset, SeekOrigin.Begin);
+
                     int scanNumberInCacheFile = mPageFileReader.ReadInt32();
                     int ionCount = mPageFileReader.ReadInt32();
+
                     if (scanNumberInCacheFile != scanNumber)
                     {
                         ReportWarning("Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum");
                     }
 
                     var msSpectrum = SpectraPool[targetPoolIndex];
+
                     msSpectrum.Clear(scanNumber);
+
                     for (int index = 0; index <= ionCount - 1; index++)
                         msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());
+
                     for (int index = 0; index <= ionCount - 1; index++)
                         msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
+
                     success = true;
                 }
                 else
@@ -552,6 +595,7 @@ namespace MASIC
                 }
 
                 SpectraPool[targetPoolIndex].Clear();
+
                 success = true;
             }
 
@@ -561,6 +605,7 @@ namespace MASIC
             }
 
             SpectraPoolInfo[targetPoolIndex].CacheState = eCacheStateConstants.LoadedFromCache;
+
             if (mSpectrumIndexInPool.Contains(scanNumber))
             {
                 mSpectrumIndexInPool[scanNumber] = targetPoolIndex;
@@ -572,6 +617,7 @@ namespace MASIC
 
             if (!returnBlankSpectrum)
                 mUnCacheEventCount += 1;
+
             return true;
         }
 
@@ -596,6 +642,7 @@ namespace MASIC
                     if (!Directory.Exists(mCacheOptions.DirectoryPath))
                     {
                         Directory.CreateDirectory(mCacheOptions.DirectoryPath);
+
                         if (!Directory.Exists(mCacheOptions.DirectoryPath))
                         {
                             ReportError("Error creating spectrum cache directory: " + mCacheOptions.DirectoryPath);
@@ -643,15 +690,19 @@ namespace MASIC
                 mPageFileWriter = new BinaryWriter(new FileStream(cacheFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
                 // Write a header line
-                mPageFileWriter.Write("MASIC Spectrum Cache Page File.  Created " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString());
+                mPageFileWriter.Write(
+                    "MASIC Spectrum Cache Page File.  Created " + DateTime.Now.ToLongDateString() + " " +
+                    DateTime.Now.ToLongTimeString());
 
                 // Add 64 bytes of white space
                 for (int index = 0; index <= 63; index++)
                     mPageFileWriter.Write(byte.MinValue);
+
                 mPageFileWriter.Flush();
 
                 // Initialize the binary reader
                 mPageFileReader = new BinaryReader(new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
                 return true;
             }
             catch (Exception ex)
