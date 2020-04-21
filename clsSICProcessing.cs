@@ -590,7 +590,7 @@ namespace MASIC
 
                 if (scanList.SurveyScans.Count > 0)
                 {
-                    maxMZCountInChunk = Convert.ToInt32(MAX_RAW_DATA_MEMORY_USAGE_MB * 1024 * 1024 / (double)(scanList.SurveyScans.Count * 12));
+                    maxMZCountInChunk = (int)(MAX_RAW_DATA_MEMORY_USAGE_MB * 1024 * 1024 / (double)(scanList.SurveyScans.Count * 12));
                 }
                 else
                 {
@@ -671,13 +671,13 @@ namespace MASIC
                     else if ((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) % 2 == 0)
                     {
                         // Odd number of points; use the m/z value of the midpoint
-                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + Convert.ToInt32((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / (double)2);
+                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + (int)((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / 2.0);
                         mzSearchChunk.SearchMZ = mzBinList[mzSearchChunk.MZIndexMidpoint].MZ;
                     }
                     else
                     {
                         // Even number of points; average the values on either side of (.mzIndexEnd - .mzIndexStart / 2)
-                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + Convert.ToInt32(Math.Floor((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / (double)2));
+                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + (int)Math.Floor((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / 2.0);
                         mzSearchChunk.SearchMZ = (mzBinList[mzSearchChunk.MZIndexMidpoint].MZ + mzBinList[mzSearchChunk.MZIndexMidpoint + 1].MZ) / 2;
                     }
 
@@ -1050,7 +1050,7 @@ namespace MASIC
                 {
                     if (scanList.ParentIons.Count > 1)
                     {
-                        UpdateProgress(Convert.ToInt16(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
+                        UpdateProgress((short)(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
                     }
                     else
                     {

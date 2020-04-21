@@ -126,7 +126,7 @@ namespace MagnitudeConcavityPeakFinder
                     return detectedPeaks;
 
                 // The mid point width is the minimum width divided by 2, rounded down
-                var peakHalfWidth = Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 2.0));
+                var peakHalfWidth = (int)Math.Floor(peakWidthPointsMinimum / 2.0);
 
                 // Find the maximum intensity in the source data
                 double maximumIntensity = 0;
@@ -394,7 +394,7 @@ namespace MagnitudeConcavityPeakFinder
             {
                 sigma = 0;
             }
-            var widthInPoints = Convert.ToInt32(Math.Ceiling(peakWidthInSigma * sigma));
+            var widthInPoints = (int)Math.Ceiling(peakWidthInSigma * sigma);
 
             if (widthInPoints > 4 * sourceDataCount)
             {
@@ -413,15 +413,14 @@ namespace MagnitudeConcavityPeakFinder
             if (widthInPoints % 2 == 0)
             {
                 // Even number
-                newPeak.LeftEdge = dataIndex - Convert.ToInt32(widthInPoints / 2);
-                newPeak.RightEdge = dataIndex + Convert.ToInt32(widthInPoints / 2) - 1;
+                newPeak.LeftEdge = dataIndex - (int)(widthInPoints / 2);
+                newPeak.RightEdge = dataIndex + (int)(widthInPoints / 2) - 1;
             }
             else
             {
                 // Odd number
-                newPeak.LeftEdge = dataIndex - Convert.ToInt32((widthInPoints - 1) / 2);
-                newPeak.RightEdge = dataIndex + Convert.ToInt32((widthInPoints - 1) /
-                                                        2);
+                newPeak.LeftEdge = dataIndex - (int)((widthInPoints - 1) / 2);
+                newPeak.RightEdge = dataIndex + (int)((widthInPoints - 1) / 2);
             }
         }
 
@@ -504,11 +503,11 @@ namespace MagnitudeConcavityPeakFinder
         {
             // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
             // Define the maximum allowed peak apex shift to be 33% of intPeakWidthPointsMinimum
-            var dataIndexCheckStart = peak.LocationIndex - Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 3.0));
+            var dataIndexCheckStart = peak.LocationIndex - (int)Math.Floor(peakWidthPointsMinimum / 3.0);
             if (dataIndexCheckStart < 0)
                 dataIndexCheckStart = 0;
 
-            var dataIndexCheckEnd = peak.LocationIndex + Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 3.0));
+            var dataIndexCheckEnd = peak.LocationIndex + (int)Math.Floor(peakWidthPointsMinimum / 3.0);
             if (dataIndexCheckEnd > sourceDataCount - 1)
                 dataIndexCheckEnd = sourceDataCount - 1;
 

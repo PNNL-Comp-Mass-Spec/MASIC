@@ -17,8 +17,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -143,12 +143,12 @@ namespace MASIC
             float scanOrAcqTimeCenter,
             float scanOrAcqTimeTolerance,
             string comment,
-            [Optional, DefaultParameterValue(false)] out bool existingRowFound)
+            out bool existingRowFound)
         {
             existingRowFound = false;
             foreach (DataRow myDataRow in mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows)
             {
-                if (Math.Abs(Convert.ToDouble(myDataRow[0]) - mz) < float.Epsilon & Math.Abs(Convert.ToSingle(myDataRow[1]) - scanOrAcqTimeCenter) < float.Epsilon)
+                if (Math.Abs(double.Parse(myDataRow[0].ToString()) - mz) < float.Epsilon & Math.Abs(float.Parse(myDataRow[1].ToString()) - scanOrAcqTimeCenter) < float.Epsilon)
                 {
                     existingRowFound = true;
                     break;
@@ -259,7 +259,7 @@ namespace MASIC
         {
             if (!updating)
             {
-                if (mHeightAdjustForce != 0 && DateTime.UtcNow.Subtract(mHeightAdjustTime).TotalSeconds <= (double)5)
+                if (mHeightAdjustForce != 0 && DateTime.UtcNow.Subtract(mHeightAdjustTime).TotalSeconds <= 5.0)
                 {
                     try
                     {
@@ -645,7 +645,7 @@ namespace MASIC
 
         private string GetSettingsFilePath()
         {
-            return ProcessFilesBase.GetSettingsFilePathLocal("MASIC", XML_SETTINGS_FILE_NAME);
+            return ProcessFilesOrDirectoriesBase.GetSettingsFilePathLocal("MASIC", XML_SETTINGS_FILE_NAME);
         }
 
         private void IniFileLoadOptions(bool updateIOPaths)
@@ -712,15 +712,15 @@ namespace MASIC
             try
             {
                 // Utilize MASIC's built-in LoadParameters function, then call ResetToDefaults
-                var objMasic = new clsMASIC();
+                var masicInstance = new clsMASIC();
 
-                bool success = objMasic.LoadParameterFileSettings(filePath);
+                bool success = masicInstance.LoadParameterFileSettings(filePath);
                 if (!success)
                 {
                     MessageBox.Show("LoadParameterFileSettings returned false for: " + Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
 
-                ResetToDefaults(false, ref objMasic);
+                ResetToDefaults(false, masicInstance);
 
                 // Sleep for 100 msec, just to be safe
                 Thread.Sleep(100);
@@ -761,7 +761,7 @@ namespace MASIC
 
                     if (txtOutputDirectoryPath.TextLength == 0)
                     {
-                        txtOutputDirectoryPath.Text = ProcessFilesBase.GetAppDirectoryPath();
+                        txtOutputDirectoryPath.Text = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
 
                     mPreferredInputFileExtension = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
@@ -915,7 +915,7 @@ namespace MASIC
             DefineOverviewText();
 
             mXmlSettingsFilePath = GetSettingsFilePath();
-            ProcessFilesBase.CreateSettingsFileIfMissing(mXmlSettingsFilePath);
+            ProcessFilesOrDirectoriesBase.CreateSettingsFileIfMissing(mXmlSettingsFilePath);
 
             mPreferredInputFileExtension = ".Raw";
 
@@ -1257,26 +1257,23 @@ namespace MASIC
             oClass.ProgressSubtaskChanged += MASIC_ProgressSubtaskChanged;
         }
 
-        private void ResetToDefaults(bool confirmReset, [Optional, DefaultParameterValue(null)] ref clsMASIC objMasic)
+        private void ResetToDefaults(bool confirmReset, clsMASIC masicReferenceClass = null)
         {
-            DialogResult eResponse;
-            bool existingMasicObjectUsed;
-
             if (confirmReset)
             {
-                eResponse = MessageBox.Show("Are you sure you want to reset all settings to their default values?", "Reset to Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-                if (eResponse != DialogResult.Yes)
+                var response = MessageBox.Show("Are you sure you want to reset all settings to their default values?", "Reset to Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                if (response != DialogResult.Yes)
                     return;
             }
 
-            if (objMasic == null)
+            clsMASIC masicInstance;
+            if (masicReferenceClass == null)
             {
-                objMasic = new clsMASIC();
-                existingMasicObjectUsed = false;
+                masicInstance = new clsMASIC();
             }
             else
             {
-                existingMasicObjectUsed = true;
+                masicInstance = masicReferenceClass;
             }
 
             Width = 710;
@@ -1287,7 +1284,7 @@ namespace MASIC
             {
                 if (txtOutputDirectoryPath.TextLength == 0 || !Directory.Exists(txtOutputDirectoryPath.Text))
                 {
-                    txtOutputDirectoryPath.Text = ProcessFilesBase.GetAppDirectoryPath();
+                    txtOutputDirectoryPath.Text = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
             }
             catch (Exception ex)
@@ -1300,10 +1297,10 @@ namespace MASIC
 
             try
             {
-                var masicOptions = objMasic.Options;
+                var masicOptions = masicInstance.Options;
 
                 // Import Options
-                txtParentIonDecoyMassDa.Text = masicOptions.ParentIonDecoyMassDa.ToString();
+                txtParentIonDecoyMassDa.Text = masicOptions.ParentIonDecoyMassDa.ToString(CultureInfo.InvariantCulture);
 
                 // Masic Export Options
                 chkIncludeHeaders.Checked = masicOptions.IncludeHeadersInExportFile;
@@ -1321,9 +1318,9 @@ namespace MASIC
                 chkExportRawDataIncludeMSMS.Checked = exportOptions.IncludeMSMS;
                 chkExportRawDataRenumberScans.Checked = exportOptions.RenumberScans;
 
-                txtExportRawDataSignalToNoiseRatioMinimum.Text = exportOptions.MinimumSignalToNoiseRatio.ToString();
-                txtExportRawDataMaxIonCountPerScan.Text = exportOptions.MaxIonCountPerScan.ToString();
-                txtExportRawDataIntensityMinimum.Text = exportOptions.IntensityMinimum.ToString();
+                txtExportRawDataSignalToNoiseRatioMinimum.Text = exportOptions.MinimumSignalToNoiseRatio.ToString(CultureInfo.InvariantCulture);
+                txtExportRawDataMaxIonCountPerScan.Text = exportOptions.MaxIonCountPerScan.ToString(CultureInfo.InvariantCulture);
+                txtExportRawDataIntensityMinimum.Text = exportOptions.IntensityMinimum.ToString(CultureInfo.InvariantCulture);
 
                 // Thermo .raw info file options
                 chkSaveMSMethodFile.Checked = masicOptions.WriteMSMethodFile;
@@ -1376,8 +1373,8 @@ namespace MASIC
 
                 txtScanStart.Text = sicOptions.ScanRangeStart.ToString();
                 txtScanEnd.Text = sicOptions.ScanRangeEnd.ToString();
-                txtTimeStart.Text = sicOptions.RTRangeStart.ToString();
-                txtTimeEnd.Text = sicOptions.RTRangeEnd.ToString();
+                txtTimeStart.Text = sicOptions.RTRangeStart.ToString(CultureInfo.InvariantCulture);
+                txtTimeEnd.Text = sicOptions.RTRangeEnd.ToString(CultureInfo.InvariantCulture);
 
                 // Note: the following 5 options are not graphically editable
                 mSuppressNoParentIonsError = masicOptions.SuppressNoParentIonsError;
@@ -1387,11 +1384,11 @@ namespace MASIC
                 mCompressToleranceDivisorForDa = sicOptions.CompressToleranceDivisorForDa;
                 mCompressToleranceDivisorForPPM = sicOptions.CompressToleranceDivisorForPPM;
 
-                txtMaxPeakWidthMinutesBackward.Text = sicOptions.MaxSICPeakWidthMinutesBackward.ToString();
-                txtMaxPeakWidthMinutesForward.Text = sicOptions.MaxSICPeakWidthMinutesForward.ToString();
+                txtMaxPeakWidthMinutesBackward.Text = sicOptions.MaxSICPeakWidthMinutesBackward.ToString(CultureInfo.InvariantCulture);
+                txtMaxPeakWidthMinutesForward.Text = sicOptions.MaxSICPeakWidthMinutesForward.ToString(CultureInfo.InvariantCulture);
 
-                txtIntensityThresholdFractionMax.Text = peakFinderOptions.IntensityThresholdFractionMax.ToString();
-                txtIntensityThresholdAbsoluteMinimum.Text = peakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString();
+                txtIntensityThresholdFractionMax.Text = peakFinderOptions.IntensityThresholdFractionMax.ToString(CultureInfo.InvariantCulture);
+                txtIntensityThresholdAbsoluteMinimum.Text = peakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString(CultureInfo.InvariantCulture);
 
                 chkReplaceSICZeroesWithMinimumPositiveValueFromMSData.Checked = sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData;
                 chkRefineReportedParentIonMZ.Checked = sicOptions.RefineReportedParentIonMZ;
@@ -1399,12 +1396,12 @@ namespace MASIC
 
                 // Peak Finding Options
                 cboSICNoiseThresholdMode.SelectedIndex = (int)peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode;
-                txtSICNoiseThresholdIntensity.Text = peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString();
-                txtSICNoiseFractionLowIntensityDataToAverage.Text = peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString();
+                txtSICNoiseThresholdIntensity.Text = peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString(CultureInfo.InvariantCulture);
+                txtSICNoiseFractionLowIntensityDataToAverage.Text = peakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString(CultureInfo.InvariantCulture);
 
                 txtMaxDistanceScansNoOverlap.Text = peakFinderOptions.MaxDistanceScansNoOverlap.ToString();
-                txtMaxAllowedUpwardSpikeFractionMax.Text = peakFinderOptions.MaxAllowedUpwardSpikeFractionMax.ToString();
-                txtInitialPeakWidthScansScaler.Text = peakFinderOptions.InitialPeakWidthScansScaler.ToString();
+                txtMaxAllowedUpwardSpikeFractionMax.Text = peakFinderOptions.MaxAllowedUpwardSpikeFractionMax.ToString(CultureInfo.InvariantCulture);
+                txtInitialPeakWidthScansScaler.Text = peakFinderOptions.InitialPeakWidthScansScaler.ToString(CultureInfo.InvariantCulture);
                 txtInitialPeakWidthScansMaximum.Text = peakFinderOptions.InitialPeakWidthScansMaximum.ToString();
 
                 if (peakFinderOptions.UseButterworthSmooth)
@@ -1418,7 +1415,7 @@ namespace MASIC
                     optUseSavitzkyGolaySmooth.Checked = true;
                 }
 
-                txtButterworthSamplingFrequency.Text = peakFinderOptions.ButterworthSamplingFrequency.ToString();
+                txtButterworthSamplingFrequency.Text = peakFinderOptions.ButterworthSamplingFrequency.ToString(CultureInfo.InvariantCulture);
                 txtSavitzkyGolayFilterOrder.Text = peakFinderOptions.SavitzkyGolayFilterOrder.ToString();
 
                 chkFindPeaksOnSmoothedData.Checked = peakFinderOptions.FindPeaksOnSmoothedData;
@@ -1426,24 +1423,24 @@ namespace MASIC
 
                 // Mass Spectra Noise Threshold Options
                 cboMassSpectraNoiseThresholdMode.SelectedIndex = (int)peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode;
-                txtMassSpectraNoiseThresholdIntensity.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString();
-                txtMassSpectraNoiseFractionLowIntensityDataToAverage.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString();
-                txtMassSpectraNoiseMinimumSignalToNoiseRatio.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio.ToString();
+                txtMassSpectraNoiseThresholdIntensity.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString(CultureInfo.InvariantCulture);
+                txtMassSpectraNoiseFractionLowIntensityDataToAverage.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage.ToString(CultureInfo.InvariantCulture);
+                txtMassSpectraNoiseMinimumSignalToNoiseRatio.Text = peakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio.ToString(CultureInfo.InvariantCulture);
 
                 // Similarity Options
-                txtSimilarIonMZToleranceHalfWidth.Text = sicOptions.SimilarIonMZToleranceHalfWidth.ToString();
-                txtSimilarIonToleranceHalfWidthMinutes.Text = sicOptions.SimilarIonToleranceHalfWidthMinutes.ToString();
-                txtSpectrumSimilarityMinimum.Text = sicOptions.SpectrumSimilarityMinimum.ToString();
+                txtSimilarIonMZToleranceHalfWidth.Text = sicOptions.SimilarIonMZToleranceHalfWidth.ToString(CultureInfo.InvariantCulture);
+                txtSimilarIonToleranceHalfWidthMinutes.Text = sicOptions.SimilarIonToleranceHalfWidthMinutes.ToString(CultureInfo.InvariantCulture);
+                txtSpectrumSimilarityMinimum.Text = sicOptions.SpectrumSimilarityMinimum.ToString(CultureInfo.InvariantCulture);
 
                 var binningOptions = masicOptions.BinningOptions;
 
                 // Binning Options
-                txtBinStartX.Text = binningOptions.StartX.ToString();
-                txtBinEndX.Text = binningOptions.EndX.ToString();
-                txtBinSize.Text = binningOptions.BinSize.ToString();
+                txtBinStartX.Text = binningOptions.StartX.ToString(CultureInfo.InvariantCulture);
+                txtBinEndX.Text = binningOptions.EndX.ToString(CultureInfo.InvariantCulture);
+                txtBinSize.Text = binningOptions.BinSize.ToString(CultureInfo.InvariantCulture);
                 txtMaximumBinCount.Text = binningOptions.MaximumBinCount.ToString();
 
-                txtBinnedDataIntensityPrecisionPct.Text = binningOptions.IntensityPrecisionPercent.ToString();
+                txtBinnedDataIntensityPrecisionPct.Text = binningOptions.IntensityPrecisionPercent.ToString(CultureInfo.InvariantCulture);
 
                 chkBinnedDataNormalize.Checked = binningOptions.Normalize;
                 chkBinnedDataSumAllIntensitiesForBin.Checked = binningOptions.SumAllIntensitiesForBin;
@@ -1478,7 +1475,7 @@ namespace MASIC
                 chkLimitSearchToCustomMZs.Checked = customSICOptions.LimitSearchToCustomMZList;
                 SetCustomSICToleranceType(customSICOptions.ScanToleranceType);
 
-                txtCustomSICScanOrAcqTimeTolerance.Text = customSICOptions.ScanOrAcqTimeTolerance.ToString();
+                txtCustomSICScanOrAcqTimeTolerance.Text = customSICOptions.ScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture);
 
                 // Load the Custom m/z values from mCustomSICList
                 var customMzList = masicOptions.CustomSICList.CustomMZSearchValues;
@@ -1495,11 +1492,6 @@ namespace MASIC
                 {
                     MessageBox.Show("Error resetting values to defaults: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
-            }
-
-            if (!existingMasicObjectUsed)
-            {
-                objMasic = null;
             }
         }
 
@@ -1526,12 +1518,12 @@ namespace MASIC
                     }
                     catch
                     {
-                        objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath();
+                        objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath();
+                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
                 objOpenFile.Title = "Select dataset lookup file";
@@ -1591,12 +1583,12 @@ namespace MASIC
                     }
                     catch
                     {
-                        objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath();
+                        objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath();
+                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
                 objOpenFile.Title = "Select custom SIC values file";
@@ -1672,12 +1664,12 @@ namespace MASIC
                     }
                     catch
                     {
-                        objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath();
+                        objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objOpenFile.InitialDirectory = ProcessFilesBase.GetAppDirectoryPath();
+                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
                 objOpenFile.Title = "Select input file";
@@ -2123,7 +2115,7 @@ namespace MASIC
                         if (currentRow[0] != null && double.TryParse(currentRow[0].ToString(), out var col0) &&
                             currentRow[1] != null && double.TryParse(currentRow[1].ToString(), out var col1))
                         {
-                            double targetMz = col0;
+                            double targetMz = Conversions.ToDouble(currentRow[0]);
                             var mzSearchSpec = new clsCustomMZSearchSpec(targetMz)
                             {
                                 MZToleranceDa = col1,
@@ -2562,8 +2554,7 @@ namespace MASIC
 
         private void mnuEditResetOptions_Click(object sender, EventArgs e)
         {
-            clsMASIC argobjMasic = null;
-            ResetToDefaults(true, ref argobjMasic);
+            ResetToDefaults(true);
         }
 
         private void mnuEditSaveDefaultOptions_Click(object sender, EventArgs e)

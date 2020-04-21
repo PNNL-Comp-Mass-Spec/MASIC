@@ -332,7 +332,7 @@ namespace MASICPeakFinder
 
             try
             {
-                int segmentCountLocal = Convert.ToInt32(baselineNoiseOptions.DualTrimmedMeanMaximumSegments);
+                int segmentCountLocal = (int)(baselineNoiseOptions.DualTrimmedMeanMaximumSegments);
                 if (segmentCountLocal == 0)
                     segmentCountLocal = 3;
                 if (segmentCountLocal < 1)
@@ -348,7 +348,7 @@ namespace MASICPeakFinder
                 }
 
                 // Determine the segment length
-                int segmentLength = Convert.ToInt32(Math.Round((indexEnd - indexStart) / (double)segmentCountLocal, 0));
+                int segmentLength = (int)Math.Round((indexEnd - indexStart) / (double)segmentCountLocal, 0);
 
                 // Initialize the first segment
                 var firstSegment = noiseStatsSegments.First();
@@ -669,7 +669,7 @@ namespace MASICPeakFinder
                             else if (dataIndex == sicPeak.IndexBaseLeft)
                             {
                                 // At the start of the peak; use the scan number halfway between .IndexBaseLeft and .IndexMax
-                                fwhmScanStart = sicData[dataIndex + Convert.ToInt32(Math.Round((sicPeak.IndexMax - sicPeak.IndexBaseLeft) / (double)2, 0))].ScanNumber;
+                                fwhmScanStart = sicData[dataIndex + (int)Math.Round((sicPeak.IndexMax - sicPeak.IndexBaseLeft) / 2.0, 0)].ScanNumber;
                             }
                             else
                             {
@@ -720,7 +720,7 @@ namespace MASICPeakFinder
                             else if (dataIndex == sicPeak.IndexBaseRight - 1)
                             {
                                 // At the end of the peak; use the scan number halfway between .IndexBaseRight and .IndexMax
-                                fwhmScanEnd = sicData[dataIndex + 1 - Convert.ToInt32(Math.Round((sicPeak.IndexBaseRight - sicPeak.IndexMax) / (double)2, 0))].ScanNumber;
+                                fwhmScanEnd = sicData[dataIndex + 1 - (int)Math.Round((sicPeak.IndexBaseRight - sicPeak.IndexMax) / 2.0, 0)].ScanNumber;
                             }
                             else
                             {
@@ -744,7 +744,7 @@ namespace MASICPeakFinder
                         }
                     }
 
-                    fwhmScans = Convert.ToInt32(Math.Round(fwhmScanEnd - fwhmScanStart, 0));
+                    fwhmScans = (int)Math.Round(fwhmScanEnd - fwhmScanStart, 0);
                     if (fwhmScans <= 0)
                         fwhmScans = 0;
                 }
@@ -843,7 +843,7 @@ namespace MASICPeakFinder
             // Compute the Vector of Normal PDF values evaluated at the X values in the peak window
             xDataPDF = new double[xData.Length];
             for (int i = 0; i <= xData.Length - 1; i++)
-                xDataPDF[i] = 1 / (Math.Sqrt(2 * Math.PI) * peakStDev) * Math.Exp(-1 / (double)2 *
+                xDataPDF[i] = 1 / (Math.Sqrt(2 * Math.PI) * peakStDev) * Math.Exp(-1 / 2.0 *
                                       Math.Pow((xData[i] - (peakMean - scanOffset)) / peakStDev, 2));
 
             double xDataPDFSum = 0;
@@ -949,7 +949,7 @@ namespace MASICPeakFinder
             int peakWidthBaseScans = ComputeWidthAtBaseUsingFWHM(sicPeak, sicData, 4);
             int peakWidthPoints = ConvertScanWidthToPoints(peakWidthBaseScans, sicPeak, sicData);
 
-            int peakHalfWidthPoints = Convert.ToInt32(Math.Round(peakWidthPoints / 1.5, 0));
+            int peakHalfWidthPoints = (int)Math.Round(peakWidthPoints / 1.5, 0);
 
             // Make sure that peakHalfWidthPoints is at least NOISE_ESTIMATE_DATA_COUNT_MINIMUM
             if (peakHalfWidthPoints < NOISE_ESTIMATE_DATA_COUNT_MINIMUM)
@@ -1180,7 +1180,7 @@ namespace MASICPeakFinder
                 double intensityThreshold = sicData[sicPeak.IndexMax].Intensity * 0.05;
 
                 // Estimate the average scan interval between each data point
-                int avgScanInterval = Convert.ToInt32(Math.Round(ComputeAvgScanInterval(sicData, sicPeak.IndexBaseLeft, sicPeak.IndexBaseRight), 0));
+                int avgScanInterval = (int)Math.Round(ComputeAvgScanInterval(sicData, sicPeak.IndexBaseLeft, sicPeak.IndexBaseRight), 0);
 
                 int areaDataBaseIndex;
                 if (sicData[sicPeak.IndexBaseLeft].Intensity > intensityThreshold)
@@ -1464,7 +1464,7 @@ namespace MASICPeakFinder
                         }
 
                         // Estimate the average scan interval between the data points in scanNumbers
-                        int avgScanInterval = Convert.ToInt32(Math.Round(ComputeAvgScanInterval(sicData, 0, dataCount - 1), 0));
+                        int avgScanInterval = (int)Math.Round(ComputeAvgScanInterval(sicData, 0, dataCount - 1), 0);
 
                         // Make sure that intensities(0) is <= intensityThreshold
                         if (intensities[0] > intensityThreshold)
@@ -1497,7 +1497,7 @@ namespace MASICPeakFinder
                     // Populate scanNumbers() and intensities() with the five data points centered around sicPeak.IndexMax
                     if (USE_SMOOTHED_DATA)
                     {
-                        validDataIndexLeft = sicPeak.IndexMax - Convert.ToInt32(Math.Floor(minimumDataCount / (double)2));
+                        validDataIndexLeft = sicPeak.IndexMax - (int)Math.Floor(minimumDataCount / 2.0);
                         if (validDataIndexLeft < 0)
                             validDataIndexLeft = 0;
                         dataCount = 0;
@@ -1517,7 +1517,7 @@ namespace MASICPeakFinder
                     }
                     else
                     {
-                        validDataIndexLeft = sicPeak.IndexMax - Convert.ToInt32(Math.Floor(minimumDataCount / (double)2));
+                        validDataIndexLeft = sicPeak.IndexMax - (int)Math.Floor(minimumDataCount / 2.0);
                         if (validDataIndexLeft < 0)
                             validDataIndexLeft = 0;
                         dataCount = 0;
@@ -1630,7 +1630,7 @@ namespace MASICPeakFinder
                         centerOfMassDecimal = scanNumbers[indexPointer];
                     }
 
-                    statMomentsData.CenterOfMassScan = Convert.ToInt32(Math.Round(centerOfMassDecimal, 0));
+                    statMomentsData.CenterOfMassScan = (int)Math.Round(centerOfMassDecimal, 0);
                     statMomentsData.DataCountUsed = 1;
                 }
                 else
@@ -1640,7 +1640,7 @@ namespace MASICPeakFinder
                     double centerOfMassDecimal = moment1Sum / peakArea + scanNumbers[0];
 
                     statMomentsData.Area = Math.Min(double.MaxValue, peakArea);
-                    statMomentsData.CenterOfMassScan = Convert.ToInt32(Math.Round(centerOfMassDecimal, 0));
+                    statMomentsData.CenterOfMassScan = (int)Math.Round(centerOfMassDecimal, 0);
                     statMomentsData.DataCountUsed = dataCount;
 
                     // For the second moment (m2), need to sum: (ScanNumber - m1)^2 * Intensity
@@ -1849,7 +1849,7 @@ namespace MASICPeakFinder
                         // eNoiseThresholdModes.TrimmedMeanByCount
                         // Find the index of the data point at dataSortedCount * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
                         // average the data from the start to that index
-                        indexEnd = Convert.ToInt32(Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0));
+                        indexEnd = (int)Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
 
                         countSummed = indexEnd + 1;
                         sum = 0;
@@ -1861,7 +1861,7 @@ namespace MASICPeakFinder
                     {
                         // Compute the average
                         // Note that countSummed will be used below in the variance computation
-                        baselineNoiseStats.NoiseLevel = sum / Convert.ToDouble(countSummed);
+                        baselineNoiseStats.NoiseLevel = sum / (double)countSummed;
                         baselineNoiseStats.PointsUsed = countSummed;
 
                         if (countSummed > 1)
@@ -1870,7 +1870,7 @@ namespace MASICPeakFinder
                             sum = 0;
                             for (int i = 0; i <= indexEnd; i++)
                                 sum += Math.Pow(dataListSorted[i] - baselineNoiseStats.NoiseLevel, 2);
-                            baselineNoiseStats.NoiseStDev = Math.Sqrt(sum / Convert.ToDouble(countSummed - 1));
+                            baselineNoiseStats.NoiseStDev = Math.Sqrt(sum / (countSummed - 1));
                         }
                         else
                         {
@@ -1915,12 +1915,12 @@ namespace MASICPeakFinder
                     if (indexEnd % 2 == 0)
                     {
                         // Even value
-                        baselineNoiseStats.NoiseLevel = dataListSorted[Convert.ToInt32(indexEnd / (double)2)];
+                        baselineNoiseStats.NoiseLevel = dataListSorted[(int)(indexEnd / 2.0)];
                     }
                     else
                     {
                         // Odd value; average the values on either side of indexEnd/2
-                        int i = Convert.ToInt32((indexEnd - 1) / (double)2);
+                        int i = (int)((indexEnd - 1) / 2.0);
                         if (i < 0)
                             i = 0;
                         double sum2 = dataListSorted[i];
@@ -1940,7 +1940,7 @@ namespace MASICPeakFinder
                     int countSummed2 = indexEnd + 1;
                     if (countSummed2 > 0)
                     {
-                        baselineNoiseStats.NoiseStDev = Math.Sqrt(varianceSum / Convert.ToDouble(countSummed2 - 1));
+                        baselineNoiseStats.NoiseStDev = Math.Sqrt(varianceSum / (countSummed2 - 1));
                     }
                     else
                     {
@@ -2022,7 +2022,7 @@ namespace MASICPeakFinder
             {
                 // Compute the peak width
                 // Note: Sigma = fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
-                sigmaBasedWidth = Convert.ToInt32(sigmaValueForBase * sicPeakFWHMScans / 2.35482);
+                sigmaBasedWidth = (int)(sigmaValueForBase * sicPeakFWHMScans / 2.35482);
 
                 if (sigmaBasedWidth <= 0)
                 {
@@ -2056,7 +2056,7 @@ namespace MASICPeakFinder
             IList<clsSICDataPoint> sicData)
         {
             double scansPerPoint = ComputeAvgScanInterval(sicData, sicPeak.IndexBaseLeft, sicPeak.IndexBaseRight);
-            return Convert.ToInt32(Math.Round(peakWidthBaseScans / scansPerPoint, 0));
+            return (int)(Math.Round(peakWidthBaseScans / scansPerPoint, 0));
         }
 
         /// <summary>
@@ -2195,7 +2195,7 @@ namespace MASICPeakFinder
 
                 // Initialize the intensity queue
                 // The queue is used to keep track of the most recent intensity values
-                var intensityQueue = new Queue();
+                var intensityQueue = new Queue<double>();
 
                 double potentialPeakArea = 0;
                 int dataPointCountAboveThreshold = 0;
@@ -2217,7 +2217,7 @@ namespace MASICPeakFinder
                         if (intensityQueue.Count >= sicPeakFinderOptions.InitialPeakWidthScansMaximum)
                         {
                             // Decrement potentialPeakArea by the oldest item in the queue
-                            potentialPeakArea -= Convert.ToDouble(intensityQueue.Dequeue());
+                            potentialPeakArea -= intensityQueue.Dequeue();
                         }
                         // Add this intensity to the queue
                         intensityQueue.Enqueue(sicData[i].Intensity);
@@ -2248,17 +2248,17 @@ namespace MASICPeakFinder
                     sicPeakFinderOptions.ButterworthSamplingFrequency = 0.25;
                 }
 
-                peakData.PeakWidthPointsMinimum = Convert.ToInt32(sicPeakFinderOptions.InitialPeakWidthScansScaler *
-                                                                  Math.Log10(Math.Floor(peakAreaSignalToNoise)) * 10);
+                peakData.PeakWidthPointsMinimum = (int)(sicPeakFinderOptions.InitialPeakWidthScansScaler *
+                                                        Math.Log10(Math.Floor(peakAreaSignalToNoise)) * 10);
 
                 // Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum
                 // and no greater than dataPointCountAboveThreshold/2 (rounded up)
                 peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, sicPeakFinderOptions.InitialPeakWidthScansMaximum);
-                peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, Convert.ToInt32(Math.Ceiling(dataPointCountAboveThreshold / (double)2)));
+                peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, (int)Math.Ceiling(dataPointCountAboveThreshold / 2.0));
 
                 if (peakData.PeakWidthPointsMinimum > peakData.SourceDataCount * 0.8)
                 {
-                    peakData.PeakWidthPointsMinimum = Convert.ToInt32(Math.Floor(peakData.SourceDataCount * 0.8));
+                    peakData.PeakWidthPointsMinimum = (int)Math.Floor(peakData.SourceDataCount * 0.8);
                 }
 
                 if (peakData.PeakWidthPointsMinimum < MINIMUM_PEAK_WIDTH)
@@ -2536,7 +2536,7 @@ namespace MASICPeakFinder
                     // If peakData.PeakWidthPointsMinimum is greater than 3 and testingMinimumPeakWidth = False, then decrement it by 50%
                     else if (peakData.PeakWidthPointsMinimum > MINIMUM_PEAK_WIDTH && !testingMinimumPeakWidth)
                     {
-                        peakData.PeakWidthPointsMinimum = Convert.ToInt32(Math.Floor(peakData.PeakWidthPointsMinimum / (double)2));
+                        peakData.PeakWidthPointsMinimum = (int)Math.Floor(peakData.PeakWidthPointsMinimum / 2.0);
                         if (peakData.PeakWidthPointsMinimum < MINIMUM_PEAK_WIDTH)
                             peakData.PeakWidthPointsMinimum = MINIMUM_PEAK_WIDTH;
                     }
@@ -2606,7 +2606,7 @@ namespace MASICPeakFinder
                     peaksContainer.SmoothedYData,
                     sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum,
                     peaksContainer.PeakWidthPointsMinimum,
-                    Convert.ToInt32(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
+                    (int)(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
             }
 
             // usedSmoothedDataForPeakDetection = True
@@ -2618,7 +2618,7 @@ namespace MASICPeakFinder
                     peaksContainer.YData,
                     sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum,
                     peaksContainer.PeakWidthPointsMinimum,
-                    Convert.ToInt32(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
+                    (int)(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
                 // usedSmoothedDataForPeakDetection = False
             }
 
@@ -2986,7 +2986,7 @@ namespace MASICPeakFinder
                         // Validate that peakWidthPointsMinimum is large enough
                         if (butterWorthFrequency > 0)
                         {
-                            peakWidthPointsCompare = Convert.ToInt32(Math.Round(1 / butterWorthFrequency, 0));
+                            peakWidthPointsCompare = (int)Math.Round(1 / butterWorthFrequency, 0);
                             if (peakWidthPointsMinimum < peakWidthPointsCompare)
                             {
                                 peakWidthPointsMinimum = peakWidthPointsCompare;
@@ -2999,7 +2999,7 @@ namespace MASICPeakFinder
                 else
                 {
                     // Filter the data with a Savitzky Golay filter
-                    filterThirdWidth = Convert.ToInt32(Math.Floor(peaksContainer.PeakWidthPointsMinimum / (double)3));
+                    filterThirdWidth = (int)Math.Floor(peaksContainer.PeakWidthPointsMinimum / 3.0);
                     if (filterThirdWidth > 3)
                         filterThirdWidth = 3;
 
@@ -3072,7 +3072,7 @@ namespace MASICPeakFinder
             int validPeakCount;
 
             // The queue is used to keep track of the most recent intensity values
-            var intensityQueue = new Queue();
+            var intensityQueue = new Queue<double>();
             minimumPotentialPeakArea = double.MaxValue;
             peakCountBasisForMinimumPotentialArea = 0;
             if (sicData.Count > 0)
@@ -3100,7 +3100,7 @@ namespace MASICPeakFinder
                     {
                         // Decrement potentialPeakArea by the oldest item in the queue
                         // If that item is >= .MinimumBaselineNoiseLevel, then decrement validPeakCount too
-                        oldestIntensity = Convert.ToDouble(intensityQueue.Dequeue());
+                        oldestIntensity = intensityQueue.Dequeue();
 
                         if (oldestIntensity >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel && oldestIntensity > 0)
                         {
@@ -3617,7 +3617,7 @@ namespace MASICPeakFinder
 
                     if (scanIndexObserved >= current.SegmentIndexStart && scanIndexObserved <= current.SegmentIndexEnd)
                     {
-                        segmentMidPointA = current.SegmentIndexStart + Convert.ToInt32((current.SegmentIndexEnd - current.SegmentIndexStart) / (double)2);
+                        segmentMidPointA = current.SegmentIndexStart + (int)((current.SegmentIndexEnd - current.SegmentIndexStart) / 2.0);
                         matchFound = true;
                     }
 
@@ -3637,7 +3637,7 @@ namespace MASICPeakFinder
                                 // Define segmentMidPointA
                                 segmentMidPointB = segmentMidPointA;
                                 var previous = noiseStatsSegments[noiseSegmentIndex - 1];
-                                segmentMidPointA = previous.SegmentIndexStart + Convert.ToInt32((previous.SegmentIndexEnd - previous.SegmentIndexStart) / (double)2);
+                                segmentMidPointA = previous.SegmentIndexStart + (int)((previous.SegmentIndexEnd - previous.SegmentIndexStart) / 2.0);
                             }
                             else
                             {
@@ -3656,7 +3656,7 @@ namespace MASICPeakFinder
                                 // Define segmentMidPointB
                                 var nextSegment = noiseStatsSegments[noiseSegmentIndex + 1];
 
-                                segmentMidPointB = nextSegment.SegmentIndexStart + Convert.ToInt32((nextSegment.SegmentIndexEnd - nextSegment.SegmentIndexStart) / (double)2);
+                                segmentMidPointB = nextSegment.SegmentIndexStart + (int)((nextSegment.SegmentIndexEnd - nextSegment.SegmentIndexStart) / 2.0);
                             }
                             else
                             {
@@ -3671,8 +3671,8 @@ namespace MASICPeakFinder
                         if (indexSegmentA != indexSegmentB)
                         {
                             // Interpolate between the two segments
-                            fractionFromSegmentB = Convert.ToDouble(scanIndexObserved - segmentMidPointA) /
-                                                                    Convert.ToDouble(segmentMidPointB - segmentMidPointA);
+                            fractionFromSegmentB = (scanIndexObserved - segmentMidPointA) /
+                                                   (double)(segmentMidPointB - segmentMidPointA);
                             if (fractionFromSegmentB < 0)
                             {
                                 fractionFromSegmentB = 0;
@@ -3690,7 +3690,7 @@ namespace MASICPeakFinder
 
                             baselineNoiseStats.NoiseLevel = segmentA.NoiseLevel * fractionFromSegmentA + segmentB.NoiseLevel * fractionFromSegmentB;
                             baselineNoiseStats.NoiseStDev = segmentA.NoiseStDev * fractionFromSegmentA + segmentB.NoiseStDev * fractionFromSegmentB;
-                            baselineNoiseStats.PointsUsed = Convert.ToInt32(segmentA.PointsUsed * fractionFromSegmentA + segmentB.PointsUsed * fractionFromSegmentB);
+                            baselineNoiseStats.PointsUsed = (int)(segmentA.PointsUsed * fractionFromSegmentA + segmentB.PointsUsed * fractionFromSegmentB);
                         }
 
                         break;

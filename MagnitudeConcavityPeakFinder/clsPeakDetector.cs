@@ -205,16 +205,16 @@ namespace MagnitudeConcavityPeakFinder
             if (Math.Abs(peakFinderOptions.ButterworthSamplingFrequency) < float.Epsilon)
                 peakFinderOptions.ButterworthSamplingFrequency = 0.25f;
 
-            peakData.PeakWidthPointsMinimum = Convert.ToInt32(peakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(areaBasedSignalToNoise)) * 10);
+            peakData.PeakWidthPointsMinimum = (int)(peakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(areaBasedSignalToNoise)) * 10);
 
             // Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum
             //  and no greater than dataPointCountAboveThreshold/2 (rounded up)
             peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, peakFinderOptions.InitialPeakWidthScansMaximum);
-            peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, Convert.ToInt32(Math.Ceiling(dataPointCountAboveThreshold / 2.0)));
+            peakData.PeakWidthPointsMinimum = Math.Min(peakData.PeakWidthPointsMinimum, (int)Math.Ceiling(dataPointCountAboveThreshold / 2.0));
 
             if (peakData.PeakWidthPointsMinimum > peakData.DataCount * 0.8)
             {
-                peakData.PeakWidthPointsMinimum = Convert.ToInt32(Math.Floor(peakData.DataCount * 0.8));
+                peakData.PeakWidthPointsMinimum = (int)Math.Floor(peakData.DataCount * 0.8);
             }
 
             if (peakData.PeakWidthPointsMinimum < MINIMUM_PEAK_WIDTH)
@@ -245,7 +245,7 @@ namespace MagnitudeConcavityPeakFinder
             double maximumPotentialPeakArea = 0;
 
             // Initialize the intensity queue, which is used to keep track of the most recent intensity values
-            var queIntensityList = new Queue();
+            var queIntensityList = new Queue<double>();
 
             double potentialPeakArea = 0;
             dataPointCountAboveThreshold = 0;
@@ -267,7 +267,7 @@ namespace MagnitudeConcavityPeakFinder
                 if (queIntensityList.Count >= peakFinderOptions.InitialPeakWidthScansMaximum)
                 {
                     // Decrement potentialPeakArea by the oldest item in the queue
-                    potentialPeakArea -= Convert.ToDouble(queIntensityList.Dequeue());
+                    potentialPeakArea -= queIntensityList.Dequeue();
                 }
 
                 // Add this intensity to the queue
@@ -331,7 +331,7 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             // The queue is used to keep track of the most recent intensity values
-            var queIntensityList = new Queue();
+            var queIntensityList = new Queue<double>();
             double potentialPeakArea = 0;
             var validPeakCount = 0;
 
@@ -354,7 +354,7 @@ namespace MagnitudeConcavityPeakFinder
                 {
                     // Decrement potentialPeakArea by the oldest item in the queue
                     // If that item is >= .MinimumBaselineNoiseLevel, then decrement validPeakCount too
-                    var dblOldestIntensity = Convert.ToDouble(queIntensityList.Dequeue());
+                    var dblOldestIntensity = queIntensityList.Dequeue();
 
                     if (dblOldestIntensity >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel && dblOldestIntensity > 0)
                     {
@@ -807,7 +807,7 @@ namespace MagnitudeConcavityPeakFinder
             // Store the smoothed data in the data container
             peakData.SetSmoothedData(smoothedYData);
 
-            var peakDetectIntensityThresholdPercentageOfMaximum = Convert.ToInt32(peakFinderOptions.IntensityThresholdFractionMax * 100);
+            var peakDetectIntensityThresholdPercentageOfMaximum = (int)(peakFinderOptions.IntensityThresholdFractionMax * 100);
             const int peakWidthInSigma = 2;
             const bool useValleysForPeakWidth = true;
             const bool movePeakLocationToMaxIntensity = true;
@@ -1088,7 +1088,7 @@ namespace MagnitudeConcavityPeakFinder
             // Validate that peakWidthPointsMinimum is large enough
             if (butterWorthFrequency > 0)
             {
-                var peakWidthPointsCompare = Convert.ToInt32(Math.Round(1 / butterWorthFrequency, 0));
+                var peakWidthPointsCompare = (int)Math.Round(1 / butterWorthFrequency, 0);
                 if (peakWidthPointsMinimum < peakWidthPointsCompare)
                 {
                     peakWidthPointsMinimum = peakWidthPointsCompare;
@@ -1109,7 +1109,7 @@ namespace MagnitudeConcavityPeakFinder
             errorMessage = string.Empty;
 
             // Filter the data with a Savitzky Golay filter
-            var intFilterThirdWidth = Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / 3.0));
+            var intFilterThirdWidth = (int)Math.Floor(peakWidthPointsMinimum / 3.0);
             if (intFilterThirdWidth > 3)
                 intFilterThirdWidth = 3;
 

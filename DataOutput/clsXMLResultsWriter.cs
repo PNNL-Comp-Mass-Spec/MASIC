@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 using MASIC.DatasetStats;
@@ -98,7 +99,7 @@ namespace MASIC.DataOutput
                         int scanDelta = sicScanNumbers[scanIndex] - sicScanNumbers[scanIndex - 1];
                         // When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
                         // However, for MRM data, field size can be much larger
-                        SICDataScanIntervals[scanIndex] = Convert.ToByte(Math.Min(byte.MaxValue, scanDelta));
+                        SICDataScanIntervals[scanIndex] = (byte)Math.Min(byte.MaxValue, scanDelta);
                     }
                 }
 
@@ -162,8 +163,8 @@ namespace MASIC.DataOutput
                     if (currentParentIon.CustomSICPeak)
                     {
                         writer.WriteElementString("CustomSICPeakComment", currentParentIon.CustomSICPeakComment);
-                        writer.WriteElementString("CustomSICPeakMZToleranceDa", currentParentIon.CustomSICPeakMZToleranceDa.ToString());
-                        writer.WriteElementString("CustomSICPeakScanTolerance", currentParentIon.CustomSICPeakScanOrAcqTimeTolerance.ToString());
+                        writer.WriteElementString("CustomSICPeakMZToleranceDa", currentParentIon.CustomSICPeakMZToleranceDa.ToString(CultureInfo.InvariantCulture));
+                        writer.WriteElementString("CustomSICPeakScanTolerance", currentParentIon.CustomSICPeakScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture));
                         writer.WriteElementString("CustomSICPeakScanToleranceType", mOptions.CustomSICList.ScanToleranceType.ToString());
                     }
 
@@ -197,7 +198,7 @@ namespace MASIC.DataOutput
                     writer.WriteElementString("PeakBaselineNoiseLevel", StringUtilities.ValueToString(noiseStats.NoiseLevel, 5));
                     writer.WriteElementString("PeakBaselineNoiseStDev", StringUtilities.ValueToString(noiseStats.NoiseStDev, 3));
                     writer.WriteElementString("PeakBaselinePointsUsed", noiseStats.PointsUsed.ToString());
-                    writer.WriteElementString("NoiseThresholdModeUsed", Convert.ToInt32(noiseStats.NoiseThresholdModeUsed).ToString());
+                    writer.WriteElementString("NoiseThresholdModeUsed", ((int)noiseStats.NoiseThresholdModeUsed).ToString());
 
                     var statMoments = sicStatsPeak.StatisticalMoments;
 
@@ -246,11 +247,11 @@ namespace MASIC.DataOutput
                                 }
                                 else if (SICDataScanIntervals[scanIntervalIndex] <= 35)
                                 {
-                                    scanIntervalList += Convert.ToString((char)(SICDataScanIntervals[scanIntervalIndex] + 55));     // 55 = -10 + 65
+                                    scanIntervalList += ((char)(SICDataScanIntervals[scanIntervalIndex] + 55)).ToString();     // 55 = -10 + 65
                                 }
                                 else if (SICDataScanIntervals[scanIntervalIndex] <= 61)
                                 {
-                                    scanIntervalList += Convert.ToString((char)(SICDataScanIntervals[scanIntervalIndex] + 61));     // 61 = -36 + 97
+                                    scanIntervalList += ((char)(SICDataScanIntervals[scanIntervalIndex] + 61)).ToString();     // 61 = -36 + 97
                                 }
                                 else
                                 {
@@ -366,7 +367,7 @@ namespace MASIC.DataOutput
                                 if (smoothedYDataSubset.Data != null && smoothedYDataSubset.DataCount > 0)
                                 {
                                     for (int index = 0; index <= smoothedYDataSubset.DataCount - 1; index++)
-                                        sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString() + ",");
+                                        sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString(CultureInfo.InvariantCulture) + ",");
 
                                     // Trim the trailing comma
                                     sbPeakYDataSmoothed.Length -= 1;
@@ -661,7 +662,7 @@ namespace MASIC.DataOutput
                 work = work.Substring(0, charIndex);
                 if (clsUtilities.IsNumber(work))
                 {
-                    currentValue = Convert.ToInt32(work);
+                    currentValue = int.Parse(work);
 
                     if (newValueToSave != currentValue)
                     {
@@ -729,7 +730,7 @@ namespace MASIC.DataOutput
                                     work = work.Substring(0, charIndex);
                                     if (clsUtilities.IsNumber(work))
                                     {
-                                        parentIonIndex = Convert.ToInt32(work);
+                                        parentIonIndex = int.Parse(work);
                                         parentIonsProcessed += 1;
 
                                         // Update progress
@@ -737,7 +738,7 @@ namespace MASIC.DataOutput
                                         {
                                             if (parentIonsProcessed % 100 == 0)
                                             {
-                                                UpdateProgress(Convert.ToInt16(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
+                                                UpdateProgress((short)(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
                                             }
                                         }
                                         else

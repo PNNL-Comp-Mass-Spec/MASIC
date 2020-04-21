@@ -377,8 +377,8 @@ namespace MASIC
                                                                            "ReporterIonStatsEnabled",
                                                                            ReporterIons.ReporterIonStatsEnabled);
 
-                    var eReporterIonMassMode = (clsReporterIons.eReporterIonMassModeConstants)Convert.ToInt32(reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode",
-                                               Convert.ToInt32(ReporterIons.ReporterIonMassMode)));
+                    var eReporterIonMassMode = (clsReporterIons.eReporterIonMassModeConstants)reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", (int)ReporterIons.ReporterIonMassMode);
 
                     ReporterIons.ReporterIonToleranceDaDefault = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
                                                                                  "ReporterIonToleranceDa",
@@ -388,12 +388,11 @@ namespace MASIC
                                                                                        "ReporterIonApplyAbundanceCorrection",
                                                                                        ReporterIons.ReporterIonApplyAbundanceCorrection);
 
-                    var eReporterIonITraq4PlexCorrectionFactorType = (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)Convert.ToInt32(reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                     "ReporterIonITraq4PlexCorrectionFactorType",
-                                                                     Convert.ToInt32(ReporterIons.ReporterIonITraq4PlexCorrectionFactorType)));
-
-                    ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
-                        eReporterIonITraq4PlexCorrectionFactorType;
+                    ReporterIons.ReporterIonITraq4PlexCorrectionFactorType = 
+                        (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)reader.GetParam(
+                            XML_SECTION_EXPORT_OPTIONS, 
+                            "ReporterIonITraq4PlexCorrectionFactorType", 
+                            (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType); ;
 
                     ReporterIons.ReporterIonSaveObservedMasses = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
                                                                                  "ReporterIonSaveObservedMasses",
@@ -411,9 +410,11 @@ namespace MASIC
                                                                          "ExportRawSpectraData",
                                                                          RawDataExportOptions.ExportEnabled);
 
-                    RawDataExportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)Convert.ToInt32(reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                      "ExportRawDataFileFormat",
-                                                      Convert.ToInt32(RawDataExportOptions.FileFormat)));
+                    RawDataExportOptions.FileFormat = 
+                        (clsRawDataExportOptions.eExportRawDataFileFormatConstants)reader.GetParam(
+                            XML_SECTION_EXPORT_OPTIONS, 
+                            "ExportRawDataFileFormat", 
+                            (int)RawDataExportOptions.FileFormat);
 
                     RawDataExportOptions.IncludeMSMS = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
                                                                        "ExportRawDataIncludeMSMS",
@@ -521,8 +522,10 @@ namespace MASIC
 
                     // Peak Finding Options
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode =
-                        (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode",
-                            Convert.ToInt32(SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode)));
+                        (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)reader.GetParam(
+                            XML_SECTION_SIC_OPTIONS, 
+                            "SICNoiseThresholdMode", 
+                            (int)SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode);
 
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute =
                         reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity",
@@ -584,8 +587,10 @@ namespace MASIC
                                                                   SICOptions.SaveSmoothedData);
 
                     SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode =
-                        (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode",
-                            Convert.ToInt32(SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode)));
+                        (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)reader.GetParam(
+                            XML_SECTION_SIC_OPTIONS, 
+                            "MassSpectraNoiseThresholdMode",
+                            (int)SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode);
 
                     SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute =
                         reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity",
@@ -686,12 +691,12 @@ namespace MASIC
                 {
                     if (CustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
                     {
-                        CustomSICList.ScanOrAcqTimeTolerance = Convert.ToInt32(scanTolerance);
+                        CustomSICList.ScanOrAcqTimeTolerance = int.Parse(scanTolerance);
                     }
                     else
                     {
                         // Includes .Relative and .AcquisitionTime
-                        CustomSICList.ScanOrAcqTimeTolerance = Convert.ToSingle(scanTolerance);
+                        CustomSICList.ScanOrAcqTimeTolerance = float.Parse(scanTolerance);
                     }
                 }
                 else

@@ -38,7 +38,7 @@ namespace MASIC
             string inputFilePathFull,
             string outputDirectoryPath)
         {
-            const char cColDelimiter = '\t';
+            const char TAB_DELIMITER = '\t';
 
             string outputFilePath = "??";
 
@@ -149,13 +149,13 @@ namespace MASIC
                             }
                             else
                             {
-                                mzValue = Convert.ToInt32(reporterIon.MZ).ToString();
+                                mzValue = ((int)Math.Round(reporterIon.MZ, 0)).ToString();
                             }
 
                             if (reporterIonMZsUnique.Contains(mzValue))
                             {
                                 // Uniquify the m/z value
-                                mzValue += "_" + reporterIonIndex.ToString();
+                                mzValue += "_" + reporterIonIndex;
                             }
 
                             try
@@ -210,7 +210,7 @@ namespace MASIC
                     }
 
                     // Write the headers to the output file, separated by tabs
-                    writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), headerColumns));
+                    writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerColumns));
 
                     UpdateProgress(0, "Searching for reporter ions");
 
@@ -233,13 +233,13 @@ namespace MASIC
                             scanList.FragScans[scanPointer],
                             writer,
                             reporterIons,
-                            cColDelimiter,
+                            TAB_DELIMITER,
                             saveUncorrectedIntensities,
                             mOptions.ReporterIons.ReporterIonSaveObservedMasses);
 
                         if (scanList.MasterScanOrderCount > 1)
                         {
-                            UpdateProgress(Convert.ToInt16(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
+                            UpdateProgress((short)(masterOrderIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
                         }
                         else
                         {
@@ -286,7 +286,7 @@ namespace MASIC
         /// <param name="currentScan"></param>
         /// <param name="writer"></param>
         /// <param name="reporterIons"></param>
-        /// <param name="cColDelimiter"></param>
+        /// <param name="delimiter"></param>
         /// <param name="saveUncorrectedIntensities"></param>
         /// <param name="saveObservedMasses"></param>
         /// <remarks></remarks>
@@ -300,7 +300,7 @@ namespace MASIC
             clsScanInfo currentScan,
             TextWriter writer,
             IList<clsReporterIonInfo> reporterIons,
-            char cColDelimiter,
+            char delimiter,
             bool saveUncorrectedIntensities,
             bool saveObservedMasses)
         {
@@ -460,7 +460,7 @@ namespace MASIC
                 }
             }
 
-            // Now construct the string of intensity values, delimited by cColDelimiter
+            // Now construct the string of intensity values, delimited by delimiter
             // Will also compute the percent change in intensities
 
             // Initialize the variables used to compute the weighted average percent change
@@ -536,7 +536,7 @@ namespace MASIC
             float weightedAvgPctIntensityCorrection;
             if (originalIntensitySum > 0)
             {
-                weightedAvgPctIntensityCorrection = Convert.ToSingle(pctChangeSum / originalIntensitySum * 100);
+                weightedAvgPctIntensityCorrection = (float)(pctChangeSum / originalIntensitySum * 100);
             }
             else
             {
@@ -577,7 +577,7 @@ namespace MASIC
                 //    dataColumns.AddRange(ftmsLabelDataMz)
             }
 
-            writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
+            writer.WriteLine(string.Join(delimiter.ToString(), dataColumns));
         }
 
         protected class clsReportIonInfoComparer : IComparer

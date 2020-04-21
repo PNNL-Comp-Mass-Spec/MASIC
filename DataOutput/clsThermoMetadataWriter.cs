@@ -65,7 +65,7 @@ namespace MASIC.DataOutput
             XRawFileIO objXcaliburAccessor,
             clsDataOutput dataOutputHandler)
         {
-            const char cColDelimiter = '\t';
+            const char TAB_DELIMITER = '\t';
 
             int tuneMethodCount;
             string outputFilePath = "?UndefinedFile?";
@@ -97,10 +97,10 @@ namespace MASIC.DataOutput
 
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
-                        writer.WriteLine("Category" + cColDelimiter + "Name" + cColDelimiter + "Value");
+                        writer.WriteLine("Category" + TAB_DELIMITER + "Name" + TAB_DELIMITER + "Value");
 
                         foreach (udtTuneMethodSetting setting in objXcaliburAccessor.FileInfo.TuneMethods[index].Settings)
-                            writer.WriteLine(setting.Category + cColDelimiter + setting.Name + cColDelimiter + setting.Value);
+                            writer.WriteLine(setting.Category + TAB_DELIMITER + setting.Name + TAB_DELIMITER + setting.Value);
                         writer.WriteLine();
                     }
                 }

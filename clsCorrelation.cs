@@ -246,14 +246,14 @@ namespace MASIC
                     mBinningOptions.EndX = mBinningOptions.StartX + mBinningOptions.BinSize * 10;
                 }
 
-                int binCount = Convert.ToInt32((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
+                int binCount = (int)((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
                 if (binCount < 1)
                     binCount = 1;
 
                 if (binCount > mBinningOptions.MaximumBinCount)
                 {
                     mBinningOptions.BinSize = (mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.MaximumBinCount;
-                    binCount = Convert.ToInt32((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
+                    binCount = (int)((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
                 }
 
                 bin2Offset = mBinningOptions.BinSize / 2;
@@ -333,13 +333,13 @@ namespace MASIC
                     if (intensityQuantizationValue <= 0)
                         intensityQuantizationValue = 1;
                     if (intensityQuantizationValue > 1)
-                        intensityQuantizationValue = Convert.ToSingle(Math.Round(intensityQuantizationValue, 0));
+                        intensityQuantizationValue = (float)(Math.Round(intensityQuantizationValue, 0));
 
                     for (index = 0; index <= binCount - 1; index++)
                     {
                         if (Math.Abs(binnedYData[index]) > float.Epsilon)
                         {
-                            binnedYData[index] = Convert.ToSingle(Math.Round(binnedYData[index] / intensityQuantizationValue, 0)) * intensityQuantizationValue;
+                            binnedYData[index] = (float)(Math.Round(binnedYData[index] / intensityQuantizationValue, 0)) * intensityQuantizationValue;
                         }
                     }
                 }
@@ -502,16 +502,16 @@ namespace MASIC
                 sxy += xt * yt;
             }
 
-            RValue = Convert.ToSingle(sxy / (Math.Sqrt(sxx * syy) + TINY));
+            RValue = (float)(sxy / (Math.Sqrt(sxx * syy) + TINY));
 
             // Fisher's z transformation
-            FishersZ = Convert.ToSingle(0.5 * Math.Log((1.0 + RValue + TINY) / (1.0 - RValue + TINY)));
+            FishersZ = (float)(0.5 * Math.Log((1.0 + RValue + TINY) / (1.0 - RValue + TINY)));
             df = n - 2;
 
             t = RValue * Math.Sqrt(df / ((1.0 - RValue + TINY) * (1.0 + RValue + TINY)));
 
             // Student's t probability
-            ProbOfSignificance = Convert.ToSingle(BetaI(0.5 * df, 0.5, df / (df + t * t)));
+            ProbOfSignificance = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
         }
 
         private void CorrelateKendall(
@@ -582,11 +582,11 @@ namespace MASIC
                 }
             }
 
-            KendallsTau = Convert.ToSingle(intIS / (Math.Sqrt(n1) * Math.Sqrt(n2)));
+            KendallsTau = (float)(intIS / (Math.Sqrt(n1) * Math.Sqrt(n2)));
 
             svar = (4.0 * n + 10.0) / (9.0 * n * (n - 1.0));
-            Z = Convert.ToSingle(KendallsTau / Math.Sqrt(svar));
-            ProbOfSignificance = Convert.ToSingle(ErfCC(Math.Abs(Z) / 1.4142136));
+            Z = (float)(KendallsTau / Math.Sqrt(svar));
+            ProbOfSignificance = (float)(ErfCC(Math.Abs(Z) / 1.4142136));
         }
 
         private void CorrelateSpearman(
@@ -650,7 +650,7 @@ namespace MASIC
             for (j = 0; j <= n - 1; j++)
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
 
-            DiffInRanks = Convert.ToSingle(DiffInRanksWork);
+            DiffInRanks = (float)(DiffInRanksWork);
 
             en = n;
 
@@ -658,10 +658,10 @@ namespace MASIC
             AvgD = en3n / 6.0 - (sf + sg) / 12.0;
             fac = (1.0 - sf / en3n) * (1.0 - sg / en3n);
             vard = (en - 1.0) * en * en * SquareNum(en + 1.0) / 36.0 * fac;
-            ZD = Convert.ToSingle((DiffInRanks - AvgD) / Math.Sqrt(vard));
+            ZD = (float)((DiffInRanks - AvgD) / Math.Sqrt(vard));
 
-            ProbOfSignificance = Convert.ToSingle(ErfCC(Math.Abs(ZD) / 1.4142136));
-            RS = Convert.ToSingle((1.0 - 6.0 / en3n * (DiffInRanks + (sf + sg) / 12.0)) / Math.Sqrt(fac));
+            ProbOfSignificance = (float)(ErfCC(Math.Abs(ZD) / 1.4142136));
+            RS = (float)((1.0 - 6.0 / en3n * (DiffInRanks + (sf + sg) / 12.0)) / Math.Sqrt(fac));
 
             fac = (RS + 1.0) * (1.0 - RS);
 
@@ -669,7 +669,7 @@ namespace MASIC
             {
                 t = RS * Math.Sqrt((en - 2.0) / fac);
                 df = en - 2.0;
-                ProbRS = Convert.ToSingle(BetaI(0.5 * df, 0.5, df / (df + t * t)));
+                ProbRS = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
             }
             else
             {
@@ -816,7 +816,7 @@ namespace MASIC
             // actually gives the bin
             // For example, given WorkingValue = 0.28 and BinSize = 0.1, Bin = CInt(Round(2.8,0)) = 3
             // Or, given WorkingValue = 30.83 and BinSize = 0.1, Bin = CInt(Round(308.3,0)) = 308
-            return Convert.ToInt32(Math.Round(workingValue / histogramBinSize, 0));
+            return (int)(Math.Round(workingValue / histogramBinSize, 0));
         }
     }
 }

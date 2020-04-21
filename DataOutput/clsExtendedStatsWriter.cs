@@ -142,7 +142,7 @@ namespace MASIC.DataOutput
         /// <param name="nonConstantHeaderIDs">Output: the ID values of the header values that are not constant</param>
         /// <param name="surveyScans"></param>
         /// <param name="fragScans"></param>
-        /// <param name="cColDelimiter"></param>
+        /// <param name="delimiter"></param>
         /// <returns>
         /// String that is a newline separated list of header values that are constant, tab delimited, and their constant values, also tab delimited
         /// Each line is in the form ParameterName_ColumnDelimiter_ParameterValue
@@ -152,7 +152,7 @@ namespace MASIC.DataOutput
             out List<int> nonConstantHeaderIDs,
             IList<clsScanInfo> surveyScans,
             IList<clsScanInfo> fragScans,
-            char cColDelimiter)
+            char delimiter)
         {
             var cTrimChars = new char[] { ':', ' ' };
 
@@ -273,7 +273,7 @@ namespace MASIC.DataOutput
 
             var consolidatedValueList = new List<string>()
             {
-                "Setting" + cColDelimiter + "Value"
+                "Setting" + delimiter + "Value"
             };
 
             foreach (var item in consolidatedValuesByID)
@@ -287,7 +287,7 @@ namespace MASIC.DataOutput
                 {
                     if (item.Value == headerId)
                     {
-                        consolidatedValueList.Add(item.Key.TrimEnd(cTrimChars) + cColDelimiter + consolidatedValuesByID[headerId]);
+                        consolidatedValueList.Add(item.Key.TrimEnd(cTrimChars) + delimiter + consolidatedValuesByID[headerId]);
                         keysToRemove.Add(item.Key);
                         break;
                     }
@@ -362,7 +362,7 @@ namespace MASIC.DataOutput
             string extendedConstantHeaderOutputFilePath;
             string extendedNonConstantHeaderOutputFilePath = string.Empty;
 
-            const char cColDelimiter = '\t';
+            const char TAB_DELIMITER = '\t';
 
             List<int> nonConstantHeaderIDs = null;
 
@@ -384,7 +384,7 @@ namespace MASIC.DataOutput
 
                 // Lookup extended stats values that are constants for all scans
                 // The following will also remove the constant header values from mExtendedHeaderNameMap
-                string constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(out nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, cColDelimiter);
+                string constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(out nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, TAB_DELIMITER);
                 if (constantExtendedHeaderValues == null)
                     constantExtendedHeaderValues = string.Empty;
 
@@ -400,7 +400,7 @@ namespace MASIC.DataOutput
                     if (includeHeaders)
                     {
                         var headerNames = ConstructExtendedStatsHeaders();
-                        writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), headerNames));
+                        writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
                     }
 
                     for (int scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
@@ -408,11 +408,11 @@ namespace MASIC.DataOutput
                         var currentScan = GetScanByMasterScanIndex(scanList, scanIndex);
 
                         var dataColumns = ConcatenateExtendedStats(nonConstantHeaderIDs, mOptions.SICOptions.DatasetID, currentScan.ScanNumber, currentScan.ExtendedHeaderInfo);
-                        writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
+                        writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
 
                         if (scanIndex % 100 == 0)
                         {
-                            UpdateProgress(Convert.ToInt16(scanIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
+                            UpdateProgress((short)(scanIndex / (double)(scanList.MasterScanOrderCount - 1) * 100));
                         }
                     }
                 }

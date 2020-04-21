@@ -102,7 +102,7 @@ namespace MASIC.DataOutput
 
             string outputFilePath = string.Empty;
 
-            const char cColDelimiter = '\t';
+            const char TAB_DELIMITER = '\t';
 
             int[] scanListArray = null;
 
@@ -125,7 +125,7 @@ namespace MASIC.DataOutput
 
                     if (masicOptions.IncludeHeadersInExportFile)
                     {
-                        writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, cColDelimiter));
+                        writer.WriteLine(dataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile, TAB_DELIMITER));
                     }
 
                     if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
@@ -139,7 +139,7 @@ namespace MASIC.DataOutput
                             var surveyScanNumber = default(int);
                             var surveyScanTime = default(float);
 
-                            WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList,
+                            WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
                                                        fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
                                                        0, includeScanTimesInSICStatsFile);
                         }
@@ -178,7 +178,7 @@ namespace MASIC.DataOutput
                                         surveyScanTime = 0;
                                     }
 
-                                    WriteSICStatsFlatFileEntry(writer, cColDelimiter, masicOptions.SICOptions, scanList,
+                                    WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
                                                                parentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
                                                                fragScanIndex, includeScanTimesInSICStatsFile);
                                 }
@@ -188,7 +188,7 @@ namespace MASIC.DataOutput
                             {
                                 if (parentIonIndex % 100 == 0)
                                 {
-                                    UpdateProgress(Convert.ToInt16(parentIonIndex / (double)(scanList.ParentIons.Count - 1) * 100));
+                                    UpdateProgress((short)(parentIonIndex / (double)(scanList.ParentIons.Count - 1) * 100));
                                 }
                             }
                             else
@@ -237,7 +237,7 @@ namespace MASIC.DataOutput
 
         private void WriteSICStatsFlatFileEntry(
             TextWriter sicStatsWriter,
-            char cColDelimiter,
+            char delimiter,
             clsSICOptions sicOptions,
             clsScanList scanList,
             clsParentIonInfo parentIon,
@@ -344,7 +344,7 @@ namespace MASIC.DataOutput
                 dataValues.Add(StringUtilities.DblToString(optimalPeakApexScanTime, 5));   // OptimalPeakApexScanTime
             }
 
-            sicStatsWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataValues));
+            sicStatsWriter.WriteLine(string.Join(delimiter.ToString(), dataValues));
         }
     }
 }

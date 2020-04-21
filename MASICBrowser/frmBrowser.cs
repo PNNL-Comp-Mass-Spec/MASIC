@@ -21,6 +21,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Timers;
@@ -235,7 +236,7 @@ namespace MASICBrowser
 
             try
             {
-                eSortOrder = (eSortOrderConstants)Convert.ToInt32(cboSortOrder.SelectedIndex);
+                eSortOrder = (eSortOrderConstants)cboSortOrder.SelectedIndex;
 
                 switch (eSortOrder)
                 {
@@ -295,7 +296,7 @@ namespace MASICBrowser
                 // Display the SIC and SIC Peak stats
                 var ionStats = mParentIonStats[parentIonIndex];
                 statDetails = string.Empty;
-                statDetails += "Index: " + ionStats.Index.ToString();
+                statDetails += "Index: " + ionStats.Index;
                 if (ionStats.OptimalPeakApexScanNumber == ionStats.SICStats.ScanNumberMaxIntensity)
                 {
                     statDetails += Environment.NewLine + "Scan at apex: " + ionStats.SICStats.ScanNumberMaxIntensity;
@@ -307,7 +308,7 @@ namespace MASICBrowser
 
                 if (validPeakFound)
                 {
-                    statDetails += Environment.NewLine + "Center of mass: " + sicStats.Peak.StatisticalMoments.CenterOfMassScan.ToString();
+                    statDetails += Environment.NewLine + "Center of mass: " + sicStats.Peak.StatisticalMoments.CenterOfMassScan;
                     if (chkShowBaselineCorrectedStats.Checked)
                     {
                         intensityToDisplay = clsMASICPeakFinder.BaselineAdjustIntensity(sicStats.Peak, false);
@@ -321,7 +322,7 @@ namespace MASICBrowser
 
                     statDetails += Environment.NewLine + "Intensity: " + StringUtilities.ValueToString(intensityToDisplay, 4);
                     statDetails += Environment.NewLine + "Area: " + StringUtilities.ValueToString(areaToDisplay, 4);
-                    statDetails += Environment.NewLine + "FWHM: " + sicStats.Peak.FWHMScanWidth.ToString();
+                    statDetails += Environment.NewLine + "FWHM: " + sicStats.Peak.FWHMScanWidth;
                 }
                 else
                 {
@@ -346,7 +347,7 @@ namespace MASICBrowser
 
                     if (sicStats.Peak.SignalToNoiseRatio >= 3)
                     {
-                        statDetails += Environment.NewLine + "S/N: " + Math.Round(sicStats.Peak.SignalToNoiseRatio, 0).ToString();
+                        statDetails += Environment.NewLine + "S/N: " + Math.Round(sicStats.Peak.SignalToNoiseRatio, 0);
                     }
                     else
                     {
@@ -356,8 +357,8 @@ namespace MASICBrowser
                     var noiseStats = sicStats.Peak.BaselineNoiseStats;
                     statDetails += Environment.NewLine + "Noise level: " + StringUtilities.ValueToString(noiseStats.NoiseLevel, 4);
                     statDetails += Environment.NewLine + "Noise StDev: " + StringUtilities.ValueToString(noiseStats.NoiseStDev, 3);
-                    statDetails += Environment.NewLine + "Points used: " + noiseStats.PointsUsed.ToString();
-                    statDetails += Environment.NewLine + "Noise Mode Used: " + noiseStats.NoiseThresholdModeUsed.ToString();
+                    statDetails += Environment.NewLine + "Points used: " + noiseStats.PointsUsed;
+                    statDetails += Environment.NewLine + "Noise Mode Used: " + noiseStats.NoiseThresholdModeUsed;
                 }
 
                 txtStats2.Text = statDetails;
@@ -366,7 +367,7 @@ namespace MASICBrowser
             }
             else
             {
-                txtStats1.Text = "Invalid parent ion index: " + parentIonIndex.ToString();
+                txtStats1.Text = "Invalid parent ion index: " + parentIonIndex;
                 txtStats2.Text = string.Empty;
                 txtStats3.Text = string.Empty;
                 sicStats = new clsSICStats();
@@ -696,59 +697,41 @@ namespace MASICBrowser
             }
         }
 
-        private bool GetSettingVal(string appName, string sectionName, string key, bool DefaultValue)
+        private bool GetSettingVal(string appName, string sectionName, string key, bool defaultValue)
         {
-            string value;
+            var value = Interaction.GetSetting(appName, sectionName, key, defaultValue.ToString());
+            if (bool.TryParse(value, out var parsedValue))
+                return parsedValue;
 
-            value = Interaction.GetSetting(appName, sectionName, key, DefaultValue.ToString());
-            try
-            {
-                return Convert.ToBoolean(value);
-            }
-            catch (Exception ex)
-            {
-                return DefaultValue;
-            }
+            return defaultValue;
         }
 
-        private int GetSettingVal(string appName, string sectionName, string key, int DefaultValue)
+        private int GetSettingVal(string appName, string sectionName, string key, int defaultValue)
         {
-            string value;
+            var value = Interaction.GetSetting(appName, sectionName, key, defaultValue.ToString());
+            if (int.TryParse(value, out var parsedValue))
+                return parsedValue;
 
-            value = Interaction.GetSetting(appName, sectionName, key, DefaultValue.ToString());
-            try
-            {
-                return Convert.ToInt32(value);
-            }
-            catch (Exception ex)
-            {
-                return DefaultValue;
-            }
+            return defaultValue;
         }
 
-        private float GetSettingVal(string appName, string sectionName, string key, float DefaultValue)
+        private float GetSettingVal(string appName, string sectionName, string key, float defaultValue)
         {
-            string value;
+            var value = Interaction.GetSetting(appName, sectionName, key, defaultValue.ToString(CultureInfo.InvariantCulture));
+            if (float.TryParse(value, out var parsedValue))
+                return parsedValue;
 
-            value = Interaction.GetSetting(appName, sectionName, key, DefaultValue.ToString());
-            try
-            {
-                return Convert.ToSingle(value);
-            }
-            catch (Exception ex)
-            {
-                return DefaultValue;
-            }
+            return defaultValue;
         }
 
         private double GetSortKey(int value1, int value2)
         {
-            return Convert.ToDouble(value1.ToString() + "." + value2.ToString("000000"));
+            return double.Parse(value1 + "." + value2.ToString("000000"));
         }
 
         private double GetSortKey(int value1, double value2)
         {
-            return Convert.ToDouble(value1.ToString() + "." + value2.ToString("000000"));
+            return double.Parse(value1 + "." + value2.ToString("000000"));
         }
 
         private void InitializeControls()
@@ -877,7 +860,7 @@ namespace MASICBrowser
                 else
                 {
                     deltaX = X2 - X1;
-                    fraction = (targetX - X1) / Convert.ToDouble(deltaX);
+                    fraction = (targetX - X1) / (double)deltaX;
                     deltaY = Y2 - Y1;
 
                     targetY = fraction * deltaY + Y1;
@@ -917,10 +900,10 @@ namespace MASICBrowser
                             scanNumberToFind = mParentIonStats[0].FragScanObserved;
                         }
 
-                        string eResponse = Interaction.InputBox("Enter the scan number to jump to: ", "Jump to Scan", scanNumberToFind.ToString());
-                        if (PRISM.DataUtils.StringToValueUtils.IsNumber(eResponse))
+                        string response = Interaction.InputBox("Enter the scan number to jump to: ", "Jump to Scan", scanNumberToFind.ToString());
+                        if (PRISM.DataUtils.StringToValueUtils.IsNumber(response))
                         {
-                            scanNumberToFind = Convert.ToInt32(eResponse);
+                            scanNumberToFind = int.Parse(response);
                         }
                     }
 
@@ -993,14 +976,14 @@ namespace MASICBrowser
 
             try
             {
-                objRows = resultTable.Select(COL_NAME_PARENT_ION_INDEX + " = " + parentIonIndex.ToString());
+                objRows = resultTable.Select(COL_NAME_PARENT_ION_INDEX + " = " + parentIonIndex);
                 sequenceCount = 0;
                 foreach (DataRow objRow in objRows)
                 {
-                    sequenceID = Convert.ToInt32(objRow[COL_NAME_SEQUENCE_ID]);
+                    sequenceID = (int)objRow[COL_NAME_SEQUENCE_ID];
                     try
                     {
-                        objSeqRows = mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Select(COL_NAME_SEQUENCE_ID + " = " + sequenceID.ToString());
+                        objSeqRows = mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Select(COL_NAME_SEQUENCE_ID + " = " + sequenceID);
 
                         if (objSeqRows != null && objSeqRows.Length > 0)
                         {
@@ -1009,17 +992,17 @@ namespace MASICBrowser
                                 sequences += Environment.NewLine;
                             }
 
-                            sequences += Convert.ToString(objSeqRows[0][COL_NAME_SEQUENCE]);
+                            sequences += objSeqRows[0][COL_NAME_SEQUENCE].ToString();
                             sequenceCount += 1;
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         // Ignore errors here
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 sequences = string.Empty;
             }
@@ -1040,20 +1023,22 @@ namespace MASICBrowser
             sequenceID = -1;
             if (sequence != null)
             {
-                if (sequence.Length >= 4)
+                var trimmedSequence = sequence.Trim();
+
+                if (trimmedSequence.Length >= 4)
                 {
-                    if (sequence.Substring(1, 1) == Convert.ToString('.') && sequence.Substring(sequence.Length - 2, 1) == Convert.ToString('.'))
+                    if (trimmedSequence.Substring(1, 1).Equals(".") && trimmedSequence.Substring(trimmedSequence.Length - 2, 1).Equals("."))
                     {
-                        sequenceNoSuffixes = sequence.Substring(2, sequence.Length - 4);
+                        sequenceNoSuffixes = trimmedSequence.Substring(2, trimmedSequence.Length - 4);
                     }
                     else
                     {
-                        sequenceNoSuffixes = string.Copy(sequence);
+                        sequenceNoSuffixes = string.Copy(trimmedSequence);
                     }
                 }
                 else
                 {
-                    sequenceNoSuffixes = string.Copy(sequence);
+                    sequenceNoSuffixes = string.Copy(trimmedSequence);
                 }
 
                 // Try to add sequenceNoSuffixes to .Tables(TABLE_NAME_SEQUENCES)
@@ -1068,7 +1053,7 @@ namespace MASICBrowser
                         sequencesTable.Rows.Add(objNewRow);
                     }
 
-                    sequenceID = Convert.ToInt32(objNewRow[COL_NAME_SEQUENCE_ID]);
+                    sequenceID = (int)objNewRow[COL_NAME_SEQUENCE_ID];
 
                     if (sequenceID >= 0)
                     {
@@ -1084,13 +1069,13 @@ namespace MASICBrowser
                                 seqProtMapTable.Rows.Add(objNewRow);
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             // Ignore errors here
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     sequenceID = -1;
                 }
@@ -1410,7 +1395,7 @@ namespace MASICBrowser
                 int xRangeHalfWidth;
                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixXRange.Text))
                 {
-                    xRangeHalfWidth = Convert.ToInt32(Convert.ToInt32(txtFixXRange.Text) / (double)2);
+                    xRangeHalfWidth = (int)(int.Parse(txtFixXRange.Text) / 2.0);
                 }
                 else
                 {
@@ -1420,7 +1405,7 @@ namespace MASICBrowser
                 double yRange;
                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixYRange.Text))
                 {
-                    yRange = Convert.ToDouble(txtFixYRange.Text);
+                    yRange = double.Parse(txtFixYRange.Text);
                 }
                 else
                 {
@@ -1543,7 +1528,7 @@ namespace MASICBrowser
                     {
                         {
                             var ionStats = mParentIonStats[mParentIonPointerArray[index]];
-                            parentIonDesc = "Scan " + ionStats.FragScanObserved.ToString() + "  (" + Math.Round(ionStats.MZ, 4).ToString() + " m/z)";
+                            parentIonDesc = "Scan " + ionStats.FragScanObserved + "  (" + Math.Round(ionStats.MZ, 4) + " m/z)";
                             lstParentIonData.Items.Add(parentIonDesc);
                         }
                     }
@@ -1687,8 +1672,8 @@ namespace MASICBrowser
                                             var newParentIon = new clsParentIonStats()
                                             {
                                                 Index = int.Parse(indexInXMLFile),
-                                                MZ = (double)0,
-                                                SICIntensityMax = (double)0
+                                                MZ = 0.0,
+                                                SICIntensityMax = 0.0
                                             };
 
                                             var sicStats = newParentIon.SICStats;
@@ -1696,7 +1681,7 @@ namespace MASICBrowser
                                             var sicStatsPeak = sicStats.Peak;
                                             sicStatsPeak.IndexBaseLeft = -1;
                                             sicStatsPeak.IndexBaseRight = -1;
-                                            sicStatsPeak.MaxIntensityValue = (double)0;
+                                            sicStatsPeak.MaxIntensityValue = 0.0;
                                             sicStatsPeak.ShoulderCount = 0;
 
                                             mParentIonStats.Add(newParentIon);
@@ -1704,8 +1689,8 @@ namespace MASICBrowser
 
                                             // Update the progress bar
                                             percentComplete = (double)reader.BaseStream.Position / (double)reader.BaseStream.Length;
-                                            if (percentComplete > (double)1)
-                                                percentComplete = (double)1;
+                                            if (percentComplete > 1.0)
+                                                percentComplete = 1.0;
 
                                             objProgress.UpdateProgressBar(percentComplete);
                                             Application.DoEvents();
@@ -1771,7 +1756,7 @@ namespace MASICBrowser
                                             {
                                                 if (char.IsNumber(scanIntervals[charIndex]))
                                                 {
-                                                    interval = Convert.ToInt32(scanIntervals.Substring(charIndex, 1));
+                                                    interval = int.Parse(scanIntervals.Substring(charIndex, 1));
                                                 }
                                                 else if (char.IsUpper(scanIntervals[charIndex]))
                                                 {
@@ -1805,11 +1790,11 @@ namespace MASICBrowser
                                             {
                                                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(valueList[index]))
                                                 {
-                                                    sicIntensities.Add(Convert.ToDouble(valueList[index]));
+                                                    sicIntensities.Add(double.Parse(valueList[index]));
                                                 }
                                                 else
                                                 {
-                                                    sicIntensities.Add((double)0);
+                                                    sicIntensities.Add(0);
                                                 }
                                             }
                                         }
@@ -1826,11 +1811,11 @@ namespace MASICBrowser
                                             {
                                                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(valueList[index]))
                                                 {
-                                                    sicMasses.Add(Convert.ToDouble(valueList[index]));
+                                                    sicMasses.Add(double.Parse(valueList[index]));
                                                 }
                                                 else
                                                 {
-                                                    sicMasses.Add((double)0);
+                                                    sicMasses.Add(0);
                                                 }
                                             }
                                         }
@@ -1846,7 +1831,7 @@ namespace MASICBrowser
                                                 break;
                                             }
 
-                                            double massValue = (double)0;
+                                            double massValue = 0.0;
                                             if (index < sicMasses.Count)
                                             {
                                                 massValue = sicMasses[index];
@@ -1888,12 +1873,12 @@ namespace MASICBrowser
 
                                                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(valueList[index]))
                                                 {
-                                                    currentParentIon.SICStats.SICSmoothedYData.Add(Convert.ToDouble(valueList[index]));
+                                                    currentParentIon.SICStats.SICSmoothedYData.Add(double.Parse(valueList[index]));
                                                     smoothedDataFound = true;
                                                 }
                                                 else
                                                 {
-                                                    currentParentIon.SICStats.SICSmoothedYData.Add((double)0);
+                                                    currentParentIon.SICStats.SICSmoothedYData.Add(0.0);
                                                 }
                                             }
                                         }
@@ -2008,25 +1993,25 @@ namespace MASICBrowser
                                             switch (objXMLReader.Name)
                                             {
                                                 case "MZ":
-                                                    ionStats.MZ = Math.Round(Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader)), 6);
+                                                    ionStats.MZ = Math.Round(double.Parse(XMLTextReaderGetInnerText(objXMLReader)), 6);
                                                     break;
                                                 case "SurveyScanNumber":
-                                                    ionStats.SurveyScanNumber = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SurveyScanNumber = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "FragScanNumber":
-                                                    ionStats.FragScanObserved = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.FragScanObserved = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "FragScanTime":
-                                                    ionStats.FragScanTime = Convert.ToSingle(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.FragScanTime = float.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "OptimalPeakApexScanNumber":
-                                                    ionStats.OptimalPeakApexScanNumber = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.OptimalPeakApexScanNumber = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "OptimalPeakApexScanTime":
-                                                    ionStats.OptimalPeakApexTime = Convert.ToSingle(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.OptimalPeakApexTime = float.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "CustomSICPeak":
-                                                    ionStats.CustomSICPeak = Convert.ToBoolean(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.CustomSICPeak = bool.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "CustomSICPeakComment":
                                                     ionStats.CustomSICPeakComment = XMLTextReaderGetInnerText(objXMLReader);
@@ -2046,85 +2031,85 @@ namespace MASICBrowser
 
                                                     break;
                                                 case "PeakScanStart":
-                                                    peakScanStart = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    peakScanStart = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakScanEnd":
-                                                    peakScanEnd = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    peakScanEnd = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakScanMaxIntensity":
-                                                    ionStats.SICStats.ScanNumberMaxIntensity = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.ScanNumberMaxIntensity = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakIntensity":
-                                                    ionStats.SICStats.Peak.MaxIntensityValue = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.MaxIntensityValue = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakSignalToNoiseRatio":
-                                                    ionStats.SICStats.Peak.SignalToNoiseRatio = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.SignalToNoiseRatio = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "FWHMInScans":
-                                                    ionStats.SICStats.Peak.FWHMScanWidth = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.FWHMScanWidth = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakArea":
-                                                    ionStats.SICStats.Peak.Area = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.Area = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "ShoulderCount":
-                                                    ionStats.SICStats.Peak.ShoulderCount = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.ShoulderCount = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
 
                                                 case "ParentIonIntensity":
-                                                    ionStats.SICStats.Peak.ParentIonIntensity = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.ParentIonIntensity = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
 
                                                 case "PeakBaselineNoiseLevel":
-                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseLevel = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseLevel = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     baselineNoiseStatsFound = true;
                                                     break;
                                                 case "PeakBaselineNoiseStDev":
-                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseStDev = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseStDev = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakBaselinePointsUsed":
-                                                    ionStats.SICStats.Peak.BaselineNoiseStats.PointsUsed = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.BaselineNoiseStats.PointsUsed = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "NoiseThresholdModeUsed":
-                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = (clsMASICPeakFinder.eNoiseThresholdModes) Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = (clsMASICPeakFinder.eNoiseThresholdModes)int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
 
                                                 case "StatMomentsArea":
-                                                    ionStats.SICStats.Peak.StatisticalMoments.Area = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.StatisticalMoments.Area = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "CenterOfMassScan":
-                                                    ionStats.SICStats.Peak.StatisticalMoments.CenterOfMassScan = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.StatisticalMoments.CenterOfMassScan = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakStDev":
-                                                    ionStats.SICStats.Peak.StatisticalMoments.StDev = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.StatisticalMoments.StDev = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakSkew":
-                                                    ionStats.SICStats.Peak.StatisticalMoments.Skew = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.StatisticalMoments.Skew = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "PeakKSStat":
-                                                    ionStats.SICStats.Peak.StatisticalMoments.KSStat = Convert.ToDouble(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.StatisticalMoments.KSStat = double.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "StatMomentsDataCountUsed":
-                                                    ionStats.SICStats.Peak.StatisticalMoments.DataCountUsed = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.StatisticalMoments.DataCountUsed = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
 
                                                 case "SICScanStart":
-                                                    scanStart = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    scanStart = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "SICScanIntervals":
                                                     scanIntervals = XMLTextReaderGetInnerText(objXMLReader);
                                                     break;
                                                 case "SICPeakIndexStart":
-                                                    ionStats.SICStats.Peak.IndexBaseLeft = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.IndexBaseLeft = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
                                                 case "SICPeakIndexEnd":
-                                                    ionStats.SICStats.Peak.IndexBaseRight = Convert.ToInt32(XMLTextReaderGetInnerText(objXMLReader));
+                                                    ionStats.SICStats.Peak.IndexBaseRight = int.Parse(XMLTextReaderGetInnerText(objXMLReader));
                                                     break;
 
                                                 case "SICDataCount":
                                                     value = XMLTextReaderGetInnerText(objXMLReader);
                                                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(value))
                                                     {
-                                                        expectedSicDataCount = Convert.ToInt32(value);
+                                                        expectedSicDataCount = int.Parse(value);
                                                     }
                                                     else
                                                     {
@@ -2137,7 +2122,7 @@ namespace MASICBrowser
                                                     value = XMLTextReaderGetInnerText(objXMLReader);
                                                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(value))
                                                     {
-                                                        ionStats.SICStats.SICSmoothedYDataIndexStart = Convert.ToInt32(value);
+                                                        ionStats.SICStats.SICSmoothedYDataIndexStart = int.Parse(value);
                                                     }
                                                     else
                                                     {
@@ -2446,8 +2431,8 @@ namespace MASICBrowser
                 chkFilterBySignalToNoise.Checked = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterBySignalToNoise", false);
 
                 txtMinimumIntensity.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", 1000000).ToString();
-                txtFilterByMZ.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", Convert.ToSingle(550)).ToString();
-                txtFilterByMZTol.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", Convert.ToSingle(0.2)).ToString();
+                txtFilterByMZ.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", (float)550).ToString(CultureInfo.InvariantCulture);
+                txtFilterByMZTol.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", (float)0.2).ToString(CultureInfo.InvariantCulture);
 
                 txtAutoStep.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", 150).ToString();
             }
@@ -2476,37 +2461,37 @@ namespace MASICBrowser
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixXRange.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", Convert.ToInt32(txtFixXRange.Text).ToString());
+                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", int.Parse(txtFixXRange.Text).ToString());
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixYRange.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", Convert.ToInt64(txtFixYRange.Text).ToString());
+                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", long.Parse(txtFixYRange.Text).ToString());
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumSignalToNoise.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", Convert.ToSingle(txtMinimumSignalToNoise.Text).ToString());
+                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", float.Parse(txtMinimumSignalToNoise.Text).ToString(CultureInfo.InvariantCulture));
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", Convert.ToInt32(txtMinimumIntensity.Text).ToString());
+                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", int.Parse(txtMinimumIntensity.Text).ToString());
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFilterByMZ.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", Convert.ToSingle(txtFilterByMZ.Text).ToString());
+                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", float.Parse(txtFilterByMZ.Text).ToString(CultureInfo.InvariantCulture));
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFilterByMZTol.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", Convert.ToSingle(txtFilterByMZTol.Text).ToString());
+                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", float.Parse(txtFilterByMZTol.Text).ToString(CultureInfo.InvariantCulture));
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", Convert.ToInt32(txtAutoStep.Text).ToString());
+                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", int.Parse(txtAutoStep.Text).ToString());
                     }
 
                     Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRangeEnabled", chkFixXRange.Checked.ToString());
@@ -2667,7 +2652,7 @@ namespace MASICBrowser
 
             if (cboSortOrder.SelectedIndex >= 0 && cboSortOrder.SelectedIndex < SORT_ORDER_MODE_COUNT)
             {
-                eSortMode = (eSortOrderConstants)Convert.ToInt32(cboSortOrder.SelectedIndex);
+                eSortMode = (eSortOrderConstants)cboSortOrder.SelectedIndex;
             }
             else
             {
@@ -2676,7 +2661,7 @@ namespace MASICBrowser
 
             if (chkFilterByIntensity.Checked && PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text))
             {
-                minimumIntensity = Convert.ToDouble(txtMinimumIntensity.Text);
+                minimumIntensity = double.Parse(txtMinimumIntensity.Text);
             }
             else
             {
@@ -2686,8 +2671,8 @@ namespace MASICBrowser
             if (chkFilterByMZ.Checked && PRISM.DataUtils.StringToValueUtils.IsNumber(txtFilterByMZ.Text) &&
                 PRISM.DataUtils.StringToValueUtils.IsNumber(txtFilterByMZTol.Text))
             {
-                mzFilter = Math.Abs(Convert.ToDouble(txtFilterByMZ.Text));
-                mzFilterTol = Math.Abs(Convert.ToDouble(txtFilterByMZTol.Text));
+                mzFilter = Math.Abs(double.Parse(txtFilterByMZ.Text));
+                mzFilterTol = Math.Abs(double.Parse(txtFilterByMZTol.Text));
             }
             else
             {
@@ -2697,7 +2682,7 @@ namespace MASICBrowser
 
             if (chkFilterBySignalToNoise.Checked && PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumSignalToNoise.Text))
             {
-                minimumSN = Convert.ToDouble(txtMinimumSignalToNoise.Text);
+                minimumSN = double.Parse(txtMinimumSignalToNoise.Text);
             }
             else
             {
@@ -2742,7 +2727,7 @@ namespace MASICBrowser
                                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
-                            sortKeys[mParentIonPointerArrayCount] = Convert.ToDouble(mParentIonStats[index].OptimalPeakApexScanNumber.ToString() + "." + Math.Round(mParentIonStats[index].MZ, 0).ToString("0000") + mParentIonStats[index].Index.ToString("00000"));
+                            sortKeys[mParentIonPointerArrayCount] = double.Parse(mParentIonStats[index].OptimalPeakApexScanNumber + "." + Math.Round(mParentIonStats[index].MZ, 0).ToString("0000") + mParentIonStats[index].Index.ToString("00000"));
                             mParentIonPointerArrayCount += 1;
                         }
                     }
@@ -2756,7 +2741,7 @@ namespace MASICBrowser
                                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
-                            sortKeys[mParentIonPointerArrayCount] = Convert.ToDouble(Math.Round(mParentIonStats[index].MZ, 2).ToString() + mParentIonStats[index].SICStats.ScanNumberMaxIntensity.ToString("000000"));
+                            sortKeys[mParentIonPointerArrayCount] = double.Parse(Math.Round(mParentIonStats[index].MZ, 2) + mParentIonStats[index].SICStats.ScanNumberMaxIntensity.ToString("000000"));
                             mParentIonPointerArrayCount += 1;
                         }
                     }
@@ -2975,7 +2960,7 @@ namespace MASICBrowser
                                                 minimumIntensity, minimumSN, mzFilter, mzFilterTol, ionStats.CustomSICPeak))
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
-                            sortKeys[mParentIonPointerArrayCount] = GetSortKey(Convert.ToInt32(Math.Round(mParentIonStats[index].SICStats.Peak.BaselineNoiseStats.NoiseLevel, 0)),
+                            sortKeys[mParentIonPointerArrayCount] = GetSortKey((int)Math.Round(mParentIonStats[index].SICStats.Peak.BaselineNoiseStats.NoiseLevel, 0),
                                                                                mParentIonStats[index].SICStats.Peak.SignalToNoiseRatio);
                             mParentIonPointerArrayCount += 1;
                         }
@@ -3086,7 +3071,7 @@ namespace MASICBrowser
 
         private string TestValueToStringWork(float value, byte digitsOfPrecision)
         {
-            return value.ToString() + ": " + StringUtilities.ValueToString(value, digitsOfPrecision);
+            return value + ": " + StringUtilities.ValueToString(value, digitsOfPrecision);
         }
 
         private void ToggleAutoStep(bool forceDisabled = false)
@@ -3100,7 +3085,7 @@ namespace MASICBrowser
             {
                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text))
                 {
-                    mAutoStepIntervalMsec = Convert.ToInt32(txtAutoStep.Text);
+                    mAutoStepIntervalMsec = int.Parse(txtAutoStep.Text);
                 }
                 else
                 {
@@ -3155,13 +3140,13 @@ namespace MASICBrowser
             {
                 mSICPeakFinderOptions.UseButterworthSmooth = false;
                 mSICPeakFinderOptions.UseSavitzkyGolaySmooth = true;
-                mSICPeakFinderOptions.SavitzkyGolayFilterOrder = Convert.ToInt16(PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, "", out _, 0));
+                mSICPeakFinderOptions.SavitzkyGolayFilterOrder = (short)PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, "", out _);
             }
             else
             {
                 mSICPeakFinderOptions.UseButterworthSmooth = true;
                 mSICPeakFinderOptions.UseSavitzkyGolaySmooth = false;
-                mSICPeakFinderOptions.ButterworthSamplingFrequency = (double)PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, "", out _, 0.25F);
+                mSICPeakFinderOptions.ButterworthSamplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, "", out _, 0.25F);
             }
             //mSICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData =
 
@@ -3193,16 +3178,16 @@ namespace MASICBrowser
 
                 sicStats.SICSmoothedYDataIndexStart = 0;
 
-                var intensities = (from item in currentParentIon.SICData select Convert.ToDouble(item.Intensity)).ToArray();
+                var intensities = (from item in currentParentIon.SICData select item.Intensity).ToArray();
 
                 if (eSmoothMode == eSmoothModeConstants.SavitzkyGolay)
                 {
-                    // Resmooth using a Savitzy Golay filter
+                    // Resmooth using a Savitzky Golay filter
 
                     int savitzkyGolayFilterOrder = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text + " should be an even number between 0 and 20; assuming 0", out _, 0);
                     int peakWidthsPointsMinimum = PRISMWin.TextBoxUtils.ParseTextBoxValueInt(txtPeakWidthPointsMinimum, lblPeakWidthPointsMinimum.Text + " should be a positive integer; assuming 6", out _, 6);
 
-                    int filterThirdWidth = Convert.ToInt32(Math.Floor(peakWidthsPointsMinimum / (double)3));
+                    int filterThirdWidth = (int)Math.Floor(peakWidthsPointsMinimum / 3.0);
                     if (filterThirdWidth > 3)
                         filterThirdWidth = 3;
 
@@ -3219,7 +3204,7 @@ namespace MASICBrowser
                     objFilter.SavitzkyGolayFilter(intensities,
                                                   0, currentParentIon.SICData.Count - 1,
                                                   filterThirdWidth, filterThirdWidth,
-                                                  Convert.ToInt16(savitzkyGolayFilterOrder), out errorMessage, true);
+                                                  (short)savitzkyGolayFilterOrder, out errorMessage, true);
                 }
                 else
                 {
@@ -3232,7 +3217,7 @@ namespace MASICBrowser
                 sicStats.SICSmoothedYData.Clear();
 
                 for (int index = 0; index <= intensities.Length - 1; index++)
-                    sicStats.SICSmoothedYData.Add(Convert.ToDouble(intensities[index]));
+                    sicStats.SICSmoothedYData.Add(intensities[index]);
             }
 
             if (repeatPeakFinding)
@@ -3416,7 +3401,7 @@ namespace MASICBrowser
 
             if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text))
             {
-                newInterval = Convert.ToInt32(txtAutoStep.Text);
+                newInterval = int.Parse(txtAutoStep.Text);
                 if (newInterval < 10)
                     newInterval = 10;
                 mAutoStepIntervalMsec = newInterval;

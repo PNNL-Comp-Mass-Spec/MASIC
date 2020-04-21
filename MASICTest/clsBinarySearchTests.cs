@@ -26,7 +26,7 @@ namespace MASICTest
 
                 for (var index = 0; index <= 19; index++)
                 {
-                    maxDataValue = index + Convert.ToInt32(Math.Pow(index, 1.5));
+                    maxDataValue = index + (int)Math.Pow(index, 1.5);
                     dataPoints.Add(maxDataValue);
                 }
 
@@ -166,7 +166,7 @@ namespace MASICTest
                     // Search intDataList for each number between intSearchValueStart and intSearchValueEnd
                     for (var index = searchValueStart; index <= searchValueEnd; index++)
                     {
-                        var dataPointToFind = Convert.ToDouble(index) + index / 10.0;
+                        var dataPointToFind = index + index / 10.0;
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints.ToArray(), dataPointToFind, dataPoints.Count, eMissingDataMode);
                         searchresults.Add(dataPointToFind, dataPoints[indexMatch]);
 

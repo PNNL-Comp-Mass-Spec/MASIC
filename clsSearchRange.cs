@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 namespace MASIC
 {
@@ -58,7 +57,6 @@ namespace MASIC
                         return 0;
                     default:
                         throw new Exception("Unknown data type encountered: " + mDataType.ToString());
-                        break;
                 }
             }
         }
@@ -78,15 +76,13 @@ namespace MASIC
                         return -1;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return -1;
                 }
             }
-            else
-            {
-                return -1;
-            }
+
+            return -1;
         }
 
         public bool UsePointerIndexArray
@@ -437,23 +433,25 @@ namespace MASIC
 
         #region "Find Value Range"
 
-        public bool FindValueRange(int searchValue, int toleranceHalfWidth, [Optional, DefaultParameterValue(0)] ref int matchIndexStart, [Optional, DefaultParameterValue(0)] ref int matchIndexEnd)
+        public bool FindValueRange(int searchValue, int toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
             // Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
             // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
             // Otherwise, returns false
 
             bool matchFound;
+            matchIndexStart = -1;
+            matchIndexEnd = -1;
 
             if (mDataType != eDataTypeToUse.IntegerType)
             {
                 switch (mDataType)
                 {
                     case eDataTypeToUse.SingleType:
-                        matchFound = FindValueRange(Convert.ToSingle(searchValue), Convert.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange(Convert.ToDouble(searchValue), Convert.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange((double)searchValue, (double)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -497,23 +495,25 @@ namespace MASIC
             return matchFound;
         }
 
-        public bool FindValueRange(double searchValue, double toleranceHalfWidth, [Optional, DefaultParameterValue(0)] ref int matchIndexStart, [Optional, DefaultParameterValue(0)] ref int matchIndexEnd)
+        public bool FindValueRange(double searchValue, double toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
             // Searches the loaded data for searchValue with a tolerance of +/-tolerance
             // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
             // Otherwise, returns false
 
             bool matchFound;
+            matchIndexStart = -1;
+            matchIndexEnd = -1;
 
             if (mDataType != eDataTypeToUse.DoubleType)
             {
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange(Convert.ToInt32(searchValue), Convert.ToInt32(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange((int)searchValue, (int)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.SingleType:
-                        matchFound = FindValueRange(Convert.ToSingle(searchValue), Convert.ToSingle(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -557,23 +557,25 @@ namespace MASIC
             return matchFound;
         }
 
-        public bool FindValueRange(float searchValue, float toleranceHalfWidth, [Optional, DefaultParameterValue(0)] ref int matchIndexStart, [Optional, DefaultParameterValue(0)] ref int matchIndexEnd)
+        public bool FindValueRange(float searchValue, float toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
             // Searches the loaded data for searchValue with a tolerance of +/-tolerance
             // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
             // Otherwise, returns false
 
             bool matchFound;
+            matchIndexStart = -1;
+            matchIndexEnd = -1;
 
             if (mDataType != eDataTypeToUse.SingleType)
             {
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange(Convert.ToInt32(searchValue), Convert.ToInt32(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange((int)searchValue, (int)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange(Convert.ToDouble(searchValue), Convert.ToDouble(toleranceHalfWidth), ref matchIndexStart, ref matchIndexEnd);
+                        matchFound = FindValueRange((double)searchValue, (double)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -623,9 +625,9 @@ namespace MASIC
         {
             try
             {
-                return Convert.ToInt32(GetValueByIndex(index));
+                return (int)GetValueByIndex(index);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return 0;
             }
@@ -652,7 +654,7 @@ namespace MASIC
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // index is probably out of range
                 // Ignore errors
@@ -665,9 +667,9 @@ namespace MASIC
         {
             try
             {
-                return Convert.ToSingle(GetValueByIndex(index));
+                return (float)GetValueByIndex(index);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return 0;
             }
@@ -679,9 +681,9 @@ namespace MASIC
         {
             try
             {
-                return Convert.ToInt32(GetValueByOriginalIndex(index));
+                return (int)GetValueByOriginalIndex(index);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return 0;
             }
@@ -717,7 +719,7 @@ namespace MASIC
                         return 0;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Ignore errors
                 }
@@ -730,9 +732,9 @@ namespace MASIC
         {
             try
             {
-                return Convert.ToSingle(GetValueByOriginalIndex(index));
+                return (float)GetValueByOriginalIndex(index);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return 0;
             }

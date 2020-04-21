@@ -234,7 +234,7 @@ namespace MASIC
             // Returns true if the MRM data is successfully written to disk
             // Note that it will also return true if udtMRMSettings() is empty
 
-            const char cColDelimiter = '\t';
+            const char TAB_DELIMITER = '\t';
 
             StreamWriter dataWriter = null;
             StreamWriter crosstabWriter = null;
@@ -274,7 +274,7 @@ namespace MASIC
                             dataColumns.Add(mrmSetting.MRMMassList[mrmMassIndex].EndMass.ToString("0.000"));
                             dataColumns.Add(mrmSetting.ScanCount.ToString());
 
-                            settingsWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
+                            settingsWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
                         }
                     }
 
@@ -312,7 +312,7 @@ namespace MASIC
                             for (int srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
                                 headerNames.Add(ConstructSRMMapKey(srmList[srmIndex]));
 
-                            crosstabWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), headerNames));
+                            crosstabWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
                         }
 
                         int scanFirst = int.MinValue;
@@ -378,7 +378,7 @@ namespace MASIC
                                         dataColumns.Add("0");
                                     }
 
-                                    dataWriter.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
+                                    dataWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
                                 }
 
                                 if (mOptions.WriteMRMIntensityCrosstab)
@@ -397,7 +397,7 @@ namespace MASIC
                                             ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst,
                                                                    crosstabColumnValue,
                                                                    crosstabColumnFlag,
-                                                                   cColDelimiter, true);
+                                                                   TAB_DELIMITER, true);
 
                                             scanFirst = fragScan.ScanNumber;
                                             scanTimeFirst = fragScan.ScanTime;
@@ -430,7 +430,7 @@ namespace MASIC
                         if (mOptions.WriteMRMIntensityCrosstab)
                         {
                             // Write out any remaining crosstab values
-                            ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst, crosstabColumnValue, crosstabColumnFlag, cColDelimiter, false);
+                            ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst, crosstabColumnValue, crosstabColumnFlag, TAB_DELIMITER, false);
                         }
                     }
                 }
@@ -464,7 +464,7 @@ namespace MASIC
             float scanTimeFirst,
             IList<double> crosstabColumnValue,
             IList<bool> crosstabColumnFlag,
-            char cColDelimiter,
+            char delimiter,
             bool forceWrite)
         {
             // If forceWrite = False, then will only write out the line if 1 or more columns is non-zero
@@ -498,7 +498,7 @@ namespace MASIC
 
             if (nonZeroCount > 0 || forceWrite)
             {
-                writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
+                writer.WriteLine(delimiter.ToString(), dataColumns);
             }
         }
 
@@ -701,7 +701,7 @@ namespace MASIC
                     {
                         if (scanList.ParentIons.Count > 1)
                         {
-                            UpdateProgress(Convert.ToInt16(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
+                            UpdateProgress((short)(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
                         }
                         else
                         {

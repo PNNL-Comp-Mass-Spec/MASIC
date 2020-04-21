@@ -57,8 +57,8 @@ namespace MASIC
             if (mDataCount >= mDataValues.Length)
             {
                 var oldMDataValues = mDataValues;
-                mDataValues = new double[(Convert.ToInt32(Math.Floor(mDataValues.Length * 1.5)))];
-                Array.Copy(oldMDataValues, mDataValues, Math.Min(Convert.ToInt32(Math.Floor(mDataValues.Length * 1.5)), oldMDataValues.Length));
+                mDataValues = new double[((int)Math.Floor(mDataValues.Length * 1.5))];
+                Array.Copy(oldMDataValues, mDataValues, Math.Min((int)Math.Floor(mDataValues.Length * 1.5), oldMDataValues.Length));
                 var oldMDataIndices = mDataIndices;
                 mDataIndices = new int[mDataValues.Length];
                 Array.Copy(oldMDataIndices, mDataIndices, Math.Min(mDataValues.Length, oldMDataIndices.Length));
@@ -166,7 +166,7 @@ namespace MASIC
                 }
 
                 // Round maxAbundance up to the next highest integer
-                maxAbundance = Convert.ToInt64(Math.Ceiling(maxAbundance));
+                maxAbundance = (long)Math.Ceiling(maxAbundance);
 
                 // Now determine the histogram bin size
                 double binSize = maxAbundance / HISTOGRAM_BIN_COUNT;
@@ -174,7 +174,7 @@ namespace MASIC
                     binSize = 1;
 
                 // Initialize histogramData
-                int binCount = Convert.ToInt32(maxAbundance / binSize) + 1;
+                int binCount = (int)(maxAbundance / binSize) + 1;
 
                 int[] histogramBinCounts;
                 double[] histogramBinStartIntensity;
@@ -195,7 +195,7 @@ namespace MASIC
                     }
                     else
                     {
-                        targetBin = Convert.ToInt32(Math.Floor(mDataValues[index] / binSize));
+                        targetBin = (int)(Math.Floor(mDataValues[index] / binSize));
                     }
 
                     if (targetBin < binCount - 1)
@@ -219,7 +219,7 @@ namespace MASIC
 
                     if (index % 10000 == 0)
                     {
-                        UpdateProgress(Convert.ToSingle((0 + (index + 1) / Convert.ToDouble(mDataCount)) / SUBTASK_STEP_COUNT * 100.0D));
+                        UpdateProgress((float)((0 + (index + 1) / (double)mDataCount) / SUBTASK_STEP_COUNT * 100.0));
                     }
                 }
 
@@ -310,7 +310,7 @@ namespace MASIC
 
                             if (index % 10000 == 0)
                             {
-                                UpdateProgress(Convert.ToSingle((1 + (index + 1) / Convert.ToDouble(mDataCount)) / SUBTASK_STEP_COUNT * 100.0D));
+                                UpdateProgress((float)((1 + (index + 1) / (double)mDataCount) / SUBTASK_STEP_COUNT * 100.0D));
                             }
                         }
 
@@ -366,7 +366,7 @@ namespace MASIC
 
                             if (binToSortDataCount < 1000 || binToSortDataCount % 100 == 0)
                             {
-                                UpdateProgress(Convert.ToSingle((3 + (index + 1) / Convert.ToDouble(binToSortDataCount)) / SUBTASK_STEP_COUNT * 100.0D));
+                                UpdateProgress((float)((3 + (index + 1) / (double)binToSortDataCount) / SUBTASK_STEP_COUNT * 100.0));
                             }
                         }
                     }
@@ -405,19 +405,19 @@ namespace MASIC
                 // Sort abundances ascending, sorting dataIndices in parallel
                 Array.Sort(abundances, dataIndices, 0, dataCount);
 
-                UpdateProgress(Convert.ToSingle(2.333 / subtaskStepCount * 100.0));
+                UpdateProgress((float)(2.333 / subtaskStepCount * 100.0));
 
                 // Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
                 for (index = 0; index <= dataCount - maximumDataCountInArraysToLoad - 1; index++)
                     abundances[index] = SkipDataPointFlag;
 
-                UpdateProgress(Convert.ToSingle(2.666 / subtaskStepCount * 100.0D));
+                UpdateProgress((float)(2.666 / subtaskStepCount * 100.0D));
 
                 // Re-sort, this time on dataIndices with abundances in parallel
                 Array.Sort(dataIndices, abundances, 0, dataCount);
             }
 
-            UpdateProgress(Convert.ToSingle(3 / (double)subtaskStepCount * 100.0D));
+            UpdateProgress((float)(3 / (double)subtaskStepCount * 100.0D));
         }
 
         private void UpdateProgress(float progressValue)

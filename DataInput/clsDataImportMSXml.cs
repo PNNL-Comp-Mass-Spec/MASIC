@@ -473,7 +473,7 @@ namespace MASIC.DataInput
 
                         var msSpectrum = new clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
 
-                        double percentComplete = scanList.MasterScanOrderCount / Convert.ToDouble(xmlReader.NumSpectra) * 100;
+                        double percentComplete = scanList.MasterScanOrderCount / (double)xmlReader.NumSpectra * 100;
 
                         var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
                                                                        scanList, spectraCache, dataOutputHandler,
@@ -562,14 +562,14 @@ namespace MASIC.DataInput
                         if (DateTime.UtcNow.Subtract(lastProgress).TotalSeconds >= 2.5)
                         {
                             lastProgress = DateTime.UtcNow;
-                            double percentComplete = chromatogramsProcessed / Convert.ToDouble(elutionTimeToScanMapByChromatogram.Count) * 100;
+                            double percentComplete = chromatogramsProcessed / (double)elutionTimeToScanMapByChromatogram.Count * 100;
                             Console.Write("{0:N0}% ", percentComplete);
                         }
 
                         var elutionTimeToScanMap = chromTimesEntry.Value;
                         foreach (var elutionTime in elutionTimeToScanMap.Keys.ToList())
                         {
-                            int nearestPseudoScan = Convert.ToInt32(Math.Round(elutionTime / medianScanTimeDiff * 100)) + 1;
+                            int nearestPseudoScan = (int)Math.Round(elutionTime / medianScanTimeDiff * 100) + 1;
                             elutionTimeToScanMap[elutionTime] = nearestPseudoScan;
                         }
 
@@ -734,7 +734,7 @@ namespace MASIC.DataInput
 
                         var msSpectrum = new clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
 
-                        double percentComplete = scanList.MasterScanOrderCount / Convert.ToDouble(simulatedSpectraByScan.Count) * 100;
+                        double percentComplete = scanList.MasterScanOrderCount / (double)simulatedSpectraByScan.Count * 100;
 
                         var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
                                                                        scanList, spectraCache, dataOutputHandler,
@@ -793,7 +793,7 @@ namespace MASIC.DataInput
 
             if (!double.IsNaN(percentComplete))
             {
-                UpdateProgress(Convert.ToInt16(Math.Round(percentComplete, 0)));
+                UpdateProgress((short)Math.Round(percentComplete, 0));
             }
 
             UpdateCacheStats(spectraCache);

@@ -127,7 +127,7 @@ namespace MASICPeakFinder
                 secondDerivative = new double[sourceDataCount];
 
                 // The mid point width is the minimum width divided by 2, rounded down
-                int peakHalfWidth = Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / (double)2));
+                int peakHalfWidth = (int)Math.Floor(peakWidthPointsMinimum / 2.0);
 
                 // Find the maximum intensity in the source data
                 double maximumIntensity = 0;
@@ -274,7 +274,7 @@ namespace MASICPeakFinder
                                     sigma = 0;
                                 }
 
-                                int widthInPoints = Convert.ToInt32(Math.Ceiling(peakWidthInSigma * sigma));
+                                int widthInPoints = (int)Math.Ceiling(peakWidthInSigma * sigma);
 
                                 if (widthInPoints > 4 * sourceDataCount)
                                 {
@@ -291,14 +291,14 @@ namespace MASICPeakFinder
                                 if (widthInPoints % 2 == 0)
                                 {
                                     // Even number
-                                    newPeak.LeftEdge = index - Convert.ToInt32(widthInPoints / (double)2);
-                                    newPeak.RightEdge = index + Convert.ToInt32(widthInPoints / (double)2) - 1;
+                                    newPeak.LeftEdge = index - (int)(widthInPoints / 2.0);
+                                    newPeak.RightEdge = index + (int)(widthInPoints / 2.0) - 1;
                                 }
                                 else
                                 {
                                     // Odd number
-                                    newPeak.LeftEdge = index - Convert.ToInt32((widthInPoints - 1) / (double)2);
-                                    newPeak.RightEdge = index + Convert.ToInt32((widthInPoints - 1) / (double)2);
+                                    newPeak.LeftEdge = index - (int)((widthInPoints - 1) / 2.0);
+                                    newPeak.RightEdge = index + (int)((widthInPoints - 1) / 2.0);
                                 }
                             }
 
@@ -363,11 +363,11 @@ namespace MASICPeakFinder
                     {
                         // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
                         // Define the maximum allowed peak apex shift to be 33% of peakWidthPointsMinimum
-                        int dataIndexCheckStart = peakItem.PeakLocation - Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / (double)3));
+                        int dataIndexCheckStart = peakItem.PeakLocation - (int)Math.Floor(peakWidthPointsMinimum / 3.0);
                         if (dataIndexCheckStart < 0)
                             dataIndexCheckStart = 0;
 
-                        int dataIndexCheckEnd = peakItem.PeakLocation + Convert.ToInt32(Math.Floor(peakWidthPointsMinimum / (double)3));
+                        int dataIndexCheckEnd = peakItem.PeakLocation + (int)Math.Floor(peakWidthPointsMinimum / 3.0);
                         if (dataIndexCheckEnd > sourceDataCount - 1)
                             dataIndexCheckEnd = sourceDataCount - 1;
 

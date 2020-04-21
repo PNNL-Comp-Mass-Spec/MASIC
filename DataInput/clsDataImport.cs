@@ -367,7 +367,7 @@ namespace MASIC.DataInput
                 var precursorMissingPct = default(double);
                 if (scanList.FragScans.Count > 0)
                 {
-                    precursorMissingPct = mPrecursorNotFoundCount / Convert.ToDouble(scanList.FragScans.Count) * 100;
+                    precursorMissingPct = mPrecursorNotFoundCount / (double)scanList.FragScans.Count * 100;
                 }
 
                 OnWarningEvent(
@@ -416,7 +416,7 @@ namespace MASIC.DataInput
             clsScanInfo currentScan,
             int datasetID)
         {
-            const char cColDelimiter = '\t';
+            const char TAB_DELIMITER = '\t';
 
             var scanStatsEntry = new ScanStatsEntry()
             {
@@ -474,7 +474,7 @@ namespace MASIC.DataInput
                 scanStatsEntry.ScanTypeName                 // Scan type name
             };
 
-            writer.WriteLine(string.Join(Convert.ToString(cColDelimiter), dataColumns));
+            writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
         }
 
         protected void UpdateCachedPrecursorScan(

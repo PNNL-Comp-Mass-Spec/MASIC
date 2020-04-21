@@ -208,12 +208,12 @@ namespace MagnitudeConcavityPeakFinder
                     if (indexEnd % 2 == 0)
                     {
                         // Even value
-                        udtBaselineNoiseStats.NoiseLevel = sortedData[Convert.ToInt32(indexEnd / 2)];
+                        udtBaselineNoiseStats.NoiseLevel = sortedData[(int)(indexEnd / 2)];
                     }
                     else
                     {
                         // Odd value; average the values on either side of intIndexEnd/2
-                        var intIndex = Convert.ToInt32((indexEnd - 1) / 2);
+                        var intIndex = (int)((indexEnd - 1) / 2);
                         if (intIndex < 0)
                             intIndex = 0;
                         summedIntensity = sortedData[intIndex];
@@ -278,9 +278,9 @@ namespace MagnitudeConcavityPeakFinder
             // Find the index of the data point at intDataSortedCount * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
             //  average the data from the start to that index
             indexEnd =
-                Convert.ToInt32(
+                (int)
                     Math.Round(
-                        (dataSortedCount - 1) * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0));
+                        (dataSortedCount - 1) * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
 
             var countSummed = indexEnd + 1;
 

@@ -384,8 +384,8 @@ namespace MASIC
                                                             mReporterIons.MZIntensityFilterIgnoreRangeStart,
                                                             mReporterIons.MZIntensityFilterIgnoreRangeEnd))
                 {
-                    xData.Add(Convert.ToSingle(fragSpectrum.IonsMZ[index]));
-                    yData.Add(Convert.ToSingle(fragSpectrum.IonsIntensity[index]));
+                    xData.Add((float)(fragSpectrum.IonsMZ[index]));
+                    yData.Add((float)(fragSpectrum.IonsIntensity[index]));
                 }
             }
 
@@ -713,7 +713,7 @@ namespace MASIC
                     {
                         if (parentIonIndex % 100 == 0)
                         {
-                            UpdateProgress(Convert.ToInt16(parentIonIndex / (double)(findSimilarIonsDataCount - 1) * 100));
+                            UpdateProgress((short)(parentIonIndex / (double)(findSimilarIonsDataCount - 1) * 100));
                         }
                     }
                     else
@@ -786,13 +786,10 @@ namespace MASIC
             DataInput.clsDataImport dataImportUtilities,
             clsSearchRange objSearchRange)
         {
-            var indexFirst = default(int);
-            var indexLast = default(int);
-
             var sicOptions = masicOptions.SICOptions;
             var binningOptions = masicOptions.BinningOptions;
 
-            if (objSearchRange.FindValueRange(searchMZ + searchMZOffset, sicOptions.SimilarIonMZToleranceHalfWidth, ref indexFirst, ref indexLast))
+            if (objSearchRange.FindValueRange(searchMZ + searchMZOffset, sicOptions.SimilarIonMZToleranceHalfWidth, out var indexFirst, out var indexLast))
             {
                 for (int matchIndex = indexFirst; matchIndex <= indexLast; matchIndex++)
                 {
@@ -813,7 +810,7 @@ namespace MASIC
                             uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
                         {
                             // Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                            timeDiff = Convert.ToSingle(Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
+                            timeDiff = (float)(Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
                         }
                         else
                         {
@@ -823,7 +820,7 @@ namespace MASIC
                     else if (scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon && uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
                     {
                         // Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                        timeDiff = Convert.ToSingle(Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
+                        timeDiff = (float)(Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
                     }
                     else
                     {

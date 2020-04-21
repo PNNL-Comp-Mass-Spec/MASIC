@@ -53,7 +53,7 @@ namespace MASIC.DataOutput
                 // SaveICRToolsChromatogramByScan(scanList.SurveyScans, scanList.SurveyScans.Count, outputFilePath, False, True, inputFilePathFull)
 
                 stepsCompleted += 1;
-                UpdateProgress(Convert.ToInt16(stepsCompleted / (double)bpiStepCount * 100));
+                UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Second, write an MS-based _scans.csv file (readable with Decon2LS)
                 string msScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSChromatogramFile);
@@ -64,7 +64,7 @@ namespace MASIC.DataOutput
                 SaveDecon2LSChromatogram(scanList.SurveyScans, spectraCache, msScansFilePath);
 
                 stepsCompleted += 1;
-                UpdateProgress(Convert.ToInt16(stepsCompleted / (double)bpiStepCount * 100));
+                UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
                 string msmsScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
@@ -214,20 +214,20 @@ namespace MASIC.DataOutput
             using (var writer = new BinaryWriter(new FileStream(outputFilePath, FileMode.Append)))
             {
                 // Write an Escape character (Byte 1B)
-                writer.Write(Convert.ToByte(27));
+                writer.Write((byte)27);
 
                 for (int scanIndex = 0; scanIndex <= scanCount - 1; scanIndex++)
                 {
                     var scan = scanList[scanIndex];
-                    // Note: Using CSng to assure that we write out single precision numbers
+                    // Note: Using (float) to assure that we write out single precision numbers
 
                     if (saveElutionTimeInsteadOfScan)
                     {
-                        writer.Write(Convert.ToSingle(scan.ScanTime));
+                        writer.Write((float)scan.ScanTime);
                     }
                     else
                     {
-                        writer.Write(Convert.ToSingle(scan.ScanNumber));
+                        writer.Write((float)scan.ScanNumber);
                     }
 
                     if (saveTICInsteadOfBPI)

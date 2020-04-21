@@ -36,7 +36,7 @@ namespace MASIC.DataInput
         #endregion
 
         public static string GetCustomMZFileColumnHeaders(
-                                                          string cColDelimiter = ", ",
+                                                          string delimiter = ", ",
                                                           bool includeAndBeforeLastItem = true)
         {
             var headerNames = new List<string>()
@@ -58,7 +58,7 @@ namespace MASIC.DataInput
                 headerNames.Add(CUSTOM_SIC_COLUMN_COMMENT);
             }
 
-            return string.Join(cColDelimiter, headerNames);
+            return string.Join(delimiter, headerNames);
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace MASIC.DataInput
                                     {
                                         if (mCustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
                                         {
-                                            mzSearchSpec.ScanOrAcqTimeTolerance = Convert.ToInt32(dataCols[colIndex]);
+                                            mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(dataCols[colIndex]);
                                         }
                                         else
                                         {

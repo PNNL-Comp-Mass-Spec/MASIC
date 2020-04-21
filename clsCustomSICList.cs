@@ -205,7 +205,7 @@ namespace MASIC
                 {
                     // All of the entries had a custom scan or acq time tolerance defined
                     // Update mScanOrAcqTimeTolerance to the average of the values
-                    ScanOrAcqTimeTolerance = Convert.ToSingle(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4));
+                    ScanOrAcqTimeTolerance = (float)(Math.Round(scanOrAcqTimeSumForAveraging / scanOrAcqTimeSumCount, 4));
                 }
             }
             catch (Exception ex)
@@ -292,12 +292,12 @@ namespace MASIC
                     {
                         if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
                         {
-                            mzSearchSpec.ScanOrAcqTimeCenter = Convert.ToInt32(lstScanCenters[index]);
+                            mzSearchSpec.ScanOrAcqTimeCenter = int.Parse(lstScanCenters[index]);
                         }
                         else
                         {
                             // Includes .Relative and .AcquisitionTime
-                            mzSearchSpec.ScanOrAcqTimeCenter = Convert.ToSingle(lstScanCenters[index]);
+                            mzSearchSpec.ScanOrAcqTimeCenter = float.Parse(lstScanCenters[index]);
                         }
                     }
                 }
@@ -308,12 +308,12 @@ namespace MASIC
                     {
                         if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
                         {
-                            mzSearchSpec.ScanOrAcqTimeTolerance = Convert.ToInt32(lstScanTolerances[index]);
+                            mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(lstScanTolerances[index]);
                         }
                         else
                         {
                             // Includes .Relative and .AcquisitionTime
-                            mzSearchSpec.ScanOrAcqTimeTolerance = Convert.ToSingle(lstScanTolerances[index]);
+                            mzSearchSpec.ScanOrAcqTimeTolerance = float.Parse(lstScanTolerances[index]);
                         }
                     }
                 }
@@ -322,7 +322,7 @@ namespace MASIC
                 {
                     if (clsUtilities.IsNumber(lstMZToleranceDa[index]))
                     {
-                        mzSearchSpec.MZToleranceDa = Convert.ToDouble(lstMZToleranceDa[index]);
+                        mzSearchSpec.MZToleranceDa = double.Parse(lstMZToleranceDa[index]);
                     }
                 }
 
