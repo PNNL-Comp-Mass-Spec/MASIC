@@ -24,7 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Debug\MASICBrowser.xml</DocumentationFile>
-    <NoWarn>CS1591,CS1572</NoWarn>
+    <NoWarn>CS1591,CS1572,CS0168</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Release\MASICBrowser.xml</DocumentationFile>
-    <NoWarn>CS1591,CS1572</NoWarn>
+    <NoWarn>CS1591,CS1572,CS0168</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>MASICBrowser.Program</StartupObject>
