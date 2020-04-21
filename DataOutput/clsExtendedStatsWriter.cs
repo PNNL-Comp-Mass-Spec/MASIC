@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.VisualBasic;
 
 namespace MASIC.DataOutput
 {
@@ -58,9 +57,9 @@ namespace MASIC.DataOutput
                     string value = null;
                     if (extendedHeaderInfo.TryGetValue(headerID, out value))
                     {
-                        if (clsUtilities.IsNumber(value))
+                        if (double.TryParse(value, out var number))
                         {
-                            if (Math.Abs(Conversion.Val(value)) < float.Epsilon)
+                            if (Math.Abs(number) < float.Epsilon)
                                 value = "0";
                         }
                         else

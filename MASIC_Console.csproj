@@ -41,7 +41,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="InterDetect">
       <HintPath>Lib\InterDetect.dll</HintPath>
     </Reference>

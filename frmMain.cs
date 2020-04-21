@@ -23,8 +23,6 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using MASIC.DataInput;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using PRISM;
 using PRISM.FileProcessor;
 using PRISMDatabaseUtils;
