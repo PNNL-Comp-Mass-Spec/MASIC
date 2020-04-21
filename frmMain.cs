@@ -150,7 +150,7 @@ namespace MASIC
             existingRowFound = false;
             foreach (DataRow myDataRow in mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows)
             {
-                if (Math.Abs(Conversions.ToDouble(myDataRow[0]) - mz) < float.Epsilon & Math.Abs(Conversions.ToSingle(myDataRow[1]) - scanOrAcqTimeCenter) < float.Epsilon)
+                if (Math.Abs(Convert.ToDouble(myDataRow[0]) - mz) < float.Epsilon & Math.Abs(Convert.ToSingle(myDataRow[1]) - scanOrAcqTimeCenter) < float.Epsilon)
                 {
                     existingRowFound = true;
                     break;
@@ -225,7 +225,7 @@ namespace MASIC
             }
 
             mLogMessages.Insert(0, textToAppend);
-            txtLogMessages.AppendText(textToAppend + ControlChars.NewLine);
+            txtLogMessages.AppendText(textToAppend + Environment.NewLine);
             txtLogMessages.ScrollToCaret();
             if (doEvents)
             {
@@ -381,7 +381,7 @@ namespace MASIC
                 }
                 else
                 {
-                    return Conversions.ToString(item);
+                    return Convert.ToString(item);
                 }
             }
             catch (Exception ex)
@@ -775,8 +775,8 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading settings from file: " + filePath + "; " + ControlChars.NewLine +
-                    ex.Message + ";" + ControlChars.NewLine, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Error loading settings from file: " + filePath + "; " + Environment.NewLine +
+                    ex.Message + ";" + Environment.NewLine, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
@@ -963,8 +963,8 @@ namespace MASIC
 
         private void PasteCustomSICValues(bool clearList)
         {
-            var lineDelimiters = new char[] { ControlChars.Cr, ControlChars.Lf };
-            var columnDelimiters = new char[] { ControlChars.Tab, ',' };
+            var lineDelimiters = new char[] { '\r', '\n' };
+            var columnDelimiters = new char[] { '\t', ',' };
 
             // Examine the clipboard contents
             var objData = Clipboard.GetDataObject();
@@ -979,7 +979,7 @@ namespace MASIC
                 return;
             }
 
-            string data = Conversions.ToString(objData.GetData(DataFormats.StringFormat, true));
+            string data = Convert.ToString(objData.GetData(DataFormats.StringFormat, true));
 
             // Split data on carriage return or line feed characters
             // Lines that end in CrLf will give two separate lines; one with the text, and one blank; that's OK
@@ -1220,12 +1220,12 @@ namespace MASIC
                     if (success)
                     {
                         // Grab the status message, but insert a carriage return directly after "in folder:"
-                        MessageBox.Show(mMasic.StatusMessage.Replace("in folder:", "in folder:" + ControlChars.NewLine) + ControlChars.NewLine + "Elapsed time: " + StringUtilities.DblToString(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 2) + " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show(mMasic.StatusMessage.Replace("in folder:", "in folder:" + Environment.NewLine) + Environment.NewLine + "Elapsed time: " + StringUtilities.DblToString(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 2) + " sec", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        MessageBox.Show("Error analyzing input file with MASIC: " + ControlChars.NewLine +
-                                        mMasic.GetErrorMessage() + ControlChars.NewLine +
+                        MessageBox.Show("Error analyzing input file with MASIC: " + Environment.NewLine +
+                                        mMasic.GetErrorMessage() + Environment.NewLine +
                                         mMasic.StatusMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
                 }
@@ -1776,17 +1776,17 @@ namespace MASIC
 
             message = string.Empty;
 
-            message += "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" + ControlChars.NewLine;
-            message += "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." + ControlChars.NewLine + ControlChars.NewLine;
+            message += "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" + Environment.NewLine;
+            message += "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." + Environment.NewLine + Environment.NewLine;
 
             message += "This is version " + Application.ProductVersion + " (" + Program.PROGRAM_DATE + "). ";
-            message += "Using MASIC PeakFinder DLL version " + mMasic.MASICPeakFinderDllVersion + ControlChars.NewLine + ControlChars.NewLine;
+            message += "Using MASIC PeakFinder DLL version " + mMasic.MASICPeakFinderDllVersion + Environment.NewLine + Environment.NewLine;
 
-            message += "E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov" + ControlChars.NewLine;
-            message += "Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/" + ControlChars.NewLine + ControlChars.NewLine;
+            message += "E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine;
+            message += "Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/" + Environment.NewLine + Environment.NewLine;
 
             message += "Licensed under the 2-Clause BSD License; you may not use this file except in compliance with the License.  ";
-            message += "You may obtain a copy of the License at https://opensource.org/licenses/BSD-2-Clause" + ControlChars.NewLine + ControlChars.NewLine;
+            message += "You may obtain a copy of the License at https://opensource.org/licenses/BSD-2-Clause" + Environment.NewLine + Environment.NewLine;
 
             MessageBox.Show(message, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -1880,7 +1880,7 @@ namespace MASIC
                 var exportOptions = masicOptions.RawDataExportOptions;
 
                 exportOptions.ExportEnabled = chkExportRawSpectraData.Checked;
-                exportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)Conversions.ToInteger(cboExportRawDataFileFormat.SelectedIndex);
+                exportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)Convert.ToInt32(cboExportRawDataFileFormat.SelectedIndex);
 
                 exportOptions.IncludeMSMS = chkExportRawDataIncludeMSMS.Checked;
                 exportOptions.RenumberScans = chkExportRawDataRenumberScans.Checked;
@@ -1994,7 +1994,7 @@ namespace MASIC
                 // ' sicOptions.UseSICStatsFromLargestPeak = chkUseSICStatsFromLargestPeak.Checked
 
                 // Peak Finding Options
-                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(cboSICNoiseThresholdMode.SelectedIndex);
+                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(cboSICNoiseThresholdMode.SelectedIndex);
                 peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
                     return false;
@@ -2025,7 +2025,7 @@ namespace MASIC
                     return false;
 
                 peakFinderOptions.UseSavitzkyGolaySmooth = optUseSavitzkyGolaySmooth.Checked;
-                peakFinderOptions.SavitzkyGolayFilterOrder = Conversions.ToShort(TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text + " must be an integer value", out parseError));
+                peakFinderOptions.SavitzkyGolayFilterOrder = Convert.ToInt16(TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text + " must be an integer value", out parseError));
                 if (parseError)
                     return false;
 
@@ -2033,7 +2033,7 @@ namespace MASIC
                 peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = chkSmoothDataRegardlessOfMinimumPeakWidth.Checked;
 
                 // Mass Spectra Noise Threshold Options
-                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Conversions.ToInteger(cboMassSpectraNoiseThresholdMode.SelectedIndex);
+                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(cboMassSpectraNoiseThresholdMode.SelectedIndex);
                 peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
                     return false;
@@ -2122,14 +2122,15 @@ namespace MASIC
                 {
                     foreach (DataRow currentRow in mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows)
                     {
-                        if (Information.IsNumeric(currentRow[0]) & Information.IsNumeric(currentRow[1]))
+                        if (currentRow[0] != null && double.TryParse(currentRow[0].ToString(), out var col0) &&
+                            currentRow[1] != null && double.TryParse(currentRow[1].ToString(), out var col1))
                         {
-                            double targetMz = Conversions.ToDouble(currentRow[0]);
+                            double targetMz = col0;
                             var mzSearchSpec = new clsCustomMZSearchSpec(targetMz)
                             {
-                                MZToleranceDa = Conversions.ToDouble(currentRow[1]),
-                                ScanOrAcqTimeCenter = Conversions.ToSingle(currentRow[2]),
-                                ScanOrAcqTimeTolerance = Conversions.ToSingle(currentRow[3]),
+                                MZToleranceDa = col1,
+                                ScanOrAcqTimeCenter = Convert.ToSingle(currentRow[2]),
+                                ScanOrAcqTimeTolerance = Convert.ToSingle(currentRow[3]),
                                 Comment = CStrSafe(currentRow[4])
                             };
 
@@ -2165,7 +2166,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error applying setting to clsMASIC: " + ControlChars.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Error applying setting to clsMASIC: " + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 
             return !parseError;
