@@ -2115,7 +2115,7 @@ namespace MASIC
                         if (currentRow[0] != null && double.TryParse(currentRow[0].ToString(), out var col0) &&
                             currentRow[1] != null && double.TryParse(currentRow[1].ToString(), out var col1))
                         {
-                            double targetMz = Conversions.ToDouble(currentRow[0]);
+                            var targetMz = col0;
                             var mzSearchSpec = new clsCustomMZSearchSpec(targetMz)
                             {
                                 MZToleranceDa = col1,
