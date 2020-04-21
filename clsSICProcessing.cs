@@ -100,8 +100,7 @@ namespace MASIC
             }
 
             // Sort mzBinList by m/z
-            var sortedMzBins = (from item in mzBinList
-                                select item).ToList();
+            var sortedMzBins = mzBinList.OrderBy(item => item.MZ).ToList();
             return sortedMzBins;
         }
 
