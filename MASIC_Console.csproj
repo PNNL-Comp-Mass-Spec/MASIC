@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BaseOutputPath>bin\Console\</BaseOutputPath>
+    <BaseIntermediateOutputPath>obj\Console\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>obj\Console\</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -32,8 +37,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>bin\Release\MASIC_Console.xml</DocumentationFile>
+    <OutputPath>bin\Console\Release\</OutputPath>
+    <DocumentationFile>bin\Console\Release\MASIC_Console.xml</DocumentationFile>
     <NoWarn>CS1591,CS1572,CS1573,CS0168</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>TRACE</DefineConstants>
