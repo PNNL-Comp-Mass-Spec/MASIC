@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}</ProjectGuid>
+    <ProjectGuid>{8363E31C-CA3D-4172-99D5-3D2D3C3FD999}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MASICTest</RootNamespace>
-    <AssemblyName>MASICTest</AssemblyName>
+    <RootNamespace>MASICPeakFinder</RootNamespace>
+    <AssemblyName>MASICPeakFinder</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +21,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>CS1591,CS1572</NoWarn>
+    <DocumentationFile>bin\Debug\MASICPeakFinder.xml</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,46 +32,38 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\MASICPeakFinder.xml</DocumentationFile>
+    <NoWarn>CS1591,CS1572</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DataFilter">
+      <HintPath>..\Lib\DataFilter.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="ThermoRawFileReader">
-      <HintPath>..\Lib\ThermoRawFileReader.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsBinarySearchTests.cs" />
-    <Compile Include="clsDatabaseTests.cs" />
-    <Compile Include="clsPeakFinderTests.cs" />
-    <Compile Include="clsTests.cs" />
+    <Compile Include="clsBaselineNoiseOptions.cs" />
+    <Compile Include="clsBaselineNoiseStats.cs" />
+    <Compile Include="clsBaselineNoiseStatsSegment.cs" />
+    <Compile Include="clsMASICPeakFinder.cs" />
+    <Compile Include="clsPeakDetection.cs" />
+    <Compile Include="clsPeakInfo.cs" />
+    <Compile Include="clsPeaksContainer.cs" />
+    <Compile Include="clsSICDataPoint.cs" />
+    <Compile Include="clsSICPeakFinderOptions.cs" />
+    <Compile Include="clsSICPotentialAreaStats.cs" />
+    <Compile Include="clsSICStatsPeak.cs" />
+    <Compile Include="clsSmoothedYDataSubset.cs" />
+    <Compile Include="clsStatisticalMoments.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit">
-      <Version>3.12.0</Version>
-    </PackageReference>
     <PackageReference Include="PRISM-Library">
       <Version>2.6.4</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MASIC.csproj">
-      <Project>{9fef8822-30ae-4fdb-bce6-df99f9a86600}</Project>
-      <Name>MASIC</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MASICPeakFinder\MASICPeakFinder.csproj">
-      <Project>{8363e31c-ca3d-4172-99d5-3d2d3c3fd999}</Project>
-      <Name>MASICPeakFinder</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

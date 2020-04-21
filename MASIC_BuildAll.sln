@@ -1,24 +1,25 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MASIC", "MASIC.vbproj", "{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MASIC", "MASIC.csproj", "{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8363E31C-CA3D-4172-99D5-3D2D3C3FD999} = {8363E31C-CA3D-4172-99D5-3D2D3C3FD999}
 		{B3B19BD9-1541-4ABE-ADB4-F224F64AC408} = {B3B19BD9-1541-4ABE-ADB4-F224F64AC408}
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MASICPeakFinder", "MASICPeakFinder\MASICPeakFinder.vbproj", "{8363E31C-CA3D-4172-99D5-3D2D3C3FD999}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MASICPeakFinder", "MASICPeakFinder\MASICPeakFinder.csproj", "{8363E31C-CA3D-4172-99D5-3D2D3C3FD999}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixDecompositionUtility", "MatrixDecompositionUtility\MatrixDecompositionUtility.csproj", "{B3B19BD9-1541-4ABE-ADB4-F224F64AC408}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MASICBrowser", "MASICBrowser\MASICBrowser.vbproj", "{5A62ED9B-7F03-413D-A879-3042A5D0B7FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MASICBrowser", "MASICBrowser\MASICBrowser.csproj", "{5A62ED9B-7F03-413D-A879-3042A5D0B7FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MASICTest", "MASICTest\MASICTest.csproj", "{A9C8D051-6FB6-45B8-8604-0E9D277E50AD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagnitudeConcavityPeakFinderDLL", "MagnitudeConcavityPeakFinder\MagnitudeConcavityPeakFinderDLL.csproj", "{A73AF394-3B69-4B92-9813-702EB9BE8BAE}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MASIC_Console", "MASIC_Console.vbproj", "{B8F6182D-7381-4624-9DF7-B5F4A44CC70D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MASIC_Console", "MASIC_Console.csproj", "{B8F6182D-7381-4624-9DF7-B5F4A44CC70D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

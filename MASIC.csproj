@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9FEF8822-30AE-4FDB-BCE6-DF99F9A86600}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <StartupObject>MASIC.Program</StartupObject>
+    <RootNamespace>MASIC</RootNamespace>
+    <AssemblyName>MASIC</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>false</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>bin\MASIC.xml</DocumentationFile>
+    <NoWarn>CS1591,CS1572,CS1573</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>TRACE;DEBUG;GUI</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>bin\Release\MASIC.xml</DocumentationFile>
+    <NoWarn>CS1591,CS1572,CS1573</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>TRACE;GUI</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="InterDetect">
+      <HintPath>Lib\InterDetect.dll</HintPath>
+    </Reference>
+    <Reference Include="MSDataFileReader">
+      <HintPath>Lib\MSDataFileReader.dll</HintPath>
+    </Reference>
+    <Reference Include="NetCDFReader">
+      <HintPath>Lib\NetCDFReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ProgressFormNET">
+      <HintPath>Lib\ProgressFormNET.dll</HintPath>
+    </Reference>
+    <Reference Include="ShFolderBrowser">
+      <HintPath>Lib\ShFolderBrowser.dll</HintPath>
+    </Reference>
+    <Reference Include="SpectraTypeClassifier">
+      <HintPath>Lib\SpectraTypeClassifier.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="ThermoFisher.CommonCore.BackgroundSubtraction">
+      <HintPath>Lib\ThermoFisher.CommonCore.BackgroundSubtraction.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.Data">
+      <HintPath>Lib\ThermoFisher.CommonCore.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.MassPrecisionEstimator">
+      <HintPath>Lib\ThermoFisher.CommonCore.MassPrecisionEstimator.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.RawFileReader">
+      <HintPath>Lib\ThermoFisher.CommonCore.RawFileReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoRawFileReader">
+      <HintPath>Lib\ThermoRawFileReader.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="clsBinarySearch.cs" />
+    <Compile Include="clsBinnedData.cs" />
+    <Compile Include="clsBinningOptions.cs" />
+    <Compile Include="clsCorrelation.cs" />
+    <Compile Include="clsCustomMZSearchSpec.cs" />
+    <Compile Include="clsCustomSICList.cs" />
+    <Compile Include="clsDataAggregation.cs" />
+    <Compile Include="clsDatabaseAccess.cs" />
+    <Compile Include="clsFilterDataArrayMaxCount.cs" />
+    <Compile Include="clsFragScanInfo.cs" />
+    <Compile Include="clsITraqIntensityCorrection.cs" />
+    <Compile Include="clsMASIC.cs" />
+    <Compile Include="clsMasicEventNotifier.cs" />
+    <Compile Include="clsMASICOptions.cs" />
+    <Compile Include="clsMRMProcessing.cs" />
+    <Compile Include="clsMRMScanInfo.cs" />
+    <Compile Include="clsMSSpectrum.cs" />
+    <Compile Include="clsMzBinInfo.cs" />
+    <Compile Include="clsMzSearchInfo.cs" />
+    <Compile Include="clsParentIonInfo.cs" />
+    <Compile Include="clsParentIonProcessing.cs" />
+    <Compile Include="clsProcessingStats.cs" />
+    <Compile Include="clsRawDataExportOptions.cs" />
+    <Compile Include="clsReporterIonInfo.cs" />
+    <Compile Include="clsReporterIonProcessor.cs" />
+    <Compile Include="clsReporterIons.cs" />
+    <Compile Include="clsScanInfo.cs" />
+    <Compile Include="clsScanList.cs" />
+    <Compile Include="clsScanNumScanTimeConversion.cs" />
+    <Compile Include="clsScanTracking.cs" />
+    <Compile Include="clsSearchRange.cs" />
+    <Compile Include="clsSICDetails.cs" />
+    <Compile Include="clsSICOptions.cs" />
+    <Compile Include="clsSICProcessing.cs" />
+    <Compile Include="clsSICStats.cs" />
+    <Compile Include="clsSimilarParentIonsData.cs" />
+    <Compile Include="clsSpectraCache.cs" />
+    <Compile Include="clsSpectrumCacheOptions.cs" />
+    <Compile Include="clsUniqueMZListItem.cs" />
+    <Compile Include="clsUtilities.cs" />
+    <Compile Include="DataInput\Centroider.cs" />
+    <Compile Include="DataInput\clsCustomSICListReader.cs" />
+    <Compile Include="DataInput\clsDataImport.cs" />
+    <Compile Include="DataInput\clsDataImportMGFandCDF.cs" />
+    <Compile Include="DataInput\clsDataImportMSXml.cs" />
+    <Compile Include="DataInput\clsDataImportThermoRaw.cs" />
+    <Compile Include="DataOutput\clsBPIWriter.cs" />
+    <Compile Include="DataOutput\clsDataOutput.cs" />
+    <Compile Include="DataOutput\clsExtendedStatsWriter.cs" />
+    <Compile Include="DataOutput\clsOutputFileHandles.cs" />
+    <Compile Include="DataOutput\clsSICStatsWriter.cs" />
+    <Compile Include="DataOutput\clsSpectrumDataWriter.cs" />
+    <Compile Include="DataOutput\clsThermoMetadataWriter.cs" />
+    <Compile Include="DataOutput\clsXMLResultsWriter.cs" />
+    <Compile Include="DatasetStats\clsDatasetFileInfo.cs" />
+    <Compile Include="DatasetStats\clsDatasetStatsSummarizer.cs" />
+    <Compile Include="DatasetStats\clsSampleInfo.cs" />
+    <Compile Include="DatasetStats\DatasetSummaryStats.cs" />
+    <Compile Include="DatasetStats\ScanStatsEntry.cs" />
+    <Compile Include="DatasetStats\SummaryStatDetails.cs" />
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics">
+      <Version>4.9.0</Version>
+    </PackageReference>
+    <PackageReference Include="PRISM-DatabaseUtils">
+      <Version>1.0.9</Version>
+    </PackageReference>
+    <PackageReference Include="PRISM-Library">
+      <Version>2.6.4</Version>
+    </PackageReference>
+    <PackageReference Include="PRISMWin-Library">
+      <Version>1.0.14</Version>
+    </PackageReference>
+    <PackageReference Include="PSI_Interface">
+      <Version>2.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="MSFileReaderLib">
+      <Guid>{F0C5F3E3-4F2A-443E-A74D-0AABE3237494}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="MASICPeakFinder\MASICPeakFinder.csproj">
+      <Project>{8363e31c-ca3d-4172-99d5-3d2d3c3fd999}</Project>
+      <Name>MASICPeakFinder</Name>
+    </ProjectReference>
+    <ProjectReference Include="MatrixDecompositionUtility\MatrixDecompositionUtility.csproj">
+      <Project>{b3b19bd9-1541-4abe-adb4-f224f64ac408}</Project>
+      <Name>MatrixDecompositionUtility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)Lib\netcdf.dll" "$(TargetDir)" /D /Y</PostBuildEvent>
+  </PropertyGroup>
+</Project>
