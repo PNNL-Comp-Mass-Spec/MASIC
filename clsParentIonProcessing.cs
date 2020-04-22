@@ -100,7 +100,7 @@ namespace MASIC
             }
 
             // See if an entry exists yet in .ParentIons for the parent ion for this fragmentation scan
-            bool matchFound = false;
+            var matchFound = false;
 
             if (mrmDaughterMZ > 0)
             {
@@ -118,7 +118,7 @@ namespace MASIC
 
             if (parentIonMZ > 0)
             {
-                double parentIonToleranceDa = GetParentIonToleranceDa(sicOptions, parentIonMZ, parentIonTolerance);
+                var parentIonToleranceDa = GetParentIonToleranceDa(sicOptions, parentIonMZ, parentIonTolerance);
 
                 for (parentIonIndex = scanList.ParentIons.Count - 1; parentIonIndex >= 0; parentIonIndex += -1)
                 {
@@ -350,14 +350,14 @@ namespace MASIC
 
                 // Now compare the binned spectra
                 // Similarity will be 0 if either instance of BinnedIntensities has fewer than 5 data points
-                float similarity1 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensities, binnedSpectrum2.BinnedIntensities, eCorrelationMethod);
+                var similarity1 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensities, binnedSpectrum2.BinnedIntensities, eCorrelationMethod);
 
                 if (!considerOffsetBinnedData)
                 {
                     return similarity1;
                 }
 
-                float similarity2 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensitiesOffset, binnedSpectrum2.BinnedIntensitiesOffset, eCorrelationMethod);
+                var similarity2 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensitiesOffset, binnedSpectrum2.BinnedIntensitiesOffset, eCorrelationMethod);
                 return Math.Max(similarity1, similarity2);
             }
             catch (Exception ex)
@@ -393,7 +393,7 @@ namespace MASIC
             binnedSpectrum.BinSize = objCorrelate.BinSize;
 
             // Note that the data in xData and yData should have already been filtered to discard data points below the noise threshold intensity
-            bool success = objCorrelate.BinData(xData, yData, binnedSpectrum.BinnedIntensities, binnedSpectrum.BinnedIntensitiesOffset);
+            var success = objCorrelate.BinData(xData, yData, binnedSpectrum.BinnedIntensities, binnedSpectrum.BinnedIntensitiesOffset);
 
             return success;
         }
@@ -634,7 +634,7 @@ namespace MASIC
                 parentIonIndex = 0;
                 do
                 {
-                    int originalIndex = intensityPointerArray[parentIonIndex];
+                    var originalIndex = intensityPointerArray[parentIonIndex];
                     if (similarParentIonsData.IonUsed[originalIndex])
                     {
                         // Parent ion was already used; move onto the next one
@@ -655,7 +655,7 @@ namespace MASIC
                         do
                         {
                             ionInUseCountOriginal = similarParentIonsData.IonInUseCount;
-                            double currentMZ = mzListEntry.MZAvg;
+                            var currentMZ = mzListEntry.MZAvg;
 
                             if (currentMZ <= 0)
                                 continue;
@@ -682,7 +682,7 @@ namespace MASIC
                                                       scanList, similarParentIonsData,
                                                       masicOptions, dataImportUtilities, objSearchRange);
 
-                            double parentIonToleranceDa = GetParentIonToleranceDa(masicOptions.SICOptions, currentMZ);
+                            var parentIonToleranceDa = GetParentIonToleranceDa(masicOptions.SICOptions, currentMZ);
 
                             if (parentIonToleranceDa <= 0.25 && masicOptions.SICOptions.SimilarIonMZToleranceHalfWidth <= 0.15)
                             {
@@ -748,7 +748,7 @@ namespace MASIC
                 ionUpdateCount = 0;
                 foreach (var uniqueMzListItem in similarParentIonsData.UniqueMZList)
                 {
-                    for (int matchIndex = 0; matchIndex <= uniqueMzListItem.MatchCount - 1; matchIndex++)
+                    for (var matchIndex = 0; matchIndex <= uniqueMzListItem.MatchCount - 1; matchIndex++)
                     {
                         parentIonIndex = uniqueMzListItem.MatchIndices[matchIndex];
 
@@ -791,10 +791,10 @@ namespace MASIC
 
             if (objSearchRange.FindValueRange(searchMZ + searchMZOffset, sicOptions.SimilarIonMZToleranceHalfWidth, out var indexFirst, out var indexLast))
             {
-                for (int matchIndex = indexFirst; matchIndex <= indexLast; matchIndex++)
+                for (var matchIndex = indexFirst; matchIndex <= indexLast; matchIndex++)
                 {
                     // See if the matches are unused and within the scan tolerance
-                    int matchOriginalIndex = similarParentIonsData.MZPointerArray[matchIndex];
+                    var matchOriginalIndex = similarParentIonsData.MZPointerArray[matchIndex];
 
                     if (similarParentIonsData.IonUsed[matchOriginalIndex])
                         continue;
@@ -831,7 +831,7 @@ namespace MASIC
                     {
                         // Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
 
-                        float similarityScore = CompareFragSpectraForParentIons(scanList, spectraCache, originalIndex, matchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities);
+                        var similarityScore = CompareFragSpectraForParentIons(scanList, spectraCache, originalIndex, matchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities);
 
                         if (similarityScore > sicOptions.SpectrumSimilarityMinimum)
                         {

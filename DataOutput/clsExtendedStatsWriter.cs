@@ -156,7 +156,7 @@ namespace MASIC.DataOutput
         {
             var cTrimChars = new char[] { ':', ' ' };
 
-            string value = string.Empty;
+            var value = string.Empty;
 
             // Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
             Dictionary<int, string> consolidatedValuesByID;
@@ -173,7 +173,7 @@ namespace MASIC.DataOutput
             }
 
             // Initialize nonConstantHeaderIDs
-            for (int i = 0; i <= mExtendedHeaderNameMap.Count - 1; i++)
+            for (var i = 0; i <= mExtendedHeaderNameMap.Count - 1; i++)
                 nonConstantHeaderIDs.Add(i);
 
             if (!mOptions.ConsolidateConstantExtendedHeaderValues)
@@ -299,7 +299,7 @@ namespace MASIC.DataOutput
 
             foreach (var keyName in keysToRemove)
             {
-                for (int headerIndex = 0; headerIndex <= mExtendedHeaderNameMap.Count - 1; headerIndex++)
+                for (var headerIndex = 0; headerIndex <= mExtendedHeaderNameMap.Count - 1; headerIndex++)
                 {
                     if ((mExtendedHeaderNameMap[headerIndex].Key ?? "") == (keyName ?? ""))
                     {
@@ -360,7 +360,7 @@ namespace MASIC.DataOutput
             // Writes out a flat file containing the extended scan stats
 
             string extendedConstantHeaderOutputFilePath;
-            string extendedNonConstantHeaderOutputFilePath = string.Empty;
+            var extendedNonConstantHeaderOutputFilePath = string.Empty;
 
             const char TAB_DELIMITER = '\t';
 
@@ -384,7 +384,7 @@ namespace MASIC.DataOutput
 
                 // Lookup extended stats values that are constants for all scans
                 // The following will also remove the constant header values from mExtendedHeaderNameMap
-                string constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(out nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, TAB_DELIMITER);
+                var constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(out nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, TAB_DELIMITER);
                 if (constantExtendedHeaderValues == null)
                     constantExtendedHeaderValues = string.Empty;
 
@@ -403,7 +403,7 @@ namespace MASIC.DataOutput
                         writer.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
                     }
 
-                    for (int scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
+                    for (var scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
                     {
                         var currentScan = GetScanByMasterScanIndex(scanList, scanIndex);
 

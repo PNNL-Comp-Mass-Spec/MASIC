@@ -148,7 +148,7 @@ namespace MASIC
         {
             if (scanType == null)
                 scanType = string.Empty;
-            string scanTypeTrimmed = scanType.Trim();
+            var scanTypeTrimmed = scanType.Trim();
 
             if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -439,9 +439,9 @@ namespace MASIC
 
                 if (!reader.SectionPresent(XML_SECTION_SIC_OPTIONS))
                 {
-                    string errorMessage = "The node '<section name=" + "\"" + XML_SECTION_SIC_OPTIONS +
-                                          "\"" + "> was not found in the parameter file: " +
-                                          parameterFilePath;
+                    var errorMessage = "The node '<section name=" + "\"" + XML_SECTION_SIC_OPTIONS +
+                                       "\"" + "> was not found in the parameter file: " +
+                                       parameterFilePath;
                     ReportError(errorMessage);
                     return false;
                 }
@@ -729,9 +729,9 @@ namespace MASIC
                     var scanCommentList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
                                                           "ScanCommentList", string.Empty);
 
-                    bool success = CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
-                                                                    scanCenterList, scanToleranceList,
-                                                                    scanCommentList);
+                    var success = CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
+                                                                   scanCenterList, scanToleranceList,
+                                                                   scanCommentList);
 
                     return success;
                 }
@@ -821,7 +821,7 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa.ToString("0.0000"));
 
                 bool sicToleranceIsPPM;
-                double sicTolerance = SICOptions.GetSICTolerance(out sicToleranceIsPPM);
+                var sicTolerance = SICOptions.GetSICTolerance(out sicToleranceIsPPM);
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", sicTolerance.ToString("0.0000"));
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", sicToleranceIsPPM.ToString());
 
@@ -911,7 +911,7 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory);
 
                 // Construct the rawText strings using mCustomSICList
-                bool scanCommentsDefined = false;
+                var scanCommentsDefined = false;
 
                 var lstMzValues = new List<string>();
                 var lstMzTolerances = new List<string>();
@@ -1026,7 +1026,7 @@ namespace MASIC
                     // Populate validatedItems using any non-blank entries in items
                     foreach (var item in items)
                     {
-                        string trimmedItem = item.Trim();
+                        var trimmedItem = item.Trim();
                         if (trimmedItem.Length > 0)
                         {
                             validatedItems.Add(trimmedItem);

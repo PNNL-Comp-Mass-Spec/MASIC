@@ -36,14 +36,14 @@ namespace MASIC
 
             try
             {
-                double smallestDifference = double.MaxValue;
+                var smallestDifference = double.MaxValue;
 
                 if (objMSSpectrum.IonsMZ != null && objMSSpectrum.IonCount > 0)
                 {
                     int indexFirst, indexLast;
                     if (SumIonsFindValueInRange(objMSSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out indexFirst, out indexLast))
                     {
-                        for (int ionIndex = indexFirst; ionIndex <= indexLast; ionIndex++)
+                        for (var ionIndex = indexFirst; ionIndex <= indexLast; ionIndex++)
                         {
                             if (returnMax)
                             {
@@ -59,7 +59,7 @@ namespace MASIC
                                 ionSumOrMax += objMSSpectrum.IonsIntensity[ionIndex];
                             }
 
-                            double testDifference = Math.Abs(objMSSpectrum.IonsMZ[ionIndex] - searchMZ);
+                            var testDifference = Math.Abs(objMSSpectrum.IonsMZ[ionIndex] - searchMZ);
                             if (testDifference < smallestDifference)
                             {
                                 smallestDifference = testDifference;
@@ -108,7 +108,7 @@ namespace MASIC
                 }
                 else
                 {
-                    bool success = FindMaxValueInMZRange(
+                    var success = FindMaxValueInMZRange(
                         spectraCache.SpectraPool[poolIndex].IonsMZ,
                         spectraCache.SpectraPool[poolIndex].IonsIntensity,
                         spectraCache.SpectraPool[poolIndex].IonCount,

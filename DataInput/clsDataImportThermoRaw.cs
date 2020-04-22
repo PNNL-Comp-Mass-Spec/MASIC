@@ -45,7 +45,7 @@ namespace MASIC.DataInput
                 double[] centroidedIonsMz = null;
                 double[] centroidedIonsIntensity = null;
 
-                int ionCount = xcaliburAccessor.GetScanData(precursorScanNumber, out centroidedIonsMz, out centroidedIonsIntensity, 0, true);
+                var ionCount = xcaliburAccessor.GetScanData(precursorScanNumber, out centroidedIonsMz, out centroidedIonsIntensity, 0, true);
 
                 UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity, ionCount);
             }
@@ -53,8 +53,8 @@ namespace MASIC.DataInput
             var chargeState = 0;
             double isolationWidth;
 
-            string chargeStateText = string.Empty;
-            string isolationWidthText = string.Empty;
+            var chargeStateText = string.Empty;
+            var isolationWidthText = string.Empty;
 
             scanInfo.TryGetScanEvent(SCAN_EVENT_CHARGE_STATE, out chargeStateText, true);
             if (!string.IsNullOrWhiteSpace(chargeStateText))
@@ -97,7 +97,7 @@ namespace MASIC.DataInput
             {
                 // ThermoRawFileReader could not determine the parent ion m/z value (this is highly unlikely)
                 // Use scan event "Monoisotopic M/Z" instead
-                string monoMzText = string.Empty;
+                var monoMzText = string.Empty;
                 if (!scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, out monoMzText, true))
                 {
                     ReportWarning("Could not determine the parent ion m/z value (" + SCAN_EVENT_MONOISOTOPIC_MZ + "); " +
@@ -122,7 +122,7 @@ namespace MASIC.DataInput
                 return 0;
             }
 
-            double precursorInterference = ComputePrecursorInterference(
+            var precursorInterference = ComputePrecursorInterference(
                 scanInfo.ScanNumber,
                 precursorScanNumber, parentIonMz, isolationWidth, chargeState);
 
@@ -162,7 +162,7 @@ namespace MASIC.DataInput
             mBpiUpdateCount = 0;
 
             // Assume success for now
-            bool success = true;
+            var success = true;
 
             try
             {
@@ -173,7 +173,7 @@ namespace MASIC.DataInput
 
                 // Obtain the full path to the file
                 var rawFileInfo = new FileInfo(filePath);
-                string inputFileFullPath = rawFileInfo.FullName;
+                var inputFileFullPath = rawFileInfo.FullName;
 
                 // Open a handle to the data file
                 if (!xcaliburAccessor.OpenRawFile(inputFileFullPath))
@@ -190,7 +190,7 @@ namespace MASIC.DataInput
                     return false;
                 }
 
-                int datasetID = mOptions.SICOptions.DatasetID;
+                var datasetID = mOptions.SICOptions.DatasetID;
 
                 success = UpdateDatasetFileStats(rawFileInfo, datasetID, xcaliburAccessor);
 
@@ -207,7 +207,7 @@ namespace MASIC.DataInput
                     metadataWriter.SaveMSTuneFile(xcaliburAccessor, dataOutputHandler);
                 }
 
-                int scanCount = xcaliburAccessor.GetNumScans();
+                var scanCount = xcaliburAccessor.GetNumScans();
 
                 if (scanCount <= 0)
                 {
@@ -217,16 +217,16 @@ namespace MASIC.DataInput
                     return false;
                 }
 
-                int scanStart = xcaliburAccessor.ScanStart;
-                int scanEnd = xcaliburAccessor.ScanEnd;
+                var scanStart = xcaliburAccessor.ScanStart;
+                var scanEnd = xcaliburAccessor.ScanEnd;
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra);
 
                 UpdateProgress(string.Format("Reading Xcalibur data ({0:N0} scans){1}", scanCount, Environment.NewLine + Path.GetFileName(filePath)));
                 ReportMessage(string.Format("Reading Xcalibur data; Total scan count: {0:N0}", scanCount));
 
-                int scanCountToRead = scanEnd - scanStart + 1;
-                for (int scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)
+                var scanCountToRead = scanEnd - scanStart + 1;
+                for (var scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)
                 {
                     if (!mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
                     {
@@ -244,8 +244,8 @@ namespace MASIC.DataInput
                         break;
                     }
 
-                    double percentComplete = scanList.MasterScanOrderCount / (double)(scanCountToRead) * 100;
-                    bool extractSuccess = ExtractScanInfoCheckRange(xcaliburAccessor, thermoScanInfo, scanList, spectraCache, dataOutputHandler, percentComplete);
+                    var percentComplete = scanList.MasterScanOrderCount / (double)(scanCountToRead) * 100;
+                    var extractSuccess = ExtractScanInfoCheckRange(xcaliburAccessor, thermoScanInfo, scanList, spectraCache, dataOutputHandler, percentComplete);
 
                     if (!extractSuccess)
                     {
@@ -393,7 +393,7 @@ namespace MASIC.DataInput
             if (scanInfo.SIMScan)
             {
                 scanList.SIMDataPresent = true;
-                string simKey = scanInfo.LowMass + "_" + scanInfo.HighMass;
+                var simKey = scanInfo.LowMass + "_" + scanInfo.HighMass;
                 int simIndex;
 
                 if (mSIMScanMapping.TryGetValue(simKey, out simIndex))
@@ -456,7 +456,7 @@ namespace MASIC.DataInput
             }
 
             // Note: Even if mKeepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            bool success = LoadSpectraForThermoRawFile(
+            var success = LoadSpectraForThermoRawFile(
                 xcaliburAccessor,
                 spectraCache,
                 scanInfo,
@@ -560,14 +560,14 @@ namespace MASIC.DataInput
             }
 
             scanList.FragScans.Add(scanInfo);
-            int fragScanIndex = scanList.FragScans.Count - 1;
+            var fragScanIndex = scanList.FragScans.Count - 1;
 
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, fragScanIndex);
 
             // Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            double msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
+            var msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
 
-            bool success = LoadSpectraForThermoRawFile(
+            var success = LoadSpectraForThermoRawFile(
                 xcaliburAccessor,
                 spectraCache,
                 scanInfo,
@@ -597,7 +597,7 @@ namespace MASIC.DataInput
 
             if (mLastNonZoomSurveyScanIndex >= 0)
             {
-                int precursorScanNumber = scanList.SurveyScans[mLastNonZoomSurveyScanIndex].ScanNumber;
+                var precursorScanNumber = scanList.SurveyScans[mLastNonZoomSurveyScanIndex].ScanNumber;
 
                 // Compute the interference of the parent ion in the MS1 spectrum for this frag scan
                 scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(xcaliburAccessor, thermoScanInfo, precursorScanNumber);
@@ -635,7 +635,7 @@ namespace MASIC.DataInput
             double[] mzList = null;
             double[] intensityList = null;
 
-            string lastKnownLocation = "Start";
+            var lastKnownLocation = "Start";
 
             try
             {
@@ -649,7 +649,7 @@ namespace MASIC.DataInput
 
                 if (scanInfo.IonCountRaw > 0)
                 {
-                    int ionCountVerified = VerifyDataSorted(scanInfo.ScanNumber, scanInfo.IonCountRaw, mzList, intensityList);
+                    var ionCountVerified = VerifyDataSorted(scanInfo.ScanNumber, scanInfo.IonCountRaw, mzList, intensityList);
                     if (ionCountVerified != scanInfo.IonCountRaw)
                     {
                         scanInfo.IonCountRaw = ionCountVerified;
@@ -674,7 +674,7 @@ namespace MASIC.DataInput
                 double basePeakIntensity = 0;
                 double basePeakMz = 0;
 
-                for (int ionIndex = 0; ionIndex <= scanInfo.IonCountRaw - 1; ionIndex++)
+                for (var ionIndex = 0; ionIndex <= scanInfo.IonCountRaw - 1; ionIndex++)
                 {
                     totalIonIntensity += intensityList[ionIndex];
                     if (intensityList[ionIndex] > basePeakIntensity)
@@ -755,7 +755,7 @@ namespace MASIC.DataInput
             var scanInfo = new ThermoRawFileReader.clsScanInfo(0);
 
             // Read the file info from the file system
-            bool success = UpdateDatasetFileStats(rawFileInfo, datasetID);
+            var success = UpdateDatasetFileStats(rawFileInfo, datasetID);
 
             if (!success)
                 return false;
@@ -774,7 +774,7 @@ namespace MASIC.DataInput
             try
             {
                 // Look up the end scan time then compute .AcqTimeEnd
-                int scanEnd = xcaliburAccessor.ScanEnd;
+                var scanEnd = xcaliburAccessor.ScanEnd;
                 xcaliburAccessor.GetScanInfo(scanEnd, out scanInfo);
 
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanInfo.RetentionTime);
@@ -870,7 +870,7 @@ namespace MASIC.DataInput
 
                     if (saveItem)
                     {
-                        int extendedHeaderID = dataOutputHandler.ExtendedStatsWriter.GetExtendedHeaderInfoIdByName(statusEntry.Key);
+                        var extendedHeaderID = dataOutputHandler.ExtendedStatsWriter.GetExtendedHeaderInfoIdByName(statusEntry.Key);
 
                         // Add or update the value for extendedHeaderID
                         scanInfo.ExtendedHeaderInfo[extendedHeaderID] = statusEntry.Value.Trim();
@@ -909,9 +909,9 @@ namespace MASIC.DataInput
                 ionCount = Math.Min(ionCount, mzList.Length);
             }
 
-            bool sortRequired = false;
+            var sortRequired = false;
 
-            for (int index = 1; index <= ionCount - 1; index++)
+            for (var index = 1; index <= ionCount - 1; index++)
             {
                 // Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z,
                 // we have observed a few cases in certain scans of certain datasets that points with

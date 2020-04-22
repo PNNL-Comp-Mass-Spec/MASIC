@@ -131,15 +131,15 @@ namespace MASIC
         public bool ApplyCorrection(ref float[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             double[] originalIntensities;
-            int dataCount = reporterIonIntensities.Count() - 1;
+            var dataCount = reporterIonIntensities.Count() - 1;
 
             originalIntensities = new double[dataCount + 1];
-            for (int index = 0; index <= dataCount; index++)
+            for (var index = 0; index <= dataCount; index++)
                 originalIntensities[index] = reporterIonIntensities[index];
 
             if (ApplyCorrection(originalIntensities, debugShowIntensities))
             {
-                for (int index = 0; index <= dataCount; index++)
+                for (var index = 0; index <= dataCount; index++)
                     reporterIonIntensities[index] = (float)originalIntensities[index];
 
                 return true;
@@ -158,8 +158,8 @@ namespace MASIC
         /// <returns></returns>
         public bool ApplyCorrection(double[] reporterIonIntensities, bool debugShowIntensities = false)
         {
-            int matrixSize = GetMatrixLength(mReporterIonMode);
-            string eReporterIonMode = clsReporterIons.GetReporterIonModeDescription(mReporterIonMode);
+            var matrixSize = GetMatrixLength(mReporterIonMode);
+            var eReporterIonMode = clsReporterIons.GetReporterIonModeDescription(mReporterIonMode);
 
             if (reporterIonIntensities.Length != matrixSize)
             {
@@ -170,7 +170,7 @@ namespace MASIC
             var correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensities);
 
             var maxIntensity = 0.0;
-            for (int index = 0; index <= matrixSize - 1; index++)
+            for (var index = 0; index <= matrixSize - 1; index++)
                 maxIntensity = Math.Max(maxIntensity, reporterIonIntensities[index]);
 
             if (debugShowIntensities)
@@ -180,7 +180,7 @@ namespace MASIC
             }
 
             // Now update reporterIonIntensities
-            for (int index = 0; index <= matrixSize - 1; index++)
+            for (var index = 0; index <= matrixSize - 1; index++)
             {
                 if (reporterIonIntensities[index] > 0)
                 {
@@ -197,8 +197,8 @@ namespace MASIC
                     if (debugShowIntensities)
                     {
                         // Compute percent change vs. the maximum reporter ion intensity
-                        double percentChange = (newIntensity - reporterIonIntensities[index]) / maxIntensity * 100;
-                        int percentChangeRounded = (int)Math.Round(percentChange, 0);
+                        var percentChange = (newIntensity - reporterIonIntensities[index]) / maxIntensity * 100;
+                        var percentChangeRounded = (int)Math.Round(percentChange, 0);
 
                         string visualPercentChange;
                         if (percentChangeRounded > 0)
@@ -281,8 +281,8 @@ namespace MASIC
             udtIsotopeContributionType udtIsoPct133C;
             udtIsotopeContributionType udtIsoPct134N;
 
-            int matrixSize = GetMatrixLength(mReporterIonMode);
-            int maxIndex = matrixSize - 1;
+            var matrixSize = GetMatrixLength(mReporterIonMode);
+            var maxIndex = matrixSize - 1;
 
             switch (mReporterIonMode)
             {
@@ -850,9 +850,9 @@ namespace MASIC
             }
 
             // Now divide all of the weights by 100
-            for (int i = 0; i <= maxIndex; i++)
+            for (var i = 0; i <= maxIndex; i++)
             {
-                for (int j = 0; j <= maxIndex; j++)
+                for (var j = 0; j <= maxIndex; j++)
                     mCoeffs[i, j] /= 100.0;
             }
 
@@ -861,13 +861,13 @@ namespace MASIC
                 // Print out the matrix
                 Console.WriteLine();
                 Console.WriteLine("Reporter Ion Correction Matrix; mode = " + mReporterIonMode.ToString());
-                for (int i = 0; i <= maxIndex; i++)
+                for (var i = 0; i <= maxIndex; i++)
                 {
                     if (i == 0)
                     {
                         // Header line
                         Console.Write("     ");
-                        for (int j = 0; j <= maxIndex; j++)
+                        for (var j = 0; j <= maxIndex; j++)
                         {
                             if (j < 10)
                             {
@@ -882,7 +882,7 @@ namespace MASIC
                         Console.WriteLine();
 
                         Console.Write("     ");
-                        for (int k = 0; k <= maxIndex; k++)
+                        for (var k = 0; k <= maxIndex; k++)
                             Console.Write(" ------ ");
 
                         Console.WriteLine();
@@ -895,7 +895,7 @@ namespace MASIC
                         indexSpacer = " ";
 
                     Console.Write("  " + i.ToString() + indexSpacer);
-                    for (int j = 0; j <= maxIndex; j++)
+                    for (var j = 0; j <= maxIndex; j++)
                     {
                         if (Math.Abs(mCoeffs[i, j]) < float.Epsilon)
                         {
@@ -941,7 +941,7 @@ namespace MASIC
                 zero = 100 - minus2 - minus1 - plus1 - plus2;
             }
 
-            float sum = minus2 + minus1 + zero + plus1 + plus2;
+            var sum = minus2 + minus1 + zero + plus1 + plus2;
             if (Math.Abs(100 - sum) > 0.05)
             {
                 throw new Exception(string.Format("Parameters for DefineIsotopeContribution should add up to 100; current sum is {0:F1}", sum));

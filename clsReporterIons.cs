@@ -509,10 +509,10 @@ namespace MASIC
 
                 foreach (var reporterIon in ReporterIonList)
                 {
-                    double mzStart = reporterIon.MZ - reporterIon.MZToleranceDa * 2;
+                    var mzStart = reporterIon.MZ - reporterIon.MZToleranceDa * 2;
                     MZIntensityFilterIgnoreRangeStart = Math.Min(MZIntensityFilterIgnoreRangeStart, mzStart);
 
-                    double mzEnd = reporterIon.MZ + reporterIon.MZToleranceDa * 2;
+                    var mzEnd = reporterIon.MZ + reporterIon.MZToleranceDa * 2;
                     MZIntensityFilterIgnoreRangeEnd = Math.Max(MZIntensityFilterIgnoreRangeEnd, mzEnd);
                 }
             }

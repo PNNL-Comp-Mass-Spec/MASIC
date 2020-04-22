@@ -11,7 +11,7 @@ namespace MASIC.DataOutput
             clsDataOutput dataOutputHandler)
         {
             int instMethodCount;
-            string outputFilePath = "?UndefinedFile?";
+            var outputFilePath = "?UndefinedFile?";
 
             try
             {
@@ -25,7 +25,7 @@ namespace MASIC.DataOutput
 
             try
             {
-                for (int index = 0; index <= instMethodCount - 1; index++)
+                for (var index = 0; index <= instMethodCount - 1; index++)
                 {
                     string methodNum;
                     if (index == 0 && objXcaliburAccessor.FileInfo.InstMethods.Count == 1)
@@ -68,7 +68,7 @@ namespace MASIC.DataOutput
             const char TAB_DELIMITER = '\t';
 
             int tuneMethodCount;
-            string outputFilePath = "?UndefinedFile?";
+            var outputFilePath = "?UndefinedFile?";
             try
             {
                 tuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count;
@@ -81,7 +81,7 @@ namespace MASIC.DataOutput
 
             try
             {
-                for (int index = 0; index <= tuneMethodCount - 1; index++)
+                for (var index = 0; index <= tuneMethodCount - 1; index++)
                 {
                     string tuneInfoNum;
                     if (index == 0 && objXcaliburAccessor.FileInfo.TuneMethods.Count == 1)
@@ -99,7 +99,7 @@ namespace MASIC.DataOutput
                     {
                         writer.WriteLine("Category" + TAB_DELIMITER + "Name" + TAB_DELIMITER + "Value");
 
-                        foreach (udtTuneMethodSetting setting in objXcaliburAccessor.FileInfo.TuneMethods[index].Settings)
+                        foreach (var setting in objXcaliburAccessor.FileInfo.TuneMethods[index].Settings)
                             writer.WriteLine(setting.Category + TAB_DELIMITER + setting.Name + TAB_DELIMITER + setting.Value);
                         writer.WriteLine();
                     }

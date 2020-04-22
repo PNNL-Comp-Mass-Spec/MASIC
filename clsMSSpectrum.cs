@@ -44,7 +44,7 @@ namespace MASIC
         public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<float> intensityList, int dataCount)
             : this(intScanNumber)
         {
-            for (int i = 0; i <= dataCount - 1; i++)
+            for (var i = 0; i <= dataCount - 1; i++)
             {
                 IonsMZ.Add(mzList[i]);
                 IonsIntensity.Add(intensityList[i]);
@@ -57,7 +57,7 @@ namespace MASIC
         public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<double> intensityList, int dataCount)
             : this(intScanNumber)
         {
-            for (int i = 0; i <= dataCount - 1; i++)
+            for (var i = 0; i <= dataCount - 1; i++)
             {
                 IonsMZ.Add(mzList[i]);
                 IonsIntensity.Add(intensityList[i]);
@@ -116,7 +116,7 @@ namespace MASIC
                 throw new Exception("ShrinkArrays should only be called with a length less than or equal to the current length");
             }
 
-            int countToRemove = IonsMZ.Count - ionCountNew;
+            var countToRemove = IonsMZ.Count - ionCountNew;
             if (countToRemove == 0)
                 return;
 

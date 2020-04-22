@@ -218,7 +218,7 @@ namespace MASIC
                 return false;
             }
 
-            bool success = ExportMRMDataToDisk(scanList, spectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath);
+            var success = ExportMRMDataToDisk(scanList, spectraCache, mrmSettings, srmList, inputFileName, outputDirectoryPath);
 
             return success;
         }
@@ -252,7 +252,7 @@ namespace MASIC
                 UpdateProgress(0, "Exporting MRM data");
 
                 // Write out the MRM Settings
-                string mrmSettingsFilePath = clsDataOutput.ConstructOutputFilePath(
+                var mrmSettingsFilePath = clsDataOutput.ConstructOutputFilePath(
                     inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile);
                 using (var settingsWriter = new StreamWriter(mrmSettingsFilePath))
                 {
@@ -260,10 +260,10 @@ namespace MASIC
 
                     var dataColumns = new List<string>();
 
-                    for (int mrmInfoIndex = 0; mrmInfoIndex <= mrmSettings.Count - 1; mrmInfoIndex++)
+                    for (var mrmInfoIndex = 0; mrmInfoIndex <= mrmSettings.Count - 1; mrmInfoIndex++)
                     {
                         var mrmSetting = mrmSettings[mrmInfoIndex];
-                        for (int mrmMassIndex = 0; mrmMassIndex <= mrmSetting.MRMMassCount - 1; mrmMassIndex++)
+                        for (var mrmMassIndex = 0; mrmMassIndex <= mrmSetting.MRMMassCount - 1; mrmMassIndex++)
                         {
                             dataColumns.Clear();
 
@@ -282,13 +282,13 @@ namespace MASIC
                     {
                         // Populate srmKeyToIndexMap
                         var srmKeyToIndexMap = new Dictionary<string, int>();
-                        for (int srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
+                        for (var srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
                             srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList[srmIndex]), srmIndex);
 
                         if (mOptions.WriteMRMDataList)
                         {
                             // Write out the raw MRM Data
-                            string dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMDatafile);
+                            var dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMDatafile);
                             dataWriter = new StreamWriter(dataFilePath);
 
                             // Write the file headers
@@ -298,7 +298,7 @@ namespace MASIC
                         if (mOptions.WriteMRMIntensityCrosstab)
                         {
                             // Write out the raw MRM Data
-                            string crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMCrosstabFile);
+                            var crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMCrosstabFile);
                             crosstabWriter = new StreamWriter(crosstabFilePath);
 
                             // Initialize the crosstab header variable using the data in udtSRMList()
@@ -309,15 +309,15 @@ namespace MASIC
                                 "ScanTime"
                             };
 
-                            for (int srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
+                            for (var srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
                                 headerNames.Add(ConstructSRMMapKey(srmList[srmIndex]));
 
                             crosstabWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
                         }
 
-                        int scanFirst = int.MinValue;
+                        var scanFirst = int.MinValue;
                         float scanTimeFirst = 0;
-                        int srmIndexLast = 0;
+                        var srmIndexLast = 0;
 
                         double[] crosstabColumnValue;
                         bool[] crosstabColumnFlag;
@@ -340,14 +340,14 @@ namespace MASIC
                             }
 
                             // Look for each of the m/z values specified in fragScan.MRMScanInfo.MRMMassList
-                            for (int mrmMassIndex = 0; mrmMassIndex <= fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
+                            for (var mrmMassIndex = 0; mrmMassIndex <= fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
                             {
                                 // Find the maximum value between fragScan.StartMass and fragScan.EndMass
                                 // Need to define a tolerance to account for numeric rounding artifacts in the variables
 
-                                double mzStart = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].StartMass;
-                                double mzEnd = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].EndMass;
-                                double mrmToleranceHalfWidth = Math.Round((mzEnd - mzStart) / 2, 6);
+                                var mzStart = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].StartMass;
+                                var mzEnd = fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].EndMass;
+                                var mrmToleranceHalfWidth = Math.Round((mzEnd - mzStart) / 2, 6);
                                 if (mrmToleranceHalfWidth < 0.001)
                                 {
                                     mrmToleranceHalfWidth = 0.001;
@@ -355,7 +355,7 @@ namespace MASIC
 
                                 double closestMZ;
                                 double matchIntensity;
-                                bool matchFound = mDataAggregation.FindMaxValueInMZRange(
+                                var matchFound = mDataAggregation.FindMaxValueInMZRange(
                                     spectraCache, fragScan,
                                     mzStart - mrmToleranceHalfWidth,
                                     mzEnd + mrmToleranceHalfWidth,
@@ -383,7 +383,7 @@ namespace MASIC
 
                                 if (mOptions.WriteMRMIntensityCrosstab)
                                 {
-                                    string srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
+                                    var srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
                                     int srmIndex;
 
                                     // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
@@ -462,7 +462,7 @@ namespace MASIC
             // If forceWrite = False, then will only write out the line if 1 or more columns is non-zero
 
             int index;
-            int nonZeroCount = 0;
+            var nonZeroCount = 0;
 
             var dataColumns = new List<string>()
             {
@@ -557,7 +557,7 @@ namespace MASIC
 
                 var noiseStatsSegments = new List<clsBaselineNoiseStatsSegment>();
 
-                for (int parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                 {
                     if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ <= 0)
                     {
@@ -566,15 +566,15 @@ namespace MASIC
 
                     // Step 1: Create the SIC for this MRM Parent/Daughter pair
 
-                    double parentIonMZ = scanList.ParentIons[parentIonIndex].MZ;
-                    double mrmDaughterMZ = scanList.ParentIons[parentIonIndex].MRMDaughterMZ;
-                    double searchToleranceHalfWidth = scanList.ParentIons[parentIonIndex].MRMToleranceHalfWidth;
+                    var parentIonMZ = scanList.ParentIons[parentIonIndex].MZ;
+                    var mrmDaughterMZ = scanList.ParentIons[parentIonIndex].MRMDaughterMZ;
+                    var searchToleranceHalfWidth = scanList.ParentIons[parentIonIndex].MRMToleranceHalfWidth;
 
                     // Reset SICData
                     sicDetails.SICData.Clear();
 
                     // Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
-                    for (int scanIndex = 0; scanIndex <= scanList.FragScans.Count - 1; scanIndex++)
+                    for (var scanIndex = 0; scanIndex <= scanList.FragScans.Count - 1; scanIndex++)
                     {
                         if (scanList.FragScans[scanIndex].MRMScanType != MRMScanTypeConstants.SRM)
                         {
@@ -583,8 +583,8 @@ namespace MASIC
 
                         var fragScan = scanList.FragScans[scanIndex];
 
-                        bool useScan = false;
-                        for (int mrmMassIndex = 0; mrmMassIndex <= fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
+                        var useScan = false;
+                        for (var mrmMassIndex = 0; mrmMassIndex <= fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
                         {
                             if (MRMParentDaughterMatch(fragScan.MRMScanInfo.ParentIonMZ,
                                                        fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass,
@@ -615,11 +615,11 @@ namespace MASIC
                     // Step 2: Find the largest peak in the SIC
 
                     // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
-                    bool success = peakFinder.ComputeDualTrimmedNoiseLevelTTest(sicDetails.SICIntensities, 0,
-                                                                                sicDetails.SICDataCount - 1,
-                                                                                mOptions.SICOptions.SICPeakFinderOptions.
-                                                                                    SICBaselineNoiseOptions,
-                                                                                out noiseStatsSegments);
+                    var success = peakFinder.ComputeDualTrimmedNoiseLevelTTest(sicDetails.SICIntensities, 0,
+                                                                               sicDetails.SICDataCount - 1,
+                                                                               mOptions.SICOptions.SICPeakFinderOptions.
+                                                                                   SICBaselineNoiseOptions,
+                                                                               out noiseStatsSegments);
 
                     if (!success)
                     {
@@ -633,9 +633,9 @@ namespace MASIC
                     // Find the data point with the maximum intensity
                     double maximumIntensity = 0;
                     scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved = 0;
-                    for (int scanIndex = 0; scanIndex <= sicDetails.SICDataCount - 1; scanIndex++)
+                    for (var scanIndex = 0; scanIndex <= sicDetails.SICDataCount - 1; scanIndex++)
                     {
-                        double intensity = sicDetails.SICIntensities[scanIndex];
+                        var intensity = sicDetails.SICIntensities[scanIndex];
                         if (intensity > maximumIntensity)
                         {
                             maximumIntensity = intensity;

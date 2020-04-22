@@ -107,15 +107,15 @@ namespace MASIC
             }
 
             // Look for blocks of data points that all have an intensity value of 0
-            int targetIndex = 0;
-            int index = 0;
+            var targetIndex = 0;
+            var index = 0;
 
             while (index < msSpectrum.IonCount)
             {
                 if (msSpectrum.IonsIntensity[index] < float.Epsilon)
                 {
-                    int countCombined = 0;
-                    for (int comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
+                    var countCombined = 0;
+                    for (var comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
                     {
                         if (msSpectrum.IonsIntensity[comparisonIndex] < float.Epsilon)
                         {
@@ -172,17 +172,17 @@ namespace MASIC
 
             while (index < msSpectrum.IonCount)
             {
-                int countCombined = 0;
-                double bestMz = msSpectrum.IonsMZ[index];
+                var countCombined = 0;
+                var bestMz = msSpectrum.IonsMZ[index];
 
                 // Only combine data if the first data point has a positive intensity value
                 if (msSpectrum.IonsIntensity[index] > 0)
                 {
-                    bool pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[index], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                    var pointInIgnoreRange = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[index], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                     if (!pointInIgnoreRange)
                     {
-                        for (int comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
+                        for (var comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
                         {
                             if (clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[comparisonIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd))
                             {
@@ -264,7 +264,7 @@ namespace MASIC
             double msDataResolution,
             bool keepRawSpectrum)
         {
-            string lastKnownLocation = "Start";
+            var lastKnownLocation = "Start";
 
             try
             {
@@ -330,7 +330,7 @@ namespace MASIC
                 }
 
                 lastKnownLocation = "Call AddSpectrumToPool";
-                bool success = spectraCache.AddSpectrumToPool(msSpectrum, scanInfo.ScanNumber);
+                var success = spectraCache.AddSpectrumToPool(msSpectrum, scanInfo.ScanNumber);
 
                 return success;
             }

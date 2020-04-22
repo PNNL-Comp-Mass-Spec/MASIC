@@ -31,7 +31,7 @@ namespace MASIC.DataOutput
         private string CheckForEmptyToleranceList(string toleranceList)
         {
             var toleranceValues = toleranceList.Split(',');
-            bool valuesDefined = false;
+            var valuesDefined = false;
 
             foreach (var value in toleranceValues)
             {
@@ -77,7 +77,7 @@ namespace MASIC.DataOutput
             // Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
             byte[] SICDataScanIntervals;
 
-            string lastGoodLoc = "Start";
+            var lastGoodLoc = "Start";
             bool intensityDataListWritten;
             bool massDataList;
 
@@ -94,9 +94,9 @@ namespace MASIC.DataOutput
                     SICDataScanIntervals = new byte[sicDetails.SICDataCount];
                     var sicScanNumbers = sicDetails.SICScanNumbers;
 
-                    for (int scanIndex = 1; scanIndex <= sicDetails.SICDataCount - 1; scanIndex++)
+                    for (var scanIndex = 1; scanIndex <= sicDetails.SICDataCount - 1; scanIndex++)
                     {
-                        int scanDelta = sicScanNumbers[scanIndex] - sicScanNumbers[scanIndex - 1];
+                        var scanDelta = sicScanNumbers[scanIndex] - sicScanNumbers[scanIndex - 1];
                         // When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
                         // However, for MRM data, field size can be much larger
                         SICDataScanIntervals[scanIndex] = (byte)Math.Min(byte.MaxValue, scanDelta);
@@ -115,7 +115,7 @@ namespace MASIC.DataOutput
                 var sicScanIndices = sicDetails.SICScanIndices;
 
                 // Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
-                for (int fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
+                for (var fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
                 {
                     lastGoodLoc = "fragScanIndex=" + fragScanIndex.ToString();
 
@@ -236,10 +236,10 @@ namespace MASIC.DataOutput
                         // For intervals between 36 and 61, uses letters A to Z
 
                         lastGoodLoc = "Populate scanIntervalList";
-                        string scanIntervalList = string.Empty;
+                        var scanIntervalList = string.Empty;
                         if (SICDataScanIntervals != null)
                         {
-                            for (int scanIntervalIndex = 0; scanIntervalIndex <= sicDetails.SICDataCount - 1; scanIntervalIndex++)
+                            for (var scanIntervalIndex = 0; scanIntervalIndex <= sicDetails.SICDataCount - 1; scanIntervalIndex++)
                             {
                                 if (SICDataScanIntervals[scanIntervalIndex] <= 9)
                                 {
@@ -366,7 +366,7 @@ namespace MASIC.DataOutput
 
                                 if (smoothedYDataSubset.Data != null && smoothedYDataSubset.DataCount > 0)
                                 {
-                                    for (int index = 0; index <= smoothedYDataSubset.DataCount - 1; index++)
+                                    for (var index = 0; index <= smoothedYDataSubset.DataCount - 1; index++)
                                         sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString(CultureInfo.InvariantCulture) + ",");
 
                                     // Trim the trailing comma
@@ -401,9 +401,9 @@ namespace MASIC.DataOutput
             byte[] dataArray)
         {
             int precisionBits;
-            string dataTypeName = string.Empty;
+            var dataTypeName = string.Empty;
 
-            string encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, out precisionBits, out dataTypeName);
+            var encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, out precisionBits, out dataTypeName);
 
             writer.WriteStartElement(elementName);
             writer.WriteAttributeString("precision", precisionBits.ToString());        // Store the precision, in bits
@@ -418,9 +418,9 @@ namespace MASIC.DataOutput
             float[] dataArray)
         {
             int precisionBits;
-            string dataTypeName = string.Empty;
+            var dataTypeName = string.Empty;
 
-            string encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, out precisionBits, out dataTypeName);
+            var encodedValues = MSDataFileReader.clsBase64EncodeDecode.EncodeNumericArray(dataArray, out precisionBits, out dataTypeName);
 
             writer.WriteStartElement(elementName);
             writer.WriteAttributeString("precision", precisionBits.ToString());        // Store the precision, in bits
@@ -447,7 +447,7 @@ namespace MASIC.DataOutput
                 writer.WriteElementString("UnCacheEventCount", spectraCache.UnCacheEventCount.ToString());
 
                 writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(processingStats.PeakMemoryUsageMB, 2));
-                float effectiveSeconds = processingTimeSec - processingStats.TotalProcessingTimeAtStart;
+                var effectiveSeconds = processingTimeSec - processingStats.TotalProcessingTimeAtStart;
                 writer.WriteElementString("TotalProcessingTimeSeconds", StringUtilities.DblToString(effectiveSeconds, 2));
 
                 writer.WriteEndElement();
@@ -483,7 +483,7 @@ namespace MASIC.DataOutput
             clsSICOptions sicOptions,
             clsBinningOptions binningOptions)
         {
-            string xmlOutputFilePath = string.Empty;
+            var xmlOutputFilePath = string.Empty;
 
             try
             {
@@ -688,9 +688,9 @@ namespace MASIC.DataOutput
             const string OPTIMAL_PEAK_APEX_TAG_NAME = "OptimalPeakApexScanNumber";
             const string PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME = "PeakApexOverrideParentIonIndex";
 
-            string xmlReadFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.XMLFile);
+            var xmlReadFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.XMLFile);
 
-            string xmlOutputFilePath = Path.Combine(outputDirectoryPath, "__temp__MASICOutputFile.xml");
+            var xmlOutputFilePath = Path.Combine(outputDirectoryPath, "__temp__MASICOutputFile.xml");
 
             try
             {
@@ -708,22 +708,22 @@ namespace MASIC.DataOutput
                 {
                     UpdateProgress(0, "Updating XML file with optimal peak apex values");
 
-                    int parentIonIndex = -1;
-                    int parentIonsProcessed = 0;
+                    var parentIonIndex = -1;
+                    var parentIonsProcessed = 0;
                     while (!reader.EndOfStream)
                     {
-                        string dataLine = reader.ReadLine();
+                        var dataLine = reader.ReadLine();
                         if (dataLine == null)
                             continue;
 
-                        string dataLineLCase = dataLine.Trim().ToLower();
+                        var dataLineLCase = dataLine.Trim().ToLower();
 
                         if (dataLineLCase.StartsWith(PARENT_ION_TAG_START_LCASE))
                         {
-                            int charIndex = dataLineLCase.IndexOf(INDEX_ATTRIBUTE_LCASE, StringComparison.CurrentCultureIgnoreCase);
+                            var charIndex = dataLineLCase.IndexOf(INDEX_ATTRIBUTE_LCASE, StringComparison.CurrentCultureIgnoreCase);
                             if (charIndex > 0)
                             {
-                                string work = dataLineLCase.Substring(charIndex + INDEX_ATTRIBUTE_LCASE.Length + 1);
+                                var work = dataLineLCase.Substring(charIndex + INDEX_ATTRIBUTE_LCASE.Length + 1);
                                 charIndex = work.IndexOf('"');
                                 if (charIndex > 0)
                                 {

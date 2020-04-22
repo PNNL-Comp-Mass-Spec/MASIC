@@ -123,7 +123,7 @@ namespace MASIC
             {
                 try
                 {
-                    int targetIndex = GetReporterIonIndexFromMode(value);
+                    var targetIndex = GetReporterIonIndexFromMode(value);
                     cboReporterIonMassMode.SelectedIndex = targetIndex;
                 }
                 catch (Exception ex)
@@ -184,7 +184,7 @@ namespace MASIC
         private void AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants reporterIonMassMode, string description)
         {
             cboReporterIonMassMode.Items.Add(description);
-            int currentIndex = cboReporterIonMassMode.Items.Count - 1;
+            var currentIndex = cboReporterIonMassMode.Items.Count - 1;
             if (mReporterIonIndexToModeMap.ContainsKey(currentIndex))
             {
                 mReporterIonIndexToModeMap[currentIndex] = reporterIonMassMode;
@@ -203,7 +203,7 @@ namespace MASIC
             }
 
             string textToAppend;
-            bool doEvents = false;
+            var doEvents = false;
             switch (messageType)
             {
                 case EventLogEntryType.Error:
@@ -447,9 +447,9 @@ namespace MASIC
         {
             bool rawExportEnabled;
 
-            bool createSICsAndRawData = !chkSkipSICAndRawDataProcessing.Checked;
-            bool msmsProcessingEnabled = !chkSkipMSMSProcessing.Checked;
-            bool exportRawDataOnly = chkExportRawDataOnly.Checked && chkExportRawSpectraData.Checked;
+            var createSICsAndRawData = !chkSkipSICAndRawDataProcessing.Checked;
+            var msmsProcessingEnabled = !chkSkipMSMSProcessing.Checked;
+            var exportRawDataOnly = chkExportRawDataOnly.Checked && chkExportRawSpectraData.Checked;
 
             chkSkipMSMSProcessing.Enabled = createSICsAndRawData;
             chkExportRawDataOnly.Enabled = createSICsAndRawData && chkExportRawSpectraData.Checked;
@@ -714,7 +714,7 @@ namespace MASIC
                 // Utilize MASIC's built-in LoadParameters function, then call ResetToDefaults
                 var masicInstance = new clsMASIC();
 
-                bool success = masicInstance.LoadParameterFileSettings(filePath);
+                var success = masicInstance.LoadParameterFileSettings(filePath);
                 if (!success)
                 {
                     MessageBox.Show("LoadParameterFileSettings returned false for: " + Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -977,7 +977,7 @@ namespace MASIC
                 return;
             }
 
-            string data = Convert.ToString(objData.GetData(DataFormats.StringFormat, true));
+            var data = Convert.ToString(objData.GetData(DataFormats.StringFormat, true));
 
             // Split data on carriage return or line feed characters
             // Lines that end in CrLf will give two separate lines; one with the text, and one blank; that's OK
@@ -999,8 +999,8 @@ namespace MASIC
                     return;
             }
 
-            int rowsAlreadyPresent = 0;
-            int rowsSkipped = 0;
+            var rowsAlreadyPresent = 0;
+            var rowsSkipped = 0;
 
             foreach (var dataLine in dataLines)
             {
@@ -1020,9 +1020,9 @@ namespace MASIC
                 {
                     double mz = 0;
                     float scanOrAcqTime = 0;
-                    string comment = string.Empty;
-                    double mzToleranceDa = defaultMZTolerance;
-                    float scanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance;
+                    var comment = string.Empty;
+                    var mzToleranceDa = defaultMZTolerance;
+                    var scanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance;
 
                     if (columns.Length == 2)
                     {
@@ -1071,7 +1071,7 @@ namespace MASIC
 
                     if (mz > 0)
                     {
-                        bool existingRowFound = false;
+                        var existingRowFound = false;
                         AddCustomSICRow(mz, mzToleranceDa, scanOrAcqTime, scanOrAcqTimeTolerance, comment,
                                         out existingRowFound);
 
@@ -1359,7 +1359,7 @@ namespace MASIC
                 var peakFinderOptions = masicOptions.SICOptions.SICPeakFinderOptions;
 
                 bool sicToleranceIsPPM;
-                double sicTolerance = sicOptions.GetSICTolerance(out sicToleranceIsPPM);
+                var sicTolerance = sicOptions.GetSICTolerance(out sicToleranceIsPPM);
 
                 txtSICTolerance.Text = StringUtilities.DblToString(sicTolerance, 6);
                 if (sicToleranceIsPPM)
@@ -1555,7 +1555,7 @@ namespace MASIC
                          "All files (*.*)|*.*"
             })
             {
-                string fileExtension = ".txt";
+                var fileExtension = ".txt";
 
                 if (txtCustomSICFileName.TextLength > 0)
                 {
@@ -1624,7 +1624,7 @@ namespace MASIC
                          "All files (*.*)|*.*"
             })
             {
-                string fileExtension = string.Copy(mPreferredInputFileExtension);
+                var fileExtension = string.Copy(mPreferredInputFileExtension);
 
                 if (txtInputFilePath.TextLength > 0)
                 {
@@ -2102,7 +2102,7 @@ namespace MASIC
 
                 // Store the custom M/Z values in mCustomSICList
 
-                string customSICFileName = txtCustomSICFileName.Text.Trim();
+                var customSICFileName = txtCustomSICFileName.Text.Trim();
                 masicOptions.CustomSICList.CustomSICListFileName = customSICFileName;
 
                 var mzSearchSpecs = new List<clsCustomMZSearchSpec>();

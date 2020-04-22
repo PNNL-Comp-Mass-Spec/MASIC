@@ -52,13 +52,13 @@ namespace MASICPeakFinder
 
             if (xValuesZeroBased == null || xValuesZeroBased.Length == 0)
                 return 0;
-            int segmentCount = endIndex - startIndex + 1;
+            var segmentCount = endIndex - startIndex + 1;
 
             segmentX = new double[segmentCount];
             segmentY = new double[segmentCount];
 
             // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
-            for (int index = startIndex; index <= endIndex; index++)
+            for (var index = startIndex; index <= endIndex; index++)
             {
                 segmentX[index - startIndex] = xValuesZeroBased[index];
                 segmentY[index - startIndex] = yValuesZeroBased[index];
@@ -118,7 +118,7 @@ namespace MASICPeakFinder
 
             try
             {
-                int sourceDataCount = xValuesZeroBased.Length;
+                var sourceDataCount = xValuesZeroBased.Length;
                 if (sourceDataCount <= 0)
                     return detectedPeaks;
 
@@ -127,11 +127,11 @@ namespace MASICPeakFinder
                 secondDerivative = new double[sourceDataCount];
 
                 // The mid point width is the minimum width divided by 2, rounded down
-                int peakHalfWidth = (int)Math.Floor(peakWidthPointsMinimum / 2.0);
+                var peakHalfWidth = (int)Math.Floor(peakWidthPointsMinimum / 2.0);
 
                 // Find the maximum intensity in the source data
                 double maximumIntensity = 0;
-                for (int index = 0; index < sourceDataCount; index++)
+                for (var index = 0; index < sourceDataCount; index++)
                 {
                     if (yValuesZeroBased[index] > maximumIntensity)
                     {
@@ -139,7 +139,7 @@ namespace MASICPeakFinder
                     }
                 }
 
-                double intensityThreshold = maximumIntensity * (peakDetectIntensityThresholdPercentageOfMaximum / 100.0);
+                var intensityThreshold = maximumIntensity * (peakDetectIntensityThresholdPercentageOfMaximum / 100.0);
                 if (intensityThreshold < intensityThresholdAbsoluteMinimum)
                 {
                     intensityThreshold = intensityThresholdAbsoluteMinimum;
@@ -162,10 +162,10 @@ namespace MASICPeakFinder
                     peakWidthPointsMinimum = 1;
 
                 // We'll start looking for peaks halfway into peakWidthPointsMinimum
-                int indexFirst = peakHalfWidth;
-                int indexLast = sourceDataCount - 1 - peakHalfWidth;
+                var indexFirst = peakHalfWidth;
+                var indexLast = sourceDataCount - 1 - peakHalfWidth;
 
-                for (int index = indexFirst; index <= indexLast; index++)
+                for (var index = indexFirst; index <= indexLast; index++)
                 {
                     if (firstDerivative[index] > 0 && firstDerivative[index + 1] < 0)
                     {
@@ -185,8 +185,8 @@ namespace MASICPeakFinder
                                 if (index > 0)
                                 {
                                     newPeak.LeftEdge = 0;
-                                    int lowIntensityPointCount = 0;
-                                    for (int compareIndex = index - 1; compareIndex >= 0; compareIndex--)
+                                    var lowIntensityPointCount = 0;
+                                    for (var compareIndex = index - 1; compareIndex >= 0; compareIndex--)
                                     {
                                         if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
                                         {
@@ -217,8 +217,8 @@ namespace MASICPeakFinder
                                 if (index < sourceDataCount - 2)
                                 {
                                     newPeak.RightEdge = sourceDataCount - 1;
-                                    int lowIntensityPointCount = 0;
-                                    for (int compareIndex = index + 1; compareIndex <= sourceDataCount - 2; compareIndex++)
+                                    var lowIntensityPointCount = 0;
+                                    for (var compareIndex = index + 1; compareIndex <= sourceDataCount - 2; compareIndex++)
                                     {
                                         if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
                                         {
@@ -274,7 +274,7 @@ namespace MASICPeakFinder
                                     sigma = 0;
                                 }
 
-                                int widthInPoints = (int)Math.Ceiling(peakWidthInSigma * sigma);
+                                var widthInPoints = (int)Math.Ceiling(peakWidthInSigma * sigma);
 
                                 if (widthInPoints > 4 * sourceDataCount)
                                 {
@@ -310,7 +310,7 @@ namespace MASICPeakFinder
                 // Compute the peak areas
                 foreach (var peakItem in detectedPeaks)
                 {
-                    int thisPeakWidthInPoints = peakItem.RightEdge - peakItem.LeftEdge + 1;
+                    var thisPeakWidthInPoints = peakItem.RightEdge - peakItem.LeftEdge + 1;
 
                     if (thisPeakWidthInPoints > 0)
                     {
@@ -325,8 +325,8 @@ namespace MASICPeakFinder
                             xValuesForArea = new double[thisPeakWidthInPoints];
                             yValuesForArea = new double[thisPeakWidthInPoints];
 
-                            int thisPeakStartIndex = peakItem.LeftEdge;
-                            int thisPeakEndIndex = peakItem.RightEdge;
+                            var thisPeakStartIndex = peakItem.LeftEdge;
+                            var thisPeakEndIndex = peakItem.RightEdge;
 
                             if (thisPeakStartIndex < 0)
                             {
@@ -340,7 +340,7 @@ namespace MASICPeakFinder
                                 thisPeakEndIndex = sourceDataCount - 1;
                             }
 
-                            for (int areaValsCopyIndex = thisPeakStartIndex; areaValsCopyIndex <= thisPeakEndIndex; areaValsCopyIndex++)
+                            for (var areaValsCopyIndex = thisPeakStartIndex; areaValsCopyIndex <= thisPeakEndIndex; areaValsCopyIndex++)
                             {
                                 xValuesForArea[areaValsCopyIndex - thisPeakStartIndex] = xValuesZeroBased[areaValsCopyIndex];
                                 yValuesForArea[areaValsCopyIndex - thisPeakStartIndex] = yValuesZeroBased[areaValsCopyIndex];
@@ -363,16 +363,16 @@ namespace MASICPeakFinder
                     {
                         // The peak finder often determines the peak center to be a few points away from the peak apex -- check for this
                         // Define the maximum allowed peak apex shift to be 33% of peakWidthPointsMinimum
-                        int dataIndexCheckStart = peakItem.PeakLocation - (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+                        var dataIndexCheckStart = peakItem.PeakLocation - (int)Math.Floor(peakWidthPointsMinimum / 3.0);
                         if (dataIndexCheckStart < 0)
                             dataIndexCheckStart = 0;
 
-                        int dataIndexCheckEnd = peakItem.PeakLocation + (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+                        var dataIndexCheckEnd = peakItem.PeakLocation + (int)Math.Floor(peakWidthPointsMinimum / 3.0);
                         if (dataIndexCheckEnd > sourceDataCount - 1)
                             dataIndexCheckEnd = sourceDataCount - 1;
 
                         maximumIntensity = yValuesZeroBased[peakItem.PeakLocation];
-                        for (int dataIndexCheck = dataIndexCheckStart; dataIndexCheck <= dataIndexCheckEnd; dataIndexCheck++)
+                        for (var dataIndexCheck = dataIndexCheckStart; dataIndexCheck <= dataIndexCheckEnd; dataIndexCheck++)
                         {
                             if (yValuesZeroBased[dataIndexCheck] > maximumIntensity)
                             {
@@ -403,7 +403,7 @@ namespace MASICPeakFinder
             // Finds the area under the curve, using trapezoidal integration
 
             double area = 0;
-            for (int index = 0; index <= arrayCount - 2; index++)
+            for (var index = 0; index <= arrayCount - 2; index++)
             {
                 // Area of a trapezoid (turned on its side) is:
                 // 0.5 * d * (h1 + h2)
@@ -432,11 +432,11 @@ namespace MASICPeakFinder
             segmentX = new double[peakWidthPointsMinimum];
             segmentY = new double[peakWidthPointsMinimum];
 
-            for (int startIndex = 0; startIndex <= sourceDataCount - peakWidthPointsMinimum - 1; startIndex++)
+            for (var startIndex = 0; startIndex <= sourceDataCount - peakWidthPointsMinimum - 1; startIndex++)
             {
 
                 // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
-                for (int subIndex = startIndex; subIndex <= startIndex + peakWidthPointsMinimum - 1; subIndex++)
+                for (var subIndex = startIndex; subIndex <= startIndex + peakWidthPointsMinimum - 1; subIndex++)
                 {
                     segmentX[subIndex - startIndex] = xValues[subIndex];
                     segmentY[subIndex - startIndex] = yValues[subIndex];
@@ -446,7 +446,7 @@ namespace MASICPeakFinder
                 LeastSquaresFit(segmentX, segmentY, out coefficients, POLYNOMIAL_ORDER);
 
                 // Compute the firstDerivative at the midpoint
-                int midPointIndex = startIndex + peakWidthMidPoint;
+                var midPointIndex = startIndex + peakWidthMidPoint;
                 firstDerivative[midPointIndex] = 2 * coefficients[2] * xValues[midPointIndex] + coefficients[1];
                 secondDerivative[midPointIndex] = 2 * coefficients[2];
             }
@@ -475,7 +475,7 @@ namespace MASICPeakFinder
             }
 
             // Define equation for "ax^0 + bx^1 + cx^2", which is the same as "a + bx + cx^2"
-            for (int term = 0; term <= polynomialOrder; term++)
+            for (var term = 0; term <= polynomialOrder; term++)
             {
                 // array of struct: Direct assignment, indexing the array every time, works.
                 equationTerms[term].Coefficient = 1;                        // a, b, c in the above equation
@@ -486,8 +486,8 @@ namespace MASICPeakFinder
                 equationTerms[term].ParamResult = 0;
             }
 
-            bool success = LLSqFit(xValues, yValues, ref equationTerms);
-            for (int term = 0; term <= polynomialOrder; term++)
+            var success = LLSqFit(xValues, yValues, ref equationTerms);
+            for (var term = 0; term <= polynomialOrder; term++)
                 coefficients[term] = equationTerms[term].ParamResult;
 
             return success;

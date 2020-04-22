@@ -76,9 +76,9 @@ namespace MASIC.DataInput
 
             try
             {
-                bool mzHeaderFound = false;
-                bool scanTimeHeaderFound = false;
-                bool timeToleranceHeaderFound = false;
+                var mzHeaderFound = false;
+                var scanTimeHeaderFound = false;
+                var timeToleranceHeaderFound = false;
 
                 mCustomSICList.ResetMzSearchValues();
 
@@ -89,7 +89,7 @@ namespace MASIC.DataInput
                 if (!File.Exists(customSICValuesFileName))
                 {
                     // Custom SIC file not found
-                    string errorMessage = "Custom MZ List file not found: " + customSICValuesFileName;
+                    var errorMessage = "Custom MZ List file not found: " + customSICValuesFileName;
                     ReportError(errorMessage);
                     mCustomSICList.CustomMZSearchValues.Clear();
                     return false;
@@ -97,10 +97,10 @@ namespace MASIC.DataInput
 
                 using (var reader = new StreamReader(new FileStream(customSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
-                    int linesRead = 0;
+                    var linesRead = 0;
                     while (!reader.EndOfStream)
                     {
-                        string dataLine = reader.ReadLine();
+                        var dataLine = reader.ReadLine();
                         if (dataLine == null)
                             continue;
 
@@ -122,11 +122,11 @@ namespace MASIC.DataInput
                         {
                             // Initialize eColumnMapping, setting the value for each column to -1, indicating the column is not present
                             eColumnMapping = new int[dataCols.Length];
-                            for (int colIndex = 0; colIndex <= eColumnMapping.Length - 1; colIndex++)
+                            for (var colIndex = 0; colIndex <= eColumnMapping.Length - 1; colIndex++)
                                 eColumnMapping[colIndex] = -1;
 
                             // The first row must be the header row; parse the values
-                            for (int colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
+                            for (var colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                             {
                                 var colName = dataCols[colIndex];
                                 if (colName.Equals(CUSTOM_SIC_COLUMN_MZ, StringComparison.OrdinalIgnoreCase))
@@ -169,7 +169,7 @@ namespace MASIC.DataInput
                             // Make sure that, at a minimum, the MZ column is present
                             if (!mzHeaderFound)
                             {
-                                string errorMessage = "Custom M/Z List file " + customSICValuesFileName + "does not have a column header named " + CUSTOM_SIC_COLUMN_MZ + " in the first row; this header is required (valid column headers are: " + GetCustomMZFileColumnHeaders() + ")";
+                                var errorMessage = "Custom M/Z List file " + customSICValuesFileName + "does not have a column header named " + CUSTOM_SIC_COLUMN_MZ + " in the first row; this header is required (valid column headers are: " + GetCustomMZFileColumnHeaders() + ")";
                                 ReportError(errorMessage);
 
                                 mCustomSICList.CustomMZSearchValues.Clear();
@@ -201,7 +201,7 @@ namespace MASIC.DataInput
                         mzSearchSpec.ScanOrAcqTimeCenter = 0;
                         mzSearchSpec.ScanOrAcqTimeTolerance = 0;
 
-                        for (int colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
+                        for (var colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                         {
                             if (colIndex >= eColumnMapping.Length)
                                 break;

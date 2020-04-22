@@ -849,8 +849,8 @@ namespace MASIC
             clsParentIonProcessing parentIonProcessor,
             DataInput.clsDataImport dataImporterBase)
         {
-            bool success = true;
-            string inputFileName = Path.GetFileName(inputFilePathFull);
+            var success = true;
+            var inputFileName = Path.GetFileName(inputFilePathFull);
             var similarParentIonUpdateCount = 0;
 
             try
@@ -1066,7 +1066,7 @@ namespace MASIC
                     // ---------------------------------------------------------
 
                     LogMessage("ProcessFile: Call FinalizeXMLFile");
-                    float processingTimeSec = GetTotalProcessingTimeSec();
+                    var processingTimeSec = GetTotalProcessingTimeSec();
                     success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, spectraCache,
                                                                      mProcessingStats, processingTimeSec);
                 }
@@ -1258,7 +1258,7 @@ namespace MASIC
                 // ---------------------------------------------------------
                 // Define inputFileName (which is referenced several times below)
                 // ---------------------------------------------------------
-                string inputFileName = Path.GetFileName(inputFilePathFull);
+                var inputFileName = Path.GetFileName(inputFilePathFull);
 
                 // ---------------------------------------------------------
                 // Create the _ScanStats.txt file
@@ -1279,7 +1279,7 @@ namespace MASIC
                     Options.ExportRawDataOnly = false;
                 }
 
-                bool keepRawMSSpectra = !Options.SkipSICAndRawDataProcessing || Options.ExportRawDataOnly;
+                var keepRawMSSpectra = !Options.SkipSICAndRawDataProcessing || Options.ExportRawDataOnly;
 
                 Options.SICOptions.ValidateSICOptions();
 
@@ -1400,7 +1400,7 @@ namespace MASIC
 
         public bool LoadParameterFileSettings(string parameterFilePath)
         {
-            bool success = Options.LoadParameterFileSettings(parameterFilePath);
+            var success = Options.LoadParameterFileSettings(parameterFilePath);
             return success;
         }
 
@@ -1463,7 +1463,7 @@ namespace MASIC
 
             bool success = default, doNotProcess = default;
 
-            string inputFilePathFull = string.Empty;
+            var inputFilePathFull = string.Empty;
 
             if (!mLoggedMASICVersion)
             {
@@ -1629,7 +1629,7 @@ namespace MASIC
 
                         LogMessage("Checking for write permission in the output path: " + outputDirectoryPath);
 
-                        string outputFileTestPath = Path.Combine(outputDirectoryPath, "TestOutputFile" + DateTime.UtcNow.Ticks + ".tmp");
+                        var outputFileTestPath = Path.Combine(outputDirectoryPath, "TestOutputFile" + DateTime.UtcNow.Ticks + ".tmp");
 
                         using (var fsOutFileTest = new StreamWriter(outputFileTestPath, false))
                         {
@@ -1850,7 +1850,7 @@ namespace MASIC
         [Obsolete("Use Options.SaveParameterFileSettings")]
         public bool SaveParameterFileSettings(string parameterFilePath)
         {
-            bool success = Options.SaveParameterFileSettings(parameterFilePath);
+            var success = Options.SaveParameterFileSettings(parameterFilePath);
             return success;
         }
 
@@ -2085,8 +2085,8 @@ namespace MASIC
 
                 try
                 {
-                    string tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
-                    string statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename);
+                    var tempPath = Path.Combine(GetAppDirectoryPath(), "Temp_" + Options.MASICStatusFilename);
+                    var statusFilePath = Path.Combine(GetAppDirectoryPath(), Options.MASICStatusFilename);
 
                     using (var writer = new System.Xml.XmlTextWriter(tempPath, System.Text.Encoding.UTF8))
                     {
@@ -2185,7 +2185,7 @@ namespace MASIC
         private void UpdateMemoryUsageEventHandler()
         {
             // Record the current memory usage
-            float memoryUsageMB = GetProcessMemoryUsageMB();
+            var memoryUsageMB = GetProcessMemoryUsageMB();
             if (memoryUsageMB > mProcessingStats.MemoryUsageMBDuringLoad)
             {
                 mProcessingStats.MemoryUsageMBDuringLoad = memoryUsageMB;

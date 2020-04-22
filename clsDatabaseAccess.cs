@@ -47,14 +47,14 @@ namespace MASIC
             string datasetLookupFilePath,
             int defaultDatasetID)
         {
-            string datasetName = Path.GetFileNameWithoutExtension(inputFilePath);
+            var datasetName = Path.GetFileNameWithoutExtension(inputFilePath);
             int newDatasetID;
 
             // ReSharper disable once CommentTypo
             // Data Source=gigasax;Initial Catalog=DMS5;User=DMSReader;Password=...
             if (!string.IsNullOrWhiteSpace(mOptions.DatabaseConnectionString))
             {
-                bool datasetFoundInDB = GetDatasetIDFromDatabase(mOptions, datasetName, out newDatasetID);
+                var datasetFoundInDB = GetDatasetIDFromDatabase(mOptions, datasetName, out newDatasetID);
                 if (datasetFoundInDB)
                 {
                     return newDatasetID;
@@ -63,7 +63,7 @@ namespace MASIC
 
             if (!string.IsNullOrWhiteSpace(datasetLookupFilePath))
             {
-                bool datasetFoundInFile = GetDatasetIDFromFile(datasetLookupFilePath, datasetName, out newDatasetID);
+                var datasetFoundInFile = GetDatasetIDFromFile(datasetLookupFilePath, datasetName, out newDatasetID);
                 if (datasetFoundInFile)
                 {
                     return newDatasetID;
@@ -81,10 +81,10 @@ namespace MASIC
         /// <returns></returns>
         private bool GetDatasetIDFromDatabase(clsMASICOptions masicOptions, string datasetName, out int newDatasetID)
         {
-            string avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " +
-                                       "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " +
-                                       "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " +
-                                       "for parameters ConnectionString and DatasetInfoQuerySql.";
+            var avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " +
+                                    "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " +
+                                    "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " +
+                                    "for parameters ConnectionString and DatasetInfoQuerySql.";
 
             newDatasetID = 0;
 
@@ -92,11 +92,11 @@ namespace MASIC
             {
                 var dbTools = PRISMDatabaseUtils.DbToolsFactory.GetDBTools(masicOptions.DatabaseConnectionString);
 
-                bool queryingSingleDataset = false;
+                var queryingSingleDataset = false;
 
-                for (int iteration = 1; iteration <= 2; iteration++)
+                for (var iteration = 1; iteration <= 2; iteration++)
                 {
-                    string sqlQuery = masicOptions.DatasetInfoQuerySql;
+                    var sqlQuery = masicOptions.DatasetInfoQuerySql;
 
                     if (string.IsNullOrEmpty(sqlQuery))
                     {
@@ -195,7 +195,7 @@ namespace MASIC
                 {
                     while (!reader.EndOfStream)
                     {
-                        string dataLine = reader.ReadLine();
+                        var dataLine = reader.ReadLine();
                         if (string.IsNullOrWhiteSpace(dataLine))
                         {
                             continue;

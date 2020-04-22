@@ -159,7 +159,7 @@ namespace MASIC.DatasetStats
 
                 mErrorMessage = string.Empty;
 
-                int scanStatsCount = scanStats.Count;
+                var scanStatsCount = scanStats.Count;
 
                 // Initialize the TIC and BPI Lists
                 var ticListMS = new List<double>(scanStatsCount);
@@ -189,7 +189,7 @@ namespace MASIC.DatasetStats
                                                       bpiListMS);
                     }
 
-                    string scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + statEntry.ScanFilterText;
+                    var scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + statEntry.ScanFilterText;
                     if (summaryStats.ScanTypeStats.ContainsKey(scanTypeKey))
                     {
                         summaryStats.ScanTypeStats[scanTypeKey] += 1;
@@ -465,8 +465,8 @@ namespace MASIC.DatasetStats
 
                 foreach (var scanTypeEntry in summaryStats.ScanTypeStats)
                 {
-                    string scanType = scanTypeEntry.Key;
-                    int indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal);
+                    var scanType = scanTypeEntry.Key;
+                    var indexMatch = scanType.IndexOf(SCAN_TYPE_STATS_SEP_CHAR, StringComparison.Ordinal);
                     string scanFilterText;
 
                     if (indexMatch >= 0)
@@ -497,7 +497,7 @@ namespace MASIC.DatasetStats
 
                 writer.WriteStartElement("AcquisitionInfo");
 
-                int scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount;
+                var scanCountTotal = summaryStats.MSStats.ScanCount + summaryStats.MSnStats.ScanCount;
                 if (scanCountTotal == 0 && datasetInfo.ScanCount > 0)
                 {
                     scanCountTotal = datasetInfo.ScanCount;
@@ -589,7 +589,7 @@ namespace MASIC.DatasetStats
             DatasetFileInfo datasetInfo,
             SampleInfo oSampleInfo)
         {
-            int datasetID = 0;
+            var datasetID = 0;
 
             try
             {
@@ -716,7 +716,7 @@ namespace MASIC.DatasetStats
             var matchFound = false;
 
             // Look for scan scanNumber in mDatasetScanStats
-            for (int index = 0; index <= mDatasetScanStats.Count - 1; index++)
+            for (var index = 0; index <= mDatasetScanStats.Count - 1; index++)
             {
                 if (mDatasetScanStats[index].ScanNumber == scanNumber)
                 {
@@ -785,7 +785,7 @@ namespace MASIC.DatasetStats
                     summaryStats = new DatasetSummaryStats();
 
                     // Parse the data in scanStats to compute the bulk values
-                    bool summarySuccess = ComputeScanStatsSummary(scanStats, out summaryStats);
+                    var summarySuccess = ComputeScanStatsSummary(scanStats, out summaryStats);
                     if (!summarySuccess)
                     {
                         ReportError("ComputeScanStatsSummary returned false; unable to continue in UpdateDatasetStatsTextFile");

@@ -137,7 +137,7 @@ namespace MASIC
 
                 UpdateProgress(0);
 
-                bool useFullDataSort = false;
+                var useFullDataSort = false;
                 if (mDataCount == 0)
                 {
                     // No data loaded
@@ -156,8 +156,8 @@ namespace MASIC
                 // (aka frequency distribution) of the abundances in mDataValues
 
                 // First, determine the maximum abundance value in mDataValues
-                double maxAbundance = double.MinValue;
-                for (int index = 0; index <= mDataCount - 1; index++)
+                var maxAbundance = double.MinValue;
+                for (var index = 0; index <= mDataCount - 1; index++)
                 {
                     if (mDataValues[index] > maxAbundance)
                     {
@@ -169,12 +169,12 @@ namespace MASIC
                 maxAbundance = (long)Math.Ceiling(maxAbundance);
 
                 // Now determine the histogram bin size
-                double binSize = maxAbundance / HISTOGRAM_BIN_COUNT;
+                var binSize = maxAbundance / HISTOGRAM_BIN_COUNT;
                 if (binSize < 1)
                     binSize = 1;
 
                 // Initialize histogramData
-                int binCount = (int)(maxAbundance / binSize) + 1;
+                var binCount = (int)(maxAbundance / binSize) + 1;
 
                 int[] histogramBinCounts;
                 double[] histogramBinStartIntensity;
@@ -182,11 +182,11 @@ namespace MASIC
                 histogramBinCounts = new int[binCount];
                 histogramBinStartIntensity = new double[binCount];
 
-                for (int index = 0; index <= binCount - 1; index++)
+                for (var index = 0; index <= binCount - 1; index++)
                     histogramBinStartIntensity[index] = index * binSize;
 
                 // Parse mDataValues to populate histogramBinCounts
-                for (int index = 0; index <= mDataCount - 1; index++)
+                for (var index = 0; index <= mDataCount - 1; index++)
                 {
                     int targetBin;
                     if (mDataValues[index] <= 0)
@@ -224,9 +224,9 @@ namespace MASIC
                 }
 
                 // Now examine the frequencies in histogramBinCounts() to determine the minimum value to consider when sorting
-                int pointTotal = 0;
-                int binToSort = -1;
-                for (int index = binCount - 1; index >= 0; index += -1)
+                var pointTotal = 0;
+                var binToSort = -1;
+                for (var index = binCount - 1; index >= 0; index += -1)
                 {
                     pointTotal = pointTotal + histogramBinCounts[index];
                     if (pointTotal >= MaximumDataCountToLoad)
@@ -243,8 +243,8 @@ namespace MASIC
                     // Find the data with intensity >= histogramBinStartIntensity(binToSort)
                     // We actually only need to sort the data in bin binToSort
 
-                    double binToSortAbundanceMinimum = histogramBinStartIntensity[binToSort];
-                    double binToSortAbundanceMaximum = maxAbundance + 1;
+                    var binToSortAbundanceMinimum = histogramBinStartIntensity[binToSort];
+                    var binToSortAbundanceMaximum = maxAbundance + 1;
 
                     if (binToSort < binCount - 1)
                     {
@@ -258,7 +258,7 @@ namespace MASIC
                         useFullDataSort = true;
                     }
 
-                    int binToSortDataCount = 0;
+                    var binToSortDataCount = 0;
 
                     if (!useFullDataSort)
                     {
@@ -276,8 +276,8 @@ namespace MASIC
 
                     if (!useFullDataSort)
                     {
-                        int dataCountImplicitlyIncluded = 0;
-                        for (int index = 0; index <= mDataCount - 1; index++)
+                        var dataCountImplicitlyIncluded = 0;
+                        for (var index = 0; index <= mDataCount - 1; index++)
                         {
                             if (mDataValues[index] < binToSortAbundanceMinimum)
                             {
@@ -344,8 +344,8 @@ namespace MASIC
                         // mDataValues and mDataIndices have not been sorted and therefore mDataIndices should currently be sorted ascending on "valid data point index"
                         // binToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
 
-                        int originalDataArrayIndex = 0;
-                        for (int index = 0; index <= binToSortDataCount - 1; index++)
+                        var originalDataArrayIndex = 0;
+                        for (var index = 0; index <= binToSortDataCount - 1; index++)
                         {
                             while (binToSortDataIndices[index] > mDataIndices[originalDataArrayIndex])
                                 originalDataArrayIndex += 1;

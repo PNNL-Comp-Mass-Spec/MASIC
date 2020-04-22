@@ -124,7 +124,7 @@ namespace MASIC
         {
             var surveyScan = GetFakeSurveyScan(scanNumber, scanTime);
 
-            int surveyScanIndex = SurveyScans.Count;
+            var surveyScanIndex = SurveyScans.Count;
 
             SurveyScans.Add(surveyScan);
 

@@ -87,7 +87,7 @@ namespace MASIC
             double defaultMassTolerance,
             bool isOrbitrapData)
         {
-            double toleranceFactor = GetDefaultToleranceFactor(isOrbitrapData);
+            var toleranceFactor = GetDefaultToleranceFactor(isOrbitrapData);
             var toleranceUnit = ThermoFisher.CommonCore.Data.Business.ToleranceMode.Amu;
 
             return EstimateResolution(mass, toleranceFactor, defaultMassTolerance, isOrbitrapData, toleranceUnit);
@@ -122,7 +122,7 @@ namespace MASIC
                     massToleranceDa = mass * 0.001 * defaultMassTolerance;
                 }
 
-                double deltaM = mass * mass * toleranceFactor;
+                var deltaM = mass * mass * toleranceFactor;
 
                 if (deltaM > massToleranceDa)
                 {

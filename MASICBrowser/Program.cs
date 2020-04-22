@@ -92,7 +92,7 @@ namespace MASICBrowser
         {
             // Returns True if no problems; otherwise, returns false
 
-            string value = string.Empty;
+            var value = string.Empty;
             var validParameters = new List<string>() { "I" };
 
             try

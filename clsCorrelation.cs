@@ -125,7 +125,7 @@ namespace MASIC
         private double BetaCF(double a, double b, double x)
         {
             const int MAX_ITERATIONS = 100;
-            double EPS = 0.0000003;
+            var EPS = 0.0000003;
             const double FPMIN = 1.0E-30;
 
             int m, m2;
@@ -245,7 +245,7 @@ namespace MASIC
                     mBinningOptions.EndX = mBinningOptions.StartX + mBinningOptions.BinSize * 10;
                 }
 
-                int binCount = (int)Math.Round((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
+                var binCount = (int)Math.Round((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
                 if (binCount < 1)
                     binCount = 1;
 
@@ -258,7 +258,7 @@ namespace MASIC
                 bin2Offset = mBinningOptions.BinSize / 2;
 
                 // Initialize the bins
-                for (int i = 1; i <= binCount; i++)
+                for (var i = 1; i <= binCount; i++)
                 {
                     binnedYData.Add(0);
                     binnedOffsetYData.Add(0);
@@ -452,7 +452,7 @@ namespace MASIC
             // Code from Numerical Recipes in C
 
             // TINY is used to "regularize" the unusual case of complete correlation
-            double TINY = 1.0E-20;
+            var TINY = 1.0E-20;
 
             // Given two arrays x[1..n] and y[1..n], this routine computes their correlation coefficient
             // r (returned as r), the significance level at which the null hypothesis of zero correlation is
@@ -462,11 +462,11 @@ namespace MASIC
             int n;
             int j;
             double yt, xt, t, df;
-            double syy = 0.0;
-            double sxy = 0.0;
-            double sxx = 0.0;
-            double ay = 0.0;
-            double ax = 0.0;
+            var syy = 0.0;
+            var sxy = 0.0;
+            var sxx = 0.0;
+            var ay = 0.0;
+            var ax = 0.0;
 
             RValue = 0;
             ProbOfSignificance = 0;
@@ -534,7 +534,7 @@ namespace MASIC
             long n2 = 0;
             long n1 = 0;
             int k, j;
-            int intIS = 0;
+            var intIS = 0;
 
             double svar, aa, a2, a1;
 
@@ -807,7 +807,7 @@ namespace MASIC
             // First subtract StartValue from ThisValue
             // For example, if StartValue is 500 and ThisValue is 500.28, then WorkingValue = 0.28
             // Or, if StartValue is 500 and ThisValue is 530.83, then WorkingValue = 30.83
-            float workingValue = thisValue - startValue;
+            var workingValue = thisValue - startValue;
 
             // Now, dividing WorkingValue by BinSize and rounding to nearest integer
             // actually gives the bin

@@ -87,7 +87,7 @@ namespace MASIC
             bool sicToleranceIsPPM,
             float defaultScanOrAcqTimeTolerance)
         {
-            int scanOrAcqTimeSumCount = 0;
+            var scanOrAcqTimeSumCount = 0;
             float scanOrAcqTimeSumForAveraging = 0;
 
             try
@@ -118,7 +118,7 @@ namespace MASIC
                     }
 
                     // Find the next MS2 scan that occurs after the survey scan (parent scan)
-                    int surveyScanNumberAbsolute = 0;
+                    var surveyScanNumberAbsolute = 0;
                     if (currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count)
                     {
                         surveyScanNumberAbsolute = scanList.SurveyScans[currentParentIon.SurveyScanIndex].ScanNumber + 1;
@@ -130,7 +130,7 @@ namespace MASIC
                     }
                     else
                     {
-                        int fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                        var fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                         while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
                             fragScanIndexMatch += 1;
@@ -270,7 +270,7 @@ namespace MASIC
                 return true;
             }
 
-            for (int index = 0; index <= lstMZs.Count - 1; index++)
+            for (var index = 0; index <= lstMZs.Count - 1; index++)
             {
                 double targetMz;
 
@@ -492,8 +492,8 @@ namespace MASIC
             // Check whether all of the values are between 0 and 1
             // If they are, then auto-switch .ScanToleranceType to "Relative"
 
-            int countBetweenZeroAndOne = 0;
-            int countOverOne = 0;
+            var countBetweenZeroAndOne = 0;
+            var countOverOne = 0;
 
             foreach (var customMzValue in CustomMZSearchValues)
             {

@@ -230,7 +230,7 @@ namespace MASIC
         {
             // Returns True if no problems; otherwise, returns false
 
-            string value = string.Empty;
+            var value = string.Empty;
             var lstValidParameters = new List<string>() { "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q" };
             int intValue;
 
@@ -288,8 +288,8 @@ namespace MASIC
                     if (commandLineParser.IsParameterPresent("R"))
                         mRecreateDirectoryHierarchyInAlternatePath = true;
 
-                    string logFileName = string.Empty;
-                    bool logToFile = false;
+                    var logFileName = string.Empty;
+                    var logToFile = false;
 
                     if (commandLineParser.IsParameterPresent("L"))
                     {

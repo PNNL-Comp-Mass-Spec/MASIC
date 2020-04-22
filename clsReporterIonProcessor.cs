@@ -40,7 +40,7 @@ namespace MASIC
         {
             const char TAB_DELIMITER = '\t';
 
-            string outputFilePath = "??";
+            var outputFilePath = "??";
 
             try
             {
@@ -54,15 +54,15 @@ namespace MASIC
                 var xcaliburAccessor = new XRawFileIO(readerOptions);
                 RegisterEvents(xcaliburAccessor);
 
-                bool includeFtmsColumns = false;
+                var includeFtmsColumns = false;
 
                 if (inputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper()))
                 {
                     // Processing a thermo .Raw file
                     // Check whether any of the frag scans has IsFTMS true
-                    for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
+                    for (var masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                     {
-                        int scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
+                        var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                         if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
                         {
                             // Skip survey scans
@@ -92,7 +92,7 @@ namespace MASIC
                 clsReporterIonInfo[] reporterIons;
                 reporterIons = new clsReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
 
-                int reporterIonIndex = 0;
+                var reporterIonIndex = 0;
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
                 {
                     reporterIons[reporterIonIndex] = reporterIon;
@@ -127,7 +127,7 @@ namespace MASIC
                     var ftmsResolution = new List<string>();
                     // Dim ftmsLabelDataMz = New List(Of String)
 
-                    bool saveUncorrectedIntensities =
+                    var saveUncorrectedIntensities =
                         mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection && mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities;
 
                     var dataAggregation = new clsDataAggregation();
@@ -214,9 +214,9 @@ namespace MASIC
 
                     UpdateProgress(0, "Searching for reporter ions");
 
-                    for (int masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
+                    for (var masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
                     {
-                        int scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
+                        var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                         if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
                         {
                             // Skip Survey Scans
@@ -359,7 +359,7 @@ namespace MASIC
             // Find the reporter ion intensities
             // Also keep track of the closest m/z for each reporter ion
             // Note that we're using the maximum intensity in the range (not the sum)
-            for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+            for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
                 int ionMatchCount;
 
@@ -387,13 +387,13 @@ namespace MASIC
 
                 // Find each reporter ion in ftLabelData
 
-                for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+                for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
                 {
-                    double mzToFind = reporterIons[reporterIonIndex].MZ;
-                    double mzToleranceDa = reporterIons[reporterIonIndex].MZToleranceDa;
-                    double highestIntensity = 0.0;
+                    var mzToFind = reporterIons[reporterIonIndex].MZ;
+                    var mzToleranceDa = reporterIons[reporterIonIndex].MZToleranceDa;
+                    var highestIntensity = 0.0;
                     var udtBestMatch = new udtFTLabelInfoType();
-                    bool matchFound = false;
+                    var matchFound = false;
 
                     foreach (var labelItem in ftLabelData)
                     {
@@ -443,8 +443,8 @@ namespace MASIC
                     }
 
                     // Count the number of non-zero data points in reporterIntensitiesCorrected()
-                    int positiveCount = 0;
-                    for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+                    var positiveCount = 0;
+                    for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
                     {
                         if (reporterIntensitiesCorrected[reporterIonIndex] > 0)
                         {
@@ -467,7 +467,7 @@ namespace MASIC
             double pctChangeSum = 0;
             double originalIntensitySum = 0;
 
-            for (int reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+            for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
                 if (!reporterIons[reporterIonIndex].ContaminantIon)
                 {
@@ -478,7 +478,7 @@ namespace MASIC
                     if (reporterIntensities[reporterIonIndex] > 0)
                     {
                         // Compute the percent change, then update pctChangeSum
-                        double pctChange =
+                        var pctChange =
                             (reporterIntensitiesCorrected[reporterIonIndex] - reporterIntensities[reporterIonIndex]) /
                             reporterIntensities[reporterIonIndex];
 

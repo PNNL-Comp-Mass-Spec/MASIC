@@ -79,10 +79,10 @@ namespace MASIC.DataOutput
             bool validExistingResultsFound;
 
             long sourceFileSizeBytes = 0;
-            string sourceFilePathCheck = string.Empty;
-            string masicVersion = string.Empty;
-            string masicPeakFinderDllVersion = string.Empty;
-            string sourceFileDateTimeCheck = string.Empty;
+            var sourceFilePathCheck = string.Empty;
+            var masicVersion = string.Empty;
+            var masicPeakFinderDllVersion = string.Empty;
+            var sourceFileDateTimeCheck = string.Empty;
             DateTime sourceFileDateTime;
 
             var skipMSMSProcessing = false;
@@ -631,12 +631,12 @@ namespace MASIC.DataOutput
             var sampleInfo = new SampleInfo();
             try
             {
-                string datasetName = Path.GetFileNameWithoutExtension(inputFileName);
-                string datasetInfoFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.DatasetInfoFile);
+                var datasetName = Path.GetFileNameWithoutExtension(inputFileName);
+                var datasetInfoFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.DatasetInfoFile);
 
                 var datasetStatsSummarizer = new clsDatasetStatsSummarizer();
 
-                bool success = datasetStatsSummarizer.CreateDatasetInfoFile(
+                var success = datasetStatsSummarizer.CreateDatasetInfoFile(
                     datasetName, datasetInfoFilePath,
                     scanTracking.ScanStats, datasetFileInfo, sampleInfo);
 
@@ -778,7 +778,7 @@ namespace MASIC.DataOutput
             string inputFilePathFull,
             string outputDirectoryPath)
         {
-            string outputFilePath = string.Empty;
+            var outputFilePath = string.Empty;
 
             try
             {
@@ -826,7 +826,7 @@ namespace MASIC.DataOutput
             string inputFileName,
             string outputDirectoryPath)
         {
-            string outputFilePath = "?UndefinedFile?";
+            var outputFilePath = "?UndefinedFile?";
 
             try
             {
@@ -846,7 +846,7 @@ namespace MASIC.DataOutput
                     writer.WriteLine();
 
                     // ScanStatsExtended
-                    string headers = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile);
+                    var headers = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile);
                     if (!string.IsNullOrWhiteSpace(headers))
                     {
                         writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) + ":");

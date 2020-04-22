@@ -486,7 +486,7 @@ namespace MASIC.DataInput
             var mzList = new List<double>();
             var intensityList = new List<double>();
 
-            for (int i = 0; i <= ionCount - 1; i++)
+            for (var i = 0; i <= ionCount - 1; i++)
             {
                 mzList.Add(centroidedIonsMz[i]);
                 intensityList.Add(centroidedIonsIntensity[i]);
@@ -502,8 +502,8 @@ namespace MASIC.DataInput
         {
             mCachedPrecursorIons.Clear();
 
-            int ionCount = centroidedIonsMz.Count;
-            for (int index = 0; index <= ionCount - 1; index++)
+            var ionCount = centroidedIonsMz.Count;
+            for (var index = 0; index <= ionCount - 1; index++)
             {
                 var newPeak = new InterDetect.Peak()
                 {

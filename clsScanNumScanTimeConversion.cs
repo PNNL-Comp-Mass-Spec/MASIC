@@ -24,7 +24,7 @@ namespace MASIC
 
                 if (eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute || eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Relative)
                 {
-                    int absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
+                    var absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
                     scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, absoluteScanNumber, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
                 }
                 else
@@ -53,10 +53,10 @@ namespace MASIC
 
             try
             {
-                int surveyScanIndexMatch = -1;
-                int scanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
+                var surveyScanIndexMatch = -1;
+                var scanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
 
-                for (int index = 0; index <= scanList.SurveyScans.Count - 1; index++)
+                for (var index = 0; index <= scanList.SurveyScans.Count - 1; index++)
                 {
                     if (scanList.SurveyScans[index].ScanNumber >= scanNumberToFind)
                     {
@@ -130,7 +130,7 @@ namespace MASIC
                         // Use the total range of scan numbers
                         if (scanList.MasterScanOrderCount > 0)
                         {
-                            int totalScanRange = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
+                            var totalScanRange = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
 
                             absoluteScanNumber = (int)Math.Round(scanOrAcqTime * totalScanRange + scanList.MasterScanNumList[0]);
                         }
@@ -149,19 +149,19 @@ namespace MASIC
 
                         if (convertingRangeOrTolerance)
                         {
-                            float totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
+                            var totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
                             if (totalRunTime < 0.1)
                             {
                                 totalRunTime = 1;
                             }
 
-                            float relativeTime = scanOrAcqTime / totalRunTime;
+                            var relativeTime = scanOrAcqTime / totalRunTime;
 
                             absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
                         }
                         else
                         {
-                            int masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
+                            var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
                             if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
                             {
                                 absoluteScanNumber = scanList.MasterScanNumList[masterScanIndex];
@@ -213,13 +213,13 @@ namespace MASIC
                                 totalScans = 1;
                             }
 
-                            float relativeTime = scanOrAcqTime / totalScans;
+                            var relativeTime = scanOrAcqTime / totalScans;
 
                             computedScanTime = ScanOrAcqTimeToScanTime(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
                         }
                         else
                         {
-                            int masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
+                            var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
                             if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
                             {
                                 computedScanTime = scanList.MasterScanTimeList[masterScanIndex];
@@ -234,7 +234,7 @@ namespace MASIC
                         // Use the total range of scan times
                         if (scanList.MasterScanOrderCount > 0)
                         {
-                            float totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
+                            var totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
 
                             computedScanTime = scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0];
                         }

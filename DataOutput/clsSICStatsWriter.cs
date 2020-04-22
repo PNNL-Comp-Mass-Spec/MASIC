@@ -18,13 +18,13 @@ namespace MASIC.DataOutput
             };
 
             // Find the previous MS1 scan that occurs before the frag scan
-            int surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1;
+            var surveyScanNumberAbsolute = currentFragScan.ScanNumber - 1;
 
             newParentIon.FragScanIndices.Add(fragScanIndex);
 
             if (scanList.MasterScanOrderCount > 0)
             {
-                int surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                var surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                 while (surveyScanIndexMatch >= 0 && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.FragScan)
                     surveyScanIndexMatch -= 1;
@@ -100,7 +100,7 @@ namespace MASIC.DataOutput
         {
             // Writes out a flat file containing identified peaks and statistics
 
-            string outputFilePath = string.Empty;
+            var outputFilePath = string.Empty;
 
             const char TAB_DELIMITER = '\t';
 
@@ -121,7 +121,7 @@ namespace MASIC.DataOutput
                     // Write the SIC stats to the output file
                     // The file is tab delimited
 
-                    bool includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile;
+                    var includeScanTimesInSICStatsFile = masicOptions.IncludeScanTimesInSICStatsFile;
 
                     if (masicOptions.IncludeHeadersInExportFile)
                     {
@@ -131,10 +131,10 @@ namespace MASIC.DataOutput
                     if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
                     {
                         // Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
-                        for (int fragScanIndex = 0; fragScanIndex <= scanList.FragScans.Count - 1; fragScanIndex++)
+                        for (var fragScanIndex = 0; fragScanIndex <= scanList.FragScans.Count - 1; fragScanIndex++)
                         {
                             var fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex);
-                            int parentIonIndex = 0;
+                            var parentIonIndex = 0;
 
                             var surveyScanNumber = 0;
                             float surveyScanTime = 0;
@@ -146,7 +146,7 @@ namespace MASIC.DataOutput
                     }
                     else
                     {
-                        for (int parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                        for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                         {
                             bool includeParentIon;
 
@@ -161,7 +161,7 @@ namespace MASIC.DataOutput
 
                             if (includeParentIon)
                             {
-                                for (int fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
+                                for (var fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
                                 {
                                     var parentIon = scanList.ParentIons[parentIonIndex];
                                     int surveyScanNumber;

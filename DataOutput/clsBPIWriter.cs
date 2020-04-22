@@ -34,16 +34,16 @@ namespace MASIC.DataOutput
 
             // Note: Note that SaveExtendedScanStatsFiles() creates a tab-delimited text file with the BPI and TIC information for each scan
 
-            string currentFilePath = "_MS_scans.csv";
+            var currentFilePath = "_MS_scans.csv";
 
             try
             {
-                int bpiStepCount = 3;
+                var bpiStepCount = 3;
 
                 UpdateProgress(0, "Saving chromatograms to disk");
-                int stepsCompleted = 0;
+                var stepsCompleted = 0;
 
-                string inputFileName = Path.GetFileName(inputFilePathFull);
+                var inputFileName = Path.GetFileName(inputFilePathFull);
 
                 // Disabled in April 2015 since not used
                 // ' First, write a true TIC file (in ICR-2LS format)
@@ -56,7 +56,7 @@ namespace MASIC.DataOutput
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Second, write an MS-based _scans.csv file (readable with Decon2LS)
-                string msScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSChromatogramFile);
+                var msScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSChromatogramFile);
                 currentFilePath = string.Copy(msScansFilePath);
 
                 ReportMessage("Saving Decon2LS MS Chromatogram File to " + Path.GetFileName(msScansFilePath));
@@ -67,7 +67,7 @@ namespace MASIC.DataOutput
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
-                string msmsScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
+                var msmsScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
                 currentFilePath = string.Copy(msmsScansFilePath);
 
                 ReportMessage("Saving Decon2LS MSMS Chromatogram File to " + Path.GetFileName(msmsScansFilePath));
@@ -89,7 +89,7 @@ namespace MASIC.DataOutput
             clsSpectraCache spectraCache,
             string outputFilePath)
         {
-            int scansWritten = 0;
+            var scansWritten = 0;
             var lastStatus = DateTime.UtcNow;
 
             using (var writer = new StreamWriter(outputFilePath))
@@ -169,7 +169,7 @@ namespace MASIC.DataOutput
                 writer.WriteLine("ZeroFills: 0 ");
 
                 // Since we're using XY pairs, the buffer length needs to be two times scanCount
-                int bufferLength = scanCount * 2;
+                var bufferLength = scanCount * 2;
                 if (bufferLength < 1)
                     bufferLength = 1;
 
@@ -216,7 +216,7 @@ namespace MASIC.DataOutput
                 // Write an Escape character (Byte 1B)
                 writer.Write((byte)27);
 
-                for (int scanIndex = 0; scanIndex <= scanCount - 1; scanIndex++)
+                for (var scanIndex = 0; scanIndex <= scanCount - 1; scanIndex++)
                 {
                     var scan = scanList[scanIndex];
                     // Note: Using (float) to assure that we write out single precision numbers
@@ -340,13 +340,13 @@ namespace MASIC.DataOutput
                 numPeaks = spectraCache.SpectraPool[poolIndex].IonCount;
             }
 
-            int scanNumber = currentScan.ScanNumber;
+            var scanNumber = currentScan.ScanNumber;
 
-            int msLevel = currentScan.FragScanInfo.MSLevel;
+            var msLevel = currentScan.FragScanInfo.MSLevel;
             if (msLevel < 1)
                 msLevel = 1;
 
-            int numIsotopicSignatures = 0;
+            var numIsotopicSignatures = 0;
 
             WriteDecon2LSScanFileEntry(writer, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures);
         }

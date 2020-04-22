@@ -69,17 +69,17 @@ namespace MASIC.DataInput
 
             double isolationWidth = 0;
 
-            int chargeState = 0;
-            string chargeStateText = string.Empty;
+            var chargeState = 0;
+            var chargeStateText = string.Empty;
 
             // This is only used if scanInfo.FragScanInfo.ParentIonMz is zero
-            string monoMzText = string.Empty;
+            var monoMzText = string.Empty;
 
-            string isolationWidthText = string.Empty;
+            var isolationWidthText = string.Empty;
 
-            string isolationWindowTargetMzText = string.Empty;
-            string isolationWindowLowerOffsetText = string.Empty;
-            string isolationWindowUpperOffsetText = string.Empty;
+            var isolationWindowTargetMzText = string.Empty;
+            var isolationWindowLowerOffsetText = string.Empty;
+            var isolationWindowUpperOffsetText = string.Empty;
 
             if (mzMLSpectrum.Precursors.Count > 0 && mzMLSpectrum.Precursors[0].IsolationWindow != null)
             {
@@ -128,7 +128,7 @@ namespace MASIC.DataInput
                 }
             }
 
-            bool isolationWidthDefined = false;
+            var isolationWidthDefined = false;
 
             if (!string.IsNullOrWhiteSpace(isolationWidthText))
             {
@@ -207,7 +207,7 @@ namespace MASIC.DataInput
                 return 0;
             }
 
-            double precursorInterference = ComputePrecursorInterference(
+            var precursorInterference = ComputePrecursorInterference(
                 scanInfo.ScanNumber,
                 precursorScanNumber, parentIonMz, isolationWidth, chargeState);
 
@@ -306,11 +306,11 @@ namespace MASIC.DataInput
 
                 // Obtain the full path to the file
                 var msXmlFileInfo = new FileInfo(filePath);
-                string inputFileFullPath = msXmlFileInfo.FullName;
+                var inputFileFullPath = msXmlFileInfo.FullName;
 
-                int datasetID = mOptions.SICOptions.DatasetID;
+                var datasetID = mOptions.SICOptions.DatasetID;
 
-                bool fileStatsSuccess = UpdateDatasetFileStats(msXmlFileInfo, datasetID);
+                var fileStatsSuccess = UpdateDatasetFileStats(msXmlFileInfo, datasetID);
                 if (!fileStatsSuccess)
                 {
                     return false;
@@ -336,7 +336,7 @@ namespace MASIC.DataInput
                 while (true)
                 {
                     clsSpectrumInfo spectrumInfo = null;
-                    bool scanFound = xmlReader.ReadNextSpectrum(out spectrumInfo);
+                    var scanFound = xmlReader.ReadNextSpectrum(out spectrumInfo);
 
                     if (!scanFound)
                         break;
@@ -352,7 +352,7 @@ namespace MASIC.DataInput
 
                     var msSpectrum = new clsMSSpectrum(spectrumInfo.ScanNumber, spectrumInfo.MZList, spectrumInfo.IntensityList, spectrumInfo.DataCount);
 
-                    float percentComplete = xmlReader.ProgressPercentComplete;
+                    var percentComplete = xmlReader.ProgressPercentComplete;
                     SimpleMzMLReader.SimpleSpectrum nullMzMLSpectrum = null;
 
                     var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, spectrumInfo, nullMzMLSpectrum,
@@ -400,7 +400,7 @@ namespace MASIC.DataInput
             bool keepRawSpectra,
             bool keepMSMSSpectra)
         {
-            bool fileOpened = false;
+            var fileOpened = false;
 
             try
             {
@@ -409,7 +409,7 @@ namespace MASIC.DataInput
 
                 UpdateProgress(0, "Opening data file:" + Environment.NewLine + mzMLFile.Name);
 
-                int datasetID = mOptions.SICOptions.DatasetID;
+                var datasetID = mOptions.SICOptions.DatasetID;
 
                 if (!mzMLFile.Exists)
                 {
@@ -422,7 +422,7 @@ namespace MASIC.DataInput
                 var xmlReader = new SimpleMzMLReader(mzMLFile.FullName, false);
                 fileOpened = true;
 
-                bool fileStatsSuccess = UpdateDatasetFileStats(mzMLFile, datasetID, xmlReader);
+                var fileStatsSuccess = UpdateDatasetFileStats(mzMLFile, datasetID, xmlReader);
                 if (!fileStatsSuccess)
                 {
                     return false;
@@ -430,7 +430,7 @@ namespace MASIC.DataInput
 
                 InitOptions(scanList, keepRawSpectra, keepMSMSSpectra);
 
-                bool thermoRawFile = false;
+                var thermoRawFile = false;
 
                 foreach (var cvParam in xmlReader.SourceFileParams.CVParams)
                 {
@@ -473,7 +473,7 @@ namespace MASIC.DataInput
 
                         var msSpectrum = new clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
 
-                        double percentComplete = scanList.MasterScanOrderCount / (double)xmlReader.NumSpectra * 100;
+                        var percentComplete = scanList.MasterScanOrderCount / (double)xmlReader.NumSpectra * 100;
 
                         var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
                                                                        scanList, spectraCache, dataOutputHandler,
@@ -497,13 +497,13 @@ namespace MASIC.DataInput
                     // Keys in this dictionary are chromatogram number
                     // Values are a dictionary where keys are elution times and values are the pseudo scan number mapped to each time (initially 0)
                     var elutionTimeToScanMapByChromatogram = new Dictionary<int, SortedDictionary<double, int>>();
-                    int chromatogramNumber = 0;
+                    var chromatogramNumber = 0;
 
                     while (iterator1.MoveNext())
                     {
                         var chromatogramItem = iterator1.Current;
 
-                        bool isSRM = IsSrmChromatogram(chromatogramItem);
+                        var isSRM = IsSrmChromatogram(chromatogramItem);
                         if (!isSRM)
                             continue;
                         chromatogramNumber += 1;
@@ -515,7 +515,7 @@ namespace MASIC.DataInput
 
                         var scanTimes = chromatogramItem.Times.ToList();
 
-                        for (int i = 0; i <= scanTimes.Count - 1; i++)
+                        for (var i = 0; i <= scanTimes.Count - 1; i++)
                         {
                             if (!elutionTimeToScanMap.ContainsKey(scanTimes[i]))
                             {
@@ -533,7 +533,7 @@ namespace MASIC.DataInput
                         }
 
                         // First, compute the median time diff in scanTimeDiffs
-                        double medianScanTimeDiffThisChromatogram = clsUtilities.ComputeMedian(scanTimeDiffs);
+                        var medianScanTimeDiffThisChromatogram = clsUtilities.ComputeMedian(scanTimeDiffs);
 
                         scanTimeDiffMedians.Add(medianScanTimeDiffThisChromatogram);
                     }
@@ -542,7 +542,7 @@ namespace MASIC.DataInput
                     // This is a bit of a challenge since chromatogram data only tracks elution time, and not scan number
 
                     // First, compute the overall median time diff
-                    double medianScanTimeDiff = clsUtilities.ComputeMedian(scanTimeDiffMedians);
+                    var medianScanTimeDiff = clsUtilities.ComputeMedian(scanTimeDiffMedians);
                     if (Math.Abs(medianScanTimeDiff) < 0.000001)
                     {
                         medianScanTimeDiff = 0.000001;
@@ -551,7 +551,7 @@ namespace MASIC.DataInput
                     Console.WriteLine("Populating dictionary mapping SRM ion elution times to pseudo scan number");
 
                     var lastProgress = DateTime.UtcNow;
-                    int chromatogramsProcessed = 0;
+                    var chromatogramsProcessed = 0;
 
                     // Keys in this dictionary are scan times, values are the pseudo scan number mapped to each time
                     var elutionTimeToScanMapMaster = new Dictionary<double, int>();
@@ -562,24 +562,24 @@ namespace MASIC.DataInput
                         if (DateTime.UtcNow.Subtract(lastProgress).TotalSeconds >= 2.5)
                         {
                             lastProgress = DateTime.UtcNow;
-                            double percentComplete = chromatogramsProcessed / (double)elutionTimeToScanMapByChromatogram.Count * 100;
+                            var percentComplete = chromatogramsProcessed / (double)elutionTimeToScanMapByChromatogram.Count * 100;
                             Console.Write("{0:N0}% ", percentComplete);
                         }
 
                         var elutionTimeToScanMap = chromTimesEntry.Value;
                         foreach (var elutionTime in elutionTimeToScanMap.Keys.ToList())
                         {
-                            int nearestPseudoScan = (int)Math.Round(elutionTime / medianScanTimeDiff * 100) + 1;
+                            var nearestPseudoScan = (int)Math.Round(elutionTime / medianScanTimeDiff * 100) + 1;
                             elutionTimeToScanMap[elutionTime] = nearestPseudoScan;
                         }
 
                         // Fix duplicate scans (values) in elutionTimeToScanMap, if possible
                         // For Each elutionTime In (From item In elutionTimeToScanMap.Keys Order By item Select item)
 
-                        for (int i = 1; i <= elutionTimeToScanMap.Count - 1; i++)
+                        for (var i = 1; i <= elutionTimeToScanMap.Count - 1; i++)
                         {
-                            int previousScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i - 1);
-                            int currentScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i);
+                            var previousScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i - 1);
+                            var currentScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i);
                             if (currentScan == previousScan)
                             {
                                 // Adjacent time points have an identical scan number
@@ -589,7 +589,7 @@ namespace MASIC.DataInput
                                 }
                                 else
                                 {
-                                    int nextScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i + 1);
+                                    var nextScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i + 1);
                                     if (nextScan - currentScan > 1)
                                     {
                                         // The next scan is more than 1 scan away from this one; it is safe to increment currentScan
@@ -633,14 +633,14 @@ namespace MASIC.DataInput
                     var xmlReader2 = new SimpleMzMLReader(mzMLFile.FullName, false);
                     var iterator2 = xmlReader2.ReadAllChromatograms(true).GetEnumerator();
 
-                    int scanTimeLookupErrors = 0;
-                    int nextWarningThreshold = 10;
+                    var scanTimeLookupErrors = 0;
+                    var nextWarningThreshold = 10;
 
                     while (iterator2.MoveNext())
                     {
                         var chromatogramItem = iterator2.Current;
 
-                        bool isSRM = IsSrmChromatogram(chromatogramItem);
+                        var isSRM = IsSrmChromatogram(chromatogramItem);
                         if (!isSRM)
                             continue;
 
@@ -650,11 +650,11 @@ namespace MASIC.DataInput
 
                         int scanToStore;
 
-                        for (int i = 0; i <= scanTimes.Count - 1; i++)
+                        for (var i = 0; i <= scanTimes.Count - 1; i++)
                         {
                             if (elutionTimeToScanMapMaster.TryGetValue(scanTimes[i], out scanToStore))
                             {
-                                bool success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore, scanTimes[i], currentMz, intensities[i]);
+                                var success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore, scanTimes[i], currentMz, intensities[i]);
 
                                 if (!success && scanToStore > 1)
                                 {
@@ -699,7 +699,7 @@ namespace MASIC.DataInput
 
                     foreach (var simulatedSpectrum in simulatedSpectraByScan)
                     {
-                        int scanNumber = simulatedSpectrum.Key;
+                        var scanNumber = simulatedSpectrum.Key;
 
                         mDatasetFileInfo.ScanCount += 1;
 
@@ -709,8 +709,8 @@ namespace MASIC.DataInput
                             continue;
                         }
 
-                        string nativeId = string.Format("controllerType=0 controllerNumber=1 scan={0}", scanNumber);
-                        double scanStartTime = simulatedSpectraTimes[scanNumber];
+                        var nativeId = string.Format("controllerType=0 controllerNumber=1 scan={0}", scanNumber);
+                        var scanStartTime = simulatedSpectraTimes[scanNumber];
 
                         var cvParams = new List<SimpleMzMLReader.CVParamData>();
                         var userParams = new List<SimpleMzMLReader.UserParamData>();
@@ -734,7 +734,7 @@ namespace MASIC.DataInput
 
                         var msSpectrum = new clsMSSpectrum(mzXmlSourceSpectrum.ScanNumber, mzList, intensityList, mzList.Count);
 
-                        double percentComplete = scanList.MasterScanOrderCount / (double)simulatedSpectraByScan.Count * 100;
+                        var percentComplete = scanList.MasterScanOrderCount / (double)simulatedSpectraByScan.Count * 100;
 
                         var extractSuccess = ExtractScanInfoCheckRange(msSpectrum, mzXmlSourceSpectrum, mzMLSpectrum,
                                                                        scanList, spectraCache, dataOutputHandler,
@@ -750,7 +750,7 @@ namespace MASIC.DataInput
                 }
 
                 // Shrink the memory usage of the scanList arrays
-                bool finalizeSuccess = FinalizeScanList(scanList, mzMLFile);
+                var finalizeSuccess = FinalizeScanList(scanList, mzMLFile);
 
                 return finalizeSuccess;
             }
@@ -969,7 +969,7 @@ namespace MASIC.DataInput
                     sourceMzs = new double[msSpectrum.IonCount];
                     sourceIntensities = new double[msSpectrum.IonCount];
 
-                    for (int i = 0; i <= msSpectrum.IonCount - 1; i++)
+                    for (var i = 0; i <= msSpectrum.IonCount - 1; i++)
                     {
                         sourceMzs[i] = msSpectrum.IonsMZ[i];
                         sourceIntensities[i] = msSpectrum.IonsIntensity[i];
@@ -978,7 +978,7 @@ namespace MASIC.DataInput
                     double[] centroidedPrecursorIonsMz = null;
                     double[] centroidedPrecursorIonsIntensity = null;
 
-                    double massResolution = mCentroider.EstimateResolution(1000, 0.5, scanInfo.IsFTMS);
+                    var massResolution = mCentroider.EstimateResolution(1000, 0.5, scanInfo.IsFTMS);
 
                     var centroidSuccess = mCentroider.CentroidData(scanInfo, sourceMzs, sourceIntensities,
                                                                    massResolution, out centroidedPrecursorIonsMz, out centroidedPrecursorIonsIntensity);
@@ -989,7 +989,7 @@ namespace MASIC.DataInput
                         mCentroidedPrecursorIonsMz.Clear();
                         mCentroidedPrecursorIonsIntensity.Clear();
 
-                        for (int i = 0; i <= centroidedPrecursorIonsMz.Length - 1; i++)
+                        for (var i = 0; i <= centroidedPrecursorIonsMz.Length - 1; i++)
                         {
                             mCentroidedPrecursorIonsMz.Add(centroidedPrecursorIonsMz[i]);
                             mCentroidedPrecursorIonsIntensity.Add(centroidedPrecursorIonsIntensity[i]);
@@ -1064,7 +1064,7 @@ namespace MASIC.DataInput
                 // Obtain the detailed filter string, e.g. "+ c NSI SRM ms2 495.285 [409.260-409.262, 506.329-506.331, 607.376-607.378]"
                 // In contrast, scanInfo.ScanHeaderText has a truncated filter string, e.g. "+ c NSI SRM ms2"
 
-                string filterString = GetFilterString(mzMLSpectrum);
+                var filterString = GetFilterString(mzMLSpectrum);
                 if (string.IsNullOrWhiteSpace(filterString))
                 {
                     mrmScan.FilterText = scanInfo.ScanHeaderText;
@@ -1131,12 +1131,12 @@ namespace MASIC.DataInput
             scanInfo.IsFTMS = IsHighResolutionSpectrum(mzXmlSourceSpectrum.FilterLine);
 
             scanList.FragScans.Add(scanInfo);
-            int fragScanIndex = scanList.FragScans.Count - 1;
+            var fragScanIndex = scanList.FragScans.Count - 1;
 
             scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, fragScanIndex);
 
             // Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
-            double msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
+            var msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
 
             StoreSpectrum(
                 msSpectrum,
@@ -1165,7 +1165,7 @@ namespace MASIC.DataInput
 
             if (mLastNonZoomSurveyScanIndex >= 0)
             {
-                int precursorScanNumber = scanList.SurveyScans[mLastNonZoomSurveyScanIndex].ScanNumber;
+                var precursorScanNumber = scanList.SurveyScans[mLastNonZoomSurveyScanIndex].ScanNumber;
 
                 // Compute the interference of the parent ion in the MS1 spectrum for this frag scan
                 scanInfo.FragScanInfo.InterferenceScore = ComputeInterference(mzMLSpectrum, scanInfo, precursorScanNumber);
@@ -1210,12 +1210,12 @@ namespace MASIC.DataInput
 
             if (mzXmlSourceSpectrum.DataCount > 0)
             {
-                double basePeakMz = mzList[0];
-                double bpi = intensityList[0];
-                double mzMin = basePeakMz;
-                double mzMax = basePeakMz;
+                var basePeakMz = mzList[0];
+                var bpi = intensityList[0];
+                var mzMin = basePeakMz;
+                var mzMax = basePeakMz;
 
-                for (int i = 1; i <= mzXmlSourceSpectrum.DataCount - 1; i++)
+                for (var i = 1; i <= mzXmlSourceSpectrum.DataCount - 1; i++)
                 {
                     if (intensityList[i] > bpi)
                     {
@@ -1333,7 +1333,7 @@ namespace MASIC.DataInput
 
             // Store the "filter string" in .FilterLine
 
-            string filterString = GetFilterString(mzMLSpectrum);
+            var filterString = GetFilterString(mzMLSpectrum);
 
             if (!string.IsNullOrWhiteSpace(filterString))
             {
@@ -1471,7 +1471,7 @@ namespace MASIC.DataInput
                 {
                     // Confirm the total scan intensity stored in the mzXML file
                     double totalIonIntensity = 0;
-                    for (int ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                    for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                         totalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
                     if (scanInfo.TotalIonIntensity < float.Epsilon)
                     {
@@ -1504,7 +1504,7 @@ namespace MASIC.DataInput
             mCentroidedPrecursorIonsMz.Clear();
             mCentroidedPrecursorIonsIntensity.Clear();
 
-            for (int i = 0; i <= msSpectrum.IonCount - 1; i++)
+            for (var i = 0; i <= msSpectrum.IonCount - 1; i++)
             {
                 mCentroidedPrecursorIonsMz.Add(msSpectrum.IonsMZ[i]);
                 mCentroidedPrecursorIonsIntensity.Add(msSpectrum.IonsIntensity[i]);
@@ -1518,7 +1518,7 @@ namespace MASIC.DataInput
             SimpleMzMLReader xmlReader)
         {
             // Read the file info from the file system
-            bool success = UpdateDatasetFileStats(rawFileInfo, datasetID);
+            var success = UpdateDatasetFileStats(rawFileInfo, datasetID);
 
             if (!success)
                 return false;

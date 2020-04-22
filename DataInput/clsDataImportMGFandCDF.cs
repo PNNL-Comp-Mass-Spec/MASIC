@@ -45,16 +45,16 @@ namespace MASIC.DataInput
 
                 // Obtain the full path to the file
                 var mgfFileInfo = new FileInfo(filePath);
-                string mgfInputFilePathFull = mgfFileInfo.FullName;
+                var mgfInputFilePathFull = mgfFileInfo.FullName;
 
                 // Make sure the extension for mgfInputFilePathFull is .MGF
                 mgfInputFilePathFull = Path.ChangeExtension(mgfInputFilePathFull, AGILENT_MSMS_FILE_EXTENSION);
-                string cdfInputFilePathFull = Path.ChangeExtension(mgfInputFilePathFull, AGILENT_MS_FILE_EXTENSION);
+                var cdfInputFilePathFull = Path.ChangeExtension(mgfInputFilePathFull, AGILENT_MS_FILE_EXTENSION);
 
-                int datasetID = mOptions.SICOptions.DatasetID;
+                var datasetID = mOptions.SICOptions.DatasetID;
                 var sicOptions = mOptions.SICOptions;
 
-                bool success = UpdateDatasetFileStats(mgfFileInfo, datasetID);
+                var success = UpdateDatasetFileStats(mgfFileInfo, datasetID);
                 mDatasetFileInfo.ScanCount = 0;
 
                 // Open a handle to each data file
@@ -72,7 +72,7 @@ namespace MASIC.DataInput
                     return false;
                 }
 
-                int msScanCount = objCDFReader.GetScanCount();
+                var msScanCount = objCDFReader.GetScanCount();
                 mDatasetFileInfo.ScanCount = msScanCount;
 
                 if (msScanCount <= 0)
@@ -91,8 +91,8 @@ namespace MASIC.DataInput
 
                 // Read all of the Survey scans from the CDF file
                 // CDF files created by the Agilent XCT list the first scan number as 0; use scanNumberCorrection to correct for this
-                int scanNumberCorrection = 0;
-                for (int msScanIndex = 0; msScanIndex <= msScanCount - 1; msScanIndex++)
+                var scanNumberCorrection = 0;
+                for (var msScanIndex = 0; msScanIndex <= msScanCount - 1; msScanIndex++)
                 {
                     int scanNumber;
                     double scanTotalIntensity, massMin, massMax;
@@ -236,7 +236,7 @@ namespace MASIC.DataInput
 
                 // We loaded all of the survey scan data above
                 // We can now initialize .MasterScanOrder()
-                int lastSurveyScanIndex = 0;
+                var lastSurveyScanIndex = 0;
 
                 scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex);
 
@@ -252,7 +252,7 @@ namespace MASIC.DataInput
                 do
                 {
                     MSDataFileReader.clsSpectrumInfo spectrumInfo = null;
-                    bool fragScanFound = objMGFReader.ReadNextSpectrum(out spectrumInfo);
+                    var fragScanFound = objMGFReader.ReadNextSpectrum(out spectrumInfo);
                     if (!fragScanFound)
                         break;
 
@@ -279,7 +279,7 @@ namespace MASIC.DataInput
                         // an older version of Agilent Chemstation.  These files typically have lines like ###MSMS: #13-29 instead of ###MSMS: #13/29/
                         // If this indexing error is found, then we'll set scanNumberCorrection = 1 and apply it to all subsequent MS/MS scans;
                         // we'll also need to correct prior MS/MS scans
-                        for (int surveyScanIndex = lastSurveyScanIndex; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
+                        for (var surveyScanIndex = lastSurveyScanIndex; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
                         {
                             if (scanList.SurveyScans[surveyScanIndex].ScanNumber == spectrumInfo.ScanNumber)
                             {
@@ -290,7 +290,7 @@ namespace MASIC.DataInput
                                 foreach (var fragScan in scanList.FragScans)
                                 {
                                     fragScan.ScanNumber += scanNumberCorrection;
-                                    float scanTimeInterpolated = InterpolateRTandFragScanNumber(
+                                    var scanTimeInterpolated = InterpolateRTandFragScanNumber(
                                         scanList.SurveyScans, 0, fragScan.ScanNumber, out var fragScanIterationOut);
                                     fragScan.FragScanInfo.FragScanNumber = fragScanIterationOut;
 
@@ -319,7 +319,7 @@ namespace MASIC.DataInput
 
                     // Make sure this fragmentation scan isn't present yet in scanList.FragScans
                     // This can occur in Agilent .MGF files if the scan is listed both singly and grouped with other MS/MS scans
-                    bool validFragScan = true;
+                    var validFragScan = true;
                     foreach (var fragScan in scanList.FragScans)
                     {
                         if (fragScan.ScanNumber == spectrumInfo.ScanNumber)
@@ -383,14 +383,14 @@ namespace MASIC.DataInput
 
                         // Compute the total scan intensity
                         newFragScan.TotalIonIntensity = 0;
-                        for (int ionIndex = 0; ionIndex <= newFragScan.IonCount - 1; ionIndex++)
+                        for (var ionIndex = 0; ionIndex <= newFragScan.IonCount - 1; ionIndex++)
                             newFragScan.TotalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
 
                         // Determine the minimum positive intensity in this scan
                         newFragScan.MinimumPositiveIntensity = mPeakFinder.FindMinimumPositiveValue(msSpectrum.IonsIntensity, 0);
 
-                        double msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
-                        bool keepRawSpectrum = keepRawSpectra && keepMSMSSpectra;
+                        var msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
+                        var keepRawSpectrum = keepRawSpectra && keepMSMSSpectra;
 
                         mScanTracking.ProcessAndStoreSpectrum(
                             newFragScan, this,
@@ -466,7 +466,7 @@ namespace MASIC.DataInput
                 ValidateMasterScanOrderSorting(scanList);
 
                 // Now that all of the data has been read, write out to the scan stats file, in order of scan number
-                for (int scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
+                for (var scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
                 {
                     var eScanType = scanList.MasterScanOrder[scanIndex].ScanType;
                     clsScanInfo currentScan;
@@ -590,8 +590,8 @@ namespace MASIC.DataInput
                             lastSurveyScanIndex = surveyScans.Count - 1;
 
                             var surveyScan = surveyScans[lastSurveyScanIndex];
-                            int scanDiff = surveyScan.ScanNumber - surveyScans[lastSurveyScanIndex - 1].ScanNumber;
-                            float prevScanElutionTime = surveyScans[lastSurveyScanIndex - 1].ScanTime;
+                            var scanDiff = surveyScan.ScanNumber - surveyScans[lastSurveyScanIndex - 1].ScanNumber;
+                            var prevScanElutionTime = surveyScans[lastSurveyScanIndex - 1].ScanTime;
 
                             // Compute fragScanIteration
                             fragScanIteration = fragScanNumber - surveyScan.ScanNumber;
@@ -625,8 +625,8 @@ namespace MASIC.DataInput
                 {
                     // Interpolate retention time
                     var surveyScan = surveyScans[lastSurveyScanIndex];
-                    int scanDiff = surveyScans[lastSurveyScanIndex + 1].ScanNumber - surveyScan.ScanNumber;
-                    float nextScanElutionTime = surveyScans[lastSurveyScanIndex + 1].ScanTime;
+                    var scanDiff = surveyScans[lastSurveyScanIndex + 1].ScanNumber - surveyScan.ScanNumber;
+                    var nextScanElutionTime = surveyScans[lastSurveyScanIndex + 1].ScanTime;
 
                     // Compute fragScanIteration
                     fragScanIteration = fragScanNumber - surveyScan.ScanNumber;
@@ -666,7 +666,7 @@ namespace MASIC.DataInput
             masterScanNumbers = new int[scanList.MasterScanOrderCount];
             masterScanOrderIndices = new int[scanList.MasterScanOrderCount];
 
-            for (int index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
+            for (var index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
             {
                 masterScanNumbers[index] = scanList.MasterScanNumList[index];
                 masterScanOrderIndices[index] = index;
@@ -676,8 +676,8 @@ namespace MASIC.DataInput
             Array.Sort(masterScanNumbers, masterScanOrderIndices);
 
             // Check whether we need to re-populate the lists
-            bool needToSort = false;
-            for (int index = 1; index <= scanList.MasterScanOrderCount - 1; index++)
+            var needToSort = false;
+            for (var index = 1; index <= scanList.MasterScanOrderCount - 1; index++)
             {
                 if (masterScanOrderIndices[index] < masterScanOrderIndices[index - 1])
                 {
@@ -699,7 +699,7 @@ namespace MASIC.DataInput
                 Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount);
                 Array.Copy(scanList.MasterScanTimeList.ToArray(), masterScanTimeListCopy, scanList.MasterScanOrderCount);
 
-                for (int index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
+                for (var index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
                 {
                     scanList.MasterScanOrder[index] = udtMasterScanOrderListCopy[masterScanOrderIndices[index]];
                     scanList.MasterScanNumList[index] = masterScanNumbers[index];
