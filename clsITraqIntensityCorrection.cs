@@ -130,7 +130,7 @@ namespace MASIC
         /// <returns></returns>
         public bool ApplyCorrection(ref float[] reporterIonIntensities, bool debugShowIntensities = false)
         {
-            var dataCount = reporterIonIntensities.Count() - 1;
+            var dataCount = reporterIonIntensities.Length - 1;
 
             var originalIntensities = new double[dataCount + 1];
             for (var index = 0; index <= dataCount; index++)

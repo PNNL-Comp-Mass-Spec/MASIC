@@ -44,7 +44,6 @@ namespace MASIC.DatasetStats
         #region "Classwide Variables"
 
         private string mDatasetStatsSummaryFileName;
-        private string mErrorMessage = string.Empty;
 
         private readonly List<ScanStatsEntry> mDatasetScanStats;
 
@@ -77,7 +76,7 @@ namespace MASIC.DatasetStats
         /// Error message
         /// </summary>
         /// <returns></returns>
-        public string ErrorMessage => mErrorMessage;
+        public string ErrorMessage { get; private set; }
 
         /// <summary>
         /// Dataset file modification time
@@ -100,7 +99,7 @@ namespace MASIC.DatasetStats
         {
             FileDate = "February 11, 2020";
 
-            mErrorMessage = string.Empty;
+            ErrorMessage = string.Empty;
 
             mDatasetScanStats = new List<ScanStatsEntry>();
             mDatasetSummaryStats = new DatasetSummaryStats();
@@ -157,7 +156,7 @@ namespace MASIC.DatasetStats
                     return false;
                 }
 
-                mErrorMessage = string.Empty;
+                ErrorMessage = string.Empty;
 
                 var scanStatsCount = scanStats.Count;
 
@@ -294,7 +293,7 @@ namespace MASIC.DatasetStats
                     return false;
                 }
 
-                mErrorMessage = string.Empty;
+                ErrorMessage = string.Empty;
 
                 // If CreateDatasetInfoXML() used a StringBuilder to cache the XML data, we would have to use System.Encoding.Unicode
                 // However, CreateDatasetInfoXML() now uses a MemoryStream, so we're able to use UTF8
@@ -406,7 +405,7 @@ namespace MASIC.DatasetStats
                     return string.Empty;
                 }
 
-                mErrorMessage = string.Empty;
+                ErrorMessage = string.Empty;
 
                 DatasetSummaryStats summaryStats;
 
@@ -595,7 +594,7 @@ namespace MASIC.DatasetStats
                     return false;
                 }
 
-                mErrorMessage = string.Empty;
+                ErrorMessage = string.Empty;
 
                 using (var scanStatsWriter = new StreamWriter(new FileStream(scanStatsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
                 {
@@ -694,8 +693,8 @@ namespace MASIC.DatasetStats
 
         private void ReportError(string message, Exception ex = null)
         {
-            mErrorMessage = string.Copy(message);
-            OnErrorEvent(mErrorMessage, ex);
+            ErrorMessage = string.Copy(message);
+            OnErrorEvent(ErrorMessage, ex);
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -768,7 +767,7 @@ namespace MASIC.DatasetStats
                     return false;
                 }
 
-                mErrorMessage = string.Empty;
+                ErrorMessage = string.Empty;
 
                 DatasetSummaryStats summaryStats;
                 if (scanStats == mDatasetScanStats)

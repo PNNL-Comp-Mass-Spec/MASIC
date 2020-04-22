@@ -85,7 +85,7 @@ namespace MASIC.DataOutput
         }
 
         private void SaveDecon2LSChromatogram(
-            IEnumerable<clsScanInfo> scanList,
+            IList<clsScanInfo> scanList,
             clsSpectraCache spectraCache,
             string outputFilePath)
         {
