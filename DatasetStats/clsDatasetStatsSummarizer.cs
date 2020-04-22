@@ -42,7 +42,7 @@ namespace MASIC.DatasetStats
         #endregion
 
         #region "Classwide Variables"
-        private readonly string mFileDate;
+
         private string mDatasetStatsSummaryFileName;
         private string mErrorMessage = string.Empty;
 
@@ -83,7 +83,7 @@ namespace MASIC.DatasetStats
         /// Dataset file modification time
         /// </summary>
         /// <returns></returns>
-        public string FileDate => mFileDate;
+        public string FileDate { get; }
 
         /// <summary>
         /// Sample info
@@ -98,7 +98,7 @@ namespace MASIC.DatasetStats
         /// </summary>
         public clsDatasetStatsSummarizer()
         {
-            mFileDate = "February 11, 2020";
+            FileDate = "February 11, 2020";
 
             mErrorMessage = string.Empty;
 

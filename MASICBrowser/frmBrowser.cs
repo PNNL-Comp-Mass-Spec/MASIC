@@ -2438,10 +2438,13 @@ namespace MASICBrowser
 
         private void SelectMASICInputFile()
         {
-            var dlgOpenFile = new OpenFileDialog();
+            var dlgOpenFile = new OpenFileDialog
+            {
+                Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*",
+                FilterIndex = 1,
+                Title = "Select MASIC Results File",
+            };
 
-            dlgOpenFile.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
-            dlgOpenFile.FilterIndex = 1;
             if (txtDataFilePath.Text.Length > 0)
             {
                 try
@@ -2457,8 +2460,6 @@ namespace MASICBrowser
             {
                 dlgOpenFile.InitialDirectory = Application.StartupPath;
             }
-
-            dlgOpenFile.Title = "Select MASIC Results File";
 
             dlgOpenFile.ShowDialog();
 
@@ -2475,10 +2476,13 @@ namespace MASICBrowser
 
         private void SelectMsMsSearchResultsInputFile()
         {
-            var dlgOpenFile = new OpenFileDialog();
+            var dlgOpenFile = new OpenFileDialog
+            {
+                Filter = "First Hits Files(*_fht.txt)|*_fht.txt|Synopsis Hits Files(*_syn.txt)|*_syn.txt|All files (*.*)|*.*",
+                FilterIndex = 1,
+                Title = "Select MS/MS Search Engine Results File",
+            };
 
-            dlgOpenFile.Filter = "First Hits Files(*_fht.txt)|*_fht.txt|Synopsis Hits Files(*_syn.txt)|*_syn.txt|All files (*.*)|*.*";
-            dlgOpenFile.FilterIndex = 1;
             if (txtDataFilePath.Text.Length > 0)
             {
                 try
@@ -2494,8 +2498,6 @@ namespace MASICBrowser
             {
                 dlgOpenFile.InitialDirectory = Application.StartupPath;
             }
-
-            dlgOpenFile.Title = "Select MS/MS Search Engine Results File";
 
             dlgOpenFile.ShowDialog();
             if (dlgOpenFile.FileName.Length > 0)

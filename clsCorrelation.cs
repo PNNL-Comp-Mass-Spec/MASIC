@@ -721,15 +721,16 @@ namespace MASIC
 
         public static clsBinningOptions GetDefaultBinningOptions()
         {
-            var binningOptions = new clsBinningOptions();
-
-            binningOptions.StartX = 50;
-            binningOptions.EndX = 2000;
-            binningOptions.BinSize = 1;
-            binningOptions.IntensityPrecisionPercent = 1;
-            binningOptions.Normalize = false;
-            binningOptions.SumAllIntensitiesForBin = true;                     // Sum all of the intensities for binned ions of the same bin together
-            binningOptions.MaximumBinCount = 100000;
+            var binningOptions = new clsBinningOptions
+            {
+                StartX = 50,
+                EndX = 2000,
+                BinSize = 1,
+                IntensityPrecisionPercent = 1,
+                Normalize = false,
+                SumAllIntensitiesForBin = true,                     // Sum all of the intensities for binned ions of the same bin together
+                MaximumBinCount = 100000
+            };
 
             return binningOptions;
         }

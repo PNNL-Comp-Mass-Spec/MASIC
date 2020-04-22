@@ -194,11 +194,13 @@ namespace MASIC.DataInput
                             continue;
                         }
 
-                        var mzSearchSpec = new clsCustomMZSearchSpec(0);
+                        var mzSearchSpec = new clsCustomMZSearchSpec(0)
+                        {
+                            MZToleranceDa = 0,
+                            ScanOrAcqTimeCenter = 0,
+                            ScanOrAcqTimeTolerance = 0
+                        };
 
-                        mzSearchSpec.MZToleranceDa = 0;
-                        mzSearchSpec.ScanOrAcqTimeCenter = 0;
-                        mzSearchSpec.ScanOrAcqTimeTolerance = 0;
 
                         for (var colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                         {

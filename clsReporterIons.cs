@@ -484,8 +484,10 @@ namespace MASIC
 
             foreach (var reporterIonMZ in reporterIonMZList)
             {
-                var newReporterIon = new clsReporterIonInfo(reporterIonMZ);
-                newReporterIon.MZToleranceDa = mzToleranceDa;
+                var newReporterIon = new clsReporterIonInfo(reporterIonMZ)
+                {
+                    MZToleranceDa = mzToleranceDa
+                };
 
                 ReporterIonList.Add(newReporterIon);
             }

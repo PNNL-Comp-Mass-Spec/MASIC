@@ -114,8 +114,14 @@ namespace MASIC.DataInput
 
                     if (mScanTracking.CheckScanInRange(scanNumber, scanTime, sicOptions))
                     {
-                        var newSurveyScan = new clsScanInfo();
-                        newSurveyScan.ScanNumber = scanNumber;
+                        var newSurveyScan = new clsScanInfo
+                        {
+                            ScanNumber = scanNumber,
+                            TotalIonIntensity = (float)scanTotalIntensity,    // Copy the Total Scan Intensity to .TotalIonIntensity
+                            ScanHeaderText = string.Empty,
+                            ScanTypeName = "MS",
+                        };
+
                         if (mOptions.CDFTimeInSeconds)
                         {
                             newSurveyScan.ScanTime = (float)(scanTime / 60);
@@ -125,14 +131,8 @@ namespace MASIC.DataInput
                             newSurveyScan.ScanTime = (float)scanTime;
                         }
 
-                        // Copy the Total Scan Intensity to .TotalIonIntensity
-                        newSurveyScan.TotalIonIntensity = (float)scanTotalIntensity;
-
                         // Survey scans typically lead to multiple parent ions; we do not record them here
                         newSurveyScan.FragScanInfo.ParentIonInfoIndex = -1;
-
-                        newSurveyScan.ScanHeaderText = string.Empty;
-                        newSurveyScan.ScanTypeName = "MS";
 
                         scanList.SurveyScans.Add(newSurveyScan);
 
@@ -340,15 +340,17 @@ namespace MASIC.DataInput
                     scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count,
                         spectrumInfo.ScanNumber, (float)scanTime);
 
-                    var newFragScan = new clsScanInfo();
-                    newFragScan.ScanNumber = spectrumInfo.ScanNumber;
-                    newFragScan.ScanTime = (float)scanTime;
+                    var newFragScan = new clsScanInfo
+                    {
+                        ScanNumber = spectrumInfo.ScanNumber,
+                        ScanTime = (float) scanTime,
+                        ScanHeaderText = string.Empty,
+                        ScanTypeName = "MSn",
+                    };
+
                     newFragScan.FragScanInfo.FragScanNumber = fragScanIteration;
                     newFragScan.FragScanInfo.MSLevel = 2;
                     newFragScan.MRMScanInfo.MRMMassCount = 0;
-
-                    newFragScan.ScanHeaderText = string.Empty;
-                    newFragScan.ScanTypeName = "MSn";
 
                     scanList.FragScans.Add(newFragScan);
 
