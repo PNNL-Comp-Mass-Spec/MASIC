@@ -671,7 +671,7 @@ namespace MASIC
                     else if ((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) % 2 == 0)
                     {
                         // Odd number of points; use the m/z value of the midpoint
-                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + (int)((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / 2.0);
+                        mzSearchChunk.MZIndexMidpoint = mzSearchChunk.MZIndexStart + (int)Math.Round((mzSearchChunk.MZIndexEnd - mzSearchChunk.MZIndexStart) / (double)2);
                         mzSearchChunk.SearchMZ = mzBinList[mzSearchChunk.MZIndexMidpoint].MZ;
                     }
                     else

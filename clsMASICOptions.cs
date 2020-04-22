@@ -388,10 +388,10 @@ namespace MASIC
                                                                                        "ReporterIonApplyAbundanceCorrection",
                                                                                        ReporterIons.ReporterIonApplyAbundanceCorrection);
 
-                    ReporterIons.ReporterIonITraq4PlexCorrectionFactorType = 
+                    ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
                         (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)reader.GetParam(
-                            XML_SECTION_EXPORT_OPTIONS, 
-                            "ReporterIonITraq4PlexCorrectionFactorType", 
+                            XML_SECTION_EXPORT_OPTIONS,
+                            "ReporterIonITraq4PlexCorrectionFactorType",
                             (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType); ;
 
                     ReporterIons.ReporterIonSaveObservedMasses = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
@@ -410,10 +410,10 @@ namespace MASIC
                                                                          "ExportRawSpectraData",
                                                                          RawDataExportOptions.ExportEnabled);
 
-                    RawDataExportOptions.FileFormat = 
+                    RawDataExportOptions.FileFormat =
                         (clsRawDataExportOptions.eExportRawDataFileFormatConstants)reader.GetParam(
-                            XML_SECTION_EXPORT_OPTIONS, 
-                            "ExportRawDataFileFormat", 
+                            XML_SECTION_EXPORT_OPTIONS,
+                            "ExportRawDataFileFormat",
                             (int)RawDataExportOptions.FileFormat);
 
                     RawDataExportOptions.IncludeMSMS = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
@@ -523,8 +523,8 @@ namespace MASIC
                     // Peak Finding Options
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode =
                         (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)reader.GetParam(
-                            XML_SECTION_SIC_OPTIONS, 
-                            "SICNoiseThresholdMode", 
+                            XML_SECTION_SIC_OPTIONS,
+                            "SICNoiseThresholdMode",
                             (int)SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode);
 
                     SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute =
@@ -588,7 +588,7 @@ namespace MASIC
 
                     SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode =
                         (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)reader.GetParam(
-                            XML_SECTION_SIC_OPTIONS, 
+                            XML_SECTION_SIC_OPTIONS,
                             "MassSpectraNoiseThresholdMode",
                             (int)SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode);
 

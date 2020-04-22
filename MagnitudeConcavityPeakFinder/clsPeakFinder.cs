@@ -413,14 +413,14 @@ namespace MagnitudeConcavityPeakFinder
             if (widthInPoints % 2 == 0)
             {
                 // Even number
-                newPeak.LeftEdge = dataIndex - (int)(widthInPoints / 2);
-                newPeak.RightEdge = dataIndex + (int)(widthInPoints / 2) - 1;
+                newPeak.LeftEdge = dataIndex - widthInPoints / 2;
+                newPeak.RightEdge = dataIndex + widthInPoints / 2 - 1;
             }
             else
             {
                 // Odd number
-                newPeak.LeftEdge = dataIndex - (int)((widthInPoints - 1) / 2);
-                newPeak.RightEdge = dataIndex + (int)((widthInPoints - 1) / 2);
+                newPeak.LeftEdge = dataIndex - (widthInPoints - 1) / 2;
+                newPeak.RightEdge = dataIndex + (widthInPoints - 1) / 2;
             }
         }
 

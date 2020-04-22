@@ -205,7 +205,7 @@ namespace MagnitudeConcavityPeakFinder
             if (Math.Abs(peakFinderOptions.ButterworthSamplingFrequency) < float.Epsilon)
                 peakFinderOptions.ButterworthSamplingFrequency = 0.25f;
 
-            peakData.PeakWidthPointsMinimum = (int)(peakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(areaBasedSignalToNoise)) * 10);
+            peakData.PeakWidthPointsMinimum = (int)Math.Round(peakFinderOptions.InitialPeakWidthScansScaler * Math.Log10(Math.Floor(areaBasedSignalToNoise)) * 10);
 
             // Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum
             //  and no greater than dataPointCountAboveThreshold/2 (rounded up)
@@ -807,7 +807,7 @@ namespace MagnitudeConcavityPeakFinder
             // Store the smoothed data in the data container
             peakData.SetSmoothedData(smoothedYData);
 
-            var peakDetectIntensityThresholdPercentageOfMaximum = (int)(peakFinderOptions.IntensityThresholdFractionMax * 100);
+            var peakDetectIntensityThresholdPercentageOfMaximum = (int)Math.Round(peakFinderOptions.IntensityThresholdFractionMax * 100);
             const int peakWidthInSigma = 2;
             const bool useValleysForPeakWidth = true;
             const bool movePeakLocationToMaxIntensity = true;

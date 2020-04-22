@@ -121,7 +121,7 @@ namespace MASIC
                     case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
                         // scanOrAcqTime is an absolute scan number (or range of scan numbers)
                         // No conversion needed; simply return the value
-                        absoluteScanNumber = (int)scanOrAcqTime;
+                        absoluteScanNumber = (int)Math.Round(scanOrAcqTime);
                         break;
 
                     case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
@@ -132,7 +132,7 @@ namespace MASIC
                         {
                             int totalScanRange = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
 
-                            absoluteScanNumber = (int)(scanOrAcqTime * totalScanRange + scanList.MasterScanNumList[0]);
+                            absoluteScanNumber = (int)Math.Round(scanOrAcqTime * totalScanRange + scanList.MasterScanNumList[0]);
                         }
                         else
                         {
@@ -172,7 +172,7 @@ namespace MASIC
 
                     default:
                         // Unknown type; assume absolute scan number
-                        absoluteScanNumber = (int)scanOrAcqTime;
+                        absoluteScanNumber = (int)Math.Round(scanOrAcqTime);
                         break;
                 }
 

@@ -332,7 +332,7 @@ namespace MASICPeakFinder
 
             try
             {
-                int segmentCountLocal = (int)(baselineNoiseOptions.DualTrimmedMeanMaximumSegments);
+                int segmentCountLocal = baselineNoiseOptions.DualTrimmedMeanMaximumSegments;
                 if (segmentCountLocal == 0)
                     segmentCountLocal = 3;
                 if (segmentCountLocal < 1)
@@ -1915,12 +1915,12 @@ namespace MASICPeakFinder
                     if (indexEnd % 2 == 0)
                     {
                         // Even value
-                        baselineNoiseStats.NoiseLevel = dataListSorted[(int)(indexEnd / 2.0)];
+                        baselineNoiseStats.NoiseLevel = dataListSorted[(int)Math.Round(indexEnd / 2.0)];
                     }
                     else
                     {
                         // Odd value; average the values on either side of indexEnd/2
-                        int i = (int)((indexEnd - 1) / 2.0);
+                        int i = (int)Math.Round((indexEnd - 1) / 2.0);
                         if (i < 0)
                             i = 0;
                         double sum2 = dataListSorted[i];
@@ -2022,7 +2022,7 @@ namespace MASICPeakFinder
             {
                 // Compute the peak width
                 // Note: Sigma = fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
-                sigmaBasedWidth = (int)(sigmaValueForBase * sicPeakFWHMScans / 2.35482);
+                sigmaBasedWidth = (int)Math.Round(sigmaValueForBase * sicPeakFWHMScans / 2.35482);
 
                 if (sigmaBasedWidth <= 0)
                 {
@@ -2248,8 +2248,8 @@ namespace MASICPeakFinder
                     sicPeakFinderOptions.ButterworthSamplingFrequency = 0.25;
                 }
 
-                peakData.PeakWidthPointsMinimum = (int)(sicPeakFinderOptions.InitialPeakWidthScansScaler *
-                                                        Math.Log10(Math.Floor(peakAreaSignalToNoise)) * 10);
+                peakData.PeakWidthPointsMinimum = (int)Math.Round(sicPeakFinderOptions.InitialPeakWidthScansScaler *
+                                                                  Math.Log10(Math.Floor(peakAreaSignalToNoise)) * 10);
 
                 // Assure that .InitialPeakWidthScansMaximum is no greater than .InitialPeakWidthScansMaximum
                 // and no greater than dataPointCountAboveThreshold/2 (rounded up)
@@ -2606,7 +2606,7 @@ namespace MASICPeakFinder
                     peaksContainer.SmoothedYData,
                     sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum,
                     peaksContainer.PeakWidthPointsMinimum,
-                    (int)(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
+                    (int)Math.Round(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
             }
 
             // usedSmoothedDataForPeakDetection = True
@@ -2618,7 +2618,7 @@ namespace MASICPeakFinder
                     peaksContainer.YData,
                     sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum,
                     peaksContainer.PeakWidthPointsMinimum,
-                    (int)(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
+                    (int)Math.Round(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
                 // usedSmoothedDataForPeakDetection = False
             }
 
@@ -3617,7 +3617,7 @@ namespace MASICPeakFinder
 
                     if (scanIndexObserved >= current.SegmentIndexStart && scanIndexObserved <= current.SegmentIndexEnd)
                     {
-                        segmentMidPointA = current.SegmentIndexStart + (int)((current.SegmentIndexEnd - current.SegmentIndexStart) / 2.0);
+                        segmentMidPointA = current.SegmentIndexStart + (int)Math.Round((current.SegmentIndexEnd - current.SegmentIndexStart) / 2.0);
                         matchFound = true;
                     }
 
@@ -3637,7 +3637,7 @@ namespace MASICPeakFinder
                                 // Define segmentMidPointA
                                 segmentMidPointB = segmentMidPointA;
                                 var previous = noiseStatsSegments[noiseSegmentIndex - 1];
-                                segmentMidPointA = previous.SegmentIndexStart + (int)((previous.SegmentIndexEnd - previous.SegmentIndexStart) / 2.0);
+                                segmentMidPointA = previous.SegmentIndexStart + (int)Math.Round((previous.SegmentIndexEnd - previous.SegmentIndexStart) / 2.0);
                             }
                             else
                             {
@@ -3656,7 +3656,7 @@ namespace MASICPeakFinder
                                 // Define segmentMidPointB
                                 var nextSegment = noiseStatsSegments[noiseSegmentIndex + 1];
 
-                                segmentMidPointB = nextSegment.SegmentIndexStart + (int)((nextSegment.SegmentIndexEnd - nextSegment.SegmentIndexStart) / 2.0);
+                                segmentMidPointB = nextSegment.SegmentIndexStart + (int)Math.Round((nextSegment.SegmentIndexEnd - nextSegment.SegmentIndexStart) / 2.0);
                             }
                             else
                             {
@@ -3690,7 +3690,7 @@ namespace MASICPeakFinder
 
                             baselineNoiseStats.NoiseLevel = segmentA.NoiseLevel * fractionFromSegmentA + segmentB.NoiseLevel * fractionFromSegmentB;
                             baselineNoiseStats.NoiseStDev = segmentA.NoiseStDev * fractionFromSegmentA + segmentB.NoiseStDev * fractionFromSegmentB;
-                            baselineNoiseStats.PointsUsed = (int)(segmentA.PointsUsed * fractionFromSegmentA + segmentB.PointsUsed * fractionFromSegmentB);
+                            baselineNoiseStats.PointsUsed = (int)Math.Round(segmentA.PointsUsed * fractionFromSegmentA + segmentB.PointsUsed * fractionFromSegmentB);
                         }
 
                         break;

@@ -1870,7 +1870,7 @@ namespace MASIC
                 var exportOptions = masicOptions.RawDataExportOptions;
 
                 exportOptions.ExportEnabled = chkExportRawSpectraData.Checked;
-                exportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)Convert.ToInt32(cboExportRawDataFileFormat.SelectedIndex);
+                exportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)cboExportRawDataFileFormat.SelectedIndex;
 
                 exportOptions.IncludeMSMS = chkExportRawDataIncludeMSMS.Checked;
                 exportOptions.RenumberScans = chkExportRawDataRenumberScans.Checked;
@@ -1984,7 +1984,7 @@ namespace MASIC
                 // ' sicOptions.UseSICStatsFromLargestPeak = chkUseSICStatsFromLargestPeak.Checked
 
                 // Peak Finding Options
-                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(cboSICNoiseThresholdMode.SelectedIndex);
+                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)cboSICNoiseThresholdMode.SelectedIndex;
                 peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
                     return false;
@@ -2015,7 +2015,7 @@ namespace MASIC
                     return false;
 
                 peakFinderOptions.UseSavitzkyGolaySmooth = optUseSavitzkyGolaySmooth.Checked;
-                peakFinderOptions.SavitzkyGolayFilterOrder = Convert.ToInt16(TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text + " must be an integer value", out parseError));
+                peakFinderOptions.SavitzkyGolayFilterOrder = (short)(TextBoxUtils.ParseTextBoxValueInt(txtSavitzkyGolayFilterOrder, lblSavitzkyGolayFilterOrder.Text + " must be an integer value", out parseError));
                 if (parseError)
                     return false;
 
@@ -2023,7 +2023,7 @@ namespace MASIC
                 peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = chkSmoothDataRegardlessOfMinimumPeakWidth.Checked;
 
                 // Mass Spectra Noise Threshold Options
-                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)Convert.ToInt32(cboMassSpectraNoiseThresholdMode.SelectedIndex);
+                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)cboMassSpectraNoiseThresholdMode.SelectedIndex;
                 peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
                     return false;

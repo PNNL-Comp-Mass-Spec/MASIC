@@ -291,14 +291,14 @@ namespace MASICPeakFinder
                                 if (widthInPoints % 2 == 0)
                                 {
                                     // Even number
-                                    newPeak.LeftEdge = index - (int)(widthInPoints / 2.0);
-                                    newPeak.RightEdge = index + (int)(widthInPoints / 2.0) - 1;
+                                    newPeak.LeftEdge = index - (int)Math.Round(widthInPoints / 2.0);
+                                    newPeak.RightEdge = index + (int)Math.Round(widthInPoints / 2.0) - 1;
                                 }
                                 else
                                 {
                                     // Odd number
-                                    newPeak.LeftEdge = index - (int)((widthInPoints - 1) / 2.0);
-                                    newPeak.RightEdge = index + (int)((widthInPoints - 1) / 2.0);
+                                    newPeak.LeftEdge = index - (int)Math.Round((widthInPoints - 1) / 2.0);
+                                    newPeak.RightEdge = index + (int)Math.Round((widthInPoints - 1) / 2.0);
                                 }
                             }
 

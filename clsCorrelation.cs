@@ -246,14 +246,14 @@ namespace MASIC
                     mBinningOptions.EndX = mBinningOptions.StartX + mBinningOptions.BinSize * 10;
                 }
 
-                int binCount = (int)((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
+                int binCount = (int)Math.Round((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
                 if (binCount < 1)
                     binCount = 1;
 
                 if (binCount > mBinningOptions.MaximumBinCount)
                 {
                     mBinningOptions.BinSize = (mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.MaximumBinCount;
-                    binCount = (int)((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
+                    binCount = (int)Math.Round((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
                 }
 
                 bin2Offset = mBinningOptions.BinSize / 2;

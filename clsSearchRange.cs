@@ -510,7 +510,7 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange((int)searchValue, (int)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
+                        matchFound = FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth), out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.SingleType:
                         matchFound = FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
@@ -572,7 +572,7 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.IntegerType:
-                        matchFound = FindValueRange((int)searchValue, (int)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
+                        matchFound = FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth), out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
                         matchFound = FindValueRange((double)searchValue, (double)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
@@ -625,7 +625,7 @@ namespace MASIC
         {
             try
             {
-                return (int)GetValueByIndex(index);
+                return (int)Math.Round(GetValueByIndex(index));
             }
             catch (Exception)
             {
@@ -681,7 +681,7 @@ namespace MASIC
         {
             try
             {
-                return (int)GetValueByOriginalIndex(index);
+                return (int)Math.Round(GetValueByOriginalIndex(index));
             }
             catch (Exception)
             {

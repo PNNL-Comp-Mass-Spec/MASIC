@@ -208,12 +208,12 @@ namespace MagnitudeConcavityPeakFinder
                     if (indexEnd % 2 == 0)
                     {
                         // Even value
-                        udtBaselineNoiseStats.NoiseLevel = sortedData[(int)(indexEnd / 2)];
+                        udtBaselineNoiseStats.NoiseLevel = sortedData[indexEnd / 2];
                     }
                     else
                     {
                         // Odd value; average the values on either side of intIndexEnd/2
-                        var intIndex = (int)((indexEnd - 1) / 2);
+                        var intIndex = (indexEnd - 1) / 2;
                         if (intIndex < 0)
                             intIndex = 0;
                         summedIntensity = sortedData[intIndex];
@@ -392,7 +392,7 @@ namespace MagnitudeConcavityPeakFinder
                 BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance,
                 BaselineNoiseLevelAbsolute = 0,
                 MinimumSignalToNoiseRatio = 0,                    // Someday: Figure out how best to use this when > 0; for now, the SICNoiseMinimumSignalToNoiseRatio property ignores any attempts to set this value
-                MinimumBaselineNoiseLevel = 1,                       
+                MinimumBaselineNoiseLevel = 1,
                 TrimmedMeanFractionLowIntensityDataToAverage = 0.75f,
                 DualTrimmedMeanStdDevLimits = 5,
                 DualTrimmedMeanMaximumSegments = 3
