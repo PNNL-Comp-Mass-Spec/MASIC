@@ -316,7 +316,7 @@ namespace MASIC
                         }
 
                         int scanFirst = int.MinValue;
-                        var scanTimeFirst = default(float);
+                        float scanTimeFirst = 0;
                         int srmIndexLast = 0;
 
                         double[] crosstabColumnValue;
@@ -498,7 +498,7 @@ namespace MASIC
 
             if (nonZeroCount > 0 || forceWrite)
             {
-                writer.WriteLine(delimiter.ToString(), dataColumns);
+                writer.WriteLine(string.Join(delimiter.ToString(), dataColumns));
             }
         }
 
