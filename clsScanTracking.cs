@@ -15,7 +15,7 @@ namespace MASIC
         #endregion
 
         #region "Properties"
-        public List<ScanStatsEntry> ScanStats { get; private set; }
+        public List<ScanStatsEntry> ScanStats { get; }
         #endregion
 
         #region "Classwide variables"

@@ -8,9 +8,9 @@ namespace MASIC
 
         public int IonInUseCount { get; set; }
 
-        public bool[] IonUsed { get; private set; }
+        public bool[] IonUsed { get; }
 
-        public List<clsUniqueMZListItem> UniqueMZList { get; private set; }
+        public List<clsUniqueMZListItem> UniqueMZList { get; }
 
         /// <summary>
         /// Constructor

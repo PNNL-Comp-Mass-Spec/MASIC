@@ -59,7 +59,7 @@ namespace MASIC
         /// </summary>
         public double MZIntensityFilterIgnoreRangeEnd { get; set; }
 
-        public List<clsReporterIonInfo> ReporterIonList { get; private set; }
+        public List<clsReporterIonInfo> ReporterIonList { get; }
 
         public bool ReporterIonStatsEnabled { get; set; }
 

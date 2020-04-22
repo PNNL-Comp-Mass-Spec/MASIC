@@ -11,7 +11,7 @@
         /// Parent ion m/z value
         /// </summary>
         /// <returns></returns>
-        public double ParentIonMz { get; private set; }
+        public double ParentIonMz { get; }
 
         /// <summary>
         /// The nth fragmentation scan after an MS1 scan

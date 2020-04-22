@@ -71,7 +71,7 @@ namespace MASIC.DatasetStats
         /// Dataset file info
         /// </summary>
         /// <returns></returns>
-        public DatasetFileInfo DatasetFileInfo { get; private set; }
+        public DatasetFileInfo DatasetFileInfo { get; }
 
         /// <summary>
         /// Error message
@@ -89,7 +89,7 @@ namespace MASIC.DatasetStats
         /// Sample info
         /// </summary>
         /// <returns></returns>
-        public SampleInfo SampleInfo { get; private set; }
+        public SampleInfo SampleInfo { get; }
 
         #endregion
 

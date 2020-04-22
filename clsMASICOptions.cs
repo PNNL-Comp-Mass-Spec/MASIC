@@ -25,14 +25,14 @@ namespace MASIC
         /// <summary>
         /// Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
         /// </summary>
-        public clsSICOptions SICOptions { get; private set; }
+        public clsSICOptions SICOptions { get; }
 
         /// <summary>
         /// Binning options for MS/MS spectra; only applies to spectrum similarity testing
         /// </summary>
-        public clsBinningOptions BinningOptions { get; private set; }
+        public clsBinningOptions BinningOptions { get; }
 
-        public clsCustomSICList CustomSICList { get; private set; }
+        public clsCustomSICList CustomSICList { get; }
 
         public bool AbortProcessing { get; set; }
 
@@ -96,20 +96,20 @@ namespace MASIC
         /// </summary>
         public bool SuppressNoParentIonsError { get; set; }
 
-        public clsRawDataExportOptions RawDataExportOptions { get; private set; }
+        public clsRawDataExportOptions RawDataExportOptions { get; }
 
-        public clsReporterIons ReporterIons { get; private set; }
+        public clsReporterIons ReporterIons { get; }
 
         public bool CDFTimeInSeconds { get; set; }
         public double ParentIonDecoyMassDa { get; set; }
 
         public bool UseBase64DataEncoding { get; set; }
 
-        public clsSpectrumCacheOptions CacheOptions { get; private set; }
+        public clsSpectrumCacheOptions CacheOptions { get; }
         public string MASICStatusFilename { get; set; } = DEFAULT_MASIC_STATUS_FILE_NAME;
 
-        public string MASICVersion { get; private set; }
-        public string PeakFinderVersion { get; private set; }
+        public string MASICVersion { get; }
+        public string PeakFinderVersion { get; }
 
         public DateTime LastParentIonProcessingLogTime { get; set; }
 
@@ -170,7 +170,7 @@ namespace MASIC
         /// Use this property to filter the items written in the StatusLog file to only include the entries in this list
         /// </summary>
         /// <returns></returns>
-        public SortedSet<string> StatusLogKeyNameFilterList { get; private set; }
+        public SortedSet<string> StatusLogKeyNameFilterList { get; }
 
         /// <summary>
         /// Returns the contents of StatusLogKeyNameFilterList

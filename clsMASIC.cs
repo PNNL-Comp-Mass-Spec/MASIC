@@ -211,7 +211,7 @@ namespace MASIC
             }
         }
 
-        public clsMASICOptions Options { get; private set; }
+        public clsMASICOptions Options { get; }
 
         public eProcessingStepConstants ProcessStep => mProcessingStep;
 

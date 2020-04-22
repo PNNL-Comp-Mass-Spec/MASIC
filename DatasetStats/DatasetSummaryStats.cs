@@ -6,9 +6,9 @@ namespace MASIC.DatasetStats
     {
         public double ElutionTimeMax { get; set; }
 
-        public SummaryStatDetails MSStats { get; private set; }
+        public SummaryStatDetails MSStats { get; }
 
-        public SummaryStatDetails MSnStats { get; private set; }
+        public SummaryStatDetails MSnStats { get; }
 
         /// <summary>
         /// Keeps track of each ScanType in the dataset, along with the number of scans of this type
@@ -20,7 +20,7 @@ namespace MASIC.DatasetStats
         /// ITMS + p ESI d Z ms
         /// ITMS + c ESI d Full ms2 @cid35.00
         /// </remarks>
-        public Dictionary<string, int> ScanTypeStats { get; private set; }
+        public Dictionary<string, int> ScanTypeStats { get; }
 
         /// <summary>
         /// Constructor

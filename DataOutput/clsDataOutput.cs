@@ -44,9 +44,9 @@ namespace MASIC.DataOutput
         #region "Properties"
         private readonly clsMASICOptions mOptions;
 
-        public clsOutputFileHandles OutputFileHandles { get; private set; }
+        public clsOutputFileHandles OutputFileHandles { get; }
 
-        public clsExtendedStatsWriter ExtendedStatsWriter { get; private set; }
+        public clsExtendedStatsWriter ExtendedStatsWriter { get; }
 
         #endregion
 

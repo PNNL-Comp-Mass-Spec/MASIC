@@ -85,7 +85,7 @@ namespace MASIC
         /// <summary>
         /// Information specific to fragmentation scans
         /// </summary>
-        public clsFragScanInfo FragScanInfo { get; private set; }
+        public clsFragScanInfo FragScanInfo { get; }
 
         /// <summary>
         /// Information specific to MRM/SRM scans
@@ -95,7 +95,7 @@ namespace MASIC
         /// <summary>
         /// Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
         /// </summary>
-        public Dictionary<int, string> ExtendedHeaderInfo { get; private set; }
+        public Dictionary<int, string> ExtendedHeaderInfo { get; }
 
         /// <summary>
         /// Number of ions that remain after filtering / condensing the data loaded via GetScanData

@@ -55,7 +55,7 @@ namespace MASIC
         /// </summary>
         public float ScanOrAcqTimeTolerance { get; set; }
 
-        public List<clsCustomMZSearchSpec> CustomMZSearchValues { get; private set; }
+        public List<clsCustomMZSearchSpec> CustomMZSearchValues { get; }
 
         /// <summary>
         /// When True, then will only search for the m/z values listed in the custom m/z list

@@ -5,9 +5,9 @@ namespace MASICPeakFinder
 {
     public class clsSmoothedYDataSubset
     {
-        public int DataCount { get; private set; }
-        public double[] Data { get; private set; }
-        public int DataStartIndex { get; private set; }
+        public int DataCount { get; }
+        public double[] Data { get; }
+        public int DataStartIndex { get; }
 
         public clsSmoothedYDataSubset()
         {
