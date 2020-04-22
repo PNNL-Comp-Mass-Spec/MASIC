@@ -206,8 +206,7 @@ namespace MASIC
 
                         if (convertingRangeOrTolerance)
                         {
-                            int totalScans;
-                            totalScans = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
+                            var totalScans = scanList.MasterScanNumList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanNumList[0];
                             if (totalScans < 1)
                             {
                                 totalScans = 1;

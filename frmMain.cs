@@ -445,8 +445,6 @@ namespace MASIC
 
         private void EnableDisableControls()
         {
-            bool rawExportEnabled;
-
             var createSICsAndRawData = !chkSkipSICAndRawDataProcessing.Checked;
             var msmsProcessingEnabled = !chkSkipMSMSProcessing.Checked;
             var exportRawDataOnly = chkExportRawDataOnly.Checked && chkExportRawSpectraData.Checked;
@@ -470,7 +468,7 @@ namespace MASIC
             fraCustomSICControls.Enabled = createSICsAndRawData && !exportRawDataOnly;
             dgCustomSICValues.Enabled = createSICsAndRawData && !exportRawDataOnly;
 
-            rawExportEnabled = chkExportRawSpectraData.Checked;
+            var rawExportEnabled = chkExportRawSpectraData.Checked;
 
             cboExportRawDataFileFormat.Enabled = rawExportEnabled;
             chkExportRawDataIncludeMSMS.Enabled = rawExportEnabled;
@@ -651,8 +649,6 @@ namespace MASIC
         {
             // Prompts the user to select a file to load the options from
 
-            string filePath;
-
             using (var objOpenFile = new OpenFileDialog()
             {
                 AddExtension = true,
@@ -666,7 +662,7 @@ namespace MASIC
                 FilterIndex = 1
             })
             {
-                filePath = mXmlSettingsFilePath;
+                var filePath = mXmlSettingsFilePath;
 
                 if (filePath.Length > 0)
                 {
@@ -779,9 +775,7 @@ namespace MASIC
 
         private void IniFileSaveDefaultOptions()
         {
-            DialogResult eResponse;
-
-            eResponse = MessageBox.Show("Save the current options as defaults?", "Save Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+            var eResponse = MessageBox.Show("Save the current options as defaults?", "Save Defaults", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
             if (eResponse == DialogResult.Yes)
             {
                 IniFileSaveOptions(GetSettingsFilePath(), false);
@@ -791,8 +785,6 @@ namespace MASIC
         private void IniFileSaveOptions()
         {
             // Prompts the user to select a file to load the options from
-
-            string filePath;
 
             using (var objSaveFile = new SaveFileDialog()
             {
@@ -807,7 +799,7 @@ namespace MASIC
                 FilterIndex = 1
             })
             {
-                filePath = mXmlSettingsFilePath;
+                var filePath = mXmlSettingsFilePath;
                 if (filePath.Length > 0)
                 {
                     try
@@ -1169,11 +1161,6 @@ namespace MASIC
 
         private void ProcessFileUsingMASIC()
         {
-            string outputDirectoryPath;
-            bool success;
-
-            DateTime startTime;
-
             if (!mWorking && ConfirmPaths())
             {
                 try
@@ -1181,7 +1168,7 @@ namespace MASIC
                     txtLogMessages.ResetText();
 
                     // Configure settings
-                    success = UpdateMasicSettings(ref mMasic);
+                    var success = UpdateMasicSettings(ref mMasic);
                     if (!success)
                         return;
 
@@ -1203,9 +1190,9 @@ namespace MASIC
                     cmdStartProcessing.Enabled = false;
                     Application.DoEvents();
 
-                    startTime = DateTime.UtcNow;
+                    var startTime = DateTime.UtcNow;
 
-                    outputDirectoryPath = txtOutputDirectoryPath.Text;
+                    var outputDirectoryPath = txtOutputDirectoryPath.Text;
                     success = mMasic.ProcessFile(txtInputFilePath.Text, outputDirectoryPath);
                     Cursor.Current = Cursors.Default;
                     if (mMasic.Options.AbortProcessing)
@@ -1759,9 +1746,7 @@ namespace MASIC
 
         private void ShowAboutBox()
         {
-            string message;
-
-            message = string.Empty;
+            var message = string.Empty;
 
             message += "Program written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in 2003" + Environment.NewLine;
             message += "Copyright 2005, Battelle Memorial Institute.  All Rights Reserved." + Environment.NewLine + Environment.NewLine;
@@ -1780,12 +1765,9 @@ namespace MASIC
 
         private void UpdateCustomSICDataGridTableStyle()
         {
-            DataGridTableStyle tsCustomSICValues;
-            bool timeTolerance;
-
             // Define the PM Thresholds table style
             // Setting the MappingName of the table style to CUSTOM_SIC_VALUES_DATA_TABLE will cause this style to be used with that table
-            tsCustomSICValues = new DataGridTableStyle()
+            var tsCustomSICValues = new DataGridTableStyle()
             {
                 MappingName = CUSTOM_SIC_VALUES_DATA_TABLE,
                 AllowSorting = true,
@@ -1797,7 +1779,7 @@ namespace MASIC
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ, "Custom m/z", 90);
             DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_MZ_TOLERANCE, "m/z tolerance (Da)", 110);
 
-            timeTolerance = false;
+            var timeTolerance = false;
             switch (GetCustomSICScanToleranceType())
             {
                 case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
@@ -2161,8 +2143,6 @@ namespace MASIC
 
         private bool ValidateSettings(ref clsMASIC objMasic)
         {
-            DialogResult eResponse;
-
             if (objMasic.Options.ReporterIons.ReporterIonMassMode != clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
             {
                 if (objMasic.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes)
@@ -2170,7 +2150,7 @@ namespace MASIC
                     // Make sure the tolerance is less than 0.03 Da; if not, warn the user
                     if (objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault > 0.03)
                     {
-                        eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be less than 0.03 m/z when using 'iTraq8 for High Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z.  If using a low resolution instrument, you should choose the 'iTraq 8 for Low Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                        var eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be less than 0.03 m/z when using 'iTraq8 for High Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z.  If using a low resolution instrument, you should choose the 'iTraq 8 for Low Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
                         if (eResponse != DialogResult.Yes)
                         {
@@ -2183,7 +2163,7 @@ namespace MASIC
                     // Make sure the tolerance is at least 0.1 Da; if not, warn the user
                     if (objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault < 0.1)
                     {
-                        eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be at least 0.1 m/z when using 'iTraq8 for Low Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z. If using a high resolution instrument, you should choose the 'iTraq 8 for High Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                        var eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be at least 0.1 m/z when using 'iTraq8 for Low Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z. If using a high resolution instrument, you should choose the 'iTraq 8 for High Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
                         if (eResponse != DialogResult.Yes)
                         {

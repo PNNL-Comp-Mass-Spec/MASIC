@@ -356,18 +356,15 @@ namespace MASIC.DataOutput
         {
             // Writes out a flat file containing the extended scan stats
 
-            string extendedConstantHeaderOutputFilePath;
             var extendedNonConstantHeaderOutputFilePath = string.Empty;
 
             const char TAB_DELIMITER = '\t';
-
-            List<int> nonConstantHeaderIDs = null;
 
             try
             {
                 UpdateProgress(0, "Saving extended scan stats to flat file");
 
-                extendedConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile);
+                var extendedConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile);
                 extendedNonConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ScanStatsExtendedFlatFile);
 
                 ReportMessage("Saving extended scan stats flat file to disk: " + Path.GetFileName(extendedNonConstantHeaderOutputFilePath));
@@ -381,7 +378,7 @@ namespace MASIC.DataOutput
 
                 // Lookup extended stats values that are constants for all scans
                 // The following will also remove the constant header values from mExtendedHeaderNameMap
-                var constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(out nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, TAB_DELIMITER);
+                var constantExtendedHeaderValues = ExtractConstantExtendedHeaderValues(out var nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, TAB_DELIMITER);
                 if (constantExtendedHeaderValues == null)
                     constantExtendedHeaderValues = string.Empty;
 

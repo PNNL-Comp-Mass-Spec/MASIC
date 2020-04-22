@@ -139,7 +139,6 @@ namespace MASIC
             // and bad for spectra with > 10 data points
             // As an alternative to this function, use AggregateIonsInRange
 
-            int dataIndex;
             int closestMatchIndex;
             var highestIntensity = 0.0;
 
@@ -148,7 +147,7 @@ namespace MASIC
                 closestMatchIndex = -1;
                 highestIntensity = 0;
 
-                for (dataIndex = 0; dataIndex <= ionCount - 1; dataIndex++)
+                for (var dataIndex = 0; dataIndex <= ionCount - 1; dataIndex++)
                 {
                     if (mzList[dataIndex] >= mzStart && mzList[dataIndex] <= mzEnd)
                     {
@@ -241,13 +240,10 @@ namespace MASIC
         {
             // Recursive search function
 
-            int indexMidpoint;
             var leftDone = false;
             var rightDone = false;
-            int leftIndex;
-            int rightIndex;
 
-            indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+            var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
@@ -273,7 +269,7 @@ namespace MASIC
             else
             {
                 // Inside range; figure out the borders
-                leftIndex = indexMidpoint;
+                var leftIndex = indexMidpoint;
                 do
                 {
                     leftIndex = leftIndex - 1;
@@ -285,7 +281,7 @@ namespace MASIC
                         leftDone = true;
                 }
                 while (!leftDone);
-                rightIndex = indexMidpoint;
+                var rightIndex = indexMidpoint;
 
                 do
                 {

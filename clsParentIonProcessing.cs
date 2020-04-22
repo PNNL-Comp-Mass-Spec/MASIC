@@ -37,14 +37,10 @@ namespace MASIC
             clsSpectraCache spectraCache,
             clsSICOptions sicOptions)
         {
-            int mrmIndex;
-            double mrmDaughterMZ;
-            double mrmToleranceHalfWidth;
-
-            for (mrmIndex = 0; mrmIndex <= mrmInfo.MRMMassCount - 1; mrmIndex++)
+            for (var mrmIndex = 0; mrmIndex <= mrmInfo.MRMMassCount - 1; mrmIndex++)
             {
-                mrmDaughterMZ = mrmInfo.MRMMassList[mrmIndex].CentralMass;
-                mrmToleranceHalfWidth = Math.Round((mrmInfo.MRMMassList[mrmIndex].EndMass - mrmInfo.MRMMassList[mrmIndex].StartMass) / 2, 6);
+                var mrmDaughterMZ = mrmInfo.MRMMassList[mrmIndex].CentralMass;
+                var mrmToleranceHalfWidth = Math.Round((mrmInfo.MRMMassList[mrmIndex].EndMass - mrmInfo.MRMMassList[mrmIndex].StartMass) / 2, 6);
                 if (mrmToleranceHalfWidth < 0.001)
                 {
                     mrmToleranceHalfWidth = 0.001;
@@ -242,9 +238,7 @@ namespace MASIC
             // Returns 0 if no similarity or no spectra to compare
             // Returns -1 if an error
 
-            int fragIndex1, fragIndex2;
-            int fragSpectrumIndex1, fragSpectrumIndex2;
-            float similarityScore, highestSimilarityScore;
+            float highestSimilarityScore;
 
             try
             {
@@ -261,9 +255,9 @@ namespace MASIC
                 else
                 {
                     highestSimilarityScore = 0;
-                    for (fragIndex1 = 0; fragIndex1 <= scanList.ParentIons[parentIonIndex1].FragScanIndices.Count - 1; fragIndex1++)
+                    for (var fragIndex1 = 0; fragIndex1 <= scanList.ParentIons[parentIonIndex1].FragScanIndices.Count - 1; fragIndex1++)
                     {
-                        fragSpectrumIndex1 = scanList.ParentIons[parentIonIndex1].FragScanIndices[fragIndex1];
+                        var fragSpectrumIndex1 = scanList.ParentIons[parentIonIndex1].FragScanIndices[fragIndex1];
 
                         if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex1].ScanNumber, out var poolIndex1))
                         {
@@ -276,9 +270,9 @@ namespace MASIC
                             dataImportUtilities.DiscardDataBelowNoiseThreshold(spectraCache.SpectraPool[poolIndex1], scanList.FragScans[fragSpectrumIndex1].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
                         }
 
-                        for (fragIndex2 = 0; fragIndex2 <= scanList.ParentIons[parentIonIndex2].FragScanIndices.Count - 1; fragIndex2++)
+                        for (var fragIndex2 = 0; fragIndex2 <= scanList.ParentIons[parentIonIndex2].FragScanIndices.Count - 1; fragIndex2++)
                         {
-                            fragSpectrumIndex2 = scanList.ParentIons[parentIonIndex2].FragScanIndices[fragIndex2];
+                            var fragSpectrumIndex2 = scanList.ParentIons[parentIonIndex2].FragScanIndices[fragIndex2];
 
                             if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex2].ScanNumber, out var poolIndex2))
                             {
@@ -291,7 +285,7 @@ namespace MASIC
                                 dataImportUtilities.DiscardDataBelowNoiseThreshold(spectraCache.SpectraPool[poolIndex2], scanList.FragScans[fragSpectrumIndex2].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
                             }
 
-                            similarityScore = CompareSpectra(spectraCache.SpectraPool[poolIndex1], spectraCache.SpectraPool[poolIndex2], binningOptions);
+                            var similarityScore = CompareSpectra(spectraCache.SpectraPool[poolIndex1], spectraCache.SpectraPool[poolIndex2], binningOptions);
 
                             if (similarityScore > highestSimilarityScore)
                             {
@@ -327,8 +321,6 @@ namespace MASIC
             var binnedSpectrum1 = new clsBinnedData();
             var binnedSpectrum2 = new clsBinnedData();
 
-            bool success;
-
             try
             {
                 var objCorrelate = new clsCorrelation(binningOptions);
@@ -337,7 +329,7 @@ namespace MASIC
                 const clsCorrelation.cmCorrelationMethodConstants eCorrelationMethod = clsCorrelation.cmCorrelationMethodConstants.Pearson;
 
                 // Bin the data in the first spectrum
-                success = CompareSpectraBinData(objCorrelate, fragSpectrum1, binnedSpectrum1);
+                var success = CompareSpectraBinData(objCorrelate, fragSpectrum1, binnedSpectrum1);
                 if (!success)
                     return -1;
 
@@ -370,13 +362,12 @@ namespace MASIC
             clsMSSpectrum fragSpectrum,
             clsBinnedData binnedSpectrum)
         {
-            int index;
             var xData = new List<float>();
             var yData = new List<float>();
 
             // Make a copy of the data, excluding any Reporter Ion data
 
-            for (index = 0; index <= fragSpectrum.IonCount - 1; index++)
+            for (var index = 0; index <= fragSpectrum.IonCount - 1; index++)
             {
                 if (!clsUtilities.CheckPointInMZIgnoreRange(fragSpectrum.IonsMZ[index],
                                                             mReporterIons.MZIntensityFilterIgnoreRangeStart,
@@ -444,17 +435,15 @@ namespace MASIC
             // Searches mzList for the closest match to searchMZ within tolerance bestMatchMZ
             // If a match is found, then updates bestMatchMZ to the m/z of the match and returns True
 
-            int dataIndex;
             int closestMatchIndex;
-            double massDifferenceAbs;
             var bestMassDifferenceAbs = 0.0;
 
             try
             {
                 closestMatchIndex = -1;
-                for (dataIndex = 0; dataIndex <= ionCount - 1; dataIndex++)
+                for (var dataIndex = 0; dataIndex <= ionCount - 1; dataIndex++)
                 {
-                    massDifferenceAbs = Math.Abs(mzList[dataIndex] - searchMZ);
+                    var massDifferenceAbs = Math.Abs(mzList[dataIndex] - searchMZ);
                     if (massDifferenceAbs <= toleranceMZ)
                     {
                         if (closestMatchIndex < 0 || massDifferenceAbs < bestMassDifferenceAbs)
@@ -515,37 +504,32 @@ namespace MASIC
                 ReportMessage("Finding similar parent ions");
                 UpdateProgress(0, "Finding similar parent ions");
 
-                int findSimilarIonsDataCount;
                 var similarParentIonsData = new clsSimilarParentIonsData(scanList.ParentIons.Count);
 
                 similarParentIonsData.UniqueMZList.Clear();
 
                 // Original m/z values, rounded to 2 decimal places
-                double[] mzList;
-                int[] intensityPointerArray;
-                double[] intensityList;
 
                 // Initialize the arrays
 
-                mzList = new double[scanList.ParentIons.Count];
-                intensityPointerArray = new int[scanList.ParentIons.Count];
-                intensityList = new double[scanList.ParentIons.Count];
+                var mzList = new double[scanList.ParentIons.Count];
+                var intensityPointerArray = new int[scanList.ParentIons.Count];
+                var intensityList = new double[scanList.ParentIons.Count];
 
-                int parentIonIndex;
                 int ionInUseCountOriginal;
 
-                findSimilarIonsDataCount = 0;
-                for (parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                var findSimilarIonsDataCount = 0;
+                for (var index = 0; index <= scanList.ParentIons.Count - 1; index++)
                 {
                     bool includeParentIon;
 
-                    if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ > 0)
+                    if (scanList.ParentIons[index].MRMDaughterMZ > 0)
                     {
                         includeParentIon = false;
                     }
                     else if (masicOptions.CustomSICList.LimitSearchToCustomMZList)
                     {
-                        includeParentIon = scanList.ParentIons[parentIonIndex].CustomSICPeak;
+                        includeParentIon = scanList.ParentIons[index].CustomSICPeak;
                     }
                     else
                     {
@@ -554,11 +538,11 @@ namespace MASIC
 
                     if (includeParentIon)
                     {
-                        similarParentIonsData.MZPointerArray[findSimilarIonsDataCount] = parentIonIndex;
-                        mzList[findSimilarIonsDataCount] = Math.Round(scanList.ParentIons[parentIonIndex].MZ, 2);
+                        similarParentIonsData.MZPointerArray[findSimilarIonsDataCount] = index;
+                        mzList[findSimilarIonsDataCount] = Math.Round(scanList.ParentIons[index].MZ, 2);
 
-                        intensityPointerArray[findSimilarIonsDataCount] = parentIonIndex;
-                        intensityList[findSimilarIonsDataCount] = scanList.ParentIons[parentIonIndex].SICStats.Peak.MaxIntensityValue;
+                        intensityPointerArray[findSimilarIonsDataCount] = index;
+                        intensityList[findSimilarIonsDataCount] = scanList.ParentIons[index].SICStats.Peak.MaxIntensityValue;
                         findSimilarIonsDataCount += 1;
                     }
                 }
@@ -628,7 +612,7 @@ namespace MASIC
 
                 // Look for similar parent ions by using m/z and scan
                 // Step through the ions by decreasing intensity
-                parentIonIndex = 0;
+                var parentIonIndex = 0;
                 do
                 {
                     var originalIndex = intensityPointerArray[parentIonIndex];
@@ -747,15 +731,15 @@ namespace MASIC
                 {
                     for (var matchIndex = 0; matchIndex <= uniqueMzListItem.MatchCount - 1; matchIndex++)
                     {
-                        parentIonIndex = uniqueMzListItem.MatchIndices[matchIndex];
+                        var parentIonMatchIndex = uniqueMzListItem.MatchIndices[matchIndex];
 
-                        if (scanList.ParentIons[parentIonIndex].MZ > 0)
+                        if (scanList.ParentIons[parentIonMatchIndex].MZ > 0)
                         {
-                            if (scanList.ParentIons[parentIonIndex].OptimalPeakApexScanNumber != uniqueMzListItem.ScanNumberMaxIntensity)
+                            if (scanList.ParentIons[parentIonMatchIndex].OptimalPeakApexScanNumber != uniqueMzListItem.ScanNumberMaxIntensity)
                             {
                                 ionUpdateCount += 1;
-                                scanList.ParentIons[parentIonIndex].OptimalPeakApexScanNumber = uniqueMzListItem.ScanNumberMaxIntensity;
-                                scanList.ParentIons[parentIonIndex].PeakApexOverrideParentIonIndex = uniqueMzListItem.ParentIonIndexMaxIntensity;
+                                scanList.ParentIons[parentIonMatchIndex].OptimalPeakApexScanNumber = uniqueMzListItem.ScanNumberMaxIntensity;
+                                scanList.ParentIons[parentIonMatchIndex].PeakApexOverrideParentIonIndex = uniqueMzListItem.ParentIonIndexMaxIntensity;
                             }
                         }
                     }

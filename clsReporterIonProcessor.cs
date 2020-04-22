@@ -89,8 +89,7 @@ namespace MASIC
                 }
 
                 // Populate array reporterIons, which we will sort by m/z
-                clsReporterIonInfo[] reporterIons;
-                reporterIons = new clsReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
+                var reporterIons = new clsReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
 
                 var reporterIonIndex = 0;
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
@@ -306,10 +305,6 @@ namespace MASIC
         {
             const bool USE_MAX_ABUNDANCE_IN_WINDOW = true;
 
-            double[] reporterIntensities;
-            double[] reporterIntensitiesCorrected;
-            double[] closestMZ;
-
             // The following will be a value between 0 and 100
             // Using Absolute Value of percent change to avoid averaging both negative and positive values
             double parentIonMZ;
@@ -330,9 +325,9 @@ namespace MASIC
             }
 
             // Initialize the arrays used to track the observed reporter ion values
-            reporterIntensities = new double[reporterIons.Count];
-            reporterIntensitiesCorrected = new double[reporterIons.Count];
-            closestMZ = new double[reporterIons.Count];
+            var reporterIntensities = new double[reporterIons.Count];
+            var reporterIntensitiesCorrected = new double[reporterIons.Count];
+            var closestMZ = new double[reporterIons.Count];
 
             // Initialize the output variables
             var dataColumns = new List<string>()
@@ -580,11 +575,8 @@ namespace MASIC
         {
             public int Compare(object x, object y)
             {
-                clsReporterIonInfo reporterIonInfoA;
-                clsReporterIonInfo reporterIonInfoB;
-
-                reporterIonInfoA = (clsReporterIonInfo)x;
-                reporterIonInfoB = (clsReporterIonInfo)y;
+                var reporterIonInfoA = (clsReporterIonInfo)x;
+                var reporterIonInfoB = (clsReporterIonInfo)y;
 
                 if (reporterIonInfoA.MZ > reporterIonInfoB.MZ)
                 {

@@ -33,13 +33,12 @@ namespace MASICBrowser
             // Returns 0 if no error, error code if an error
 
             var commandLineParser = new clsParseCommandLine();
-            bool proceed;
 
             mInputFilePath = string.Empty;
 
             try
             {
-                proceed = false;
+                var proceed = false;
                 if (commandLineParser.ParseCommandLine())
                 {
                     if (SetOptionsUsingCommandLineParameters(commandLineParser))

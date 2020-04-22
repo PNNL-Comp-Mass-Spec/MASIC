@@ -370,8 +370,6 @@ namespace MASIC
         {
             // Returns True if success
 
-            int index;
-
             if (mzToleranceList.Length > 0 && mzToleranceList.Length != mzList.Length)
             {
                 // Invalid Custom SIC comment list; number of entries doesn't match
@@ -405,7 +403,7 @@ namespace MASIC
                 return true;
             }
 
-            for (index = 0; index <= mzList.Length - 1; index++)
+            for (var index = 0; index <= mzList.Length - 1; index++)
             {
                 var mzSearchSpec = new clsCustomMZSearchSpec(mzList[index]);
 

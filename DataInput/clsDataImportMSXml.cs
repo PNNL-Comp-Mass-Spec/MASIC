@@ -239,11 +239,9 @@ namespace MASIC.DataInput
             bool keepRawSpectra,
             bool keepMSMSSpectra)
         {
-            clsMSDataFileReaderBaseClass xmlReader;
-
             try
             {
-                xmlReader = new clsMzXMLFileReader();
+                clsMSDataFileReaderBaseClass xmlReader = new clsMzXMLFileReader();
                 return ExtractScanInfoFromMSXMLDataFile(filePath, xmlReader, scanList, spectraCache,
                                                         dataOutputHandler, keepRawSpectra, keepMSMSSpectra);
             }
@@ -262,11 +260,9 @@ namespace MASIC.DataInput
             bool keepRawSpectra,
             bool keepMSMSSpectra)
         {
-            clsMSDataFileReaderBaseClass xmlReader;
-
             try
             {
-                xmlReader = new clsMzDataFileReader();
+                clsMSDataFileReaderBaseClass xmlReader = new clsMzDataFileReader();
                 return ExtractScanInfoFromMSXMLDataFile(filePath, xmlReader, scanList, spectraCache,
                                                         dataOutputHandler,
                                                         keepRawSpectra, keepMSMSSpectra);
@@ -954,11 +950,8 @@ namespace MASIC.DataInput
                 else
                 {
                     // Need to centroid the data
-                    double[] sourceMzs;
-                    double[] sourceIntensities;
-
-                    sourceMzs = new double[msSpectrum.IonCount];
-                    sourceIntensities = new double[msSpectrum.IonCount];
+                    var sourceMzs = new double[msSpectrum.IonCount];
+                    var sourceIntensities = new double[msSpectrum.IonCount];
 
                     for (var i = 0; i <= msSpectrum.IonCount - 1; i++)
                     {

@@ -154,8 +154,6 @@ namespace MASIC.DataInput
             MASICPeakFinder.clsBaselineNoiseOptions noiseThresholdOptions)
         {
             var ionCountNew = 0;
-            int ionIndex;
-            bool pointPassesFilter;
 
             try
             {
@@ -165,9 +163,9 @@ namespace MASIC.DataInput
                         if (noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0)
                         {
                             ionCountNew = 0;
-                            for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                            for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                             {
-                                pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                                var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                                 if (!pointPassesFilter)
                                 {
@@ -198,9 +196,9 @@ namespace MASIC.DataInput
                         if (noiseThresholdOptions.MinimumSignalToNoiseRatio > 0)
                         {
                             ionCountNew = 0;
-                            for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                            for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                             {
-                                pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                                var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                                 if (!pointPassesFilter)
                                 {
@@ -249,8 +247,6 @@ namespace MASIC.DataInput
             int maxIonCountToRetain)
         {
             int ionCountNew;
-            int ionIndex;
-            bool pointPassesFilter;
 
             // When this is true, then will write a text file of the mass spectrum before and after it is filtered
             // Used for debugging
@@ -275,7 +271,7 @@ namespace MASIC.DataInput
                     }
 
                     // Store the intensity values in objFilterDataArray
-                    for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                    for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                     {
                         objFilterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
                         if (writeDebugData)
@@ -293,9 +289,9 @@ namespace MASIC.DataInput
                     objFilterDataArray.FilterData();
 
                     ionCountNew = 0;
-                    for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                    for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                     {
-                        pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
+                        var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                         if (!pointPassesFilter)
                         {
@@ -331,7 +327,7 @@ namespace MASIC.DataInput
                         postFilterWriter.WriteLine("m/z" + "\t" + "Intensity");
 
                         // Store the intensity values in objFilterDataArray
-                        for (ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                        for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
                             postFilterWriter.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" +
                                                        msSpectrum.IonsIntensity[ionIndex]);
                     }

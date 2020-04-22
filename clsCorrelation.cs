@@ -128,22 +128,21 @@ namespace MASIC
             var EPS = 0.0000003;
             const double FPMIN = 1.0E-30;
 
-            int m, m2;
-            double aa, c, d, del, h, qab, qam, qap;
+            int m;
 
-            qab = a + b;
-            qap = a + 1.0;
-            qam = a - 1.0;
-            c = 1.0;
-            d = 1.0 - qab * x / qap;
+            var qab = a + b;
+            var qap = a + 1.0;
+            var qam = a - 1.0;
+            var c = 1.0;
+            var d = 1.0 - qab * x / qap;
             if (Math.Abs(d) < FPMIN)
                 d = FPMIN;
             d = 1.0 / d;
-            h = d;
+            var h = d;
             for (m = 1; m <= MAX_ITERATIONS; m++)
             {
-                m2 = 2 * m;
-                aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+                var m2 = 2 * m;
+                var aa = m * (b - m) * x / ((qam + m2) * (a + m2));
                 d = 1.0 + aa * d;
                 if (Math.Abs(d) < FPMIN)
                     d = FPMIN;
@@ -160,7 +159,7 @@ namespace MASIC
                 if (Math.Abs(c) < FPMIN)
                     c = FPMIN;
                 d = 1.0 / d;
-                del = d * c;
+                var del = d * c;
                 h *= del;
                 if (Math.Abs(del - 1.0) < EPS)
                     break;
@@ -220,16 +219,12 @@ namespace MASIC
             List<float> binnedYData,
             List<float> binnedOffsetYData)
         {
-            int dataCount;
-
-            float bin2Offset;
-
             binnedYData.Clear();
             binnedOffsetYData.Clear();
 
             try
             {
-                dataCount = xData.Count;
+                var dataCount = xData.Count;
                 if (dataCount <= 0)
                 {
                     return false;
@@ -255,7 +250,7 @@ namespace MASIC
                     binCount = (int)Math.Round((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
                 }
 
-                bin2Offset = mBinningOptions.BinSize / 2;
+                var bin2Offset = mBinningOptions.BinSize / 2;
 
                 // Initialize the bins
                 for (var i = 1; i <= binCount; i++)
@@ -282,20 +277,14 @@ namespace MASIC
         private void BinDataWork(IList<float> xData, IList<float> yData, int dataCount,
                                  IList<float> binnedYData, int binCount, clsBinningOptions binningOptions, float offset)
         {
-            int index;
-            int binNumber;
-
-            float maximumIntensity;
-            float intensityQuantizationValue;
-
             try
             {
-                maximumIntensity = float.MinValue;
-                for (index = 0; index <= dataCount - 1; index++)
+                var maximumIntensity = float.MinValue;
+                for (var index = 0; index <= dataCount - 1; index++)
                 {
                     if (yData[index] >= NoiseThresholdIntensity)
                     {
-                        binNumber = ValueToBinNumber(xData[index], binningOptions.StartX + offset, binningOptions.BinSize);
+                        var binNumber = ValueToBinNumber(xData[index], binningOptions.StartX + offset, binningOptions.BinSize);
                         if (binNumber >= 0 && binNumber < binCount)
                         {
                             if (binningOptions.SumAllIntensitiesForBin)
@@ -328,13 +317,13 @@ namespace MASIC
                 if (binningOptions.IntensityPrecisionPercent > 0)
                 {
                     // Quantize the intensities to .IntensityPrecisionPercent of maximumIntensity
-                    intensityQuantizationValue = binningOptions.IntensityPrecisionPercent / 100 * maximumIntensity;
+                    var intensityQuantizationValue = binningOptions.IntensityPrecisionPercent / 100 * maximumIntensity;
                     if (intensityQuantizationValue <= 0)
                         intensityQuantizationValue = 1;
                     if (intensityQuantizationValue > 1)
                         intensityQuantizationValue = (float)(Math.Round(intensityQuantizationValue, 0));
 
-                    for (index = 0; index <= binCount - 1; index++)
+                    for (var index = 0; index <= binCount - 1; index++)
                     {
                         if (Math.Abs(binnedYData[index]) > float.Epsilon)
                         {
@@ -345,7 +334,7 @@ namespace MASIC
 
                 if (binningOptions.Normalize && maximumIntensity > 0)
                 {
-                    for (index = 0; index <= binCount - 1; index++)
+                    for (var index = 0; index <= binCount - 1; index++)
                     {
                         if (Math.Abs(binnedYData[index]) > float.Epsilon)
                         {
@@ -375,32 +364,22 @@ namespace MASIC
             IReadOnlyCollection<float> dataList2,
             cmCorrelationMethodConstants eCorrelationMethod)
         {
-            int index;
-            int dataCount;
-            int nonZeroDataCount;
-
-            float RValue, ProbOfSignificance;
-            float RS;
-            float KendallsTau;
+            float ProbOfSignificance;
 
             // '  Dim dataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
             // '  Dim dataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
 
             try
             {
-                RValue = 0;
-                RS = 0;
-                KendallsTau = 0;
-
-                dataCount = dataList1.Count;
+                var dataCount = dataList1.Count;
                 if (dataList2.Count != dataList1.Count)
                 {
                     return -1;
                 }
 
                 // Determine the number of non-zero data points in the two spectra
-                nonZeroDataCount = 0;
-                for (index = 0; index <= dataCount - 1; index++)
+                var nonZeroDataCount = 0;
+                for (var index = 0; index <= dataCount - 1; index++)
                 {
                     if (dataList1.ElementAtOrDefault(index) > 0)
                         nonZeroDataCount += 1;
@@ -410,7 +389,7 @@ namespace MASIC
                     return 0;
 
                 nonZeroDataCount = 0;
-                for (index = 0; index <= dataCount - 1; index++)
+                for (var index = 0; index <= dataCount - 1; index++)
                 {
                     if (dataList2.ElementAtOrDefault(index) > 0)
                         nonZeroDataCount += 1;
@@ -422,13 +401,13 @@ namespace MASIC
                 switch (eCorrelationMethod)
                 {
                     case cmCorrelationMethodConstants.Pearson:
-                        CorrelatePearson(dataList1, dataList2, out RValue, out ProbOfSignificance, out var FishersZ);
+                        CorrelatePearson(dataList1, dataList2, out var RValue, out ProbOfSignificance, out var FishersZ);
                         return RValue;
                     case cmCorrelationMethodConstants.Spearman:
-                        CorrelateSpearman(dataList1, dataList2, out var DiffInRanks, out var ZD, out ProbOfSignificance, out RS, out var ProbRS);
+                        CorrelateSpearman(dataList1, dataList2, out var DiffInRanks, out var ZD, out ProbOfSignificance, out var RS, out var ProbRS);
                         return RS;
                     case cmCorrelationMethodConstants.Kendall:
-                        CorrelateKendall(dataList1, dataList2, out KendallsTau, out var Z, out ProbOfSignificance);
+                        CorrelateKendall(dataList1, dataList2, out var KendallsTau, out var Z, out ProbOfSignificance);
                         return KendallsTau;
                     default:
                         return -1;
@@ -459,9 +438,6 @@ namespace MASIC
             // disproved (prob whose small value indicates a significant correlation), and Fisher's z (returned
             // as z), whose value can be used in further statistical tests as described above.
 
-            int n;
-            int j;
-            double yt, xt, t, df;
             var syy = 0.0;
             var sxy = 0.0;
             var sxx = 0.0;
@@ -472,7 +448,7 @@ namespace MASIC
             ProbOfSignificance = 0;
             FishersZ = 0;
 
-            n = dataList1.Count;
+            var n = dataList1.Count;
             if (n != dataList2.Count)
             {
                 throw new Exception("dataList1 and dataList2 must be lists of the same length");
@@ -482,7 +458,7 @@ namespace MASIC
                 return;
 
             // Find the means
-            for (j = 0; j <= n - 1; j++)
+            for (var j = 0; j <= n - 1; j++)
             {
                 ax += dataList1.ElementAtOrDefault(j);
                 ay += dataList2.ElementAtOrDefault(j);
@@ -492,10 +468,10 @@ namespace MASIC
             ay /= n;
 
             // Compute the correlation coefficient
-            for (j = 0; j <= n - 1; j++)
+            for (var j = 0; j <= n - 1; j++)
             {
-                xt = dataList1.ElementAtOrDefault(j) - ax;
-                yt = dataList2.ElementAtOrDefault(j) - ay;
+                var xt = dataList1.ElementAtOrDefault(j) - ax;
+                var yt = dataList2.ElementAtOrDefault(j) - ay;
                 sxx += xt * xt;
                 syy += yt * yt;
                 sxy += xt * yt;
@@ -505,9 +481,9 @@ namespace MASIC
 
             // Fisher's z transformation
             FishersZ = (float)(0.5 * Math.Log((1.0 + RValue + TINY) / (1.0 - RValue + TINY)));
-            df = n - 2;
+            double df = n - 2;
 
-            t = RValue * Math.Sqrt(df / ((1.0 - RValue + TINY) * (1.0 + RValue + TINY)));
+            var t = RValue * Math.Sqrt(df / ((1.0 - RValue + TINY) * (1.0 + RValue + TINY)));
 
             // Student's t probability
             ProbOfSignificance = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
@@ -530,19 +506,15 @@ namespace MASIC
             // Small values of prob indicate a significant correlation (tau positive) or anti correlation (tau
             // negative).
 
-            int n;
             long n2 = 0;
             long n1 = 0;
-            int k, j;
             var intIS = 0;
-
-            double svar, aa, a2, a1;
 
             KendallsTau = 0;
             Z = 0;
             ProbOfSignificance = 0;
 
-            n = dataList1.Count;
+            var n = dataList1.Count;
             if (n != dataList2.Count)
             {
                 throw new Exception("dataList1 and dataList2 must be lists of the same length");
@@ -551,13 +523,13 @@ namespace MASIC
             if (n <= 0)
                 return;
 
-            for (j = 0; j <= n - 2; j++)
+            for (var j = 0; j <= n - 2; j++)
             {
-                for (k = j + 1; k <= n - 1; k++)
+                for (var k = j + 1; k <= n - 1; k++)
                 {
-                    a1 = dataList1.ElementAtOrDefault(j) - dataList1.ElementAtOrDefault(k);
-                    a2 = dataList2.ElementAtOrDefault(j) - dataList2.ElementAtOrDefault(k);
-                    aa = a1 * a2;
+                    double a1 = dataList1.ElementAtOrDefault(j) - dataList1.ElementAtOrDefault(k);
+                    double a2 = dataList2.ElementAtOrDefault(j) - dataList2.ElementAtOrDefault(k);
+                    var aa = a1 * a2;
                     if (Math.Abs(aa) > double.Epsilon)
                     {
                         n1 += 1;
@@ -583,7 +555,7 @@ namespace MASIC
 
             KendallsTau = (float)(intIS / (Math.Sqrt(n1) * Math.Sqrt(n2)));
 
-            svar = (4.0 * n + 10.0) / (9.0 * n * (n - 1.0));
+            var svar = (4.0 * n + 10.0) / (9.0 * n * (n - 1.0));
             Z = (float)(KendallsTau / Math.Sqrt(svar));
             ProbOfSignificance = (float)(ErfCC(Math.Abs(Z) / 1.4142136));
         }
@@ -611,19 +583,13 @@ namespace MASIC
             // zero as probrs. The external routine CRank is used.  A small value of either probd or probrs indicates
             // a significant correlation (rs positive) or anti correlation (rs negative).
 
-            int n;
-            int j;
-
-            double vard, t, fac, en3n, en, df, AvgD;
-            double DiffInRanksWork;
-
             DiffInRanks = 0;
             ZD = 0;
             ProbOfSignificance = 0;
             RS = 0;
             ProbRS = 0;
 
-            n = dataList1.Count;
+            var n = dataList1.Count;
             if (n != dataList2.Count)
             {
                 throw new Exception("dataList1a and dataList2a must be lists of the same length");
@@ -644,18 +610,18 @@ namespace MASIC
             Array.Sort(data2, data1);
             CRank(n, data2, out var sg);
 
-            DiffInRanksWork = 0.0;
-            for (j = 0; j <= n - 1; j++)
+            var DiffInRanksWork = 0.0;
+            for (var j = 0; j <= n - 1; j++)
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
 
             DiffInRanks = (float)(DiffInRanksWork);
 
-            en = n;
+            double en = n;
 
-            en3n = en * en * en - en;
-            AvgD = en3n / 6.0 - (sf + sg) / 12.0;
-            fac = (1.0 - sf / en3n) * (1.0 - sg / en3n);
-            vard = (en - 1.0) * en * en * SquareNum(en + 1.0) / 36.0 * fac;
+            var en3n = en * en * en - en;
+            var AvgD = en3n / 6.0 - (sf + sg) / 12.0;
+            var fac = (1.0 - sf / en3n) * (1.0 - sg / en3n);
+            var vard = (en - 1.0) * en * en * SquareNum(en + 1.0) / 36.0 * fac;
             ZD = (float)((DiffInRanks - AvgD) / Math.Sqrt(vard));
 
             ProbOfSignificance = (float)(ErfCC(Math.Abs(ZD) / 1.4142136));
@@ -665,8 +631,8 @@ namespace MASIC
 
             if (fac > 0.0)
             {
-                t = RS * Math.Sqrt((en - 2.0) / fac);
-                df = en - 2.0;
+                var t = RS * Math.Sqrt((en - 2.0) / fac);
+                var df = en - 2.0;
                 ProbRS = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
             }
             else
@@ -680,12 +646,8 @@ namespace MASIC
             // Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including mid-ranking of ties,
             // and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
 
-            int j;
-            int ji, jt;
-            float t, rank;
-
             s = 0;
-            j = 0;
+            var j = 0;
             while (j < n - 1)
             {
                 if (Math.Abs(w[j + 1] - w[j]) > float.Epsilon)
@@ -695,16 +657,16 @@ namespace MASIC
                 }
                 else
                 {
-                    jt = j + 1;
+                    var jt = j + 1;
                     while (jt < n && Math.Abs(w[jt] - w[j]) < float.Epsilon)
                         jt += 1;
 
-                    rank = 0.5F * (j + jt - 1) + 1;
+                    var rank = 0.5F * (j + jt - 1) + 1;
 
-                    for (ji = j; ji <= jt - 1; ji++)
+                    for (var ji = j; ji <= jt - 1; ji++)
                         w[ji] = rank;
 
-                    t = jt - j;
+                    float t = jt - j;
                     s += t * t * t - t;          // t^3 - t
                     j = jt;
                 }
@@ -718,14 +680,12 @@ namespace MASIC
 
         private double ErfCC(double x)
         {
-            double t, z, ans;
+            var z = Math.Abs(x);
+            var t = 1.0 / (1.0 + 0.5 * z);
 
-            z = Math.Abs(x);
-            t = 1.0 / (1.0 + 0.5 * z);
-
-            ans = t * Math.Exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
-                               t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
-                               t * (-0.82215223 + t * 0.17087277)))))))));
+            var ans = t * Math.Exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
+                                   t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
+                                   t * (-0.82215223 + t * 0.17087277)))))))));
 
             if (x >= 0.0)
             {
@@ -744,17 +704,14 @@ namespace MASIC
         /// <returns></returns>
         private double GammaLn(double xx)
         {
-            double x, y, tmp, ser;
-            int j;
+            var x = xx;
+            var y = x;
 
-            x = xx;
-            y = x;
-
-            tmp = x + 5.5;
+            var tmp = x + 5.5;
             tmp -= (x + 0.5) * Math.Log(tmp);
-            ser = 1.0000000001900149;
+            var ser = 1.0000000001900149;
 
-            for (j = 0; j <= 5; j++)
+            for (var j = 0; j <= 5; j++)
             {
                 y += 1;
                 ser += mCoefficients[j] / y;

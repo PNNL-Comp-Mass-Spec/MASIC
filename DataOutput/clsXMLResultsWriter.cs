@@ -77,8 +77,6 @@ namespace MASIC.DataOutput
             byte[] SICDataScanIntervals;
 
             var lastGoodLoc = "Start";
-            bool intensityDataListWritten;
-            bool massDataList;
 
             try
             {
@@ -285,8 +283,7 @@ namespace MASIC.DataOutput
                         if (mOptions.SICOptions.SaveSmoothedData)
                         {
                             // Need to copy the data into an array with the correct number of elements
-                            float[] dataArray;
-                            dataArray = new float[smoothedYDataSubset.DataCount];
+                            var dataArray = new float[smoothedYDataSubset.DataCount];
                             Array.Copy(smoothedYDataSubset.Data, dataArray, smoothedYDataSubset.DataCount);
 
                             SaveDataToXMLEncodeArray(writer, "SICSmoothedYData", dataArray);
@@ -296,8 +293,8 @@ namespace MASIC.DataOutput
                     {
                         // Save intensity and mass data lists as tab-delimited text list
 
-                        intensityDataListWritten = false;
-                        massDataList = false;
+                        var intensityDataListWritten = false;
+                        var massDataList = false;
                         try
                         {
                             lastGoodLoc = "Populate sbIntensityDataList";
@@ -644,22 +641,18 @@ namespace MASIC.DataOutput
         {
             // xmlElementName should be the properly capitalized element name and should not start with "<"
 
-            string work;
-            int charIndex;
-            int currentValue;
-
             // Need to add two since xmlElementName doesn't include "<" at the beginning
-            work = lineIn.Trim().ToLower().Substring(xmlElementName.Length + 2);
+            var work = lineIn.Trim().ToLower().Substring(xmlElementName.Length + 2);
 
             // Look for the "<" after the number
-            charIndex = work.IndexOf("<", StringComparison.Ordinal);
+            var charIndex = work.IndexOf("<", StringComparison.Ordinal);
             if (charIndex > 0)
             {
                 // Isolate the number
                 work = work.Substring(0, charIndex);
                 if (clsUtilities.IsNumber(work))
                 {
-                    currentValue = int.Parse(work);
+                    var currentValue = int.Parse(work);
 
                     if (newValueToSave != currentValue)
                     {

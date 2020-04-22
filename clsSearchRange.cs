@@ -98,13 +98,10 @@ namespace MASIC
         {
             // Recursive search function
 
-            int indexMidpoint;
             var leftDone = false;
             var rightDone = false;
-            int leftIndex;
-            int rightIndex;
 
-            indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+            var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
@@ -130,7 +127,7 @@ namespace MASIC
             else
             {
                 // Inside range; figure out the borders
-                leftIndex = indexMidpoint;
+                var leftIndex = indexMidpoint;
                 do
                 {
                     leftIndex = leftIndex - 1;
@@ -142,7 +139,7 @@ namespace MASIC
                         leftDone = true;
                 }
                 while (!leftDone);
-                rightIndex = indexMidpoint;
+                var rightIndex = indexMidpoint;
                 do
                 {
                     rightIndex = rightIndex + 1;
@@ -164,13 +161,10 @@ namespace MASIC
         {
             // Recursive search function
 
-            int indexMidpoint;
             var leftDone = false;
             var rightDone = false;
-            int leftIndex;
-            int rightIndex;
 
-            indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+            var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
@@ -196,7 +190,7 @@ namespace MASIC
             else
             {
                 // Inside range; figure out the borders
-                leftIndex = indexMidpoint;
+                var leftIndex = indexMidpoint;
                 do
                 {
                     leftIndex = leftIndex - 1;
@@ -208,7 +202,7 @@ namespace MASIC
                         leftDone = true;
                 }
                 while (!leftDone);
-                rightIndex = indexMidpoint;
+                var rightIndex = indexMidpoint;
                 do
                 {
                     rightIndex = rightIndex + 1;
@@ -229,13 +223,10 @@ namespace MASIC
         {
             // Recursive search function
 
-            int indexMidpoint;
             var leftDone = false;
             var rightDone = false;
-            int leftIndex;
-            int rightIndex;
 
-            indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
+            var indexMidpoint = (matchIndexStart + matchIndexEnd) / 2;
             if (indexMidpoint == matchIndexStart)
             {
                 // Min and Max are next to each other
@@ -261,7 +252,7 @@ namespace MASIC
             else
             {
                 // Inside range; figure out the borders
-                leftIndex = indexMidpoint;
+                var leftIndex = indexMidpoint;
                 do
                 {
                     leftIndex = leftIndex - 1;
@@ -273,7 +264,7 @@ namespace MASIC
                         leftDone = true;
                 }
                 while (!leftDone);
-                rightIndex = indexMidpoint;
+                var rightIndex = indexMidpoint;
                 do
                 {
                     rightIndex = rightIndex + 1;
@@ -691,8 +682,6 @@ namespace MASIC
 
         public double GetValueByOriginalIndex(int indexOriginal)
         {
-            int index;
-
             if (!mPointerArrayIsValid || mDataType == eDataTypeToUse.NoDataPresent)
             {
                 return 0;
@@ -701,7 +690,7 @@ namespace MASIC
             {
                 try
                 {
-                    index = Array.IndexOf(mPointerIndices, indexOriginal);
+                    var index = Array.IndexOf(mPointerIndices, indexOriginal);
                     if (index >= 0)
                     {
                         switch (mDataType)
@@ -752,13 +741,11 @@ namespace MASIC
 
         private void InitializePointerIndexArray(int arrayLength)
         {
-            int index;
-
             if (arrayLength < 0)
                 arrayLength = 0;
             mPointerIndices = new int[arrayLength];
 
-            for (index = 0; index <= arrayLength - 1; index++)
+            for (var index = 0; index <= arrayLength - 1; index++)
                 mPointerIndices[index] = index;
 
             if (arrayLength > 0)

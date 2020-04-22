@@ -29,15 +29,13 @@ namespace MASIC
             bool processSIMScans,
             int simIndex)
         {
-            int parentIonIndex;
-
             bool includeParentIon;
 
             var mzBinList = new List<clsMzBinInfo>(scanList.ParentIons.Count - 1);
 
             var sicOptions = masicOptions.SICOptions;
 
-            for (parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+            for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
             {
                 if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ > 0)
                 {
@@ -113,8 +111,6 @@ namespace MASIC
             clsXMLResultsWriter xmlResultsWriter)
         {
             var success = false;
-            int parentIonIndex;
-            int parentIonsProcessed;
 
             if (scanList.ParentIons.Count <= 0)
             {
@@ -145,7 +141,7 @@ namespace MASIC
 
             try
             {
-                parentIonsProcessed = 0;
+                var parentIonsProcessed = 0;
                 masicOptions.LastParentIonProcessingLogTime = DateTime.UtcNow;
 
                 UpdateProgress(0, CREATING_SICS);
@@ -154,9 +150,6 @@ namespace MASIC
 
                 // Create an array of m/z values in scanList.ParentIons, then sort by m/z
                 // Next, step through the data in order of m/z, creating SICs for each grouping of m/z's within half of the SIC tolerance
-
-                int simIndex;
-                int simIndexMax;
 
                 // First process the non SIM, non MRM scans
                 // If this file only has MRM scans, then CreateMZLookupList will return False
@@ -172,8 +165,8 @@ namespace MASIC
                 {
                     // Now process the SIM scans (if any)
                     // First, see if any SIMScans are present and determine the maximum SIM Index
-                    simIndexMax = -1;
-                    for (parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                    var simIndexMax = -1;
+                    for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                     {
                         var surveyScan = scanList.SurveyScans[scanList.ParentIons[parentIonIndex].SurveyScanIndex];
                         if (surveyScan.SIMScan)
@@ -186,7 +179,7 @@ namespace MASIC
                     }
 
                     // Now process each SIM Scan type
-                    for (simIndex = 0; simIndex <= simIndexMax; simIndex++)
+                    for (var simIndex = 0; simIndex <= simIndexMax; simIndex++)
                     {
                         var mzBinListSIM = CreateMZLookupList(masicOptions, scanList, true, simIndex);
                         if (mzBinListSIM.Count > 0)
@@ -747,21 +740,17 @@ namespace MASIC
         {
             // The following are 2D arrays, ranging from 0 to mzSearchChunkCount-1 in the first dimension and 0 to .SurveyScans.Count - 1 in the second dimension
             // We could have included these in udtMZSearchChunk but memory management is more efficient if I use 2D arrays for this data
-            int[,] fullSICScanIndices;     // Pointer into .SurveyScans
-            double[,] fullSICIntensities;
-            double[,] fullSICMasses;
-            int[] fullSICDataCount;        // Count of the number of valid entries in the second dimension of the above 3 arrays
-
-            // The following is a 1D array, containing the SIC intensities for a single m/z group
-            double[] fullSICIntensities1D;
 
             // Reserve room in fullSICScanIndices for at most maxMZCountInChunk values and .SurveyScans.Count scans
-            fullSICDataCount = new int[mzSearchChunk.Count];
-            fullSICScanIndices = new int[mzSearchChunk.Count, scanList.SurveyScans.Count];
-            fullSICIntensities = new double[mzSearchChunk.Count, scanList.SurveyScans.Count];
-            fullSICMasses = new double[mzSearchChunk.Count, scanList.SurveyScans.Count];
+            // Count of the number of valid entries in the second dimension of the above 3 arrays
+            var fullSICDataCount = new int[mzSearchChunk.Count];
+            // Pointer into .SurveyScans
+            var fullSICScanIndices = new int[mzSearchChunk.Count, scanList.SurveyScans.Count];
+            var fullSICIntensities = new double[mzSearchChunk.Count, scanList.SurveyScans.Count];
+            var fullSICMasses = new double[mzSearchChunk.Count, scanList.SurveyScans.Count];
 
-            fullSICIntensities1D = new double[scanList.SurveyScans.Count];
+            // The following is a 1D array, containing the SIC intensities for a single m/z group
+            var fullSICIntensities1D = new double[scanList.SurveyScans.Count];
 
             // Initialize .MaximumIntensity and .ScanIndexMax
             // Additionally, reset fullSICDataCount() and, for safety, set fullSICScanIndices() to -1
@@ -1159,8 +1148,6 @@ namespace MASIC
             clsSICStatsPeak sicPeak,
             bool peakIsValid)
         {
-            int dataIndex;
-            int scanIndexObserved;
             int fragScanNumber;
 
             bool processingMRMPeak;
@@ -1185,7 +1172,7 @@ namespace MASIC
 
                 var currentParentIon = scanList.ParentIons[parentIonIndex];
 
-                scanIndexObserved = currentParentIon.SurveyScanIndex;
+                var scanIndexObserved = currentParentIon.SurveyScanIndex;
                 if (scanIndexObserved < 0)
                     scanIndexObserved = 0;
 
@@ -1227,7 +1214,7 @@ namespace MASIC
 
                     // Search for scanIndexObserved in sicScanIndices()
                     sicStats.Peak.IndexObserved = -1;
-                    for (dataIndex = 0; dataIndex <= sicDetails.SICDataCount - 1; dataIndex++)
+                    for (var dataIndex = 0; dataIndex <= sicDetails.SICDataCount - 1; dataIndex++)
                     {
                         if (sicData[dataIndex].ScanIndex == scanIndexObserved)
                         {

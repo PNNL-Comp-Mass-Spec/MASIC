@@ -64,7 +64,6 @@ namespace MASIC
             // Returns 0 if no error, error code if an error
 
             var commandLineParser = new clsParseCommandLine();
-            bool proceed;
 
             mInputFilePath = string.Empty;
             mOutputDirectoryPath = string.Empty;
@@ -81,7 +80,7 @@ namespace MASIC
 
             try
             {
-                proceed = false;
+                var proceed = false;
                 if (commandLineParser.ParseCommandLine())
                 {
                     if (SetOptionsUsingCommandLineParameters(commandLineParser))
@@ -359,12 +358,10 @@ namespace MASIC
 #if GUI
         public static void ShowGUI()
         {
-            frmMain objFormMain;
-
             Application.EnableVisualStyles();
             Application.DoEvents();
 
-            objFormMain = new frmMain();
+            var objFormMain = new frmMain();
 
             // The following call is needed because the .ShowDialog() call is inexplicably increasing the size of the form
             objFormMain.SetHeightAdjustForce(objFormMain.Height);

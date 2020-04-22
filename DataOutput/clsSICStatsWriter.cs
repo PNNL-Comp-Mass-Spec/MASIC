@@ -76,13 +76,11 @@ namespace MASIC.DataOutput
             int surveyScanCount,
             out int[] scanListArray)
         {
-            int index;
-
             if (surveyScanCount > 0)
             {
                 scanListArray = new int[surveyScanCount];
 
-                for (index = 0; index <= surveyScanCount - 1; index++)
+                for (var index = 0; index <= surveyScanCount - 1; index++)
                     scanListArray[index] = surveyScans[index].ScanNumber;
             }
             else
@@ -260,11 +258,10 @@ namespace MASIC.DataOutput
             dataValues.Add(surveyScanNumber.ToString());                     // Survey scan number
 
             double interferenceScore;
-            int fragScanNumber;
 
             if (fragScanIndex < scanList.FragScans.Count)
             {
-                fragScanNumber = scanList.FragScans[parentIon.FragScanIndices[fragScanIndex]].ScanNumber;
+                var fragScanNumber = scanList.FragScans[parentIon.FragScanIndices[fragScanIndex]].ScanNumber;
                 dataValues.Add(fragScanNumber.ToString());  // Fragmentation scan number
                 interferenceScore = scanList.FragScans[parentIon.FragScanIndices[fragScanIndex]].FragScanInfo.InterferenceScore;
             }

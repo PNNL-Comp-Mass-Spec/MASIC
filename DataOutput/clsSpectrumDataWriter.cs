@@ -123,7 +123,6 @@ namespace MASIC.DataOutput
             ref int spectrumExportCount)
         {
             int scanNumber;
-            double baselineNoiseLevel;
 
             if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
             {
@@ -157,7 +156,7 @@ namespace MASIC.DataOutput
             var numIsotopicSignatures = 0;
             var numPeaks = spectraCache.SpectraPool[poolIndex].IonCount;
 
-            baselineNoiseLevel = currentScan.BaselineNoiseStats.NoiseLevel;
+            var baselineNoiseLevel = currentScan.BaselineNoiseStats.NoiseLevel;
             if (baselineNoiseLevel < 1)
                 baselineNoiseLevel = 1;
 
@@ -170,11 +169,8 @@ namespace MASIC.DataOutput
             {
                 // Populate intensities and pointerArray()
 
-                double[] intensities;
-                int[] pointerArray;
-
-                intensities = new double[spectraPool.IonCount];
-                pointerArray = new int[spectraPool.IonCount];
+                var intensities = new double[spectraPool.IonCount];
+                var pointerArray = new int[spectraPool.IonCount];
                 for (var ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
                 {
                     intensities[ionIndex] = spectraPool.IonsIntensity[ionIndex];
@@ -294,11 +290,9 @@ namespace MASIC.DataOutput
             if (spectraPool.IonCount > 0)
             {
                 // Populate intensities and pointerArray()
-                double[] intensities;
-                int[] pointerArray;
 
-                intensities = new double[spectraPool.IonCount];
-                pointerArray = new int[spectraPool.IonCount];
+                var intensities = new double[spectraPool.IonCount];
+                var pointerArray = new int[spectraPool.IonCount];
                 for (var ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
                 {
                     intensities[ionIndex] = spectraPool.IonsIntensity[ionIndex];

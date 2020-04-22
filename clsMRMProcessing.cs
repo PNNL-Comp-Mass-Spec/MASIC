@@ -50,11 +50,7 @@ namespace MASIC
 
         private string ConstructSRMMapKey(double parentIonMZ, double centralMass)
         {
-            string mapKey;
-
-            mapKey = parentIonMZ.ToString("0.000") + "_to_" + centralMass.ToString("0.000");
-
-            return mapKey;
+            return parentIonMZ.ToString("0.000") + "_to_" + centralMass.ToString("0.000");
         }
 
         private bool DetermineMRMSettings(
@@ -65,19 +61,12 @@ namespace MASIC
             // Returns true if this dataset has MRM data and if it is parsed successfully
             // Returns false if the dataset does not have MRM data, or if an error occurs
 
-            string mrmInfoHash;
-
-            int mrmMassIndex;
-
-            bool mrmDataPresent;
-            bool matchFound;
-
             mrmSettings = new List<clsMRMScanInfo>();
             srmList = new List<udtSRMListType>();
 
             try
             {
-                mrmDataPresent = false;
+                var mrmDataPresent = false;
                 UpdateProgress(0, "Determining MRM settings");
 
                 // Initialize the tracking arrays
@@ -92,7 +81,7 @@ namespace MASIC
 
                         // See if this MRM spec is already in mrmSettings
 
-                        mrmInfoHash = GenerateMRMInfoHash(fragScan.MRMScanInfo);
+                        var mrmInfoHash = GenerateMRMInfoHash(fragScan.MRMScanInfo);
 
                         if (!mrmHashToIndexMap.TryGetValue(mrmInfoHash, out var mrmInfoForHash))
                         {
@@ -106,10 +95,10 @@ namespace MASIC
 
                             // Append the new entries to srmList
 
-                            for (mrmMassIndex = 0; mrmMassIndex <= mrmInfoForHash.MRMMassCount - 1; mrmMassIndex++)
+                            for (var mrmMassIndex = 0; mrmMassIndex <= mrmInfoForHash.MRMMassCount - 1; mrmMassIndex++)
                             {
                                 // Add this new transition to srmList() only if not already present
-                                matchFound = false;
+                                var matchFound = false;
                                 foreach (var srmItem in srmList)
                                 {
                                     if (MRMParentDaughterMatch(srmItem, mrmInfoForHash, mrmMassIndex))
@@ -315,11 +304,8 @@ namespace MASIC
                         float scanTimeFirst = 0;
                         var srmIndexLast = 0;
 
-                        double[] crosstabColumnValue;
-                        bool[] crosstabColumnFlag;
-
-                        crosstabColumnValue = new double[srmList.Count];
-                        crosstabColumnFlag = new bool[srmList.Count];
+                        var crosstabColumnValue = new double[srmList.Count];
+                        var crosstabColumnFlag = new bool[srmList.Count];
 
                         // For scanIndex = 0 To scanList.FragScanCount - 1
                         foreach (var fragScan in scanList.FragScans)
@@ -454,7 +440,6 @@ namespace MASIC
         {
             // If forceWrite = False, then will only write out the line if 1 or more columns is non-zero
 
-            int index;
             var nonZeroCount = 0;
 
             var dataColumns = new List<string>()
@@ -465,7 +450,7 @@ namespace MASIC
 
             // Construct a tab-delimited list of the values
             // At the same time, clear the arrays
-            for (index = 0; index <= crosstabColumnValue.Count - 1; index++)
+            for (var index = 0; index <= crosstabColumnValue.Count - 1; index++)
             {
                 if (crosstabColumnValue[index] > 0)
                 {
@@ -489,12 +474,9 @@ namespace MASIC
 
         private string GenerateMRMInfoHash(clsMRMScanInfo mrmScanInfo)
         {
-            string hashValue;
-            int index;
+            var hashValue = mrmScanInfo.ParentIonMZ + "_" + mrmScanInfo.MRMMassCount;
 
-            hashValue = mrmScanInfo.ParentIonMZ + "_" + mrmScanInfo.MRMMassCount;
-
-            for (index = 0; index <= mrmScanInfo.MRMMassCount - 1; index++)
+            for (var index = 0; index <= mrmScanInfo.MRMMassCount - 1; index++)
                 hashValue += "_" +
                     mrmScanInfo.MRMMassList[index].CentralMass.ToString("0.000") + "_" +
                     mrmScanInfo.MRMMassList[index].StartMass.ToString("0.000") + "_" +

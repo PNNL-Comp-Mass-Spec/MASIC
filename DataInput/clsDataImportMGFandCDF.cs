@@ -492,8 +492,6 @@ namespace MASIC.DataInput
         {
             // Finds the base peak ion
             // Also determines the minimum and maximum m/z values in mzList
-            int basePeakIndex;
-            int dataIndex;
 
             mzMin = 0;
             mzMax = 0;
@@ -503,8 +501,8 @@ namespace MASIC.DataInput
                 mzMin = mzList[0];
                 mzMax = mzList[0];
 
-                basePeakIndex = 0;
-                for (dataIndex = 0; dataIndex <= mzList.Count - 1; dataIndex++)
+                var basePeakIndex = 0;
+                for (var dataIndex = 0; dataIndex <= mzList.Count - 1; dataIndex++)
                 {
                     if (ionIntensity[dataIndex] > ionIntensity[basePeakIndex])
                     {
@@ -647,11 +645,8 @@ namespace MASIC.DataInput
             // Validate that .MasterScanOrder() really is sorted by scan number
             // Cannot use an IComparer because .MasterScanOrder points into other arrays
 
-            int[] masterScanNumbers;
-            int[] masterScanOrderIndices;
-
-            masterScanNumbers = new int[scanList.MasterScanOrderCount];
-            masterScanOrderIndices = new int[scanList.MasterScanOrderCount];
+            var masterScanNumbers = new int[scanList.MasterScanOrderCount];
+            var masterScanOrderIndices = new int[scanList.MasterScanOrderCount];
 
             for (var index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
             {
@@ -677,11 +672,8 @@ namespace MASIC.DataInput
             {
                 // Reorder .MasterScanOrder, .MasterScanNumList, and .MasterScanTimeList
 
-                clsScanList.udtScanOrderPointerType[] udtMasterScanOrderListCopy;
-                float[] masterScanTimeListCopy;
-
-                udtMasterScanOrderListCopy = new clsScanList.udtScanOrderPointerType[scanList.MasterScanOrder.Count];
-                masterScanTimeListCopy = new float[scanList.MasterScanOrder.Count];
+                var udtMasterScanOrderListCopy = new clsScanList.udtScanOrderPointerType[scanList.MasterScanOrder.Count];
+                var masterScanTimeListCopy = new float[scanList.MasterScanOrder.Count];
 
                 Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount);
                 Array.Copy(scanList.MasterScanTimeList.ToArray(), masterScanTimeListCopy, scanList.MasterScanOrderCount);

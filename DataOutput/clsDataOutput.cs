@@ -71,23 +71,18 @@ namespace MASIC.DataOutput
         {
             // Returns True if existing results already exist for the given input file path, SIC Options, and Binning options
 
-            string filePathToCheck;
-
             var sicOptionsCompare = new clsSICOptions();
             var binningOptionsCompare = new clsBinningOptions();
-
-            bool validExistingResultsFound;
 
             long sourceFileSizeBytes = 0;
             var sourceFilePathCheck = string.Empty;
             var masicVersion = string.Empty;
             var masicPeakFinderDllVersion = string.Empty;
             var sourceFileDateTimeCheck = string.Empty;
-            DateTime sourceFileDateTime;
 
             var skipMSMSProcessing = false;
 
-            validExistingResultsFound = false;
+            var validExistingResultsFound = false;
             try
             {
                 // Don't even look for the XML file if mSkipSICAndRawDataProcessing = True
@@ -97,7 +92,7 @@ namespace MASIC.DataOutput
                 }
 
                 // Obtain the output XML filename
-                filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.XMLFile);
+                var filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.XMLFile);
 
                 // See if the file exists
                 if (File.Exists(filePathToCheck))
@@ -186,7 +181,7 @@ namespace MASIC.DataOutput
 
                         // Check if the source file stats match
                         var inputFileInfo = new FileInfo(inputFilePathFull);
-                        sourceFileDateTime = inputFileInfo.LastWriteTime;
+                        var sourceFileDateTime = inputFileInfo.LastWriteTime;
                         if ((sourceFileDateTimeCheck ?? "") != (sourceFileDateTime.ToShortDateString() + " " + sourceFileDateTime.ToShortTimeString() ?? ""))
                             return false;
                         if (sourceFileSizeBytes != inputFileInfo.Length)
@@ -531,9 +526,7 @@ namespace MASIC.DataOutput
             eOutputFileTypeConstants eFileType,
             int fragTypeNumber = 1)
         {
-            string outputFilePath;
-
-            outputFilePath = Path.Combine(outputDirectoryPath, Path.GetFileNameWithoutExtension(inputFileName));
+            var outputFilePath = Path.Combine(outputDirectoryPath, Path.GetFileNameWithoutExtension(inputFileName));
             switch (eFileType)
             {
                 case eOutputFileTypeConstants.XMLFile:
@@ -809,10 +802,8 @@ namespace MASIC.DataOutput
             string outputDirectoryPath,
             bool writeHeaders)
         {
-            string outputFilePath;
-
             // Scan Stats file
-            outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
+            var outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
             OutputFileHandles.ScanStats = new StreamWriter(outputFilePath, false);
             if (writeHeaders)
                 OutputFileHandles.ScanStats.WriteLine(GetHeadersForOutputFile(null, eOutputFileTypeConstants.ScanStatsFlatFile));
@@ -869,9 +860,6 @@ namespace MASIC.DataOutput
             int parentIonIndex,
             clsSICDetails sicDetails)
         {
-            int fragScanIndex;
-            string prefix;
-
             try
             {
                 if (OutputFileHandles.SICDataFile == null)
@@ -881,13 +869,13 @@ namespace MASIC.DataOutput
 
                 // Write the detailed SIC values for the given parent ion to the text file
 
-                for (fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
+                for (var fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
                 {
                     // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
-                    prefix = sicOptions.DatasetID.ToString() + "\t" +
-                        parentIonIndex.ToString() + "\t" +
-                        fragScanIndex.ToString() + "\t" +
-                        StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4) + "\t";
+                    var prefix = sicOptions.DatasetID.ToString() + "\t" +
+                                 parentIonIndex.ToString() + "\t" +
+                                 fragScanIndex.ToString() + "\t" +
+                                 StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4) + "\t";
 
                     if (sicDetails.SICDataCount == 0)
                     {

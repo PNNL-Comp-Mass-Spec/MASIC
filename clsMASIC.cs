@@ -1409,11 +1409,9 @@ namespace MASIC
             Exception ex,
             eMasicErrorCodes eNewErrorCode = eMasicErrorCodes.NoError)
         {
-            string messageWithoutCRLF;
-
             Options.StatusMessage = message;
 
-            messageWithoutCRLF = Options.StatusMessage.Replace(Environment.NewLine, "; ");
+            var messageWithoutCRLF = Options.StatusMessage.Replace(Environment.NewLine, "; ");
             if (ex == null)
             {
                 ex = new Exception("Error");
@@ -1458,8 +1456,6 @@ namespace MASIC
             string parameterFilePath,
             bool resetErrorCode)
         {
-            FileInfo inputFileInfo;
-
             bool success = default, doNotProcess = default;
 
             var inputFilePathFull = string.Empty;
@@ -1587,7 +1583,7 @@ namespace MASIC
                         // ---------------------------------------------------------
 
                         // Obtain the full path to the input file
-                        inputFileInfo = new FileInfo(inputFilePath);
+                        var inputFileInfo = new FileInfo(inputFilePath);
                         inputFilePathFull = inputFileInfo.FullName;
 
                         LogMessage("Checking for existing results in the output path: " + outputDirectoryPath);
@@ -1885,15 +1881,12 @@ namespace MASIC
 
         private void SetDefaultPeakLocValues(clsScanList scanList)
         {
-            int parentIonIndex;
-            int scanIndexObserved;
-
             try
             {
-                for (parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                 {
                     var parentIon = scanList.ParentIons[parentIonIndex];
-                    scanIndexObserved = parentIon.SurveyScanIndex;
+                    var scanIndexObserved = parentIon.SurveyScanIndex;
 
                     var sicStats = parentIon.SICStats;
                     sicStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan;
@@ -2030,17 +2023,14 @@ namespace MASIC
                 weightingFactors = new float[] { 0, 0.194F, 0.003F, 0.65F, 0.09F, 0.001F, 0.006F, 0.001F, 0.055F };
             }     // The sum of these factors should be 1.00
 
-            int currentStep, index;
-            float overallPctCompleted;
-
             try
             {
-                currentStep = (int)mProcessingStep;
+                var currentStep = (int)mProcessingStep;
                 if (currentStep >= weightingFactors.Length)
                     currentStep = weightingFactors.Length - 1;
 
-                overallPctCompleted = 0;
-                for (index = 0; index <= currentStep - 1; index++)
+                float overallPctCompleted = 0;
+                for (var index = 0; index <= currentStep - 1; index++)
                     overallPctCompleted += weightingFactors[index] * 100;
 
                 overallPctCompleted += weightingFactors[currentStep] * mSubtaskProcessingStepPct;
@@ -2057,9 +2047,7 @@ namespace MASIC
 
         private void UpdatePeakMemoryUsage()
         {
-            float memoryUsageMB;
-
-            memoryUsageMB = GetProcessMemoryUsageMB();
+            var memoryUsageMB = GetProcessMemoryUsageMB();
             if (memoryUsageMB > mProcessingStats.PeakMemoryUsageMB)
             {
                 mProcessingStats.PeakMemoryUsageMB = memoryUsageMB;

@@ -31,9 +31,6 @@ namespace MASICBrowser
             IList<int> arrayToSearch, int itemToSearchFor, int dataCount,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int indexFirst, indexLast;
-            int midIndex;
-            int currentFirst, currentLast;
             int matchIndex;
 
             try
@@ -41,16 +38,16 @@ namespace MASICBrowser
                 if (arrayToSearch == null)
                     return -1;
 
-                indexFirst = 0;
+                var indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
                 {
                     dataCount = arrayToSearch.Count;
                 }
 
-                indexLast = dataCount - 1;
+                var indexLast = dataCount - 1;
 
-                currentFirst = indexFirst;
-                currentLast = indexLast;
+                var currentFirst = indexFirst;
+                var currentLast = indexLast;
 
                 if (currentFirst > currentLast)
                 {
@@ -64,7 +61,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
+                    var midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
                     if (midIndex < currentFirst)
                         midIndex = currentFirst;
 
@@ -196,9 +193,6 @@ namespace MASICBrowser
             IList<float> arrayToSearch, float itemToSearchFor, int dataCount,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int indexFirst, indexLast;
-            int midIndex;
-            int currentFirst, currentLast;
             int matchIndex;
 
             try
@@ -206,16 +200,16 @@ namespace MASICBrowser
                 if (arrayToSearch == null)
                     return -1;
 
-                indexFirst = 0;
+                var indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
                 {
                     dataCount = arrayToSearch.Count;
                 }
 
-                indexLast = dataCount - 1;
+                var indexLast = dataCount - 1;
 
-                currentFirst = indexFirst;
-                currentLast = indexLast;
+                var currentFirst = indexFirst;
+                var currentLast = indexLast;
 
                 if (currentFirst > currentLast)
                 {
@@ -229,7 +223,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
+                    var midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
                     if (midIndex < currentFirst)
                         midIndex = currentFirst;
 
@@ -362,9 +356,6 @@ namespace MASICBrowser
             IList<double> arrayToSearch, double itemToSearchFor, int dataCount,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int indexFirst, indexLast;
-            int midIndex;
-            int currentFirst, currentLast;
             int matchIndex;
 
             try
@@ -372,16 +363,16 @@ namespace MASICBrowser
                 if (arrayToSearch == null)
                     return -1;
 
-                indexFirst = 0;
+                var indexFirst = 0;
                 if (dataCount > arrayToSearch.Count)
                 {
                     dataCount = arrayToSearch.Count;
                 }
 
-                indexLast = dataCount - 1;
+                var indexLast = dataCount - 1;
 
-                currentFirst = indexFirst;
-                currentLast = indexLast;
+                var currentFirst = indexFirst;
+                var currentLast = indexLast;
 
                 if (currentFirst > currentLast)
                 {
@@ -395,7 +386,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
+                    var midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
                     if (midIndex < currentFirst)
                         midIndex = currentFirst;
 

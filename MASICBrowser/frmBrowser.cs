@@ -181,16 +181,14 @@ namespace MASICBrowser
             // Look for a corresponding Synopsis or First hits file in the same folder as masicFilePath
 
             var dataDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(masicFilePath));
-            string fileNameToFind;
-            string fileNameBase;
 
-            fileNameBase = Path.GetFileNameWithoutExtension(masicFilePath);
+            var fileNameBase = Path.GetFileNameWithoutExtension(masicFilePath);
             if (fileNameBase.ToLower().EndsWith("_sics"))
             {
                 fileNameBase = fileNameBase.Substring(0, fileNameBase.Length - 5);
             }
 
-            fileNameToFind = fileNameBase + "_fht.txt";
+            var fileNameToFind = fileNameBase + "_fht.txt";
             fileNameToFind = Path.Combine(dataDirectoryInfo.FullName, fileNameToFind);
 
             txtStats3.Visible = false;
@@ -232,11 +230,9 @@ namespace MASICBrowser
 
         private void DefineDefaultSortDirection()
         {
-            eSortOrderConstants eSortOrder;
-
             try
             {
-                eSortOrder = (eSortOrderConstants)cboSortOrder.SelectedIndex;
+                var eSortOrder = (eSortOrderConstants)cboSortOrder.SelectedIndex;
 
                 switch (eSortOrder)
                 {
@@ -267,12 +263,9 @@ namespace MASICBrowser
             // Also, if re-smooth data is enabled, then the SIC data will be re-smoothed
 
             eSmoothModeConstants eSmoothMode;
-            bool validPeakFound;
 
             double intensityToDisplay;
             double areaToDisplay;
-
-            string statDetails;
 
             UpdateSICPeakFinderOptions();
 
@@ -291,11 +284,11 @@ namespace MASICBrowser
                     eSmoothMode = eSmoothModeConstants.DoNotReSmooth;
                 }
 
-                validPeakFound = UpdateSICStats(parentIonIndex, chkUsePeakFinder.Checked, eSmoothMode, out sicStats);
+                var validPeakFound = UpdateSICStats(parentIonIndex, chkUsePeakFinder.Checked, eSmoothMode, out sicStats);
 
                 // Display the SIC and SIC Peak stats
                 var ionStats = mParentIonStats[parentIonIndex];
-                statDetails = string.Empty;
+                var statDetails = string.Empty;
                 statDetails += "Index: " + ionStats.Index;
                 if (ionStats.OptimalPeakApexScanNumber == ionStats.SICStats.ScanNumberMaxIntensity)
                 {
@@ -415,11 +408,9 @@ namespace MASICBrowser
             // parentIonIndexStart and parentIonIndexEnd
             // However, the summed intensity is not used if the number of points >= .SICNoiseThresholdIntensity is less than Minimum_Peak_Width
 
-            int parentIonIndex;
-
             potentialAreaStatsForRegion.MinimumPotentialPeakArea = double.MaxValue;
             potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = 0;
-            for (parentIonIndex = parentIonIndexStart; parentIonIndex <= parentIonIndexEnd; parentIonIndex++)
+            for (var parentIonIndex = parentIonIndexStart; parentIonIndex <= parentIonIndexEnd; parentIonIndex++)
             {
                 var ionStats = mParentIonStats[parentIonIndex];
                 if (Math.Abs(ionStats.SICStats.SICPotentialAreaStatsForPeak.MinimumPotentialPeakArea) < float.Epsilon && ionStats.SICStats.SICPotentialAreaStatsForPeak.PeakCountBasisForMinimumPotentialArea == 0)
@@ -457,30 +448,25 @@ namespace MASICBrowser
 
         private bool FindSICPeakAndAreaForParentIon(int parentIonIndex, clsSICStats sicStats)
         {
-            int index;
-            int parentIonIndexStart;
-
             var sicPotentialAreaStatsForRegion = new clsSICPotentialAreaStats();
-            bool returnClosestPeak;
-
             bool recomputeNoiseLevel;
 
             try
             {
                 // Determine the minimum potential peak area in the last 500 scans
-                parentIonIndexStart = parentIonIndex - 500;
+                var parentIonIndexStart = parentIonIndex - 500;
                 if (parentIonIndexStart < 0)
                     parentIonIndexStart = 0;
                 FindMinimumPotentialPeakAreaInRegion(parentIonIndexStart, parentIonIndex, sicPotentialAreaStatsForRegion);
 
                 var parentIon = mParentIonStats[parentIonIndex];
 
-                returnClosestPeak = !parentIon.CustomSICPeak;
+                var returnClosestPeak = !parentIon.CustomSICPeak;
 
                 // Look for .SurveyScanNumber in .SICScans in order to populate sicStats.Peak.IndexObserved
                 if (sicStats.Peak.IndexObserved == 0)
                 {
-                    for (index = 0; index <= parentIon.SICData.Count - 1; index++)
+                    for (var index = 0; index <= parentIon.SICData.Count - 1; index++)
                     {
                         if (parentIon.SICData[index].ScanNumber == parentIon.SurveyScanNumber)
                         {
@@ -842,11 +828,6 @@ namespace MASICBrowser
             //
             // Returns True if a match is found; otherwise, returns false
 
-            double deltaY;
-            double fraction;
-            int deltaX;
-            double targetY;
-
             if (X1 < targetX || X2 < targetX)
             {
                 if (X1 < targetX && X2 < targetX)
@@ -857,11 +838,11 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    deltaX = X2 - X1;
-                    fraction = (targetX - X1) / (double)deltaX;
-                    deltaY = Y2 - Y1;
+                    var deltaX = X2 - X1;
+                    var fraction = (targetX - X1) / (double)deltaX;
+                    var deltaY = Y2 - Y1;
 
-                    targetY = fraction * deltaY + Y1;
+                    var targetY = fraction * deltaY + Y1;
 
                     if (Math.Abs(targetY - Y1) >= 0 && Math.Abs(targetY - Y2) >= 0)
                     {
@@ -962,26 +943,20 @@ namespace MASICBrowser
 
         private string LookupSequenceForParentIonIndex(int parentIonIndex)
         {
-            int sequenceID;
-            int sequenceCount;
-
-            DataRow[] objRows;
-            DataRow[] objSeqRows;
-
             var sequences = string.Empty;
 
             var resultTable = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS];
 
             try
             {
-                objRows = resultTable.Select(COL_NAME_PARENT_ION_INDEX + " = " + parentIonIndex);
-                sequenceCount = 0;
+                var objRows = resultTable.Select(COL_NAME_PARENT_ION_INDEX + " = " + parentIonIndex);
+                var sequenceCount = 0;
                 foreach (var objRow in objRows)
                 {
-                    sequenceID = (int)objRow[COL_NAME_SEQUENCE_ID];
+                    var sequenceID = (int)objRow[COL_NAME_SEQUENCE_ID];
                     try
                     {
-                        objSeqRows = mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Select(COL_NAME_SEQUENCE_ID + " = " + sequenceID);
+                        var objSeqRows = mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Select(COL_NAME_SEQUENCE_ID + " = " + sequenceID);
 
                         if (objSeqRows != null && objSeqRows.Length > 0)
                         {
@@ -1015,10 +990,8 @@ namespace MASICBrowser
             // Additionally, adds a mapping between sequence and protein in mMsMsResults.Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
             string sequenceNoSuffixes;
-            DataRow objNewRow;
-            int sequenceID;
 
-            sequenceID = -1;
+            var sequenceID = -1;
             if (sequence != null)
             {
                 var trimmedSequence = sequence.Trim();
@@ -1043,7 +1016,7 @@ namespace MASICBrowser
                 try
                 {
                     var sequencesTable = mMsMsResults.Tables[TABLE_NAME_SEQUENCES];
-                    objNewRow = sequencesTable.Rows.Find(sequenceNoSuffixes);
+                    var objNewRow = sequencesTable.Rows.Find(sequenceNoSuffixes);
                     if (objNewRow == null)
                     {
                         objNewRow = sequencesTable.NewRow();
@@ -1106,11 +1079,6 @@ namespace MASICBrowser
             // indexToPlot points to an entry in mParentIonStats()
 
             // We plot the data as two different series to allow for different coloring
-            int dataCountSeries1, dataCountSeries2, dataCountSeries3, dataCountSeries4;
-            double[] xDataSeries1, yDataSeries1;          // Holds the scans and SIC data for data <=0 (data not part of the peak)
-            double[] xDataSeries2, yDataSeries2;          // Holds the scans and SIC data for data > 0 (data part of the peak)
-            double[] xDataSeries3, yDataSeries3;          // Holds the scan numbers at which the given m/z was chosen for fragmentation
-            double[] xDataSeries4, yDataSeries4;          // Holds the smoothed SIC data
 
             try
             {
@@ -1131,22 +1099,24 @@ namespace MASICBrowser
 
                 if (currentParentIon.SICData.Count == 0)
                     return;
-                dataCountSeries1 = 0;
-                dataCountSeries2 = 0;
-                dataCountSeries3 = currentParentIon.SimilarFragScans.Count;
-                dataCountSeries4 = 0;
 
-                xDataSeries1 = new double[currentParentIon.SICData.Count + 3 + 1];   // Need extra room for potential zero padding
-                yDataSeries1 = new double[currentParentIon.SICData.Count + 3 + 1];
+                var dataCountSeries1 = 0;
+                var dataCountSeries2 = 0;
+                var dataCountSeries3 = currentParentIon.SimilarFragScans.Count;
+                var dataCountSeries4 = 0;
 
-                xDataSeries2 = new double[currentParentIon.SICData.Count + 3 + 1];
-                yDataSeries2 = new double[currentParentIon.SICData.Count + 3 + 1];
+                // Length + 1: Need extra room for potential zero padding
+                var xDataSeries1 = new double[currentParentIon.SICData.Count + 3 + 1];          // Holds the scans and SIC data for data <=0 (data not part of the peak)
+                var yDataSeries1 = new double[currentParentIon.SICData.Count + 3 + 1];          // Holds the scans and SIC data for data <=0 (data not part of the peak)
 
-                xDataSeries3 = new double[currentParentIon.SimilarFragScans.Count];
-                yDataSeries3 = new double[currentParentIon.SimilarFragScans.Count];
+                var xDataSeries2 = new double[currentParentIon.SICData.Count + 3 + 1];          // Holds the scans and SIC data for data > 0 (data part of the peak)
+                var yDataSeries2 = new double[currentParentIon.SICData.Count + 3 + 1];          // Holds the scans and SIC data for data > 0 (data part of the peak)
 
-                xDataSeries4 = new double[currentParentIon.SICData.Count + 1];
-                yDataSeries4 = new double[currentParentIon.SICData.Count + 1];
+                var xDataSeries3 = new double[currentParentIon.SimilarFragScans.Count];          // Holds the scan numbers at which the given m/z was chosen for fragmentation
+                var yDataSeries3 = new double[currentParentIon.SimilarFragScans.Count];          // Holds the scan numbers at which the given m/z was chosen for fragmentation
+
+                var xDataSeries4 = new double[currentParentIon.SICData.Count + 1];               // Holds the smoothed SIC data
+                var yDataSeries4 = new double[currentParentIon.SICData.Count + 1];               // Holds the smoothed SIC data
 
                 var zeroEdgeSeries1 = false;
 
@@ -1489,11 +1459,9 @@ namespace MASICBrowser
             // Construct a mapping between .FragScanObserved and Index in mParentIonStats
             // If multiple parent ions have the same value for .FragScanObserved, then the we will only track the mapping to the first one
 
-            int index;
-
             var htFragScanToIndex = new Hashtable();
 
-            for (index = 0; index <= mParentIonStats.Count - 1; index++)
+            for (var index = 0; index <= mParentIonStats.Count - 1; index++)
             {
                 if (!htFragScanToIndex.ContainsKey(mParentIonStats[index].FragScanObserved))
                 {
@@ -1512,23 +1480,17 @@ namespace MASICBrowser
 
         private void PopulateSpectrumList(int scanNumberToHighlight)
         {
-            int index;
-
-            string parentIonDesc;
-
             try
             {
                 lstParentIonData.Items.Clear();
 
                 if (mParentIonPointerArrayCount > 0)
                 {
-                    for (index = 0; index <= mParentIonPointerArrayCount - 1; index++)
+                    for (var index = 0; index <= mParentIonPointerArrayCount - 1; index++)
                     {
-                        {
-                            var ionStats = mParentIonStats[mParentIonPointerArray[index]];
-                            parentIonDesc = "Scan " + ionStats.FragScanObserved + "  (" + Math.Round(ionStats.MZ, 4) + " m/z)";
-                            lstParentIonData.Items.Add(parentIonDesc);
-                        }
+                        var ionStats = mParentIonStats[mParentIonPointerArray[index]];
+                        var parentIonDesc = "Scan " + ionStats.FragScanObserved + "  (" + Math.Round(ionStats.MZ, 4) + " m/z)";
+                        lstParentIonData.Items.Add(parentIonDesc);
                     }
 
                     lstParentIonData.SelectedIndex = 0;
@@ -1581,9 +1543,7 @@ namespace MASICBrowser
             eCurrentXMLDataFileSectionConstants eCurrentXMLDataFileSection;
 
             var indexInXMLFile = "-1";
-            bool validParentIon;
 
-            double percentComplete;
             var errorMessages = new List<string>();
 
             float similarIonMZToleranceHalfWidth = 0;
@@ -1594,8 +1554,6 @@ namespace MASICBrowser
             var scanStart = 0;
 
             int peakScanStart = default, peakScanEnd = default;
-            int index;
-            int charIndex;
             int interval;
 
             var smoothedDataFound = false;
@@ -1610,7 +1568,6 @@ namespace MASICBrowser
             var delimiters = " ,;" + '\t';
 
             var delimiterList = delimiters.ToCharArray();
-            string[] valueList;
 
             var expectedSicDataCount = 0;
 
@@ -1636,7 +1593,7 @@ namespace MASICBrowser
                     mParentIonStats.Clear();
 
                     eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.UnknownFile;
-                    validParentIon = false;
+                    var validParentIon = false;
 
                     while (objXMLReader.Read())
                     {
@@ -1686,7 +1643,7 @@ namespace MASICBrowser
                                             validParentIon = true;
 
                                             // Update the progress bar
-                                            percentComplete = (double)reader.BaseStream.Position / (double)reader.BaseStream.Length;
+                                            var percentComplete = (double)reader.BaseStream.Position / (double)reader.BaseStream.Length;
                                             if (percentComplete > 1.0)
                                                 percentComplete = 1.0;
 
@@ -1750,7 +1707,7 @@ namespace MASICBrowser
                                         // For intervals between 36 and 61, uses letters A to Z
                                         if (scanIntervals != null)
                                         {
-                                            for (charIndex = 1; charIndex <= scanIntervals.Length - 1; charIndex++)
+                                            for (var charIndex = 1; charIndex <= scanIntervals.Length - 1; charIndex++)
                                             {
                                                 if (char.IsNumber(scanIntervals[charIndex]))
                                                 {
@@ -1783,8 +1740,8 @@ namespace MASICBrowser
                                         // Split apart the Intensity data list using the delimiters in delimiterList
                                         if (intensityDataList != null)
                                         {
-                                            valueList = intensityDataList.Trim().Split(delimiterList);
-                                            for (index = 0; index <= valueList.Length - 1; index++)
+                                            var valueList = intensityDataList.Trim().Split(delimiterList);
+                                            for (var index = 0; index <= valueList.Length - 1; index++)
                                             {
                                                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(valueList[index]))
                                                 {
@@ -1804,8 +1761,8 @@ namespace MASICBrowser
                                         // Split apart the Mass data list using the delimiters in delimiterList
                                         if (massDataList != null)
                                         {
-                                            valueList = massDataList.Trim().Split(delimiterList);
-                                            for (index = 0; index <= valueList.Length - 1; index++)
+                                            var valueList = massDataList.Trim().Split(delimiterList);
+                                            for (var index = 0; index <= valueList.Length - 1; index++)
                                             {
                                                 if (PRISM.DataUtils.StringToValueUtils.IsNumber(valueList[index]))
                                                 {
@@ -1822,7 +1779,7 @@ namespace MASICBrowser
                                             errorMessages.Add("Missing 'IntensityDataList' node for parent ion '" + indexInXMLFile + "'");
                                         }
 
-                                        for (index = 0; index <= sicScans.Count - 1; index++)
+                                        for (var index = 0; index <= sicScans.Count - 1; index++)
                                         {
                                             if (index == sicIntensities.Count)
                                             {
@@ -1859,9 +1816,9 @@ namespace MASICBrowser
                                         // Split apart the smoothed Y data using the delimiters in delimiterList
                                         if (smoothedYDataList != null)
                                         {
-                                            valueList = smoothedYDataList.Trim().Split(delimiterList);
+                                            var valueList = smoothedYDataList.Trim().Split(delimiterList);
 
-                                            for (index = 0; index <= valueList.Length - 1; index++)
+                                            for (var index = 0; index <= valueList.Length - 1; index++)
                                             {
                                                 if (index >= sicData.Count)
                                                 {
@@ -2235,15 +2192,9 @@ namespace MASICBrowser
         {
             var chSepChars = new char[] { '\t' };
 
-            int sequenceID;
             long bytesRead = 0;
-            int linesRead;
-
-            int scanNumber, charge;
 
             var createdNewProgressForm = false;
-
-            DataRow objNewRow;
 
             try
             {
@@ -2268,7 +2219,7 @@ namespace MASICBrowser
                         ClearMsMsResults();
                     }
 
-                    linesRead = 0;
+                    var linesRead = 0;
                     while (!reader.EndOfStream)
                     {
                         var dataLine = reader.ReadLine();
@@ -2290,19 +2241,19 @@ namespace MASICBrowser
 
                             if (dataCols.Length >= 13)
                             {
-                                sequenceID = LookupSequenceID(dataCols[(int)eMsMsSearchEngineResultColumns.Sequence], dataCols[(int)eMsMsSearchEngineResultColumns.Protein]);
+                                var sequenceID = LookupSequenceID(dataCols[(int)eMsMsSearchEngineResultColumns.Sequence], dataCols[(int)eMsMsSearchEngineResultColumns.Protein]);
 
                                 if (sequenceID >= 0)
                                 {
                                     try
                                     {
-                                        scanNumber = int.Parse(dataCols[(int)eMsMsSearchEngineResultColumns.Scan]);
-                                        charge = int.Parse(dataCols[(int)eMsMsSearchEngineResultColumns.Charge]);
+                                        var scanNumber = int.Parse(dataCols[(int)eMsMsSearchEngineResultColumns.Scan]);
+                                        var charge = int.Parse(dataCols[(int)eMsMsSearchEngineResultColumns.Charge]);
 
                                         var msMsResultsTable = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS];
                                         if (!msMsResultsTable.Rows.Contains(new object[] { scanNumber, charge, sequenceID }))
                                         {
-                                            objNewRow = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].NewRow();
+                                            var objNewRow = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].NewRow();
                                             objNewRow[COL_NAME_SCAN] = scanNumber;
                                             objNewRow[COL_NAME_CHARGE] = charge;
                                             objNewRow[COL_NAME_MH] = dataCols[(int)eMsMsSearchEngineResultColumns.MH];
@@ -2351,11 +2302,6 @@ namespace MASICBrowser
         {
             const eSmoothModeConstants SMOOTH_MODE = eSmoothModeConstants.Butterworth;
 
-            int parentIonIndex;
-            bool validPeakFound;
-
-            clsSICStats sicStats = null;
-
             var objProgress = new frmProgress();
 
             try
@@ -2368,9 +2314,9 @@ namespace MASICBrowser
 
                 UpdateSICPeakFinderOptions();
 
-                for (parentIonIndex = 0; parentIonIndex <= mParentIonStats.Count - 1; parentIonIndex++)
+                for (var parentIonIndex = 0; parentIonIndex <= mParentIonStats.Count - 1; parentIonIndex++)
                 {
-                    validPeakFound = UpdateSICStats(parentIonIndex, true, SMOOTH_MODE, out sicStats);
+                    var validPeakFound = UpdateSICStats(parentIonIndex, true, SMOOTH_MODE, out var sicStats);
 
                     if (validPeakFound)
                     {
@@ -2611,7 +2557,6 @@ namespace MASICBrowser
 
         private void SortData()
         {
-            double[] sortKeys;
             eSortOrderConstants eSortMode;
 
             var scanNumberSaved = 0;
@@ -2640,7 +2585,7 @@ namespace MASICBrowser
 
             mParentIonPointerArrayCount = 0;
             mParentIonPointerArray = new int[mParentIonStats.Count];
-            sortKeys = new double[mParentIonStats.Count];
+            var sortKeys = new double[mParentIonStats.Count];
 
             if (cboSortOrder.SelectedIndex >= 0 && cboSortOrder.SelectedIndex < SORT_ORDER_MODE_COUNT)
             {
@@ -3226,10 +3171,9 @@ namespace MASICBrowser
 
         private void UpdateStatsAndPlot()
         {
-            clsSICStats sicStats = null;
             if (mParentIonPointerArrayCount > 0)
             {
-                DisplaySICStats(mParentIonPointerArray[lstParentIonData.SelectedIndex], out sicStats);
+                DisplaySICStats(mParentIonPointerArray[lstParentIonData.SelectedIndex], out var sicStats);
                 PlotData(mParentIonPointerArray[lstParentIonData.SelectedIndex], sicStats);
             }
         }
@@ -3389,11 +3333,9 @@ namespace MASICBrowser
 
         private void txtAutoStep_TextChanged(object sender, EventArgs e)
         {
-            int newInterval;
-
             if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text))
             {
-                newInterval = int.Parse(txtAutoStep.Text);
+                var newInterval = int.Parse(txtAutoStep.Text);
                 if (newInterval < 10)
                     newInterval = 10;
                 mAutoStepIntervalMsec = newInterval;

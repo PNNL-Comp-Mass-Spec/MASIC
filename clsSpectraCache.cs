@@ -424,12 +424,10 @@ namespace MASIC
 
         private int GetNextAvailablePoolIndex()
         {
-            int nextPoolIndex;
-
             // Need to cache the spectrum stored at mNextAvailablePoolIndex
             CacheSpectrum(mNextAvailablePoolIndex);
 
-            nextPoolIndex = mNextAvailablePoolIndex;
+            var nextPoolIndex = mNextAvailablePoolIndex;
 
             mNextAvailablePoolIndex += 1;
             if (mNextAvailablePoolIndex >= mMaximumPoolLength)

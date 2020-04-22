@@ -129,11 +129,8 @@ namespace MASIC
 
             try
             {
-                double[] binToSortAbundances;
-                int[] binToSortDataIndices;
-
-                binToSortAbundances = new double[10];
-                binToSortDataIndices = new int[10];
+                var binToSortAbundances = new double[10];
+                var binToSortDataIndices = new int[10];
 
                 UpdateProgress(0);
 
@@ -176,11 +173,8 @@ namespace MASIC
                 // Initialize histogramData
                 var binCount = (int)(maxAbundance / binSize) + 1;
 
-                int[] histogramBinCounts;
-                double[] histogramBinStartIntensity;
-
-                histogramBinCounts = new int[binCount];
-                histogramBinStartIntensity = new double[binCount];
+                var histogramBinCounts = new int[binCount];
+                var histogramBinStartIntensity = new double[binCount];
 
                 for (var index = 0; index <= binCount - 1; index++)
                     histogramBinStartIntensity[index] = index * binSize;
@@ -398,8 +392,6 @@ namespace MASIC
         // This will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible
         private void SortAndMarkPointsToSkip(ref double[] abundances, ref int[] dataIndices, int dataCount, int maximumDataCountInArraysToLoad, int subtaskStepCount)
         {
-            int index;
-
             if (dataCount > 0)
             {
                 // Sort abundances ascending, sorting dataIndices in parallel
@@ -408,7 +400,7 @@ namespace MASIC
                 UpdateProgress((float)(2.333 / subtaskStepCount * 100.0));
 
                 // Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
-                for (index = 0; index <= dataCount - maximumDataCountInArraysToLoad - 1; index++)
+                for (var index = 0; index <= dataCount - maximumDataCountInArraysToLoad - 1; index++)
                     abundances[index] = SkipDataPointFlag;
 
                 UpdateProgress((float)(2.666 / subtaskStepCount * 100.0D));

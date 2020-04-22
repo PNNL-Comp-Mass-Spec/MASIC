@@ -83,8 +83,7 @@ namespace MASIC.DataInput
                 mCustomSICList.ResetMzSearchValues();
 
                 // eColumnMapping will be initialized when the headers are read
-                int[] eColumnMapping;
-                eColumnMapping = new int[0];
+                var eColumnMapping = new int[0];
 
                 if (!File.Exists(customSICValuesFileName))
                 {

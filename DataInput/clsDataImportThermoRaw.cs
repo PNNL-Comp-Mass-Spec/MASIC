@@ -624,9 +624,6 @@ namespace MASIC.DataInput
             double msDataResolution,
             bool keepRawSpectrum)
         {
-            double[] mzList = null;
-            double[] intensityList = null;
-
             var lastKnownLocation = "Start";
 
             try
@@ -637,7 +634,7 @@ namespace MASIC.DataInput
 
                 // Retrieve the m/z and intensity values for the given scan
                 // We retrieve the profile-mode data, since that's required for determining spectrum noise
-                scanInfo.IonCountRaw = xcaliburAccessor.GetScanData(scanInfo.ScanNumber, out mzList, out intensityList);
+                scanInfo.IonCountRaw = xcaliburAccessor.GetScanData(scanInfo.ScanNumber, out var mzList, out var intensityList);
 
                 if (scanInfo.IonCountRaw > 0)
                 {

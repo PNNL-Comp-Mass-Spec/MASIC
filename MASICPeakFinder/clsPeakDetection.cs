@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace MASICPeakFinder
 {
@@ -45,15 +44,12 @@ namespace MASICPeakFinder
         {
             const int POLYNOMIAL_ORDER = 1;
 
-            double[] segmentX;
-            double[] segmentY;
-
             if (xValuesZeroBased == null || xValuesZeroBased.Length == 0)
                 return 0;
             var segmentCount = endIndex - startIndex + 1;
 
-            segmentX = new double[segmentCount];
-            segmentY = new double[segmentCount];
+            var segmentX = new double[segmentCount];
+            var segmentY = new double[segmentCount];
 
             // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
             for (var index = startIndex; index <= endIndex; index++)
@@ -105,12 +101,6 @@ namespace MASICPeakFinder
             // and h''(t_r) is the height of the second derivative of the peak
             // In chromatography, the baseline peak widthInPoints = 4*sigma
 
-            double[] firstDerivative;
-            double[] secondDerivative;
-
-            double[] xValuesForArea;
-            double[] yValuesForArea;
-
             // Initialize the list of detected peaks
             var detectedPeaks = new List<clsPeakInfo>();
 
@@ -121,8 +111,8 @@ namespace MASICPeakFinder
                     return detectedPeaks;
 
                 // Reserve space for the first and second derivatives
-                firstDerivative = new double[sourceDataCount];
-                secondDerivative = new double[sourceDataCount];
+                var firstDerivative = new double[sourceDataCount];
+                var secondDerivative = new double[sourceDataCount];
 
                 // The mid point width is the minimum width divided by 2, rounded down
                 var peakHalfWidth = (int)Math.Floor(peakWidthPointsMinimum / 2.0);
@@ -320,8 +310,8 @@ namespace MASICPeakFinder
                         }
                         else
                         {
-                            xValuesForArea = new double[thisPeakWidthInPoints];
-                            yValuesForArea = new double[thisPeakWidthInPoints];
+                            var xValuesForArea = new double[thisPeakWidthInPoints];
+                            var yValuesForArea = new double[thisPeakWidthInPoints];
 
                             var thisPeakStartIndex = peakItem.LeftEdge;
                             var thisPeakEndIndex = peakItem.RightEdge;
@@ -419,16 +409,11 @@ namespace MASICPeakFinder
 
             const int POLYNOMIAL_ORDER = 2;
 
-            double[] segmentX;
-            double[] segmentY;
-
-            double[] coefficients = null;
-
             // if (POLYNOMIAL_ORDER < 2) POLYNOMIAL_ORDER = 2;
             // if (POLYNOMIAL_ORDER > 9) POLYNOMIAL_ORDER = 9;
 
-            segmentX = new double[peakWidthPointsMinimum];
-            segmentY = new double[peakWidthPointsMinimum];
+            var segmentX = new double[peakWidthPointsMinimum];
+            var segmentY = new double[peakWidthPointsMinimum];
 
             for (var startIndex = 0; startIndex <= sourceDataCount - peakWidthPointsMinimum - 1; startIndex++)
             {
@@ -441,7 +426,7 @@ namespace MASICPeakFinder
                 }
 
                 // Compute the coefficients for the curve fit
-                LeastSquaresFit(segmentX, segmentY, out coefficients, POLYNOMIAL_ORDER);
+                LeastSquaresFit(segmentX, segmentY, out var coefficients, POLYNOMIAL_ORDER);
 
                 // Compute the firstDerivative at the midpoint
                 var midPointIndex = startIndex + peakWidthMidPoint;
@@ -459,11 +444,10 @@ namespace MASICPeakFinder
             // Code excerpted from the VB6 program FitIt
             // URL: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
 
-            udtLeastSquaresFitEquationTermType[] equationTerms;
             // int term;
             // bool success;
 
-            equationTerms = new udtLeastSquaresFitEquationTermType[polynomialOrder + 1];
+            var equationTerms = new udtLeastSquaresFitEquationTermType[polynomialOrder + 1];
             coefficients = new double[polynomialOrder + 1];
 
             if (xValues.Count < polynomialOrder + 1)
@@ -495,38 +479,31 @@ namespace MASICPeakFinder
         {
             // Linear Least Squares Fit
 
-            int i, j, k, L, m;
-            double ym;
+            var Beta = new double[xValues.Count];
+            var CoVar = new double[equationTerms.Length, equationTerms.Length];
+            var PFuncVal = new double[equationTerms.Length];
 
-            double[] Beta;
-            double[,] CoVar;
-            double[] PFuncVal;
-
-            Beta = new double[xValues.Count];
-            CoVar = new double[equationTerms.Length, equationTerms.Length];
-            PFuncVal = new double[equationTerms.Length];
-
-            for (i = 0; i < xValues.Count; i++)
+            for (var i = 0; i < xValues.Count; i++)
             {
                 GetLVals(xValues[i], ref equationTerms, ref PFuncVal);
-                ym = yValues[i];
-                for (L = 0; L < equationTerms.Length; L++)
+                var ym = yValues[i];
+                for (var L = 0; L < equationTerms.Length; L++)
                 {
-                    for (m = 0; m <= L; m++)
+                    for (var m = 0; m <= L; m++)
                         CoVar[L, m] += PFuncVal[L] * PFuncVal[m];
                     Beta[L] += ym * PFuncVal[L];
                 }
             }
 
-            for (j = 1; j < equationTerms.Length; j++)
+            for (var j = 1; j < equationTerms.Length; j++)
             {
-                for (k = 0; k < j; k++)
+                for (var k = 0; k < j; k++)
                     CoVar[k, j] = CoVar[j, k];
             }
 
             if (GaussJordan(ref CoVar, ref equationTerms, ref Beta))
             {
-                for (L = 0; L < equationTerms.Length; L++)
+                for (var L = 0; L < equationTerms.Length; L++)
                     equationTerms[L].ParamResult = Beta[L];
 
                 return true;
@@ -534,7 +511,7 @@ namespace MASICPeakFinder
             else
             {
                 // Error fitting; clear coefficients
-                for (L = 0; L < equationTerms.Length; L++)
+                for (var L = 0; L < equationTerms.Length; L++)
                     equationTerms[L].ParamResult = 0;
 
                 return false;
@@ -546,7 +523,6 @@ namespace MASICPeakFinder
             // Get values for Linear Least Squares
             // equationTerms() is a 0-based array defining the form of each term
 
-            int i;
             var v = 0.0;
 
             // Use the following for a 2nd order polynomial fit
@@ -557,7 +533,7 @@ namespace MASICPeakFinder
             // PFuncVal(3) = X ^ 2
 
             // f = "1,X,Log(X),Log10(X),Exp(X),Sin(X),Cos(X),Tan(X),ATAN(X)"
-            for (i = 0; i < equationTerms.Length; i++)
+            for (var i = 0; i < equationTerms.Length; i++)
             {
                 // Struct: No assignment is performed, we don't need to copy the end value back.
                 var term = equationTerms[i];
@@ -631,28 +607,25 @@ namespace MASICPeakFinder
             // GaussJordan elimination for LLSq and LM solving
             // Returns True if success, False if an error
 
-            int[] indxc, indxr, ipiv;
-            int n;
+            var n = equationTerms.Length;
 
-            n = equationTerms.Length;
+            var indxc = new int[n];
+            var indxr = new int[n];
+            var ipiv = new int[n];
 
-            indxc = new int[n];
-            indxr = new int[n];
-            ipiv = new int[n];
-
-            int i, icol = 0, irow = 0, j, k, L, ll;
-            double Big, Dum, PivInv;
+            int icol = 0, irow = 0;
+            double Dum;
 
             try
             {
-                for (i = 0; i < n; i++)
+                for (var i = 0; i < n; i++)
                 {
-                    Big = 0;
-                    for (j = 0; j < n; j++)
+                    double Big = 0;
+                    for (var j = 0; j < n; j++)
                     {
                         if (ipiv[j] != 1)
                         {
-                            for (k = 0; k < n; k++)
+                            for (var k = 0; k < n; k++)
                             {
                                 if (ipiv[k] == 0)
                                 {
@@ -670,7 +643,7 @@ namespace MASICPeakFinder
                     ipiv[icol] += 1;
                     if (irow != icol)
                     {
-                        for (L = 0; L < n; L++)
+                        for (var L = 0; L < n; L++)
                         {
                             Dum = A[irow, L];
                             A[irow, L] = A[icol, L];
@@ -690,30 +663,30 @@ namespace MASICPeakFinder
                         return false;
                     }
 
-                    PivInv = 1 / A[icol, icol];
+                    var PivInv = 1 / A[icol, icol];
                     A[icol, icol] = 1;
-                    for (L = 0; L < n; L++)
+                    for (var L = 0; L < n; L++)
                         A[icol, L] *= PivInv;
 
                     b[icol] *= PivInv;
-                    for (ll = 0; ll < n; ll++)
+                    for (var ll = 0; ll < n; ll++)
                     {
                         if (ll != icol)
                         {
                             Dum = A[ll, icol];
                             A[ll, icol] = 0;
-                            for (L = 0; L < n; L++)
+                            for (var L = 0; L < n; L++)
                                 A[ll, L] -= A[icol, L] * Dum;
                             b[ll] -= b[icol] * Dum;
                         }
                     }
                 }
 
-                for (L = n - 1; L >= 0; L--)
+                for (var L = n - 1; L >= 0; L--)
                 {
                     if (indxr[L] != indxc[L])
                     {
-                        for (k = 0; k < n; k++)
+                        for (var k = 0; k < n; k++)
                         {
                             Dum = A[k, indxr[L]];
                             A[k, indxr[L]] = A[k, indxc[L]];
