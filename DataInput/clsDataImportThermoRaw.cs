@@ -377,7 +377,7 @@ namespace MASIC.DataInput
             // Survey scans typically lead to multiple parent ions; we do not record them here
             scanInfo.FragScanInfo.ParentIonInfoIndex = -1;
 
-            if (!(scanInfo.MRMScanType == MRMScanTypeConstants.NotMRM))
+            if (scanInfo.MRMScanType != MRMScanTypeConstants.NotMRM)
             {
                 // This is an MRM scan
                 scanList.MRMDataPresent = true;
@@ -512,7 +512,7 @@ namespace MASIC.DataInput
 
             scanInfo.FragScanInfo.MSLevel = thermoScanInfo.MSLevel;
 
-            if (!(scanInfo.MRMScanType == MRMScanTypeConstants.NotMRM))
+            if (scanInfo.MRMScanType != MRMScanTypeConstants.NotMRM)
             {
                 // This is an MRM scan
                 scanList.MRMDataPresent = true;

@@ -357,7 +357,7 @@ namespace MASIC
                                                                   WriteExtendedStatsStatusLog);
 
                     var filterList = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", string.Empty);
-                    if (filterList != null && filterList.Length > 0)
+                    if (!string.IsNullOrEmpty(filterList))
                     {
                         SetStatusLogKeyNameFilterList(filterList, ',');
                     }
@@ -747,7 +747,7 @@ namespace MASIC
 
             try
             {
-                if (parameterFilePath == null || parameterFilePath.Length == 0)
+                if (string.IsNullOrEmpty(parameterFilePath))
                 {
                     // No parameter file specified; unable to save
                     ReportError("Empty parameter file path sent to SaveParameterFileSettings");

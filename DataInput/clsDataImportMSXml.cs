@@ -1031,7 +1031,7 @@ namespace MASIC.DataInput
             UpdateMSXmlScanType(scanInfo, spectrumInfo.MSLevel, "MSn", isMzXML, mzXmlSourceSpectrum);
 
             var eMRMScanType = scanInfo.MRMScanType;
-            if (!(eMRMScanType == MRMScanTypeConstants.NotMRM))
+            if (eMRMScanType != MRMScanTypeConstants.NotMRM)
             {
                 // This is an MRM scan
                 scanList.MRMDataPresent = true;

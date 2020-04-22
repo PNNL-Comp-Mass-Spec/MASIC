@@ -1416,7 +1416,7 @@ namespace MASIC
             {
                 ex = new Exception("Error");
             }
-            else if (ex.Message != null && ex.Message.Length > 0 && !message.Contains(ex.Message))
+            else if (!string.IsNullOrEmpty(ex.Message) && !message.Contains(ex.Message))
             {
                 messageWithoutCRLF += "; " + ex.Message;
             }
@@ -1436,7 +1436,7 @@ namespace MASIC
                 Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
             }
 
-            if (!(eNewErrorCode == eMasicErrorCodes.NoError))
+            if (eNewErrorCode != eMasicErrorCodes.NoError)
             {
                 SetLocalErrorCode(eNewErrorCode, true);
             }
@@ -1526,7 +1526,7 @@ namespace MASIC
 
                     LogMessage("Source data file: " + inputFilePath);
 
-                    if (inputFilePath == null || inputFilePath.Length == 0)
+                    if (string.IsNullOrEmpty(inputFilePath))
                     {
                         ShowErrorMessage("Input file name is empty");
                         SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidInputFilePath);
@@ -1697,7 +1697,7 @@ namespace MASIC
                             mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
                             if (!success)
                             {
-                                if (mStatusMessage == null || mStatusMessage.Length == 0)
+                                if (string.IsNullOrEmpty(mStatusMessage))
                                 {
                                     mStatusMessage = "Unable to parse file; unknown error";
                                 }

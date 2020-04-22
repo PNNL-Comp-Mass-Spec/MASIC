@@ -88,7 +88,7 @@ namespace MASIC.DataInput
         /// <param name="masicOptions"></param>
         /// <param name="peakFinder"></param>
         /// <param name="parentIonProcessor"></param>
-        public clsDataImport(
+        protected clsDataImport(
             clsMASICOptions masicOptions,
             MASICPeakFinder.clsMASICPeakFinder peakFinder,
             clsParentIonProcessing parentIonProcessor,

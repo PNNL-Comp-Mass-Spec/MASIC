@@ -109,7 +109,7 @@ namespace MASIC
                 mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath;
                 mMASIC.Options.SICOptions.DatasetID = mDatasetID;
 
-                if (mMASICStatusFilename != null && mMASICStatusFilename.Length > 0)
+                if (!string.IsNullOrEmpty(mMASICStatusFilename))
                 {
                     mMASIC.Options.MASICStatusFilename = mMASICStatusFilename;
                 }

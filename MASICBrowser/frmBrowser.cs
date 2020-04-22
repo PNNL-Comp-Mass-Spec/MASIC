@@ -1589,7 +1589,7 @@ namespace MASICBrowser
                     while (objXMLReader.Read())
                     {
                         XMLTextReaderSkipWhitespace(objXMLReader);
-                        if (!(objXMLReader.ReadState == ReadState.Interactive))
+                        if (objXMLReader.ReadState != ReadState.Interactive)
                             break;
                         if (objXMLReader.Depth < 2)
                         {
@@ -1646,7 +1646,7 @@ namespace MASICBrowser
                                             // Advance to the next tag
                                             objXMLReader.Read();
                                             XMLTextReaderSkipWhitespace(objXMLReader);
-                                            if (!(objXMLReader.ReadState == ReadState.Interactive))
+                                            if (objXMLReader.ReadState != ReadState.Interactive)
                                                 break;
                                         }
                                         else
@@ -3186,7 +3186,7 @@ namespace MASICBrowser
                 success = true;
             }
 
-            if ((success && !(objXMLReader.NodeType == XmlNodeType.Whitespace)) && objXMLReader.HasValue)
+            if ((success && objXMLReader.NodeType != XmlNodeType.Whitespace) && objXMLReader.HasValue)
             {
                 value = objXMLReader.Value;
             }
