@@ -249,18 +249,15 @@ namespace MASIC.DataInput
 
                     mDatasetFileInfo.ScanCount += 1;
 
-                    if (spectrumInfo.ScanNumber < scanList.SurveyScans[lastSurveyScanIndex].ScanNumber)
+                    while (spectrumInfo.ScanNumber < scanList.SurveyScans[lastSurveyScanIndex].ScanNumber)
                     {
                         // The scan number for the current MS/MS spectrum is less than the last survey scan index scan number
                         // This can happen, due to oddities with combining scans when creating the .MGF file
                         // Need to decrement lastSurveyScanIndex until we find the appropriate survey scan
-                        do
-                        {
-                            lastSurveyScanIndex -= 1;
-                            if (lastSurveyScanIndex == 0)
-                                break;
-                        }
-                        while (spectrumInfo.ScanNumber < scanList.SurveyScans[lastSurveyScanIndex].ScanNumber);
+
+                        lastSurveyScanIndex -= 1;
+                        if (lastSurveyScanIndex == 0)
+                            break;
                     }
 
                     if (scanNumberCorrection == 0)
