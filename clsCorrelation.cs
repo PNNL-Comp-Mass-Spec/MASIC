@@ -177,14 +177,13 @@ namespace MASIC
 
         private double BetaI(double a, double b, double x)
         {
-            double bt;
-
             if (x < 0.0 || x > 1.0)
             {
                 throw new Exception("Bad x in routine clsCorrelation->BetaI; should be between 0 and 1");
             }
             else
             {
+                double bt;
                 if (Math.Abs(x) < double.Epsilon || Math.Abs(x - 1.0) < double.Epsilon)
                 {
                     bt = 0.0;

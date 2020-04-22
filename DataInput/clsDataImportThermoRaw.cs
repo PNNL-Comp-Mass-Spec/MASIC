@@ -813,7 +813,7 @@ namespace MASIC.DataInput
             IReadOnlyCollection<string> keyNameFilterList)
         {
             var filterItems = false;
-            bool saveItem;
+
             try
             {
                 if (statusEntries == null)
@@ -834,6 +834,7 @@ namespace MASIC.DataInput
                         continue;
                     }
 
+                    bool saveItem;
                     if (filterItems)
                     {
                         saveItem = false;

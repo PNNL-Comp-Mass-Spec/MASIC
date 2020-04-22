@@ -516,8 +516,6 @@ namespace MASIC
                 var intensityPointerArray = new int[scanList.ParentIons.Count];
                 var intensityList = new double[scanList.ParentIons.Count];
 
-                int ionInUseCountOriginal;
-
                 var findSimilarIonsDataCount = 0;
                 for (var index = 0; index <= scanList.ParentIons.Count - 1; index++)
                 {
@@ -633,6 +631,7 @@ namespace MASIC
 
                         // Look for other parent ions with m/z values in tolerance (must be within mass tolerance and scan tolerance)
                         // If new values are added, then repeat the search using the updated udtUniqueMZList().MZAvg value
+                        int ionInUseCountOriginal;
                         do
                         {
                             ionInUseCountOriginal = similarParentIonsData.IonInUseCount;

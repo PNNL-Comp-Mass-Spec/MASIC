@@ -595,8 +595,6 @@ namespace MASICPeakFinder
 
             const bool ALLOW_NEGATIVE_VALUES = false;
             int fwhmScans;
-            double targetIntensity;
-            double y1, y2;
 
             // Determine the full width at half max (fwhm), in units of absolute scan number
             try
@@ -621,6 +619,7 @@ namespace MASICPeakFinder
                 }
 
                 // Look for the intensity halfway down the peak (correcting for baseline noise level if subtractBaselineNoise = True)
+                double targetIntensity;
                 if (subtractBaselineNoise)
                 {
                     targetIntensity = BaselineAdjustIntensity(sicPeak.MaxIntensityValue, sicPeak.BaselineNoiseStats.NoiseLevel, ALLOW_NEGATIVE_VALUES) / 2;
@@ -641,6 +640,8 @@ namespace MASICPeakFinder
 
                     // Start the search at each peak edge to thus determine the largest fwhm value
                     double fwhmScanStart = -1;
+                    double y2;
+                    double y1;
                     for (var dataIndex = sicPeak.IndexBaseLeft; dataIndex <= sicPeak.IndexMax - 1; dataIndex++)
                     {
                         if (subtractBaselineNoise)
@@ -2915,10 +2916,6 @@ namespace MASICPeakFinder
             // Returns True if the data was smoothed; false if not or an error
             // The smoothed data is returned in peakData.SmoothedYData
 
-            bool success;
-
-            double butterWorthFrequency;
-
             var filter = new DataFilter.DataFilter();
 
             peaksContainer.SmoothedYData = new double[peaksContainer.SourceDataCount];
@@ -2927,9 +2924,11 @@ namespace MASICPeakFinder
                 sicPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth)
             {
                 peaksContainer.YData.CopyTo(peaksContainer.SmoothedYData, 0);
+                bool success;
                 if (sicPeakFinderOptions.UseButterworthSmooth)
                 {
                     // Filter the data with a Butterworth filter (.UseButterworthSmooth takes precedence over .UseSavitzkyGolaySmooth)
+                    double butterWorthFrequency;
                     if (simDataPresent && sicPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData)
                     {
                         butterWorthFrequency = sicPeakFinderOptions.ButterworthSamplingFrequency * 2;
@@ -3170,8 +3169,6 @@ namespace MASICPeakFinder
 
             // Set simDataPresent to True when there are large gaps in the survey scan numbers
 
-            bool success;
-
             potentialAreaStatsForPeak = new clsSICPotentialAreaStats();
             smoothedYDataSubset = new clsSmoothedYDataSubset();
 
@@ -3229,6 +3226,7 @@ namespace MASICPeakFinder
                     sicPeak.PreviousPeakFWHMPointRight = sicPeak.IndexBaseLeft;
                     sicPeak.NextPeakFWHMPointLeft = sicPeak.IndexBaseRight;
 
+                    bool success;
                     if (recomputeNoiseLevel)
                     {
                         var intensities = (from item in sicData select item.Intensity).ToArray();

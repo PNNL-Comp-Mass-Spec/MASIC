@@ -262,15 +262,11 @@ namespace MASICBrowser
             // updated SIC stats if chkUsePeakFinder is Checked
             // Also, if re-smooth data is enabled, then the SIC data will be re-smoothed
 
-            eSmoothModeConstants eSmoothMode;
-
-            double intensityToDisplay;
-            double areaToDisplay;
-
             UpdateSICPeakFinderOptions();
 
             if (parentIonIndex >= 0 && parentIonIndex < mParentIonStats.Count)
             {
+                eSmoothModeConstants eSmoothMode;
                 if (optUseButterworthSmooth.Checked)
                 {
                     eSmoothMode = eSmoothModeConstants.Butterworth;
@@ -302,6 +298,8 @@ namespace MASICBrowser
                 if (validPeakFound)
                 {
                     statDetails += Environment.NewLine + "Center of mass: " + sicStats.Peak.StatisticalMoments.CenterOfMassScan;
+                    double areaToDisplay;
+                    double intensityToDisplay;
                     if (chkShowBaselineCorrectedStats.Checked)
                     {
                         intensityToDisplay = clsMASICPeakFinder.BaselineAdjustIntensity(sicStats.Peak, false);
@@ -449,7 +447,6 @@ namespace MASICBrowser
         private bool FindSICPeakAndAreaForParentIon(int parentIonIndex, clsSICStats sicStats)
         {
             var sicPotentialAreaStatsForRegion = new clsSICPotentialAreaStats();
-            bool recomputeNoiseLevel;
 
             try
             {
@@ -478,6 +475,7 @@ namespace MASICBrowser
                 // Determine the value for .ParentIonIntensity
                 mMASICPeakFinder.ComputeParentIonIntensity(parentIon.SICData, sicStats.Peak, parentIon.FragScanObserved);
 
+                bool recomputeNoiseLevel;
                 if (parentIon.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed == clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance)
                 {
                     recomputeNoiseLevel = false;
@@ -989,13 +987,12 @@ namespace MASICBrowser
             // Returns the SequenceID if found; adds it if not present
             // Additionally, adds a mapping between sequence and protein in mMsMsResults.Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
-            string sequenceNoSuffixes;
-
             var sequenceID = -1;
             if (sequence != null)
             {
                 var trimmedSequence = sequence.Trim();
 
+                string sequenceNoSuffixes;
                 if (trimmedSequence.Length >= 4)
                 {
                     if (trimmedSequence.Substring(1, 1).Equals(".") && trimmedSequence.Substring(trimmedSequence.Length - 2, 1).Equals("."))
@@ -1167,15 +1164,13 @@ namespace MASICBrowser
 
                 for (var index = 0; index <= currentParentIon.SICData.Count - 1; index++)
                 {
-                    double interpolatedYValue;
-
                     if (index < currentParentIon.SICData.Count - 1)
                     {
                         if (currentParentIon.SICData[index].ScanNumber <= currentParentIon.FragScanObserved && currentParentIon.SICData[index + 1].ScanNumber >= currentParentIon.FragScanObserved)
                         {
                             // Use the survey scan data to calculate the appropriate intensity for the Frag Scan cursor
 
-                            if (InterpolateY(out interpolatedYValue, currentParentIon.SICData[index].ScanNumber, currentParentIon.SICData[index + 1].ScanNumber, currentParentIon.SICData[index].Intensity, currentParentIon.SICData[index + 1].Intensity, currentParentIon.FragScanObserved))
+                            if (InterpolateY(out var interpolatedYValue, currentParentIon.SICData[index].ScanNumber, currentParentIon.SICData[index + 1].ScanNumber, currentParentIon.SICData[index].Intensity, currentParentIon.SICData[index + 1].Intensity, currentParentIon.FragScanObserved))
                             {
                                 scanObservedIntensity = interpolatedYValue;
                             }
@@ -1185,7 +1180,7 @@ namespace MASICBrowser
                         {
                             // Use the survey scan data to calculate the appropriate intensity for the Optimal Peak Apex Scan cursor
 
-                            if (InterpolateY(out interpolatedYValue, currentParentIon.SICData[index].ScanNumber, currentParentIon.SICData[index + 1].ScanNumber, currentParentIon.SICData[index].Intensity, currentParentIon.SICData[index + 1].Intensity, currentParentIon.OptimalPeakApexScanNumber))
+                            if (InterpolateY(out var interpolatedYValue, currentParentIon.SICData[index].ScanNumber, currentParentIon.SICData[index + 1].ScanNumber, currentParentIon.SICData[index].Intensity, currentParentIon.SICData[index + 1].Intensity, currentParentIon.OptimalPeakApexScanNumber))
                             {
                                 optimalPeakApexIntensity = interpolatedYValue;
                             }
@@ -1540,8 +1535,6 @@ namespace MASICBrowser
 
         private void ReadDataFileXMLTextReader(string filePath)
         {
-            eCurrentXMLDataFileSectionConstants eCurrentXMLDataFileSection;
-
             var indexInXMLFile = "-1";
 
             var errorMessages = new List<string>();
@@ -1554,12 +1547,9 @@ namespace MASICBrowser
             var scanStart = 0;
 
             int peakScanStart = default, peakScanEnd = default;
-            int interval;
 
             var smoothedDataFound = false;
             var baselineNoiseStatsFound = false;
-
-            string value;
 
             var scanIntervals = string.Empty;
             var intensityDataList = string.Empty;
@@ -1582,6 +1572,7 @@ namespace MASICBrowser
             {
 
                 // Initialize the stream reader and the XML Text Reader
+                eCurrentXMLDataFileSectionConstants eCurrentXMLDataFileSection;
                 using (var reader = new StreamReader(filePath))
                 using (var objXMLReader = new XmlTextReader(reader))
                 {
@@ -1709,6 +1700,7 @@ namespace MASICBrowser
                                         {
                                             for (var charIndex = 1; charIndex <= scanIntervals.Length - 1; charIndex++)
                                             {
+                                                int interval;
                                                 if (char.IsNumber(scanIntervals[charIndex]))
                                                 {
                                                     interval = int.Parse(scanIntervals.Substring(charIndex, 1));
@@ -1945,6 +1937,7 @@ namespace MASICBrowser
                                         try
                                         {
                                             var ionStats = mParentIonStats[mParentIonStats.Count - 1];
+                                            string value;
                                             switch (objXMLReader.Name)
                                             {
                                                 case "MZ":

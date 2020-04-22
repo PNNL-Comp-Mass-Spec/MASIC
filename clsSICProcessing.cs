@@ -29,14 +29,13 @@ namespace MASIC
             bool processSIMScans,
             int simIndex)
         {
-            bool includeParentIon;
-
             var mzBinList = new List<clsMzBinInfo>(scanList.ParentIons.Count - 1);
 
             var sicOptions = masicOptions.SICOptions;
 
             for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
             {
+                bool includeParentIon;
                 if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ > 0)
                 {
                     includeParentIon = false;
@@ -1148,10 +1147,6 @@ namespace MASIC
             clsSICStatsPeak sicPeak,
             bool peakIsValid)
         {
-            int fragScanNumber;
-
-            bool processingMRMPeak;
-
             try
             {
                 if (sicDetails.SICDataCount == 0)
@@ -1176,6 +1171,7 @@ namespace MASIC
                 if (scanIndexObserved < 0)
                     scanIndexObserved = 0;
 
+                bool processingMRMPeak;
                 if (currentParentIon.MRMDaughterMZ > 0)
                 {
                     processingMRMPeak = true;
@@ -1231,6 +1227,7 @@ namespace MASIC
                     }
                 }
 
+                int fragScanNumber;
                 if (scanList.FragScans.Count > 0 && currentParentIon.FragScanIndices[0] < scanList.FragScans.Count)
                 {
                     // Record the fragmentation scan number

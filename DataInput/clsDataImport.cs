@@ -246,8 +246,6 @@ namespace MASIC.DataInput
             double mzIgnoreRangeEnd,
             int maxIonCountToRetain)
         {
-            int ionCountNew;
-
             // When this is true, then will write a text file of the mass spectrum before and after it is filtered
             // Used for debugging
             var writeDebugData = false;
@@ -255,6 +253,7 @@ namespace MASIC.DataInput
 
             try
             {
+                int ionCountNew;
                 if (msSpectrum.IonCount > maxIonCountToRetain)
                 {
                     var objFilterDataArray = new clsFilterDataArrayMaxCount()

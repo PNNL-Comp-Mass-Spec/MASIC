@@ -614,7 +614,6 @@ namespace MASICPeakFinder
             var ipiv = new int[n];
 
             int icol = 0, irow = 0;
-            double Dum;
 
             try
             {
@@ -643,6 +642,7 @@ namespace MASICPeakFinder
                     ipiv[icol] += 1;
                     if (irow != icol)
                     {
+                        double Dum;
                         for (var L = 0; L < n; L++)
                         {
                             Dum = A[irow, L];
@@ -673,7 +673,7 @@ namespace MASICPeakFinder
                     {
                         if (ll != icol)
                         {
-                            Dum = A[ll, icol];
+                            var Dum = A[ll, icol];
                             A[ll, icol] = 0;
                             for (var L = 0; L < n; L++)
                                 A[ll, L] -= A[icol, L] * Dum;
@@ -688,7 +688,7 @@ namespace MASICPeakFinder
                     {
                         for (var k = 0; k < n; k++)
                         {
-                            Dum = A[k, indxr[L]];
+                            var Dum = A[k, indxr[L]];
                             A[k, indxr[L]] = A[k, indxc[L]];
                             A[k, indxc[L]] = Dum;
                         }

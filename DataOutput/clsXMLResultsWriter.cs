@@ -74,7 +74,6 @@ namespace MASIC.DataOutput
             clsDataOutput dataOutputHandler)
         {
             // Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
-            byte[] SICDataScanIntervals;
 
             var lastGoodLoc = "Start";
 
@@ -82,6 +81,7 @@ namespace MASIC.DataOutput
             {
                 // Populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
 
+                byte[] SICDataScanIntervals;
                 if (sicDetails.SICDataCount == 0)
                 {
                     SICDataScanIntervals = new byte[1];

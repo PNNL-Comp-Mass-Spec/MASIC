@@ -231,7 +231,6 @@ namespace MASIC
 
             var value = string.Empty;
             var lstValidParameters = new List<string>() { "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q" };
-            int intValue;
 
             try
             {
@@ -261,7 +260,7 @@ namespace MASIC
                         mParameterFilePath = value;
                     if (commandLineParser.RetrieveValueForParameter("D", out value))
                     {
-                        if (int.TryParse(value, out intValue))
+                        if (int.TryParse(value, out var intValue))
                         {
                             mDatasetID = intValue;
                         }
@@ -276,7 +275,7 @@ namespace MASIC
                     if (commandLineParser.RetrieveValueForParameter("S", out value))
                     {
                         mRecurseDirectories = true;
-                        if (int.TryParse(value, out intValue))
+                        if (int.TryParse(value, out var intValue))
                         {
                             mMaxLevelsToRecurse = intValue;
                         }

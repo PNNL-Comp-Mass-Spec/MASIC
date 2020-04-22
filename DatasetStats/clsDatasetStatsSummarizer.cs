@@ -760,8 +760,6 @@ namespace MASIC.DatasetStats
         {
             var writeHeaders = false;
 
-            DatasetSummaryStats summaryStats;
-
             try
             {
                 if (scanStats == null)
@@ -772,6 +770,7 @@ namespace MASIC.DatasetStats
 
                 mErrorMessage = string.Empty;
 
+                DatasetSummaryStats summaryStats;
                 if (scanStats == mDatasetScanStats)
                 {
                     summaryStats = GetDatasetSummaryStats();
