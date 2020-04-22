@@ -851,7 +851,7 @@ namespace MASIC
         {
             bool success = true;
             string inputFileName = Path.GetFileName(inputFilePathFull);
-            var similarParentIonUpdateCount = default(int);
+            var similarParentIonUpdateCount = 0;
 
             try
             {
@@ -1962,7 +1962,7 @@ namespace MASIC
         {
             const int MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250;
 
-            var raiseEventNow = default(bool);
+            var raiseEventNow = false;
 
             if (Math.Abs(subtaskPercentComplete) < float.Epsilon)
             {

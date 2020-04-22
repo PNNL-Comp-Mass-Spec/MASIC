@@ -549,7 +549,7 @@ namespace MASICPeakFinder
             // equationTerms() is a 0-based array defining the form of each term
 
             int i;
-            var v = default(double);
+            var v = 0.0;
 
             // Use the following for a 2nd order polynomial fit
             // 'Define the formula via PFuncVal

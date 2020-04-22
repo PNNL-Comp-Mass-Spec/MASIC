@@ -114,7 +114,7 @@ namespace MASIC
         {
             try
             {
-                var absoluteScanNumber = default(int);
+                var absoluteScanNumber = 0;
 
                 switch (eScanType)
                 {
@@ -193,7 +193,7 @@ namespace MASIC
         {
             try
             {
-                var computedScanTime = default(float);
+                float computedScanTime = 0;
 
                 switch (eScanType)
                 {

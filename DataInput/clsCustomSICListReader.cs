@@ -72,7 +72,7 @@ namespace MASIC.DataInput
         public bool LoadCustomSICListFromFile(string customSICValuesFileName)
         {
             var delimiterList = new char[] { '\t' };
-            var forceAcquisitionTimeMode = default(bool);
+            var forceAcquisitionTimeMode = false;
 
             try
             {

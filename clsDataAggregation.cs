@@ -144,7 +144,7 @@ namespace MASIC
 
             int dataIndex;
             int closestMatchIndex;
-            var highestIntensity = default(double);
+            var highestIntensity = 0.0;
 
             try
             {
@@ -245,8 +245,8 @@ namespace MASIC
             // Recursive search function
 
             int indexMidpoint;
-            var leftDone = default(bool);
-            var rightDone = default(bool);
+            var leftDone = false;
+            var rightDone = false;
             int leftIndex;
             int rightIndex;
 

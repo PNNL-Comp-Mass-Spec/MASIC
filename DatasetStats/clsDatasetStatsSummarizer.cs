@@ -713,7 +713,7 @@ namespace MASIC.DatasetStats
         /// <remarks></remarks>
         public bool UpdateDatasetScanType(int scanNumber, int scanType, string scanTypeName)
         {
-            var matchFound = default(bool);
+            var matchFound = false;
 
             // Look for scan scanNumber in mDatasetScanStats
             for (int index = 0; index <= mDatasetScanStats.Count - 1; index++)
@@ -762,7 +762,7 @@ namespace MASIC.DatasetStats
             DatasetFileInfo datasetInfo,
             SampleInfo oSampleInfo)
         {
-            var writeHeaders = default(bool);
+            var writeHeaders = false;
 
             DatasetSummaryStats summaryStats;
 

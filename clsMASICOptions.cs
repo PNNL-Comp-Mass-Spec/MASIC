@@ -392,7 +392,7 @@ namespace MASIC
                         (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)reader.GetParam(
                             XML_SECTION_EXPORT_OPTIONS,
                             "ReporterIonITraq4PlexCorrectionFactorType",
-                            (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType); ;
+                            (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
 
                     ReporterIons.ReporterIonSaveObservedMasses = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
                                                                                  "ReporterIonSaveObservedMasses",

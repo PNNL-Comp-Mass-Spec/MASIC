@@ -386,8 +386,8 @@ namespace MASICBrowser
 
         private void EnableDisableControls()
         {
-            var useButterworth = default(bool);
-            var useSavitzkyGolay = default(bool);
+            var useButterworth = false;
+            var useSavitzkyGolay = false;
 
             if (optDoNotResmooth.Checked)
             {
@@ -1150,7 +1150,7 @@ namespace MASICBrowser
                 xDataSeries4 = new double[currentParentIon.SICData.Count + 1];
                 yDataSeries4 = new double[currentParentIon.SICData.Count + 1];
 
-                var zeroEdgeSeries1 = default(bool);
+                var zeroEdgeSeries1 = false;
 
                 if (sicStats.Peak.IndexBaseLeft == 0)
                 {
@@ -1588,20 +1588,20 @@ namespace MASICBrowser
             double percentComplete;
             var errorMessages = new List<string>();
 
-            var similarIonMZToleranceHalfWidth = default(float);
-            var findPeaksOnSmoothedData = default(bool);
+            float similarIonMZToleranceHalfWidth = 0;
+            var findPeaksOnSmoothedData = false;
             bool useButterworthSmooth = default, useSavitzkyGolaySmooth = default;
-            var butterworthSamplingFrequency = default(float);
-            var savitzkyGolayFilterOrder = default(int);
-            var scanStart = default(int);
+            float butterworthSamplingFrequency = 0;
+            var savitzkyGolayFilterOrder = 0;
+            var scanStart = 0;
 
             int peakScanStart = default, peakScanEnd = default;
             int index;
             int charIndex;
             int interval;
 
-            var smoothedDataFound = default(bool);
-            var baselineNoiseStatsFound = default(bool);
+            var smoothedDataFound = false;
+            var baselineNoiseStatsFound = false;
 
             string value;
 
@@ -2241,12 +2241,12 @@ namespace MASICBrowser
             var chSepChars = new char[] { '\t' };
 
             int sequenceID;
-            var bytesRead = default(long);
+            long bytesRead = 0;
             int linesRead;
 
             int scanNumber, charge;
 
-            var createdNewProgressForm = default(bool);
+            var createdNewProgressForm = false;
 
             DataRow objNewRow;
 
@@ -2622,7 +2622,7 @@ namespace MASICBrowser
             double[] sortKeys;
             eSortOrderConstants eSortMode;
 
-            var scanNumberSaved = default(int);
+            var scanNumberSaved = 0;
 
             double minimumIntensity;
             double mzFilter, mzFilterTol;

@@ -153,7 +153,7 @@ namespace MASIC.DataInput
             double mzIgnoreRangeEnd,
             MASICPeakFinder.clsBaselineNoiseOptions noiseThresholdOptions)
         {
-            var ionCountNew = default(int);
+            var ionCountNew = 0;
             int ionIndex;
             bool pointPassesFilter;
 
@@ -254,7 +254,7 @@ namespace MASIC.DataInput
 
             // When this is true, then will write a text file of the mass spectrum before and after it is filtered
             // Used for debugging
-            var writeDebugData = default(bool);
+            var writeDebugData = false;
             StreamWriter writer = null;
 
             try
@@ -364,7 +364,7 @@ namespace MASIC.DataInput
 
             if (mPrecursorNotFoundCount > PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW)
             {
-                var precursorMissingPct = default(double);
+                var precursorMissingPct = 0.0;
                 if (scanList.FragScans.Count > 0)
                 {
                     precursorMissingPct = mPrecursorNotFoundCount / (double)scanList.FragScans.Count * 100;

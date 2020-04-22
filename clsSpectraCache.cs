@@ -285,7 +285,7 @@ namespace MASIC
         {
             try
             {
-                var garbageCollect = default(bool);
+                var garbageCollect = false;
 
                 if (mPageFileReader != null)
                 {
@@ -534,7 +534,7 @@ namespace MASIC
         /// <returns>True if successfully uncached, false if an error</returns>
         private bool UnCacheSpectrum(int scanNumber, out int targetPoolIndex)
         {
-            var success = default(bool);
+            var success = false;
             targetPoolIndex = GetNextAvailablePoolIndex();
 
             // Uncache the spectrum from disk

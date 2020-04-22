@@ -31,7 +31,7 @@ namespace MASIC.DataInput
             // filePath can contain the path to the MGF or to the CDF file; the extension will be removed in order to determine the base file name,
             // then the two files will be looked for separately
 
-            var scanTime = default(double);
+            var scanTime = 0.0;
 
             var objCDFReader = new NetCDFReader.clsMSNetCdf();
             var objMGFReader = new MSDataFileReader.clsMGFFileReader();
@@ -562,7 +562,7 @@ namespace MASIC.DataInput
             int fragScanNumber,
             out int fragScanIteration)
         {
-            var elutionTime = default(float);
+            float elutionTime = 0;
 
             fragScanIteration = 1;
 

@@ -169,7 +169,7 @@ namespace MASIC
 
             var correctedIntensities = mMatrixUtility.ProcessData(mCoeffs, matrixSize, reporterIonIntensities);
 
-            var maxIntensity = default(double);
+            var maxIntensity = 0.0;
             for (int index = 0; index <= matrixSize - 1; index++)
                 maxIntensity = Math.Max(maxIntensity, reporterIonIntensities[index]);
 

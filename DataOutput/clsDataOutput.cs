@@ -78,14 +78,14 @@ namespace MASIC.DataOutput
 
             bool validExistingResultsFound;
 
-            var sourceFileSizeBytes = default(long);
+            long sourceFileSizeBytes = 0;
             string sourceFilePathCheck = string.Empty;
             string masicVersion = string.Empty;
             string masicPeakFinderDllVersion = string.Empty;
             string sourceFileDateTimeCheck = string.Empty;
             DateTime sourceFileDateTime;
 
-            var skipMSMSProcessing = default(bool);
+            var skipMSMSProcessing = false;
 
             validExistingResultsFound = false;
             try

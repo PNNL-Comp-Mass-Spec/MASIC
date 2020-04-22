@@ -77,7 +77,7 @@ namespace MASIC
             // If surveyScanIndex < 0, the first scan(s) in the file occurred before we encountered a survey scan
             // In this case, we cannot properly associate the fragmentation scan with a survey scan
 
-            var parentIonIndex = default(int);
+            var parentIonIndex = 0;
 
             double parentIonTolerance;
             double parentIonMZMatch;
@@ -450,7 +450,7 @@ namespace MASIC
             int dataIndex;
             int closestMatchIndex;
             double massDifferenceAbs;
-            var bestMassDifferenceAbs = default(double);
+            var bestMassDifferenceAbs = 0.0;
 
             try
             {

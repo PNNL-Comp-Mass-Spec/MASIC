@@ -112,7 +112,7 @@ namespace MASIC
             clsSICProcessing sicProcessor,
             clsXMLResultsWriter xmlResultsWriter)
         {
-            var success = default(bool);
+            var success = false;
             int parentIonIndex;
             int parentIonsProcessed;
 
@@ -232,12 +232,12 @@ namespace MASIC
             // Minimum number of scans to extend left or right of the scan that meets the minimum intensity threshold requirement
             const int MINIMUM_NOISE_SCANS_TO_INCLUDE = 10;
 
-            var customSICScanToleranceMinutesHalfWidth = default(float);
+            float customSICScanToleranceMinutesHalfWidth = 0;
 
             // Pointers to entries in fullSICScanIndices() and fullSICIntensities()
-            int scanIndexStart = default(int), scanIndexEnd = default(int);
+            int scanIndexStart = 0, scanIndexEnd = 0;
 
-            var maximumIntensity = default(double);
+            var maximumIntensity = 0.0;
 
             var sicOptions = masicOptions.SICOptions;
 
@@ -323,7 +323,8 @@ namespace MASIC
 
             if (scanIndexEnd >= scanIndexStart)
             {
-                var scanIndexMax = default(int);
+                var scanIndexMax = 0;
+
                 try
                 {
                     // Start by using the 3 survey scans centered around scanIndexObservedInFullSIC

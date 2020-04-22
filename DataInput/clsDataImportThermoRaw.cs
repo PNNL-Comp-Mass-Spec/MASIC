@@ -50,7 +50,7 @@ namespace MASIC.DataInput
                 UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity, ionCount);
             }
 
-            var chargeState = default(int);
+            var chargeState = 0;
             double isolationWidth;
 
             string chargeStateText = string.Empty;
@@ -823,7 +823,7 @@ namespace MASIC.DataInput
             IReadOnlyCollection<KeyValuePair<string, string>> statusEntries,
             IReadOnlyCollection<string> keyNameFilterList)
         {
-            var filterItems = default(bool);
+            var filterItems = false;
             bool saveItem;
             try
             {

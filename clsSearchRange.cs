@@ -99,8 +99,8 @@ namespace MASIC
             // Recursive search function
 
             int indexMidpoint;
-            var leftDone = default(bool);
-            var rightDone = default(bool);
+            var leftDone = false;
+            var rightDone = false;
             int leftIndex;
             int rightIndex;
 
@@ -165,8 +165,8 @@ namespace MASIC
             // Recursive search function
 
             int indexMidpoint;
-            var leftDone = default(bool);
-            var rightDone = default(bool);
+            var leftDone = false;
+            var rightDone = false;
             int leftIndex;
             int rightIndex;
 
@@ -230,8 +230,8 @@ namespace MASIC
             // Recursive search function
 
             int indexMidpoint;
-            var leftDone = default(bool);
-            var rightDone = default(bool);
+            var leftDone = false;
+            var rightDone = false;
             int leftIndex;
             int rightIndex;
 

@@ -233,8 +233,8 @@ namespace MASIC
 
         private void AutoPopulateCustomSICValues(bool confirmReplaceExistingResults)
         {
-            var defaultMZTolerance = default(double);
-            var defaultScanOrAcqTimeTolerance = default(float);
+            var defaultMZTolerance = 0.0;
+            float defaultScanOrAcqTimeTolerance = 0;
             GetCurrentCustomSICTolerances(ref defaultMZTolerance, ref defaultScanOrAcqTimeTolerance);
             if (defaultScanOrAcqTimeTolerance > 1)
             {
@@ -988,8 +988,8 @@ namespace MASIC
                 return;
             }
 
-            var defaultMZTolerance = default(double);
-            var defaultScanOrAcqTimeTolerance = default(float);
+            var defaultMZTolerance = 0.0;
+            float defaultScanOrAcqTimeTolerance = 0;
 
             GetCurrentCustomSICTolerances(ref defaultMZTolerance, ref defaultScanOrAcqTimeTolerance);
 
@@ -1019,7 +1019,7 @@ namespace MASIC
                 try
                 {
                     double mz = 0;
-                    var scanOrAcqTime = default(float);
+                    float scanOrAcqTime = 0;
                     string comment = string.Empty;
                     double mzToleranceDa = defaultMZTolerance;
                     float scanOrAcqTimeTolerance = defaultScanOrAcqTimeTolerance;
@@ -1846,7 +1846,7 @@ namespace MASIC
 
         private bool UpdateMasicSettings(ref clsMASIC objMasic)
         {
-            var parseError = default(bool);
+            var parseError = false;
 
             try
             {

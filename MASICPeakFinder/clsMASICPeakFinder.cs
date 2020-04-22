@@ -145,8 +145,8 @@ namespace MASICPeakFinder
             int minimumCount,
             clsBaselineNoiseStats baselineNoiseStats)
         {
-            var useLeftData = default(bool);
-            var useRightData = default(bool);
+            var useLeftData = false;
+            var useRightData = false;
             if (minimumCount < 1)
                 minimumCount = 1;
             bool useBothSides = false;
@@ -1622,7 +1622,7 @@ namespace MASICPeakFinder
                 if (peakArea <= 0)
                 {
                     // Cannot compute the center of mass; use the scan at .IndexMax instead
-                    var centerOfMassDecimal = default(double);
+                    var centerOfMassDecimal = 0.0;
 
                     int indexPointer = sicPeak.IndexMax - sicPeak.IndexBaseLeft;
                     if (indexPointer >= 0 && indexPointer < scanNumbers.Length)
@@ -3581,8 +3581,8 @@ namespace MASICPeakFinder
             int indexSegmentB;
 
             clsBaselineNoiseStats baselineNoiseStats = null;
-            var segmentMidPointA = default(int);
-            var segmentMidPointB = default(int);
+            var segmentMidPointA = 0;
+            var segmentMidPointB = 0;
             bool matchFound;
 
             double fractionFromSegmentB;
