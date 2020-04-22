@@ -169,7 +169,6 @@ namespace MASIC
             if (m > MAX_ITERATIONS)
             {
                 throw new Exception("a or b too big, or MAX_ITERATIONS too small in clsCorrelation->BetaCF");
-                return 0;
             }
             else
             {
@@ -805,8 +804,6 @@ namespace MASIC
 
         private int ValueToBinNumber(float thisValue, float startValue, float histogramBinSize)
         {
-            int ValueToBinNumberRet = default;
-
             // First subtract StartValue from ThisValue
             // For example, if StartValue is 500 and ThisValue is 500.28, then WorkingValue = 0.28
             // Or, if StartValue is 500 and ThisValue is 530.83, then WorkingValue = 30.83

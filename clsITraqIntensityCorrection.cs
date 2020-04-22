@@ -242,7 +242,6 @@ namespace MASIC
                     return SIXTEEN_PLEX_TMT_MATRIX_LENGTH;
                 default:
                     throw new ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " + eReporterIonMode.ToString());
-                    break;
             }
         }
 
@@ -848,7 +847,6 @@ namespace MASIC
 
                 default:
                     throw new Exception("Invalid reporter ion mode in IntensityCorrection.InitializeCoefficients");
-                    break;
             }
 
             // Now divide all of the weights by 100

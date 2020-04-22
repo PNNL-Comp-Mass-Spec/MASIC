@@ -617,7 +617,6 @@ namespace MASIC.DataOutput
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(eFileType), "Unknown Output File Type found in clsDataOutput.ConstructOutputFilePath");
-                    break;
             }
 
             return outputFilePath;

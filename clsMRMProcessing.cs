@@ -415,7 +415,6 @@ namespace MASIC
                                     {
                                         // Unknown combination of parent ion m/z and daughter m/z; this is unexpected
                                         // We won't write this entry out
-                                        srmIndexLast = srmIndexLast;
                                     }
                                 }
                             }
