@@ -379,9 +379,9 @@ namespace MASIC
             int dataCount;
             int nonZeroDataCount;
 
-            float RValue, ProbOfSignificance, FishersZ;
-            float DiffInRanks, ZD, RS, ProbRS;
-            float KendallsTau, Z;
+            float RValue, ProbOfSignificance;
+            float RS;
+            float KendallsTau;
 
             // '  Dim dataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
             // '  Dim dataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
@@ -422,13 +422,13 @@ namespace MASIC
                 switch (eCorrelationMethod)
                 {
                     case cmCorrelationMethodConstants.Pearson:
-                        CorrelatePearson(dataList1, dataList2, out RValue, out ProbOfSignificance, out FishersZ);
+                        CorrelatePearson(dataList1, dataList2, out RValue, out ProbOfSignificance, out var FishersZ);
                         return RValue;
                     case cmCorrelationMethodConstants.Spearman:
-                        CorrelateSpearman(dataList1, dataList2, out DiffInRanks, out ZD, out ProbOfSignificance, out RS, out ProbRS);
+                        CorrelateSpearman(dataList1, dataList2, out var DiffInRanks, out var ZD, out ProbOfSignificance, out RS, out var ProbRS);
                         return RS;
                     case cmCorrelationMethodConstants.Kendall:
-                        CorrelateKendall(dataList1, dataList2, out KendallsTau, out Z, out ProbOfSignificance);
+                        CorrelateKendall(dataList1, dataList2, out KendallsTau, out var Z, out ProbOfSignificance);
                         return KendallsTau;
                     default:
                         return -1;
@@ -614,7 +614,6 @@ namespace MASIC
             int n;
             int j;
 
-            float sg, sf;
             double vard, t, fac, en3n, en, df, AvgD;
             double DiffInRanksWork;
 
@@ -639,11 +638,11 @@ namespace MASIC
 
             // Sort data1, sorting data2 parallel to it
             Array.Sort(data1, data2);
-            CRank(n, data1, out sf);
+            CRank(n, data1, out var sf);
 
             // Sort data2, sorting data1 parallel to it
             Array.Sort(data2, data1);
-            CRank(n, data2, out sg);
+            CRank(n, data2, out var sg);
 
             DiffInRanksWork = 0.0;
             for (j = 0; j <= n - 1; j++)

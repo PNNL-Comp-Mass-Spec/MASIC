@@ -242,12 +242,10 @@ namespace MASIC
             }
             else if (msSpectrum.IonCount > 0)
             {
-                clsBaselineNoiseStats newBaselineNoiseStats = null;
-
                 mPeakFinder.ComputeTrimmedNoiseLevel(
                     msSpectrum.IonsIntensity, 0, msSpectrum.IonCount - 1,
                     noiseThresholdOptions, IGNORE_NON_POSITIVE_DATA,
-                    out newBaselineNoiseStats);
+                    out var newBaselineNoiseStats);
 
                 scanInfo.BaselineNoiseStats = newBaselineNoiseStats;
             }

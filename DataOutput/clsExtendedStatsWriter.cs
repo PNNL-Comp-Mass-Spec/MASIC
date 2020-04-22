@@ -54,8 +54,7 @@ namespace MASIC.DataOutput
             {
                 foreach (var headerID in from item in nonConstantHeaderIDs orderby item select item)
                 {
-                    string value = null;
-                    if (extendedHeaderInfo.TryGetValue(headerID, out value))
+                    if (extendedHeaderInfo.TryGetValue(headerID, out var value))
                     {
                         if (double.TryParse(value, out var number))
                         {
@@ -163,8 +162,6 @@ namespace MASIC.DataOutput
 
             var constantHeaderIDs = new List<int>();
 
-            int scanFilterTextHeaderID;
-
             nonConstantHeaderIDs = new List<int>();
 
             if (mExtendedHeaderNameMap.Count == 0)
@@ -201,7 +198,7 @@ namespace MASIC.DataOutput
             }
 
             // Look for "Scan Filter Text" in mExtendedHeaderNameMap
-            if (TryGetExtendedHeaderInfoValue(EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, out scanFilterTextHeaderID))
+            if (TryGetExtendedHeaderInfoValue(EXTENDED_STATS_HEADER_SCAN_FILTER_TEXT, out var scanFilterTextHeaderID))
             {
                 // Match found
 
@@ -429,9 +426,7 @@ namespace MASIC.DataOutput
 
         public int GetExtendedHeaderInfoIdByName(string keyName)
         {
-            int idValue;
-
-            if (TryGetExtendedHeaderInfoValue(keyName, out idValue))
+            if (TryGetExtendedHeaderInfoValue(keyName, out var idValue))
             {
                 // Match found
             }

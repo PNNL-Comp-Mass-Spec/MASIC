@@ -809,9 +809,7 @@ namespace MASIC
                     continue;
                 }
 
-                int poolIndex;
-
-                if (!spectraCache.ValidateSpectrumInPool(scanList.SurveyScans[surveyScanIndex].ScanNumber, out poolIndex))
+                if (!spectraCache.ValidateSpectrumInPool(scanList.SurveyScans[surveyScanIndex].ScanNumber, out var poolIndex))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                     return false;
@@ -832,12 +830,9 @@ namespace MASIC
                         mzToleranceDa = current.MZTolerance;
                     }
 
-                    int ionMatchCount;
-                    double closestMZ;
-
                     var ionSum = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex],
                                                                       current.SearchMZ, mzToleranceDa,
-                                                                      out ionMatchCount, out closestMZ, false);
+                                                                      out var ionMatchCount, out var closestMZ, false);
 
                     var dataIndex = fullSICDataCount[mzIndexWork];
                     fullSICScanIndices[mzIndexWork, dataIndex] = surveyScanIndex;
@@ -898,12 +893,11 @@ namespace MASIC
                     fullSICIntensities1D[dataIndex] = fullSICIntensities[mzIndexWork, dataIndex];
 
                 // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
-                List<clsBaselineNoiseStatsSegment> noiseStatSegments = null;
 
                 var success = mMASICPeakFinder.ComputeDualTrimmedNoiseLevelTTest(
                     fullSICIntensities1D, 0, fullSICDataCount[mzIndexWork] - 1,
                     masicOptions.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions,
-                    out noiseStatSegments);
+                    out var noiseStatSegments);
 
                 if (!success)
                 {
@@ -913,13 +907,11 @@ namespace MASIC
 
                 mzSearchChunk[mzIndexWork].BaselineNoiseStatSegments = noiseStatSegments;
 
-                clsSICPotentialAreaStats potentialAreaStatsInFullSIC = null;
-
                 // Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
                 mMASICPeakFinder.FindPotentialPeakArea(
                     fullSICDataCount[mzIndexWork],
                     fullSICIntensities1D,
-                    out potentialAreaStatsInFullSIC,
+                    out var potentialAreaStatsInFullSIC,
                     masicOptions.SICOptions.SICPeakFinderOptions);
 
                 clsSICPotentialAreaStats potentialAreaStatsForPeak = null;
@@ -972,8 +964,6 @@ namespace MASIC
                         scanIndexObservedInFullSIC = -1;
                     }
 
-                    clsSmoothedYDataSubset smoothedYDataSubsetInSearchChunk = null;
-
                     var currentParentIon = scanList.ParentIons[parentIonIndices[parentIonIndexPointer]];
 
                     // Clear udtSICPotentialAreaStatsForPeak
@@ -1016,7 +1006,7 @@ namespace MASIC
                         sicDetails.SICData,
                         out var potentialAreaStatsForPeakOut,
                         sicStatsPeak,
-                        out smoothedYDataSubsetInSearchChunk,
+                        out var smoothedYDataSubsetInSearchChunk,
                         masicOptions.SICOptions.SICPeakFinderOptions,
                         potentialAreaStatsInFullSIC,
                         returnClosestPeak,
@@ -1100,13 +1090,11 @@ namespace MASIC
             IList<bool> parentIonUpdated,
             ref int parentIonsProcessed)
         {
-            clsSmoothedYDataSubset smoothedYDataSubset = null;
-
             // Find the largest peak in the SIC for this m/z
             var largestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
                 sicDetails.SICData,
                 out potentialAreaStatsForPeak, sicPeak,
-                out smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
+                out var smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
                 potentialAreaStatsInFullSIC,
                 true, scanList.SIMDataPresent, false);
 

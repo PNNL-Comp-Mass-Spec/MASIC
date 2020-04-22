@@ -413,8 +413,7 @@ namespace MASIC
         [Obsolete("Use Property Options.SICOptions.GetSICTolerance")]
         public double GetSICTolerance()
         {
-            bool toleranceIsPPM;
-            return Options.SICOptions.GetSICTolerance(out toleranceIsPPM);
+            return Options.SICOptions.GetSICTolerance(out var toleranceIsPPM);
         }
 
         [Obsolete("Use Property Options.SICOptions.GetSICTolerance")]
@@ -1684,8 +1683,6 @@ namespace MASIC
                             var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
                             RegisterEvents(scanTracking);
 
-                            DataInput.clsDataImport dataImporterBase = null;
-
                             // ---------------------------------------------------------
                             // Load the mass spectral data
                             // ---------------------------------------------------------
@@ -1697,7 +1694,7 @@ namespace MASIC
                                                scanTracking,
                                                scanList,
                                                spectraCache,
-                                               out dataImporterBase,
+                                               out var dataImporterBase,
                                                out datasetFileInfo);
 
                             // Record that the file is finished loading

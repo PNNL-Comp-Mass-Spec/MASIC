@@ -48,8 +48,6 @@ namespace MASICPeakFinder
             double[] segmentX;
             double[] segmentY;
 
-            double[] coefficients = null;
-
             if (xValuesZeroBased == null || xValuesZeroBased.Length == 0)
                 return 0;
             var segmentCount = endIndex - startIndex + 1;
@@ -65,7 +63,7 @@ namespace MASICPeakFinder
             }
 
             // Compute the coefficients for the curve fit
-            LeastSquaresFit(segmentX, segmentY, out coefficients, POLYNOMIAL_ORDER);
+            LeastSquaresFit(segmentX, segmentY, out var coefficients, POLYNOMIAL_ORDER);
 
             return coefficients[1];
         }

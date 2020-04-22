@@ -53,8 +53,6 @@ namespace MagnitudeConcavityPeakFinder
 
             const int POLYNOMIAL_ORDER = 1;
 
-            double[] coefficients;
-
             if (xValsZeroBased == null || xValsZeroBased.Length == 0)
                 return 0;
 
@@ -71,7 +69,7 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             // Compute the coefficients for the curve fit
-            LeastSquaresFit(segmentX, segmentY, out coefficients, POLYNOMIAL_ORDER);
+            LeastSquaresFit(segmentX, segmentY, out var coefficients, POLYNOMIAL_ORDER);
 
             return coefficients[1];
 
@@ -148,12 +146,9 @@ namespace MagnitudeConcavityPeakFinder
                 if (maximumIntensity < intensityThreshold)
                     return detectedPeaks;
 
-                double[] firstDerivative;
-                double[] secondDerivative;
-
                 // Do the actual work
                 FitSegments(xValsZeroBased, yValsZeroBased, sourceDataCount, peakWidthPointsMinimum,
-                            peakHalfWidth, out firstDerivative, out secondDerivative);
+                            peakHalfWidth, out var firstDerivative, out var secondDerivative);
 
                 if (peakWidthInSigma < 1)
                     peakWidthInSigma = 1;
@@ -483,8 +478,7 @@ namespace MagnitudeConcavityPeakFinder
                 }
 
                 // Compute the coefficients for the curve fit
-                double[] coefficients;
-                LeastSquaresFit(segmentX, segmentY, out coefficients, POLYNOMIAL_ORDER);
+                LeastSquaresFit(segmentX, segmentY, out var coefficients, POLYNOMIAL_ORDER);
 
                 // Compute the dblFirstDerivative at the midpoint
                 var midPointIndex = startIndex + peakWidthMidPoint;

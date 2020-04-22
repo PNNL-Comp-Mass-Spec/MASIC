@@ -450,11 +450,9 @@ namespace MASIC
                     // SIC Options
                     // Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
 
-                    bool notPresent;
-
                     // Preferentially use "SICTolerance", if it is present
                     var sicTolerance = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance",
-                                                       SICOptions.GetSICTolerance(), out notPresent);
+                                                       SICOptions.GetSICTolerance(), out var notPresent);
 
                     if (notPresent)
                     {
@@ -820,8 +818,7 @@ namespace MASIC
                 // "SICToleranceDa" is a legacy parameter.  If the SIC tolerance is in PPM, then "SICToleranceDa" is the Da tolerance at 1000 m/z
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa.ToString("0.0000"));
 
-                bool sicToleranceIsPPM;
-                var sicTolerance = SICOptions.GetSICTolerance(out sicToleranceIsPPM);
+                var sicTolerance = SICOptions.GetSICTolerance(out var sicToleranceIsPPM);
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance", sicTolerance.ToString("0.0000"));
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", sicToleranceIsPPM.ToString());
 

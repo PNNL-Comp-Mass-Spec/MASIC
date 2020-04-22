@@ -80,7 +80,6 @@ namespace MASIC
             var parentIonIndex = 0;
 
             double parentIonTolerance;
-            double parentIonMZMatch;
 
             if (sicOptions.SICToleranceIsPPM)
             {
@@ -166,7 +165,7 @@ namespace MASIC
                     // This is done to determine the parent ion mass more precisely
                     if (sicOptions.RefineReportedParentIonMZ)
                     {
-                        if (FindClosestMZ(spectraCache, scanList.SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, out parentIonMZMatch))
+                        if (FindClosestMZ(spectraCache, scanList.SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, out var parentIonMZMatch))
                         {
                             newParentIon.UpdateMz(parentIonMZMatch);
                         }
@@ -245,7 +244,6 @@ namespace MASIC
 
             int fragIndex1, fragIndex2;
             int fragSpectrumIndex1, fragSpectrumIndex2;
-            int poolIndex1, poolIndex2;
             float similarityScore, highestSimilarityScore;
 
             try
@@ -267,7 +265,7 @@ namespace MASIC
                     {
                         fragSpectrumIndex1 = scanList.ParentIons[parentIonIndex1].FragScanIndices[fragIndex1];
 
-                        if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex1].ScanNumber, out poolIndex1))
+                        if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex1].ScanNumber, out var poolIndex1))
                         {
                             SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                             return -1;
@@ -282,7 +280,7 @@ namespace MASIC
                         {
                             fragSpectrumIndex2 = scanList.ParentIons[parentIonIndex2].FragScanIndices[fragIndex2];
 
-                            if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex2].ScanNumber, out poolIndex2))
+                            if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex2].ScanNumber, out var poolIndex2))
                             {
                                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                                 return -1;
@@ -406,7 +404,6 @@ namespace MASIC
             double toleranceMZ,
             out double bestMatchMZ)
         {
-            int poolIndex;
             bool success;
 
             bestMatchMZ = 0;
@@ -417,7 +414,7 @@ namespace MASIC
                     // No data in this spectrum
                     success = false;
                 }
-                else if (!spectraCache.ValidateSpectrumInPool(scanList[spectrumIndex].ScanNumber, out poolIndex))
+                else if (!spectraCache.ValidateSpectrumInPool(scanList[spectrumIndex].ScanNumber, out var poolIndex))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                     success = false;

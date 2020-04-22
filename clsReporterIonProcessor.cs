@@ -323,8 +323,7 @@ namespace MASIC
                 parentIonMZ = 0;
             }
 
-            int poolIndex;
-            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out poolIndex))
+            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                 return;
@@ -361,15 +360,13 @@ namespace MASIC
             // Note that we're using the maximum intensity in the range (not the sum)
             for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
             {
-                int ionMatchCount;
-
                 var ion = reporterIons[reporterIonIndex];
                 // Search for the reporter ion MZ in this mass spectrum
                 reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(
                     spectraCache.SpectraPool[poolIndex],
                     ion.MZ,
                     ion.MZToleranceDa,
-                    out ionMatchCount,
+                    out var ionMatchCount,
                     out closestMZ[reporterIonIndex],
                     USE_MAX_ABUNDANCE_IN_WINDOW);
 
@@ -382,8 +379,7 @@ namespace MASIC
             {
                 // Retrieve the label data for this spectrum
 
-                udtFTLabelInfoType[] ftLabelData = null;
-                xcaliburAccessor.GetScanLabelData(currentScan.ScanNumber, out ftLabelData);
+                xcaliburAccessor.GetScanLabelData(currentScan.ScanNumber, out var ftLabelData);
 
                 // Find each reporter ion in ftLabelData
 

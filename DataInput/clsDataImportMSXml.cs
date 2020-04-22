@@ -140,13 +140,9 @@ namespace MASIC.DataInput
 
             if (!isolationWidthDefined && !string.IsNullOrWhiteSpace(isolationWindowTargetMzText))
             {
-                double isolationWindowTargetMz;
-                double isolationWindowLowerOffset;
-                double isolationWindowUpperOffset;
-
-                if (double.TryParse(isolationWindowTargetMzText, out isolationWindowTargetMz) &&
-                    double.TryParse(isolationWindowLowerOffsetText, out isolationWindowLowerOffset) &&
-                    double.TryParse(isolationWindowUpperOffsetText, out isolationWindowUpperOffset))
+                if (double.TryParse(isolationWindowTargetMzText, out var isolationWindowTargetMz) &&
+                    double.TryParse(isolationWindowLowerOffsetText, out var isolationWindowLowerOffset) &&
+                    double.TryParse(isolationWindowUpperOffsetText, out var isolationWindowUpperOffset))
                 {
                     isolationWidth = isolationWindowLowerOffset + isolationWindowUpperOffset;
                     isolationWidthDefined = true;
@@ -190,8 +186,7 @@ namespace MASIC.DataInput
                     return 0;
                 }
 
-                double mz;
-                if (!double.TryParse(monoMzText, out mz))
+                if (!double.TryParse(monoMzText, out var mz))
                 {
                     OnWarningEvent(string.Format("Skipping scan {0} since 'selected ion m/z' was not a number:  {1}",
                                                  scanInfo.ScanNumber, monoMzText));
@@ -335,8 +330,7 @@ namespace MASIC.DataInput
 
                 while (true)
                 {
-                    clsSpectrumInfo spectrumInfo = null;
-                    var scanFound = xmlReader.ReadNextSpectrum(out spectrumInfo);
+                    var scanFound = xmlReader.ReadNextSpectrum(out var spectrumInfo);
 
                     if (!scanFound)
                         break;
@@ -600,11 +594,10 @@ namespace MASIC.DataInput
                         }
 
                         // Populate the master dictionary mapping elution time to scan number
-                        int existingScan;
 
                         foreach (var item in elutionTimeToScanMap)
                         {
-                            if (elutionTimeToScanMapMaster.TryGetValue(item.Key, out existingScan))
+                            if (elutionTimeToScanMapMaster.TryGetValue(item.Key, out var existingScan))
                             {
                                 if (existingScan != item.Value)
                                 {
@@ -648,11 +641,9 @@ namespace MASIC.DataInput
                         var intensities = chromatogramItem.Intensities.ToList();
                         var currentMz = chromatogramItem.Product.TargetMz;
 
-                        int scanToStore;
-
                         for (var i = 0; i <= scanTimes.Count - 1; i++)
                         {
-                            if (elutionTimeToScanMapMaster.TryGetValue(scanTimes[i], out scanToStore))
+                            if (elutionTimeToScanMapMaster.TryGetValue(scanTimes[i], out var scanToStore))
                             {
                                 var success = StoreSimulatedDataPoint(simulatedSpectraByScan, simulatedSpectraTimes, scanToStore, scanTimes[i], currentMz, intensities[i]);
 
@@ -975,13 +966,10 @@ namespace MASIC.DataInput
                         sourceIntensities[i] = msSpectrum.IonsIntensity[i];
                     }
 
-                    double[] centroidedPrecursorIonsMz = null;
-                    double[] centroidedPrecursorIonsIntensity = null;
-
                     var massResolution = mCentroider.EstimateResolution(1000, 0.5, scanInfo.IsFTMS);
 
                     var centroidSuccess = mCentroider.CentroidData(scanInfo, sourceMzs, sourceIntensities,
-                                                                   massResolution, out centroidedPrecursorIonsMz, out centroidedPrecursorIonsIntensity);
+                                                                   massResolution, out var centroidedPrecursorIonsMz, out var centroidedPrecursorIonsIntensity);
 
                     if (centroidSuccess)
                     {
@@ -1419,16 +1407,14 @@ namespace MASIC.DataInput
             double intensity)
         {
             // Keys in this dictionary are m/z; values are intensity for the m/z
-            Dictionary<double, double> mzListForScan = null;
-            if (!simulatedSpectraByScan.TryGetValue(scanToStore, out mzListForScan))
+            if (!simulatedSpectraByScan.TryGetValue(scanToStore, out var mzListForScan))
             {
                 mzListForScan = new Dictionary<double, double>();
                 simulatedSpectraByScan.Add(scanToStore, mzListForScan);
                 simulatedSpectraTimes.Add(scanToStore, elutionTime);
             }
 
-            double existingIntensity;
-            if (mzListForScan.TryGetValue(mz, out existingIntensity))
+            if (mzListForScan.TryGetValue(mz, out var existingIntensity))
             {
                 return false;
             }
@@ -1571,12 +1557,8 @@ namespace MASIC.DataInput
                 scanInfo.ScanTypeName = XRawFileIO.GetScanTypeNameFromThermoScanFilterText(scanInfo.ScanHeaderText);
 
                 // Now populate .SIMScan, .MRMScanType and .ZoomScan
-                int msLevelFromFilter;
-                bool simScan;
-                MRMScanTypeConstants mrmScanType;
-                bool zoomScan;
 
-                XRawFileIO.ValidateMSScan(scanInfo.ScanHeaderText, out msLevelFromFilter, out simScan, out mrmScanType, out zoomScan);
+                XRawFileIO.ValidateMSScan(scanInfo.ScanHeaderText, out var msLevelFromFilter, out var simScan, out var mrmScanType, out var zoomScan);
 
                 scanInfo.SIMScan = simScan;
                 scanInfo.MRMScanType = mrmScanType;

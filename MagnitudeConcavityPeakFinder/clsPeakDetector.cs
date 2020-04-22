@@ -168,7 +168,6 @@ namespace MagnitudeConcavityPeakFinder
             // Estimate the noise level
             var noiseAnalyzer = new NoiseLevelAnalyzer();
             const bool ignoreNonPositiveData = false;
-            NoiseLevelAnalyzer.udtBaselineNoiseStatsType udtBaselineNoiseStats;
 
             var intensityData = new double[xyData.Count];
             var scanNumbers = new int[xyData.Count];
@@ -180,12 +179,11 @@ namespace MagnitudeConcavityPeakFinder
 
             noiseAnalyzer.ComputeTrimmedNoiseLevel(intensityData, 0, intensityData.Length - 1,
                                                    peakFinderOptions.SICBaselineNoiseOptions, ignoreNonPositiveData,
-                                                   out udtBaselineNoiseStats);
+                                                   out var udtBaselineNoiseStats);
 
 
             // Find maximumPotentialPeakArea and dataPointCountAboveThreshold
-            int dataPointCountAboveThreshold;
-            var maximumPotentialPeakArea = FindMaximumPotentialPeakArea(intensityData, peakFinderOptions, udtBaselineNoiseStats, out dataPointCountAboveThreshold);
+            var maximumPotentialPeakArea = FindMaximumPotentialPeakArea(intensityData, peakFinderOptions, udtBaselineNoiseStats, out var dataPointCountAboveThreshold);
 
 
             if (maximumPotentialPeakArea < 1)
@@ -437,23 +435,18 @@ namespace MagnitudeConcavityPeakFinder
                     if (dataCols.Length < 2)
                         continue;
 
-                    int scanNumber;
-                    double intensity;
-
-                    if (!int.TryParse(dataCols[0], out scanNumber))
+                    if (!int.TryParse(dataCols[0], out var scanNumber))
                         continue;
 
-                    if (!double.TryParse(dataCols[1], out intensity))
+                    if (!double.TryParse(dataCols[1], out var intensity))
                         continue;
 
                     xyData.Add(new KeyValuePair<int, double>(scanNumber, intensity));
                 }
             }
 
-            List<double> smoothedYData;
-
             // Find the peaks
-            var detectedPeaks = FindPeaks(peakFinderOptions, xyData, xyData.Count / 2, out smoothedYData);
+            var detectedPeaks = FindPeaks(peakFinderOptions, xyData, xyData.Count / 2, out var smoothedYData);
 
             if (detectedPeaks == null || detectedPeaks.Count == 0)
             {
@@ -792,14 +785,11 @@ namespace MagnitudeConcavityPeakFinder
 
             bool validPeakFound;
 
-            string errorMessage;
-
             // Smooth the Y data, and store in peakData.SmoothedYData
             // Note that if using a Butterworth filter, then we increase peakData.PeakWidthPointsMinimum if too small, compared to 1/SamplingFrequency
             var peakWidthPointsMinimum = peakData.PeakWidthPointsMinimum;
-            double[] smoothedYData;
 
-            var dataIsSmoothed = SmoothData(peakData.YData, peakData.DataCount, peakFinderOptions, ref peakWidthPointsMinimum, out smoothedYData, out errorMessage);
+            var dataIsSmoothed = SmoothData(peakData.YData, peakData.DataCount, peakFinderOptions, ref peakWidthPointsMinimum, out var smoothedYData, out var errorMessage);
 
             // peakWidthPointsMinimum may have been auto-updated
             peakData.PeakWidthPointsMinimum = peakWidthPointsMinimum;

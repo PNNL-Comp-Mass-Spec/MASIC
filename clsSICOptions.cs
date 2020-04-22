@@ -177,8 +177,7 @@
 
         public double GetSICTolerance()
         {
-            bool toleranceIsPPM;
-            return GetSICTolerance(out toleranceIsPPM);
+            return GetSICTolerance(out var toleranceIsPPM);
         }
 
         public double GetSICTolerance(out bool toleranceIsPPM)

@@ -330,8 +330,7 @@ namespace MASIC.DataOutput
             }
             else
             {
-                int poolIndex;
-                if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out poolIndex))
+                if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                     return;

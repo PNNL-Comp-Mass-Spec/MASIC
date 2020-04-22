@@ -629,8 +629,7 @@ namespace MASIC
 
         private clsReporterIons.eReporterIonMassModeConstants GetReporterIonModeFromIndex(int comboboxIndex)
         {
-            clsReporterIons.eReporterIonMassModeConstants reporterIonMassMode;
-            if (mReporterIonIndexToModeMap.TryGetValue(comboboxIndex, out reporterIonMassMode))
+            if (mReporterIonIndexToModeMap.TryGetValue(comboboxIndex, out var reporterIonMassMode))
             {
                 return reporterIonMassMode;
             }
@@ -1071,9 +1070,8 @@ namespace MASIC
 
                     if (mz > 0)
                     {
-                        var existingRowFound = false;
                         AddCustomSICRow(mz, mzToleranceDa, scanOrAcqTime, scanOrAcqTimeTolerance, comment,
-                                        out existingRowFound);
+                                        out var existingRowFound);
 
                         if (existingRowFound)
                         {
@@ -1358,8 +1356,7 @@ namespace MASIC
                 var sicOptions = masicOptions.SICOptions;
                 var peakFinderOptions = masicOptions.SICOptions.SICPeakFinderOptions;
 
-                bool sicToleranceIsPPM;
-                var sicTolerance = sicOptions.GetSICTolerance(out sicToleranceIsPPM);
+                var sicTolerance = sicOptions.GetSICTolerance(out var sicToleranceIsPPM);
 
                 txtSICTolerance.Text = StringUtilities.DblToString(sicTolerance, 6);
                 if (sicToleranceIsPPM)

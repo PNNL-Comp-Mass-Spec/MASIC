@@ -506,10 +506,8 @@ namespace MASICBrowser
                     }
                 }
 
-                clsSmoothedYDataSubset smoothedYDataSubset = null;
-
                 mMASICPeakFinder.FindSICPeakAndArea(parentIon.SICData, out var potentialAreaStatsForPeak, sicStats.Peak,
-                                                    out smoothedYDataSubset, mSICPeakFinderOptions,
+                                                    out var smoothedYDataSubset, mSICPeakFinderOptions,
                                                     sicPotentialAreaStatsForRegion,
                                                     returnClosestPeak, false, recomputeNoiseLevel);
                 sicStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeak;

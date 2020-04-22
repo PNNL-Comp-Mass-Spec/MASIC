@@ -272,9 +272,7 @@ namespace MASIC
 
             for (var index = 0; index <= lstMZs.Count - 1; index++)
             {
-                double targetMz;
-
-                if (!double.TryParse(lstMZs[index], out targetMz))
+                if (!double.TryParse(lstMZs[index], out var targetMz))
                 {
                     continue;
                 }

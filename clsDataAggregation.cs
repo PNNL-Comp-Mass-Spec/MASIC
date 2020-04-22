@@ -40,8 +40,7 @@ namespace MASIC
 
                 if (objMSSpectrum.IonsMZ != null && objMSSpectrum.IonCount > 0)
                 {
-                    int indexFirst, indexLast;
-                    if (SumIonsFindValueInRange(objMSSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out indexFirst, out indexLast))
+                    if (SumIonsFindValueInRange(objMSSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out var indexFirst, out var indexLast))
                     {
                         for (var ionIndex = indexFirst; ionIndex <= indexLast; ionIndex++)
                         {
@@ -95,13 +94,11 @@ namespace MASIC
             // and bad for spectra with > 10 data points
             // As an alternative to this function, use AggregateIonsInRange
 
-            int poolIndex;
-
             bestMatchMZ = 0;
             matchIntensity = 0;
             try
             {
-                if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out poolIndex))
+                if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
                 {
                     OnErrorEvent("Error uncaching scan " + currentScan.ScanNumber);
                     return false;

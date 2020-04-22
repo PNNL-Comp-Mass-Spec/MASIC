@@ -42,16 +42,12 @@ namespace MASIC.DataInput
         {
             if (precursorScanNumber != mCachedPrecursorScan)
             {
-                double[] centroidedIonsMz = null;
-                double[] centroidedIonsIntensity = null;
-
-                var ionCount = xcaliburAccessor.GetScanData(precursorScanNumber, out centroidedIonsMz, out centroidedIonsIntensity, 0, true);
+                var ionCount = xcaliburAccessor.GetScanData(precursorScanNumber, out var centroidedIonsMz, out var centroidedIonsIntensity, 0, true);
 
                 UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity, ionCount);
             }
 
             var chargeState = 0;
-            double isolationWidth;
 
             var chargeStateText = string.Empty;
             var isolationWidthText = string.Empty;
@@ -80,7 +76,7 @@ namespace MASIC.DataInput
                 return 0;
             }
 
-            if (!double.TryParse(isolationWidthText, out isolationWidth))
+            if (!double.TryParse(isolationWidthText, out var isolationWidth))
             {
                 ReportWarning("MS2 isolation width (" + SCAN_EVENT_MS2_ISOLATION_WIDTH + ") was non-numeric (" + isolationWidthText + "); " +
                               "cannot compute interference for scan " + scanInfo.ScanNumber);
@@ -105,8 +101,7 @@ namespace MASIC.DataInput
                     return 0;
                 }
 
-                double mz;
-                if (!double.TryParse(monoMzText, out mz))
+                if (!double.TryParse(monoMzText, out var mz))
                 {
                     OnWarningEvent(string.Format("Skipping scan {0} since scan event {1} was not a number: {2}",
                                                  scanInfo.ScanNumber, SCAN_EVENT_MONOISOTOPIC_MZ, monoMzText));
@@ -234,9 +229,7 @@ namespace MASIC.DataInput
                         continue;
                     }
 
-                    ThermoRawFileReader.clsScanInfo thermoScanInfo = null;
-
-                    success = xcaliburAccessor.GetScanInfo(scanNumber, out thermoScanInfo);
+                    success = xcaliburAccessor.GetScanInfo(scanNumber, out ThermoRawFileReader.clsScanInfo thermoScanInfo);
                     if (!success)
                     {
                         // GetScanInfo returned false
@@ -394,9 +387,8 @@ namespace MASIC.DataInput
             {
                 scanList.SIMDataPresent = true;
                 var simKey = scanInfo.LowMass + "_" + scanInfo.HighMass;
-                int simIndex;
 
-                if (mSIMScanMapping.TryGetValue(simKey, out simIndex))
+                if (mSIMScanMapping.TryGetValue(simKey, out var simIndex))
                 {
                     scanInfo.SIMIndex = simIndex;
                 }

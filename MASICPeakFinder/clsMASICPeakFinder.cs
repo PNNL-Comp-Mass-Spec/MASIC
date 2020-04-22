@@ -395,7 +395,6 @@ namespace MASICPeakFinder
                     var current = noiseStatsSegments[segmentIndex];
 
                     bool significantDifference;
-                    double tCalculated;
                     significantDifference = TestSignificanceUsingTTest(
                         current.BaselineNoiseStats.NoiseLevel,
                         previous.BaselineNoiseStats.NoiseLevel,
@@ -404,7 +403,7 @@ namespace MASICPeakFinder
                         current.BaselineNoiseStats.PointsUsed,
                         previous.BaselineNoiseStats.PointsUsed,
                         confidenceLevel,
-                        out tCalculated);
+                        out var tCalculated);
 
                     if (significantDifference)
                     {
@@ -1126,9 +1125,8 @@ namespace MASICPeakFinder
                 {
                     var x2 = sicData[sicPeak.IndexObserved + 1].ScanNumber;
                     var y2 = sicData[sicPeak.IndexObserved + 1].Intensity;
-                    double interpolatedIntensity;
 
-                    success = InterpolateY(out interpolatedIntensity, x1, x2, y1, y2, (double)(fragScanNumber - 1));
+                    success = InterpolateY(out var interpolatedIntensity, x1, x2, y1, y2, (double)(fragScanNumber - 1));
 
                     if (success)
                     {
@@ -1555,10 +1553,8 @@ namespace MASICPeakFinder
                         // Interpolate between pointIndex-1 and validDataIndexLeft
                         for (var indexPointer = pointIndex; indexPointer <= validDataIndexLeft - 1; indexPointer++)
                         {
-                            double interpolatedIntensity;
-
                             if (InterpolateY(
-                                out interpolatedIntensity,
+                                out var interpolatedIntensity,
                                 scanNumbers[pointIndex - 1], scanNumbers[validDataIndexLeft],
                                 intensities[pointIndex - 1], intensities[validDataIndexLeft],
                                 (double)scanNumbers[indexPointer]))
@@ -1605,9 +1601,8 @@ namespace MASICPeakFinder
                             for (var scanNumberInterpolate = scanNumbers[dataIndex - 1] + 1; scanNumberInterpolate <= scanNumbers[dataIndex] - 1; scanNumberInterpolate++)
                             {
                                 // Use InterpolateY() to fill in the scans between dataIndex-1 and dataIndex
-                                double interpolatedIntensity;
                                 if (InterpolateY(
-                                    out interpolatedIntensity,
+                                    out var interpolatedIntensity,
                                     scanNumbers[dataIndex - 1], scanNumbers[dataIndex],
                                     intensities[dataIndex - 1], intensities[dataIndex],
                                     (double)scanNumberInterpolate))
@@ -1663,9 +1658,8 @@ namespace MASICPeakFinder
                                 for (var scanNumberInterpolate = scanNumbers[dataIndex - 1] + 1; scanNumberInterpolate <= scanNumbers[dataIndex] - 1; scanNumberInterpolate++)
                                 {
                                     // Use InterpolateY() to fill in the scans between dataIndex-1 and dataIndex
-                                    double interpolatedIntensity;
                                     if (InterpolateY(
-                                        out interpolatedIntensity,
+                                        out var interpolatedIntensity,
                                         scanNumbers[dataIndex - 1], scanNumbers[dataIndex],
                                         intensities[dataIndex - 1], intensities[dataIndex],
                                         (double)scanNumberInterpolate))

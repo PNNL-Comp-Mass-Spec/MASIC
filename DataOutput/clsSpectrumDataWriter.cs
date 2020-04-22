@@ -122,11 +122,10 @@ namespace MASIC.DataOutput
             bool fragmentationScan,
             ref int spectrumExportCount)
         {
-            int poolIndex;
             int scanNumber;
             double baselineNoiseLevel;
 
-            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out poolIndex))
+            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                 return;
@@ -240,10 +239,9 @@ namespace MASIC.DataOutput
             bool fragmentationScan,
             ref int spectrumExportCount)
         {
-            int poolIndex;
             var exportCount = 0;
 
-            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out poolIndex))
+            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                 return;

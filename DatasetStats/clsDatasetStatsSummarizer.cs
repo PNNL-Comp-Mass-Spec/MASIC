@@ -222,13 +222,9 @@ namespace MASIC.DatasetStats
             ICollection<double> ticList,
             ICollection<double> bpiList)
         {
-            double elutionTime;
-            double totalIonCurrent;
-            double basePeakIntensity;
-
             if (!string.IsNullOrWhiteSpace(scanStats.ElutionTime))
             {
-                if (double.TryParse(scanStats.ElutionTime, out elutionTime))
+                if (double.TryParse(scanStats.ElutionTime, out var elutionTime))
                 {
                     if (elutionTime > summaryStats.ElutionTimeMax)
                     {
@@ -237,7 +233,7 @@ namespace MASIC.DatasetStats
                 }
             }
 
-            if (double.TryParse(scanStats.TotalIonIntensity, out totalIonCurrent))
+            if (double.TryParse(scanStats.TotalIonIntensity, out var totalIonCurrent))
             {
                 if (totalIonCurrent > summaryStatDetails.TICMax)
                 {
@@ -247,7 +243,7 @@ namespace MASIC.DatasetStats
                 ticList.Add(totalIonCurrent);
             }
 
-            if (double.TryParse(scanStats.BasePeakIntensity, out basePeakIntensity))
+            if (double.TryParse(scanStats.BasePeakIntensity, out var basePeakIntensity))
             {
                 if (basePeakIntensity > summaryStatDetails.BPIMax)
                 {

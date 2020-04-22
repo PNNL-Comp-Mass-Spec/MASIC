@@ -117,9 +117,7 @@ namespace MASIC
                         }
                     }
 
-                    List<List<string>> lstResults = null;
-
-                    var success = dbTools.GetQueryResults(sqlQuery, out lstResults);
+                    var success = dbTools.GetQueryResults(sqlQuery, out var lstResults);
                     if (success)
                     {
                         // Find the row in the lstResults that matches fileNameCompare

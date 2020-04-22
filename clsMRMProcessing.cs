@@ -94,8 +94,7 @@ namespace MASIC
 
                         mrmInfoHash = GenerateMRMInfoHash(fragScan.MRMScanInfo);
 
-                        clsMRMScanInfo mrmInfoForHash = null;
-                        if (!mrmHashToIndexMap.TryGetValue(mrmInfoHash, out mrmInfoForHash))
+                        if (!mrmHashToIndexMap.TryGetValue(mrmInfoHash, out var mrmInfoForHash))
                         {
                             mrmInfoForHash = DuplicateMRMInfo(fragScan.MRMScanInfo);
 
@@ -210,10 +209,7 @@ namespace MASIC
             string inputFileName,
             string outputDirectoryPath)
         {
-            List<clsMRMScanInfo> mrmSettings = null;
-            List<udtSRMListType> srmList = null;
-
-            if (!DetermineMRMSettings(scanList, out mrmSettings, out srmList))
+            if (!DetermineMRMSettings(scanList, out var mrmSettings, out var srmList))
             {
                 return false;
             }
@@ -353,13 +349,11 @@ namespace MASIC
                                     mrmToleranceHalfWidth = 0.001;
                                 }
 
-                                double closestMZ;
-                                double matchIntensity;
                                 var matchFound = mDataAggregation.FindMaxValueInMZRange(
                                     spectraCache, fragScan,
                                     mzStart - mrmToleranceHalfWidth,
                                     mzEnd + mrmToleranceHalfWidth,
-                                    out closestMZ, out matchIntensity);
+                                    out var closestMZ, out var matchIntensity);
 
                                 if (mOptions.WriteMRMDataList)
                                 {
@@ -384,10 +378,9 @@ namespace MASIC
                                 if (mOptions.WriteMRMIntensityCrosstab)
                                 {
                                     var srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
-                                    int srmIndex;
 
                                     // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
-                                    if (srmKeyToIndexMap.TryGetValue(srmMapKey, out srmIndex))
+                                    if (srmKeyToIndexMap.TryGetValue(srmMapKey, out var srmIndex))
                                     {
                                         if (crosstabColumnFlag[srmIndex] ||
                                             srmIndex == 0 && srmIndexLast == srmList.Count - 1)
@@ -600,14 +593,11 @@ namespace MASIC
 
                         // Include this scan in the SIC for this parent ion
 
-                        double matchIntensity;
-                        double closestMZ;
-
                         mDataAggregation.FindMaxValueInMZRange(spectraCache,
                                                                scanList.FragScans[scanIndex],
                                                                mrmDaughterMZ - searchToleranceHalfWidth,
                                                                mrmDaughterMZ + searchToleranceHalfWidth,
-                                                               out closestMZ, out matchIntensity);
+                                                               out var closestMZ, out var matchIntensity);
 
                         sicDetails.AddData(fragScan.ScanNumber, matchIntensity, closestMZ, scanIndex);
                     }
@@ -643,11 +633,9 @@ namespace MASIC
                         }
                     }
 
-                    clsSICPotentialAreaStats potentialAreaStatsInFullSIC = null;
-
                     // Compute the minimum potential peak area in the entire SIC, populating udtSICPotentialAreaStatsInFullSIC
                     peakFinder.FindPotentialPeakArea(sicDetails.SICData,
-                                                     out potentialAreaStatsInFullSIC,
+                                                     out var potentialAreaStatsInFullSIC,
                                                      mOptions.SICOptions.SICPeakFinderOptions);
 
                     // Update .BaselineNoiseStats in scanList.ParentIons(parentIonIndex).SICStats.Peak
@@ -656,8 +644,6 @@ namespace MASIC
                         scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved,
                         noiseStatsSegments);
 
-                    clsSmoothedYDataSubset smoothedYDataSubset = null;
-
                     var parentIon = scanList.ParentIons[parentIonIndex];
 
                     // Clear udtSICPotentialAreaStatsForPeak
@@ -665,7 +651,7 @@ namespace MASIC
 
                     var peakIsValid = peakFinder.FindSICPeakAndArea(sicDetails.SICData,
                                                                     out var potentialAreaStatsForPeakOut,
-                                                                    parentIon.SICStats.Peak, out smoothedYDataSubset,
+                                                                    parentIon.SICStats.Peak, out var smoothedYDataSubset,
                                                                     mOptions.SICOptions.SICPeakFinderOptions,
                                                                     potentialAreaStatsInFullSIC, false,
                                                                     scanList.SIMDataPresent, false);
