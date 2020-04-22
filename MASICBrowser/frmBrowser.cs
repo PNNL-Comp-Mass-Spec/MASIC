@@ -2229,10 +2229,7 @@ namespace MASICBrowser
             }
             finally
             {
-                if (objProgress != null)
-                {
-                    objProgress.HideForm();
-                }
+                objProgress?.HideForm();
             }
         }
 
@@ -2396,10 +2393,7 @@ namespace MASICBrowser
             }
             finally
             {
-                if (objProgress != null)
-                {
-                    objProgress.HideForm();
-                }
+                objProgress?.HideForm();
 
                 cmdRedoSICPeakFindingAllData.Enabled = true;
             }

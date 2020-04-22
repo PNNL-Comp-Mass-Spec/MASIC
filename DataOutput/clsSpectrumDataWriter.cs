@@ -102,10 +102,8 @@ namespace MASIC.DataOutput
                     }
                 }
 
-                if (dataWriter != null)
-                    dataWriter.Close();
-                if (scanInfoWriter != null)
-                    scanInfoWriter.Close();
+                dataWriter?.Close();
+                scanInfoWriter?.Close();
 
                 return true;
             }

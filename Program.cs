@@ -496,10 +496,7 @@ namespace MASIC
         private static void ProgressResetKeypressAbortHandler()
         {
 #if GUI
-            if (mProgressForm != null)
-            {
-                mProgressForm.ResetKeyPressAbortProcess();
-            }
+            mProgressForm?.ResetKeyPressAbortProcess();
 #endif
         }
 

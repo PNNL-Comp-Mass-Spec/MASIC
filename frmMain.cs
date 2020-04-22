@@ -2597,10 +2597,7 @@ namespace MASIC
 
         private void MASIC_ProgressResetKeypressAbort()
         {
-            if (mProgressForm != null)
-            {
-                mProgressForm.ResetKeyPressAbortProcess();
-            }
+            mProgressForm?.ResetKeyPressAbortProcess();
         }
 
         private void MASIC_ProgressSubtaskChanged()

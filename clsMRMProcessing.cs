@@ -443,15 +443,8 @@ namespace MASIC
             }
             finally
             {
-                if (dataWriter != null)
-                {
-                    dataWriter.Close();
-                }
-
-                if (crosstabWriter != null)
-                {
-                    crosstabWriter.Close();
-                }
+                dataWriter?.Close();
+                crosstabWriter?.Close();
             }
 
             return success;
