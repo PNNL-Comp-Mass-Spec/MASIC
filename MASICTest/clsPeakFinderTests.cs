@@ -71,7 +71,6 @@ namespace MASICTest
                     Assert.AreEqual(i - 12, sicMinimumPositiveValue);
                     Assert.AreEqual(i - 12, doubleMinimumPositiveValue);
                 }
-
             }
 
             // Call the overloaded variant that accepts the number of data points
@@ -102,6 +101,5 @@ namespace MASICTest
                 }
             }
         }
-
     }
 }

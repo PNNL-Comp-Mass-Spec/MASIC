@@ -10,7 +10,6 @@ namespace MASICTest
     [TestFixture]
     public class clsTests : EventNotifier
     {
-
         [Test]
         public void TestScanConversions()
         {
@@ -25,8 +24,10 @@ namespace MASICTest
 
             // Populate scanList with example scan data
 
-            for (var scanNumber = 1; scanNumber <= 1750; scanNumber++) {
-                if (scanNumber % 10 == 0) {
+            for (var scanNumber = 1; scanNumber <= 1750; scanNumber++)
+            {
+                if (scanNumber % 10 == 0)
+                {
                     // Add a survey scan
                     // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
                     var newSurveyScan = new MASIC.clsScanInfo
@@ -55,15 +56,15 @@ namespace MASICTest
                     newSurveyScan.HighMass = Math.Max(newSurveyScan.BasePeakIonMZ * 1.1, MZ_MINIMUM * 10);
                     newSurveyScan.IsFTMS = false;
 
-
                     scanList.SurveyScans.Add(newSurveyScan);
 
                     var intLastSurveyScanIndex = scanList.SurveyScans.Count - 1;
 
                     scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex);
                     intLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1;
-
-                } else {
+                }
+                else
+                {
                     // If this is a mzXML file that was processed with ReadW, .ScanHeaderText and .ScanTypeName will get updated by UpdateMSXMLScanType
                     var newFragScan = new MASIC.clsScanInfo
                     {
@@ -100,7 +101,6 @@ namespace MASICTest
                 }
             }
 
-
             var scanNumScanConverter = new clsScanNumScanTimeConversion();
             RegisterEvents(scanNumScanConverter);
 
@@ -131,8 +131,6 @@ namespace MASICTest
                 new KeyValuePair<int, int>(50, 5),
                 new KeyValuePair<float, float>(0.1F, 17.59F),
                 new KeyValuePair<float, float>(5, 5));
-
-
         }
 
         /// <summary>
@@ -150,7 +148,8 @@ namespace MASICTest
             KeyValuePair<float, float> relativeTime,
             KeyValuePair<float, float> scanTime)
         {
-            try {
+            try
+            {
                 // Find the scan number corresponding to each of these values
                 float result1 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanNumber.Key, clsCustomSICList.eCustomSICScanTypeConstants.Absolute, false);
                 Console.WriteLine(scanNumber.Key + " -> " + result1);
@@ -165,11 +164,11 @@ namespace MASICTest
                 Assert.AreEqual(scanTime.Value, result3, 1E-05);
 
                 Console.WriteLine();
-
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Error caught: " + ex.Message);
             }
-
         }
 
         /// <summary>
@@ -183,7 +182,8 @@ namespace MASICTest
 
         public void TestScanConversionToTime(clsScanList scanList, clsScanNumScanTimeConversion scanNumScanConverter, KeyValuePair<int, int> scanNumber, KeyValuePair<float, float> relativeTime, KeyValuePair<float, float> scanTime)
         {
-            try {
+            try
+            {
                 // Find the scan time corresponding to each of these values
                 var result1 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanNumber.Key, clsCustomSICList.eCustomSICScanTypeConstants.Absolute, false);
                 Console.WriteLine(scanNumber.Key + " -> " + result1 + " minutes");
@@ -198,11 +198,11 @@ namespace MASICTest
                 Assert.AreEqual(scanTime.Value, result3, 1E-05);
 
                 Console.WriteLine();
-
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Error caught: " + ex.Message);
             }
-
         }
 
         [Test]
@@ -230,15 +230,16 @@ namespace MASICTest
         public void TestValueToString(double valueToConvert, string expectedResult, byte digitsOfPrecision, int scientificNotationThreshold)
         {
             string result;
-            if (scientificNotationThreshold > 0) {
+            if (scientificNotationThreshold > 0)
+            {
                 result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision, scientificNotationThreshold);
-            } else {
+            }
+            else
+            {
                 result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision);
             }
 
             Console.WriteLine(string.Format("{0,-12} -> {1,-12}", valueToConvert, result));
-
         }
-
     }
 }

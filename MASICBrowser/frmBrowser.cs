@@ -1569,7 +1569,6 @@ namespace MASICBrowser
             var objProgress = new frmProgress();
             try
             {
-
                 // Initialize the stream reader and the XML Text Reader
                 eCurrentXMLDataFileSectionConstants eCurrentXMLDataFileSection;
                 using (var reader = new StreamReader(filePath))
@@ -2374,7 +2373,6 @@ namespace MASICBrowser
 
         private void RegSaveSettings()
         {
-
             // Save settings to the registry
             try
             {

@@ -636,7 +636,6 @@ namespace MASICPeakFinder
 
                 if (targetIntensity > 0)
                 {
-
                     // Start the search at each peak edge to thus determine the largest fwhm value
                     double fwhmScanStart = -1;
                     double y2;
@@ -1145,7 +1144,6 @@ namespace MASICPeakFinder
 
             try
             {
-
                 // Compute the peak area
 
                 // Copy the matching data from the source arrays to scanNumbers() and intensities
@@ -2269,7 +2267,6 @@ namespace MASICPeakFinder
 
                     if (validPeakFound)
                     {
-
                         // For each peak, see if several zero intensity values are in a row in the raw data
                         // If found, then narrow the peak to leave just one zero intensity value
                         for (var peakIndexCompare = 0; peakIndexCompare <= peakData.Peaks.Count - 1; peakIndexCompare++)
@@ -2464,7 +2461,6 @@ namespace MASICPeakFinder
                             var comparisonPeak = peakDataSaved.Peaks[peakIndexCompare];
                             if (peakIndexCompare != peakDataSaved.BestPeakIndex && comparisonPeak.PeakLocation >= peakIndexEnd)
                             {
-
                                 // The peak is after peakIndexEnd; is its intensity large enough?
                                 if (sicData[comparisonPeak.PeakLocation].Intensity >= adjacentPeakIntensityThreshold)
                                 {
@@ -3044,7 +3040,6 @@ namespace MASICPeakFinder
 
                 for (var i = 0; i <= sicData.Count - 1; i++)
                 {
-
                     // If this data point is > .MinimumBaselineNoiseLevel, then add this intensity to potentialPeakArea
                     // and increment validPeakCount
                     var intensityToUse = Math.Max(minimumPositiveValue, sicData[i].Intensity);

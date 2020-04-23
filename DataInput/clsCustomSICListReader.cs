@@ -201,7 +201,6 @@ namespace MASIC.DataInput
                             ScanOrAcqTimeTolerance = 0
                         };
 
-
                         for (var colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
                         {
                             if (colIndex >= eColumnMapping.Length)

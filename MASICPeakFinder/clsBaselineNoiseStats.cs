@@ -2,7 +2,6 @@
 {
     public class clsBaselineNoiseStats
     {
-
         /// <summary>
         /// Typically the average of the data being sampled to determine the baseline noise estimate
         /// </summary>

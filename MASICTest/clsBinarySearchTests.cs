@@ -42,7 +42,6 @@ namespace MASICTest
 
                 using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
-
                     srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
                     for (var index = 0; index <= dataPoints.Count - 1; index++)
                     {
@@ -100,17 +99,14 @@ namespace MASICTest
 
                             break;
                     }
-
                 }
 
                 Console.WriteLine("Test complete; see file " + outputFile.FullName);
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error in clsBinarySearch->TestSearchFunctions: " + ex.Message);
             }
-
         }
 
         [Test]
@@ -143,7 +139,6 @@ namespace MASICTest
 
                 using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
-
                     srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
                     for (var index = 0; index <= dataPoints.Count - 1; index++)
                     {
@@ -207,7 +202,6 @@ namespace MASICTest
 
                             break;
                     }
-
                 }
 
                 Console.WriteLine("Test complete; see file " + outputFile.FullName);
@@ -216,7 +210,6 @@ namespace MASICTest
 
                 Console.WriteLine(entryAssembly);
                 Console.WriteLine(@"C:\Users\d3l243\AppData\Local\JetBrains\Installations");
-
             }
             catch (Exception ex)
             {
@@ -240,7 +233,6 @@ namespace MASICTest
                 }
 
                 return ".";
-
             }
             catch (Exception ex)
             {
@@ -249,6 +241,5 @@ namespace MASICTest
 
             return string.Empty;
         }
-
     }
 }

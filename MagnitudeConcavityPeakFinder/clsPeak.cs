@@ -32,10 +32,7 @@ namespace MagnitudeConcavityPeakFinder
         /// <summary>
         /// Peak width (in points)
         /// </summary>
-        public int PeakWidth
-        {
-            get { return RightEdge - LeftEdge + 1; }
-        }
+        public int PeakWidth => RightEdge - LeftEdge + 1;
 
         public new string ToString()
         {

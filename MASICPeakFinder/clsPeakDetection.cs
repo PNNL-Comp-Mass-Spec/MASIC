@@ -417,7 +417,6 @@ namespace MASICPeakFinder
 
             for (var startIndex = 0; startIndex <= sourceDataCount - peakWidthPointsMinimum - 1; startIndex++)
             {
-
                 // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
                 for (var subIndex = startIndex; subIndex <= startIndex + peakWidthPointsMinimum - 1; subIndex++)
                 {

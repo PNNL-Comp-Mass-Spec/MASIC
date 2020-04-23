@@ -7,7 +7,6 @@ namespace MagnitudeConcavityPeakFinder
 {
     public class PeakDetector
     {
-
         private const int MINIMUM_PEAK_WIDTH = 3;
 
         #region Structures
@@ -116,7 +115,6 @@ namespace MagnitudeConcavityPeakFinder
            int originalPeakLocationIndex,
            out List<double> smoothedYData)
         {
-
             return FindPeaks(peakFinderOptions, scanNumbers, intensityData, scanNumbers.Length, originalPeakLocationIndex, out smoothedYData);
         }
 
@@ -137,7 +135,6 @@ namespace MagnitudeConcavityPeakFinder
 
             return FindPeaks(peakFinderOptions, xyData, originalPeakLocationIndex, out smoothedYData);
         }
-
 
         /// <summary>
         ///
@@ -180,10 +177,8 @@ namespace MagnitudeConcavityPeakFinder
                                                    peakFinderOptions.SICBaselineNoiseOptions, ignoreNonPositiveData,
                                                    out var udtBaselineNoiseStats);
 
-
             // Find maximumPotentialPeakArea and dataPointCountAboveThreshold
             var maximumPotentialPeakArea = FindMaximumPotentialPeakArea(intensityData, peakFinderOptions, udtBaselineNoiseStats, out var dataPointCountAboveThreshold);
-
 
             if (maximumPotentialPeakArea < 1)
                 maximumPotentialPeakArea = 1;
@@ -197,7 +192,6 @@ namespace MagnitudeConcavityPeakFinder
 
             var peakData = new PeakDataContainer();
             peakData.SetData(xyData);
-
 
             if (Math.Abs(peakFinderOptions.ButterworthSamplingFrequency) < float.Epsilon)
                 peakFinderOptions.ButterworthSamplingFrequency = 0.25f;
@@ -228,7 +222,6 @@ namespace MagnitudeConcavityPeakFinder
             smoothedYData = peakData.SmoothedYData.ToList();
 
             return peakData.Peaks;
-
         }
 
         private double FindMaximumPotentialPeakArea(
@@ -237,7 +230,6 @@ namespace MagnitudeConcavityPeakFinder
             NoiseLevelAnalyzer.udtBaselineNoiseStatsType udtBaselineNoiseStats,
             out int dataPointCountAboveThreshold)
         {
-
             var maximumIntensity = intensityData[0];
             double maximumPotentialPeakArea = 0;
 
@@ -283,7 +275,6 @@ namespace MagnitudeConcavityPeakFinder
 
         protected double FindMinimumPositiveValue(List<KeyValuePair<int, double>> xyData, double absoluteMinimumValue)
         {
-
             var minimumPositiveValue = double.MaxValue;
 
             foreach (var dataPoint in xyData)
@@ -296,7 +287,6 @@ namespace MagnitudeConcavityPeakFinder
                 minimumPositiveValue = absoluteMinimumValue;
 
             return minimumPositiveValue;
-
         }
 
         /// <summary>
@@ -312,10 +302,8 @@ namespace MagnitudeConcavityPeakFinder
             List<KeyValuePair<int, double>> xyData,
             udtSICPeakFinderOptionsType udtSICPeakFinderOptions)
         {
-
             var minimumPotentialPeakArea = double.MaxValue;
             var peakCountBasisForMinimumPotentialArea = 0;
-
 
             if (xyData.Count == 0)
             {
@@ -411,7 +399,6 @@ namespace MagnitudeConcavityPeakFinder
         /// <param name="peakFinderOptions"></param>
         public void TestPeakFinder(string dataFilePath, udtSICPeakFinderOptionsType peakFinderOptions)
         {
-
             var fiDataFile = new FileInfo(dataFilePath);
             if (!fiDataFile.Exists)
             {
@@ -464,7 +451,6 @@ namespace MagnitudeConcavityPeakFinder
                 Console.WriteLine("  Area =      " + peak.Area.ToString("0.00"));
                 Console.WriteLine("  LeftEdge =  " + peak.LeftEdge);
                 Console.WriteLine("  RightEdge = " + peak.RightEdge);
-
             }
 
             // Write the original data, the smoothed data, and the points within each peak to a tab-delimited text file
@@ -479,12 +465,9 @@ namespace MagnitudeConcavityPeakFinder
             var resultsFilePath = Path.Combine(fiDataFile.Directory.FullName,
                                                Path.GetFileNameWithoutExtension(fiDataFile.Name) + "_Peaks" +
                                                fiDataFile.Extension);
-            using (
-                var writer = new StreamWriter(new FileStream(resultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
-            )
+            using (var writer = new StreamWriter(new FileStream(resultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
                 var outputData = new List<string>();
-
 
                 writer.Write("Scan\tIntensity\tSmoothedIntensity\t");
                 for (var peakIndex = 0; peakIndex < detectedPeaks.Count; peakIndex++)
@@ -585,11 +568,9 @@ namespace MagnitudeConcavityPeakFinder
             peakFinderOptions.ReturnClosestPeak = true;
 
             return peakFinderOptions;
-
         }
 
         #endregion
-
 
         private void ExamineNarrowPeaks(PeakDataContainer peakData, udtSICPeakFinderOptionsType peakFinderOptions)
         {
@@ -645,16 +626,14 @@ namespace MagnitudeConcavityPeakFinder
             var intStepOverIncreaseCount = 0;
             while (peak.LeftEdge > 0)
             {
-
                 if (peakData.SmoothedYData[peak.LeftEdge - 1] <
                     peakData.SmoothedYData[peak.LeftEdge])
                 {
                     // The adjacent point is lower than the current point
                     peak.LeftEdge -= 1;
                 }
-                else if (
-                    Math.Abs(peakData.SmoothedYData[peak.LeftEdge - 1] -
-                             peakData.SmoothedYData[peak.LeftEdge]) < double.Epsilon)
+                else if (Math.Abs(peakData.SmoothedYData[peak.LeftEdge - 1] -
+                                  peakData.SmoothedYData[peak.LeftEdge]) < double.Epsilon)
                 {
                     // The adjacent point is equal to the current point
                     peak.LeftEdge -= 1;
@@ -710,15 +689,13 @@ namespace MagnitudeConcavityPeakFinder
             var intStepOverIncreaseCount = 0;
             while (peak.RightEdge < peakData.DataCount - 1)
             {
-
                 if (peakData.SmoothedYData[peak.RightEdge + 1] < peakData.SmoothedYData[peak.RightEdge])
                 {
                     // The adjacent point is lower than the current point
                     peak.RightEdge += 1;
                 }
-                else if (
-                    Math.Abs(peakData.SmoothedYData[peak.RightEdge + 1] -
-                             peakData.SmoothedYData[peak.RightEdge]) < double.Epsilon)
+                else if (Math.Abs(peakData.SmoothedYData[peak.RightEdge + 1] -
+                                  peakData.SmoothedYData[peak.RightEdge]) < double.Epsilon)
                 {
                     // The adjacent point is equal to the current point
                     peak.RightEdge += 1;
@@ -779,7 +756,6 @@ namespace MagnitudeConcavityPeakFinder
             PeakDataContainer peakData,
             udtSICPeakFinderOptionsType peakFinderOptions)
         {
-
             const float sngPeakMaximum = 0;
 
             bool validPeakFound;
@@ -800,7 +776,6 @@ namespace MagnitudeConcavityPeakFinder
             const int peakWidthInSigma = 2;
             const bool useValleysForPeakWidth = true;
             const bool movePeakLocationToMaxIntensity = true;
-
 
             if (peakFinderOptions.FindPeaksOnSmoothedData && dataIsSmoothed)
             {
@@ -826,7 +801,6 @@ namespace MagnitudeConcavityPeakFinder
                     movePeakLocationToMaxIntensity);
             }
 
-
             if (peakData.Peaks == null)
             {
                 // Fatal error occurred while finding peaks
@@ -843,7 +817,6 @@ namespace MagnitudeConcavityPeakFinder
             {
                 // No peaks were found
                 return false;
-
             }
 
             foreach (var peak in peakData.Peaks)
@@ -894,7 +867,6 @@ namespace MagnitudeConcavityPeakFinder
 
                     // Store the smoothed data in the data container
                     peakData.SetSmoothedData(smoothedYData);
-
                 }
 
                 // First see if we need to narrow the peak by looking for decreasing intensities moving toward the peak center
@@ -924,7 +896,6 @@ namespace MagnitudeConcavityPeakFinder
                         break;
                     }
                 }
-
 
                 // Now see if we need to expand the peak by looking for decreasing intensities moving away from the peak center,
                 //  but allowing for small increases
@@ -992,7 +963,6 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             return validPeakFound;
-
         }
 
         private bool SmoothData(
@@ -1026,7 +996,6 @@ namespace MagnitudeConcavityPeakFinder
                 return false;
             }
 
-
             bool success;
             if (peakFinderOptions.UseButterworthSmooth)
             {
@@ -1038,7 +1007,6 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             return success;
-
         }
 
         private static bool SmoothDataButterworth(
@@ -1048,7 +1016,6 @@ namespace MagnitudeConcavityPeakFinder
             ref int peakWidthPointsMinimum,
             out string errorMessage)
         {
-
             var dataFilter = new DataFilter.DataFilter();
             errorMessage = string.Empty;
 
@@ -1118,6 +1085,7 @@ namespace MagnitudeConcavityPeakFinder
                                                        intFilterThirdWidth,
                                                        peakFinderOptions.SavitzkyGolayFilterOrder,
                                                        out errorMessage, true);
+
             if (!success)
             {
                 Console.WriteLine("Error with the Savitzky-Golay filter: " + errorMessage);

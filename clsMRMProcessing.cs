@@ -157,7 +157,6 @@ namespace MASIC
                 ParentIonInfoIndex = -1,
         };
 
-
             if (oSource.MRMMassList == null)
             {
                 oTarget.MRMMassList = new List<udtMRMMassRangeType>();
@@ -180,7 +179,6 @@ namespace MASIC
                 ScanCount = oSource.ScanCount,
                 ParentIonInfoIndex = oSource.ParentIonInfoIndex,
             };
-
 
             if (oSource.MRMMassList == null)
             {

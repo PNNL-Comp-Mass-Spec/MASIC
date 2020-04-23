@@ -62,7 +62,6 @@ namespace MASICTest
             Console.WriteLine("Data file " + datasetName + " is dataset ID " + datasetID);
 
             Assert.AreEqual(expectedDatasetID, datasetID, "DatasetID Mismatch");
-
         }
 
         private static string GetConnectionString(string server, string database, string user = "Integrated", string password = "")
@@ -72,6 +71,5 @@ namespace MASICTest
 
             return string.Format("Data Source={0};Initial Catalog={1};User={2};Password={3};", server, database, user, password);
         }
-
     }
 }

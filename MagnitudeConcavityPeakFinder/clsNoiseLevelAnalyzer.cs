@@ -63,7 +63,6 @@ namespace MagnitudeConcavityPeakFinder
             // Note: Replaces values of 0 with the minimum positive value in sngData()
             // Note: You cannot use sngData.Length to determine the length of the array; use intDataCount
 
-
             double summedIntensity;
 
             int countSummed;
@@ -121,7 +120,6 @@ namespace MagnitudeConcavityPeakFinder
                 {
                     return false;
                 }
-
             }
 
             // Look for the minimum positive value and replace all data in sortedData with that value
@@ -154,7 +152,6 @@ namespace MagnitudeConcavityPeakFinder
                         udtBaselineNoiseStats.PointsUsed = 1;
                         break;
                     }
-
 
                     // Compute the average
                     // Note that countSummed will be used below in the variance computation
@@ -233,7 +230,6 @@ namespace MagnitudeConcavityPeakFinder
                         summedIntensity += Math.Pow((sortedData[intIndex] - udtBaselineNoiseStats.NoiseLevel), 2);
                     }
 
-
                     countSummed = indexEnd + 1;
                     if (countSummed > 0)
                     {
@@ -264,7 +260,6 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             return true;
-
         }
 
         private static int ComputeTrimmedMeanByCount(
@@ -274,13 +269,9 @@ namespace MagnitudeConcavityPeakFinder
             out int indexEnd,
             out double summedIntensity)
         {
-
             // Find the index of the data point at intDataSortedCount * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
             //  average the data from the start to that index
-            indexEnd =
-                (int)
-                    Math.Round(
-                        (dataSortedCount - 1) * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
+            indexEnd = (int) Math.Round((dataSortedCount - 1) * udtBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
 
             var countSummed = indexEnd + 1;
 
@@ -380,7 +371,6 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             return minimumPositiveValue;
-
         }
 
         #region Default Options
@@ -402,6 +392,5 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         #endregion
-
     }
 }

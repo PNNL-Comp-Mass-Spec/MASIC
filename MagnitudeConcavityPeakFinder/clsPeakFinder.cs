@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace MagnitudeConcavityPeakFinder
 {
-
     internal class PeakFinder
     {
-
         // Peak detection routines
         // Written by Matthew Monroe in roughly 2001 at UNC (Chapel Hill, NC)
         // Kevin Lan provided the concept of Magnitude Concavity fitting
@@ -43,14 +41,12 @@ namespace MagnitudeConcavityPeakFinder
             public double ParamResult;
         }
 
-
         public double ComputeSlope(
             double[] xValsZeroBased,
             double[] yValsZeroBased,
             int startIndex,
             int endIndex)
         {
-
             const int POLYNOMIAL_ORDER = 1;
 
             if (xValsZeroBased == null || xValsZeroBased.Length == 0)
@@ -72,7 +68,6 @@ namespace MagnitudeConcavityPeakFinder
             LeastSquaresFit(segmentX, segmentY, out var coefficients, POLYNOMIAL_ORDER);
 
             return coefficients[1];
-
         }
 
         public List<clsPeak> DetectPeaks(
@@ -113,12 +108,10 @@ namespace MagnitudeConcavityPeakFinder
             //  and h''(t_r) is the height of the second derivative of the peak
             // In chromatography, the baseline peak widthInPoints = 4*dblSigma
 
-
             var detectedPeaks = new List<clsPeak>();
 
             try
             {
-
                 var sourceDataCount = xValsZeroBased.Length;
                 if (sourceDataCount <= 0)
                     return detectedPeaks;
@@ -193,7 +186,6 @@ namespace MagnitudeConcavityPeakFinder
                     }
                 }
 
-
                 // Compute the peak areas
                 foreach (var peak in detectedPeaks)
                 {
@@ -204,7 +196,6 @@ namespace MagnitudeConcavityPeakFinder
                         MovePeakLocationToMax(sourceDataCount, yValsZeroBased, peak, peakWidthPointsMinimum);
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -212,7 +203,6 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             return detectedPeaks;
-
         }
 
         private void ComputePeakArea(
@@ -221,7 +211,6 @@ namespace MagnitudeConcavityPeakFinder
             double[] yValsZeroBased,
             clsPeak peak)
         {
-
             if (peak.PeakWidth == 0)
             {
                 // 0-width peak; this shouldn't happen
@@ -257,7 +246,6 @@ namespace MagnitudeConcavityPeakFinder
             var xValsForArea = new double[thisPeakWidthInPoints];
             var yValsForArea = new double[thisPeakWidthInPoints];
 
-
             for (var areaValsCopyIndex = thisPeakStartIndex; areaValsCopyIndex <= thisPeakEndIndex; areaValsCopyIndex++)
             {
                 xValsForArea[areaValsCopyIndex - thisPeakStartIndex] = xValsZeroBased[areaValsCopyIndex];
@@ -265,7 +253,6 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             peak.Area = FindArea(xValsForArea, yValsForArea, thisPeakWidthInPoints);
-
         }
 
         private void DetectPeaksUseValleys(
@@ -368,7 +355,6 @@ namespace MagnitudeConcavityPeakFinder
             }
         }
 
-
         private void DetectPeaksSecondDerivative(
             int sourceDataCount,
             double[] yValsZeroBased,
@@ -438,7 +424,6 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             return area;
-
         }
 
         private void FitSegments (
@@ -484,9 +469,7 @@ namespace MagnitudeConcavityPeakFinder
                 var midPointIndex = startIndex + peakWidthMidPoint;
                 firstDerivative[midPointIndex] = 2 * coefficients[2] * xVals[midPointIndex] + coefficients[1];
                 secondDerivative[midPointIndex] = 2 * coefficients[2];
-
             }
-
         }
 
         private void MovePeakLocationToMax(
@@ -529,7 +512,6 @@ namespace MagnitudeConcavityPeakFinder
 
         private void LeastSquaresFit(double[] xVals, double[] yVals, out double[] coefficients, int polynomialOrder)
         {
-
             // Code from article "Fit for Purpose" written by Steven Abbot
             // and published in the February 2003 issue of Hardcore Visual Basic.
             // Code excerpted from the VB6 program FitIt
@@ -569,7 +551,6 @@ namespace MagnitudeConcavityPeakFinder
 
         private void LLSqFit(double[] DataX, double[] DataY, ref udtLeastSquaresFitEquationTermType[] udtEquationTerms)
         {
-
             //Linear Least Squares Fit
 
             var Beta = new double[DataX.Length];
@@ -705,9 +686,7 @@ namespace MagnitudeConcavityPeakFinder
                 {
                     PFuncVal[i] = v;
                 }
-
             }
-
         }
 
         private bool GaussJordan(
@@ -715,7 +694,6 @@ namespace MagnitudeConcavityPeakFinder
             int termCount,
             ref double[] b)
         {
-
             // GaussJordan elimination for LLSq and LM solving
             // Returns True if success, False if an error
 
@@ -728,7 +706,6 @@ namespace MagnitudeConcavityPeakFinder
 
             try
             {
-                double Dum;
                 for (var i = 0; i <= termCount - 1; i++)
                 {
                     double Big = 0;
@@ -754,6 +731,7 @@ namespace MagnitudeConcavityPeakFinder
                     ipiv[icol] += 1;
                     if (irow != icol)
                     {
+                        double Dum;
                         for (var L = 0; L <= termCount - 1; L++)
                         {
                             Dum = A[irow, L];
@@ -785,7 +763,7 @@ namespace MagnitudeConcavityPeakFinder
                     {
                         if (ll != icol)
                         {
-                            Dum = A[ll, icol];
+                            var Dum = A[ll, icol];
                             A[ll, icol] = 0;
                             for (var L = 0; L <= termCount - 1; L++)
                             {
@@ -802,13 +780,12 @@ namespace MagnitudeConcavityPeakFinder
                     {
                         for (var k = 0; k <= termCount - 1; k++)
                         {
-                            Dum = A[k, indxr[L]];
+                            var Dum = A[k, indxr[L]];
                             A[k, indxr[L]] = A[k, indxc[L]];
                             A[k, indxc[L]] = Dum;
                         }
                     }
                 }
-
             }
             catch (Exception)
             {
@@ -816,11 +793,8 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             return true;
-
         }
 
         #endregion
-
-
     }
 }
