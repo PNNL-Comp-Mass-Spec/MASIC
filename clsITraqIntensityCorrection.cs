@@ -291,20 +291,20 @@ namespace MASIC
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Applied Biosystems
 
-                        udtIsoPct114 = this.DefineIsotopeContribution((float)0, (float)1, 92.9F, 5.9F, 0.2F);
-                        udtIsoPct115 = this.DefineIsotopeContribution((float)0, (float)2, 92.3F, 5.6F, 0.1F);
-                        udtIsoPct116 = this.DefineIsotopeContribution((float)0, (float)3, 92.4F, 4.5F, 0.1F);
-                        udtIsoPct117 = this.DefineIsotopeContribution(0.1F, (float)4, 92.3F, 3.5F, 0.1F);
+                        udtIsoPct114 = this.DefineIsotopeContribution(0, 1, 92.9F, 5.9F, 0.2F);
+                        udtIsoPct115 = this.DefineIsotopeContribution(0, 2, 92.3F, 5.6F, 0.1F);
+                        udtIsoPct116 = this.DefineIsotopeContribution(0, 3, 92.4F, 4.5F, 0.1F);
+                        udtIsoPct117 = this.DefineIsotopeContribution(0.1F, 4, 92.3F, 3.5F, 0.1F);
                     }
                     else if (mITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.BroadInstitute)
                     {
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
 
-                        udtIsoPct114 = this.DefineIsotopeContribution((float)0, (float)0, 95.5F, 4.5F, (float)0);
-                        udtIsoPct115 = this.DefineIsotopeContribution((float)0, 0.9F, 94.6F, 4.5F, (float)0);
-                        udtIsoPct116 = this.DefineIsotopeContribution((float)0, 0.9F, 95.7F, 3.4F, (float)0);
-                        udtIsoPct117 = this.DefineIsotopeContribution((float)0, 1.4F, 98.6F, (float)0, (float)0);
+                        udtIsoPct114 = this.DefineIsotopeContribution(0, 0, 95.5F, 4.5F, 0);
+                        udtIsoPct115 = this.DefineIsotopeContribution(0, 0.9F, 94.6F, 4.5F, 0);
+                        udtIsoPct116 = this.DefineIsotopeContribution(0, 0.9F, 95.7F, 3.4F, 0);
+                        udtIsoPct117 = this.DefineIsotopeContribution(0, 1.4F, 98.6F, 0, 0);
                     }
                     else
                     {
@@ -352,14 +352,14 @@ namespace MASIC
                     // Source percentages provided by Applied Biosystems
                     // Note there is a 2 Da jump between 119 and 121, which is why 7.44 and 0.87 are not included in mCoeffs()
 
-                    udtIsoPct113 = this.DefineIsotopeContribution((float)0, (float)0, 92.89F, 6.89F, 0.22F);
-                    udtIsoPct114 = this.DefineIsotopeContribution((float)0, 0.94F, 93.01F, 5.9F, 0.16F);
-                    udtIsoPct115 = this.DefineIsotopeContribution((float)0, 1.88F, 93.12F, 4.9F, 0.1F);
-                    udtIsoPct116 = this.DefineIsotopeContribution((float)0, 2.82F, 93.21F, 3.9F, 0.07F);
-                    udtIsoPct117 = this.DefineIsotopeContribution(0.06F, 3.77F, 93.29F, 2.88F, (float)0);
-                    udtIsoPct118 = this.DefineIsotopeContribution(0.09F, 4.71F, 93.32F, 1.88F, (float)0);
-                    udtIsoPct119 = this.DefineIsotopeContribution(0.14F, 5.66F, 93.34F, 0.87F, (float)0);
-                    udtIsoPct121 = this.DefineIsotopeContribution(0.27F, 7.44F, 92.11F, 0.18F, (float)0);
+                    udtIsoPct113 = this.DefineIsotopeContribution(0, 0, 92.89F, 6.89F, 0.22F);
+                    udtIsoPct114 = this.DefineIsotopeContribution(0, 0.94F, 93.01F, 5.9F, 0.16F);
+                    udtIsoPct115 = this.DefineIsotopeContribution(0, 1.88F, 93.12F, 4.9F, 0.1F);
+                    udtIsoPct116 = this.DefineIsotopeContribution(0, 2.82F, 93.21F, 3.9F, 0.07F);
+                    udtIsoPct117 = this.DefineIsotopeContribution(0.06F, 3.77F, 93.29F, 2.88F, 0);
+                    udtIsoPct118 = this.DefineIsotopeContribution(0.09F, 4.71F, 93.32F, 1.88F, 0);
+                    udtIsoPct119 = this.DefineIsotopeContribution(0.14F, 5.66F, 93.34F, 0.87F, 0);
+                    udtIsoPct121 = this.DefineIsotopeContribution(0.27F, 7.44F, 92.11F, 0.18F, 0);
 
                     // Goal is to generate this matrix:
                     // 0       1       2       3       4       5       6       7
@@ -428,15 +428,15 @@ namespace MASIC
 
                     // ReSharper restore CommentTypo
 
-                    udtIsoPct113 = this.DefineIsotopeContribution((float)0, (float)0, 92.89F, 6.89F, 0.22F);
-                    udtIsoPct114 = this.DefineIsotopeContribution((float)0, 0.94F, 93.01F, 5.9F, 0.16F);
-                    udtIsoPct115 = this.DefineIsotopeContribution((float)0, 1.88F, 93.12F, 4.9F, 0.1F);
-                    udtIsoPct116 = this.DefineIsotopeContribution((float)0, 2.82F, 93.21F, 3.9F, 0.07F);
-                    udtIsoPct117 = this.DefineIsotopeContribution(0.06F, 3.77F, 93.29F, 2.88F, (float)0);
-                    udtIsoPct118 = this.DefineIsotopeContribution(0.09F, 4.71F, 93.32F, 1.88F, (float)0);
-                    udtIsoPct119 = this.DefineIsotopeContribution(0.14F, 5.66F, 93.34F, 0.87F, (float)0);
-                    udtIsoPct120 = this.DefineIsotopeContribution((float)0, (float)0, 91.01F, 8.62F, (float)0);
-                    udtIsoPct121 = this.DefineIsotopeContribution(0.27F, 7.44F, 92.11F, 0.18F, (float)0);
+                    udtIsoPct113 = this.DefineIsotopeContribution(0, 0, 92.89F, 6.89F, 0.22F);
+                    udtIsoPct114 = this.DefineIsotopeContribution(0, 0.94F, 93.01F, 5.9F, 0.16F);
+                    udtIsoPct115 = this.DefineIsotopeContribution(0, 1.88F, 93.12F, 4.9F, 0.1F);
+                    udtIsoPct116 = this.DefineIsotopeContribution(0, 2.82F, 93.21F, 3.9F, 0.07F);
+                    udtIsoPct117 = this.DefineIsotopeContribution(0.06F, 3.77F, 93.29F, 2.88F, 0);
+                    udtIsoPct118 = this.DefineIsotopeContribution(0.09F, 4.71F, 93.32F, 1.88F, 0);
+                    udtIsoPct119 = this.DefineIsotopeContribution(0.14F, 5.66F, 93.34F, 0.87F, 0);
+                    udtIsoPct120 = this.DefineIsotopeContribution(0, 0, 91.01F, 8.62F, 0);
+                    udtIsoPct121 = this.DefineIsotopeContribution(0.27F, 7.44F, 92.11F, 0.18F, 0);
 
                     // Goal is to generate this expanded matrix, which takes Phenylalanine into account
                     // 0       1       2       3       4       5       6       7      8
@@ -537,17 +537,17 @@ namespace MASIC
 
                     // TMT10plex lot SG252258
                     // TMT11plex lot T4259309
-                    udtIsoPct126 = this.DefineIsotopeContribution((float)0, (float)0, (float)100, 7.2F, 0.2F);
-                    udtIsoPct127N = this.DefineIsotopeContribution((float)0, 0.4F, (float)100, 7.3F, 0.2F);
-                    udtIsoPct127C = this.DefineIsotopeContribution((float)0, 0.5F, (float)100, 6.3F, (float)0);
-                    udtIsoPct128N = this.DefineIsotopeContribution((float)0, 0.7F, (float)100, 5.7F, (float)0);
-                    udtIsoPct128C = this.DefineIsotopeContribution((float)0, 1.4F, (float)100, 5.1F, (float)0);
-                    udtIsoPct129N = this.DefineIsotopeContribution((float)0, 2.5F, (float)100, (float)5, (float)0);
-                    udtIsoPct129C = this.DefineIsotopeContribution((float)0, 2.3F, (float)100, 4.3F, (float)0);
-                    udtIsoPct130N = this.DefineIsotopeContribution((float)0, 2.7F, (float)100, 3.9F, (float)0);
-                    udtIsoPct130C = this.DefineIsotopeContribution(0.4F, 2.9F, (float)100, 3.3F, (float)0);
-                    udtIsoPct131N = this.DefineIsotopeContribution((float)0, 3.4F, (float)100, 3.3F, (float)0);
-                    udtIsoPct131C = this.DefineIsotopeContribution((float)0, 3.7F, (float)100, 2.9F, (float)0);
+                    udtIsoPct126 = this.DefineIsotopeContribution(0, 0, 100, 7.2F, 0.2F);
+                    udtIsoPct127N = this.DefineIsotopeContribution(0, 0.4F, 100, 7.3F, 0.2F);
+                    udtIsoPct127C = this.DefineIsotopeContribution(0, 0.5F, 100, 6.3F, 0);
+                    udtIsoPct128N = this.DefineIsotopeContribution(0, 0.7F, 100, 5.7F, 0);
+                    udtIsoPct128C = this.DefineIsotopeContribution(0, 1.4F, 100, 5.1F, 0);
+                    udtIsoPct129N = this.DefineIsotopeContribution(0, 2.5F, 100, 5, 0);
+                    udtIsoPct129C = this.DefineIsotopeContribution(0, 2.3F, 100, 4.3F, 0);
+                    udtIsoPct130N = this.DefineIsotopeContribution(0, 2.7F, 100, 3.9F, 0);
+                    udtIsoPct130C = this.DefineIsotopeContribution(0.4F, 2.9F, 100, 3.3F, 0);
+                    udtIsoPct131N = this.DefineIsotopeContribution(0, 3.4F, 100, 3.3F, 0);
+                    udtIsoPct131C = this.DefineIsotopeContribution(0, 3.7F, 100, 2.9F, 0);
 
                     // Goal is to generate this matrix (11-plex will not have the final row or final column)
                     // 0       1       2       3       4       5       6       7       8       9       10
@@ -666,22 +666,22 @@ namespace MASIC
                     // Source percentages provided by Thermo
 
                     // TMTpro lot UH290428
-                    udtIsoPct126 = this.DefineIsotopeContribution((float)0, (float)0, (float)100, 7.73F, 0.22F);
-                    udtIsoPct127N = this.DefineIsotopeContribution((float)0, (float)0, (float)100, 7.46F, 0.22F);
-                    udtIsoPct127C = this.DefineIsotopeContribution((float)0, 0.71F, (float)100, 6.62F, 0.16F);
-                    udtIsoPct128N = this.DefineIsotopeContribution((float)0, 0.75F, (float)100, 6.67F, 0.16F);
-                    udtIsoPct128C = this.DefineIsotopeContribution(0.06F, 1.34F, (float)100, 5.31F, 0.11F);
-                    udtIsoPct129N = this.DefineIsotopeContribution(0.01F, 1.29F, (float)100, 5.48F, 0.1F);
-                    udtIsoPct129C = this.DefineIsotopeContribution(0.26F, 2.34F, (float)100, 4.87F, 0.08F);
-                    udtIsoPct130N = this.DefineIsotopeContribution(0.39F, 2.36F, (float)100, 4.57F, 0.07F);
-                    udtIsoPct130C = this.DefineIsotopeContribution(0.05F, 2.67F, (float)100, 3.85F, 0.15F);
-                    udtIsoPct131N = this.DefineIsotopeContribution(0.05F, 2.71F, (float)100, 3.73F, 0.04F);
-                    udtIsoPct131C = this.DefineIsotopeContribution(0.09F, 3.69F, (float)100, 2.77F, 0.01F);
-                    udtIsoPct132N = this.DefineIsotopeContribution(0.09F, 2.51F, (float)100, 2.76F, 0.01F);
-                    udtIsoPct132C = this.DefineIsotopeContribution(0.1F, 4.11F, (float)100, 1.63F, (float)0);
-                    udtIsoPct133N = this.DefineIsotopeContribution(0.09F, 3.09F, (float)100, 1.58F, (float)0);
-                    udtIsoPct133C = this.DefineIsotopeContribution(0.36F, 4.63F, (float)100, 0.88F, (float)0);
-                    udtIsoPct134N = this.DefineIsotopeContribution(0.38F, 4.82F, (float)100, 0.86F, (float)0);
+                    udtIsoPct126 = this.DefineIsotopeContribution(0, 0, 100, 7.73F, 0.22F);
+                    udtIsoPct127N = this.DefineIsotopeContribution(0, 0, 100, 7.46F, 0.22F);
+                    udtIsoPct127C = this.DefineIsotopeContribution(0, 0.71F, 100, 6.62F, 0.16F);
+                    udtIsoPct128N = this.DefineIsotopeContribution(0, 0.75F, 100, 6.67F, 0.16F);
+                    udtIsoPct128C = this.DefineIsotopeContribution(0.06F, 1.34F, 100, 5.31F, 0.11F);
+                    udtIsoPct129N = this.DefineIsotopeContribution(0.01F, 1.29F, 100, 5.48F, 0.1F);
+                    udtIsoPct129C = this.DefineIsotopeContribution(0.26F, 2.34F, 100, 4.87F, 0.08F);
+                    udtIsoPct130N = this.DefineIsotopeContribution(0.39F, 2.36F, 100, 4.57F, 0.07F);
+                    udtIsoPct130C = this.DefineIsotopeContribution(0.05F, 2.67F, 100, 3.85F, 0.15F);
+                    udtIsoPct131N = this.DefineIsotopeContribution(0.05F, 2.71F, 100, 3.73F, 0.04F);
+                    udtIsoPct131C = this.DefineIsotopeContribution(0.09F, 3.69F, 100, 2.77F, 0.01F);
+                    udtIsoPct132N = this.DefineIsotopeContribution(0.09F, 2.51F, 100, 2.76F, 0.01F);
+                    udtIsoPct132C = this.DefineIsotopeContribution(0.1F, 4.11F, 100, 1.63F, 0);
+                    udtIsoPct133N = this.DefineIsotopeContribution(0.09F, 3.09F, 100, 1.58F, 0);
+                    udtIsoPct133C = this.DefineIsotopeContribution(0.36F, 4.63F, 100, 0.88F, 0);
+                    udtIsoPct134N = this.DefineIsotopeContribution(0.38F, 4.82F, 100, 0.86F, 0);
 
                     // Goal is to generate a 16x16 matrix
                     // 0       1       2       3       4       5       6       7       8       9       10      11      12      13      14      15

@@ -1110,7 +1110,7 @@ namespace MASICPeakFinder
                     var x2 = sicData[sicPeak.IndexObserved + 1].ScanNumber;
                     var y2 = sicData[sicPeak.IndexObserved + 1].Intensity;
 
-                    success = InterpolateY(out var interpolatedIntensity, x1, x2, y1, y2, (double)(fragScanNumber - 1));
+                    success = InterpolateY(out var interpolatedIntensity, x1, x2, y1, y2, fragScanNumber - 1);
 
                     if (success)
                     {
@@ -1538,7 +1538,7 @@ namespace MASICPeakFinder
                                 out var interpolatedIntensity,
                                 scanNumbers[pointIndex - 1], scanNumbers[validDataIndexLeft],
                                 intensities[pointIndex - 1], intensities[validDataIndexLeft],
-                                (double)scanNumbers[indexPointer]))
+                                scanNumbers[indexPointer]))
                             {
                                 intensities[indexPointer] = interpolatedIntensity;
                             }
@@ -1586,7 +1586,7 @@ namespace MASICPeakFinder
                                     out var interpolatedIntensity,
                                     scanNumbers[dataIndex - 1], scanNumbers[dataIndex],
                                     intensities[dataIndex - 1], intensities[dataIndex],
-                                    (double)scanNumberInterpolate))
+                                    scanNumberInterpolate))
                                 {
                                     moment1Sum += (scanNumberInterpolate - scanNumbers[0]) * interpolatedIntensity;
                                 }
@@ -1643,7 +1643,7 @@ namespace MASICPeakFinder
                                         out var interpolatedIntensity,
                                         scanNumbers[dataIndex - 1], scanNumbers[dataIndex],
                                         intensities[dataIndex - 1], intensities[dataIndex],
-                                        (double)scanNumberInterpolate))
+                                        scanNumberInterpolate))
                                     {
                                         moment2Sum += Math.Pow(scanNumberInterpolate - centerOfMassDecimal, 2) * interpolatedIntensity;
                                         moment3Sum += Math.Pow(scanNumberInterpolate - centerOfMassDecimal, 3) * interpolatedIntensity;
@@ -1835,7 +1835,7 @@ namespace MASICPeakFinder
                     {
                         // Compute the average
                         // Note that countSummed will be used below in the variance computation
-                        baselineNoiseStats.NoiseLevel = sum / (double)countSummed;
+                        baselineNoiseStats.NoiseLevel = sum / countSummed;
                         baselineNoiseStats.PointsUsed = countSummed;
 
                         if (countSummed > 1)
@@ -3015,7 +3015,7 @@ namespace MASICPeakFinder
             for (var index = 0; index <= dataCount - 1; index++)
                 sicData.Add(new clsSICDataPoint(0, sicIntensities[index], 0));
 
-            FindPotentialPeakArea((IList<clsSICDataPoint>)sicData, out potentialAreaStats, sicPeakFinderOptions);
+            FindPotentialPeakArea(sicData, out potentialAreaStats, sicPeakFinderOptions);
         }
 
         public void FindPotentialPeakArea(
@@ -3174,7 +3174,7 @@ namespace MASICPeakFinder
             try
             {
                 // Compute the potential peak area for this SIC
-                FindPotentialPeakArea((IList<clsSICDataPoint>)sicData, out potentialAreaStatsForPeak, sicPeakFinderOptions);
+                FindPotentialPeakArea(sicData, out potentialAreaStatsForPeak, sicPeakFinderOptions);
 
                 // See if the potential peak area for this SIC is lower than the values for the Region
                 // If so, then update the region values with this peak's values

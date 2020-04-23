@@ -1708,12 +1708,12 @@ namespace MASICBrowser
                                                 else if (char.IsUpper(scanIntervals[charIndex]))
                                                 {
                                                     // Uppercase letter
-                                                    interval = (int)scanIntervals[charIndex] - 55;
+                                                    interval = scanIntervals[charIndex] - 55;
                                                 }
                                                 else if (char.IsLower(scanIntervals[charIndex]))
                                                 {
                                                     // Lowercase letter
-                                                    interval = (int)scanIntervals[charIndex] - 61;
+                                                    interval = scanIntervals[charIndex] - 61;
                                                 }
                                                 else
                                                 {
@@ -2108,12 +2108,12 @@ namespace MASICBrowser
 
                 // For each parent ion, find the other nearby parent ions with similar m/z values
                 // Use the tolerance specified by similarIonMZToleranceHalfWidth, though with a minimum value of 0.1
-                if ((double)similarIonMZToleranceHalfWidth < 0.1)
+                if (similarIonMZToleranceHalfWidth < 0.1)
                 {
                     similarIonMZToleranceHalfWidth = 0.1F;
                 }
 
-                FindSimilarParentIon((double)(similarIonMZToleranceHalfWidth * (float)2));
+                FindSimilarParentIon(similarIonMZToleranceHalfWidth * 2);
 
                 if (eCurrentXMLDataFileSection == eCurrentXMLDataFileSectionConstants.UnknownFile)
                 {
@@ -3371,7 +3371,7 @@ namespace MASICBrowser
 
         private void txtFilterByMZTol_Validating(object sender, CancelEventArgs e)
         {
-            PRISMWin.TextBoxUtils.ValidateTextBoxFloat(txtFilterByMZTol, (float)0, (float)100000, 0.2F);
+            PRISMWin.TextBoxUtils.ValidateTextBoxFloat(txtFilterByMZTol, 0, 100000, 0.2F);
         }
 
         private void txtFixXRange_TextChanged(object sender, EventArgs e)

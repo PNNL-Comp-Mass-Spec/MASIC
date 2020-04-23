@@ -282,7 +282,7 @@ namespace MASIC.DataInput
                                         scanList.SurveyScans, 0, fragScan.ScanNumber, out var fragScanIterationOut);
                                     fragScan.FragScanInfo.FragScanNumber = fragScanIterationOut;
 
-                                    fragScan.ScanTime = (float)scanTimeInterpolated;
+                                    fragScan.ScanTime = scanTimeInterpolated;
                                 }
 
                                 break;

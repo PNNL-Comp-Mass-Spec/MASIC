@@ -2064,7 +2064,7 @@ namespace MASIC
 
         private void UpdateStatusFile(bool forceUpdate = false)
         {
-            if (forceUpdate || DateTime.UtcNow.Subtract(UpdateStatusFileLastFileWriteTime).TotalSeconds >= (double)MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS)
+            if (forceUpdate || DateTime.UtcNow.Subtract(UpdateStatusFileLastFileWriteTime).TotalSeconds >= MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS)
             {
                 UpdateStatusFileLastFileWriteTime = DateTime.UtcNow;
 
