@@ -27,7 +27,7 @@ using System.Timers;
 using System.Windows.Forms;
 using System.Xml;
 using MASICPeakFinder;
-using Microsoft.VisualBasic;
+using Microsoft.Win32;
 using OxyDataPlotter;
 using OxyPlot;
 using PRISM;
@@ -678,29 +678,38 @@ namespace MASICBrowser
             }
         }
 
-        private bool GetSettingVal(string appName, string sectionName, string key, bool defaultValue)
+        private bool GetSettingValue(RegistryKey regKey, string name, bool defaultValue)
         {
-            var value = Interaction.GetSetting(appName, sectionName, key, defaultValue.ToString());
+            var value = regKey?.GetValue(name, defaultValue.ToString())?.ToString() ?? "";
             if (bool.TryParse(value, out var parsedValue))
                 return parsedValue;
 
             return defaultValue;
         }
 
-        private int GetSettingVal(string appName, string sectionName, string key, int defaultValue)
+        private int GetSettingValue(RegistryKey regKey, string name, int defaultValue)
         {
-            var value = Interaction.GetSetting(appName, sectionName, key, defaultValue.ToString());
+            var value = regKey?.GetValue(name, defaultValue.ToString())?.ToString() ?? "";
             if (int.TryParse(value, out var parsedValue))
                 return parsedValue;
 
             return defaultValue;
         }
 
-        private float GetSettingVal(string appName, string sectionName, string key, float defaultValue)
+        private float GetSettingValue(RegistryKey regKey, string name, float defaultValue)
         {
-            var value = Interaction.GetSetting(appName, sectionName, key, defaultValue.ToString(CultureInfo.InvariantCulture));
+            var value = regKey?.GetValue(name, defaultValue.ToString(CultureInfo.InvariantCulture))?.ToString() ?? "";
             if (float.TryParse(value, out var parsedValue))
                 return parsedValue;
+
+            return defaultValue;
+        }
+
+        private string GetSettingValue(RegistryKey regKey, string name, string defaultValue)
+        {
+            var value = regKey?.GetValue(name, defaultValue)?.ToString() ?? "";
+            if (!string.IsNullOrWhiteSpace(value))
+                return value;
 
             return defaultValue;
         }
@@ -876,10 +885,20 @@ namespace MASICBrowser
                             scanNumberToFind = mParentIonStats[0].FragScanObserved;
                         }
 
-                        var response = Interaction.InputBox("Enter the scan number to jump to: ", "Jump to Scan", scanNumberToFind.ToString());
-                        if (PRISM.DataUtils.StringToValueUtils.IsNumber(response))
+                        var response = InputBox.Show("Enter the scan number to jump to: ", "Jump to Scan",
+                            scanNumberToFind.ToString(),
+                            (sender, args) =>
+                            {
+                                if (!int.TryParse(args.Text, out _))
+                                {
+                                    args.Cancel = true;
+                                    args.Message = "Input must be a whole number";
+                                }
+                            });
+
+                        if (response.OK && int.TryParse(response.Text, out var numberToFind))
                         {
-                            scanNumberToFind = int.Parse(response);
+                            scanNumberToFind = numberToFind;
                         }
                     }
 
@@ -2339,31 +2358,37 @@ namespace MASICBrowser
             // Load settings from the registry
             try
             {
-                txtDataFilePath.Text = Interaction.GetSetting(REG_APP_NAME, REG_SECTION_NAME, "DataFilePath", string.Empty);
+                var regKey = Registry.CurrentUser.OpenSubKey($"SOFTWARE\\PNNL PAST Toolkit\\{REG_APP_NAME}\\{REG_SECTION_NAME}");
+                if (regKey == null)
+                {
+                    regKey = Registry.CurrentUser.OpenSubKey($"SOFTWARE\\VB and VBA Program Settings\\{REG_APP_NAME}\\{REG_SECTION_NAME}");
+                }
 
-                Width = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeWidth", Width);
-                // Me.Height = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeHeight", Me.Height)
+                txtDataFilePath.Text = GetSettingValue(regKey, "DataFilePath", string.Empty);
+
+                Width = GetSettingValue(regKey, "WindowSizeWidth", Width);
+                // Height = GetSettingValue(regKey, "WindowSizeHeight", Height)
                 Height = 700;
 
-                Top = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowPosTop", Top);
-                Left = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "WindowPosLeft", Left);
+                Top = GetSettingValue(regKey, "WindowPosTop", Top);
+                Left = GetSettingValue(regKey, "WindowPosLeft", Left);
 
-                cboSortOrder.SelectedIndex = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "SortOrder", cboSortOrder.SelectedIndex);
-                chkSortDescending.Checked = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "SortDescending", chkSortDescending.Checked);
+                cboSortOrder.SelectedIndex = GetSettingValue(regKey, "SortOrder", cboSortOrder.SelectedIndex);
+                chkSortDescending.Checked = GetSettingValue(regKey, "SortDescending", chkSortDescending.Checked);
 
-                txtFixXRange.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", 300).ToString();
-                txtFixYRange.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", 5000000).ToString();
-                txtMinimumSignalToNoise.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", 3).ToString();
+                txtFixXRange.Text = GetSettingValue(regKey, "FixXRange", 300).ToString();
+                txtFixYRange.Text = GetSettingValue(regKey, "FixYRange", 5000000).ToString();
+                txtMinimumSignalToNoise.Text = GetSettingValue(regKey, "MinimumSignalToNoise", 3).ToString();
 
-                chkFixXRange.Checked = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FixXRangeEnabled", true);
-                chkFixYRange.Checked = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FixYRangeEnabled", false);
-                chkFilterBySignalToNoise.Checked = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterBySignalToNoise", false);
+                chkFixXRange.Checked = GetSettingValue(regKey, "FixXRangeEnabled", true);
+                chkFixYRange.Checked = GetSettingValue(regKey, "FixYRangeEnabled", false);
+                chkFilterBySignalToNoise.Checked = GetSettingValue(regKey, "FilterBySignalToNoise", false);
 
-                txtMinimumIntensity.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", 1000000).ToString();
-                txtFilterByMZ.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", (float)550).ToString(CultureInfo.InvariantCulture);
-                txtFilterByMZTol.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", (float)0.2).ToString(CultureInfo.InvariantCulture);
+                txtMinimumIntensity.Text = GetSettingValue(regKey, "MinimumIntensity", 1000000).ToString();
+                txtFilterByMZ.Text = GetSettingValue(regKey, "FilterByMZ", (float)550).ToString(CultureInfo.InvariantCulture);
+                txtFilterByMZTol.Text = GetSettingValue(regKey, "FilterByMZTol", (float)0.2).ToString(CultureInfo.InvariantCulture);
 
-                txtAutoStep.Text = GetSettingVal(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", 150).ToString();
+                txtAutoStep.Text = GetSettingValue(regKey, "AutoStepInterval", 150).ToString();
             }
             catch (Exception ex)
             {
@@ -2378,53 +2403,56 @@ namespace MASICBrowser
             {
                 if (txtDataFilePath.Text.Length > 0)
                 {
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "DatafilePath", txtDataFilePath.Text);
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeWidth", Width.ToString());
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowSizeHeight", Height.ToString());
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowPosTop", Top.ToString());
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "WindowPosLeft", Left.ToString());
+                    var regKey = Registry.CurrentUser.CreateSubKey($"SOFTWARE\\PNNL PAST Toolkit\\{REG_APP_NAME}\\{REG_SECTION_NAME}");
 
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortOrder", cboSortOrder.SelectedIndex.ToString());
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "SortDescending", chkSortDescending.Checked.ToString());
+                    regKey.SetValue("DatafilePath", txtDataFilePath.Text, RegistryValueKind.String);
+                    regKey.SetValue("DatafilePath", txtDataFilePath.Text, RegistryValueKind.String);
+                    regKey.SetValue("WindowSizeWidth", Width.ToString(), RegistryValueKind.String);
+                    regKey.SetValue("WindowSizeHeight", Height.ToString(), RegistryValueKind.String);
+                    regKey.SetValue("WindowPosTop", Top.ToString(), RegistryValueKind.String);
+                    regKey.SetValue("WindowPosLeft", Left.ToString(), RegistryValueKind.String);
+
+                    regKey.SetValue("SortOrder", cboSortOrder.SelectedIndex.ToString(), RegistryValueKind.String);
+                    regKey.SetValue("SortDescending", chkSortDescending.Checked.ToString(), RegistryValueKind.String);
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixXRange.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRange", int.Parse(txtFixXRange.Text).ToString());
+                        regKey.SetValue("FixXRange", int.Parse(txtFixXRange.Text).ToString(), RegistryValueKind.String);
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFixYRange.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRange", long.Parse(txtFixYRange.Text).ToString());
+                      regKey.SetValue("FixYRange", long.Parse(txtFixYRange.Text).ToString(), RegistryValueKind.String);
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumSignalToNoise.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumSignalToNoise", float.Parse(txtMinimumSignalToNoise.Text).ToString(CultureInfo.InvariantCulture));
+                      regKey.SetValue("MinimumSignalToNoise", float.Parse(txtMinimumSignalToNoise.Text).ToString(CultureInfo.InvariantCulture), RegistryValueKind.String);
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "MinimumIntensity", int.Parse(txtMinimumIntensity.Text).ToString());
+                      regKey.SetValue("MinimumIntensity", int.Parse(txtMinimumIntensity.Text).ToString(), RegistryValueKind.String);
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFilterByMZ.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZ", float.Parse(txtFilterByMZ.Text).ToString(CultureInfo.InvariantCulture));
+                      regKey.SetValue("FilterByMZ", float.Parse(txtFilterByMZ.Text).ToString(CultureInfo.InvariantCulture), RegistryValueKind.String);
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtFilterByMZTol.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterByMZTol", float.Parse(txtFilterByMZTol.Text).ToString(CultureInfo.InvariantCulture));
+                      regKey.SetValue("FilterByMZTol", float.Parse(txtFilterByMZTol.Text).ToString(CultureInfo.InvariantCulture), RegistryValueKind.String);
                     }
 
                     if (PRISM.DataUtils.StringToValueUtils.IsNumber(txtAutoStep.Text))
                     {
-                        Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "AutoStepInterval", int.Parse(txtAutoStep.Text).ToString());
+                      regKey.SetValue("AutoStepInterval", int.Parse(txtAutoStep.Text).ToString(), RegistryValueKind.String);
                     }
 
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixXRangeEnabled", chkFixXRange.Checked.ToString());
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FixYRangeEnabled", chkFixYRange.Checked.ToString());
-                    Interaction.SaveSetting(REG_APP_NAME, REG_SECTION_NAME, "FilterBySignalToNoise", chkFilterBySignalToNoise.Checked.ToString());
+                  regKey.SetValue("FixXRangeEnabled", chkFixXRange.Checked.ToString(), RegistryValueKind.String);
+                  regKey.SetValue("FixYRangeEnabled", chkFixYRange.Checked.ToString(), RegistryValueKind.String);
+                  regKey.SetValue("FilterBySignalToNoise", chkFilterBySignalToNoise.Checked.ToString(), RegistryValueKind.String);
                 }
             }
             catch (Exception ex)
@@ -3055,14 +3083,7 @@ namespace MASICBrowser
             //mSICPeakFinderOptions.InitialPeakWidthScansScaler =
             //mSICPeakFinderOptions.InitialPeakWidthScansMaximum =
 
-            if (optDoNotResmooth.Checked)
-            {
-                mSICPeakFinderOptions.FindPeaksOnSmoothedData = false;
-            }
-            else
-            {
-                mSICPeakFinderOptions.FindPeaksOnSmoothedData = true;
-            }
+            mSICPeakFinderOptions.FindPeaksOnSmoothedData = !optDoNotResmooth.Checked;
 
             //mSICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth =
             if (optUseSavitzkyGolaySmooth.Checked)
@@ -3077,6 +3098,7 @@ namespace MASICBrowser
                 mSICPeakFinderOptions.UseSavitzkyGolaySmooth = false;
                 mSICPeakFinderOptions.ButterworthSamplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, "", out _, 0.25F);
             }
+
             //mSICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData =
 
             //var msNoiseThresholdOpts = mSICPeakFinderOptions.MassSpectraNoiseThresholdOptions;
@@ -3126,14 +3148,12 @@ namespace MASICBrowser
                         filterThirdWidth -= 1;
                     }
 
-                    var errorMessage = "";
-
                     // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
                     // Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
                     objFilter.SavitzkyGolayFilter(intensities,
                                                   0, currentParentIon.SICData.Count - 1,
                                                   filterThirdWidth, filterThirdWidth,
-                                                  (short)savitzkyGolayFilterOrder, out errorMessage, true);
+                                                  (short)savitzkyGolayFilterOrder, out _, true);
                 }
                 else
                 {
@@ -3437,7 +3457,8 @@ namespace MASICBrowser
         {
             if (char.IsControl(e.KeyChar))
             {
-                switch (Strings.Asc(e.KeyChar))
+                // See http://www.physics.udel.edu/~watson/scen103/ascii.html for reference
+                switch ((int)e.KeyChar)
                 {
                     case 3:
                         // Ctrl+C; allow copy
@@ -3463,7 +3484,8 @@ namespace MASICBrowser
         {
             if (char.IsControl(e.KeyChar))
             {
-                switch (Strings.Asc(e.KeyChar))
+                // See http://www.physics.udel.edu/~watson/scen103/ascii.html for reference
+                switch ((int)e.KeyChar)
                 {
                     case 3:
                         // Ctrl+C; allow copy
@@ -3489,7 +3511,8 @@ namespace MASICBrowser
         {
             if (char.IsControl(e.KeyChar))
             {
-                switch (Strings.Asc(e.KeyChar))
+                // See http://www.physics.udel.edu/~watson/scen103/ascii.html for reference
+                switch ((int)e.KeyChar)
                 {
                     case 3:
                         // Ctrl+C; allow copy

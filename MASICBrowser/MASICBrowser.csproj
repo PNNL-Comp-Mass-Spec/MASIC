@@ -46,7 +46,6 @@
       <Name>DataFilter</Name>
       <HintPath>..\lib\DataFilter.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="OxyDataPlotter">
       <HintPath>..\Lib\OxyDataPlotter.dll</HintPath>
     </Reference>
@@ -70,6 +69,9 @@
     <Compile Include="frmBrowser.Designer.cs">
       <DependentUpon>frmBrowser.cs</DependentUpon>
     </Compile>
+    <Compile Include="InputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -79,6 +81,10 @@
   <ItemGroup>
     <EmbeddedResource Include="frmBrowser.resx">
       <DependentUpon>frmBrowser.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InputBox.resx">
+      <DependentUpon>InputBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

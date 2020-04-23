@@ -36,6 +36,7 @@ namespace MASICBrowser
         /// </summary>
         private void InitializeComponent()
         {
+            components = new Container();
             lblParentIon = new Label();
             txtDataFilePath = new TextBox();
             cmdSelectFile = new Button();
