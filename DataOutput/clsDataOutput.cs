@@ -117,18 +117,18 @@ namespace MASIC.DataOutput
 
                     // If we get here, the file opened successfully
                     var rootElement = xmlDoc.DocumentElement;
-                    if ((rootElement.Name ?? "") == "SICData")
+                    if (rootElement.Name == "SICData")
                     {
                         // See if the ProcessingComplete node has a value of True
                         var matchingNodeList = rootElement.GetElementsByTagName("ProcessingComplete");
-                        if (matchingNodeList == null || matchingNodeList.Count != 1)
+                        if (matchingNodeList.Count != 1)
                             return false;
-                        if ((matchingNodeList.Item(0).InnerText.ToLower() ?? "") != "true")
+                        if (matchingNodeList.Item(0).InnerText.ToLower() != "true")
                             return false;
 
                         // Read the ProcessingSummary and populate
                         matchingNodeList = rootElement.GetElementsByTagName("ProcessingSummary");
-                        if (matchingNodeList == null || matchingNodeList.Count != 1)
+                        if (matchingNodeList.Count != 1)
                             return false;
 
                         foreach (System.Xml.XmlNode valueNode in matchingNodeList[0].ChildNodes)

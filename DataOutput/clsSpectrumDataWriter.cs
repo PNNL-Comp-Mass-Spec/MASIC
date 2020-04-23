@@ -102,7 +102,7 @@ namespace MASIC.DataOutput
                     }
                 }
 
-                dataWriter?.Close();
+                dataWriter.Close();
                 scanInfoWriter?.Close();
 
                 return true;

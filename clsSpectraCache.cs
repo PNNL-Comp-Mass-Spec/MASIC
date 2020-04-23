@@ -383,14 +383,11 @@ namespace MASIC
 
                 var cacheDirectory = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())));
 
-                if (cacheDirectory != null)
+                foreach (var candidateFile in cacheDirectory.GetFiles(filePathMatch))
                 {
-                    foreach (var candidateFile in cacheDirectory.GetFiles(filePathMatch))
+                    if (candidateFile.LastWriteTimeUtc < fileDateTolerance)
                     {
-                        if (candidateFile.LastWriteTimeUtc < fileDateTolerance)
-                        {
-                            candidateFile.Delete();
-                        }
+                        candidateFile.Delete();
                     }
                 }
             }

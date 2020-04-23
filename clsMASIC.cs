@@ -1431,10 +1431,7 @@ namespace MASIC
                 ShowErrorMessage(source + ": " + messageWithoutCRLF, true);
             }
 
-            if (ex != null)
-            {
-                Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
-            }
+            Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
 
             if (eNewErrorCode != eMasicErrorCodes.NoError)
             {

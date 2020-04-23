@@ -111,7 +111,7 @@ namespace MASIC.DataInput
 
                         var dataCols = dataLine.Split(delimiterList);
 
-                        if (dataCols == null || dataCols.Length <= 0)
+                        if (dataCols.Length <= 0)
                             continue;
 
                         // This is the first non-blank line

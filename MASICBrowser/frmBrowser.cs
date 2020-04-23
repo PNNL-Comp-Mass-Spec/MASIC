@@ -956,7 +956,7 @@ namespace MASICBrowser
                     {
                         var objSeqRows = mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Select(COL_NAME_SEQUENCE_ID + " = " + sequenceID);
 
-                        if (objSeqRows != null && objSeqRows.Length > 0)
+                        if (objSeqRows.Length > 0)
                         {
                             if (sequenceCount > 0)
                             {
@@ -1236,7 +1236,7 @@ namespace MASICBrowser
                         dataCountSeries1 += 1;
                     }
 
-                    if (index >= smoothedYDataIndexStart && smoothedYData != null &&
+                    if (index >= smoothedYDataIndexStart &&
                         index - smoothedYDataIndexStart < smoothedYData.Length)
                     {
                         xDataSeries4[dataCountSeries4] = currentParentIon.SICData[index].ScanNumber;

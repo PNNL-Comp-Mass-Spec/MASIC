@@ -49,10 +49,7 @@ namespace MASIC.DataInput
 
             var chargeState = 0;
 
-            var chargeStateText = string.Empty;
-            var isolationWidthText = string.Empty;
-
-            scanInfo.TryGetScanEvent(SCAN_EVENT_CHARGE_STATE, out chargeStateText, true);
+            scanInfo.TryGetScanEvent(SCAN_EVENT_CHARGE_STATE, out var chargeStateText, true);
             if (!string.IsNullOrWhiteSpace(chargeStateText))
             {
                 if (!int.TryParse(chargeStateText, out chargeState))
@@ -61,7 +58,7 @@ namespace MASIC.DataInput
                 }
             }
 
-            if (!scanInfo.TryGetScanEvent(SCAN_EVENT_MS2_ISOLATION_WIDTH, out isolationWidthText, true))
+            if (!scanInfo.TryGetScanEvent(SCAN_EVENT_MS2_ISOLATION_WIDTH, out var isolationWidthText, true))
             {
                 if (scanInfo.MRMScanType == MRMScanTypeConstants.SRM)
                 {
@@ -93,8 +90,7 @@ namespace MASIC.DataInput
             {
                 // ThermoRawFileReader could not determine the parent ion m/z value (this is highly unlikely)
                 // Use scan event "Monoisotopic M/Z" instead
-                var monoMzText = string.Empty;
-                if (!scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, out monoMzText, true))
+                if (!scanInfo.TryGetScanEvent(SCAN_EVENT_MONOISOTOPIC_MZ, out var monoMzText, true))
                 {
                     ReportWarning("Could not determine the parent ion m/z value (" + SCAN_EVENT_MONOISOTOPIC_MZ + "); " +
                                   "cannot compute interference for scan " + scanInfo.ScanNumber);
@@ -741,8 +737,6 @@ namespace MASIC.DataInput
             int datasetID,
             XRawFileIO xcaliburAccessor)
         {
-            var scanInfo = new ThermoRawFileReader.clsScanInfo(0);
-
             // Read the file info from the file system
             var success = UpdateDatasetFileStats(rawFileInfo, datasetID);
 
@@ -764,7 +758,7 @@ namespace MASIC.DataInput
             {
                 // Look up the end scan time then compute .AcqTimeEnd
                 var scanEnd = xcaliburAccessor.ScanEnd;
-                xcaliburAccessor.GetScanInfo(scanEnd, out scanInfo);
+                xcaliburAccessor.GetScanInfo(scanEnd, out ThermoRawFileReader.clsScanInfo scanInfo);
 
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanInfo.RetentionTime);
                 mDatasetFileInfo.ScanCount = xcaliburAccessor.GetNumScans();

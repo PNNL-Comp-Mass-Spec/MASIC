@@ -901,8 +901,6 @@ namespace MASIC
                     out var potentialAreaStatsInFullSIC,
                     masicOptions.SICOptions.SICPeakFinderOptions);
 
-                clsSICPotentialAreaStats potentialAreaStatsForPeak = null;
-
                 var scanIndexObservedInFullSIC = mzSearchChunk[mzIndexWork].ScanIndexMax;
 
                 // Initialize sicDetails
@@ -922,7 +920,6 @@ namespace MASIC
 
                 UpdateSICStatsUsingLargestPeak(
                     sicDetails,
-                    potentialAreaStatsForPeak,
                     sicPeak,
                     masicOptions,
                     potentialAreaStatsInFullSIC,
@@ -1063,7 +1060,6 @@ namespace MASIC
 
         private void UpdateSICStatsUsingLargestPeak(
             clsSICDetails sicDetails,
-            clsSICPotentialAreaStats potentialAreaStatsForPeak,
             clsSICStatsPeak sicPeak,
             clsMASICOptions masicOptions,
             clsSICPotentialAreaStats potentialAreaStatsInFullSIC,
@@ -1080,7 +1076,7 @@ namespace MASIC
             // Find the largest peak in the SIC for this m/z
             var largestPeakFound = mMASICPeakFinder.FindSICPeakAndArea(
                 sicDetails.SICData,
-                out potentialAreaStatsForPeak, sicPeak,
+                out var potentialAreaStatsForPeak, sicPeak,
                 out var smoothedYDataSubset, masicOptions.SICOptions.SICPeakFinderOptions,
                 potentialAreaStatsInFullSIC,
                 true, scanList.SIMDataPresent, false);

@@ -415,8 +415,6 @@ namespace MASIC.DatasetStats
                 }
                 else
                 {
-                    summaryStats = new DatasetSummaryStats();
-
                     // Parse the data in scanStats to compute the bulk values
                     ComputeScanStatsSummary(scanStats, out summaryStats);
                 }
@@ -776,8 +774,6 @@ namespace MASIC.DatasetStats
                 }
                 else
                 {
-                    summaryStats = new DatasetSummaryStats();
-
                     // Parse the data in scanStats to compute the bulk values
                     var summarySuccess = ComputeScanStatsSummary(scanStats, out summaryStats);
                     if (!summarySuccess)

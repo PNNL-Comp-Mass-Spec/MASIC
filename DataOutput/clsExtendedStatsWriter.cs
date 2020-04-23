@@ -155,8 +155,6 @@ namespace MASIC.DataOutput
         {
             var cTrimChars = new char[] { ':', ' ' };
 
-            var value = string.Empty;
-
             // Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
             Dictionary<int, string> consolidatedValuesByID;
 
@@ -217,7 +215,7 @@ namespace MASIC.DataOutput
                 {
                     foreach (var dataItem in surveyScan.ExtendedHeaderInfo)
                     {
-                        if (consolidatedValuesByID.TryGetValue(dataItem.Key, out value))
+                        if (consolidatedValuesByID.TryGetValue(dataItem.Key, out var value))
                         {
                             if (string.Equals(value, dataItem.Value))
                             {
@@ -241,7 +239,7 @@ namespace MASIC.DataOutput
                 {
                     foreach (var item in fragScan.ExtendedHeaderInfo)
                     {
-                        if (consolidatedValuesByID.TryGetValue(item.Key, out value))
+                        if (consolidatedValuesByID.TryGetValue(item.Key, out var value))
                         {
                             if (string.Equals(value, item.Value))
                             {
@@ -257,7 +255,7 @@ namespace MASIC.DataOutput
                 }
             }
 
-            if (consolidatedValuesByID == null || consolidatedValuesByID.Count == 0)
+            if (consolidatedValuesByID.Count == 0)
             {
                 return string.Empty;
             }
