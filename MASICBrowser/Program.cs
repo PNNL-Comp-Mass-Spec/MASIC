@@ -28,6 +28,7 @@ namespace MASICBrowser
 
         private static string mInputFilePath;
 
+        [STAThread]
         public static int Main()
         {
             // Returns 0 if no error, error code if an error
