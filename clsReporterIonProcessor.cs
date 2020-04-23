@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using MASIC.DataOutput;
@@ -571,12 +570,12 @@ namespace MASIC
             writer.WriteLine(string.Join(delimiter.ToString(), dataColumns));
         }
 
-        protected class clsReportIonInfoComparer : IComparer
+        protected class clsReportIonInfoComparer : IComparer<clsReporterIonInfo>
         {
-            public int Compare(object x, object y)
+            public int Compare(clsReporterIonInfo x, clsReporterIonInfo y)
             {
-                var reporterIonInfoA = (clsReporterIonInfo)x;
-                var reporterIonInfoB = (clsReporterIonInfo)y;
+                var reporterIonInfoA = x;
+                var reporterIonInfoB = y;
 
                 if (reporterIonInfoA.MZ > reporterIonInfoB.MZ)
                 {

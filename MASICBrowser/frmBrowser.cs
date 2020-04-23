@@ -15,7 +15,6 @@
 // https://opensource.org/licenses/BSD-2-Clause
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -1454,7 +1453,7 @@ namespace MASICBrowser
             // Construct a mapping between .FragScanObserved and Index in mParentIonStats
             // If multiple parent ions have the same value for .FragScanObserved, then the we will only track the mapping to the first one
 
-            var htFragScanToIndex = new Hashtable();
+            var htFragScanToIndex = new Dictionary<int, int>();
 
             for (var index = 0; index <= mParentIonStats.Count - 1; index++)
             {
@@ -1466,9 +1465,9 @@ namespace MASICBrowser
 
             foreach (DataRow objRow in mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].Rows)
             {
-                if (htFragScanToIndex.Contains(objRow[COL_NAME_SCAN]))
+                if (htFragScanToIndex.TryGetValue((int)objRow[COL_NAME_SCAN], out var value))
                 {
-                    objRow[COL_NAME_PARENT_ION_INDEX] = htFragScanToIndex[objRow[COL_NAME_SCAN]];
+                    objRow[COL_NAME_PARENT_ION_INDEX] = value;
                 }
             }
         }

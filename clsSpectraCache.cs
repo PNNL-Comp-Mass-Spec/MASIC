@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 namespace MASIC
@@ -87,8 +87,8 @@ namespace MASIC
         private int mMaximumPoolLength;
         private int mNextAvailablePoolIndex;
 
-        private Hashtable mSpectrumIndexInPool;
-        private Hashtable mSpectrumByteOffset;         // Records the byte offset of the data in the page file for a given scan number
+        private Dictionary<int, int> mSpectrumIndexInPool;
+        private Dictionary<int, long> mSpectrumByteOffset;         // Records the byte offset of the data in the page file for a given scan number
 
         #endregion
 
@@ -154,10 +154,10 @@ namespace MASIC
             {
                 int targetPoolIndex;
 
-                if (mSpectrumIndexInPool.Contains(scanNumber))
+                if (mSpectrumIndexInPool.ContainsKey(scanNumber))
                 {
                     // Replace the spectrum data with objMSSpectrum
-                    targetPoolIndex = (int)mSpectrumIndexInPool[scanNumber];
+                    targetPoolIndex = mSpectrumIndexInPool[scanNumber];
                 }
                 else
                 {
@@ -208,7 +208,7 @@ namespace MASIC
                 {
                     // See if the given spectrum is already present in the page file
                     var scanNumber = SpectraPool[poolIndexToCache].ScanNumber;
-                    if (mSpectrumByteOffset.Contains(scanNumber))
+                    if (mSpectrumByteOffset.ContainsKey(scanNumber))
                     {
                         // Page file already contains the given scan; do not re-write
                     }
@@ -315,7 +315,7 @@ namespace MASIC
 
             if (mSpectrumByteOffset == null)
             {
-                mSpectrumByteOffset = new Hashtable();
+                mSpectrumByteOffset = new Dictionary<int, long>();
             }
             else
             {
@@ -465,7 +465,7 @@ namespace MASIC
 
             if (mSpectrumIndexInPool == null)
             {
-                mSpectrumIndexInPool = new Hashtable();
+                mSpectrumIndexInPool = new Dictionary<int, int>();
             }
             else
             {
@@ -540,9 +540,9 @@ namespace MASIC
             {
                 // Lookup the byte offset for the given spectrum
 
-                if (mSpectrumByteOffset.Contains(scanNumber))
+                if (mSpectrumByteOffset.ContainsKey(scanNumber))
                 {
-                    var byteOffset = (long)(mSpectrumByteOffset[scanNumber]);
+                    var byteOffset = mSpectrumByteOffset[scanNumber];
 
                     // Make sure all previous spectra are flushed to disk
                     mPageFileWriter.Flush();
@@ -601,7 +601,7 @@ namespace MASIC
 
             SpectraPoolInfo[targetPoolIndex].CacheState = eCacheStateConstants.LoadedFromCache;
 
-            if (mSpectrumIndexInPool.Contains(scanNumber))
+            if (mSpectrumIndexInPool.ContainsKey(scanNumber))
             {
                 mSpectrumIndexInPool[scanNumber] = targetPoolIndex;
             }
@@ -718,9 +718,9 @@ namespace MASIC
         {
             try
             {
-                if (mSpectrumIndexInPool.Contains(scanNumber))
+                if (mSpectrumIndexInPool.ContainsKey(scanNumber))
                 {
-                    poolIndex = (int)(mSpectrumIndexInPool[scanNumber]);
+                    poolIndex = mSpectrumIndexInPool[scanNumber];
                     return true;
                 }
 
