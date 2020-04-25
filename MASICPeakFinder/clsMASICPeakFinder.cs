@@ -19,7 +19,8 @@ namespace MASICPeakFinder
     public class clsMASICPeakFinder : PRISM.EventNotifier
     {
         #region "Constants and Enums"
-        public string PROGRAM_DATE = "May 23, 2019";
+
+        public string PROGRAM_DATE = "April 24, 2020";
 
         public const int MINIMUM_PEAK_WIDTH = 3;                         // Width in points
 
