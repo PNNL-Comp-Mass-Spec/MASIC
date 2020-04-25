@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace MASIC
 {
@@ -29,9 +28,11 @@ namespace MASIC
             ABSciex = 0,
             BroadInstitute = 1          // Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
         }
+
         #endregion
 
         #region "Structures"
+
         private struct udtIsotopeContributionType
         {
             public float Minus2;
@@ -45,14 +46,15 @@ namespace MASIC
                 return string.Format("{0:F2}  {1:F2}  {2:F2}  {3:F2}  {4:F2}", Minus2, Minus1, Zero, Plus1, Plus2);
             }
         }
+
         #endregion
 
         #region "Classwide Variables"
-        private clsReporterIons.eReporterIonMassModeConstants mReporterIonMode;
 
-        private eCorrectionFactorsiTRAQ4Plex mITraq4PlexCorrectionFactorType;
-
-        // Matrix of coefficients, derived from the isotope contribution table
+        /// <summary>
+        /// Matrix of coefficients, derived from the isotope contribution table
+        /// </summary>
+        // ReSharper disable once IdentifierTypo
         private double[,] mCoeffs;
 
         private readonly MatrixDecompositionUtility.LUDecomposition mMatrixUtility;
@@ -61,9 +63,9 @@ namespace MASIC
 
         #region "Properties"
 
-        public clsReporterIons.eReporterIonMassModeConstants ReporterIonMode => mReporterIonMode;
+        public clsReporterIons.eReporterIonMassModeConstants ReporterIonMode { get; private set; }
 
-        public eCorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType => mITraq4PlexCorrectionFactorType;
+        public eCorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType { get; private set; }
 
         #endregion
 
@@ -85,12 +87,12 @@ namespace MASIC
         /// <remarks>The iTraqCorrectionFactorType parameter is only used if eReporterIonMode is ITraqFourMZ</remarks>
         public clsITraqIntensityCorrection(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode, eCorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
-            mReporterIonMode = eReporterIonMode;
-            mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
+            ReporterIonMode = eReporterIonMode;
+            ITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
 
             mMatrixUtility = new MatrixDecompositionUtility.LUDecomposition();
 
-            if (mReporterIonMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
+            if (ReporterIonMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
             {
                 return;
             }
@@ -104,7 +106,7 @@ namespace MASIC
         /// <param name="eReporterIonMode"></param>
         public void UpdateReporterIonMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode)
         {
-            UpdateReporterIonMode(eReporterIonMode, mITraq4PlexCorrectionFactorType);
+            UpdateReporterIonMode(eReporterIonMode, ITraq4PlexCorrectionFactorType);
         }
 
         /// <summary>
@@ -114,10 +116,10 @@ namespace MASIC
         /// <param name="iTraqCorrectionFactorType"></param>
         public void UpdateReporterIonMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode, eCorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
-            if (mReporterIonMode != eReporterIonMode || mITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
+            if (ReporterIonMode != eReporterIonMode || ITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
             {
-                mReporterIonMode = eReporterIonMode;
-                mITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
+                ReporterIonMode = eReporterIonMode;
+                ITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
                 InitializeCoefficients(true);
             }
         }
@@ -157,8 +159,8 @@ namespace MASIC
         /// <returns></returns>
         public bool ApplyCorrection(double[] reporterIonIntensities, bool debugShowIntensities = false)
         {
-            var matrixSize = GetMatrixLength(mReporterIonMode);
-            var eReporterIonMode = clsReporterIons.GetReporterIonModeDescription(mReporterIonMode);
+            var matrixSize = GetMatrixLength(ReporterIonMode);
+            var eReporterIonMode = clsReporterIons.GetReporterIonModeDescription(ReporterIonMode);
 
             if (reporterIonIntensities.Length != matrixSize)
             {
@@ -280,13 +282,13 @@ namespace MASIC
             udtIsotopeContributionType udtIsoPct133C;
             udtIsotopeContributionType udtIsoPct134N;
 
-            var matrixSize = GetMatrixLength(mReporterIonMode);
+            var matrixSize = GetMatrixLength(ReporterIonMode);
             var maxIndex = matrixSize - 1;
 
-            switch (mReporterIonMode)
+            switch (ReporterIonMode)
             {
                 case clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ:
-                    if (mITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.ABSciex)
+                    if (ITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.ABSciex)
                     {
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Applied Biosystems
@@ -296,7 +298,7 @@ namespace MASIC
                         udtIsoPct116 = this.DefineIsotopeContribution(0, 3, 92.4F, 4.5F, 0.1F);
                         udtIsoPct117 = this.DefineIsotopeContribution(0.1F, 4, 92.3F, 3.5F, 0.1F);
                     }
-                    else if (mITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.BroadInstitute)
+                    else if (ITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.BroadInstitute)
                     {
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
@@ -308,7 +310,7 @@ namespace MASIC
                     }
                     else
                     {
-                        throw new ArgumentOutOfRangeException(nameof(mITraq4PlexCorrectionFactorType), "Unrecognized value for the iTRAQ 4 plex correction type");
+                        throw new ArgumentOutOfRangeException(nameof(ITraq4PlexCorrectionFactorType), "Unrecognized value for the iTRAQ 4 plex correction type");
                     }
 
                     // Goal is to generate either of these two matrices (depending on mITraq4PlexCorrectionFactorType):
@@ -859,7 +861,7 @@ namespace MASIC
             {
                 // Print out the matrix
                 Console.WriteLine();
-                Console.WriteLine("Reporter Ion Correction Matrix; mode = " + mReporterIonMode.ToString());
+                Console.WriteLine("Reporter Ion Correction Matrix; mode = " + ReporterIonMode.ToString());
                 for (var i = 0; i <= maxIndex; i++)
                 {
                     if (i == 0)

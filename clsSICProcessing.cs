@@ -117,24 +117,21 @@ namespace MASIC
                 {
                     return true;
                 }
-                else
-                {
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.NoParentIonsFoundInInputFile);
-                    return false;
-                }
+
+                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.NoParentIonsFoundInInputFile);
+                return false;
             }
-            else if (scanList.SurveyScans.Count <= 0)
+
+            if (scanList.SurveyScans.Count <= 0)
             {
                 // No survey scans
                 if (masicOptions.SuppressNoParentIonsError)
                 {
                     return true;
                 }
-                else
-                {
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.NoSurveyScansFoundInInputFile);
-                    return false;
-                }
+
+                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.NoSurveyScansFoundInInputFile);
+                return false;
             }
 
             try
@@ -380,6 +377,8 @@ namespace MASIC
                                 // Require a minimum distance of InitialPeakWidthScansMaximum data points to the left of scanIndexObservedInFullSIC and to the left of scanIndexMax
                                 if (scanIndexObservedInFullSIC - scanIndexStart < sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
                                     leftDone = false;
+
+
                                 if (scanIndexMax - scanIndexStart < sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
                                     leftDone = false;
 
@@ -395,6 +394,7 @@ namespace MASIC
 
                             if (!leftDone)
                             {
+                                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                                 if (scanIndexStart == 0)
                                 {
                                     leftDone = true;
@@ -819,7 +819,7 @@ namespace MASIC
 
                     var ionSum = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex],
                                                                       current.SearchMZ, mzToleranceDa,
-                                                                      out var ionMatchCount, out var closestMZ, false);
+                                                                      out _, out var closestMZ, false);
 
                     var dataIndex = fullSICDataCount[mzIndexWork];
                     fullSICScanIndices[mzIndexWork, dataIndex] = surveyScanIndex;

@@ -1003,7 +1003,7 @@ namespace MagnitudeConcavityPeakFinder
             }
             else
             {
-                success = SmoothDataSavitkyGolay(smoothedYData, dataCount, peakFinderOptions, peakWidthPointsMinimum, out errorMessage);
+                success = SmoothDataSavitzkyGolay(smoothedYData, dataCount, peakFinderOptions, peakWidthPointsMinimum, out errorMessage);
             }
 
             return success;
@@ -1054,7 +1054,7 @@ namespace MagnitudeConcavityPeakFinder
             return true;
         }
 
-        private bool SmoothDataSavitkyGolay(
+        private bool SmoothDataSavitzkyGolay(
             double[] smoothedYData,
             int dataCount,
             udtSICPeakFinderOptionsType peakFinderOptions,

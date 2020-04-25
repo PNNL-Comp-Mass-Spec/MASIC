@@ -132,9 +132,9 @@ namespace MASICBrowser
             // 
             // lblParentIon
             // 
-            this.lblParentIon.Location = new System.Drawing.Point(8, 8);
+            this.lblParentIon.Location = new System.Drawing.Point(10, 9);
             this.lblParentIon.Name = "lblParentIon";
-            this.lblParentIon.Size = new System.Drawing.Size(152, 16);
+            this.lblParentIon.Size = new System.Drawing.Size(182, 19);
             this.lblParentIon.TabIndex = 2;
             this.lblParentIon.Text = "Parent Ion SIC to View";
             // 
@@ -142,35 +142,35 @@ namespace MASICBrowser
             // 
             this.txtDataFilePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDataFilePath.Location = new System.Drawing.Point(96, 10);
+            this.txtDataFilePath.Location = new System.Drawing.Point(115, 12);
             this.txtDataFilePath.Name = "txtDataFilePath";
-            this.txtDataFilePath.Size = new System.Drawing.Size(465, 20);
+            this.txtDataFilePath.Size = new System.Drawing.Size(581, 22);
             this.txtDataFilePath.TabIndex = 1;
             this.txtDataFilePath.Text = "D:\\";
             // 
             // cmdSelectFile
             // 
-            this.cmdSelectFile.Location = new System.Drawing.Point(8, 8);
+            this.cmdSelectFile.Location = new System.Drawing.Point(10, 9);
             this.cmdSelectFile.Name = "cmdSelectFile";
-            this.cmdSelectFile.Size = new System.Drawing.Size(80, 24);
+            this.cmdSelectFile.Size = new System.Drawing.Size(96, 28);
             this.cmdSelectFile.TabIndex = 0;
             this.cmdSelectFile.Text = "&Select File";
             this.cmdSelectFile.Click += new System.EventHandler(this.cmdSelectFile_Click);
             // 
             // lblSortOrder
             // 
-            this.lblSortOrder.Location = new System.Drawing.Point(8, 8);
+            this.lblSortOrder.Location = new System.Drawing.Point(10, 9);
             this.lblSortOrder.Name = "lblSortOrder";
-            this.lblSortOrder.Size = new System.Drawing.Size(88, 16);
+            this.lblSortOrder.Size = new System.Drawing.Size(105, 19);
             this.lblSortOrder.TabIndex = 0;
             this.lblSortOrder.Text = "Sort Order";
             // 
             // cboSortOrder
             // 
             this.cboSortOrder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboSortOrder.Location = new System.Drawing.Point(8, 28);
+            this.cboSortOrder.Location = new System.Drawing.Point(10, 32);
             this.cboSortOrder.Name = "cboSortOrder";
-            this.cboSortOrder.Size = new System.Drawing.Size(264, 21);
+            this.cboSortOrder.Size = new System.Drawing.Size(316, 24);
             this.cboSortOrder.TabIndex = 1;
             this.cboSortOrder.SelectedIndexChanged += new System.EventHandler(this.cboSortOrder_SelectedIndexChanged);
             // 
@@ -178,18 +178,18 @@ namespace MASICBrowser
             // 
             this.chkFixXRange.Checked = true;
             this.chkFixXRange.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkFixXRange.Location = new System.Drawing.Point(8, 64);
+            this.chkFixXRange.Location = new System.Drawing.Point(10, 74);
             this.chkFixXRange.Name = "chkFixXRange";
-            this.chkFixXRange.Size = new System.Drawing.Size(88, 16);
+            this.chkFixXRange.Size = new System.Drawing.Size(105, 18);
             this.chkFixXRange.TabIndex = 2;
             this.chkFixXRange.Text = "Fix X Range";
             this.chkFixXRange.CheckedChanged += new System.EventHandler(this.chkFixXRange_CheckedChanged);
             // 
             // txtFixXRange
             // 
-            this.txtFixXRange.Location = new System.Drawing.Point(128, 64);
+            this.txtFixXRange.Location = new System.Drawing.Point(154, 74);
             this.txtFixXRange.Name = "txtFixXRange";
-            this.txtFixXRange.Size = new System.Drawing.Size(72, 20);
+            this.txtFixXRange.Size = new System.Drawing.Size(86, 22);
             this.txtFixXRange.TabIndex = 3;
             this.txtFixXRange.Text = "300";
             this.txtFixXRange.TextChanged += new System.EventHandler(this.txtFixXRange_TextChanged);
@@ -197,25 +197,25 @@ namespace MASICBrowser
             // 
             // lblFixXRange
             // 
-            this.lblFixXRange.Location = new System.Drawing.Point(200, 68);
+            this.lblFixXRange.Location = new System.Drawing.Point(240, 78);
             this.lblFixXRange.Name = "lblFixXRange";
-            this.lblFixXRange.Size = new System.Drawing.Size(46, 16);
+            this.lblFixXRange.Size = new System.Drawing.Size(55, 19);
             this.lblFixXRange.TabIndex = 4;
             this.lblFixXRange.Text = "scans";
             // 
             // lblMinimumIntensity
             // 
-            this.lblMinimumIntensity.Location = new System.Drawing.Point(200, 140);
+            this.lblMinimumIntensity.Location = new System.Drawing.Point(240, 162);
             this.lblMinimumIntensity.Name = "lblMinimumIntensity";
-            this.lblMinimumIntensity.Size = new System.Drawing.Size(46, 16);
+            this.lblMinimumIntensity.Size = new System.Drawing.Size(55, 18);
             this.lblMinimumIntensity.TabIndex = 12;
             this.lblMinimumIntensity.Text = "counts";
             // 
             // txtMinimumIntensity
             // 
-            this.txtMinimumIntensity.Location = new System.Drawing.Point(144, 136);
+            this.txtMinimumIntensity.Location = new System.Drawing.Point(173, 157);
             this.txtMinimumIntensity.Name = "txtMinimumIntensity";
-            this.txtMinimumIntensity.Size = new System.Drawing.Size(56, 20);
+            this.txtMinimumIntensity.Size = new System.Drawing.Size(67, 22);
             this.txtMinimumIntensity.TabIndex = 11;
             this.txtMinimumIntensity.Text = "1000000";
             this.txtMinimumIntensity.Leave += new System.EventHandler(this.txtMinimumIntensity_Leave);
@@ -223,9 +223,9 @@ namespace MASICBrowser
             // 
             // chkFilterByIntensity
             // 
-            this.chkFilterByIntensity.Location = new System.Drawing.Point(8, 136);
+            this.chkFilterByIntensity.Location = new System.Drawing.Point(10, 157);
             this.chkFilterByIntensity.Name = "chkFilterByIntensity";
-            this.chkFilterByIntensity.Size = new System.Drawing.Size(144, 16);
+            this.chkFilterByIntensity.Size = new System.Drawing.Size(172, 18);
             this.chkFilterByIntensity.TabIndex = 10;
             this.chkFilterByIntensity.Text = "Minimum Intensity";
             this.chkFilterByIntensity.CheckedChanged += new System.EventHandler(this.chkFilterByIntensity_CheckedChanged);
@@ -247,9 +247,9 @@ namespace MASICBrowser
             this.fraNavigation.Controls.Add(this.cmdNext);
             this.fraNavigation.Controls.Add(this.cmdJump);
             this.fraNavigation.Enabled = false;
-            this.fraNavigation.Location = new System.Drawing.Point(16, 24);
+            this.fraNavigation.Location = new System.Drawing.Point(19, 28);
             this.fraNavigation.Name = "fraNavigation";
-            this.fraNavigation.Size = new System.Drawing.Size(224, 128);
+            this.fraNavigation.Size = new System.Drawing.Size(269, 147);
             this.fraNavigation.TabIndex = 4;
             this.fraNavigation.TabStop = false;
             this.fraNavigation.Text = "Navigation";
@@ -258,17 +258,17 @@ namespace MASICBrowser
             // 
             this.chkAutoStepForward.Checked = true;
             this.chkAutoStepForward.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAutoStepForward.Location = new System.Drawing.Point(112, 104);
+            this.chkAutoStepForward.Location = new System.Drawing.Point(134, 120);
             this.chkAutoStepForward.Name = "chkAutoStepForward";
-            this.chkAutoStepForward.Size = new System.Drawing.Size(104, 16);
+            this.chkAutoStepForward.Size = new System.Drawing.Size(125, 18);
             this.chkAutoStepForward.TabIndex = 6;
             this.chkAutoStepForward.Text = "Move forward";
             // 
             // txtAutoStep
             // 
-            this.txtAutoStep.Location = new System.Drawing.Point(112, 80);
+            this.txtAutoStep.Location = new System.Drawing.Point(134, 92);
             this.txtAutoStep.Name = "txtAutoStep";
-            this.txtAutoStep.Size = new System.Drawing.Size(32, 20);
+            this.txtAutoStep.Size = new System.Drawing.Size(39, 22);
             this.txtAutoStep.TabIndex = 4;
             this.txtAutoStep.Text = "150";
             this.txtAutoStep.TextChanged += new System.EventHandler(this.txtAutoStep_TextChanged);
@@ -276,52 +276,52 @@ namespace MASICBrowser
             // 
             // lblAutoStep
             // 
-            this.lblAutoStep.Location = new System.Drawing.Point(152, 80);
+            this.lblAutoStep.Location = new System.Drawing.Point(182, 92);
             this.lblAutoStep.Name = "lblAutoStep";
-            this.lblAutoStep.Size = new System.Drawing.Size(64, 16);
+            this.lblAutoStep.Size = new System.Drawing.Size(77, 19);
             this.lblAutoStep.TabIndex = 5;
             // 
             // cmdAutoStep
             // 
-            this.cmdAutoStep.Location = new System.Drawing.Point(8, 80);
+            this.cmdAutoStep.Location = new System.Drawing.Point(10, 92);
             this.cmdAutoStep.Name = "cmdAutoStep";
-            this.cmdAutoStep.Size = new System.Drawing.Size(88, 24);
+            this.cmdAutoStep.Size = new System.Drawing.Size(105, 28);
             this.cmdAutoStep.TabIndex = 2;
             this.cmdAutoStep.Text = "&Auto Step";
             this.cmdAutoStep.Click += new System.EventHandler(this.cmdAutoStep_Click);
             // 
             // cmdPrevious
             // 
-            this.cmdPrevious.Location = new System.Drawing.Point(8, 24);
+            this.cmdPrevious.Location = new System.Drawing.Point(10, 28);
             this.cmdPrevious.Name = "cmdPrevious";
-            this.cmdPrevious.Size = new System.Drawing.Size(88, 24);
+            this.cmdPrevious.Size = new System.Drawing.Size(105, 27);
             this.cmdPrevious.TabIndex = 0;
             this.cmdPrevious.Text = "&Previous";
             this.cmdPrevious.Click += new System.EventHandler(this.cmdPrevious_Click);
             // 
             // cmdNext
             // 
-            this.cmdNext.Location = new System.Drawing.Point(8, 48);
+            this.cmdNext.Location = new System.Drawing.Point(10, 55);
             this.cmdNext.Name = "cmdNext";
-            this.cmdNext.Size = new System.Drawing.Size(88, 24);
+            this.cmdNext.Size = new System.Drawing.Size(105, 28);
             this.cmdNext.TabIndex = 1;
             this.cmdNext.Text = "&Next";
             this.cmdNext.Click += new System.EventHandler(this.cmdNext_Click);
             // 
             // cmdJump
             // 
-            this.cmdJump.Location = new System.Drawing.Point(112, 24);
+            this.cmdJump.Location = new System.Drawing.Point(134, 28);
             this.cmdJump.Name = "cmdJump";
-            this.cmdJump.Size = new System.Drawing.Size(96, 24);
+            this.cmdJump.Size = new System.Drawing.Size(116, 27);
             this.cmdJump.TabIndex = 3;
             this.cmdJump.Text = "&Jump to Scan";
             this.cmdJump.Click += new System.EventHandler(this.cmdJump_Click);
             // 
             // txtFilterByMZ
             // 
-            this.txtFilterByMZ.Location = new System.Drawing.Point(144, 160);
+            this.txtFilterByMZ.Location = new System.Drawing.Point(173, 185);
             this.txtFilterByMZ.Name = "txtFilterByMZ";
-            this.txtFilterByMZ.Size = new System.Drawing.Size(56, 20);
+            this.txtFilterByMZ.Size = new System.Drawing.Size(67, 22);
             this.txtFilterByMZ.TabIndex = 14;
             this.txtFilterByMZ.Text = "543";
             this.txtFilterByMZ.Leave += new System.EventHandler(this.txtFilterByMZ_Leave);
@@ -329,26 +329,26 @@ namespace MASICBrowser
             // 
             // lblFilterByMZ
             // 
-            this.lblFilterByMZ.Location = new System.Drawing.Point(200, 164);
+            this.lblFilterByMZ.Location = new System.Drawing.Point(240, 189);
             this.lblFilterByMZ.Name = "lblFilterByMZ";
-            this.lblFilterByMZ.Size = new System.Drawing.Size(24, 16);
+            this.lblFilterByMZ.Size = new System.Drawing.Size(29, 19);
             this.lblFilterByMZ.TabIndex = 15;
             this.lblFilterByMZ.Text = "m/z";
             // 
             // chkFilterByMZ
             // 
-            this.chkFilterByMZ.Location = new System.Drawing.Point(8, 160);
+            this.chkFilterByMZ.Location = new System.Drawing.Point(10, 185);
             this.chkFilterByMZ.Name = "chkFilterByMZ";
-            this.chkFilterByMZ.Size = new System.Drawing.Size(96, 16);
+            this.chkFilterByMZ.Size = new System.Drawing.Size(115, 18);
             this.chkFilterByMZ.TabIndex = 13;
             this.chkFilterByMZ.Text = "Filter by m/z";
             this.chkFilterByMZ.CheckedChanged += new System.EventHandler(this.chkFilterByMZ_CheckedChanged);
             // 
             // txtFilterByMZTol
             // 
-            this.txtFilterByMZTol.Location = new System.Drawing.Point(160, 184);
+            this.txtFilterByMZTol.Location = new System.Drawing.Point(192, 212);
             this.txtFilterByMZTol.Name = "txtFilterByMZTol";
-            this.txtFilterByMZTol.Size = new System.Drawing.Size(40, 20);
+            this.txtFilterByMZTol.Size = new System.Drawing.Size(48, 22);
             this.txtFilterByMZTol.TabIndex = 17;
             this.txtFilterByMZTol.Text = "0.2";
             this.txtFilterByMZTol.Leave += new System.EventHandler(this.txtFilterByMZTol_Leave);
@@ -356,26 +356,26 @@ namespace MASICBrowser
             // 
             // lblFilterByMZTolUnits
             // 
-            this.lblFilterByMZTolUnits.Location = new System.Drawing.Point(200, 188);
+            this.lblFilterByMZTolUnits.Location = new System.Drawing.Point(240, 217);
             this.lblFilterByMZTolUnits.Name = "lblFilterByMZTolUnits";
-            this.lblFilterByMZTolUnits.Size = new System.Drawing.Size(32, 16);
+            this.lblFilterByMZTolUnits.Size = new System.Drawing.Size(38, 18);
             this.lblFilterByMZTolUnits.TabIndex = 18;
             this.lblFilterByMZTolUnits.Text = "m/z";
             // 
             // lblFilterByMZTol
             // 
-            this.lblFilterByMZTol.Location = new System.Drawing.Point(136, 188);
+            this.lblFilterByMZTol.Location = new System.Drawing.Point(163, 217);
             this.lblFilterByMZTol.Name = "lblFilterByMZTol";
-            this.lblFilterByMZTol.Size = new System.Drawing.Size(16, 16);
+            this.lblFilterByMZTol.Size = new System.Drawing.Size(19, 18);
             this.lblFilterByMZTol.TabIndex = 16;
             this.lblFilterByMZTol.Text = "±";
             this.lblFilterByMZTol.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // txtFixYRange
             // 
-            this.txtFixYRange.Location = new System.Drawing.Point(128, 88);
+            this.txtFixYRange.Location = new System.Drawing.Point(154, 102);
             this.txtFixYRange.Name = "txtFixYRange";
-            this.txtFixYRange.Size = new System.Drawing.Size(72, 20);
+            this.txtFixYRange.Size = new System.Drawing.Size(86, 22);
             this.txtFixYRange.TabIndex = 6;
             this.txtFixYRange.Text = "1E6";
             this.txtFixYRange.TextChanged += new System.EventHandler(this.txtFixYRange_TextChanged);
@@ -383,9 +383,9 @@ namespace MASICBrowser
             // 
             // lblFixYRange
             // 
-            this.lblFixYRange.Location = new System.Drawing.Point(200, 92);
+            this.lblFixYRange.Location = new System.Drawing.Point(240, 106);
             this.lblFixYRange.Name = "lblFixYRange";
-            this.lblFixYRange.Size = new System.Drawing.Size(46, 16);
+            this.lblFixYRange.Size = new System.Drawing.Size(55, 19);
             this.lblFixYRange.TabIndex = 7;
             this.lblFixYRange.Text = "counts";
             // 
@@ -393,37 +393,37 @@ namespace MASICBrowser
             // 
             this.chkFixYRange.Checked = true;
             this.chkFixYRange.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkFixYRange.Location = new System.Drawing.Point(8, 88);
+            this.chkFixYRange.Location = new System.Drawing.Point(10, 102);
             this.chkFixYRange.Name = "chkFixYRange";
-            this.chkFixYRange.Size = new System.Drawing.Size(88, 16);
+            this.chkFixYRange.Size = new System.Drawing.Size(105, 18);
             this.chkFixYRange.TabIndex = 5;
             this.chkFixYRange.Text = "Fix Y Range";
             this.chkFixYRange.CheckedChanged += new System.EventHandler(this.chkFixYRange_CheckedChanged);
             // 
             // lblSICsTypeFilter
             // 
-            this.lblSICsTypeFilter.Location = new System.Drawing.Point(8, 8);
+            this.lblSICsTypeFilter.Location = new System.Drawing.Point(10, 9);
             this.lblSICsTypeFilter.Name = "lblSICsTypeFilter";
-            this.lblSICsTypeFilter.Size = new System.Drawing.Size(152, 16);
+            this.lblSICsTypeFilter.Size = new System.Drawing.Size(182, 19);
             this.lblSICsTypeFilter.TabIndex = 0;
             this.lblSICsTypeFilter.Text = "SIC Type Filter";
             // 
             // cboSICsTypeFilter
             // 
             this.cboSICsTypeFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboSICsTypeFilter.Location = new System.Drawing.Point(8, 24);
+            this.cboSICsTypeFilter.Location = new System.Drawing.Point(10, 28);
             this.cboSICsTypeFilter.Name = "cboSICsTypeFilter";
-            this.cboSICsTypeFilter.Size = new System.Drawing.Size(232, 21);
+            this.cboSICsTypeFilter.Size = new System.Drawing.Size(278, 24);
             this.cboSICsTypeFilter.TabIndex = 1;
             this.cboSICsTypeFilter.SelectedIndexChanged += new System.EventHandler(this.cboSICsTypeFilter_SelectedIndexChanged);
             // 
             // txtStats1
             // 
-            this.txtStats1.Location = new System.Drawing.Point(8, 80);
+            this.txtStats1.Location = new System.Drawing.Point(10, 92);
             this.txtStats1.Multiline = true;
             this.txtStats1.Name = "txtStats1";
             this.txtStats1.ReadOnly = true;
-            this.txtStats1.Size = new System.Drawing.Size(132, 88);
+            this.txtStats1.Size = new System.Drawing.Size(158, 102);
             this.txtStats1.TabIndex = 4;
             this.txtStats1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtStats1_KeyPress);
             // 
@@ -497,9 +497,9 @@ namespace MASICBrowser
             // 
             // chkSortDescending
             // 
-            this.chkSortDescending.Location = new System.Drawing.Point(160, 8);
+            this.chkSortDescending.Location = new System.Drawing.Point(192, 9);
             this.chkSortDescending.Name = "chkSortDescending";
-            this.chkSortDescending.Size = new System.Drawing.Size(112, 16);
+            this.chkSortDescending.Size = new System.Drawing.Size(134, 19);
             this.chkSortDescending.TabIndex = 2;
             this.chkSortDescending.Text = "Sort Descending";
             this.chkSortDescending.CheckedChanged += new System.EventHandler(this.chkSortDescending_CheckedChanged);
@@ -508,17 +508,18 @@ namespace MASICBrowser
             // 
             this.lstParentIonData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.lstParentIonData.Location = new System.Drawing.Point(8, 24);
+            this.lstParentIonData.ItemHeight = 16;
+            this.lstParentIonData.Location = new System.Drawing.Point(10, 28);
             this.lstParentIonData.Name = "lstParentIonData";
-            this.lstParentIonData.Size = new System.Drawing.Size(272, 160);
+            this.lstParentIonData.Size = new System.Drawing.Size(326, 116);
             this.lstParentIonData.TabIndex = 3;
             this.lstParentIonData.SelectedIndexChanged += new System.EventHandler(this.lstParentIonData_SelectedIndexChanged);
             // 
             // txtMinimumSignalToNoise
             // 
-            this.txtMinimumSignalToNoise.Location = new System.Drawing.Point(144, 112);
+            this.txtMinimumSignalToNoise.Location = new System.Drawing.Point(173, 129);
             this.txtMinimumSignalToNoise.Name = "txtMinimumSignalToNoise";
-            this.txtMinimumSignalToNoise.Size = new System.Drawing.Size(56, 20);
+            this.txtMinimumSignalToNoise.Size = new System.Drawing.Size(67, 22);
             this.txtMinimumSignalToNoise.TabIndex = 9;
             this.txtMinimumSignalToNoise.Text = "3";
             this.txtMinimumSignalToNoise.Leave += new System.EventHandler(this.txtMinimumSignalToNoise_Leave);
@@ -526,9 +527,9 @@ namespace MASICBrowser
             // 
             // chkFilterBySignalToNoise
             // 
-            this.chkFilterBySignalToNoise.Location = new System.Drawing.Point(8, 112);
+            this.chkFilterBySignalToNoise.Location = new System.Drawing.Point(10, 129);
             this.chkFilterBySignalToNoise.Name = "chkFilterBySignalToNoise";
-            this.chkFilterBySignalToNoise.Size = new System.Drawing.Size(120, 16);
+            this.chkFilterBySignalToNoise.Size = new System.Drawing.Size(144, 19);
             this.chkFilterBySignalToNoise.TabIndex = 8;
             this.chkFilterBySignalToNoise.Text = "Minimum S/N";
             this.chkFilterBySignalToNoise.CheckedChanged += new System.EventHandler(this.chkFilterBySignalToNoise_CheckedChanged);
@@ -546,9 +547,9 @@ namespace MASICBrowser
             this.fraResmoothingOptions.Controls.Add(this.txtSavitzkyGolayFilterOrder);
             this.fraResmoothingOptions.Controls.Add(this.lblSavitzkyGolayFilterOrder);
             this.fraResmoothingOptions.Controls.Add(this.optUseButterworthSmooth);
-            this.fraResmoothingOptions.Location = new System.Drawing.Point(8, 8);
+            this.fraResmoothingOptions.Location = new System.Drawing.Point(10, 9);
             this.fraResmoothingOptions.Name = "fraResmoothingOptions";
-            this.fraResmoothingOptions.Size = new System.Drawing.Size(320, 136);
+            this.fraResmoothingOptions.Size = new System.Drawing.Size(384, 157);
             this.fraResmoothingOptions.TabIndex = 7;
             this.fraResmoothingOptions.TabStop = false;
             this.fraResmoothingOptions.Text = "Smoothing Options";
@@ -557,17 +558,18 @@ namespace MASICBrowser
             // 
             this.chkShowSmoothedData.Checked = true;
             this.chkShowSmoothedData.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowSmoothedData.Location = new System.Drawing.Point(16, 16);
+            this.chkShowSmoothedData.Location = new System.Drawing.Point(19, 18);
             this.chkShowSmoothedData.Name = "chkShowSmoothedData";
-            this.chkShowSmoothedData.Size = new System.Drawing.Size(152, 16);
+            this.chkShowSmoothedData.Size = new System.Drawing.Size(183, 19);
             this.chkShowSmoothedData.TabIndex = 0;
             this.chkShowSmoothedData.Text = "Show Smoothed Data";
+            this.chkShowSmoothedData.CheckedChanged += new System.EventHandler(this.chkShowSmoothedData_CheckedChanged);
             // 
             // txtPeakWidthPointsMinimum
             // 
-            this.txtPeakWidthPointsMinimum.Location = new System.Drawing.Point(264, 104);
+            this.txtPeakWidthPointsMinimum.Location = new System.Drawing.Point(317, 120);
             this.txtPeakWidthPointsMinimum.Name = "txtPeakWidthPointsMinimum";
-            this.txtPeakWidthPointsMinimum.Size = new System.Drawing.Size(48, 20);
+            this.txtPeakWidthPointsMinimum.Size = new System.Drawing.Size(57, 22);
             this.txtPeakWidthPointsMinimum.TabIndex = 9;
             this.txtPeakWidthPointsMinimum.Text = "6";
             this.txtPeakWidthPointsMinimum.TextChanged += new System.EventHandler(this.txtPeakWidthPointsMinimum_TextChanged);
@@ -575,18 +577,18 @@ namespace MASICBrowser
             // 
             // lblPeakWidthPointsMinimum
             // 
-            this.lblPeakWidthPointsMinimum.Location = new System.Drawing.Point(96, 112);
+            this.lblPeakWidthPointsMinimum.Location = new System.Drawing.Point(115, 129);
             this.lblPeakWidthPointsMinimum.Name = "lblPeakWidthPointsMinimum";
-            this.lblPeakWidthPointsMinimum.Size = new System.Drawing.Size(160, 16);
+            this.lblPeakWidthPointsMinimum.Size = new System.Drawing.Size(192, 19);
             this.lblPeakWidthPointsMinimum.TabIndex = 8;
             this.lblPeakWidthPointsMinimum.Text = "Minimum Peak Width (points)";
             // 
             // optDoNotResmooth
             // 
             this.optDoNotResmooth.Checked = true;
-            this.optDoNotResmooth.Location = new System.Drawing.Point(16, 48);
+            this.optDoNotResmooth.Location = new System.Drawing.Point(19, 55);
             this.optDoNotResmooth.Name = "optDoNotResmooth";
-            this.optDoNotResmooth.Size = new System.Drawing.Size(200, 16);
+            this.optDoNotResmooth.Size = new System.Drawing.Size(240, 19);
             this.optDoNotResmooth.TabIndex = 1;
             this.optDoNotResmooth.TabStop = true;
             this.optDoNotResmooth.Text = "Do Not Show Smoothed Data";
@@ -594,18 +596,18 @@ namespace MASICBrowser
             // 
             // optUseSavitzkyGolaySmooth
             // 
-            this.optUseSavitzkyGolaySmooth.Location = new System.Drawing.Point(16, 80);
+            this.optUseSavitzkyGolaySmooth.Location = new System.Drawing.Point(19, 92);
             this.optUseSavitzkyGolaySmooth.Name = "optUseSavitzkyGolaySmooth";
-            this.optUseSavitzkyGolaySmooth.Size = new System.Drawing.Size(168, 16);
+            this.optUseSavitzkyGolaySmooth.Size = new System.Drawing.Size(202, 19);
             this.optUseSavitzkyGolaySmooth.TabIndex = 5;
             this.optUseSavitzkyGolaySmooth.Text = "Use Savitzky Golay Smooth";
             this.optUseSavitzkyGolaySmooth.CheckedChanged += new System.EventHandler(this.optUseSavitzkyGolaySmooth_CheckedChanged);
             // 
             // txtButterworthSamplingFrequency
             // 
-            this.txtButterworthSamplingFrequency.Location = new System.Drawing.Point(264, 56);
+            this.txtButterworthSamplingFrequency.Location = new System.Drawing.Point(317, 65);
             this.txtButterworthSamplingFrequency.Name = "txtButterworthSamplingFrequency";
-            this.txtButterworthSamplingFrequency.Size = new System.Drawing.Size(48, 20);
+            this.txtButterworthSamplingFrequency.Size = new System.Drawing.Size(57, 22);
             this.txtButterworthSamplingFrequency.TabIndex = 4;
             this.txtButterworthSamplingFrequency.Text = "0.25";
             this.txtButterworthSamplingFrequency.TextChanged += new System.EventHandler(this.txtButterworthSamplingFrequency_TextChanged);
@@ -613,17 +615,17 @@ namespace MASICBrowser
             // 
             // lblButterworthSamplingFrequency
             // 
-            this.lblButterworthSamplingFrequency.Location = new System.Drawing.Point(184, 64);
+            this.lblButterworthSamplingFrequency.Location = new System.Drawing.Point(221, 74);
             this.lblButterworthSamplingFrequency.Name = "lblButterworthSamplingFrequency";
-            this.lblButterworthSamplingFrequency.Size = new System.Drawing.Size(72, 16);
+            this.lblButterworthSamplingFrequency.Size = new System.Drawing.Size(86, 18);
             this.lblButterworthSamplingFrequency.TabIndex = 3;
             this.lblButterworthSamplingFrequency.Text = "Filter Order";
             // 
             // txtSavitzkyGolayFilterOrder
             // 
-            this.txtSavitzkyGolayFilterOrder.Location = new System.Drawing.Point(264, 80);
+            this.txtSavitzkyGolayFilterOrder.Location = new System.Drawing.Point(317, 92);
             this.txtSavitzkyGolayFilterOrder.Name = "txtSavitzkyGolayFilterOrder";
-            this.txtSavitzkyGolayFilterOrder.Size = new System.Drawing.Size(48, 20);
+            this.txtSavitzkyGolayFilterOrder.Size = new System.Drawing.Size(57, 22);
             this.txtSavitzkyGolayFilterOrder.TabIndex = 7;
             this.txtSavitzkyGolayFilterOrder.Text = "0";
             this.txtSavitzkyGolayFilterOrder.TextChanged += new System.EventHandler(this.txtSavitzkyGolayFilterOrder_TextChanged);
@@ -631,17 +633,17 @@ namespace MASICBrowser
             // 
             // lblSavitzkyGolayFilterOrder
             // 
-            this.lblSavitzkyGolayFilterOrder.Location = new System.Drawing.Point(184, 88);
+            this.lblSavitzkyGolayFilterOrder.Location = new System.Drawing.Point(221, 102);
             this.lblSavitzkyGolayFilterOrder.Name = "lblSavitzkyGolayFilterOrder";
-            this.lblSavitzkyGolayFilterOrder.Size = new System.Drawing.Size(72, 16);
+            this.lblSavitzkyGolayFilterOrder.Size = new System.Drawing.Size(86, 18);
             this.lblSavitzkyGolayFilterOrder.TabIndex = 6;
             this.lblSavitzkyGolayFilterOrder.Text = "Filter Order";
             // 
             // optUseButterworthSmooth
             // 
-            this.optUseButterworthSmooth.Location = new System.Drawing.Point(16, 64);
+            this.optUseButterworthSmooth.Location = new System.Drawing.Point(19, 74);
             this.optUseButterworthSmooth.Name = "optUseButterworthSmooth";
-            this.optUseButterworthSmooth.Size = new System.Drawing.Size(168, 16);
+            this.optUseButterworthSmooth.Size = new System.Drawing.Size(202, 18);
             this.optUseButterworthSmooth.TabIndex = 2;
             this.optUseButterworthSmooth.Text = "Use Butterworth Smooth";
             this.optUseButterworthSmooth.CheckedChanged += new System.EventHandler(this.optUseButterworthSmooth_CheckedChanged);
@@ -652,27 +654,27 @@ namespace MASICBrowser
             this.fraPeakFinder.Controls.Add(this.cmdRedoSICPeakFindingAllData);
             this.fraPeakFinder.Controls.Add(this.chkUsePeakFinder);
             this.fraPeakFinder.Controls.Add(this.chkFindPeaksSubtractBaseline);
-            this.fraPeakFinder.Location = new System.Drawing.Point(336, 8);
+            this.fraPeakFinder.Location = new System.Drawing.Point(403, 9);
             this.fraPeakFinder.Name = "fraPeakFinder";
-            this.fraPeakFinder.Size = new System.Drawing.Size(200, 128);
+            this.fraPeakFinder.Size = new System.Drawing.Size(240, 148);
             this.fraPeakFinder.TabIndex = 8;
             this.fraPeakFinder.TabStop = false;
             this.fraPeakFinder.Text = "SIC Peak Finding";
             // 
             // cmdRedoSICPeakFindingAllData
             // 
-            this.cmdRedoSICPeakFindingAllData.Location = new System.Drawing.Point(16, 80);
+            this.cmdRedoSICPeakFindingAllData.Location = new System.Drawing.Point(19, 92);
             this.cmdRedoSICPeakFindingAllData.Name = "cmdRedoSICPeakFindingAllData";
-            this.cmdRedoSICPeakFindingAllData.Size = new System.Drawing.Size(112, 40);
+            this.cmdRedoSICPeakFindingAllData.Size = new System.Drawing.Size(135, 46);
             this.cmdRedoSICPeakFindingAllData.TabIndex = 20;
             this.cmdRedoSICPeakFindingAllData.Text = "Redo SIC Peak Finding For All Data";
             this.cmdRedoSICPeakFindingAllData.Click += new System.EventHandler(this.cmdRedoSICPeakFindingAllData_Click);
             // 
             // chkUsePeakFinder
             // 
-            this.chkUsePeakFinder.Location = new System.Drawing.Point(8, 16);
+            this.chkUsePeakFinder.Location = new System.Drawing.Point(10, 18);
             this.chkUsePeakFinder.Name = "chkUsePeakFinder";
-            this.chkUsePeakFinder.Size = new System.Drawing.Size(184, 16);
+            this.chkUsePeakFinder.Size = new System.Drawing.Size(220, 19);
             this.chkUsePeakFinder.TabIndex = 18;
             this.chkUsePeakFinder.Text = "Recompute SIC Peak Stats";
             this.chkUsePeakFinder.CheckedChanged += new System.EventHandler(this.chkUsePeakFinder_CheckedChanged);
@@ -681,9 +683,9 @@ namespace MASICBrowser
             // 
             this.chkFindPeaksSubtractBaseline.Checked = true;
             this.chkFindPeaksSubtractBaseline.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkFindPeaksSubtractBaseline.Location = new System.Drawing.Point(16, 33);
+            this.chkFindPeaksSubtractBaseline.Location = new System.Drawing.Point(19, 38);
             this.chkFindPeaksSubtractBaseline.Name = "chkFindPeaksSubtractBaseline";
-            this.chkFindPeaksSubtractBaseline.Size = new System.Drawing.Size(176, 32);
+            this.chkFindPeaksSubtractBaseline.Size = new System.Drawing.Size(211, 37);
             this.chkFindPeaksSubtractBaseline.TabIndex = 19;
             this.chkFindPeaksSubtractBaseline.Text = "Subtract baseline when computing Intensity and Area";
             // 
@@ -697,9 +699,9 @@ namespace MASICBrowser
             this.fraSortOrderAndStats.Controls.Add(this.lblSortOrder);
             this.fraSortOrderAndStats.Controls.Add(this.chkSortDescending);
             this.fraSortOrderAndStats.Controls.Add(this.txtStats1);
-            this.fraSortOrderAndStats.Location = new System.Drawing.Point(0, 206);
+            this.fraSortOrderAndStats.Location = new System.Drawing.Point(0, 141);
             this.fraSortOrderAndStats.Name = "fraSortOrderAndStats";
-            this.fraSortOrderAndStats.Size = new System.Drawing.Size(282, 225);
+            this.fraSortOrderAndStats.Size = new System.Drawing.Size(338, 259);
             this.fraSortOrderAndStats.TabIndex = 5;
             this.fraSortOrderAndStats.TabStop = false;
             // 
@@ -707,31 +709,31 @@ namespace MASICBrowser
             // 
             this.chkShowBaselineCorrectedStats.Checked = true;
             this.chkShowBaselineCorrectedStats.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowBaselineCorrectedStats.Location = new System.Drawing.Point(8, 58);
+            this.chkShowBaselineCorrectedStats.Location = new System.Drawing.Point(10, 67);
             this.chkShowBaselineCorrectedStats.Name = "chkShowBaselineCorrectedStats";
-            this.chkShowBaselineCorrectedStats.Size = new System.Drawing.Size(216, 16);
+            this.chkShowBaselineCorrectedStats.Size = new System.Drawing.Size(259, 18);
             this.chkShowBaselineCorrectedStats.TabIndex = 14;
             this.chkShowBaselineCorrectedStats.Text = "Show Baseline Corrected Stats";
             this.chkShowBaselineCorrectedStats.CheckedChanged += new System.EventHandler(this.chkShowBaselineCorrectedStats_CheckedChanged);
             // 
             // txtStats2
             // 
-            this.txtStats2.Location = new System.Drawing.Point(144, 80);
+            this.txtStats2.Location = new System.Drawing.Point(173, 92);
             this.txtStats2.Multiline = true;
             this.txtStats2.Name = "txtStats2";
             this.txtStats2.ReadOnly = true;
-            this.txtStats2.Size = new System.Drawing.Size(132, 88);
+            this.txtStats2.Size = new System.Drawing.Size(158, 102);
             this.txtStats2.TabIndex = 6;
             this.txtStats2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtStats2_KeyPress);
             // 
             // txtStats3
             // 
-            this.txtStats3.Location = new System.Drawing.Point(8, 176);
+            this.txtStats3.Location = new System.Drawing.Point(10, 203);
             this.txtStats3.Multiline = true;
             this.txtStats3.Name = "txtStats3";
             this.txtStats3.ReadOnly = true;
             this.txtStats3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtStats3.Size = new System.Drawing.Size(266, 40);
+            this.txtStats3.Size = new System.Drawing.Size(319, 46);
             this.txtStats3.TabIndex = 5;
             this.txtStats3.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txStats3_KeyPress);
             // 
@@ -739,10 +741,10 @@ namespace MASICBrowser
             // 
             this.TabControl1.Controls.Add(this.tpSICFilters);
             this.TabControl1.Controls.Add(this.tpMsMsSearchResultsFilters);
-            this.TabControl1.Location = new System.Drawing.Point(16, 160);
+            this.TabControl1.Location = new System.Drawing.Point(19, 185);
             this.TabControl1.Name = "TabControl1";
             this.TabControl1.SelectedIndex = 0;
-            this.TabControl1.Size = new System.Drawing.Size(256, 240);
+            this.TabControl1.Size = new System.Drawing.Size(307, 277);
             this.TabControl1.TabIndex = 6;
             // 
             // tpSICFilters
@@ -766,9 +768,9 @@ namespace MASICBrowser
             this.tpSICFilters.Controls.Add(this.chkFilterBySignalToNoise);
             this.tpSICFilters.Controls.Add(this.txtFilterByMZ);
             this.tpSICFilters.Controls.Add(this.lblFilterByMZ);
-            this.tpSICFilters.Location = new System.Drawing.Point(4, 22);
+            this.tpSICFilters.Location = new System.Drawing.Point(4, 25);
             this.tpSICFilters.Name = "tpSICFilters";
-            this.tpSICFilters.Size = new System.Drawing.Size(248, 214);
+            this.tpSICFilters.Size = new System.Drawing.Size(299, 248);
             this.tpSICFilters.TabIndex = 0;
             this.tpSICFilters.Text = "SIC Filters";
             // 
@@ -781,9 +783,9 @@ namespace MASICBrowser
             this.tpMsMsSearchResultsFilters.Controls.Add(this.lblMinimumXCorr);
             this.tpMsMsSearchResultsFilters.Controls.Add(this.txtSequenceFilter);
             this.tpMsMsSearchResultsFilters.Controls.Add(this.txtMinimumXCorr);
-            this.tpMsMsSearchResultsFilters.Location = new System.Drawing.Point(4, 22);
+            this.tpMsMsSearchResultsFilters.Location = new System.Drawing.Point(4, 25);
             this.tpMsMsSearchResultsFilters.Name = "tpMsMsSearchResultsFilters";
-            this.tpMsMsSearchResultsFilters.Size = new System.Drawing.Size(248, 214);
+            this.tpMsMsSearchResultsFilters.Size = new System.Drawing.Size(299, 248);
             this.tpMsMsSearchResultsFilters.TabIndex = 1;
             this.tpMsMsSearchResultsFilters.Text = "MS/MS Results Filters";
             // 
@@ -792,59 +794,59 @@ namespace MASICBrowser
             this.chkSequenceFilterExactMatch.Checked = true;
             this.chkSequenceFilterExactMatch.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSequenceFilterExactMatch.Enabled = false;
-            this.chkSequenceFilterExactMatch.Location = new System.Drawing.Point(144, 72);
+            this.chkSequenceFilterExactMatch.Location = new System.Drawing.Point(173, 83);
             this.chkSequenceFilterExactMatch.Name = "chkSequenceFilterExactMatch";
-            this.chkSequenceFilterExactMatch.Size = new System.Drawing.Size(90, 16);
+            this.chkSequenceFilterExactMatch.Size = new System.Drawing.Size(108, 19);
             this.chkSequenceFilterExactMatch.TabIndex = 5;
             this.chkSequenceFilterExactMatch.Text = "Exact Match?";
             // 
             // lblSequenceFilter
             // 
-            this.lblSequenceFilter.Location = new System.Drawing.Point(8, 72);
+            this.lblSequenceFilter.Location = new System.Drawing.Point(10, 83);
             this.lblSequenceFilter.Name = "lblSequenceFilter";
-            this.lblSequenceFilter.Size = new System.Drawing.Size(96, 16);
+            this.lblSequenceFilter.Size = new System.Drawing.Size(115, 19);
             this.lblSequenceFilter.TabIndex = 4;
             this.lblSequenceFilter.Text = "Sequence Filter";
             // 
             // lblChargeFilter
             // 
-            this.lblChargeFilter.Location = new System.Drawing.Point(8, 40);
+            this.lblChargeFilter.Location = new System.Drawing.Point(10, 46);
             this.lblChargeFilter.Name = "lblChargeFilter";
-            this.lblChargeFilter.Size = new System.Drawing.Size(96, 16);
+            this.lblChargeFilter.Size = new System.Drawing.Size(115, 19);
             this.lblChargeFilter.TabIndex = 2;
             this.lblChargeFilter.Text = "Charge Filter";
             // 
             // TextBox2
             // 
             this.TextBox2.Enabled = false;
-            this.TextBox2.Location = new System.Drawing.Point(144, 40);
+            this.TextBox2.Location = new System.Drawing.Point(173, 46);
             this.TextBox2.Name = "TextBox2";
-            this.TextBox2.Size = new System.Drawing.Size(56, 20);
+            this.TextBox2.Size = new System.Drawing.Size(67, 22);
             this.TextBox2.TabIndex = 3;
             this.TextBox2.Text = "0";
             // 
             // lblMinimumXCorr
             // 
-            this.lblMinimumXCorr.Location = new System.Drawing.Point(8, 16);
+            this.lblMinimumXCorr.Location = new System.Drawing.Point(10, 18);
             this.lblMinimumXCorr.Name = "lblMinimumXCorr";
-            this.lblMinimumXCorr.Size = new System.Drawing.Size(96, 16);
+            this.lblMinimumXCorr.Size = new System.Drawing.Size(115, 19);
             this.lblMinimumXCorr.TabIndex = 0;
             this.lblMinimumXCorr.Text = "XCorr Minimum";
             // 
             // txtSequenceFilter
             // 
             this.txtSequenceFilter.Enabled = false;
-            this.txtSequenceFilter.Location = new System.Drawing.Point(8, 88);
+            this.txtSequenceFilter.Location = new System.Drawing.Point(10, 102);
             this.txtSequenceFilter.Name = "txtSequenceFilter";
-            this.txtSequenceFilter.Size = new System.Drawing.Size(230, 20);
+            this.txtSequenceFilter.Size = new System.Drawing.Size(276, 22);
             this.txtSequenceFilter.TabIndex = 6;
             // 
             // txtMinimumXCorr
             // 
             this.txtMinimumXCorr.Enabled = false;
-            this.txtMinimumXCorr.Location = new System.Drawing.Point(144, 16);
+            this.txtMinimumXCorr.Location = new System.Drawing.Point(173, 18);
             this.txtMinimumXCorr.Name = "txtMinimumXCorr";
-            this.txtMinimumXCorr.Size = new System.Drawing.Size(56, 20);
+            this.txtMinimumXCorr.Size = new System.Drawing.Size(67, 22);
             this.txtMinimumXCorr.TabIndex = 1;
             this.txtMinimumXCorr.Text = "2.2";
             // 
@@ -855,7 +857,7 @@ namespace MASICBrowser
             this.pnlInputFile.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlInputFile.Location = new System.Drawing.Point(0, 0);
             this.pnlInputFile.Name = "pnlInputFile";
-            this.pnlInputFile.Size = new System.Drawing.Size(568, 40);
+            this.pnlInputFile.Size = new System.Drawing.Size(705, 46);
             this.pnlInputFile.TabIndex = 9;
             // 
             // pnlSICs
@@ -864,9 +866,9 @@ namespace MASICBrowser
             this.pnlSICs.Controls.Add(this.lstParentIonData);
             this.pnlSICs.Controls.Add(this.fraSortOrderAndStats);
             this.pnlSICs.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlSICs.Location = new System.Drawing.Point(0, 40);
+            this.pnlSICs.Location = new System.Drawing.Point(0, 46);
             this.pnlSICs.Name = "pnlSICs";
-            this.pnlSICs.Size = new System.Drawing.Size(288, 440);
+            this.pnlSICs.Size = new System.Drawing.Size(346, 411);
             this.pnlSICs.TabIndex = 10;
             // 
             // pnlNavigationAndOptions
@@ -874,9 +876,9 @@ namespace MASICBrowser
             this.pnlNavigationAndOptions.Controls.Add(this.fraNavigation);
             this.pnlNavigationAndOptions.Controls.Add(this.TabControl1);
             this.pnlNavigationAndOptions.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlNavigationAndOptions.Location = new System.Drawing.Point(288, 40);
+            this.pnlNavigationAndOptions.Location = new System.Drawing.Point(346, 46);
             this.pnlNavigationAndOptions.Name = "pnlNavigationAndOptions";
-            this.pnlNavigationAndOptions.Size = new System.Drawing.Size(280, 440);
+            this.pnlNavigationAndOptions.Size = new System.Drawing.Size(336, 411);
             this.pnlNavigationAndOptions.TabIndex = 11;
             // 
             // pnlBottom
@@ -884,21 +886,21 @@ namespace MASICBrowser
             this.pnlBottom.Controls.Add(this.fraPeakFinder);
             this.pnlBottom.Controls.Add(this.fraResmoothingOptions);
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlBottom.Location = new System.Drawing.Point(0, 480);
+            this.pnlBottom.Location = new System.Drawing.Point(0, 457);
             this.pnlBottom.Name = "pnlBottom";
-            this.pnlBottom.Size = new System.Drawing.Size(568, 152);
+            this.pnlBottom.Size = new System.Drawing.Size(705, 175);
             this.pnlBottom.TabIndex = 12;
             // 
             // frmBrowser
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(568, 632);
+            this.AutoScaleBaseSize = new System.Drawing.Size(6, 15);
+            this.ClientSize = new System.Drawing.Size(705, 632);
             this.Controls.Add(this.pnlNavigationAndOptions);
             this.Controls.Add(this.pnlSICs);
             this.Controls.Add(this.pnlInputFile);
             this.Controls.Add(this.pnlBottom);
             this.Menu = this.MainMenuControl;
-            this.MinimumSize = new System.Drawing.Size(512, 0);
+            this.MinimumSize = new System.Drawing.Size(614, 0);
             this.Name = "frmBrowser";
             this.Text = "MASIC Browser";
             ((System.ComponentModel.ISupportInitialize)(this.tmrAutoStep)).EndInit();

@@ -7,8 +7,11 @@ namespace MASIC
     public class clsParentIonProcessing : clsMasicEventNotifier
     {
         #region "Classwide Variables"
+
         private readonly clsReporterIons mReporterIons;
+
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -465,11 +468,9 @@ namespace MASIC
                 bestMatchMZ = mzList[closestMatchIndex];
                 return true;
             }
-            else
-            {
-                bestMatchMZ = 0;
-                return false;
-            }
+
+            bestMatchMZ = 0;
+            return false;
         }
 
         public bool FindSimilarParentIons(
@@ -482,22 +483,13 @@ namespace MASIC
             // Look for parent ions that have similar m/z values and are nearby one another in time
             // For the groups of similar ions, assign the scan number of the highest intensity parent ion to the other similar parent ions
 
-            bool success;
-
             try
             {
                 ionUpdateCount = 0;
 
                 if (scanList.ParentIons.Count <= 0)
                 {
-                    if (masicOptions.SuppressNoParentIonsError)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return masicOptions.SuppressNoParentIonsError;
                 }
 
                 Console.Write("Finding similar parent ions ");
@@ -567,14 +559,8 @@ namespace MASIC
                     {
                         return true;
                     }
-                    else if (scanList.MRMDataPresent)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+
+                    return scanList.MRMDataPresent;
                 }
 
                 ReportMessage("FindSimilarParentIons: Sorting the mz arrays");
@@ -592,7 +578,7 @@ namespace MASIC
                     UsePointerIndexArray = false
                 };
 
-                success = objSearchRange.FillWithData(ref mzList);
+                var success = objSearchRange.FillWithData(ref mzList);
 
                 ReportMessage("FindSimilarParentIons: Sort the intensity arrays");
 
@@ -744,15 +730,13 @@ namespace MASIC
                     }
                 }
 
-                success = true;
+                return true;
             }
             catch (Exception ex)
             {
                 ReportError("Error in FindSimilarParentIons", ex, clsMASIC.eMasicErrorCodes.FindSimilarParentIonsError);
-                success = false;
+                return false;
             }
-
-            return success;
         }
 
         private void FindSimilarParentIonsWork(
@@ -838,10 +822,8 @@ namespace MASIC
             {
                 return clsUtilities.PPMToMass(parentIonTolerance, parentIonMZ);
             }
-            else
-            {
-                return parentIonTolerance;
-            }
+
+            return parentIonTolerance;
         }
     }
 }

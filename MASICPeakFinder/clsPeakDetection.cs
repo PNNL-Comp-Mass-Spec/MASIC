@@ -52,10 +52,10 @@ namespace MASICPeakFinder
             var segmentY = new double[segmentCount];
 
             // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
-            for (var index = startIndex; index <= endIndex; index++)
+            for (var i = startIndex; i <= endIndex; i++)
             {
-                segmentX[index - startIndex] = xValuesZeroBased[index];
-                segmentY[index - startIndex] = yValuesZeroBased[index];
+                segmentX[i - startIndex] = xValuesZeroBased[i];
+                segmentY[i - startIndex] = yValuesZeroBased[i];
             }
 
             // Compute the coefficients for the curve fit
@@ -119,11 +119,11 @@ namespace MASICPeakFinder
 
                 // Find the maximum intensity in the source data
                 double maximumIntensity = 0;
-                for (var index = 0; index < sourceDataCount; index++)
+                for (var dataIndex = 0; dataIndex < sourceDataCount; dataIndex++)
                 {
-                    if (yValuesZeroBased[index] > maximumIntensity)
+                    if (yValuesZeroBased[dataIndex] > maximumIntensity)
                     {
-                        maximumIntensity = yValuesZeroBased[index];
+                        maximumIntensity = yValuesZeroBased[dataIndex];
                     }
                 }
 
@@ -138,7 +138,8 @@ namespace MASICPeakFinder
                     return detectedPeaks;
 
                 // Do the actual work
-                FitSegments(xValuesZeroBased, yValuesZeroBased, sourceDataCount, peakWidthPointsMinimum, peakHalfWidth, ref firstDerivative, ref secondDerivative);
+                FitSegments(xValuesZeroBased, yValuesZeroBased, sourceDataCount, peakWidthPointsMinimum,
+                            peakHalfWidth, ref firstDerivative, ref secondDerivative);
 
                 if (peakWidthInSigma < 1)
                     peakWidthInSigma = 1;
@@ -182,7 +183,8 @@ namespace MASICPeakFinder
                                             newPeak.LeftEdge = compareIndex + 1;
                                             break;
                                         }
-                                        else if (yValuesZeroBased[compareIndex] < intensityThreshold)
+
+                                        if (yValuesZeroBased[compareIndex] < intensityThreshold)
                                         {
                                             lowIntensityPointCount += 1;
                                             if (lowIntensityPointCount > peakHalfWidth)
@@ -214,7 +216,8 @@ namespace MASICPeakFinder
                                             newPeak.RightEdge = compareIndex;
                                             break;
                                         }
-                                        else if (yValuesZeroBased[compareIndex] < intensityThreshold)
+
+                                        if (yValuesZeroBased[compareIndex] < intensityThreshold)
                                         {
                                             lowIntensityPointCount += 1;
                                             if (lowIntensityPointCount > peakHalfWidth)
@@ -328,10 +331,10 @@ namespace MASICPeakFinder
                                 thisPeakEndIndex = sourceDataCount - 1;
                             }
 
-                            for (var areaValsCopyIndex = thisPeakStartIndex; areaValsCopyIndex <= thisPeakEndIndex; areaValsCopyIndex++)
+                            for (var areaValuesCopyIndex = thisPeakStartIndex; areaValuesCopyIndex <= thisPeakEndIndex; areaValuesCopyIndex++)
                             {
-                                xValuesForArea[areaValsCopyIndex - thisPeakStartIndex] = xValuesZeroBased[areaValsCopyIndex];
-                                yValuesForArea[areaValsCopyIndex - thisPeakStartIndex] = yValuesZeroBased[areaValsCopyIndex];
+                                xValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = xValuesZeroBased[areaValuesCopyIndex];
+                                yValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = yValuesZeroBased[areaValuesCopyIndex];
                             }
 
                             peakItem.PeakArea = FindArea(xValuesForArea, yValuesForArea, thisPeakWidthInPoints);
@@ -484,7 +487,8 @@ namespace MASICPeakFinder
 
             for (var i = 0; i < xValues.Count; i++)
             {
-                GetLVals(xValues[i], ref equationTerms, ref PFuncVal);
+                GetLValues(xValues[i], ref equationTerms, ref PFuncVal);
+
                 var ym = yValues[i];
                 for (var L = 0; L < equationTerms.Length; L++)
                 {
@@ -507,17 +511,15 @@ namespace MASICPeakFinder
 
                 return true;
             }
-            else
-            {
-                // Error fitting; clear coefficients
-                for (var L = 0; L < equationTerms.Length; L++)
-                    equationTerms[L].ParamResult = 0;
 
-                return false;
-            }
+            // Error fitting; clear coefficients
+            for (var L = 0; L < equationTerms.Length; L++)
+                equationTerms[L].ParamResult = 0;
+
+            return false;
         }
 
-        private void GetLVals(double X, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] PFuncVal)
+        private void GetLValues(double X, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] PFuncVal)
         {
             // Get values for Linear Least Squares
             // equationTerms() is a 0-based array defining the form of each term
@@ -601,24 +603,31 @@ namespace MASICPeakFinder
             }
         }
 
+        /// <summary>
+        /// GaussJordan elimination for LLSq and LM solving
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="equationTerms"></param>
+        /// <param name="b"></param>
+        /// <returns>True if success, False if an error</returns>
         private bool GaussJordan(ref double[,] A, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] b)
         {
-            // GaussJordan elimination for LLSq and LM solving
-            // Returns True if success, False if an error
 
             var n = equationTerms.Length;
 
-            var indxc = new int[n];
-            var indxr = new int[n];
+            var indexC = new int[n];
+            var indexR = new int[n];
+
+            // ReSharper disable once IdentifierTypo
             var ipiv = new int[n];
 
-            int icol = 0, irow = 0;
+            int columnIndex = 0, rowIndex = 0;
 
             try
             {
                 for (var i = 0; i < n; i++)
                 {
-                    double Big = 0;
+                    double bigValue = 0;
                     for (var j = 0; j < n; j++)
                     {
                         if (ipiv[j] != 1)
@@ -627,69 +636,74 @@ namespace MASICPeakFinder
                             {
                                 if (ipiv[k] == 0)
                                 {
-                                    if (Math.Abs(A[j, k]) >= Big)
+                                    if (Math.Abs(A[j, k]) >= bigValue)
                                     {
-                                        Big = Math.Abs(A[j, k]);
-                                        irow = j;
-                                        icol = k;
+                                        bigValue = Math.Abs(A[j, k]);
+                                        rowIndex = j;
+                                        columnIndex = k;
                                     }
                                 }
                             }
                         }
                     }
 
-                    ipiv[icol] += 1;
-                    if (irow != icol)
+                    ipiv[columnIndex] += 1;
+                    if (rowIndex != columnIndex)
                     {
-                        double Dum;
+                        double swapValue;
                         for (var L = 0; L < n; L++)
                         {
-                            Dum = A[irow, L];
-                            A[irow, L] = A[icol, L];
-                            A[icol, L] = Dum;
+                            swapValue = A[rowIndex, L];
+                            A[rowIndex, L] = A[columnIndex, L];
+                            A[columnIndex, L] = swapValue;
                         }
 
-                        Dum = b[irow];
-                        b[irow] = b[icol];
-                        b[icol] = Dum;
+                        swapValue = b[rowIndex];
+                        b[rowIndex] = b[columnIndex];
+                        b[columnIndex] = swapValue;
                     }
 
-                    indxr[i] = irow;
-                    indxc[i] = icol;
-                    if (Math.Abs(A[icol, icol]) < double.Epsilon)
+                    indexR[i] = rowIndex;
+                    indexC[i] = columnIndex;
+                    if (Math.Abs(A[columnIndex, columnIndex]) < double.Epsilon)
                     {
                         // Error, the matrix was singular
                         return false;
                     }
 
-                    var PivInv = 1 / A[icol, icol];
-                    A[icol, icol] = 1;
+                    var PivInv = 1 / A[columnIndex, columnIndex];
+                    A[columnIndex, columnIndex] = 1;
                     for (var L = 0; L < n; L++)
-                        A[icol, L] *= PivInv;
+                    {
+                        A[columnIndex, L] *= PivInv;
+                    }
 
-                    b[icol] *= PivInv;
+                    b[columnIndex] *= PivInv;
                     for (var ll = 0; ll < n; ll++)
                     {
-                        if (ll != icol)
+                        if (ll != columnIndex)
                         {
-                            var Dum = A[ll, icol];
-                            A[ll, icol] = 0;
+                            var multiplier = A[ll, columnIndex];
+                            A[ll, columnIndex] = 0;
                             for (var L = 0; L < n; L++)
-                                A[ll, L] -= A[icol, L] * Dum;
-                            b[ll] -= b[icol] * Dum;
+                            {
+                                A[ll, L] -= A[columnIndex, L] * multiplier;
+                            }
+
+                            b[ll] -= b[columnIndex] * multiplier;
                         }
                     }
                 }
 
                 for (var L = n - 1; L >= 0; L--)
                 {
-                    if (indxr[L] != indxc[L])
+                    if (indexR[L] != indexC[L])
                     {
                         for (var k = 0; k < n; k++)
                         {
-                            var Dum = A[k, indxr[L]];
-                            A[k, indxr[L]] = A[k, indxc[L]];
-                            A[k, indxc[L]] = Dum;
+                            var swapValue = A[k, indexR[L]];
+                            A[k, indexR[L]] = A[k, indexC[L]];
+                            A[k, indexC[L]] = swapValue;
                         }
                     }
                 }

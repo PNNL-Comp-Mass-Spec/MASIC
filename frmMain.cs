@@ -104,6 +104,7 @@ namespace MASIC
         /// <summary>
         /// Log messages, including warnings and errors, with the newest message at the top
         /// </summary>
+        // ReSharper disable once CollectionNeverQueried.Local
         private readonly List<string> mLogMessages;
 
         private readonly Dictionary<int, clsReporterIons.eReporterIonMassModeConstants> mReporterIonIndexToModeMap;
@@ -233,9 +234,7 @@ namespace MASIC
 
         private void AutoPopulateCustomSICValues(bool confirmReplaceExistingResults)
         {
-            var defaultMZTolerance = 0.0;
-            float defaultScanOrAcqTimeTolerance = 0;
-            GetCurrentCustomSICTolerances(ref defaultMZTolerance, ref defaultScanOrAcqTimeTolerance);
+            GetCurrentCustomSICTolerances(out var defaultMZTolerance, out var defaultScanOrAcqTimeTolerance);
             if (defaultScanOrAcqTimeTolerance > 1)
             {
                 defaultScanOrAcqTimeTolerance = 0.6F;
@@ -245,7 +244,7 @@ namespace MASIC
             {
                 // The default values use relative times, so make sure that mode is enabled
                 SetCustomSICToleranceType(clsCustomSICList.eCustomSICScanTypeConstants.Relative);
-                txtCustomSICScanOrAcqTimeTolerance.Text = defaultScanOrAcqTimeTolerance.ToString();
+                txtCustomSICScanOrAcqTimeTolerance.Text = defaultScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture);
                 foreach (var item in mDefaultCustomSICList)
                 {
                     AddCustomSICRow(item.MZ, defaultMZTolerance, item.ScanCenter, defaultScanOrAcqTimeTolerance, item.Comment, out _);
@@ -253,29 +252,30 @@ namespace MASIC
             }
         }
 
-        private bool updating = false;
+        private bool updating;
 
         private void CatchUnrequestedHeightChange()
         {
-            if (!updating)
+            if (updating)
+                return;
+
+            if (mHeightAdjustForce == 0 || DateTime.UtcNow.Subtract(mHeightAdjustTime).TotalSeconds > 5.0)
+                return;
+
+            try
             {
-                if (mHeightAdjustForce != 0 && DateTime.UtcNow.Subtract(mHeightAdjustTime).TotalSeconds <= 5.0)
-                {
-                    try
-                    {
-                        updating = true;
-                        Height = mHeightAdjustForce;
-                        mHeightAdjustForce = 0;
-                        mHeightAdjustTime = DateTime.Parse("1900-01-01");
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                    finally
-                    {
-                        updating = false;
-                    }
-                }
+                updating = true;
+                Height = mHeightAdjustForce;
+                mHeightAdjustForce = 0;
+                mHeightAdjustTime = DateTime.Parse("1900-01-01");
+            }
+            catch (Exception ex)
+            {
+                // Ignore errors here
+            }
+            finally
+            {
+                updating = false;
             }
         }
 
@@ -317,10 +317,16 @@ namespace MASIC
             txtTimeEnd.Text = "0";
         }
 
+        /// <summary>
+        /// Clear the custom SIC list
+        /// </summary>
+        /// <param name="confirmReplaceExistingResults"></param>
+        /// <returns>
+        /// True if the CUSTOM_SIC_VALUES_DATA_TABLE is empty or if it was cleared
+        /// False if the user is queried about clearing and they do not click Yes
+        /// </returns>
         private bool ClearCustomSICList(bool confirmReplaceExistingResults)
         {
-            // Returns true if the CUSTOM_SIC_VALUES_DATA_TABLE is empty or if it was cleared
-            // Returns false if the user is queried about clearing and they do not click Yes
 
             var eResult = default(DialogResult);
 
@@ -353,16 +359,15 @@ namespace MASIC
                 txtInputFilePath.Focus();
                 return false;
             }
-            else if (txtOutputDirectoryPath.TextLength == 0)
+
+            if (txtOutputDirectoryPath.TextLength == 0)
             {
                 MessageBox.Show("Please define an output directory path", "Missing Value", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 txtOutputDirectoryPath.Focus();
                 return false;
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
         private string CStrSafe(object item)
@@ -373,14 +378,13 @@ namespace MASIC
                 {
                     return string.Empty;
                 }
-                else if (Convert.IsDBNull(item))
+
+                if (Convert.IsDBNull(item))
                 {
                     return string.Empty;
                 }
-                else
-                {
-                    return Convert.ToString(item);
-                }
+
+                return Convert.ToString(item);
             }
             catch (Exception ex)
             {
@@ -565,7 +569,7 @@ namespace MASIC
             CatchUnrequestedHeightChange();
         }
 
-        private void GetCurrentCustomSICTolerances(ref double defaultMZTolerance, ref float defaultScanOrAcqTimeTolerance)
+        private void GetCurrentCustomSICTolerances(out double defaultMZTolerance, out float defaultScanOrAcqTimeTolerance)
         {
             try
             {
@@ -597,19 +601,19 @@ namespace MASIC
             {
                 return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
             }
-            else if (optCustomSICScanToleranceRelative.Checked)
+
+            if (optCustomSICScanToleranceRelative.Checked)
             {
                 return clsCustomSICList.eCustomSICScanTypeConstants.Relative;
             }
-            else if (optCustomSICScanToleranceAcqTime.Checked)
+
+            if (optCustomSICScanToleranceAcqTime.Checked)
             {
                 return clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime;
             }
-            else
-            {
-                // Assume absolute
-                return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
-            }
+
+            // Assume absolute
+            return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
         }
 
         private int GetReporterIonIndexFromMode(clsReporterIons.eReporterIonMassModeConstants reporterIonMassMode)
@@ -930,7 +934,7 @@ namespace MASIC
             DataTableUtils.AppendColumnStringToTable(customSICValues, COL_NAME_SCAN_COMMENT, string.Empty);
             DataTableUtils.AppendColumnIntegerToTable(customSICValues, COL_NAME_CUSTOM_SIC_VALUE_ROW_ID, 0, true, true);
 
-            var primaryKeyColumn = new DataColumn[] { customSICValues.Columns[COL_NAME_CUSTOM_SIC_VALUE_ROW_ID] };
+            var primaryKeyColumn = new[] { customSICValues.Columns[COL_NAME_CUSTOM_SIC_VALUE_ROW_ID] };
             customSICValues.PrimaryKey = primaryKeyColumn;
 
             // Instantiate the dataset
@@ -952,8 +956,8 @@ namespace MASIC
 
         private void PasteCustomSICValues(bool clearList)
         {
-            var lineDelimiters = new char[] { '\r', '\n' };
-            var columnDelimiters = new char[] { '\t', ',' };
+            var lineDelimiters = new[] { '\r', '\n' };
+            var columnDelimiters = new[] { '\t', ',' };
 
             // Examine the clipboard contents
             var objData = Clipboard.GetDataObject();
@@ -979,10 +983,7 @@ namespace MASIC
                 return;
             }
 
-            var defaultMZTolerance = 0.0;
-            float defaultScanOrAcqTimeTolerance = 0;
-
-            GetCurrentCustomSICTolerances(ref defaultMZTolerance, ref defaultScanOrAcqTimeTolerance);
+            GetCurrentCustomSICTolerances(out var defaultMZTolerance, out var defaultScanOrAcqTimeTolerance);
 
             if (clearList)
             {
@@ -1251,15 +1252,7 @@ namespace MASIC
                     return;
             }
 
-            clsMASIC masicInstance;
-            if (masicReferenceClass == null)
-            {
-                masicInstance = new clsMASIC();
-            }
-            else
-            {
-                masicInstance = masicReferenceClass;
-            }
+            var masicInstance = masicReferenceClass ?? new clsMASIC();
 
             Width = 710;
             Height = 560;
@@ -1712,11 +1705,14 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// This function can be used to prevent the form from resizing itself
+        /// if the MyBase.Resize event fires within 2 seconds of the current time
+        /// </summary>
+        /// <param name="heightToForce"></param>
+        /// <remarks>See CatchUnrequestedHeightChange for more info</remarks>
         public void SetHeightAdjustForce(int heightToForce)
         {
-            // This function can be used to prevent the form from resizing itself if the MyBase.Resize event
-            // fires within 2 seconds of the current time
-            // See CatchUnrequestedHeightChange for more info
             mHeightAdjustForce = heightToForce;
             mHeightAdjustTime = DateTime.UtcNow;
         }
@@ -1737,7 +1733,10 @@ namespace MASIC
             objToolTipControl.SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.25");
             objToolTipControl.SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter");
 
-            objToolTipControl.SetToolTip(chkRefineReportedParentIonMZ, "If enabled, then will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / " + clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA.ToString() + "); will update the reported m/z value to the one found");
+            objToolTipControl.SetToolTip(chkRefineReportedParentIonMZ, string.Format(
+                "If enabled, will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / {0:F0}); " +
+                "will update the reported m/z value to the one found",
+                clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA));
 
             //objToolTipControl.SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram");
 
@@ -2356,7 +2355,7 @@ namespace MASIC
 
         private void txtCustomSICFileDescription_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.A && e.Control == true)
+            if (e.KeyCode == Keys.A && e.Control)
             {
                 txtCustomSICFileDescription.SelectAll();
             }

@@ -3,11 +3,13 @@
     public class clsRawDataExportOptions
     {
         #region "Constants and Enums"
+
         public enum eExportRawDataFileFormatConstants
         {
             PEKFile = 0,
             CSVFile = 1
         }
+
         #endregion
 
         public bool ExportEnabled { get; set; }
@@ -37,12 +39,10 @@
         {
             if (ExportEnabled)
             {
-                return "Export raw data as " + FileFormat.ToString();
+                return "Export raw data as " + FileFormat;
             }
-            else
-            {
-                return "Raw data export is disabled";
-            }
+
+            return "Raw data export is disabled";
         }
     }
 }

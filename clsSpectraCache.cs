@@ -26,7 +26,6 @@ namespace MASIC
         private const string SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR = "_Temp";
 
         private const int SPECTRUM_CACHE_MAX_FILE_AGE_HOURS = 12;
-        private const int DEFAULT_SPECTRUM_ION_COUNT = 500;
 
         private enum eCacheStateConstants
         {
@@ -94,6 +93,7 @@ namespace MASIC
 
         public int CacheEventCount => mCacheEventCount;
 
+        [Obsolete("Legacy parameter; no longer used")]
         public string CacheFileNameBase => mCacheFileNameBase;
 
         public string CacheDirectoryPath
@@ -189,96 +189,95 @@ namespace MASIC
         /// </return>
         private void CacheSpectrum(int poolIndexToCache)
         {
-            const int MAX_RETRIES = 3;
-
             if (SpectraPoolInfo[poolIndexToCache].CacheState == eCacheStateConstants.UnusedSlot)
             {
                 // Nothing to do; slot is already empty
+                return;
             }
-            else
+
+            if (SpectraPoolInfo[poolIndexToCache].CacheState == eCacheStateConstants.LoadedFromCache)
             {
-                if (SpectraPoolInfo[poolIndexToCache].CacheState == eCacheStateConstants.LoadedFromCache)
-                {
-                    // Already cached previously, simply reset the slot
-                }
-
+                // Already cached previously, simply reset the slot
+            }
+            else if (ValidatePageFileIO(true))
+            {
                 // Store all of the spectra in one large file
+                CacheSpectrumWork(poolIndexToCache);
+            }
 
-                else if (ValidatePageFileIO(true))
+            // Remove the spectrum from mSpectrumIndexInPool
+            mSpectrumIndexInPool.Remove(SpectraPool[poolIndexToCache].ScanNumber);
+
+            // Reset .ScanNumber, .IonCount, and .CacheState
+            SpectraPool[poolIndexToCache].Clear(0);
+
+            SpectraPoolInfo[poolIndexToCache].CacheState = eCacheStateConstants.UnusedSlot;
+
+            mCacheEventCount += 1;
+        }
+
+        private void CacheSpectrumWork(int poolIndexToCache)
+        {
+            const int MAX_RETRIES = 3;
+
+            // See if the given spectrum is already present in the page file
+            var scanNumber = SpectraPool[poolIndexToCache].ScanNumber;
+            if (mSpectrumByteOffset.ContainsKey(scanNumber))
+            {
+                // Page file already contains the given scan; do not re-write
+                return;
+            }
+
+            var initialOffset = mPageFileWriter.BaseStream.Position;
+
+            // Write the spectrum to the page file
+            // Record the current offset in the hashtable
+            mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position);
+
+            var retryCount = MAX_RETRIES;
+            while (true)
+            {
+                try
                 {
-                    // See if the given spectrum is already present in the page file
-                    var scanNumber = SpectraPool[poolIndexToCache].ScanNumber;
-                    if (mSpectrumByteOffset.ContainsKey(scanNumber))
+                    var spectraPool = SpectraPool[poolIndexToCache];
+                    // Write the scan number
+                    mPageFileWriter.Write(scanNumber);
+
+                    // Write the ion count
+                    mPageFileWriter.Write(spectraPool.IonCount);
+
+                    // Write the m/z values
+                    for (var index = 0; index <= spectraPool.IonCount - 1; index++)
+                        mPageFileWriter.Write(spectraPool.IonsMZ[index]);
+
+                    // Write the intensity values
+                    for (var index = 0; index <= spectraPool.IonCount - 1; index++)
+                        mPageFileWriter.Write(spectraPool.IonsIntensity[index]);
+
+                    // Write four blank bytes (not really necessary, but adds a little padding between spectra)
+                    mPageFileWriter.Write(0);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    retryCount -= 1;
+                    var message = string.Format("Error caching scan {0}: {1}", scanNumber, ex.Message);
+                    if (retryCount >= 0)
                     {
-                        // Page file already contains the given scan; do not re-write
+                        OnWarningEvent(message);
+
+                        // Wait 2, 4, or 8 seconds, then try again
+                        var sleepSeconds = Math.Pow(2, MAX_RETRIES - retryCount);
+                        System.Threading.Thread.Sleep((int)(sleepSeconds * 1000));
+
+                        mPageFileWriter.BaseStream.Seek(initialOffset, SeekOrigin.Begin);
                     }
                     else
                     {
-                        var initialOffset = mPageFileWriter.BaseStream.Position;
-
-                        // Write the spectrum to the page file
-                        // Record the current offset in the hashtable
-                        mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position);
-
-                        var retryCount = MAX_RETRIES;
-                        while (retryCount >= 0)
-                        {
-                            try
-                            {
-                                var spectraPool = SpectraPool[poolIndexToCache];
-                                // Write the scan number
-                                mPageFileWriter.Write(scanNumber);
-
-                                // Write the ion count
-                                mPageFileWriter.Write(spectraPool.IonCount);
-
-                                // Write the m/z values
-                                for (var index = 0; index <= spectraPool.IonCount - 1; index++)
-                                    mPageFileWriter.Write(spectraPool.IonsMZ[index]);
-
-                                // Write the intensity values
-                                for (var index = 0; index <= spectraPool.IonCount - 1; index++)
-                                    mPageFileWriter.Write(spectraPool.IonsIntensity[index]);
-
-                                // Write four blank bytes (not really necessary, but adds a little padding between spectra)
-                                mPageFileWriter.Write(0);
-                                break;
-                            }
-                            catch (Exception ex)
-                            {
-                                retryCount -= 1;
-                                var message = string.Format("Error caching scan {0}: {1}", scanNumber, ex.Message);
-                                if (retryCount >= 0)
-                                {
-                                    OnWarningEvent(message);
-
-                                    // Wait 2, 4, or 8 seconds, then try again
-                                    var sleepSeconds = Math.Pow(2, MAX_RETRIES - retryCount);
-                                    System.Threading.Thread.Sleep((int)(sleepSeconds * 1000));
-
-                                    mPageFileWriter.BaseStream.Seek(initialOffset, SeekOrigin.Begin);
-                                }
-                                else
-                                {
-                                    throw new Exception(message, ex);
-                                }
-                            }
-                        }
+                        throw new Exception(message, ex);
                     }
                 }
-
-                // Remove the spectrum from mSpectrumIndexInPool
-                mSpectrumIndexInPool.Remove(SpectraPool[poolIndexToCache].ScanNumber);
-
-                // Reset .ScanNumber, .IonCount, and .CacheState
-                SpectraPool[poolIndexToCache].Clear(0);
-
-                SpectraPoolInfo[poolIndexToCache].CacheState = eCacheStateConstants.UnusedSlot;
-
-                mCacheEventCount += 1;
             }
-
-            return;
         }
 
         public void ClosePageFile()
@@ -381,9 +380,14 @@ namespace MASIC
             {
                 var filePathMatch = SPECTRUM_CACHE_FILE_PREFIX + "*" + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + "*";
 
-                var cacheDirectory = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(ConstructCachedSpectrumPath())));
+                var spectrumFile = new FileInfo(Path.GetFullPath(ConstructCachedSpectrumPath()));
+                if (spectrumFile.Directory == null)
+                {
+                    ReportWarning("Unable to determine the spectrum cache directory path in DeleteSpectrumCacheFiles; this is unexpected");
+                    return;
+                }
 
-                foreach (var candidateFile in cacheDirectory.GetFiles(filePathMatch))
+                foreach (var candidateFile in spectrumFile.Directory.GetFiles(filePathMatch))
                 {
                     if (candidateFile.LastWriteTimeUtc < fileDateTolerance)
                     {
@@ -516,6 +520,7 @@ namespace MASIC
         }
 
         [Obsolete("Use GetDefaultCacheOptions, which returns a new instance of clsSpectrumCacheOptions")]
+        // ReSharper disable once RedundantAssignment
         public static void ResetCacheOptions(ref clsSpectrumCacheOptions udtCacheOptions)
         {
             udtCacheOptions = GetDefaultCacheOptions();
@@ -584,6 +589,8 @@ namespace MASIC
             {
                 // Scan not found; create a new, blank mass spectrum
                 // Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
+
+                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                 if (SpectraPool[targetPoolIndex] == null)
                 {
                     SpectraPool[targetPoolIndex] = new clsMSSpectrum(scanNumber);
@@ -594,6 +601,7 @@ namespace MASIC
                 success = true;
             }
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (!success)
             {
                 return false;
@@ -655,10 +663,8 @@ namespace MASIC
                     return false;
                 }
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
         private bool ValidatePageFileIO(bool createIfUninitialized)

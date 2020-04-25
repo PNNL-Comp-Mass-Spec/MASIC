@@ -6,12 +6,12 @@ namespace MASIC
     public class clsScanNumScanTimeConversion : EventNotifier
     {
         /// <summary>
-        /// Returns the index of the scan closest to scanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
+        /// Find the index of the scan closest to scanOrAcqTime (searching both Survey and Frag Scans using the MasterScanList)
         /// </summary>
         /// <param name="scanList"></param>
         /// <param name="scanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
         /// <param name="eScanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
-        /// <returns></returns>
+        /// <returns>The index of the scan closest to scanOrAcqTime, or 0 if an error</returns>
         /// <remarks></remarks>
         private int FindNearestScanNumIndex(
             clsScanList scanList,
@@ -31,7 +31,11 @@ namespace MASIC
                 {
                     // eScanType = eCustomSICScanTypeConstants.AcquisitionTime
                     // Find the closest match in scanList.MasterScanTimeList
-                    scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanTimeList, scanOrAcqTime, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                    scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                        scanList.MasterScanTimeList,
+                        scanOrAcqTime,
+                        scanList.MasterScanOrderCount,
+                        clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
                 }
 
                 return scanIndexMatch;

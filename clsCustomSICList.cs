@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using PRISM;
 
@@ -15,9 +16,24 @@ namespace MASIC
 
         public enum eCustomSICScanTypeConstants
         {
-            Absolute = 0,            // Absolute scan number
-            Relative = 1,            // Relative scan number (ranging from 0 to 1, where 0 is the first scan and 1 is the last scan)
-            AcquisitionTime = 2,     // The scan's acquisition time (aka elution time if using liquid chromatography)
+            /// <summary>
+            /// Absolute scan number
+            /// </summary>
+            Absolute = 0,
+
+            /// <summary>
+            /// Relative scan number (ranging from 0 to 1, where 0 is the first scan and 1 is the last scan)
+            /// </summary>
+            Relative = 1,
+
+            /// <summary>
+            /// The scan's acquisition time (aka elution time if using liquid chromatography)
+            /// </summary>
+            AcquisitionTime = 2,
+
+            /// <summary>
+            /// Undefined
+            /// </summary>
             Undefined = 3
         }
 
@@ -70,7 +86,9 @@ namespace MASIC
         #endregion
 
         #region "Classwide variables"
+
         private string mCustomSICListFileName;
+
         #endregion
 
         /// <summary>
@@ -130,7 +148,11 @@ namespace MASIC
                     }
                     else
                     {
-                        var fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                        var fragScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                            scanList.MasterScanNumList,
+                            surveyScanNumberAbsolute,
+                            scanList.MasterScanOrderCount,
+                            clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                         while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
                             fragScanIndexMatch += 1;
@@ -224,10 +246,10 @@ namespace MASIC
                 RawTextScanOrAcqTimeToleranceList += ",";
             }
 
-            RawTextMZList += mzSearchSpec.MZ.ToString();
-            RawTextMZToleranceDaList += mzSearchSpec.MZToleranceDa.ToString();
-            RawTextScanOrAcqTimeCenterList += mzSearchSpec.ScanOrAcqTimeCenter.ToString();
-            RawTextScanOrAcqTimeToleranceList += mzSearchSpec.ScanOrAcqTimeTolerance.ToString();
+            RawTextMZList += mzSearchSpec.MZ.ToString(CultureInfo.InvariantCulture);
+            RawTextMZToleranceDaList += mzSearchSpec.MZToleranceDa.ToString(CultureInfo.InvariantCulture);
+            RawTextScanOrAcqTimeCenterList += mzSearchSpec.ScanOrAcqTimeCenter.ToString(CultureInfo.InvariantCulture);
+            RawTextScanOrAcqTimeToleranceList += mzSearchSpec.ScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture);
 
             CustomMZSearchValues.Add(mzSearchSpec);
         }
@@ -239,7 +261,7 @@ namespace MASIC
             string scanToleranceList,
             string scanCommentList)
         {
-            var delimiters = new char[] { ',', '\t' };
+            var delimiters = new[] { ',', '\t' };
 
             // Trim any trailing tab characters
             mzList = mzList.TrimEnd('\t');
@@ -357,6 +379,18 @@ namespace MASIC
             RawTextScanOrAcqTimeToleranceList = string.Empty;
         }
 
+        /// <summary>
+        /// Define custom SIC list values
+        /// </summary>
+        /// <param name="eScanType"></param>
+        /// <param name="mzToleranceDa"></param>
+        /// <param name="scanOrAcqTimeToleranceValue"></param>
+        /// <param name="mzList"></param>
+        /// <param name="mzToleranceList"></param>
+        /// <param name="scanOrAcqTimeCenterList"></param>
+        /// <param name="scanOrAcqTimeToleranceList"></param>
+        /// <param name="scanComments"></param>
+        /// <returns>True if success, otherwise false</returns>
         [Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")]
         public bool SetCustomSICListValues(
             eCustomSICScanTypeConstants eScanType,
@@ -368,24 +402,26 @@ namespace MASIC
             float[] scanOrAcqTimeToleranceList,
             string[] scanComments)
         {
-            // Returns True if success
 
             if (mzToleranceList.Length > 0 && mzToleranceList.Length != mzList.Length)
             {
                 // Invalid Custom SIC comment list; number of entries doesn't match
                 return false;
             }
-            else if (scanOrAcqTimeCenterList.Length > 0 && scanOrAcqTimeCenterList.Length != mzList.Length)
+
+            if (scanOrAcqTimeCenterList.Length > 0 && scanOrAcqTimeCenterList.Length != mzList.Length)
             {
                 // Invalid Custom SIC scan center list; number of entries doesn't match
                 return false;
             }
-            else if (scanOrAcqTimeToleranceList.Length > 0 && scanOrAcqTimeToleranceList.Length != mzList.Length)
+
+            if (scanOrAcqTimeToleranceList.Length > 0 && scanOrAcqTimeToleranceList.Length != mzList.Length)
             {
                 // Invalid Custom SIC scan center list; number of entries doesn't match
                 return false;
             }
-            else if (scanComments.Length > 0 && scanComments.Length != mzList.Length)
+
+            if (scanComments.Length > 0 && scanComments.Length != mzList.Length)
             {
                 // Invalid Custom SIC comment list; number of entries doesn't match
                 return false;
@@ -450,12 +486,18 @@ namespace MASIC
             return true;
         }
 
+        /// <summary>
+        /// Define custom SIC list values
+        /// </summary>
+        /// <param name="eScanType"></param>
+        /// <param name="scanOrAcqTimeToleranceValue"></param>
+        /// <param name="mzSearchSpecs"></param>
+        /// <returns>True if success, false if error</returns>
         public bool SetCustomSICListValues(
             eCustomSICScanTypeConstants eScanType,
             float scanOrAcqTimeToleranceValue,
             List<clsCustomMZSearchSpec> mzSearchSpecs)
         {
-            // Returns True if success
 
             ResetMzSearchValues();
 
@@ -530,10 +572,8 @@ namespace MASIC
             {
                 return "0 custom m/z search values";
             }
-            else
-            {
-                return CustomMZSearchValues.Count + " custom m/z search values";
-            }
+
+            return CustomMZSearchValues.Count + " custom m/z search values";
         }
     }
 }

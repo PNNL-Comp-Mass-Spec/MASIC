@@ -99,7 +99,7 @@ namespace MASIC.DataOutput
 
         public List<string> ConstructExtendedStatsHeaders()
         {
-            var cTrimChars = new char[] { ':', ' ' };
+            var cTrimChars = new[] { ':', ' ' };
 
             var headerNames = new List<string>()
             {
@@ -153,7 +153,7 @@ namespace MASIC.DataOutput
             IList<clsScanInfo> fragScans,
             char delimiter)
         {
-            var cTrimChars = new char[] { ':', ' ' };
+            var cTrimChars = new[] { ':', ' ' };
 
             // Keys are ID values pointing to mExtendedHeaderNameMap (where the name is defined); values are the string or numeric values for the settings
             Dictionary<int, string> consolidatedValuesByID;
@@ -333,10 +333,12 @@ namespace MASIC.DataOutput
                         // Survey scan
                         currentScan = scanList.SurveyScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
                         break;
+
                     case clsScanList.eScanTypeConstants.FragScan:
                         // Frag Scan
                         currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
                         break;
+
                     default:
                         // Unknown scan type
                         break;

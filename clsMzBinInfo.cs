@@ -16,10 +16,8 @@
             {
                 return "m/z: " + MZ.ToString("0.0") + ", MZTolerance: " + MZTolerance.ToString("0.0") + " ppm";
             }
-            else
-            {
-                return "m/z: " + MZ.ToString("0.0") + ", MZTolerance: " + MZTolerance.ToString("0.000") + " Da";
-            }
+
+            return "m/z: " + MZ.ToString("0.0") + ", MZTolerance: " + MZTolerance.ToString("0.000") + " Da";
         }
     }
 }

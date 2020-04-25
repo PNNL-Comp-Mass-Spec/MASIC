@@ -85,14 +85,13 @@ namespace MASICBrowser
         /// <remarks></remarks>
         private static string GetAppVersion(string programDate)
         {
-            return Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (" + programDate + ")";
+            return Assembly.GetExecutingAssembly().GetName().Version + " (" + programDate + ")";
         }
 
         private static bool SetOptionsUsingCommandLineParameters(clsParseCommandLine commandLineParser)
         {
             // Returns True if no problems; otherwise, returns false
 
-            var value = string.Empty;
             var validParameters = new List<string>() { "I" };
 
             try
@@ -104,21 +103,19 @@ namespace MASICBrowser
                         (from item in commandLineParser.InvalidParameters(validParameters) select ("/" + item)).ToList());
                     return false;
                 }
-                else
-                {
-                    // Query commandLineParser to see if various parameters are present
-                    if (commandLineParser.RetrieveValueForParameter("I", out value))
-                    {
-                        mInputFilePath = value;
-                    }
-                    else if (commandLineParser.NonSwitchParameterCount > 0)
-                    {
-                        // Treat the first non-switch parameter as the input file
-                        mInputFilePath = commandLineParser.RetrieveNonSwitchParameter(0);
-                    }
 
-                    return true;
+                // Query commandLineParser to see if various parameters are present
+                if (commandLineParser.RetrieveValueForParameter("I", out var inputFilePath))
+                {
+                    mInputFilePath = inputFilePath;
                 }
+                else if (commandLineParser.NonSwitchParameterCount > 0)
+                {
+                    // Treat the first non-switch parameter as the input file
+                    mInputFilePath = commandLineParser.RetrieveNonSwitchParameter(0);
+                }
+
+                return true;
             }
             catch (Exception ex)
             {

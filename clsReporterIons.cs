@@ -6,6 +6,7 @@ namespace MASIC
     public class clsReporterIons
     {
         #region "Constants and Enums"
+
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT = 0.5;
         public const double REPORTER_ION_TOLERANCE_DA_MINIMUM = 0.001;
 

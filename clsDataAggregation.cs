@@ -103,17 +103,15 @@ namespace MASIC
                     OnErrorEvent("Error uncaching scan " + currentScan.ScanNumber);
                     return false;
                 }
-                else
-                {
-                    var success = FindMaxValueInMZRange(
-                        spectraCache.SpectraPool[poolIndex].IonsMZ,
-                        spectraCache.SpectraPool[poolIndex].IonsIntensity,
-                        spectraCache.SpectraPool[poolIndex].IonCount,
-                        mzStart, mzEnd,
-                        out bestMatchMZ, out matchIntensity);
 
-                    return success;
-                }
+                var success = FindMaxValueInMZRange(
+                    spectraCache.SpectraPool[poolIndex].IonsMZ,
+                    spectraCache.SpectraPool[poolIndex].IonsIntensity,
+                    spectraCache.SpectraPool[poolIndex].IonCount,
+                    mzStart, mzEnd,
+                    out bestMatchMZ, out matchIntensity);
+
+                return success;
             }
             catch (Exception ex)
             {
@@ -176,14 +174,21 @@ namespace MASIC
                 matchIntensity = highestIntensity;
                 return true;
             }
-            else
-            {
-                bestMatchMZ = 0;
-                matchIntensity = 0;
-                return false;
-            }
+
+            bestMatchMZ = 0;
+            matchIntensity = 0;
+            return false;
         }
 
+        /// <summary>
+        /// Searches dataValues for searchValue with a tolerance of +/-toleranceHalfWidth
+        /// </summary>
+        /// <param name="dataValues"></param>
+        /// <param name="searchValue"></param>
+        /// <param name="toleranceHalfWidth"></param>
+        /// <param name="matchIndexStart">Output: start index of matching values</param>
+        /// <param name="matchIndexEnd">Output: end index of matching values</param>
+        /// <returns> True if a match is found, false if no match</returns>
         private bool SumIonsFindValueInRange(
             IReadOnlyList<double> dataValues,
             double searchValue,
@@ -191,10 +196,6 @@ namespace MASIC
             out int matchIndexStart,
             out int matchIndexEnd)
         {
-            // Searches dataValues for searchValue with a tolerance of +/-toleranceHalfWidth
-            // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
-            // Otherwise, returns false
-
             bool matchFound;
 
             matchIndexStart = 0;

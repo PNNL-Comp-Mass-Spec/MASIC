@@ -174,13 +174,6 @@ namespace MASIC.DataInput
                     return false;
                 }
 
-                if (xcaliburAccessor == null)
-                {
-                    ReportError("Error opening input data file: " + inputFileFullPath + " (xcaliburAccessor is Nothing)");
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
-                    return false;
-                }
-
                 var datasetID = mOptions.SICOptions.DatasetID;
 
                 success = UpdateDatasetFileStats(rawFileInfo, datasetID, xcaliburAccessor);

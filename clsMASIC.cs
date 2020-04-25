@@ -106,7 +106,7 @@ namespace MASIC
 
         #region "Classwide Variables"
 
-        private bool mLoggedMASICVersion = false;
+        private bool mLoggedMASICVersion;
 
         private readonly MASICPeakFinder.clsMASICPeakFinder mMASICPeakFinder;
 
@@ -187,10 +187,8 @@ namespace MASIC
                 {
                     return mMASICPeakFinder.ProgramVersion;
                 }
-                else
-                {
-                    return string.Empty;
-                }
+
+                return string.Empty;
             }
         }
 
@@ -351,6 +349,7 @@ namespace MASIC
         }
 
         [Obsolete("No longer supported")]
+        // ReSharper disable once IdentifierTypo
         public bool UseFinniganXRawAccessorFunctions
         {
             get => true;
@@ -413,7 +412,7 @@ namespace MASIC
         [Obsolete("Use Property Options.SICOptions.GetSICTolerance")]
         public double GetSICTolerance()
         {
-            return Options.SICOptions.GetSICTolerance(out var toleranceIsPPM);
+            return Options.SICOptions.GetSICTolerance(out _);
         }
 
         [Obsolete("Use Property Options.SICOptions.GetSICTolerance")]
@@ -533,9 +532,10 @@ namespace MASIC
             get => Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute;
             set
             {
-                if (value < 0 || value > double.MaxValue)
-                    value = 0;
-                Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = value;
+                if (value < 0)
+                    Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = 0;
+                else
+                    Options.SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = value;
             }
         }
 
@@ -1397,6 +1397,7 @@ namespace MASIC
             return success;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public bool LoadParameterFileSettings(string parameterFilePath)
         {
             var success = Options.LoadParameterFileSettings(parameterFilePath);
@@ -1407,7 +1408,7 @@ namespace MASIC
             string source,
             string message,
             Exception ex,
-            eMasicErrorCodes eNewErrorCode = eMasicErrorCodes.NoError)
+            eMasicErrorCodes newErrorCode = eMasicErrorCodes.NoError)
         {
             Options.StatusMessage = message;
 
@@ -1424,18 +1425,18 @@ namespace MASIC
             // Show the message and log to the clsProcessFilesBaseClass logger
             if (string.IsNullOrEmpty(source))
             {
-                ShowErrorMessage(messageWithoutCRLF, true);
+                ShowErrorMessage(messageWithoutCRLF);
             }
             else
             {
-                ShowErrorMessage(source + ": " + messageWithoutCRLF, true);
+                ShowErrorMessage(source + ": " + messageWithoutCRLF);
             }
 
             Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
 
-            if (eNewErrorCode != eMasicErrorCodes.NoError)
+            if (newErrorCode != eMasicErrorCodes.NoError)
             {
-                SetLocalErrorCode(eNewErrorCode, true);
+                SetLocalErrorCode(newErrorCode, true);
             }
         }
 
@@ -1665,8 +1666,6 @@ namespace MASIC
 
                             spectraCache.InitializeSpectraPool();
 
-                            var datasetFileInfo = new DatasetFileInfo();
-
                             var scanList = new clsScanList();
                             RegisterEvents(scanList);
 
@@ -1688,7 +1687,7 @@ namespace MASIC
                                                scanList,
                                                spectraCache,
                                                out var dataImporterBase,
-                                               out datasetFileInfo);
+                                               out var datasetFileInfo);
 
                             // Record that the file is finished loading
                             mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
@@ -1768,17 +1767,17 @@ namespace MASIC
                     ShowErrorMessage(mStatusMessage);
                 }
 
-                LogMessage("ProcessingStats: Memory Usage At Start (MB) = " + mProcessingStats.MemoryUsageMBAtStart.ToString());
-                LogMessage("ProcessingStats: Peak memory usage (MB) = " + mProcessingStats.PeakMemoryUsageMB.ToString());
+                LogMessage(string.Format("ProcessingStats: Memory Usage At Start (MB) = {0:F2}", mProcessingStats.MemoryUsageMBAtStart));
+                LogMessage(string.Format("ProcessingStats: Peak memory usage (MB) = {0:F2}", mProcessingStats.PeakMemoryUsageMB));
 
-                LogMessage("ProcessingStats: File Load Time (seconds) = " + mProcessingStats.FileLoadEndTime.Subtract(mProcessingStats.FileLoadStartTime).TotalSeconds.ToString());
-                LogMessage("ProcessingStats: Memory Usage During Load (MB) = " + mProcessingStats.MemoryUsageMBDuringLoad.ToString());
+                LogMessage(string.Format("ProcessingStats: File Load Time (seconds) = {0:N0}", mProcessingStats.FileLoadEndTime.Subtract(mProcessingStats.FileLoadStartTime).TotalSeconds));
+                LogMessage(string.Format("ProcessingStats: Memory Usage During Load (MB) = {0:F2}", mProcessingStats.MemoryUsageMBDuringLoad));
 
-                LogMessage("ProcessingStats: Processing Time (seconds) = " + mProcessingStats.ProcessingEndTime.Subtract(mProcessingStats.ProcessingStartTime).TotalSeconds.ToString());
-                LogMessage("ProcessingStats: Memory Usage At End (MB) = " + mProcessingStats.MemoryUsageMBAtEnd.ToString());
+                LogMessage(string.Format("ProcessingStats: Processing Time (seconds) = {0:N0}", mProcessingStats.ProcessingEndTime.Subtract(mProcessingStats.ProcessingStartTime).TotalSeconds));
+                LogMessage(string.Format("ProcessingStats: Memory Usage At End (MB) = {0:F2}", mProcessingStats.MemoryUsageMBAtEnd));
 
-                LogMessage("ProcessingStats: Cache Event Count = " + mProcessingStats.CacheEventCount.ToString());
-                LogMessage("ProcessingStats: UncCache Event Count = " + mProcessingStats.UnCacheEventCount.ToString());
+                LogMessage(string.Format("ProcessingStats: Cache Event Count = {0:N0}", mProcessingStats.CacheEventCount));
+                LogMessage(string.Format("ProcessingStats: UncCache Event Count = {0:N0}", mProcessingStats.UnCacheEventCount));
 
                 if (success)
                 {
@@ -1898,14 +1897,7 @@ namespace MASIC
             }
         }
 
-        private void SetLocalErrorCode(eMasicErrorCodes eNewErrorCode)
-        {
-            SetLocalErrorCode(eNewErrorCode, false);
-        }
-
-        private void SetLocalErrorCode(
-            eMasicErrorCodes eNewErrorCode,
-            bool leaveExistingErrorCodeUnchanged)
+        private void SetLocalErrorCode(eMasicErrorCodes newErrorCode, bool leaveExistingErrorCodeUnchanged = false)
         {
             if (leaveExistingErrorCodeUnchanged && mLocalErrorCode != eMasicErrorCodes.NoError)
             {
@@ -1913,9 +1905,9 @@ namespace MASIC
             }
             else
             {
-                mLocalErrorCode = eNewErrorCode;
+                mLocalErrorCode = newErrorCode;
 
-                if (eNewErrorCode == eMasicErrorCodes.NoError)
+                if (newErrorCode == eMasicErrorCodes.NoError)
                 {
                     if (ErrorCode == ProcessFilesErrorCodes.LocalizedError)
                     {
@@ -1929,15 +1921,6 @@ namespace MASIC
             }
         }
 
-        /// <summary>
-        /// Update subtask progress
-        /// </summary>
-        /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
-        private void SetSubtaskProcessingStepPct(float subtaskPercentComplete)
-        {
-            SetSubtaskProcessingStepPct(subtaskPercentComplete, false);
-        }
-
         private DateTime SetSubtaskProcessingStepPctLastFileWriteTime = DateTime.UtcNow;
 
         /// <summary>
@@ -1945,7 +1928,7 @@ namespace MASIC
         /// </summary>
         /// <param name="subtaskPercentComplete">Percent complete, between 0 and 100</param>
         /// <param name="forceUpdate"></param>
-        private void SetSubtaskProcessingStepPct(float subtaskPercentComplete, bool forceUpdate)
+        private void SetSubtaskProcessingStepPct(float subtaskPercentComplete, bool forceUpdate = false)
         {
             const int MINIMUM_PROGRESS_UPDATE_INTERVAL_MILLISECONDS = 250;
 
@@ -2011,14 +1994,14 @@ namespace MASIC
 
             if (Options.SkipMSMSProcessing)
             {
-                // Step                           0   1     2     3  4   5      6      7      8
-                weightingFactors = new float[] { 0, 0.97F, 0.002F, 0, 0, 0.001F, 0.025F, 0.001F, 0.001F };            // The sum of these factors should be 1.00
+                // Step                    0  1      2       3  4  5       6       7       8
+                weightingFactors = new[] { 0, 0.97F, 0.002F, 0, 0, 0.001F, 0.025F, 0.001F, 0.001F };            // The sum of these factors should be 1.00
             }
             else
             {
-                // Step                           0   1      2      3     4     5      6      7      8
-                weightingFactors = new float[] { 0, 0.194F, 0.003F, 0.65F, 0.09F, 0.001F, 0.006F, 0.001F, 0.055F };
-            }     // The sum of these factors should be 1.00
+                // Step                    0  1       2       3      4      5       6       7       8
+                weightingFactors = new[] { 0, 0.194F, 0.003F, 0.65F, 0.09F, 0.001F, 0.006F, 0.001F, 0.055F };   // The sum of these factors should be 1.00
+            }
 
             try
             {
@@ -2082,7 +2065,7 @@ namespace MASIC
                         writer.WriteStartElement("Root");
 
                         writer.WriteStartElement("General");
-                        writer.WriteElementString("LastUpdate", DateTime.Now.ToString());
+                        writer.WriteElementString("LastUpdate", DateTime.Now.ToString(clsDatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
                         writer.WriteElementString("ProcessingStep", mProcessingStep.ToString());
                         writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2));
                         writer.WriteElementString("Error", GetErrorMessage());

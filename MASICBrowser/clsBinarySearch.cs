@@ -61,9 +61,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    var midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
-                    if (midIndex < currentFirst)
-                        midIndex = currentFirst;
+                    var midIndex = currentLast / 2;            // Note: Using Integer division
 
                     while (currentFirst <= currentLast && arrayToSearch[midIndex] != itemToSearchFor)
                     {
@@ -223,9 +221,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    var midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
-                    if (midIndex < currentFirst)
-                        midIndex = currentFirst;
+                    var midIndex = currentLast / 2;            // Note: Using Integer division
 
                     while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
                     {
@@ -386,9 +382,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    var midIndex = (currentFirst + currentLast) / 2;            // Note: Using Integer division
-                    if (midIndex < currentFirst)
-                        midIndex = currentFirst;
+                    var midIndex = currentLast / 2;            // Note: Using Integer division
 
                     while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
                     {

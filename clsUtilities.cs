@@ -5,12 +5,12 @@ namespace MASIC
 {
     public class clsUtilities
     {
-        #region "Constants and Enums"
         // Const CHARGE_CARRIER_MASS_AVG As Double = 1.00739
 
+        /// <summary>
+        /// Monoisotopic charge carrier mass
+        /// </summary>
         public const double CHARGE_CARRIER_MASS_MONOISOTOPIC = 1.00727649;
-
-        #endregion
 
         public static bool CheckPointInMZIgnoreRange(
             double mz,
@@ -19,20 +19,11 @@ namespace MASIC
         {
             if (mzIgnoreRangeStart > 0 || mzIgnoreRangeEnd > 0)
             {
-                if (mz <= mzIgnoreRangeEnd && mz >= mzIgnoreRangeStart)
-                {
-                    // The m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                // Return true if the m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd
+                return mz >= mzIgnoreRangeStart && mz <= mzIgnoreRangeEnd;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /// <summary>
@@ -179,7 +170,7 @@ namespace MASIC
             return false;
         }
 
-        #region "PPMToMassConversion"
+        // ReSharper disable once UnusedMember.Global
         public static double MassToPPM(double massToConvert, double currentMZ)
         {
             // Converts massToConvert to ppm, based on the value of currentMZ
@@ -193,6 +184,5 @@ namespace MASIC
 
             return ppmToConvert / 1000000.0 * currentMZ;
         }
-        #endregion
     }
 }

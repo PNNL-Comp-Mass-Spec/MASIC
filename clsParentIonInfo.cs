@@ -85,10 +85,8 @@ namespace MASIC
             {
                 return "m/z " + MZ.ToString("0.00") + " (Custom SIC peak)";
             }
-            else
-            {
-                return "m/z " + MZ.ToString("0.00");
-            }
+
+            return "m/z " + MZ.ToString("0.00");
         }
     }
 }

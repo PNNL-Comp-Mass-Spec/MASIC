@@ -64,13 +64,18 @@ namespace MASIC.DataOutput
             RegisterEvents(ExtendedStatsWriter);
         }
 
+        /// <summary>
+        /// Check for existing results
+        /// </summary>
+        /// <param name="inputFilePathFull"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="masicOptions"></param>
+        /// <returns>True if existing results already exist for the given input file path, SIC Options, and Binning options</returns>
         public bool CheckForExistingResults(
             string inputFilePathFull,
             string outputDirectoryPath,
             clsMASICOptions masicOptions)
         {
-            // Returns True if existing results already exist for the given input file path, SIC Options, and Binning options
-
             var sicOptionsCompare = new clsSICOptions();
             var binningOptionsCompare = new clsBinningOptions();
 
@@ -117,13 +122,14 @@ namespace MASIC.DataOutput
 
                     // If we get here, the file opened successfully
                     var rootElement = xmlDoc.DocumentElement;
-                    if (rootElement.Name == "SICData")
+                    if (rootElement != null && rootElement.Name == "SICData")
                     {
                         // See if the ProcessingComplete node has a value of True
                         var matchingNodeList = rootElement.GetElementsByTagName("ProcessingComplete");
                         if (matchingNodeList.Count != 1)
                             return false;
-                        if (matchingNodeList.Item(0).InnerText.ToLower() != "true")
+
+                        if (matchingNodeList.Item(0)?.InnerText.ToLower() != "true")
                             return false;
 
                         // Read the ProcessingSummary and populate
@@ -492,7 +498,6 @@ namespace MASIC.DataOutput
                         if (validExistingResultsFound)
                         {
                             // All of the options match, make sure the other output files exist
-                            validExistingResultsFound = false;
 
                             filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
                             if (!File.Exists(filePathToCheck))
@@ -681,11 +686,9 @@ namespace MASIC.DataOutput
                 case eOutputFileTypeConstants.ScanStatsExtendedFlatFile:
                     if (!(ExtendedStatsWriter.ExtendedHeaderNameCount > 0))
                     {
-                        List<int> nonConstantHeaderIDs = null;
-
                         // Lookup extended stats values that are constants for all scans
                         // The following will also remove the constant header values from htExtendedHeaderInfo
-                        ExtendedStatsWriter.ExtractConstantExtendedHeaderValues(out nonConstantHeaderIDs, scanList.SurveyScans, scanList.FragScans, delimiter);
+                        ExtendedStatsWriter.ExtractConstantExtendedHeaderValues(out _, scanList.SurveyScans, scanList.FragScans, delimiter);
 
                         headerNames = ExtendedStatsWriter.ConstructExtendedStatsHeaders();
                     }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using PRISM;
 using PRISM.FileProcessor;
+using PRISM.Logging;
+
 #if GUI
 using System.Windows.Forms;
 using ProgressFormNET;
@@ -209,7 +211,7 @@ namespace MASIC
             return ProcessFilesOrDirectoriesBase.GetAppVersion(PROGRAM_DATE);
         }
 
-        private static void RegisterEvents(EventNotifier oClass)
+        private static void RegisterEvents(IEventNotifier oClass)
         {
             oClass.StatusEvent += StatusEventHandler;
             oClass.DebugEvent += DebugEventHandler;
@@ -230,7 +232,6 @@ namespace MASIC
         {
             // Returns True if no problems; otherwise, returns false
 
-            var value = string.Empty;
             var lstValidParameters = new List<string>() { "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q" };
 
             try
@@ -242,100 +243,101 @@ namespace MASIC
                         (from item in commandLineParser.InvalidParameters(lstValidParameters) select ("/" + item)).ToList());
                     return false;
                 }
-                else
+
+                // Query commandLineParser to see if various parameters are present
+                if (commandLineParser.RetrieveValueForParameter("I", out var inputFilePath))
                 {
-                    // Query commandLineParser to see if various parameters are present
-                    if (commandLineParser.RetrieveValueForParameter("I", out value))
-                    {
-                        mInputFilePath = value;
-                    }
-                    else if (commandLineParser.NonSwitchParameterCount > 0)
-                    {
-                        // Treat the first non-switch parameter as the input file
-                        mInputFilePath = commandLineParser.RetrieveNonSwitchParameter(0);
-                    }
-
-                    if (commandLineParser.RetrieveValueForParameter("O", out value))
-                        mOutputDirectoryPath = value;
-                    if (commandLineParser.RetrieveValueForParameter("P", out value))
-                        mParameterFilePath = value;
-                    if (commandLineParser.RetrieveValueForParameter("D", out value))
-                    {
-                        if (int.TryParse(value, out var intValue))
-                        {
-                            mDatasetID = intValue;
-                        }
-                        else if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            // Assume the user specified a dataset number lookup file comma, space, or tab delimited delimited file specifying the dataset number for each input file)
-                            mDatasetLookupFilePath = value;
-                            mDatasetID = 0;
-                        }
-                    }
-
-                    if (commandLineParser.RetrieveValueForParameter("S", out value))
-                    {
-                        mRecurseDirectories = true;
-                        if (int.TryParse(value, out var intValue))
-                        {
-                            mMaxLevelsToRecurse = intValue;
-                        }
-                    }
-
-                    if (commandLineParser.RetrieveValueForParameter("A", out value))
-                        mOutputDirectoryAlternatePath = value;
-                    if (commandLineParser.IsParameterPresent("R"))
-                        mRecreateDirectoryHierarchyInAlternatePath = true;
-
-                    var logFileName = string.Empty;
-                    var logToFile = false;
-
-                    if (commandLineParser.IsParameterPresent("L"))
-                    {
-                        logToFile = commandLineParser.RetrieveValueForParameter("L", out logFileName);
-                    }
-                    else if (commandLineParser.IsParameterPresent("Log"))
-                    {
-                        logToFile = commandLineParser.RetrieveValueForParameter("Log", out logFileName);
-                    }
-
-                    if (logToFile)
-                    {
-                        mLogMessagesToFile = true;
-                        if (!string.IsNullOrEmpty(logFileName))
-                        {
-                            mLogFilePath = logFileName.Trim('"');
-                        }
-                    }
-
-                    if (commandLineParser.RetrieveValueForParameter("SF", out value))
-                    {
-                        mMASICStatusFilename = value;
-                    }
-
-                    if (commandLineParser.RetrieveValueForParameter("LogDir", out value))
-                    {
-                        mLogMessagesToFile = true;
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            mLogDirectoryPath = value;
-                        }
-                    }
-
-                    if (commandLineParser.RetrieveValueForParameter("LogFolder", out value))
-                    {
-                        mLogMessagesToFile = true;
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            mLogDirectoryPath = value;
-                        }
-                    }
-
-                    if (commandLineParser.IsParameterPresent("Q"))
-                        mQuietMode = true;
-
-                    return true;
+                    mInputFilePath = inputFilePath;
                 }
+                else if (commandLineParser.NonSwitchParameterCount > 0)
+                {
+                    // Treat the first non-switch parameter as the input file
+                    mInputFilePath = commandLineParser.RetrieveNonSwitchParameter(0);
+                }
+
+                if (commandLineParser.RetrieveValueForParameter("O", out var outputDirectoryPath))
+                    mOutputDirectoryPath = outputDirectoryPath;
+
+                if (commandLineParser.RetrieveValueForParameter("P", out var parameterFilePath))
+                    mParameterFilePath = parameterFilePath;
+
+                if (commandLineParser.RetrieveValueForParameter("D", out var datasetIdOrLookupFile))
+                {
+                    if (int.TryParse(datasetIdOrLookupFile, out var datasetId))
+                    {
+                        mDatasetID = datasetId;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(datasetIdOrLookupFile))
+                    {
+                        // Assume the user specified a dataset number lookup file comma, space, or tab delimited delimited file specifying the dataset number for each input file)
+                        mDatasetLookupFilePath = datasetIdOrLookupFile;
+                        mDatasetID = 0;
+                    }
+                }
+
+                if (commandLineParser.RetrieveValueForParameter("S", out var recursionDepth))
+                {
+                    mRecurseDirectories = true;
+                    if (int.TryParse(recursionDepth, out var levelsToRecurse))
+                    {
+                        mMaxLevelsToRecurse = levelsToRecurse;
+                    }
+                }
+
+                if (commandLineParser.RetrieveValueForParameter("A", out var alternateOutputDirectory))
+                    mOutputDirectoryAlternatePath = alternateOutputDirectory;
+
+                if (commandLineParser.IsParameterPresent("R"))
+                    mRecreateDirectoryHierarchyInAlternatePath = true;
+
+                var logFileName = string.Empty;
+                var logToFile = false;
+
+                if (commandLineParser.IsParameterPresent("L"))
+                {
+                    logToFile = commandLineParser.RetrieveValueForParameter("L", out logFileName);
+                }
+                else if (commandLineParser.IsParameterPresent("Log"))
+                {
+                    logToFile = commandLineParser.RetrieveValueForParameter("Log", out logFileName);
+                }
+
+                if (logToFile)
+                {
+                    mLogMessagesToFile = true;
+                    if (!string.IsNullOrEmpty(logFileName))
+                    {
+                        mLogFilePath = logFileName.Trim('"');
+                    }
+                }
+
+                if (commandLineParser.RetrieveValueForParameter("SF", out var masicStatusFile))
+                {
+                    mMASICStatusFilename = masicStatusFile;
+                }
+
+                if (commandLineParser.RetrieveValueForParameter("LogDir", out var logDirectoryPath))
+                {
+                    mLogMessagesToFile = true;
+                    if (!string.IsNullOrEmpty(logDirectoryPath))
+                    {
+                        mLogDirectoryPath = logDirectoryPath;
+                    }
+                }
+
+                if (commandLineParser.RetrieveValueForParameter("LogFolder", out var logFolderPath))
+                {
+                    mLogMessagesToFile = true;
+                    if (!string.IsNullOrEmpty(logFolderPath))
+                    {
+                        mLogDirectoryPath = logFolderPath;
+                    }
+                }
+
+                if (commandLineParser.IsParameterPresent("Q"))
+                    mQuietMode = true;
+
+                return true;
             }
             catch (Exception ex)
             {

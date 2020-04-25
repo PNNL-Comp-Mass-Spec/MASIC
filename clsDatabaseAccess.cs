@@ -20,7 +20,9 @@ namespace MASIC
         #endregion
 
         #region "Classwide Variables"
+
         private readonly clsMASICOptions mOptions;
+
         #endregion
 
         /// <summary>
@@ -129,10 +131,8 @@ namespace MASIC
                                 {
                                     return true;
                                 }
-                                else
-                                {
-                                    ReportError("Error converting Dataset ID '" + datasetItem[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
-                                }
+
+                                ReportError("Error converting Dataset ID '" + datasetItem[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
 
                                 break;
                             }
@@ -182,7 +182,7 @@ namespace MASIC
         /// <returns></returns>
         private bool GetDatasetIDFromFile(string datasetLookupFilePath, string datasetName, out int newDatasetId)
         {
-            var delimiterList = new char[] { ' ', ',', '\t' };
+            var delimiterList = new[] { ' ', ',', '\t' };
 
             newDatasetId = 0;
 
@@ -218,10 +218,8 @@ namespace MASIC
                         {
                             return true;
                         }
-                        else
-                        {
-                            ReportError("Error converting Dataset ID '" + dataValues[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
-                        }
+
+                        ReportError("Error converting Dataset ID '" + dataValues[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
                     }
                 }
 

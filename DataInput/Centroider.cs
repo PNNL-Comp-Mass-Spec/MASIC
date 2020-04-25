@@ -151,10 +151,8 @@ namespace MASIC
             {
                 return 0.0000001;
             }
-            else
-            {
-                return 0.000002;
-            }
+
+            return 0.000002;
         }
     }
 }

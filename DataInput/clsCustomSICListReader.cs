@@ -71,7 +71,7 @@ namespace MASIC.DataInput
 
         public bool LoadCustomSICListFromFile(string customSICValuesFileName)
         {
-            var delimiterList = new char[] { '\t' };
+            var delimiterList = new[] { '\t' };
             var forceAcquisitionTimeMode = false;
 
             try
@@ -106,7 +106,7 @@ namespace MASIC.DataInput
                         if (linesRead == 0 && !dataLine.Contains("\t"))
                         {
                             // Split on commas instead of tab characters
-                            delimiterList = new char[] { ',' };
+                            delimiterList = new[] { ',' };
                         }
 
                         var dataCols = dataLine.Split(delimiterList);
@@ -292,6 +292,7 @@ namespace MASIC.DataInput
                                 case (int)eCustomSICFileColumns.Comment:
                                     mzSearchSpec.Comment = string.Copy(dataCols[colIndex]);
                                     break;
+
                                 default:
                                     // Unknown column code
                                     break;

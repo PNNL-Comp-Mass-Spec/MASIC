@@ -23,22 +23,26 @@ namespace MASIC
         private double[] mDataValues = new double[0];
         private int[] mDataIndices = new int[0];
 
-        private float mProgress;     // Value between 0 and 100
-
         public event ProgressChangedEventHandler ProgressChanged;
 
         public delegate void ProgressChangedEventHandler(float progressVal);
 
         #region "Properties"
+
         public int MaximumDataCountToLoad { get; set; }
 
-        public float Progress => mProgress;
+        /// <summary>
+        /// Progress
+        /// </summary>
+        /// <remarks>Value between 0 and 100</remarks>
+        public float Progress { get; private set; }
 
         public float SkipDataPointFlag { get; set; }
 
         public bool TotalIntensityPercentageFilterEnabled { get; set; }
 
         public float TotalIntensityPercentageFilter { get; set; }
+
         #endregion
 
         public clsFilterDataArrayMaxCount()
@@ -93,11 +97,9 @@ namespace MASIC
             {
                 return mDataValues[dataPointIndex];
             }
-            else
-            {
-                // Invalid data point index value
-                return -1;
-            }
+
+            // Invalid data point index value
+            return -1;
         }
 
         public void FilterData()
@@ -141,7 +143,8 @@ namespace MASIC
                     UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
                     return;
                 }
-                else if (mDataCount <= MaximumDataCountToLoad)
+
+                if (mDataCount <= MaximumDataCountToLoad)
                 {
                     // Loaded less than mMaximumDataCountToKeep data points
                     // Nothing to filter
@@ -379,8 +382,6 @@ namespace MASIC
                 }
 
                 UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
-
-                return;
             }
             catch (Exception ex)
             {
@@ -414,9 +415,9 @@ namespace MASIC
 
         private void UpdateProgress(float progressValue)
         {
-            mProgress = progressValue;
+            Progress = progressValue;
 
-            ProgressChanged?.Invoke(mProgress);
+            ProgressChanged?.Invoke(Progress);
         }
     }
 }

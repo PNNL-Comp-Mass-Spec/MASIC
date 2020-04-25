@@ -34,7 +34,7 @@ namespace MASICTest
 
                 // Write the data to disk
                 // The output folder will be below \\proto-2\UnitTest_Files\ if that folder exists
-                // Otherwise, it will be local, and when running NUnit with resharper the output file path will be of the form
+                // Otherwise, it will be local, and when running NUnit with ReSharper the output file path will be of the form
                 // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
                 var outputFolderPath = GetOutputFolderPath();
@@ -56,16 +56,21 @@ namespace MASICTest
                     var searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 10;
 
-                    // Initialize intSearchResults
-                    // Note that keys in searchresults will contain the search values
-                    // and the values in searchresults will contain the search results
-                    var searchresults = new Dictionary<int, int>();
+                    // Initialize searchResults
+                    // Note that keys in searchResults will contain the search values
+                    // and the values in searchResults will contain the search results
+                    var searchResults = new Dictionary<int, int>();
 
                     // Search intDataList for each number between intSearchValueStart and intSearchValueEnd
                     for (var dataPointToFind = searchValueStart; dataPointToFind <= searchValueEnd; dataPointToFind++)
                     {
-                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints.ToArray(), dataPointToFind, dataPoints.Count, eMissingDataMode);
-                        searchresults.Add(dataPointToFind, dataPoints[indexMatch]);
+                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(
+                            dataPoints.ToArray(),
+                            dataPointToFind,
+                            dataPoints.Count,
+                            eMissingDataMode);
+
+                        searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
                         srOutFile.WriteLine(dataPointToFind + '\t' + dataPoints[indexMatch] + '\t' + indexMatch);
                     }
@@ -74,28 +79,28 @@ namespace MASICTest
                     switch (eMissingDataMode)
                     {
                         case clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint:
-                            Assert.AreEqual(searchresults[10], 8);
-                            Assert.AreEqual(searchresults[11], 12);
-                            Assert.AreEqual(searchresults[89], 87);
-                            Assert.AreEqual(searchresults[90], 87);
-                            Assert.AreEqual(searchresults[91], 94);
+                            Assert.AreEqual(searchResults[10], 8);
+                            Assert.AreEqual(searchResults[11], 12);
+                            Assert.AreEqual(searchResults[89], 87);
+                            Assert.AreEqual(searchResults[90], 87);
+                            Assert.AreEqual(searchResults[91], 94);
 
                             break;
                         case clsBinarySearch.eMissingDataModeConstants.ReturnNextPoint:
-                            Assert.AreEqual(searchresults[10], 12);
-                            Assert.AreEqual(searchresults[11], 12);
-                            Assert.AreEqual(searchresults[12], 12);
-                            Assert.AreEqual(searchresults[13], 16);
-                            Assert.AreEqual(searchresults[14], 16);
+                            Assert.AreEqual(searchResults[10], 12);
+                            Assert.AreEqual(searchResults[11], 12);
+                            Assert.AreEqual(searchResults[12], 12);
+                            Assert.AreEqual(searchResults[13], 16);
+                            Assert.AreEqual(searchResults[14], 16);
 
                             break;
 
                         case clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint:
-                            Assert.AreEqual(searchresults[10], 8);
-                            Assert.AreEqual(searchresults[11], 8);
-                            Assert.AreEqual(searchresults[12], 12);
-                            Assert.AreEqual(searchresults[13], 12);
-                            Assert.AreEqual(searchresults[14], 12);
+                            Assert.AreEqual(searchResults[10], 8);
+                            Assert.AreEqual(searchResults[11], 8);
+                            Assert.AreEqual(searchResults[12], 12);
+                            Assert.AreEqual(searchResults[13], 12);
+                            Assert.AreEqual(searchResults[14], 12);
 
                             break;
                     }
@@ -131,7 +136,7 @@ namespace MASICTest
 
                 // Write the data to disk
                 // The output folder will be below \\proto-2\UnitTest_Files\ if that folder exists
-                // Otherwise, it will be local, and when running NUnit with resharper the output file path will be of the form
+                // Otherwise, it will be local, and when running NUnit with ReSharper the output file path will be of the form
                 // C:\Users\username\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15\BinarySearch_Test_Int.txt
 
                 var outputFolderPath = GetOutputFolderPath();
@@ -153,17 +158,17 @@ namespace MASICTest
                     var searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 11;
 
-                    // Initialize intSearchResults
-                    // Note that keys in searchresults will contain the search values
-                    // and the values in searchresults will contain the search results
-                    var searchresults = new Dictionary<double, double>();
+                    // Initialize searchResults
+                    // Note that keys in searchResults will contain the search values
+                    // and the values in searchResults will contain the search results
+                    var searchResults = new Dictionary<double, double>();
 
                     // Search intDataList for each number between intSearchValueStart and intSearchValueEnd
                     for (var index = searchValueStart; index <= searchValueEnd; index++)
                     {
                         var dataPointToFind = index + index / 10.0;
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints.ToArray(), dataPointToFind, dataPoints.Count, eMissingDataMode);
-                        searchresults.Add(dataPointToFind, dataPoints[indexMatch]);
+                        searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
                         srOutFile.WriteLine(dataPointToFind + '\t' + dataPoints[indexMatch] + '\t' + indexMatch);
                     }
@@ -172,33 +177,33 @@ namespace MASICTest
                     switch (eMissingDataMode)
                     {
                         case clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint:
-                            Assert.AreEqual(searchresults[23.1], 20.69693846, 1E-06);
-                            Assert.AreEqual(searchresults[24.2], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[25.3], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[26.4], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[27.5], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[28.6], 30.627417, 1E-06);
+                            Assert.AreEqual(searchResults[23.1], 20.69693846, 1E-06);
+                            Assert.AreEqual(searchResults[24.2], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[25.3], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[26.4], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[27.5], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[28.6], 30.627417, 1E-06);
 
                             break;
                         case clsBinarySearch.eMissingDataModeConstants.ReturnNextPoint:
-                            Assert.AreEqual(searchresults[23.1], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[24.2], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[25.3], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[26.4], 30.627417, 1E-06);
-                            Assert.AreEqual(searchresults[27.5], 30.627417, 1E-06);
-                            Assert.AreEqual(searchresults[28.6], 30.627417, 1E-06);
+                            Assert.AreEqual(searchResults[23.1], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[24.2], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[25.3], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[26.4], 30.627417, 1E-06);
+                            Assert.AreEqual(searchResults[27.5], 30.627417, 1E-06);
+                            Assert.AreEqual(searchResults[28.6], 30.627417, 1E-06);
 
                             break;
 
                         case clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint:
-                            Assert.AreEqual(searchresults[23.1], 20.69693846, 1E-06);
-                            Assert.AreEqual(searchresults[24.2], 20.69693846, 1E-06);
-                            Assert.AreEqual(searchresults[25.3], 20.69693846, 1E-06);
-                            Assert.AreEqual(searchresults[26.4], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[27.5], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[28.6], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[29.7], 25.52025918, 1E-06);
-                            Assert.AreEqual(searchresults[30.8], 30.627416998, 1E-06);
+                            Assert.AreEqual(searchResults[23.1], 20.69693846, 1E-06);
+                            Assert.AreEqual(searchResults[24.2], 20.69693846, 1E-06);
+                            Assert.AreEqual(searchResults[25.3], 20.69693846, 1E-06);
+                            Assert.AreEqual(searchResults[26.4], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[27.5], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[28.6], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[29.7], 25.52025918, 1E-06);
+                            Assert.AreEqual(searchResults[30.8], 30.627416998, 1E-06);
 
                             break;
                     }

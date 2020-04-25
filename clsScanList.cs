@@ -9,6 +9,7 @@ namespace MASIC
     public class clsScanList : clsMasicEventNotifier
     {
         #region "Constants and Enums"
+
         public enum eScanTypeConstants
         {
             SurveyScan = 0,

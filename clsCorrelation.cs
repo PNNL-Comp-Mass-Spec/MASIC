@@ -37,12 +37,13 @@ namespace MASIC
             mBinningOptions = binningOptions;
             NoiseThresholdIntensity = 0;
 
-            mCoefficients = new double[] { 76.180091729471457, -86.505320329416776,
-                                           24.014098240830911, -1.231739572450155,
-                                           0.001208650973866179, -0.000005395239384953 };
+            mCoefficients = new[] { 76.180091729471457, -86.505320329416776,
+                                    24.014098240830911, -1.231739572450155,
+                                    0.001208650973866179, -0.000005395239384953 };
         }
 
         #region "Constants and Structures"
+
         private const int MIN_NON_ZERO_ION_COUNT = 5;
 
         public enum cmCorrelationMethodConstants
@@ -55,7 +56,9 @@ namespace MASIC
         #endregion
 
         #region "Local Member Variables"
+
         private clsBinningOptions mBinningOptions;
+
         #endregion
 
         #region "Property Interface Functions"
@@ -120,13 +123,14 @@ namespace MASIC
                 mBinningOptions.MaximumBinCount = value;
             }
         }
+
         #endregion
 
         private double BetaCF(double a, double b, double x)
         {
             const int MAX_ITERATIONS = 100;
             var EPS = 0.0000003;
-            const double FPMIN = 1.0E-30;
+            const double FP_MIN = 1.0E-30;
 
             int m;
 
@@ -135,32 +139,44 @@ namespace MASIC
             var qam = a - 1.0;
             var c = 1.0;
             var d = 1.0 - qab * x / qap;
-            if (Math.Abs(d) < FPMIN)
-                d = FPMIN;
+
+            if (Math.Abs(d) < FP_MIN)
+                d = FP_MIN;
+
             d = 1.0 / d;
             var h = d;
+
             for (m = 1; m <= MAX_ITERATIONS; m++)
             {
                 var m2 = 2 * m;
                 var aa = m * (b - m) * x / ((qam + m2) * (a + m2));
                 d = 1.0 + aa * d;
-                if (Math.Abs(d) < FPMIN)
-                    d = FPMIN;
+
+                if (Math.Abs(d) < FP_MIN)
+                    d = FP_MIN;
+
                 c = 1.0 + aa / c;
-                if (Math.Abs(c) < FPMIN)
-                    c = FPMIN;
+
+                if (Math.Abs(c) < FP_MIN)
+                    c = FP_MIN;
+
                 d = 1.0 / d;
                 h *= d * c;
                 aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
                 d = 1.0 + aa * d;
-                if (Math.Abs(d) < FPMIN)
-                    d = FPMIN;
+
+                if (Math.Abs(d) < FP_MIN)
+                    d = FP_MIN;
+
                 c = 1.0 + aa / c;
-                if (Math.Abs(c) < FPMIN)
-                    c = FPMIN;
+
+                if (Math.Abs(c) < FP_MIN)
+                    c = FP_MIN;
+
                 d = 1.0 / d;
                 var del = d * c;
                 h *= del;
+
                 if (Math.Abs(del - 1.0) < EPS)
                     break;
             }
@@ -169,10 +185,8 @@ namespace MASIC
             {
                 throw new Exception("a or b too big, or MAX_ITERATIONS too small in clsCorrelation->BetaCF");
             }
-            else
-            {
-                return h;
-            }
+
+            return h;
         }
 
         private double BetaI(double a, double b, double x)
@@ -181,27 +195,23 @@ namespace MASIC
             {
                 throw new Exception("Bad x in routine clsCorrelation->BetaI; should be between 0 and 1");
             }
+
+            double bt;
+            if (Math.Abs(x) < double.Epsilon || Math.Abs(x - 1.0) < double.Epsilon)
+            {
+                bt = 0.0;
+            }
             else
             {
-                double bt;
-                if (Math.Abs(x) < double.Epsilon || Math.Abs(x - 1.0) < double.Epsilon)
-                {
-                    bt = 0.0;
-                }
-                else
-                {
-                    bt = Math.Exp(GammaLn(a + b) - GammaLn(a) - GammaLn(b) + a * Math.Log(x) + b * Math.Log(1.0 - x));
-                }
-
-                if (x < (a + 1.0) / (a + b + 2.0))
-                {
-                    return bt * BetaCF(a, b, x) / a;
-                }
-                else
-                {
-                    return 1.0 - bt * BetaCF(b, a, 1.0 - x) / b;
-                }
+                bt = Math.Exp(GammaLn(a + b) - GammaLn(a) - GammaLn(b) + a * Math.Log(x) + b * Math.Log(1.0 - x));
             }
+
+            if (x < (a + 1.0) / (a + b + 2.0))
+            {
+                return bt * BetaCF(a, b, x) / a;
+            }
+
+            return 1.0 - bt * BetaCF(b, a, 1.0 - x) / b;
         }
 
         /// <summary>
@@ -240,6 +250,7 @@ namespace MASIC
                 }
 
                 var binCount = (int)Math.Round((mBinningOptions.EndX - mBinningOptions.StartX) / mBinningOptions.BinSize - 1);
+
                 if (binCount < 1)
                     binCount = 1;
 
@@ -281,32 +292,32 @@ namespace MASIC
                 var maximumIntensity = float.MinValue;
                 for (var index = 0; index <= dataCount - 1; index++)
                 {
-                    if (yData[index] >= NoiseThresholdIntensity)
-                    {
-                        var binNumber = ValueToBinNumber(xData[index], binningOptions.StartX + offset, binningOptions.BinSize);
-                        if (binNumber >= 0 && binNumber < binCount)
-                        {
-                            if (binningOptions.SumAllIntensitiesForBin)
-                            {
-                                // Add this ion's intensity to the bin intensity
-                                binnedYData[binNumber] += yData[index];
-                            }
-                            // Only change the bin's intensity if this ion's intensity is larger than the bin's intensity
-                            // If it is, then set the bin intensity to equal the ion's intensity
-                            else if (yData[index] > binnedYData[binNumber])
-                            {
-                                binnedYData[binNumber] = yData[index];
-                            }
+                    if (yData[index] < NoiseThresholdIntensity)
+                        continue;
 
-                            if (binnedYData[binNumber] > maximumIntensity)
-                            {
-                                maximumIntensity = binnedYData[binNumber];
-                            }
-                        }
-                        else
+                    var binNumber = ValueToBinNumber(xData[index], binningOptions.StartX + offset, binningOptions.BinSize);
+                    if (binNumber >= 0 && binNumber < binCount)
+                    {
+                        if (binningOptions.SumAllIntensitiesForBin)
                         {
-                            // Bin is Out of range; ignore the value
+                            // Add this ion's intensity to the bin intensity
+                            binnedYData[binNumber] += yData[index];
                         }
+                        // Only change the bin's intensity if this ion's intensity is larger than the bin's intensity
+                        // If it is, then set the bin intensity to equal the ion's intensity
+                        else if (yData[index] > binnedYData[binNumber])
+                        {
+                            binnedYData[binNumber] = yData[index];
+                        }
+
+                        if (binnedYData[binNumber] > maximumIntensity)
+                        {
+                            maximumIntensity = binnedYData[binNumber];
+                        }
+                    }
+                    else
+                    {
+                        // Bin is Out of range; ignore the value
                     }
                 }
 
@@ -331,14 +342,15 @@ namespace MASIC
                     }
                 }
 
-                if (binningOptions.Normalize && maximumIntensity > 0)
+                if (!binningOptions.Normalize || maximumIntensity <= 0)
+                    return;
+
+
+                for (var index = 0; index <= binCount - 1; index++)
                 {
-                    for (var index = 0; index <= binCount - 1; index++)
+                    if (Math.Abs(binnedYData[index]) > float.Epsilon)
                     {
-                        if (Math.Abs(binnedYData[index]) > float.Epsilon)
-                        {
-                            binnedYData[index] /= maximumIntensity * 100;
-                        }
+                        binnedYData[index] /= maximumIntensity * 100;
                     }
                 }
             }
@@ -363,10 +375,11 @@ namespace MASIC
             IReadOnlyCollection<float> dataList2,
             cmCorrelationMethodConstants eCorrelationMethod)
         {
-            float ProbOfSignificance;
+            // ReSharper disable once NotAccessedVariable
+            float probabilityOfSignificance;
 
-            // '  Dim dataList1Test() As Single = New Single() {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6}
-            // '  Dim dataList2Test() As Single = New Single() {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10}
+            // var dataList1Test = new float[] {1, 2, 2, 8, 9, 0, 0, 3, 9, 0, 5, 6};
+            // var dataList2Test = new float[] {2, 3, 7, 7, 11, 1, 3, 2, 13, 0, 4, 10};
 
             try
             {
@@ -400,14 +413,18 @@ namespace MASIC
                 switch (eCorrelationMethod)
                 {
                     case cmCorrelationMethodConstants.Pearson:
-                        CorrelatePearson(dataList1, dataList2, out var RValue, out ProbOfSignificance, out var FishersZ);
+                        CorrelatePearson(dataList1, dataList2, out var RValue, out probabilityOfSignificance, out var fishersZ);
                         return RValue;
+
                     case cmCorrelationMethodConstants.Spearman:
-                        CorrelateSpearman(dataList1, dataList2, out var DiffInRanks, out var ZD, out ProbOfSignificance, out var RS, out var ProbRS);
+                        CorrelateSpearman(dataList1, dataList2, out var diffInRanks, out var ZD, out probabilityOfSignificance, out var RS, out var ProbRS);
                         return RS;
+
                     case cmCorrelationMethodConstants.Kendall:
-                        CorrelateKendall(dataList1, dataList2, out var KendallsTau, out var Z, out ProbOfSignificance);
-                        return KendallsTau;
+                        // ReSharper disable once IdentifierTypo
+                        CorrelateKendall(dataList1, dataList2, out var kendallsTau, out var Z, out probabilityOfSignificance);
+                        return kendallsTau;
+
                     default:
                         return -1;
                 }
@@ -422,7 +439,7 @@ namespace MASIC
         private void CorrelatePearson(
             IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2,
             out float RValue,
-            out float ProbOfSignificance, out float FishersZ)
+            out float probabilityOfSignificance, out float FishersZ)
         {
             // Performs a Pearson correlation (aka linear correlation) of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
@@ -444,7 +461,7 @@ namespace MASIC
             var ax = 0.0;
 
             RValue = 0;
-            ProbOfSignificance = 0;
+            probabilityOfSignificance = 0;
             FishersZ = 0;
 
             var n = dataList1.Count;
@@ -485,15 +502,16 @@ namespace MASIC
             var t = RValue * Math.Sqrt(df / ((1.0 - RValue + TINY) * (1.0 + RValue + TINY)));
 
             // Student's t probability
-            ProbOfSignificance = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
+            probabilityOfSignificance = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
         }
 
         private void CorrelateKendall(
             IReadOnlyCollection<float> dataList1,
             IReadOnlyCollection<float> dataList2,
-            out float KendallsTau,
+            // ReSharper disable once IdentifierTypo
+            out float kendallsTau,
             out float Z,
-            out float ProbOfSignificance)
+            out float probabilityOfSignificance)
         {
             // Performs a Kendall correlation (aka linear correlation) of the two lists
             // The lists must have the same number of data points in each and should be 0-based arrays
@@ -509,9 +527,9 @@ namespace MASIC
             long n1 = 0;
             var intIS = 0;
 
-            KendallsTau = 0;
+            kendallsTau = 0;
             Z = 0;
-            ProbOfSignificance = 0;
+            probabilityOfSignificance = 0;
 
             var n = dataList1.Count;
             if (n != dataList2.Count)
@@ -552,11 +570,14 @@ namespace MASIC
                 }
             }
 
-            KendallsTau = (float)(intIS / (Math.Sqrt(n1) * Math.Sqrt(n2)));
+            kendallsTau = (float)(intIS / (Math.Sqrt(n1) * Math.Sqrt(n2)));
 
+            // ReSharper disable once IdentifierTypo
             var svar = (4.0 * n + 10.0) / (9.0 * n * (n - 1.0));
-            Z = (float)(KendallsTau / Math.Sqrt(svar));
-            ProbOfSignificance = (float)(ErfCC(Math.Abs(Z) / 1.4142136));
+
+            Z = (float)(kendallsTau / Math.Sqrt(svar));
+
+            probabilityOfSignificance = (float)(ErfCC(Math.Abs(Z) / 1.4142136));
         }
 
         private void CorrelateSpearman(
@@ -564,7 +585,7 @@ namespace MASIC
             IReadOnlyCollection<float> dataList2,
             out float DiffInRanks,
             out float ZD,
-            out float ProbOfSignificance,
+            out float probabilityOfSignificance,
             out float RS,
             out float ProbRS)
         {
@@ -577,14 +598,14 @@ namespace MASIC
 
             // Given two data arrays, data1[0..n-1] and data2[0..n-1], this routine returns their sum-squared
             // difference of ranks as D, the number of standard deviations by which D deviates from its null hypothesis
-            // expected value as zd, the two-sided significance level of this deviation as probd,
+            // expected value as zd, the two-sided significance level of this deviation as prob_d,
             // Spearman's rank correlation rs as rs, and the two-sided significance level of its deviation from
-            // zero as probrs. The external routine CRank is used.  A small value of either probd or probrs indicates
+            // zero as prob_rs. The external routine CRank is used.  A small value of either prob_d or prob_rs indicates
             // a significant correlation (rs positive) or anti correlation (rs negative).
 
             DiffInRanks = 0;
             ZD = 0;
-            ProbOfSignificance = 0;
+            probabilityOfSignificance = 0;
             RS = 0;
             ProbRS = 0;
 
@@ -620,10 +641,13 @@ namespace MASIC
             var en3n = en * en * en - en;
             var AvgD = en3n / 6.0 - (sf + sg) / 12.0;
             var fac = (1.0 - sf / en3n) * (1.0 - sg / en3n);
+
+            // ReSharper disable once IdentifierTypo
             var vard = (en - 1.0) * en * en * SquareNum(en + 1.0) / 36.0 * fac;
+
             ZD = (float)((DiffInRanks - AvgD) / Math.Sqrt(vard));
 
-            ProbOfSignificance = (float)(ErfCC(Math.Abs(ZD) / 1.4142136));
+            probabilityOfSignificance = (float)(ErfCC(Math.Abs(ZD) / 1.4142136));
             RS = (float)((1.0 - 6.0 / en3n * (DiffInRanks + (sf + sg) / 12.0)) / Math.Sqrt(fac));
 
             fac = (RS + 1.0) * (1.0 - RS);
@@ -690,10 +714,8 @@ namespace MASIC
             {
                 return ans;
             }
-            else
-            {
-                return 2.0 - ans;
-            }
+
+            return 2.0 - ans;
         }
 
         /// <summary>
@@ -752,10 +774,8 @@ namespace MASIC
             {
                 return 0;
             }
-            else
-            {
-                return value * value;
-            }
+
+            return value * value;
         }
 
         private int ValueToBinNumber(float thisValue, float startValue, float histogramBinSize)

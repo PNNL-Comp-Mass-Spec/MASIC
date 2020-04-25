@@ -46,9 +46,11 @@ namespace MASICPeakFinder
             Conf99_9Pct = 7
             // ReSharper restore UnusedMember.Global
         }
+
         #endregion
 
         #region "Classwide Variables"
+
         private string mStatusMessage;
 
         /// <summary>
@@ -57,7 +59,7 @@ namespace MASICPeakFinder
         /// 80%, 90%, 95%, 98%, 99%, 99.5%, 99.8%, 99.9%
         /// 1.886, 2.920, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598
         /// </summary>
-        private readonly double[] TTestConfidenceLevels = new double[] { 1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598 };
+        private readonly double[] TTestConfidenceLevels = new[] { 1.886, 2.92, 4.303, 6.965, 9.925, 14.089, 22.327, 31.598 };
 
         #endregion
 
@@ -111,10 +113,8 @@ namespace MASICPeakFinder
             {
                 return correctedArea;
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -132,10 +132,8 @@ namespace MASICPeakFinder
             {
                 return rawIntensity - baselineNoiseLevel;
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         private bool ComputeAverageNoiseLevelCheckCounts(
@@ -145,59 +143,52 @@ namespace MASICPeakFinder
             clsBaselineNoiseStats baselineNoiseStats)
         {
             var useLeftData = false;
-            var useRightData = false;
+
             if (minimumCount < 1)
                 minimumCount = 1;
             var useBothSides = false;
 
-            if (validDataCountA >= minimumCount || validDataCountB >= minimumCount)
+            if (validDataCountA < minimumCount && validDataCountB < minimumCount)
+                return false;
+
+            if (validDataCountA >= minimumCount && validDataCountB >= minimumCount)
             {
-                if (validDataCountA >= minimumCount && validDataCountB >= minimumCount)
-                {
-                    // Both meet the minimum count criterion
-                    // Return an overall average
-                    useBothSides = true;
-                }
-                else if (validDataCountA >= minimumCount)
-                {
-                    useLeftData = true;
-                }
-                else
-                {
-                    useRightData = true;
-                }
-
-                if (useBothSides)
-                {
-                    baselineNoiseStats.NoiseLevel = (sumA + sumB) / (validDataCountA + validDataCountB);
-                    baselineNoiseStats.NoiseStDev = 0;      // We'll compute noise StDev outside this function
-                    baselineNoiseStats.PointsUsed = validDataCountA + validDataCountB;
-                }
-                else if (useLeftData)
-                {
-                    // Use left data only
-                    baselineNoiseStats.NoiseLevel = sumA / validDataCountA;
-                    baselineNoiseStats.NoiseStDev = 0;
-                    baselineNoiseStats.PointsUsed = validDataCountA;
-                }
-                else if (useRightData)
-                {
-                    // Use right data only
-                    baselineNoiseStats.NoiseLevel = sumB / validDataCountB;
-                    baselineNoiseStats.NoiseStDev = 0;
-                    baselineNoiseStats.PointsUsed = validDataCountB;
-                }
-                else
-                {
-                    throw new Exception("Logic error; This code should not be reached");
-                }
-
-                return true;
+                // Both meet the minimum count criterion
+                // Return an overall average
+                useBothSides = true;
+            }
+            else if (validDataCountA >= minimumCount)
+            {
+                useLeftData = true;
             }
             else
             {
-                return false;
+                // Will use the data to the right of the peak apex
             }
+
+            if (useBothSides)
+            {
+                baselineNoiseStats.NoiseLevel = (sumA + sumB) / (validDataCountA + validDataCountB);
+                baselineNoiseStats.NoiseStDev = 0;      // We'll compute noise StDev outside this function
+                baselineNoiseStats.PointsUsed = validDataCountA + validDataCountB;
+            }
+            else if (useLeftData)
+            {
+                // Use left data only
+                baselineNoiseStats.NoiseLevel = sumA / validDataCountA;
+                baselineNoiseStats.NoiseStDev = 0;
+                baselineNoiseStats.PointsUsed = validDataCountA;
+            }
+            else
+            {
+                // Use right data only
+                baselineNoiseStats.NoiseLevel = sumB / validDataCountB;
+                baselineNoiseStats.NoiseStDev = 0;
+                baselineNoiseStats.PointsUsed = validDataCountB;
+            }
+
+            return true;
+
         }
 
         private bool ComputeAverageNoiseLevelExcludingRegion(
@@ -358,7 +349,11 @@ namespace MASICPeakFinder
                 }
                 else
                 {
-                    firstSegment.SegmentIndexEnd = firstSegment.SegmentIndexStart + segmentLength - 1;
+                    // ReSharper thinks that segmentLength will always be 0; this is a Bug in ReSharper
+                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                    // ReSharper disable once UselessBinaryOperation
+                    firstSegment.SegmentIndexEnd = segmentLength + firstSegment.SegmentIndexStart - 1;
                 }
 
                 // Initialize the remaining segments
@@ -401,7 +396,7 @@ namespace MASICPeakFinder
                         current.BaselineNoiseStats.PointsUsed,
                         previous.BaselineNoiseStats.PointsUsed,
                         confidenceLevel,
-                        out var tCalculated);
+                        out _);
 
                     if (significantDifference)
                     {
@@ -486,9 +481,11 @@ namespace MASICPeakFinder
             // Compute the average using the data in dataListSorted between dataSortedIndexStart and dataSortedIndexEnd (i.e. all the data)
             double sum = 0;
             for (var i = dataSortedIndexStart; i <= dataSortedIndexEnd; i++)
+            {
                 sum += dataListSorted[i];
+            }
 
-            var dataUsedCount = dataSortedIndexEnd - dataSortedIndexStart + 1;
+            var dataUsedCount = dataSortedIndexEnd + 1;
             var average = sum / dataUsedCount;
             double variance;
 
@@ -663,7 +660,13 @@ namespace MASICPeakFinder
                             else if (dataIndex == sicPeak.IndexBaseLeft)
                             {
                                 // At the start of the peak; use the scan number halfway between .IndexBaseLeft and .IndexMax
-                                fwhmScanStart = sicData[dataIndex + (int)Math.Round((sicPeak.IndexMax - sicPeak.IndexBaseLeft) / 2.0, 0)].ScanNumber;
+                                var indexOffset = (int)Math.Round((sicPeak.IndexMax - sicPeak.IndexBaseLeft) / 2.0, 0);
+
+                                // ReSharper thinks that indexOffset will always be 0; this is a Bug in ReSharper
+                                // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                                // ReSharper disable once UselessBinaryOperation
+                                fwhmScanStart = sicData[dataIndex + indexOffset].ScanNumber;
                             }
                             else
                             {
@@ -714,7 +717,13 @@ namespace MASICPeakFinder
                             else if (dataIndex == sicPeak.IndexBaseRight - 1)
                             {
                                 // At the end of the peak; use the scan number halfway between .IndexBaseRight and .IndexMax
-                                fwhmScanEnd = sicData[dataIndex + 1 - (int)Math.Round((sicPeak.IndexBaseRight - sicPeak.IndexMax) / 2.0, 0)].ScanNumber;
+                                var indexOffset = (int)Math.Round((sicPeak.IndexBaseRight - sicPeak.IndexMax) / 2.0, 0);
+
+                                // ReSharper thinks that indexOffset will always be 0; this is a Bug in ReSharper
+                                // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                                // ReSharper disable once UselessBinaryOperation
+                                fwhmScanEnd = sicData[dataIndex + 1 - indexOffset].ScanNumber;
                             }
                             else
                             {
@@ -739,6 +748,12 @@ namespace MASICPeakFinder
                     }
 
                     fwhmScans = (int)Math.Round(fwhmScanEnd - fwhmScanStart, 0);
+
+                    // ReSharper thinks that fwhmScans will always be 0 based on the previous statement; this is a Bug in ReSharper
+                    // I have verified during runtime: fwhmScans is definitely a positive number, e.g. 64 or 79
+                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (fwhmScans <= 0)
                         fwhmScans = 0;
                 }
@@ -761,7 +776,7 @@ namespace MASICPeakFinder
         // ReSharper disable once UnusedMember.Global
         public void TestComputeKSStat()
         {
-            var scanNumbers = new int[] { 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 };
+            var scanNumbers = new[] { 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 };
             var intensities = new double[] { 2, 5, 7, 10, 11, 18, 19, 15, 8, 4, 1 };
 
             var scanAtApex = 20;
@@ -885,10 +900,8 @@ namespace MASICPeakFinder
             {
                 return ComputeDualTrimmedNoiseLevel(dataList, 0, dataCount - 1, baselineNoiseOptions, out baselineNoiseStats);
             }
-            else
-            {
-                return ComputeTrimmedNoiseLevel(dataList, 0, dataCount - 1, baselineNoiseOptions, IGNORE_NON_POSITIVE_DATA, out baselineNoiseStats);
-            }
+
+            return ComputeTrimmedNoiseLevel(dataList, 0, dataCount - 1, baselineNoiseOptions, IGNORE_NON_POSITIVE_DATA, out baselineNoiseStats);
         }
 
         [Obsolete("Use the version that takes a List(Of clsSICDataPoint")]
@@ -934,6 +947,11 @@ namespace MASICPeakFinder
             var peakHalfWidthPoints = (int)Math.Round(peakWidthPoints / 1.5, 0);
 
             // Make sure that peakHalfWidthPoints is at least NOISE_ESTIMATE_DATA_COUNT_MINIMUM
+
+            // ReSharper thinks that peakHalfWidthPoints is always 0; this is a Bug in ReSharper
+            // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (peakHalfWidthPoints < NOISE_ESTIMATE_DATA_COUNT_MINIMUM)
             {
                 peakHalfWidthPoints = NOISE_ESTIMATE_DATA_COUNT_MINIMUM;
@@ -978,10 +996,8 @@ namespace MASICPeakFinder
                     {
                         break;
                     }
-                    else
-                    {
-                        shiftLeft = !shiftLeft;
-                    }
+
+                    shiftLeft = !shiftLeft;
                 }
             }
 
@@ -1011,10 +1027,8 @@ namespace MASICPeakFinder
                     {
                         break;
                     }
-                    else
-                    {
-                        shiftLeft = !shiftLeft;
-                    }
+
+                    shiftLeft = !shiftLeft;
                 }
             }
 
@@ -1164,7 +1178,13 @@ namespace MASICPeakFinder
                 if (sicData[sicPeak.IndexBaseLeft].Intensity > intensityThreshold)
                 {
                     // Prepend an intensity data point of intensityThreshold, with a scan number avgScanInterval less than the first scan number for the actual peak data
+
+                    // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
+                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                    // ReSharper disable once UselessBinaryOperation
                     scanNumbers[0] = sicData[sicPeak.IndexBaseLeft].ScanNumber - avgScanInterval;
+
                     intensities[0] = intensityThreshold;
                     // intensitiesSmoothed(0) = intensityThreshold
                     areaDataBaseIndex = 1;
@@ -1190,7 +1210,13 @@ namespace MASICPeakFinder
                 {
                     // Append an intensity data point of intensityThreshold, with a scan number avgScanInterval more than the last scan number for the actual peak data
                     var dataIndex = sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + areaDataBaseIndex + 1;
+
+                    // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
+                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                    // ReSharper disable once UselessBinaryOperation
                     scanNumbers[dataIndex] = sicData[sicPeak.IndexBaseRight].ScanNumber + avgScanInterval;
+
                     intensities[dataIndex] = intensityThreshold;
                     areaDataCount += 1;
                     // intensitiesSmoothed(dataIndex) = intensityThreshold
@@ -1453,6 +1479,10 @@ namespace MASICPeakFinder
                                 intensities[dataIndex] = intensities[dataIndex - 1];
                             }
 
+                            // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
+                            // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                            // ReSharper disable once UselessBinaryOperation
                             scanNumbers[0] = scanNumbers[1] - avgScanInterval;
                             intensities[0] = intensityThreshold;
                             dataCount += 1;
@@ -1462,6 +1492,11 @@ namespace MASICPeakFinder
                         if (intensities[dataCount - 1] > intensityThreshold)
                         {
                             // Append a data point with intensity intensityThreshold and with a scan number 1 more than the last scan number in the valid data
+
+                            // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
+                            // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                            // ReSharper disable once UselessBinaryOperation
                             scanNumbers[dataCount] = scanNumbers[dataCount - 1] + avgScanInterval;
                             intensities[dataCount] = intensityThreshold;
                             dataCount += 1;
@@ -1704,10 +1739,8 @@ namespace MASICPeakFinder
             {
                 return signal / noiseThresholdIntensity;
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         /// <summary>
@@ -1781,6 +1814,8 @@ namespace MASICPeakFinder
             }
 
             // Look for the minimum positive value and replace all data in dataListSorted with that value
+
+            // ReSharper disable once UnusedVariable
             var minimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(dataSortedCount, dataListSorted);
 
             switch (baselineNoiseOptions.BaselineNoiseMode)
@@ -1823,7 +1858,12 @@ namespace MASICPeakFinder
                         // average the data from the start to that index
                         indexEnd = (int)Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
 
+                        // ReSharper thinks that indexEnd will always be 0; this is a Bug in ReSharper
+                        // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
+
+                        // ReSharper disable once UselessBinaryOperation
                         countSummed = indexEnd + 1;
+
                         sum = 0;
                         for (var i = 0; i <= indexEnd; i++)
                             sum += dataListSorted[i];
@@ -2891,14 +2931,7 @@ namespace MASICPeakFinder
                 }
             }
 
-            if (peaksContainer.BestPeakIndex >= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return peaksContainer.BestPeakIndex >= 0;
         }
 
         private bool FindPeaksWorkSmoothData(
@@ -2942,62 +2975,54 @@ namespace MASICPeakFinder
                                   "Error with the Butterworth filter" + errorMessage, null, false);
                         return false;
                     }
-                    else
+
+                    // Data was smoothed
+                    // Validate that peakWidthPointsMinimum is large enough
+                    if (butterWorthFrequency > 0)
                     {
-                        // Data was smoothed
-                        // Validate that peakWidthPointsMinimum is large enough
-                        if (butterWorthFrequency > 0)
+                        var peakWidthPointsCompare = (int)Math.Round(1 / butterWorthFrequency, 0);
+                        if (peakWidthPointsMinimum < peakWidthPointsCompare)
                         {
-                            var peakWidthPointsCompare = (int)Math.Round(1 / butterWorthFrequency, 0);
-                            if (peakWidthPointsMinimum < peakWidthPointsCompare)
-                            {
-                                peakWidthPointsMinimum = peakWidthPointsCompare;
-                            }
+                            peakWidthPointsMinimum = peakWidthPointsCompare;
                         }
-
-                        return true;
                     }
+
+                    return true;
                 }
-                else
+
+                // Filter the data with a Savitzky Golay filter
+                var filterThirdWidth = (int)Math.Floor(peaksContainer.PeakWidthPointsMinimum / 3.0);
+                if (filterThirdWidth > 3)
+                    filterThirdWidth = 3;
+
+                // Make sure filterThirdWidth is Odd
+                if (filterThirdWidth % 2 == 0)
                 {
-                    // Filter the data with a Savitzky Golay filter
-                    var filterThirdWidth = (int)Math.Floor(peaksContainer.PeakWidthPointsMinimum / 3.0);
-                    if (filterThirdWidth > 3)
-                        filterThirdWidth = 3;
-
-                    // Make sure filterThirdWidth is Odd
-                    if (filterThirdWidth % 2 == 0)
-                    {
-                        filterThirdWidth -= 1;
-                    }
-
-                    // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
-                    // Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-                    success = filter.SavitzkyGolayFilter(
-                        peaksContainer.SmoothedYData, 0,
-                        peaksContainer.SmoothedYData.Length - 1,
-                        filterThirdWidth, filterThirdWidth,
-                        sicPeakFinderOptions.SavitzkyGolayFilterOrder, out errorMessage, true);
-
-                    if (!success)
-                    {
-                        LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData",
-                                  "Error with the Savitzky-Golay filter: " + errorMessage, null, false);
-                        return false;
-                    }
-                    else
-                    {
-                        // Data was smoothed
-                        return true;
-                    }
+                    filterThirdWidth -= 1;
                 }
+
+                // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
+                // Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
+                success = filter.SavitzkyGolayFilter(
+                    peaksContainer.SmoothedYData, 0,
+                    peaksContainer.SmoothedYData.Length - 1,
+                    filterThirdWidth, filterThirdWidth,
+                    sicPeakFinderOptions.SavitzkyGolayFilterOrder, out errorMessage, true);
+
+                if (!success)
+                {
+                    LogErrors("clsMasicPeakFinder->FindPeaksWorkSmoothData",
+                        "Error with the Savitzky-Golay filter: " + errorMessage, null, false);
+                    return false;
+                }
+
+                // Data was smoothed
+                return true;
             }
-            else
-            {
-                // Do not filter
-                peaksContainer.YData.CopyTo(peaksContainer.SmoothedYData, 0);
-                return false;
-            }
+
+            // Do not filter
+            peaksContainer.YData.CopyTo(peaksContainer.SmoothedYData, 0);
+            return false;
         }
 
         public void FindPotentialPeakArea(
@@ -3463,12 +3488,10 @@ namespace MASICPeakFinder
                 interpolatedXValue = targetX;
                 return true;
             }
-            else
-            {
-                LogErrors("clsMasicPeakFinder->InterpolateX", "TargetX is not between X1 and X2; this shouldn't happen", null, false);
-                interpolatedXValue = 0;
-                return false;
-            }
+
+            LogErrors("clsMasicPeakFinder->InterpolateX", "TargetX is not between X1 and X2; this shouldn't happen", null, false);
+            interpolatedXValue = 0;
+            return false;
         }
 
         /// <summary>
@@ -3493,12 +3516,10 @@ namespace MASICPeakFinder
                 interpolatedIntensity = Y1 + (Y2 - Y1) * ((xValToInterpolate - X1) / scanDifference);
                 return true;
             }
-            else
-            {
-                // xValToInterpolate is not between X1 and X2; cannot interpolate
-                interpolatedIntensity = 0;
-                return false;
-            }
+
+            // xValToInterpolate is not between X1 and X2; cannot interpolate
+            interpolatedIntensity = 0;
+            return false;
         }
 
         private void LogErrors(
@@ -3705,31 +3726,29 @@ namespace MASICPeakFinder
                 tCalculated = 0;
                 return false;
             }
+
+            var sPooled = Math.Sqrt((Math.Pow(stDev1, 2) * (dataCount1 - 1) + Math.Pow(stDev2, 2) * (dataCount2 - 1)) / (dataCount1 + dataCount2 - 2));
+            tCalculated = (mean1 - mean2) / sPooled * Math.Sqrt(dataCount1 * dataCount2 / (double)(dataCount1 + dataCount2));
+
+            var confidenceLevelIndex = (int)confidenceLevel;
+            if (confidenceLevelIndex < 0)
+            {
+                confidenceLevelIndex = 0;
+            }
+            else if (confidenceLevelIndex >= TTestConfidenceLevels.Length)
+            {
+                confidenceLevelIndex = TTestConfidenceLevels.Length - 1;
+            }
+
+            if (tCalculated >= TTestConfidenceLevels[confidenceLevelIndex])
+            {
+                // Differences are significant
+                return true;
+            }
             else
             {
-                var sPooled = Math.Sqrt((Math.Pow(stDev1, 2) * (dataCount1 - 1) + Math.Pow(stDev2, 2) * (dataCount2 - 1)) / (dataCount1 + dataCount2 - 2));
-                tCalculated = (mean1 - mean2) / sPooled * Math.Sqrt(dataCount1 * dataCount2 / (double)(dataCount1 + dataCount2));
-
-                var confidenceLevelIndex = (int)confidenceLevel;
-                if (confidenceLevelIndex < 0)
-                {
-                    confidenceLevelIndex = 0;
-                }
-                else if (confidenceLevelIndex >= TTestConfidenceLevels.Length)
-                {
-                    confidenceLevelIndex = TTestConfidenceLevels.Length - 1;
-                }
-
-                if (tCalculated >= TTestConfidenceLevels[confidenceLevelIndex])
-                {
-                    // Differences are significant
-                    return true;
-                }
-                else
-                {
-                    // Differences are not significant
-                    return false;
-                }
+                // Differences are not significant
+                return false;
             }
         }
     }

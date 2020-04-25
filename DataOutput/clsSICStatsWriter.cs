@@ -24,7 +24,11 @@ namespace MASIC.DataOutput
 
             if (scanList.MasterScanOrderCount > 0)
             {
-                var surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, surveyScanNumberAbsolute, scanList.MasterScanOrderCount, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                var surveyScanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                    scanList.MasterScanNumList,
+                    surveyScanNumberAbsolute,
+                    scanList.MasterScanOrderCount,
+                    clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                 while (surveyScanIndexMatch >= 0 && scanList.MasterScanOrder[surveyScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.FragScan)
                     surveyScanIndexMatch -= 1;
@@ -102,10 +106,8 @@ namespace MASIC.DataOutput
 
             const char TAB_DELIMITER = '\t';
 
-            int[] scanListArray = null;
-
-            // Populate scanListArray with the scan numbers in scanList.SurveyScans
-            PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScans.Count, out scanListArray);
+            // Old: Populate scanListArray with the scan numbers in scanList.SurveyScans
+            // PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScans.Count, out var scanListArray);
 
             try
             {

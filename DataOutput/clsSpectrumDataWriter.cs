@@ -365,9 +365,11 @@ namespace MASIC.DataOutput
                 case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
                     SavePEKFileToDiskWork(dataWriter, currentScan, spectraCache, inputFileName, fragmentationScan, ref spectrumExportCount);
                     break;
+
                 case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
                     SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, spectraCache, fragmentationScan, ref spectrumExportCount);
                     break;
+
                 default:
                     // Unknown format
                     // This code should never be reached

@@ -500,7 +500,7 @@ namespace MASIC.DatasetStats
 
                 writer.WriteElementString("ScanCountMS", summaryStats.MSStats.ScanCount.ToString());
                 writer.WriteElementString("ScanCountMSn", summaryStats.MSnStats.ScanCount.ToString());
-                writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString());
+                writer.WriteElementString("Elution_Time_Max", summaryStats.ElutionTimeMax.ToString("0.0###"));
 
                 writer.WriteElementString("AcqTimeMinutes", datasetInfo.AcqTimeEnd.Subtract(datasetInfo.AcqTimeStart).TotalMinutes.ToString("0.00"));
                 writer.WriteElementString("StartTime", datasetInfo.AcqTimeStart.ToString(DATE_TIME_FORMAT_STRING));
@@ -672,10 +672,8 @@ namespace MASIC.DatasetStats
             {
                 return string.Empty;
             }
-            else
-            {
-                return item;
-            }
+
+            return item;
         }
 
         public DatasetSummaryStats GetDatasetSummaryStats()
@@ -847,18 +845,18 @@ namespace MASIC.DatasetStats
             {
                 return StringUtilities.ValueToString(valueIfNaN, digitsOfPrecision);
             }
-            else if (double.IsNegativeInfinity(value))
+
+            if (double.IsNegativeInfinity(value))
             {
                 return StringUtilities.ValueToString(double.MinValue, digitsOfPrecision);
             }
-            else if (double.IsPositiveInfinity(value))
+
+            if (double.IsPositiveInfinity(value))
             {
                 return StringUtilities.ValueToString(double.MaxValue, digitsOfPrecision);
             }
-            else
-            {
-                return StringUtilities.ValueToString(value, 5);
-            }
+
+            return StringUtilities.ValueToString(value, 5);
         }
     }
 }

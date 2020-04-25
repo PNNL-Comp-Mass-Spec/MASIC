@@ -9,21 +9,28 @@ namespace MASIC
     {
         #region "Constants and Enums"
 
-        // Absolute maximum number of ions that will be tracked for a mass spectrum
+        /// <summary>
+        /// Absolute maximum number of ions that will be tracked for a mass spectrum
+        /// </summary>
         private const int MAX_ALLOWABLE_ION_COUNT = 50000;
 
         #endregion
 
         #region "Properties"
+
         public List<ScanStatsEntry> ScanStats { get; }
+
         #endregion
 
         #region "Classwide variables"
+
         private readonly clsReporterIons mReporterIons;
+
         private readonly clsMASICPeakFinder mPeakFinder;
 
-        private int mSpectraFoundExceedingMaxIonCount = 0;
-        private int mMaxIonCountReported = 0;
+        private int mSpectraFoundExceedingMaxIonCount;
+
+        private int mMaxIonCountReported;
 
         #endregion
 

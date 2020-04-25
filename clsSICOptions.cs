@@ -36,10 +36,8 @@
                     // Return the Da tolerance value that will result for the given ppm tolerance at 1000 m/z
                     return clsParentIonProcessing.GetParentIonToleranceDa(this, 1000);
                 }
-                else
-                {
-                    return SICTolerance;
-                }
+
+                return SICTolerance;
             }
             set => SetSICTolerance(value, false);
         }
@@ -177,7 +175,7 @@
 
         public double GetSICTolerance()
         {
-            return GetSICTolerance(out var toleranceIsPPM);
+            return GetSICTolerance(out _);
         }
 
         public double GetSICTolerance(out bool toleranceIsPPM)
@@ -254,14 +252,9 @@
 
         public override string ToString()
         {
-            if (SICToleranceIsPPM)
-            {
-                return "SIC Tolerance: " + SICTolerance.ToString("0.00") + " ppm";
-            }
-            else
-            {
-                return "SIC Tolerance: " + SICTolerance.ToString("0.0000") + " Da";
-            }
+            var toleranceUnits = SICToleranceIsPPM ? "ppm" : "Da";
+
+            return string.Format("SIC Tolerance: {0:F2} {1}", SICTolerance, toleranceUnits);
         }
 
         #region "Classwide variables"

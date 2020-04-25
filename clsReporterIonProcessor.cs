@@ -50,8 +50,8 @@ namespace MASIC
                     LoadMSTuneInfo = false
                 };
 
-                var xcaliburAccessor = new XRawFileIO(readerOptions);
-                RegisterEvents(xcaliburAccessor);
+                var rawFileReader = new XRawFileIO(readerOptions);
+                RegisterEvents(rawFileReader);
 
                 var includeFtmsColumns = false;
 
@@ -77,7 +77,7 @@ namespace MASIC
 
                     if (includeFtmsColumns)
                     {
-                        xcaliburAccessor.OpenRawFile(inputFilePathFull);
+                        rawFileReader.OpenRawFile(inputFilePathFull);
                     }
                 }
 
@@ -222,7 +222,7 @@ namespace MASIC
                         }
 
                         FindReporterIonsWork(
-                            xcaliburAccessor,
+                            rawFileReader,
                             dataAggregation,
                             includeFtmsColumns,
                             mOptions.SICOptions,
@@ -255,7 +255,7 @@ namespace MASIC
                 if (includeFtmsColumns)
                 {
                     // Close the handle to the data file
-                    xcaliburAccessor.CloseRawFile();
+                    rawFileReader.CloseRawFile();
                 }
 
                 return true;
@@ -275,7 +275,7 @@ namespace MASIC
         /// Looks for the reporter ion m/z values, +/- a tolerance
         /// Calls AggregateIonsInRange with returnMax = True, meaning we're reporting the maximum ion abundance for each reporter ion m/z
         /// </summary>
-        /// <param name="xcaliburAccessor"></param>
+        /// <param name="rawFileReader"></param>
         /// <param name="dataAggregation"></param>
         /// <param name="includeFtmsColumns"></param>
         /// <param name="sicOptions"></param>
@@ -289,7 +289,7 @@ namespace MASIC
         /// <param name="saveObservedMasses"></param>
         /// <remarks></remarks>
         private void FindReporterIonsWork(
-            XRawFileIO xcaliburAccessor,
+            XRawFileIO rawFileReader,
             clsDataAggregation dataAggregation,
             bool includeFtmsColumns,
             clsSICOptions sicOptions,
@@ -360,7 +360,7 @@ namespace MASIC
                     spectraCache.SpectraPool[poolIndex],
                     ion.MZ,
                     ion.MZToleranceDa,
-                    out var ionMatchCount,
+                    out _,
                     out closestMZ[reporterIonIndex],
                     USE_MAX_ABUNDANCE_IN_WINDOW);
 
@@ -373,7 +373,7 @@ namespace MASIC
             {
                 // Retrieve the label data for this spectrum
 
-                xcaliburAccessor.GetScanLabelData(currentScan.ScanNumber, out var ftLabelData);
+                rawFileReader.GetScanLabelData(currentScan.ScanNumber, out var ftLabelData);
 
                 // Find each reporter ion in ftLabelData
 
@@ -577,18 +577,20 @@ namespace MASIC
                 var reporterIonInfoA = x;
                 var reporterIonInfoB = y;
 
+                if (reporterIonInfoA == null || reporterIonInfoB == null)
+                    return 0;
+
                 if (reporterIonInfoA.MZ > reporterIonInfoB.MZ)
                 {
                     return 1;
                 }
-                else if (reporterIonInfoA.MZ < reporterIonInfoB.MZ)
+
+                if (reporterIonInfoA.MZ < reporterIonInfoB.MZ)
                 {
                     return -1;
                 }
-                else
-                {
-                    return 0;
-                }
+
+                return 0;
             }
         }
     }

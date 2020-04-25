@@ -26,9 +26,11 @@ namespace MASIC
         #endregion
 
         #region "Classwide variables"
+
         private readonly clsMASICOptions mOptions;
         private readonly clsDataAggregation mDataAggregation;
         private readonly clsDataOutput mDataOutputHandler;
+
         #endregion
 
         /// <summary>
@@ -129,14 +131,7 @@ namespace MASIC
                     }
                 }
 
-                if (mrmDataPresent)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return mrmDataPresent;
             }
             catch (Exception ex)
             {
@@ -340,7 +335,7 @@ namespace MASIC
                                     spectraCache, fragScan,
                                     mzStart - mrmToleranceHalfWidth,
                                     mzEnd + mrmToleranceHalfWidth,
-                                    out var closestMZ, out var matchIntensity);
+                                    out _, out var matchIntensity);
 
                                 if (mOptions.WriteMRMDataList)
                                 {
@@ -359,43 +354,43 @@ namespace MASIC
                                         dataColumns.Add("0");
                                     }
 
-                                    dataWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
+                                    dataWriter?.WriteLine(string.Join(TAB_DELIMITER.ToString(), dataColumns));
                                 }
 
-                                if (mOptions.WriteMRMIntensityCrosstab)
+                                if (!mOptions.WriteMRMIntensityCrosstab)
+                                    continue;
+
+                                var srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
+
+                                // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
+                                if (srmKeyToIndexMap.TryGetValue(srmMapKey, out var srmIndex))
                                 {
-                                    var srmMapKey = ConstructSRMMapKey(fragScan.MRMScanInfo.ParentIonMZ, fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass);
-
-                                    // Use srmKeyToIndexMap to determine the appropriate column index for srmMapKey
-                                    if (srmKeyToIndexMap.TryGetValue(srmMapKey, out var srmIndex))
+                                    if (crosstabColumnFlag[srmIndex] ||
+                                        srmIndex == 0 && srmIndexLast == srmList.Count - 1)
                                     {
-                                        if (crosstabColumnFlag[srmIndex] ||
-                                            srmIndex == 0 && srmIndexLast == srmList.Count - 1)
-                                        {
-                                            // Either the column is already populated, or the SRMIndex has cycled back to zero
-                                            // Write out the current crosstab line and reset the crosstab column arrays
-                                            ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst,
-                                                                   crosstabColumnValue,
-                                                                   crosstabColumnFlag,
-                                                                   TAB_DELIMITER, true);
+                                        // Either the column is already populated, or the SRMIndex has cycled back to zero
+                                        // Write out the current crosstab line and reset the crosstab column arrays
+                                        ExportMRMDataWriteLine(crosstabWriter, scanFirst, scanTimeFirst,
+                                            crosstabColumnValue,
+                                            crosstabColumnFlag,
+                                            TAB_DELIMITER, true);
 
-                                            scanFirst = fragScan.ScanNumber;
-                                            scanTimeFirst = fragScan.ScanTime;
-                                        }
-
-                                        if (matchFound)
-                                        {
-                                            crosstabColumnValue[srmIndex] = matchIntensity;
-                                        }
-
-                                        crosstabColumnFlag[srmIndex] = true;
-                                        srmIndexLast = srmIndex;
+                                        scanFirst = fragScan.ScanNumber;
+                                        scanTimeFirst = fragScan.ScanTime;
                                     }
-                                    else
+
+                                    if (matchFound)
                                     {
-                                        // Unknown combination of parent ion m/z and daughter m/z; this is unexpected
-                                        // We won't write this entry out
+                                        crosstabColumnValue[srmIndex] = matchIntensity;
                                     }
+
+                                    crosstabColumnFlag[srmIndex] = true;
+                                    srmIndexLast = srmIndex;
+                                }
+                                else
+                                {
+                                    // Unknown combination of parent ion m/z and daughter m/z; this is unexpected
+                                    // We won't write this entry out
                                 }
                             }
 
@@ -510,10 +505,8 @@ namespace MASIC
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public bool ProcessMRMList(
@@ -530,8 +523,6 @@ namespace MASIC
                 var sicDetails = new clsSICDetails();
                 sicDetails.Reset();
                 sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan;
-
-                var noiseStatsSegments = new List<clsBaselineNoiseStatsSegment>();
 
                 for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
                 {
@@ -591,8 +582,8 @@ namespace MASIC
                     var success = peakFinder.ComputeDualTrimmedNoiseLevelTTest(sicDetails.SICIntensities, 0,
                                                                                sicDetails.SICDataCount - 1,
                                                                                mOptions.SICOptions.SICPeakFinderOptions.
-                                                                                   SICBaselineNoiseOptions,
-                                                                               out noiseStatsSegments);
+                                                                               SICBaselineNoiseOptions,
+                                                                               out var noiseStatsSegments);
 
                     if (!success)
                     {
@@ -622,8 +613,7 @@ namespace MASIC
                                                      mOptions.SICOptions.SICPeakFinderOptions);
 
                     // Update .BaselineNoiseStats in scanList.ParentIons(parentIonIndex).SICStats.Peak
-                    scanList.ParentIons[parentIonIndex].SICStats.Peak.BaselineNoiseStats =
-                    peakFinder.LookupNoiseStatsUsingSegments(
+                    scanList.ParentIons[parentIonIndex].SICStats.Peak.BaselineNoiseStats = peakFinder.LookupNoiseStatsUsingSegments(
                         scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved,
                         noiseStatsSegments);
 
@@ -638,6 +628,7 @@ namespace MASIC
                                                                     mOptions.SICOptions.SICPeakFinderOptions,
                                                                     potentialAreaStatsInFullSIC, false,
                                                                     scanList.SIMDataPresent, false);
+
                     parentIon.SICStats.SICPotentialAreaStatsForPeak = potentialAreaStatsForPeakOut;
 
                     sicProcessor.StorePeakInParentIon(scanList, parentIonIndex, sicDetails,

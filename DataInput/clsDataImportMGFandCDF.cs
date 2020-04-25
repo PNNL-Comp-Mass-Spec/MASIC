@@ -94,7 +94,7 @@ namespace MASIC.DataInput
                 var scanNumberCorrection = 0;
                 for (var msScanIndex = 0; msScanIndex <= msScanCount - 1; msScanIndex++)
                 {
-                    success = objCDFReader.GetScanInfo(msScanIndex, out var scanNumber, out var scanTotalIntensity, out scanTime, out var massMin, out var massMax);
+                    success = objCDFReader.GetScanInfo(msScanIndex, out var scanNumber, out var scanTotalIntensity, out scanTime, out _, out _);
 
                     if (msScanIndex == 0 && scanNumber == 0)
                     {
@@ -287,7 +287,8 @@ namespace MASIC.DataInput
 
                                 break;
                             }
-                            else if (scanList.SurveyScans[surveyScanIndex].ScanNumber > spectrumInfo.ScanNumber)
+
+                            if (scanList.SurveyScans[surveyScanIndex].ScanNumber > spectrumInfo.ScanNumber)
                             {
                                 break;
                             }
@@ -364,7 +365,8 @@ namespace MASIC.DataInput
                         // Find the base peak ion mass and intensity
                         newFragScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ, msSpectrum.IonsIntensity,
                                                                     out var basePeakIonIntensity,
-                                                                    out var mzMin, out var mzMax);
+                                                                    out _, out _);
+
                         newFragScan.BasePeakIonIntensity = basePeakIonIntensity;
 
                         // Compute the total scan intensity

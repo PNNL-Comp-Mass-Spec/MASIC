@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using PRISM;
@@ -148,21 +149,21 @@ namespace MASIC
         {
             if (scanType == null)
                 scanType = string.Empty;
+
             var scanTypeTrimmed = scanType.Trim();
 
             if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase))
             {
                 return clsCustomSICList.eCustomSICScanTypeConstants.Relative;
             }
-            else if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME, StringComparison.InvariantCultureIgnoreCase))
+
+            if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME, StringComparison.InvariantCultureIgnoreCase))
             {
                 return clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime;
             }
-            else
-            {
-                // Assume absolute
-                return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
-            }
+
+            // Assume absolute
+            return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
         }
 
         /// <summary>
@@ -180,14 +181,9 @@ namespace MASIC
         /// <remarks></remarks>
         public string GetStatusLogKeyNameFilterListAsText(bool commaSeparatedList)
         {
-            if (commaSeparatedList)
-            {
-                return string.Join(Environment.NewLine, StatusLogKeyNameFilterList);
-            }
-            else
-            {
-                return string.Join(", ", StatusLogKeyNameFilterList);
-            }
+            var delimiter = commaSeparatedList ? ", " : Environment.NewLine;
+
+            return string.Join(delimiter, StatusLogKeyNameFilterList);
         }
 
         public void InitializeVariables()
@@ -249,10 +245,8 @@ namespace MASIC
                     ReportMessage("Parameter file not specified -- will use default settings");
                     return true;
                 }
-                else
-                {
-                    ReportMessage("Loading parameter file: " + parameterFilePath);
-                }
+
+                ReportMessage("Loading parameter file: " + parameterFilePath);
 
                 if (!File.Exists(parameterFilePath))
                 {
@@ -264,7 +258,11 @@ namespace MASIC
                         {
                             // Also look in the same directory as the instrument data file
                             var instrumentDataFile = new FileInfo(instrumentDataFilePath);
-                            parameterFilePath = Path.Combine(instrumentDataFile.DirectoryName, Path.GetFileName(parameterFilePath));
+                            if (instrumentDataFile.DirectoryName != null)
+                            {
+                                // ReSharper disable once AssignNullToNotNullAttribute
+                                parameterFilePath = Path.Combine(instrumentDataFile.DirectoryName, Path.GetFileName(parameterFilePath));
+                            }
                         }
 
                         if (!File.Exists(parameterFilePath))
@@ -290,10 +288,11 @@ namespace MASIC
                 }
                 else
                 {
-                    DatabaseConnectionString = reader.GetParam(XML_SECTION_DATABASE_SETTINGS, "ConnectionString",
-                                                               DatabaseConnectionString);
-                    DatasetInfoQuerySql = reader.GetParam(XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql",
-                                                          DatasetInfoQuerySql);
+                    DatabaseConnectionString = reader.GetParam(
+                        XML_SECTION_DATABASE_SETTINGS, "ConnectionString", DatabaseConnectionString);
+
+                    DatasetInfoQuerySql = reader.GetParam(
+                        XML_SECTION_DATABASE_SETTINGS, "DatasetInfoQuerySql", DatasetInfoQuerySql);
                 }
 
                 if (!reader.SectionPresent(XML_SECTION_IMPORT_OPTIONS))
@@ -302,9 +301,11 @@ namespace MASIC
                 }
                 else
                 {
-                    CDFTimeInSeconds = reader.GetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", CDFTimeInSeconds);
-                    ParentIonDecoyMassDa = reader.GetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa",
-                                                           ParentIonDecoyMassDa);
+                    CDFTimeInSeconds = reader.GetParam(
+                        XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", CDFTimeInSeconds);
+
+                    ParentIonDecoyMassDa = reader.GetParam(
+                        XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", ParentIonDecoyMassDa);
                 }
 
                 // Masic Export Options
@@ -314,79 +315,77 @@ namespace MASIC
                 }
                 else
                 {
-                    IncludeHeadersInExportFile = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders",
-                                                                 IncludeHeadersInExportFile);
+                    IncludeHeadersInExportFile = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", IncludeHeadersInExportFile);
 
-                    IncludeScanTimesInSICStatsFile = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                     "IncludeScanTimesInSICStatsFile",
-                                                                     IncludeScanTimesInSICStatsFile);
+                    IncludeScanTimesInSICStatsFile = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", IncludeScanTimesInSICStatsFile);
 
-                    SkipMSMSProcessing = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing",
-                                                         SkipMSMSProcessing);
+                    SkipMSMSProcessing = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", SkipMSMSProcessing);
 
                     // Check for both "SkipSICProcessing" and "SkipSICAndRawDataProcessing" in the XML file
                     // If either is true, then mExportRawDataOnly will be auto-set to false in function ProcessFiles
-                    SkipSICAndRawDataProcessing = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "SkipSICProcessing",
-                                                                  SkipSICAndRawDataProcessing);
+                    SkipSICAndRawDataProcessing = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "SkipSICProcessing", SkipSICAndRawDataProcessing);
 
-                    SkipSICAndRawDataProcessing = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                  "SkipSICAndRawDataProcessing",
-                                                                  SkipSICAndRawDataProcessing);
+                    SkipSICAndRawDataProcessing = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "SkipSICAndRawDataProcessing", SkipSICAndRawDataProcessing);
 
-                    ExportRawDataOnly = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", ExportRawDataOnly);
+                    ExportRawDataOnly = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ExportRawDataOnly", ExportRawDataOnly);
 
-                    SuppressNoParentIonsError = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError",
-                                                                SuppressNoParentIonsError);
+                    SuppressNoParentIonsError = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "SuppressNoParentIonsError", SuppressNoParentIonsError);
 
-                    WriteDetailedSICDataFile = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile",
-                                                               WriteDetailedSICDataFile);
+                    WriteDetailedSICDataFile = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteDetailedSICDataFile", WriteDetailedSICDataFile);
 
-                    WriteMSMethodFile = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", WriteMSMethodFile);
+                    WriteMSMethodFile = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteMSMethodFile", WriteMSMethodFile);
 
-                    WriteMSTuneFile = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", WriteMSTuneFile);
+                    WriteMSTuneFile = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteMSTuneFile", WriteMSTuneFile);
 
-                    WriteExtendedStats = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats",
-                                                         WriteExtendedStats);
+                    WriteExtendedStats = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStats", WriteExtendedStats);
 
-                    WriteExtendedStatsIncludeScanFilterText = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                              "WriteExtendedStatsIncludeScanFilterText",
-                                                                              WriteExtendedStatsIncludeScanFilterText);
+                    WriteExtendedStatsIncludeScanFilterText = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsIncludeScanFilterText", WriteExtendedStatsIncludeScanFilterText);
 
-                    WriteExtendedStatsStatusLog = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                  "WriteExtendedStatsStatusLog",
-                                                                  WriteExtendedStatsStatusLog);
+                    WriteExtendedStatsStatusLog = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteExtendedStatsStatusLog", WriteExtendedStatsStatusLog);
 
-                    var filterList = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", string.Empty);
+                    var filterList = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "StatusLogKeyNameFilterList", string.Empty);
                     if (!string.IsNullOrEmpty(filterList))
                     {
                         SetStatusLogKeyNameFilterList(filterList, ',');
                     }
 
-                    ConsolidateConstantExtendedHeaderValues = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                              "ConsolidateConstantExtendedHeaderValues",
-                                                                              ConsolidateConstantExtendedHeaderValues);
+                    ConsolidateConstantExtendedHeaderValues = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ConsolidateConstantExtendedHeaderValues", ConsolidateConstantExtendedHeaderValues);
 
-                    WriteMRMDataList = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", WriteMRMDataList);
-                    WriteMRMIntensityCrosstab = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab",
-                                                                WriteMRMIntensityCrosstab);
+                    WriteMRMDataList = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteMRMDataList", WriteMRMDataList);
 
-                    FastExistingXMLFileTest = reader.GetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest",
-                                                              FastExistingXMLFileTest);
+                    WriteMRMIntensityCrosstab = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "WriteMRMIntensityCrosstab", WriteMRMIntensityCrosstab);
 
-                    ReporterIons.ReporterIonStatsEnabled = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                           "ReporterIonStatsEnabled",
-                                                                           ReporterIons.ReporterIonStatsEnabled);
+                    FastExistingXMLFileTest = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", FastExistingXMLFileTest);
+
+                    ReporterIons.ReporterIonStatsEnabled = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled);
 
                     var eReporterIonMassMode = (clsReporterIons.eReporterIonMassModeConstants)reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", (int)ReporterIons.ReporterIonMassMode);
 
-                    ReporterIons.ReporterIonToleranceDaDefault = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                                 "ReporterIonToleranceDa",
-                                                                                 ReporterIons.ReporterIonToleranceDaDefault);
+                    ReporterIons.ReporterIonToleranceDaDefault = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", ReporterIons.ReporterIonToleranceDaDefault);
 
-                    ReporterIons.ReporterIonApplyAbundanceCorrection = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                                       "ReporterIonApplyAbundanceCorrection",
-                                                                                       ReporterIons.ReporterIonApplyAbundanceCorrection);
+                    ReporterIons.ReporterIonApplyAbundanceCorrection = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection);
 
                     ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
                         (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)reader.GetParam(
@@ -394,21 +393,18 @@ namespace MASIC
                             "ReporterIonITraq4PlexCorrectionFactorType",
                             (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
 
-                    ReporterIons.ReporterIonSaveObservedMasses = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                                 "ReporterIonSaveObservedMasses",
-                                                                                 ReporterIons.ReporterIonSaveObservedMasses);
+                    ReporterIons.ReporterIonSaveObservedMasses = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", ReporterIons.ReporterIonSaveObservedMasses);
 
-                    ReporterIons.ReporterIonSaveUncorrectedIntensities = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                                         "ReporterIonSaveUncorrectedIntensities",
-                                                                                         ReporterIons.ReporterIonSaveUncorrectedIntensities);
+                    ReporterIons.ReporterIonSaveUncorrectedIntensities = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities);
 
                     ReporterIons.SetReporterIonMassMode(eReporterIonMassMode,
                                                         ReporterIons.ReporterIonToleranceDaDefault);
 
                     // Raw data export options
-                    RawDataExportOptions.ExportEnabled = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                         "ExportRawSpectraData",
-                                                                         RawDataExportOptions.ExportEnabled);
+                    RawDataExportOptions.ExportEnabled = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", RawDataExportOptions.ExportEnabled);
 
                     RawDataExportOptions.FileFormat =
                         (clsRawDataExportOptions.eExportRawDataFileFormatConstants)reader.GetParam(
@@ -416,25 +412,20 @@ namespace MASIC
                             "ExportRawDataFileFormat",
                             (int)RawDataExportOptions.FileFormat);
 
-                    RawDataExportOptions.IncludeMSMS = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                       "ExportRawDataIncludeMSMS",
-                                                                       RawDataExportOptions.IncludeMSMS);
+                    RawDataExportOptions.IncludeMSMS = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", RawDataExportOptions.IncludeMSMS);
 
-                    RawDataExportOptions.RenumberScans = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                         "ExportRawDataRenumberScans",
-                                                                         RawDataExportOptions.RenumberScans);
+                    RawDataExportOptions.RenumberScans = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", RawDataExportOptions.RenumberScans);
 
-                    RawDataExportOptions.MinimumSignalToNoiseRatio = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                                     "ExportRawDataMinimumSignalToNoiseRatio",
-                                                                                     RawDataExportOptions.MinimumSignalToNoiseRatio);
+                    RawDataExportOptions.MinimumSignalToNoiseRatio = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", RawDataExportOptions.MinimumSignalToNoiseRatio);
 
-                    RawDataExportOptions.MaxIonCountPerScan = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                              "ExportRawDataMaxIonCountPerScan",
-                                                                              RawDataExportOptions.MaxIonCountPerScan);
+                    RawDataExportOptions.MaxIonCountPerScan = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", RawDataExportOptions.MaxIonCountPerScan);
 
-                    RawDataExportOptions.IntensityMinimum = reader.GetParam(XML_SECTION_EXPORT_OPTIONS,
-                                                                            "ExportRawDataIntensityMinimum",
-                                                                            RawDataExportOptions.IntensityMinimum);
+                    RawDataExportOptions.IntensityMinimum = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", RawDataExportOptions.IntensityMinimum);
                 }
 
                 if (!reader.SectionPresent(XML_SECTION_SIC_OPTIONS))
@@ -445,182 +436,152 @@ namespace MASIC
                     ReportError(errorMessage);
                     return false;
                 }
+
+                // SIC Options
+                // Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
+
+                // Preferentially use "SICTolerance", if it is present
+                var sicTolerance = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SICTolerance", SICOptions.GetSICTolerance(), out var notPresent);
+
+                if (notPresent)
+                {
+                    // Check for "SICToleranceDa", which is a legacy setting
+                    sicTolerance = reader.GetParam(
+                        XML_SECTION_SIC_OPTIONS, "SICToleranceDa", SICOptions.SICToleranceDa, out notPresent);
+
+                    if (!notPresent)
+                    {
+                        SICOptions.SetSICTolerance(sicTolerance, false);
+                    }
+                }
                 else
                 {
-                    // SIC Options
-                    // Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
+                    var sicToleranceIsPPM = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", false);
 
-                    // Preferentially use "SICTolerance", if it is present
-                    var sicTolerance = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICTolerance",
-                                                       SICOptions.GetSICTolerance(), out var notPresent);
-
-                    if (notPresent)
-                    {
-                        // Check for "SICToleranceDa", which is a legacy setting
-                        sicTolerance = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceDa",
-                                                       SICOptions.SICToleranceDa, out notPresent);
-
-                        if (!notPresent)
-                        {
-                            SICOptions.SetSICTolerance(sicTolerance, false);
-                        }
-                    }
-                    else
-                    {
-                        var sicToleranceIsPPM = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICToleranceIsPPM", false);
-
-                        SICOptions.SetSICTolerance(sicTolerance, sicToleranceIsPPM);
-                    }
-
-                    SICOptions.RefineReportedParentIonMZ = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                           "RefineReportedParentIonMZ",
-                                                                           SICOptions.RefineReportedParentIonMZ);
-
-                    SICOptions.ScanRangeStart = reader.GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeStart",
-                                                                SICOptions.ScanRangeStart);
-
-                    SICOptions.ScanRangeEnd = reader.GetParam(XML_SECTION_SIC_OPTIONS, "ScanRangeEnd",
-                                                              SICOptions.ScanRangeEnd);
-
-                    SICOptions.RTRangeStart = reader.GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeStart",
-                                                              SICOptions.RTRangeStart);
-
-                    SICOptions.RTRangeEnd = reader.GetParam(XML_SECTION_SIC_OPTIONS, "RTRangeEnd", SICOptions.RTRangeEnd);
-
-                    SICOptions.CompressMSSpectraData = reader.GetParam(XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData",
-                                                                       SICOptions.CompressMSSpectraData);
-
-                    SICOptions.CompressMSMSSpectraData = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                         "CompressMSMSSpectraData",
-                                                                         SICOptions.CompressMSMSSpectraData);
-
-                    SICOptions.CompressToleranceDivisorForDa = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                               "CompressToleranceDivisorForDa",
-                                                                               SICOptions.CompressToleranceDivisorForDa);
-
-                    SICOptions.CompressToleranceDivisorForPPM = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                                "CompressToleranceDivisorForPPM",
-                                                                                SICOptions.CompressToleranceDivisorForPPM);
-
-                    SICOptions.MaxSICPeakWidthMinutesBackward = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                                "MaxSICPeakWidthMinutesBackward",
-                                                                                SICOptions.MaxSICPeakWidthMinutesBackward);
-
-                    SICOptions.MaxSICPeakWidthMinutesForward = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                               "MaxSICPeakWidthMinutesForward",
-                                                                               SICOptions.MaxSICPeakWidthMinutesForward);
-
-                    SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax",
-                                        SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax);
-
-                    SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum",
-                                        SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum);
-
-                    // Peak Finding Options
-                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode =
-                        (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)reader.GetParam(
-                            XML_SECTION_SIC_OPTIONS,
-                            "SICNoiseThresholdMode",
-                            (int)SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode);
-
-                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity",
-                                        SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute);
-
-                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                        "SICNoiseFractionLowIntensityDataToAverage",
-                                        SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage);
-
-                    // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
-                    SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0;
-
-                    SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap =
-                    reader.GetParam(XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap",
-                                    SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap);
-
-                    SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax",
-                                        SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax);
-
-                    SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler",
-                                        SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler);
-
-                    SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum",
-                                        SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum);
-
-                    SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData",
-                                        SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData);
-
-                    SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth",
-                                        SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth);
-
-                    SICOptions.SICPeakFinderOptions.UseButterworthSmooth =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth",
-                                        SICOptions.SICPeakFinderOptions.UseButterworthSmooth);
-
-                    SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency",
-                                        SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency);
-
-                    SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData",
-                                        SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData);
-
-                    SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth",
-                                        SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth);
-
-                    SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder",
-                                        SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder);
-
-                    SICOptions.SaveSmoothedData = reader.GetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData",
-                                                                  SICOptions.SaveSmoothedData);
-
-                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode =
-                        (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)reader.GetParam(
-                            XML_SECTION_SIC_OPTIONS,
-                            "MassSpectraNoiseThresholdMode",
-                            (int)SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode);
-
-                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity",
-                                        SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.
-                                            BaselineNoiseLevelAbsolute);
-
-                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.
-                        TrimmedMeanFractionLowIntensityDataToAverage =
-                            reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage",
-                                            SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage);
-
-                    SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio ",
-                                        SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio);
-
-                    SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData =
-                        reader.GetParam(XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData",
-                                        SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData);
-
-                    // Similarity Options
-                    SICOptions.SimilarIonMZToleranceHalfWidth = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                    "SimilarIonMZToleranceHalfWidth",
-                                    SICOptions.SimilarIonMZToleranceHalfWidth);
-
-                    SICOptions.SimilarIonToleranceHalfWidthMinutes = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                                     "SimilarIonToleranceHalfWidthMinutes",
-                                                                                     SICOptions.SimilarIonToleranceHalfWidthMinutes);
-
-                    SICOptions.SpectrumSimilarityMinimum = reader.GetParam(XML_SECTION_SIC_OPTIONS,
-                                                                           "SpectrumSimilarityMinimum",
-                                                                           SICOptions.SpectrumSimilarityMinimum);
+                    SICOptions.SetSICTolerance(sicTolerance, sicToleranceIsPPM);
                 }
+
+                SICOptions.RefineReportedParentIonMZ = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "RefineReportedParentIonMZ", SICOptions.RefineReportedParentIonMZ);
+
+                SICOptions.ScanRangeStart = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "ScanRangeStart", SICOptions.ScanRangeStart);
+
+                SICOptions.ScanRangeEnd = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "ScanRangeEnd", SICOptions.ScanRangeEnd);
+
+                SICOptions.RTRangeStart = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "RTRangeStart", SICOptions.RTRangeStart);
+
+                SICOptions.RTRangeEnd = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "RTRangeEnd", SICOptions.RTRangeEnd);
+
+                SICOptions.CompressMSSpectraData = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "CompressMSSpectraData", SICOptions.CompressMSSpectraData);
+
+                SICOptions.CompressMSMSSpectraData = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "CompressMSMSSpectraData", SICOptions.CompressMSMSSpectraData);
+
+                SICOptions.CompressToleranceDivisorForDa = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForDa", SICOptions.CompressToleranceDivisorForDa);
+
+                SICOptions.CompressToleranceDivisorForPPM = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "CompressToleranceDivisorForPPM", SICOptions.CompressToleranceDivisorForPPM);
+
+                SICOptions.MaxSICPeakWidthMinutesBackward = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesBackward", SICOptions.MaxSICPeakWidthMinutesBackward);
+
+                SICOptions.MaxSICPeakWidthMinutesForward = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "MaxSICPeakWidthMinutesForward", SICOptions.MaxSICPeakWidthMinutesForward);
+
+                SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "IntensityThresholdFractionMax", SICOptions.SICPeakFinderOptions.IntensityThresholdFractionMax);
+
+                SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum);
+
+                // Peak Finding Options
+                var sicNoiseThresholdMode = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", (int)SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode);
+
+                SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode =
+                    (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)sicNoiseThresholdMode;
+
+                SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute);
+
+                SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SICNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage);
+
+                // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
+                SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0;
+
+                SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "MaxDistanceScansNoOverlap", SICOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap);
+
+                SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "MaxAllowedUpwardSpikeFractionMax", SICOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax);
+
+                SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansScaler", SICOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler);
+
+                SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "InitialPeakWidthScansMaximum", SICOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum);
+
+                SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "FindPeaksOnSmoothedData", SICOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData);
+
+                SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SmoothDataRegardlessOfMinimumPeakWidth", SICOptions.SICPeakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth);
+
+                SICOptions.SICPeakFinderOptions.UseButterworthSmooth = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "UseButterworthSmooth", SICOptions.SICPeakFinderOptions.UseButterworthSmooth);
+
+                SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequency", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequency);
+
+                SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "ButterworthSamplingFrequencyDoubledForSIMData", SICOptions.SICPeakFinderOptions.ButterworthSamplingFrequencyDoubledForSIMData);
+
+                SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "UseSavitzkyGolaySmooth", SICOptions.SICPeakFinderOptions.UseSavitzkyGolaySmooth);
+
+                SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SavitzkyGolayFilterOrder", SICOptions.SICPeakFinderOptions.SavitzkyGolayFilterOrder);
+
+                SICOptions.SaveSmoothedData = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", SICOptions.SaveSmoothedData);
+
+                var massSpectraNoiseThresholdMode = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS,
+                    "MassSpectraNoiseThresholdMode",
+                    (int)SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode);
+
+                SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode =
+                    (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)massSpectraNoiseThresholdMode;
+
+                SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute);
+
+                SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseFractionLowIntensityDataToAverage", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage);
+
+                SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseMinimumSignalToNoiseRatio ", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio);
+
+                SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "ReplaceSICZeroesWithMinimumPositiveValueFromMSData", SICOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData);
+
+                // Similarity Options
+                SICOptions.SimilarIonMZToleranceHalfWidth = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SimilarIonMZToleranceHalfWidth", SICOptions.SimilarIonMZToleranceHalfWidth);
+
+                SICOptions.SimilarIonToleranceHalfWidthMinutes = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SimilarIonToleranceHalfWidthMinutes", SICOptions.SimilarIonToleranceHalfWidthMinutes);
+
+                SICOptions.SpectrumSimilarityMinimum = reader.GetParam(
+                    XML_SECTION_SIC_OPTIONS, "SpectrumSimilarityMinimum", SICOptions.SpectrumSimilarityMinimum);
 
                 // Binning Options
                 if (!reader.SectionPresent(XML_SECTION_BINNING_OPTIONS))
@@ -633,41 +594,40 @@ namespace MASIC
                     SetBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes.InvalidParameterFile);
                     return false;
                 }
-                else
-                {
-                    BinningOptions.StartX = reader.GetParam(XML_SECTION_BINNING_OPTIONS, "BinStartX",
-                                                            BinningOptions.StartX);
-                    BinningOptions.EndX = reader.GetParam(XML_SECTION_BINNING_OPTIONS, "BinEndX", BinningOptions.EndX);
-                    BinningOptions.BinSize = reader.GetParam(XML_SECTION_BINNING_OPTIONS, "BinSize",
-                                                             BinningOptions.BinSize);
 
-                    BinningOptions.MaximumBinCount = reader.GetParam(XML_SECTION_BINNING_OPTIONS, "MaximumBinCount",
-                                                                     BinningOptions.MaximumBinCount);
+                BinningOptions.StartX = reader.GetParam(
+                    XML_SECTION_BINNING_OPTIONS, "BinStartX", BinningOptions.StartX);
 
-                    BinningOptions.IntensityPrecisionPercent = reader.GetParam(XML_SECTION_BINNING_OPTIONS,
-                                                                               "IntensityPrecisionPercent",
-                                                                               BinningOptions.IntensityPrecisionPercent);
-                    BinningOptions.Normalize = reader.GetParam(XML_SECTION_BINNING_OPTIONS, "Normalize",
-                                                               BinningOptions.Normalize);
-                    BinningOptions.SumAllIntensitiesForBin = reader.GetParam(XML_SECTION_BINNING_OPTIONS,
-                                                                             "SumAllIntensitiesForBin",
-                                                                             BinningOptions.SumAllIntensitiesForBin);
-                }
+                BinningOptions.EndX = reader.GetParam(
+                    XML_SECTION_BINNING_OPTIONS, "BinEndX", BinningOptions.EndX);
+
+                BinningOptions.BinSize = reader.GetParam(
+                    XML_SECTION_BINNING_OPTIONS, "BinSize", BinningOptions.BinSize);
+
+                BinningOptions.MaximumBinCount = reader.GetParam(
+                    XML_SECTION_BINNING_OPTIONS, "MaximumBinCount", BinningOptions.MaximumBinCount);
+
+                BinningOptions.IntensityPrecisionPercent = reader.GetParam(
+                    XML_SECTION_BINNING_OPTIONS, "IntensityPrecisionPercent", BinningOptions.IntensityPrecisionPercent);
+
+                BinningOptions.Normalize = reader.GetParam(
+                    XML_SECTION_BINNING_OPTIONS, "Normalize", BinningOptions.Normalize);
+
+                BinningOptions.SumAllIntensitiesForBin = reader.GetParam(
+                    XML_SECTION_BINNING_OPTIONS, "SumAllIntensitiesForBin", BinningOptions.SumAllIntensitiesForBin);
 
                 // Memory management options
-                CacheOptions.DiskCachingAlwaysDisabled = reader.GetParam(XML_SECTION_MEMORY_OPTIONS,
-                                                                         "DiskCachingAlwaysDisabled",
-                                                                         CacheOptions.DiskCachingAlwaysDisabled);
+                CacheOptions.DiskCachingAlwaysDisabled = reader.GetParam(
+                    XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", CacheOptions.DiskCachingAlwaysDisabled);
 
-                CacheOptions.DirectoryPath = reader.GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath",
-                                                             CacheOptions.DirectoryPath);
+                CacheOptions.DirectoryPath = reader.GetParam(
+                    XML_SECTION_MEMORY_OPTIONS, "CacheFolderPath", CacheOptions.DirectoryPath);
 
-                CacheOptions.DirectoryPath = reader.GetParam(XML_SECTION_MEMORY_OPTIONS, "CacheDirectoryPath",
-                                                             CacheOptions.DirectoryPath);
+                CacheOptions.DirectoryPath = reader.GetParam(
+                    XML_SECTION_MEMORY_OPTIONS, "CacheDirectoryPath", CacheOptions.DirectoryPath);
 
-                CacheOptions.SpectraToRetainInMemory = reader.GetParam(XML_SECTION_MEMORY_OPTIONS,
-                                                                       "CacheSpectraToRetainInMemory",
-                                                                       CacheOptions.SpectraToRetainInMemory);
+                CacheOptions.SpectraToRetainInMemory = reader.GetParam(
+                    XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory);
 
                 if (!reader.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES))
                 {
@@ -676,12 +636,14 @@ namespace MASIC
                     return true;
                 }
 
-                CustomSICList.LimitSearchToCustomMZList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                                          "LimitSearchToCustomMZList",
-                                                                          CustomSICList.LimitSearchToCustomMZList);
+                CustomSICList.LimitSearchToCustomMZList = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "LimitSearchToCustomMZList", CustomSICList.LimitSearchToCustomMZList);
 
-                var scanType = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", string.Empty);
-                var scanTolerance = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", string.Empty);
+                var scanType = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", string.Empty);
+
+                var scanTolerance = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", string.Empty);
 
                 CustomSICList.ScanToleranceType = GetScanToleranceTypeFromText(scanType);
 
@@ -702,8 +664,8 @@ namespace MASIC
                     CustomSICList.ScanOrAcqTimeTolerance = 0;
                 }
 
-                CustomSICList.CustomSICListFileName = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                                      "CustomMZFile", string.Empty);
+                CustomSICList.CustomSICListFileName = reader.GetParam(
+                        XML_SECTION_CUSTOM_SIC_VALUES, "CustomMZFile", string.Empty);
 
                 if (CustomSICList.CustomSICListFileName.Length > 0)
                 {
@@ -713,26 +675,27 @@ namespace MASIC
 
                     return true;
                 }
-                else
-                {
-                    var mzList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Empty);
-                    var mzToleranceDaList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                            "MZToleranceDaList", string.Empty);
 
-                    var scanCenterList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList",
-                                                         string.Empty);
-                    var scanToleranceList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                            "ScanToleranceList", string.Empty);
+                var mzList = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Empty);
 
-                    var scanCommentList = reader.GetParam(XML_SECTION_CUSTOM_SIC_VALUES,
-                                                          "ScanCommentList", string.Empty);
+                var mzToleranceDaList = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", string.Empty);
 
-                    var success = CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
-                                                                   scanCenterList, scanToleranceList,
-                                                                   scanCommentList);
+                var scanCenterList = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", string.Empty);
 
-                    return success;
-                }
+                var scanToleranceList = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", string.Empty);
+
+                var scanCommentList = reader.GetParam(
+                    XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Empty);
+
+                var success = CustomSICList.ParseCustomSICList(mzList, mzToleranceDaList,
+                    scanCenterList, scanToleranceList,
+                    scanCommentList);
+
+                return success;
             }
             catch (Exception ex)
             {
@@ -794,16 +757,16 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "FastExistingXMLFileTest", FastExistingXMLFileTest);
 
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled);
-                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", (int) ReporterIons.ReporterIonMassMode);
+                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", (int)ReporterIons.ReporterIonMassMode);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonToleranceDa", ReporterIons.ReporterIonToleranceDaDefault);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection);
-                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", (int) ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
+                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonITraq4PlexCorrectionFactorType", (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
 
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveObservedMasses", ReporterIons.ReporterIonSaveObservedMasses);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ReporterIonSaveUncorrectedIntensities", ReporterIons.ReporterIonSaveUncorrectedIntensities);
 
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", RawDataExportOptions.ExportEnabled);
-                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", (int) RawDataExportOptions.FileFormat);
+                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataFileFormat", (int)RawDataExportOptions.FileFormat);
 
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIncludeMSMS", RawDataExportOptions.IncludeMSMS);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataRenumberScans", RawDataExportOptions.RenumberScans);
@@ -840,7 +803,7 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "IntensityThresholdAbsoluteMinimum", SICOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum);
 
                 // Peak Finding Options
-                writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", (int) SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode);
+                writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", (int)SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode);
 
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute);
 
@@ -875,7 +838,7 @@ namespace MASIC
 
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "SaveSmoothedData", SICOptions.SaveSmoothedData);
 
-                writer.SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", (int) SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode);
+                writer.SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdMode", (int)SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode);
 
                 writer.SetParam(XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute);
 
@@ -918,11 +881,11 @@ namespace MASIC
 
                 foreach (var mzSearchValue in CustomSICList.CustomMZSearchValues)
                 {
-                    lstMzValues.Add(mzSearchValue.MZ.ToString());
-                    lstMzTolerances.Add(mzSearchValue.MZToleranceDa.ToString());
+                    lstMzValues.Add(mzSearchValue.MZ.ToString(CultureInfo.InvariantCulture));
+                    lstMzTolerances.Add(mzSearchValue.MZToleranceDa.ToString(CultureInfo.InvariantCulture));
 
-                    lstScanCenters.Add(mzSearchValue.ScanOrAcqTimeCenter.ToString());
-                    lstScanTolerances.Add(mzSearchValue.ScanOrAcqTimeTolerance.ToString());
+                    lstScanCenters.Add(mzSearchValue.ScanOrAcqTimeCenter.ToString(CultureInfo.InvariantCulture));
+                    lstScanTolerances.Add(mzSearchValue.ScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture));
 
                     if (mzSearchValue.Comment == null)
                     {
@@ -954,7 +917,7 @@ namespace MASIC
                     writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Empty);
                 }
 
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", CustomSICList.ScanOrAcqTimeTolerance.ToString());
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanTolerance", CustomSICList.ScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture));
 
                 switch (CustomSICList.ScanToleranceType)
                 {
@@ -1009,12 +972,12 @@ namespace MASIC
             }
         }
 
-        public void SetStatusLogKeyNameFilterList(string matchSpecList, char chDelimiter)
+        public void SetStatusLogKeyNameFilterList(string matchSpecList, char delimiter)
         {
             try
             {
                 // Split on the user-specified delimiter, plus also CR and LF
-                var items = matchSpecList.Split(new char[] { chDelimiter, '\r', '\n' }).ToList();
+                var items = matchSpecList.Split(delimiter, '\r', '\n').ToList();
 
                 var validatedItems = new List<string>();
 

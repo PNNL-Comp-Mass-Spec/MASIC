@@ -5,7 +5,7 @@ namespace MASIC
 {
     public abstract class clsMasicEventNotifier : EventNotifier
     {
-        private short mLastPercentComplete = 0;
+        private short mLastPercentComplete;
 
         #region "Events"
 

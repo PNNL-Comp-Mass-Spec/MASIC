@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Linq;
 
 namespace MASIC.DataOutput
 {
@@ -13,14 +13,13 @@ namespace MASIC.DataOutput
             {
                 return PRISM.StringUtilities.ValueToString(value, 5);
             }
-            else if (value < 1000)
+
+            if (value < 1000)
             {
                 return PRISM.StringUtilities.DblToString(value, 3);
             }
-            else
-            {
-                return PRISM.StringUtilities.DblToString(value, 2);
-            }
+
+            return PRISM.StringUtilities.DblToString(value, 2);
         }
 
         public bool SaveBPIs(
@@ -41,7 +40,6 @@ namespace MASIC.DataOutput
                 var bpiStepCount = 3;
 
                 UpdateProgress(0, "Saving chromatograms to disk");
-                var stepsCompleted = 0;
 
                 var inputFileName = Path.GetFileName(inputFilePathFull);
 
@@ -52,7 +50,7 @@ namespace MASIC.DataOutput
 
                 // SaveICRToolsChromatogramByScan(scanList.SurveyScans, scanList.SurveyScans.Count, outputFilePath, False, True, inputFilePathFull)
 
-                stepsCompleted += 1;
+                var stepsCompleted = 1;
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Second, write an MS-based _scans.csv file (readable with Decon2LS)
@@ -85,7 +83,7 @@ namespace MASIC.DataOutput
         }
 
         private void SaveDecon2LSChromatogram(
-            IList<clsScanInfo> scanList,
+            ICollection<clsScanInfo> scanList,
             clsSpectraCache spectraCache,
             string outputFilePath)
         {
@@ -109,7 +107,7 @@ namespace MASIC.DataOutput
                         if (DateTime.UtcNow.Subtract(lastStatus).TotalSeconds >= 30)
                         {
                             lastStatus = DateTime.UtcNow;
-                            ReportMessage(string.Format("  {0} / {1} scans processed", scansWritten, scanList.Count()));
+                            ReportMessage(string.Format("  {0} / {1} scans processed", scansWritten, scanList.Count));
                         }
                     }
 
@@ -189,7 +187,7 @@ namespace MASIC.DataOutput
                 {
                     if (saveElutionTimeInsteadOfScan)
                     {
-                        writer.WriteLine("CurrentXmax: " + scanList[scanCount - 1].ScanTime.ToString() + " ");
+                        writer.WriteLine("CurrentXmax: " + scanList[scanCount - 1].ScanTime.ToString(CultureInfo.InvariantCulture) + " ");
                     }
                     else
                     {
@@ -285,14 +283,14 @@ namespace MASIC.DataOutput
                 charge.ToString(),
                 intensity.ToString("0.000"),
                 ionMZ.ToString("0.00000"),
-                isoFit.ToString(),
+                isoFit.ToString(CultureInfo.InvariantCulture),
                 averageMass.ToString("0.00000"),
                 monoisotopicMass.ToString("0.00000"),
                 mostAbundantMass.ToString("0.00000"),
-                peakFWHM.ToString(),
+                peakFWHM.ToString(CultureInfo.InvariantCulture),
                 signalToNoise.ToString("0.000"),
-                monoisotopicAbu.ToString(),
-                monoPlus2Abu.ToString()
+                monoisotopicAbu.ToString(CultureInfo.InvariantCulture),
+                monoPlus2Abu.ToString(CultureInfo.InvariantCulture)
             };
 
             writer.WriteLine(string.Join(",", dataValues));

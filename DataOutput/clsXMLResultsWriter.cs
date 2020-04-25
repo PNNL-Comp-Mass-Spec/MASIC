@@ -60,10 +60,8 @@ namespace MASIC.DataOutput
             {
                 return toleranceList;
             }
-            else
-            {
-                return string.Empty;
-            }
+
+            return string.Empty;
         }
 
         public bool SaveDataToXML(
@@ -142,7 +140,7 @@ namespace MASIC.DataOutput
                     {
                         var currentFragScan = scanList.FragScans[currentParentIon.FragScanIndices[fragScanIndex]];
                         writer.WriteElementString("FragScanNumber", currentFragScan.ScanNumber.ToString());
-                        writer.WriteElementString("FragScanTime", currentFragScan.ScanTime.ToString());
+                        writer.WriteElementString("FragScanTime", currentFragScan.ScanTime.ToString(CultureInfo.InvariantCulture));
                         interferenceScore = currentFragScan.FragScanInfo.InterferenceScore;
                     }
                     else
@@ -543,8 +541,8 @@ namespace MASIC.DataOutput
 
                 writer.WriteElementString("ScanRangeStart", sicOptions.ScanRangeStart.ToString());
                 writer.WriteElementString("ScanRangeEnd", sicOptions.ScanRangeEnd.ToString());
-                writer.WriteElementString("RTRangeStart", sicOptions.RTRangeStart.ToString());
-                writer.WriteElementString("RTRangeEnd", sicOptions.RTRangeEnd.ToString());
+                writer.WriteElementString("RTRangeStart", sicOptions.RTRangeStart.ToString(CultureInfo.InvariantCulture));
+                writer.WriteElementString("RTRangeEnd", sicOptions.RTRangeEnd.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteElementString("CompressMSSpectraData", sicOptions.CompressMSSpectraData.ToString());
                 writer.WriteElementString("CompressMSMSSpectraData", sicOptions.CompressMSMSSpectraData.ToString());
@@ -552,22 +550,22 @@ namespace MASIC.DataOutput
                 writer.WriteElementString("CompressToleranceDivisorForDa", sicOptions.CompressToleranceDivisorForDa.ToString("0.0"));
                 writer.WriteElementString("CompressToleranceDivisorForPPM", sicOptions.CompressToleranceDivisorForPPM.ToString("0.0"));
 
-                writer.WriteElementString("MaxSICPeakWidthMinutesBackward", sicOptions.MaxSICPeakWidthMinutesBackward.ToString());
-                writer.WriteElementString("MaxSICPeakWidthMinutesForward", sicOptions.MaxSICPeakWidthMinutesForward.ToString());
+                writer.WriteElementString("MaxSICPeakWidthMinutesBackward", sicOptions.MaxSICPeakWidthMinutesBackward.ToString(CultureInfo.InvariantCulture));
+                writer.WriteElementString("MaxSICPeakWidthMinutesForward", sicOptions.MaxSICPeakWidthMinutesForward.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteElementString("IntensityThresholdFractionMax", StringUtilities.DblToString(sicOptions.SICPeakFinderOptions.IntensityThresholdFractionMax, 5));
-                writer.WriteElementString("IntensityThresholdAbsoluteMinimum", sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString());
+                writer.WriteElementString("IntensityThresholdAbsoluteMinimum", sicOptions.SICPeakFinderOptions.IntensityThresholdAbsoluteMinimum.ToString(CultureInfo.InvariantCulture));
 
                 // Peak Finding Options
                 var baselineNoiseOptions = sicOptions.SICPeakFinderOptions.SICBaselineNoiseOptions;
                 writer.WriteElementString("SICNoiseThresholdMode", baselineNoiseOptions.BaselineNoiseMode.ToString());
-                writer.WriteElementString("SICNoiseThresholdIntensity", baselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString());
+                writer.WriteElementString("SICNoiseThresholdIntensity", baselineNoiseOptions.BaselineNoiseLevelAbsolute.ToString(CultureInfo.InvariantCulture));
                 writer.WriteElementString("SICNoiseFractionLowIntensityDataToAverage", StringUtilities.DblToString(baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 5));
-                writer.WriteElementString("SICNoiseMinimumSignalToNoiseRatio", baselineNoiseOptions.MinimumSignalToNoiseRatio.ToString());
+                writer.WriteElementString("SICNoiseMinimumSignalToNoiseRatio", baselineNoiseOptions.MinimumSignalToNoiseRatio.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteElementString("MaxDistanceScansNoOverlap", sicOptions.SICPeakFinderOptions.MaxDistanceScansNoOverlap.ToString());
                 writer.WriteElementString("MaxAllowedUpwardSpikeFractionMax", StringUtilities.DblToString(sicOptions.SICPeakFinderOptions.MaxAllowedUpwardSpikeFractionMax, 5));
-                writer.WriteElementString("InitialPeakWidthScansScaler", sicOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler.ToString());
+                writer.WriteElementString("InitialPeakWidthScansScaler", sicOptions.SICPeakFinderOptions.InitialPeakWidthScansScaler.ToString(CultureInfo.InvariantCulture));
                 writer.WriteElementString("InitialPeakWidthScansMaximum", sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum.ToString());
 
                 writer.WriteElementString("FindPeaksOnSmoothedData", sicOptions.SICPeakFinderOptions.FindPeaksOnSmoothedData.ToString());
@@ -581,28 +579,28 @@ namespace MASIC.DataOutput
 
                 var noiseThresholdOptions = sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions;
                 writer.WriteElementString("MassSpectraNoiseThresholdMode", noiseThresholdOptions.BaselineNoiseMode.ToString());
-                writer.WriteElementString("MassSpectraNoiseThresholdIntensity", noiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString());
+                writer.WriteElementString("MassSpectraNoiseThresholdIntensity", noiseThresholdOptions.BaselineNoiseLevelAbsolute.ToString(CultureInfo.InvariantCulture));
                 writer.WriteElementString("MassSpectraNoiseFractionLowIntensityDataToAverage", StringUtilities.DblToString(noiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage, 5));
-                writer.WriteElementString("MassSpectraNoiseMinimumSignalToNoiseRatio", noiseThresholdOptions.MinimumSignalToNoiseRatio.ToString());
+                writer.WriteElementString("MassSpectraNoiseMinimumSignalToNoiseRatio", noiseThresholdOptions.MinimumSignalToNoiseRatio.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteElementString("ReplaceSICZeroesWithMinimumPositiveValueFromMSData", sicOptions.ReplaceSICZeroesWithMinimumPositiveValueFromMSData.ToString());
                 writer.WriteElementString("SaveSmoothedData", sicOptions.SaveSmoothedData.ToString());
 
                 // Similarity options
-                writer.WriteElementString("SimilarIonMZToleranceHalfWidth", sicOptions.SimilarIonMZToleranceHalfWidth.ToString());
-                writer.WriteElementString("SimilarIonToleranceHalfWidthMinutes", sicOptions.SimilarIonToleranceHalfWidthMinutes.ToString());
-                writer.WriteElementString("SpectrumSimilarityMinimum", sicOptions.SpectrumSimilarityMinimum.ToString());
+                writer.WriteElementString("SimilarIonMZToleranceHalfWidth", sicOptions.SimilarIonMZToleranceHalfWidth.ToString(CultureInfo.InvariantCulture));
+                writer.WriteElementString("SimilarIonToleranceHalfWidthMinutes", sicOptions.SimilarIonToleranceHalfWidthMinutes.ToString(CultureInfo.InvariantCulture));
+                writer.WriteElementString("SpectrumSimilarityMinimum", sicOptions.SpectrumSimilarityMinimum.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteEndElement();
 
                 writer.WriteStartElement("BinningOptions");
 
-                writer.WriteElementString("BinStartX", binningOptions.StartX.ToString());
-                writer.WriteElementString("BinEndX", binningOptions.EndX.ToString());
-                writer.WriteElementString("BinSize", binningOptions.BinSize.ToString());
+                writer.WriteElementString("BinStartX", binningOptions.StartX.ToString(CultureInfo.InvariantCulture));
+                writer.WriteElementString("BinEndX", binningOptions.EndX.ToString(CultureInfo.InvariantCulture));
+                writer.WriteElementString("BinSize", binningOptions.BinSize.ToString(CultureInfo.InvariantCulture));
                 writer.WriteElementString("MaximumBinCount", binningOptions.MaximumBinCount.ToString());
 
-                writer.WriteElementString("IntensityPrecisionPercent", binningOptions.IntensityPrecisionPercent.ToString());
+                writer.WriteElementString("IntensityPrecisionPercent", binningOptions.IntensityPrecisionPercent.ToString(CultureInfo.InvariantCulture));
                 writer.WriteElementString("Normalize", binningOptions.Normalize.ToString());
                 writer.WriteElementString("SumAllIntensitiesForBin", binningOptions.SumAllIntensitiesForBin.ToString());
 
@@ -614,7 +612,7 @@ namespace MASIC.DataOutput
                 writer.WriteElementString("MZToleranceDaList", CheckForEmptyToleranceList(mOptions.CustomSICList.RawTextMZToleranceDaList));
                 writer.WriteElementString("ScanCenterList", mOptions.CustomSICList.RawTextScanOrAcqTimeCenterList);
                 writer.WriteElementString("ScanToleranceList", CheckForEmptyToleranceList(mOptions.CustomSICList.RawTextScanOrAcqTimeToleranceList));
-                writer.WriteElementString("ScanTolerance", mOptions.CustomSICList.ScanOrAcqTimeTolerance.ToString());
+                writer.WriteElementString("ScanTolerance", mOptions.CustomSICList.ScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture));
                 writer.WriteElementString("ScanType", mOptions.CustomSICList.ScanToleranceType.ToString());
                 writer.WriteElementString("LimitSearchToCustomMZList", mOptions.CustomSICList.LimitSearchToCustomMZList.ToString());
 
@@ -668,8 +666,8 @@ namespace MASIC.DataOutput
             string outputDirectoryPath)
         {
             // ReSharper disable once StringLiteralTypo
-            const string PARENT_ION_TAG_START_LCASE = "<parention";     // Note: this needs to be lowercase
-            const string INDEX_ATTRIBUTE_LCASE = "index=";              // Note: this needs to be lowercase
+            const string PARENT_ION_TAG_START_LOWER = "<parention";     // Note: this needs to be lowercase
+            const string INDEX_ATTRIBUTE_LOWER = "index=";              // Note: this needs to be lowercase
 
             const string OPTIMAL_PEAK_APEX_TAG_NAME = "OptimalPeakApexScanNumber";
             const string PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME = "PeakApexOverrideParentIonIndex";
@@ -704,12 +702,12 @@ namespace MASIC.DataOutput
 
                         var dataLineLCase = dataLine.Trim().ToLower();
 
-                        if (dataLineLCase.StartsWith(PARENT_ION_TAG_START_LCASE))
+                        if (dataLineLCase.StartsWith(PARENT_ION_TAG_START_LOWER))
                         {
-                            var charIndex = dataLineLCase.IndexOf(INDEX_ATTRIBUTE_LCASE, StringComparison.CurrentCultureIgnoreCase);
+                            var charIndex = dataLineLCase.IndexOf(INDEX_ATTRIBUTE_LOWER, StringComparison.CurrentCultureIgnoreCase);
                             if (charIndex > 0)
                             {
-                                var work = dataLineLCase.Substring(charIndex + INDEX_ATTRIBUTE_LCASE.Length + 1);
+                                var work = dataLineLCase.Substring(charIndex + INDEX_ATTRIBUTE_LOWER.Length + 1);
                                 charIndex = work.IndexOf('"');
                                 if (charIndex > 0)
                                 {

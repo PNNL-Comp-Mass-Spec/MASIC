@@ -21,6 +21,7 @@ namespace MASIC
 
         public float[] SICMassesAsFloat => (from item in SICData select (float)item.Mass).ToArray();
 
+        // ReSharper disable once UnusedMember.Global
         public double[] SICMasses => (from item in SICData select item.Mass).ToArray();
 
         public int[] SICScanNumbers => (from item in SICData select item.ScanNumber).ToArray();

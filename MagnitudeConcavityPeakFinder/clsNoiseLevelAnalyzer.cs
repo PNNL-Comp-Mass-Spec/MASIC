@@ -19,19 +19,39 @@ namespace MagnitudeConcavityPeakFinder
 
         public struct udtBaselineNoiseOptionsType
         {
-            // Method to use to determine the baseline noise level
+            /// <summary>
+            /// Method to use to determine the baseline noise level
+            /// </summary>
             public eNoiseThresholdModes BaselineNoiseMode;
-            // Explicitly defined noise intensity; only used if .BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra
+
+            /// <summary>
+            /// Explicitly defined noise intensity; only used if .BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra
+            /// </summary>
             public float BaselineNoiseLevelAbsolute;
-            // Typically 2 or 3 for spectra; 0 for SICs
+
+            /// <summary>
+            /// Typically 2 or 3 for spectra; 0 for SICs
+            /// </summary>
             public float MinimumSignalToNoiseRatio;
-            // If the noise threshold computed is less than this value, then will use this value to compute S/N; additionally, this is used as the minimum intensity threshold when computing a trimmed noise level
+
+            /// <summary>
+            /// If the noise threshold computed is less than this value, then will use this value to compute S/N; additionally, this is used as the minimum intensity threshold when computing a trimmed noise level
+            /// </summary>
             public float MinimumBaselineNoiseLevel;
-            // Typically 0.75 for SICs, 0.5 for MS/MS spectra; only used for eNoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
+
+            /// <summary>
+            /// Typically 0.75 for SICs, 0.5 for MS/MS spectra; only used for eNoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
+            /// </summary>
             public float TrimmedMeanFractionLowIntensityDataToAverage;
-            // Typically 5; distance from the mean in standard deviation units (SqrRt(Variance)) to discard data for computing the trimmed mean
+
+            /// <summary>
+            /// Typically 5; distance from the mean in standard deviation units (SqrRt(Variance)) to discard data for computing the trimmed mean
+            /// </summary>
             public short DualTrimmedMeanStdDevLimits;
-            // Typically 3; set to 1 to disable segmentation
+
+            /// <summary>
+            /// Typically 3; set to 1 to disable segmentation
+            /// </summary>
             public short DualTrimmedMeanMaximumSegments;
         }
 
@@ -123,6 +143,8 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             // Look for the minimum positive value and replace all data in sortedData with that value
+
+            // ReSharper disable once UnusedVariable
             var minimumPositiveValue = ReplaceSortedDataWithMinimumPositiveValue(dataSortedCount, sortedData);
 
             switch (udtBaselineNoiseOptions.BaselineNoiseMode)
@@ -344,7 +366,7 @@ namespace MagnitudeConcavityPeakFinder
         /// <param name="dataCount"></param>
         /// <param name="sortedData"></param>
         /// <returns>The minimum positive value</returns>
-        /// <remarks>Asumes sortedData[] is sorted ascending</remarks>
+        /// <remarks>Assumes sortedData[] is sorted ascending</remarks>
         private double ReplaceSortedDataWithMinimumPositiveValue(int dataCount, IList<double> sortedData)
         {
             // Find the minimum positive value in sortedData

@@ -61,28 +61,26 @@ namespace MASIC
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public int get_OriginalIndex(int index)
         {
-            if (mPointerArrayIsValid)
+            if (!mPointerArrayIsValid)
+                return -1;
+
+            try
             {
-                try
+                if (index < mPointerIndices.Length)
                 {
-                    if (index < mPointerIndices.Length)
-                    {
-                        return mPointerIndices[index];
-                    }
-                    else
-                    {
-                        return -1;
-                    }
+                    return mPointerIndices[index];
                 }
-                catch (Exception)
-                {
-                    return -1;
-                }
+
+                return -1;
+            }
+            catch (Exception)
+            {
+                return -1;
             }
 
-            return -1;
         }
 
         public bool UsePointerIndexArray
@@ -296,6 +294,7 @@ namespace MASIC
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void ClearData()
         {
             mDataType = eDataTypeToUse.NoDataPresent;
@@ -304,6 +303,7 @@ namespace MASIC
 
         #region "Fill with Data"
 
+        // ReSharper disable once UnusedMember.Global
         public bool FillWithData(ref int[] values)
         {
             bool success;
@@ -343,6 +343,7 @@ namespace MASIC
             return success;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public bool FillWithData(ref float[] values)
         {
             bool success;
@@ -439,10 +440,10 @@ namespace MASIC
                 switch (mDataType)
                 {
                     case eDataTypeToUse.SingleType:
-                        matchFound = FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
+                        matchFound = FindValueRange((float)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange((double)searchValue, (double)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
+                        matchFound = FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -566,7 +567,7 @@ namespace MASIC
                         matchFound = FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth), out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
-                        matchFound = FindValueRange((double)searchValue, (double)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
+                        matchFound = FindValueRange((double)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     default:
                         matchFound = false;
@@ -612,6 +613,8 @@ namespace MASIC
         #endregion
 
         #region "Get Value by Index"
+
+        // ReSharper disable once UnusedMember.Global
         public int GetValueByIndexInt(int index)
         {
             try
@@ -632,17 +635,15 @@ namespace MASIC
                 {
                     return 0;
                 }
-                else
+
+                switch (mDataType)
                 {
-                    switch (mDataType)
-                    {
-                        case eDataTypeToUse.IntegerType:
-                            return mDataInt[index];
-                        case eDataTypeToUse.SingleType:
-                            return mDataSingle[index];
-                        case eDataTypeToUse.DoubleType:
-                            return mDataDouble[index];
-                    }
+                    case eDataTypeToUse.IntegerType:
+                        return mDataInt[index];
+                    case eDataTypeToUse.SingleType:
+                        return mDataSingle[index];
+                    case eDataTypeToUse.DoubleType:
+                        return mDataDouble[index];
                 }
             }
             catch (Exception)
@@ -654,6 +655,7 @@ namespace MASIC
             return 0;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public float GetValueByIndexSng(int index)
         {
             try
@@ -668,6 +670,8 @@ namespace MASIC
         #endregion
 
         #region "Get Value by Original Index"
+
+        // ReSharper disable once UnusedMember.Global
         public int GetValueByOriginalIndexInt(int index)
         {
             try
@@ -686,37 +690,36 @@ namespace MASIC
             {
                 return 0;
             }
-            else
+
+            try
             {
-                try
+                var index = Array.IndexOf(mPointerIndices, indexOriginal);
+                if (index >= 0)
                 {
-                    var index = Array.IndexOf(mPointerIndices, indexOriginal);
-                    if (index >= 0)
+                    switch (mDataType)
                     {
-                        switch (mDataType)
-                        {
-                            case eDataTypeToUse.IntegerType:
-                                return mDataInt[mPointerIndices[index]];
-                            case eDataTypeToUse.SingleType:
-                                return mDataSingle[mPointerIndices[index]];
-                            case eDataTypeToUse.DoubleType:
-                                return mDataDouble[mPointerIndices[index]];
-                        }
-                    }
-                    else
-                    {
-                        return 0;
+                        case eDataTypeToUse.IntegerType:
+                            return mDataInt[mPointerIndices[index]];
+                        case eDataTypeToUse.SingleType:
+                            return mDataSingle[mPointerIndices[index]];
+                        case eDataTypeToUse.DoubleType:
+                            return mDataDouble[mPointerIndices[index]];
                     }
                 }
-                catch (Exception)
+                else
                 {
-                    // Ignore errors
+                    return 0;
                 }
+            }
+            catch (Exception)
+            {
+                // Ignore errors
             }
 
             return 0;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public float GetValueByOriginalIndexSng(int index)
         {
             try
