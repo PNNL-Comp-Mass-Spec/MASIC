@@ -903,6 +903,8 @@ namespace MASICBrowser
             this.MinimumSize = new System.Drawing.Size(614, 0);
             this.Name = "frmBrowser";
             this.Text = "MASIC Browser";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmBrowser_Closing);
+            this.Resize += new System.EventHandler(this.frmBrowser_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.tmrAutoStep)).EndInit();
             this.fraNavigation.ResumeLayout(false);
             this.fraNavigation.PerformLayout();

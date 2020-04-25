@@ -3558,7 +3558,7 @@ namespace MASICBrowser
         }
         #endregion
 
-        private void frmBrowser_Closing(object sender, CancelEventArgs e)
+        private void frmBrowser_Closing(object sender, FormClosingEventArgs e)
         {
             RegSaveSettings();
         }
