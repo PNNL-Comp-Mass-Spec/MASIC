@@ -1,5 +1,9 @@
 MASIC Change Log
 
+Version 3.1.7425; April 30, 2020
+	- Convert to C#
+	- Update PRISMDatabaseUtils.dll
+
 Version 3.0.7389; March 25, 2020
 	- Build the installer using InnoSetup 6
 
