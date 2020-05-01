@@ -19,29 +19,29 @@ namespace MASICBrowser
         }
 
         /// <summary>
-        /// Looks through arrayToSearch for itemToSearchFor
+        /// Looks through listToSearch for itemToFind
         /// </summary>
-        /// <param name="arrayToSearch"></param>
-        /// <param name="itemToSearchFor"></param>
+        /// <param name="listToSearch"></param>
+        /// <param name="itemToFind"></param>
         /// <param name="dataCount"></param>
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            IList<int> arrayToSearch, int itemToSearchFor, int dataCount,
+            IList<int> listToSearch, int itemToFind, int dataCount,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int matchIndex;
 
             try
             {
-                if (arrayToSearch == null)
+                if (listToSearch == null)
                     return -1;
 
                 var indexFirst = 0;
-                if (dataCount > arrayToSearch.Count)
+                if (dataCount > listToSearch.Count)
                 {
-                    dataCount = arrayToSearch.Count;
+                    dataCount = listToSearch.Count;
                 }
 
                 var indexLast = dataCount - 1;
@@ -63,14 +63,14 @@ namespace MASICBrowser
                 {
                     var midIndex = currentLast / 2;            // Note: Using Integer division
 
-                    while (currentFirst <= currentLast && arrayToSearch[midIndex] != itemToSearchFor)
+                    while (currentFirst <= currentLast && listToSearch[midIndex] != itemToFind)
                     {
-                        if (itemToSearchFor < arrayToSearch[midIndex])
+                        if (itemToFind < listToSearch[midIndex])
                         {
                             // Search the lower half
                             currentLast = midIndex - 1;
                         }
-                        else if (itemToSearchFor > arrayToSearch[midIndex])
+                        else if (itemToFind > listToSearch[midIndex])
                         {
                             // Search the upper half
                             currentFirst = midIndex + 1;
@@ -94,7 +94,7 @@ namespace MASICBrowser
                     // See if an exact match has been found
                     if (midIndex >= currentFirst && midIndex <= currentLast)
                     {
-                        if (arrayToSearch[midIndex] == itemToSearchFor)
+                        if (listToSearch[midIndex] == itemToFind)
                         {
                             matchIndex = midIndex;
                         }
@@ -105,12 +105,12 @@ namespace MASICBrowser
                         if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
                         {
                             // No exact match; find the nearest match
-                            if (arrayToSearch[midIndex] < itemToSearchFor)
+                            if (listToSearch[midIndex] < itemToFind)
                             {
                                 if (midIndex < indexLast)
                                 {
-                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
-                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    if (Math.Abs(listToSearch[midIndex] - itemToFind) <=
+                                        Math.Abs(listToSearch[midIndex + 1] - itemToFind))
                                     {
                                         matchIndex = midIndex;
                                     }
@@ -124,11 +124,11 @@ namespace MASICBrowser
                                     matchIndex = indexLast;
                                 }
                             }
-                            // ArrayToSearch(midIndex) >= ItemToSearchFor
+                            // listToSearch(midIndex) >= itemToFind
                             else if (midIndex > indexFirst)
                             {
-                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
-                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                if (Math.Abs(listToSearch[midIndex - 1] - itemToFind) <=
+                                    Math.Abs(listToSearch[midIndex] - itemToFind))
                                 {
                                     matchIndex = midIndex - 1;
                                 }
@@ -143,7 +143,7 @@ namespace MASICBrowser
                             }
                         }
                         // No exact match; return the previous point or the next point
-                        else if (arrayToSearch[midIndex] < itemToSearchFor)
+                        else if (listToSearch[midIndex] < itemToFind)
                         {
                             if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
                             {
@@ -156,7 +156,7 @@ namespace MASICBrowser
                                 matchIndex = midIndex;
                             }
                         }
-                        // ArrayToSearch(midIndex) >= ItemToSearchFor
+                        // listToSearch(midIndex) >= itemToFind
                         else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
                         {
                             matchIndex = midIndex;
@@ -179,29 +179,29 @@ namespace MASICBrowser
         }
 
         /// <summary>
-        /// Looks through arrayToSearch for itemToSearchFor
+        /// Looks through listToSearch for itemToFind
         /// </summary>
-        /// <param name="arrayToSearch"></param>
-        /// <param name="itemToSearchFor"></param>
+        /// <param name="listToSearch"></param>
+        /// <param name="itemToFind"></param>
         /// <param name="dataCount"></param>
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            IList<float> arrayToSearch, float itemToSearchFor, int dataCount,
+            IList<float> listToSearch, float itemToFind, int dataCount,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int matchIndex;
 
             try
             {
-                if (arrayToSearch == null)
+                if (listToSearch == null)
                     return -1;
 
                 var indexFirst = 0;
-                if (dataCount > arrayToSearch.Count)
+                if (dataCount > listToSearch.Count)
                 {
-                    dataCount = arrayToSearch.Count;
+                    dataCount = listToSearch.Count;
                 }
 
                 var indexLast = dataCount - 1;
@@ -223,14 +223,14 @@ namespace MASICBrowser
                 {
                     var midIndex = currentLast / 2;            // Note: Using Integer division
 
-                    while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
+                    while (currentFirst <= currentLast && Math.Abs(listToSearch[midIndex] - itemToFind) > float.Epsilon)
                     {
-                        if (itemToSearchFor < arrayToSearch[midIndex])
+                        if (itemToFind < listToSearch[midIndex])
                         {
                             // Search the lower half
                             currentLast = midIndex - 1;
                         }
-                        else if (itemToSearchFor > arrayToSearch[midIndex])
+                        else if (itemToFind > listToSearch[midIndex])
                         {
                             // Search the upper half
                             currentFirst = midIndex + 1;
@@ -254,7 +254,7 @@ namespace MASICBrowser
                     // See if an exact match has been found
                     if (midIndex >= currentFirst && midIndex <= currentLast)
                     {
-                        if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) < float.Epsilon)
+                        if (Math.Abs(listToSearch[midIndex] - itemToFind) < float.Epsilon)
                         {
                             matchIndex = midIndex;
                         }
@@ -265,12 +265,12 @@ namespace MASICBrowser
                         if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
                         {
                             // No exact match; find the nearest match
-                            if (arrayToSearch[midIndex] < itemToSearchFor)
+                            if (listToSearch[midIndex] < itemToFind)
                             {
                                 if (midIndex < indexLast)
                                 {
-                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
-                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    if (Math.Abs(listToSearch[midIndex] - itemToFind) <=
+                                        Math.Abs(listToSearch[midIndex + 1] - itemToFind))
                                     {
                                         matchIndex = midIndex;
                                     }
@@ -284,11 +284,11 @@ namespace MASICBrowser
                                     matchIndex = indexLast;
                                 }
                             }
-                            // ArrayToSearch(midIndex) >= ItemToSearchFor
+                            // listToSearch(midIndex) >= itemToFind
                             else if (midIndex > indexFirst)
                             {
-                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
-                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                if (Math.Abs(listToSearch[midIndex - 1] - itemToFind) <=
+                                    Math.Abs(listToSearch[midIndex] - itemToFind))
                                 {
                                     matchIndex = midIndex - 1;
                                 }
@@ -303,7 +303,7 @@ namespace MASICBrowser
                             }
                         }
                         // No exact match; return the previous point or the next point
-                        else if (arrayToSearch[midIndex] < itemToSearchFor)
+                        else if (listToSearch[midIndex] < itemToFind)
                         {
                             if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
                             {
@@ -316,7 +316,7 @@ namespace MASICBrowser
                                 matchIndex = midIndex;
                             }
                         }
-                        // ArrayToSearch(midIndex) >= ItemToSearchFor
+                        // listToSearch(midIndex) >= itemToFind
                         else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
                         {
                             matchIndex = midIndex;
@@ -340,29 +340,29 @@ namespace MASICBrowser
 
         // ReSharper disable once UnusedMember.Global
         /// <summary>
-        /// Looks through arrayToSearch for itemToSearchFor
+        /// Looks through listToSearch for itemToFind
         /// </summary>
-        /// <param name="arrayToSearch"></param>
-        /// <param name="itemToSearchFor"></param>
+        /// <param name="listToSearch"></param>
+        /// <param name="itemToFind"></param>
         /// <param name="dataCount"></param>
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
-        /// <remarks>Assumes arrayToSearch is already sorted</remarks>
+        /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            IList<double> arrayToSearch, double itemToSearchFor, int dataCount,
+            IList<double> listToSearch, double itemToFind, int dataCount,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int matchIndex;
 
             try
             {
-                if (arrayToSearch == null)
+                if (listToSearch == null)
                     return -1;
 
                 var indexFirst = 0;
-                if (dataCount > arrayToSearch.Count)
+                if (dataCount > listToSearch.Count)
                 {
-                    dataCount = arrayToSearch.Count;
+                    dataCount = listToSearch.Count;
                 }
 
                 var indexLast = dataCount - 1;
@@ -384,14 +384,14 @@ namespace MASICBrowser
                 {
                     var midIndex = currentLast / 2;            // Note: Using Integer division
 
-                    while (currentFirst <= currentLast && Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) > float.Epsilon)
+                    while (currentFirst <= currentLast && Math.Abs(listToSearch[midIndex] - itemToFind) > float.Epsilon)
                     {
-                        if (itemToSearchFor < arrayToSearch[midIndex])
+                        if (itemToFind < listToSearch[midIndex])
                         {
                             // Search the lower half
                             currentLast = midIndex - 1;
                         }
-                        else if (itemToSearchFor > arrayToSearch[midIndex])
+                        else if (itemToFind > listToSearch[midIndex])
                         {
                             // Search the upper half
                             currentFirst = midIndex + 1;
@@ -415,7 +415,7 @@ namespace MASICBrowser
                     // See if an exact match has been found
                     if (midIndex >= currentFirst && midIndex <= currentLast)
                     {
-                        if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) < double.Epsilon)
+                        if (Math.Abs(listToSearch[midIndex] - itemToFind) < double.Epsilon)
                         {
                             matchIndex = midIndex;
                         }
@@ -426,12 +426,12 @@ namespace MASICBrowser
                         if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
                         {
                             // No exact match; find the nearest match
-                            if (arrayToSearch[midIndex] < itemToSearchFor)
+                            if (listToSearch[midIndex] < itemToFind)
                             {
                                 if (midIndex < indexLast)
                                 {
-                                    if (Math.Abs(arrayToSearch[midIndex] - itemToSearchFor) <=
-                                        Math.Abs(arrayToSearch[midIndex + 1] - itemToSearchFor))
+                                    if (Math.Abs(listToSearch[midIndex] - itemToFind) <=
+                                        Math.Abs(listToSearch[midIndex + 1] - itemToFind))
                                     {
                                         matchIndex = midIndex;
                                     }
@@ -445,11 +445,11 @@ namespace MASICBrowser
                                     matchIndex = indexLast;
                                 }
                             }
-                            // ArrayToSearch(midIndex) >= ItemToSearchFor
+                            // listToSearch(midIndex) >= itemToFind
                             else if (midIndex > indexFirst)
                             {
-                                if (Math.Abs(arrayToSearch[midIndex - 1] - itemToSearchFor) <=
-                                    Math.Abs(arrayToSearch[midIndex] - itemToSearchFor))
+                                if (Math.Abs(listToSearch[midIndex - 1] - itemToFind) <=
+                                    Math.Abs(listToSearch[midIndex] - itemToFind))
                                 {
                                     matchIndex = midIndex - 1;
                                 }
@@ -464,7 +464,7 @@ namespace MASICBrowser
                             }
                         }
                         // No exact match; return the previous point or the next point
-                        else if (arrayToSearch[midIndex] < itemToSearchFor)
+                        else if (listToSearch[midIndex] < itemToFind)
                         {
                             if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
                             {
@@ -477,7 +477,7 @@ namespace MASICBrowser
                                 matchIndex = midIndex;
                             }
                         }
-                        // ArrayToSearch(midIndex) >= ItemToSearchFor
+                        // listToSearch(midIndex) >= itemToFind
                         else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
                         {
                             matchIndex = midIndex;
