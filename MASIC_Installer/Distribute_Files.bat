@@ -26,7 +26,7 @@ pause
 xcopy ..\bin\Console\Release\MASIC_Console.*     C:\DMS_Programs\MASIC\ /D /Y
 xcopy ..\bin\Console\Release\*.dll               C:\DMS_Programs\MASIC\ /D /Y
 
-xcopy ..\bin\Console\Release\MASIC_Console.*     \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\ /D /Y
-xcopy ..\bin\Console\Release\*.dll               \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\ /D /Y
+xcopy ..\bin\Console\Release\MASIC_Console.*     \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC\ /D /Y
+xcopy ..\bin\Console\Release\*.dll               \\pnl\projects\OmicsSW\DMS_Programs\AnalysisToolManagerDistribution\MASIC\ /D /Y
 
 pause
