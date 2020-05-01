@@ -26,6 +26,7 @@ using System.Linq;
 using System.Timers;
 using System.Windows.Forms;
 using System.Xml;
+using C5;
 using MASICPeakFinder;
 using Microsoft.Win32;
 using OxyDataPlotter;
@@ -523,14 +524,14 @@ namespace MASICBrowser
             }
         }
 
-        private void FindSimilarParentIon()
+        private void FindSimilarParentIon(frmProgress progressForm)
         {
             const double SIMILAR_MZ_TOLERANCE = 0.2;
 
-            FindSimilarParentIon(SIMILAR_MZ_TOLERANCE);
+            FindSimilarParentIon(SIMILAR_MZ_TOLERANCE, progressForm);
         }
 
-        private void FindSimilarParentIon(double similarMZTolerance)
+        private void FindSimilarParentIon(double similarMZTolerance, frmProgress progressForm)
         {
             const double DEFAULT_INTENSITY = 1;
 
@@ -541,12 +542,41 @@ namespace MASICBrowser
                     return;
                 }
 
-                var similarFragScans = new List<int>();
+                progressForm.UpdateCurrentTask("Finding similar parent ions");
+                Application.DoEvents();
 
-                for (var parentIonIndex = 0; parentIonIndex <= mParentIonStats.Count - 1; parentIonIndex++)
+                var similarFragScans = new SortedSet<int>();
+                var parentIonCount = mParentIonStats.Count;
+
+                // Populate a dictionary mapping frag scan to parent ion stats
+                // Using a TreeDictionary since it supports RangeFromTo
+                var fragScanObservedToParentIonMap = new TreeDictionary<int, List<clsParentIonStats>>();
+
+                foreach (var ionStats in mParentIonStats)
                 {
+                    if (fragScanObservedToParentIonMap.Contains(ionStats.FragScanObserved))
+                    {
+                        fragScanObservedToParentIonMap[ionStats.FragScanObserved].Add(ionStats);
+                    }
+                    else
+                    {
+                        fragScanObservedToParentIonMap.Add(ionStats.FragScanObserved, new List<clsParentIonStats> { ionStats });
+                    }
+                }
+
+                for (var parentIonIndex = 0; parentIonIndex < parentIonCount; parentIonIndex++)
+                {
+                    // Percent complete will be between 0.5 and 1.0
+                    var percentComplete = 0.5 + parentIonIndex / (double)parentIonCount / 2;
+                    if (percentComplete > 1.0)
+                        percentComplete = 1.0;
+
+                    progressForm.UpdateProgressBar(percentComplete);
+                    Application.DoEvents();
+                    if (progressForm.KeyPressAbortProcess)
+                        break;
+
                     var currentParentIon = mParentIonStats[parentIonIndex];
-                    currentParentIon.SimilarFragScans.Clear();
 
                     if (currentParentIon.SICData.Count == 0)
                     {
@@ -565,10 +595,38 @@ namespace MASICBrowser
                     similarFragScans.Clear();
                     similarFragScans.Add(currentParentIon.FragScanObserved);
 
-                    // Step through the parent ions and look for others with a similar m/z and a fragmentation scan
-                    // between scanStart and scanEnd
+                    // Find parent ions with a fragmentation scan between scanStart and scanEnd
+                    // and a similar m/z
 
-                    for (var indexCompare = 0; indexCompare <= mParentIonStats.Count - 1; indexCompare++)
+                    foreach (var item in fragScanObservedToParentIonMap.RangeFromTo(scanStart, scanEnd))
+                    {
+                        foreach (var parentIonToCompare in item.Value)
+                        {
+                            if (currentParentIon.Index == parentIonToCompare.Index)
+                                continue;
+
+                            var comparisonFragScanObserved = parentIonToCompare.FragScanObserved;
+
+                            if (comparisonFragScanObserved < scanStart || comparisonFragScanObserved > scanEnd)
+                                continue;
+
+                            if (Math.Abs(parentIonToCompare.MZ - parentIonMZ) > similarMZTolerance)
+                                continue;
+
+                            // Similar parent ion m/z found
+                            if (!similarFragScans.Contains(comparisonFragScanObserved))
+                            {
+                                similarFragScans.Add(comparisonFragScanObserved);
+                            }
+                        }
+                    }
+
+                    //
+                    // Old, inefficient brute force:
+                    //
+
+                    /*
+                    for (var indexCompare = 0; indexCompare < mParentIonStats.Count; indexCompare++)
                     {
                         var ionStats = mParentIonStats[indexCompare];
                         if (indexCompare != parentIonIndex && ionStats.FragScanObserved >= scanStart && ionStats.FragScanObserved <= scanEnd)
@@ -581,14 +639,12 @@ namespace MASICBrowser
                             }
                         }
                     }
+                    */
 
                     if (similarFragScans.Count == 0)
                     {
                         continue;
                     }
-
-                    // Sort the data in similarFragScans
-                    similarFragScans.Sort();
 
                     // Copy the sorted data into .SimilarFragScans
                     // When copying, make sure we don't have any duplicates
