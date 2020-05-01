@@ -176,7 +176,7 @@ namespace MASICBrowser
 
         #endregion
 
-        private void AutoOpenMsMsResults(string masicFilePath, frmProgress objProgress)
+        private void AutoOpenMsMsResults(string masicFilePath, frmProgress progressForm)
         {
             // Look for a corresponding Synopsis or First hits file in the same folder as masicFilePath
 
@@ -194,7 +194,7 @@ namespace MASICBrowser
             txtStats3.Visible = false;
             if (File.Exists(fileNameToFind))
             {
-                ReadMsMsSearchEngineResults(fileNameToFind, objProgress);
+                ReadMsMsSearchEngineResults(fileNameToFind, progressForm);
             }
             else
             {
@@ -203,7 +203,7 @@ namespace MASICBrowser
 
                 if (File.Exists(fileNameToFind))
                 {
-                    ReadMsMsSearchEngineResults(fileNameToFind, objProgress);
+                    ReadMsMsSearchEngineResults(fileNameToFind, progressForm);
                     txtStats3.Visible = true;
                 }
             }
@@ -1638,7 +1638,7 @@ namespace MASICBrowser
             }
 
             // Initialize the progress form
-            var objProgress = new frmProgress();
+            var progressForm = new frmProgress();
             try
             {
                 // Initialize the stream reader and the XML Text Reader
@@ -1646,8 +1646,8 @@ namespace MASICBrowser
                 using (var reader = new StreamReader(filePath))
                 using (var xmlReader = new XmlTextReader(reader))
                 {
-                    objProgress.InitializeProgressForm("Reading file " + Environment.NewLine + PathUtils.CompactPathString(filePath), 0, 1, true);
-                    objProgress.Show();
+                    progressForm.InitializeProgressForm("Reading file " + Environment.NewLine + PathUtils.CompactPathString(filePath), 0, 1, true);
+                    progressForm.Show();
                     Application.DoEvents();
 
                     // Initialize mParentIonStats
@@ -1704,13 +1704,14 @@ namespace MASICBrowser
                                             validParentIon = true;
 
                                             // Update the progress bar
-                                            var percentComplete = reader.BaseStream.Position / (double)reader.BaseStream.Length;
+                                            // Dividing by two since FindSimilarParentIons can take time
+                                            var percentComplete = reader.BaseStream.Position / (double)reader.BaseStream.Length / 2;
                                             if (percentComplete > 1.0)
                                                 percentComplete = 1.0;
 
-                                            objProgress.UpdateProgressBar(percentComplete);
+                                            progressForm.UpdateProgressBar(percentComplete);
                                             Application.DoEvents();
-                                            if (objProgress.KeyPressAbortProcess)
+                                            if (progressForm.KeyPressAbortProcess)
                                                 break;
 
                                             // Advance to the next tag
@@ -2189,7 +2190,7 @@ namespace MASICBrowser
                     similarIonMZToleranceHalfWidth = 0.1F;
                 }
 
-                FindSimilarParentIon(similarIonMZToleranceHalfWidth * 2);
+                FindSimilarParentIon(similarIonMZToleranceHalfWidth * 2, progressForm);
 
                 if (eCurrentXMLDataFileSection == eCurrentXMLDataFileSectionConstants.UnknownFile)
                 {
@@ -2228,7 +2229,10 @@ namespace MASICBrowser
                         MessageBox.Show(string.Join(Environment.NewLine, errorMessages.Take(15)), "Invalid Lines", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
 
-                    // Sort the data
+                    progressForm.UpdateCurrentTask("Populating the parent ion list");
+                    Application.DoEvents();
+
+                    // Sort the data and populate lstParentIonData
                     SortData();
 
                     // Select the first item in lstParentIonData
@@ -2237,13 +2241,13 @@ namespace MASICBrowser
                         lstParentIonData.SelectedIndex = 0;
                     }
 
-                    if (objProgress.KeyPressAbortProcess)
+                    if (progressForm.KeyPressAbortProcess)
                     {
                         MessageBox.Show("Load cancelled before all of the data was read", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
                     else
                     {
-                        AutoOpenMsMsResults(Path.GetFullPath(filePath), objProgress);
+                        AutoOpenMsMsResults(Path.GetFullPath(filePath), progressForm);
                     }
                 }
             }
@@ -2253,11 +2257,11 @@ namespace MASICBrowser
             }
             finally
             {
-                objProgress?.HideForm();
+                progressForm?.HideForm();
             }
         }
 
-        private void ReadMsMsSearchEngineResults(string filePath, frmProgress objProgress)
+        private void ReadMsMsSearchEngineResults(string filePath, frmProgress progressForm)
         {
             var chSepChars = new[] { '\t' };
 
@@ -2272,15 +2276,15 @@ namespace MASICBrowser
 
                 using (var reader = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
-                    if (objProgress == null)
+                    if (progressForm == null)
                     {
-                        objProgress = new frmProgress();
+                        progressForm = new frmProgress();
                         createdNewProgressForm = true;
                     }
 
-                    objProgress.InitializeProgressForm("Reading MS/MS Search Engine Results ", 0, fileSizeBytes, true);
-                    objProgress.Show();
-                    objProgress.BringToFront();
+                    progressForm.InitializeProgressForm("Reading MS/MS Search Engine Results ", 0, fileSizeBytes, true);
+                    progressForm.Show();
+                    progressForm.BringToFront();
                     Application.DoEvents();
 
                     if (mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].Rows.Count > 0 || mMsMsResults.Tables[TABLE_NAME_SEQ_TO_PROTEIN_MAP].Rows.Count > 0 || mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Rows.Count > 0)
@@ -2300,9 +2304,9 @@ namespace MASICBrowser
 
                             if (linesRead % 50 == 0)
                             {
-                                objProgress.UpdateProgressBar(bytesRead);
+                                progressForm.UpdateProgressBar(bytesRead);
                                 Application.DoEvents();
-                                if (objProgress.KeyPressAbortProcess)
+                                if (progressForm.KeyPressAbortProcess)
                                     break;
                             }
 
@@ -2362,7 +2366,7 @@ namespace MASICBrowser
             {
                 if (createdNewProgressForm)
                 {
-                    objProgress.HideForm();
+                    progressForm.HideForm();
                 }
             }
         }
