@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsBinarySearch.cs" />
     <Compile Include="clsBaselineNoiseOptions.cs" />
     <Compile Include="clsBaselineNoiseStats.cs" />
     <Compile Include="clsBaselineNoiseStatsSegment.cs" />

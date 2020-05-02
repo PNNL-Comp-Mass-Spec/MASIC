@@ -60,7 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsBinarySearch.cs" />
     <Compile Include="clsParentIonStats.cs" />
     <Compile Include="clsSICStats.cs" />
     <Compile Include="frmBrowser.cs">

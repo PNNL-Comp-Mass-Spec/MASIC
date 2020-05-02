@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using MASIC;
+using MASICPeakFinder;
 using NUnit.Framework;
 
 namespace MASICTest

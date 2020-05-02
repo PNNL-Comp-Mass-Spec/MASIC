@@ -80,7 +80,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsBinarySearch.cs" />
     <Compile Include="clsBinnedData.cs" />
     <Compile Include="clsBinningOptions.cs" />
     <Compile Include="clsCorrelation.cs" />

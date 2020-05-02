@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MASICBrowser
+namespace MASICPeakFinder
 {
     /// <summary>
     /// This class can be used to search a list of values for the value closest to the search value

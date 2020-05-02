@@ -1,4 +1,5 @@
 ﻿using System;
+using MASICPeakFinder;
 using PRISM;
 
 namespace MASIC
