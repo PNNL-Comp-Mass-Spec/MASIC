@@ -30,141 +30,46 @@ namespace MASICPeakFinder
             List<int> listToSearch, int itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int matchIndex;
+            if (listToSearch == null || listToSearch.Count == 0)
+                return -1;
 
-            try
+            // Search space is only one element long; simply return that element's index
+            if (listToSearch.Count == 1)
+                return 0;
+
+            var index = listToSearch.BinarySearch(itemToFind);
+
+            // item found
+            if (index >= 0)
+                return index;
+
+            // Get the bitwise complement, it is the "insert index" (points to the next greater item)
+            index = ~index;
+
+            // the first item is the closest match
+            if (index == 0)
+                return 0;
+
+            // the last item is the closest match
+            if (index == listToSearch.Count)
+                return index - 1;
+
+            switch (eMissingDataMode)
             {
-                if (listToSearch == null || listToSearch.Count == 0)
-                    return -1;
-
-                var indexFirst = 0;
-                var indexLast = listToSearch.Count - 1;
-
-                var currentFirst = indexFirst;
-                var currentLast = indexLast;
-
-                if (currentFirst == currentLast)
-                {
-                    // Search space is only one element long; simply return that element's index
-                    matchIndex = currentFirst;
-                }
-                else
-                {
-                    var midIndex = currentLast / 2;            // Note: Using Integer division
-
-                    while (currentFirst <= currentLast && listToSearch[midIndex] != itemToFind)
+                case eMissingDataModeConstants.ReturnNextPoint:
+                    return index;
+                case eMissingDataModeConstants.ReturnPreviousPoint:
+                    return index - 1;
+                case eMissingDataModeConstants.ReturnClosestPoint:
+                default:
+                    if (Math.Abs(listToSearch[index - 1] - itemToFind) <=
+                        Math.Abs(listToSearch[index] - itemToFind))
                     {
-                        if (itemToFind < listToSearch[midIndex])
-                        {
-                            // Search the lower half
-                            currentLast = midIndex - 1;
-                        }
-                        else if (itemToFind > listToSearch[midIndex])
-                        {
-                            // Search the upper half
-                            currentFirst = midIndex + 1;
-                        }
-
-                        // Compute the new mid point
-                        midIndex = (currentFirst + currentLast) / 2;
-                        if (midIndex < currentFirst)
-                        {
-                            midIndex = currentFirst;
-                            if (midIndex > currentLast)
-                            {
-                                midIndex = currentLast;
-                            }
-
-                            break;
-                        }
+                        return index - 1;
                     }
 
-                    matchIndex = -1;
-                    // See if an exact match has been found
-                    if (midIndex >= currentFirst && midIndex <= currentLast)
-                    {
-                        if (listToSearch[midIndex] == itemToFind)
-                        {
-                            matchIndex = midIndex;
-                        }
-                    }
-
-                    if (matchIndex == -1)
-                    {
-                        if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
-                        {
-                            // No exact match; find the nearest match
-                            if (listToSearch[midIndex] < itemToFind)
-                            {
-                                if (midIndex < indexLast)
-                                {
-                                    if (Math.Abs(listToSearch[midIndex] - itemToFind) <=
-                                        Math.Abs(listToSearch[midIndex + 1] - itemToFind))
-                                    {
-                                        matchIndex = midIndex;
-                                    }
-                                    else
-                                    {
-                                        matchIndex = midIndex + 1;
-                                    }
-                                }
-                                else
-                                {
-                                    matchIndex = indexLast;
-                                }
-                            }
-                            // listToSearch(midIndex) >= itemToFind
-                            else if (midIndex > indexFirst)
-                            {
-                                if (Math.Abs(listToSearch[midIndex - 1] - itemToFind) <=
-                                    Math.Abs(listToSearch[midIndex] - itemToFind))
-                                {
-                                    matchIndex = midIndex - 1;
-                                }
-                                else
-                                {
-                                    matchIndex = midIndex;
-                                }
-                            }
-                            else
-                            {
-                                matchIndex = indexFirst;
-                            }
-                        }
-                        // No exact match; return the previous point or the next point
-                        else if (listToSearch[midIndex] < itemToFind)
-                        {
-                            if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
-                            {
-                                matchIndex = midIndex + 1;
-                                if (matchIndex > indexLast)
-                                    matchIndex = indexLast;
-                            }
-                            else
-                            {
-                                matchIndex = midIndex;
-                            }
-                        }
-                        // listToSearch(midIndex) >= itemToFind
-                        else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
-                        {
-                            matchIndex = midIndex;
-                        }
-                        else
-                        {
-                            matchIndex = midIndex - 1;
-                            if (matchIndex < indexFirst)
-                                matchIndex = indexFirst;
-                        }
-                    }
-                }
+                    return index;
             }
-            catch (Exception ex)
-            {
-                matchIndex = -1;
-            }
-
-            return matchIndex;
         }
 
         /// <summary>
@@ -179,141 +84,46 @@ namespace MASICPeakFinder
             List<float> listToSearch, float itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int matchIndex;
+            if (listToSearch == null || listToSearch.Count == 0)
+                return -1;
 
-            try
+            // Search space is only one element long; simply return that element's index
+            if (listToSearch.Count == 1)
+                return 0;
+
+            var index = listToSearch.BinarySearch(itemToFind);
+
+            // item found
+            if (index >= 0)
+                return index;
+
+            // Get the bitwise complement, it is the "insert index" (points to the next greater item)
+            index = ~index;
+
+            // the first item is the closest match
+            if (index == 0)
+                return 0;
+
+            // the last item is the closest match
+            if (index == listToSearch.Count)
+                return index - 1;
+
+            switch (eMissingDataMode)
             {
-                if (listToSearch == null || listToSearch.Count == 0)
-                    return -1;
-
-                var indexFirst = 0;
-                var indexLast = listToSearch.Count - 1;
-
-                var currentFirst = indexFirst;
-                var currentLast = indexLast;
-
-                if (currentFirst == currentLast)
-                {
-                    // Search space is only one element long; simply return that element's index
-                    matchIndex = currentFirst;
-                }
-                else
-                {
-                    var midIndex = currentLast / 2;            // Note: Using Integer division
-
-                    while (currentFirst <= currentLast && Math.Abs(listToSearch[midIndex] - itemToFind) > float.Epsilon)
+                case eMissingDataModeConstants.ReturnNextPoint:
+                    return index;
+                case eMissingDataModeConstants.ReturnPreviousPoint:
+                    return index - 1;
+                case eMissingDataModeConstants.ReturnClosestPoint:
+                default:
+                    if (Math.Abs(listToSearch[index - 1] - itemToFind) <=
+                        Math.Abs(listToSearch[index] - itemToFind))
                     {
-                        if (itemToFind < listToSearch[midIndex])
-                        {
-                            // Search the lower half
-                            currentLast = midIndex - 1;
-                        }
-                        else if (itemToFind > listToSearch[midIndex])
-                        {
-                            // Search the upper half
-                            currentFirst = midIndex + 1;
-                        }
-
-                        // Compute the new mid point
-                        midIndex = (currentFirst + currentLast) / 2;
-                        if (midIndex < currentFirst)
-                        {
-                            midIndex = currentFirst;
-                            if (midIndex > currentLast)
-                            {
-                                midIndex = currentLast;
-                            }
-
-                            break;
-                        }
+                        return index - 1;
                     }
 
-                    matchIndex = -1;
-                    // See if an exact match has been found
-                    if (midIndex >= currentFirst && midIndex <= currentLast)
-                    {
-                        if (Math.Abs(listToSearch[midIndex] - itemToFind) < float.Epsilon)
-                        {
-                            matchIndex = midIndex;
-                        }
-                    }
-
-                    if (matchIndex == -1)
-                    {
-                        if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
-                        {
-                            // No exact match; find the nearest match
-                            if (listToSearch[midIndex] < itemToFind)
-                            {
-                                if (midIndex < indexLast)
-                                {
-                                    if (Math.Abs(listToSearch[midIndex] - itemToFind) <=
-                                        Math.Abs(listToSearch[midIndex + 1] - itemToFind))
-                                    {
-                                        matchIndex = midIndex;
-                                    }
-                                    else
-                                    {
-                                        matchIndex = midIndex + 1;
-                                    }
-                                }
-                                else
-                                {
-                                    matchIndex = indexLast;
-                                }
-                            }
-                            // listToSearch(midIndex) >= itemToFind
-                            else if (midIndex > indexFirst)
-                            {
-                                if (Math.Abs(listToSearch[midIndex - 1] - itemToFind) <=
-                                    Math.Abs(listToSearch[midIndex] - itemToFind))
-                                {
-                                    matchIndex = midIndex - 1;
-                                }
-                                else
-                                {
-                                    matchIndex = midIndex;
-                                }
-                            }
-                            else
-                            {
-                                matchIndex = indexFirst;
-                            }
-                        }
-                        // No exact match; return the previous point or the next point
-                        else if (listToSearch[midIndex] < itemToFind)
-                        {
-                            if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
-                            {
-                                matchIndex = midIndex + 1;
-                                if (matchIndex > indexLast)
-                                    matchIndex = indexLast;
-                            }
-                            else
-                            {
-                                matchIndex = midIndex;
-                            }
-                        }
-                        // listToSearch(midIndex) >= itemToFind
-                        else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
-                        {
-                            matchIndex = midIndex;
-                        }
-                        else
-                        {
-                            matchIndex = midIndex - 1;
-                            if (matchIndex < indexFirst)
-                                matchIndex = indexFirst;
-                        }
-                    }
-                }
+                    return index;
             }
-            catch (Exception ex)
-            {
-                matchIndex = -1;
-            }
-
-            return matchIndex;
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -329,141 +139,46 @@ namespace MASICPeakFinder
             List<double> listToSearch, double itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
-            int matchIndex;
+            if (listToSearch == null || listToSearch.Count == 0)
+                return -1;
 
-            try
+            // Search space is only one element long; simply return that element's index
+            if (listToSearch.Count == 1)
+                return 0;
+
+            var index = listToSearch.BinarySearch(itemToFind);
+
+            // item found
+            if (index >= 0)
+                return index;
+
+            // Get the bitwise complement, it is the "insert index" (points to the next greater item)
+            index = ~index;
+
+            // the first item is the closest match
+            if (index == 0)
+                return 0;
+
+            // the last item is the closest match
+            if (index == listToSearch.Count)
+                return index - 1;
+
+            switch (eMissingDataMode)
             {
-                if (listToSearch == null || listToSearch.Count == 0)
-                    return -1;
-
-                var indexFirst = 0;
-                var indexLast = listToSearch.Count - 1;
-
-                var currentFirst = indexFirst;
-                var currentLast = indexLast;
-
-                if (currentFirst == currentLast)
-                {
-                    // Search space is only one element long; simply return that element's index
-                    matchIndex = currentFirst;
-                }
-                else
-                {
-                    var midIndex = currentLast / 2;            // Note: Using Integer division
-
-                    while (currentFirst <= currentLast && Math.Abs(listToSearch[midIndex] - itemToFind) > float.Epsilon)
+                case eMissingDataModeConstants.ReturnNextPoint:
+                    return index;
+                case eMissingDataModeConstants.ReturnPreviousPoint:
+                    return index - 1;
+                case eMissingDataModeConstants.ReturnClosestPoint:
+                default:
+                    if (Math.Abs(listToSearch[index - 1] - itemToFind) <=
+                        Math.Abs(listToSearch[index] - itemToFind))
                     {
-                        if (itemToFind < listToSearch[midIndex])
-                        {
-                            // Search the lower half
-                            currentLast = midIndex - 1;
-                        }
-                        else if (itemToFind > listToSearch[midIndex])
-                        {
-                            // Search the upper half
-                            currentFirst = midIndex + 1;
-                        }
-
-                        // Compute the new mid point
-                        midIndex = (currentFirst + currentLast) / 2;
-                        if (midIndex < currentFirst)
-                        {
-                            midIndex = currentFirst;
-                            if (midIndex > currentLast)
-                            {
-                                midIndex = currentLast;
-                            }
-
-                            break;
-                        }
+                        return index - 1;
                     }
 
-                    matchIndex = -1;
-                    // See if an exact match has been found
-                    if (midIndex >= currentFirst && midIndex <= currentLast)
-                    {
-                        if (Math.Abs(listToSearch[midIndex] - itemToFind) < double.Epsilon)
-                        {
-                            matchIndex = midIndex;
-                        }
-                    }
-
-                    if (matchIndex == -1)
-                    {
-                        if (eMissingDataMode == eMissingDataModeConstants.ReturnClosestPoint)
-                        {
-                            // No exact match; find the nearest match
-                            if (listToSearch[midIndex] < itemToFind)
-                            {
-                                if (midIndex < indexLast)
-                                {
-                                    if (Math.Abs(listToSearch[midIndex] - itemToFind) <=
-                                        Math.Abs(listToSearch[midIndex + 1] - itemToFind))
-                                    {
-                                        matchIndex = midIndex;
-                                    }
-                                    else
-                                    {
-                                        matchIndex = midIndex + 1;
-                                    }
-                                }
-                                else
-                                {
-                                    matchIndex = indexLast;
-                                }
-                            }
-                            // listToSearch(midIndex) >= itemToFind
-                            else if (midIndex > indexFirst)
-                            {
-                                if (Math.Abs(listToSearch[midIndex - 1] - itemToFind) <=
-                                    Math.Abs(listToSearch[midIndex] - itemToFind))
-                                {
-                                    matchIndex = midIndex - 1;
-                                }
-                                else
-                                {
-                                    matchIndex = midIndex;
-                                }
-                            }
-                            else
-                            {
-                                matchIndex = indexFirst;
-                            }
-                        }
-                        // No exact match; return the previous point or the next point
-                        else if (listToSearch[midIndex] < itemToFind)
-                        {
-                            if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
-                            {
-                                matchIndex = midIndex + 1;
-                                if (matchIndex > indexLast)
-                                    matchIndex = indexLast;
-                            }
-                            else
-                            {
-                                matchIndex = midIndex;
-                            }
-                        }
-                        // listToSearch(midIndex) >= itemToFind
-                        else if (eMissingDataMode == eMissingDataModeConstants.ReturnNextPoint)
-                        {
-                            matchIndex = midIndex;
-                        }
-                        else
-                        {
-                            matchIndex = midIndex - 1;
-                            if (matchIndex < indexFirst)
-                                matchIndex = indexFirst;
-                        }
-                    }
-                }
+                    return index;
             }
-            catch (Exception ex)
-            {
-                matchIndex = -1;
-            }
-
-            return matchIndex;
         }
     }
 }
