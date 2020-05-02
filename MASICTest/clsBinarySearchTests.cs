@@ -42,16 +42,16 @@ namespace MASICTest
 
                 using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
-                    srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
+                    srOutFile.WriteLine("Data_Index" + "\t" + "Data_Value");
                     for (var index = 0; index <= dataPoints.Count - 1; index++)
                     {
-                        srOutFile.WriteLine(index.ToString() + '\t' + dataPoints[index]);
+                        srOutFile.WriteLine(index.ToString() + "\t" + dataPoints[index]);
                     }
 
                     srOutFile.WriteLine();
 
                     // Write the headers
-                    srOutFile.WriteLine("Search Value" + '\t' + "Match Value" + '\t' + "Match Index");
+                    srOutFile.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
 
                     var searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 10;
@@ -72,7 +72,7 @@ namespace MASICTest
 
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
-                        srOutFile.WriteLine(dataPointToFind + '\t' + dataPoints[indexMatch] + '\t' + indexMatch);
+                        srOutFile.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
                     }
 
                     // Verify some of the results
@@ -144,16 +144,16 @@ namespace MASICTest
 
                 using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
-                    srOutFile.WriteLine("Data_Index" + '\t' + "Data_Value");
+                    srOutFile.WriteLine("Data_Index" + "\t" + "Data_Value");
                     for (var index = 0; index <= dataPoints.Count - 1; index++)
                     {
-                        srOutFile.WriteLine(index.ToString() + '\t' + dataPoints[index].ToString(CultureInfo.InvariantCulture));
+                        srOutFile.WriteLine(index.ToString() + "\t" + dataPoints[index].ToString(CultureInfo.InvariantCulture));
                     }
 
                     srOutFile.WriteLine();
 
                     // Write the headers
-                    srOutFile.WriteLine("Search Value" + '\t' + "Match Value" + '\t' + "Match Index");
+                    srOutFile.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
 
                     var searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 11;
@@ -170,7 +170,7 @@ namespace MASICTest
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints.ToArray(), dataPointToFind, dataPoints.Count, eMissingDataMode);
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
-                        srOutFile.WriteLine(dataPointToFind + '\t' + dataPoints[indexMatch] + '\t' + indexMatch);
+                        srOutFile.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
                     }
 
                     // Verify some of the results

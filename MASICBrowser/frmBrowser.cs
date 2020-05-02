@@ -1626,7 +1626,7 @@ namespace MASICBrowser
             var intensityDataList = string.Empty;
             var massDataList = string.Empty;
             var smoothedYDataList = string.Empty;
-            var delimiters = " ,;" + '\t';
+            var delimiters = " ,;\t";
 
             var delimiterList = delimiters.ToCharArray();
 
