@@ -668,7 +668,6 @@ namespace MASICBrowser
                         var matchIndex = clsBinarySearch.BinarySearchFindNearest(
                             scanNumbers,
                             similarFragScan,
-                            scanNumbers.Count,
                             clsBinarySearch.eMissingDataModeConstants.ReturnPreviousPoint);
 
                         if (matchIndex < 0)

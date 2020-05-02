@@ -23,38 +23,27 @@ namespace MASICPeakFinder
         /// </summary>
         /// <param name="listToSearch"></param>
         /// <param name="itemToFind"></param>
-        /// <param name="dataCount"></param>
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            IList<int> listToSearch, int itemToFind, int dataCount,
+            List<int> listToSearch, int itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int matchIndex;
 
             try
             {
-                if (listToSearch == null)
+                if (listToSearch == null || listToSearch.Count == 0)
                     return -1;
 
                 var indexFirst = 0;
-                if (dataCount > listToSearch.Count)
-                {
-                    dataCount = listToSearch.Count;
-                }
-
-                var indexLast = dataCount - 1;
+                var indexLast = listToSearch.Count - 1;
 
                 var currentFirst = indexFirst;
                 var currentLast = indexLast;
 
-                if (currentFirst > currentLast)
-                {
-                    // Invalid indices were provided
-                    matchIndex = -1;
-                }
-                else if (currentFirst == currentLast)
+                if (currentFirst == currentLast)
                 {
                     // Search space is only one element long; simply return that element's index
                     matchIndex = currentFirst;
@@ -183,38 +172,27 @@ namespace MASICPeakFinder
         /// </summary>
         /// <param name="listToSearch"></param>
         /// <param name="itemToFind"></param>
-        /// <param name="dataCount"></param>
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            IList<float> listToSearch, float itemToFind, int dataCount,
+            List<float> listToSearch, float itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int matchIndex;
 
             try
             {
-                if (listToSearch == null)
+                if (listToSearch == null || listToSearch.Count == 0)
                     return -1;
 
                 var indexFirst = 0;
-                if (dataCount > listToSearch.Count)
-                {
-                    dataCount = listToSearch.Count;
-                }
-
-                var indexLast = dataCount - 1;
+                var indexLast = listToSearch.Count - 1;
 
                 var currentFirst = indexFirst;
                 var currentLast = indexLast;
 
-                if (currentFirst > currentLast)
-                {
-                    // Invalid indices were provided
-                    matchIndex = -1;
-                }
-                else if (currentFirst == currentLast)
+                if (currentFirst == currentLast)
                 {
                     // Search space is only one element long; simply return that element's index
                     matchIndex = currentFirst;
@@ -344,38 +322,27 @@ namespace MASICPeakFinder
         /// </summary>
         /// <param name="listToSearch"></param>
         /// <param name="itemToFind"></param>
-        /// <param name="dataCount"></param>
         /// <param name="eMissingDataMode"></param>
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            IList<double> listToSearch, double itemToFind, int dataCount,
+            List<double> listToSearch, double itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             int matchIndex;
 
             try
             {
-                if (listToSearch == null)
+                if (listToSearch == null || listToSearch.Count == 0)
                     return -1;
 
                 var indexFirst = 0;
-                if (dataCount > listToSearch.Count)
-                {
-                    dataCount = listToSearch.Count;
-                }
-
-                var indexLast = dataCount - 1;
+                var indexLast = listToSearch.Count - 1;
 
                 var currentFirst = indexFirst;
                 var currentLast = indexLast;
 
-                if (currentFirst > currentLast)
-                {
-                    // Invalid indices were provided
-                    matchIndex = -1;
-                }
-                else if (currentFirst == currentLast)
+                if (currentFirst == currentLast)
                 {
                     // Search space is only one element long; simply return that element's index
                     matchIndex = currentFirst;

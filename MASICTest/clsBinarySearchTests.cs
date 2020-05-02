@@ -65,9 +65,8 @@ namespace MASICTest
                     for (var dataPointToFind = searchValueStart; dataPointToFind <= searchValueEnd; dataPointToFind++)
                     {
                         var indexMatch = clsBinarySearch.BinarySearchFindNearest(
-                            dataPoints.ToArray(),
+                            dataPoints,
                             dataPointToFind,
-                            dataPoints.Count,
                             eMissingDataMode);
 
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
@@ -167,7 +166,7 @@ namespace MASICTest
                     for (var index = searchValueStart; index <= searchValueEnd; index++)
                     {
                         var dataPointToFind = index + index / 10.0;
-                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints.ToArray(), dataPointToFind, dataPoints.Count, eMissingDataMode);
+                        var indexMatch = clsBinarySearch.BinarySearchFindNearest(dataPoints, dataPointToFind, eMissingDataMode);
                         searchResults.Add(dataPointToFind, dataPoints[indexMatch]);
 
                         srOutFile.WriteLine("{0}\t{1}\t{2}", dataPointToFind, dataPoints[indexMatch], indexMatch);
