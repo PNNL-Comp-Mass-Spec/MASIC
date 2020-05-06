@@ -122,7 +122,7 @@ namespace MASIC
                 if (msSpectrum.IonsIntensity[index] < float.Epsilon)
                 {
                     var countCombined = 0;
-                    for (var comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
+                    for (var comparisonIndex = index + 1; comparisonIndex < msSpectrum.IonCount; comparisonIndex++)
                     {
                         if (msSpectrum.IonsIntensity[comparisonIndex] < float.Epsilon)
                         {
@@ -189,7 +189,7 @@ namespace MASIC
 
                     if (!pointInIgnoreRange)
                     {
-                        for (var comparisonIndex = index + 1; comparisonIndex <= msSpectrum.IonCount - 1; comparisonIndex++)
+                        for (var comparisonIndex = index + 1; comparisonIndex < msSpectrum.IonCount; comparisonIndex++)
                         {
                             if (clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[comparisonIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd))
                             {

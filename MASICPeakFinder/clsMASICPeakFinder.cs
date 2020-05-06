@@ -414,7 +414,7 @@ namespace MASICPeakFinder
                                                           out var baselineNoiseStats);
                         previous.BaselineNoiseStats = baselineNoiseStats;
 
-                        for (var segmentIndexCopy = segmentIndex; segmentIndexCopy <= segmentCountLocal - 2; segmentIndexCopy++)
+                        for (var segmentIndexCopy = segmentIndex; segmentIndexCopy < segmentCountLocal - 1; segmentIndexCopy++)
                             noiseStatsSegments[segmentIndexCopy] = noiseStatsSegments[segmentIndexCopy + 1];
                         segmentCountLocal -= 1;
                     }
@@ -638,7 +638,7 @@ namespace MASICPeakFinder
                     double fwhmScanStart = -1;
                     double y2;
                     double y1;
-                    for (var dataIndex = sicPeak.IndexBaseLeft; dataIndex <= sicPeak.IndexMax - 1; dataIndex++)
+                    for (var dataIndex = sicPeak.IndexBaseLeft; dataIndex < sicPeak.IndexMax; dataIndex++)
                     {
                         if (subtractBaselineNoise)
                         {
@@ -814,27 +814,27 @@ namespace MASICPeakFinder
             var yData = new double[dataCount];
 
             var scanOffset = xDataIn[0];
-            for (var i = 0; i <= dataCount - 1; i++)
+            for (var i = 0; i < dataCount; i++)
             {
                 xData[i] = xDataIn[i] - scanOffset;
                 yData[i] = yDataIn[i];
             }
 
             double yDataSum = 0;
-            for (var i = 0; i <= yData.Length - 1; i++)
+            for (var i = 0; i < yData.Length; i++)
                 yDataSum += yData[i];
             if (Math.Abs(yDataSum) < double.Epsilon)
                 yDataSum = 1;
 
             // Compute the Vector of normalized intensities = observed pdf
             var yDataNormalized = new double[yData.Length];
-            for (var i = 0; i <= yData.Length - 1; i++)
+            for (var i = 0; i < yData.Length; i++)
                 yDataNormalized[i] = yData[i] / yDataSum;
 
             // Estimate the empirical distribution function (EDF) using an accumulating sum
             yDataSum = 0;
             var yDataEDF = new double[yDataNormalized.Length];
-            for (var i = 0; i <= yDataNormalized.Length - 1; i++)
+            for (var i = 0; i < yDataNormalized.Length; i++)
             {
                 yDataSum += yDataNormalized[i];
                 yDataEDF[i] = yDataSum;
@@ -842,18 +842,18 @@ namespace MASICPeakFinder
 
             // Compute the Vector of Normal PDF values evaluated at the X values in the peak window
             var xDataPDF = new double[xData.Length];
-            for (var i = 0; i <= xData.Length - 1; i++)
+            for (var i = 0; i < xData.Length; i++)
                 xDataPDF[i] = 1 / (Math.Sqrt(2 * Math.PI) * peakStDev) * Math.Exp(-1 / 2.0 *
                                       Math.Pow((xData[i] - (peakMean - scanOffset)) / peakStDev, 2));
 
             double xDataPDFSum = 0;
-            for (var i = 0; i <= xDataPDF.Length - 1; i++)
+            for (var i = 0; i < xDataPDF.Length; i++)
                 xDataPDFSum += xDataPDF[i];
 
             // Estimate the theoretical CDF using an accumulating sum
             var xDataCDF = new double[xDataPDF.Length];
             yDataSum = 0;
-            for (var i = 0; i <= xDataPDF.Length - 1; i++)
+            for (var i = 0; i < xDataPDF.Length; i++)
             {
                 yDataSum += xDataPDF[i];
                 xDataCDF[i] = yDataSum / ((1 + 1 / (double)xData.Length) * xDataPDFSum);
@@ -861,7 +861,7 @@ namespace MASICPeakFinder
 
             // Compute the maximum of the absolute differences between the YData EDF and XData CDF
             double KS_gof = 0;
-            for (var i = 0; i <= xDataCDF.Length - 1; i++)
+            for (var i = 0; i < xDataCDF.Length; i++)
             {
                 var compareVal = Math.Abs(yDataEDF[i] - xDataCDF[i]);
                 if (compareVal > KS_gof)
@@ -913,7 +913,7 @@ namespace MASICPeakFinder
         {
             var sicData = new List<clsSICDataPoint>();
 
-            for (var index = 0; index <= dataCount - 1; index++)
+            for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(sicScanNumbers[index], sicIntensities[index], 0));
 
             return ComputeNoiseLevelInPeakVicinity(sicData, sicPeak, baselineNoiseOptions);
@@ -1076,7 +1076,7 @@ namespace MASICPeakFinder
         {
             var sicData = new List<clsSICDataPoint>();
 
-            for (var index = 0; index <= dataCount - 1; index++)
+            for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(sicScanNumbers[index], sicIntensities[index], 0));
 
             return ComputeParentIonIntensity(sicData, sicPeak, fragScanNumber);
@@ -1227,7 +1227,7 @@ namespace MASICPeakFinder
                 // Note that we're using real data for this and not smoothed data
                 // Also note that we're using raw data for the peak area (not baseline corrected values)
                 double peakArea = 0;
-                for (var dataIndex = 0; dataIndex <= areaDataCount - 2; dataIndex++)
+                for (var dataIndex = 0; dataIndex < areaDataCount - 1; dataIndex++)
                 {
                     // Use the Trapezoid area formula to compute the area slice to add to sicPeak.Area
                     // Area = 0.5 * DeltaX * (Y1 + Y2)
@@ -1444,7 +1444,7 @@ namespace MASICPeakFinder
                         {
                             // Shrink the array to remove the values at the beginning that are < intensityThreshold, retaining one point < intensityThreshold
                             // Due to the algorithm used to find the contiguous data centered around the peak maximum, this code will typically never be reached
-                            for (var dataIndex = validDataIndexLeft; dataIndex <= dataCount - 1; dataIndex++)
+                            for (var dataIndex = validDataIndexLeft; dataIndex < dataCount; dataIndex++)
                             {
                                 var indexPointer = dataIndex - validDataIndexLeft;
                                 scanNumbers[indexPointer] = scanNumbers[dataIndex];
@@ -1514,7 +1514,7 @@ namespace MASICPeakFinder
                         if (validDataIndexLeft < 0)
                             validDataIndexLeft = 0;
                         dataCount = 0;
-                        for (var dataIndex = validDataIndexLeft; dataIndex <= Math.Min(validDataIndexLeft + minimumDataCount - 1, sicData.Count - 1); dataIndex++)
+                        for (var dataIndex = validDataIndexLeft; dataIndex < Math.Min(validDataIndexLeft + minimumDataCount, sicData.Count); dataIndex++)
                         {
                             var smoothedDataPointer = dataIndex - smoothedYDataSubset.DataStartIndex;
                             if (smoothedDataPointer >= 0 && smoothedDataPointer < smoothedYDataSubset.DataCount)
@@ -1534,7 +1534,7 @@ namespace MASICPeakFinder
                         if (validDataIndexLeft < 0)
                             validDataIndexLeft = 0;
                         dataCount = 0;
-                        for (var dataIndex = validDataIndexLeft; dataIndex <= Math.Min(validDataIndexLeft + minimumDataCount - 1, sicData.Count - 1); dataIndex++)
+                        for (var dataIndex = validDataIndexLeft; dataIndex < Math.Min(validDataIndexLeft + minimumDataCount, sicData.Count); dataIndex++)
                         {
                             if (sicData[dataIndex].Intensity > 0)
                             {
@@ -1566,7 +1566,7 @@ namespace MASICPeakFinder
                             validDataIndexLeft += 1;
 
                         // Interpolate between pointIndex-1 and validDataIndexLeft
-                        for (var indexPointer = pointIndex; indexPointer <= validDataIndexLeft - 1; indexPointer++)
+                        for (var indexPointer = pointIndex; indexPointer < validDataIndexLeft; indexPointer++)
                         {
                             if (InterpolateY(
                                 out var interpolatedIntensity,
@@ -1588,7 +1588,7 @@ namespace MASICPeakFinder
 
                 // Compute the zeroth moment (m0)
                 double peakArea = 0;
-                for (var dataIndex = 0; dataIndex <= dataCount - 2; dataIndex++)
+                for (var dataIndex = 0; dataIndex < dataCount - 1; dataIndex++)
                 {
                     // Use the Trapezoid area formula to compute the area slice to add to peakArea
                     // Area = 0.5 * DeltaX * (Y1 + Y2)
@@ -1602,7 +1602,7 @@ namespace MASICPeakFinder
                 // When ScanDelta is > 1, then need to interpolate.
 
                 var moment1Sum = (scanNumbers[0] - scanNumbers[0]) * intensities[0];
-                for (var dataIndex = 1; dataIndex <= dataCount - 1; dataIndex++)
+                for (var dataIndex = 1; dataIndex < dataCount; dataIndex++)
                 {
                     moment1Sum += (scanNumbers[dataIndex] - scanNumbers[0]) * intensities[dataIndex];
 
@@ -1613,7 +1613,7 @@ namespace MASICPeakFinder
                         // However, no need to interpolate if both intensity values are 0
                         if (intensities[dataIndex - 1] > 0 || intensities[dataIndex] > 0)
                         {
-                            for (var scanNumberInterpolate = scanNumbers[dataIndex - 1] + 1; scanNumberInterpolate <= scanNumbers[dataIndex] - 1; scanNumberInterpolate++)
+                            for (var scanNumberInterpolate = scanNumbers[dataIndex - 1] + 1; scanNumberInterpolate < scanNumbers[dataIndex]; scanNumberInterpolate++)
                             {
                                 // Use InterpolateY() to fill in the scans between dataIndex-1 and dataIndex
                                 if (InterpolateY(
@@ -1658,7 +1658,7 @@ namespace MASICPeakFinder
                     // When ScanDelta is > 1, then need to interpolate
                     var moment2Sum = Math.Pow(scanNumbers[0] - centerOfMassDecimal, 2) * intensities[0];
                     var moment3Sum = Math.Pow(scanNumbers[0] - centerOfMassDecimal, 3) * intensities[0];
-                    for (var dataIndex = 1; dataIndex <= dataCount - 1; dataIndex++)
+                    for (var dataIndex = 1; dataIndex < dataCount; dataIndex++)
                     {
                         moment2Sum += Math.Pow(scanNumbers[dataIndex] - centerOfMassDecimal, 2) * intensities[dataIndex];
                         moment3Sum += Math.Pow(scanNumbers[dataIndex] - centerOfMassDecimal, 3) * intensities[dataIndex];
@@ -1670,7 +1670,7 @@ namespace MASICPeakFinder
                             // However, no need to interpolate if both intensity values are 0
                             if (intensities[dataIndex - 1] > 0 || intensities[dataIndex] > 0)
                             {
-                                for (var scanNumberInterpolate = scanNumbers[dataIndex - 1] + 1; scanNumberInterpolate <= scanNumbers[dataIndex] - 1; scanNumberInterpolate++)
+                                for (var scanNumberInterpolate = scanNumbers[dataIndex - 1] + 1; scanNumberInterpolate < scanNumbers[dataIndex]; scanNumberInterpolate++)
                                 {
                                     // Use InterpolateY() to fill in the scans between dataIndex-1 and dataIndex
                                     if (InterpolateY(
@@ -1792,7 +1792,7 @@ namespace MASICPeakFinder
                 if (dataListSorted[0] <= 0)
                 {
                     var validDataCount = 0;
-                    for (var i = 0; i <= dataSortedCount - 1; i++)
+                    for (var i = 0; i < dataSortedCount; i++)
                     {
                         if (dataListSorted[i] > 0)
                         {
@@ -1836,7 +1836,7 @@ namespace MASICPeakFinder
                         // Initialize countSummed to dataSortedCount for now, in case all data is within the intensity threshold
                         countSummed = dataSortedCount;
                         sum = 0;
-                        for (var i = 0; i <= dataSortedCount - 1; i++)
+                        for (var i = 0; i < dataSortedCount; i++)
                         {
                             if (dataListSorted[i] <= intensityThreshold)
                             {
@@ -1915,7 +1915,7 @@ namespace MASICPeakFinder
 
                         // Find the first point with an intensity value <= intensityThreshold
                         indexEnd = dataSortedCount - 1;
-                        for (var i = 1; i <= dataSortedCount - 1; i++)
+                        for (var i = 1; i < dataSortedCount; i++)
                         {
                             if (dataListSorted[i] > intensityThreshold)
                             {
@@ -2211,7 +2211,7 @@ namespace MASICPeakFinder
                 double potentialPeakArea = 0;
                 var dataPointCountAboveThreshold = 0;
 
-                for (var i = 0; i <= peakData.SourceDataCount - 1; i++)
+                for (var i = 0; i < peakData.SourceDataCount; i++)
                 {
                     peakData.XData[i] = sicData[i].ScanNumber;
                     peakData.YData[i] = sicData[i].Intensity;
@@ -2310,7 +2310,7 @@ namespace MASICPeakFinder
                     {
                         // For each peak, see if several zero intensity values are in a row in the raw data
                         // If found, then narrow the peak to leave just one zero intensity value
-                        for (var peakIndexCompare = 0; peakIndexCompare <= peakData.Peaks.Count - 1; peakIndexCompare++)
+                        for (var peakIndexCompare = 0; peakIndexCompare < peakData.Peaks.Count; peakIndexCompare++)
                         {
                             var currentPeak = peakData.Peaks[peakIndexCompare];
 
@@ -2450,7 +2450,7 @@ namespace MASICPeakFinder
                         // thus the need for an exhaustive search
 
                         var smallestIndexDifference = sicData.Count + 1;
-                        for (var peakIndexCompare = 0; peakIndexCompare <= peakDataSaved.Peaks.Count - 1; peakIndexCompare++)
+                        for (var peakIndexCompare = 0; peakIndexCompare < peakDataSaved.Peaks.Count; peakIndexCompare++)
                         {
                             var comparisonPeak = peakDataSaved.Peaks[peakIndexCompare];
 
@@ -2655,7 +2655,7 @@ namespace MASICPeakFinder
                 {
                     // Make sure one of the peaks is within 1 of the original peak location
                     var success = false;
-                    for (var foundPeakIndex = 0; foundPeakIndex <= peaksContainer.Peaks.Count - 1; foundPeakIndex++)
+                    for (var foundPeakIndex = 0; foundPeakIndex < peaksContainer.Peaks.Count; foundPeakIndex++)
                     {
                         if (Math.Abs(peaksContainer.Peaks[foundPeakIndex].PeakLocation - peaksContainer.OriginalPeakLocationIndex) <= 1)
                         {
@@ -2918,7 +2918,7 @@ namespace MASICPeakFinder
             // Find the peak with the largest area that has peaksContainer.PeakIsValid = True
             peaksContainer.BestPeakIndex = -1;
             peaksContainer.BestPeakArea = double.MinValue;
-            for (var foundPeakIndex = 0; foundPeakIndex <= peaksContainer.Peaks.Count - 1; foundPeakIndex++)
+            for (var foundPeakIndex = 0; foundPeakIndex < peaksContainer.Peaks.Count; foundPeakIndex++)
             {
                 var currentPeak = peaksContainer.Peaks[foundPeakIndex];
 
@@ -3034,7 +3034,7 @@ namespace MASICPeakFinder
         {
             var sicData = new List<clsSICDataPoint>();
 
-            for (var index = 0; index <= dataCount - 1; index++)
+            for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(0, sicIntensities[index], 0));
 
             FindPotentialPeakArea(sicData, out potentialAreaStats, sicPeakFinderOptions);
@@ -3064,7 +3064,7 @@ namespace MASICPeakFinder
                 // Find the minimum intensity in SICData()
                 var minimumPositiveValue = FindMinimumPositiveValue(sicData, 1);
 
-                for (var i = 0; i <= sicData.Count - 1; i++)
+                for (var i = 0; i < sicData.Count; i++)
                 {
                     // If this data point is > .MinimumBaselineNoiseLevel, then add this intensity to potentialPeakArea
                     // and increment validPeakCount
@@ -3150,7 +3150,7 @@ namespace MASICPeakFinder
         {
             var sicData = new List<clsSICDataPoint>();
 
-            for (var index = 0; index <= dataCount - 1; index++)
+            for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(sicScanNumbers[index], sicIntensities[index], 0));
 
             return FindSICPeakAndArea(sicData,

@@ -97,7 +97,7 @@ namespace MASIC
 
                             // Append the new entries to srmList
 
-                            for (var mrmMassIndex = 0; mrmMassIndex <= mrmInfoForHash.MRMMassCount - 1; mrmMassIndex++)
+                            for (var mrmMassIndex = 0; mrmMassIndex < mrmInfoForHash.MRMMassCount; mrmMassIndex++)
                             {
                                 // Add this new transition to srmList() only if not already present
                                 var matchFound = false;
@@ -241,10 +241,10 @@ namespace MASIC
 
                     var dataColumns = new List<string>();
 
-                    for (var mrmInfoIndex = 0; mrmInfoIndex <= mrmSettings.Count - 1; mrmInfoIndex++)
+                    for (var mrmInfoIndex = 0; mrmInfoIndex < mrmSettings.Count; mrmInfoIndex++)
                     {
                         var mrmSetting = mrmSettings[mrmInfoIndex];
-                        for (var mrmMassIndex = 0; mrmMassIndex <= mrmSetting.MRMMassCount - 1; mrmMassIndex++)
+                        for (var mrmMassIndex = 0; mrmMassIndex < mrmSetting.MRMMassCount; mrmMassIndex++)
                         {
                             dataColumns.Clear();
 
@@ -263,7 +263,7 @@ namespace MASIC
                     {
                         // Populate srmKeyToIndexMap
                         var srmKeyToIndexMap = new Dictionary<string, int>();
-                        for (var srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
+                        for (var srmIndex = 0; srmIndex < srmList.Count; srmIndex++)
                             srmKeyToIndexMap.Add(ConstructSRMMapKey(srmList[srmIndex]), srmIndex);
 
                         if (mOptions.WriteMRMDataList)
@@ -290,7 +290,7 @@ namespace MASIC
                                 "ScanTime"
                             };
 
-                            for (var srmIndex = 0; srmIndex <= srmList.Count - 1; srmIndex++)
+                            for (var srmIndex = 0; srmIndex < srmList.Count; srmIndex++)
                                 headerNames.Add(ConstructSRMMapKey(srmList[srmIndex]));
 
                             crosstabWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
@@ -318,7 +318,7 @@ namespace MASIC
                             }
 
                             // Look for each of the m/z values specified in fragScan.MRMScanInfo.MRMMassList
-                            for (var mrmMassIndex = 0; mrmMassIndex <= fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
+                            for (var mrmMassIndex = 0; mrmMassIndex < fragScan.MRMScanInfo.MRMMassCount; mrmMassIndex++)
                             {
                                 // Find the maximum value between fragScan.StartMass and fragScan.EndMass
                                 // Need to define a tolerance to account for numeric rounding artifacts in the variables
@@ -446,7 +446,7 @@ namespace MASIC
 
             // Construct a tab-delimited list of the values
             // At the same time, clear the arrays
-            for (var index = 0; index <= crosstabColumnValue.Count - 1; index++)
+            for (var index = 0; index < crosstabColumnValue.Count; index++)
             {
                 if (crosstabColumnValue[index] > 0)
                 {
@@ -472,7 +472,7 @@ namespace MASIC
         {
             var hashValue = mrmScanInfo.ParentIonMZ + "_" + mrmScanInfo.MRMMassCount;
 
-            for (var index = 0; index <= mrmScanInfo.MRMMassCount - 1; index++)
+            for (var index = 0; index < mrmScanInfo.MRMMassCount; index++)
                 hashValue += "_" +
                     mrmScanInfo.MRMMassList[index].CentralMass.ToString("0.000") + "_" +
                     mrmScanInfo.MRMMassList[index].StartMass.ToString("0.000") + "_" +
@@ -524,7 +524,7 @@ namespace MASIC
                 sicDetails.Reset();
                 sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan;
 
-                for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
                 {
                     if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ <= 0)
                     {
@@ -541,7 +541,7 @@ namespace MASIC
                     sicDetails.SICData.Clear();
 
                     // Step through the fragmentation spectra, finding those that have matching parent and daughter ion m/z values
-                    for (var scanIndex = 0; scanIndex <= scanList.FragScans.Count - 1; scanIndex++)
+                    for (var scanIndex = 0; scanIndex < scanList.FragScans.Count; scanIndex++)
                     {
                         if (scanList.FragScans[scanIndex].MRMScanType != MRMScanTypeConstants.SRM)
                         {
@@ -551,7 +551,7 @@ namespace MASIC
                         var fragScan = scanList.FragScans[scanIndex];
 
                         var useScan = false;
-                        for (var mrmMassIndex = 0; mrmMassIndex <= fragScan.MRMScanInfo.MRMMassCount - 1; mrmMassIndex++)
+                        for (var mrmMassIndex = 0; mrmMassIndex < fragScan.MRMScanInfo.MRMMassCount; mrmMassIndex++)
                         {
                             if (MRMParentDaughterMatch(fragScan.MRMScanInfo.ParentIonMZ,
                                                        fragScan.MRMScanInfo.MRMMassList[mrmMassIndex].CentralMass,
@@ -597,7 +597,7 @@ namespace MASIC
                     // Find the data point with the maximum intensity
                     double maximumIntensity = 0;
                     scanList.ParentIons[parentIonIndex].SICStats.Peak.IndexObserved = 0;
-                    for (var scanIndex = 0; scanIndex <= sicDetails.SICDataCount - 1; scanIndex++)
+                    for (var scanIndex = 0; scanIndex < sicDetails.SICDataCount; scanIndex++)
                     {
                         var intensity = sicDetails.SICIntensities[scanIndex];
                         if (intensity > maximumIntensity)

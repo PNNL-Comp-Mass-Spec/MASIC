@@ -292,7 +292,7 @@ namespace MASIC
                 return true;
             }
 
-            for (var index = 0; index <= lstMZs.Count - 1; index++)
+            for (var index = 0; index < lstMZs.Count; index++)
             {
                 if (!double.TryParse(lstMZs[index], out var targetMz))
                 {
@@ -439,7 +439,7 @@ namespace MASIC
                 return true;
             }
 
-            for (var index = 0; index <= mzList.Length - 1; index++)
+            for (var index = 0; index < mzList.Length; index++)
             {
                 var mzSearchSpec = new clsCustomMZSearchSpec(mzList[index]);
 

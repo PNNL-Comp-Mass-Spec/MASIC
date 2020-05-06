@@ -121,11 +121,11 @@ namespace MASIC.DataInput
                         {
                             // Initialize eColumnMapping, setting the value for each column to -1, indicating the column is not present
                             eColumnMapping = new int[dataCols.Length];
-                            for (var colIndex = 0; colIndex <= eColumnMapping.Length - 1; colIndex++)
+                            for (var colIndex = 0; colIndex < eColumnMapping.Length; colIndex++)
                                 eColumnMapping[colIndex] = -1;
 
                             // The first row must be the header row; parse the values
-                            for (var colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
+                            for (var colIndex = 0; colIndex < dataCols.Length; colIndex++)
                             {
                                 var colName = dataCols[colIndex];
                                 if (colName.Equals(CUSTOM_SIC_COLUMN_MZ, StringComparison.OrdinalIgnoreCase))
@@ -201,7 +201,7 @@ namespace MASIC.DataInput
                             ScanOrAcqTimeTolerance = 0
                         };
 
-                        for (var colIndex = 0; colIndex <= dataCols.Length - 1; colIndex++)
+                        for (var colIndex = 0; colIndex < dataCols.Length; colIndex++)
                         {
                             if (colIndex >= eColumnMapping.Length)
                                 break;

@@ -872,7 +872,7 @@ namespace MASIC.DataOutput
 
                 // Write the detailed SIC values for the given parent ion to the text file
 
-                for (var fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
+                for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {
                     // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
                     var prefix = sicOptions.DatasetID.ToString() + "\t" +

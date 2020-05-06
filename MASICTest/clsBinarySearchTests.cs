@@ -43,7 +43,7 @@ namespace MASICTest
                 using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
                     srOutFile.WriteLine("Data_Index" + "\t" + "Data_Value");
-                    for (var index = 0; index <= dataPoints.Count - 1; index++)
+                    for (var index = 0; index < dataPoints.Count; index++)
                     {
                         srOutFile.WriteLine(index.ToString() + "\t" + dataPoints[index]);
                     }
@@ -144,7 +144,7 @@ namespace MASICTest
                 using (var srOutFile = new StreamWriter(outputFile.FullName, false))
                 {
                     srOutFile.WriteLine("Data_Index" + "\t" + "Data_Value");
-                    for (var index = 0; index <= dataPoints.Count - 1; index++)
+                    for (var index = 0; index < dataPoints.Count; index++)
                     {
                         srOutFile.WriteLine(index.ToString() + "\t" + dataPoints[index].ToString(CultureInfo.InvariantCulture));
                     }

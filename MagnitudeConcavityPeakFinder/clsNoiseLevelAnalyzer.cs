@@ -120,7 +120,7 @@ namespace MagnitudeConcavityPeakFinder
                 // Remove data with a value <= 0
 
                 var validDataCount = 0;
-                for (var intIndex = 0; intIndex <= dataSortedCount - 1; intIndex++)
+                for (var intIndex = 0; intIndex < dataSortedCount; intIndex++)
                 {
                     if (sortedData[intIndex] > 0)
                     {
@@ -214,7 +214,7 @@ namespace MagnitudeConcavityPeakFinder
 
                         // Find the first point with an intensity value <= dblIntensityThreshold
                         indexEnd = dataSortedCount - 1;
-                        for (var intIndex = 1; intIndex <= dataSortedCount - 1; intIndex++)
+                        for (var intIndex = 1; intIndex < dataSortedCount; intIndex++)
                         {
                             if (sortedData[intIndex] > dblIntensityThreshold)
                             {
@@ -324,7 +324,7 @@ namespace MagnitudeConcavityPeakFinder
             var countSummed = dataSortedCount;
 
             summedIntensity = 0;
-            for (var intIndex = 0; intIndex <= dataSortedCount - 1; intIndex++)
+            for (var intIndex = 0; intIndex < dataSortedCount; intIndex++)
             {
                 if (sortedData[intIndex] <= dblIntensityThreshold)
                 {
@@ -374,7 +374,7 @@ namespace MagnitudeConcavityPeakFinder
 
             var indexFirstPositiveValue = -1;
             double minimumPositiveValue = 0;
-            for (var intIndex = 0; intIndex <= dataCount - 1; intIndex++)
+            for (var intIndex = 0; intIndex < dataCount; intIndex++)
             {
                 if (sortedData[intIndex] > 0)
                 {

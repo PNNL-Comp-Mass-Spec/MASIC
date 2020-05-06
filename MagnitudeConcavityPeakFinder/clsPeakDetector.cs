@@ -239,7 +239,7 @@ namespace MagnitudeConcavityPeakFinder
             double potentialPeakArea = 0;
             dataPointCountAboveThreshold = 0;
 
-            for (var index = 0; index <= intensityData.Count - 1; index++)
+            for (var index = 0; index < intensityData.Count; index++)
             {
                 if (intensityData[index] > maximumIntensity)
                 {
@@ -324,7 +324,7 @@ namespace MagnitudeConcavityPeakFinder
             var minimumPositiveValue = FindMinimumPositiveValue(xyData, 1.0);
 
             int index;
-            for (index = 0; index <= xyData.Count - 1; index++)
+            for (index = 0; index < xyData.Count; index++)
             {
                 // If this data point is > .MinimumBaselineNoiseLevel, then add this intensity to potentialPeakArea
                 //  and increment validPeakCount

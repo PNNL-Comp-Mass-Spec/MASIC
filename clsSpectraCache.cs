@@ -247,11 +247,11 @@ namespace MASIC
                     mPageFileWriter.Write(spectraPool.IonCount);
 
                     // Write the m/z values
-                    for (var index = 0; index <= spectraPool.IonCount - 1; index++)
+                    for (var index = 0; index < spectraPool.IonCount; index++)
                         mPageFileWriter.Write(spectraPool.IonsMZ[index]);
 
                     // Write the intensity values
-                    for (var index = 0; index <= spectraPool.IonCount - 1; index++)
+                    for (var index = 0; index < spectraPool.IonCount; index++)
                         mPageFileWriter.Write(spectraPool.IonsIntensity[index]);
 
                     // Write four blank bytes (not really necessary, but adds a little padding between spectra)
@@ -366,7 +366,7 @@ namespace MASIC
                 filePathMatch = filePathMatch.Substring(0, charIndex);
                 var files = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(filePathMatch) + "*");
 
-                for (var index = 0; index <= files.Length - 1; index++)
+                for (var index = 0; index < files.Length; index++)
                     File.Delete(files[index]);
             }
             catch (Exception ex)
@@ -415,7 +415,7 @@ namespace MASIC
                 SpectraPoolInfo = new udtSpectraPoolInfoType[mMaximumPoolLength];
                 Array.Copy(oldSpectraPoolInfo, SpectraPoolInfo, Math.Min(mMaximumPoolLength, oldSpectraPoolInfo.Length));
 
-                for (var index = currentPoolLength; index <= mMaximumPoolLength - 1; index++)
+                for (var index = currentPoolLength; index < mMaximumPoolLength; index++)
                 {
                     SpectraPool[index] = new clsMSSpectrum(0);
                     SpectraPoolInfo[index].CacheState = eCacheStateConstants.UnusedSlot;
@@ -493,7 +493,7 @@ namespace MASIC
             }
 
             // Note: Resetting spectra all the way to SpectraPool.Length, even if SpectraPool.Length is > mMaximumPoolLength
-            for (var index = 0; index <= SpectraPool.Length - 1; index++)
+            for (var index = 0; index < SpectraPool.Length; index++)
             {
                 SpectraPool[index] = new clsMSSpectrum(0);
                 SpectraPoolInfo[index].CacheState = eCacheStateConstants.UnusedSlot;
@@ -567,10 +567,10 @@ namespace MASIC
 
                     msSpectrum.Clear(scanNumber);
 
-                    for (var index = 0; index <= ionCount - 1; index++)
+                    for (var index = 0; index < ionCount; index++)
                         msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());
 
-                    for (var index = 0; index <= ionCount - 1; index++)
+                    for (var index = 0; index < ionCount; index++)
                         msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
 
                     success = true;

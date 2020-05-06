@@ -163,7 +163,7 @@ namespace MASIC.DataInput
                         if (noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0)
                         {
                             ionCountNew = 0;
-                            for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                            for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             {
                                 var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
@@ -196,7 +196,7 @@ namespace MASIC.DataInput
                         if (noiseThresholdOptions.MinimumSignalToNoiseRatio > 0)
                         {
                             ionCountNew = 0;
-                            for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                            for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             {
                                 var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
@@ -270,7 +270,7 @@ namespace MASIC.DataInput
                     }
 
                     // Store the intensity values in objFilterDataArray
-                    for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                    for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                     {
                         objFilterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
                         if (writeDebugData)
@@ -288,7 +288,7 @@ namespace MASIC.DataInput
                     objFilterDataArray.FilterData();
 
                     ionCountNew = 0;
-                    for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                    for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                     {
                         var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
@@ -326,7 +326,7 @@ namespace MASIC.DataInput
                         postFilterWriter.WriteLine("m/z" + "\t" + "Intensity");
 
                         // Store the intensity values in objFilterDataArray
-                        for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                        for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             postFilterWriter.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" +
                                                        msSpectrum.IonsIntensity[ionIndex]);
                     }
@@ -481,7 +481,7 @@ namespace MASIC.DataInput
             var mzList = new List<double>();
             var intensityList = new List<double>();
 
-            for (var i = 0; i <= ionCount - 1; i++)
+            for (var i = 0; i < ionCount; i++)
             {
                 mzList.Add(centroidedIonsMz[i]);
                 intensityList.Add(centroidedIonsIntensity[i]);
@@ -498,7 +498,7 @@ namespace MASIC.DataInput
             mCachedPrecursorIons.Clear();
 
             var ionCount = centroidedIonsMz.Count;
-            for (var index = 0; index <= ionCount - 1; index++)
+            for (var index = 0; index < ionCount; index++)
             {
                 var newPeak = new InterDetect.Peak()
                 {

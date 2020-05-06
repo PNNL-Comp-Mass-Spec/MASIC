@@ -518,7 +518,7 @@ namespace MASIC.DataInput
 
                         var scanTimes = chromatogramItem.Times.ToList();
 
-                        for (var i = 0; i <= scanTimes.Count - 1; i++)
+                        for (var i = 0; i < scanTimes.Count; i++)
                         {
                             if (!elutionTimeToScanMap.ContainsKey(scanTimes[i]))
                             {
@@ -579,7 +579,7 @@ namespace MASIC.DataInput
                         // Fix duplicate scans (values) in elutionTimeToScanMap, if possible
                         // For Each elutionTime In (From item In elutionTimeToScanMap.Keys Order By item Select item)
 
-                        for (var i = 1; i <= elutionTimeToScanMap.Count - 1; i++)
+                        for (var i = 1; i < elutionTimeToScanMap.Count; i++)
                         {
                             var previousScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i - 1);
                             var currentScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i);
@@ -647,7 +647,7 @@ namespace MASIC.DataInput
                         var intensities = chromatogramItem.Intensities.ToList();
                         var currentMz = chromatogramItem.Product.TargetMz;
 
-                        for (var i = 0; i <= scanTimes.Count - 1; i++)
+                        for (var i = 0; i < scanTimes.Count; i++)
                         {
                             if (elutionTimeToScanMapMaster.TryGetValue(scanTimes[i], out var scanToStore))
                             {
@@ -965,7 +965,7 @@ namespace MASIC.DataInput
                     var sourceMzs = new double[msSpectrum.IonCount];
                     var sourceIntensities = new double[msSpectrum.IonCount];
 
-                    for (var i = 0; i <= msSpectrum.IonCount - 1; i++)
+                    for (var i = 0; i < msSpectrum.IonCount; i++)
                     {
                         sourceMzs[i] = msSpectrum.IonsMZ[i];
                         sourceIntensities[i] = msSpectrum.IonsIntensity[i];
@@ -982,7 +982,7 @@ namespace MASIC.DataInput
                         mCentroidedPrecursorIonsMz.Clear();
                         mCentroidedPrecursorIonsIntensity.Clear();
 
-                        for (var i = 0; i <= centroidedPrecursorIonsMz.Length - 1; i++)
+                        for (var i = 0; i < centroidedPrecursorIonsMz.Length; i++)
                         {
                             mCentroidedPrecursorIonsMz.Add(centroidedPrecursorIonsMz[i]);
                             mCentroidedPrecursorIonsIntensity.Add(centroidedPrecursorIonsIntensity[i]);
@@ -1211,7 +1211,7 @@ namespace MASIC.DataInput
                 var mzMin = basePeakMz;
                 var mzMax = basePeakMz;
 
-                for (var i = 1; i <= mzXmlSourceSpectrum.DataCount - 1; i++)
+                for (var i = 1; i < mzXmlSourceSpectrum.DataCount; i++)
                 {
                     if (intensityList[i] > bpi)
                     {
@@ -1466,7 +1466,7 @@ namespace MASIC.DataInput
 
                     if (msSpectrum.IonsIntensity != null)
                     {
-                        for (var ionIndex = 0; ionIndex <= msSpectrum.IonCount - 1; ionIndex++)
+                        for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                         {
                             totalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
                         }
@@ -1503,7 +1503,7 @@ namespace MASIC.DataInput
             mCentroidedPrecursorIonsMz.Clear();
             mCentroidedPrecursorIonsIntensity.Clear();
 
-            for (var i = 0; i <= msSpectrum.IonCount - 1; i++)
+            for (var i = 0; i < msSpectrum.IonCount; i++)
             {
                 mCentroidedPrecursorIonsMz.Add(msSpectrum.IonsMZ[i]);
                 mCentroidedPrecursorIonsIntensity.Add(msSpectrum.IonsIntensity[i]);

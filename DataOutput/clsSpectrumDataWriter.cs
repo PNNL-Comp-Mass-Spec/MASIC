@@ -71,7 +71,7 @@ namespace MASIC.DataOutput
 
                 UpdateProgress(0, "Exporting raw data");
 
-                for (var masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
+                for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
                     var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                     if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
@@ -171,7 +171,7 @@ namespace MASIC.DataOutput
 
                 var intensities = new double[spectraPool.IonCount];
                 var pointerArray = new int[spectraPool.IonCount];
-                for (var ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
+                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
                 {
                     intensities[ionIndex] = spectraPool.IonsIntensity[ionIndex];
                     pointerArray[ionIndex] = ionIndex;
@@ -205,7 +205,7 @@ namespace MASIC.DataOutput
                     minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
                 }
 
-                for (var ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
+                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
                 {
                     if (spectraPool.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
@@ -293,7 +293,7 @@ namespace MASIC.DataOutput
 
                 var intensities = new double[spectraPool.IonCount];
                 var pointerArray = new int[spectraPool.IonCount];
-                for (var ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
+                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
                 {
                     intensities[ionIndex] = spectraPool.IonsIntensity[ionIndex];
                     pointerArray[ionIndex] = ionIndex;
@@ -329,7 +329,7 @@ namespace MASIC.DataOutput
                 }
 
                 exportCount = 0;
-                for (var ionIndex = 0; ionIndex <= spectraPool.IonCount - 1; ionIndex++)
+                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
                 {
                     if (spectraPool.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {

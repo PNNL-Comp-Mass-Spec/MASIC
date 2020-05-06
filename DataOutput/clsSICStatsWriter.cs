@@ -84,7 +84,7 @@ namespace MASIC.DataOutput
             {
                 scanListArray = new int[surveyScanCount];
 
-                for (var index = 0; index <= surveyScanCount - 1; index++)
+                for (var index = 0; index < surveyScanCount; index++)
                     scanListArray[index] = surveyScans[index].ScanNumber;
             }
             else
@@ -131,7 +131,7 @@ namespace MASIC.DataOutput
                     if (scanList.SurveyScans.Count == 0 && scanList.ParentIons.Count == 0)
                     {
                         // Write out fake values to the _SICStats.txt file so that downstream software can still access some of the information
-                        for (var fragScanIndex = 0; fragScanIndex <= scanList.FragScans.Count - 1; fragScanIndex++)
+                        for (var fragScanIndex = 0; fragScanIndex < scanList.FragScans.Count; fragScanIndex++)
                         {
                             var fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex);
                             var parentIonIndex = 0;
@@ -146,7 +146,7 @@ namespace MASIC.DataOutput
                     }
                     else
                     {
-                        for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                        for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
                         {
                             bool includeParentIon;
 
@@ -161,7 +161,7 @@ namespace MASIC.DataOutput
 
                             if (includeParentIon)
                             {
-                                for (var fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
+                                for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                                 {
                                     var parentIon = scanList.ParentIons[parentIonIndex];
                                     int surveyScanNumber;

@@ -290,7 +290,7 @@ namespace MASIC
             try
             {
                 var maximumIntensity = float.MinValue;
-                for (var index = 0; index <= dataCount - 1; index++)
+                for (var index = 0; index < dataCount; index++)
                 {
                     if (yData[index] < NoiseThresholdIntensity)
                         continue;
@@ -333,7 +333,7 @@ namespace MASIC
                     if (intensityQuantizationValue > 1)
                         intensityQuantizationValue = (float)(Math.Round(intensityQuantizationValue, 0));
 
-                    for (var index = 0; index <= binCount - 1; index++)
+                    for (var index = 0; index < binCount; index++)
                     {
                         if (Math.Abs(binnedYData[index]) > float.Epsilon)
                         {
@@ -346,7 +346,7 @@ namespace MASIC
                     return;
 
 
-                for (var index = 0; index <= binCount - 1; index++)
+                for (var index = 0; index < binCount; index++)
                 {
                     if (Math.Abs(binnedYData[index]) > float.Epsilon)
                     {
@@ -391,7 +391,7 @@ namespace MASIC
 
                 // Determine the number of non-zero data points in the two spectra
                 var nonZeroDataCount = 0;
-                for (var index = 0; index <= dataCount - 1; index++)
+                for (var index = 0; index < dataCount; index++)
                 {
                     if (dataList1.ElementAtOrDefault(index) > 0)
                         nonZeroDataCount += 1;
@@ -401,7 +401,7 @@ namespace MASIC
                     return 0;
 
                 nonZeroDataCount = 0;
-                for (var index = 0; index <= dataCount - 1; index++)
+                for (var index = 0; index < dataCount; index++)
                 {
                     if (dataList2.ElementAtOrDefault(index) > 0)
                         nonZeroDataCount += 1;
@@ -474,7 +474,7 @@ namespace MASIC
                 return;
 
             // Find the means
-            for (var j = 0; j <= n - 1; j++)
+            for (var j = 0; j < n; j++)
             {
                 ax += dataList1.ElementAtOrDefault(j);
                 ay += dataList2.ElementAtOrDefault(j);
@@ -484,7 +484,7 @@ namespace MASIC
             ay /= n;
 
             // Compute the correlation coefficient
-            for (var j = 0; j <= n - 1; j++)
+            for (var j = 0; j < n; j++)
             {
                 var xt = dataList1.ElementAtOrDefault(j) - ax;
                 var yt = dataList2.ElementAtOrDefault(j) - ay;
@@ -540,9 +540,9 @@ namespace MASIC
             if (n <= 0)
                 return;
 
-            for (var j = 0; j <= n - 2; j++)
+            for (var j = 0; j < n - 1; j++)
             {
-                for (var k = j + 1; k <= n - 1; k++)
+                for (var k = j + 1; k < n; k++)
                 {
                     double a1 = dataList1.ElementAtOrDefault(j) - dataList1.ElementAtOrDefault(k);
                     double a2 = dataList2.ElementAtOrDefault(j) - dataList2.ElementAtOrDefault(k);
@@ -631,7 +631,7 @@ namespace MASIC
             CRank(n, data2, out var sg);
 
             var DiffInRanksWork = 0.0;
-            for (var j = 0; j <= n - 1; j++)
+            for (var j = 0; j < n; j++)
                 DiffInRanksWork += SquareNum(data1[j] - data2[j]);
 
             DiffInRanks = (float)(DiffInRanksWork);
@@ -686,7 +686,7 @@ namespace MASIC
 
                     var rank = 0.5F * (j + jt - 1) + 1;
 
-                    for (var ji = j; ji <= jt - 1; ji++)
+                    for (var ji = j; ji < jt; ji++)
                         w[ji] = rank;
 
                     float t = jt - j;

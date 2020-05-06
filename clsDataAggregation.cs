@@ -145,7 +145,7 @@ namespace MASIC
                 closestMatchIndex = -1;
                 highestIntensity = 0;
 
-                for (var dataIndex = 0; dataIndex <= ionCount - 1; dataIndex++)
+                for (var dataIndex = 0; dataIndex < ionCount; dataIndex++)
                 {
                     if (mzList[dataIndex] >= mzStart && mzList[dataIndex] <= mzEnd)
                     {

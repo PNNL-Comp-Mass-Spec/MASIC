@@ -1879,7 +1879,7 @@ namespace MASIC
         {
             try
             {
-                for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
                 {
                     var parentIon = scanList.ParentIons[parentIonIndex];
                     var scanIndexObserved = parentIon.SurveyScanIndex;
@@ -2010,7 +2010,7 @@ namespace MASIC
                     currentStep = weightingFactors.Length - 1;
 
                 float overallPctCompleted = 0;
-                for (var index = 0; index <= currentStep - 1; index++)
+                for (var index = 0; index < currentStep; index++)
                     overallPctCompleted += weightingFactors[index] * 100;
 
                 overallPctCompleted += weightingFactors[currentStep] * mSubtaskProcessingStepPct;

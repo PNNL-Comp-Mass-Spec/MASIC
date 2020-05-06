@@ -311,7 +311,7 @@ namespace MagnitudeConcavityPeakFinder
                 newPeak.RightEdge = sourceDataCount - 1;
                 lowIntensityPointCount = 0;
                 for (compareIndex = dataIndex + 1;
-                    compareIndex <= sourceDataCount - 2;
+                    compareIndex < sourceDataCount - 1;
                     compareIndex++)
                 {
                     if (firstDerivative[compareIndex] <= 0 &
@@ -412,7 +412,7 @@ namespace MagnitudeConcavityPeakFinder
             // Finds the area under the curve, using trapezoidal integration
 
             double area = 0;
-            for (var i = 0; i <= dataPointCount - 2; i++)
+            for (var i = 0; i < dataPointCount - 1; i++)
             {
                 // Area of a trapezoid (turned on its side) is:
                 //   0.5 * d * (h1 + h2)
@@ -449,7 +449,7 @@ namespace MagnitudeConcavityPeakFinder
             secondDerivative = new double[sourceDataCount];
 
             for (var startIndex = 0;
-                startIndex <= sourceDataCount - peakWidthPointsMinimum - 1;
+                startIndex < sourceDataCount - peakWidthPointsMinimum;
                 startIndex++)
             {
                 // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
@@ -557,12 +557,12 @@ namespace MagnitudeConcavityPeakFinder
             var CoVar = new double[udtEquationTerms.Length, udtEquationTerms.Length];
             var PFuncVal = new double[udtEquationTerms.Length];
 
-            for (var i = 0; i <= DataX.Count - 1; i++)
+            for (var i = 0; i < DataX.Count; i++)
             {
                 GetLValues(DataX[i], udtEquationTerms, ref PFuncVal);
 
                 var ym = DataY[i];
-                for (var L = 0; L <= udtEquationTerms.Length - 1; L++)
+                for (var L = 0; L < udtEquationTerms.Length; L++)
                 {
                     for (var m = 0; m <= L; m++)
                     {
@@ -572,9 +572,9 @@ namespace MagnitudeConcavityPeakFinder
                 }
             }
 
-            for (var j = 1; j <= udtEquationTerms.Length - 1; j++)
+            for (var j = 1; j < udtEquationTerms.Length; j++)
             {
-                for (var k = 0; k <= j - 1; k++)
+                for (var k = 0; k < j; k++)
                 {
                     CoVar[k, j] = CoVar[j, k];
                 }
@@ -582,7 +582,7 @@ namespace MagnitudeConcavityPeakFinder
 
             if (GaussJordan(ref CoVar, udtEquationTerms.Length, ref Beta))
             {
-                for (var L = 0; L <= udtEquationTerms.Length - 1; L++)
+                for (var L = 0; L < udtEquationTerms.Length; L++)
                 {
                     udtEquationTerms[L].ParamResult = Beta[L];
                 }
@@ -591,7 +591,7 @@ namespace MagnitudeConcavityPeakFinder
             }
 
             // Error fitting; clear coefficients
-            for (var L = 0; L <= udtEquationTerms.Length - 1; L++)
+            for (var L = 0; L < udtEquationTerms.Length; L++)
             {
                 udtEquationTerms[L].ParamResult = 0;
             }
@@ -619,7 +619,7 @@ namespace MagnitudeConcavityPeakFinder
                 PFuncVal = new double[udtEquationTerms.Count];
 
             //f = "1,X,Log(X),Log10(X),Exp(X),Sin(X),Cos(X),Tan(X),ATAN(X)"
-            for (var i = 0; i <= udtEquationTerms.Count - 1; i++)
+            for (var i = 0; i < udtEquationTerms.Count; i++)
             {
                 var udtTerm = udtEquationTerms[i];
                 double v = 0;
@@ -713,14 +713,14 @@ namespace MagnitudeConcavityPeakFinder
 
             try
             {
-                for (var i = 0; i <= termCount - 1; i++)
+                for (var i = 0; i < termCount; i++)
                 {
                     double bigValue = 0;
-                    for (var j = 0; j <= termCount - 1; j++)
+                    for (var j = 0; j < termCount; j++)
                     {
                         if (ipiv[j] != 1)
                         {
-                            for (var k = 0; k <= termCount - 1; k++)
+                            for (var k = 0; k < termCount; k++)
                             {
                                 if (ipiv[k] == 0)
                                 {
@@ -739,7 +739,7 @@ namespace MagnitudeConcavityPeakFinder
                     if (rowIndex != columnIndex)
                     {
                         double swapValue;
-                        for (var L = 0; L <= termCount - 1; L++)
+                        for (var L = 0; L < termCount; L++)
                         {
                             swapValue = A[rowIndex, L];
                             A[rowIndex, L] = A[columnIndex, L];
@@ -760,19 +760,19 @@ namespace MagnitudeConcavityPeakFinder
 
                     var PivInv = 1 / A[columnIndex, columnIndex];
                     A[columnIndex, columnIndex] = 1;
-                    for (var L = 0; L <= termCount - 1; L++)
+                    for (var L = 0; L < termCount; L++)
                     {
                         A[columnIndex, L] *= PivInv;
                     }
 
                     b[columnIndex] *= PivInv;
-                    for (var ll = 0; ll <= termCount - 1; ll++)
+                    for (var ll = 0; ll < termCount; ll++)
                     {
                         if (ll != columnIndex)
                         {
                             var multiplier = A[ll, columnIndex];
                             A[ll, columnIndex] = 0;
-                            for (var L = 0; L <= termCount - 1; L++)
+                            for (var L = 0; L < termCount; L++)
                             {
                                 A[ll, L] -= A[columnIndex, L] * multiplier;
                             }
@@ -785,7 +785,7 @@ namespace MagnitudeConcavityPeakFinder
                 {
                     if (indexR[L] != indexC[L])
                     {
-                        for (var k = 0; k <= termCount - 1; k++)
+                        for (var k = 0; k < termCount; k++)
                         {
                             var swapValue = A[k, indexR[L]];
                             A[k, indexR[L]] = A[k, indexC[L]];

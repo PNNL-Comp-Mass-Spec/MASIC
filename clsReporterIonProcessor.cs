@@ -59,7 +59,7 @@ namespace MASIC
                 {
                     // Processing a thermo .Raw file
                     // Check whether any of the frag scans has IsFTMS true
-                    for (var masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
+                    for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                     {
                         var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                         if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
@@ -212,7 +212,7 @@ namespace MASIC
 
                     UpdateProgress(0, "Searching for reporter ions");
 
-                    for (var masterOrderIndex = 0; masterOrderIndex <= scanList.MasterScanOrderCount - 1; masterOrderIndex++)
+                    for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                     {
                         var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
                         if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
@@ -352,7 +352,7 @@ namespace MASIC
             // Find the reporter ion intensities
             // Also keep track of the closest m/z for each reporter ion
             // Note that we're using the maximum intensity in the range (not the sum)
-            for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+            for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
             {
                 var ion = reporterIons[reporterIonIndex];
                 // Search for the reporter ion MZ in this mass spectrum
@@ -377,7 +377,7 @@ namespace MASIC
 
                 // Find each reporter ion in ftLabelData
 
-                for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+                for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
                 {
                     var mzToFind = reporterIons[reporterIonIndex].MZ;
                     var mzToleranceDa = reporterIons[reporterIonIndex].MZToleranceDa;
@@ -434,7 +434,7 @@ namespace MASIC
 
                     // Count the number of non-zero data points in reporterIntensitiesCorrected()
                     var positiveCount = 0;
-                    for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+                    for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
                     {
                         if (reporterIntensitiesCorrected[reporterIonIndex] > 0)
                         {
@@ -457,7 +457,7 @@ namespace MASIC
             double pctChangeSum = 0;
             double originalIntensitySum = 0;
 
-            for (var reporterIonIndex = 0; reporterIonIndex <= reporterIons.Count - 1; reporterIonIndex++)
+            for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
             {
                 if (!reporterIons[reporterIonIndex].ContaminantIon)
                 {

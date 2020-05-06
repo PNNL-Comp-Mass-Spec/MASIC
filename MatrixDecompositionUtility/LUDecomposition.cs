@@ -39,7 +39,7 @@ namespace MatrixDecompositionUtility
                 b[ip] = b[i];
                 if (ii > -1) {
                     j = ii;
-                    while (j <= (i - 1)) {
+                    while (j < i) {
                         sum -= a[i, j] * b[j];
                         j++;
                     }

@@ -32,7 +32,7 @@ namespace MASIC
 
             var sicOptions = masicOptions.SICOptions;
 
-            for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+            for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
             {
                 bool includeParentIon;
                 if (scanList.ParentIons[parentIonIndex].MRMDaughterMZ > 0)
@@ -161,7 +161,7 @@ namespace MASIC
                     // Now process the SIM scans (if any)
                     // First, see if any SIMScans are present and determine the maximum SIM Index
                     var simIndexMax = -1;
-                    for (var parentIonIndex = 0; parentIonIndex <= scanList.ParentIons.Count - 1; parentIonIndex++)
+                    for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
                     {
                         var surveyScan = scanList.SurveyScans[scanList.ParentIons[parentIonIndex].SurveyScanIndex];
                         if (surveyScan.SIMScan)
@@ -752,12 +752,12 @@ namespace MASIC
 
             // Initialize .MaximumIntensity and .ScanIndexMax
             // Additionally, reset fullSICDataCount() and, for safety, set fullSICScanIndices() to -1
-            for (var mzIndexWork = 0; mzIndexWork <= mzSearchChunk.Count - 1; mzIndexWork++)
+            for (var mzIndexWork = 0; mzIndexWork < mzSearchChunk.Count; mzIndexWork++)
             {
                 mzSearchChunk[mzIndexWork].ResetMaxIntensity();
 
                 fullSICDataCount[mzIndexWork] = 0;
-                for (var surveyScanIndex = 0; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
+                for (var surveyScanIndex = 0; surveyScanIndex < scanList.SurveyScans.Count; surveyScanIndex++)
                     fullSICScanIndices[mzIndexWork, surveyScanIndex] = -1;
             }
 
@@ -765,7 +765,7 @@ namespace MASIC
             // Step through scanList to obtain the scan numbers and intensity data for each .SearchMZ in udtMZSearchChunk
             // We're stepping scan by scan since the process of loading a scan from disk is slower than the process of searching for each m/z in the scan
             // ---------------------------------------------------------
-            for (var surveyScanIndex = 0; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
+            for (var surveyScanIndex = 0; surveyScanIndex < scanList.SurveyScans.Count; surveyScanIndex++)
             {
                 bool useScan;
 
@@ -802,7 +802,7 @@ namespace MASIC
                     return false;
                 }
 
-                for (var mzIndexWork = 0; mzIndexWork <= mzSearchChunk.Count - 1; mzIndexWork++)
+                for (var mzIndexWork = 0; mzIndexWork < mzSearchChunk.Count; mzIndexWork++)
                 {
                     var current = mzSearchChunk[mzIndexWork];
 
@@ -866,7 +866,7 @@ namespace MASIC
             // Compute the noise level in fullSICIntensities() for each m/z in udtMZSearchChunk
             // Also, find the peaks for each m/z in udtMZSearchChunk and retain the largest peak found
             // ---------------------------------------------------------
-            for (var mzIndexWork = 0; mzIndexWork <= mzSearchChunk.Count - 1; mzIndexWork++)
+            for (var mzIndexWork = 0; mzIndexWork < mzSearchChunk.Count; mzIndexWork++)
             {
                 // Use this for debugging
                 if (Math.Abs(mzSearchChunk[mzIndexWork].SearchMZ - DebugMZToFind) < 0.1)
@@ -876,7 +876,7 @@ namespace MASIC
                 }
 
                 // Copy the data for this m/z into fullSICIntensities1D()
-                for (var dataIndex = 0; dataIndex <= fullSICDataCount[mzIndexWork] - 1; dataIndex++)
+                for (var dataIndex = 0; dataIndex < fullSICDataCount[mzIndexWork]; dataIndex++)
                     fullSICIntensities1D[dataIndex] = fullSICIntensities[mzIndexWork, dataIndex];
 
                 // Compute the noise level; the noise level may change with increasing index number if the background is increasing for a given m/z
@@ -956,7 +956,7 @@ namespace MASIC
                     // Record the index in the Full SIC that the parent ion mass was first observed
                     // Search for .SurveyScanIndex in fullSICScanIndices
                     scanIndexObservedInFullSIC = -1;
-                    for (var dataIndex = 0; dataIndex <= fullSICDataCount[mzIndexWork] - 1; dataIndex++)
+                    for (var dataIndex = 0; dataIndex < fullSICDataCount[mzIndexWork]; dataIndex++)
                     {
                         if (fullSICScanIndices[mzIndexWork, dataIndex] >= currentParentIon.SurveyScanIndex)
                         {
@@ -1205,7 +1205,7 @@ namespace MASIC
 
                     // Search for scanIndexObserved in sicScanIndices()
                     sicStats.Peak.IndexObserved = -1;
-                    for (var dataIndex = 0; dataIndex <= sicDetails.SICDataCount - 1; dataIndex++)
+                    for (var dataIndex = 0; dataIndex < sicDetails.SICDataCount; dataIndex++)
                     {
                         if (sicData[dataIndex].ScanIndex == scanIndexObserved)
                         {

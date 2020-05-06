@@ -89,7 +89,7 @@ namespace MASIC.DataOutput
                     SICDataScanIntervals = new byte[sicDetails.SICDataCount];
                     var sicScanNumbers = sicDetails.SICScanNumbers;
 
-                    for (var scanIndex = 1; scanIndex <= sicDetails.SICDataCount - 1; scanIndex++)
+                    for (var scanIndex = 1; scanIndex < sicDetails.SICDataCount; scanIndex++)
                     {
                         var scanDelta = sicScanNumbers[scanIndex] - sicScanNumbers[scanIndex - 1];
                         // When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
@@ -110,7 +110,7 @@ namespace MASIC.DataOutput
                 var sicScanIndices = sicDetails.SICScanIndices;
 
                 // Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
-                for (var fragScanIndex = 0; fragScanIndex <= scanList.ParentIons[parentIonIndex].FragScanIndices.Count - 1; fragScanIndex++)
+                for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {
                     lastGoodLoc = "fragScanIndex=" + fragScanIndex.ToString();
 
@@ -234,7 +234,7 @@ namespace MASIC.DataOutput
                         var scanIntervalList = string.Empty;
                         if (SICDataScanIntervals != null)
                         {
-                            for (var scanIntervalIndex = 0; scanIntervalIndex <= sicDetails.SICDataCount - 1; scanIntervalIndex++)
+                            for (var scanIntervalIndex = 0; scanIntervalIndex < sicDetails.SICDataCount; scanIntervalIndex++)
                             {
                                 if (SICDataScanIntervals[scanIntervalIndex] <= 9)
                                 {
@@ -360,7 +360,7 @@ namespace MASIC.DataOutput
 
                                 if (smoothedYDataSubset.Data != null && smoothedYDataSubset.DataCount > 0)
                                 {
-                                    for (var index = 0; index <= smoothedYDataSubset.DataCount - 1; index++)
+                                    for (var index = 0; index < smoothedYDataSubset.DataCount; index++)
                                         sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString(CultureInfo.InvariantCulture) + ",");
 
                                     // Trim the trailing comma

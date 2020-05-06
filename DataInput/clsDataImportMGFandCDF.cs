@@ -92,7 +92,7 @@ namespace MASIC.DataInput
                 // Read all of the Survey scans from the CDF file
                 // CDF files created by the Agilent XCT list the first scan number as 0; use scanNumberCorrection to correct for this
                 var scanNumberCorrection = 0;
-                for (var msScanIndex = 0; msScanIndex <= msScanCount - 1; msScanIndex++)
+                for (var msScanIndex = 0; msScanIndex < msScanCount; msScanIndex++)
                 {
                     success = objCDFReader.GetScanInfo(msScanIndex, out var scanNumber, out var scanTotalIntensity, out scanTime, out _, out _);
 
@@ -267,7 +267,7 @@ namespace MASIC.DataInput
                         // an older version of Agilent Chemstation.  These files typically have lines like ###MSMS: #13-29 instead of ###MSMS: #13/29/
                         // If this indexing error is found, then we'll set scanNumberCorrection = 1 and apply it to all subsequent MS/MS scans;
                         // we'll also need to correct prior MS/MS scans
-                        for (var surveyScanIndex = lastSurveyScanIndex; surveyScanIndex <= scanList.SurveyScans.Count - 1; surveyScanIndex++)
+                        for (var surveyScanIndex = lastSurveyScanIndex; surveyScanIndex < scanList.SurveyScans.Count; surveyScanIndex++)
                         {
                             if (scanList.SurveyScans[surveyScanIndex].ScanNumber == spectrumInfo.ScanNumber)
                             {
@@ -371,7 +371,7 @@ namespace MASIC.DataInput
 
                         // Compute the total scan intensity
                         newFragScan.TotalIonIntensity = 0;
-                        for (var ionIndex = 0; ionIndex <= newFragScan.IonCount - 1; ionIndex++)
+                        for (var ionIndex = 0; ionIndex < newFragScan.IonCount; ionIndex++)
                             newFragScan.TotalIonIntensity += msSpectrum.IonsIntensity[ionIndex];
 
                         // Determine the minimum positive intensity in this scan
@@ -454,7 +454,7 @@ namespace MASIC.DataInput
                 ValidateMasterScanOrderSorting(scanList);
 
                 // Now that all of the data has been read, write out to the scan stats file, in order of scan number
-                for (var scanIndex = 0; scanIndex <= scanList.MasterScanOrderCount - 1; scanIndex++)
+                for (var scanIndex = 0; scanIndex < scanList.MasterScanOrderCount; scanIndex++)
                 {
                     var eScanType = scanList.MasterScanOrder[scanIndex].ScanType;
                     clsScanInfo currentScan;
@@ -503,7 +503,7 @@ namespace MASIC.DataInput
                 mzMax = mzList[0];
 
                 var basePeakIndex = 0;
-                for (var dataIndex = 0; dataIndex <= mzList.Count - 1; dataIndex++)
+                for (var dataIndex = 0; dataIndex < mzList.Count; dataIndex++)
                 {
                     if (ionIntensity[dataIndex] > ionIntensity[basePeakIndex])
                     {
@@ -649,7 +649,7 @@ namespace MASIC.DataInput
             var masterScanNumbers = new int[scanList.MasterScanOrderCount];
             var masterScanOrderIndices = new int[scanList.MasterScanOrderCount];
 
-            for (var index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
+            for (var index = 0; index < scanList.MasterScanOrderCount; index++)
             {
                 masterScanNumbers[index] = scanList.MasterScanNumList[index];
                 masterScanOrderIndices[index] = index;
@@ -660,7 +660,7 @@ namespace MASIC.DataInput
 
             // Check whether we need to re-populate the lists
             var needToSort = false;
-            for (var index = 1; index <= scanList.MasterScanOrderCount - 1; index++)
+            for (var index = 1; index < scanList.MasterScanOrderCount; index++)
             {
                 if (masterScanOrderIndices[index] < masterScanOrderIndices[index - 1])
                 {
@@ -679,7 +679,7 @@ namespace MASIC.DataInput
                 Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount);
                 Array.Copy(scanList.MasterScanTimeList.ToArray(), masterScanTimeListCopy, scanList.MasterScanOrderCount);
 
-                for (var index = 0; index <= scanList.MasterScanOrderCount - 1; index++)
+                for (var index = 0; index < scanList.MasterScanOrderCount; index++)
                 {
                     scanList.MasterScanOrder[index] = udtMasterScanOrderListCopy[masterScanOrderIndices[index]];
                     scanList.MasterScanNumList[index] = masterScanNumbers[index];

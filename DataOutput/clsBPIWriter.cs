@@ -214,7 +214,7 @@ namespace MASIC.DataOutput
                 // Write an Escape character (Byte 1B)
                 writer.Write((byte)27);
 
-                for (var scanIndex = 0; scanIndex <= scanCount - 1; scanIndex++)
+                for (var scanIndex = 0; scanIndex < scanCount; scanIndex++)
                 {
                     var scan = scanList[scanIndex];
                     // Note: Using (float) to assure that we write out single precision numbers

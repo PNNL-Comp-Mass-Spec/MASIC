@@ -652,7 +652,7 @@ namespace MASIC.DataInput
                 double basePeakIntensity = 0;
                 double basePeakMz = 0;
 
-                for (var ionIndex = 0; ionIndex <= scanInfo.IonCountRaw - 1; ionIndex++)
+                for (var ionIndex = 0; ionIndex < scanInfo.IonCountRaw; ionIndex++)
                 {
                     totalIonIntensity += intensityList[ionIndex];
                     if (intensityList[ionIndex] > basePeakIntensity)
@@ -888,7 +888,7 @@ namespace MASIC.DataInput
 
             var sortRequired = false;
 
-            for (var index = 1; index <= ionCount - 1; index++)
+            for (var index = 1; index < ionCount; index++)
             {
                 // Although the data returned by mXRawFile.GetMassListFromScanNum is generally sorted by m/z,
                 // we have observed a few cases in certain scans of certain datasets that points with

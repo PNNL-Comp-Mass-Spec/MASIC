@@ -60,7 +60,7 @@ namespace MASIC
                 var surveyScanIndexMatch = -1;
                 var scanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
 
-                for (var index = 0; index <= scanList.SurveyScans.Count - 1; index++)
+                for (var index = 0; index < scanList.SurveyScans.Count; index++)
                 {
                     if (scanList.SurveyScans[index].ScanNumber >= scanNumberToFind)
                     {

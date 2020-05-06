@@ -208,7 +208,7 @@ namespace MASICPeakFinder
                                 {
                                     newPeak.RightEdge = sourceDataCount - 1;
                                     var lowIntensityPointCount = 0;
-                                    for (var compareIndex = index + 1; compareIndex <= sourceDataCount - 2; compareIndex++)
+                                    for (var compareIndex = index + 1; compareIndex < sourceDataCount - 1; compareIndex++)
                                     {
                                         if (firstDerivative[compareIndex] <= 0 && firstDerivative[compareIndex + 1] >= 0)
                                         {
@@ -394,7 +394,7 @@ namespace MASICPeakFinder
             // Finds the area under the curve, using trapezoidal integration
 
             double area = 0;
-            for (var index = 0; index <= arrayCount - 2; index++)
+            for (var index = 0; index < arrayCount - 1; index++)
             {
                 // Area of a trapezoid (turned on its side) is:
                 // 0.5 * d * (h1 + h2)
@@ -418,10 +418,10 @@ namespace MASICPeakFinder
             var segmentX = new double[peakWidthPointsMinimum];
             var segmentY = new double[peakWidthPointsMinimum];
 
-            for (var startIndex = 0; startIndex <= sourceDataCount - peakWidthPointsMinimum - 1; startIndex++)
+            for (var startIndex = 0; startIndex < sourceDataCount - peakWidthPointsMinimum; startIndex++)
             {
                 // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
-                for (var subIndex = startIndex; subIndex <= startIndex + peakWidthPointsMinimum - 1; subIndex++)
+                for (var subIndex = startIndex; subIndex < startIndex + peakWidthPointsMinimum; subIndex++)
                 {
                     segmentX[subIndex - startIndex] = xValues[subIndex];
                     segmentY[subIndex - startIndex] = yValues[subIndex];
