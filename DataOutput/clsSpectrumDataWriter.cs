@@ -124,7 +124,7 @@ namespace MASIC.DataOutput
         {
             int scanNumber;
 
-            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
+            if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                 return;
@@ -154,7 +154,7 @@ namespace MASIC.DataOutput
             }
 
             var numIsotopicSignatures = 0;
-            var numPeaks = spectraCache.SpectraPool[poolIndex].IonCount;
+            var numPeaks = spectrum.IonCount;
 
             var baselineNoiseLevel = currentScan.BaselineNoiseStats.NoiseLevel;
             if (baselineNoiseLevel < 1)
@@ -162,18 +162,17 @@ namespace MASIC.DataOutput
 
             mBPIWriter.WriteDecon2LSScanFileEntry(scanInfoWriter, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures);
 
-            var spectraPool = spectraCache.SpectraPool[poolIndex];
             // Now write an entry to the "_isos.csv" file
 
-            if (spectraPool.IonCount > 0)
+            if (spectrum.IonCount > 0)
             {
                 // Populate intensities and pointerArray()
 
-                var intensities = new double[spectraPool.IonCount];
-                var pointerArray = new int[spectraPool.IonCount];
-                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
+                var intensities = new double[spectrum.IonCount];
+                var pointerArray = new int[spectrum.IonCount];
+                for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
-                    intensities[ionIndex] = spectraPool.IonsIntensity[ionIndex];
+                    intensities[ionIndex] = spectrum.IonsIntensity[ionIndex];
                     pointerArray[ionIndex] = ionIndex;
                 }
 
@@ -184,7 +183,7 @@ namespace MASIC.DataOutput
                 if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
                 {
                     // Possibly limit the number of ions to maxIonCount
-                    startIndex = spectraPool.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
+                    startIndex = spectrum.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
                     if (startIndex < 0)
                         startIndex = 0;
                 }
@@ -194,7 +193,7 @@ namespace MASIC.DataOutput
                 }
 
                 // Define the minimum data point intensity value
-                var minimumIntensityCurrentScan = spectraPool.IonsIntensity[pointerArray[startIndex]];
+                var minimumIntensityCurrentScan = spectrum.IonsIntensity[pointerArray[startIndex]];
 
                 // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
                 minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
@@ -205,21 +204,21 @@ namespace MASIC.DataOutput
                     minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, currentScan.BaselineNoiseStats.NoiseLevel * mOptions.RawDataExportOptions.MinimumSignalToNoiseRatio);
                 }
 
-                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
+                for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
-                    if (spectraPool.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
+                    if (spectrum.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
                         var charge = 1;
                         var isoFit = 0;
-                        var mass = clsUtilities.ConvoluteMass(spectraPool.IonsMZ[ionIndex], 1, 0);
+                        var mass = clsUtilities.ConvoluteMass(spectrum.IonsMZ[ionIndex], 1, 0);
                         var peakFWHM = 0;
-                        var signalToNoise = spectraPool.IonsIntensity[ionIndex] / baselineNoiseLevel;
+                        var signalToNoise = spectrum.IonsIntensity[ionIndex] / baselineNoiseLevel;
                         var monoisotopicAbu = -10;
                         var monoPlus2Abu = -10;
 
                         mBPIWriter.WriteDecon2LSIsosFileEntry(
                             dataWriter, scanNumber, charge,
-                            spectraPool.IonsIntensity[ionIndex], spectraPool.IonsMZ[ionIndex],
+                            spectrum.IonsIntensity[ionIndex], spectrum.IonsMZ[ionIndex],
                             isoFit, mass, mass, mass,
                             peakFWHM, signalToNoise, monoisotopicAbu, monoPlus2Abu);
                     }
@@ -237,7 +236,7 @@ namespace MASIC.DataOutput
         {
             var exportCount = 0;
 
-            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
+            if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                 return;
@@ -285,17 +284,15 @@ namespace MASIC.DataOutput
             writer.WriteLine("Charge state mass transform results:");
             writer.WriteLine("First CS,    Number of CS,   Abundance,   Mass,   Standard deviation");
 
-            var spectraPool = spectraCache.SpectraPool[poolIndex];
-
-            if (spectraPool.IonCount > 0)
+            if (spectrum.IonCount > 0)
             {
                 // Populate intensities and pointerArray()
 
-                var intensities = new double[spectraPool.IonCount];
-                var pointerArray = new int[spectraPool.IonCount];
-                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
+                var intensities = new double[spectrum.IonCount];
+                var pointerArray = new int[spectrum.IonCount];
+                for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
-                    intensities[ionIndex] = spectraPool.IonsIntensity[ionIndex];
+                    intensities[ionIndex] = spectrum.IonsIntensity[ionIndex];
                     pointerArray[ionIndex] = ionIndex;
                 }
 
@@ -307,7 +304,7 @@ namespace MASIC.DataOutput
                 if (mOptions.RawDataExportOptions.MaxIonCountPerScan > 0)
                 {
                     // Possibly limit the number of ions to maxIonCount
-                    startIndex = spectraPool.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
+                    startIndex = spectrum.IonCount - mOptions.RawDataExportOptions.MaxIonCountPerScan;
                     if (startIndex < 0)
                         startIndex = 0;
                 }
@@ -317,7 +314,7 @@ namespace MASIC.DataOutput
                 }
 
                 // Define the minimum data point intensity value
-                var minimumIntensityCurrentScan = spectraPool.IonsIntensity[pointerArray[startIndex]];
+                var minimumIntensityCurrentScan = spectrum.IonsIntensity[pointerArray[startIndex]];
 
                 // Update the minimum intensity if a higher minimum intensity is defined in .IntensityMinimum
                 minimumIntensityCurrentScan = Math.Max(minimumIntensityCurrentScan, mOptions.RawDataExportOptions.IntensityMinimum);
@@ -329,15 +326,15 @@ namespace MASIC.DataOutput
                 }
 
                 exportCount = 0;
-                for (var ionIndex = 0; ionIndex < spectraPool.IonCount; ionIndex++)
+                for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
-                    if (spectraPool.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
+                    if (spectrum.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
                         var dataLine1 =
                             "1" + "\t" +
                             "1" + "\t" +
-                            spectraPool.IonsIntensity[ionIndex] + "\t" +
-                            spectraPool.IonsMZ[ionIndex] + "\t" +
+                            spectrum.IonsIntensity[ionIndex] + "\t" +
+                            spectrum.IonsMZ[ionIndex] + "\t" +
                             "0";
 
                         writer.WriteLine(dataLine1);
@@ -346,7 +343,7 @@ namespace MASIC.DataOutput
                 }
             }
 
-            writer.WriteLine("Number of peaks in spectrum = " + spectraPool.IonCount.ToString());
+            writer.WriteLine("Number of peaks in spectrum = " + spectrum.IonCount.ToString());
             writer.WriteLine("Number of isotopic distributions detected = " + exportCount.ToString());
             writer.WriteLine();
         }

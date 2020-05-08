@@ -98,16 +98,16 @@ namespace MASIC
             matchIntensity = 0;
             try
             {
-                if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
+                if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
                 {
                     OnErrorEvent("Error uncaching scan " + currentScan.ScanNumber);
                     return false;
                 }
 
                 var success = FindMaxValueInMZRange(
-                    spectraCache.SpectraPool[poolIndex].IonsMZ,
-                    spectraCache.SpectraPool[poolIndex].IonsIntensity,
-                    spectraCache.SpectraPool[poolIndex].IonCount,
+                    spectrum.IonsMZ,
+                    spectrum.IonsIntensity,
+                    spectrum.IonCount,
                     mzStart, mzEnd,
                     out bestMatchMZ, out matchIntensity);
 

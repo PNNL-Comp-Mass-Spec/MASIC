@@ -328,13 +328,13 @@ namespace MASIC.DataOutput
             }
             else
             {
-                if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
+                if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                     return;
                 }
 
-                numPeaks = spectraCache.SpectraPool[poolIndex].IonCount;
+                numPeaks = spectrum.IonCount;
             }
 
             var scanNumber = currentScan.ScanNumber;

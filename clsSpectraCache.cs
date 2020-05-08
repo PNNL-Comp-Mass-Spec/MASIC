@@ -557,90 +557,29 @@ namespace MASIC
         /// <returns>True if successfully uncached, false if an error</returns>
         private bool UnCacheSpectrum(int scanNumber, out int targetPoolIndex)
         {
-            var success = false;
             targetPoolIndex = GetNextAvailablePoolIndex();
 
-            // Uncache the spectrum from disk
-            var returnBlankSpectrum = false;
-
-            // All of the spectra are stored in one large file
-            if (ValidatePageFileIO(false))
+            // make sure we have a valid object
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (SpectraPool[targetPoolIndex] == null)
             {
-                // Lookup the byte offset for the given spectrum
+                SpectraPool[targetPoolIndex] = new clsMSSpectrum(scanNumber);
+            }
 
-                if (mSpectrumByteOffset.ContainsKey(scanNumber))
-                {
-                    var byteOffset = mSpectrumByteOffset[scanNumber];
+            var msSpectrum = SpectraPool[targetPoolIndex];
 
-                    // Make sure all previous spectra are flushed to disk
-                    mPageFileWriter.Flush();
-
-                    // Read the spectrum from the page file
-                    mPageFileReader.BaseStream.Seek(byteOffset, SeekOrigin.Begin);
-
-                    var scanNumberInCacheFile = mPageFileReader.ReadInt32();
-                    var ionCount = mPageFileReader.ReadInt32();
-
-                    if (scanNumberInCacheFile != scanNumber)
-                    {
-                        ReportWarning("Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum");
-                    }
-
-                    var msSpectrum = SpectraPool[targetPoolIndex];
-
-                    msSpectrum.Clear(scanNumber, ionCount);
-
-                    // Optimization: byte read, Buffer.BlockCopy, and AddRange can be very efficient, and therefore faster than ReadDouble() and Add.
-                    // It may require more memory, but it is all very short term, and should be removed by a level 1 garbage collection
-                    var byteCount = ionCount * 8;
-                    var byteBuffer = new byte[byteCount];
-                    var dblBuffer = new double[ionCount];
-                    mPageFileReader.Read(byteBuffer, 0, byteCount);
-                    Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
-                    msSpectrum.IonsMZ.AddRange(dblBuffer);
-
-                    mPageFileReader.Read(byteBuffer, 0, byteCount);
-                    Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
-                    msSpectrum.IonsIntensity.AddRange(dblBuffer);
-
-                    //for (var index = 0; index < ionCount; index++)
-                    //    msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());
-                    //
-                    //for (var index = 0; index < ionCount; index++)
-                    //    msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
-
-                    success = true;
-                }
-                else
-                {
-                    returnBlankSpectrum = true;
-                }
+            // Uncache the spectrum from disk
+            if (UnCacheSpectrumWork(scanNumber, msSpectrum))
+            {
+                // If we passed in 'null', we need to store a copy
+                // This should always be safe
+                SpectraPool[targetPoolIndex] = msSpectrum;
             }
             else
             {
-                returnBlankSpectrum = true;
-            }
-
-            if (returnBlankSpectrum)
-            {
-                // Scan not found; create a new, blank mass spectrum
+                // Scan not found; use a blank mass spectrum
                 // Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
-
-                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-                if (SpectraPool[targetPoolIndex] == null)
-                {
-                    SpectraPool[targetPoolIndex] = new clsMSSpectrum(scanNumber);
-                }
-
-                SpectraPool[targetPoolIndex].Clear();
-
-                success = true;
-            }
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (!success)
-            {
-                return false;
+                msSpectrum.Clear(scanNumber);
             }
 
             SpectraPoolInfo[targetPoolIndex].CacheState = eCacheStateConstants.LoadedFromCache;
@@ -654,10 +593,67 @@ namespace MASIC
                 mSpectrumIndexInPool.Add(scanNumber, targetPoolIndex);
             }
 
-            if (!returnBlankSpectrum)
-                mUnCacheEventCount += 1;
-
             return true;
+        }
+
+        /// <summary>
+        /// Load the spectrum from disk and cache in SpectraPool
+        /// </summary>
+        /// <param name="scanNumber">Scan number to load</param>
+        /// <param name="msSpectrum"><see cref="clsMSSpectrum"/> object to store data into; supplying 'null' is an exception.</param>
+        /// <returns>True if successfully uncached, false if an error</returns>
+        private bool UnCacheSpectrumWork(int scanNumber, clsMSSpectrum msSpectrum)
+        {
+            var success = false;
+            msSpectrum.Clear();
+
+            // All of the spectra are stored in one large file
+            // Lookup the byte offset for the given spectrum
+            if (ValidatePageFileIO(false) &&
+                mSpectrumByteOffset.ContainsKey(scanNumber))
+            {
+                var byteOffset = mSpectrumByteOffset[scanNumber];
+
+                // Make sure all previous spectra are flushed to disk
+                mPageFileWriter.Flush();
+
+                // Read the spectrum from the page file
+                mPageFileReader.BaseStream.Seek(byteOffset, SeekOrigin.Begin);
+
+                var scanNumberInCacheFile = mPageFileReader.ReadInt32();
+                var ionCount = mPageFileReader.ReadInt32();
+
+                if (scanNumberInCacheFile != scanNumber)
+                {
+                    ReportWarning("Scan number In cache file doesn't agree with expected scan number in UnCacheSpectrum");
+                }
+
+                msSpectrum.Clear(scanNumber, ionCount);
+
+                // Optimization: byte read, Buffer.BlockCopy, and AddRange can be very efficient, and therefore faster than ReadDouble() and Add.
+                // It may require more memory, but it is all very short term, and should be removed by a level 1 garbage collection
+                var byteCount = ionCount * 8;
+                var byteBuffer = new byte[byteCount];
+                var dblBuffer = new double[ionCount];
+                mPageFileReader.Read(byteBuffer, 0, byteCount);
+                Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
+                msSpectrum.IonsMZ.AddRange(dblBuffer);
+
+                mPageFileReader.Read(byteBuffer, 0, byteCount);
+                Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
+                msSpectrum.IonsIntensity.AddRange(dblBuffer);
+
+                //for (var index = 0; index < ionCount; index++)
+                //    msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());
+                //
+                //for (var index = 0; index < ionCount; index++)
+                //    msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
+
+                mUnCacheEventCount += 1;
+                success = true;
+            }
+
+            return success;
         }
 
         private bool ValidateCachedSpectrumDirectory()
@@ -774,6 +770,46 @@ namespace MASIC
             {
                 ReportError(ex.Message, ex);
                 poolIndex = -1;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get a spectrum from the pool or cache, potentially without updating the pool
+        /// </summary>
+        /// <param name="scanNumber"></param>
+        /// <param name="spectrum"></param>
+        /// <param name="canSkipPool">if true and the spectrum is not in the pool, it will be read from the disk cache without updating the pool</param>
+        /// <returns></returns>
+        public bool GetSpectrum(int scanNumber, out clsMSSpectrum spectrum, bool canSkipPool)
+        {
+            try
+            {
+                if (mSpectrumIndexInPool.ContainsKey(scanNumber))
+                {
+                    var poolIndex = mSpectrumIndexInPool[scanNumber];
+                    spectrum = SpectraPool[poolIndex];
+                    return true;
+                }
+
+                if (!canSkipPool)
+                {
+                    // Need to load the spectrum
+                    var success = UnCacheSpectrum(scanNumber, out var poolIndex);
+                    spectrum = SpectraPool[poolIndex];
+                    return success;
+                }
+
+                spectrum = new clsMSSpectrum(scanNumber);
+                UnCacheSpectrumWork(scanNumber, spectrum);
+
+                // Maintain functionality: return true, even if the spectrum was not in the cache file.
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ReportError(ex.Message, ex);
+                spectrum = null;
                 return false;
             }
         }

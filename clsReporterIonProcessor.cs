@@ -317,7 +317,7 @@ namespace MASIC
                 parentIonMZ = 0;
             }
 
-            if (!spectraCache.ValidateSpectrumInPool(currentScan.ScanNumber, out var poolIndex))
+            if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
             {
                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                 return;
@@ -357,7 +357,7 @@ namespace MASIC
                 var ion = reporterIons[reporterIonIndex];
                 // Search for the reporter ion MZ in this mass spectrum
                 reporterIntensities[reporterIonIndex] = dataAggregation.AggregateIonsInRange(
-                    spectraCache.SpectraPool[poolIndex],
+                    spectrum,
                     ion.MZ,
                     ion.MZToleranceDa,
                     out _,
