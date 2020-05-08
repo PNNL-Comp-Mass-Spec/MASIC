@@ -210,6 +210,8 @@ namespace MASIC.DataInput
                 ReportMessage(string.Format("Reading Xcalibur data; Total scan count: {0:N0}", scanCount));
 
                 var scanCountToRead = scanEnd - scanStart + 1;
+                scanList.ReserveListCapacity(scanCountToRead);
+                mScanTracking.ReserveListCapacity(scanCountToRead);
                 for (var scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)
                 {
                     if (!mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
@@ -236,6 +238,9 @@ namespace MASIC.DataInput
                 }
 
                 Console.WriteLine();
+
+                scanList.SetListCapacityToCount();
+                mScanTracking.SetListCapacityToCount();
 
                 // Shrink the memory usage of the scanList arrays
                 success = FinalizeScanList(scanList, rawFileInfo);

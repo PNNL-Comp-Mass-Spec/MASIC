@@ -96,6 +96,23 @@ namespace MASIC
             return true;
         }
 
+        /// <summary>
+        /// Resizes the lists to a set capacity (unless there are existing contents larger than <paramref name="scanCount"/>)
+        /// </summary>
+        /// <param name="scanCount"></param>
+        public void ReserveListCapacity(int scanCount)
+        {
+            ScanStats.Capacity = Math.Max(ScanStats.Count, scanCount);
+        }
+
+        /// <summary>
+        /// Reduces memory usage by resizing the list to the contents
+        /// </summary>
+        public void SetListCapacityToCount()
+        {
+            ScanStats.Capacity = ScanStats.Count;
+        }
+
         private void CompressSpectraData(
             clsMSSpectrum msSpectrum,
             double msDataResolution,

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ThermoRawFileReader;
 
 namespace MASIC
@@ -187,6 +188,45 @@ namespace MASIC
 
             MasterScanNumList.Add(scanNumber);
             MasterScanTimeList.Add(scanTime);
+        }
+
+        /// <summary>
+        /// Resizes the lists to a set capacity (unless there are existing contents larger than <paramref name="scanCount"/>)
+        /// </summary>
+        /// <param name="scanCount"></param>
+        /// <param name="surveyScanCount"></param>
+        public void ReserveListCapacity(int scanCount, int surveyScanCount = 0)
+        {
+            MasterScanOrder.Capacity = Math.Max(MasterScanOrder.Count, scanCount);
+            MasterScanNumList.Capacity = Math.Max(MasterScanNumList.Count, scanCount);
+            MasterScanTimeList.Capacity = Math.Max(MasterScanTimeList.Count, scanCount);
+
+            if (surveyScanCount > 0)
+            {
+                SurveyScans.Capacity = Math.Max(SurveyScans.Count, surveyScanCount);
+                FragScans.Capacity = Math.Max(FragScans.Count, scanCount - surveyScanCount);
+                ParentIons.Capacity = Math.Max(ParentIons.Count, scanCount - surveyScanCount);
+            }
+            else
+            {
+                // Unknown: start each off at 1/10th of scan count
+                SurveyScans.Capacity = Math.Max(SurveyScans.Count, scanCount / 10);
+                FragScans.Capacity = Math.Max(FragScans.Count, scanCount / 10);
+                ParentIons.Capacity = Math.Max(ParentIons.Count, scanCount / 10);
+            }
+        }
+
+        /// <summary>
+        /// Reduces unnecessary memory overhead by resizing some lists to their contents.
+        /// </summary>
+        public void SetListCapacityToCount()
+        {
+            MasterScanOrder.Capacity = MasterScanOrder.Count;
+            MasterScanNumList.Capacity = MasterScanNumList.Count;
+            MasterScanTimeList.Capacity = MasterScanTimeList.Count;
+            SurveyScans.Capacity = SurveyScans.Count;
+            FragScans.Capacity = FragScans.Count;
+            ParentIons.Capacity = ParentIons.Count;
         }
 
         private clsScanInfo GetFakeSurveyScan(int scanNumber, float scanTime)

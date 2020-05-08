@@ -1394,6 +1394,8 @@ namespace MASIC
                 dataImporterBase = null;
             }
 
+            scanList.SetListCapacityToCount();
+
             return success;
         }
 

@@ -85,6 +85,8 @@ namespace MASIC.DataInput
 
                 // Reserve memory for all of the Survey Scan data
                 scanList.Initialize();
+                scanList.ReserveListCapacity(msScanCount * 3, msScanCount); // Assume there are 2 frag scans for every survey scan
+                mScanTracking.ReserveListCapacity(msScanCount * 3);
 
                 UpdateProgress("Reading CDF/MGF data (" + msScanCount.ToString() + " scans)" + Environment.NewLine + Path.GetFileName(filePath));
                 ReportMessage("Reading CDF/MGF data; Total MS scan count: " + msScanCount.ToString());
@@ -474,6 +476,9 @@ namespace MASIC.DataInput
                 }
 
                 Console.WriteLine();
+
+                scanList.SetListCapacityToCount();
+                mScanTracking.SetListCapacityToCount();
 
                 return success;
             }

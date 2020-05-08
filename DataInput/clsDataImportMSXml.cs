@@ -336,6 +336,7 @@ namespace MASIC.DataInput
                 ReportMessage("Reading XML data from " + filePath);
 
                 double scanTimeMax = 0;
+                var firstRead = true;
 
                 while (true)
                 {
@@ -343,6 +344,18 @@ namespace MASIC.DataInput
 
                     if (!scanFound)
                         break;
+
+                    if (firstRead)
+                    {
+                        // ScanCount property isn't populated until first spectrum is read.
+                        var scanCount = xmlReader.ScanCount;
+                        if (scanCount > 0)
+                        {
+                            scanList.ReserveListCapacity(scanCount);
+                            mScanTracking.ReserveListCapacity(scanCount);
+                        }
+                        firstRead = false;
+                    }
 
                     mDatasetFileInfo.ScanCount += 1;
                     scanTimeMax = spectrumInfo.RetentionTimeMin;
@@ -373,6 +386,9 @@ namespace MASIC.DataInput
 
                 // Shrink the memory usage of the scanList arrays
                 success = FinalizeScanList(scanList, msXmlFileInfo);
+
+                scanList.SetListCapacityToCount();
+                mScanTracking.SetListCapacityToCount();
             }
             catch (Exception ex)
             {
@@ -455,6 +471,8 @@ namespace MASIC.DataInput
 
                 if (xmlReader.NumSpectra > 0)
                 {
+                    scanList.ReserveListCapacity(xmlReader.NumSpectra);
+                    mScanTracking.ReserveListCapacity(xmlReader.NumSpectra);
                     foreach (var mzMLSpectrum in xmlReader.ReadAllSpectra(true))
                     {
                         if (mzMLSpectrum == null)
@@ -637,6 +655,8 @@ namespace MASIC.DataInput
 
                     var scanTimeLookupErrors = 0;
                     var nextWarningThreshold = 10;
+                    scanList.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
+                    mScanTracking.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
 
                     foreach (var chromatogramItem in xmlReader2.ReadAllChromatograms(true))
                     {
@@ -751,6 +771,9 @@ namespace MASIC.DataInput
 
                 // Shrink the memory usage of the scanList arrays
                 var finalizeSuccess = FinalizeScanList(scanList, mzMLFile);
+
+                scanList.SetListCapacityToCount();
+                mScanTracking.SetListCapacityToCount();
 
                 return finalizeSuccess;
             }
