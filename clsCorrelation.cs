@@ -262,6 +262,9 @@ namespace MASIC
 
                 var bin2Offset = mBinningOptions.BinSize / 2;
 
+                binnedYData.Capacity = binCount;
+                binnedOffsetYData.Capacity = binCount;
+
                 // Initialize the bins
                 for (var i = 1; i <= binCount; i++)
                 {

@@ -28,7 +28,7 @@ namespace MASIC
             bool processSIMScans,
             int simIndex)
         {
-            var mzBinList = new List<clsMzBinInfo>(scanList.ParentIons.Count - 1);
+            var mzBinList = new List<clsMzBinInfo>(scanList.ParentIons.Count);
 
             var sicOptions = masicOptions.SICOptions;
 
@@ -570,7 +570,7 @@ namespace MASIC
 
             int maxMZCountInChunk;
 
-            var mzSearchChunks = new List<clsMzSearchInfo>();
+            var mzSearchChunks = new List<clsMzSearchInfo>(mzBinList.Count);
 
             bool[] parentIonUpdated;
 

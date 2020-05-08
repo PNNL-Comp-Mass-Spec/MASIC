@@ -39,7 +39,7 @@ namespace MASIC.DataInput
                                                           string delimiter = ", ",
                                                           bool includeAndBeforeLastItem = true)
         {
-            var headerNames = new List<string>()
+            var headerNames = new List<string>(8)
             {
                 CUSTOM_SIC_COLUMN_MZ,
                 CUSTOM_SIC_COLUMN_MZ_TOLERANCE,

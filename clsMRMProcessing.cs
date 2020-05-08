@@ -239,7 +239,7 @@ namespace MASIC
                 {
                     settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile));
 
-                    var dataColumns = new List<string>();
+                    var dataColumns = new List<string>(7);
 
                     for (var mrmInfoIndex = 0; mrmInfoIndex < mrmSettings.Count; mrmInfoIndex++)
                     {
@@ -284,7 +284,7 @@ namespace MASIC
 
                             // Initialize the crosstab header variable using the data in udtSRMList()
 
-                            var headerNames = new List<string>()
+                            var headerNames = new List<string>(srmList.Count + 2)
                             {
                                 "Scan_First",
                                 "ScanTime"
@@ -438,7 +438,7 @@ namespace MASIC
 
             var nonZeroCount = 0;
 
-            var dataColumns = new List<string>()
+            var dataColumns = new List<string>(crosstabColumnValue.Count + 2)
             {
                 scanFirst.ToString(),
                 StringUtilities.DblToString(scanTimeFirst, 5)

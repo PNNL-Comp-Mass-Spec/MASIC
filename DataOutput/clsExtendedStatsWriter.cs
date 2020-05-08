@@ -44,7 +44,7 @@ namespace MASIC.DataOutput
             int scanNumber,
             IReadOnlyDictionary<int, string> extendedHeaderInfo)
         {
-            var dataValues = new List<string>()
+            var dataValues = new List<string>(2 + mExtendedHeaderNameMap.Count)
             {
                 datasetID.ToString(),
                 scanNumber.ToString()
@@ -101,7 +101,7 @@ namespace MASIC.DataOutput
         {
             var cTrimChars = new[] { ':', ' ' };
 
-            var headerNames = new List<string>()
+            var headerNames = new List<string>(2)
             {
                 "Dataset",
                 "ScanNumber"
@@ -113,6 +113,8 @@ namespace MASIC.DataOutput
             {
                 return headerNames;
             }
+
+            headerNames.Capacity = 2 + mExtendedHeaderNameMap.Count;
 
             var headerNamesByID = new Dictionary<int, string>();
 
@@ -160,7 +162,7 @@ namespace MASIC.DataOutput
 
             var constantHeaderIDs = new List<int>();
 
-            nonConstantHeaderIDs = new List<int>();
+            nonConstantHeaderIDs = new List<int>(mExtendedHeaderNameMap.Count);
 
             if (mExtendedHeaderNameMap.Count == 0)
             {
@@ -266,10 +268,12 @@ namespace MASIC.DataOutput
             // Need to first populate constantHeaderIDs with the ID values and sort the list so that the values are
             // stored in consolidatedValueList in the correct order
 
-            var consolidatedValueList = new List<string>()
+            var consolidatedValueList = new List<string>(30)
             {
                 "Setting" + delimiter + "Value"
             };
+
+            constantHeaderIDs.Capacity = consolidatedValuesByID.Count;
 
             foreach (var item in consolidatedValuesByID)
                 constantHeaderIDs.Add(item.Key);

@@ -365,8 +365,8 @@ namespace MASIC
             clsMSSpectrum fragSpectrum,
             clsBinnedData binnedSpectrum)
         {
-            var xData = new List<float>();
-            var yData = new List<float>();
+            var xData = new List<float>(fragSpectrum.IonCount);
+            var yData = new List<float>(fragSpectrum.IonCount);
 
             // Make a copy of the data, excluding any Reporter Ion data
 

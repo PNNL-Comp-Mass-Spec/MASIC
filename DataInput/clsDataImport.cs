@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MASIC.DatasetStats;
 using PRISM;
 
@@ -478,16 +479,7 @@ namespace MASIC.DataInput
             double[] centroidedIonsIntensity,
             int ionCount)
         {
-            var mzList = new List<double>();
-            var intensityList = new List<double>();
-
-            for (var i = 0; i < ionCount; i++)
-            {
-                mzList.Add(centroidedIonsMz[i]);
-                intensityList.Add(centroidedIonsIntensity[i]);
-            }
-
-            UpdateCachedPrecursorScan(precursorScanNumber, mzList, intensityList);
+            UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz.ToList(), centroidedIonsIntensity.ToList());
         }
 
         protected void UpdateCachedPrecursorScan(
@@ -496,6 +488,7 @@ namespace MASIC.DataInput
             List<double> centroidedIonsIntensity)
         {
             mCachedPrecursorIons.Clear();
+            mCachedPrecursorIons.Capacity = Math.Max(mCachedPrecursorIons.Capacity, centroidedIonsMz.Count);
 
             var ionCount = centroidedIonsMz.Count;
             for (var index = 0; index < ionCount; index++)

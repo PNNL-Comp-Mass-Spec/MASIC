@@ -873,11 +873,11 @@ namespace MASIC
                 // Construct the rawText strings using mCustomSICList
                 var scanCommentsDefined = false;
 
-                var lstMzValues = new List<string>();
-                var lstMzTolerances = new List<string>();
-                var lstScanCenters = new List<string>();
-                var lstScanTolerances = new List<string>();
-                var lstComments = new List<string>();
+                var lstMzValues = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var lstMzTolerances = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var lstScanCenters = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var lstScanTolerances = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var lstComments = new List<string>(CustomSICList.CustomMZSearchValues.Count);
 
                 foreach (var mzSearchValue in CustomSICList.CustomMZSearchValues)
                 {
@@ -979,7 +979,7 @@ namespace MASIC
                 // Split on the user-specified delimiter, plus also CR and LF
                 var items = matchSpecList.Split(delimiter, '\r', '\n').ToList();
 
-                var validatedItems = new List<string>();
+                var validatedItems = new List<string>(items.Count);
 
                 if (items.Count > 0)
                 {

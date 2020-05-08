@@ -108,7 +108,7 @@ namespace MagnitudeConcavityPeakFinder
             //  and h''(t_r) is the height of the second derivative of the peak
             // In chromatography, the baseline peak widthInPoints = 4*dblSigma
 
-            var detectedPeaks = new List<clsPeak>();
+            var detectedPeaks = new List<clsPeak>(30);
 
             try
             {

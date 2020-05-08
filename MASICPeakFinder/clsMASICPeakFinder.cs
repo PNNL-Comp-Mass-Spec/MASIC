@@ -319,7 +319,7 @@ namespace MASICPeakFinder
         clsBaselineNoiseOptions baselineNoiseOptions,
         out List<clsBaselineNoiseStatsSegment> noiseStatsSegments)
         {
-            noiseStatsSegments = new List<clsBaselineNoiseStatsSegment>();
+            noiseStatsSegments = new List<clsBaselineNoiseStatsSegment>(Math.Max(3, (int)baselineNoiseOptions.DualTrimmedMeanMaximumSegments));
 
             try
             {
@@ -911,7 +911,7 @@ namespace MASICPeakFinder
             clsSICStatsPeak sicPeak,
             clsBaselineNoiseOptions baselineNoiseOptions)
         {
-            var sicData = new List<clsSICDataPoint>();
+            var sicData = new List<clsSICDataPoint>(dataCount);
 
             for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(sicScanNumbers[index], sicIntensities[index], 0));
@@ -1074,7 +1074,7 @@ namespace MASICPeakFinder
             clsSICStatsPeak sicPeak,
             int fragScanNumber)
         {
-            var sicData = new List<clsSICDataPoint>();
+            var sicData = new List<clsSICDataPoint>(dataCount);
 
             for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(sicScanNumbers[index], sicIntensities[index], 0));
@@ -3032,7 +3032,7 @@ namespace MASICPeakFinder
             out clsSICPotentialAreaStats potentialAreaStats,
             clsSICPeakFinderOptions sicPeakFinderOptions)
         {
-            var sicData = new List<clsSICDataPoint>();
+            var sicData = new List<clsSICDataPoint>(dataCount);
 
             for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(0, sicIntensities[index], 0));
@@ -3148,7 +3148,7 @@ namespace MASICPeakFinder
             bool simDataPresent,
             bool recomputeNoiseLevel)
         {
-            var sicData = new List<clsSICDataPoint>();
+            var sicData = new List<clsSICDataPoint>(dataCount);
 
             for (var index = 0; index < dataCount; index++)
                 sicData.Add(new clsSICDataPoint(sicScanNumbers[index], sicIntensities[index], 0));

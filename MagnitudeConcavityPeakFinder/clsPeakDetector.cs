@@ -126,7 +126,7 @@ namespace MagnitudeConcavityPeakFinder
             int originalPeakLocationIndex,
             out List<double> smoothedYData)
         {
-            var xyData = new List<KeyValuePair<int, double>>();
+            var xyData = new List<KeyValuePair<int, double>>(dataCount);
 
             for (var i = 0; i < dataCount; i++)
             {
@@ -406,7 +406,7 @@ namespace MagnitudeConcavityPeakFinder
                 return;
             }
 
-            var xyData = new List<KeyValuePair<int, double>>();
+            var xyData = new List<KeyValuePair<int, double>>(30);
 
             using (
                 var reader = new StreamReader(new FileStream(fiDataFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
@@ -467,7 +467,7 @@ namespace MagnitudeConcavityPeakFinder
                                                fiDataFile.Extension);
             using (var writer = new StreamWriter(new FileStream(resultsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
-                var outputData = new List<string>();
+                var outputData = new List<string>(50);
 
                 writer.Write("Scan\tIntensity\tSmoothedIntensity\t");
                 for (var peakIndex = 0; peakIndex < detectedPeaks.Count; peakIndex++)

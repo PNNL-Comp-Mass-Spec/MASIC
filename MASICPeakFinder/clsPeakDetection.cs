@@ -102,7 +102,7 @@ namespace MASICPeakFinder
             // In chromatography, the baseline peak widthInPoints = 4*sigma
 
             // Initialize the list of detected peaks
-            var detectedPeaks = new List<clsPeakInfo>();
+            var detectedPeaks = new List<clsPeakInfo>(100);
 
             try
             {

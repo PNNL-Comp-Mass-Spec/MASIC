@@ -614,7 +614,7 @@ namespace MASIC.DatasetStats
 
                     scanStatsWriter.WriteLine(string.Join("\t", headerNames));
 
-                    var dataValues = new List<string>();
+                    var dataValues = new List<string>(12);
 
                     foreach (var scanStatsEntry in scanStats)
                     {

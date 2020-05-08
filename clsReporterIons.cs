@@ -126,7 +126,7 @@ namespace MASIC
             eReporterIonMassModeConstants eReporterIonMassMode,
             double mzToleranceDa)
         {
-            var reporterIons = new List<clsReporterIonInfo>();
+            var reporterIons = new List<clsReporterIonInfo>(16); // largest count is 16
 
             switch (eReporterIonMassMode)
             {
@@ -434,6 +434,7 @@ namespace MASIC
             {
                 return;
             }
+            ReporterIonList.Capacity = reporterIons.Count;
 
             foreach (var reporterIon in reporterIons)
             {

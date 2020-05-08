@@ -44,6 +44,8 @@ namespace MASIC
         public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<float> intensityList, int dataCount)
             : this(intScanNumber)
         {
+            IonsMZ.Capacity = dataCount;
+            IonsIntensity.Capacity = dataCount;
             for (var i = 0; i < dataCount; i++)
             {
                 IonsMZ.Add(mzList[i]);
@@ -57,6 +59,8 @@ namespace MASIC
         public clsMSSpectrum(int intScanNumber, IList<double> mzList, IList<double> intensityList, int dataCount)
             : this(intScanNumber)
         {
+            IonsMZ.Capacity = dataCount;
+            IonsIntensity.Capacity = dataCount;
             for (var i = 0; i < dataCount; i++)
             {
                 IonsMZ.Add(mzList[i]);

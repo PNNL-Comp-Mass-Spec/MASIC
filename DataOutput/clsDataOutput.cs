@@ -700,7 +700,7 @@ namespace MASIC.DataOutput
                     break;
 
                 case eOutputFileTypeConstants.SICStatsFlatFile:
-                    headerNames = new List<string>()
+                    headerNames = new List<string>(31)
                     {
                         "Dataset",
                         "ParentIonIndex",

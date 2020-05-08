@@ -247,7 +247,7 @@ namespace MASIC.DataOutput
             int fragScanIndex,
             bool includeScanTimesInSICStatsFile)
         {
-            var dataValues = new List<string>();
+            var dataValues = new List<string>(40);
 
             float fragScanTime = 0;
             float optimalPeakApexScanTime = 0;

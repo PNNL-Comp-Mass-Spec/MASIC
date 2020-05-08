@@ -108,7 +108,7 @@ namespace MASIC
                 {
                     // Write the file headers
                     var reporterIonMZsUnique = new SortedSet<string>();
-                    var headerColumns = new List<string>()
+                    var headerColumns = new List<string>(7 + reporterIons.Length + 1)
                     {
                         "Dataset",
                         "ScanNumber",
@@ -119,11 +119,11 @@ namespace MASIC
                         "ReporterIonIntensityMax"
                     };
 
-                    var obsMZHeaders = new List<string>();
-                    var uncorrectedIntensityHeaders = new List<string>();
-                    var ftmsSignalToNoise = new List<string>();
-                    var ftmsResolution = new List<string>();
-                    // Dim ftmsLabelDataMz = New List(Of String)
+                    var obsMZHeaders = new List<string>(reporterIons.Length);
+                    var uncorrectedIntensityHeaders = new List<string>(reporterIons.Length);
+                    var ftmsSignalToNoise = new List<string>(reporterIons.Length);
+                    var ftmsResolution = new List<string>(reporterIons.Length);
+                    //var ftmsLabelDataMz = new List<string>(reporterIons.Length);
 
                     var saveUncorrectedIntensities =
                         mOptions.ReporterIons.ReporterIonApplyAbundanceCorrection && mOptions.ReporterIons.ReporterIonSaveUncorrectedIntensities;
@@ -181,7 +181,7 @@ namespace MASIC
 
                             // Uncomment to include the label data m/z value in the _ReporterIons.txt file
                             // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                            // ftmsLabelDataMz.Add("Ion_" + mzValue + "_LabelDataMZ");
+                            //ftmsLabelDataMz.Add("Ion_" + mzValue + "_LabelDataMZ");
                         }
                     }
 
@@ -339,13 +339,13 @@ namespace MASIC
                 StringUtilities.DblToString(currentScan.BasePeakIonMZ, 4)
             };
 
-            var reporterIntensityList = new List<string>();
-            var obsMZList = new List<string>();
-            var uncorrectedIntensityList = new List<string>();
+            var reporterIntensityList = new List<string>(reporterIons.Count);
+            var obsMZList = new List<string>(reporterIons.Count);
+            var uncorrectedIntensityList = new List<string>(reporterIons.Count);
 
-            var ftmsSignalToNoise = new List<string>();
-            var ftmsResolution = new List<string>();
-            // Dim ftmsLabelDataMz = New List(Of String)
+            var ftmsSignalToNoise = new List<string>(reporterIons.Count);
+            var ftmsResolution = new List<string>(reporterIons.Count);
+            //var ftmsLabelDataMz = new List<string>(reporterIons.Count);
 
             double reporterIntensityMax = 0;
 
@@ -510,13 +510,13 @@ namespace MASIC
                             // A match was not found in the label data; display blanks (not zeroes)
                             ftmsSignalToNoise.Add(string.Empty);
                             ftmsResolution.Add(string.Empty);
-                            // ftmsLabelDataMz.Add(String.Empty)
+                            //ftmsLabelDataMz.Add(string.Empty);
                         }
                         else
                         {
                             ftmsSignalToNoise.Add(StringUtilities.DblToString(reporterIons[reporterIonIndex].SignalToNoise, 2));
                             ftmsResolution.Add(StringUtilities.DblToString(reporterIons[reporterIonIndex].Resolution, 2));
-                            // ftmsLabelDataMz.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).LabelDataMZ, 4))
+                            //ftmsLabelDataMz.Add(StringUtilities.DblToString(reporterIons(reporterIonIndex).LabelDataMZ, 4));
                         }
                     }
                 }
@@ -533,6 +533,9 @@ namespace MASIC
                 weightedAvgPctIntensityCorrection = 0;
             }
 
+            // Resize the target list capacity to large enough to hold all data.
+            dataColumns.Capacity = reporterIntensityList.Count + 3 + obsMZList.Count + uncorrectedIntensityList.Count +
+                                   ftmsSignalToNoise.Count + ftmsResolution.Count;
             // Append the maximum reporter ion intensity then the individual reporter ion intensities
             dataColumns.Add(StringUtilities.DblToString(reporterIntensityMax, 2));
             dataColumns.AddRange(reporterIntensityList);
