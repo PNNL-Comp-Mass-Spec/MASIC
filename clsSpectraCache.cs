@@ -590,11 +590,24 @@ namespace MASIC
 
                     msSpectrum.Clear(scanNumber, ionCount);
 
-                    for (var index = 0; index < ionCount; index++)
-                        msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());
+                    // Optimization: byte read, Buffer.BlockCopy, and AddRange can be very efficient, and therefore faster than ReadDouble() and Add.
+                    // It may require more memory, but it is all very short term, and should be removed by a level 1 garbage collection
+                    var byteCount = ionCount * 8;
+                    var byteBuffer = new byte[byteCount];
+                    var dblBuffer = new double[ionCount];
+                    mPageFileReader.Read(byteBuffer, 0, byteCount);
+                    Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
+                    msSpectrum.IonsMZ.AddRange(dblBuffer);
 
-                    for (var index = 0; index < ionCount; index++)
-                        msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
+                    mPageFileReader.Read(byteBuffer, 0, byteCount);
+                    Buffer.BlockCopy(byteBuffer, 0, dblBuffer, 0, byteCount);
+                    msSpectrum.IonsIntensity.AddRange(dblBuffer);
+
+                    //for (var index = 0; index < ionCount; index++)
+                    //    msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());
+                    //
+                    //for (var index = 0; index < ionCount; index++)
+                    //    msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
 
                     success = true;
                 }
@@ -725,7 +738,7 @@ namespace MASIC
                 mPageFileWriter.Flush();
 
                 // Initialize the binary reader
-                mPageFileReader = new BinaryReader(new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+                mPageFileReader = new BinaryReader(new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 8192));
 
                 return true;
             }
