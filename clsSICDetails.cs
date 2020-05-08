@@ -33,7 +33,7 @@ namespace MASIC
         /// </summary>
         public clsSICDetails()
         {
-            SICData = new List<clsSICDataPoint>();
+            SICData = new List<clsSICDataPoint>(16);
         }
 
         public void AddData(int scanNumber, double intensity, double mass, int scanIndex)

@@ -95,14 +95,14 @@ namespace MASIC
         /// </summary>
         public clsScanList()
         {
-            SurveyScans = new List<clsScanInfo>();
-            FragScans = new List<clsScanInfo>();
+            SurveyScans = new List<clsScanInfo>(8);
+            FragScans = new List<clsScanInfo>(8);
 
-            MasterScanOrder = new List<udtScanOrderPointerType>();
-            MasterScanNumList = new List<int>();
-            MasterScanTimeList = new List<float>();
+            MasterScanOrder = new List<udtScanOrderPointerType>(8);
+            MasterScanNumList = new List<int>(8);
+            MasterScanTimeList = new List<float>(8);
 
-            ParentIons = new List<clsParentIonInfo>();
+            ParentIons = new List<clsParentIonInfo>(8);
         }
 
         public int AddFakeSurveyScan()

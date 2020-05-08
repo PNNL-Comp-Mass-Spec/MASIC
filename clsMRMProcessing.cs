@@ -96,6 +96,7 @@ namespace MASIC
                             mrmHashToIndexMap.Add(mrmInfoHash, mrmInfoForHash);
 
                             // Append the new entries to srmList
+                            srmList.Capacity = mrmInfoForHash.MRMMassCount; // minimize list resizes
 
                             for (var mrmMassIndex = 0; mrmMassIndex < mrmInfoForHash.MRMMassCount; mrmMassIndex++)
                             {

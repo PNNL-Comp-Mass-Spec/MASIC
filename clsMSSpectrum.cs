@@ -80,10 +80,20 @@ namespace MASIC
         /// <summary>
         /// Clear the m/z and intensity values, and update the scan number
         /// </summary>
-        public void Clear(int newScanNumber)
+        public void Clear(int newScanNumber, int newCapacity = 0)
         {
             IonsMZ.Clear();
             IonsIntensity.Clear();
+            if (newCapacity > 0)
+            {
+                var currentCapacity = IonsMZ.Capacity;
+                if (newCapacity < currentCapacity / 2)
+                {
+                    currentCapacity = newCapacity;
+                }
+                IonsMZ.Capacity = Math.Max(currentCapacity, newCapacity);
+                IonsIntensity.Capacity = Math.Max(currentCapacity, newCapacity);
+            }
             ScanNumber = newScanNumber;
         }
 
@@ -107,9 +117,15 @@ namespace MASIC
             }
 
             IonsMZ.Clear();
-            IonsMZ.AddRange(spectrum.IonsMZ);
-
             IonsIntensity.Clear();
+
+            if (IonsMZ.Capacity / 2 > spectrum.IonsMZ.Count)
+            {
+                IonsMZ.Capacity = spectrum.IonsMZ.Count;
+                IonsIntensity.Capacity = spectrum.IonsIntensity.Count;
+            }
+
+            IonsMZ.AddRange(spectrum.IonsMZ);
             IonsIntensity.AddRange(spectrum.IonsIntensity);
         }
 

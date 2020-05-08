@@ -565,7 +565,7 @@ namespace MASIC
 
                     var msSpectrum = SpectraPool[targetPoolIndex];
 
-                    msSpectrum.Clear(scanNumber);
+                    msSpectrum.Clear(scanNumber, ionCount);
 
                     for (var index = 0; index < ionCount; index++)
                         msSpectrum.IonsMZ.Add(mPageFileReader.ReadDouble());

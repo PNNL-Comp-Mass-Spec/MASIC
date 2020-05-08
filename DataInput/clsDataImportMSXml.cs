@@ -492,13 +492,14 @@ namespace MASIC.DataInput
                 else if (xmlReader.NumSpectra == 0 && xmlReader.NumChromatograms > 0)
                 {
                     // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
-                    var scanTimeDiffMedians = new List<double>();
+                    var scanTimeDiffMedians = new List<double>(200);
 
                     // Also keep track of elution times
                     // Keys in this dictionary are chromatogram number
                     // Values are a dictionary where keys are elution times and values are the pseudo scan number mapped to each time (initially 0)
                     var elutionTimeToScanMapByChromatogram = new Dictionary<int, SortedDictionary<double, int>>();
                     var chromatogramNumber = 0;
+                    var scanTimeDiffs = new List<double>(200);
 
                     foreach (var chromatogramItem in xmlReader.ReadAllChromatograms(true))
                     {
@@ -514,7 +515,7 @@ namespace MASIC.DataInput
                         elutionTimeToScanMapByChromatogram.Add(chromatogramNumber, elutionTimeToScanMap);
 
                         // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
-                        var scanTimeDiffs = new List<double>();
+                        scanTimeDiffs.Clear();
 
                         var scanTimes = chromatogramItem.Times.ToList();
 
@@ -691,8 +692,8 @@ namespace MASIC.DataInput
 
                     // Call ExtractFragmentationScan for each scan in simulatedSpectraByScan
 
-                    var mzList = new List<double>();
-                    var intensityList = new List<double>();
+                    var mzList = new List<double>(200);
+                    var intensityList = new List<double>(200);
 
                     foreach (var simulatedSpectrum in simulatedSpectraByScan)
                     {
@@ -981,6 +982,9 @@ namespace MASIC.DataInput
                         mMostRecentPrecursorScan = scanInfo.ScanNumber;
                         mCentroidedPrecursorIonsMz.Clear();
                         mCentroidedPrecursorIonsIntensity.Clear();
+
+                        mCentroidedPrecursorIonsMz.Capacity = Math.Max(mCentroidedPrecursorIonsMz.Capacity, centroidedPrecursorIonsMz.Length);
+                        mCentroidedPrecursorIonsIntensity.Capacity = mCentroidedPrecursorIonsMz.Capacity;
 
                         for (var i = 0; i < centroidedPrecursorIonsMz.Length; i++)
                         {
@@ -1502,6 +1506,9 @@ namespace MASIC.DataInput
             mMostRecentPrecursorScan = scanNumber;
             mCentroidedPrecursorIonsMz.Clear();
             mCentroidedPrecursorIonsIntensity.Clear();
+
+            mCentroidedPrecursorIonsMz.Capacity = Math.Max(mCentroidedPrecursorIonsMz.Capacity, msSpectrum.IonCount);
+            mCentroidedPrecursorIonsIntensity.Capacity = mCentroidedPrecursorIonsMz.Capacity;
 
             for (var i = 0; i < msSpectrum.IonCount; i++)
             {
