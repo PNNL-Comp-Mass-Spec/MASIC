@@ -212,6 +212,7 @@ namespace MASIC.DataInput
                 var scanCountToRead = scanEnd - scanStart + 1;
                 scanList.ReserveListCapacity(scanCountToRead);
                 mScanTracking.ReserveListCapacity(scanCountToRead);
+                spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scanCountToRead);
                 for (var scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)
                 {
                     if (!mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))

@@ -353,6 +353,7 @@ namespace MASIC.DataInput
                         {
                             scanList.ReserveListCapacity(scanCount);
                             mScanTracking.ReserveListCapacity(scanCount);
+                            spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scanCount);
                         }
                         firstRead = false;
                     }
@@ -473,6 +474,7 @@ namespace MASIC.DataInput
                 {
                     scanList.ReserveListCapacity(xmlReader.NumSpectra);
                     mScanTracking.ReserveListCapacity(xmlReader.NumSpectra);
+                    spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, xmlReader.NumSpectra);
                     foreach (var mzMLSpectrum in xmlReader.ReadAllSpectra(true))
                     {
                         if (mzMLSpectrum == null)
@@ -657,6 +659,7 @@ namespace MASIC.DataInput
                     var nextWarningThreshold = 10;
                     scanList.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
                     mScanTracking.ReserveListCapacity(elutionTimeToScanMapMaster.Count);
+                    spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, elutionTimeToScanMapMaster.Count);
 
                     foreach (var chromatogramItem in xmlReader2.ReadAllChromatograms(true))
                     {

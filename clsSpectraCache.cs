@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MASIC
 {
@@ -143,6 +144,11 @@ namespace MASIC
 
         public int UnCacheEventCount => mUnCacheEventCount;
 
+        /// <summary>
+        /// The number of spectra we expect to read, updated to the number cached (to disk)
+        /// </summary>
+        public int SpectrumCount { get; set; }
+
         public bool AddSpectrumToPool(
             clsMSSpectrum spectrum,
             int scanNumber)
@@ -152,6 +158,17 @@ namespace MASIC
 
             try
             {
+                if (SpectrumCount > CacheSpectraToRetainInMemory &&
+                    !DiskCachingAlwaysDisabled &&
+                    ValidatePageFileIO(true))
+                {
+                    // Store all of the spectra in one large file
+                    CacheSpectrumWork(spectrum);
+
+                    mCacheEventCount += 1;
+                    return true;
+                }
+
                 int targetPoolIndex;
 
                 if (mSpectrumIndexInPool.ContainsKey(scanNumber))
@@ -218,10 +235,15 @@ namespace MASIC
 
         private void CacheSpectrumWork(int poolIndexToCache)
         {
+            CacheSpectrumWork(SpectraPool[poolIndexToCache]);
+        }
+
+        private void CacheSpectrumWork(clsMSSpectrum spectrumToCache)
+        {
             const int MAX_RETRIES = 3;
 
             // See if the given spectrum is already present in the page file
-            var scanNumber = SpectraPool[poolIndexToCache].ScanNumber;
+            var scanNumber = spectrumToCache.ScanNumber;
             if (mSpectrumByteOffset.ContainsKey(scanNumber))
             {
                 // Page file already contains the given scan; do not re-write
@@ -233,26 +255,27 @@ namespace MASIC
             // Write the spectrum to the page file
             // Record the current offset in the hashtable
             mSpectrumByteOffset.Add(scanNumber, mPageFileWriter.BaseStream.Position);
+            if (mSpectrumByteOffset.Count > SpectrumCount)
+                SpectrumCount = mSpectrumByteOffset.Count;
 
             var retryCount = MAX_RETRIES;
             while (true)
             {
                 try
                 {
-                    var spectraPool = SpectraPool[poolIndexToCache];
                     // Write the scan number
                     mPageFileWriter.Write(scanNumber);
 
                     // Write the ion count
-                    mPageFileWriter.Write(spectraPool.IonCount);
+                    mPageFileWriter.Write(spectrumToCache.IonCount);
 
                     // Write the m/z values
-                    for (var index = 0; index < spectraPool.IonCount; index++)
-                        mPageFileWriter.Write(spectraPool.IonsMZ[index]);
+                    for (var index = 0; index < spectrumToCache.IonCount; index++)
+                        mPageFileWriter.Write(spectrumToCache.IonsMZ[index]);
 
                     // Write the intensity values
-                    for (var index = 0; index < spectraPool.IonCount; index++)
-                        mPageFileWriter.Write(spectraPool.IonsIntensity[index]);
+                    for (var index = 0; index < spectrumToCache.IonCount; index++)
+                        mPageFileWriter.Write(spectrumToCache.IonsIntensity[index]);
 
                     // Write four blank bytes (not really necessary, but adds a little padding between spectra)
                     mPageFileWriter.Write(0);
