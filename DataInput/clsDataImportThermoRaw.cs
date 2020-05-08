@@ -148,6 +148,7 @@ namespace MASIC.DataInput
             };
 
             var xcaliburAccessor = new XRawFileIO(readerOptions);
+            xcaliburAccessor.ScanInfoCacheMaxSize = 0; // Don't cache scanInfo objects
             RegisterEvents(xcaliburAccessor);
 
             mBpiUpdateCount = 0;
