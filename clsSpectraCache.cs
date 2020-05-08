@@ -307,27 +307,16 @@ namespace MASIC
         {
             try
             {
-                var garbageCollect = false;
-
                 if (mPageFileReader != null)
                 {
                     mPageFileReader.Close();
                     mPageFileReader = null;
-                    garbageCollect = true;
                 }
 
                 if (mPageFileWriter != null)
                 {
                     mPageFileWriter.Close();
                     mPageFileWriter = null;
-                    garbageCollect = true;
-                }
-
-                if (garbageCollect)
-                {
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    System.Threading.Thread.Sleep(500);
                 }
             }
             catch (Exception ex)
@@ -335,14 +324,11 @@ namespace MASIC
                 // Ignore errors here
             }
 
-            if (mSpectrumByteOffset == null)
-            {
-                mSpectrumByteOffset = new Dictionary<int, long>();
-            }
-            else
-            {
-                mSpectrumByteOffset.Clear();
-            }
+            mSpectrumByteOffset = new Dictionary<int, long>();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            System.Threading.Thread.Sleep(500);
         }
 
         private string ConstructCachedSpectrumPath()
@@ -464,10 +450,6 @@ namespace MASIC
                 else
                 {
                     mNextAvailablePoolIndex = 0;
-
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    System.Threading.Thread.Sleep(50);
                 }
             }
 

@@ -300,13 +300,6 @@ namespace MASIC.DataInput
                 mLastLogTime = DateTime.UtcNow;
             }
 
-            if ((scanList.MasterScanOrderCount - 1) % 100 == 0)
-            {
-                // Call the garbage collector every 100 spectra
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                System.Threading.Thread.Sleep(50);
-            }
 
             return success;
         }

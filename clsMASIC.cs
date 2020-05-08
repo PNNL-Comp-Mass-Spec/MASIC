@@ -1395,6 +1395,9 @@ namespace MASIC
             }
 
             scanList.SetListCapacityToCount();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            System.Threading.Thread.Sleep(50);
 
             return success;
         }
