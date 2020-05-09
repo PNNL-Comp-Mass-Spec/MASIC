@@ -54,6 +54,22 @@
         public int ScanRangeEnd { get; set; }
 
         /// <summary>
+        /// Number of scans we will process, according the ScanRangeStart and ScanRangeEnd. '-1' means no limit.
+        /// </summary>
+        public int ScanRangeCount
+        {
+            get
+            {
+                if (ScanRangeStart >= 0 && ScanRangeEnd > ScanRangeStart)
+                {
+                    return ScanRangeEnd - ScanRangeStart + 1;
+                }
+
+                return -1;
+            }
+        }
+
+        /// <summary>
         /// If both RTRangeStart >=0 and RTRangeEnd > RTRangeStart then will only process data between those that scan range (in minutes)
         /// </summary>
         public float RTRangeStart { get; set; }

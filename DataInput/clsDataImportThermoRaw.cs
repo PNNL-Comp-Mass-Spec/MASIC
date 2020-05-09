@@ -211,9 +211,14 @@ namespace MASIC.DataInput
                 ReportMessage(string.Format("Reading Xcalibur data; Total scan count: {0:N0}", scanCount));
 
                 var scanCountToRead = scanEnd - scanStart + 1;
-                scanList.ReserveListCapacity(scanCountToRead);
-                mScanTracking.ReserveListCapacity(scanCountToRead);
-                spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scanCountToRead);
+                var scansEst = mOptions.SICOptions.ScanRangeCount;
+                if (scansEst <= 0)
+                {
+                    scansEst = scanCountToRead;
+                }
+                scanList.ReserveListCapacity(scansEst);
+                mScanTracking.ReserveListCapacity(scansEst);
+                spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scansEst);
                 for (var scanNumber = scanStart; scanNumber <= scanEnd; scanNumber++)
                 {
                     if (!mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))

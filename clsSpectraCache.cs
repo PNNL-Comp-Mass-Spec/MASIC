@@ -160,7 +160,7 @@ namespace MASIC
 
             try
             {
-                if (SpectrumCount > CacheSpectraToRetainInMemory &&
+                if (SpectrumCount > CacheSpectraToRetainInMemory + 5 &&
                     !DiskCachingAlwaysDisabled &&
                     ValidatePageFileIO(true))
                 {

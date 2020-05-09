@@ -348,7 +348,11 @@ namespace MASIC.DataInput
                     if (firstRead)
                     {
                         // ScanCount property isn't populated until first spectrum is read.
-                        var scanCount = xmlReader.ScanCount;
+                        var scanCount = mOptions.SICOptions.ScanRangeCount;
+                        if (scanCount <= 0)
+                        {
+                            scanCount = xmlReader.ScanCount;
+                        }
                         if (scanCount > 0)
                         {
                             scanList.ReserveListCapacity(scanCount);
@@ -472,9 +476,14 @@ namespace MASIC.DataInput
 
                 if (xmlReader.NumSpectra > 0)
                 {
-                    scanList.ReserveListCapacity(xmlReader.NumSpectra);
-                    mScanTracking.ReserveListCapacity(xmlReader.NumSpectra);
-                    spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, xmlReader.NumSpectra);
+                    var scansEst = mOptions.SICOptions.ScanRangeCount;
+                    if (scansEst <= 0)
+                    {
+                        scansEst = xmlReader.NumSpectra;
+                    }
+                    scanList.ReserveListCapacity(scansEst);
+                    mScanTracking.ReserveListCapacity(scansEst);
+                    spectraCache.SpectrumCount = Math.Max(spectraCache.SpectrumCount, scansEst);
                     foreach (var mzMLSpectrum in xmlReader.ReadAllSpectra(true))
                     {
                         if (mzMLSpectrum == null)
