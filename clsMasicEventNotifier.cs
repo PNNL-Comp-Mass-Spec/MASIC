@@ -14,9 +14,10 @@ namespace MASIC
         /// </summary>
         /// <param name="cacheEventCount"></param>
         /// <param name="unCacheEventCount"></param>
+        /// <param name="spectraPoolHitEventCount"></param>
         public event UpdateCacheStatsEventEventHandler UpdateCacheStatsEvent;
 
-        public delegate void UpdateCacheStatsEventEventHandler(int cacheEventCount, int unCacheEventCount);
+        public delegate void UpdateCacheStatsEventEventHandler(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount);
 
         /// <summary>
         /// Update the code associated with an error
@@ -37,9 +38,9 @@ namespace MASIC
 
         #endregion
 
-        private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount)
+        private void OnUpdateCacheStats(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount)
         {
-            UpdateCacheStatsEvent?.Invoke(cacheEventCount, unCacheEventCount);
+            UpdateCacheStatsEvent?.Invoke(cacheEventCount, unCacheEventCount, spectraPoolHitEventCount);
         }
 
         private void OnUpdateBaseClassErrorCode(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode)
@@ -118,7 +119,7 @@ namespace MASIC
 
         protected void UpdateCacheStats(clsSpectraCache spectraCache)
         {
-            OnUpdateCacheStats(spectraCache.CacheEventCount, spectraCache.UnCacheEventCount);
+            OnUpdateCacheStats(spectraCache.CacheEventCount, spectraCache.UnCacheEventCount, spectraCache.SpectraPoolHitEventCount);
         }
 
         /// <summary>
@@ -143,9 +144,9 @@ namespace MASIC
 
         #region "Event Handlers"
 
-        private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount)
+        private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount)
         {
-            OnUpdateCacheStats(cacheEventCount, unCacheEventCount);
+            OnUpdateCacheStats(cacheEventCount, unCacheEventCount, spectraPoolHitEventCount);
         }
 
         private void UpdateBaseClassErrorCodeEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eErrorCode)

@@ -83,6 +83,7 @@ namespace MASIC
 
         private int mCacheEventCount;
         private int mUnCacheEventCount;
+        private int mSpectraPoolHitEventCount;
 
         private int mMaximumPoolLength;
         private int mNextAvailablePoolIndex;
@@ -93,6 +94,7 @@ namespace MASIC
         #endregion
 
         public int CacheEventCount => mCacheEventCount;
+        public int SpectraPoolHitEventCount => mSpectraPoolHitEventCount;
 
         [Obsolete("Legacy parameter; no longer used")]
         public string CacheFileNameBase => mCacheFileNameBase;
@@ -466,6 +468,7 @@ namespace MASIC
 
             mCacheEventCount = 0;
             mUnCacheEventCount = 0;
+            mSpectraPoolHitEventCount = 0;
 
             mDirectoryPathValidated = false;
             mCacheFileNameBase = string.Empty;
@@ -741,6 +744,7 @@ namespace MASIC
                 if (mSpectrumIndexInPool.ContainsKey(scanNumber))
                 {
                     poolIndex = mSpectrumIndexInPool[scanNumber];
+                    mSpectraPoolHitEventCount++;
                     return true;
                 }
 
@@ -771,6 +775,7 @@ namespace MASIC
                 {
                     var poolIndex = mSpectrumIndexInPool[scanNumber];
                     spectrum = SpectraPool[poolIndex];
+                    mSpectraPoolHitEventCount++;
                     return true;
                 }
 

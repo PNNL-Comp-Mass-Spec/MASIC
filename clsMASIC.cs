@@ -1782,7 +1782,8 @@ namespace MASIC
                 LogMessage(string.Format("ProcessingStats: Memory Usage At End (MB) = {0:F2}", mProcessingStats.MemoryUsageMBAtEnd));
 
                 LogMessage(string.Format("ProcessingStats: Cache Event Count = {0:N0}", mProcessingStats.CacheEventCount));
-                LogMessage(string.Format("ProcessingStats: UncCache Event Count = {0:N0}", mProcessingStats.UnCacheEventCount));
+                LogMessage(string.Format("ProcessingStats: UnCache Event Count = {0:N0}", mProcessingStats.UnCacheEventCount));
+                LogMessage(string.Format("ProcessingStats: SpectraPool Hit Event Count = {0:N0}", mProcessingStats.SpectraPoolHitEventCount));
 
                 if (success)
                 {
@@ -2136,10 +2137,11 @@ namespace MASIC
             }
         }
 
-        private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount)
+        private void UpdatedCacheStatsEventHandler(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount)
         {
             mProcessingStats.CacheEventCount = cacheEventCount;
             mProcessingStats.UnCacheEventCount = unCacheEventCount;
+            mProcessingStats.SpectraPoolHitEventCount = spectraPoolHitEventCount;
         }
 
         private void UpdateBaseClassErrorCodeEventHandler(ProcessFilesErrorCodes eErrorCode)

@@ -8,6 +8,7 @@ namespace MASIC
         public float TotalProcessingTimeAtStart { get; set; }
         public int CacheEventCount { get; set; }
         public int UnCacheEventCount { get; set; }
+        public int SpectraPoolHitEventCount { get; set; }
 
         public DateTime FileLoadStartTime { get; set; }
         public DateTime FileLoadEndTime { get; set; }
