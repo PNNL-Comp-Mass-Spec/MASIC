@@ -262,7 +262,7 @@ namespace MASIC
                     {
                         var fragSpectrumIndex1 = scanList.ParentIons[parentIonIndex1].FragScanIndices[fragIndex1];
 
-                        if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex1].ScanNumber, out var poolIndex1))
+                        if (!spectraCache.GetSpectrum(scanList.FragScans[fragSpectrumIndex1].ScanNumber, out var spectrum1, false))
                         {
                             SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                             return -1;
@@ -270,14 +270,14 @@ namespace MASIC
 
                         if (!clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD)
                         {
-                            dataImportUtilities.DiscardDataBelowNoiseThreshold(spectraCache.SpectraPool[poolIndex1], scanList.FragScans[fragSpectrumIndex1].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
+                            dataImportUtilities.DiscardDataBelowNoiseThreshold(spectrum1, scanList.FragScans[fragSpectrumIndex1].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
                         }
 
                         for (var fragIndex2 = 0; fragIndex2 < scanList.ParentIons[parentIonIndex2].FragScanIndices.Count; fragIndex2++)
                         {
                             var fragSpectrumIndex2 = scanList.ParentIons[parentIonIndex2].FragScanIndices[fragIndex2];
 
-                            if (!spectraCache.ValidateSpectrumInPool(scanList.FragScans[fragSpectrumIndex2].ScanNumber, out var poolIndex2))
+                            if (!spectraCache.GetSpectrum(scanList.FragScans[fragSpectrumIndex2].ScanNumber, out var spectrum2, false))
                             {
                                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                                 return -1;
@@ -285,10 +285,10 @@ namespace MASIC
 
                             if (!clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD)
                             {
-                                dataImportUtilities.DiscardDataBelowNoiseThreshold(spectraCache.SpectraPool[poolIndex2], scanList.FragScans[fragSpectrumIndex2].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
+                                dataImportUtilities.DiscardDataBelowNoiseThreshold(spectrum2, scanList.FragScans[fragSpectrumIndex2].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
                             }
 
-                            var similarityScore = CompareSpectra(spectraCache.SpectraPool[poolIndex1], spectraCache.SpectraPool[poolIndex2], binningOptions);
+                            var similarityScore = CompareSpectra(spectrum1, spectrum2, binningOptions);
 
                             if (similarityScore > highestSimilarityScore)
                             {
@@ -408,15 +408,14 @@ namespace MASIC
                     // No data in this spectrum
                     success = false;
                 }
-                else if (!spectraCache.ValidateSpectrumInPool(scanList[spectrumIndex].ScanNumber, out var poolIndex))
+                else if (!spectraCache.GetSpectrum(scanList[spectrumIndex].ScanNumber, out var spectrum, true))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                     success = false;
                 }
                 else
                 {
-                    var spectraPool = spectraCache.SpectraPool[poolIndex];
-                    success = FindClosestMZ(spectraPool.IonsMZ, spectraPool.IonCount, searchMZ, toleranceMZ, out bestMatchMZ);
+                    success = FindClosestMZ(spectrum.IonsMZ, spectrum.IonCount, searchMZ, toleranceMZ, out bestMatchMZ);
                 }
             }
             catch (Exception ex)

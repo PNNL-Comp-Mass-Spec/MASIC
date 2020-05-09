@@ -68,7 +68,7 @@ namespace MASIC
         #endregion
 
         #region "Classwide Variables"
-        public clsMSSpectrum[] SpectraPool;                   // Pool (collection) of currently loaded spectra; 0-based array
+        private clsMSSpectrum[] SpectraPool;                  // Pool (collection) of currently loaded spectra; 0-based array
         private udtSpectraPoolInfoType[] SpectraPoolInfo;     // Parallel with SpectraPool(), but not publicly visible
 
         private readonly clsSpectrumCacheOptions mCacheOptions;
@@ -731,43 +731,14 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Make sure the spectrum given by scanNumber is present in FragScanSpectra
-        /// When doing this, update the Pool Access History with this scan number to assure it doesn't get purged from the pool anytime soon
-        /// </summary>
-        /// <param name="scanNumber">Scan number to load</param>
-        /// <param name="poolIndex">Output: index in the array that contains the given spectrum; -1 if no match</param>
-        /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
-        public bool ValidateSpectrumInPool(int scanNumber, out int poolIndex)
-        {
-            try
-            {
-                if (mSpectrumIndexInPool.ContainsKey(scanNumber))
-                {
-                    poolIndex = mSpectrumIndexInPool[scanNumber];
-                    mSpectraPoolHitEventCount++;
-                    return true;
-                }
-
-                // Need to load the spectrum
-                var success = UnCacheSpectrum(scanNumber, out poolIndex);
-                return success;
-            }
-            catch (Exception ex)
-            {
-                ReportError(ex.Message, ex);
-                poolIndex = -1;
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Get a spectrum from the pool or cache, potentially without updating the pool
         /// </summary>
-        /// <param name="scanNumber"></param>
-        /// <param name="spectrum"></param>
-        /// <param name="canSkipPool">if true and the spectrum is not in the pool, it will be read from the disk cache without updating the pool</param>
-        /// <returns></returns>
-        public bool GetSpectrum(int scanNumber, out clsMSSpectrum spectrum, bool canSkipPool)
+        /// <param name="scanNumber">Scan number to load</param>
+        /// <param name="spectrum">The requested spectrum</param>
+        /// <param name="canSkipPool">if true and the spectrum is not in the pool, it will be read from the disk cache without updating the pool.
+        /// This should be true for any spectrum requests that are not likely to be repeated within the next <see cref="clsSpectrumCacheOptions.SpectraToRetainInMemory"/> requests.</param>
+        /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
+        public bool GetSpectrum(int scanNumber, out clsMSSpectrum spectrum, bool canSkipPool = true)
         {
             try
             {

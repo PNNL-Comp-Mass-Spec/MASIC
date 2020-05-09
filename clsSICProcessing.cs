@@ -796,7 +796,7 @@ namespace MASIC
                     continue;
                 }
 
-                if (!spectraCache.ValidateSpectrumInPool(scanList.SurveyScans[surveyScanIndex].ScanNumber, out var poolIndex))
+                if (!spectraCache.GetSpectrum(scanList.SurveyScans[surveyScanIndex].ScanNumber, out var spectrum, true))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                     return false;
@@ -817,7 +817,7 @@ namespace MASIC
                         mzToleranceDa = current.MZTolerance;
                     }
 
-                    var ionSum = dataAggregation.AggregateIonsInRange(spectraCache.SpectraPool[poolIndex],
+                    var ionSum = dataAggregation.AggregateIonsInRange(spectrum,
                                                                       current.SearchMZ, mzToleranceDa,
                                                                       out _, out var closestMZ, false);
 
