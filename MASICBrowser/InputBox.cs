@@ -27,16 +27,16 @@ namespace MASICBrowser
     /// </remarks>
     public class InputBox : Form
     {
-        protected System.Windows.Forms.Button buttonOK;
-        protected System.Windows.Forms.Button buttonCancel;
-        protected System.Windows.Forms.Label labelPrompt;
-        protected System.Windows.Forms.TextBox textBoxText;
-        protected System.Windows.Forms.ErrorProvider errorProviderText;
+        protected Button buttonOK;
+        protected Button buttonCancel;
+        protected Label labelPrompt;
+        protected TextBox textBoxText;
+        protected ErrorProvider errorProviderText;
 
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.Container components = null;
+        private readonly System.ComponentModel.Container components = null;
 
         private InputBox()
         {
@@ -57,10 +57,7 @@ namespace MASICBrowser
         {
             if (disposing)
             {
-                if (components != null)
-                {
-                    components.Dispose();
-                }
+                components?.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -144,13 +141,13 @@ namespace MASICBrowser
         }
         #endregion
 
-        private void buttonCancel_Click(object sender, System.EventArgs e)
+        private void buttonCancel_Click(object sender, EventArgs e)
         {
             this.Validator = null;
             this.Close();
         }
 
-        private void buttonOK_Click(object sender, System.EventArgs e)
+        private void buttonOK_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -162,33 +159,33 @@ namespace MASICBrowser
         /// <param name="title">String expression displayed in the title bar of the dialog box</param>
         /// <param name="defaultResponse">String expression displayed in the text box as the default response</param>
         /// <param name="validator">Delegate used to validate the text</param>
-        /// <param name="xpos">Numeric expression that specifies the distance of the left edge of the dialog box from the left edge of the screen.</param>
-        /// <param name="ypos">Numeric expression that specifies the distance of the upper edge of the dialog box from the top of the screen</param>
+        /// <param name="xPos">Numeric expression that specifies the distance of the left edge of the dialog box from the left edge of the screen.</param>
+        /// <param name="yPos">Numeric expression that specifies the distance of the upper edge of the dialog box from the top of the screen</param>
         /// <returns>An InputBoxResult object with the Text and the OK property set to true when OK was clicked.</returns>
-        public static InputBoxResult Show(string prompt, string title, string defaultResponse, InputBoxValidatingHandler validator, int xpos, int ypos)
+        public static InputBoxResult Show(string prompt, string title, string defaultResponse, InputBoxValidatingHandler validator, int xPos, int yPos)
         {
             using (var form = new InputBox())
             {
                 form.labelPrompt.Text = prompt;
                 form.Text = title;
                 form.textBoxText.Text = defaultResponse;
-                if (xpos >= 0 && ypos >= 0)
+                if (xPos >= 0 && yPos >= 0)
                 {
                     form.StartPosition = FormStartPosition.Manual;
-                    form.Left = xpos;
-                    form.Top = ypos;
+                    form.Left = xPos;
+                    form.Top = yPos;
                 }
                 form.Validator = validator;
 
                 var result = form.ShowDialog();
 
-                var retval = new InputBoxResult();
+                var returnValue = new InputBoxResult();
                 if (result == DialogResult.OK)
                 {
-                    retval.Text = form.textBoxText.Text;
-                    retval.OK = true;
+                    returnValue.Text = form.textBoxText.Text;
+                    returnValue.OK = true;
                 }
-                return retval;
+                return returnValue;
             }
         }
 
@@ -211,9 +208,9 @@ namespace MASICBrowser
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void textBoxText_TextChanged(object sender, System.EventArgs e)
+        private void textBoxText_TextChanged(object sender, EventArgs e)
         {
-            errorProviderText.SetError(textBoxText, "");
+            errorProviderText.SetError(textBoxText, string.Empty);
         }
 
         /// <summary>
