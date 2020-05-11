@@ -350,10 +350,6 @@ namespace MASICPeakFinder
                 }
                 else
                 {
-                    // ReSharper thinks that segmentLength will always be 0; this is a Bug in ReSharper
-                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                    // ReSharper disable once UselessBinaryOperation
                     firstSegment.SegmentIndexEnd = segmentLength + firstSegment.SegmentIndexStart - 1;
                 }
 
@@ -663,10 +659,6 @@ namespace MASICPeakFinder
                                 // At the start of the peak; use the scan number halfway between .IndexBaseLeft and .IndexMax
                                 var indexOffset = (int)Math.Round((sicPeak.IndexMax - sicPeak.IndexBaseLeft) / 2.0, 0);
 
-                                // ReSharper thinks that indexOffset will always be 0; this is a Bug in ReSharper
-                                // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                                // ReSharper disable once UselessBinaryOperation
                                 fwhmScanStart = sicData[dataIndex + indexOffset].ScanNumber;
                             }
                             else
@@ -720,10 +712,6 @@ namespace MASICPeakFinder
                                 // At the end of the peak; use the scan number halfway between .IndexBaseRight and .IndexMax
                                 var indexOffset = (int)Math.Round((sicPeak.IndexBaseRight - sicPeak.IndexMax) / 2.0, 0);
 
-                                // ReSharper thinks that indexOffset will always be 0; this is a Bug in ReSharper
-                                // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                                // ReSharper disable once UselessBinaryOperation
                                 fwhmScanEnd = sicData[dataIndex + 1 - indexOffset].ScanNumber;
                             }
                             else
@@ -750,11 +738,6 @@ namespace MASICPeakFinder
 
                     fwhmScans = (int)Math.Round(fwhmScanEnd - fwhmScanStart, 0);
 
-                    // ReSharper thinks that fwhmScans will always be 0 based on the previous statement; this is a Bug in ReSharper
-                    // I have verified during runtime: fwhmScans is definitely a positive number, e.g. 64 or 79
-                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (fwhmScans <= 0)
                         fwhmScans = 0;
                 }
@@ -949,10 +932,6 @@ namespace MASICPeakFinder
 
             // Make sure that peakHalfWidthPoints is at least NOISE_ESTIMATE_DATA_COUNT_MINIMUM
 
-            // ReSharper thinks that peakHalfWidthPoints is always 0; this is a Bug in ReSharper
-            // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (peakHalfWidthPoints < NOISE_ESTIMATE_DATA_COUNT_MINIMUM)
             {
                 peakHalfWidthPoints = NOISE_ESTIMATE_DATA_COUNT_MINIMUM;
@@ -1180,10 +1159,6 @@ namespace MASICPeakFinder
                 {
                     // Prepend an intensity data point of intensityThreshold, with a scan number avgScanInterval less than the first scan number for the actual peak data
 
-                    // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
-                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                    // ReSharper disable once UselessBinaryOperation
                     scanNumbers[0] = sicData[sicPeak.IndexBaseLeft].ScanNumber - avgScanInterval;
 
                     intensities[0] = intensityThreshold;
@@ -1212,10 +1187,6 @@ namespace MASICPeakFinder
                     // Append an intensity data point of intensityThreshold, with a scan number avgScanInterval more than the last scan number for the actual peak data
                     var dataIndex = sicPeak.IndexBaseRight - sicPeak.IndexBaseLeft + areaDataBaseIndex + 1;
 
-                    // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
-                    // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                    // ReSharper disable once UselessBinaryOperation
                     scanNumbers[dataIndex] = sicData[sicPeak.IndexBaseRight].ScanNumber + avgScanInterval;
 
                     intensities[dataIndex] = intensityThreshold;
@@ -1480,10 +1451,6 @@ namespace MASICPeakFinder
                                 intensities[dataIndex] = intensities[dataIndex - 1];
                             }
 
-                            // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
-                            // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                            // ReSharper disable once UselessBinaryOperation
                             scanNumbers[0] = scanNumbers[1] - avgScanInterval;
                             intensities[0] = intensityThreshold;
                             dataCount += 1;
@@ -1494,10 +1461,6 @@ namespace MASICPeakFinder
                         {
                             // Append a data point with intensity intensityThreshold and with a scan number 1 more than the last scan number in the valid data
 
-                            // ReSharper thinks avgScanInterval is always 0; this is a Bug in ReSharper
-                            // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                            // ReSharper disable once UselessBinaryOperation
                             scanNumbers[dataCount] = scanNumbers[dataCount - 1] + avgScanInterval;
                             intensities[dataCount] = intensityThreshold;
                             dataCount += 1;
@@ -1859,10 +1822,6 @@ namespace MASICPeakFinder
                         // average the data from the start to that index
                         indexEnd = (int)Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
 
-                        // ReSharper thinks that indexEnd will always be 0; this is a Bug in ReSharper
-                        // ToDo: Remove the ReSharper disable if the next release of ReSharper stops flagging this as always 0
-
-                        // ReSharper disable once UselessBinaryOperation
                         countSummed = indexEnd + 1;
 
                         sum = 0;
