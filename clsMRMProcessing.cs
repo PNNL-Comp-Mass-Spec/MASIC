@@ -63,8 +63,8 @@ namespace MASIC
             // Returns true if this dataset has MRM data and if it is parsed successfully
             // Returns false if the dataset does not have MRM data, or if an error occurs
 
-            mrmSettings = new List<clsMRMScanInfo>();
-            srmList = new List<udtSRMListType>();
+            mrmSettings = new List<clsMRMScanInfo>(200);
+            srmList = new List<udtSRMListType>(600); // Assume there are 3 frag masses for each parent mass
 
             try
             {
@@ -96,8 +96,6 @@ namespace MASIC
                             mrmHashToIndexMap.Add(mrmInfoHash, mrmInfoForHash);
 
                             // Append the new entries to srmList
-                            srmList.Capacity = mrmInfoForHash.MRMMassCount; // minimize list resizes
-
                             for (var mrmMassIndex = 0; mrmMassIndex < mrmInfoForHash.MRMMassCount; mrmMassIndex++)
                             {
                                 // Add this new transition to srmList() only if not already present
@@ -131,6 +129,10 @@ namespace MASIC
                         }
                     }
                 }
+
+                // Resize the lists to their contents
+                mrmSettings.Capacity = mrmSettings.Count;
+                srmList.Capacity = srmList.Count;
 
                 return mrmDataPresent;
             }
