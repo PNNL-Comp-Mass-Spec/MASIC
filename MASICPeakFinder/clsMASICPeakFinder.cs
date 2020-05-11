@@ -2269,12 +2269,10 @@ namespace MASICPeakFinder
                     {
                         // For each peak, see if several zero intensity values are in a row in the raw data
                         // If found, then narrow the peak to leave just one zero intensity value
-                        for (var peakIndexCompare = 0; peakIndexCompare < peakData.Peaks.Count; peakIndexCompare++)
+                        foreach (var currentPeak in peakData.Peaks)
                         {
-                            var currentPeak = peakData.Peaks[peakIndexCompare];
-
                             while (currentPeak.LeftEdge < sicData.Count - 1 &&
-                            currentPeak.LeftEdge < currentPeak.RightEdge)
+                                   currentPeak.LeftEdge < currentPeak.RightEdge)
                             {
                                 if (Math.Abs(sicData[currentPeak.LeftEdge].Intensity) < double.Epsilon &&
                                     Math.Abs(sicData[currentPeak.LeftEdge + 1].Intensity) < double.Epsilon)
@@ -2288,7 +2286,7 @@ namespace MASICPeakFinder
                             }
 
                             while (currentPeak.RightEdge > 0 &&
-                                currentPeak.RightEdge > currentPeak.LeftEdge)
+                                   currentPeak.RightEdge > currentPeak.LeftEdge)
                             {
                                 if (Math.Abs(sicData[currentPeak.RightEdge].Intensity) < double.Epsilon &&
                                     Math.Abs(sicData[currentPeak.RightEdge - 1].Intensity) < double.Epsilon)
@@ -3023,11 +3021,11 @@ namespace MASICPeakFinder
                 // Find the minimum intensity in SICData()
                 var minimumPositiveValue = FindMinimumPositiveValue(sicData, 1);
 
-                for (var i = 0; i < sicData.Count; i++)
+                foreach (var dataPoint in sicData)
                 {
                     // If this data point is > .MinimumBaselineNoiseLevel, then add this intensity to potentialPeakArea
                     // and increment validPeakCount
-                    var intensityToUse = Math.Max(minimumPositiveValue, sicData[i].Intensity);
+                    var intensityToUse = Math.Max(minimumPositiveValue, dataPoint.Intensity);
                     if (intensityToUse >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel)
                     {
                         potentialPeakArea += intensityToUse;

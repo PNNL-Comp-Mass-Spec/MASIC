@@ -258,10 +258,8 @@ namespace MASIC
                 else
                 {
                     highestSimilarityScore = 0;
-                    for (var fragIndex1 = 0; fragIndex1 < scanList.ParentIons[parentIonIndex1].FragScanIndices.Count; fragIndex1++)
+                    foreach (var fragSpectrumIndex1 in scanList.ParentIons[parentIonIndex1].FragScanIndices)
                     {
-                        var fragSpectrumIndex1 = scanList.ParentIons[parentIonIndex1].FragScanIndices[fragIndex1];
-
                         if (!spectraCache.GetSpectrum(scanList.FragScans[fragSpectrumIndex1].ScanNumber, out var spectrum1, false))
                         {
                             SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
@@ -273,10 +271,8 @@ namespace MASIC
                             dataImportUtilities.DiscardDataBelowNoiseThreshold(spectrum1, scanList.FragScans[fragSpectrumIndex1].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
                         }
 
-                        for (var fragIndex2 = 0; fragIndex2 < scanList.ParentIons[parentIonIndex2].FragScanIndices.Count; fragIndex2++)
+                        foreach (var fragSpectrumIndex2 in scanList.ParentIons[parentIonIndex2].FragScanIndices)
                         {
-                            var fragSpectrumIndex2 = scanList.ParentIons[parentIonIndex2].FragScanIndices[fragIndex2];
-
                             if (!spectraCache.GetSpectrum(scanList.FragScans[fragSpectrumIndex2].ScanNumber, out var spectrum2, false))
                             {
                                 SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);

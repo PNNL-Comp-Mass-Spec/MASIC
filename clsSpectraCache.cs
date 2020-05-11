@@ -377,8 +377,10 @@ namespace MASIC
                 filePathMatch = filePathMatch.Substring(0, charIndex);
                 var files = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(filePathMatch) + "*");
 
-                for (var index = 0; index < files.Length; index++)
-                    File.Delete(files[index]);
+                foreach (var cacheFile in cacheFiles)
+                {
+                    File.Delete(cacheFile);
+                }
             }
             catch (Exception ex)
             {

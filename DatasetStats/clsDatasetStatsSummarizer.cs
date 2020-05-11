@@ -707,17 +707,17 @@ namespace MASIC.DatasetStats
             var matchFound = false;
 
             // Look for scan scanNumber in mDatasetScanStats
-            for (var index = 0; index < mDatasetScanStats.Count; index++)
+            foreach (var scan in mDatasetScanStats)
             {
-                if (mDatasetScanStats[index].ScanNumber == scanNumber)
-                {
-                    mDatasetScanStats[index].ScanType = scanType;
-                    mDatasetScanStats[index].ScanTypeName = scanTypeName;
-                    mDatasetSummaryStatsUpToDate = false;
+                if (scan.ScanNumber != scanNumber)
+                    continue;
 
-                    matchFound = true;
-                    break;
-                }
+                scan.ScanType = scanType;
+                scan.ScanTypeName = scanTypeName;
+                mDatasetSummaryStatsUpToDate = false;
+
+                matchFound = true;
+                break;
             }
 
             return matchFound;

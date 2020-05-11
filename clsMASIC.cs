@@ -1885,9 +1885,8 @@ namespace MASIC
         {
             try
             {
-                for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
+                foreach (var parentIon in scanList.ParentIons)
                 {
-                    var parentIon = scanList.ParentIons[parentIonIndex];
                     var scanIndexObserved = parentIon.SurveyScanIndex;
 
                     var sicStats = parentIon.SICStats;

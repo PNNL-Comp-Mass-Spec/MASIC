@@ -39,7 +39,7 @@ namespace MASICBrowser
 {
     public partial class frmBrowser : Form
     {
-        private const string PROGRAM_DATE = "April 30, 2020";
+        private const string PROGRAM_DATE = "May 11, 2020";
 
         public frmBrowser()
         {
@@ -3221,8 +3221,10 @@ namespace MASICBrowser
                 // Copy the smoothed data into udtSICStats.SICSmoothedYData
                 sicStats.SICSmoothedYData.Clear();
 
-                for (var index = 0; index < intensities.Length; index++)
-                    sicStats.SICSmoothedYData.Add(intensities[index]);
+                foreach (var dataPoint in intensities)
+                {
+                    sicStats.SICSmoothedYData.Add(dataPoint);
+                }
             }
 
             if (repeatPeakFinding)
