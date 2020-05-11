@@ -803,9 +803,8 @@ namespace MASICPeakFinder
                 yData[i] = yDataIn[i];
             }
 
-            double yDataSum = 0;
-            for (var i = 0; i < yData.Length; i++)
-                yDataSum += yData[i];
+            var yDataSum = yData.Sum();
+
             if (Math.Abs(yDataSum) < double.Epsilon)
                 yDataSum = 1;
 
@@ -829,9 +828,7 @@ namespace MASICPeakFinder
                 xDataPDF[i] = 1 / (Math.Sqrt(2 * Math.PI) * peakStDev) * Math.Exp(-1 / 2.0 *
                                       Math.Pow((xData[i] - (peakMean - scanOffset)) / peakStDev, 2));
 
-            double xDataPDFSum = 0;
-            for (var i = 0; i < xDataPDF.Length; i++)
-                xDataPDFSum += xDataPDF[i];
+            var xDataPDFSum = xDataPDF.Sum();
 
             // Estimate the theoretical CDF using an accumulating sum
             var xDataCDF = new double[xDataPDF.Length];
@@ -2611,15 +2608,7 @@ namespace MASICPeakFinder
                 else if (returnClosestPeak)
                 {
                     // Make sure one of the peaks is within 1 of the original peak location
-                    var success = false;
-                    for (var foundPeakIndex = 0; foundPeakIndex < peaksContainer.Peaks.Count; foundPeakIndex++)
-                    {
-                        if (Math.Abs(peaksContainer.Peaks[foundPeakIndex].PeakLocation - peaksContainer.OriginalPeakLocationIndex) <= 1)
-                        {
-                            success = true;
-                            break;
-                        }
-                    }
+                    var success = peaksContainer.Peaks.Any(t => Math.Abs(t.PeakLocation - peaksContainer.OriginalPeakLocationIndex) <= 1);
 
                     if (!success)
                     {
