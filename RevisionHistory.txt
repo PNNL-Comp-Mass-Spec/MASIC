@@ -1,5 +1,8 @@
 MASIC Change Log
 
+Version 3.1.7436; May 11, 2020
+	- Optimize spectrum caching logic to improve processing speed
+
 Version 3.1.7425; April 30, 2020
 	- Convert to C#
 	- Update PRISMDatabaseUtils.dll

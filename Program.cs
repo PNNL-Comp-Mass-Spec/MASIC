@@ -31,7 +31,7 @@ namespace MASIC
 
     public static class Program
     {
-        public const string PROGRAM_DATE = "April 30, 2020";
+        public const string PROGRAM_DATE = "May 11, 2020";
 
         private static string mInputFilePath;
         private static string mOutputDirectoryPath;                          // Optional
@@ -127,7 +127,7 @@ namespace MASIC
                     mProgressForm = new frmProgress();
 
                     mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
-                    mProgressForm.InitializeSubtask("", 0, 100, false);
+                    mProgressForm.InitializeSubtask(string.Empty, 0, 100, false);
                     mProgressForm.ResetKeyPressAbortProcess();
                     mProgressForm.Show();
                     Application.DoEvents();
