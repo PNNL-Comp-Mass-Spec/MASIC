@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace MASIC
 {
@@ -333,11 +332,12 @@ namespace MASIC
             System.Threading.Thread.Sleep(500);
         }
 
+        /// <summary>
+        /// Constructs the full path for the given spectrum file
+        /// </summary>
+        /// <returns>The file path, or an empty string if unable to validate the spectrum cache directory</returns>
         private string ConstructCachedSpectrumPath()
         {
-            // Constructs the full path for the given spectrum file
-            // Returns String.empty if unable to validate the cached spectrum directory
-
             if (!ValidateCachedSpectrumDirectory())
             {
                 return string.Empty;

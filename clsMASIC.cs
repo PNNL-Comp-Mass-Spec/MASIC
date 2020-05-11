@@ -353,6 +353,7 @@ namespace MASIC
         public bool UseFinniganXRawAccessorFunctions
         {
             get => true;
+            // ReSharper disable once ValueParameterNotUsed
             set {}
         }
 
@@ -495,6 +496,7 @@ namespace MASIC
         {
             get => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio;
             // This value isn't utilized by MASIC for SICs so we'll force it to always be zero
+            // ReSharper disable once ValueParameterNotUsed
             set => Options.SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.MinimumSignalToNoiseRatio = 0;
         }
 

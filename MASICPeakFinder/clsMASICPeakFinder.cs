@@ -1339,6 +1339,8 @@ namespace MASICPeakFinder
                     }
                 }
                 else
+                // ReSharper disable HeuristicUnreachableCode
+#pragma warning disable 162
                 {
                     dataCount = 0;
                     for (var dataIndex = sicPeak.IndexBaseLeft; dataIndex <= sicPeak.IndexBaseRight; dataIndex++)
@@ -1358,6 +1360,8 @@ namespace MASICPeakFinder
                         dataCount += 1;
                     }
                 }
+#pragma warning restore 162
+                // ReSharper restore HeuristicUnreachableCode
 
                 // Define an intensity threshold of 10% of MaximumBaselineAdjustedIntensity
                 var intensityThreshold = maximumBaselineAdjustedIntensity * 0.1;
@@ -1489,6 +1493,8 @@ namespace MASICPeakFinder
                         }
                     }
                     else
+                    // ReSharper disable HeuristicUnreachableCode
+#pragma warning disable 162
                     {
                         validDataIndexLeft = sicPeak.IndexMax - (int)Math.Floor(minimumDataCount / 2.0);
                         if (validDataIndexLeft < 0)
@@ -1504,6 +1510,8 @@ namespace MASICPeakFinder
                             }
                         }
                     }
+#pragma warning restore 162
+                    // ReSharper restore HeuristicUnreachableCode
 
                     if (dataCount < 3)
                     {
@@ -1676,11 +1684,15 @@ namespace MASICPeakFinder
                     peakStDev = statMomentsData.StDev;
                 }
                 else
+                // ReSharper disable HeuristicUnreachableCode
+#pragma warning disable 162
                 {
                     peakMean = sicData[sicPeak.IndexMax].ScanNumber;
                     // fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
                     peakStDev = sicPeak.FWHMScanWidth / 2.35482;
                 }
+#pragma warning restore 162
+                // ReSharper restore HeuristicUnreachableCode
 
                 statMomentsData.KSStat = ComputeKSStatistic(dataCount, scanNumbers, intensities, peakMean, peakStDev);
             }
@@ -2570,8 +2582,6 @@ namespace MASICPeakFinder
                     peaksContainer.PeakWidthPointsMinimum,
                     (int)Math.Round(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
             }
-
-            // usedSmoothedDataForPeakDetection = True
             else
             {
                 // Look for the peaks, using peaksContainer.PeakWidthPointsMinimum as the minimum peak width
@@ -2581,7 +2591,6 @@ namespace MASICPeakFinder
                     sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum,
                     peaksContainer.PeakWidthPointsMinimum,
                     (int)Math.Round(sicPeakFinderOptions.IntensityThresholdFractionMax * 100), 2, true, true);
-                // usedSmoothedDataForPeakDetection = False
             }
 
             if (peaksContainer.Peaks.Count == -1)
@@ -3046,7 +3055,7 @@ namespace MASICPeakFinder
                             peakCountBasisForMinimumPotentialArea = validPeakCount;
                         }
                         else if (potentialPeakArea < minimumPotentialPeakArea &&
-                            validPeakCount == peakCountBasisForMinimumPotentialArea)
+                                 validPeakCount == peakCountBasisForMinimumPotentialArea)
                         {
                             minimumPotentialPeakArea = potentialPeakArea;
                         }
@@ -3215,7 +3224,8 @@ namespace MASICPeakFinder
                     var previousPeakFWHMPointRight = sicPeak.PreviousPeakFWHMPointRight;
                     var nextPeakFWHMPointLeft = sicPeak.NextPeakFWHMPointLeft;
                     var shoulderCount = sicPeak.ShoulderCount;
-                    success = FindPeaks(sicData, ref peakIndexStart, ref peakIndexEnd, ref peakLocationIndex,
+                    var success = FindPeaks(
+                        sicData, ref peakIndexStart, ref peakIndexEnd, ref peakLocationIndex,
                         ref previousPeakFWHMPointRight, ref nextPeakFWHMPointLeft, ref shoulderCount,
                         out smoothedYDataSubset, simDataPresent, sicPeakFinderOptions,
                         sicPeak.BaselineNoiseStats.NoiseLevel,

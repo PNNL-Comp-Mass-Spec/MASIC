@@ -266,10 +266,15 @@ namespace MASIC
                             return -1;
                         }
 
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                         if (!clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD)
+#pragma warning disable 162
+                        // ReSharper disable HeuristicUnreachableCode
                         {
                             dataImportUtilities.DiscardDataBelowNoiseThreshold(spectrum1, scanList.FragScans[fragSpectrumIndex1].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
                         }
+                        // ReSharper restore HeuristicUnreachableCode
+#pragma warning restore 162
 
                         foreach (var fragSpectrumIndex2 in scanList.ParentIons[parentIonIndex2].FragScanIndices)
                         {
@@ -279,10 +284,15 @@ namespace MASIC
                                 return -1;
                             }
 
+                            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                             if (!clsMASIC.DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD)
+#pragma warning disable 162
+                            // ReSharper disable HeuristicUnreachableCode
                             {
                                 dataImportUtilities.DiscardDataBelowNoiseThreshold(spectrum2, scanList.FragScans[fragSpectrumIndex2].BaselineNoiseStats.NoiseLevel, 0, 0, noiseThresholdOptions);
                             }
+                            // ReSharper restore HeuristicUnreachableCode
+#pragma warning restore 162
 
                             var similarityScore = CompareSpectra(spectrum1, spectrum2, binningOptions);
 
