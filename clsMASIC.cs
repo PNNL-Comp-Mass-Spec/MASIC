@@ -2085,6 +2085,7 @@ namespace MASIC
 
                         writer.WriteElementString("CacheEventCount", mProcessingStats.CacheEventCount.ToString());
                         writer.WriteElementString("UnCacheEventCount", mProcessingStats.UnCacheEventCount.ToString());
+                        writer.WriteElementString("SpectraPoolHitEventCount", mProcessingStats.SpectraPoolHitEventCount.ToString());
 
                         writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 2));
                         writer.WriteEndElement();

@@ -433,6 +433,7 @@ namespace MASIC.DataOutput
                 writer.WriteStartElement("ProcessingStats");
                 writer.WriteElementString("CacheEventCount", spectraCache.CacheEventCount.ToString());
                 writer.WriteElementString("UnCacheEventCount", spectraCache.UnCacheEventCount.ToString());
+                writer.WriteElementString("SpectraPoolHitEventCount", spectraCache.SpectraPoolHitEventCount.ToString());
 
                 writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(processingStats.PeakMemoryUsageMB, 2));
                 var effectiveSeconds = processingTimeSec - processingStats.TotalProcessingTimeAtStart;
