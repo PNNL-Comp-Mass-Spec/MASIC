@@ -162,10 +162,10 @@ namespace MASICPeakFinder
             {
                 useLeftData = true;
             }
-            else
-            {
-                // Will use the data to the right of the peak apex
-            }
+            // else
+            // {
+            //     // Will use the data to the right of the peak apex
+            // }
 
             if (useBothSides)
             {
@@ -811,7 +811,9 @@ namespace MASICPeakFinder
             // Compute the Vector of normalized intensities = observed pdf
             var yDataNormalized = new double[yData.Length];
             for (var i = 0; i < yData.Length; i++)
+            {
                 yDataNormalized[i] = yData[i] / yDataSum;
+            }
 
             // Estimate the empirical distribution function (EDF) using an accumulating sum
             yDataSum = 0;
@@ -3231,6 +3233,7 @@ namespace MASICPeakFinder
                         sicPeak.BaselineNoiseStats.NoiseLevel,
                         potentialAreaStatsForRegion.MinimumPotentialPeakArea,
                         returnClosestPeak);
+
                     sicPeak.IndexBaseLeft = peakIndexStart;
                     sicPeak.IndexBaseRight = peakIndexEnd;
                     sicPeak.IndexMax = peakLocationIndex;
@@ -3555,10 +3558,10 @@ namespace MASICPeakFinder
                                 var previous = noiseStatsSegments[noiseSegmentIndex - 1];
                                 segmentMidPointA = previous.SegmentIndexStart + (int)Math.Round((previous.SegmentIndexEnd - previous.SegmentIndexStart) / 2.0);
                             }
-                            else
-                            {
-                                // scanIndexObserved occurs before the midpoint, but we're in the first segment; no need to Interpolate
-                            }
+                            // else
+                            // {
+                            //    // scanIndexObserved occurs before the midpoint, but we're in the first segment; no need to Interpolate
+                            // }
                         }
                         else if (scanIndexObserved > segmentMidPointA)
                         {
@@ -3574,15 +3577,15 @@ namespace MASICPeakFinder
 
                                 segmentMidPointB = nextSegment.SegmentIndexStart + (int)Math.Round((nextSegment.SegmentIndexEnd - nextSegment.SegmentIndexStart) / 2.0);
                             }
-                            else
-                            {
-                                // scanIndexObserved occurs after the midpoint, but we're in the last segment; no need to Interpolate
-                            }
+                            // else
+                            // {
+                            //     // scanIndexObserved occurs after the midpoint, but we're in the last segment; no need to Interpolate
+                            // }
                         }
-                        else
-                        {
-                            // scanIndexObserved occurs at the midpoint; no need to Interpolate
-                        }
+                        // else
+                        // {
+                        //     // scanIndexObserved occurs at the midpoint; no need to Interpolate
+                        // }
 
                         if (indexSegmentA != indexSegmentB)
                         {
@@ -3701,11 +3704,9 @@ namespace MASICPeakFinder
                 // Differences are significant
                 return true;
             }
-            else
-            {
-                // Differences are not significant
-                return false;
-            }
+
+            // Differences are not significant
+            return false;
         }
     }
 }
