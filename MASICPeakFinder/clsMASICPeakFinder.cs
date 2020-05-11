@@ -3192,7 +3192,6 @@ namespace MASICPeakFinder
                     sicPeak.PreviousPeakFWHMPointRight = sicPeak.IndexBaseLeft;
                     sicPeak.NextPeakFWHMPointLeft = sicPeak.IndexBaseRight;
 
-                    bool success;
                     if (recomputeNoiseLevel)
                     {
                         var intensities = (from item in sicData select item.Intensity).ToArray();
@@ -3201,7 +3200,7 @@ namespace MASICPeakFinder
                         // This value is first computed using all data in the SIC; it is later updated
                         // to be the minimum value of the average of the data to the immediate left and
                         // immediate right of the peak identified in the SIC
-                        success = ComputeNoiseLevelForSICData(
+                        ComputeNoiseLevelForSICData(
                         sicData.Count, intensities,
                         sicPeakFinderOptions.SICBaselineNoiseOptions,
                         out var baselineNoiseStats);
@@ -3237,7 +3236,7 @@ namespace MASICPeakFinder
                         if (recomputeNoiseLevel)
                         {
                             // Update the value for potentialAreaStatsForPeak.SICNoiseThresholdIntensity based on the data around the peak
-                            success = ComputeNoiseLevelInPeakVicinity(
+                            ComputeNoiseLevelInPeakVicinity(
                                 sicData, sicPeak,
                                 sicPeakFinderOptions.SICBaselineNoiseOptions);
                         }
@@ -3286,7 +3285,7 @@ namespace MASICPeakFinder
                         sicPeak.FWHMScanWidth = ComputeFWHM(sicData, sicPeak, true);
 
                         // Compute the Area (this function uses .FWHMScanWidth and therefore needs to be called after ComputeFWHM)
-                        success = ComputeSICPeakArea(sicData, sicPeak);
+                        ComputeSICPeakArea(sicData, sicPeak);
 
                         // Compute the Statistical Moments values
                         ComputeStatisticalMomentsStats(sicData, smoothedYDataSubset, sicPeak);

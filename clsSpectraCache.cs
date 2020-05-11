@@ -374,8 +374,8 @@ namespace MASIC
                     return;
                 }
 
-                filePathMatch = filePathMatch.Substring(0, charIndex);
-                var files = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(filePathMatch) + "*");
+                var bastPath = filePathMatch.Substring(0, charIndex);
+                var cacheFiles = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(bastPath) + "*");
 
                 foreach (var cacheFile in cacheFiles)
                 {
