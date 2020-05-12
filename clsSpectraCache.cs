@@ -515,18 +515,13 @@ namespace MASIC
             targetPoolIndex = GetNextAvailablePoolIndex();
 
             // make sure we have a valid object
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if (SpectraPool[targetPoolIndex] == null)
-            {
-                SpectraPool[targetPoolIndex] = new clsMSSpectrum(scanNumber);
-            }
-
+            // Also, avoid overwriting an object in use.
+            SpectraPool[targetPoolIndex] = new clsMSSpectrum(scanNumber);
             var msSpectrum = SpectraPool[targetPoolIndex];
 
             // Uncache the spectrum from disk
             if (UnCacheSpectrumWork(scanNumber, msSpectrum))
             {
-                // If we passed in 'null', we need to store a copy
                 // This should always be safe
                 SpectraPool[targetPoolIndex] = msSpectrum;
             }
