@@ -34,41 +34,11 @@ namespace MASIC
             LoadedFromCache = 2,         // Loaded from cache, and in memory; or, loaded using XRaw; safe to purge without caching
         }
 
-        //private enum eCacheRequestStateConstants
-        //{
-        //    NoRequest = 0,               // Undefined
-        //    SafeToCache = 1,             // In memory, but safe to cache or purge
-        //    RequestUncache = 2,          // Not in memory, need to uncache
-        //    RequestUncacheAndLock = 3,   // Not in memory, need to uncache and lock in memory
-        //    LockedInMemory = 4,          // In memory and should not cache
-        //}
-
-        //private enum eCacheCommandConstants
-        //{
-        //    CacheAllSpectraOutOfRange = 0,
-        //    CacheSurveyScansOutOfRange = 1,
-        //    CacheFragScansOutOfRange = 2,
-        //    CacheAllSpectraOutOfRangeDoNotUncache = 3,
-        //    ValidateSurveyScanUncached = 4,
-        //    ValidateFragScanUncached = 5,
-        //    UnlockAllSpectra = 6
-        //}
-
-        #endregion
-
-        #region "Structures"
-
-        private struct udtSpectraPoolInfoType
-        {
-            public eCacheStateConstants CacheState;
-            // Public LockInMemory As Boolean
-        }
-
         #endregion
 
         #region "Classwide Variables"
         private clsMSSpectrum[] SpectraPool;                  // Pool (collection) of currently loaded spectra; 0-based array
-        private udtSpectraPoolInfoType[] SpectraPoolInfo;     // Parallel with SpectraPool(), but not publicly visible
+        private eCacheStateConstants[] SpectraPoolCacheState; // Parallel with SpectraPool(), but not publicly visible
 
         private readonly clsSpectrumCacheOptions mCacheOptions;
 
@@ -186,7 +156,7 @@ namespace MASIC
 
                 SpectraPool[targetPoolIndex].ReplaceData(spectrum, scanNumber);
 
-                SpectraPoolInfo[targetPoolIndex].CacheState = eCacheStateConstants.NeverCached;
+                SpectraPoolCacheState[targetPoolIndex] = eCacheStateConstants.NeverCached;
 
                 return true;
             }
@@ -207,13 +177,13 @@ namespace MASIC
         /// </return>
         private void CacheSpectrum(int poolIndexToCache)
         {
-            if (SpectraPoolInfo[poolIndexToCache].CacheState == eCacheStateConstants.UnusedSlot)
+            if (SpectraPoolCacheState[poolIndexToCache] == eCacheStateConstants.UnusedSlot)
             {
                 // Nothing to do; slot is already empty
                 return;
             }
 
-            if (SpectraPoolInfo[poolIndexToCache].CacheState == eCacheStateConstants.LoadedFromCache)
+            if (SpectraPoolCacheState[poolIndexToCache] == eCacheStateConstants.LoadedFromCache)
             {
                 // Already cached previously, simply reset the slot
             }
@@ -229,7 +199,7 @@ namespace MASIC
             // Reset .ScanNumber, .IonCount, and .CacheState
             SpectraPool[poolIndexToCache].Clear(0);
 
-            SpectraPoolInfo[poolIndexToCache].CacheState = eCacheStateConstants.UnusedSlot;
+            SpectraPoolCacheState[poolIndexToCache] = eCacheStateConstants.UnusedSlot;
 
             mCacheEventCount += 1;
         }
@@ -424,14 +394,14 @@ namespace MASIC
                 var oldSpectraPool = SpectraPool;
                 SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
                 Array.Copy(oldSpectraPool, SpectraPool, Math.Min(mMaximumPoolLength, oldSpectraPool.Length));
-                var oldSpectraPoolInfo = SpectraPoolInfo;
-                SpectraPoolInfo = new udtSpectraPoolInfoType[mMaximumPoolLength];
-                Array.Copy(oldSpectraPoolInfo, SpectraPoolInfo, Math.Min(mMaximumPoolLength, oldSpectraPoolInfo.Length));
+                var oldSpectraPoolInfo = SpectraPoolCacheState;
+                SpectraPoolCacheState = new eCacheStateConstants[mMaximumPoolLength];
+                Array.Copy(oldSpectraPoolInfo, SpectraPoolCacheState, Math.Min(mMaximumPoolLength, oldSpectraPoolInfo.Length));
 
                 for (var index = currentPoolLength; index < mMaximumPoolLength; index++)
                 {
                     SpectraPool[index] = new clsMSSpectrum(0);
-                    SpectraPoolInfo[index].CacheState = eCacheStateConstants.UnusedSlot;
+                    SpectraPoolCacheState[index] = eCacheStateConstants.UnusedSlot;
                 }
             }
         }
@@ -460,6 +430,9 @@ namespace MASIC
             return nextPoolIndex;
         }
 
+        /// <summary>
+        /// Configures the spectra cache after all options have been set.
+        /// </summary>
         public void InitializeSpectraPool()
         {
             mMaximumPoolLength = mCacheOptions.SpectraToRetainInMemory;
@@ -486,27 +459,22 @@ namespace MASIC
                 mSpectrumIndexInPool.Clear();
             }
 
-            //if (mPoolAccessHistory == null)
-            //    mPoolAccessHistory = new Hashtable();
-            //else
-            //    mPoolAccessHistory.Clear();
-
             if (SpectraPool == null)
             {
                 SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
-                SpectraPoolInfo = new udtSpectraPoolInfoType[mMaximumPoolLength];
+                SpectraPoolCacheState = new eCacheStateConstants[mMaximumPoolLength];
             }
             else if (SpectraPool.Length < mMaximumPoolLength)
             {
                 SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
-                SpectraPoolInfo = new udtSpectraPoolInfoType[mMaximumPoolLength];
+                SpectraPoolCacheState = new eCacheStateConstants[mMaximumPoolLength];
             }
 
             // Note: Resetting spectra all the way to SpectraPool.Length, even if SpectraPool.Length is > mMaximumPoolLength
             for (var index = 0; index < SpectraPool.Length; index++)
             {
                 SpectraPool[index] = new clsMSSpectrum(0);
-                SpectraPoolInfo[index].CacheState = eCacheStateConstants.UnusedSlot;
+                SpectraPoolCacheState[index] = eCacheStateConstants.UnusedSlot;
             }
         }
 
@@ -569,7 +537,7 @@ namespace MASIC
                 msSpectrum.Clear(scanNumber);
             }
 
-            SpectraPoolInfo[targetPoolIndex].CacheState = eCacheStateConstants.LoadedFromCache;
+            SpectraPoolCacheState[targetPoolIndex] = eCacheStateConstants.LoadedFromCache;
 
             if (mSpectrumIndexInPool.ContainsKey(scanNumber))
             {
