@@ -37,8 +37,7 @@ namespace MASIC
         #endregion
 
         #region "Classwide Variables"
-        private clsMSSpectrum[] SpectraPool;                  // Pool (collection) of currently loaded spectra; 0-based array
-        private eCacheStateConstants[] SpectraPoolCacheState; // Parallel with SpectraPool(), but not publicly visible
+        private IScanMemoryCache spectraPool;                  // Pool (collection) of currently loaded spectra
 
         private readonly clsSpectrumCacheOptions mCacheOptions;
 
@@ -55,9 +54,7 @@ namespace MASIC
         private int mSpectraPoolHitEventCount;
 
         private int mMaximumPoolLength;
-        private int mNextAvailablePoolIndex;
 
-        private Dictionary<int, int> mSpectrumIndexInPool;
         private Dictionary<int, long> mSpectrumByteOffset;         // Records the byte offset of the data in the page file for a given scan number
 
         #endregion
@@ -140,23 +137,17 @@ namespace MASIC
                     return true;
                 }
 
-                int targetPoolIndex;
-
-                if (mSpectrumIndexInPool.ContainsKey(scanNumber))
+                if (spectraPool.GetItem(scanNumber, out var cacheItem))
                 {
                     // Replace the spectrum data with objMSSpectrum
-                    targetPoolIndex = mSpectrumIndexInPool[scanNumber];
+                    cacheItem.Scan.ReplaceData(spectrum, scanNumber);
+                    cacheItem.CacheState = eCacheStateConstants.NeverCached;
                 }
                 else
                 {
                     // Need to add the spectrum
-                    targetPoolIndex = GetNextAvailablePoolIndex();
-                    mSpectrumIndexInPool.Add(scanNumber, targetPoolIndex);
+                    AddItemToSpectraPool(new ScanMemoryCacheItem(spectrum, eCacheStateConstants.NeverCached));
                 }
-
-                SpectraPool[targetPoolIndex].ReplaceData(spectrum, scanNumber);
-
-                SpectraPoolCacheState[targetPoolIndex] = eCacheStateConstants.NeverCached;
 
                 return true;
             }
@@ -167,48 +158,6 @@ namespace MASIC
             }
         }
 
-        /// <summary>
-        /// Cache the spectrum at the given pool index
-        /// </summary>
-        /// <param name="poolIndexToCache"></param>
-        /// <return>
-        /// True if already cached or if successfully cached
-        /// False if an error
-        /// </return>
-        private void CacheSpectrum(int poolIndexToCache)
-        {
-            if (SpectraPoolCacheState[poolIndexToCache] == eCacheStateConstants.UnusedSlot)
-            {
-                // Nothing to do; slot is already empty
-                return;
-            }
-
-            if (SpectraPoolCacheState[poolIndexToCache] == eCacheStateConstants.LoadedFromCache)
-            {
-                // Already cached previously, simply reset the slot
-            }
-            else if (ValidatePageFileIO(true))
-            {
-                // Store all of the spectra in one large file
-                CacheSpectrumWork(poolIndexToCache);
-            }
-
-            // Remove the spectrum from mSpectrumIndexInPool
-            mSpectrumIndexInPool.Remove(SpectraPool[poolIndexToCache].ScanNumber);
-
-            // Reset .ScanNumber, .IonCount, and .CacheState
-            SpectraPool[poolIndexToCache].Clear(0);
-
-            SpectraPoolCacheState[poolIndexToCache] = eCacheStateConstants.UnusedSlot;
-
-            mCacheEventCount += 1;
-        }
-
-        private void CacheSpectrumWork(int poolIndexToCache)
-        {
-            CacheSpectrumWork(SpectraPool[poolIndexToCache]);
-        }
-
         private void CacheSpectrumWork(clsMSSpectrum spectrumToCache)
         {
             const int MAX_RETRIES = 3;
@@ -217,8 +166,12 @@ namespace MASIC
             var scanNumber = spectrumToCache.ScanNumber;
             if (mSpectrumByteOffset.ContainsKey(scanNumber))
             {
-                // Page file already contains the given scan; do not re-write
-                return;
+                // Page file already contains the given scan;
+                // re-cache the item. for some reason we have updated peaks.
+                mSpectrumByteOffset.Remove(scanNumber);
+
+                // Data not changed; do not re-write
+                //return;
             }
 
             var initialOffset = mPageFileWriter.BaseStream.Position;
@@ -384,50 +337,52 @@ namespace MASIC
             }
         }
 
-        private void ExpandSpectraPool(int newPoolLength)
+        /// <summary>
+        /// Checks the spectraPool for available capacity, caching the oldest item if full
+        /// </summary>
+        private void AddItemToSpectraPool(ScanMemoryCacheItem itemToAdd)
         {
-            var currentPoolLength = Math.Min(mMaximumPoolLength, SpectraPool.Length);
-            mMaximumPoolLength = newPoolLength;
-
-            if (newPoolLength > currentPoolLength)
+            // Disk caching disabled: expand the size of the in-memory cache
+            if (spectraPool.Count >= mMaximumPoolLength &&
+                mCacheOptions.DiskCachingAlwaysDisabled)
             {
-                var oldSpectraPool = SpectraPool;
-                SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
-                Array.Copy(oldSpectraPool, SpectraPool, Math.Min(mMaximumPoolLength, oldSpectraPool.Length));
-                var oldSpectraPoolInfo = SpectraPoolCacheState;
-                SpectraPoolCacheState = new eCacheStateConstants[mMaximumPoolLength];
-                Array.Copy(oldSpectraPoolInfo, SpectraPoolCacheState, Math.Min(mMaximumPoolLength, oldSpectraPoolInfo.Length));
+                // The pool is full, but disk caching is disabled, so we have to expand the pool
+                var newPoolLength = mMaximumPoolLength + 500;
 
-                for (var index = currentPoolLength; index < mMaximumPoolLength; index++)
+                var currentPoolLength = Math.Min(mMaximumPoolLength, spectraPool.Capacity);
+                mMaximumPoolLength = newPoolLength;
+
+                if (newPoolLength > currentPoolLength)
                 {
-                    SpectraPool[index] = new clsMSSpectrum(0);
-                    SpectraPoolCacheState[index] = eCacheStateConstants.UnusedSlot;
+                    spectraPool.Capacity = mMaximumPoolLength;
                 }
             }
-        }
 
-        private int GetNextAvailablePoolIndex()
-        {
             // Need to cache the spectrum stored at mNextAvailablePoolIndex
-            CacheSpectrum(mNextAvailablePoolIndex);
-
-            var nextPoolIndex = mNextAvailablePoolIndex;
-
-            mNextAvailablePoolIndex += 1;
-            if (mNextAvailablePoolIndex >= mMaximumPoolLength)
+            // Removes the oldest spectrum from spectraPool
+            if (spectraPool.AddNew(itemToAdd, out var cacheItem))
             {
-                if (mCacheOptions.DiskCachingAlwaysDisabled)
+                // An item was removed from the spectraPool. Write it to the disk cache if needed.
+                if (cacheItem.CacheState == eCacheStateConstants.LoadedFromCache)
                 {
-                    // The pool is full, but disk caching is disabled, so we have to expand the pool
-                    ExpandSpectraPool(mMaximumPoolLength + 500);
+                    // Already cached previously, simply reset the slot
                 }
-                else
+                else if (cacheItem.CacheState == eCacheStateConstants.NeverCached &&
+                         ValidatePageFileIO(true))
                 {
-                    mNextAvailablePoolIndex = 0;
+                    // Store all of the spectra in one large file
+                    CacheSpectrumWork(cacheItem.Scan);
+                }
+
+                if (cacheItem.CacheState != eCacheStateConstants.UnusedSlot)
+                {
+                    // Reset .ScanNumber, .IonCount, and .CacheState
+                    cacheItem.Scan.Clear(0);
+                    cacheItem.CacheState = eCacheStateConstants.UnusedSlot;
+
+                    mCacheEventCount += 1;
                 }
             }
-
-            return nextPoolIndex;
         }
 
         /// <summary>
@@ -439,8 +394,6 @@ namespace MASIC
             if (mMaximumPoolLength < 1)
                 mMaximumPoolLength = 1;
 
-            mNextAvailablePoolIndex = 0;
-
             mCacheEventCount = 0;
             mUnCacheEventCount = 0;
             mSpectraPoolHitEventCount = 0;
@@ -450,31 +403,20 @@ namespace MASIC
 
             ClosePageFile();
 
-            if (mSpectrumIndexInPool == null)
+            if (spectraPool == null || spectraPool.Capacity < mMaximumPoolLength)
             {
-                mSpectrumIndexInPool = new Dictionary<int, int>();
+                if (mCacheOptions.DiskCachingAlwaysDisabled)
+                {
+                    spectraPool = new MemoryCacheArray(mMaximumPoolLength);
+                }
+                else
+                {
+                    spectraPool = new MemoryCacheLRU(mMaximumPoolLength);
+                }
             }
             else
             {
-                mSpectrumIndexInPool.Clear();
-            }
-
-            if (SpectraPool == null)
-            {
-                SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
-                SpectraPoolCacheState = new eCacheStateConstants[mMaximumPoolLength];
-            }
-            else if (SpectraPool.Length < mMaximumPoolLength)
-            {
-                SpectraPool = new clsMSSpectrum[mMaximumPoolLength];
-                SpectraPoolCacheState = new eCacheStateConstants[mMaximumPoolLength];
-            }
-
-            // Note: Resetting spectra all the way to SpectraPool.Length, even if SpectraPool.Length is > mMaximumPoolLength
-            for (var index = 0; index < SpectraPool.Length; index++)
-            {
-                SpectraPool[index] = new clsMSSpectrum(0);
-                SpectraPoolCacheState[index] = eCacheStateConstants.UnusedSlot;
+                spectraPool.Clear();
             }
         }
 
@@ -508,40 +450,25 @@ namespace MASIC
         /// Load the spectrum from disk and cache in SpectraPool
         /// </summary>
         /// <param name="scanNumber">Scan number to load</param>
-        /// <param name="targetPoolIndex">Output: index in the array that contains the given spectrum</param>
+        /// <param name="msSpectrum">Output: spectrum for scan number</param>
         /// <returns>True if successfully uncached, false if an error</returns>
-        private bool UnCacheSpectrum(int scanNumber, out int targetPoolIndex)
+        private bool UnCacheSpectrum(int scanNumber, out clsMSSpectrum msSpectrum)
         {
-            targetPoolIndex = GetNextAvailablePoolIndex();
-
             // make sure we have a valid object
-            // Also, avoid overwriting an object in use.
-            SpectraPool[targetPoolIndex] = new clsMSSpectrum(scanNumber);
-            var msSpectrum = SpectraPool[targetPoolIndex];
+            var cacheItem = new ScanMemoryCacheItem(new clsMSSpectrum(scanNumber), eCacheStateConstants.LoadedFromCache);
+
+            msSpectrum = cacheItem.Scan;
 
             // Uncache the spectrum from disk
-            if (UnCacheSpectrumWork(scanNumber, msSpectrum))
-            {
-                // This should always be safe
-                SpectraPool[targetPoolIndex] = msSpectrum;
-            }
-            else
+            if (!UnCacheSpectrumWork(scanNumber, msSpectrum))
             {
                 // Scan not found; use a blank mass spectrum
                 // Its cache state will be set to LoadedFromCache, which is ok, since we don't need to cache it to disk
                 msSpectrum.Clear(scanNumber);
             }
 
-            SpectraPoolCacheState[targetPoolIndex] = eCacheStateConstants.LoadedFromCache;
-
-            if (mSpectrumIndexInPool.ContainsKey(scanNumber))
-            {
-                mSpectrumIndexInPool[scanNumber] = targetPoolIndex;
-            }
-            else
-            {
-                mSpectrumIndexInPool.Add(scanNumber, targetPoolIndex);
-            }
+            cacheItem.CacheState = eCacheStateConstants.LoadedFromCache;
+            AddItemToSpectraPool(cacheItem);
 
             return true;
         }
@@ -707,19 +634,18 @@ namespace MASIC
         {
             try
             {
-                if (mSpectrumIndexInPool.ContainsKey(scanNumber))
+                if (spectraPool.GetItem(scanNumber, out var cacheItem))
                 {
-                    var poolIndex = mSpectrumIndexInPool[scanNumber];
-                    spectrum = SpectraPool[poolIndex];
                     mSpectraPoolHitEventCount++;
+                    spectrum = cacheItem.Scan;
                     return true;
                 }
 
                 if (!canSkipPool)
                 {
                     // Need to load the spectrum
-                    var success = UnCacheSpectrum(scanNumber, out var poolIndex);
-                    spectrum = SpectraPool[poolIndex];
+                    var success = UnCacheSpectrum(scanNumber, out var cacheSpectrum);
+                    spectrum = cacheSpectrum;
                     return success;
                 }
 
@@ -734,6 +660,292 @@ namespace MASIC
                 ReportError(ex.Message, ex);
                 spectrum = null;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Container to group needed information in the in-memory cache
+        /// </summary>
+        private class ScanMemoryCacheItem
+        {
+            public eCacheStateConstants CacheState { get; set; }
+            public clsMSSpectrum Scan { get; }
+
+            public ScanMemoryCacheItem(clsMSSpectrum scan, eCacheStateConstants cacheState = eCacheStateConstants.NeverCached)
+            {
+                Scan = scan;
+                CacheState = cacheState;
+            }
+        }
+
+        /// <summary>
+        /// Interface to allow choosing between two different in-memory cache implementations
+        /// </summary>
+        private interface IScanMemoryCache
+        {
+            /// <summary>
+            /// Number of items in the cache
+            /// </summary>
+            int Count { get; }
+
+            /// <summary>
+            /// Limit of items in the cache. Set will throw an exception if new value is smaller than <see cref="Count"/>
+            /// </summary>
+            int Capacity { get; set; }
+
+            /// <summary>
+            /// Retrieve the item for the scan number
+            /// </summary>
+            /// <param name="scanNumber"></param>
+            /// <param name="item"></param>
+            /// <returns>true if item available in cache</returns>
+            bool GetItem(int scanNumber, out ScanMemoryCacheItem item);
+
+            /// <summary>
+            /// Adds an item to the cache. Will not add duplicates. Will remove (and return) the oldest item if necessary.
+            /// </summary>
+            /// <param name="newItem">Item to add to the cache</param>
+            /// <param name="removedItem">Item removed from the cache, or default if remove not needed</param>
+            /// <returns>true if <paramref name="removedItem"/> is an item removed from the cache</returns>
+            bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem);
+
+            /// <summary>
+            /// Clear all contents
+            /// </summary>
+            void Clear();
+        }
+
+        /// <summary>
+        /// Basic in-memory cache option. Less memory than an LRU implementation.
+        /// </summary>
+        private class MemoryCacheArray : IScanMemoryCache
+        {
+            private readonly List<ScanMemoryCacheItem> cache;
+            private readonly Dictionary<int, int> scanNumberToIndexMap;
+            private int capacity;
+            private int lastIndex;
+
+            public MemoryCacheArray(int initialCapacity)
+            {
+                capacity = initialCapacity;
+                cache = new List<ScanMemoryCacheItem>(initialCapacity);
+                scanNumberToIndexMap = new Dictionary<int, int>(initialCapacity);
+                lastIndex = -1;
+                Count = 0;
+            }
+
+            public int Count { get; private set; }
+
+            public int Capacity
+            {
+                get => capacity;
+                set
+                {
+                    if (value < cache.Count)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(value), "capacity was less than the current size.");
+                    }
+
+                    capacity = value;
+                    cache.Capacity = value;
+                }
+            }
+
+            public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
+            {
+                if (!scanNumberToIndexMap.TryGetValue(scanNumber, out var index))
+                {
+                    item = default(ScanMemoryCacheItem);
+                    return false;
+                }
+
+                item = cache[index];
+                return true;
+            }
+
+            public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
+            {
+                var itemRemoved = RemoveOldestItem(out removedItem);
+                Add(newItem);
+
+                return itemRemoved;
+            }
+
+            /// <summary>
+            /// Add an item to the cache.
+            /// </summary>
+            /// <param name="newItem"></param>
+            /// <returns>true if the item could be added, false otherwise (like if the cache is already full)</returns>
+            private bool Add(ScanMemoryCacheItem newItem)
+            {
+                if (Count == capacity)
+                {
+                    return false;
+                }
+
+                if (scanNumberToIndexMap.ContainsKey(newItem.Scan.ScanNumber))
+                {
+                    return true;
+                }
+
+                if (Count >= capacity)
+                {
+                    lastIndex++;
+                    if (lastIndex >= Count)
+                        lastIndex = 0;
+
+                    //cache.Insert(lastIndex, newItem);
+                    cache[lastIndex] = newItem;
+                }
+                else
+                {
+                    lastIndex = cache.Count;
+                    cache.Add(newItem);
+                }
+
+                scanNumberToIndexMap.Add(newItem.Scan.ScanNumber, lastIndex);
+                Count++;
+                return true;
+            }
+
+            /// <summary>
+            /// Remove the oldest item from the cache, but only if it is full
+            /// </summary>
+            /// <param name="oldItem">oldest item in the cache</param>
+            /// <returns>true if item was removed, false otherwise</returns>
+            private bool RemoveOldestItem(out ScanMemoryCacheItem oldItem)
+            {
+                if (Count < capacity)
+                {
+                    oldItem = default(ScanMemoryCacheItem);
+                    return false;
+                }
+
+                if (lastIndex == Count - 1)
+                {
+                    oldItem = cache[0];
+                }
+                else
+                {
+                    oldItem = cache[lastIndex + 1];
+                }
+
+                scanNumberToIndexMap.Remove(oldItem.Scan.ScanNumber);
+                Count--;
+                return true;
+            }
+
+            public void Clear()
+            {
+                cache.Clear();
+                scanNumberToIndexMap.Clear();
+                lastIndex = -1;
+            }
+        }
+
+        /// <summary>
+        /// LRU (Least-Recently-Used) cache implementation
+        /// </summary>
+        private class MemoryCacheLRU : IScanMemoryCache
+        {
+            private readonly LinkedList<ScanMemoryCacheItem> cache;
+            private readonly Dictionary<int, LinkedListNode<ScanMemoryCacheItem>> scanNumberToNodeMap;
+            private int capacity;
+
+            public MemoryCacheLRU(int initialCapacity)
+            {
+                capacity = initialCapacity;
+                cache = new LinkedList<ScanMemoryCacheItem>();
+                scanNumberToNodeMap = new Dictionary<int, LinkedListNode<ScanMemoryCacheItem>>(initialCapacity);
+            }
+
+            public int Count => cache.Count;
+            public int Capacity
+            {
+                get => capacity;
+                set
+                {
+                    if (value < cache.Count)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(value), "capacity was less than the current size.");
+                    }
+
+                    capacity = value;
+                }
+            }
+
+            public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
+            {
+                if (!scanNumberToNodeMap.TryGetValue(scanNumber, out var node))
+                {
+                    item = default(ScanMemoryCacheItem);
+                    return false;
+                }
+
+                item = node.Value;
+
+                // LRU management
+                cache.Remove(node); // O(1)
+                cache.AddLast(node); // O(1)
+
+                return true;
+            }
+
+            public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
+            {
+                var itemRemoved = RemoveOldestItem(out removedItem);
+                Add(newItem);
+
+                return itemRemoved;
+            }
+
+            /// <summary>
+            /// Add an item to the cache.
+            /// </summary>
+            /// <param name="newItem"></param>
+            /// <returns>true if the item could be added, false otherwise (like if the cache is already full)</returns>
+            private bool Add(ScanMemoryCacheItem newItem)
+            {
+                if (cache.Count == capacity)
+                {
+                    return false;
+                }
+
+                if (scanNumberToNodeMap.ContainsKey(newItem.Scan.ScanNumber))
+                {
+                    return true;
+                }
+
+                var node = cache.AddLast(newItem);
+                scanNumberToNodeMap.Add(newItem.Scan.ScanNumber, node);
+                return true;
+            }
+
+            /// <summary>
+            /// Remove the oldest item from the cache, but only if it is full
+            /// </summary>
+            /// <param name="oldItem">oldest item in the cache</param>
+            /// <returns>true if item was removed, false otherwise</returns>
+            private bool RemoveOldestItem(out ScanMemoryCacheItem oldItem)
+            {
+                if (Count < capacity)
+                {
+                    oldItem = default(ScanMemoryCacheItem);
+                    return false;
+                }
+
+                var node = cache.First;
+                oldItem = node.Value;
+                cache.RemoveFirst();
+                scanNumberToNodeMap.Remove(node.Value.Scan.ScanNumber);
+
+                return true;
+            }
+
+            public void Clear()
+            {
+                cache.Clear();
+                scanNumberToNodeMap.Clear();
             }
         }
     }
