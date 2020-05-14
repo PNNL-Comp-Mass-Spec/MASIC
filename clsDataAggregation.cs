@@ -10,7 +10,7 @@ namespace MASIC
         /// When returnMax is false, determine the sum of the data within the search mass tolerance
         /// When returnMaxis true, determine the maximum of the data within the search mass tolerance
         /// </summary>
-        /// <param name="objMSSpectrum"></param>
+        /// <param name="msSpectrum"></param>
         /// <param name="searchMZ"></param>
         /// <param name="searchToleranceHalfWidth"></param>
         /// <param name="ionMatchCount"></param>
@@ -18,12 +18,12 @@ namespace MASIC
         /// <param name="returnMax"></param>
         /// <returns>The sum or maximum of the matching data; 0 if no matches</returns>
         /// <remarks>
-        /// Note that this function performs a recursive search of objMSSpectrum.IonsMZ
+        /// Note that this function performs a recursive search of msSpectrum.IonsMZ
         /// It is therefore very efficient regardless of the number of data points in the spectrum
         /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
         /// </remarks>
         public double AggregateIonsInRange(
-        clsMSSpectrum objMSSpectrum,
+        clsMSSpectrum msSpectrum,
         double searchMZ,
         double searchToleranceHalfWidth,
         out int ionMatchCount,
@@ -38,31 +38,31 @@ namespace MASIC
             {
                 var smallestDifference = double.MaxValue;
 
-                if (objMSSpectrum.IonsMZ != null && objMSSpectrum.IonCount > 0)
+                if (msSpectrum.IonsMZ != null && msSpectrum.IonCount > 0)
                 {
-                    if (SumIonsFindValueInRange(objMSSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out var indexFirst, out var indexLast))
+                    if (SumIonsFindValueInRange(msSpectrum.IonsMZ, searchMZ, searchToleranceHalfWidth, out var indexFirst, out var indexLast))
                     {
                         for (var ionIndex = indexFirst; ionIndex <= indexLast; ionIndex++)
                         {
                             if (returnMax)
                             {
                                 // Return max
-                                if (objMSSpectrum.IonsIntensity[ionIndex] > ionSumOrMax)
+                                if (msSpectrum.IonsIntensity[ionIndex] > ionSumOrMax)
                                 {
-                                    ionSumOrMax = objMSSpectrum.IonsIntensity[ionIndex];
+                                    ionSumOrMax = msSpectrum.IonsIntensity[ionIndex];
                                 }
                             }
                             else
                             {
                                 // Return sum
-                                ionSumOrMax += objMSSpectrum.IonsIntensity[ionIndex];
+                                ionSumOrMax += msSpectrum.IonsIntensity[ionIndex];
                             }
 
-                            var testDifference = Math.Abs(objMSSpectrum.IonsMZ[ionIndex] - searchMZ);
+                            var testDifference = Math.Abs(msSpectrum.IonsMZ[ionIndex] - searchMZ);
                             if (testDifference < smallestDifference)
                             {
                                 smallestDifference = testDifference;
-                                closestMZ = objMSSpectrum.IonsMZ[ionIndex];
+                                closestMZ = msSpectrum.IonsMZ[ionIndex];
                             }
                         }
 

@@ -118,11 +118,11 @@ namespace MASIC
                         }
                     }
 
-                    var success = dbTools.GetQueryResults(sqlQuery, out var lstResults);
+                    var success = dbTools.GetQueryResults(sqlQuery, out var results);
                     if (success)
                     {
                         // Find the row in the lstResults that matches fileNameCompare
-                        foreach (var datasetItem in lstResults)
+                        foreach (var datasetItem in results)
                         {
                             if (string.Equals(datasetItem[0], datasetName, StringComparison.OrdinalIgnoreCase))
                             {
@@ -138,13 +138,13 @@ namespace MASIC
                             }
                         }
 
-                        if (lstResults.Count > 0)
+                        if (results.Count > 0)
                         {
                             try
                             {
-                                if (queryingSingleDataset || lstResults.First()[0].StartsWith(datasetName))
+                                if (queryingSingleDataset || results.First()[0].StartsWith(datasetName))
                                 {
-                                    if (int.TryParse(lstResults.First()[1], out newDatasetID))
+                                    if (int.TryParse(results.First()[1], out newDatasetID))
                                     {
                                         return true;
                                     }

@@ -332,31 +332,31 @@ namespace MASIC
 
             try
             {
-                var objCorrelate = new clsCorrelation(binningOptions);
-                RegisterEvents(objCorrelate);
+                var dataComparer = new clsCorrelation(binningOptions);
+                RegisterEvents(dataComparer);
 
                 const clsCorrelation.cmCorrelationMethodConstants eCorrelationMethod = clsCorrelation.cmCorrelationMethodConstants.Pearson;
 
                 // Bin the data in the first spectrum
-                var success = CompareSpectraBinData(objCorrelate, fragSpectrum1, binnedSpectrum1);
+                var success = CompareSpectraBinData(dataComparer, fragSpectrum1, binnedSpectrum1);
                 if (!success)
                     return -1;
 
                 // Bin the data in the second spectrum
-                success = CompareSpectraBinData(objCorrelate, fragSpectrum2, binnedSpectrum2);
+                success = CompareSpectraBinData(dataComparer, fragSpectrum2, binnedSpectrum2);
                 if (!success)
                     return -1;
 
                 // Now compare the binned spectra
                 // Similarity will be 0 if either instance of BinnedIntensities has fewer than 5 data points
-                var similarity1 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensities, binnedSpectrum2.BinnedIntensities, eCorrelationMethod);
+                var similarity1 = dataComparer.Correlate(binnedSpectrum1.BinnedIntensities, binnedSpectrum2.BinnedIntensities, eCorrelationMethod);
 
                 if (!considerOffsetBinnedData)
                 {
                     return similarity1;
                 }
 
-                var similarity2 = objCorrelate.Correlate(binnedSpectrum1.BinnedIntensitiesOffset, binnedSpectrum2.BinnedIntensitiesOffset, eCorrelationMethod);
+                var similarity2 = dataComparer.Correlate(binnedSpectrum1.BinnedIntensitiesOffset, binnedSpectrum2.BinnedIntensitiesOffset, eCorrelationMethod);
                 return Math.Max(similarity1, similarity2);
             }
             catch (Exception ex)
@@ -367,7 +367,7 @@ namespace MASIC
         }
 
         private bool CompareSpectraBinData(
-            clsCorrelation objCorrelate,
+            clsCorrelation dataComparer,
             clsMSSpectrum fragSpectrum,
             clsBinnedData binnedSpectrum)
         {
@@ -387,11 +387,11 @@ namespace MASIC
                 }
             }
 
-            binnedSpectrum.BinnedDataStartX = objCorrelate.BinStartX;
-            binnedSpectrum.BinSize = objCorrelate.BinSize;
+            binnedSpectrum.BinnedDataStartX = dataComparer.BinStartX;
+            binnedSpectrum.BinSize = dataComparer.BinSize;
 
             // Note that the data in xData and yData should have already been filtered to discard data points below the noise threshold intensity
-            var success = objCorrelate.BinData(xData, yData, binnedSpectrum.BinnedIntensities, binnedSpectrum.BinnedIntensitiesOffset);
+            var success = dataComparer.BinData(xData, yData, binnedSpectrum.BinnedIntensities, binnedSpectrum.BinnedIntensitiesOffset);
 
             return success;
         }
@@ -573,17 +573,17 @@ namespace MASIC
                 // Sort the MZ arrays
                 Array.Sort(mzList, similarParentIonsData.MZPointerArray);
 
-                ReportMessage("FindSimilarParentIons: Populate objSearchRange");
+                ReportMessage("FindSimilarParentIons: Populate searchRange");
 
-                // Populate objSearchRange
+                // Populate searchRange
                 // Set UsePointerIndexArray to false to prevent .FillWithData trying to sort mzList
                 // (the data was already sorted above)
-                var objSearchRange = new clsSearchRange()
+                var searchRange = new clsSearchRange()
                 {
                     UsePointerIndexArray = false
                 };
 
-                var success = objSearchRange.FillWithData(ref mzList);
+                var success = searchRange.FillWithData(mzList);
 
                 ReportMessage("FindSimilarParentIons: Sort the intensity arrays");
 
@@ -633,25 +633,25 @@ namespace MASIC
 
                             FindSimilarParentIonsWork(spectraCache, currentMZ, 0, originalIndex,
                                                       scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, objSearchRange);
+                                                      masicOptions, dataImportUtilities, searchRange);
 
                             // Look for similar 1+ spaced m/z values
                             FindSimilarParentIonsWork(spectraCache, currentMZ, 1, originalIndex,
                                                       scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, objSearchRange);
+                                                      masicOptions, dataImportUtilities, searchRange);
 
                             FindSimilarParentIonsWork(spectraCache, currentMZ, -1, originalIndex,
                                                       scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, objSearchRange);
+                                                      masicOptions, dataImportUtilities, searchRange);
 
                             // Look for similar 2+ spaced m/z values
                             FindSimilarParentIonsWork(spectraCache, currentMZ, 0.5, originalIndex,
                                                       scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, objSearchRange);
+                                                      masicOptions, dataImportUtilities, searchRange);
 
                             FindSimilarParentIonsWork(spectraCache, currentMZ, -0.5, originalIndex,
                                                       scanList, similarParentIonsData,
-                                                      masicOptions, dataImportUtilities, objSearchRange);
+                                                      masicOptions, dataImportUtilities, searchRange);
 
                             var parentIonToleranceDa = GetParentIonToleranceDa(masicOptions.SICOptions, currentMZ);
 
@@ -660,19 +660,19 @@ namespace MASIC
                                 // Also look for similar 3+ spaced m/z values
                                 FindSimilarParentIonsWork(spectraCache, currentMZ, 0.666, originalIndex,
                                                           scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange);
+                                                          masicOptions, dataImportUtilities, searchRange);
 
                                 FindSimilarParentIonsWork(spectraCache, currentMZ, 0.333, originalIndex,
                                                           scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange);
+                                                          masicOptions, dataImportUtilities, searchRange);
 
                                 FindSimilarParentIonsWork(spectraCache, currentMZ, -0.333, originalIndex,
                                                           scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange);
+                                                          masicOptions, dataImportUtilities, searchRange);
 
                                 FindSimilarParentIonsWork(spectraCache, currentMZ, -0.666, originalIndex,
                                                           scanList, similarParentIonsData,
-                                                          masicOptions, dataImportUtilities, objSearchRange);
+                                                          masicOptions, dataImportUtilities, searchRange);
                             }
                         }
                         while (similarParentIonsData.IonInUseCount > ionInUseCountOriginal);
@@ -753,12 +753,12 @@ namespace MASIC
             clsSimilarParentIonsData similarParentIonsData,
             clsMASICOptions masicOptions,
             DataInput.clsDataImport dataImportUtilities,
-            clsSearchRange objSearchRange)
+            clsSearchRange searchRange)
         {
             var sicOptions = masicOptions.SICOptions;
             var binningOptions = masicOptions.BinningOptions;
 
-            if (objSearchRange.FindValueRange(searchMZ + searchMZOffset, sicOptions.SimilarIonMZToleranceHalfWidth, out var indexFirst, out var indexLast))
+            if (searchRange.FindValueRange(searchMZ + searchMZOffset, sicOptions.SimilarIonMZToleranceHalfWidth, out var indexFirst, out var indexLast))
             {
                 for (var matchIndex = indexFirst; matchIndex <= indexLast; matchIndex++)
                 {

@@ -33,8 +33,8 @@ namespace MASIC.DataInput
 
             var scanTime = 0.0;
 
-            var objCDFReader = new NetCDFReader.clsMSNetCdf();
-            var objMGFReader = new MSDataFileReader.clsMGFFileReader();
+            var cdfReader = new NetCDFReader.clsMSNetCdf();
+            var mgfReader = new MSDataFileReader.clsMGFFileReader();
 
             try
             {
@@ -58,21 +58,21 @@ namespace MASIC.DataInput
                 mDatasetFileInfo.ScanCount = 0;
 
                 // Open a handle to each data file
-                if (!objCDFReader.OpenMSCdfFile(cdfInputFilePathFull))
+                if (!cdfReader.OpenMSCdfFile(cdfInputFilePathFull))
                 {
                     ReportError("Error opening input data file: " + cdfInputFilePathFull);
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
-                if (!objMGFReader.OpenFile(mgfInputFilePathFull))
+                if (!mgfReader.OpenFile(mgfInputFilePathFull))
                 {
                     ReportError("Error opening input data file: " + mgfInputFilePathFull);
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
-                var msScanCount = objCDFReader.GetScanCount();
+                var msScanCount = cdfReader.GetScanCount();
                 mDatasetFileInfo.ScanCount = msScanCount;
 
                 if (msScanCount <= 0)
@@ -102,7 +102,7 @@ namespace MASIC.DataInput
                 var scanNumberCorrection = 0;
                 for (var msScanIndex = 0; msScanIndex < msScanCount; msScanIndex++)
                 {
-                    success = objCDFReader.GetScanInfo(msScanIndex, out var scanNumber, out var scanTotalIntensity, out scanTime, out _, out _);
+                    success = cdfReader.GetScanInfo(msScanIndex, out var scanNumber, out var scanTotalIntensity, out scanTime, out _, out _);
 
                     if (msScanIndex == 0 && scanNumber == 0)
                     {
@@ -144,7 +144,7 @@ namespace MASIC.DataInput
 
                         scanList.SurveyScans.Add(newSurveyScan);
 
-                        success = objCDFReader.GetMassSpectrum(msScanIndex, out var mzData,
+                        success = cdfReader.GetMassSpectrum(msScanIndex, out var mzData,
                                                                out var intensityData,
                                                                out var intIonCount, out _);
 
@@ -232,7 +232,7 @@ namespace MASIC.DataInput
                 // Record the current memory usage (before we close the .CDF file)
                 OnUpdateMemoryUsage();
 
-                objCDFReader.CloseMSCdfFile();
+                cdfReader.CloseMSCdfFile();
 
                 // We loaded all of the survey scan data above
                 // We can now initialize .MasterScanOrder()
@@ -251,7 +251,7 @@ namespace MASIC.DataInput
                 // Now read the MS/MS data from the MGF file
                 do
                 {
-                    var fragScanFound = objMGFReader.ReadNextSpectrum(out var spectrumInfo);
+                    var fragScanFound = mgfReader.ReadNextSpectrum(out var spectrumInfo);
                     if (!fragScanFound)
                         break;
 
@@ -435,7 +435,7 @@ namespace MASIC.DataInput
                 // Record the current memory usage (before we close the .MGF file)
                 OnUpdateMemoryUsage();
 
-                objMGFReader.CloseFile();
+                mgfReader.CloseFile();
 
                 // Check for any other survey scans that need to be added to MasterScanOrder
 

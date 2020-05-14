@@ -278,7 +278,7 @@ namespace MASIC
                 // Pass False to .LoadSettings() here to turn off case sensitive matching
                 if (!reader.LoadSettings(parameterFilePath, false))
                 {
-                    ReportError("Error calling objSettingsFile.LoadSettings for " + parameterFilePath, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                    ReportError("Error calling XmlSettingsFileAccessor.LoadSettings for " + parameterFilePath, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
                     return false;
                 }
 
@@ -873,23 +873,23 @@ namespace MASIC
                 // Construct the rawText strings using mCustomSICList
                 var scanCommentsDefined = false;
 
-                var lstMzValues = new List<string>(CustomSICList.CustomMZSearchValues.Count);
-                var lstMzTolerances = new List<string>(CustomSICList.CustomMZSearchValues.Count);
-                var lstScanCenters = new List<string>(CustomSICList.CustomMZSearchValues.Count);
-                var lstScanTolerances = new List<string>(CustomSICList.CustomMZSearchValues.Count);
-                var lstComments = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var mzValues = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var mzTolerances = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var scanCenters = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var scanTolerances = new List<string>(CustomSICList.CustomMZSearchValues.Count);
+                var comments = new List<string>(CustomSICList.CustomMZSearchValues.Count);
 
                 foreach (var mzSearchValue in CustomSICList.CustomMZSearchValues)
                 {
-                    lstMzValues.Add(mzSearchValue.MZ.ToString(CultureInfo.InvariantCulture));
-                    lstMzTolerances.Add(mzSearchValue.MZToleranceDa.ToString(CultureInfo.InvariantCulture));
+                    mzValues.Add(mzSearchValue.MZ.ToString(CultureInfo.InvariantCulture));
+                    mzTolerances.Add(mzSearchValue.MZToleranceDa.ToString(CultureInfo.InvariantCulture));
 
-                    lstScanCenters.Add(mzSearchValue.ScanOrAcqTimeCenter.ToString(CultureInfo.InvariantCulture));
-                    lstScanTolerances.Add(mzSearchValue.ScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture));
+                    scanCenters.Add(mzSearchValue.ScanOrAcqTimeCenter.ToString(CultureInfo.InvariantCulture));
+                    scanTolerances.Add(mzSearchValue.ScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture));
 
                     if (mzSearchValue.Comment == null)
                     {
-                        lstComments.Add(string.Empty);
+                        comments.Add(string.Empty);
                     }
                     else
                     {
@@ -898,19 +898,19 @@ namespace MASIC
                             scanCommentsDefined = true;
                         }
 
-                        lstComments.Add(mzSearchValue.Comment);
+                        comments.Add(mzSearchValue.Comment);
                     }
                 }
 
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Join("\t", lstMzValues));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", string.Join("\t", lstMzTolerances));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZList", string.Join("\t", mzValues));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "MZToleranceDaList", string.Join("\t", mzTolerances));
 
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", string.Join("\t", lstScanCenters));
-                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", string.Join("\t", lstScanTolerances));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCenterList", string.Join("\t", scanCenters));
+                writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanToleranceList", string.Join("\t", scanTolerances));
 
                 if (scanCommentsDefined)
                 {
-                    writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Join("\t", lstComments));
+                    writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanCommentList", string.Join("\t", comments));
                 }
                 else
                 {

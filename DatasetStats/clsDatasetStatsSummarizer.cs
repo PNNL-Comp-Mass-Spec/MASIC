@@ -430,19 +430,18 @@ namespace MASIC.DatasetStats
 
                 // We could cache the text using a StringBuilder, like this:
                 //
-                // Dim sbDatasetInfo As New System.StringBuilder
-                // Dim objStringWriter As = StringWriter
-                // objStringWriter = New StringWriter(sbDatasetInfo)
-                // writer = New System.Xml.XmlTextWriter(objStringWriter)
-                // writer.Formatting = System.Xml.Formatting.Indented
-                // writer.Indentation = 2
+                // var sbDatasetInfo = new StringBuilder();
+                // var stringWriter = new StringWriter(sbDatasetInfo);
+                // var writer = new System.Xml.XmlTextWriter(stringWriter);
+                // writer.Formatting = System.Xml.Formatting.Indented;
+                // writer.Indentation = 2;
 
                 // However, when you send the output to a StringBuilder it is always encoded as Unicode (UTF-16)
                 // since this is the only character encoding used in the .NET Framework for String values,
                 // and thus you'll see the attribute encoding="utf-16" in the opening XML declaration
                 // The alternative is to use a MemoryStream.  Here, the stream encoding is set by the XmlWriter
                 // and so you see the attribute encoding="utf-8" in the opening XML declaration encoding
-                // (since we used objXMLSettings.Encoding = System.Encoding.UTF8)
+                // (since we used xmlSettings.Encoding = System.Encoding.UTF8)
                 //
                 var memStream = new MemoryStream();
                 var writer = XmlWriter.Create(memStream, xmlSettings);

@@ -1209,17 +1209,17 @@ namespace MASIC
         private float GetProcessMemoryUsageMB()
         {
             // Obtain a handle to the current process
-            var objProcess = Process.GetCurrentProcess();
+            var currentProcess = Process.GetCurrentProcess();
 
             // The WorkingSet is the total physical memory usage
-            return (float)(objProcess.WorkingSet64 / 1024.0 / 1024);
+            return (float)(currentProcess.WorkingSet64 / 1024.0 / 1024);
         }
 
         private float GetTotalProcessingTimeSec()
         {
-            var objProcess = Process.GetCurrentProcess();
+            var currentProcess = Process.GetCurrentProcess();
 
-            return (float)(objProcess.TotalProcessorTime.TotalSeconds);
+            return (float)(currentProcess.TotalProcessorTime.TotalSeconds);
         }
 
         private void InitializeMemoryManagementOptions(clsProcessingStats processingStats)
@@ -1621,11 +1621,11 @@ namespace MASIC
                         // Verify that we have write access to the output directory
                         // ---------------------------------------------------------
 
-                        // The following should work for testing access permissions, but it doesn't
-                        // Dim objFilePermissionTest As New Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
-                        // ' The following should throw an exception if the current user doesn't have read/write access; however, no exception is thrown for me
-                        // objFilePermissionTest.Demand()
-                        // objFilePermissionTest.Assert()
+                        // The following use of .Demand() and .Assert() should work for testing access permissions, but it doesn't
+                        // 
+                        // var filePermissionTest = new Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
+                        // filePermissionTest.Demand()
+                        // filePermissionTest.Assert()
 
                         LogMessage("Checking for write permission in the output path: " + outputDirectoryPath);
 

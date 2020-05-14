@@ -257,7 +257,7 @@ namespace MASIC.DataInput
                 int ionCountNew;
                 if (msSpectrum.IonCount > maxIonCountToRetain)
                 {
-                    var objFilterDataArray = new clsFilterDataArrayMaxCount()
+                    var filterDataArray = new clsFilterDataArrayMaxCount
                     {
                         MaximumDataCountToLoad = maxIonCountToRetain,
                         TotalIntensityPercentageFilterEnabled = false
@@ -270,10 +270,10 @@ namespace MASIC.DataInput
                         writer.WriteLine("m/z" + "\t" + "Intensity");
                     }
 
-                    // Store the intensity values in objFilterDataArray
+                    // Store the intensity values in filterDataArray
                     for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                     {
-                        objFilterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
+                        filterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
                         if (writeDebugData)
                         {
                             writer.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" + msSpectrum.IonsIntensity[ionIndex]);
@@ -286,7 +286,7 @@ namespace MASIC.DataInput
                     }
 
                     // Call .FilterData, which will determine which data points to keep
-                    objFilterDataArray.FilterData();
+                    filterDataArray.FilterData();
 
                     ionCountNew = 0;
                     for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
@@ -296,7 +296,7 @@ namespace MASIC.DataInput
                         if (!pointPassesFilter)
                         {
                             // See if the point's intensity is negative
-                            if (objFilterDataArray.GetAbundanceByIndex(ionIndex) >= 0)
+                            if (filterDataArray.GetAbundanceByIndex(ionIndex) >= 0)
                             {
                                 pointPassesFilter = true;
                             }
@@ -326,7 +326,7 @@ namespace MASIC.DataInput
                     {
                         postFilterWriter.WriteLine("m/z" + "\t" + "Intensity");
 
-                        // Store the intensity values in objFilterDataArray
+                        // Store the intensity values in filterDataArray
                         for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             postFilterWriter.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" +
                                                        msSpectrum.IonsIntensity[ionIndex]);

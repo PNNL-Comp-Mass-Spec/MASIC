@@ -1017,23 +1017,23 @@ namespace MASICBrowser
 
             try
             {
-                var objRows = resultTable.Select(COL_NAME_PARENT_ION_INDEX + " = " + parentIonIndex);
+                var matchingRows = resultTable.Select(COL_NAME_PARENT_ION_INDEX + " = " + parentIonIndex);
                 var sequenceCount = 0;
-                foreach (var objRow in objRows)
+                foreach (var currentRow in matchingRows)
                 {
-                    var sequenceID = (int)objRow[COL_NAME_SEQUENCE_ID];
+                    var sequenceID = (int)currentRow[COL_NAME_SEQUENCE_ID];
                     try
                     {
-                        var objSeqRows = mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Select(COL_NAME_SEQUENCE_ID + " = " + sequenceID);
+                        var sequenceRows = mMsMsResults.Tables[TABLE_NAME_SEQUENCES].Select(COL_NAME_SEQUENCE_ID + " = " + sequenceID);
 
-                        if (objSeqRows.Length > 0)
+                        if (sequenceRows.Length > 0)
                         {
                             if (sequenceCount > 0)
                             {
                                 sequences += Environment.NewLine;
                             }
 
-                            sequences += objSeqRows[0][COL_NAME_SEQUENCE].ToString();
+                            sequences += sequenceRows[0][COL_NAME_SEQUENCE].ToString();
                             sequenceCount += 1;
                         }
                     }
@@ -1534,11 +1534,11 @@ namespace MASICBrowser
                 }
             }
 
-            foreach (DataRow objRow in mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].Rows)
+            foreach (DataRow currentRow in mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].Rows)
             {
-                if (htFragScanToIndex.TryGetValue((int)objRow[COL_NAME_SCAN], out var value))
+                if (htFragScanToIndex.TryGetValue((int)currentRow[COL_NAME_SCAN], out var value))
                 {
-                    objRow[COL_NAME_PARENT_ION_INDEX] = value;
+                    currentRow[COL_NAME_PARENT_ION_INDEX] = value;
                 }
             }
         }
@@ -1611,12 +1611,14 @@ namespace MASICBrowser
 
             float similarIonMZToleranceHalfWidth = 0;
             var findPeaksOnSmoothedData = false;
-            bool useButterworthSmooth = default, useSavitzkyGolaySmooth = default;
+            var useButterworthSmooth = false;
+            var useSavitzkyGolaySmooth = false;
             float butterworthSamplingFrequency = 0;
             var savitzkyGolayFilterOrder = 0;
             var scanStart = 0;
 
-            int peakScanStart = default, peakScanEnd = default;
+            int peakScanStart = 0;
+            var peakScanEnd = 0;
 
             var smoothedDataFound = false;
             var baselineNoiseStatsFound = false;
@@ -2325,19 +2327,19 @@ namespace MASICBrowser
                                         var msMsResultsTable = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS];
                                         if (!msMsResultsTable.Rows.Contains(new object[] { scanNumber, charge, sequenceID }))
                                         {
-                                            var objNewRow = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].NewRow();
-                                            objNewRow[COL_NAME_SCAN] = scanNumber;
-                                            objNewRow[COL_NAME_CHARGE] = charge;
-                                            objNewRow[COL_NAME_MH] = dataCols[(int)eMsMsSearchEngineResultColumns.MH];
-                                            objNewRow[COL_NAME_XCORR] = dataCols[(int)eMsMsSearchEngineResultColumns.XCorr];
-                                            objNewRow[COL_NAME_DELTACN] = dataCols[(int)eMsMsSearchEngineResultColumns.DeltaCN];
-                                            objNewRow[COL_NAME_DELTACN2] = dataCols[(int)eMsMsSearchEngineResultColumns.DeltaCn2];
-                                            objNewRow[COL_NAME_RANK_SP] = dataCols[(int)eMsMsSearchEngineResultColumns.RankSp];
-                                            objNewRow[COL_NAME_RANK_XC] = dataCols[(int)eMsMsSearchEngineResultColumns.RankXc];
-                                            objNewRow[COL_NAME_SEQUENCE_ID] = sequenceID;
-                                            objNewRow[COL_NAME_PARENT_ION_INDEX] = -1;
+                                            var newRow = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].NewRow();
+                                            newRow[COL_NAME_SCAN] = scanNumber;
+                                            newRow[COL_NAME_CHARGE] = charge;
+                                            newRow[COL_NAME_MH] = dataCols[(int)eMsMsSearchEngineResultColumns.MH];
+                                            newRow[COL_NAME_XCORR] = dataCols[(int)eMsMsSearchEngineResultColumns.XCorr];
+                                            newRow[COL_NAME_DELTACN] = dataCols[(int)eMsMsSearchEngineResultColumns.DeltaCN];
+                                            newRow[COL_NAME_DELTACN2] = dataCols[(int)eMsMsSearchEngineResultColumns.DeltaCn2];
+                                            newRow[COL_NAME_RANK_SP] = dataCols[(int)eMsMsSearchEngineResultColumns.RankSp];
+                                            newRow[COL_NAME_RANK_XC] = dataCols[(int)eMsMsSearchEngineResultColumns.RankXc];
+                                            newRow[COL_NAME_SEQUENCE_ID] = sequenceID;
+                                            newRow[COL_NAME_PARENT_ION_INDEX] = -1;
 
-                                            mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].Rows.Add(objNewRow);
+                                            mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].Rows.Add(newRow);
                                         }
                                     }
                                     catch (Exception ex)
@@ -2603,10 +2605,10 @@ namespace MASICBrowser
 
         private void SetToolTips()
         {
-            var objToolTipControl = new ToolTip();
+            var toolTipControl = new ToolTip();
 
-            objToolTipControl.SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.20");
-            objToolTipControl.SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter");
+            toolTipControl.SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.20");
+            toolTipControl.SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter");
         }
 
         private void ShowAboutBox()
@@ -3179,7 +3181,7 @@ namespace MASICBrowser
             if (eSmoothMode != eSmoothModeConstants.DoNotReSmooth)
             {
                 // Re-smooth the data
-                var objFilter = new DataFilter.DataFilter();
+                var dataFilter = new DataFilter.DataFilter();
 
                 var currentParentIon = mParentIonStats[parentIonIndex];
 
@@ -3206,7 +3208,7 @@ namespace MASICBrowser
 
                     // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
                     // Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
-                    objFilter.SavitzkyGolayFilter(intensities,
+                    dataFilter.SavitzkyGolayFilter(intensities,
                                                   0, currentParentIon.SICData.Count - 1,
                                                   filterThirdWidth, filterThirdWidth,
                                                   (short)savitzkyGolayFilterOrder, out _, true);
@@ -3215,7 +3217,7 @@ namespace MASICBrowser
                 {
                     // Assume eSmoothMode = eSmoothModeConstants.Butterworth
                     var samplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text + " should be a number between 0.01 and 0.99; assuming 0.2", out _, 0.2F);
-                    objFilter.ButterworthFilter(intensities, 0, currentParentIon.SICData.Count - 1, samplingFrequency);
+                    dataFilter.ButterworthFilter(intensities, 0, currentParentIon.SICData.Count - 1, samplingFrequency);
                 }
 
                 // Copy the smoothed data into udtSICStats.SICSmoothedYData

@@ -232,15 +232,17 @@ namespace MASIC
         {
             // Returns True if no problems; otherwise, returns false
 
-            var lstValidParameters = new List<string>() { "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q" };
+            var validParameters = new List<string> {
+                "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q"
+            };
 
             try
             {
                 // Make sure no invalid parameters are present
-                if (commandLineParser.InvalidParametersPresent(lstValidParameters))
+                if (commandLineParser.InvalidParametersPresent(validParameters))
                 {
                     ShowErrorMessage("Invalid command line parameters",
-                        (from item in commandLineParser.InvalidParameters(lstValidParameters) select ("/" + item)).ToList());
+                        (from item in commandLineParser.InvalidParameters(validParameters) select ("/" + item)).ToList());
                     return false;
                 }
 
@@ -363,12 +365,12 @@ namespace MASIC
             Application.EnableVisualStyles();
             Application.DoEvents();
 
-            var objFormMain = new frmMain();
+            var mainWindow = new frmMain();
 
             // The following call is needed because the .ShowDialog() call is inexplicably increasing the size of the form
-            objFormMain.SetHeightAdjustForce(objFormMain.Height);
+            mainWindow.SetHeightAdjustForce(mainWindow.Height);
 
-            objFormMain.ShowDialog();
+            mainWindow.ShowDialog();
         }
 #endif
 

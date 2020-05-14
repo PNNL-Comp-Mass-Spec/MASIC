@@ -139,7 +139,7 @@ namespace MASIC
 
                 if (spectraPool.GetItem(scanNumber, out var cacheItem))
                 {
-                    // Replace the spectrum data with objMSSpectrum
+                    // Replace the spectrum data with spectrum
                     cacheItem.Scan.ReplaceData(spectrum, scanNumber);
                     cacheItem.CacheState = eCacheStateConstants.NeverCached;
                 }
@@ -268,10 +268,12 @@ namespace MASIC
 
             if (string.IsNullOrWhiteSpace(mCacheFileNameBase))
             {
-                var objRand = new Random();
+                var randomGenerator = new Random();
 
                 // Create the cache file name, using both a timestamp and a random number between 1 and 9999
-                mCacheFileNameBase = SPECTRUM_CACHE_FILE_PREFIX + DateTime.UtcNow.Hour + DateTime.UtcNow.Minute + DateTime.UtcNow.Second + DateTime.UtcNow.Millisecond + objRand.Next(1, 9999);
+                mCacheFileNameBase = SPECTRUM_CACHE_FILE_PREFIX +
+                                     DateTime.UtcNow.Hour + DateTime.UtcNow.Minute + DateTime.UtcNow.Second + DateTime.UtcNow.Millisecond +
+                                     randomGenerator.Next(1, 9999);
             }
 
             var fileName = mCacheFileNameBase + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + ".bin";

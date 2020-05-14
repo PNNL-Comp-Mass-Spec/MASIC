@@ -269,10 +269,10 @@ namespace MASIC
             scanCenterList = scanCenterList.TrimEnd('\t');
             scanCommentList = scanCommentList.TrimEnd(delimiters);
 
-            var lstMZs = mzList.Split(delimiters).ToList();
-            var lstMZToleranceDa = mzToleranceDaList.Split(delimiters).ToList();
-            var lstScanCenters = scanCenterList.Split(delimiters).ToList();
-            var lstScanTolerances = scanToleranceList.Split(delimiters).ToList();
+            var mzValues = mzList.Split(delimiters).ToList();
+            var mzToleranceDa = mzToleranceDaList.Split(delimiters).ToList();
+            var scanCenters = scanCenterList.Split(delimiters).ToList();
+            var scanTolerances = scanToleranceList.Split(delimiters).ToList();
             List<string> lstScanComments;
 
             if (scanCommentList.Length > 0)
@@ -286,15 +286,15 @@ namespace MASIC
 
             ResetMzSearchValues();
 
-            if (lstMZs.Count <= 0)
+            if (mzValues.Count <= 0)
             {
                 // Nothing to parse; return true
                 return true;
             }
 
-            for (var index = 0; index < lstMZs.Count; index++)
+            for (var index = 0; index < mzValues.Count; index++)
             {
-                if (!double.TryParse(lstMZs[index], out var targetMz))
+                if (!double.TryParse(mzValues[index], out var targetMz))
                 {
                     continue;
                 }
@@ -306,43 +306,43 @@ namespace MASIC
                     ScanOrAcqTimeTolerance = 0
                 };
 
-                if (lstScanCenters.Count > index)
+                if (scanCenters.Count > index)
                 {
-                    if (clsUtilities.IsNumber(lstScanCenters[index]))
+                    if (clsUtilities.IsNumber(scanCenters[index]))
                     {
                         if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
                         {
-                            mzSearchSpec.ScanOrAcqTimeCenter = int.Parse(lstScanCenters[index]);
+                            mzSearchSpec.ScanOrAcqTimeCenter = int.Parse(scanCenters[index]);
                         }
                         else
                         {
                             // Includes .Relative and .AcquisitionTime
-                            mzSearchSpec.ScanOrAcqTimeCenter = float.Parse(lstScanCenters[index]);
+                            mzSearchSpec.ScanOrAcqTimeCenter = float.Parse(scanCenters[index]);
                         }
                     }
                 }
 
-                if (lstScanTolerances.Count > index)
+                if (scanTolerances.Count > index)
                 {
-                    if (clsUtilities.IsNumber(lstScanTolerances[index]))
+                    if (clsUtilities.IsNumber(scanTolerances[index]))
                     {
                         if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
                         {
-                            mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(lstScanTolerances[index]);
+                            mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(scanTolerances[index]);
                         }
                         else
                         {
                             // Includes .Relative and .AcquisitionTime
-                            mzSearchSpec.ScanOrAcqTimeTolerance = float.Parse(lstScanTolerances[index]);
+                            mzSearchSpec.ScanOrAcqTimeTolerance = float.Parse(scanTolerances[index]);
                         }
                     }
                 }
 
-                if (lstMZToleranceDa.Count > index)
+                if (mzToleranceDa.Count > index)
                 {
-                    if (clsUtilities.IsNumber(lstMZToleranceDa[index]))
+                    if (clsUtilities.IsNumber(mzToleranceDa[index]))
                     {
-                        mzSearchSpec.MZToleranceDa = double.Parse(lstMZToleranceDa[index]);
+                        mzSearchSpec.MZToleranceDa = double.Parse(mzToleranceDa[index]);
                     }
                 }
 

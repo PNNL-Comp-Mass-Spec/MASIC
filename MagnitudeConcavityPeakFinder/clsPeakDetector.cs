@@ -188,7 +188,7 @@ namespace MagnitudeConcavityPeakFinder
             if (areaBasedSignalToNoise < 1)
                 areaBasedSignalToNoise = 1;
 
-            var objPeakDetector = new PeakFinder();
+            var peakDetector = new PeakFinder();
 
             var peakData = new PeakDataContainer();
             peakData.SetData(xyData);
@@ -214,7 +214,7 @@ namespace MagnitudeConcavityPeakFinder
             peakData.OriginalPeakLocationIndex = originalPeakLocationIndex;
 
             var peakFoundContainingOriginalPeakLocation = FindPeaksWork(
-                objPeakDetector,
+                peakDetector,
                 scanNumbers,
                 peakData,
                 peakFinderOptions);
@@ -745,13 +745,13 @@ namespace MagnitudeConcavityPeakFinder
         /// <summary>
         ///
         /// </summary>
-        /// <param name="objPeakDetector"></param>
+        /// <param name="peakDetector"></param>
         /// <param name="scanNumbers"></param>
         /// <param name="peakData"></param>
         /// <param name="peakFinderOptions"></param>
         /// <returns>Detected peaks will be in the peakData object</returns>
         private bool FindPeaksWork(
-            PeakFinder objPeakDetector,
+            PeakFinder peakDetector,
             IList<int> scanNumbers,
             PeakDataContainer peakData,
             udtSICPeakFinderOptionsType peakFinderOptions)
@@ -779,7 +779,7 @@ namespace MagnitudeConcavityPeakFinder
 
             if (peakFinderOptions.FindPeaksOnSmoothedData && dataIsSmoothed)
             {
-                peakData.Peaks = objPeakDetector.DetectPeaks(
+                peakData.Peaks = peakDetector.DetectPeaks(
                     peakData.XData, peakData.SmoothedYData,
                     peakFinderOptions.IntensityThresholdAbsoluteMinimum,
                     peakData.PeakWidthPointsMinimum,
@@ -791,7 +791,7 @@ namespace MagnitudeConcavityPeakFinder
             else
             {
                 // Look for the peaks, using peakData.PeakWidthPointsMinimum as the minimum peak width
-                peakData.Peaks = objPeakDetector.DetectPeaks(
+                peakData.Peaks = peakDetector.DetectPeaks(
                     peakData.XData, peakData.YData,
                     peakFinderOptions.IntensityThresholdAbsoluteMinimum,
                     peakData.PeakWidthPointsMinimum,

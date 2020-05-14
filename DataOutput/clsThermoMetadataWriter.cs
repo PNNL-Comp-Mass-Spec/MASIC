@@ -7,7 +7,7 @@ namespace MASIC.DataOutput
     public class clsThermoMetadataWriter : clsMasicEventNotifier
     {
         public bool SaveMSMethodFile(
-            XRawFileIO objXcaliburAccessor,
+            XRawFileIO rawFileReader,
             clsDataOutput dataOutputHandler)
         {
             int instMethodCount;
@@ -15,11 +15,11 @@ namespace MASIC.DataOutput
 
             try
             {
-                instMethodCount = objXcaliburAccessor.FileInfo.InstMethods.Count;
+                instMethodCount = rawFileReader.FileInfo.InstMethods.Count;
             }
             catch (Exception ex)
             {
-                ReportError("Error looking up InstMethod length in objXcaliburAccessor.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error looking up InstMethod length in rawFileReader.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -28,7 +28,7 @@ namespace MASIC.DataOutput
                 for (var index = 0; index < instMethodCount; index++)
                 {
                     string methodNum;
-                    if (index == 0 && objXcaliburAccessor.FileInfo.InstMethods.Count == 1)
+                    if (index == 0 && rawFileReader.FileInfo.InstMethods.Count == 1)
                     {
                         methodNum = string.Empty;
                     }
@@ -41,14 +41,14 @@ namespace MASIC.DataOutput
 
                     using (var writer = new StreamWriter(outputFilePath, false))
                     {
-                        var fileInfo = objXcaliburAccessor.FileInfo;
+                        var fileInfo = rawFileReader.FileInfo;
                         writer.WriteLine("Instrument model: " + fileInfo.InstModel);
                         writer.WriteLine("Instrument name: " + fileInfo.InstName);
                         writer.WriteLine("Instrument description: " + fileInfo.InstrumentDescription);
                         writer.WriteLine("Instrument serial number: " + fileInfo.InstSerialNumber);
                         writer.WriteLine();
 
-                        writer.WriteLine(objXcaliburAccessor.FileInfo.InstMethods[index]);
+                        writer.WriteLine(rawFileReader.FileInfo.InstMethods[index]);
                     }
                 }
             }
@@ -62,7 +62,7 @@ namespace MASIC.DataOutput
         }
 
         public bool SaveMSTuneFile(
-            XRawFileIO objXcaliburAccessor,
+            XRawFileIO rawFileReader,
             clsDataOutput dataOutputHandler)
         {
             const char TAB_DELIMITER = '\t';
@@ -71,11 +71,11 @@ namespace MASIC.DataOutput
             var outputFilePath = "?UndefinedFile?";
             try
             {
-                tuneMethodCount = objXcaliburAccessor.FileInfo.TuneMethods.Count;
+                tuneMethodCount = rawFileReader.FileInfo.TuneMethods.Count;
             }
             catch (Exception ex)
             {
-                ReportError("Error looking up TuneMethods length in objXcaliburAccessor.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error looking up TuneMethods length in rawFileReader.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -84,7 +84,7 @@ namespace MASIC.DataOutput
                 for (var index = 0; index < tuneMethodCount; index++)
                 {
                     string tuneInfoNum;
-                    if (index == 0 && objXcaliburAccessor.FileInfo.TuneMethods.Count == 1)
+                    if (index == 0 && rawFileReader.FileInfo.TuneMethods.Count == 1)
                     {
                         tuneInfoNum = string.Empty;
                     }
@@ -99,7 +99,7 @@ namespace MASIC.DataOutput
                     {
                         writer.WriteLine("Category" + TAB_DELIMITER + "Name" + TAB_DELIMITER + "Value");
 
-                        foreach (var setting in objXcaliburAccessor.FileInfo.TuneMethods[index].Settings)
+                        foreach (var setting in rawFileReader.FileInfo.TuneMethods[index].Settings)
                             writer.WriteLine(setting.Category + TAB_DELIMITER + setting.Name + TAB_DELIMITER + setting.Value);
                         writer.WriteLine();
                     }

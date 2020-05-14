@@ -653,7 +653,7 @@ namespace MASIC
         {
             // Prompts the user to select a file to load the options from
 
-            using (var objOpenFile = new OpenFileDialog()
+            using (var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -672,32 +672,32 @@ namespace MASIC
                 {
                     try
                     {
-                        objOpenFile.InitialDirectory = Directory.GetParent(filePath).ToString();
+                        fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
                     }
                     catch
                     {
-                        objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
                 if (File.Exists(filePath))
                 {
-                    objOpenFile.FileName = Path.GetFileName(filePath);
+                    fileSelector.FileName = Path.GetFileName(filePath);
                 }
 
-                objOpenFile.Title = "Specify file to load options from";
+                fileSelector.Title = "Specify file to load options from";
 
-                var result = objOpenFile.ShowDialog();
+                var result = fileSelector.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
 
-                if (objOpenFile.FileName.Length > 0)
+                if (fileSelector.FileName.Length > 0)
                 {
-                    mXmlSettingsFilePath = objOpenFile.FileName;
+                    mXmlSettingsFilePath = fileSelector.FileName;
 
                     IniFileLoadOptions(mXmlSettingsFilePath, updateIOPaths);
                 }
@@ -725,14 +725,14 @@ namespace MASIC
                 Thread.Sleep(100);
 
                 // Now load some custom options that aren't loaded by clsMASIC
-                var objXmlFile = new XmlSettingsFileAccessor();
+                var xmlFileReader = new XmlSettingsFileAccessor();
 
                 // Pass True to .LoadSettings() to turn off case sensitive matching
-                objXmlFile.LoadSettings(filePath, false);
+                xmlFileReader.LoadSettings(filePath, false);
 
                 try
                 {
-                    txtDatasetLookupFilePath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
+                    txtDatasetLookupFilePath.Text = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
                     try
                     {
                         if (!File.Exists(txtDatasetLookupFilePath.Text))
@@ -747,15 +747,15 @@ namespace MASIC
 
                     if (updateIOPaths)
                     {
-                        txtInputFilePath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
+                        txtInputFilePath.Text = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
                     }
 
-                    Width = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
-                    Height = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
+                    Width = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
+                    Height = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
 
                     if (updateIOPaths)
                     {
-                        txtOutputDirectoryPath.Text = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
+                        txtOutputDirectoryPath.Text = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
                     }
 
                     if (txtOutputDirectoryPath.TextLength == 0)
@@ -763,7 +763,7 @@ namespace MASIC
                         txtOutputDirectoryPath.Text = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
 
-                    mPreferredInputFileExtension = objXmlFile.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
+                    mPreferredInputFileExtension = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
                 }
                 catch (Exception ex)
                 {
@@ -790,7 +790,7 @@ namespace MASIC
         {
             // Prompts the user to select a file to load the options from
 
-            using (var objSaveFile = new SaveFileDialog()
+            using (var fileSelector = new SaveFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = false,
@@ -808,32 +808,32 @@ namespace MASIC
                 {
                     try
                     {
-                        objSaveFile.InitialDirectory = Directory.GetParent(filePath).ToString();
+                        fileSelector.InitialDirectory = Directory.GetParent(filePath).ToString();
                     }
                     catch
                     {
-                        objSaveFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objSaveFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
                 if (File.Exists(filePath))
                 {
-                    objSaveFile.FileName = Path.GetFileName(filePath);
+                    fileSelector.FileName = Path.GetFileName(filePath);
                 }
 
-                objSaveFile.Title = "Specify file to save options to";
+                fileSelector.Title = "Specify file to save options to";
 
-                var result = objSaveFile.ShowDialog();
+                var result = fileSelector.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
 
-                if (objSaveFile.FileName.Length > 0)
+                if (fileSelector.FileName.Length > 0)
                 {
-                    mXmlSettingsFilePath = objSaveFile.FileName;
+                    mXmlSettingsFilePath = fileSelector.FileName;
 
                     IniFileSaveOptions(mXmlSettingsFilePath, false);
                 }
@@ -846,20 +846,20 @@ namespace MASIC
             {
                 if (!saveWindowDimensionsOnly)
                 {
-                    var objMasic = new clsMASIC();
+                    var masicInstance = new clsMASIC();
 
-                    UpdateMasicSettings(ref objMasic);
+                    UpdateMasicSettings(masicInstance);
 
-                    objMasic.Options.SaveParameterFileSettings(filePath);
+                    masicInstance.Options.SaveParameterFileSettings(filePath);
 
                     // Sleep for 100 msec, just to be safe
                     Thread.Sleep(100);
                 }
 
                 // Pass True to .LoadSettings() here so that newly made Xml files will have the correct capitalization
-                var objXmlFile = new XmlSettingsFileAccessor();
+                var xmlFileReader = new XmlSettingsFileAccessor();
 
-                objXmlFile.LoadSettings(filePath, true);
+                xmlFileReader.LoadSettings(filePath, true);
 
                 try
                 {
@@ -869,7 +869,7 @@ namespace MASIC
                         {
                             if (File.Exists(txtDatasetLookupFilePath.Text))
                             {
-                                objXmlFile.SetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
+                                xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
                             }
                         }
                         catch (Exception ex)
@@ -877,21 +877,21 @@ namespace MASIC
                             // Ignore any errors here
                         }
 
-                        objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
+                        xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
                     }
 
-                    objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
-                    objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
+                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
+                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
 
-                    objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
-                    objXmlFile.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
+                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
+                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error storing parameter in settings file: " + Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
 
-                objXmlFile.SaveSettings();
+                xmlFileReader.SaveSettings();
             }
             catch (Exception ex)
             {
@@ -960,19 +960,19 @@ namespace MASIC
             var columnDelimiters = new[] { '\t', ',' };
 
             // Examine the clipboard contents
-            var objData = Clipboard.GetDataObject();
+            var clipboardData = Clipboard.GetDataObject();
 
-            if (objData == null)
+            if (clipboardData == null)
             {
                 return;
             }
 
-            if (!objData.GetDataPresent(DataFormats.StringFormat, true))
+            if (!clipboardData.GetDataPresent(DataFormats.StringFormat, true))
             {
                 return;
             }
 
-            var data = Convert.ToString(objData.GetData(DataFormats.StringFormat, true));
+            var data = Convert.ToString(clipboardData.GetData(DataFormats.StringFormat, true));
 
             // Split data on carriage return or line feed characters
             // Lines that end in CrLf will give two separate lines; one with the text, and one blank; that's OK
@@ -1169,12 +1169,12 @@ namespace MASIC
                     txtLogMessages.ResetText();
 
                     // Configure settings
-                    var success = UpdateMasicSettings(ref mMasic);
+                    var success = UpdateMasicSettings(mMasic);
                     if (!success)
                         return;
 
                     // Validate settings
-                    success = ValidateSettings(ref mMasic);
+                    success = ValidateSettings(mMasic);
                     if (!success)
                         return;
 
@@ -1474,7 +1474,7 @@ namespace MASIC
 
         private void SelectDatasetLookupFile()
         {
-            using (var objOpenFile = new OpenFileDialog()
+            using (var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1491,34 +1491,34 @@ namespace MASIC
                 {
                     try
                     {
-                        objOpenFile.InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString();
+                        fileSelector.InitialDirectory = Directory.GetParent(txtDatasetLookupFilePath.Text).ToString();
                     }
                     catch
                     {
-                        objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
-                objOpenFile.Title = "Select dataset lookup file";
+                fileSelector.Title = "Select dataset lookup file";
 
-                var result = objOpenFile.ShowDialog();
+                var result = fileSelector.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
 
-                if (objOpenFile.FileName.Length > 0)
+                if (fileSelector.FileName.Length > 0)
                 {
-                    txtDatasetLookupFilePath.Text = objOpenFile.FileName;
+                    txtDatasetLookupFilePath.Text = fileSelector.FileName;
                 }
             }
         }
 
         private void SelectCustomSICFile()
         {
-            using (var objOpenFile = new OpenFileDialog()
+            using (var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1542,13 +1542,13 @@ namespace MASIC
                 switch (fileExtension.ToLower())
                 {
                     case ".txt":
-                        objOpenFile.FilterIndex = 1;
+                        fileSelector.FilterIndex = 1;
                         break;
                     case "csv":
-                        objOpenFile.FilterIndex = 2;
+                        fileSelector.FilterIndex = 2;
                         break;
                     default:
-                        objOpenFile.FilterIndex = 1;
+                        fileSelector.FilterIndex = 1;
                         break;
                 }
 
@@ -1556,34 +1556,34 @@ namespace MASIC
                 {
                     try
                     {
-                        objOpenFile.InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString();
+                        fileSelector.InitialDirectory = Directory.GetParent(txtCustomSICFileName.Text).ToString();
                     }
                     catch
                     {
-                        objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
-                objOpenFile.Title = "Select custom SIC values file";
+                fileSelector.Title = "Select custom SIC values file";
 
-                var result = objOpenFile.ShowDialog();
+                var result = fileSelector.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
 
-                if (objOpenFile.FileName.Length > 0)
+                if (fileSelector.FileName.Length > 0)
                 {
-                    txtCustomSICFileName.Text = objOpenFile.FileName;
+                    txtCustomSICFileName.Text = fileSelector.FileName;
                 }
             }
         }
 
         private void SelectInputFile()
         {
-            using (var objOpenFile = new OpenFileDialog()
+            using (var fileSelector = new OpenFileDialog()
             {
                 AddExtension = true,
                 CheckFileExists = true,
@@ -1631,34 +1631,34 @@ namespace MASIC
                         break;
                 }
 
-                objOpenFile.FilterIndex = filterIndex;
+                fileSelector.FilterIndex = filterIndex;
 
                 if (txtInputFilePath.TextLength > 0)
                 {
                     try
                     {
-                        objOpenFile.InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString();
+                        fileSelector.InitialDirectory = Directory.GetParent(txtInputFilePath.Text).ToString();
                     }
                     catch
                     {
-                        objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                        fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
                 }
                 else
                 {
-                    objOpenFile.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
+                    fileSelector.InitialDirectory = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                 }
 
-                objOpenFile.Title = "Select input file";
+                fileSelector.Title = "Select input file";
 
-                var result = objOpenFile.ShowDialog();
+                var result = fileSelector.ShowDialog();
                 if (result == DialogResult.Cancel)
                     return;
 
-                if (objOpenFile.FileName.Length > 0)
+                if (fileSelector.FileName.Length > 0)
                 {
-                    txtInputFilePath.Text = objOpenFile.FileName;
-                    mPreferredInputFileExtension = Path.GetExtension(objOpenFile.FileName);
+                    txtInputFilePath.Text = fileSelector.FileName;
+                    mPreferredInputFileExtension = Path.GetExtension(fileSelector.FileName);
                 }
             }
         }
@@ -1719,28 +1719,28 @@ namespace MASIC
 
         private void SetToolTips()
         {
-            var objToolTipControl = new ToolTip();
+            var toolTipControl = new ToolTip();
 
-            objToolTipControl.SetToolTip(txtDatasetID, "The dataset ID is included as the first column in the output file.");
+            toolTipControl.SetToolTip(txtDatasetID, "The dataset ID is included as the first column in the output file.");
 
-            objToolTipControl.SetToolTip(txtIntensityThresholdAbsoluteMinimum, "Threshold for extending SIC");
-            objToolTipControl.SetToolTip(txtMaxDistanceScansNoOverlap, "Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion.");
-            objToolTipControl.SetToolTip(txtMaxAllowedUpwardSpikeFractionMax, "Maximum fraction of the peak maximum that an upward spike can be to be included in the peak");
-            objToolTipControl.SetToolTip(txtInitialPeakWidthScansScaler, "Multiplied by the S/N for the given spectrum to determine the initial minimum peak width (in scans) to try");
-            objToolTipControl.SetToolTip(txtInitialPeakWidthScansMaximum, "Maximum initial peak width to allow");
+            toolTipControl.SetToolTip(txtIntensityThresholdAbsoluteMinimum, "Threshold for extending SIC");
+            toolTipControl.SetToolTip(txtMaxDistanceScansNoOverlap, "Maximum distance that the edge of an identified peak can be away from the scan number that the parent ion was observed in if the identified peak does not contain the parent ion.");
+            toolTipControl.SetToolTip(txtMaxAllowedUpwardSpikeFractionMax, "Maximum fraction of the peak maximum that an upward spike can be to be included in the peak");
+            toolTipControl.SetToolTip(txtInitialPeakWidthScansScaler, "Multiplied by the S/N for the given spectrum to determine the initial minimum peak width (in scans) to try");
+            toolTipControl.SetToolTip(txtInitialPeakWidthScansMaximum, "Maximum initial peak width to allow");
 
-            objToolTipControl.SetToolTip(txtSICTolerance, "Search tolerance for creating SIC; suggest 0.6 Da for ion traps and 20 ppm for TOF, FT or Orbitrap instruments");
-            objToolTipControl.SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.25");
-            objToolTipControl.SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter");
+            toolTipControl.SetToolTip(txtSICTolerance, "Search tolerance for creating SIC; suggest 0.6 Da for ion traps and 20 ppm for TOF, FT or Orbitrap instruments");
+            toolTipControl.SetToolTip(txtButterworthSamplingFrequency, "Value between 0.01 and 0.99; suggested value is 0.25");
+            toolTipControl.SetToolTip(txtSavitzkyGolayFilterOrder, "Even number, 0 or greater; 0 means a moving average filter, 2 means a 2nd order Savitzky Golay filter");
 
-            objToolTipControl.SetToolTip(chkRefineReportedParentIonMZ, string.Format(
+            toolTipControl.SetToolTip(chkRefineReportedParentIonMZ, string.Format(
                 "If enabled, will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / {0:F0}); " +
                 "will update the reported m/z value to the one found",
                 clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA));
 
-            //objToolTipControl.SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram");
+            //toolTipControl.SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram");
 
-            objToolTipControl.SetToolTip(txtStatusLogKeyNameFilterList, "Enter a comma and/or NewLine separated list of Status Log Key names to match (will match any part of the key name to the text you enter).  Leave blank to include all Status Log entries.");
+            toolTipControl.SetToolTip(txtStatusLogKeyNameFilterList, "Enter a comma and/or NewLine separated list of Status Log Key names to match (will match any part of the key name to the text you enter).  Leave blank to include all Status Log entries.");
         }
 
         private void ShowAboutBox()
@@ -1828,7 +1828,7 @@ namespace MASIC
 
             try
             {
-                var masicOptions = objMasic.Options;
+                var masicOptions = masicInstance.Options;
 
                 // Import options
 
@@ -2142,32 +2142,46 @@ namespace MASIC
 
         private bool ValidateSettings(ref clsMASIC objMasic)
         {
-            if (objMasic.Options.ReporterIons.ReporterIonMassMode != clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
-            {
-                if (objMasic.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes)
-                {
-                    // Make sure the tolerance is less than 0.03 Da; if not, warn the user
-                    if (objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault > 0.03)
-                    {
-                        var eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be less than 0.03 m/z when using 'iTraq8 for High Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z.  If using a low resolution instrument, you should choose the 'iTraq 8 for Low Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
+                return true;
 
-                        if (eResponse != DialogResult.Yes)
-                        {
-                            return false;
-                        }
+            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes)
+            {
+                // Make sure the tolerance is less than 0.03 Da; if not, warn the user
+                if (masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault > 0.03)
+                {
+                    var warningMessage = string.Format(
+                        "Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be less than 0.03 m/z " +
+                        "when using 'iTraq8 for High Res MS/MS' reporter ions. It is currently {0:F3} m/z. " +
+                        "If using a low resolution instrument, you should choose the 'iTraq 8 for Low Res MS/MS' mode. " +
+                        "Continue anyway?",
+                        masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault);
+
+                    var response = MessageBox.Show(warningMessage, "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+
+                    if (response != DialogResult.Yes)
+                    {
+                        return false;
                     }
                 }
-                else if (objMasic.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes)
+            }
+            else if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes)
+            {
+                // Make sure the tolerance is at least 0.1 Da; if not, warn the user
+                if (masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault < 0.1)
                 {
-                    // Make sure the tolerance is at least 0.1 Da; if not, warn the user
-                    if (objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault < 0.1)
-                    {
-                        var eResponse = MessageBox.Show("Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be at least 0.1 m/z when using 'iTraq8 for Low Res MS/MS' reporter ions.  It is currently " + objMasic.Options.ReporterIons.ReporterIonToleranceDaDefault.ToString("0.000") + " m/z. If using a high resolution instrument, you should choose the 'iTraq 8 for High Res MS/MS' mode.  Continue anyway?", "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                    var warningMessage = string.Format(
+                        "Warning: the Reporter Ion 'm/z Tolerance Half Width' value should be at least 0.1 m/z " +
+                        "when using 'iTraq8 for Low Res MS/MS' reporter ions. It is currently {0:F3} m/z. " +
+                        "If using a high resolution instrument, you should choose the 'iTraq 8 for High Res MS/MS' mode. " +
+                        "Continue anyway?",
+                        masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault);
 
-                        if (eResponse != DialogResult.Yes)
-                        {
-                            return false;
-                        }
+                    var response = MessageBox.Show(warningMessage, "Warning", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+
+                    if (response != DialogResult.Yes)
+                    {
+                        return false;
                     }
                 }
             }
