@@ -483,15 +483,15 @@ namespace MASIC
             clsSpectraCache spectraCache,
             clsMASICOptions masicOptions,
             DataInput.clsDataImport dataImportUtilities,
-            ref int ionUpdateCount)
+            out int ionUpdateCount)
         {
             // Look for parent ions that have similar m/z values and are nearby one another in time
             // For the groups of similar ions, assign the scan number of the highest intensity parent ion to the other similar parent ions
 
+            ionUpdateCount = 0;
+
             try
             {
-                ionUpdateCount = 0;
-
                 if (scanList.ParentIons.Count <= 0)
                 {
                     return masicOptions.SuppressNoParentIonsError;

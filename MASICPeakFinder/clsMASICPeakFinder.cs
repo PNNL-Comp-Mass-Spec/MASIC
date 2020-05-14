@@ -3413,7 +3413,7 @@ namespace MASICPeakFinder
 
         [Obsolete("Use the version that returns baselineNoiseStatsType")]
         public static void InitializeBaselineNoiseStats(
-            ref clsBaselineNoiseStats baselineNoiseStats,
+            out clsBaselineNoiseStats baselineNoiseStats,
             double minimumBaselineNoiseLevel,
             eNoiseThresholdModes noiseThresholdMode)
         {

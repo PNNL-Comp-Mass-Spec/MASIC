@@ -1002,7 +1002,7 @@ namespace MASIC
                         UpdatePeakMemoryUsage();
 
                         LogMessage("ProcessFile: Call FindSimilarParentIons");
-                        success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, Options, dataImporterBase, ref similarParentIonUpdateCount);
+                        success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, Options, dataImporterBase, out similarParentIonUpdateCount);
 
                         if (!success)
                         {
