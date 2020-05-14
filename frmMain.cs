@@ -327,24 +327,23 @@ namespace MASIC
         /// </returns>
         private bool ClearCustomSICList(bool confirmReplaceExistingResults)
         {
+            if (mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows.Count <= 0)
+                return true;
 
-            var eResult = default(DialogResult);
+            DialogResult result;
 
-            if (mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows.Count > 0)
+            if (confirmReplaceExistingResults)
             {
-                if (confirmReplaceExistingResults)
-                {
-                    eResult = MessageBox.Show("Are you sure you want to clear the Custom SIC list?", "Clear Custom SICs", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-                }
-
-                if (eResult == DialogResult.Yes || !confirmReplaceExistingResults)
-                {
-                    mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows.Clear();
-                    return true;
-                }
+                result = MessageBox.Show("Are you sure you want to clear the Custom SIC list?", "Clear Custom SICs", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
             }
             else
             {
+                result = DialogResult.Yes;
+            }
+
+            if (result == DialogResult.Yes)
+            {
+                mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows.Clear();
                 return true;
             }
 
