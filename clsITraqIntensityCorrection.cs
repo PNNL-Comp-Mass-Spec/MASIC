@@ -130,7 +130,7 @@ namespace MASIC
         /// <param name="reporterIonIntensities"></param>
         /// <param name="debugShowIntensities">When true, show the old and new reporter ion intensities at the console</param>
         /// <returns></returns>
-        public bool ApplyCorrection(ref float[] reporterIonIntensities, bool debugShowIntensities = false)
+        public bool ApplyCorrection(float[] reporterIonIntensities, bool debugShowIntensities = false)
         {
             var dataCount = reporterIonIntensities.Length - 1;
 

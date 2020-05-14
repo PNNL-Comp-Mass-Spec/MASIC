@@ -1822,7 +1822,7 @@ namespace MASIC
             }
         }
 
-        private bool UpdateMasicSettings(ref clsMASIC objMasic)
+        private bool UpdateMasicSettings(clsMASIC masicInstance)
         {
             var parseError = false;
 
@@ -2140,7 +2140,7 @@ namespace MASIC
             return !parseError;
         }
 
-        private bool ValidateSettings(ref clsMASIC objMasic)
+        private bool ValidateSettings(clsMASIC masicInstance)
         {
             if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
                 return true;

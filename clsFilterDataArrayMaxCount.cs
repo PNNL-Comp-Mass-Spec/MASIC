@@ -334,7 +334,7 @@ namespace MASIC
                         }
                         else
                         {
-                            SortAndMarkPointsToSkip(ref binToSortAbundances, ref binToSortDataIndices, binToSortDataCount, MaximumDataCountToLoad - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT);
+                            SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, MaximumDataCountToLoad - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT);
                         }
 
                         // Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataValues
@@ -378,7 +378,7 @@ namespace MASIC
                     // This shouldn't normally be necessary
 
                     // We have to sort all of the data; this can be quite slow
-                    SortAndMarkPointsToSkip(ref mDataValues, ref mDataIndices, mDataCount, MaximumDataCountToLoad, SUBTASK_STEP_COUNT);
+                    SortAndMarkPointsToSkip(mDataValues, mDataIndices, mDataCount, MaximumDataCountToLoad, SUBTASK_STEP_COUNT);
                 }
 
                 UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
@@ -389,9 +389,16 @@ namespace MASIC
             }
         }
 
-        // This is sub uses a full sort to filter the data
-        // This will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible
-        private void SortAndMarkPointsToSkip(ref double[] abundances, ref int[] dataIndices, int dataCount, int maximumDataCountInArraysToLoad, int subtaskStepCount)
+        /// <summary>
+        /// This method uses a full sort to filter the data
+        /// </summary>
+        /// <param name="abundances"></param>
+        /// <param name="dataIndices"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="maximumDataCountInArraysToLoad"></param>
+        /// <param name="subtaskStepCount"></param>
+        /// <remarks>Sorting will be slow for large arrays and you should therefore use FilterDataByMaxDataCountToKeep if possible</remarks>
+        private void SortAndMarkPointsToSkip(double[] abundances, int[] dataIndices, int dataCount, int maximumDataCountInArraysToLoad, int subtaskStepCount)
         {
             if (dataCount > 0)
             {
