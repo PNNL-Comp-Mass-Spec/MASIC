@@ -757,7 +757,7 @@ namespace MASIC
             {
                 if (!scanNumberToIndexMap.TryGetValue(scanNumber, out var index))
                 {
-                    item = default(ScanMemoryCacheItem);
+                    item = null;
                     return false;
                 }
 
@@ -819,7 +819,7 @@ namespace MASIC
             {
                 if (Count < capacity)
                 {
-                    oldItem = default(ScanMemoryCacheItem);
+                    oldItem = null;
                     return false;
                 }
 
@@ -880,7 +880,7 @@ namespace MASIC
             {
                 if (!scanNumberToNodeMap.TryGetValue(scanNumber, out var node))
                 {
-                    item = default(ScanMemoryCacheItem);
+                    item = null;
                     return false;
                 }
 
@@ -932,7 +932,7 @@ namespace MASIC
             {
                 if (Count < capacity)
                 {
-                    oldItem = default(ScanMemoryCacheItem);
+                    oldItem = null;
                     return false;
                 }
 
