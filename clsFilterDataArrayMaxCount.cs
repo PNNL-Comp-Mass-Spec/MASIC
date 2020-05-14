@@ -180,7 +180,9 @@ namespace MASIC
                 var histogramBinStartIntensity = new double[binCount];
 
                 for (var index = 0; index < binCount; index++)
+                {
                     histogramBinStartIntensity[index] = index * binSize;
+                }
 
                 // Parse mDataValues to populate histogramBinCounts
                 for (var index = 0; index < mDataCount; index++)
@@ -409,7 +411,9 @@ namespace MASIC
 
                 // Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
                 for (var index = 0; index < dataCount - maximumDataCountInArraysToLoad; index++)
+                {
                     abundances[index] = SkipDataPointFlag;
+                }
 
                 UpdateProgress((float)(2.666 / subtaskStepCount * 100.0D));
 

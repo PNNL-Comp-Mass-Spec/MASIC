@@ -1611,24 +1611,32 @@ namespace MASIC
                 int filterIndex;
                 switch (fileExtension.ToLower())
                 {
+                    // ReSharper disable StringLiteralTypo
                     case ".mzxml":
                         filterIndex = 2;
                         break;
+
                     case "mzml":
                         filterIndex = 3;
                         break;
+
                     case ".mzdata":
                         filterIndex = 4;
                         break;
+
                     case ".mgf":
                         filterIndex = 5;
                         break;
+
                     case ".cdf":
                         filterIndex = 6;
                         break;
+
                     default:
                         filterIndex = 1;
                         break;
+
+                    // ReSharper restore StringLiteralTypo
                 }
 
                 fileSelector.FilterIndex = filterIndex;

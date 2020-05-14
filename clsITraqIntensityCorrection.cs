@@ -136,19 +136,21 @@ namespace MASIC
 
             var originalIntensities = new double[dataCount + 1];
             for (var index = 0; index <= dataCount; index++)
+            {
                 originalIntensities[index] = reporterIonIntensities[index];
+            }
 
             if (ApplyCorrection(originalIntensities, debugShowIntensities))
             {
                 for (var index = 0; index <= dataCount; index++)
+                {
                     reporterIonIntensities[index] = (float)originalIntensities[index];
+                }
 
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /// <summary>

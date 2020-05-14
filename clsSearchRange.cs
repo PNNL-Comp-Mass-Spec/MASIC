@@ -412,7 +412,7 @@ namespace MASIC
                     success = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 success = false;
             }

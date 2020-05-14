@@ -70,7 +70,7 @@ namespace MASIC
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ionMatchCount = 0;
             }
