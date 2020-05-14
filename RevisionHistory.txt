@@ -2,12 +2,12 @@ MASIC Change Log
 
 Version 3.2.7438; May 13, 2020
 	- Fix a bug with the in-memory spectra pool
-		- There were certain cases where a spectrum in use might have its data replaced by a new spectrum read from the disk cache.
+		- There were certain cases where a spectrum in use might have its data replaced by a new spectrum read from the disk cache
 		- Object re-use when reading from disk no longer occurs to avoid this issue
 	- Other performance improvements
 		- Make use of a least-recently-used cache for the in-memory spectra pool
 		- Set list initial allocation size before adding content (reduces memory allocations and copies)
-		- Removing extra allocated space from lists when done adding content (reduces overall memory usage)
+		- Remove extra allocated space from lists when done adding content (reduces overall memory usage)
 
 Version 3.1.7436; May 11, 2020
 	- Optimize spectrum caching logic to improve processing speed
