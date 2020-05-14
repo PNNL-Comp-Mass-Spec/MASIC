@@ -10,6 +10,64 @@ namespace MASICTest
     [TestFixture]
     public class clsTests : EventNotifier
     {
+
+        /// <summary>
+        /// Test the FilterData method in clsFilterDataArrayMaxCount
+        /// </summary>
+        [Test]
+        public void TestFilterData()
+        {
+            const int MAX_ALLOWABLE_ION_COUNT = 2000;
+
+            var options = new clsMASICOptions(string.Empty, string.Empty);
+            var peakFinder = new MASICPeakFinder.clsMASICPeakFinder();
+            var reporterIons = new clsReporterIons();
+
+            var parentIonProcessor = new clsParentIonProcessing(reporterIons);
+            var scanTracking = new clsScanTracking(reporterIons, peakFinder);
+
+            var dataImportUtilities = new MASIC.DataInput.clsDataImportThermoRaw(options, peakFinder, parentIonProcessor, scanTracking);
+
+            var mReporterIons = new clsReporterIons();
+
+            var msSpectrum = new clsMSSpectrum(1000);
+
+            for (var mz = 500.0; mz < 1000; mz += 0.1)
+            {
+                msSpectrum.IonsMZ.Add(mz);
+                msSpectrum.IonsIntensity.Add(100 + Math.Sin(mz / 10) * 50 - Math.Abs(750 - mz) / 10);
+            }
+
+            dataImportUtilities.DiscardDataToLimitIonCount(msSpectrum,
+                mReporterIons.MZIntensityFilterIgnoreRangeStart,
+                mReporterIons.MZIntensityFilterIgnoreRangeEnd,
+                MAX_ALLOWABLE_ION_COUNT);
+
+            var pointsToCheck = new Dictionary<int, KeyValuePair<double, double>>
+            {
+                {0, new KeyValuePair<double, double>(508.500, 103.43985)},
+                {10, new KeyValuePair<double, double>(509.500, 107.56497)},
+                {250, new KeyValuePair<double, double>(574.500, 121.65772)},
+                {500, new KeyValuePair<double, double>(637.800, 129.39681)},
+                {750, new KeyValuePair<double, double>(698.500, 128.37793)},
+                {1000, new KeyValuePair<double, double>(756.800, 113.22312)},
+                {1500, new KeyValuePair<double, double>(841.500, 122.01680)},
+                {1999, new KeyValuePair<double, double>(968.600, 103.38958)}
+            };
+
+            foreach (var item in pointsToCheck)
+            {
+                var index = item.Key;
+                Console.WriteLine(
+                    "Data point {0,4}: {1:F4} m/z, {2:F4} counts",
+                    item.Key, msSpectrum.IonsMZ[index], msSpectrum.IonsIntensity[index]);
+
+                Assert.AreEqual(item.Value.Key, msSpectrum.IonsMZ[index], 0.00001);
+                Assert.AreEqual(item.Value.Value, msSpectrum.IonsIntensity[index], 0.00001);
+            }
+
+        }
+
         [Test]
         public void TestScanConversions()
         {
@@ -239,7 +297,7 @@ namespace MASICTest
                 result = StringUtilities.ValueToString(valueToConvert, digitsOfPrecision);
             }
 
-            Console.WriteLine(string.Format("{0,-12} -> {1,-12}", valueToConvert, result));
+            Console.WriteLine("{0,-12} -> {1,-12}", valueToConvert, result);
         }
     }
 }
