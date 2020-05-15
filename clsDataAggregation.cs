@@ -215,7 +215,7 @@ namespace MASIC
             }
             else
             {
-                SumIonsBinarySearchRangeDbl(dataValues, searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd);
+                SumIonsBinarySearchRangeDbl(dataValues, searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
 
             if (matchIndexStart > matchIndexEnd)
@@ -236,8 +236,8 @@ namespace MASIC
             IReadOnlyList<double> dataValues,
             double searchValue,
             double toleranceHalfWidth,
-            int matchIndexStart,
-            int matchIndexEnd)
+            ref int matchIndexStart,
+            ref int matchIndexEnd)
         {
             // Recursive search function
 
@@ -259,13 +259,13 @@ namespace MASIC
             {
                 // Out of range on the right
                 matchIndexEnd = indexMidpoint;
-                SumIonsBinarySearchRangeDbl(dataValues, searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd);
+                SumIonsBinarySearchRangeDbl(dataValues, searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else if (dataValues[indexMidpoint] < searchValue - toleranceHalfWidth)
             {
                 // Out of range on the left
                 matchIndexStart = indexMidpoint;
-                SumIonsBinarySearchRangeDbl(dataValues, searchValue, toleranceHalfWidth, matchIndexStart, matchIndexEnd);
+                SumIonsBinarySearchRangeDbl(dataValues, searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else
             {
