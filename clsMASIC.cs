@@ -1631,9 +1631,9 @@ namespace MASIC
 
                         var outputFileTestPath = Path.Combine(outputDirectoryPath, "TestOutputFile" + DateTime.UtcNow.Ticks + ".tmp");
 
-                        using (var fsOutFileTest = new StreamWriter(outputFileTestPath, false))
+                        using (var writer = new StreamWriter(outputFileTestPath, false))
                         {
-                            fsOutFileTest.WriteLine("Test");
+                            writer.WriteLine("Test");
                         }
 
                         // Wait 250 msec, then delete the file
