@@ -22,7 +22,22 @@ namespace MASIC
             mMRMProcessor = mrmProcessor;
         }
 
-        private List<clsMzBinInfo> CreateMZLookupList(
+        private static short ComputeMzSearchChunkProgress(
+            int parentIonsProcessed, int parentIonsCount,
+            int surveyScanIndex, int surveyScansCount,
+            double mzSearchChunkProgressFraction)
+        {
+            var progressAddon = surveyScanIndex / (double)surveyScansCount * mzSearchChunkProgressFraction * 100;
+            if (parentIonsCount < 1)
+            {
+                return (short)Math.Round(progressAddon, 0);
+            }
+
+            var percentComplete = parentIonsProcessed / (double)(parentIonsCount - 1) * 100 + progressAddon;
+            return (short)Math.Round(percentComplete, 0);
+        }
+
+        private static List<clsMzBinInfo> CreateMZLookupList(
             clsMASICOptions masicOptions,
             clsScanList scanList,
             bool processSIMScans,
@@ -682,12 +697,15 @@ namespace MASIC
                         // Process all of the m/z values in udtMZSearchChunk
                         // ---------------------------------------------------------
 
+                        var mzSearchChunkProgressFraction = mzSearchChunks.Count / (double)mzBinList.Count;
+
                         var success = ProcessMzSearchChunk(
                             masicOptions,
                             scanList,
                             dataAggregation, dataOutputHandler, xmlResultsWriter,
                             spectraCache, scanNumScanConverter,
                             mzSearchChunks,
+                            mzSearchChunkProgressFraction,
                             parentIonIndices,
                             processSIMScans,
                             simIndex,
@@ -730,6 +748,7 @@ namespace MASIC
             clsSpectraCache spectraCache,
             clsScanNumScanTimeConversion scanNumScanConverter,
             IReadOnlyList<clsMzSearchInfo> mzSearchChunk,
+            double mzSearchChunkProgressFraction,
             IList<int> parentIonIndices,
             bool processSIMScans,
             int simIndex,
@@ -742,6 +761,7 @@ namespace MASIC
             // Reserve room in fullSICScanIndices for at most maxMZCountInChunk values and .SurveyScans.Count scans
             // Count of the number of valid entries in the second dimension of the above 3 arrays
             var fullSICDataCount = new int[mzSearchChunk.Count];
+
             // Pointer into .SurveyScans
             var fullSICScanIndices = new int[mzSearchChunk.Count, scanList.SurveyScans.Count];
             var fullSICIntensities = new double[mzSearchChunk.Count, scanList.SurveyScans.Count];
@@ -842,7 +862,13 @@ namespace MASIC
 
                 if (surveyScanIndex % 100 == 0)
                 {
-                    UpdateProgress("Loading raw SIC data: " + surveyScanIndex + " / " + scanList.SurveyScans.Count);
+                    var subtaskPercentComplete = ComputeMzSearchChunkProgress(
+                        parentIonsProcessed, scanList.ParentIons.Count,
+                        surveyScanIndex, scanList.SurveyScans.Count, mzSearchChunkProgressFraction);
+
+                    var progressMessage = "Loading raw SIC data: " + surveyScanIndex + " / " + scanList.SurveyScans.Count;
+
+                    UpdateProgress(subtaskPercentComplete, progressMessage);
                     if (masicOptions.AbortProcessing)
                     {
                         scanList.ProcessingIncomplete = true;
@@ -1023,14 +1049,11 @@ namespace MASIC
                 // ---------------------------------------------------------
                 try
                 {
-                    if (scanList.ParentIons.Count > 1)
-                    {
-                        UpdateProgress((short)(parentIonsProcessed / (double)(scanList.ParentIons.Count - 1) * 100));
-                    }
-                    else
-                    {
-                        UpdateProgress(0);
-                    }
+                    var subtaskPercentComplete = ComputeMzSearchChunkProgress(
+                        parentIonsProcessed, scanList.ParentIons.Count,
+                        scanList.SurveyScans.Count, scanList.SurveyScans.Count, mzSearchChunkProgressFraction);
+
+                    UpdateProgress(subtaskPercentComplete);
 
                     UpdateCacheStats(spectraCache);
                     if (masicOptions.AbortProcessing)
