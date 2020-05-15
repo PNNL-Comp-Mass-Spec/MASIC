@@ -161,9 +161,9 @@ namespace MASIC
                     // Now process the SIM scans (if any)
                     // First, see if any SIMScans are present and determine the maximum SIM Index
                     var simIndexMax = -1;
-                    for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
+                    foreach (var parentIon in scanList.ParentIons)
                     {
-                        var surveyScan = scanList.SurveyScans[scanList.ParentIons[parentIonIndex].SurveyScanIndex];
+                        var surveyScan = scanList.SurveyScans[parentIon.SurveyScanIndex];
                         if (surveyScan.SIMScan)
                         {
                             if (surveyScan.SIMIndex > simIndexMax)
