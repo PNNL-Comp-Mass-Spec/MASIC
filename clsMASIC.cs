@@ -40,8 +40,8 @@ namespace MASIC
         {
             mFileDate = "May 14, 2020";
 
-            mLocalErrorCode = eMasicErrorCodes.NoError;
-            mStatusMessage = string.Empty;
+            LocalErrorCode = eMasicErrorCodes.NoError;
+            StatusMessage = string.Empty;
 
             mProcessingStats = new clsProcessingStats();
             InitializeMemoryManagementOptions(mProcessingStats);
@@ -112,22 +112,6 @@ namespace MASIC
 
         private readonly clsProcessingStats mProcessingStats;
 
-        /// <summary>
-        /// Current processing step
-        /// </summary>
-        private eProcessingStepConstants mProcessingStep;
-
-        /// <summary>
-        /// Percent completion for the current sub task
-        /// </summary>
-        /// <remarks>Value between 0 and 100</remarks>
-        private float mSubtaskProcessingStepPct;
-
-        private string mSubtaskDescription = string.Empty;
-
-        private eMasicErrorCodes mLocalErrorCode;
-        private string mStatusMessage;
-
         #endregion
 
         #region "Events"
@@ -177,7 +161,10 @@ namespace MASIC
             set => Options.SICOptions.DatasetID = value;
         }
 
-        public eMasicErrorCodes LocalErrorCode => mLocalErrorCode;
+        /// <summary>
+        /// Local error code
+        /// </summary>
+        public eMasicErrorCodes LocalErrorCode { get; private set; }
 
         public string MASICPeakFinderDllVersion
         {
@@ -209,20 +196,32 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Processing options
+        /// </summary>
         public clsMASICOptions Options { get; }
 
-        public eProcessingStepConstants ProcessStep => mProcessingStep;
+        /// <summary>
+        /// Current processing step
+        /// </summary>
+        public eProcessingStepConstants ProcessStep { get; private set; }
+
+        /// <summary>
+        /// Status message
+        /// </summary>
+        public string StatusMessage { get; private set; }
 
         /// <summary>
         /// Subtask progress percent complete
         /// </summary>
         /// <returns></returns>
         /// <remarks>Value between 0 and 100</remarks>
-        public float SubtaskProgressPercentComplete => mSubtaskProcessingStepPct;
+        public float SubtaskProgressPercentComplete { get; private set; }
 
-        public string SubtaskDescription => mSubtaskDescription;
-
-        public string StatusMessage => mStatusMessage;
+        /// <summary>
+        /// Subtask description
+        /// </summary>
+        public string SubtaskDescription { get; private set; } = string.Empty;
 
         #endregion
 
@@ -1124,7 +1123,7 @@ namespace MASIC
             if (ErrorCode == ProcessFilesErrorCodes.LocalizedError ||
                 ErrorCode == ProcessFilesErrorCodes.NoError)
             {
-                switch (mLocalErrorCode)
+                switch (LocalErrorCode)
                 {
                     case eMasicErrorCodes.NoError:
                         errorMessage = string.Empty;
@@ -1273,7 +1272,7 @@ namespace MASIC
                 UpdateProcessingStep(eProcessingStepConstants.ReadDataFile);
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
-                mStatusMessage = string.Empty;
+                StatusMessage = string.Empty;
 
                 if (Options.SkipSICAndRawDataProcessing)
                 {
@@ -1368,7 +1367,7 @@ namespace MASIC
                         break;
 
                     default:
-                        mStatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePathFull);
+                        StatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePathFull);
                         SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension);
                         success = false;
 
@@ -1381,9 +1380,9 @@ namespace MASIC
 
                 if (!success)
                 {
-                    if (mLocalErrorCode == eMasicErrorCodes.NoParentIonsFoundInInputFile && string.IsNullOrWhiteSpace(mStatusMessage))
+                    if (LocalErrorCode == eMasicErrorCodes.NoParentIonsFoundInInputFile && string.IsNullOrWhiteSpace(StatusMessage))
                     {
-                        mStatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range";
+                        StatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range";
                     }
 
                     SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, true);
@@ -1480,20 +1479,20 @@ namespace MASIC
 
             Options.OutputDirectoryPath = outputDirectoryPath;
 
-            mSubtaskProcessingStepPct = 0;
+            SubtaskProgressPercentComplete = 0;
             UpdateProcessingStep(eProcessingStepConstants.NewTask, true);
             ResetProgress("Starting calculations");
 
-            mStatusMessage = string.Empty;
+            StatusMessage = string.Empty;
 
             UpdateStatusFile(true);
 
             if (!Options.LoadParameterFileSettings(parameterFilePath, inputFilePath))
             {
                 SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile);
-                mStatusMessage = "Parameter file load error: " + parameterFilePath;
+                StatusMessage = "Parameter file load error: " + parameterFilePath;
 
-                ShowErrorMessage(mStatusMessage);
+                ShowErrorMessage(StatusMessage);
 
                 if (ErrorCode == ProcessFilesErrorCodes.NoError)
                 {
@@ -1542,7 +1541,7 @@ namespace MASIC
 
                 if (keepProcessing)
                 {
-                    mStatusMessage = "Parsing " + Path.GetFileName(inputFilePath);
+                    StatusMessage = "Parsing " + Path.GetFileName(inputFilePath);
 
                     success = CleanupFilePaths(ref inputFilePath, ref outputDirectoryPath);
                     Options.OutputDirectoryPath = outputDirectoryPath;
@@ -1571,7 +1570,7 @@ namespace MASIC
 
                     if (!success)
                     {
-                        if (mLocalErrorCode == eMasicErrorCodes.NoError)
+                        if (LocalErrorCode == eMasicErrorCodes.NoError)
                             SetBaseClassErrorCode(ProcessFilesErrorCodes.FilePathError);
                         keepProcessing = false;
                     }
@@ -1701,16 +1700,16 @@ namespace MASIC
                             mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
                             if (!success)
                             {
-                                if (string.IsNullOrEmpty(mStatusMessage))
+                                if (string.IsNullOrEmpty(StatusMessage))
                                 {
-                                    mStatusMessage = "Unable to parse file; unknown error";
+                                    StatusMessage = "Unable to parse file; unknown error";
                                 }
                                 else
                                 {
-                                    mStatusMessage = "Unable to parse file: " + mStatusMessage;
+                                    StatusMessage = "Unable to parse file: " + StatusMessage;
                                 }
 
-                                ShowErrorMessage(mStatusMessage);
+                                ShowErrorMessage(StatusMessage);
                             }
                             else
                             {
@@ -1756,23 +1755,23 @@ namespace MASIC
                 Console.WriteLine();
                 if (doNotProcess)
                 {
-                    mStatusMessage = "Existing valid results were found; processing was not repeated.";
-                    ShowMessage(mStatusMessage);
+                    StatusMessage = "Existing valid results were found; processing was not repeated.";
+                    ShowMessage(StatusMessage);
                 }
                 else if (success)
                 {
-                    mStatusMessage = "Processing complete.  Results can be found in directory: " + outputDirectoryPath;
-                    ShowMessage(mStatusMessage);
+                    StatusMessage = "Processing complete.  Results can be found in directory: " + outputDirectoryPath;
+                    ShowMessage(StatusMessage);
                 }
                 else if (LocalErrorCode == eMasicErrorCodes.NoError)
                 {
-                    mStatusMessage = "Error Code " + ErrorCode + ": " + GetErrorMessage();
-                    ShowErrorMessage(mStatusMessage);
+                    StatusMessage = "Error Code " + ErrorCode + ": " + GetErrorMessage();
+                    ShowErrorMessage(StatusMessage);
                 }
                 else
                 {
-                    mStatusMessage = "Error Code " + LocalErrorCode + ": " + GetErrorMessage();
-                    ShowErrorMessage(mStatusMessage);
+                    StatusMessage = "Error Code " + LocalErrorCode + ": " + GetErrorMessage();
+                    ShowErrorMessage(StatusMessage);
                 }
 
                 LogMessage(string.Format("ProcessingStats: Memory Usage At Start (MB) = {0:F2}", mProcessingStats.MemoryUsageMBAtStart));
@@ -1907,13 +1906,13 @@ namespace MASIC
 
         private void SetLocalErrorCode(eMasicErrorCodes newErrorCode, bool leaveExistingErrorCodeUnchanged = false)
         {
-            if (leaveExistingErrorCodeUnchanged && mLocalErrorCode != eMasicErrorCodes.NoError)
+            if (leaveExistingErrorCodeUnchanged && LocalErrorCode != eMasicErrorCodes.NoError)
             {
                 // An error code is already defined; do not change it
             }
             else
             {
-                mLocalErrorCode = newErrorCode;
+                LocalErrorCode = newErrorCode;
 
                 if (newErrorCode == eMasicErrorCodes.NoError)
                 {
@@ -1949,10 +1948,10 @@ namespace MASIC
                 raiseEventNow = true;
             }
 
-            if (Math.Abs(subtaskPercentComplete - mSubtaskProcessingStepPct) > float.Epsilon)
+            if (Math.Abs(subtaskPercentComplete - SubtaskProgressPercentComplete) > float.Epsilon)
             {
                 raiseEventNow = true;
-                mSubtaskProcessingStepPct = subtaskPercentComplete;
+                SubtaskProgressPercentComplete = subtaskPercentComplete;
             }
 
             if (forceUpdate || raiseEventNow ||
@@ -1973,7 +1972,7 @@ namespace MASIC
         /// <param name="message"></param>
         private void SetSubtaskProcessingStepPct(float subtaskPercentComplete, string message)
         {
-            mSubtaskDescription = message;
+            SubtaskDescription = message;
             SetSubtaskProcessingStepPct(subtaskPercentComplete, true);
         }
 
@@ -2013,7 +2012,13 @@ namespace MASIC
 
             try
             {
-                var currentStep = (int)mProcessingStep;
+                if (ProcessStep == eProcessingStepConstants.CreateSICsAndFindPeaks && SubtaskProgressPercentComplete < 1)
+                {
+                    // Check this code
+                    SubtaskProgressPercentComplete = SubtaskProgressPercentComplete + 3 - 2 - 1;
+                }
+
+                var currentStep = (int)ProcessStep;
                 if (currentStep >= weightingFactors.Length)
                     currentStep = weightingFactors.Length - 1;
 
@@ -2021,7 +2026,7 @@ namespace MASIC
                 for (var index = 0; index < currentStep; index++)
                     overallPctCompleted += weightingFactors[index] * 100;
 
-                overallPctCompleted += weightingFactors[currentStep] * mSubtaskProcessingStepPct;
+                overallPctCompleted += weightingFactors[currentStep] * SubtaskProgressPercentComplete;
 
                 mProgressPercentComplete = overallPctCompleted;
             }
@@ -2044,7 +2049,7 @@ namespace MASIC
 
         private void UpdateProcessingStep(eProcessingStepConstants eNewProcessingStep, bool forceStatusFileUpdate = false)
         {
-            mProcessingStep = eNewProcessingStep;
+            ProcessStep = eNewProcessingStep;
             UpdateStatusFile(forceStatusFileUpdate);
         }
 
@@ -2074,7 +2079,7 @@ namespace MASIC
 
                         writer.WriteStartElement("General");
                         writer.WriteElementString("LastUpdate", DateTime.Now.ToString(clsDatasetStatsSummarizer.DATE_TIME_FORMAT_STRING));
-                        writer.WriteElementString("ProcessingStep", mProcessingStep.ToString());
+                        writer.WriteElementString("ProcessingStep", ProcessStep.ToString());
                         writer.WriteElementString("Progress", StringUtilities.DblToString(mProgressPercentComplete, 2));
                         writer.WriteElementString("Error", GetErrorMessage());
                         writer.WriteEndElement();
