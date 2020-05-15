@@ -1621,11 +1621,14 @@ namespace MASIC
                         // Verify that we have write access to the output directory
                         // ---------------------------------------------------------
 
-                        // The following use of .Demand() and .Assert() should work for testing access permissions, but it doesn't
-                        // 
-                        // var filePermissionTest = new Security.Permissions.FileIOPermission(Security.Permissions.FileIOPermissionAccess.AllAccess, outputDirectoryPath)
-                        // filePermissionTest.Demand()
-                        // filePermissionTest.Assert()
+                        // The following use of .Demand() and .Assert() doesn't work for testing access permissions
+                        // This is because System.Security.Permissions.FileIOPermission doesn't examine actual file system ACLs
+                        // Instead, just create a dummy file, then delete it
+                        // see also https://stackoverflow.com/a/21637409/1179467
+                        //
+                        // var filePermissionTest = new FileIOPermission(FileIOPermissionAccess.AllAccess, outputDirectoryPath);
+                        // filePermissionTest.Demand();
+                        // filePermissionTest.Assert();
 
                         LogMessage("Checking for write permission in the output path: " + outputDirectoryPath);
 

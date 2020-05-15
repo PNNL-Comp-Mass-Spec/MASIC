@@ -23,12 +23,12 @@ namespace MASIC
         /// For sparse spectra, you can alternatively use FindMaxValueInMZRange
         /// </remarks>
         public double AggregateIonsInRange(
-        clsMSSpectrum msSpectrum,
-        double searchMZ,
-        double searchToleranceHalfWidth,
-        out int ionMatchCount,
-        out double closestMZ,
-        bool returnMax)
+            clsMSSpectrum msSpectrum,
+            double searchMZ,
+            double searchToleranceHalfWidth,
+            out int ionMatchCount,
+            out double closestMZ,
+            bool returnMax)
         {
             ionMatchCount = 0;
             closestMZ = 0;

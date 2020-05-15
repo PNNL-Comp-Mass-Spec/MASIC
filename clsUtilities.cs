@@ -12,6 +12,13 @@ namespace MASIC
         /// </summary>
         public const double CHARGE_CARRIER_MASS_MONOISOTOPIC = 1.00727649;
 
+        /// <summary>
+        /// Check whether the m/z value is in the specified range
+        /// </summary>
+        /// <param name="mz"></param>
+        /// <param name="mzIgnoreRangeStart"></param>
+        /// <param name="mzIgnoreRangeEnd"></param>
+        /// <returns>True if the m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd</returns>
         public static bool CheckPointInMZIgnoreRange(
             double mz,
             double mzIgnoreRangeStart,
@@ -19,7 +26,6 @@ namespace MASIC
         {
             if (mzIgnoreRangeStart > 0 || mzIgnoreRangeEnd > 0)
             {
-                // Return true if the m/z value is between mzIgnoreRangeStart and mzIgnoreRangeEnd
                 return mz >= mzIgnoreRangeStart && mz <= mzIgnoreRangeEnd;
             }
 

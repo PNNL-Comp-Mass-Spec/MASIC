@@ -166,6 +166,8 @@ namespace MASIC.DataInput
                             ionCountNew = 0;
                             for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             {
+                                // Always keep points in the m/z ignore range
+                                // If CheckPointInMZIgnoreRange returns true, set pointPassesFilter to true
                                 var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                                 if (!pointPassesFilter)
@@ -199,6 +201,8 @@ namespace MASIC.DataInput
                             ionCountNew = 0;
                             for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                             {
+                                // Always keep points in the m/z ignore range
+                                // If CheckPointInMZIgnoreRange returns true, set pointPassesFilter to true
                                 var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                                 if (!pointPassesFilter)
@@ -291,6 +295,8 @@ namespace MASIC.DataInput
                     ionCountNew = 0;
                     for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
                     {
+                        // Always keep points in the m/z ignore range
+                        // If CheckPointInMZIgnoreRange returns true, set pointPassesFilter to true
                         var pointPassesFilter = clsUtilities.CheckPointInMZIgnoreRange(msSpectrum.IonsMZ[ionIndex], mzIgnoreRangeStart, mzIgnoreRangeEnd);
 
                         if (!pointPassesFilter)

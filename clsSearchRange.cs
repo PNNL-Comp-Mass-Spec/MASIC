@@ -419,6 +419,7 @@ namespace MASIC
 
             if (success)
                 ClearUnusedData();
+
             return success;
         }
         #endregion
