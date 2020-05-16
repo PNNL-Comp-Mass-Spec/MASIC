@@ -42,9 +42,9 @@ namespace MASIC.DataInput
         {
             if (precursorScanNumber != mCachedPrecursorScan)
             {
-                var ionCount = xcaliburAccessor.GetScanData(precursorScanNumber, out var centroidedIonsMz, out var centroidedIonsIntensity, 0, true);
+                xcaliburAccessor.GetScanData(precursorScanNumber, out var centroidedIonsMz, out var centroidedIonsIntensity, 0, true);
 
-                UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity, ionCount);
+                UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz, centroidedIonsIntensity);
             }
 
             var chargeState = 0;

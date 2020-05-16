@@ -555,31 +555,24 @@ namespace MASIC.DatasetStats
         /// <summary>
         /// Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
         /// </summary>
-        /// <param name="datasetName">Dataset Name</param>
         /// <param name="scanStatsFilePath">File path to write the text file to</param>
         /// <returns>True if success; False if failure</returns>
         /// <remarks></remarks>
-        public bool CreateScanStatsFile(string datasetName, string scanStatsFilePath)
+        public bool CreateScanStatsFile(string scanStatsFilePath)
         {
-            return CreateScanStatsFile(datasetName, scanStatsFilePath, mDatasetScanStats, DatasetFileInfo, SampleInfo);
+            return CreateScanStatsFile(scanStatsFilePath, mDatasetScanStats);
         }
 
         /// <summary>
         /// Creates a tab-delimited text file with details on each scan tracked by this class (stored in mDatasetScanStats)
         /// </summary>
-        /// <param name="datasetName">Dataset Name</param>
         /// <param name="scanStatsFilePath">File path to write the text file to</param>
         /// <param name="scanStats">Scan stats to parse</param>
-        /// <param name="datasetInfo">Dataset Info</param>
-        /// <param name="oSampleInfo">Sample Info</param>
         /// <returns>True if success; False if failure</returns>
         /// <remarks></remarks>
         public bool CreateScanStatsFile(
-            string datasetName,
             string scanStatsFilePath,
-            List<ScanStatsEntry> scanStats,
-            DatasetFileInfo datasetInfo,
-            SampleInfo oSampleInfo)
+            List<ScanStatsEntry> scanStats)
         {
             var datasetID = 0;
 

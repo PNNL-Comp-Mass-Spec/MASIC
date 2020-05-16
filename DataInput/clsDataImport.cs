@@ -491,8 +491,7 @@ namespace MASIC.DataInput
         protected void UpdateCachedPrecursorScan(
             int precursorScanNumber,
             double[] centroidedIonsMz,
-            double[] centroidedIonsIntensity,
-            int ionCount)
+            double[] centroidedIonsIntensity)
         {
             UpdateCachedPrecursorScan(precursorScanNumber, centroidedIonsMz.ToList(), centroidedIonsIntensity.ToList());
         }
