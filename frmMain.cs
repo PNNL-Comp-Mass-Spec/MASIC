@@ -98,7 +98,7 @@ namespace MASIC
         private int mHeightAdjustForce;
         private DateTime mHeightAdjustTime;
 
-        private clsMASIC mMasic;
+        private readonly clsMASIC mMasic;
         private frmProgress mProgressForm;
 
         /// <summary>
@@ -2205,6 +2205,11 @@ namespace MASIC
             EnableDisableControls();
         }
 
+        private void cboReporterIonMassMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            AutoToggleReporterIonStatsEnabled();
+        }
+
         private void cboSICNoiseThresholdMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2647,9 +2652,5 @@ namespace MASIC
 
         #endregion
 
-        private void cboReporterIonMassMode_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            AutoToggleReporterIonStatsEnabled();
-        }
     }
 }
