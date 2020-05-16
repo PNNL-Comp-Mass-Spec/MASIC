@@ -38,7 +38,7 @@ namespace MASIC
         /// </summary>
         public clsMASIC()
         {
-            mFileDate = "May 14, 2020";
+            mFileDate = "May 15, 2020";
 
             LocalErrorCode = eMasicErrorCodes.NoError;
             StatusMessage = string.Empty;
@@ -2050,12 +2050,6 @@ namespace MASIC
 
             try
             {
-                if (ProcessStep == eProcessingStepConstants.CreateSICsAndFindPeaks && SubtaskProgressPercentComplete < 1)
-                {
-                    // Check this code
-                    SubtaskProgressPercentComplete = SubtaskProgressPercentComplete + 3 - 2 - 1;
-                }
-
                 var currentStep = (int)ProcessStep;
                 if (currentStep >= weightingFactors.Length)
                     currentStep = weightingFactors.Length - 1;
