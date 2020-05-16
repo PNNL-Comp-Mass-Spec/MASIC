@@ -291,6 +291,7 @@ namespace MASIC
             mzList = mzList.TrimEnd('\t');
             mzToleranceDaList = mzToleranceDaList.TrimEnd('\t');
             scanCenterList = scanCenterList.TrimEnd('\t');
+            scanToleranceList = scanToleranceList.TrimEnd('\t');
             scanCommentList = scanCommentList.TrimEnd(delimiters);
 
             var mzValues = mzList.Split(delimiters).ToList();
