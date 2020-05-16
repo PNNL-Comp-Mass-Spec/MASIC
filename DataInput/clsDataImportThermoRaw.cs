@@ -141,7 +141,7 @@ namespace MASIC.DataInput
         {
             // Use XrawFileIO to read the .Raw files (it uses ThermoFisher.CommonCore)
 
-            var readerOptions = new ThermoReaderOptions()
+            var readerOptions = new ThermoReaderOptions
             {
                 LoadMSMethodInfo = mOptions.WriteMSMethodFile,
                 LoadMSTuneInfo = mOptions.WriteMSTuneFile

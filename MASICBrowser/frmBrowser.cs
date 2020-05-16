@@ -148,7 +148,9 @@ namespace MASICBrowser
         #endregion
 
         #region "Properties"
+
         public string FileToAutoLoad { get; set; }
+
         #endregion
 
         #region "Classwide Variables"
@@ -1033,9 +1035,9 @@ namespace MASICBrowser
                     MessageBox.Show("No data is in memory", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Ignore any errors in this sub
+                // Ignore any errors in this method
             }
         }
 
@@ -2712,7 +2714,7 @@ namespace MASICBrowser
                     scanNumberSaved = mParentIonStats[mParentIonPointerArray[lstParentIonData.SelectedIndex]].FragScanObserved;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 scanNumberSaved = 1;
             }

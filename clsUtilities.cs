@@ -143,7 +143,7 @@ namespace MASIC
             {
                 return double.TryParse(value, out _);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

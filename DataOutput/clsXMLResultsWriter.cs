@@ -113,7 +113,7 @@ namespace MASIC.DataOutput
                 // Write the SIC's and computed peak stats and areas to the XML file for the given parent ion
                 for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {
-                    lastGoodLoc = "fragScanIndex=" + fragScanIndex.ToString();
+                    lastGoodLoc = "fragScanIndex=" + fragScanIndex;
 
                     writer.WriteStartElement("ParentIon");
                     writer.WriteAttributeString("Index", parentIonIndex.ToString());             // Parent ion Index

@@ -543,7 +543,7 @@ namespace MASIC.DataInput
 
                 mDatasetFileInfo.ScanCount = 0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

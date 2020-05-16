@@ -443,7 +443,7 @@ namespace MASIC
                     // No data in this spectrum
                     success = false;
                 }
-                else if (!spectraCache.GetSpectrum(scanList[spectrumIndex].ScanNumber, out var spectrum, true))
+                else if (!spectraCache.GetSpectrum(scanList[spectrumIndex].ScanNumber, out var spectrum, canSkipPool: true))
                 {
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
                     success = false;
@@ -619,7 +619,7 @@ namespace MASIC
                     UsePointerIndexArray = false
                 };
 
-                var success = searchRange.FillWithData(mzList);
+                searchRange.FillWithData(mzList);
 
                 ReportMessage("FindSimilarParentIons: Sort the intensity arrays");
 
@@ -664,7 +664,7 @@ namespace MASIC
                             ionInUseCountOriginal = similarParentIonsData.IonInUseCount;
                             var currentMZ = mzListEntry.MZAvg;
 
-                            if (currentMZ <= 0)
+                            if (currentMZ < double.Epsilon)
                                 continue;
 
                             FindSimilarParentIonsWork(spectraCache, currentMZ, 0, originalIndex,
@@ -752,7 +752,6 @@ namespace MASIC
                 ReportMessage("FindSimilarParentIons: Update the scan numbers for the unique ions");
 
                 // Update the optimal peak apex scan numbers for the unique ions
-                ionUpdateCount = 0;
                 foreach (var uniqueMzListItem in similarParentIonsData.UniqueMZList)
                 {
                     for (var matchIndex = 0; matchIndex < uniqueMzListItem.MatchCount; matchIndex++)

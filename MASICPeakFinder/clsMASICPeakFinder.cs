@@ -3403,7 +3403,7 @@ namespace MASICPeakFinder
                 var versionInfo = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 return versionInfo;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return "??.??.??.??";
             }
