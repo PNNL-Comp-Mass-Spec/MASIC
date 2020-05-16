@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using MASIC;
 using NUnit.Framework;
 using PRISM;
@@ -10,6 +11,77 @@ namespace MASICTest
     [TestFixture]
     public class clsTests : EventNotifier
     {
+        [Test]
+        [TestCase(1000, 0, 1, 0, 1001.0073)]
+        [TestCase(1000, 0, 2, 0, 501.0073)]
+        [TestCase(1000, 0, 3, 0, 334.3406)]
+        [TestCase(1000, 0, 4, 0, 251.0073)]
+        [TestCase(1000, 1, 0, 0, 998.9927)]
+        [TestCase(1000, 1, 1, 0, 1000)]
+        [TestCase(1000, 1, 2, 0, 500.5036)]
+        [TestCase(1000, 1, 3, 0, 334.0049)]
+        [TestCase(1000, 1, 4, 0, 250.7555)]
+        [TestCase(1000, 2, 0, 0, 1997.9854)]
+        [TestCase(1000, 2, 1, 0, 1998.9927)]
+        [TestCase(1000, 2, 2, 0, 1000)]
+        [TestCase(1000, 2, 3, 0, 667.0024)]
+        [TestCase(1000, 2, 4, 0, 500.5036)]
+        [TestCase(1000, 3, 1, 0, 2997.9854)]
+        [TestCase(1000, 3, 2, 0, 1499.4964)]
+        [TestCase(1000, 3, 3, 0, 1000)]
+        [TestCase(1000, 3, 4, 0, 750.2518)]
+        [TestCase(1000, 4, 1, 0, 3996.9782)]
+        [TestCase(1000, 4, 2, 0, 1998.9927)]
+        [TestCase(1000, 4, 3, 0, 1332.99757)]
+        [TestCase(500, 2, 1, 0, 998.9927)]
+        [TestCase(750, 2, 1, 0, 1498.9927)]
+        [TestCase(1500, 2, 1, 0, 2998.9927)]
+        [TestCase(1500, 1, 3, 0, 500.6715)]
+        [TestCase(749.8, 1, 3, 0, 250.6049)]
+        [TestCase(750, 1, 3, 0, 250.6715)]
+        [TestCase(750.25, 1, 3, 0, 250.7549)]
+        [TestCase(750, 2, 1, 1.00739, 1498.9926)]
+        [TestCase(1500, 2, 1, 1.00739, 2998.9926)]
+        [TestCase(750, 1, 3, 1.00739, 250.6716)]
+        [TestCase(1000, -2, -1, 0, 0)]
+        [TestCase(1000, -2, -2, 0, 1000)]
+        [TestCase(1000, -2, -3, 0, 0)]
+        public void TestConvoluteMass(double massMZ, short currentCharge, short desiredCharge, double chargeCarrierMass, double expectedMass)
+        {
+            var newMass = clsUtilities.ConvoluteMass(massMZ, currentCharge, desiredCharge, chargeCarrierMass);
+
+            var currentChargeWithSign = GetChargeWithSign(currentCharge);
+            var newChargeWithSign = GetChargeWithSign(desiredCharge);
+            string chargeCarrierText;
+
+            if (Math.Abs(chargeCarrierMass) < float.Epsilon)
+                chargeCarrierText = string.Empty;
+            else
+                chargeCarrierText = " (Charge carrier: " + chargeCarrierMass + ")";
+
+            var description = string.Format(
+                "Convert {0:F4} from {1} to {2} = {3:F4}{4}",
+                massMZ,
+                currentChargeWithSign,
+                newChargeWithSign,
+                newMass,
+                chargeCarrierText);
+
+            Console.WriteLine(description);
+
+            Assert.AreEqual(expectedMass, newMass, 0.0001);
+        }
+
+        private string GetChargeWithSign(short currentCharge)
+        {
+            if (currentCharge > 0)
+                return string.Format("{0}+", currentCharge);
+
+            if (currentCharge < 0)
+                return string.Format("{0}-", Math.Abs(currentCharge));
+
+            return "0";
+        }
 
         /// <summary>
         /// Test the FilterData method in clsFilterDataArrayMaxCount
