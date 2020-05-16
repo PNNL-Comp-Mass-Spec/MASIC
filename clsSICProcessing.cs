@@ -115,6 +115,16 @@ namespace MASIC
             return sortedMzBins;
         }
 
+        /// <summary>
+        /// Create selected ion chromatograms for the parent ions
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="masicOptions"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="sicProcessor"></param>
+        /// <param name="xmlResultsWriter"></param>
+        /// <returns></returns>
         public bool CreateParentIonSICs(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -1157,6 +1167,16 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Store a selected ion chromatogram peak in a parent ion
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="parentIonIndex"></param>
+        /// <param name="sicDetails"></param>
+        /// <param name="potentialAreaStatsForPeak"></param>
+        /// <param name="sicPeak"></param>
+        /// <param name="peakIsValid"></param>
+        /// <returns></returns>
         public bool StorePeakInParentIon(
             clsScanList scanList,
             int parentIonIndex,

@@ -78,6 +78,23 @@ namespace MASIC
             return ionSumOrMax;
         }
 
+        /// <summary>
+        /// Searches currentScan.IonsMZ for the maximum intensity value between mzStart and mzEnd
+        /// If a match is found, updates bestMatchMZ to the m/z of the match,
+        /// updates matchIntensity to its intensity, and returns True
+        /// </summary>
+        /// <param name="spectraCache"></param>
+        /// <param name="currentScan"></param>
+        /// <param name="mzStart"></param>
+        /// <param name="mzEnd"></param>
+        /// <param name="bestMatchMZ">Output: m/z of the most intense ion in the given range</param>
+        /// <param name="matchIntensity">Output: intensity of the most intense ion in the given range</param>
+        /// <returns>True if a match is found, false if no data exists within the m/z range (or if the spectrum could not be obtained)</returns>
+        /// <remarks>
+        /// Note that this function performs a linear search of .IonsMZ
+        /// It is therefore good for spectra with less than 10 data points and bad for spectra with more than 10 data points
+        /// As an alternative to this function, use AggregateIonsInRange
+        /// </remarks>
         public bool FindMaxValueInMZRange(
             clsSpectraCache spectraCache,
             clsScanInfo currentScan,
@@ -86,14 +103,6 @@ namespace MASIC
             out double bestMatchMZ,
             out double matchIntensity)
         {
-            // Searches currentScan.IonsMZ for the maximum value between mzStart and mzEnd
-            // If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
-            // and returns True
-            //
-            // Note that this function performs a linear search of .IonsMZ; it is therefore good for spectra with < 10 data points
-            // and bad for spectra with > 10 data points
-            // As an alternative to this function, use AggregateIonsInRange
-
             bestMatchMZ = 0;
             matchIntensity = 0;
             try
@@ -120,6 +129,24 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Searches mzList for the maximum intensity value between mzStart and mzEnd
+        /// If a match is found, updates bestMatchMZ to the m/z of the match,
+        /// updates matchIntensity to its intensity, and returns True
+        /// </summary>
+        /// <param name="mzList"></param>
+        /// <param name="intensityList"></param>
+        /// <param name="ionCount"></param>
+        /// <param name="mzStart"></param>
+        /// <param name="mzEnd"></param>
+        /// <param name="bestMatchMZ">Output: m/z of the most intense ion in the given range</param>
+        /// <param name="matchIntensity">Output: intensity of the most intense ion in the given range</param>
+        /// <returns>True if a match is found, false if no data exists within the m/z range (or if the spectrum could not be obtained)</returns>
+        /// <remarks>
+        /// Note that this function performs a linear search of .IonsMZ
+        /// It is therefore good for spectra with less than 10 data points and bad for spectra with more than 10 data points
+        /// As an alternative to this function, use AggregateIonsInRange
+        /// </remarks>
         private bool FindMaxValueInMZRange(
             IList<double> mzList,
             IList<double> intensityList,
@@ -129,14 +156,6 @@ namespace MASIC
             out double bestMatchMZ,
             out double matchIntensity)
         {
-            // Searches mzList for the maximum value between mzStart and mzEnd
-            // If a match is found, then updates bestMatchMZ to the m/z of the match, updates matchIntensity to its intensity,
-            // and returns True
-            //
-            // Note that this function performs a linear search of .IonsMZ; it is therefore good for spectra with < 10 data points
-            // and bad for spectra with > 10 data points
-            // As an alternative to this function, use AggregateIonsInRange
-
             int closestMatchIndex;
             var highestIntensity = 0.0;
 

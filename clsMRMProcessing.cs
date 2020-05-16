@@ -191,6 +191,14 @@ namespace MASIC
             return oTarget;
         }
 
+        /// <summary>
+        /// Export MRM data to disk
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <returns></returns>
         public bool ExportMRMDataToDisk(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -207,6 +215,16 @@ namespace MASIC
             return success;
         }
 
+        /// <summary>
+        /// Export MRM data to disk
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="mrmSettings"></param>
+        /// <param name="srmList"></param>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <returns>True if the MRM data is successfully written to disk, or if the mrmSettings list is empty</returns>
         private bool ExportMRMDataToDisk(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -215,9 +233,6 @@ namespace MASIC
             string inputFileName,
             string outputDirectoryPath)
         {
-            // Returns true if the MRM data is successfully written to disk
-            // Note that it will also return true if udtMRMSettings() is empty
-
             const char TAB_DELIMITER = '\t';
 
             StreamWriter dataWriter = null;
@@ -428,6 +443,16 @@ namespace MASIC
             return success;
         }
 
+        /// <summary>
+        /// Write one line to the export file
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="scanFirst"></param>
+        /// <param name="scanTimeFirst"></param>
+        /// <param name="crosstabColumnValue"></param>
+        /// <param name="crosstabColumnFlag"></param>
+        /// <param name="delimiter"></param>
+        /// <param name="forceWrite">If false, only write out the line if 1 or more columns is non-zero</param>
         private void ExportMRMDataWriteLine(
             TextWriter writer,
             int scanFirst,
@@ -437,8 +462,6 @@ namespace MASIC
             char delimiter,
             bool forceWrite)
         {
-            // If forceWrite = False, then will only write out the line if 1 or more columns is non-zero
-
             var nonZeroCount = 0;
 
             var dataColumns = new List<string>(crosstabColumnValue.Count + 2)

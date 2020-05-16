@@ -10,7 +10,9 @@ namespace MASIC
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
         #region "Classwide variables"
+
         private readonly clsMASICOptions mOptions;
+
         #endregion
 
         /// <summary>

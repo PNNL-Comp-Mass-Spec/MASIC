@@ -64,6 +64,9 @@ namespace MASIC
 
         private const int MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS = 3;
 
+        /// <summary>
+        /// Processing steps
+        /// </summary>
         public enum eProcessingStepConstants
         {
             NewTask = 0,
@@ -79,6 +82,9 @@ namespace MASIC
             Complete = 100
         }
 
+        /// <summary>
+        /// MASIC Error Codes
+        /// </summary>
         public enum eMasicErrorCodes
         {
             NoError = 0,
@@ -115,14 +121,18 @@ namespace MASIC
         #endregion
 
         #region "Events"
+
         /// <summary>
         /// Use RaiseEvent MyBase.ProgressChanged when updating the overall progress
-        /// Use ProgressSubtaskChanged when updating the sub task progress
+        /// Use ProgressSubtaskChanged when updating the subtask progress
         /// </summary>
         public event ProgressSubtaskChangedEventHandler ProgressSubtaskChanged;
 
         public delegate void ProgressSubtaskChangedEventHandler();
 
+        /// <summary>
+        /// Event to track that the user wants to abort processing
+        /// </summary>
         public event ProgressResetKeypressAbortEventHandler ProgressResetKeypressAbort;
 
         public delegate void ProgressResetKeypressAbortEventHandler();
@@ -830,8 +840,12 @@ namespace MASIC
         }
 
         #endregion
+
         // ReSharper restore UnusedMember.Global
 
+        /// <summary>
+        /// Call this method to abort processing
+        /// </summary>
         public override void AbortProcessingNow()
         {
             AbortProcessing = true;
@@ -1109,15 +1123,21 @@ namespace MASIC
             return success;
         }
 
+        /// <summary>
+        /// Get supported file extensions
+        /// </summary>
+        /// <returns></returns>
         public override IList<string> GetDefaultExtensionsToParse()
         {
             return DataInput.clsDataImport.GetDefaultExtensionsToParse();
         }
 
+        /// <summary>
+        /// Get the error message, or an empty string if no error
+        /// </summary>
+        /// <returns></returns>
         public override string GetErrorMessage()
         {
-            // Returns String.Empty if no error
-
             string errorMessage;
 
             if (ErrorCode == ProcessFilesErrorCodes.LocalizedError ||
@@ -1196,15 +1216,21 @@ namespace MASIC
             return errorMessage;
         }
 
+        /// <summary>
+        /// Get the amount of free memory, in MB
+        /// </summary>
+        /// <returns></returns>
         private float GetFreeMemoryMB()
         {
-            // Returns the amount of free memory, in MB
-
             var freeMemoryMB = SystemInfo.GetFreeMemoryMB();
 
             return freeMemoryMB;
         }
 
+        /// <summary>
+        /// Get the amount of memory used by this process
+        /// </summary>
+        /// <returns></returns>
         private float GetProcessMemoryUsageMB()
         {
             // Obtain a handle to the current process
@@ -1214,6 +1240,10 @@ namespace MASIC
             return (float)(currentProcess.WorkingSet64 / 1024.0 / 1024);
         }
 
+        /// <summary>
+        /// Get total processing time, in seconds
+        /// </summary>
+        /// <returns></returns>
         private float GetTotalProcessingTimeSec()
         {
             var currentProcess = Process.GetCurrentProcess();
@@ -1403,6 +1433,11 @@ namespace MASIC
             return success;
         }
 
+        /// <summary>
+        /// Load settings from a parameter file
+        /// </summary>
+        /// <param name="parameterFilePath"></param>
+        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public bool LoadParameterFileSettings(string parameterFilePath)
         {
@@ -2165,9 +2200,11 @@ namespace MASIC
             SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
         }
 
+        /// <summary>
+        /// Update mProcessingStats.MemoryUsageMBDuringLoad based on the current memory usage
+        /// </summary>
         private void UpdateMemoryUsageEventHandler()
         {
-            // Record the current memory usage
             var memoryUsageMB = GetProcessMemoryUsageMB();
             if (memoryUsageMB > mProcessingStats.MemoryUsageMBDuringLoad)
             {

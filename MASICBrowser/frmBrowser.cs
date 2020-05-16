@@ -161,8 +161,16 @@ namespace MASICBrowser
 
         private clsSICPeakFinderOptions mSICPeakFinderOptions;
 
-        private int mParentIonPointerArrayCount;          // Could be less than mParentIonStats.Count if filtering the data
-        private int[] mParentIonPointerArray = new int[0];  // Pointer array used for de-referencing cboParentIon.SelectedItem to mParentIonStats
+        /// <summary>
+        /// Number of data point in mParentIonPointerArray
+        /// </summary>
+        /// <remarks>Could be less than mParentIonStats.Count if filtering the data</remarks>
+        private int mParentIonPointerArrayCount;
+
+        /// <summary>
+        /// Pointer array used for de-referencing cboParentIon.SelectedItem to mParentIonStats
+        /// </summary>
+        private int[] mParentIonPointerArray = new int[0];
 
         private bool mAutoStepEnabled;
         private int mAutoStepIntervalMsec;
@@ -176,10 +184,13 @@ namespace MASICBrowser
 
         #endregion
 
+        /// <summary>
+        /// Look for a corresponding Synopsis or First hits file in the same folder as masicFilePath
+        /// </summary>
+        /// <param name="masicFilePath"></param>
+        /// <param name="progressForm"></param>
         private void AutoOpenMsMsResults(string masicFilePath, frmProgress progressForm)
         {
-            // Look for a corresponding Synopsis or First hits file in the same folder as masicFilePath
-
             var dataDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(masicFilePath));
 
             var fileNameBase = Path.GetFileNameWithoutExtension(masicFilePath);
@@ -256,12 +267,17 @@ namespace MASICBrowser
             }
         }
 
+        /// <summary>
+        /// Display SIC stats
+        /// </summary>
+        /// <param name="parentIonIndex"></param>
+        /// <param name="sicStats">
+        /// Output: populated with either the original SIC stats found by MASIC
+        /// or with the updated SIC stats if chkUsePeakFinder is Checked
+        /// </param>
+        /// <remarks>If re-smooth data is enabled, the SIC data returned in sicStats will be re-smoothed</remarks>
         private void DisplaySICStats(int parentIonIndex, out clsSICStats sicStats)
         {
-            // udtSICStats will be populated with either the original SIC stats found by MASIC or with the
-            // updated SIC stats if chkUsePeakFinder is Checked
-            // Also, if re-smooth data is enabled, then the SIC data will be re-smoothed
-
             UpdateSICPeakFinderOptions();
 
             if (parentIonIndex >= 0 && parentIonIndex < mParentIonStats.Count)
@@ -403,12 +419,19 @@ namespace MASICBrowser
             txtSavitzkyGolayFilterOrder.Enabled = useSavitzkyGolay;
         }
 
+        /// <summary>
+        /// Find the minimum potential peak area in the parent ions between
+        /// parentIonIndexStart and parentIonIndexEnd, storing in ionStats.SICStats.SICPotentialAreaStatsForPeak
+        /// </summary>
+        /// <param name="parentIonIndexStart"></param>
+        /// <param name="parentIonIndexEnd"></param>
+        /// <param name="potentialAreaStatsForRegion"></param>
+        /// <remarks>
+        /// The summed intensity is not used if the number of points greater than or equal to
+        /// .SICNoiseThresholdIntensity is less than Minimum_Peak_Width
+        /// </remarks>
         private void FindMinimumPotentialPeakAreaInRegion(int parentIonIndexStart, int parentIonIndexEnd, clsSICPotentialAreaStats potentialAreaStatsForRegion)
         {
-            // This function finds the minimum potential peak area in the parent ions between
-            // parentIonIndexStart and parentIonIndexEnd
-            // However, the summed intensity is not used if the number of points >= .SICNoiseThresholdIntensity is less than Minimum_Peak_Width
-
             potentialAreaStatsForRegion.MinimumPotentialPeakArea = double.MaxValue;
             potentialAreaStatsForRegion.PeakCountBasisForMinimumPotentialArea = 0;
             for (var parentIonIndex = parentIonIndexStart; parentIonIndex <= parentIonIndexEnd; parentIonIndex++)
@@ -881,13 +904,19 @@ namespace MASICBrowser
             mMsMsResults.Tables.Add(sequenceInfoTable);
         }
 
+        /// <summary>
+        /// Checks if X1 or X2 is less than targetX
+        /// If it is, determines the Y value that corresponds to targetX by interpolating the line between (X1, Y1) and (X2, Y2)
+        /// </summary>
+        /// <param name="interpolatedYValue"></param>
+        /// <param name="X1"></param>
+        /// <param name="X2"></param>
+        /// <param name="Y1"></param>
+        /// <param name="Y2"></param>
+        /// <param name="targetX"></param>
+        /// <returns>True if the value could be interpolated; otherwise, false</returns>
         private bool InterpolateY(out double interpolatedYValue, int X1, int X2, double Y1, double Y2, int targetX)
         {
-            // Checks if X1 or X2 is less than targetX
-            // If it is, then determines the Y value that corresponds to targetX by interpolating the line between (X1, Y1) and (X2, Y2)
-            //
-            // Returns True if a match is found; otherwise, returns false
-
             if (X1 < targetX || X2 < targetX)
             {
                 if (X1 < targetX && X2 < targetX)
@@ -1051,11 +1080,16 @@ namespace MASICBrowser
             return sequences;
         }
 
+        /// <summary>
+        /// Looks for sequence in mMsMsResults.Tables(TABLE_NAME_SEQUENCES)
+        /// Returns the SequenceID if found; adds it if not present
+        /// Additionally, adds a mapping between sequence and protein in mMsMsResults.Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="protein"></param>
+        /// <returns>Sequence ID, or -1 if an error</returns>
         private int LookupSequenceID(string sequence, string protein)
         {
-            // Looks for sequence in mMsMsResults.Tables(TABLE_NAME_SEQUENCES)
-            // Returns the SequenceID if found; adds it if not present
-            // Additionally, adds a mapping between sequence and protein in mMsMsResults.Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
 
             var sequenceID = -1;
             if (sequence != null)
@@ -1141,10 +1175,13 @@ namespace MASICBrowser
                 ToggleAutoStep(true);
         }
 
+        /// <summary>
+        /// Plot the selected ion chromatogram
+        /// </summary>
+        /// <param name="indexToPlot">Index in mParentIonStats()</param>
+        /// <param name="sicStats"></param>
         private void PlotData(int indexToPlot, clsSICStats sicStats)
         {
-            // indexToPlot points to an entry in mParentIonStats()
-
             // We plot the data as two different series to allow for different coloring
 
             try
@@ -1517,12 +1554,14 @@ namespace MASICBrowser
             cboSICsTypeFilter.SelectedIndex = (int)eSICTypeFilterConstants.AllSICs;
         }
 
+        /// <summary>
+        /// For each row in mMsMsResults.Tables(TABLE_NAME_MSMS_RESULTS), find the corresponding row in mParentIonStats
+        ///
+        /// Construct a mapping between .FragScanObserved and Index in mParentIonStats
+        /// If multiple parent ions have the same value for .FragScanObserved, then the we will only track the mapping to the first one
+        /// </summary>
         private void PopulateParentIonIndexColumnInMsMsResultsTable()
         {
-            // For each row in mMsMsResults.Tables(TABLE_NAME_MSMS_RESULTS), find the corresponding row in mParentIonStats
-
-            // Construct a mapping between .FragScanObserved and Index in mParentIonStats
-            // If multiple parent ions have the same value for .FragScanObserved, then the we will only track the mapping to the first one
 
             var htFragScanToIndex = new Dictionary<int, int>();
 
@@ -2417,9 +2456,11 @@ namespace MASICBrowser
             }
         }
 
+        /// <summary>
+        /// Load settings from the registry
+        /// </summary>
         private void RegReadSettings()
         {
-            // Load settings from the registry
             try
             {
                 var regKey = Registry.CurrentUser.OpenSubKey($"SOFTWARE\\PNNL PAST Toolkit\\{REG_APP_NAME}\\{REG_SECTION_NAME}") ??
@@ -2647,6 +2688,9 @@ namespace MASICBrowser
             MessageBox.Show(string.Join(Environment.NewLine, message), "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        /// <summary>
+        /// Sort the data shown in lstParentIonData
+        /// </summary>
         private void SortData()
         {
             eSortOrderConstants eSortMode;
@@ -3281,6 +3325,7 @@ namespace MASICBrowser
         }
 
         #region "Checkboxes"
+
         private void chkFilterByIntensity_CheckedChanged(object sender, EventArgs e)
         {
             SortData();
@@ -3330,9 +3375,11 @@ namespace MASICBrowser
         {
             UpdateStatsAndPlot();
         }
+
         #endregion
 
         #region "Command Buttons"
+
         private void cmdAutoStep_Click(object sender, EventArgs e)
         {
             ToggleAutoStep();
@@ -3357,9 +3404,11 @@ namespace MASICBrowser
         {
             JumpToScan();
         }
+
         #endregion
 
         #region "ListBoxes and Comboboxes"
+
         private void lstParentIonData_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateStatsAndPlot();
@@ -3380,6 +3429,7 @@ namespace MASICBrowser
         #endregion
 
         #region "Option buttons"
+
         private void optDoNotResmooth_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -3397,6 +3447,7 @@ namespace MASICBrowser
             EnableDisableControls();
             UpdateStatsAndPlot();
         }
+
         #endregion
 
         #region "Textboxes"
@@ -3595,6 +3646,7 @@ namespace MASICBrowser
         #endregion
 
         #region "Menubar"
+
         private void mnuHelpAbout_Click(object sender, EventArgs e)
         {
             ShowAboutBox();
@@ -3619,6 +3671,7 @@ namespace MASICBrowser
         {
             Close();
         }
+
         #endregion
 
         private void frmBrowser_Closing(object sender, FormClosingEventArgs e)

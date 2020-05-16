@@ -31,6 +31,7 @@ namespace MASIC.DataInput
         #endregion
 
         #region "Classwide Variables"
+
         protected readonly clsMASICOptions mOptions;
 
         protected readonly clsParentIonProcessing mParentIonProcessor;
@@ -147,6 +148,14 @@ namespace MASIC.DataInput
             return precursorInfo.Interference;
         }
 
+        /// <summary>
+        /// Discard data below the noise threshold
+        /// </summary>
+        /// <param name="msSpectrum"></param>
+        /// <param name="noiseThresholdIntensity"></param>
+        /// <param name="mzIgnoreRangeStart"></param>
+        /// <param name="mzIgnoreRangeEnd"></param>
+        /// <param name="noiseThresholdOptions"></param>
         public void DiscardDataBelowNoiseThreshold(
             clsMSSpectrum msSpectrum,
             double noiseThresholdIntensity,
@@ -251,8 +260,8 @@ namespace MASIC.DataInput
             double mzIgnoreRangeEnd,
             int maxIonCountToRetain)
         {
-            // When this is true, then will write a text file of the mass spectrum before and after it is filtered
-            // Used for debugging
+            // When this is true, will write a text file of the mass spectrum before and after it is filtered
+            // Enable this for debugging
             var writeDebugData = false;
             StreamWriter writer = null;
 

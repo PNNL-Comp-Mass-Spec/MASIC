@@ -2209,9 +2209,11 @@ namespace MASIC
         {
             EnableDisableControls();
         }
+
         #endregion
 
         #region "Button Handlers"
+
         private void cmdClearAllRangeFilters_Click(object sender, EventArgs e)
         {
             ClearAllRangeFilters();
@@ -2261,9 +2263,11 @@ namespace MASIC
         {
             SetConnectionStringToPNNLServer();
         }
+
         #endregion
 
         #region "Checkbox Events"
+
         private void chkExportRawDataOnly_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2307,6 +2311,7 @@ namespace MASIC
         #endregion
 
         #region "Radio Button Events"
+
         private void optUseButterworthSmooth_CheckedChanged(object sender, EventArgs e)
         {
             EnableDisableControls();
@@ -2331,9 +2336,11 @@ namespace MASIC
         {
             UpdateCustomSICDataGridTableStyle();
         }
+
         #endregion
 
         #region "Textbox Events"
+
         private void txtMassSpectraNoiseThresholdIntensity_KeyPress(object sender, KeyPressEventArgs e)
         {
             TextBoxUtils.TextBoxKeyPressHandler(txtMassSpectraNoiseThresholdIntensity, e, true, true);
@@ -2516,9 +2523,11 @@ namespace MASIC
         {
             TextBoxUtils.TextBoxKeyPressHandler(txtTimeStart, e, true, true);
         }
+
         #endregion
 
         #region "Menu Handlers"
+
         private void mnuFileSelectInputFile_Click(object sender, EventArgs e)
         {
             SelectInputFile();
@@ -2567,6 +2576,7 @@ namespace MASIC
         #endregion
 
         #region "Form and Masic Class Events"
+
         private void frmMain_Load(object sender, EventArgs e)
         {
             // Note that InitializeControls() is called in Sub New()
@@ -2634,6 +2644,7 @@ namespace MASIC
             AppendToLog(EventLogEntryType.Warning, message);
             ConsoleMsgUtils.ShowWarning(message);
         }
+
         #endregion
 
         private void cboReporterIonMassMode_SelectedIndexChanged(object sender, EventArgs e)

@@ -48,6 +48,7 @@ namespace MASIC
             {
                 if (mCustomSICListFileName == null)
                     return string.Empty;
+
                 return mCustomSICListFileName;
             }
             set
@@ -72,6 +73,9 @@ namespace MASIC
         /// </summary>
         public float ScanOrAcqTimeTolerance { get; set; }
 
+        /// <summary>
+        /// List of m/z values to search for
+        /// </summary>
         public List<clsCustomMZSearchSpec> CustomMZSearchValues { get; }
 
         /// <summary>
@@ -100,6 +104,13 @@ namespace MASIC
             CustomMZSearchValues = new List<clsCustomMZSearchSpec>();
         }
 
+        /// <summary>
+        /// Store custom SIC values defined in CustomMZSearchValues
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="defaultSICTolerance"></param>
+        /// <param name="sicToleranceIsPPM"></param>
+        /// <param name="defaultScanOrAcqTimeTolerance"></param>
         public void AddCustomSICValues(
             clsScanList scanList,
             double defaultSICTolerance,
@@ -236,6 +247,10 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Append a custom m/z value to CustomMZSearchValues
+        /// </summary>
+        /// <param name="mzSearchSpec"></param>
         public void AddMzSearchTarget(clsCustomMZSearchSpec mzSearchSpec)
         {
             if (CustomMZSearchValues.Count > 0)
@@ -254,6 +269,15 @@ namespace MASIC
             CustomMZSearchValues.Add(mzSearchSpec);
         }
 
+        /// <summary>
+        /// Parse parallel lists of custom m/z info
+        /// </summary>
+        /// <param name="mzList">Comma or tab separated list of m/z values</param>
+        /// <param name="mzToleranceDaList">Comma or tab separated list of tolerances (in Da)</param>
+        /// <param name="scanCenterList">Comma or tab separated list of scan centers</param>
+        /// <param name="scanToleranceList">Comma or tab separated list of scan tolerances</param>
+        /// <param name="scanCommentList">Comma or tab separated list of comments</param>
+        /// <returns></returns>
         public bool ParseCustomSICList(
             string mzList,
             string mzToleranceDaList,
@@ -361,6 +385,9 @@ namespace MASIC
             return true;
         }
 
+        /// <summary>
+        /// Clear custom m/z targets and reset the default scan tolerance
+        /// </summary>
         public void Reset()
         {
             ScanToleranceType = eCustomSICScanTypeConstants.Absolute;
@@ -369,6 +396,9 @@ namespace MASIC
             ResetMzSearchValues();
         }
 
+        /// <summary>
+        /// Clear custom m/z targets
+        /// </summary>
         public void ResetMzSearchValues()
         {
             CustomMZSearchValues.Clear();

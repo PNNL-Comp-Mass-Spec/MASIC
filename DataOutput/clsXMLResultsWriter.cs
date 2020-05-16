@@ -71,13 +71,13 @@ namespace MASIC.DataOutput
             MASICPeakFinder.clsSmoothedYDataSubset smoothedYDataSubset,
             clsDataOutput dataOutputHandler)
         {
-            // Numbers between 0 and 255 that specify the distance (in scans) between each of the data points in SICData(); the first scan number is given by SICScanIndices(0)
 
             var lastGoodLoc = "Start";
 
             try
             {
-                // Populate udtSICStats.SICDataScanIntervals with the scan intervals between each of the data points
+                // Populate SICDataScanIntervals with the scan intervals between each of the data points in sicDetails.SICScanNumbers
+                // The first scan number is given by SICScanIndices(0)
 
                 byte[] SICDataScanIntervals;
                 if (sicDetails.SICDataCount == 0)
@@ -92,6 +92,7 @@ namespace MASIC.DataOutput
                     for (var scanIndex = 1; scanIndex < sicDetails.SICDataCount; scanIndex++)
                     {
                         var scanDelta = sicScanNumbers[scanIndex] - sicScanNumbers[scanIndex - 1];
+
                         // When storing in SICDataScanIntervals, make sure the Scan Interval is, at most, 255; it will typically be 1 or 4
                         // However, for MRM data, field size can be much larger
                         SICDataScanIntervals[scanIndex] = (byte)Math.Min(byte.MaxValue, scanDelta);
@@ -309,7 +310,8 @@ namespace MASIC.DataOutput
                                     }
                                     else
                                     {
-                                        sbIntensityDataList.Append(',');     // Do not output any number if the intensity is 0
+                                        // Do not output any number if the intensity is 0
+                                        sbIntensityDataList.Append(',');
                                     }
 
                                     if (dataPoint.Mass > 0)
@@ -318,7 +320,8 @@ namespace MASIC.DataOutput
                                     }
                                     else
                                     {
-                                        sbMassDataList.Append(',');     // Do not output any number if the mass is 0
+                                        // Do not output any number if the mass is 0
+                                        sbMassDataList.Append(',');
                                     }
                                 }
 
@@ -628,14 +631,19 @@ namespace MASIC.DataOutput
             return true;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="lineIn"></param>
+        /// <param name="xmlElementName">This should be the properly capitalized element name and should not start with "&lt;"</param>
+        /// <param name="newValueToSave"></param>
         private void XmlOutputFileReplaceSetting(
             TextWriter writer,
             string lineIn,
             string xmlElementName,
             int newValueToSave)
         {
-            // xmlElementName should be the properly capitalized element name and should not start with "<"
-
             // Need to add two since xmlElementName doesn't include "<" at the beginning
             var work = lineIn.Trim().ToLower().Substring(xmlElementName.Length + 2);
 
@@ -661,6 +669,13 @@ namespace MASIC.DataOutput
             writer.WriteLine(lineIn);
         }
 
+        /// <summary>
+        /// Update inputFileName with optimal peak apex values
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <returns></returns>
         public bool XmlOutputFileUpdateEntries(
             clsScanList scanList,
             string inputFileName,

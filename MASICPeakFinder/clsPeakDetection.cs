@@ -41,6 +41,14 @@ namespace MASICPeakFinder
         //private bool mEolsDllNotFound;
 
         public double ComputeSlope(double[] xValuesZeroBased, double[] yValuesZeroBased, int startIndex, int endIndex)
+        /// <summary>
+        /// Compute slope
+        /// </summary>
+        /// <param name="xValues"></param>
+        /// <param name="yValues"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
         {
             const int POLYNOMIAL_ORDER = 1;
 
@@ -64,6 +72,31 @@ namespace MASICPeakFinder
             return coefficients[1];
         }
 
+        /// <summary>
+        /// Finds peaks in the parallel arrays xValues() and yValues()
+        /// </summary>
+        /// <param name="xValues"></param>
+        /// <param name="yValues"></param>
+        /// <param name="intensityThresholdAbsoluteMinimum">Minimum absolute intensity allowable for a peak</param>
+        /// <param name="peakWidthPointsMinimum"></param>
+        /// <param name="peakDetectIntensityThresholdPercentageOfMaximum">Use this to specify a minimum intensity as a percentage of the maximum peak intensity</param>
+        /// <param name="peakWidthInSigma"></param>
+        /// <param name="useValleysForPeakWidth"></param>
+        /// <param name="movePeakLocationToMaxIntensity"></param>
+        /// <returns>
+        /// List of detected peaks (list of clsPeakInfo)
+        /// .PeakLocation is the location of the peak (index of the peak apex in the source arrays)
+        /// .LeftEdge is the the left edge of the peak (in points, not actual units); this value could be negative if useValleysForPeakWidth = False
+        /// .RightEdge is the right edge of the peak (in points); this value could be larger than sourceDataCount-1 if useValleysForPeakWidth = False
+        /// .PeakArea is the peak area
+        /// Compute peak width using: peakWidthPoints = newPeak.RightEdge - newPeak.LeftEdge + 1
+        /// </returns>
+        /// <remarks>
+        /// Note that the maximum value of intensityThreshold vs. MaxValue*peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
+        /// For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
+        /// then if the maximum of yValues() is 50, then the minimum intensity of identified peaks is 10, and not 2.5
+        /// However, if the maximum of yValues() is 500, then the minimum intensity of identified peaks is 50, and not 10
+        /// </remarks>
         public List<clsPeakInfo> DetectPeaks(
             double[] xValuesZeroBased,
             double[] yValuesZeroBased,
@@ -74,24 +107,7 @@ namespace MASICPeakFinder
             bool useValleysForPeakWidth = true,
             bool movePeakLocationToMaxIntensity = true)
         {
-            // Finds peaks in the parallel arrays xValuesZeroBased() and yValuesZeroBased()
-            // intensityThreshold is the minimum absolute intensity allowable for a peak
-            // peakDetectIntensityThresholdPercentageOfMaximum allows one to specify a minimum intensity as a percentage of the maximum peak intensity
-            // Note that the maximum value of intensityThreshold vs. MaxValue*peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
-            // For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
-            // then if the maximum of yValuesZeroBased() is 50, then the minimum intensity of identified peaks is 10, and not 2.5
-            // However, if the maximum of yValuesZeroBased() is 500, then the minimum intensity of identified peaks is 50, and not 10
-
-            // Returns the locations of the peaks in peakLocations() -- indices of the peak apexes in the source arrays
-            // Returns the left edges of the peaks (in points, not actual units) in peakEdgesLeft()       -- These values could be negative if useValleysForPeakWidth = False
-            // Returns the right edges of the peaks in peakEdgesRight()                                   -- These values could be larger than sourceDataCount-1 if useValleysForPeakWidth = False
-            // Returns the areas of the peaks in peakAreas()
-
-            // Note: Compute peak width using: peakWidthPoints = newPeak.RightEdge - newPeak.LeftEdge + 1
-
-            // The function returns the number of peaks found; if none are found, returns 0
-
-            // Uses the Magnitude-Concavity method, wherein a second order
+            // This method uses the Magnitude-Concavity method, wherein a second order
             // polynomial is fit to the points within the window, giving a_2*x^2 + a_1*x + a_0
             // Given this, a_1 is the first derivative and a_2 is the second derivative
             // From this, the first derivative gives the index of the peak apex
@@ -387,12 +403,15 @@ namespace MASICPeakFinder
             return detectedPeaks;
         }
 
+        /// <summary>
+        /// Finds the area under the curve, using trapezoidal integration
+        /// </summary>
+        /// <param name="xValues">X values</param>
+        /// <param name="yValues">Y values (intensities)</param>
+        /// <param name="arrayCount"></param>
+        /// <returns></returns>
         private double FindArea(IList<double> xValues, IList<double> yValues, int arrayCount)
         {
-            // yValues() should be 0-based
-
-            // Finds the area under the curve, using trapezoidal integration
-
             double area = 0;
             for (var index = 0; index < arrayCount - 1; index++)
             {
@@ -408,8 +427,6 @@ namespace MASICPeakFinder
 
         private void FitSegments(IList<double> xValues, IList<double> yValues, int sourceDataCount, int peakWidthPointsMinimum, int peakWidthMidPoint, ref double[] firstDerivative, ref double[] secondDerivative)
         {
-            // xValues() and yValues() are zero-based arrays
-
             const int POLYNOMIAL_ORDER = 2;
 
             // if (POLYNOMIAL_ORDER < 2) POLYNOMIAL_ORDER = 2;
@@ -439,15 +456,22 @@ namespace MASICPeakFinder
 
         #region "LinearLeastSquaresFitting"
 
+        /// <summary>
+        /// Least squares fit
+        /// </summary>
+        /// <param name="xValues"></param>
+        /// <param name="yValues"></param>
+        /// <param name="coefficients"></param>
+        /// <param name="polynomialOrder"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Code from article "Fit for Purpose" written by Steven Abbot
+        /// and published in the February 2003 issue of Hardcore Visual Basic.
+        /// Code excerpted from the VB6 program FitIt
+        /// URL: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
+        /// </remarks>
         private bool LeastSquaresFit(IList<double> xValues, IList<double> yValues, out double[] coefficients, int polynomialOrder)
         {
-            // Code from article "Fit for Purpose" written by Steven Abbot
-            // and published in the February 2003 issue of Hardcore Visual Basic.
-            // Code excerpted from the VB6 program FitIt
-            // URL: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
-
-            // int term;
-            // bool success;
 
             var equationTerms = new udtLeastSquaresFitEquationTermType[polynomialOrder + 1];
             coefficients = new double[polynomialOrder + 1];
@@ -477,6 +501,13 @@ namespace MASICPeakFinder
             return success;
         }
 
+        /// <summary>
+        /// Linear Least Squares Fit
+        /// </summary>
+        /// <param name="xValues"></param>
+        /// <param name="yValues"></param>
+        /// <param name="equationTerms"></param>
+        /// <returns></returns>
         private bool LLSqFit(IList<double> xValues, IList<double> yValues, ref udtLeastSquaresFitEquationTermType[] equationTerms)
         {
             // Linear Least Squares Fit
@@ -527,25 +558,27 @@ namespace MASICPeakFinder
             var v = 0.0;
 
             // Use the following for a 2nd order polynomial fit
-            // 'Define the formula via PFuncVal
-            // 'In this case NTerms=3 and y=a+bx+cx^2
-            // PFuncVal(1) = 1
-            // PFuncVal(2) = X
-            // PFuncVal(3) = X ^ 2
+            // // Define the formula via pFuncValue
+            // // In this case NTerms=3 and y=a+bx+cx^2
+            // pFuncValue[1] = 1;
+            // pFuncValue[2] = X;
+            // pFuncValue[3] = X * X;
 
             // f = "1,X,Log(X),Log10(X),Exp(X),Sin(X),Cos(X),Tan(X),ATAN(X)"
             for (var i = 0; i < equationTerms.Length; i++)
             {
-                // Struct: No assignment is performed, we don't need to copy the end value back.
+                // equationTerms is an array of structures: No assignment is performed, we don't need to copy the end value back.
                 var term = equationTerms[i];
                 switch (term.Func)
                 {
                     case eTermFunctionConstants.One:
                         v = 1;
                         break;
+
                     case eTermFunctionConstants.X:
                         v = Math.Pow(X, term.Power);
                         break;
+
                     case eTermFunctionConstants.LogX:
                         if (term.Coefficient * X <= 0)
                         {
@@ -555,8 +588,8 @@ namespace MASICPeakFinder
                         {
                             v = Math.Pow(Math.Log(term.Coefficient * X), term.Power);
                         }
-
                         break;
+
                     case eTermFunctionConstants.Log10X:
                         if (term.Coefficient * X <= 0)
                         {
@@ -566,20 +599,24 @@ namespace MASICPeakFinder
                         {
                             v = Math.Pow(Math.Log10(term.Coefficient * X), term.Power);
                         }
-
                         break;
+
                     case eTermFunctionConstants.ExpX:
                         v = Math.Pow(Math.Exp(term.Coefficient * X), term.Power);
                         break;
+
                     case eTermFunctionConstants.SinX:
                         v = Math.Pow(Math.Sin(term.Coefficient * X), term.Power);
                         break;
+
                     case eTermFunctionConstants.CosX:
                         v = Math.Pow(Math.Cos(term.Coefficient * X), term.Power);
                         break;
+
                     case eTermFunctionConstants.TanX:
                         v = Math.Pow(Math.Tan(term.Coefficient * X), term.Power);
                         break;
+
                     case eTermFunctionConstants.ATanX:
                         v = Math.Pow(Math.Atan(term.Coefficient * X), term.Power);
                         break;
@@ -612,7 +649,6 @@ namespace MASICPeakFinder
         /// <returns>True if success, False if an error</returns>
         private bool GaussJordan(ref double[,] A, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] b)
         {
-
             var n = equationTerms.Length;
 
             var indexC = new int[n];
@@ -755,7 +791,7 @@ namespace MASICPeakFinder
         //        // Note: For a 2nd order equation, coefficients(0), (1), and (2) correspond to C0, C1, and C2 in the equation:
         //        //       y = C0 +  C1 x  +  C2 x^2
         //        returnCode = EoLeastSquaresFit(xValues, yValues, xValues.Length, polynomialOrder + 1, 0, coefficients, EODOUBLE, 0, 0);
-        //        Debug.Assert(returnCode = 1, "Call to EoLeastSquaresFit failed (clsPeakDetection->LeastSquaresFitEolsDll)");
+        //        ConsoleMsgUtils.ShowWarning(returnCode = 1, "Call to EoLeastSquaresFit failed (clsPeakDetection->LeastSquaresFitEolsDll)");
         //    }
         //    catch (Exception ex)
         //    {
@@ -770,7 +806,7 @@ namespace MASICPeakFinder
         //        }
         //        else
         //        {
-        //            Debug.Assert(false, "Error in clsPeakDetection->LeastSquaresFitEolsDll: " + ex.Message);
+        //            ConsoleMsgUtils.ShowWarning(false, "Error in clsPeakDetection->LeastSquaresFitEolsDll: " + ex.Message);
         //        }
         //    }
         //}

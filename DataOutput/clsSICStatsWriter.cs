@@ -93,6 +93,15 @@ namespace MASIC.DataOutput
             }
         }
 
+        /// <summary>
+        /// Writes out a flat file containing identified peaks and statistics
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="masicOptions"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <returns></returns>
         public bool SaveSICStatsFlatFile(
             clsScanList scanList,
             string inputFileName,
@@ -100,8 +109,6 @@ namespace MASIC.DataOutput
             clsMASICOptions masicOptions,
             clsDataOutput dataOutputHandler)
         {
-            // Writes out a flat file containing identified peaks and statistics
-
             var outputFilePath = string.Empty;
 
             const char TAB_DELIMITER = '\t';

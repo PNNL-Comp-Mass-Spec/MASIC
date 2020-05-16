@@ -9,6 +9,10 @@ namespace MASIC
     /// </summary>
     public class clsSpectraCache : clsMasicEventNotifier, IDisposable
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="cacheOptions"></param>
         public clsSpectraCache(clsSpectrumCacheOptions cacheOptions)
         {
             mCacheOptions = cacheOptions;
@@ -29,15 +33,30 @@ namespace MASIC
 
         private enum eCacheStateConstants
         {
-            UnusedSlot = 0,              // No data present
-            NeverCached = 1,             // In memory, but never cached
-            LoadedFromCache = 2,         // Loaded from cache, and in memory; or, loaded using XRaw; safe to purge without caching
+            /// <summary>
+            /// No data present
+            /// </summary>
+            UnusedSlot = 0,
+
+            /// <summary>
+            /// In memory, but never cached
+            /// </summary>
+            NeverCached = 1,
+
+            /// <summary>
+            /// Loaded from cache, and in memory; or, loaded using XRaw; safe to purge without caching
+            /// </summary>
+            LoadedFromCache = 2
         }
 
         #endregion
 
         #region "Classwide Variables"
-        private IScanMemoryCache spectraPool;                  // Pool (collection) of currently loaded spectra
+
+        /// <summary>
+        /// Pool (collection) of currently loaded spectra
+        /// </summary>
+        private IScanMemoryCache spectraPool;
 
         private readonly clsSpectrumCacheOptions mCacheOptions;
 
@@ -55,7 +74,10 @@ namespace MASIC
 
         private int mMaximumPoolLength;
 
-        private Dictionary<int, long> mSpectrumByteOffset;         // Records the byte offset of the data in the page file for a given scan number
+        /// <summary>
+        /// Records the byte offset of the data in the page file for a given scan number
+        /// </summary>
+        private Dictionary<int, long> mSpectrumByteOffset;
 
         #endregion
 
@@ -65,12 +87,18 @@ namespace MASIC
         [Obsolete("Legacy parameter; no longer used")]
         public string CacheFileNameBase => mCacheFileNameBase;
 
+        /// <summary>
+        /// Spectrum cache directory path
+        /// </summary>
         public string CacheDirectoryPath
         {
             get => mCacheOptions.DirectoryPath;
             set => mCacheOptions.DirectoryPath = value;
         }
 
+        /// <summary>
+        /// Maximum memory that the cache is allowed to use
+        /// </summary>
         [Obsolete("Legacy parameter; no longer used")]
         public float CacheMaximumMemoryUsageMB
         {
@@ -78,6 +106,9 @@ namespace MASIC
             set => mCacheOptions.MaximumMemoryUsageMB = value;
         }
 
+        /// <summary>
+        /// Minimum memory that the cache will use
+        /// </summary>
         [Obsolete("Legacy parameter; no longer used")]
         public float CacheMinimumFreeMemoryMB
         {
@@ -93,6 +124,9 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Number of spectra to keep in the in-memory cache
+        /// </summary>
         public int CacheSpectraToRetainInMemory
         {
             get => mCacheOptions.SpectraToRetainInMemory;
@@ -104,6 +138,9 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// When True, disk caching is disabled
+        /// </summary>
         public bool DiskCachingAlwaysDisabled
         {
             get => mCacheOptions.DiskCachingAlwaysDisabled;
@@ -117,12 +154,16 @@ namespace MASIC
         /// </summary>
         public int SpectrumCount { get; set; }
 
+        /// <summary>
+        /// Adds spectrum to the spectrum pool
+        /// </summary>
+        /// <param name="spectrum"></param>
+        /// <param name="scanNumber"></param>
+        /// <returns>Index of the spectrum in the pool in targetPoolIndex</returns>
         public bool AddSpectrumToPool(
             clsMSSpectrum spectrum,
             int scanNumber)
         {
-            // Adds spectrum to the spectrum pool
-            // Returns the index of the spectrum in the pool in targetPoolIndex
 
             try
             {
@@ -227,6 +268,9 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Close the page file
+        /// </summary>
         public void ClosePageFile()
         {
             try
@@ -281,12 +325,14 @@ namespace MASIC
             return Path.Combine(mCacheOptions.DirectoryPath, fileName);
         }
 
+        /// <summary>
+        /// Looks for and deletes the spectrum cache files created by this instance of MASIC
+        /// Additionally, looks for and deletes spectrum cache files with modification dates more than SPECTRUM_CACHE_MAX_FILE_AGE_HOURS from the present
+        /// </summary>
         public void DeleteSpectrumCacheFiles()
         {
-            // Looks for and deletes the spectrum cache files created by this instance of MASIC
-            // Additionally, looks for and deletes spectrum cache files with modification dates more than SPECTRUM_CACHE_MAX_FILE_AGE_HOURS from the present
-
             var fileDateTolerance = DateTime.UtcNow.Subtract(new TimeSpan(SPECTRUM_CACHE_MAX_FILE_AGE_HOURS, 0, 0));
+
             try
             {
                 // Delete the cached files for this instance of clsMasic
@@ -429,6 +475,10 @@ namespace MASIC
             InitializeSpectraPool();
         }
 
+        /// <summary>
+        /// Get default cache options
+        /// </summary>
+        /// <returns></returns>
         public static clsSpectrumCacheOptions GetDefaultCacheOptions()
         {
             var udtCacheOptions = new clsSpectrumCacheOptions
@@ -456,7 +506,7 @@ namespace MASIC
         /// <returns>True if successfully uncached, false if an error</returns>
         private bool UnCacheSpectrum(int scanNumber, out clsMSSpectrum msSpectrum)
         {
-            // make sure we have a valid object
+            // Make sure we have a valid object
             var cacheItem = new ScanMemoryCacheItem(new clsMSSpectrum(scanNumber), eCacheStateConstants.LoadedFromCache);
 
             msSpectrum = cacheItem.Scan;
@@ -578,11 +628,14 @@ namespace MASIC
             return true;
         }
 
+        /// <summary>
+        /// Validates that we can read and write from a Page file
+        /// Opens the page file reader and writer if not yet opened
+        /// </summary>
+        /// <param name="createIfUninitialized"></param>
+        /// <returns></returns>
         private bool ValidatePageFileIO(bool createIfUninitialized)
         {
-            // Validates that we can read and write from a Page file
-            // Opens the page file reader and writer if not yet opened
-
             if (mPageFileReader != null)
             {
                 return true;
@@ -670,9 +723,21 @@ namespace MASIC
         /// </summary>
         private class ScanMemoryCacheItem
         {
+            /// <summary>
+            /// Cache state
+            /// </summary>
             public eCacheStateConstants CacheState { get; set; }
+
+            /// <summary>
+            /// Mass Spectrum
+            /// </summary>
             public clsMSSpectrum Scan { get; }
 
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="scan"></param>
+            /// <param name="cacheState"></param>
             public ScanMemoryCacheItem(clsMSSpectrum scan, eCacheStateConstants cacheState = eCacheStateConstants.NeverCached)
             {
                 Scan = scan;

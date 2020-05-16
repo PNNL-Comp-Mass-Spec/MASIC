@@ -10,6 +10,7 @@ namespace MASIC
     public class clsMASICOptions : clsMasicEventNotifier
     {
         #region "Constants and Enums"
+
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
         public const string XML_SECTION_IMPORT_OPTIONS = "MasicImportOptions";
         public const string XML_SECTION_EXPORT_OPTIONS = "MasicExportOptions";
@@ -19,6 +20,7 @@ namespace MASIC
         public const string XML_SECTION_CUSTOM_SIC_VALUES = "CustomSICValues";
 
         public const string DEFAULT_MASIC_STATUS_FILE_NAME = "MasicStatus.xml";
+
         #endregion
 
         #region "Classwide Variables"

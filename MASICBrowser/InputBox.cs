@@ -202,7 +202,6 @@ namespace MASICBrowser
             return Show(prompt, title, defaultText, validator, -1, -1);
         }
 
-
         /// <summary>
         /// Reset the ErrorProvider
         /// </summary>

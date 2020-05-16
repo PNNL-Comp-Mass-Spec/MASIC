@@ -297,7 +297,8 @@ namespace MagnitudeConcavityPeakFinder
         /// <returns>Struct with the MinimumPotentialPeakArea</returns>
         /// <remarks>
         /// The summed intensity is not used if the number of points greater than or equal to
-        ///  .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width</remarks>
+        /// .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
+        /// </remarks>
         public udtSICPotentialAreaStatsType FindMinimumPotentialPeakArea(
             List<KeyValuePair<int, double>> xyData,
             udtSICPeakFinderOptionsType udtSICPeakFinderOptions)
@@ -521,8 +522,6 @@ namespace MagnitudeConcavityPeakFinder
             }
         }
 
-        #region GetDefaultOptions
-
         public static udtSICPeakFinderOptionsType GetDefaultSICPeakFinderOptions()
         {
             var peakFinderOptions = new udtSICPeakFinderOptionsType
@@ -569,8 +568,6 @@ namespace MagnitudeConcavityPeakFinder
 
             return peakFinderOptions;
         }
-
-        #endregion
 
         private void ExamineNarrowPeaks(PeakDataContainer peakData, udtSICPeakFinderOptionsType peakFinderOptions)
         {

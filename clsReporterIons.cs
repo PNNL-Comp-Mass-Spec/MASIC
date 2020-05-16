@@ -101,6 +101,7 @@ namespace MASIC
         }
 
         #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -452,12 +453,22 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Define reporter ions to search for
+        /// </summary>
+        /// <param name="reporterIonMZList"></param>
+        /// <remarks>Will use REPORTER_ION_TOLERANCE_DA_DEFAULT for the search tolerance</remarks>
         public void SetReporterIons(
             double[] reporterIonMZList)
         {
             SetReporterIons(reporterIonMZList, REPORTER_ION_TOLERANCE_DA_DEFAULT);
         }
 
+        /// <summary>
+        /// Define reporter ions to search for
+        /// </summary>
+        /// <param name="reporterIonMZList"></param>
+        /// <param name="mzToleranceDa">Search tolerance (half width)</param>
         public void SetReporterIons(
             double[] reporterIonMZList,
             double mzToleranceDa)
@@ -465,12 +476,18 @@ namespace MASIC
             SetReporterIons(reporterIonMZList, mzToleranceDa, true);
         }
 
+        /// <summary>
+        /// Define reporter ions to search for
+        /// </summary>
+        /// <param name="reporterIonMZList"></param>
+        /// <param name="mzToleranceDa">Search tolerance (half width); must be 0.001 or larger</param>
+        /// <param name="customReporterIons">True if these are custom reporter ions</param>
+        /// <remarks>When customReportIons is true, sets mReporterIonMassMode to eReporterIonMassModeConstants.CustomOrNone</remarks>
         public void SetReporterIons(
             double[] reporterIonMZList,
             double mzToleranceDa,
             bool customReporterIons)
         {
-            // mzToleranceDa is the search tolerance (half width)
 
             if (mzToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM)
             {
@@ -500,11 +517,13 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Look at the m/z values in ReporterIonList to determine the minimum and maximum m/z values
+        /// Update MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd to be
+        /// 2x .MZToleranceDa away from the minimum and maximum
+        /// </summary>
         public void UpdateMZIntensityFilterIgnoreRange()
         {
-            // Look at the m/z values in ReporterIonList to determine the minimum and maximum m/z values
-            // Update MZIntensityFilterIgnoreRangeStart and MZIntensityFilterIgnoreRangeEnd to be
-            // 2x .MZToleranceDa away from the minimum and maximum
 
             if (ReporterIonStatsEnabled && ReporterIonList.Count > 0)
             {

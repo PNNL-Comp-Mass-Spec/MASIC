@@ -6,6 +6,12 @@ namespace MASIC.DataOutput
 {
     public class clsThermoMetadataWriter : clsMasicEventNotifier
     {
+        /// <summary>
+        /// Write the instrument method file to disk
+        /// </summary>
+        /// <param name="rawFileReader"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <returns></returns>
         public bool SaveMSMethodFile(
             XRawFileIO rawFileReader,
             clsDataOutput dataOutputHandler)
@@ -61,6 +67,12 @@ namespace MASIC.DataOutput
             return true;
         }
 
+        /// <summary>
+        /// Write the tune method file to disk
+        /// </summary>
+        /// <param name="rawFileReader"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <returns></returns>
         public bool SaveMSTuneFile(
             XRawFileIO rawFileReader,
             clsDataOutput dataOutputHandler)

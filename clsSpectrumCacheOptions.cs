@@ -16,6 +16,9 @@ namespace MASIC
         /// </summary>
         public string DirectoryPath { get; set; }
 
+        /// <summary>
+        /// Number of spectra to keep in the in-memory cache
+        /// </summary>
         public int SpectraToRetainInMemory
         {
             get => mSpectraToRetainInMemory;
@@ -36,9 +39,14 @@ namespace MASIC
         #endregion
 
         #region "Classwide variables"
+
         private int mSpectraToRetainInMemory = 1000;
+
         #endregion
 
+        /// <summary>
+        /// Reset the options
+        /// </summary>
         public void Reset()
         {
             var defaultOptions = clsSpectraCache.GetDefaultCacheOptions();
@@ -48,6 +56,10 @@ namespace MASIC
             SpectraToRetainInMemory = defaultOptions.SpectraToRetainInMemory;
         }
 
+        /// <summary>
+        /// Show the maximum number of spectra to cache, and the cache directory
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return "Cache up to " + SpectraToRetainInMemory + " in directory " + DirectoryPath;

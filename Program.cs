@@ -61,11 +61,13 @@ namespace MASIC
         private static DateTime mLastProgressReportTime;
         private static int mLastProgressReportValue;
 
+        /// <summary>
+        /// Entry method
+        /// </summary>
+        /// <returns>0 if no error; error code if an error</returns>
         [STAThread]
         public static int Main()
         {
-            // Returns 0 if no error, error code if an error
-
             var commandLineParser = new clsParseCommandLine();
 
             mInputFilePath = string.Empty;
@@ -228,10 +230,13 @@ namespace MASIC
             oClass.ProgressSubtaskChanged += ProgressSubtaskChangedHandler;
         }
 
+        /// <summary>
+        /// Set options using command line arguments
+        /// </summary>
+        /// <param name="commandLineParser"></param>
+        /// <returns>True if no problems; otherwise, false</returns>
         private static bool SetOptionsUsingCommandLineParameters(clsParseCommandLine commandLineParser)
         {
-            // Returns True if no problems; otherwise, returns false
-
             var validParameters = new List<string> {
                 "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q"
             };

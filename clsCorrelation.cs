@@ -439,16 +439,21 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Performs a Pearson correlation (aka linear correlation) of the two lists
+        /// The lists must have the same number of data points
+        /// Code from Numerical Recipes in C
+        /// </summary>
+        /// <param name="dataList1"></param>
+        /// <param name="dataList2"></param>
+        /// <param name="RValue"></param>
+        /// <param name="probabilityOfSignificance"></param>
+        /// <param name="FishersZ"></param>
         private void CorrelatePearson(
             IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2,
             out float RValue,
             out float probabilityOfSignificance, out float FishersZ)
         {
-            // Performs a Pearson correlation (aka linear correlation) of the two lists
-            // The lists must have the same number of data points in each and should be 0-based arrays
-            //
-            // Code from Numerical Recipes in C
-
             // TINY is used to "regularize" the unusual case of complete correlation
             var TINY = 1.0E-20;
 
@@ -508,6 +513,16 @@ namespace MASIC
             probabilityOfSignificance = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
         }
 
+        /// <summary>
+        /// Performs a Kendall correlation (aka linear correlation) of the two lists
+        /// The lists must have the same number of data points
+        /// Code from Numerical Recipes in C
+        /// </summary>
+        /// <param name="dataList1"></param>
+        /// <param name="dataList2"></param>
+        /// <param name="kendallsTau"></param>
+        /// <param name="Z"></param>
+        /// <param name="probabilityOfSignificance"></param>
         private void CorrelateKendall(
             IReadOnlyCollection<float> dataList1,
             IReadOnlyCollection<float> dataList2,
@@ -516,10 +531,6 @@ namespace MASIC
             out float Z,
             out float probabilityOfSignificance)
         {
-            // Performs a Kendall correlation (aka linear correlation) of the two lists
-            // The lists must have the same number of data points in each and should be 0-based arrays
-            //
-            // Code from Numerical Recipes in C
 
             // Given data arrays data1[1..n] and data2[1..n], this program returns Kendall's tau as tau,
             // its number of standard deviations from zero as z, and its two-sided significance level as prob.
@@ -583,6 +594,18 @@ namespace MASIC
             probabilityOfSignificance = (float)(ErfCC(Math.Abs(Z) / 1.4142136));
         }
 
+        /// <summary>
+        /// Performs a Spearman correlation of the two lists
+        /// The lists must have the same number of data points
+        /// Code from Numerical Recipes in C
+        /// </summary>
+        /// <param name="dataList1"></param>
+        /// <param name="dataList2"></param>
+        /// <param name="DiffInRanks"></param>
+        /// <param name="ZD"></param>
+        /// <param name="probabilityOfSignificance"></param>
+        /// <param name="RS"></param>
+        /// <param name="ProbRS"></param>
         private void CorrelateSpearman(
             IReadOnlyCollection<float> dataList1,
             IReadOnlyCollection<float> dataList2,
@@ -592,11 +615,6 @@ namespace MASIC
             out float RS,
             out float ProbRS)
         {
-            // Performs a Spearman correlation of the two lists
-            // The lists must have the same number of data points in each and should be 0-based arrays
-            //
-            // Code from Numerical Recipes in C
-
             // Note: data1 and data2 are re-ordered by this function; thus, they are passed ByVal
 
             // Given two data arrays, data1[0..n-1] and data2[0..n-1], this routine returns their sum-squared
@@ -667,11 +685,15 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including mid-ranking of ties,
+        /// and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="w"></param>
+        /// <param name="s"></param>
         private void CRank(int n, IList<float> w, out float s)
         {
-            // Given a zero-based sorted array w(0..n-1), replaces the elements by their rank (1 .. n), including mid-ranking of ties,
-            // and returns as s the sum of f^3 - f, where f is the number of elements in each tie.
-
             s = 0;
             var j = 0;
             while (j < n - 1)

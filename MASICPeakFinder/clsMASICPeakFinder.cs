@@ -65,6 +65,7 @@ namespace MASICPeakFinder
         #endregion
 
         #region "Properties"
+
         // ReSharper disable once UnusedMember.Global
         public string ProgramDate => PROGRAM_DATE;
 
@@ -72,6 +73,7 @@ namespace MASICPeakFinder
 
         // ReSharper disable once UnusedMember.Global
         public string StatusMessage => mStatusMessage;
+
         #endregion
 
         /// <summary>
@@ -1131,10 +1133,15 @@ namespace MASICPeakFinder
             return success;
         }
 
+        /// <summary>
+        /// Compute the peak area
+        /// </summary>
+        /// <param name="sicData"></param>
+        /// <param name="sicPeak"></param>
+        /// <returns></returns>
+        /// <remarks>The calling function must populate sicPeak.IndexMax, sicPeak.IndexBaseLeft, and sicPeak.IndexBaseRight</remarks>
         private bool ComputeSICPeakArea(IList<clsSICDataPoint> sicData, clsSICStatsPeak sicPeak)
         {
-            // The calling function must populate sicPeak.IndexMax, sicPeak.IndexBaseLeft, and sicPeak.IndexBaseRight
-
             try
             {
                 // Compute the peak area
@@ -2997,21 +3004,28 @@ namespace MASICPeakFinder
             FindPotentialPeakArea(sicData, out potentialAreaStats, sicPeakFinderOptions);
         }
 
+        /// <summary>
+        /// Compute the potential peak area for a given SIC
+        /// Stores the value in potentialAreaStats.MinimumPotentialPeakArea
+        ///
+        /// However, the summed intensity is not stored if the number of points
+        /// greater than or equal to .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
+        /// </summary>
+        /// <param name="sicData"></param>
+        /// <param name="potentialAreaStats"></param>
+        /// <param name="sicPeakFinderOptions"></param>
         public void FindPotentialPeakArea(
             IList<clsSICDataPoint> sicData,
             out clsSICPotentialAreaStats potentialAreaStats,
             clsSICPeakFinderOptions sicPeakFinderOptions)
         {
-            // This function computes the potential peak area for a given SIC
-            // and stores in potentialAreaStats.MinimumPotentialPeakArea
-            // However, the summed intensity is not used if the number of points >= .SICBaselineNoiseOptions.MinimumBaselineNoiseLevel is less than Minimum_Peak_Width
-
-            // Note: You cannot use SICData.Length to determine the length of the array; use dataCount
-
-            // The queue is used to keep track of the most recent intensity values
+            // This queue is used to keep track of the most recent intensity values
             var intensityQueue = new Queue<double>();
+
             var minimumPotentialPeakArea = double.MaxValue;
+
             var peakCountBasisForMinimumPotentialArea = 0;
+
             if (sicData.Count > 0)
             {
                 intensityQueue.Clear();
@@ -3091,7 +3105,7 @@ namespace MASICPeakFinder
         /// <param name="returnClosestPeak"></param>
         /// <param name="simDataPresent">True if Select Ion Monitoring data is present</param>
         /// <param name="recomputeNoiseLevel"></param>
-        [Obsolete("Use the version that takes a List(Of clsSICDataPoint")]
+        [Obsolete("Use the version that takes List<clsSICDataPoint>")]
         public bool FindSICPeakAndArea(
             int dataCount,
             int[] sicScanNumbers,
@@ -3127,9 +3141,13 @@ namespace MASICPeakFinder
         /// <param name="sicPeakFinderOptions"></param>
         /// <param name="potentialAreaStatsForRegion"></param>
         /// <param name="returnClosestPeak"></param>
-        /// <param name="simDataPresent">True if Select Ion Monitoring data is present</param>
+        /// <param name="simDataPresent">Set to true if Select Ion Monitoring data is present and there are thus large gaps in the survey scan numbers</param>
         /// <param name="recomputeNoiseLevel"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// The calling function should populate sicPeak.IndexObserved with the index in SICData() where the
+        /// parent ion m/z was actually observed; this will be used as the default peak location if a peak cannot be found
+        /// </remarks>
         public bool FindSICPeakAndArea(
             List<clsSICDataPoint> sicData,
             out clsSICPotentialAreaStats potentialAreaStatsForPeak,
@@ -3141,11 +3159,6 @@ namespace MASICPeakFinder
             bool simDataPresent,
             bool recomputeNoiseLevel)
         {
-            // Note: The calling function should populate sicPeak.IndexObserved with the index in SICData() that the
-            // parent ion m/z was actually observed; this will be used as the default peak location if a peak cannot be found
-
-            // Set simDataPresent to True when there are large gaps in the survey scan numbers
-
             potentialAreaStatsForPeak = new clsSICPotentialAreaStats();
             smoothedYDataSubset = new clsSmoothedYDataSubset();
 
@@ -3464,10 +3477,10 @@ namespace MASICPeakFinder
         /// <param name="xValToInterpolate"></param>
         /// <returns></returns>
         private bool InterpolateY(
-        out double interpolatedIntensity,
-        int X1, int X2,
-        double Y1, double Y2,
-        double xValToInterpolate)
+            out double interpolatedIntensity,
+            int X1, int X2,
+            double Y1, double Y2,
+            double xValToInterpolate)
         {
             var scanDifference = X2 - X1;
             if (scanDifference != 0)
@@ -3625,7 +3638,7 @@ namespace MASICPeakFinder
         }
 
         /// <summary>
-        /// Looks for the minimum positive value in dataListSorted() and replaces all values of 0 in dataListSorted() with minimumPositiveValue
+        /// Looks for the minimum positive value in dataListSorted and replaces all values of 0 in dataListSorted with the minimumPositiveValue
         /// </summary>
         /// <param name="dataCount"></param>
         /// <param name="dataListSorted"></param>
@@ -3650,6 +3663,7 @@ namespace MASICPeakFinder
 
             if (minimumPositiveValue < 1)
                 minimumPositiveValue = 1;
+
             for (var i = indexFirstPositiveValue; i >= 0; i--)
                 dataListSorted[i] = minimumPositiveValue;
 

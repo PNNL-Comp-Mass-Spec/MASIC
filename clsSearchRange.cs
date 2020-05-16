@@ -7,7 +7,7 @@ namespace MASIC
     /// The input list need not be sorted, since mPointerIndices() will be populated when the data is loaded,
     /// after which the data array will be sorted
     ///
-    /// To prevent this behavior, and save memory by not populating mPointerIndices, set mUsePointerIndexArray = False
+    /// To prevent this behavior, and save memory by not populating mPointerIndices, set UsePointerIndexArray = False
     /// </summary>
     public class clsSearchRange
     {
@@ -33,10 +33,12 @@ namespace MASIC
         private float[] mDataSingle;
         private double[] mDataDouble;
 
-        private int[] mPointerIndices;        // Pointers to the original index of the data point in the source array
+        /// <summary>
+        /// Pointers to the original index of the data point in the source array
+        /// </summary>
+        private int[] mPointerIndices;
 
         private bool mPointerArrayIsValid;
-        private bool mUsePointerIndexArray;    // Set this to false to conserve memory usage
 
         #endregion
 
@@ -61,6 +63,11 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Get the original index of a data point, given its current index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public int get_OriginalIndex(int index)
         {
@@ -83,18 +90,24 @@ namespace MASIC
 
         }
 
-        public bool UsePointerIndexArray
-        {
-            get => mUsePointerIndexArray;
-            set => mUsePointerIndexArray = value;
-        }
+        /// <summary>
+        /// When true, keep track of the original index of each data point
+        /// Set this to false to conserve memory usage
+        /// </summary>
+        public bool UsePointerIndexArray { get; set; }
+
         #endregion
 
         #region "Binary Search Range"
 
-        private void BinarySearchRangeInt(int searchValue, int toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
+        /// <summary>
+        /// Recursively search for the given integer, +/- tolerance
+        /// </summary>
+        /// <param name="searchValue"></param>
+        /// <param name="toleranceHalfWidth"></param>
+        /// <param name="matchIndexStart"></param>
+        /// <param name="matchIndexEnd"></param>
         {
-            // Recursive search function
 
             var leftDone = false;
             var rightDone = false;
@@ -156,8 +169,14 @@ namespace MASIC
         }
 
         private void BinarySearchRangeSng(float searchValue, float toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
+        /// <summary>
+        /// Recursively search for the given float, +/- tolerance
+        /// </summary>
+        /// <param name="searchValue"></param>
+        /// <param name="toleranceHalfWidth"></param>
+        /// <param name="matchIndexStart"></param>
+        /// <param name="matchIndexEnd"></param>
         {
-            // Recursive search function
 
             var leftDone = false;
             var rightDone = false;
@@ -218,8 +237,14 @@ namespace MASIC
         }
 
         private void BinarySearchRangeDbl(double searchValue, double toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
+        /// <summary>
+        /// Recursively search for the given double, +/- tolerance
+        /// </summary>
+        /// <param name="searchValue"></param>
+        /// <param name="toleranceHalfWidth"></param>
+        /// <param name="matchIndexStart"></param>
+        /// <param name="matchIndexEnd"></param>
         {
-            // Recursive search function
 
             var leftDone = false;
             var rightDone = false;
@@ -294,6 +319,9 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Clear stored data
+        /// </summary>
         // ReSharper disable once UnusedMember.Global
         public void ClearData()
         {
@@ -303,6 +331,13 @@ namespace MASIC
 
         #region "Fill with Data"
 
+        /// <summary>
+        /// Store data to search (integers)
+        /// The data is sorted after being stored
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns>True if success, false if an error</returns>
+        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         // ReSharper disable once UnusedMember.Global
         public bool FillWithData(int[] values)
         {
@@ -318,7 +353,7 @@ namespace MASIC
                     mDataInt = new int[values.Length];
                     values.CopyTo(mDataInt, 0);
 
-                    if (mUsePointerIndexArray)
+                    if (UsePointerIndexArray)
                     {
                         InitializePointerIndexArray(mDataInt.Length);
                         Array.Sort(mDataInt, mPointerIndices);
@@ -343,6 +378,13 @@ namespace MASIC
             return success;
         }
 
+        /// <summary>
+        /// Store data to search (floats)
+        /// The data is sorted after being stored
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns>True if success, false if an error</returns>
+        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         // ReSharper disable once UnusedMember.Global
         public bool FillWithData(float[] values)
         {
@@ -358,7 +400,7 @@ namespace MASIC
                     mDataSingle = new float[values.Length];
                     values.CopyTo(mDataSingle, 0);
 
-                    if (mUsePointerIndexArray)
+                    if (UsePointerIndexArray)
                     {
                         InitializePointerIndexArray(mDataSingle.Length);
                         Array.Sort(mDataSingle, mPointerIndices);
@@ -383,6 +425,13 @@ namespace MASIC
             return success;
         }
 
+        /// <summary>
+        /// Store data to search (doubles)
+        /// The data is sorted after being stored
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns>True if success, false if an error</returns>
+        /// <remarks>This class can only track one set of data at a time (doubles, floats, or integers)</remarks>
         public bool FillWithData(double[] values)
         {
             bool success;
@@ -397,7 +446,7 @@ namespace MASIC
                     mDataDouble = new double[values.Length];
                     values.CopyTo(mDataDouble, 0);
 
-                    if (mUsePointerIndexArray)
+                    if (UsePointerIndexArray)
                     {
                         InitializePointerIndexArray(mDataDouble.Length);
                         Array.Sort(mDataDouble, mPointerIndices);
@@ -422,16 +471,22 @@ namespace MASIC
 
             return success;
         }
+
         #endregion
 
         #region "Find Value Range"
 
+        /// <summary>
+        /// Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
+        /// Call FillWithData() prior to using this method
+        /// </summary>
+        /// <param name="searchValue"></param>
+        /// <param name="toleranceHalfWidth"></param>
+        /// <param name="matchIndexStart">Output: starting index of the data that matches the target value, within the given tolerance</param>
+        /// <param name="matchIndexEnd">Output: ending index of the data that matches the target value, within the given tolerance</param>
+        /// <returns>True if a match is found, otherwise false</returns>
         public bool FindValueRange(int searchValue, int toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
-            // Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
-            // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
-            // Otherwise, returns false
-
             bool matchFound;
             matchIndexStart = -1;
             matchIndexEnd = -1;
@@ -488,12 +543,17 @@ namespace MASIC
             return matchFound;
         }
 
+        /// <summary>
+        /// Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
+        /// Call FillWithData() prior to using this method
+        /// </summary>
+        /// <param name="searchValue"></param>
+        /// <param name="toleranceHalfWidth"></param>
+        /// <param name="matchIndexStart">Output: starting index of the data that matches the target value, within the given tolerance</param>
+        /// <param name="matchIndexEnd">Output: ending index of the data that matches the target value, within the given tolerance</param>
+        /// <returns>True if a match is found, otherwise false</returns>
         public bool FindValueRange(double searchValue, double toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
-            // Searches the loaded data for searchValue with a tolerance of +/-tolerance
-            // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
-            // Otherwise, returns false
-
             bool matchFound;
             matchIndexStart = -1;
             matchIndexEnd = -1;
@@ -550,12 +610,17 @@ namespace MASIC
             return matchFound;
         }
 
+        /// <summary>
+        /// Searches the loaded data for searchValue with a tolerance of +/-toleranceHalfWidth
+        /// Call FillWithData() prior to using this method
+        /// </summary>
+        /// <param name="searchValue"></param>
+        /// <param name="toleranceHalfWidth"></param>
+        /// <param name="matchIndexStart">Output: starting index of the data that matches the target value, within the given tolerance</param>
+        /// <param name="matchIndexEnd">Output: ending index of the data that matches the target value, within the given tolerance</param>
+        /// <returns>True if a match is found, otherwise false</returns>
         public bool FindValueRange(float searchValue, float toleranceHalfWidth, out int matchIndexStart, out int matchIndexEnd)
         {
-            // Searches the loaded data for searchValue with a tolerance of +/-tolerance
-            // Returns True if a match is found; in addition, populates matchIndexStart and matchIndexEnd
-            // Otherwise, returns false
-
             bool matchFound;
             matchIndexStart = -1;
             matchIndexEnd = -1;
@@ -615,6 +680,11 @@ namespace MASIC
 
         #region "Get Value by Index"
 
+        /// <summary>
+        /// Get the value stored at the given index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         // ReSharper disable once UnusedMember.Global
         public int GetValueByIndexInt(int index)
         {
@@ -628,6 +698,11 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Get the value stored at the given index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         public double GetValueByIndex(int index)
         {
             try
@@ -656,6 +731,11 @@ namespace MASIC
             return 0;
         }
 
+        /// <summary>
+        /// Get the value stored at the given index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         // ReSharper disable once UnusedMember.Global
         public float GetValueByIndexSng(int index)
         {
@@ -672,6 +752,11 @@ namespace MASIC
 
         #region "Get Value by Original Index"
 
+        /// <summary>
+        /// Get the value stored at the given original index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         // ReSharper disable once UnusedMember.Global
         public int GetValueByOriginalIndexInt(int index)
         {
@@ -685,6 +770,11 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Get the value stored at the given original index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         public double GetValueByOriginalIndex(int indexOriginal)
         {
             if (!mPointerArrayIsValid || mDataType == eDataTypeToUse.NoDataPresent)
@@ -720,6 +810,11 @@ namespace MASIC
             return 0;
         }
 
+        /// <summary>
+        /// Get the value stored at the given original index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         // ReSharper disable once UnusedMember.Global
         public float GetValueByOriginalIndexSng(int index)
         {

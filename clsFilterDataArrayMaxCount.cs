@@ -2,21 +2,23 @@
 
 namespace MASIC
 {
+    /// <summary>
+    /// This class can be used to select the top N data points in a list, sorting descending
+    /// It does not require a full sort of the data, which allows for faster filtering of the data
+    /// </summary>
+    /// <remarks>
+    /// To use, first call AddDataPoint() for each source data point, specifying the value to sort on and a data point index
+    /// When done, call FilterData()
+    /// This routine will determine which data points to retain
+    /// For the remaining points, their data values will be changed to SkipDataPointFlag (defaults to -1)
+    /// </remarks>
     public class clsFilterDataArrayMaxCount
     {
-        // This class can be used to select the top N data points in a list, sorting descending
-        // It does not require a full sort of the data, which allows for faster filtering of the data
-        //
-        // To use, first call AddDataPoint() for each source data point, specifying the value to sort on and a data point index
-        // When done, call FilterData()
-        // This routine will determine which data points to retain
-        // For the remaining points, their data values will be changed to mSkipDataPointFlag (defaults to -1)
-
         private const int INITIAL_MEMORY_RESERVE = 50000;
 
         private const float DEFAULT_SKIP_DATA_POINT_FLAG = -1;
 
-        // 4 steps in Sub FilterDataByMaxDataCountToLoad
+        // 4 steps in method FilterDataByMaxDataCountToLoad
         private const int SUBTASK_STEP_COUNT = 4;
 
         private int mDataCount;
@@ -45,17 +47,29 @@ namespace MASIC
 
         #endregion
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public clsFilterDataArrayMaxCount()
             : this(INITIAL_MEMORY_RESERVE)
         {
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="initialCapacity"></param>
         public clsFilterDataArrayMaxCount(int initialCapacity)
         {
             SkipDataPointFlag = DEFAULT_SKIP_DATA_POINT_FLAG;
             Clear(initialCapacity);
         }
 
+        /// <summary>
+        /// Add a data point
+        /// </summary>
+        /// <param name="abundance"></param>
+        /// <param name="dataPointIndex"></param>
         public void AddDataPoint(double abundance, int dataPointIndex)
         {
             if (mDataCount >= mDataValues.Length)
@@ -74,6 +88,10 @@ namespace MASIC
             mDataCount += 1;
         }
 
+        /// <summary>
+        /// Clear cached data
+        /// </summary>
+        /// <param name="initialCapacity"></param>
         public void Clear(int initialCapacity)
         {
             MaximumDataCountToLoad = 400000;
@@ -91,6 +109,11 @@ namespace MASIC
             mDataIndices = new int[initialCapacity];
         }
 
+        /// <summary>
+        /// Get the abundance value associated with the given data point
+        /// </summary>
+        /// <param name="dataPointIndex"></param>
+        /// <returns></returns>
         public double GetAbundanceByIndex(int dataPointIndex)
         {
             if (dataPointIndex >= 0 && dataPointIndex < mDataCount)
@@ -102,6 +125,9 @@ namespace MASIC
             return -1;
         }
 
+        /// <summary>
+        /// Filter the stored data to assure there is no more than MaximumDataCountToKeep data points
+        /// </summary>
         public void FilterData()
         {
             if (mDataCount <= 0)

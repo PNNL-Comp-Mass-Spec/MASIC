@@ -21,6 +21,15 @@ namespace MASIC
             mReporterIons = reporterIons;
         }
 
+        /// <summary>
+        /// Add the parent ion, or associate the fragmentation scan with an existing parent ion
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="surveyScanIndex"></param>
+        /// <param name="parentIonMZ"></param>
+        /// <param name="fragScanIndex"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="sicOptions"></param>
         public void AddUpdateParentIons(
             clsScanList scanList,
             int surveyScanIndex,
@@ -32,6 +41,15 @@ namespace MASIC
             AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, 0, 0, fragScanIndex, spectraCache, sicOptions);
         }
 
+        /// <summary>
+        /// Add the parent ion, or associate the fragmentation scan with an existing parent ion
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="surveyScanIndex"></param>
+        /// <param name="parentIonMZ"></param>
+        /// <param name="mrmInfo"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="sicOptions"></param>
         public void AddUpdateParentIons(
             clsScanList scanList,
             int surveyScanIndex,
@@ -53,6 +71,26 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Add the parent ion, or associate the fragmentation scan with an existing parent ion
+        ///
+        /// Checks to see if the parent ion specified by surveyScanIndex and parentIonMZ exists in .ParentIons()
+        /// If mrmDaughterMZ is > 0, also considers that value when determining uniqueness
+        ///
+        /// If the parent ion entry already exists, adds an entry to .FragScanIndices()
+        /// If it does not exist, adds a new entry to .ParentIons()
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="surveyScanIndex">
+        /// If this is less than 0 the first MS2 scan(s) in the file occurred before we encountered a survey scan
+        /// In this case, we cannot properly associate the fragmentation scan with a survey scan
+        /// </param>
+        /// <param name="parentIonMZ"></param>
+        /// <param name="mrmDaughterMZ"></param>
+        /// <param name="mrmToleranceHalfWidth"></param>
+        /// <param name="fragScanIndex">This is typically equal to scanList.FragScans.Count - 1</param>
+        /// <param name="spectraCache"></param>
+        /// <param name="sicOptions"></param>
         private void AddUpdateParentIons(
             clsScanList scanList,
             int surveyScanIndex,
@@ -65,16 +103,6 @@ namespace MASIC
         {
             const double MINIMUM_TOLERANCE_PPM = 0.01;
             const double MINIMUM_TOLERANCE_DA = 0.0001;
-
-            // Checks to see if the parent ion specified by surveyScanIndex and parentIonMZ exists in .ParentIons()
-            // If mrmDaughterMZ is > 0, also considers that value when determining uniqueness
-            //
-            // If the parent ion entry already exists, adds an entry to .FragScanIndices()
-            // If it does not exist, adds a new entry to .ParentIons()
-            // Note that typically fragScanIndex will equal scanList.FragScans.Count - 1
-
-            // If surveyScanIndex < 0, the first scan(s) in the file occurred before we encountered a survey scan
-            // In this case, we cannot properly associate the fragmentation scan with a survey scan
 
             var parentIonIndex = 0;
 
@@ -478,6 +506,16 @@ namespace MASIC
             return false;
         }
 
+        /// <summary>
+        /// Look for parent ions that have similar m/z values and are nearby one another in time
+        /// For the groups of similar ions, assign the scan number of the highest intensity parent ion to the other similar parent ions
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="masicOptions"></param>
+        /// <param name="dataImportUtilities"></param>
+        /// <param name="ionUpdateCount"></param>
+        /// <returns></returns>
         public bool FindSimilarParentIons(
             clsScanList scanList,
             clsSpectraCache spectraCache,
@@ -485,9 +523,6 @@ namespace MASIC
             DataInput.clsDataImport dataImportUtilities,
             out int ionUpdateCount)
         {
-            // Look for parent ions that have similar m/z values and are nearby one another in time
-            // For the groups of similar ions, assign the scan number of the highest intensity parent ion to the other similar parent ions
-
             ionUpdateCount = 0;
 
             try
@@ -816,11 +851,25 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Get the parent ion tolerance, in Daltons
+        /// </summary>
+        /// <param name="sicOptions"></param>
+        /// <param name="parentIonMZ"></param>
+        /// <returns></returns>
         public static double GetParentIonToleranceDa(clsSICOptions sicOptions, double parentIonMZ)
         {
             return GetParentIonToleranceDa(sicOptions, parentIonMZ, sicOptions.SICTolerance);
         }
 
+        /// <summary>
+        /// Get the parent ion tolerance specified by parentIonTolerance, in Daltons
+        /// Will convert from ppm to Da if sicOptions.SICToleranceIsPPM is true
+        /// </summary>
+        /// <param name="sicOptions"></param>
+        /// <param name="parentIonMZ"></param>
+        /// <param name="parentIonTolerance"></param>
+        /// <returns></returns>
         public static double GetParentIonToleranceDa(clsSICOptions sicOptions, double parentIonMZ, double parentIonTolerance)
         {
             if (sicOptions.SICToleranceIsPPM)

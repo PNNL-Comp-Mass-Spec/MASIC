@@ -47,16 +47,23 @@ namespace MASIC
             return MathNet.Numerics.Statistics.Statistics.Median(values);
         }
 
+        /// <summary>
+        /// Converts massMZ to the MZ that would appear at the given desiredCharge
+        /// To return the neutral mass, set desiredCharge to 0
+        /// If chargeCarrierMass is 0, uses CHARGE_CARRIER_MASS_MONOISOTOPIC
+        /// </summary>
+        /// <param name="massMZ"></param>
+        /// <param name="currentCharge"></param>
+        /// <param name="desiredCharge"></param>
+        /// <param name="chargeCarrierMass"></param>
+        /// <returns></returns>
         public static double ConvoluteMass(
             double massMZ,
             short currentCharge,
             short desiredCharge = 1,
             double chargeCarrierMass = 0)
         {
-            // Converts massMZ to the MZ that would appear at the given desiredCharge
-            // To return the neutral mass, set desiredCharge to 0
 
-            // If chargeCarrierMass is 0, uses CHARGE_CARRIER_MASS_MONOISOTOPIC
 
             double newMZ;
             if (Math.Abs(chargeCarrierMass) < double.Epsilon)
@@ -120,6 +127,11 @@ namespace MASIC
             return (float)value;
         }
 
+        /// <summary>
+        /// Return true if the number can be parsed as a double
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool IsNumber(string value)
         {
             try
@@ -132,11 +144,25 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Return true if the two values match, within float.Epsilon
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <returns></returns>
         public static bool ValuesMatch(float value1, float value2)
         {
             return ValuesMatch(value1, value2, -1);
         }
 
+        /// <summary>
+        /// Return true if the two values match, when rounded to the given number of digits after the decimal point
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <param name="digitsOfPrecision">Digits to round the numbers to before comparing</param>
+        /// <returns></returns>
+        /// <remarks>If digitsOfPrecision is negative, the values must match within float.Epsilon</remarks>
         public static bool ValuesMatch(float value1, float value2, int digitsOfPrecision)
         {
             if (digitsOfPrecision < 0)
@@ -154,11 +180,25 @@ namespace MASIC
             return false;
         }
 
+        /// <summary>
+        /// Return true if the two values match, within double.Epsilon
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <returns></returns>
         public static bool ValuesMatch(double value1, double value2)
         {
             return ValuesMatch(value1, value2, -1);
         }
 
+        /// <summary>
+        /// Return true if the two values match, when rounded to the given number of digits after the decimal point
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <param name="digitsOfPrecision">Digits to round the numbers to before comparing</param>
+        /// <returns></returns>
+        /// <remarks>If digitsOfPrecision is negative, the values must match within double.Epsilon</remarks>
         public static bool ValuesMatch(double value1, double value2, int digitsOfPrecision)
         {
             if (digitsOfPrecision < 0)
@@ -176,18 +216,26 @@ namespace MASIC
             return false;
         }
 
+        /// <summary>
+        /// Converts massToConvert to ppm, based on the value of currentMZ
+        /// </summary>
+        /// <param name="massToConvert"></param>
+        /// <param name="currentMZ"></param>
+        /// <returns></returns>
         // ReSharper disable once UnusedMember.Global
         public static double MassToPPM(double massToConvert, double currentMZ)
         {
-            // Converts massToConvert to ppm, based on the value of currentMZ
-
             return massToConvert * 1000000.0 / currentMZ;
         }
 
+        /// <summary>
+        /// Converts ppmToConvert to a mass value, which is dependent on currentMZ
+        /// </summary>
+        /// <param name="ppmToConvert"></param>
+        /// <param name="currentMZ"></param>
+        /// <returns></returns>
         public static double PPMToMass(double ppmToConvert, double currentMZ)
         {
-            // Converts ppmToConvert to a mass value, which is dependent on currentMZ
-
             return ppmToConvert / 1000000.0 * currentMZ;
         }
     }

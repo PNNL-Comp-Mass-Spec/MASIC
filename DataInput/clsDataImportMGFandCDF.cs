@@ -652,9 +652,12 @@ namespace MASIC.DataInput
             return elutionTime;
         }
 
+        /// <summary>
+        /// Validate that .MasterScanOrder() really is sorted by scan number
+        /// </summary>
+        /// <param name="scanList"></param>
         private void ValidateMasterScanOrderSorting(clsScanList scanList)
         {
-            // Validate that .MasterScanOrder() really is sorted by scan number
             // Cannot use an IComparer because .MasterScanOrder points into other arrays
 
             var masterScanNumbers = new int[scanList.MasterScanOrderCount];
