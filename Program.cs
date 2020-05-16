@@ -213,21 +213,21 @@ namespace MASIC
             return ProcessFilesOrDirectoriesBase.GetAppVersion(PROGRAM_DATE);
         }
 
-        private static void RegisterEvents(IEventNotifier oClass)
+        private static void RegisterEvents(IEventNotifier sourceClass)
         {
-            oClass.StatusEvent += StatusEventHandler;
-            oClass.DebugEvent += DebugEventHandler;
-            oClass.ErrorEvent += ErrorEventHandler;
-            oClass.WarningEvent += WarningEventHandler;
+            sourceClass.StatusEvent += StatusEventHandler;
+            sourceClass.DebugEvent += DebugEventHandler;
+            sourceClass.ErrorEvent += ErrorEventHandler;
+            sourceClass.WarningEvent += WarningEventHandler;
         }
 
-        private static void RegisterMasicEvents(clsMASIC oClass)
+        private static void RegisterMasicEvents(clsMASIC sourceClass)
         {
-            RegisterEvents(oClass);
+            RegisterEvents(sourceClass);
 
-            oClass.ProgressUpdate += ProgressUpdateHandler;
-            oClass.ProgressResetKeypressAbort += ProgressResetKeypressAbortHandler;
-            oClass.ProgressSubtaskChanged += ProgressSubtaskChangedHandler;
+            sourceClass.ProgressUpdate += ProgressUpdateHandler;
+            sourceClass.ProgressResetKeypressAbort += ProgressResetKeypressAbortHandler;
+            sourceClass.ProgressSubtaskChanged += ProgressSubtaskChangedHandler;
         }
 
         /// <summary>

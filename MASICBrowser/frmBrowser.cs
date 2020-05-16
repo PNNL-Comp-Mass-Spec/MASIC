@@ -282,21 +282,21 @@ namespace MASICBrowser
 
             if (parentIonIndex >= 0 && parentIonIndex < mParentIonStats.Count)
             {
-                eSmoothModeConstants eSmoothMode;
+                eSmoothModeConstants smoothMode;
                 if (optUseButterworthSmooth.Checked)
                 {
-                    eSmoothMode = eSmoothModeConstants.Butterworth;
+                    smoothMode = eSmoothModeConstants.Butterworth;
                 }
                 else if (optUseSavitzkyGolaySmooth.Checked)
                 {
-                    eSmoothMode = eSmoothModeConstants.SavitzkyGolay;
+                    smoothMode = eSmoothModeConstants.SavitzkyGolay;
                 }
                 else
                 {
-                    eSmoothMode = eSmoothModeConstants.DoNotReSmooth;
+                    smoothMode = eSmoothModeConstants.DoNotReSmooth;
                 }
 
-                var validPeakFound = UpdateSICStats(parentIonIndex, chkUsePeakFinder.Checked, eSmoothMode, out sicStats);
+                var validPeakFound = UpdateSICStats(parentIonIndex, chkUsePeakFinder.Checked, smoothMode, out sicStats);
 
                 // Display the SIC and SIC Peak stats
                 var ionStats = mParentIonStats[parentIonIndex];
@@ -475,6 +475,7 @@ namespace MASICBrowser
                 var parentIonIndexStart = parentIonIndex - 500;
                 if (parentIonIndexStart < 0)
                     parentIonIndexStart = 0;
+
                 FindMinimumPotentialPeakAreaInRegion(parentIonIndexStart, parentIonIndex, sicPotentialAreaStatsForRegion);
 
                 var parentIon = mParentIonStats[parentIonIndex];
@@ -923,7 +924,7 @@ namespace MASICBrowser
                 {
                     // Both of the X values are less than targetX
                     // We cannot interpolate
-                    Debug.Assert(false, "This code should normally not be reached (frmBrowser->InterpolateY)");
+                    ConsoleMsgUtils.ShowWarning("This code should normally not be reached (frmBrowser->InterpolateY)");
                 }
                 else
                 {
@@ -1562,20 +1563,19 @@ namespace MASICBrowser
         /// </summary>
         private void PopulateParentIonIndexColumnInMsMsResultsTable()
         {
-
-            var htFragScanToIndex = new Dictionary<int, int>();
+            var fragScanToIndexMap = new Dictionary<int, int>();
 
             for (var index = 0; index < mParentIonStats.Count; index++)
             {
-                if (!htFragScanToIndex.ContainsKey(mParentIonStats[index].FragScanObserved))
+                if (!fragScanToIndexMap.ContainsKey(mParentIonStats[index].FragScanObserved))
                 {
-                    htFragScanToIndex.Add(mParentIonStats[index].FragScanObserved, index);
+                    fragScanToIndexMap.Add(mParentIonStats[index].FragScanObserved, index);
                 }
             }
 
             foreach (DataRow currentRow in mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].Rows)
             {
-                if (htFragScanToIndex.TryGetValue((int)currentRow[COL_NAME_SCAN], out var value))
+                if (fragScanToIndexMap.TryGetValue((int)currentRow[COL_NAME_SCAN], out var value))
                 {
                     currentRow[COL_NAME_PARENT_ION_INDEX] = value;
                 }
@@ -1656,7 +1656,7 @@ namespace MASICBrowser
             var savitzkyGolayFilterOrder = 0;
             var scanStart = 0;
 
-            int peakScanStart = 0;
+            var peakScanStart = 0;
             var peakScanEnd = 0;
 
             var smoothedDataFound = false;
@@ -3212,7 +3212,7 @@ namespace MASICBrowser
             //msNoiseThresholdOpts.MinimumNoiseThresholdLevel =
         }
 
-        private bool UpdateSICStats(int parentIonIndex, bool repeatPeakFinding, eSmoothModeConstants eSmoothMode, out clsSICStats sicStats)
+        private bool UpdateSICStats(int parentIonIndex, bool repeatPeakFinding, eSmoothModeConstants smoothMode, out clsSICStats sicStats)
         {
             // Copy the original SIC stats found by MASIC into udtSICStats
             // This also includes the original smoothed data
@@ -3222,7 +3222,7 @@ namespace MASICBrowser
             // the array linked in both mParentIonStats().SICStats and udtSICStats
             sicStats = mParentIonStats[parentIonIndex].SICStats.Clone();
 
-            if (eSmoothMode != eSmoothModeConstants.DoNotReSmooth)
+            if (smoothMode != eSmoothModeConstants.DoNotReSmooth)
             {
                 // Re-smooth the data
                 var dataFilter = new DataFilter.DataFilter();
@@ -3233,7 +3233,7 @@ namespace MASICBrowser
 
                 var intensities = (from item in currentParentIon.SICData select item.Intensity).ToArray();
 
-                if (eSmoothMode == eSmoothModeConstants.SavitzkyGolay)
+                if (smoothMode == eSmoothModeConstants.SavitzkyGolay)
                 {
                     // Resmooth using a Savitzky Golay filter
 
@@ -3259,7 +3259,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    // Assume eSmoothMode = eSmoothModeConstants.Butterworth
+                    // Assume smoothMode = eSmoothModeConstants.Butterworth
                     var samplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text + " should be a number between 0.01 and 0.99; assuming 0.2", out _, 0.2F);
                     dataFilter.ButterworthFilter(intensities, 0, currentParentIon.SICData.Count - 1, samplingFrequency);
                 }

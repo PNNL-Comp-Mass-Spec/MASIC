@@ -1863,21 +1863,21 @@ namespace MASIC
             dataImporter.UpdateMemoryUsageEvent += UpdateMemoryUsageEventHandler;
         }
 
-        private void RegisterEventsBase(IEventNotifier oClass)
+        private void RegisterEventsBase(IEventNotifier sourceClass)
         {
-            oClass.StatusEvent += MessageEventHandler;
-            oClass.ErrorEvent += ErrorEventHandler;
-            oClass.WarningEvent += WarningEventHandler;
-            oClass.ProgressUpdate += ProgressUpdateHandler;
+            sourceClass.StatusEvent += MessageEventHandler;
+            sourceClass.ErrorEvent += ErrorEventHandler;
+            sourceClass.WarningEvent += WarningEventHandler;
+            sourceClass.ProgressUpdate += ProgressUpdateHandler;
         }
 
-        private void RegisterEvents(clsMasicEventNotifier oClass)
+        private void RegisterEvents(clsMasicEventNotifier sourceClass)
         {
-            RegisterEventsBase(oClass);
+            RegisterEventsBase(sourceClass);
 
-            oClass.UpdateCacheStatsEvent += UpdatedCacheStatsEventHandler;
-            oClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
-            oClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
+            sourceClass.UpdateCacheStatsEvent += UpdatedCacheStatsEventHandler;
+            sourceClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
+            sourceClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
         }
 
         // ReSharper disable UnusedMember.Global

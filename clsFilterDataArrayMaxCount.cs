@@ -31,7 +31,7 @@ namespace MASIC
 
         #region "Properties"
 
-        public int MaximumDataCountToLoad { get; set; }
+        public int MaximumDataCountToKeep { get; set; }
 
         /// <summary>
         /// Progress
@@ -94,7 +94,7 @@ namespace MASIC
         /// <param name="initialCapacity"></param>
         public void Clear(int initialCapacity)
         {
-            MaximumDataCountToLoad = 400000;
+            MaximumDataCountToKeep = 400000;
 
             TotalIntensityPercentageFilterEnabled = false;
             TotalIntensityPercentageFilter = 90;
@@ -170,7 +170,7 @@ namespace MASIC
                     return;
                 }
 
-                if (mDataCount <= MaximumDataCountToLoad)
+                if (mDataCount <= MaximumDataCountToKeep)
                 {
                     // Loaded less than mMaximumDataCountToKeep data points
                     // Nothing to filter
@@ -254,7 +254,7 @@ namespace MASIC
                 for (var index = binCount - 1; index >= 0; index += -1)
                 {
                     pointTotal = pointTotal + histogramBinCounts[index];
-                    if (pointTotal >= MaximumDataCountToLoad)
+                    if (pointTotal >= MaximumDataCountToKeep)
                     {
                         binToSort = index;
                         break;
@@ -356,13 +356,13 @@ namespace MASIC
                             // This code shouldn't be reached
                         }
 
-                        if (MaximumDataCountToLoad - dataCountImplicitlyIncluded - binToSortDataCount == 0)
+                        if (MaximumDataCountToKeep - dataCountImplicitlyIncluded - binToSortDataCount == 0)
                         {
                             // No need to sort and examine the data for BinToSort since we'll ultimately include all of it
                         }
                         else
                         {
-                            SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, MaximumDataCountToLoad - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT);
+                            SortAndMarkPointsToSkip(binToSortAbundances, binToSortDataIndices, binToSortDataCount, MaximumDataCountToKeep - dataCountImplicitlyIncluded, SUBTASK_STEP_COUNT);
                         }
 
                         // Synchronize the data in binToSortAbundances and binToSortDataIndices with mDataValues and mDataValues
@@ -406,7 +406,7 @@ namespace MASIC
                     // This shouldn't normally be necessary
 
                     // We have to sort all of the data; this can be quite slow
-                    SortAndMarkPointsToSkip(mDataValues, mDataIndices, mDataCount, MaximumDataCountToLoad, SUBTASK_STEP_COUNT);
+                    SortAndMarkPointsToSkip(mDataValues, mDataIndices, mDataCount, MaximumDataCountToKeep, SUBTASK_STEP_COUNT);
                 }
 
                 UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
@@ -435,7 +435,7 @@ namespace MASIC
 
                 UpdateProgress((float)(2.333 / subtaskStepCount * 100.0));
 
-                // Change the abundance values to mSkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
+                // Change the abundance values to SkipDataPointFlag for data up to index dataCount-maximumDataCountInArraysToLoad-1
                 for (var index = 0; index < dataCount - maximumDataCountInArraysToLoad; index++)
                 {
                     abundances[index] = SkipDataPointFlag;

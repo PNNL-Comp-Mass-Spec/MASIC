@@ -230,11 +230,11 @@ namespace MASIC.DataOutput
 
                     if (saveTICInsteadOfBPI)
                     {
-                        writer.Write(clsUtilities.CSngSafe(scan.TotalIonIntensity));
+                        writer.Write(clsUtilities.CFloatSafe(scan.TotalIonIntensity));
                     }
                     else
                     {
-                        writer.Write(clsUtilities.CSngSafe(scan.BasePeakIonIntensity));
+                        writer.Write(clsUtilities.CFloatSafe(scan.BasePeakIonIntensity));
                     }
                 }
             }

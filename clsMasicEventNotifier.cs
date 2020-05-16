@@ -53,13 +53,13 @@ namespace MASIC
             UpdateErrorCodeEvent?.Invoke(eNewErrorCode, leaveExistingErrorCodeUnchanged);
         }
 
-        protected void RegisterEvents(clsMasicEventNotifier oClass)
+        protected void RegisterEvents(clsMasicEventNotifier sourceClass)
         {
-            base.RegisterEvents(oClass);
+            base.RegisterEvents(sourceClass);
 
-            oClass.UpdateCacheStatsEvent += UpdatedCacheStatsEventHandler;
-            oClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
-            oClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
+            sourceClass.UpdateCacheStatsEvent += UpdatedCacheStatsEventHandler;
+            sourceClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
+            sourceClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
         }
 
         protected void ReportMessage(string message)

@@ -38,9 +38,6 @@ namespace MASICPeakFinder
             public double ParamResult;        // Stores the coefficient determined for the fit
         }
 
-        //private bool mEolsDllNotFound;
-
-        public double ComputeSlope(double[] xValuesZeroBased, double[] yValuesZeroBased, int startIndex, int endIndex)
         /// <summary>
         /// Compute slope
         /// </summary>
@@ -49,10 +46,11 @@ namespace MASICPeakFinder
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
         /// <returns></returns>
+        public double ComputeSlope(double[] xValues, double[] yValues, int startIndex, int endIndex)
         {
             const int POLYNOMIAL_ORDER = 1;
 
-            if (xValuesZeroBased == null || xValuesZeroBased.Length == 0)
+            if (xValues == null || xValues.Length == 0)
                 return 0;
             var segmentCount = endIndex - startIndex + 1;
 
@@ -62,8 +60,8 @@ namespace MASICPeakFinder
             // Copy the desired segment of data from xValues to segmentX and yValues to segmentY
             for (var i = startIndex; i <= endIndex; i++)
             {
-                segmentX[i - startIndex] = xValuesZeroBased[i];
-                segmentY[i - startIndex] = yValuesZeroBased[i];
+                segmentX[i - startIndex] = xValues[i];
+                segmentY[i - startIndex] = yValues[i];
             }
 
             // Compute the coefficients for the curve fit
@@ -98,8 +96,8 @@ namespace MASICPeakFinder
         /// However, if the maximum of yValues() is 500, then the minimum intensity of identified peaks is 50, and not 10
         /// </remarks>
         public List<clsPeakInfo> DetectPeaks(
-            double[] xValuesZeroBased,
-            double[] yValuesZeroBased,
+            double[] xValues,
+            double[] yValues,
             double intensityThresholdAbsoluteMinimum,
             int peakWidthPointsMinimum,
             int peakDetectIntensityThresholdPercentageOfMaximum = 0,
@@ -122,7 +120,7 @@ namespace MASICPeakFinder
 
             try
             {
-                var sourceDataCount = xValuesZeroBased.Length;
+                var sourceDataCount = xValues.Length;
                 if (sourceDataCount <= 0)
                     return detectedPeaks;
 
@@ -137,9 +135,9 @@ namespace MASICPeakFinder
                 double maximumIntensity = 0;
                 for (var dataIndex = 0; dataIndex < sourceDataCount; dataIndex++)
                 {
-                    if (yValuesZeroBased[dataIndex] > maximumIntensity)
+                    if (yValues[dataIndex] > maximumIntensity)
                     {
-                        maximumIntensity = yValuesZeroBased[dataIndex];
+                        maximumIntensity = yValues[dataIndex];
                     }
                 }
 
@@ -154,7 +152,7 @@ namespace MASICPeakFinder
                     return detectedPeaks;
 
                 // Do the actual work
-                FitSegments(xValuesZeroBased, yValuesZeroBased, sourceDataCount, peakWidthPointsMinimum,
+                FitSegments(xValues, yValues, sourceDataCount, peakWidthPointsMinimum,
                             peakHalfWidth, ref firstDerivative, ref secondDerivative);
 
                 if (peakWidthInSigma < 1)
@@ -175,7 +173,7 @@ namespace MASICPeakFinder
                     if (firstDerivative[index] > 0 && firstDerivative[index + 1] < 0)
                     {
                         // Possible peak
-                        if (yValuesZeroBased[index] >= intensityThreshold || yValuesZeroBased[index + 1] >= intensityThreshold)
+                        if (yValues[index] >= intensityThreshold || yValues[index + 1] >= intensityThreshold)
                         {
                             // Actual peak
 
@@ -200,7 +198,7 @@ namespace MASICPeakFinder
                                             break;
                                         }
 
-                                        if (yValuesZeroBased[compareIndex] < intensityThreshold)
+                                        if (yValues[compareIndex] < intensityThreshold)
                                         {
                                             lowIntensityPointCount += 1;
                                             if (lowIntensityPointCount > peakHalfWidth)
@@ -233,7 +231,7 @@ namespace MASICPeakFinder
                                             break;
                                         }
 
-                                        if (yValuesZeroBased[compareIndex] < intensityThreshold)
+                                        if (yValues[compareIndex] < intensityThreshold)
                                         {
                                             lowIntensityPointCount += 1;
                                             if (lowIntensityPointCount > peakHalfWidth)
@@ -274,7 +272,7 @@ namespace MASICPeakFinder
                                 try
                                 {
                                     // If secondDerivative(index)) is tiny, the following division will fail
-                                    sigma = Math.Sqrt(Math.Abs(-yValuesZeroBased[index] / secondDerivative[index]));
+                                    sigma = Math.Sqrt(Math.Abs(-yValues[index] / secondDerivative[index]));
                                 }
                                 catch (Exception ex)
                                 {
@@ -325,7 +323,7 @@ namespace MASICPeakFinder
                         {
                             // I don't think this can happen
                             // Just in case, we'll set the area equal to the peak intensity
-                            peakItem.PeakArea = yValuesZeroBased[peakItem.PeakLocation];
+                            peakItem.PeakArea = yValues[peakItem.PeakLocation];
                         }
                         else
                         {
@@ -349,8 +347,8 @@ namespace MASICPeakFinder
 
                             for (var areaValuesCopyIndex = thisPeakStartIndex; areaValuesCopyIndex <= thisPeakEndIndex; areaValuesCopyIndex++)
                             {
-                                xValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = xValuesZeroBased[areaValuesCopyIndex];
-                                yValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = yValuesZeroBased[areaValuesCopyIndex];
+                                xValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = xValues[areaValuesCopyIndex];
+                                yValuesForArea[areaValuesCopyIndex - thisPeakStartIndex] = yValues[areaValuesCopyIndex];
                             }
 
                             peakItem.PeakArea = FindArea(xValuesForArea, yValuesForArea, thisPeakWidthInPoints);
@@ -378,13 +376,13 @@ namespace MASICPeakFinder
                         if (dataIndexCheckEnd > sourceDataCount - 1)
                             dataIndexCheckEnd = sourceDataCount - 1;
 
-                        maximumIntensity = yValuesZeroBased[peakItem.PeakLocation];
+                        maximumIntensity = yValues[peakItem.PeakLocation];
                         for (var dataIndexCheck = dataIndexCheckStart; dataIndexCheck <= dataIndexCheckEnd; dataIndexCheck++)
                         {
-                            if (yValuesZeroBased[dataIndexCheck] > maximumIntensity)
+                            if (yValues[dataIndexCheck] > maximumIntensity)
                             {
                                 peakItem.PeakLocation = dataIndexCheck;
-                                maximumIntensity = yValuesZeroBased[dataIndexCheck];
+                                maximumIntensity = yValues[dataIndexCheck];
                             }
                         }
 
@@ -510,35 +508,33 @@ namespace MASICPeakFinder
         /// <returns></returns>
         private bool LLSqFit(IList<double> xValues, IList<double> yValues, ref udtLeastSquaresFitEquationTermType[] equationTerms)
         {
-            // Linear Least Squares Fit
-
-            var Beta = new double[xValues.Count];
-            var CoVar = new double[equationTerms.Length, equationTerms.Length];
-            var PFuncVal = new double[equationTerms.Length];
+            var beta = new double[xValues.Count];
+            var coVariance = new double[equationTerms.Length, equationTerms.Length];
+            var pFuncValue = new double[equationTerms.Length];
 
             for (var i = 0; i < xValues.Count; i++)
             {
-                GetLValues(xValues[i], ref equationTerms, ref PFuncVal);
+                GetLValues(xValues[i], ref equationTerms, ref pFuncValue);
 
                 var ym = yValues[i];
                 for (var L = 0; L < equationTerms.Length; L++)
                 {
                     for (var m = 0; m <= L; m++)
-                        CoVar[L, m] += PFuncVal[L] * PFuncVal[m];
-                    Beta[L] += ym * PFuncVal[L];
+                        coVariance[L, m] += pFuncValue[L] * pFuncValue[m];
+                    beta[L] += ym * pFuncValue[L];
                 }
             }
 
             for (var j = 1; j < equationTerms.Length; j++)
             {
                 for (var k = 0; k < j; k++)
-                    CoVar[k, j] = CoVar[j, k];
+                    coVariance[k, j] = coVariance[j, k];
             }
 
-            if (GaussJordan(ref CoVar, ref equationTerms, ref Beta))
+            if (GaussJordan(ref coVariance, ref equationTerms, ref beta))
             {
                 for (var L = 0; L < equationTerms.Length; L++)
-                    equationTerms[L].ParamResult = Beta[L];
+                    equationTerms[L].ParamResult = beta[L];
 
                 return true;
             }
@@ -550,7 +546,7 @@ namespace MASICPeakFinder
             return false;
         }
 
-        private void GetLValues(double X, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] PFuncVal)
+        private void GetLValues(double X, ref udtLeastSquaresFitEquationTermType[] equationTerms, ref double[] pFuncValue)
         {
             // Get values for Linear Least Squares
             // equationTerms() is a 0-based array defining the form of each term
@@ -626,16 +622,16 @@ namespace MASICPeakFinder
                 {
                     if (Math.Abs(v) < double.Epsilon)
                     {
-                        PFuncVal[i] = 0;
+                        pFuncValue[i] = 0;
                     }
                     else // NOT V...
                     {
-                        PFuncVal[i] = 1 / v;
+                        pFuncValue[i] = 1 / v;
                     }
                 }
                 else // INV(I) = FALSE
                 {
-                    PFuncVal[i] = v;
+                    pFuncValue[i] = v;
                 }
             }
         }

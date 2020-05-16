@@ -17,16 +17,20 @@ namespace MASIC
         }
 
         #region "Constants and Enums"
+
         private enum eDataTypeToUse
         {
             NoDataPresent = 0,
             IntegerType = 1,
-            SingleType = 2,
+            FloatType = 2,
             DoubleType = 3
         }
+
         #endregion
 
+
         #region "Classwide Variables"
+
         private eDataTypeToUse mDataType;
 
         private int[] mDataInt;
@@ -43,6 +47,7 @@ namespace MASIC
         #endregion
 
         #region "Interface Functions"
+
         public int DataCount
         {
             get
@@ -51,12 +56,16 @@ namespace MASIC
                 {
                     case eDataTypeToUse.IntegerType:
                         return mDataInt.Length;
-                    case eDataTypeToUse.SingleType:
+
+                    case eDataTypeToUse.FloatType:
                         return mDataSingle.Length;
+
                     case eDataTypeToUse.DoubleType:
                         return mDataDouble.Length;
+
                     case eDataTypeToUse.NoDataPresent:
                         return 0;
+
                     default:
                         throw new Exception("Unknown data type encountered: " + mDataType.ToString());
                 }
@@ -107,8 +116,8 @@ namespace MASIC
         /// <param name="toleranceHalfWidth"></param>
         /// <param name="matchIndexStart"></param>
         /// <param name="matchIndexEnd"></param>
+        private void BinarySearchRangeInteger(int searchValue, int toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         {
-
             var leftDone = false;
             var rightDone = false;
 
@@ -127,13 +136,13 @@ namespace MASIC
             {
                 // Out of range on the right
                 matchIndexEnd = indexMidpoint;
-                BinarySearchRangeInt(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                BinarySearchRangeInteger(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else if (mDataInt[indexMidpoint] < searchValue - toleranceHalfWidth)
             {
                 // Out of range on the left
                 matchIndexStart = indexMidpoint;
-                BinarySearchRangeInt(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                BinarySearchRangeInteger(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else
             {
@@ -168,7 +177,6 @@ namespace MASIC
             }
         }
 
-        private void BinarySearchRangeSng(float searchValue, float toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         /// <summary>
         /// Recursively search for the given float, +/- tolerance
         /// </summary>
@@ -176,8 +184,8 @@ namespace MASIC
         /// <param name="toleranceHalfWidth"></param>
         /// <param name="matchIndexStart"></param>
         /// <param name="matchIndexEnd"></param>
+        private void BinarySearchRangeFloat(float searchValue, float toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         {
-
             var leftDone = false;
             var rightDone = false;
 
@@ -196,13 +204,13 @@ namespace MASIC
             {
                 // Out of range on the right
                 matchIndexEnd = indexMidpoint;
-                BinarySearchRangeSng(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                BinarySearchRangeFloat(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else if (mDataSingle[indexMidpoint] < searchValue - toleranceHalfWidth)
             {
                 // Out of range on the left
                 matchIndexStart = indexMidpoint;
-                BinarySearchRangeSng(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                BinarySearchRangeFloat(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else
             {
@@ -236,7 +244,6 @@ namespace MASIC
             }
         }
 
-        private void BinarySearchRangeDbl(double searchValue, double toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         /// <summary>
         /// Recursively search for the given double, +/- tolerance
         /// </summary>
@@ -244,8 +251,8 @@ namespace MASIC
         /// <param name="toleranceHalfWidth"></param>
         /// <param name="matchIndexStart"></param>
         /// <param name="matchIndexEnd"></param>
+        private void BinarySearchRangeDouble(double searchValue, double toleranceHalfWidth, ref int matchIndexStart, ref int matchIndexEnd)
         {
-
             var leftDone = false;
             var rightDone = false;
 
@@ -264,13 +271,13 @@ namespace MASIC
             {
                 // Out of range on the right
                 matchIndexEnd = indexMidpoint;
-                BinarySearchRangeDbl(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                BinarySearchRangeDouble(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else if (mDataDouble[indexMidpoint] < searchValue - toleranceHalfWidth)
             {
                 // Out of range on the left
                 matchIndexStart = indexMidpoint;
-                BinarySearchRangeDbl(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                BinarySearchRangeDouble(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
             }
             else
             {
@@ -303,16 +310,20 @@ namespace MASIC
                 matchIndexEnd = rightIndex - 1;
             }
         }
+
         #endregion
 
         private void ClearUnusedData()
         {
             if (mDataType != eDataTypeToUse.IntegerType)
                 mDataInt = new int[0];
-            if (mDataType != eDataTypeToUse.SingleType)
+
+            if (mDataType != eDataTypeToUse.FloatType)
                 mDataSingle = new float[0];
+
             if (mDataType != eDataTypeToUse.DoubleType)
                 mDataDouble = new double[0];
+
             if (mDataType == eDataTypeToUse.NoDataPresent)
             {
                 mPointerArrayIsValid = false;
@@ -411,7 +422,7 @@ namespace MASIC
                         mPointerArrayIsValid = false;
                     }
 
-                    mDataType = eDataTypeToUse.SingleType;
+                    mDataType = eDataTypeToUse.FloatType;
                     success = true;
                 }
             }
@@ -495,7 +506,7 @@ namespace MASIC
             {
                 switch (mDataType)
                 {
-                    case eDataTypeToUse.SingleType:
+                    case eDataTypeToUse.FloatType:
                         matchFound = FindValueRange((float)searchValue, toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     case eDataTypeToUse.DoubleType:
@@ -525,7 +536,7 @@ namespace MASIC
                 }
                 else
                 {
-                    BinarySearchRangeInt(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                    BinarySearchRangeInteger(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
                 }
 
                 if (matchIndexStart > matchIndexEnd)
@@ -565,7 +576,7 @@ namespace MASIC
                     case eDataTypeToUse.IntegerType:
                         matchFound = FindValueRange((int)Math.Round(searchValue), (int)Math.Round(toleranceHalfWidth), out matchIndexStart, out matchIndexEnd);
                         break;
-                    case eDataTypeToUse.SingleType:
+                    case eDataTypeToUse.FloatType:
                         matchFound = FindValueRange((float)searchValue, (float)toleranceHalfWidth, out matchIndexStart, out matchIndexEnd);
                         break;
                     default:
@@ -592,7 +603,7 @@ namespace MASIC
                 }
                 else
                 {
-                    BinarySearchRangeDbl(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                    BinarySearchRangeDouble(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
                 }
 
                 if (matchIndexStart > matchIndexEnd)
@@ -625,7 +636,7 @@ namespace MASIC
             matchIndexStart = -1;
             matchIndexEnd = -1;
 
-            if (mDataType != eDataTypeToUse.SingleType)
+            if (mDataType != eDataTypeToUse.FloatType)
             {
                 switch (mDataType)
                 {
@@ -659,7 +670,7 @@ namespace MASIC
                 }
                 else
                 {
-                    BinarySearchRangeSng(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
+                    BinarySearchRangeFloat(searchValue, toleranceHalfWidth, ref matchIndexStart, ref matchIndexEnd);
                 }
 
                 if (matchIndexStart > matchIndexEnd)
@@ -676,6 +687,7 @@ namespace MASIC
 
             return matchFound;
         }
+
         #endregion
 
         #region "Get Value by Index"
@@ -716,7 +728,7 @@ namespace MASIC
                 {
                     case eDataTypeToUse.IntegerType:
                         return mDataInt[index];
-                    case eDataTypeToUse.SingleType:
+                    case eDataTypeToUse.FloatType:
                         return mDataSingle[index];
                     case eDataTypeToUse.DoubleType:
                         return mDataDouble[index];
@@ -737,7 +749,7 @@ namespace MASIC
         /// <param name="index"></param>
         /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         // ReSharper disable once UnusedMember.Global
-        public float GetValueByIndexSng(int index)
+        public float GetValueByIndexFloat(int index)
         {
             try
             {
@@ -791,7 +803,7 @@ namespace MASIC
                     {
                         case eDataTypeToUse.IntegerType:
                             return mDataInt[mPointerIndices[index]];
-                        case eDataTypeToUse.SingleType:
+                        case eDataTypeToUse.FloatType:
                             return mDataSingle[mPointerIndices[index]];
                         case eDataTypeToUse.DoubleType:
                             return mDataDouble[mPointerIndices[index]];
@@ -816,7 +828,7 @@ namespace MASIC
         /// <param name="index"></param>
         /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         // ReSharper disable once UnusedMember.Global
-        public float GetValueByOriginalIndexSng(int index)
+        public float GetValueByOriginalIndexFloat(int index)
         {
             try
             {
@@ -834,7 +846,7 @@ namespace MASIC
             mDataType = eDataTypeToUse.NoDataPresent;
             ClearUnusedData();
 
-            mUsePointerIndexArray = true;
+            UsePointerIndexArray = true;
             InitializePointerIndexArray(0);
         }
 

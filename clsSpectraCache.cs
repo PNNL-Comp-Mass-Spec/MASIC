@@ -345,8 +345,8 @@ namespace MASIC
                     return;
                 }
 
-                var bastPath = filePathMatch.Substring(0, charIndex);
-                var cacheFiles = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(bastPath) + "*");
+                var basePath = filePathMatch.Substring(0, charIndex);
+                var cacheFiles = Directory.GetFiles(mCacheOptions.DirectoryPath, Path.GetFileName(basePath) + "*");
 
                 foreach (var cacheFile in cacheFiles)
                 {
@@ -787,49 +787,71 @@ namespace MASIC
         /// </summary>
         private class MemoryCacheArray : IScanMemoryCache
         {
-            private readonly List<ScanMemoryCacheItem> cache;
-            private readonly Dictionary<int, int> scanNumberToIndexMap;
-            private int capacity;
-            private int lastIndex;
+            private readonly List<ScanMemoryCacheItem> mMemoryCache;
+            private readonly Dictionary<int, int> mScanNumberToIndexMap;
+            private int mCapacity;
+            private int mLastIndex;
 
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="initialCapacity"></param>
             public MemoryCacheArray(int initialCapacity)
             {
-                capacity = initialCapacity;
-                cache = new List<ScanMemoryCacheItem>(initialCapacity);
-                scanNumberToIndexMap = new Dictionary<int, int>(initialCapacity);
-                lastIndex = -1;
+                mCapacity = initialCapacity;
+                mMemoryCache = new List<ScanMemoryCacheItem>(initialCapacity);
+                mScanNumberToIndexMap = new Dictionary<int, int>(initialCapacity);
+                mLastIndex = -1;
                 Count = 0;
             }
 
+            /// <summary>
+            /// Number of spectra in the cache
+            /// </summary>
             public int Count { get; private set; }
 
+            /// <summary>
+            /// Spectrum cache capacity
+            /// </summary>
             public int Capacity
             {
-                get => capacity;
+                get => mCapacity;
                 set
                 {
-                    if (value < cache.Count)
+                    if (value < mMemoryCache.Count)
                     {
                         throw new ArgumentOutOfRangeException(nameof(value), "capacity was less than the current size.");
                     }
 
-                    capacity = value;
-                    cache.Capacity = value;
+                    mCapacity = value;
+                    mMemoryCache.Capacity = value;
                 }
             }
 
+            /// <summary>
+            /// Get the spectrum for the given scan
+            /// </summary>
+            /// <param name="scanNumber"></param>
+            /// <param name="item"></param>
+            /// <returns></returns>
             public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
             {
-                if (!scanNumberToIndexMap.TryGetValue(scanNumber, out var index))
+                if (!mScanNumberToIndexMap.TryGetValue(scanNumber, out var index))
                 {
                     item = null;
                     return false;
                 }
 
-                item = cache[index];
+                item = mMemoryCache[index];
                 return true;
             }
 
+            /// <summary>
+            /// Add a new spectrum (and remove the oldest one if the cache is at capacity)
+            /// </summary>
+            /// <param name="newItem"></param>
+            /// <param name="removedItem"></param>
+            /// <returns></returns>
             public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
             {
                 var itemRemoved = RemoveOldestItem(out removedItem);
@@ -845,32 +867,32 @@ namespace MASIC
             /// <returns>true if the item could be added, false otherwise (like if the cache is already full)</returns>
             private bool Add(ScanMemoryCacheItem newItem)
             {
-                if (Count == capacity)
+                if (Count == mCapacity)
                 {
                     return false;
                 }
 
-                if (scanNumberToIndexMap.ContainsKey(newItem.Scan.ScanNumber))
+                if (mScanNumberToIndexMap.ContainsKey(newItem.Scan.ScanNumber))
                 {
                     return true;
                 }
 
-                if (Count >= capacity)
+                if (Count >= mCapacity)
                 {
-                    lastIndex++;
-                    if (lastIndex >= Count)
-                        lastIndex = 0;
+                    mLastIndex++;
+                    if (mLastIndex >= Count)
+                        mLastIndex = 0;
 
-                    //cache.Insert(lastIndex, newItem);
-                    cache[lastIndex] = newItem;
+                    //cache.Insert(mLastIndex, newItem);
+                    mMemoryCache[mLastIndex] = newItem;
                 }
                 else
                 {
-                    lastIndex = cache.Count;
-                    cache.Add(newItem);
+                    mLastIndex = mMemoryCache.Count;
+                    mMemoryCache.Add(newItem);
                 }
 
-                scanNumberToIndexMap.Add(newItem.Scan.ScanNumber, lastIndex);
+                mScanNumberToIndexMap.Add(newItem.Scan.ScanNumber, mLastIndex);
                 Count++;
                 return true;
             }
@@ -882,31 +904,36 @@ namespace MASIC
             /// <returns>true if item was removed, false otherwise</returns>
             private bool RemoveOldestItem(out ScanMemoryCacheItem oldItem)
             {
-                if (Count < capacity)
+                if (Count < mCapacity)
                 {
                     oldItem = null;
                     return false;
                 }
 
-                if (lastIndex == Count - 1)
+                if (mLastIndex == Count - 1)
                 {
-                    oldItem = cache[0];
+                    oldItem = mMemoryCache[0];
                 }
                 else
                 {
-                    oldItem = cache[lastIndex + 1];
+                    oldItem = mMemoryCache[mLastIndex + 1];
                 }
 
-                scanNumberToIndexMap.Remove(oldItem.Scan.ScanNumber);
+                mScanNumberToIndexMap.Remove(oldItem.Scan.ScanNumber);
                 Count--;
                 return true;
             }
 
+            /// <summary>
+            /// Clear the cache
+            /// </summary>
             public void Clear()
             {
-                cache.Clear();
-                scanNumberToIndexMap.Clear();
-                lastIndex = -1;
+                mMemoryCache.Clear();
+                mScanNumberToIndexMap.Clear();
+                mLastIndex = -1;
+            }
+
             }
         }
 
@@ -915,35 +942,52 @@ namespace MASIC
         /// </summary>
         private class MemoryCacheLRU : IScanMemoryCache
         {
-            private readonly LinkedList<ScanMemoryCacheItem> cache;
-            private readonly Dictionary<int, LinkedListNode<ScanMemoryCacheItem>> scanNumberToNodeMap;
-            private int capacity;
+            private readonly LinkedList<ScanMemoryCacheItem> mMemoryCache;
+            private readonly Dictionary<int, LinkedListNode<ScanMemoryCacheItem>> mScanNumberToNodeMap;
+            private int mCapacity;
 
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="initialCapacity"></param>
             public MemoryCacheLRU(int initialCapacity)
             {
-                capacity = initialCapacity;
-                cache = new LinkedList<ScanMemoryCacheItem>();
-                scanNumberToNodeMap = new Dictionary<int, LinkedListNode<ScanMemoryCacheItem>>(initialCapacity);
+                mCapacity = initialCapacity;
+                mMemoryCache = new LinkedList<ScanMemoryCacheItem>();
+                mScanNumberToNodeMap = new Dictionary<int, LinkedListNode<ScanMemoryCacheItem>>(initialCapacity);
             }
 
-            public int Count => cache.Count;
+            /// <summary>
+            /// Number of spectra in the cache
+            /// </summary>
+            public int Count => mMemoryCache.Count;
+
+            /// <summary>
+            /// Spectrum cache capacity
+            /// </summary>
             public int Capacity
             {
-                get => capacity;
+                get => mCapacity;
                 set
                 {
-                    if (value < cache.Count)
+                    if (value < mMemoryCache.Count)
                     {
                         throw new ArgumentOutOfRangeException(nameof(value), "capacity was less than the current size.");
                     }
 
-                    capacity = value;
+                    mCapacity = value;
                 }
             }
 
+            /// <summary>
+            /// Get the spectrum for the given scan
+            /// </summary>
+            /// <param name="scanNumber"></param>
+            /// <param name="item"></param>
+            /// <returns></returns>
             public bool GetItem(int scanNumber, out ScanMemoryCacheItem item)
             {
-                if (!scanNumberToNodeMap.TryGetValue(scanNumber, out var node))
+                if (!mScanNumberToNodeMap.TryGetValue(scanNumber, out var node))
                 {
                     item = null;
                     return false;
@@ -952,12 +996,18 @@ namespace MASIC
                 item = node.Value;
 
                 // LRU management
-                cache.Remove(node); // O(1)
-                cache.AddLast(node); // O(1)
+                mMemoryCache.Remove(node); // O(1)
+                mMemoryCache.AddLast(node); // O(1)
 
                 return true;
             }
 
+            /// <summary>
+            /// Add a new spectrum (and remove the oldest one if the cache is at capacity)
+            /// </summary>
+            /// <param name="newItem"></param>
+            /// <param name="removedItem"></param>
+            /// <returns></returns>
             public bool AddNew(ScanMemoryCacheItem newItem, out ScanMemoryCacheItem removedItem)
             {
                 var itemRemoved = RemoveOldestItem(out removedItem);
@@ -973,18 +1023,18 @@ namespace MASIC
             /// <returns>true if the item could be added, false otherwise (like if the cache is already full)</returns>
             private bool Add(ScanMemoryCacheItem newItem)
             {
-                if (cache.Count == capacity)
+                if (mMemoryCache.Count == mCapacity)
                 {
                     return false;
                 }
 
-                if (scanNumberToNodeMap.ContainsKey(newItem.Scan.ScanNumber))
+                if (mScanNumberToNodeMap.ContainsKey(newItem.Scan.ScanNumber))
                 {
                     return true;
                 }
 
-                var node = cache.AddLast(newItem);
-                scanNumberToNodeMap.Add(newItem.Scan.ScanNumber, node);
+                var node = mMemoryCache.AddLast(newItem);
+                mScanNumberToNodeMap.Add(newItem.Scan.ScanNumber, node);
                 return true;
             }
 
@@ -995,24 +1045,38 @@ namespace MASIC
             /// <returns>true if item was removed, false otherwise</returns>
             private bool RemoveOldestItem(out ScanMemoryCacheItem oldItem)
             {
-                if (Count < capacity)
+                if (Count < mCapacity)
                 {
                     oldItem = null;
                     return false;
                 }
 
-                var node = cache.First;
+                var node = mMemoryCache.First;
                 oldItem = node.Value;
-                cache.RemoveFirst();
-                scanNumberToNodeMap.Remove(node.Value.Scan.ScanNumber);
+                mMemoryCache.RemoveFirst();
+                mScanNumberToNodeMap.Remove(node.Value.Scan.ScanNumber);
 
                 return true;
             }
 
+            /// <summary>
+            /// Clear the cache
+            /// </summary>
             public void Clear()
             {
-                cache.Clear();
-                scanNumberToNodeMap.Clear();
+                mMemoryCache.Clear();
+                mScanNumberToNodeMap.Clear();
+            }
+
+            /// <summary>
+            /// Report the number of cached spectra, along with the cache capacity
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                return string.Format(
+                    "In-memory least-recently-used spectrum cache with {0} spectra cached (capacity {1})",
+                    mMemoryCache.Count, mCapacity);
             }
         }
     }

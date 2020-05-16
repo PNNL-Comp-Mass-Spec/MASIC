@@ -963,7 +963,7 @@ namespace MagnitudeConcavityPeakFinder
         }
 
         private bool SmoothData(
-            double[] yDataVals,
+            double[] yDataValues,
             int dataCount,
             udtSICPeakFinderOptionsType peakFinderOptions,
             ref int peakWidthPointsMinimum,
@@ -977,7 +977,7 @@ namespace MagnitudeConcavityPeakFinder
 
             // Make a copy of the data
             smoothedYData = new double[dataCount];
-            yDataVals.CopyTo(smoothedYData, 0);
+            yDataValues.CopyTo(smoothedYData, 0);
 
             var performSmooth = peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth;
 
@@ -1059,17 +1059,16 @@ namespace MagnitudeConcavityPeakFinder
             out string errorMessage)
         {
             var dataFilter = new DataFilter.DataFilter();
-            errorMessage = string.Empty;
 
             // Filter the data with a Savitzky Golay filter
-            var intFilterThirdWidth = (int)Math.Floor(peakWidthPointsMinimum / 3.0);
-            if (intFilterThirdWidth > 3)
-                intFilterThirdWidth = 3;
+            var filterThirdWidth = (int)Math.Floor(peakWidthPointsMinimum / 3.0);
+            if (filterThirdWidth > 3)
+                filterThirdWidth = 3;
 
-            // Make sure intFilterThirdWidth is Odd
-            if (intFilterThirdWidth % 2 == 0)
+            // Make sure filterThirdWidth is Odd
+            if (filterThirdWidth % 2 == 0)
             {
-                intFilterThirdWidth -= 1;
+                filterThirdWidth -= 1;
             }
 
             const int startIndex = 0;
@@ -1078,8 +1077,8 @@ namespace MagnitudeConcavityPeakFinder
             // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
             // Also note that a PolynomialDegree value of 0 results in the equivalent of a moving average filter
             var success = dataFilter.SavitzkyGolayFilter(smoothedYData, startIndex,
-                                                       endIndex, intFilterThirdWidth,
-                                                       intFilterThirdWidth,
+                                                       endIndex, filterThirdWidth,
+                                                       filterThirdWidth,
                                                        peakFinderOptions.SavitzkyGolayFilterOrder,
                                                        out errorMessage, true);
 

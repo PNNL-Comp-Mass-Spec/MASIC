@@ -272,7 +272,7 @@ namespace MASIC.DataInput
                 {
                     var filterDataArray = new clsFilterDataArrayMaxCount
                     {
-                        MaximumDataCountToLoad = maxIonCountToRetain,
+                        MaximumDataCountToKeep = maxIonCountToRetain,
                         TotalIntensityPercentageFilterEnabled = false
                     };
 

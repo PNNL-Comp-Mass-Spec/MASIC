@@ -118,12 +118,20 @@ namespace MASIC
             return newMZ;
         }
 
-        public static float CSngSafe(double value)
+        /// <summary>
+        /// Convert from a double to float
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <remarks>Assures that the value is between float.MinValue and float.MaxValue</remarks>
+        public static float CFloatSafe(double value)
         {
             if (value > float.MaxValue)
                 return float.MaxValue;
+
             if (value < float.MinValue)
                 return float.MinValue;
+
             return (float)value;
         }
 

@@ -1237,7 +1237,7 @@ namespace MASIC.DataInput
             {
                 SpectrumID = mzMLSpectrum.ScanNumber,
                 ScanNumber = mzMLSpectrum.ScanNumber,
-                RetentionTimeMin = clsUtilities.CSngSafe(mzMLSpectrum.ScanStartTime),
+                RetentionTimeMin = clsUtilities.CFloatSafe(mzMLSpectrum.ScanStartTime),
                 MSLevel = mzMLSpectrum.MsLevel,
                 TotalIonCurrent = mzMLSpectrum.TotalIonCurrent,
                 DataCount = mzList.Count
@@ -1269,10 +1269,10 @@ namespace MASIC.DataInput
                 }
 
                 mzXmlSourceSpectrum.BasePeakMZ = basePeakMz;
-                mzXmlSourceSpectrum.BasePeakIntensity = clsUtilities.CSngSafe(bpi);
+                mzXmlSourceSpectrum.BasePeakIntensity = clsUtilities.CFloatSafe(bpi);
 
-                mzXmlSourceSpectrum.mzRangeStart = clsUtilities.CSngSafe(mzMin);
-                mzXmlSourceSpectrum.mzRangeEnd = clsUtilities.CSngSafe(mzMax);
+                mzXmlSourceSpectrum.mzRangeStart = clsUtilities.CFloatSafe(mzMin);
+                mzXmlSourceSpectrum.mzRangeEnd = clsUtilities.CFloatSafe(mzMax);
             }
 
             if (mzXmlSourceSpectrum.MSLevel > 1)

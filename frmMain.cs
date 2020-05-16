@@ -252,11 +252,11 @@ namespace MASIC
             }
         }
 
-        private bool updating;
+        private bool mUpdating;
 
         private void CatchUnrequestedHeightChange()
         {
-            if (updating)
+            if (mUpdating)
                 return;
 
             if (mHeightAdjustForce == 0 || DateTime.UtcNow.Subtract(mHeightAdjustTime).TotalSeconds > 5.0)
@@ -264,7 +264,7 @@ namespace MASIC
 
             try
             {
-                updating = true;
+                mUpdating = true;
                 Height = mHeightAdjustForce;
                 mHeightAdjustForce = 0;
                 mHeightAdjustTime = DateTime.Parse("1900-01-01");
@@ -275,7 +275,7 @@ namespace MASIC
             }
             finally
             {
-                updating = false;
+                mUpdating = false;
             }
         }
 
@@ -1230,16 +1230,16 @@ namespace MASIC
             }
         }
 
-        private void RegisterEvents(clsMASIC oClass)
+        private void RegisterEvents(clsMASIC masicInstance)
         {
-            oClass.StatusEvent += StatusEventHandler;
-            oClass.DebugEvent += DebugEventHandler;
-            oClass.ErrorEvent += ErrorEventHandler;
-            oClass.WarningEvent += WarningEventHandler;
+            masicInstance.StatusEvent += StatusEventHandler;
+            masicInstance.DebugEvent += DebugEventHandler;
+            masicInstance.ErrorEvent += ErrorEventHandler;
+            masicInstance.WarningEvent += WarningEventHandler;
 
-            oClass.ProgressUpdate += MASIC_ProgressUpdate;
-            oClass.ProgressResetKeypressAbort += MASIC_ProgressResetKeypressAbort;
-            oClass.ProgressSubtaskChanged += MASIC_ProgressSubtaskChanged;
+            masicInstance.ProgressUpdate += MASIC_ProgressUpdate;
+            masicInstance.ProgressResetKeypressAbort += MASIC_ProgressResetKeypressAbort;
+            masicInstance.ProgressSubtaskChanged += MASIC_ProgressSubtaskChanged;
         }
 
         private void ResetToDefaults(bool confirmReset, clsMASIC masicReferenceClass = null)

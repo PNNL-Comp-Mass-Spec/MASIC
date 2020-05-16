@@ -143,52 +143,63 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Duplicate MRM info, overriding the parent ion m/z using parentIonMZ
+        /// </summary>
+        /// <param name="sourceInfo"></param>
+        /// <param name="parentIonMZ"></param>
+        /// <returns></returns>
         public static clsMRMScanInfo DuplicateMRMInfo(
-            MRMInfo oSource,
+            MRMInfo sourceInfo,
             double parentIonMZ)
         {
-            var oTarget = new clsMRMScanInfo
+            var targetInfo = new clsMRMScanInfo
             {
                 ParentIonMZ = parentIonMZ,
-                MRMMassCount = oSource.MRMMassList.Count,
+                MRMMassCount = sourceInfo.MRMMassList.Count,
                 ScanCount = 0,
                 ParentIonInfoIndex = -1,
         };
 
-            if (oSource.MRMMassList == null)
+            if (sourceInfo.MRMMassList == null)
             {
-                oTarget.MRMMassList = new List<udtMRMMassRangeType>();
+                targetInfo.MRMMassList = new List<udtMRMMassRangeType>();
             }
             else
             {
-                oTarget.MRMMassList = new List<udtMRMMassRangeType>(oSource.MRMMassList.Count);
-                oTarget.MRMMassList.AddRange(oSource.MRMMassList);
+                targetInfo.MRMMassList = new List<udtMRMMassRangeType>(sourceInfo.MRMMassList.Count);
+                targetInfo.MRMMassList.AddRange(sourceInfo.MRMMassList);
             }
 
-            return oTarget;
+            return targetInfo;
         }
 
-        private clsMRMScanInfo DuplicateMRMInfo(clsMRMScanInfo oSource)
+        /// <summary>
+        /// Duplicate MRM info
+        /// </summary>
+        /// <param name="sourceInfo"></param>
+        /// <returns></returns>
+        private clsMRMScanInfo DuplicateMRMInfo(clsMRMScanInfo sourceInfo)
         {
-            var oTarget = new clsMRMScanInfo
+            var targetInfo = new clsMRMScanInfo
             {
-                ParentIonMZ = oSource.ParentIonMZ,
-                MRMMassCount = oSource.MRMMassCount,
-                ScanCount = oSource.ScanCount,
-                ParentIonInfoIndex = oSource.ParentIonInfoIndex,
+                ParentIonMZ = sourceInfo.ParentIonMZ,
+                MRMMassCount = sourceInfo.MRMMassCount,
+                ScanCount = sourceInfo.ScanCount,
+                ParentIonInfoIndex = sourceInfo.ParentIonInfoIndex,
             };
 
-            if (oSource.MRMMassList == null)
+            if (sourceInfo.MRMMassList == null)
             {
-                oTarget.MRMMassList = new List<udtMRMMassRangeType>();
+                targetInfo.MRMMassList = new List<udtMRMMassRangeType>();
             }
             else
             {
-                oTarget.MRMMassList = new List<udtMRMMassRangeType>(oSource.MRMMassList.Count);
-                oTarget.MRMMassList.AddRange(oSource.MRMMassList);
+                targetInfo.MRMMassList = new List<udtMRMMassRangeType>(sourceInfo.MRMMassList.Count);
+                targetInfo.MRMMassList.AddRange(sourceInfo.MRMMassList);
             }
 
-            return oTarget;
+            return targetInfo;
         }
 
         /// <summary>
