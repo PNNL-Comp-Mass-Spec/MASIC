@@ -65,13 +65,6 @@ namespace MASIC
 
         private bool mDirectoryPathValidated;
 
-        // Base filename for this instance of clsMasic, includes a timestamp to allow multiple instances to write to the same cache directory
-        private string mCacheFileNameBase;
-
-        private int mCacheEventCount;
-        private int mUnCacheEventCount;
-        private int mSpectraPoolHitEventCount;
-
         private int mMaximumPoolLength;
 
         /// <summary>
@@ -81,11 +74,15 @@ namespace MASIC
 
         #endregion
 
-        public int CacheEventCount => mCacheEventCount;
-        public int SpectraPoolHitEventCount => mSpectraPoolHitEventCount;
+        /// <summary>
+        /// Number of cache events
+        /// </summary>
+        public int CacheEventCount { get; private set; }
 
-        [Obsolete("Legacy parameter; no longer used")]
-        public string CacheFileNameBase => mCacheFileNameBase;
+        /// <summary>
+        /// Number of times the spectrum was found in the in-memory spectrum pool
+        /// </summary>
+        public int SpectraPoolHitEventCount { get; private set; }
 
         /// <summary>
         /// Spectrum cache directory path
@@ -147,7 +144,10 @@ namespace MASIC
             set => mCacheOptions.DiskCachingAlwaysDisabled = value;
         }
 
-        public int UnCacheEventCount => mUnCacheEventCount;
+        /// <summary>
+        /// Number of times a spectrum was loaded from disk and cached in the SpectraPool
+        /// </summary>
+        public int UnCacheEventCount { get; private set; }
 
         /// <summary>
         /// The number of spectra we expect to read, updated to the number cached (to disk)
@@ -174,7 +174,7 @@ namespace MASIC
                     // Store all of the spectra in one large file
                     CacheSpectrumWork(spectrum);
 
-                    mCacheEventCount += 1;
+                    CacheEventCount += 1;
                     return true;
                 }
 
@@ -287,7 +287,7 @@ namespace MASIC
                     mPageFileWriter = null;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore errors here
             }
@@ -310,17 +310,14 @@ namespace MASIC
                 return string.Empty;
             }
 
-            if (string.IsNullOrWhiteSpace(mCacheFileNameBase))
-            {
-                var randomGenerator = new Random();
+            var randomGenerator = new Random();
 
-                // Create the cache file name, using both a timestamp and a random number between 1 and 9999
-                mCacheFileNameBase = SPECTRUM_CACHE_FILE_PREFIX +
-                                     DateTime.UtcNow.Hour + DateTime.UtcNow.Minute + DateTime.UtcNow.Second + DateTime.UtcNow.Millisecond +
-                                     randomGenerator.Next(1, 9999);
-            }
+            // Create the cache file name, using both a timestamp and a random number between 1 and 9999
+            var baseName = SPECTRUM_CACHE_FILE_PREFIX +
+                                 DateTime.UtcNow.Hour + DateTime.UtcNow.Minute + DateTime.UtcNow.Second + DateTime.UtcNow.Millisecond +
+                                 randomGenerator.Next(1, 9999);
 
-            var fileName = mCacheFileNameBase + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + ".bin";
+            var fileName = baseName + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + ".bin";
 
             return Path.Combine(mCacheOptions.DirectoryPath, fileName);
         }
@@ -428,7 +425,7 @@ namespace MASIC
                     cacheItem.Scan.Clear(0);
                     cacheItem.CacheState = eCacheStateConstants.UnusedSlot;
 
-                    mCacheEventCount += 1;
+                    CacheEventCount += 1;
                 }
             }
         }
@@ -442,12 +439,11 @@ namespace MASIC
             if (mMaximumPoolLength < 1)
                 mMaximumPoolLength = 1;
 
-            mCacheEventCount = 0;
-            mUnCacheEventCount = 0;
-            mSpectraPoolHitEventCount = 0;
+            CacheEventCount = 0;
+            UnCacheEventCount = 0;
+            SpectraPoolHitEventCount = 0;
 
             mDirectoryPathValidated = false;
-            mCacheFileNameBase = string.Empty;
 
             ClosePageFile();
 
@@ -489,13 +485,6 @@ namespace MASIC
             };
 
             return udtCacheOptions;
-        }
-
-        [Obsolete("Use GetDefaultCacheOptions, which returns a new instance of clsSpectrumCacheOptions")]
-        // ReSharper disable once RedundantAssignment
-        public static void ResetCacheOptions(ref clsSpectrumCacheOptions udtCacheOptions)
-        {
-            udtCacheOptions = GetDefaultCacheOptions();
         }
 
         /// <summary>
@@ -578,7 +567,7 @@ namespace MASIC
                 //for (var index = 0; index < ionCount; index++)
                 //    msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
 
-                mUnCacheEventCount += 1;
+                UnCacheEventCount += 1;
                 success = true;
             }
 
@@ -691,7 +680,7 @@ namespace MASIC
             {
                 if (spectraPool.GetItem(scanNumber, out var cacheItem))
                 {
-                    mSpectraPoolHitEventCount++;
+                    SpectraPoolHitEventCount++;
                     spectrum = cacheItem.Scan;
                     return true;
                 }
@@ -934,6 +923,15 @@ namespace MASIC
                 mLastIndex = -1;
             }
 
+            /// <summary>
+            /// Report the number of cached spectra, along with the cache capacity
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                return string.Format(
+                    "In-memory spectrum cache with {0} spectra cached (capacity {1})",
+                    mMemoryCache.Count, mCapacity);
             }
         }
 
