@@ -169,42 +169,43 @@ namespace MASIC
 
             if (!matchFound)
             {
-                // Add a new parent ion entry to .ParentIons(), but only if surveyScanIndex >= 0
+                // Add a new parent ion entry to .ParentIons(), but only if surveyScanIndex is non-negative
 
-                if (surveyScanIndex >= 0)
+                if (surveyScanIndex < 0)
+                    return;
+
+                var newParentIon = new clsParentIonInfo(parentIonMZ)
                 {
-                    var newParentIon = new clsParentIonInfo(parentIonMZ)
+                    SurveyScanIndex = surveyScanIndex,
+                    CustomSICPeak = false,
+                    MRMDaughterMZ = mrmDaughterMZ,
+                    MRMToleranceHalfWidth = mrmToleranceHalfWidth
+                };
+
+                newParentIon.FragScanIndices.Add(fragScanIndex);
+
+                newParentIon.OptimalPeakApexScanNumber = scanList.SurveyScans[surveyScanIndex].ScanNumber;        // Was: .FragScans(fragScanIndex).ScanNumber
+                newParentIon.PeakApexOverrideParentIonIndex = -1;
+                scanList.FragScans[fragScanIndex].FragScanInfo.ParentIonInfoIndex = scanList.ParentIons.Count;
+
+                // Look for .MZ in the survey scan, using a tolerance of parentIonTolerance
+                // If found, then update the mass to the matched ion
+                // This is done to determine the parent ion mass more precisely
+                if (sicOptions.RefineReportedParentIonMZ)
+                {
+                    if (FindClosestMZ(spectraCache, scanList.SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, out var parentIonMZMatch))
                     {
-                        SurveyScanIndex = surveyScanIndex,
-                        CustomSICPeak = false,
-                        MRMDaughterMZ = mrmDaughterMZ,
-                        MRMToleranceHalfWidth = mrmToleranceHalfWidth
-                    };
-
-                    newParentIon.FragScanIndices.Add(fragScanIndex);
-
-                    newParentIon.OptimalPeakApexScanNumber = scanList.SurveyScans[surveyScanIndex].ScanNumber;        // Was: .FragScans(fragScanIndex).ScanNumber
-                    newParentIon.PeakApexOverrideParentIonIndex = -1;
-                    scanList.FragScans[fragScanIndex].FragScanInfo.ParentIonInfoIndex = scanList.ParentIons.Count;
-
-                    // Look for .MZ in the survey scan, using a tolerance of parentIonTolerance
-                    // If found, then update the mass to the matched ion
-                    // This is done to determine the parent ion mass more precisely
-                    if (sicOptions.RefineReportedParentIonMZ)
-                    {
-                        if (FindClosestMZ(spectraCache, scanList.SurveyScans, surveyScanIndex, parentIonMZ, parentIonTolerance, out var parentIonMZMatch))
-                        {
-                            newParentIon.UpdateMz(parentIonMZMatch);
-                        }
+                        newParentIon.UpdateMz(parentIonMZMatch);
                     }
-
-                    scanList.ParentIons.Add(newParentIon);
                 }
+
+                scanList.ParentIons.Add(newParentIon);
+                return;
             }
+
             // Add a new entry to .FragScanIndices() for the matching parent ion
             // However, do not add a new entry if this is an MRM scan
-
-            else if (mrmDaughterMZ < double.Epsilon)
+            if (mrmDaughterMZ < double.Epsilon)
             {
                 scanList.ParentIons[parentIonIndex].FragScanIndices.Add(fragScanIndex);
                 scanList.FragScans[fragScanIndex].FragScanInfo.ParentIonInfoIndex = parentIonIndex;
@@ -758,15 +759,15 @@ namespace MASIC
                     {
                         var parentIonMatchIndex = uniqueMzListItem.MatchIndices[matchIndex];
 
-                        if (scanList.ParentIons[parentIonMatchIndex].MZ > 0)
+                        if (scanList.ParentIons[parentIonMatchIndex].MZ < double.Epsilon ||
+                            scanList.ParentIons[parentIonMatchIndex].OptimalPeakApexScanNumber == uniqueMzListItem.ScanNumberMaxIntensity)
                         {
-                            if (scanList.ParentIons[parentIonMatchIndex].OptimalPeakApexScanNumber != uniqueMzListItem.ScanNumberMaxIntensity)
-                            {
-                                ionUpdateCount += 1;
-                                scanList.ParentIons[parentIonMatchIndex].OptimalPeakApexScanNumber = uniqueMzListItem.ScanNumberMaxIntensity;
-                                scanList.ParentIons[parentIonMatchIndex].PeakApexOverrideParentIonIndex = uniqueMzListItem.ParentIonIndexMaxIntensity;
-                            }
+                            continue;
                         }
+
+                        ionUpdateCount += 1;
+                        scanList.ParentIons[parentIonMatchIndex].OptimalPeakApexScanNumber = uniqueMzListItem.ScanNumberMaxIntensity;
+                        scanList.ParentIons[parentIonMatchIndex].PeakApexOverrideParentIonIndex = uniqueMzListItem.ParentIonIndexMaxIntensity;
                     }
                 }
 
@@ -793,61 +794,65 @@ namespace MASIC
             var sicOptions = masicOptions.SICOptions;
             var binningOptions = masicOptions.BinningOptions;
 
-            if (searchRange.FindValueRange(searchMZ + searchMZOffset, sicOptions.SimilarIonMZToleranceHalfWidth, out var indexFirst, out var indexLast))
+            if (!searchRange.FindValueRange(
+                    searchMZ + searchMZOffset,
+                    sicOptions.SimilarIonMZToleranceHalfWidth,
+                    out var matchIndexStart,
+                    out var matchIndexEnd))
+                return;
+
+            for (var matchIndex = matchIndexStart; matchIndex <= matchIndexEnd; matchIndex++)
             {
-                for (var matchIndex = indexFirst; matchIndex <= indexLast; matchIndex++)
+                // See if the matches are unused and within the scan tolerance
+                var matchOriginalIndex = similarParentIonsData.MZPointerArray[matchIndex];
+
+                if (similarParentIonsData.IonUsed[matchOriginalIndex])
+                    continue;
+
+                float timeDiff;
+
+                var uniqueMzListItem = similarParentIonsData.UniqueMZList.Last();
+                var sicStats = scanList.ParentIons[matchOriginalIndex].SICStats;
+
+                if (sicStats.ScanTypeForPeakIndices == clsScanList.eScanTypeConstants.FragScan)
                 {
-                    // See if the matches are unused and within the scan tolerance
-                    var matchOriginalIndex = similarParentIonsData.MZPointerArray[matchIndex];
-
-                    if (similarParentIonsData.IonUsed[matchOriginalIndex])
-                        continue;
-
-                    float timeDiff;
-
-                    var uniqueMzListItem = similarParentIonsData.UniqueMZList.Last();
-                    var sicStats = scanList.ParentIons[matchOriginalIndex].SICStats;
-
-                    if (sicStats.ScanTypeForPeakIndices == clsScanList.eScanTypeConstants.FragScan)
-                    {
-                        if (scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon &&
-                            uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
-                        {
-                            // Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                            timeDiff = (float)(Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
-                        }
-                        else
-                        {
-                            timeDiff = Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime - uniqueMzListItem.ScanTimeMaxIntensity);
-                        }
-                    }
-                    else if (scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon && uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
+                    if (scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon &&
+                        uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
                     {
                         // Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
-                        timeDiff = (float)(Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
+                        timeDiff = (float)(Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
                     }
                     else
                     {
-                        timeDiff = Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanTime - uniqueMzListItem.ScanTimeMaxIntensity);
-                    }
-
-                    if (timeDiff <= sicOptions.SimilarIonToleranceHalfWidthMinutes)
-                    {
-                        // Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
-
-                        var similarityScore = CompareFragSpectraForParentIons(scanList, spectraCache, originalIndex, matchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities);
-
-                        if (similarityScore > sicOptions.SpectrumSimilarityMinimum)
-                        {
-                            // Yes, the spectra are similar
-                            // Add this parent ion to uniqueMzListItem
-                            AppendParentIonToUniqueMZEntry(scanList, matchOriginalIndex, uniqueMzListItem, searchMZOffset);
-
-                            similarParentIonsData.IonUsed[matchOriginalIndex] = true;
-                            similarParentIonsData.IonInUseCount += 1;
-                        }
+                        timeDiff = Math.Abs(scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime - uniqueMzListItem.ScanTimeMaxIntensity);
                     }
                 }
+                else if (scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon && uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)
+                {
+                    // Both elution times are 0; instead of computing the difference in scan time, compute the difference in scan number, then convert to minutes assuming the acquisition rate is 1 Hz (which is obviously a big assumption)
+                    timeDiff = (float)(Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanNumber - uniqueMzListItem.ScanNumberMaxIntensity) / 60.0);
+                }
+                else
+                {
+                    timeDiff = Math.Abs(scanList.SurveyScans[sicStats.PeakScanIndexMax].ScanTime - uniqueMzListItem.ScanTimeMaxIntensity);
+                }
+
+                if (timeDiff > sicOptions.SimilarIonToleranceHalfWidthMinutes)
+                    continue;
+
+                // Match is within m/z and time difference; see if the fragmentation spectra patterns are similar
+
+                var similarityScore = CompareFragSpectraForParentIons(scanList, spectraCache, originalIndex, matchOriginalIndex, binningOptions, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions, dataImportUtilities);
+
+                if (similarityScore <= sicOptions.SpectrumSimilarityMinimum)
+                    continue;
+
+                // Yes, the spectra are similar
+                // Add this parent ion to uniqueMzListItem
+                AppendParentIonToUniqueMZEntry(scanList, matchOriginalIndex, uniqueMzListItem, searchMZOffset);
+
+                similarParentIonsData.IonUsed[matchOriginalIndex] = true;
+                similarParentIonsData.IonInUseCount += 1;
             }
         }
 

@@ -524,25 +524,23 @@ namespace MASIC
         /// </summary>
         public void UpdateMZIntensityFilterIgnoreRange()
         {
-
-            if (ReporterIonStatsEnabled && ReporterIonList.Count > 0)
-            {
-                MZIntensityFilterIgnoreRangeStart = ReporterIonList[0].MZ - ReporterIonList[0].MZToleranceDa * 2;
-                MZIntensityFilterIgnoreRangeEnd = ReporterIonList[0].MZ + ReporterIonList[0].MZToleranceDa * 2;
-
-                foreach (var reporterIon in ReporterIonList)
-                {
-                    var mzStart = reporterIon.MZ - reporterIon.MZToleranceDa * 2;
-                    MZIntensityFilterIgnoreRangeStart = Math.Min(MZIntensityFilterIgnoreRangeStart, mzStart);
-
-                    var mzEnd = reporterIon.MZ + reporterIon.MZToleranceDa * 2;
-                    MZIntensityFilterIgnoreRangeEnd = Math.Max(MZIntensityFilterIgnoreRangeEnd, mzEnd);
-                }
-            }
-            else
+            if (!ReporterIonStatsEnabled || ReporterIonList.Count <= 0)
             {
                 MZIntensityFilterIgnoreRangeStart = 0;
                 MZIntensityFilterIgnoreRangeEnd = 0;
+                return;
+            }
+
+            MZIntensityFilterIgnoreRangeStart = ReporterIonList[0].MZ - ReporterIonList[0].MZToleranceDa * 2;
+            MZIntensityFilterIgnoreRangeEnd = ReporterIonList[0].MZ + ReporterIonList[0].MZToleranceDa * 2;
+
+            foreach (var reporterIon in ReporterIonList)
+            {
+                var mzStart = reporterIon.MZ - reporterIon.MZToleranceDa * 2;
+                MZIntensityFilterIgnoreRangeStart = Math.Min(MZIntensityFilterIgnoreRangeStart, mzStart);
+
+                var mzEnd = reporterIon.MZ + reporterIon.MZToleranceDa * 2;
+                MZIntensityFilterIgnoreRangeEnd = Math.Max(MZIntensityFilterIgnoreRangeEnd, mzEnd);
             }
         }
     }

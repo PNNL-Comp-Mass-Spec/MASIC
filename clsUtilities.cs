@@ -64,58 +64,55 @@ namespace MASIC
             double chargeCarrierMass = 0)
         {
 
-
-            double newMZ;
             if (Math.Abs(chargeCarrierMass) < double.Epsilon)
                 chargeCarrierMass = CHARGE_CARRIER_MASS_MONOISOTOPIC;
 
             if (currentCharge == desiredCharge)
             {
+                return massMZ;
+            }
+
+            double newMZ;
+
+            if (currentCharge == 1)
+            {
                 newMZ = massMZ;
+            }
+            else if (currentCharge > 1)
+            {
+                // Convert massMZ to M+H
+                newMZ = massMZ * currentCharge - chargeCarrierMass * (currentCharge - 1);
+            }
+            else if (currentCharge == 0)
+            {
+                // Convert massMZ (which is neutral) to M+H and store in newMZ
+                newMZ = massMZ + chargeCarrierMass;
             }
             else
             {
-                if (currentCharge == 1)
-                {
-                    newMZ = massMZ;
-                }
-                else if (currentCharge > 1)
-                {
-                    // Convert massMZ to M+H
-                    newMZ = massMZ * currentCharge - chargeCarrierMass * (currentCharge - 1);
-                }
-                else if (currentCharge == 0)
-                {
-                    // Convert massMZ (which is neutral) to M+H and store in newMZ
-                    newMZ = massMZ + chargeCarrierMass;
-                }
-                else
-                {
-                    // Negative charges are not supported; return 0
-                    return 0;
-                }
-
-                if (desiredCharge > 1)
-                {
-                    newMZ = (newMZ + chargeCarrierMass * (desiredCharge - 1)) / desiredCharge;
-                }
-                else if (desiredCharge == 1)
-                {
-                    // Return M+H, which is currently stored in newMZ
-                }
-                else if (desiredCharge == 0)
-                {
-                    // Return the neutral mass
-                    newMZ -= chargeCarrierMass;
-                }
-                else
-                {
-                    // Negative charges are not supported; return 0
-                    newMZ = 0;
-                }
+                // Negative charges are not supported; return 0
+                return 0;
             }
 
-            return newMZ;
+            if (desiredCharge > 1)
+            {
+                return (newMZ + chargeCarrierMass * (desiredCharge - 1)) / desiredCharge;
+            }
+
+            if (desiredCharge == 1)
+            {
+                // Return M+H, which is currently stored in newMZ
+                return newMZ;
+            }
+
+            if (desiredCharge == 0)
+            {
+                // Return the neutral mass
+                return newMZ - chargeCarrierMass;
+            }
+
+            // Negative charges are not supported; return 0
+            return 0;
         }
 
         /// <summary>

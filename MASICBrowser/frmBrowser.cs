@@ -1091,70 +1091,68 @@ namespace MASICBrowser
         /// <returns>Sequence ID, or -1 if an error</returns>
         private int LookupSequenceID(string sequence, string protein)
         {
+            if (sequence == null)
+                return -1;
 
-            var sequenceID = -1;
-            if (sequence != null)
+            var trimmedSequence = sequence.Trim();
+
+            string sequenceNoSuffixes;
+            if (trimmedSequence.Length >= 4)
             {
-                var trimmedSequence = sequence.Trim();
-
-                string sequenceNoSuffixes;
-                if (trimmedSequence.Length >= 4)
+                if (trimmedSequence.Substring(1, 1).Equals(".") && trimmedSequence.Substring(trimmedSequence.Length - 2, 1).Equals("."))
                 {
-                    if (trimmedSequence.Substring(1, 1).Equals(".") && trimmedSequence.Substring(trimmedSequence.Length - 2, 1).Equals("."))
-                    {
-                        sequenceNoSuffixes = trimmedSequence.Substring(2, trimmedSequence.Length - 4);
-                    }
-                    else
-                    {
-                        sequenceNoSuffixes = string.Copy(trimmedSequence);
-                    }
+                    sequenceNoSuffixes = trimmedSequence.Substring(2, trimmedSequence.Length - 4);
                 }
                 else
                 {
                     sequenceNoSuffixes = string.Copy(trimmedSequence);
                 }
-
-                // Try to add sequenceNoSuffixes to .Tables(TABLE_NAME_SEQUENCES)
-                try
-                {
-                    var sequencesTable = mMsMsResults.Tables[TABLE_NAME_SEQUENCES];
-                    var newSequenceRow = sequencesTable.Rows.Find(sequenceNoSuffixes);
-                    if (newSequenceRow == null)
-                    {
-                        newSequenceRow = sequencesTable.NewRow();
-                        newSequenceRow[COL_NAME_SEQUENCE] = sequenceNoSuffixes;
-                        sequencesTable.Rows.Add(newSequenceRow);
-                    }
-
-                    sequenceID = (int)newSequenceRow[COL_NAME_SEQUENCE_ID];
-
-                    if (sequenceID >= 0)
-                    {
-                        try
-                        {
-                            // Possibly add sequenceNoSuffixes and protein to .Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
-                            var seqToProteinMapTable = mMsMsResults.Tables[TABLE_NAME_SEQ_TO_PROTEIN_MAP];
-                            if (!seqToProteinMapTable.Rows.Contains(new object[] { sequenceID, protein }))
-                            {
-                                var newMapRow = seqToProteinMapTable.NewRow();
-                                newMapRow[COL_NAME_SEQUENCE_ID] = sequenceID;
-                                newMapRow[COL_NAME_PROTEIN] = protein;
-                                seqToProteinMapTable.Rows.Add(newMapRow);
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            // Ignore errors here
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    sequenceID = -1;
-                }
+            }
+            else
+            {
+                sequenceNoSuffixes = string.Copy(trimmedSequence);
             }
 
-            return sequenceID;
+            // Try to add sequenceNoSuffixes to .Tables(TABLE_NAME_SEQUENCES)
+            try
+            {
+                var sequencesTable = mMsMsResults.Tables[TABLE_NAME_SEQUENCES];
+                var newSequenceRow = sequencesTable.Rows.Find(sequenceNoSuffixes);
+                if (newSequenceRow == null)
+                {
+                    newSequenceRow = sequencesTable.NewRow();
+                    newSequenceRow[COL_NAME_SEQUENCE] = sequenceNoSuffixes;
+                    sequencesTable.Rows.Add(newSequenceRow);
+                }
+
+                var sequenceID = (int)newSequenceRow[COL_NAME_SEQUENCE_ID];
+
+                if (sequenceID >= 0)
+                {
+                    try
+                    {
+                        // Possibly add sequenceNoSuffixes and protein to .Tables(TABLE_NAME_SEQ_TO_PROTEIN_MAP)
+                        var seqToProteinMapTable = mMsMsResults.Tables[TABLE_NAME_SEQ_TO_PROTEIN_MAP];
+                        if (!seqToProteinMapTable.Rows.Contains(new object[] { sequenceID, protein }))
+                        {
+                            var newMapRow = seqToProteinMapTable.NewRow();
+                            newMapRow[COL_NAME_SEQUENCE_ID] = sequenceID;
+                            newMapRow[COL_NAME_PROTEIN] = protein;
+                            seqToProteinMapTable.Rows.Add(newMapRow);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Ignore errors here
+                    }
+                }
+
+                return sequenceID;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
         }
 
         private void NavigateScanList(bool moveForward)
