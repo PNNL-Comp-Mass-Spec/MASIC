@@ -49,6 +49,7 @@ namespace MASIC.DatasetStats
 
         private bool mDatasetSummaryStatsUpToDate;
         private DatasetSummaryStats mDatasetSummaryStats;
+
         #endregion
 
         #region "Properties"
@@ -97,7 +98,7 @@ namespace MASIC.DatasetStats
         /// </summary>
         public clsDatasetStatsSummarizer()
         {
-            FileDate = "May 13, 2020";
+            FileDate = "May 15, 2020";
 
             ErrorMessage = string.Empty;
 

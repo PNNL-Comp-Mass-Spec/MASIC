@@ -20,7 +20,7 @@ namespace MASICPeakFinder
     {
         #region "Constants and Enums"
 
-        public string PROGRAM_DATE = "May 11, 2020";
+        public string PROGRAM_DATE = "May 15, 2020";
 
         public const int MINIMUM_PEAK_WIDTH = 3;                         // Width in points
 

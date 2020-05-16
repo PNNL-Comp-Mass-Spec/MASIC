@@ -39,7 +39,7 @@ namespace MASICBrowser
 {
     public partial class frmBrowser : Form
     {
-        private const string PROGRAM_DATE = "May 11, 2020";
+        private const string PROGRAM_DATE = "May 15, 2020";
 
         public frmBrowser()
         {
