@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -26,7 +25,7 @@ using System.Linq;
 using System.Timers;
 using System.Windows.Forms;
 using System.Xml;
-using C5;
+using C5;                      // TreeDictionary
 using MASICPeakFinder;
 using Microsoft.Win32;
 using OxyDataPlotter;
