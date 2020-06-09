@@ -922,9 +922,27 @@
             Thermo reader options
             </summary>
         </member>
+        <member name="T:ThermoRawFileReader.ThermoReaderOptions.OptionsUpdatedEventHandler">
+            <summary>
+            Delegate method for OptionsUpdatedEvent
+            </summary>
+            <param name="sender"></param>
+        </member>
+        <member name="E:ThermoRawFileReader.ThermoReaderOptions.OptionsUpdatedEvent">
+            <summary>
+            This event is raised when one of the options tracked by this class is changed
+            </summary>
+        </member>
+        <member name="P:ThermoRawFileReader.ThermoReaderOptions.IncludeReferenceAndExceptionData">
+            <summary>
+            When true, include reference and exception peaks when obtaining mass spec data
+            using GetScanData, GetScanData2D, or GetScanDataSumScans
+            </summary>
+            <remarks>Reference and exception peaks are internal mass calibration data within a scan</remarks>
+        </member>
         <member name="P:ThermoRawFileReader.ThermoReaderOptions.LoadMSMethodInfo">
             <summary>
-            MS Method Information
+            Load MS Method Information when calling OpenRawFile
             </summary>
             <remarks>
             Set this to false when using the ThermoRawFileReader on Linux systems;
@@ -937,7 +955,7 @@
         </member>
         <member name="P:ThermoRawFileReader.ThermoReaderOptions.LoadMSTuneInfo">
             <summary>
-            MS Tune Information
+            Load MS Tune Information when calling OpenRawFile
             </summary>
         </member>
         <member name="T:ThermoRawFileReader.XRawFileIO">
@@ -1049,6 +1067,34 @@
             </summary>
             <param name="message"></param>
         </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor">
+            <summary>
+            Constructor
+            </summary>
+            <remarks></remarks>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(ThermoRawFileReader.ThermoReaderOptions)">
+            <summary>
+            Constructor with an options parameter
+            </summary>
+            <param name="options">Thermo reader options</param>
+            <remarks></remarks>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(System.String,System.Boolean)">
+            <summary>
+            Constructor with a file path parameter
+            </summary>
+            <param name="rawFilePath">Thermo .raw file to open (empty string to not open a file)</param>
+            <param name="traceMode">When true, additional messages are reported via Debug events</param>
+        </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(System.String,ThermoRawFileReader.ThermoReaderOptions,System.Boolean)">
+            <summary>
+            Constructor with file path, options, and optionally a trace flag
+            </summary>
+            <param name="rawFilePath">Thermo .raw file to open (empty string to not open a file)</param>
+            <param name="options">Thermo reader options</param>
+            <param name="traceMode">When true, additional messages are reported via Debug events</param>
+        </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.CheckFunctionality">
             <summary>
             Test the functionality of the reader - can we instantiate the MSFileReader Object?
@@ -1154,6 +1200,7 @@
             Populate mFileInfo
             </summary>
             <returns>True if no error, False if an error</returns>
+            <remarks>Called from OpenRawFile</remarks>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.GetChromatogramData(ThermoFisher.CommonCore.Data.Business.Device,System.Int32,System.Int32,System.Int32)">
             <summary>
@@ -1385,6 +1432,12 @@
             <param name="filePath"></param>
             <returns></returns>
         </member>
+        <member name="M:ThermoRawFileReader.XRawFileIO.UpdateReaderOptions">
+            <summary>
+            Update options in mXRawFile based on current values in the Options instance of ThermoReaderOptions
+            </summary>
+            <remarks>Called from OpenRawFile and whenever the Options class raises event OptionsUpdated</remarks>
+        </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.ValidateAndSelectDevice(ThermoFisher.CommonCore.Data.Business.Device,System.Int32)">
             <summary>
             Validate that the .raw file has this device. If it does, select it using mXRawFile.SelectInstrument
@@ -1393,34 +1446,6 @@
             <param name="deviceType"></param>
             <param name="deviceNumber"></param>
             <returns>Empty string if the device was successfully selected, otherwise an error message</returns>
-        </member>
-        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor">
-            <summary>
-            Constructor
-            </summary>
-            <remarks></remarks>
-        </member>
-        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(ThermoRawFileReader.ThermoReaderOptions)">
-            <summary>
-            Constructor with an options parameter
-            </summary>
-            <param name="options">Thermo reader options</param>
-            <remarks></remarks>
-        </member>
-        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(System.String,System.Boolean)">
-            <summary>
-            Constructor with a file path parameter
-            </summary>
-            <param name="rawFilePath">Thermo .raw file to open (empty string to not open a file)</param>
-            <param name="traceMode">When true, additional messages are reported via Debug events</param>
-        </member>
-        <member name="M:ThermoRawFileReader.XRawFileIO.#ctor(System.String,ThermoRawFileReader.ThermoReaderOptions,System.Boolean)">
-            <summary>
-            Constructor with file path, options, and optionally a trace flag
-            </summary>
-            <param name="rawFilePath">Thermo .raw file to open (empty string to not open a file)</param>
-            <param name="options">Thermo reader options</param>
-            <param name="traceMode">When true, additional messages are reported via Debug events</param>
         </member>
         <member name="M:ThermoRawFileReader.XRawFileIO.Dispose">
             <summary>
