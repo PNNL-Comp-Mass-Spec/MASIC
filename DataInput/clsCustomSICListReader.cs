@@ -36,9 +36,15 @@ namespace MASIC.DataInput
 
         #endregion
 
+        /// <summary>
+        /// Get the default header names for a custom SIC list file
+        /// </summary>
+        /// <param name="delimiter"></param>
+        /// <param name="includeAndBeforeLastItem"></param>
+        /// <returns></returns>
         public static string GetCustomMZFileColumnHeaders(
-                                                          string delimiter = ", ",
-                                                          bool includeAndBeforeLastItem = true)
+            string delimiter = ", ",
+            bool includeAndBeforeLastItem = true)
         {
             var headerNames = new List<string>(8)
             {
@@ -70,6 +76,11 @@ namespace MASIC.DataInput
             mCustomSICList = customSicList;
         }
 
+        /// <summary>
+        /// Load a custom SIC list file
+        /// </summary>
+        /// <param name="customSICValuesFileName"></param>
+        /// <returns></returns>
         public bool LoadCustomSICListFromFile(string customSICValuesFileName)
         {
             var delimiterList = new[] { '\t' };
@@ -254,12 +265,12 @@ namespace MASIC.DataInput
 
         /// <summary>
         /// Parse a double value from a string
-        /// Raises an exception if unable to parse
         /// </summary>
         /// <param name="valueText"></param>
         /// <param name="columnName"></param>
         /// <param name="rowNumber"></param>
         /// <returns></returns>
+        /// <remarks>Raises an exception if unable to parse</remarks>
         private double ParseDouble(string valueText, string columnName, int rowNumber)
         {
             if (!double.TryParse(valueText, out var value))
