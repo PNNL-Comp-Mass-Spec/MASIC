@@ -438,9 +438,9 @@ namespace MASIC.DataOutput
                 writer.WriteElementString("UnCacheEventCount", spectraCache.UnCacheEventCount.ToString());
                 writer.WriteElementString("SpectraPoolHitEventCount", spectraCache.SpectraPoolHitEventCount.ToString());
 
-                writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(processingStats.PeakMemoryUsageMB, 2));
+                writer.WriteElementString("PeakMemoryUsageMB", StringUtilities.DblToString(processingStats.PeakMemoryUsageMB, 1));
                 var effectiveSeconds = processingTimeSec - processingStats.TotalProcessingTimeAtStart;
-                writer.WriteElementString("TotalProcessingTimeSeconds", StringUtilities.DblToString(effectiveSeconds, 2));
+                writer.WriteElementString("TotalProcessingTimeSeconds", StringUtilities.DblToString(effectiveSeconds, 1));
 
                 writer.WriteEndElement();
 

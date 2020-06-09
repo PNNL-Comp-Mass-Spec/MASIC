@@ -2125,7 +2125,7 @@ namespace MASIC
                         writer.WriteElementString("UnCacheEventCount", mProcessingStats.UnCacheEventCount.ToString());
                         writer.WriteElementString("SpectraPoolHitEventCount", mProcessingStats.SpectraPoolHitEventCount.ToString());
 
-                        writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 2));
+                        writer.WriteElementString("ProcessingTimeSec", StringUtilities.DblToString(GetTotalProcessingTimeSec(), 1));
                         writer.WriteEndElement();
 
                         writer.WriteEndElement();  // End the "Root" element.
