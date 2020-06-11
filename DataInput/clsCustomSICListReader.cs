@@ -113,7 +113,7 @@ namespace MASIC.DataInput
                 }
 
                 // Do not throw exceptions when a column is not present
-                // GetColumnValue will simply return te default value
+                // GetColumnValue will simply return the default value
                 DataTableUtils.GetColumnValueThrowExceptions = false;
 
                 using (var reader = new StreamReader(new FileStream(customSICValuesFileName, FileMode.Open, FileAccess.Read, FileShare.Read)))
