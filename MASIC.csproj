@@ -83,7 +83,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBinnedData.cs" />
-    <Compile Include="clsBinningOptions.cs" />
     <Compile Include="clsCorrelation.cs" />
     <Compile Include="clsCustomMZSearchSpec.cs" />
     <Compile Include="clsCustomSICList.cs" />
@@ -94,7 +93,6 @@
     <Compile Include="clsITraqIntensityCorrection.cs" />
     <Compile Include="clsMASIC.cs" />
     <Compile Include="clsMasicEventNotifier.cs" />
-    <Compile Include="clsMASICOptions.cs" />
     <Compile Include="clsMRMProcessing.cs" />
     <Compile Include="clsMRMScanInfo.cs" />
     <Compile Include="clsMSSpectrum.cs" />
@@ -103,7 +101,6 @@
     <Compile Include="clsParentIonInfo.cs" />
     <Compile Include="clsParentIonProcessing.cs" />
     <Compile Include="clsProcessingStats.cs" />
-    <Compile Include="clsRawDataExportOptions.cs" />
     <Compile Include="clsReporterIonInfo.cs" />
     <Compile Include="clsReporterIonProcessor.cs" />
     <Compile Include="clsReporterIons.cs" />
@@ -113,12 +110,10 @@
     <Compile Include="clsScanTracking.cs" />
     <Compile Include="clsSearchRange.cs" />
     <Compile Include="clsSICDetails.cs" />
-    <Compile Include="clsSICOptions.cs" />
     <Compile Include="clsSICProcessing.cs" />
     <Compile Include="clsSICStats.cs" />
     <Compile Include="clsSimilarParentIonsData.cs" />
     <Compile Include="clsSpectraCache.cs" />
-    <Compile Include="clsSpectrumCacheOptions.cs" />
     <Compile Include="clsUniqueMZListItem.cs" />
     <Compile Include="clsUtilities.cs" />
     <Compile Include="DataInput\Centroider.cs" />
@@ -152,6 +147,11 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Options\BinningOptions.cs" />
+    <Compile Include="Options\MASICOptions.cs" />
+    <Compile Include="Options\RawDataExportOptions.cs" />
+    <Compile Include="Options\SICOptions.cs" />
+    <Compile Include="Options\SpectrumCacheOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
