@@ -7,6 +7,10 @@ using PRISM;
 
 namespace MASIC.Options
 {
+    /// <summary>
+    /// MASIC Options
+    /// </summary>
+    /// <remarks>Set options through the Property Functions or by passing parameterFilePath to ProcessFile()</remarks>
     public class MASICOptions : clsMasicEventNotifier
     {
         #region "Constants and Enums"
@@ -27,7 +31,7 @@ namespace MASIC.Options
         #region "Classwide Variables"
 
         /// <summary>
-        /// Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
+        /// SIC processing options
         /// </summary>
         public SICOptions SICOptions { get; }
 
@@ -36,6 +40,9 @@ namespace MASIC.Options
         /// </summary>
         public BinningOptions BinningOptions { get; }
 
+        /// <summary>
+        /// Custom SIC list details
+        /// </summary>
         public clsCustomSICList CustomSICList { get; }
 
         /// <summary>
@@ -655,6 +662,8 @@ namespace MASIC.Options
 
                 PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "ReporterIonTopNPctObsRateYAxisMinimum", PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum);
+
+                // Custom SIC options
                 if (!reader.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES))
                 {
                     // Custom SIC values section not found; that's ok

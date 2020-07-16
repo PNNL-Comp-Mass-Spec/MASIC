@@ -185,8 +185,10 @@
         #endregion
 
         #region "Classwide Variables"
+
         private float mMaxSICPeakWidthMinutesBackward;
         private float mMaxSICPeakWidthMinutesForward;
+
         #endregion
 
         public double GetSICTolerance()
