@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MASIC.DataOutput;
+using MASIC.Options;
 using MASICPeakFinder;
 using MSDataFileReader;
 using PRISM;
@@ -38,7 +39,7 @@ namespace MASIC.DataInput
         /// <param name="parentIonProcessor"></param>
         /// <param name="scanTracking"></param>
         public clsDataImportMSXml(
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsMASICPeakFinder peakFinder,
             clsParentIonProcessing parentIonProcessor,
             clsScanTracking scanTracking)
@@ -853,7 +854,7 @@ namespace MASIC.DataInput
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsDataOutput dataOutputHandler,
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             clsMSSpectrum msSpectrum,
             clsSpectrumInfo spectrumInfo,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)
@@ -913,7 +914,7 @@ namespace MASIC.DataInput
             clsDataOutput dataOutputHandler,
             clsSpectrumInfo spectrumInfo,
             clsMSSpectrum msSpectrum,
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             bool isMzXML,
             clsSpectrumInfoMzXML mzXmlSourceSpectrum)
         {
@@ -1041,7 +1042,7 @@ namespace MASIC.DataInput
             clsDataOutput dataOutputHandler,
             clsSpectrumInfo spectrumInfo,
             clsMSSpectrum msSpectrum,
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             bool isMzXML,
             clsSpectrumInfoMzXML mzXmlSourceSpectrum,
             SimpleMzMLReader.SimpleSpectrum mzMLSpectrum)

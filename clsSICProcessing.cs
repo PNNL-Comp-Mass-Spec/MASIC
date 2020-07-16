@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MASIC.DataOutput;
+using MASIC.Options;
 using MASICPeakFinder;
 
 namespace MASIC
@@ -38,7 +39,7 @@ namespace MASIC
         }
 
         private static List<clsMzBinInfo> CreateMZLookupList(
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsScanList scanList,
             bool processSIMScans,
             int simIndex)
@@ -128,7 +129,7 @@ namespace MASIC
         public bool CreateParentIonSICs(
             clsScanList scanList,
             clsSpectraCache spectraCache,
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsDataOutput dataOutputHandler,
             clsSICProcessing sicProcessor,
             clsXMLResultsWriter xmlResultsWriter)
@@ -237,7 +238,7 @@ namespace MASIC
             clsScanList scanList,
             int scanIndexObservedInFullSIC,
             clsSICDetails sicDetails,
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsScanNumScanTimeConversion scanNumScanConverter,
             bool customSICPeak,
             float customSICPeakScanOrAcqTimeTolerance)
@@ -581,7 +582,7 @@ namespace MASIC
         private bool ProcessMZList(
             clsScanList scanList,
             clsSpectraCache spectraCache,
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsDataOutput dataOutputHandler,
             clsXMLResultsWriter xmlResultsWriter,
             IReadOnlyList<clsMzBinInfo> mzBinList,
@@ -750,7 +751,7 @@ namespace MASIC
         }
 
         private bool ProcessMzSearchChunk(
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsScanList scanList,
             clsDataAggregation dataAggregation,
             clsDataOutput dataOutputHandler,
@@ -1094,7 +1095,7 @@ namespace MASIC
         private void UpdateSICStatsUsingLargestPeak(
             clsSICDetails sicDetails,
             clsSICStatsPeak sicPeak,
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsSICPotentialAreaStats potentialAreaStatsInFullSIC,
             clsScanList scanList,
             IReadOnlyList<clsMzSearchInfo> mzSearchChunk,

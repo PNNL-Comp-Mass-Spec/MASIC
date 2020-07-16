@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Options;
 
 namespace MASIC
 {
@@ -13,7 +14,7 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="cacheOptions"></param>
-        public clsSpectraCache(clsSpectrumCacheOptions cacheOptions)
+        public clsSpectraCache(SpectrumCacheOptions cacheOptions)
         {
             mCacheOptions = cacheOptions;
             InitializeVariables();
@@ -58,7 +59,7 @@ namespace MASIC
         /// </summary>
         private IScanMemoryCache spectraPool;
 
-        private readonly clsSpectrumCacheOptions mCacheOptions;
+        private readonly SpectrumCacheOptions mCacheOptions;
 
         private BinaryReader mPageFileReader;
         private BinaryWriter mPageFileWriter;
@@ -475,16 +476,16 @@ namespace MASIC
         /// Get default cache options
         /// </summary>
         /// <returns></returns>
-        public static clsSpectrumCacheOptions GetDefaultCacheOptions()
+        public static SpectrumCacheOptions GetDefaultCacheOptions()
         {
-            var udtCacheOptions = new clsSpectrumCacheOptions
+            var cacheOptions = new SpectrumCacheOptions
             {
                 DiskCachingAlwaysDisabled = false,
                 DirectoryPath = Path.GetTempPath(),
                 SpectraToRetainInMemory = 1000
             };
 
-            return udtCacheOptions;
+            return cacheOptions;
         }
 
         /// <summary>
@@ -672,7 +673,7 @@ namespace MASIC
         /// <param name="scanNumber">Scan number to load</param>
         /// <param name="spectrum">The requested spectrum</param>
         /// <param name="canSkipPool">if true and the spectrum is not in the pool, it will be read from the disk cache without updating the pool.
-        /// This should be true for any spectrum requests that are not likely to be repeated within the next <see cref="clsSpectrumCacheOptions.SpectraToRetainInMemory"/> requests.</param>
+        /// This should be true for any spectrum requests that are not likely to be repeated within the next <see cref="SpectrumCacheOptions.SpectraToRetainInMemory"/> requests.</param>
         /// <returns>True if the scan was found in the spectrum pool (or was successfully added to the pool)</returns>
         public bool GetSpectrum(int scanNumber, out clsMSSpectrum spectrum, bool canSkipPool = true)
         {

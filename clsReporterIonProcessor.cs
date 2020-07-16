@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using MASIC.DataOutput;
+using MASIC.Options;
 using PRISM;
 using ThermoRawFileReader;
 
@@ -11,7 +12,7 @@ namespace MASIC
     {
         #region "Classwide variables"
 
-        private readonly clsMASICOptions mOptions;
+        private readonly MASICOptions mOptions;
 
         #endregion
 
@@ -19,7 +20,7 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="masicOptions"></param>
-        public clsReporterIonProcessor(clsMASICOptions masicOptions)
+        public clsReporterIonProcessor(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }
@@ -294,7 +295,7 @@ namespace MASIC
             XRawFileIO rawFileReader,
             clsDataAggregation dataAggregation,
             bool includeFtmsColumns,
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsScanInfo currentScan,

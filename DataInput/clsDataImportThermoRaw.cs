@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MASIC.DataOutput;
+using MASIC.Options;
 using MASICPeakFinder;
 using PRISM;
 using ThermoRawFileReader;
@@ -27,7 +28,7 @@ namespace MASIC.DataInput
         /// <param name="parentIonProcessor"></param>
         /// <param name="scanTracking"></param>
         public clsDataImportThermoRaw(
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsMASICPeakFinder peakFinder,
             clsParentIonProcessing parentIonProcessor,
             clsScanTracking scanTracking)
@@ -315,7 +316,7 @@ namespace MASIC.DataInput
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsDataOutput dataOutputHandler,
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
             if (thermoScanInfo.ParentIonMZ > 0 && Math.Abs(mOptions.ParentIonDecoyMassDa) > 0)
@@ -348,7 +349,7 @@ namespace MASIC.DataInput
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsDataOutput dataOutputHandler,
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
             var scanInfo = new clsScanInfo()
@@ -466,8 +467,8 @@ namespace MASIC.DataInput
             clsScanList scanList,
             clsSpectraCache spectraCache,
             clsDataOutput dataOutputHandler,
-            clsSICOptions sicOptions,
-            clsBinningOptions binningOptions,
+            SICOptions sicOptions,
+            BinningOptions binningOptions,
             ThermoRawFileReader.clsScanInfo thermoScanInfo)
         {
             // Note that MinimumPositiveIntensity will be determined in LoadSpectraForThermoRawFile

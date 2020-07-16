@@ -1,6 +1,6 @@
-﻿namespace MASIC
+﻿namespace MASIC.Options
 {
-    public class clsRawDataExportOptions
+    public class RawDataExportOptions
     {
         #region "Constants and Enums"
 

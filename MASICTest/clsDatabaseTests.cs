@@ -1,5 +1,6 @@
 ﻿using System;
 using MASIC;
+using MASIC.Options;
 using NUnit.Framework;
 
 namespace MASICTest
@@ -50,7 +51,7 @@ namespace MASICTest
 
             var connectionString = GetConnectionString("Gigasax", "DMS5", user, password);
 
-            var options = new clsMASICOptions(mMasic.FileVersion, mMASICPeakFinder.ProgramVersion)
+            var options = new MASICOptions(mMasic.FileVersion, mMASICPeakFinder.ProgramVersion)
             {
                 DatabaseConnectionString = connectionString
             };

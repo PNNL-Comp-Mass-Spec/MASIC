@@ -26,6 +26,7 @@ using System.Diagnostics;
 using System.IO;
 using MASIC.DataOutput;
 using MASIC.DatasetStats;
+using MASIC.Options;
 using PRISM;
 using PRISM.Logging;
 
@@ -38,7 +39,7 @@ namespace MASIC
         /// </summary>
         public clsMASIC()
         {
-            mFileDate = "June 9, 2020";
+            mFileDate = "July 16, 2020";
 
             LocalErrorCode = eMasicErrorCodes.NoError;
             StatusMessage = string.Empty;
@@ -49,7 +50,7 @@ namespace MASIC
             mMASICPeakFinder = new MASICPeakFinder.clsMASICPeakFinder();
             RegisterEvents(mMASICPeakFinder);
 
-            Options = new clsMASICOptions(FileVersion, mMASICPeakFinder.ProgramVersion);
+            Options = new MASICOptions(FileVersion, mMASICPeakFinder.ProgramVersion);
             Options.InitializeVariables();
             RegisterEvents(Options);
         }
@@ -197,7 +198,7 @@ namespace MASIC
             {
                 if (value == null || value.Trim().Length == 0)
                 {
-                    Options.MASICStatusFilename = clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME;
+                    Options.MASICStatusFilename = MASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME;
                 }
                 else
                 {
@@ -209,7 +210,7 @@ namespace MASIC
         /// <summary>
         /// Processing options
         /// </summary>
-        public clsMASICOptions Options { get; }
+        public MASICOptions Options { get; }
 
         /// <summary>
         /// Current processing step
@@ -596,7 +597,7 @@ namespace MASIC
         }
 
         [Obsolete("Use Property Options")]
-        public clsRawDataExportOptions.eExportRawDataFileFormatConstants ExportRawDataFileFormat
+        public RawDataExportOptions.eExportRawDataFileFormatConstants ExportRawDataFileFormat
         {
             get => Options.RawDataExportOptions.FileFormat;
             set => Options.RawDataExportOptions.FileFormat = value;
@@ -886,7 +887,7 @@ namespace MASIC
 
                 if (Options.SkipSICAndRawDataProcessing || !Options.ExportRawDataOnly)
                 {
-                    LogMessage("ProcessFile: Call SaveBPIs");
+                    LogMessage("FindSICsAndWriteOutput: Call SaveBPIs", MessageTypeConstants.Debug);
                     bpiWriter.SaveBPIs(scanList, spectraCache, inputFilePathFull, outputDirectoryPath);
                 }
 
@@ -895,7 +896,7 @@ namespace MASIC
                 // ---------------------------------------------------------
                 try
                 {
-                    LogMessage("ProcessFile: Close outputFileHandles.ScanStats");
+                    LogMessage("FindSICsAndWriteOutput: Close outputFileHandles.ScanStats");
 
                     dataOutputHandler.OutputFileHandles.CloseScanStats();
                 }
@@ -908,12 +909,12 @@ namespace MASIC
                 // Create the DatasetInfo XML file
                 // ---------------------------------------------------------
 
-                LogMessage("ProcessFile: Create DatasetInfo File");
+                LogMessage("FindSICsAndWriteOutput: Create DatasetInfo File");
                 dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputDirectoryPath, scanTracking, datasetFileInfo);
 
                 if (Options.SkipSICAndRawDataProcessing)
                 {
-                    LogMessage("ProcessFile: Skipping SIC Processing");
+                    LogMessage("FindSICsAndWriteOutput: Skipping SIC Processing");
 
                     SetDefaultPeakLocValues(scanList);
                 }
@@ -991,7 +992,7 @@ namespace MASIC
                         SetSubtaskProcessingStepPct(0);
                         UpdatePeakMemoryUsage();
 
-                        LogMessage("ProcessFile: Call CreateParentIonSICs");
+                        LogMessage("FindSICsAndWriteOutput: Call CreateParentIonSICs", MessageTypeConstants.Debug);
                         var sicProcessor = new clsSICProcessing(mMASICPeakFinder, mrmProcessor);
                         RegisterEvents(sicProcessor);
 
@@ -1014,7 +1015,7 @@ namespace MASIC
                         SetSubtaskProcessingStepPct(0);
                         UpdatePeakMemoryUsage();
 
-                        LogMessage("ProcessFile: Call FindSimilarParentIons");
+                        LogMessage("FindSICsAndWriteOutput: Call FindSimilarParentIons", MessageTypeConstants.Debug);
                         success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, Options, dataImporterBase, out similarParentIonUpdateCount);
 
                         if (!success)
@@ -1035,7 +1036,7 @@ namespace MASIC
                     SetSubtaskProcessingStepPct(0);
                     UpdatePeakMemoryUsage();
 
-                    LogMessage("ProcessFile: Call SaveExtendedScanStatsFiles");
+                    LogMessage("FindSICsAndWriteOutput: Call SaveExtendedScanStatsFiles", MessageTypeConstants.Debug);
                     success = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
                         scanList, inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile);
 
@@ -1059,7 +1060,7 @@ namespace MASIC
                     var sicStatsWriter = new clsSICStatsWriter();
                     RegisterEvents(sicStatsWriter);
 
-                    LogMessage("ProcessFile: Call SaveSICStatsFlatFile");
+                    LogMessage("FindSICsAndWriteOutput: Call SaveSICStatsFlatFile", MessageTypeConstants.Debug);
                     success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, Options, dataOutputHandler);
 
                     if (!success)
@@ -1079,7 +1080,7 @@ namespace MASIC
                     // Write processing stats to the XML output file
                     // ---------------------------------------------------------
 
-                    LogMessage("ProcessFile: Call FinalizeXMLFile");
+                    LogMessage("FindSICsAndWriteOutput: Call FinalizeXMLFile", MessageTypeConstants.Debug);
                     var processingTimeSec = GetTotalProcessingTimeSec();
                     success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, spectraCache,
                                                                      mProcessingStats, processingTimeSec);
@@ -1095,7 +1096,7 @@ namespace MASIC
                 // ---------------------------------------------------------
                 if (!Options.IncludeHeadersInExportFile)
                 {
-                    LogMessage("ProcessFile: Call SaveHeaderGlossary");
+                    LogMessage("FindSICsAndWriteOutput: Call SaveHeaderGlossary", MessageTypeConstants.Debug);
                     dataOutputHandler.SaveHeaderGlossary(scanList, inputFileName, outputDirectoryPath);
                 }
 
@@ -1110,7 +1111,7 @@ namespace MASIC
                     SetSubtaskProcessingStepPct(0);
                     UpdatePeakMemoryUsage();
 
-                    LogMessage("ProcessFile: Call XmlOutputFileUpdateEntries");
+                    LogMessage("FindSICsAndWriteOutput: Call XmlOutputFileUpdateEntries", MessageTypeConstants.Debug);
                     xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, inputFileName, outputDirectoryPath);
                 }
             }
@@ -1161,6 +1162,7 @@ namespace MASIC
                         errorMessage = "Invalid dataset number";
                         break;
                     case eMasicErrorCodes.CreateSICsError:
+                        // ReSharper disable once StringLiteralTypo
                         errorMessage = "Create SIC's error";
                         break;
                     case eMasicErrorCodes.FindSICPeaksError:
@@ -1421,7 +1423,7 @@ namespace MASIC
             catch (Exception ex)
             {
                 success = false;
-                LogErrors("ProcessFile", "Error accessing input data file: " + inputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError);
+                LogErrors("LoadData", "Error accessing input data file: " + inputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError);
                 dataImporterBase = null;
             }
 
@@ -1594,7 +1596,6 @@ namespace MASIC
                             {
                                 // Ignore this error
                                 SetLocalErrorCode(eMasicErrorCodes.NoError);
-                                success = true;
                             }
                             else
                             {

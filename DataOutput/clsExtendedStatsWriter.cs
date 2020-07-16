@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Options;
 
 namespace MASIC.DataOutput
 {
@@ -26,13 +27,13 @@ namespace MASIC.DataOutput
         /// <remarks>The order of the values defines the appropriate output order for the names</remarks>
         private readonly List<KeyValuePair<string, int>> mExtendedHeaderNameMap;
 
-        private readonly clsMASICOptions mOptions;
+        private readonly MASICOptions mOptions;
         #endregion
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsExtendedStatsWriter(clsMASICOptions masicOptions)
+        public clsExtendedStatsWriter(MASICOptions masicOptions)
         {
             mExtendedHeaderNameMap = new List<KeyValuePair<string, int>>();
             mOptions = masicOptions;

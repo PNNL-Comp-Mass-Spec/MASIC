@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using MASIC.Options;
 
 namespace MASIC
 {
@@ -21,7 +22,7 @@ namespace MASIC
 
         #region "Classwide Variables"
 
-        private readonly clsMASICOptions mOptions;
+        private readonly MASICOptions mOptions;
 
         #endregion
 
@@ -29,7 +30,7 @@ namespace MASIC
         /// Constructor
         /// </summary>
         /// <param name="masicOptions"></param>
-        public clsDatabaseAccess(clsMASICOptions masicOptions)
+        public clsDatabaseAccess(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }
@@ -80,7 +81,7 @@ namespace MASIC
         /// <param name="masicOptions"></param>
         /// <param name="datasetName"></param>
         /// <returns></returns>
-        private bool GetDatasetIDFromDatabase(clsMASICOptions masicOptions, string datasetName, out int newDatasetID)
+        private bool GetDatasetIDFromDatabase(MASICOptions masicOptions, string datasetName, out int newDatasetID)
         {
             var avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " +
                                     "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " +

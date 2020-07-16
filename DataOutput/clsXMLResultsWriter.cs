@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using MASIC.DatasetStats;
+using MASIC.Options;
 using PRISM;
 
 namespace MASIC.DataOutput
@@ -10,14 +11,14 @@ namespace MASIC.DataOutput
     public class clsXMLResultsWriter : clsMasicEventNotifier
     {
         #region "Classwide variables"
-        private readonly clsMASICOptions mOptions;
+        private readonly MASICOptions mOptions;
         #endregion
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="masicOptions"></param>
-        public clsXMLResultsWriter(clsMASICOptions masicOptions)
+        public clsXMLResultsWriter(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
         }
@@ -472,8 +473,8 @@ namespace MASIC.DataOutput
             clsDataOutput dataOutputHandler,
             clsScanList scanList,
             clsSpectraCache spectraCache,
-            clsSICOptions sicOptions,
-            clsBinningOptions binningOptions)
+            SICOptions sicOptions,
+            BinningOptions binningOptions)
         {
             var xmlOutputFilePath = string.Empty;
 

@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using MASIC.DataInput;
+using MASIC.Options;
 using PRISM;
 using PRISM.FileProcessor;
 using PRISMDatabaseUtils;
@@ -41,7 +42,7 @@ namespace MASIC
 
             // Add any initialization after the InitializeComponent() call
 
-            mCacheOptions = new clsSpectrumCacheOptions();
+            mCacheOptions = new SpectrumCacheOptions();
             mDefaultCustomSICList = new List<udtCustomSICEntryType>();
             mLogMessages = new List<string>();
             mReporterIonIndexToModeMap = new Dictionary<int, clsReporterIons.eReporterIonMassModeConstants>();
@@ -86,7 +87,7 @@ namespace MASIC
         private string mXmlSettingsFilePath;
         private string mPreferredInputFileExtension;
 
-        private readonly clsSpectrumCacheOptions mCacheOptions;
+        private readonly SpectrumCacheOptions mCacheOptions;
 
         private bool mSuppressNoParentIonsError;
         private bool mCompressMSSpectraData;
@@ -731,7 +732,7 @@ namespace MASIC
 
                 try
                 {
-                    txtDatasetLookupFilePath.Text = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
+                    txtDatasetLookupFilePath.Text = xmlFileReader.GetParam(MASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
                     try
                     {
                         if (!File.Exists(txtDatasetLookupFilePath.Text))
@@ -746,15 +747,15 @@ namespace MASIC
 
                     if (updateIOPaths)
                     {
-                        txtInputFilePath.Text = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
+                        txtInputFilePath.Text = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
                     }
 
-                    Width = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
-                    Height = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
+                    Width = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
+                    Height = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
 
                     if (updateIOPaths)
                     {
-                        txtOutputDirectoryPath.Text = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
+                        txtOutputDirectoryPath.Text = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
                     }
 
                     if (txtOutputDirectoryPath.TextLength == 0)
@@ -762,7 +763,7 @@ namespace MASIC
                         txtOutputDirectoryPath.Text = ProcessFilesOrDirectoriesBase.GetAppDirectoryPath();
                     }
 
-                    mPreferredInputFileExtension = xmlFileReader.GetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
+                    mPreferredInputFileExtension = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
                 }
                 catch (Exception ex)
                 {
@@ -868,7 +869,7 @@ namespace MASIC
                         {
                             if (File.Exists(txtDatasetLookupFilePath.Text))
                             {
-                                xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
+                                xmlFileReader.SetParam(MASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
                             }
                         }
                         catch (Exception ex)
@@ -876,14 +877,14 @@ namespace MASIC
                             // Ignore any errors here
                         }
 
-                        xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
+                        xmlFileReader.SetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "InputFilePath", txtInputFilePath.Text);
                     }
 
-                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
-                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
+                    xmlFileReader.SetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);
+                    xmlFileReader.SetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
 
-                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
-                    xmlFileReader.SetParam(clsMASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
+                    xmlFileReader.SetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
+                    xmlFileReader.SetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
                 }
                 catch (Exception ex)
                 {
@@ -1112,9 +1113,9 @@ namespace MASIC
         private void PopulateComboBoxes()
         {
             cboExportRawDataFileFormat.Items.Clear();
-            cboExportRawDataFileFormat.Items.Insert((int)clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile, "PEK File");
-            cboExportRawDataFileFormat.Items.Insert((int)clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File");
-            cboExportRawDataFileFormat.SelectedIndex = (int)clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile;
+            cboExportRawDataFileFormat.Items.Insert((int)RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile, "PEK File");
+            cboExportRawDataFileFormat.Items.Insert((int)RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile, "DeconTools CSV File");
+            cboExportRawDataFileFormat.SelectedIndex = (int)RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile;
 
             cboSICNoiseThresholdMode.Items.Clear();
             cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
@@ -1743,7 +1744,7 @@ namespace MASIC
             toolTipControl.SetToolTip(chkRefineReportedParentIonMZ, string.Format(
                 "If enabled, will look through the m/z values in the parent ion spectrum data to find the closest match (within SICTolerance / {0:F0}); " +
                 "will update the reported m/z value to the one found",
-                clsSICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA));
+                SICOptions.DEFAULT_COMPRESS_TOLERANCE_DIVISOR_FOR_DA));
 
             //toolTipControl.SetToolTip(chkUseSICStatsFromLargestPeak, "If enabled, SIC stats for similar parent ions will all be based on the largest peak in the selected ion chromatogram");
 
@@ -1855,7 +1856,7 @@ namespace MASIC
                 var exportOptions = masicOptions.RawDataExportOptions;
 
                 exportOptions.ExportEnabled = chkExportRawSpectraData.Checked;
-                exportOptions.FileFormat = (clsRawDataExportOptions.eExportRawDataFileFormatConstants)cboExportRawDataFileFormat.SelectedIndex;
+                exportOptions.FileFormat = (RawDataExportOptions.eExportRawDataFileFormatConstants)cboExportRawDataFileFormat.SelectedIndex;
 
                 exportOptions.IncludeMSMS = chkExportRawDataIncludeMSMS.Checked;
                 exportOptions.RenumberScans = chkExportRawDataRenumberScans.Checked;

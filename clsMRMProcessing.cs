@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using MASIC.DataOutput;
+using MASIC.Options;
 using MASICPeakFinder;
 using PRISM;
 using ThermoRawFileReader;
@@ -27,7 +28,7 @@ namespace MASIC
 
         #region "Classwide variables"
 
-        private readonly clsMASICOptions mOptions;
+        private readonly MASICOptions mOptions;
         private readonly clsDataAggregation mDataAggregation;
         private readonly clsDataOutput mDataOutputHandler;
 
@@ -36,7 +37,7 @@ namespace MASIC
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsMRMProcessing(clsMASICOptions masicOptions, clsDataOutput dataOutputHandler)
+        public clsMRMProcessing(MASICOptions masicOptions, clsDataOutput dataOutputHandler)
         {
             mOptions = masicOptions;
             mDataAggregation = new clsDataAggregation();

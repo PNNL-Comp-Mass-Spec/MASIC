@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace MASIC
+namespace MASIC.Options
 {
-    public class clsSpectrumCacheOptions
+    public class SpectrumCacheOptions
     {
         #region "Properties"
 

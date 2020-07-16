@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using MASIC.DatasetStats;
+using MASIC.Options;
 using PRISM;
 
 namespace MASIC.DataOutput
@@ -42,7 +43,7 @@ namespace MASIC.DataOutput
         #endregion
 
         #region "Properties"
-        private readonly clsMASICOptions mOptions;
+        private readonly MASICOptions mOptions;
 
         public clsOutputFileHandles OutputFileHandles { get; }
 
@@ -53,7 +54,7 @@ namespace MASIC.DataOutput
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsDataOutput(clsMASICOptions masicOptions)
+        public clsDataOutput(MASICOptions masicOptions)
         {
             mOptions = masicOptions;
 
@@ -74,10 +75,10 @@ namespace MASIC.DataOutput
         public bool CheckForExistingResults(
             string inputFilePathFull,
             string outputDirectoryPath,
-            clsMASICOptions masicOptions)
+            MASICOptions masicOptions)
         {
-            var sicOptionsCompare = new clsSICOptions();
-            var binningOptionsCompare = new clsBinningOptions();
+            var sicOptionsCompare = new SICOptions();
+            var binningOptionsCompare = new BinningOptions();
 
             long sourceFileSizeBytes = 0;
             var sourceFilePathCheck = string.Empty;
@@ -858,7 +859,7 @@ namespace MASIC.DataOutput
         }
 
         public bool SaveSICDataToText(
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             clsScanList scanList,
             int parentIonIndex,
             clsSICDetails sicDetails)

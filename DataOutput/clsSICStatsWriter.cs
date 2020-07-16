@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Options;
 using MASICPeakFinder;
 using PRISM;
 
@@ -106,7 +107,7 @@ namespace MASIC.DataOutput
             clsScanList scanList,
             string inputFileName,
             string outputDirectoryPath,
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             clsDataOutput dataOutputHandler)
         {
             var outputFilePath = string.Empty;
@@ -245,7 +246,7 @@ namespace MASIC.DataOutput
         private void WriteSICStatsFlatFileEntry(
             TextWriter sicStatsWriter,
             char delimiter,
-            clsSICOptions sicOptions,
+            SICOptions sicOptions,
             clsScanList scanList,
             clsParentIonInfo parentIon,
             int parentIonIndex,

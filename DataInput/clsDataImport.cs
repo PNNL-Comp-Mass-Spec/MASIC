@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MASIC.DatasetStats;
+using MASIC.Options;
 using PRISM;
 
 namespace MASIC.DataInput
@@ -32,7 +33,7 @@ namespace MASIC.DataInput
 
         #region "Classwide Variables"
 
-        protected readonly clsMASICOptions mOptions;
+        protected readonly MASICOptions mOptions;
 
         protected readonly clsParentIonProcessing mParentIonProcessor;
 
@@ -91,7 +92,7 @@ namespace MASIC.DataInput
         /// <param name="peakFinder"></param>
         /// <param name="parentIonProcessor"></param>
         protected clsDataImport(
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             MASICPeakFinder.clsMASICPeakFinder peakFinder,
             clsParentIonProcessing parentIonProcessor,
             clsScanTracking scanTracking)

@@ -5,15 +5,16 @@ using System.IO;
 using System.Linq;
 using PRISM;
 
-namespace MASIC
+namespace MASIC.Options
 {
-    public class clsMASICOptions : clsMasicEventNotifier
+    public class MASICOptions : clsMasicEventNotifier
     {
         #region "Constants and Enums"
 
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
         public const string XML_SECTION_IMPORT_OPTIONS = "MasicImportOptions";
         public const string XML_SECTION_EXPORT_OPTIONS = "MasicExportOptions";
+        public const string XML_SECTION_PLOT_OPTIONS = "PlotOptions";
         public const string XML_SECTION_SIC_OPTIONS = "SICOptions";
         public const string XML_SECTION_BINNING_OPTIONS = "BinningOptions";
         public const string XML_SECTION_MEMORY_OPTIONS = "MemoryOptions";
@@ -28,12 +29,12 @@ namespace MASIC
         /// <summary>
         /// Set options through the Property Functions or by passing parameterFilePath to ProcessFile()
         /// </summary>
-        public clsSICOptions SICOptions { get; }
+        public SICOptions SICOptions { get; }
 
         /// <summary>
         /// Binning options for MS/MS spectra; only applies to spectrum similarity testing
         /// </summary>
-        public clsBinningOptions BinningOptions { get; }
+        public BinningOptions BinningOptions { get; }
 
         public clsCustomSICList CustomSICList { get; }
 
@@ -99,7 +100,7 @@ namespace MASIC
         /// </summary>
         public bool SuppressNoParentIonsError { get; set; }
 
-        public clsRawDataExportOptions RawDataExportOptions { get; }
+        public RawDataExportOptions RawDataExportOptions { get; }
 
         public clsReporterIons ReporterIons { get; }
 
@@ -108,7 +109,7 @@ namespace MASIC
 
         public bool UseBase64DataEncoding { get; set; }
 
-        public clsSpectrumCacheOptions CacheOptions { get; }
+        public SpectrumCacheOptions CacheOptions { get; }
         public string MASICStatusFilename { get; set; } = DEFAULT_MASIC_STATUS_FILE_NAME;
 
         public string MASICVersion { get; }
@@ -121,28 +122,29 @@ namespace MASIC
         #region "Properties"
 
         public string StatusMessage { get; set; }
+
         #endregion
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsMASICOptions(string masicVersionInfo, string peakFinderVersionInfo)
+        public MASICOptions(string masicVersionInfo, string peakFinderVersionInfo)
         {
             MASICVersion = masicVersionInfo;
             PeakFinderVersion = peakFinderVersionInfo;
 
-            CacheOptions = new clsSpectrumCacheOptions();
+            CacheOptions = new SpectrumCacheOptions();
 
             CustomSICList = new clsCustomSICList();
             RegisterEvents(CustomSICList);
 
-            RawDataExportOptions = new clsRawDataExportOptions();
+            RawDataExportOptions = new RawDataExportOptions();
 
             ReporterIons = new clsReporterIons();
 
-            BinningOptions = new clsBinningOptions();
+            BinningOptions = new BinningOptions();
 
-            SICOptions = new clsSICOptions();
+            SICOptions = new SICOptions();
 
             StatusLogKeyNameFilterList = new SortedSet<string>();
         }
@@ -237,7 +239,13 @@ namespace MASIC
             CustomSICList.Reset();
         }
 
-        public bool LoadParameterFileSettings(string parameterFilePath, string instrumentDataFilePath = "")
+        /// <summary>
+        /// Load MASIC settings from the parameter file
+        /// </summary>
+        /// <param name="parameterFilePath"></param>
+        /// <param name="inputFilePath"></param>
+        /// <returns></returns>
+        public bool LoadParameterFileSettings(string parameterFilePath, string inputFilePath = "")
         {
             try
             {
@@ -256,10 +264,10 @@ namespace MASIC
                     parameterFilePath = Path.Combine(PRISM.FileProcessor.ProcessFilesOrDirectoriesBase.GetAppDirectoryPath(), Path.GetFileName(parameterFilePath));
                     if (!File.Exists(parameterFilePath))
                     {
-                        if (!string.IsNullOrWhiteSpace(instrumentDataFilePath))
+                        if (!string.IsNullOrWhiteSpace(inputFilePath))
                         {
                             // Also look in the same directory as the instrument data file
-                            var instrumentDataFile = new FileInfo(instrumentDataFilePath);
+                            var instrumentDataFile = new FileInfo(inputFilePath);
                             if (instrumentDataFile.DirectoryName != null)
                             {
                                 // ReSharper disable once AssignNullToNotNullAttribute
@@ -310,7 +318,7 @@ namespace MASIC
                         XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", ParentIonDecoyMassDa);
                 }
 
-                // Masic Export Options
+                // MASIC Export Options
                 if (!reader.SectionPresent(XML_SECTION_EXPORT_OPTIONS))
                 {
                     // Export options section not found; that's ok
@@ -409,7 +417,7 @@ namespace MASIC
                         XML_SECTION_EXPORT_OPTIONS, "ExportRawSpectraData", RawDataExportOptions.ExportEnabled);
 
                     RawDataExportOptions.FileFormat =
-                        (clsRawDataExportOptions.eExportRawDataFileFormatConstants)reader.GetParam(
+                        (RawDataExportOptions.eExportRawDataFileFormatConstants)reader.GetParam(
                             XML_SECTION_EXPORT_OPTIONS,
                             "ExportRawDataFileFormat",
                             (int)RawDataExportOptions.FileFormat);
@@ -734,7 +742,7 @@ namespace MASIC
                 writer.SetParam(XML_SECTION_IMPORT_OPTIONS, "CDFTimeInSeconds", CDFTimeInSeconds);
                 writer.SetParam(XML_SECTION_IMPORT_OPTIONS, "ParentIonDecoyMassDa", ParentIonDecoyMassDa);
 
-                // Masic Export Options
+                // MASIC Export Options
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeHeaders", IncludeHeadersInExportFile);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "IncludeScanTimesInSICStatsFile", IncludeScanTimesInSICStatsFile);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "SkipMSMSProcessing", SkipMSMSProcessing);
@@ -869,6 +877,11 @@ namespace MASIC
 
                 // Memory management options
                 writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "DiskCachingAlwaysDisabled", CacheOptions.DiskCachingAlwaysDisabled);
+                writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheDirectoryPath", CacheOptions.DirectoryPath);
+                writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory);
+
+                // Plot options
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "CreatePlots", CacheOptions.DiskCachingAlwaysDisabled);
                 writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheDirectoryPath", CacheOptions.DirectoryPath);
                 writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory);
 

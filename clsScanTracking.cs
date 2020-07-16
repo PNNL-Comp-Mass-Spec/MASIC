@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MASIC.DatasetStats;
+using MASIC.Options;
 using MASICPeakFinder;
 
 namespace MASIC
@@ -55,7 +56,7 @@ namespace MASIC
         /// <returns>True if filtering is disabled, or if scanNumber is within the limits</returns>
         public bool CheckScanInRange(
             int scanNumber,
-            clsSICOptions sicOptions)
+            SICOptions sicOptions)
         {
             if (sicOptions.ScanRangeStart >= 0 && sicOptions.ScanRangeEnd > sicOptions.ScanRangeStart)
             {
@@ -78,7 +79,7 @@ namespace MASIC
         public bool CheckScanInRange(
             int scanNumber,
             double elutionTime,
-            clsSICOptions sicOptions)
+            SICOptions sicOptions)
         {
             if (!CheckScanInRange(scanNumber, sicOptions))
             {

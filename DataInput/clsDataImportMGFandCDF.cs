@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MASIC.Options;
 
 namespace MASIC.DataInput
 {
     public class clsDataImportMGFandCDF : clsDataImport
     {
         public clsDataImportMGFandCDF(
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             MASICPeakFinder.clsMASICPeakFinder peakFinder,
             clsParentIonProcessing parentIonProcessor,
             clsScanTracking scanTracking)

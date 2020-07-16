@@ -1,6 +1,6 @@
-﻿namespace MASIC
+﻿namespace MASIC.Options
 {
-    public class clsSICOptions
+    public class SICOptions
     {
         #region "Constants and Enums"
 

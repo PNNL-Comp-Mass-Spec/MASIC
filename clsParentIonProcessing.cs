@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MASIC.Options;
 
 namespace MASIC
 {
@@ -36,7 +37,7 @@ namespace MASIC
             double parentIonMZ,
             int fragScanIndex,
             clsSpectraCache spectraCache,
-            clsSICOptions sicOptions)
+            SICOptions sicOptions)
         {
             AddUpdateParentIons(scanList, surveyScanIndex, parentIonMZ, 0, 0, fragScanIndex, spectraCache, sicOptions);
         }
@@ -56,7 +57,7 @@ namespace MASIC
             double parentIonMZ,
             clsMRMScanInfo mrmInfo,
             clsSpectraCache spectraCache,
-            clsSICOptions sicOptions)
+            SICOptions sicOptions)
         {
             for (var mrmIndex = 0; mrmIndex < mrmInfo.MRMMassCount; mrmIndex++)
             {
@@ -99,7 +100,7 @@ namespace MASIC
             double mrmToleranceHalfWidth,
             int fragScanIndex,
             clsSpectraCache spectraCache,
-            clsSICOptions sicOptions)
+            SICOptions sicOptions)
         {
             const double MINIMUM_TOLERANCE_PPM = 0.01;
             const double MINIMUM_TOLERANCE_DA = 0.0001;
@@ -261,7 +262,7 @@ namespace MASIC
             clsSpectraCache spectraCache,
             int parentIonIndex1,
             int parentIonIndex2,
-            clsBinningOptions binningOptions,
+            BinningOptions binningOptions,
             MASICPeakFinder.clsBaselineNoiseOptions noiseThresholdOptions,
             DataInput.clsDataImport dataImportUtilities)
         {
@@ -345,7 +346,7 @@ namespace MASIC
         private float CompareSpectra(
             clsMSSpectrum fragSpectrum1,
             clsMSSpectrum fragSpectrum2,
-            clsBinningOptions binningOptions,
+            BinningOptions binningOptions,
             bool considerOffsetBinnedData = true)
         {
             // Compares the two spectra and returns a similarity score (ranging from 0 to 1)
@@ -520,7 +521,7 @@ namespace MASIC
         public bool FindSimilarParentIons(
             clsScanList scanList,
             clsSpectraCache spectraCache,
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             DataInput.clsDataImport dataImportUtilities,
             out int ionUpdateCount)
         {
@@ -786,7 +787,7 @@ namespace MASIC
             int originalIndex,
             clsScanList scanList,
             clsSimilarParentIonsData similarParentIonsData,
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             DataInput.clsDataImport dataImportUtilities,
             clsSearchRange searchRange)
         {
@@ -861,7 +862,7 @@ namespace MASIC
         /// <param name="sicOptions"></param>
         /// <param name="parentIonMZ"></param>
         /// <returns></returns>
-        public static double GetParentIonToleranceDa(clsSICOptions sicOptions, double parentIonMZ)
+        public static double GetParentIonToleranceDa(SICOptions sicOptions, double parentIonMZ)
         {
             return GetParentIonToleranceDa(sicOptions, parentIonMZ, sicOptions.SICTolerance);
         }
@@ -874,7 +875,7 @@ namespace MASIC
         /// <param name="parentIonMZ"></param>
         /// <param name="parentIonTolerance"></param>
         /// <returns></returns>
-        public static double GetParentIonToleranceDa(clsSICOptions sicOptions, double parentIonMZ, double parentIonTolerance)
+        public static double GetParentIonToleranceDa(SICOptions sicOptions, double parentIonMZ, double parentIonTolerance)
         {
             if (sicOptions.SICToleranceIsPPM)
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using MASIC.Options;
 
 namespace MASIC.DataOutput
 {
@@ -118,7 +119,7 @@ namespace MASIC.DataOutput
 
         [Obsolete("No longer used")]
         private void SaveICRToolsChromatogramByScan(
-            clsMASICOptions masicOptions,
+            MASICOptions masicOptions,
             IList<clsScanInfo> scanList,
             int scanCount,
             string outputFilePath,

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using MASIC;
+using MASIC.Options;
 using NUnit.Framework;
 using PRISM;
 using ThermoRawFileReader;
@@ -91,7 +91,7 @@ namespace MASICTest
         {
             const int MAX_ALLOWABLE_ION_COUNT = 2000;
 
-            var options = new clsMASICOptions(string.Empty, string.Empty);
+            var options = new MASICOptions(string.Empty, string.Empty);
             var peakFinder = new MASICPeakFinder.clsMASICPeakFinder();
             var reporterIons = new clsReporterIons();
 

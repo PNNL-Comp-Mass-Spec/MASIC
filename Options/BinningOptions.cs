@@ -1,6 +1,6 @@
-﻿namespace MASIC
+﻿namespace MASIC.Options
 {
-    public class clsBinningOptions
+    public class BinningOptions
     {
         #region "Properties"
 

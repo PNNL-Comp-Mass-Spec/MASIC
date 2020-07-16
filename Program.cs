@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using MASIC.Options;
 using PRISM;
 using PRISM.FileProcessor;
 using PRISM.Logging;
@@ -437,7 +438,7 @@ namespace MASIC
                 Console.WriteLine();
 
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
-                    "Use /SF to specify the name to use for the Masic Status file (default is " + clsMASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME + ")."));
+                    "Use /SF to specify the name to use for the Masic Status file (default is " + MASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME + ")."));
                 Console.WriteLine();
 
                 Console.WriteLine("The optional /Q switch will prevent the progress window from being shown");

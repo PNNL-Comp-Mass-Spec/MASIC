@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using MASIC.Options;
 
 namespace MASIC.DataOutput
 {
@@ -7,13 +8,13 @@ namespace MASIC.DataOutput
     {
         #region "Classwide variables"
         private readonly clsBPIWriter mBPIWriter;
-        private readonly clsMASICOptions mOptions;
+        private readonly MASICOptions mOptions;
         #endregion
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public clsSpectrumDataWriter(clsBPIWriter bpiWriter, clsMASICOptions masicOptions)
+        public clsSpectrumDataWriter(clsBPIWriter bpiWriter, MASICOptions masicOptions)
         {
             mBPIWriter = bpiWriter;
             mOptions = masicOptions;
@@ -34,12 +35,12 @@ namespace MASIC.DataOutput
 
                 switch (mOptions.RawDataExportOptions.FileFormat)
                 {
-                    case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
+                    case RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
                         outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.PEKFile);
                         dataWriter = new StreamWriter(outputFilePath);
                         scanInfoWriter = null;
                         break;
-                    case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
+                    case RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
                         outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsIsosFile);
 
                         var outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsScansFile);
@@ -359,11 +360,11 @@ namespace MASIC.DataOutput
         {
             switch (mOptions.RawDataExportOptions.FileFormat)
             {
-                case clsRawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
+                case RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
                     SavePEKFileToDiskWork(dataWriter, currentScan, spectraCache, inputFileName, fragmentationScan, ref spectrumExportCount);
                     break;
 
-                case clsRawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
+                case RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
                     SaveCSVFilesToDiskWork(dataWriter, scanInfoWriter, currentScan, spectraCache, fragmentationScan, ref spectrumExportCount);
                     break;
 

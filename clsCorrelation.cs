@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MASIC.Options;
 using PRISM;
 
 namespace MASIC
@@ -32,7 +33,7 @@ namespace MASIC
         {
         }
 
-        public clsCorrelation(clsBinningOptions binningOptions)
+        public clsCorrelation(BinningOptions binningOptions)
         {
             mBinningOptions = binningOptions;
             NoiseThresholdIntensity = 0;
@@ -57,7 +58,7 @@ namespace MASIC
 
         #region "Local Member Variables"
 
-        private clsBinningOptions mBinningOptions;
+        private BinningOptions mBinningOptions;
 
         #endregion
 
@@ -288,7 +289,7 @@ namespace MASIC
         }
 
         private void BinDataWork(IList<float> xData, IList<float> yData, int dataCount,
-                                 IList<float> binnedYData, int binCount, clsBinningOptions binningOptions, float offset)
+                                 IList<float> binnedYData, int binCount, BinningOptions binningOptions, float offset)
         {
             try
             {
@@ -766,9 +767,9 @@ namespace MASIC
             return -tmp + Math.Log(2.5066282746310007 * ser / x);
         }
 
-        public static clsBinningOptions GetDefaultBinningOptions()
+        public static BinningOptions GetDefaultBinningOptions()
         {
-            var binningOptions = new clsBinningOptions
+            var binningOptions = new BinningOptions
             {
                 StartX = 50,
                 EndX = 2000,
@@ -783,12 +784,12 @@ namespace MASIC
         }
 
         [Obsolete("Use GetDefaultBinningOptions, which returns an instance of clsBinningOptions")]
-        public static void InitializeBinningOptions(out clsBinningOptions binningOptions)
+        public static void InitializeBinningOptions(out BinningOptions binningOptions)
         {
             binningOptions = GetDefaultBinningOptions();
         }
 
-        public void SetBinningOptions(clsBinningOptions binningOptions)
+        public void SetBinningOptions(BinningOptions binningOptions)
         {
             mBinningOptions = binningOptions;
         }
