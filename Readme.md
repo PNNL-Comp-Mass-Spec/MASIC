@@ -206,17 +206,17 @@ msconvert.exe --32 --mzML --filter "peakPicking true 1" DatasetName.raw
 Both MASIC.exe and MASIC_Console.exe include the same command line interface.
 ```
 MASIC.exe
- /I:InputFilePath.raw [/O:OutputDirectoryPath]
+ /I:InputFilePath [/O:OutputDirectoryPath]
  [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath]
  [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]
  [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]
 ```
 
 The input file path can contain the wildcard character *
+* It will typically point to an instrument data file (e.g. Thermo .raw file)
 
-The output directory name is optional. If omitted, the output files will be
-created in the same directory as the input file. If included, then a subdirectory
-is created with the name OutputDirectoryName.
+If the input file name ends with _SICstats.txt, MASIC will create plots using existing results
+* If a _ReporterIons.txt file is also present, the Reporter Ion Observation Rate plots will also be made
 
 The parameter file switch `/P` is optional. If supplied, it should point to a valid 
 MASIC XML parameter file.  If omitted, defaults are used.

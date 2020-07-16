@@ -32,15 +32,15 @@ namespace MASIC
 
     public static class Program
     {
-        public const string PROGRAM_DATE = "June 9, 2020";
+        public const string PROGRAM_DATE = "July 16, 2020";
 
         private static string mInputFilePath;
-        private static string mOutputDirectoryPath;                          // Optional
-        private static string mParameterFilePath;                            // Optional
-        private static string mOutputDirectoryAlternatePath;                 // Optional
-        private static bool mRecreateDirectoryHierarchyInAlternatePath;   // Optional
+        private static string mOutputDirectoryPath;                         // Optional
+        private static string mParameterFilePath;                           // Optional
+        private static string mOutputDirectoryAlternatePath;                // Optional
+        private static bool mRecreateDirectoryHierarchyInAlternatePath;     // Optional
 
-        private static string mDatasetLookupFilePath;                        // Optional
+        private static string mDatasetLookupFilePath;                       // Optional
         private static int mDatasetID;
 
         private static bool mRecurseDirectories;
@@ -143,6 +143,7 @@ namespace MASIC
 
                 if (mRecurseDirectories)
                 {
+                    // This call will lead to calls to method ProcessFile in clsMASIC
                     if (mMASIC.ProcessFilesAndRecurseDirectories(mInputFilePath, mOutputDirectoryPath,
                                                                  mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath,
                                                                  mParameterFilePath, mMaxLevelsToRecurse))
@@ -393,13 +394,19 @@ namespace MASIC
                 Console.WriteLine();
 
                 Console.WriteLine("Program syntax:" + Environment.NewLine + Path.GetFileName(ProcessFilesOrDirectoriesBase.GetAppPath()));
-                Console.WriteLine(" /I:InputFilePath.raw [/O:OutputDirectoryPath]");
+                Console.WriteLine(" /I:InputFilePath [/O:OutputDirectoryPath]");
                 Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath] ");
                 Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]");
                 Console.WriteLine(" [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]");
                 Console.WriteLine();
 
                 Console.WriteLine("The input file path can contain the wildcard character *");
+                Console.WriteLine("It will typically point to an instrument data file (e.g. Thermo .raw file)");
+                Console.WriteLine();
+                Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                    // ReSharper disable once StringLiteralTypo
+                    "If the input file name ends with _SICstats.txt, MASIC will create plots using existing results. " +
+                    "If a _ReporterIons.txt file is also present, the Reporter Ion Observation Rate plots will also be made"));
                 Console.WriteLine();
 
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
