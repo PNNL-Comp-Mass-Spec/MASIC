@@ -38,6 +38,11 @@ namespace MASIC.Options
 
         public clsCustomSICList CustomSICList { get; }
 
+        /// <summary>
+        /// Plotting options
+        /// </summary>
+        public PlotOptions PlotOptions { get; }
+
         public bool AbortProcessing { get; set; }
 
         public string DatabaseConnectionString { get; set; }
@@ -145,6 +150,8 @@ namespace MASIC.Options
             BinningOptions = new BinningOptions();
 
             SICOptions = new SICOptions();
+
+            PlotOptions = new PlotOptions();
 
             StatusLogKeyNameFilterList = new SortedSet<string>();
         }
@@ -639,6 +646,15 @@ namespace MASIC.Options
                 CacheOptions.SpectraToRetainInMemory = reader.GetParam(
                     XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory);
 
+                // Plot options
+                PlotOptions.CreatePlots = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
+
+                PlotOptions.ReporterIonObservationRateTopNPct = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "ReporterIonObservationRateTopNPct", PlotOptions.ReporterIonObservationRateTopNPct);
+
+                PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "ReporterIonTopNPctObsRateYAxisMinimum", PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum);
                 if (!reader.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES))
                 {
                     // Custom SIC values section not found; that's ok
@@ -881,9 +897,9 @@ namespace MASIC.Options
                 writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory);
 
                 // Plot options
-                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "CreatePlots", CacheOptions.DiskCachingAlwaysDisabled);
-                writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheDirectoryPath", CacheOptions.DirectoryPath);
-                writer.SetParam(XML_SECTION_MEMORY_OPTIONS, "CacheSpectraToRetainInMemory", CacheOptions.SpectraToRetainInMemory);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "ReporterIonObservationRateTopNPct", PlotOptions.ReporterIonObservationRateTopNPct);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "ReporterIonTopNPctObsRateYAxisMinimum", PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum);
 
                 // Construct the rawText strings using mCustomSICList
                 var scanCommentsDefined = false;

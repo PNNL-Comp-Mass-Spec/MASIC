@@ -136,6 +136,7 @@
     <Compile Include="DatasetStats\SummaryStatDetails.cs" />
     <Compile Include="Options\BinningOptions.cs" />
     <Compile Include="Options\MASICOptions.cs" />
+    <Compile Include="Options\PlotOptions.cs" />
     <Compile Include="Options\RawDataExportOptions.cs" />
     <Compile Include="Options\SICOptions.cs" />
     <Compile Include="Options\SpectrumCacheOptions.cs" />
