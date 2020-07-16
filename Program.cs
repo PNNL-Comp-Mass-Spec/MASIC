@@ -412,12 +412,14 @@ namespace MASIC
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                     "The output directory name is optional. " +
                     "If omitted, the output files will be created in the same directory as the input file. " +
-                    "If included, then a subdirectory is created with the name OutputDirectoryName."));
+                    "If included, a subdirectory will be created with the name OutputDirectoryName."));
                 Console.WriteLine();
 
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                     "The parameter file switch /P is optional. " +
-                    "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used."));
+                    "If supplied, it should point to a valid MASIC XML parameter file.  If omitted, defaults are used." +
+                    "Create a parameter file for MASIC using the MASIC GUI. " +
+                    "Alternatively, download a file from GitHub: https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Parameter_Files"));
 
                 Console.WriteLine();
 
