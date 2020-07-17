@@ -380,10 +380,10 @@ namespace MASIC
 
                 // Find each reporter ion in ftLabelData
 
-                for (var reporterIonIndex = 0; reporterIonIndex < reporterIons.Count; reporterIonIndex++)
+                foreach (var reporterIon in reporterIons)
                 {
-                    var mzToFind = reporterIons[reporterIonIndex].MZ;
-                    var mzToleranceDa = reporterIons[reporterIonIndex].MZToleranceDa;
+                    var mzToFind = reporterIon.MZ;
+                    var mzToleranceDa = reporterIon.MZToleranceDa;
                     var highestIntensity = 0.0;
                     var udtBestMatch = new udtFTLabelInfoType();
                     var matchFound = false;
@@ -407,9 +407,9 @@ namespace MASIC
 
                     if (matchFound)
                     {
-                        reporterIons[reporterIonIndex].SignalToNoise = udtBestMatch.SignalToNoise;
-                        reporterIons[reporterIonIndex].Resolution = udtBestMatch.Resolution;
-                        reporterIons[reporterIonIndex].LabelDataMZ = udtBestMatch.Mass;
+                        reporterIon.SignalToNoise = udtBestMatch.SignalToNoise;
+                        reporterIon.Resolution = udtBestMatch.Resolution;
+                        reporterIon.LabelDataMZ = udtBestMatch.Mass;
                     }
                 }
             }
