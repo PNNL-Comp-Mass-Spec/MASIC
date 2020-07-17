@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using MASIC.DataInput;
 using MASIC.DataOutput;
 using MASIC.DatasetStats;
 using MASIC.Options;
@@ -364,7 +365,7 @@ namespace MASIC
         {
             get => true;
             // ReSharper disable once ValueParameterNotUsed
-            set {}
+            set { }
         }
 
         [Obsolete("Use Property Options")]
@@ -862,7 +863,7 @@ namespace MASIC
             clsScanTracking scanTracking,
             DatasetFileInfo datasetFileInfo,
             clsParentIonProcessing parentIonProcessor,
-            DataInput.clsDataImport dataImporterBase)
+            clsDataImport dataImporterBase)
         {
             var inputFileName = Path.GetFileName(inputFilePathFull);
 
@@ -1182,7 +1183,7 @@ namespace MASIC
         /// <returns></returns>
         public override IList<string> GetDefaultExtensionsToParse()
         {
-            return DataInput.clsDataImport.GetDefaultExtensionsToParse();
+            return clsDataImport.GetDefaultExtensionsToParse();
         }
 
         /// <summary>
@@ -1324,14 +1325,14 @@ namespace MASIC
         }
 
         private bool LoadData(
-            string inputFilePathFull,
+            string inputFilePath,
             string outputDirectoryPath,
             clsDataOutput dataOutputHandler,
             clsParentIonProcessing parentIonProcessor,
             clsScanTracking scanTracking,
             clsScanList scanList,
             clsSpectraCache spectraCache,
-            out DataInput.clsDataImport dataImporterBase,
+            out clsDataImport dataImporterBase,
             out DatasetFileInfo datasetFileInfo)
         {
             bool success;
@@ -1342,7 +1343,7 @@ namespace MASIC
                 // ---------------------------------------------------------
                 // Define inputFileName (which is referenced several times below)
                 // ---------------------------------------------------------
-                var inputFileName = Path.GetFileName(inputFilePathFull);
+                var inputFileName = Path.GetFileName(inputFilePath);
 
                 // ---------------------------------------------------------
                 // Create the _ScanStats.txt file
@@ -1369,15 +1370,15 @@ namespace MASIC
 
                 switch (Path.GetExtension(inputFileName).ToUpper())
                 {
-                    case DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION:
+                    case clsDataImport.THERMO_RAW_FILE_EXTENSION:
                         // Open the .Raw file and obtain the scan information
 
-                        var dataImporter = new DataInput.clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporter = new clsDataImportThermoRaw(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporter);
                         dataImporterBase = dataImporter;
 
                         success = dataImporter.ExtractScanInfoFromXcaliburDataFile(
-                            inputFilePathFull,
+                            inputFilePath,
                             scanList, spectraCache, dataOutputHandler,
                             keepRawMSSpectra,
                             !Options.SkipMSMSProcessing);
@@ -1385,15 +1386,15 @@ namespace MASIC
                         datasetFileInfo = dataImporter.DatasetFileInfo;
                         break;
 
-                    case DataInput.clsDataImport.MZ_ML_FILE_EXTENSION:
+                    case clsDataImport.MZ_ML_FILE_EXTENSION:
                         // Open the .mzML file and obtain the scan information
 
-                        var dataImporterMzML = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMzML = new clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMzML);
                         dataImporterBase = dataImporterMzML;
 
                         success = dataImporterMzML.ExtractScanInfoFromMzMLDataFile(
-                            inputFilePathFull,
+                            inputFilePath,
                             scanList, spectraCache, dataOutputHandler,
                             keepRawMSSpectra,
                             !Options.SkipMSMSProcessing);
@@ -1401,16 +1402,16 @@ namespace MASIC
                         datasetFileInfo = dataImporterMzML.DatasetFileInfo;
                         break;
 
-                    case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION1:
-                    case DataInput.clsDataImport.MZ_XML_FILE_EXTENSION2:
+                    case clsDataImport.MZ_XML_FILE_EXTENSION1:
+                    case clsDataImport.MZ_XML_FILE_EXTENSION2:
                         // Open the .mzXML file and obtain the scan information
 
-                        var dataImporterMzXML = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMzXML = new clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMzXML);
                         dataImporterBase = dataImporterMzXML;
 
                         success = dataImporterMzXML.ExtractScanInfoFromMzXMLDataFile(
-                            inputFilePathFull,
+                            inputFilePath,
                             scanList, spectraCache, dataOutputHandler,
                             keepRawMSSpectra,
                             !Options.SkipMSMSProcessing);
@@ -1418,32 +1419,32 @@ namespace MASIC
                         datasetFileInfo = dataImporterMzXML.DatasetFileInfo;
                         break;
 
-                    case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION1:
-                    case DataInput.clsDataImport.MZ_DATA_FILE_EXTENSION2:
+                    case clsDataImport.MZ_DATA_FILE_EXTENSION1:
+                    case clsDataImport.MZ_DATA_FILE_EXTENSION2:
                         // Open the .mzData file and obtain the scan information
 
-                        var dataImporterMzData = new DataInput.clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMzData = new clsDataImportMSXml(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMzData);
                         dataImporterBase = dataImporterMzData;
 
                         success = dataImporterMzData.ExtractScanInfoFromMzDataFile(
-                            inputFilePathFull,
+                            inputFilePath,
                             scanList, spectraCache, dataOutputHandler,
                             keepRawMSSpectra, !Options.SkipMSMSProcessing);
 
                         datasetFileInfo = dataImporterMzData.DatasetFileInfo;
                         break;
 
-                    case DataInput.clsDataImport.AGILENT_MSMS_FILE_EXTENSION:
-                    case DataInput.clsDataImport.AGILENT_MS_FILE_EXTENSION:
+                    case clsDataImport.AGILENT_MSMS_FILE_EXTENSION:
+                    case clsDataImport.AGILENT_MS_FILE_EXTENSION:
                         // Open the .MGF and .CDF files to obtain the scan information
 
-                        var dataImporterMGF = new DataInput.clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
+                        var dataImporterMGF = new clsDataImportMGFandCDF(Options, mMASICPeakFinder, parentIonProcessor, scanTracking);
                         RegisterDataImportEvents(dataImporterMGF);
                         dataImporterBase = dataImporterMGF;
 
                         success = dataImporterMGF.ExtractScanInfoFromMGFandCDF(
-                            inputFilePathFull,
+                            inputFilePath,
                             scanList, spectraCache, dataOutputHandler,
                             keepRawMSSpectra, !Options.SkipMSMSProcessing);
 
@@ -1451,7 +1452,7 @@ namespace MASIC
                         break;
 
                     default:
-                        StatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePathFull);
+                        StatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePath);
                         SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension);
                         success = false;
 
@@ -1475,7 +1476,7 @@ namespace MASIC
             catch (Exception ex)
             {
                 success = false;
-                LogErrors("LoadData", "Error accessing input data file: " + inputFilePathFull, ex, eMasicErrorCodes.InputFileDataReadError);
+                LogErrors("LoadData", "Error accessing input data file: " + inputFilePath, ex, eMasicErrorCodes.InputFileDataReadError);
                 dataImporterBase = null;
             }
 
@@ -1550,7 +1551,6 @@ namespace MASIC
             bool resetErrorCode)
         {
             var success = false;
-            var doNotProcess = false;
 
             var inputFilePathFull = string.Empty;
 
@@ -1595,14 +1595,16 @@ namespace MASIC
             }
 
             var dataOutputHandler = new clsDataOutput(Options);
+            var existingResultsFound = false;
+
             RegisterEvents(dataOutputHandler);
             try
             {
                 var keepProcessing = true;
-                // If a Custom SICList file is defined, then load the custom SIC values now
+                // If a Custom SICList file is defined, load the custom SIC values now
                 if (Options.CustomSICList.CustomSICListFileName.Length > 0)
                 {
-                    var sicListReader = new DataInput.clsCustomSICListReader(Options.CustomSICList);
+                    var sicListReader = new clsCustomSICListReader(Options.CustomSICList);
                     RegisterEvents(sicListReader);
 
                     LogMessage("ProcessFile: Reading custom SIC values file: " + Options.CustomSICList.CustomSICListFileName);
@@ -1953,8 +1955,6 @@ namespace MASIC
             sourceClass.UpdateBaseClassErrorCodeEvent += UpdateBaseClassErrorCodeEventHandler;
             sourceClass.UpdateErrorCodeEvent += UpdateErrorCodeEventHandler;
         }
-
-        // ReSharper disable UnusedMember.Global
 
         [Obsolete("Use Options.SaveParameterFileSettings")]
         public bool SaveParameterFileSettings(string parameterFilePath)
