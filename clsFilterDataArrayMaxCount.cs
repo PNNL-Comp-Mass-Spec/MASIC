@@ -21,7 +21,6 @@ namespace MASIC
         // 4 steps in method FilterDataByMaxDataCountToLoad
         private const int SUBTASK_STEP_COUNT = 4;
 
-        private int mDataCount;
         private double[] mDataValues = new double[0];
         private int[] mDataIndices = new int[0];
 
@@ -30,6 +29,8 @@ namespace MASIC
         public delegate void ProgressChangedEventHandler(float progressVal);
 
         #region "Properties"
+
+        public int DataCount { get; private set; }
 
         public int MaximumDataCountToKeep { get; set; }
 
@@ -72,20 +73,21 @@ namespace MASIC
         /// <param name="dataPointIndex"></param>
         public void AddDataPoint(double abundance, int dataPointIndex)
         {
-            if (mDataCount >= mDataValues.Length)
+            if (DataCount >= mDataValues.Length)
             {
                 var oldMDataValues = mDataValues;
                 mDataValues = new double[((int)Math.Floor(mDataValues.Length * 1.5))];
                 Array.Copy(oldMDataValues, mDataValues, Math.Min((int)Math.Floor(mDataValues.Length * 1.5), oldMDataValues.Length));
+
                 var oldMDataIndices = mDataIndices;
                 mDataIndices = new int[mDataValues.Length];
                 Array.Copy(oldMDataIndices, mDataIndices, Math.Min(mDataValues.Length, oldMDataIndices.Length));
             }
 
-            mDataValues[mDataCount] = abundance;
-            mDataIndices[mDataCount] = dataPointIndex;
+            mDataValues[DataCount] = abundance;
+            mDataIndices[DataCount] = dataPointIndex;
 
-            mDataCount += 1;
+            DataCount += 1;
         }
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace MASIC
                 initialCapacity = 4;
             }
 
-            mDataCount = 0;
+            DataCount = 0;
             mDataValues = new double[initialCapacity];
             mDataIndices = new int[initialCapacity];
         }
@@ -116,7 +118,7 @@ namespace MASIC
         /// <returns></returns>
         public double GetAbundanceByIndex(int dataPointIndex)
         {
-            if (dataPointIndex >= 0 && dataPointIndex < mDataCount)
+            if (dataPointIndex >= 0 && dataPointIndex < DataCount)
             {
                 return mDataValues[dataPointIndex];
             }
@@ -130,21 +132,22 @@ namespace MASIC
         /// </summary>
         public void FilterData()
         {
-            if (mDataCount <= 0)
+            if (DataCount <= 0)
             {
                 // Nothing to do
             }
             else
             {
-                // Shrink the arrays to mDataCount
-                if (mDataCount < mDataValues.Length)
+                // Shrink the arrays to DataCount
+                if (DataCount < mDataValues.Length)
                 {
                     var oldMDataValues = mDataValues;
-                    mDataValues = new double[mDataCount];
-                    Array.Copy(oldMDataValues, mDataValues, Math.Min(mDataCount, oldMDataValues.Length));
+                    mDataValues = new double[DataCount];
+                    Array.Copy(oldMDataValues, mDataValues, Math.Min(DataCount, oldMDataValues.Length));
+
                     var oldMDataIndices = mDataIndices;
-                    mDataIndices = new int[mDataCount];
-                    Array.Copy(oldMDataIndices, mDataIndices, Math.Min(mDataCount, oldMDataIndices.Length));
+                    mDataIndices = new int[DataCount];
+                    Array.Copy(oldMDataIndices, mDataIndices, Math.Min(DataCount, oldMDataIndices.Length));
                 }
 
                 FilterDataByMaxDataCountToKeep();
@@ -163,14 +166,14 @@ namespace MASIC
                 UpdateProgress(0);
 
                 var useFullDataSort = false;
-                if (mDataCount == 0)
+                if (DataCount == 0)
                 {
                     // No data loaded
                     UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
                     return;
                 }
 
-                if (mDataCount <= MaximumDataCountToKeep)
+                if (DataCount <= MaximumDataCountToKeep)
                 {
                     // Loaded less than mMaximumDataCountToKeep data points
                     // Nothing to filter
@@ -183,7 +186,7 @@ namespace MASIC
 
                 // First, determine the maximum abundance value in mDataValues
                 var maxAbundance = double.MinValue;
-                for (var index = 0; index < mDataCount; index++)
+                for (var index = 0; index < DataCount; index++)
                 {
                     if (mDataValues[index] > maxAbundance)
                     {
@@ -211,7 +214,7 @@ namespace MASIC
                 }
 
                 // Parse mDataValues to populate histogramBinCounts
-                for (var index = 0; index < mDataCount; index++)
+                for (var index = 0; index < DataCount; index++)
                 {
                     int targetBin;
                     if (mDataValues[index] <= 0)
@@ -244,7 +247,7 @@ namespace MASIC
 
                     if (index % 10000 == 0)
                     {
-                        UpdateProgress((float)((0 + (index + 1) / (double)mDataCount) / SUBTASK_STEP_COUNT * 100.0));
+                        UpdateProgress((float)((0 + (index + 1) / (double)DataCount) / SUBTASK_STEP_COUNT * 100.0));
                     }
                 }
 
@@ -302,7 +305,7 @@ namespace MASIC
                     if (!useFullDataSort)
                     {
                         var dataCountImplicitlyIncluded = 0;
-                        for (var index = 0; index < mDataCount; index++)
+                        for (var index = 0; index < DataCount; index++)
                         {
                             if (mDataValues[index] < binToSortAbundanceMinimum)
                             {
@@ -335,7 +338,7 @@ namespace MASIC
 
                             if (index % 10000 == 0)
                             {
-                                UpdateProgress((float)((1 + (index + 1) / (double)mDataCount) / SUBTASK_STEP_COUNT * 100.0D));
+                                UpdateProgress((float)((1 + (index + 1) / (double)DataCount) / SUBTASK_STEP_COUNT * 100.0D));
                             }
                         }
 
@@ -346,6 +349,7 @@ namespace MASIC
                                 var oldBinToSortAbundances1 = binToSortAbundances;
                                 binToSortAbundances = new double[binToSortDataCount];
                                 Array.Copy(oldBinToSortAbundances1, binToSortAbundances, Math.Min(binToSortDataCount, oldBinToSortAbundances1.Length));
+
                                 var oldBinToSortDataIndices1 = binToSortDataIndices;
                                 binToSortDataIndices = new int[binToSortDataCount];
                                 Array.Copy(oldBinToSortDataIndices1, binToSortDataIndices, Math.Min(binToSortDataCount, oldBinToSortDataIndices1.Length));
@@ -406,7 +410,7 @@ namespace MASIC
                     // This shouldn't normally be necessary
 
                     // We have to sort all of the data; this can be quite slow
-                    SortAndMarkPointsToSkip(mDataValues, mDataIndices, mDataCount, MaximumDataCountToKeep, SUBTASK_STEP_COUNT);
+                    SortAndMarkPointsToSkip(mDataValues, mDataIndices, DataCount, MaximumDataCountToKeep, SUBTASK_STEP_COUNT);
                 }
 
                 UpdateProgress((float)(4 / (double)SUBTASK_STEP_COUNT * 100.0D));
