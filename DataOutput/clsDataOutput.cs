@@ -11,6 +11,12 @@ namespace MASIC.DataOutput
     {
         #region "Constants and Enums"
 
+        public const string SCAN_STATS_FILE_SUFFIX = "_ScanStats.txt";
+
+        public const string SIC_STATS_FILE_SUFFIX = "_SICstats.txt";
+
+        public const string REPORTER_IONS_FILE_SUFFIX = "_ReporterIons.txt";
+
         public enum eOutputFileTypeConstants
         {
             XMLFile = 0,
@@ -539,7 +545,7 @@ namespace MASIC.DataOutput
                     outputFilePath += "_SICs.xml";
                     break;
                 case eOutputFileTypeConstants.ScanStatsFlatFile:
-                    outputFilePath += "_ScanStats.txt";
+                    outputFilePath += SCAN_STATS_FILE_SUFFIX;
                     break;
                 case eOutputFileTypeConstants.ScanStatsExtendedFlatFile:
                     outputFilePath += "_ScanStatsEx.txt";
@@ -548,8 +554,7 @@ namespace MASIC.DataOutput
                     outputFilePath += "_ScanStatsConstant.txt";
                     break;
                 case eOutputFileTypeConstants.SICStatsFlatFile:
-                    // ReSharper disable once StringLiteralTypo
-                    outputFilePath += "_SICstats.txt";
+                    outputFilePath += SIC_STATS_FILE_SUFFIX;
                     break;
                 case eOutputFileTypeConstants.BPIFile:
                     outputFilePath += "_BPI.txt";
@@ -597,7 +602,7 @@ namespace MASIC.DataOutput
                     outputFilePath += "_MSTuneSettings";
                     break;
                 case eOutputFileTypeConstants.ReporterIonsFile:
-                    outputFilePath += "_ReporterIons.txt";
+                    outputFilePath += REPORTER_IONS_FILE_SUFFIX;
                     break;
                 case eOutputFileTypeConstants.MRMSettingsFile:
                     outputFilePath += "_MRMSettings.txt";
@@ -784,7 +789,8 @@ namespace MASIC.DataOutput
                 OutputFileHandles.SICDataFile = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
                 // Write the header line
-                OutputFileHandles.SICDataFile.WriteLine("Dataset" + "\t" +
+                OutputFileHandles.SICDataFile.WriteLine(
+                    "Dataset" + "\t" +
                     "ParentIonIndex" + "\t" +
                     "FragScanIndex" + "\t" +
                     "ParentIonMZ" + "\t" +
@@ -876,9 +882,9 @@ namespace MASIC.DataOutput
                 for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {
                     // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
-                    var prefix = sicOptions.DatasetID.ToString() + "\t" +
-                                 parentIonIndex.ToString() + "\t" +
-                                 fragScanIndex.ToString() + "\t" +
+                    var prefix = sicOptions.DatasetID + "\t" +
+                                 parentIonIndex + "\t" +
+                                 fragScanIndex + "\t" +
                                  StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4) + "\t";
 
                     if (sicDetails.SICDataCount == 0)
@@ -889,10 +895,13 @@ namespace MASIC.DataOutput
                     else
                     {
                         foreach (var dataPoint in sicDetails.SICData)
-                            OutputFileHandles.SICDataFile.WriteLine(prefix +
-                                                                    dataPoint.ScanNumber + "\t" +
-                                                                    dataPoint.Mass + "\t" +
-                                                                    dataPoint.Intensity);
+                        {
+                            OutputFileHandles.SICDataFile.WriteLine(
+                                prefix +
+                                dataPoint.ScanNumber + "\t" +
+                                dataPoint.Mass + "\t" +
+                                dataPoint.Intensity);
+                        }
                     }
                 }
             }
