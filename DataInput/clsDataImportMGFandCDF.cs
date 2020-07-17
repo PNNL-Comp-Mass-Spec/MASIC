@@ -5,8 +5,10 @@ using MASIC.Options;
 
 namespace MASIC.DataInput
 {
+    // ReSharper disable once IdentifierTypo
     public class clsDataImportMGFandCDF : clsDataImport
     {
+        // ReSharper disable once IdentifierTypo
         public clsDataImportMGFandCDF(
             MASICOptions masicOptions,
             MASICPeakFinder.clsMASICPeakFinder peakFinder,
@@ -16,6 +18,7 @@ namespace MASIC.DataInput
         {
         }
 
+        // ReSharper disable once IdentifierTypo
         public bool ExtractScanInfoFromMGFandCDF(
             string filePath,
             clsScanList scanList,
@@ -162,7 +165,7 @@ namespace MASIC.DataInput
                             newSurveyScan.BasePeakIonMZ = FindBasePeakIon(msSpectrum.IonsMZ,
                                 msSpectrum.IonsIntensity,
                                 out var basePeakIonIntensity,
-                                out var mzMin, out var mzMax);
+                                out var mzMin, out _);
                             newSurveyScan.BasePeakIonIntensity = basePeakIonIntensity;
 
                             // Determine the minimum positive intensity in this scan
@@ -491,6 +494,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
+                // ReSharper disable once StringLiteralTypo
                 ReportError("Error in ExtractScanInfoFromMGFandCDF", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
                 return false;
             }
@@ -554,6 +558,7 @@ namespace MASIC.DataInput
         /// <param name="fragScanNumber"></param>
         /// <param name="fragScanIteration"></param>
         /// <returns>Closest elution time</returns>
+        // ReSharper disable once IdentifierTypo
         private float InterpolateRTandFragScanNumber(
             IList<clsScanInfo> surveyScans,
             int lastSurveyScanIndex,
@@ -647,6 +652,7 @@ namespace MASIC.DataInput
             catch (Exception ex)
             {
                 // Ignore any errors that occur in this function
+                // ReSharper disable once StringLiteralTypo
                 ReportError("Error in InterpolateRTandFragScanNumber", ex);
             }
 

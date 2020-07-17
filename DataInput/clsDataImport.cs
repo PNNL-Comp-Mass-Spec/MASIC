@@ -12,6 +12,10 @@ namespace MASIC.DataInput
     {
         #region "Constants and Enums"
 
+        /// <summary>
+        /// Thermo .raw file extension
+        /// </summary>
+        /// <remarks>Needs to be all caps because of the switch statement in clsMASIC.LoadData</remarks>
         public const string THERMO_RAW_FILE_EXTENSION = ".RAW";
 
         public const string MZ_ML_FILE_EXTENSION = ".MZML";
@@ -277,6 +281,8 @@ namespace MASIC.DataInput
                         TotalIntensityPercentageFilterEnabled = false
                     };
 
+                    // ReSharper disable ConditionIsAlwaysTrueOrFalse
+                    // ReSharper disable once RedundantAssignment
                     writeDebugData = false;
                     if (writeDebugData)
                     {
@@ -298,6 +304,7 @@ namespace MASIC.DataInput
                     {
                         writer.Close();
                     }
+                    // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
                     // Call .FilterData, which will determine which data points to keep
                     filterDataArray.FilterData();
@@ -336,6 +343,7 @@ namespace MASIC.DataInput
                     msSpectrum.ShrinkArrays(ionCountNew);
                 }
 
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (writeDebugData)
                 {
                     using (var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read)))

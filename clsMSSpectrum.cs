@@ -15,6 +15,9 @@ namespace MASIC
         /// <remarks>0 if not in use</remarks>
         public int ScanNumber { get; set; }
 
+        /// <summary>
+        /// Number of items in IonsMZ or IonsIntensity
+        /// </summary>
         public int IonCount => IonsMZ.Count;
 
         /// <summary>
@@ -23,7 +26,7 @@ namespace MASIC
         public readonly List<double> IonsMZ;
 
         /// <summary>
-        /// List of intensities
+        /// List of intensities; should be the same length as IonsMZ
         /// </summary>
         public readonly List<double> IonsIntensity;
 
@@ -97,11 +100,21 @@ namespace MASIC
             ScanNumber = newScanNumber;
         }
 
+        /// <summary>
+        /// Make a deep copy of this mass spectrum
+        /// </summary>
+        /// <returns></returns>
+        // ReSharper disable once UnusedMember.Global
         public clsMSSpectrum Clone()
         {
             return Copy(this);
         }
 
+        /// <summary>
+        /// Make a deep copy of the given mass spectrum
+        /// </summary>
+        /// <param name="sourceSpectrum"></param>
+        /// <returns></returns>
         public clsMSSpectrum Copy(clsMSSpectrum sourceSpectrum)
         {
             var newSpectrum = new clsMSSpectrum(sourceSpectrum.ScanNumber, sourceSpectrum.IonsMZ, sourceSpectrum.IonsIntensity, sourceSpectrum.IonsMZ.Count);
