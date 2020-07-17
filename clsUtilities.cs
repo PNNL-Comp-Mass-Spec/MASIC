@@ -150,6 +150,25 @@ namespace MASIC
         }
 
         /// <summary>
+        /// Replace the suffix at the end of a string to be a new suffix
+        /// Uses a case-insensitive comparison
+        /// </summary>
+        /// <param name="textToUpdate"></param>
+        /// <param name="oldSuffix"></param>
+        /// <param name="newSuffix"></param>
+        /// <returns></returns>
+        public static string ReplaceSuffix(string textToUpdate, string oldSuffix, string newSuffix)
+        {
+            if (!textToUpdate.EndsWith(oldSuffix, StringComparison.OrdinalIgnoreCase))
+                return textToUpdate;
+
+            if (textToUpdate.Equals(oldSuffix))
+                return newSuffix;
+
+            return textToUpdate.Substring(0, textToUpdate.Length - oldSuffix.Length) + newSuffix;
+        }
+
+        /// <summary>
         /// Return true if the two values match, within float.Epsilon
         /// </summary>
         /// <param name="value1"></param>
