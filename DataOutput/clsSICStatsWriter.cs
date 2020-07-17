@@ -10,6 +10,8 @@ namespace MASIC.DataOutput
 {
     public class clsSICStatsWriter : clsMasicEventNotifier
     {
+        public string SICStatsFilePath { get; private set; } = string.Empty;
+
         private clsParentIonInfo GetFakeParentIonForFragScan(clsScanList scanList, int fragScanIndex)
         {
             var currentFragScan = scanList.FragScans[fragScanIndex];
@@ -76,6 +78,7 @@ namespace MASIC.DataOutput
             return newParentIon;
         }
 
+        [Obsolete("Unused")]
         private void PopulateScanListPointerArray(
             IList<clsScanInfo> surveyScans,
             int surveyScanCount,
@@ -110,21 +113,18 @@ namespace MASIC.DataOutput
             MASICOptions masicOptions,
             clsDataOutput dataOutputHandler)
         {
-            var outputFilePath = string.Empty;
+            SICStatsFilePath = string.Empty;
 
             const char TAB_DELIMITER = '\t';
-
-            // Old: Populate scanListArray with the scan numbers in scanList.SurveyScans
-            // PopulateScanListPointerArray(scanList.SurveyScans, scanList.SurveyScans.Count, out var scanListArray);
 
             try
             {
                 UpdateProgress(0, "Saving SIC data to flat file");
 
-                outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile);
-                ReportMessage("Saving SIC flat file to disk: " + Path.GetFileName(outputFilePath));
+                SICStatsFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.SICStatsFlatFile);
+                ReportMessage("Saving SIC flat file to disk: " + Path.GetFileName(SICStatsFilePath));
 
-                using (var writer = new StreamWriter(outputFilePath, false))
+                using (var writer = new StreamWriter(SICStatsFilePath, false))
                 {
                     // Write the SIC stats to the output file
                     // The file is tab delimited
@@ -216,7 +216,7 @@ namespace MASIC.DataOutput
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                ReportError("Error writing the Peak Stats to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the Peak Stats to: " + SICStatsFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
