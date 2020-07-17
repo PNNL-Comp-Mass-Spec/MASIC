@@ -864,9 +864,7 @@ namespace MASIC
             clsParentIonProcessing parentIonProcessor,
             DataInput.clsDataImport dataImporterBase)
         {
-            var success = true;
             var inputFileName = Path.GetFileName(inputFilePathFull);
-            var similarParentIonUpdateCount = 0;
 
             try
             {
@@ -912,118 +910,30 @@ namespace MASIC
                 LogMessage("FindSICsAndWriteOutput: Create DatasetInfo File");
                 dataOutputHandler.CreateDatasetInfoFile(inputFileName, outputDirectoryPath, scanTracking, datasetFileInfo);
 
+                int similarParentIonUpdateCount;
                 if (Options.SkipSICAndRawDataProcessing)
                 {
                     LogMessage("FindSICsAndWriteOutput: Skipping SIC Processing");
 
                     SetDefaultPeakLocValues(scanList);
+                    similarParentIonUpdateCount = 0;
                 }
                 else
                 {
-                    // ---------------------------------------------------------
-                    // Optionally, export the raw mass spectra data
-                    // ---------------------------------------------------------
+                    var success = FindSICsWork(
+                        inputFilePathFull,
+                        outputDirectoryPath,
+                        scanList,
+                        spectraCache,
+                        dataOutputHandler,
+                        parentIonProcessor,
+                        dataImporterBase,
+                        bpiWriter,
+                        xmlResultsWriter,
+                        out similarParentIonUpdateCount);
 
-                    if (Options.RawDataExportOptions.ExportEnabled)
-                    {
-                        var rawDataExporter = new clsSpectrumDataWriter(bpiWriter, Options);
-                        RegisterEvents(rawDataExporter);
-
-                        rawDataExporter.ExportRawDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath);
-                    }
-
-                    if (Options.ReporterIons.ReporterIonStatsEnabled)
-                    {
-                        // Look for Reporter Ions in the Fragmentation spectra
-
-                        var reporterIonProcessor = new clsReporterIonProcessor(Options);
-                        RegisterEvents(reporterIonProcessor);
-                        reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath);
-                    }
-
-                    var mrmProcessor = new clsMRMProcessing(Options, dataOutputHandler);
-                    RegisterEvents(mrmProcessor);
-
-                    // ---------------------------------------------------------
-                    // If MRM data is present, save the MRM values to disk
-                    // ---------------------------------------------------------
-                    if (scanList.MRMDataPresent)
-                    {
-                        mrmProcessor.ExportMRMDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath);
-                    }
-
-                    if (!Options.ExportRawDataOnly)
-                    {
-                        // ---------------------------------------------------------
-                        // Add the custom SIC values to scanList
-                        // ---------------------------------------------------------
-                        Options.CustomSICList.AddCustomSICValues(scanList, Options.SICOptions.SICTolerance,
-                                                                 Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance);
-
-                        // ---------------------------------------------------------
-                        // Possibly create the Tab-separated values SIC details output file
-                        // ---------------------------------------------------------
-                        if (Options.WriteDetailedSICDataFile)
-                        {
-                            success = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath);
-                            if (!success)
-                            {
-                                SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
-                                return false;
-                            }
-                        }
-
-                        // ---------------------------------------------------------
-                        // Create the XML output file
-                        // ---------------------------------------------------------
-                        success = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList, spectraCache, Options.SICOptions, Options.BinningOptions);
-                        if (!success)
-                        {
-                            SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
-                            return false;
-                        }
-
-                        // ---------------------------------------------------------
-                        // Create the selected ion chromatograms (SICs)
-                        // For each one, find the peaks and make an entry to the XML output file
-                        // ---------------------------------------------------------
-
-                        UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks);
-                        SetSubtaskProcessingStepPct(0);
-                        UpdatePeakMemoryUsage();
-
-                        LogMessage("FindSICsAndWriteOutput: Call CreateParentIonSICs", MessageTypeConstants.Debug);
-                        var sicProcessor = new clsSICProcessing(mMASICPeakFinder, mrmProcessor);
-                        RegisterEvents(sicProcessor);
-
-                        success = sicProcessor.CreateParentIonSICs(scanList, spectraCache, Options, dataOutputHandler, sicProcessor, xmlResultsWriter);
-
-                        if (!success)
-                        {
-                            SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, true);
-                            return false;
-                        }
-                    }
-
-                    if (!(Options.SkipMSMSProcessing || Options.ExportRawDataOnly))
-                    {
-                        // ---------------------------------------------------------
-                        // Find Similar Parent Ions
-                        // ---------------------------------------------------------
-
-                        UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons);
-                        SetSubtaskProcessingStepPct(0);
-                        UpdatePeakMemoryUsage();
-
-                        LogMessage("FindSICsAndWriteOutput: Call FindSimilarParentIons", MessageTypeConstants.Debug);
-                        success = parentIonProcessor.FindSimilarParentIons(scanList, spectraCache, Options, dataImporterBase, out similarParentIonUpdateCount);
-
-                        if (!success)
-                        {
-                            SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, true);
-                            return false;
-                        }
-                    }
+                    if (!success)
+                        return false;
                 }
 
                 if (Options.WriteExtendedStats && !Options.ExportRawDataOnly)
@@ -1037,10 +947,10 @@ namespace MASIC
                     UpdatePeakMemoryUsage();
 
                     LogMessage("FindSICsAndWriteOutput: Call SaveExtendedScanStatsFiles", MessageTypeConstants.Debug);
-                    success = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
+                    var extendedStatsWritten = dataOutputHandler.ExtendedStatsWriter.SaveExtendedScanStatsFiles(
                         scanList, inputFileName, outputDirectoryPath, Options.IncludeHeadersInExportFile);
 
-                    if (!success)
+                    if (!extendedStatsWritten)
                     {
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
                         return false;
@@ -1055,19 +965,26 @@ namespace MASIC
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
 
+                string sicStatsFilePath;
                 if (!Options.ExportRawDataOnly)
                 {
                     var sicStatsWriter = new clsSICStatsWriter();
                     RegisterEvents(sicStatsWriter);
 
                     LogMessage("FindSICsAndWriteOutput: Call SaveSICStatsFlatFile", MessageTypeConstants.Debug);
-                    success = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, Options, dataOutputHandler);
+                    var sicStatsWritten = sicStatsWriter.SaveSICStatsFlatFile(scanList, inputFileName, outputDirectoryPath, Options, dataOutputHandler);
 
-                    if (!success)
+                    if (!sicStatsWritten)
                     {
                         SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
                         return false;
                     }
+
+                    sicStatsFilePath = sicStatsWriter.SICStatsFilePath;
+                }
+                else
+                {
+                    sicStatsFilePath = string.Empty;
                 }
 
                 UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles);
@@ -1082,8 +999,9 @@ namespace MASIC
 
                     LogMessage("FindSICsAndWriteOutput: Call FinalizeXMLFile", MessageTypeConstants.Debug);
                     var processingTimeSec = GetTotalProcessingTimeSec();
-                    success = xmlResultsWriter.XMLOutputFileFinalize(dataOutputHandler, scanList, spectraCache,
-                                                                     mProcessingStats, processingTimeSec);
+                    xmlResultsWriter.XMLOutputFileFinalize(
+                        dataOutputHandler, scanList, spectraCache,
+                        mProcessingStats, processingTimeSec);
                 }
 
                 // ---------------------------------------------------------
@@ -1114,14 +1032,148 @@ namespace MASIC
                     LogMessage("FindSICsAndWriteOutput: Call XmlOutputFileUpdateEntries", MessageTypeConstants.Debug);
                     xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, inputFileName, outputDirectoryPath);
                 }
+
+                if (string.IsNullOrEmpty(sicStatsFilePath) || !Options.PlotOptions.CreatePlots)
+                {
+                    return true;
+                }
+
+                var plotsCreated = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
+                return plotsCreated;
             }
             catch (Exception ex)
             {
-                success = false;
                 LogErrors("FindSICsAndWriteOutput", "Error saving results to: " + outputDirectoryPath, ex, eMasicErrorCodes.OutputFileWriteError);
+                return false;
             }
 
-            return success;
+        }
+
+        private bool FindSICsWork(
+            string inputFilePathFull,
+            string outputDirectoryPath,
+            clsScanList scanList,
+            clsSpectraCache spectraCache,
+            clsDataOutput dataOutputHandler,
+            clsParentIonProcessing parentIonProcessor,
+            clsDataImport dataImporterBase,
+            clsBPIWriter bpiWriter,
+            clsXMLResultsWriter xmlResultsWriter,
+            out int similarParentIonUpdateCount)
+        {
+
+            var inputFileName = Path.GetFileName(inputFilePathFull);
+            similarParentIonUpdateCount = 0;
+
+            // ---------------------------------------------------------
+            // Optionally, export the raw mass spectra data
+            // ---------------------------------------------------------
+
+            if (Options.RawDataExportOptions.ExportEnabled)
+            {
+                var rawDataExporter = new clsSpectrumDataWriter(bpiWriter, Options);
+                RegisterEvents(rawDataExporter);
+
+                rawDataExporter.ExportRawDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath);
+            }
+
+            if (Options.ReporterIons.ReporterIonStatsEnabled)
+            {
+                // Look for Reporter Ions in the Fragmentation spectra
+
+                var reporterIonProcessor = new clsReporterIonProcessor(Options);
+                RegisterEvents(reporterIonProcessor);
+                reporterIonProcessor.FindReporterIons(scanList, spectraCache, inputFilePathFull, outputDirectoryPath);
+            }
+
+            var mrmProcessor = new clsMRMProcessing(Options, dataOutputHandler);
+            RegisterEvents(mrmProcessor);
+
+            // ---------------------------------------------------------
+            // If MRM data is present, save the MRM values to disk
+            // ---------------------------------------------------------
+            if (scanList.MRMDataPresent)
+            {
+                mrmProcessor.ExportMRMDataToDisk(scanList, spectraCache, inputFileName, outputDirectoryPath);
+            }
+
+            if (!Options.ExportRawDataOnly)
+            {
+                // ---------------------------------------------------------
+                // Add the custom SIC values to scanList
+                // ---------------------------------------------------------
+                Options.CustomSICList.AddCustomSICValues(scanList, Options.SICOptions.SICTolerance,
+                    Options.SICOptions.SICToleranceIsPPM, Options.CustomSICList.ScanOrAcqTimeTolerance);
+
+                // ---------------------------------------------------------
+                // Possibly create the Tab-separated SIC details output file
+                // ---------------------------------------------------------
+                if (Options.WriteDetailedSICDataFile)
+                {
+                    var sicDetailsFileCreated = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath);
+                    if (!sicDetailsFileCreated)
+                    {
+                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                        return false;
+                    }
+                }
+
+                // ---------------------------------------------------------
+                // Create the XML output file
+                // ---------------------------------------------------------
+                var xmlWriterInitialized = xmlResultsWriter.XMLOutputFileInitialize(inputFilePathFull, outputDirectoryPath, dataOutputHandler, scanList,
+                    spectraCache, Options.SICOptions, Options.BinningOptions);
+                if (!xmlWriterInitialized)
+                {
+                    SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                    return false;
+                }
+
+                // ---------------------------------------------------------
+                // Create the selected ion chromatograms (SICs)
+                // For each one, find the peaks and make an entry to the XML output file
+                // ---------------------------------------------------------
+
+                UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks);
+                SetSubtaskProcessingStepPct(0);
+                UpdatePeakMemoryUsage();
+
+                LogMessage("FindSicsWork: Call CreateParentIonSICs", MessageTypeConstants.Debug);
+                var sicProcessor = new clsSICProcessing(mMASICPeakFinder, mrmProcessor);
+                RegisterEvents(sicProcessor);
+
+                var parentIonSICsCreated = sicProcessor.CreateParentIonSICs(
+                    scanList, spectraCache, Options, dataOutputHandler, sicProcessor, xmlResultsWriter);
+
+                if (!parentIonSICsCreated)
+                {
+                    SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, true);
+                    return false;
+                }
+            }
+
+            if (!(Options.SkipMSMSProcessing || Options.ExportRawDataOnly))
+            {
+                // ---------------------------------------------------------
+                // Find Similar Parent Ions
+                // ---------------------------------------------------------
+
+                UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons);
+                SetSubtaskProcessingStepPct(0);
+                UpdatePeakMemoryUsage();
+
+                LogMessage("FindSICsWork: Call FindSimilarParentIons", MessageTypeConstants.Debug);
+                var foundSimilarParentIons = parentIonProcessor.FindSimilarParentIons(
+                    scanList, spectraCache, Options, dataImporterBase, out similarParentIonUpdateCount);
+
+                if (!foundSimilarParentIons)
+                {
+                    SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, true);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -1617,43 +1669,6 @@ namespace MASIC
                     try
                     {
                         // ---------------------------------------------------------
-                        // See if an output XML file already exists
-                        // If it does, open it and read the parameters used
-                        // If they match the current analysis parameters, and if the input file specs match the input file, then
-                        // do not reprocess
-                        // ---------------------------------------------------------
-
-                        // Obtain the full path to the input file
-                        var inputFileInfo = new FileInfo(inputFilePath);
-                        inputFilePathFull = inputFileInfo.FullName;
-
-                        LogMessage("Checking for existing results in the output path: " + outputDirectoryPath);
-
-                        doNotProcess = dataOutputHandler.CheckForExistingResults(inputFilePathFull, outputDirectoryPath, Options);
-
-                        if (doNotProcess)
-                        {
-                            LogMessage("Existing results found; data will not be reprocessed");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        success = false;
-                        LogErrors("ProcessFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError);
-                    }
-
-                    if (doNotProcess)
-                    {
-                        success = true;
-                        keepProcessing = false;
-                    }
-                }
-
-                if (keepProcessing)
-                {
-                    try
-                    {
-                        // ---------------------------------------------------------
                         // Verify that we have write access to the output directory
                         // ---------------------------------------------------------
 
@@ -1697,71 +1712,15 @@ namespace MASIC
 
                         InitializeMemoryManagementOptions(mProcessingStats);
 
-                        // ---------------------------------------------------------
-                        // Instantiate the SpectraCache
-                        // ---------------------------------------------------------
-
-                        using (var spectraCache = new clsSpectraCache(Options.CacheOptions)
+                        if (inputFilePathFull.EndsWith(clsDataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                         {
-                            DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
-                            CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
-                            CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
-                        })
-                        {
-                            RegisterEvents(spectraCache);
-
-                            spectraCache.InitializeSpectraPool();
-
-                            var scanList = new clsScanList();
-                            RegisterEvents(scanList);
-
-                            var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
-                            RegisterEvents(parentIonProcessor);
-
-                            var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
-                            RegisterEvents(scanTracking);
-
-                            // ---------------------------------------------------------
-                            // Load the mass spectral data
-                            // ---------------------------------------------------------
-
-                            success = LoadData(inputFilePathFull,
-                                               outputDirectoryPath,
-                                               dataOutputHandler,
-                                               parentIonProcessor,
-                                               scanTracking,
-                                               scanList,
-                                               spectraCache,
-                                               out var dataImporterBase,
-                                               out var datasetFileInfo);
-
-                            // Record that the file is finished loading
-                            mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
-                            if (!success)
-                            {
-                                if (string.IsNullOrEmpty(StatusMessage))
-                                {
-                                    StatusMessage = "Unable to parse file; unknown error";
-                                }
-                                else
-                                {
-                                    StatusMessage = "Unable to parse file: " + StatusMessage;
-                                }
-
-                                ShowErrorMessage(StatusMessage);
-                            }
-                            else
-                            {
-                                // ---------------------------------------------------------
-                                // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
-                                // ---------------------------------------------------------
-
-                                success = FindSICsAndWriteOutput(
-                                    inputFilePathFull, outputDirectoryPath,
-                                    scanList, spectraCache, dataOutputHandler, scanTracking,
-                                    datasetFileInfo, parentIonProcessor, dataImporterBase);
-                            }
+                            success = CreatePlots(inputFilePathFull, outputDirectoryPath);
                         }
+                        else
+                        {
+                            success = ProcessInstrumentDataFile(inputFilePathFull, outputDirectoryPath, dataOutputHandler, out existingResultsFound);
+                        }
+
                     }
                 }
             }
@@ -1792,7 +1751,7 @@ namespace MASIC
                 LogMessage("ProcessFile: Processing nearly complete");
 
                 Console.WriteLine();
-                if (doNotProcess)
+                if (existingResultsFound)
                 {
                     StatusMessage = "Existing valid results were found; processing was not repeated.";
                     ShowMessage(StatusMessage);
@@ -1858,7 +1817,121 @@ namespace MASIC
             return success;
         }
 
-        private void RegisterDataImportEvents(DataInput.clsDataImport dataImporter)
+        private bool ProcessInstrumentDataFile(
+            string inputFilePath,
+            string outputDirectoryPath,
+            clsDataOutput dataOutputHandler,
+            out bool existingResultsFound)
+        {
+            try
+            {
+                // ---------------------------------------------------------
+                // See if an output XML file already exists
+                // If it does, open it and read the parameters used
+                // If they match the current analysis parameters, and if the input file specs match the input file, then
+                // do not reprocess
+                // ---------------------------------------------------------
+
+                // Obtain the full path to the input file
+                var inputFileInfo = new FileInfo(inputFilePath);
+
+                LogMessage("Checking for existing results in the output path: " + outputDirectoryPath);
+
+                existingResultsFound = dataOutputHandler.CheckForExistingResults(inputFileInfo.FullName, outputDirectoryPath, Options);
+
+                if (existingResultsFound)
+                {
+                    LogMessage("Existing results found; data will not be reprocessed");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogErrors("ProcessInstrumentDataFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError);
+                existingResultsFound = false;
+                return false;
+            }
+
+            try
+            {
+                // ---------------------------------------------------------
+                // Instantiate the SpectraCache
+                // ---------------------------------------------------------
+
+                using (var spectraCache = new clsSpectraCache(Options.CacheOptions)
+                {
+                    DiskCachingAlwaysDisabled = Options.CacheOptions.DiskCachingAlwaysDisabled,
+                    CacheDirectoryPath = Options.CacheOptions.DirectoryPath,
+                    CacheSpectraToRetainInMemory = Options.CacheOptions.SpectraToRetainInMemory
+                })
+                {
+                    RegisterEvents(spectraCache);
+
+                    spectraCache.InitializeSpectraPool();
+
+                    var scanList = new clsScanList();
+                    RegisterEvents(scanList);
+
+                    var parentIonProcessor = new clsParentIonProcessing(Options.ReporterIons);
+                    RegisterEvents(parentIonProcessor);
+
+                    var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
+                    RegisterEvents(scanTracking);
+
+
+                    // ---------------------------------------------------------
+                    // Load the mass spectral data
+                    // ---------------------------------------------------------
+
+                    var dataLoadSuccess = LoadData(inputFilePath,
+                        outputDirectoryPath,
+                        dataOutputHandler,
+                        parentIonProcessor,
+                        scanTracking,
+                        scanList,
+                        spectraCache,
+                        out var dataImporterBase,
+                        out var datasetFileInfo);
+
+                    // Record that the file is finished loading
+                    mProcessingStats.FileLoadEndTime = DateTime.UtcNow;
+                    if (!dataLoadSuccess)
+                    {
+                        if (string.IsNullOrEmpty(StatusMessage))
+                        {
+                            StatusMessage = "Unable to parse file; unknown error";
+                        }
+                        else
+                        {
+                            StatusMessage = "Unable to parse file: " + StatusMessage;
+                        }
+
+                        ShowErrorMessage(StatusMessage);
+                        return false;
+                    }
+
+                    // ---------------------------------------------------------
+                    // Find the Selected Ion Chromatograms, reporter ions, etc. and write the results to disk
+                    // ---------------------------------------------------------
+
+                    var success = FindSICsAndWriteOutput(
+                        inputFilePath, outputDirectoryPath,
+                        scanList, spectraCache, dataOutputHandler, scanTracking,
+                        datasetFileInfo, parentIonProcessor, dataImporterBase);
+
+                    return success;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                LogErrors("ProcessInstrumentDataFile", "Error processing", ex, eMasicErrorCodes.InputFileDataReadError);
+                return false;
+            }
+
+        }
+
+        private void RegisterDataImportEvents(clsDataImport dataImporter)
         {
             RegisterEvents(dataImporter);
             dataImporter.UpdateMemoryUsageEvent += UpdateMemoryUsageEventHandler;
