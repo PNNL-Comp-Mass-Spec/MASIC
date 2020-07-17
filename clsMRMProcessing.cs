@@ -46,9 +46,9 @@ namespace MASIC
             mDataOutputHandler = dataOutputHandler;
         }
 
-        private string ConstructSRMMapKey(udtSRMListType udtSRMListEntry)
+        private string ConstructSRMMapKey(udtSRMListType srmEntry)
         {
-            return ConstructSRMMapKey(udtSRMListEntry.ParentIonMZ, udtSRMListEntry.CentralMass);
+            return ConstructSRMMapKey(srmEntry.ParentIonMZ, srmEntry.CentralMass);
         }
 
         private string ConstructSRMMapKey(double parentIonMZ, double centralMass)
@@ -320,8 +320,8 @@ namespace MASIC
                                 "ScanTime"
                             };
 
-                            for (var srmIndex = 0; srmIndex < srmList.Count; srmIndex++)
-                                headerNames.Add(ConstructSRMMapKey(srmList[srmIndex]));
+                            foreach (var srmEntry in srmList)
+                                headerNames.Add(ConstructSRMMapKey(srmEntry));
 
                             crosstabWriter.WriteLine(string.Join(TAB_DELIMITER.ToString(), headerNames));
                         }
