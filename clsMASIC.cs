@@ -854,6 +854,56 @@ namespace MASIC
             Options.AbortProcessing = true;
         }
 
+        private bool CreatePlots(string inputFilePath, string outputDirectoryPath)
+        {
+            bool success;
+            var inputFile = new FileInfo(inputFilePath);
+
+            if (inputFile.Name.EndsWith(clsDataOutput.SIC_STATS_FILE_SUFFIX))
+            {
+                success = CreatePlots(inputFile, outputDirectoryPath);
+            }
+            else if (inputFilePath.EndsWith(clsDataOutput.SCAN_STATS_FILE_SUFFIX))
+            {
+                // The user specified the Scan Stats file
+                // Auto-switch to the SIC stats file
+                var sicStatsFilePath = clsUtilities.ReplaceSuffix(inputFilePath, clsDataOutput.SCAN_STATS_FILE_SUFFIX, clsDataOutput.SIC_STATS_FILE_SUFFIX);
+                success = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
+            }
+            else if (inputFilePath.EndsWith(clsDataOutput.REPORTER_IONS_FILE_SUFFIX))
+            {
+                // The user specified the Reporter Ion data file
+                // Auto-switch to the SIC stats file
+
+                var sicStatsFilePath = clsUtilities.ReplaceSuffix(inputFilePath, clsDataOutput.REPORTER_IONS_FILE_SUFFIX, clsDataOutput.SIC_STATS_FILE_SUFFIX);
+                success = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
+            }
+            else
+            {
+                StatusMessage = "Invalid input file path; cannot create plots using " + inputFilePath;
+                ShowErrorMessage(StatusMessage);
+                return false;
+            }
+
+            return success;
+        }
+
+        private bool CreatePlots(FileSystemInfo sicStatsFile, string outputDirectoryPath)
+        {
+            try
+            {
+                var statsPlotter = new StatsPlotter();
+
+                var success = statsPlotter.ProcessFile(sicStatsFile.FullName, outputDirectoryPath);
+                return success;
+            }
+            catch (Exception ex)
+            {
+                LogErrors("CreatePlots", "Error summarizing stats and creating plots", ex, eMasicErrorCodes.OutputFileWriteError);
+                return false;
+            }
+        }
+
         private bool FindSICsAndWriteOutput(
             string inputFilePathFull,
             string outputDirectoryPath,
