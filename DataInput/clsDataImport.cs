@@ -298,7 +298,7 @@ namespace MASIC.DataInput
                         filterDataArray.AddDataPoint(msSpectrum.IonsIntensity[ionIndex], ionIndex);
                         if (writeDebugData)
                         {
-                            writer.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" + msSpectrum.IonsIntensity[ionIndex]);
+                            writer.WriteLine("{0:F3}\t{1:F0}", msSpectrum.IonsMZ[ionIndex], msSpectrum.IonsIntensity[ionIndex]);
                         }
                     }
 
@@ -354,8 +354,9 @@ namespace MASIC.DataInput
 
                         // Store the intensity values in filterDataArray
                         for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)
-                            postFilterWriter.WriteLine(msSpectrum.IonsMZ[ionIndex].ToString() + "\t" +
-                                                       msSpectrum.IonsIntensity[ionIndex]);
+                        {
+                            postFilterWriter.WriteLine("{0:F3}\t{1:F0}", msSpectrum.IonsMZ[ionIndex], msSpectrum.IonsIntensity[ionIndex]);
+                        }
                     }
                 }
             }
