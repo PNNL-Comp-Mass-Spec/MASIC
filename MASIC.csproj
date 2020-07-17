@@ -130,6 +130,8 @@
     <Compile Include="DataOutput\clsSpectrumDataWriter.cs" />
     <Compile Include="DataOutput\clsThermoMetadataWriter.cs" />
     <Compile Include="DataOutput\clsXMLResultsWriter.cs" />
+    <Compile Include="DataOutput\StatsPlotter.cs" />
+    <Compile Include="DataOutput\StatsSummarizer.cs" />
     <Compile Include="DatasetStats\clsDatasetFileInfo.cs" />
     <Compile Include="DatasetStats\clsDatasetStatsSummarizer.cs" />
     <Compile Include="DatasetStats\clsSampleInfo.cs" />
