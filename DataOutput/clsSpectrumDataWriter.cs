@@ -248,17 +248,17 @@ namespace MASIC.DataOutput
             writer.WriteLine("Time domain signal level:" + "\t" + currentScan.BasePeakIonIntensity.ToString("0.000"));          // Store the base peak ion intensity as the time domain signal level value
 
             writer.WriteLine("MASIC " + mOptions.MASICVersion);                     // Software version
-            var dataLine = "MS/MS-based PEK file";
+            var pekFileInfoLine = "MS/MS-based PEK file";
             if (mOptions.RawDataExportOptions.IncludeMSMS)
             {
-                dataLine += " (includes both survey scans and fragmentation spectra)";
+                pekFileInfoLine += " (includes both survey scans and fragmentation spectra)";
             }
             else
             {
-                dataLine += " (includes only survey scans)";
+                pekFileInfoLine += " (includes only survey scans)";
             }
 
-            writer.WriteLine(dataLine);
+            writer.WriteLine(pekFileInfoLine);
 
             int scanNumber;
             if (mOptions.RawDataExportOptions.RenumberScans)
@@ -270,8 +270,8 @@ namespace MASIC.DataOutput
                 scanNumber = currentScan.ScanNumber;
             }
 
-            dataLine = "Filename: " + inputFileName + "." + scanNumber.ToString("00000");
-            writer.WriteLine(dataLine);
+            var fileInfoLine = "Filename: " + inputFileName + "." + scanNumber.ToString("00000");
+            writer.WriteLine(fileInfoLine);
 
             if (fragmentationScan)
             {
@@ -331,14 +331,14 @@ namespace MASIC.DataOutput
                 {
                     if (spectrum.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
-                        var dataLine1 =
+                        var dataLine =
                             "1" + "\t" +
                             "1" + "\t" +
                             spectrum.IonsIntensity[ionIndex] + "\t" +
                             spectrum.IonsMZ[ionIndex] + "\t" +
                             "0";
 
-                        writer.WriteLine(dataLine1);
+                        writer.WriteLine(dataLine);
                         exportCount += 1;
                     }
                 }
