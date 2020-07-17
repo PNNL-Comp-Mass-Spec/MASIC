@@ -29,6 +29,8 @@ namespace MASIC.DataInput
         public const string AGILENT_MSMS_FILE_EXTENSION = ".MGF";    // Agilent files must have been exported to a .MGF and .CDF file pair prior to using MASIC
         public const string AGILENT_MS_FILE_EXTENSION = ".CDF";
 
+        public const string TEXT_FILE_EXTENSION = ".TXT";
+
         private const int ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW = 5;
 
         protected const int PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW = 5;
@@ -410,7 +412,8 @@ namespace MASIC.DataInput
                 MZ_XML_FILE_EXTENSION2,
                 MZ_DATA_FILE_EXTENSION1,
                 MZ_DATA_FILE_EXTENSION2,
-                AGILENT_MSMS_FILE_EXTENSION
+                AGILENT_MSMS_FILE_EXTENSION,
+                TEXT_FILE_EXTENSION
             };
 
             return extensionsToParse;
