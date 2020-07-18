@@ -96,6 +96,22 @@ namespace MASIC.DataOutput
         /// </summary>
         public MASICOptions Options { get; }
 
+        /// <summary>
+        /// Peak area histogram
+        /// </summary>
+        /// <remarks>Keys are base-10 log for this bin, values are bin counts</remarks>
+        public Dictionary<float, int> PeakAreaHistogram { get; }
+
+        /// <summary>
+        /// Peak width histogram
+        /// </summary>
+        /// <remarks>Keys are either peak width in seconds or scan number, values are bin counts</remarks>
+        public Dictionary<float, int> PeakWidthHistogram { get; }
+
+        /// <summary>
+        /// X axis units for the peak width histogram
+        /// </summary>
+        public string PeakWidthHistogramUnits { get; private set; }
 
         /// <summary>
         /// Reporter ion column names
@@ -347,6 +363,174 @@ namespace MASIC.DataOutput
             }
         }
 
+        private bool GeneratePeakAreaHistogram()
+        {
+            try
+            {
+                PeakAreaHistogram.Clear();
+
+                var peakAreaData = new List<double>();
+
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                foreach (var parentIon in mParentIons.Values)
+                {
+                    var peakArea = parentIon.SICStats.Peak.Area;
+                    if (peakArea <= 0)
+                        continue;
+
+                    var logPeakArea = Math.Log10(peakArea);
+
+                    peakAreaData.Add(logPeakArea);
+                }
+
+                var numberOfBins = Options.PlotOptions.PeakAreaHistogramBinCount <= 0 ?
+                                       40 :
+                                       Options.PlotOptions.PeakAreaHistogramBinCount;
+
+                var histogram = new MathNet.Numerics.Statistics.Histogram(peakAreaData, numberOfBins);
+
+                for (var i = 0; i < histogram.BucketCount; i++)
+                {
+                    var binCount = histogram[i].Count;
+
+                    if (double.IsNaN(binCount))
+                        continue;
+
+                    var midPoint = ((float)histogram[i].LowerBound + (float)histogram[i].UpperBound) / 2;
+                    PeakAreaHistogram.Add(midPoint, (int)binCount);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in GeneratePeakAreaHistogram", ex);
+                return false;
+            }
+        }
+
+        private bool GeneratePeakWidthHistogram()
+        {
+            try
+            {
+                PeakWidthHistogram.Clear();
+
+                var scanNumbers = new List<int>();
+                foreach (var scanNumber in (from item in mScanList.Keys orderby item select item))
+                {
+                    scanNumbers.Add(scanNumber);
+                }
+
+                var peakWidths = new List<double>();
+
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                foreach (var parentIon in mParentIons)
+                {
+                    var fwhmWidthScans = parentIon.Value.SICStats.Peak.FWHMScanWidth;
+                    if (fwhmWidthScans <= 0)
+                    {
+                        continue;
+                    }
+
+                    if (scanNumbers.Count > 0)
+                    {
+                        // Track peak width in seconds
+                        var scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanNumbers, parentIon.Value.OptimalPeakApexScanNumber, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+
+                        var startScanIndex = (int)Math.Floor(scanIndexMatch - fwhmWidthScans / 2.0);
+                        if (startScanIndex < 0)
+                            startScanIndex = 0;
+
+                        var endScanIndex = startScanIndex + fwhmWidthScans;
+                        if (endScanIndex >= scanNumbers.Count)
+                            endScanIndex = scanNumbers.Count - 1;
+
+                        var startScan = scanNumbers[startScanIndex];
+                        var endScan = scanNumbers[endScanIndex];
+
+                        if (!mScanList.ContainsKey(startScan))
+                        {
+                            OnWarningEvent(string.Format(
+                                "StartScan {0} not found in the _ScanStats file; cannot use parent ion index {1} for the peak width histogram",
+                                startScan, parentIon.Key));
+
+                            continue;
+                        }
+
+                        if (!mScanList.ContainsKey(endScan))
+                        {
+                            OnWarningEvent(string.Format(
+                                "EndScan {0} not found in the _ScanStats file; cannot use parent ion index {1} for the peak width histogram",
+                                endScan, parentIon.Key));
+
+                            continue;
+                        }
+
+                        var peakWidth = (int)Math.Floor(mScanList[endScan].ScanTime * 60.0 - mScanList[startScan].ScanTime * 60.0);
+                        peakWidths.Add(peakWidth);
+                        continue;
+                    }
+
+                    // Track peak width in scans
+                    peakWidths.Add(fwhmWidthScans);
+
+                }
+
+                var numberOfBins = Options.PlotOptions.PeakWidthHistogramBinCount <= 0 ?
+                                       40 :
+                                       Options.PlotOptions.PeakWidthHistogramBinCount;
+
+                var histogram = new MathNet.Numerics.Statistics.Histogram(peakWidths, numberOfBins);
+
+                var binCountSum = 0;
+                var maxPeakWidthToUse = -1;
+
+                for (var i = 0; i < histogram.BucketCount; i++)
+                {
+                    var binCount = histogram[i].Count;
+
+                    if (double.IsNaN(binCount))
+                        continue;
+
+                    binCountSum += (int)binCount;
+
+                    if (binCountSum / (double)peakWidths.Count > 0.98)
+                    {
+                        var binStart = (int)Math.Round(histogram[i].UpperBound);
+                        maxPeakWidthToUse = binStart;
+                        break;
+                    }
+                }
+
+                var filteredPeakWidths = new List<double>();
+                foreach (var peakWidth in peakWidths)
+                {
+                    if (maxPeakWidthToUse < 0 || peakWidth <= maxPeakWidthToUse)
+                        filteredPeakWidths.Add(peakWidth);
+                }
+
+                var filteredHistogram = new MathNet.Numerics.Statistics.Histogram(filteredPeakWidths, numberOfBins);
+
+                for (var i = 0; i < filteredHistogram.BucketCount; i++)
+                {
+                    var binCount = filteredHistogram[i].Count;
+
+                    if (double.IsNaN(binCount))
+                        continue;
+
+                    var midPoint = ((float)histogram[i].LowerBound + (float)histogram[i].UpperBound) / 2;
+
+                    PeakWidthHistogram.Add(midPoint, (int)binCount);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in GeneratePeakWidthHistogram", ex);
+                return false;
+            }
+        }
 
         private bool LoadReporterIons(string reporterIonsFilePath)
         {
@@ -744,6 +928,8 @@ namespace MASIC.DataOutput
         {
             try
             {
+                bool peakAreaHistogramCreated;
+                bool peakWidthHistogramCreated;
                 bool observationRatesDetermined;
                 bool totalIntensitiesComputed;
 
@@ -759,6 +945,16 @@ namespace MASIC.DataOutput
                 var reporterIonsFilePath = clsUtilities.ReplaceSuffix(sicStatsFilePath, clsDataOutput.SIC_STATS_FILE_SUFFIX, clsDataOutput.REPORTER_IONS_FILE_SUFFIX);
                 var reporterIonsLoaded = LoadReporterIons(reporterIonsFilePath);
 
+                if (sicStatsLoaded)
+                {
+                    peakAreaHistogramCreated = GeneratePeakAreaHistogram();
+                    peakWidthHistogramCreated = GeneratePeakWidthHistogram();
+                }
+                else
+                {
+                    peakAreaHistogramCreated = false;
+                    peakWidthHistogramCreated = false;
+                }
 
                 if (reporterIonsLoaded)
                 {
@@ -771,6 +967,10 @@ namespace MASIC.DataOutput
                     totalIntensitiesComputed = false;
                 }
 
+                return peakAreaHistogramCreated ||
+                       peakWidthHistogramCreated ||
+                       observationRatesDetermined ||
+                       totalIntensitiesComputed;
             }
             catch (Exception ex)
             {
