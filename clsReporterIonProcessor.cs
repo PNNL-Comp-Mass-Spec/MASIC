@@ -93,11 +93,11 @@ namespace MASIC
                 // Populate array reporterIons, which we will sort by m/z
                 var reporterIons = new clsReporterIonInfo[mOptions.ReporterIons.ReporterIonList.Count];
 
-                var reporterIonIndex = 0;
+                var index = 0;
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
                 {
-                    reporterIons[reporterIonIndex] = reporterIon;
-                    reporterIonIndex += 1;
+                    reporterIons[index] = reporterIon;
+                    index += 1;
                 }
 
                 Array.Sort(reporterIons, new clsReportIonInfoComparer());
@@ -134,9 +134,10 @@ namespace MASIC
                     var dataAggregation = new clsDataAggregation();
                     RegisterEvents(dataAggregation);
 
-                    foreach (var reporterIon in reporterIons)
+                    for (var reporterIonIndex= 0; reporterIonIndex < reporterIons.Length; reporterIonIndex++)
                     {
                         if (!reporterIon.ContaminantIon || saveUncorrectedIntensities)
+                        var reporterIon = reporterIons[reporterIonIndex];
                         {
                             // Construct the reporter ion intensity header
                             // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
