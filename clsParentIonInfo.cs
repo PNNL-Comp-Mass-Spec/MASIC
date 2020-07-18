@@ -4,12 +4,10 @@ namespace MASIC
 {
     public class clsParentIonInfo
     {
-        private double mParentIonMz;
-
         /// <summary>
         /// Parent ion m/z value
         /// </summary>
-        public double MZ => mParentIonMz;
+        public double MZ { get; private set; }
 
         /// <summary>
         /// Survey scan that this parent ion was observed in; Pointer to entry in .SurveyScans()
@@ -71,13 +69,13 @@ namespace MASIC
         public clsParentIonInfo(double parentIonMz)
         {
             FragScanIndices = new List<int>();
-            mParentIonMz = parentIonMz;
+            MZ = parentIonMz;
             SICStats = new clsSICStats();
         }
 
         public void UpdateMz(double parentIonMz)
         {
-            mParentIonMz = parentIonMz;
+            MZ = parentIonMz;
         }
 
         public override string ToString()
