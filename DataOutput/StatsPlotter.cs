@@ -25,6 +25,11 @@ namespace MASIC.DataOutput
             RegisterEvents(mStatsSummarizer);
         }
 
+        private bool CreatePlots(string outputDirectory)
+        {
+            return false;
+        }
+
         /// <summary>
         /// Read the SIC stats file (and optionally reporter ions file)
         /// Generate stats, then create plots
@@ -34,22 +39,13 @@ namespace MASIC.DataOutput
         {
             try
             {
+                var statsSummarized = mStatsSummarizer.SummarizeSICStats(sicStatsFilePath);
+                if (!statsSummarized)
+                    return false;
 
-                // ToDo: Code This:
+                var plotsGenerated = CreatePlots(outputDirectory);
 
-                //var sicDataLoaded = LoadSICStats(sicStatsFilePath);
-
-                //var reporterIonsFilePath = clsUtilities.ReplaceSuffix(sicStatsFilePath, clsDataOutput.SIC_STATS_FILE_SUFFIX, clsDataOutput.REPORTER_IONS_FILE_SUFFIX);
-
-                //var reporterIonsLoaded = LoadReporterIons(sicStatsFilePath);
-
-                //mStatsSummarizer.SummarizeSICStats();
-
-                //mStatsSummarizer.ExamineReporterIons();
-
-                //CreatePlots();
-
-                return true;
+                return plotsGenerated;
             }
             catch (Exception ex)
             {
