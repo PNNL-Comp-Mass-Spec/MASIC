@@ -2,30 +2,30 @@
 {
     public class clsReporterIonInfo
     {
-        public double MZ;
+        public double MZ { get; }
 
-        public double MZToleranceDa;
+        public double MZToleranceDa { get; set; }
 
         /// <summary>
         /// Should be False for Reporter Ions and True for other ions, e.g. immonium loss from phenylalanine
         /// </summary>
-        public bool ContaminantIon;
+        public bool ContaminantIon { get; set; }
 
         /// <summary>
         /// Signal/Noise ratio; only populated for FTMS MS2 spectra on Thermo instruments
         /// </summary>
-        public double SignalToNoise;
+        public double SignalToNoise { get; set; }
 
         /// <summary>
         /// Resolution; only populated for FTMS MS2 spectra on Thermo instruments
         /// </summary>
-        public double Resolution;
+        public double Resolution { get; set; }
 
         /// <summary>
         /// m/z value for which the resolution and signal/noise value was computed
         /// Only populated for FTMS MS2 spectra on Thermo instruments
         /// </summary>
-        public double LabelDataMZ;
+        public double LabelDataMZ { get; set; }
 
         /// <summary>
         /// Constructor
