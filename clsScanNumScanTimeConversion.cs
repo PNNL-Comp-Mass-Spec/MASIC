@@ -11,26 +11,26 @@ namespace MASIC
         /// </summary>
         /// <param name="scanList"></param>
         /// <param name="scanOrAcqTime">can be absolute, relative, or AcquisitionTime</param>
-        /// <param name="eScanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
+        /// <param name="scanType">Specifies what type of value scanOrAcqTime is; 0=absolute, 1=relative, 2=acquisition time (aka elution time)</param>
         /// <returns>The index of the scan closest to scanOrAcqTime, or 0 if an error</returns>
         /// <remarks></remarks>
         private int FindNearestScanNumIndex(
             clsScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.eCustomSICScanTypeConstants eScanType)
+            clsCustomSICList.eCustomSICScanTypeConstants scanType)
         {
             try
             {
                 int scanIndexMatch;
 
-                if (eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute || eScanType == clsCustomSICList.eCustomSICScanTypeConstants.Relative)
+                if (scanType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute || scanType == clsCustomSICList.eCustomSICScanTypeConstants.Relative)
                 {
-                    var absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
+                    var absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, scanType, false);
                     scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, absoluteScanNumber, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
                 }
                 else
                 {
-                    // eScanType = eCustomSICScanTypeConstants.AcquisitionTime
+                    // scanType = eCustomSICScanTypeConstants.AcquisitionTime
                     // Find the closest match in scanList.MasterScanTimeList
                     scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
                         scanList.MasterScanTimeList,
@@ -47,18 +47,23 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Finds the index of the survey scan closest to scanOrAcqTime
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="scanOrAcqTime">Scan or acquisition time</param>
+        /// <param name="scanType">Type for scanOrAcqTime; should be Absolute, Relative, or AcquisitionTime</param>
+        /// <returns></returns>
         public int FindNearestSurveyScanIndex(
             clsScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.eCustomSICScanTypeConstants eScanType)
+            clsCustomSICList.eCustomSICScanTypeConstants scanType)
         {
-            // Finds the index of the survey scan closest to scanOrAcqTime
-            // Note that scanOrAcqTime can be absolute, relative, or AcquisitionTime; eScanType specifies which it is
 
             try
             {
                 var surveyScanIndexMatch = -1;
-                var scanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, eScanType, false);
+                var scanNumberToFind = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, scanType, false);
 
                 for (var index = 0; index < scanList.SurveyScans.Count; index++)
                 {
@@ -102,25 +107,25 @@ namespace MASIC
         }
 
         /// <summary>
-        /// Converts a scan number of acquisition time to an actual scan number
+        /// Converts a scan number or acquisition time to an actual scan number
         /// </summary>
         /// <param name="scanList"></param>
         /// <param name="scanOrAcqTime">Value to convert</param>
-        /// <param name="eScanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
+        /// <param name="scanType">Type of the value to convert; 0=Absolute, 1=Relative, 2=Acquisition Time (aka elution time)</param>
         /// <param name="convertingRangeOrTolerance">True when converting a range</param>
         /// <returns></returns>
         /// <remarks></remarks>
         public int ScanOrAcqTimeToAbsolute(
             clsScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.eCustomSICScanTypeConstants eScanType,
+            clsCustomSICList.eCustomSICScanTypeConstants scanType,
             bool convertingRangeOrTolerance)
         {
             try
             {
                 var absoluteScanNumber = 0;
 
-                switch (eScanType)
+                switch (scanType)
                 {
                     case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
                         // scanOrAcqTime is an absolute scan number (or range of scan numbers)
@@ -165,7 +170,7 @@ namespace MASIC
                         }
                         else
                         {
-                            var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
+                            var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, scanType);
                             if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
                             {
                                 absoluteScanNumber = scanList.MasterScanNumList[masterScanIndex];
@@ -189,24 +194,32 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Convert a relative scan or acquisition time to elution time
+        /// If scanType is eCustomSICScanTypeConstants.AcquisitionTime, no conversion is required
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="scanOrAcqTime"></param>
+        /// <param name="scanType"></param>
+        /// <param name="convertingRangeOrTolerance"></param>
+        /// <returns></returns>
         public float ScanOrAcqTimeToScanTime(
             clsScanList scanList,
             float scanOrAcqTime,
-            clsCustomSICList.eCustomSICScanTypeConstants eScanType,
+            clsCustomSICList.eCustomSICScanTypeConstants scanType,
             bool convertingRangeOrTolerance)
         {
             try
             {
-                float computedScanTime = 0;
-
-                switch (eScanType)
+                switch (scanType)
                 {
                     case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
                         // scanOrAcqTime is an absolute scan number (or range of scan numbers)
 
-                        // If convertingRangeOrTolerance = False, then look for the scan that is nearest to scanOrAcqTime
-                        // If convertingRangeOrTolerance = True, then Convert scanOrAcqTime to a relative scan range and then
-                        // call this function again with that relative time
+                        // If convertingRangeOrTolerance = False, look for the scan that is nearest to scanOrAcqTime
+
+                        // If convertingRangeOrTolerance = True, Convert scanOrAcqTime to a relative scan range,
+                        // then call this function again with that relative time
 
                         if (convertingRangeOrTolerance)
                         {
