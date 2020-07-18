@@ -96,6 +96,40 @@ namespace MASIC.DataOutput
         /// </summary>
         public MASICOptions Options { get; }
 
+
+        /// <summary>
+        /// Reporter ion column names
+        /// </summary>
+        /// <remarks>Keys are column index, values are reporter ion info</remarks>
+        private Dictionary<int, string> ReporterIonNames { get; }
+
+        /// <summary>
+        /// Reporter ion observation rate, by channel
+        /// </summary>
+        /// <remarks>
+        /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
+        /// Values the observation rate (value between 0 and 100)
+        /// </remarks>
+        public Dictionary<int, float> ReporterIonObservationRate { get; }
+
+        /// <summary>
+        /// Reporter ion observation rate, by channel, using data from the top N percent of the data (sorted by descending peak area)
+        /// </summary>
+        /// <remarks>
+        /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
+        /// Values are the observation rate (value between 0 and 100)
+        /// </remarks>
+        public Dictionary<int, float> ReporterIonObservationRateHighAbundance { get; }
+
+        /// <summary>
+        /// Total intensity for each reporter ion channel
+        /// </summary>
+        /// <remarks>
+        /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
+        /// Values are total intensity
+        /// </remarks>
+        public Dictionary<int, double> ReporterIonTotalIntensityByChannel { get; }
+
         #endregion
 
         /// <summary>
@@ -112,6 +146,17 @@ namespace MASIC.DataOutput
             mReporterIonInfo = new Dictionary<int, clsReporterIonInfo>();
             mReporterIonAbundances = new Dictionary<int, Dictionary<int, double>>();
 
+            PeakAreaHistogram = new Dictionary<float, int>();
+
+            PeakWidthHistogram = new Dictionary<float, int>();
+            PeakWidthHistogramUnits = "Undefined Units";
+
+            ReporterIonNames = new Dictionary<int, string>();
+
+            ReporterIonObservationRate = new Dictionary<int, float>();
+            ReporterIonObservationRateHighAbundance = new Dictionary<int, float>();
+
+            ReporterIonTotalIntensityByChannel = new Dictionary<int, double>();
         }
 
         private void AddHeaderColumn<T>(Dictionary<T, SortedSet<string>> columnNamesByIdentifier, T columnId, string columnName)
@@ -126,6 +171,181 @@ namespace MASIC.DataOutput
 
             mReporterIonInfo.Clear();
             mReporterIonAbundances.Clear();
+
+            PeakAreaHistogram.Clear();
+
+            PeakWidthHistogram.Clear();
+            PeakWidthHistogramUnits = "Undefined Units";
+
+            ReporterIonNames.Clear();
+
+            ReporterIonObservationRate.Clear();
+            ReporterIonObservationRateHighAbundance.Clear();
+
+            ReporterIonTotalIntensityByChannel.Clear();
+        }
+
+        private bool ComputeReporterIonObservationRates()
+        {
+            try
+            {
+                ReporterIonObservationRate.Clear();
+                ReporterIonObservationRateHighAbundance.Clear();
+
+                var reporterIonScans = new SortedSet<int>();
+
+                // Construct a master list of scan numbers for which we have reporter ion data
+                foreach (var reporterIon in mReporterIonAbundances)
+                {
+                    foreach (var scanNumber in reporterIon.Value.Keys.Where(scanNumber => !reporterIonScans.Contains(scanNumber)))
+                    {
+                        reporterIonScans.Add(scanNumber);
+                    }
+                }
+
+                // Determine the peak area for each scan
+                // Keys are scan number, values are peak area
+                var peakAreaByScan = new Dictionary<int, double>();
+
+                foreach (var parentIon in mParentIons)
+                {
+                    if (parentIon.Value.FragScanIndices.Count == 0)
+                    {
+                        OnWarningEvent(string.Format(
+                            "Parent ion {0} does not have a frag scan defined", parentIon.Key));
+                        continue;
+                    }
+
+                    var fragScanNumber = parentIon.Value.FragScanIndices[0];
+                    var peakArea = parentIon.Value.SICStats.Peak.Area;
+
+                    if (peakAreaByScan.ContainsKey(fragScanNumber))
+                    {
+                        // Multiple parent ions point to the same scan; this shouldn't happen, but we'll allow it
+                        peakAreaByScan[fragScanNumber] = Math.Max(peakAreaByScan[fragScanNumber], peakArea);
+                        continue;
+                    }
+
+                    peakAreaByScan.Add(fragScanNumber, peakArea);
+                }
+
+                int highAbundanceThreshold;
+
+                if (Options.PlotOptions.ReporterIonObservationRateTopNPct > 100 ||
+                    Options.PlotOptions.ReporterIonObservationRateTopNPct < 1)
+                {
+                    highAbundanceThreshold = 100;
+                }
+                else
+                {
+                    highAbundanceThreshold = Options.PlotOptions.ReporterIonObservationRateTopNPct;
+                }
+
+                var scansToUseForHighAbundanceHistogram = peakAreaByScan.Count * highAbundanceThreshold / 100.0;
+
+                // Assure that peakAreaByScan has an entry for each reporter ion
+                // This shouldn't be required, but we'll check anyway
+                foreach (var reporterIon in mReporterIonAbundances)
+                {
+                    foreach (var scanNumber in reporterIon.Value.Keys.Where(scanNumber => !peakAreaByScan.ContainsKey(scanNumber)))
+                    {
+                        peakAreaByScan.Add(scanNumber, 0);
+                    }
+                }
+
+                // Create the dictionary that will track the count of non-zero values, by reporter ion
+                // Keys in this dictionary correspond to the keys in mReporterIonAbundances (which correspond to keys in mReporterIonInfo)
+                // Values are the count of scans with a non-zero reporter ion
+                var nonZeroReporterIonStats = new Dictionary<int, int>();
+                var nonZeroReporterIonStatsHighAbundance = new Dictionary<int, int>();
+
+                // Initialize the tracking dictionaries
+                foreach (var reporterIonIndex in mReporterIonAbundances.Keys)
+                {
+                    nonZeroReporterIonStats.Add(reporterIonIndex, 0);
+                    nonZeroReporterIonStatsHighAbundance.Add(reporterIonIndex, 0);
+                }
+
+                var scansUsed = 0;
+                var scansUsedHighAbundance = 0;
+
+                foreach (var scanNumber in (from item in peakAreaByScan orderby item.Value descending select item.Key))
+                {
+                    if (!reporterIonScans.Contains(scanNumber))
+                        continue;
+
+                    scansUsed++;
+
+                    // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                    foreach (var reporterIon in mReporterIonAbundances)
+                    {
+                        var reporterIonIndex = reporterIon.Key;
+                        var reporterIonAbundance = reporterIon.Value[scanNumber];
+
+                        if (reporterIonAbundance <= 0)
+                            continue;
+
+                        nonZeroReporterIonStats[reporterIonIndex]++;
+
+                        if (scansUsed > scansToUseForHighAbundanceHistogram)
+                            continue;
+
+                        nonZeroReporterIonStatsHighAbundance[reporterIonIndex]++;
+                    }
+
+                    if (scansUsed > scansToUseForHighAbundanceHistogram)
+                        continue;
+
+                    scansUsedHighAbundance++;
+                }
+
+                if (scansUsed == 0)
+                {
+                    // reporterIonScans was empty; this is unexpected
+                    return true;
+                }
+
+                // Compute observation rate
+                foreach (var reporterIonIndex in mReporterIonAbundances.Keys)
+                {
+                    var observationRate = nonZeroReporterIonStats[reporterIonIndex] / (float)scansUsed * 100;
+                    ReporterIonObservationRate.Add(reporterIonIndex, observationRate);
+
+                    var observationRateHighAbundance = nonZeroReporterIonStatsHighAbundance[reporterIonIndex] / (float)scansUsedHighAbundance * 100;
+                    ReporterIonObservationRateHighAbundance.Add(reporterIonIndex, observationRateHighAbundance);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in ComputeReporterIonObservationRates", ex);
+                return false;
+            }
+        }
+
+        private bool ComputeTotalIntensityByReporterIon()
+        {
+            try
+            {
+                ReporterIonTotalIntensityByChannel.Clear();
+
+                foreach (var reporterIon in mReporterIonAbundances)
+                {
+                    var reporterIonIndex = reporterIon.Key;
+                    var totalIntensity = reporterIon.Value.Values.Sum();
+
+                    ReporterIonTotalIntensityByChannel.Add(reporterIonIndex, totalIntensity);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in ComputeTotalIntensityByReporterIon", ex);
+                return false;
+            }
+        }
 
 
         private bool LoadReporterIons(string reporterIonsFilePath)
@@ -524,6 +744,8 @@ namespace MASIC.DataOutput
         {
             try
             {
+                bool observationRatesDetermined;
+                bool totalIntensitiesComputed;
 
                 ClearResults();
 
@@ -536,6 +758,18 @@ namespace MASIC.DataOutput
 
                 var reporterIonsFilePath = clsUtilities.ReplaceSuffix(sicStatsFilePath, clsDataOutput.SIC_STATS_FILE_SUFFIX, clsDataOutput.REPORTER_IONS_FILE_SUFFIX);
                 var reporterIonsLoaded = LoadReporterIons(reporterIonsFilePath);
+
+
+                if (reporterIonsLoaded)
+                {
+                    observationRatesDetermined = ComputeReporterIonObservationRates();
+                    totalIntensitiesComputed = ComputeTotalIntensityByReporterIon();
+                }
+                else
+                {
+                    observationRatesDetermined = false;
+                    totalIntensitiesComputed = false;
+                }
 
             }
             catch (Exception ex)
