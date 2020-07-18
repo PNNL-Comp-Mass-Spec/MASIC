@@ -10,6 +10,12 @@ namespace MASIC
 {
     public class clsReporterIonProcessor : clsMasicEventNotifier
     {
+        #region "Constants"
+
+        public const string REPORTER_ION_COLUMN_PREFIX = "Ion_";
+
+        #endregion
+
         #region "Classwide variables"
 
         private readonly MASICOptions mOptions;
@@ -136,57 +142,58 @@ namespace MASIC
 
                     for (var reporterIonIndex= 0; reporterIonIndex < reporterIons.Length; reporterIonIndex++)
                     {
-                        if (!reporterIon.ContaminantIon || saveUncorrectedIntensities)
                         var reporterIon = reporterIons[reporterIonIndex];
+
+                        if (reporterIon.ContaminantIon && !saveUncorrectedIntensities)
+                            continue;
+
+                        // Construct the reporter ion intensity header
+                        // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
+
+                        string mzValue;
+                        if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ ||
+                            mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ ||
+                            mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ)
                         {
-                            // Construct the reporter ion intensity header
-                            // We skip contaminant ions, unless saveUncorrectedIntensities is True, then we include them
-
-                            string mzValue;
-                            if (mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ ||
-                                mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ ||
-                                mOptions.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ)
-                            {
-                                mzValue = reporterIon.MZ.ToString("#0.000");
-                            }
-                            else
-                            {
-                                mzValue = ((int)Math.Round(reporterIon.MZ, 0)).ToString();
-                            }
-
-                            if (reporterIonMZsUnique.Contains(mzValue))
-                            {
-                                // Uniquify the m/z value
-                                mzValue += "_" + reporterIonIndex;
-                            }
-
-                            try
-                            {
-                                reporterIonMZsUnique.Add(mzValue);
-                            }
-                            catch (Exception ex)
-                            {
-                                // Error updating the SortedSet;
-                                // this shouldn't happen based on the .ContainsKey test above
-                            }
-
-                            // Append the reporter ion intensity title to the headers
-                            headerColumns.Add("Ion_" + mzValue);
-
-                            // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                            obsMZHeaders.Add("Ion_" + mzValue + "_ObsMZ");
-
-                            // This string will be included in the header line if saveUncorrectedIntensities is true
-                            uncorrectedIntensityHeaders.Add("Ion_" + mzValue + "_OriginalIntensity");
-
-                            // This string will be included in the header line if includeFtmsColumns is true
-                            ftmsSignalToNoise.Add("Ion_" + mzValue + "_SignalToNoise");
-                            ftmsResolution.Add("Ion_" + mzValue + "_Resolution");
-
-                            // Uncomment to include the label data m/z value in the _ReporterIons.txt file
-                            // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
-                            //ftmsLabelDataMz.Add("Ion_" + mzValue + "_LabelDataMZ");
+                            mzValue = reporterIon.MZ.ToString("#0.000");
                         }
+                        else
+                        {
+                            mzValue = ((int)Math.Round(reporterIon.MZ, 0)).ToString();
+                        }
+
+                        if (reporterIonMZsUnique.Contains(mzValue))
+                        {
+                            // Uniquify the m/z value
+                            mzValue += "_" + reporterIonIndex;
+                        }
+
+                        try
+                        {
+                            reporterIonMZsUnique.Add(mzValue);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Error updating the SortedSet;
+                            // this shouldn't happen based on the .ContainsKey test above
+                        }
+
+                        // Append the reporter ion intensity title to the headers
+                        headerColumns.Add(REPORTER_ION_COLUMN_PREFIX + mzValue);
+
+                        // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
+                        obsMZHeaders.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_ObsMZ");
+
+                        // This string will be included in the header line if saveUncorrectedIntensities is true
+                        uncorrectedIntensityHeaders.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_OriginalIntensity");
+
+                        // This string will be included in the header line if includeFtmsColumns is true
+                        ftmsSignalToNoise.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_SignalToNoise");
+                        ftmsResolution.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_Resolution");
+
+                        // Uncomment to include the label data m/z value in the _ReporterIons.txt file
+                        // This string will only be included in the header line if mOptions.ReporterIons.ReporterIonSaveObservedMasses is true
+                        //ftmsLabelDataMz.Add(REPORTER_ION_COLUMN_PREFIX + mzValue + "_LabelDataMZ");
                     }
 
                     headerColumns.Add("Weighted Avg Pct Intensity Correction");
