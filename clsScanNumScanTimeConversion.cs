@@ -231,14 +231,14 @@ namespace MASIC
 
                             var relativeTime = scanOrAcqTime / totalScans;
 
-                            computedScanTime = ScanOrAcqTimeToScanTime(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
+                            return ScanOrAcqTimeToScanTime(scanList, relativeTime, clsCustomSICList.eCustomSICScanTypeConstants.Relative, true);
                         }
                         else
                         {
-                            var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, eScanType);
+                            var masterScanIndex = FindNearestScanNumIndex(scanList, scanOrAcqTime, scanType);
                             if (masterScanIndex >= 0 && scanList.MasterScanOrderCount > 0)
                             {
-                                computedScanTime = scanList.MasterScanTimeList[masterScanIndex];
+                                return scanList.MasterScanTimeList[masterScanIndex];
                             }
                         }
 
@@ -252,27 +252,24 @@ namespace MASIC
                         {
                             var totalRunTime = scanList.MasterScanTimeList[scanList.MasterScanOrderCount - 1] - scanList.MasterScanTimeList[0];
 
-                            computedScanTime = scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0];
+                            return scanOrAcqTime * totalRunTime + scanList.MasterScanTimeList[0];
                         }
                         else
                         {
-                            computedScanTime = 0;
+                            return 0;
                         }
-
-                        break;
 
                     case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
                         // scanOrAcqTime is an elution time value (or elution time range)
                         // No conversion needed; simply return the value
-                        computedScanTime = scanOrAcqTime;
-                        break;
+                        return scanOrAcqTime;
+
                     default:
                         // Unknown type; assume already a scan time
-                        computedScanTime = scanOrAcqTime;
-                        break;
+                        return scanOrAcqTime;
                 }
 
-                return computedScanTime;
+                return 0;
             }
             catch (Exception ex)
             {
