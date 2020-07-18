@@ -657,6 +657,12 @@ namespace MASIC.Options
                 PlotOptions.CreatePlots = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
 
+                PlotOptions.PeakAreaHistogramBinCount = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "PeakAreaHistogramBinCount", PlotOptions.PeakAreaHistogramBinCount);
+
+                PlotOptions.PeakWidthHistogramBinCount = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "PeakWidthHistogramBinCount", PlotOptions.PeakWidthHistogramBinCount);
+
                 PlotOptions.ReporterIonObservationRateTopNPct = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "ReporterIonObservationRateTopNPct", PlotOptions.ReporterIonObservationRateTopNPct);
 
@@ -907,6 +913,10 @@ namespace MASIC.Options
 
                 // Plot options
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
+
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PeakAreaHistogramBinCount", PlotOptions.PeakAreaHistogramBinCount);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PeakWidthHistogramBinCount", PlotOptions.PeakWidthHistogramBinCount);
+
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "ReporterIonObservationRateTopNPct", PlotOptions.ReporterIonObservationRateTopNPct);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "ReporterIonTopNPctObsRateYAxisMinimum", PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum);
 

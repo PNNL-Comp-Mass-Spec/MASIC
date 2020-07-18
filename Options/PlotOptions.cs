@@ -13,6 +13,16 @@ namespace MASIC.Options
         public bool CreatePlots { get; set; } = true;
 
         /// <summary>
+        /// Number of bins (buckets) to use for the histogram of log-10 transformed peak areas
+        /// </summary>
+        public int PeakAreaHistogramBinCount { get; set; } = 40;
+
+        /// <summary>
+        /// Number of bins (buckets) to use for the histogram of peak widths
+        /// </summary>
+        public int PeakWidthHistogramBinCount { get; set; } = 40;
+
+        /// <summary>
         /// When compiling reporter ion observation rates, only look at data
         /// from this percentage of the peaks, sorted from highest to lowest abundance
         /// </summary>
