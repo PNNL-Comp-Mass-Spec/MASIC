@@ -12,7 +12,8 @@ namespace MASIC
         public double MZ => mParentIonMz;
 
         /// <summary>
-        /// Survey scan that this parent ion was observed in; Pointer to entry in .SurveyScans(); For custom SIC values, this is the closest survey scan to .ScanCenter
+        /// Survey scan that this parent ion was observed in; Pointer to entry in .SurveyScans()
+        /// For custom SIC values, this is the closest survey scan to .ScanCenter
         /// </summary>
         public int SurveyScanIndex { get; set; }
 

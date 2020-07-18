@@ -40,6 +40,9 @@
         /// </summary>
         public int NextPeakFWHMPointLeft { get; set; }
 
+        /// <summary>
+        /// Full width at half max, in scans
+        /// </summary>
         public int FWHMScanWidth { get; set; }
 
         /// <summary>

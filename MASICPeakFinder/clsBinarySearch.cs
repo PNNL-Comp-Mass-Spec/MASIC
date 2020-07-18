@@ -27,7 +27,8 @@ namespace MASICPeakFinder
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            List<int> listToSearch, int itemToFind,
+            List<int> listToSearch,
+            int itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             if (listToSearch == null || listToSearch.Count == 0)
@@ -39,18 +40,18 @@ namespace MASICPeakFinder
 
             var index = listToSearch.BinarySearch(itemToFind);
 
-            // item found
+            // Item found
             if (index >= 0)
                 return index;
 
             // Get the bitwise complement, it is the "insert index" (points to the next greater item)
             index = ~index;
 
-            // the first item is the closest match
+            // The first item is the closest match
             if (index == 0)
                 return 0;
 
-            // the last item is the closest match
+            // The last item is the closest match
             if (index == listToSearch.Count)
                 return index - 1;
 
@@ -84,7 +85,8 @@ namespace MASICPeakFinder
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            List<float> listToSearch, float itemToFind,
+            List<float> listToSearch,
+            float itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             if (listToSearch == null || listToSearch.Count == 0)
@@ -96,18 +98,18 @@ namespace MASICPeakFinder
 
             var index = listToSearch.BinarySearch(itemToFind);
 
-            // item found
+            // Item found
             if (index >= 0)
                 return index;
 
             // Get the bitwise complement, it is the "insert index" (points to the next greater item)
             index = ~index;
 
-            // the first item is the closest match
+            // The first item is the closest match
             if (index == 0)
                 return 0;
 
-            // the last item is the closest match
+            // The last item is the closest match
             if (index == listToSearch.Count)
                 return index - 1;
 
@@ -141,7 +143,8 @@ namespace MASICPeakFinder
         /// <returns>The index of the item if found, otherwise, the index of the closest match, based on eMissingDataMode</returns>
         /// <remarks>Assumes listToSearch is already sorted</remarks>
         public static int BinarySearchFindNearest(
-            List<double> listToSearch, double itemToFind,
+            List<double> listToSearch,
+            double itemToFind,
             eMissingDataModeConstants eMissingDataMode = eMissingDataModeConstants.ReturnClosestPoint)
         {
             if (listToSearch == null || listToSearch.Count == 0)
@@ -153,18 +156,18 @@ namespace MASICPeakFinder
 
             var index = listToSearch.BinarySearch(itemToFind);
 
-            // item found
+            // Item found
             if (index >= 0)
                 return index;
 
             // Get the bitwise complement, it is the "insert index" (points to the next greater item)
             index = ~index;
 
-            // the first item is the closest match
+            // The first item is the closest match
             if (index == 0)
                 return 0;
 
-            // the last item is the closest match
+            // The last item is the closest match
             if (index == listToSearch.Count)
                 return index - 1;
 

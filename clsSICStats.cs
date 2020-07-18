@@ -26,6 +26,9 @@
 
         public MASICPeakFinder.clsSICPotentialAreaStats SICPotentialAreaStatsForPeak { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public clsSICStats()
         {
             Peak = new MASICPeakFinder.clsSICStatsPeak();
