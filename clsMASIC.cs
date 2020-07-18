@@ -892,7 +892,7 @@ namespace MASIC
         {
             try
             {
-                var statsPlotter = new StatsPlotter();
+                var statsPlotter = new StatsPlotter(Options);
 
                 var success = statsPlotter.ProcessFile(sicStatsFile.FullName, outputDirectoryPath);
                 return success;

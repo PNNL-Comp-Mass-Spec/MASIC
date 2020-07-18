@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MASIC.Options;
 using PRISM;
 
 namespace MASIC.DataOutput
@@ -12,11 +9,19 @@ namespace MASIC.DataOutput
         private readonly StatsSummarizer mStatsSummarizer;
 
         /// <summary>
+        /// MASIC Options
+        /// </summary>
+        public MASICOptions Options { get; }
+
+        /// <summary>
         /// Constructor
         /// </summary>
-        public StatsPlotter()
+        /// <param name="options">MASIC Options</param>
+        public StatsPlotter(MASICOptions options)
         {
-            mStatsSummarizer = new StatsSummarizer();
+            Options = options;
+
+            mStatsSummarizer = new StatsSummarizer(Options);
             RegisterEvents(mStatsSummarizer);
         }
 
