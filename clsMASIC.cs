@@ -1602,8 +1602,6 @@ namespace MASIC
         {
             var success = false;
 
-            var inputFilePathFull = string.Empty;
-
             if (!mLoggedMASICVersion)
             {
                 LogMessage("Starting MASIC v" + GetAppVersion(mFileDate));
@@ -1687,7 +1685,7 @@ namespace MASIC
                     success = CleanupFilePaths(ref inputFilePath, ref outputDirectoryPath);
                     Options.OutputDirectoryPath = outputDirectoryPath;
 
-                    if (success)
+                    if (success && !inputFilePath.EndsWith(clsDataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                     {
                         var dbAccessor = new clsDatabaseAccess(Options);
                         RegisterEvents(dbAccessor);
@@ -1764,13 +1762,13 @@ namespace MASIC
 
                         InitializeMemoryManagementOptions(mProcessingStats);
 
-                        if (inputFilePathFull.EndsWith(clsDataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
+                        if (inputFilePath.EndsWith(clsDataImport.TEXT_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                         {
-                            success = CreatePlots(inputFilePathFull, outputDirectoryPath);
+                            success = CreatePlots(inputFilePath, outputDirectoryPath);
                         }
                         else
                         {
-                            success = ProcessInstrumentDataFile(inputFilePathFull, outputDirectoryPath, dataOutputHandler, out existingResultsFound);
+                            success = ProcessInstrumentDataFile(inputFilePath, outputDirectoryPath, dataOutputHandler, out existingResultsFound);
                         }
 
                     }
