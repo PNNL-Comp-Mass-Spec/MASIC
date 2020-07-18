@@ -58,10 +58,13 @@ namespace MASICPeakFinder
             {
                 case eMissingDataModeConstants.ReturnNextPoint:
                     return index;
+
                 case eMissingDataModeConstants.ReturnPreviousPoint:
                     return index - 1;
-                case eMissingDataModeConstants.ReturnClosestPoint:
+
                 default:
+                    // Includes eMissingDataModeConstants.ReturnClosestPoint
+
                     if (Math.Abs(listToSearch[index - 1] - itemToFind) <=
                         Math.Abs(listToSearch[index] - itemToFind))
                     {
@@ -112,10 +115,12 @@ namespace MASICPeakFinder
             {
                 case eMissingDataModeConstants.ReturnNextPoint:
                     return index;
+
                 case eMissingDataModeConstants.ReturnPreviousPoint:
                     return index - 1;
-                case eMissingDataModeConstants.ReturnClosestPoint:
+
                 default:
+                    // Includes eMissingDataModeConstants.ReturnClosestPoint:
                     if (Math.Abs(listToSearch[index - 1] - itemToFind) <=
                         Math.Abs(listToSearch[index] - itemToFind))
                     {
@@ -167,10 +172,12 @@ namespace MASICPeakFinder
             {
                 case eMissingDataModeConstants.ReturnNextPoint:
                     return index;
+
                 case eMissingDataModeConstants.ReturnPreviousPoint:
                     return index - 1;
-                case eMissingDataModeConstants.ReturnClosestPoint:
+
                 default:
+                    // Includes eMissingDataModeConstants.ReturnClosestPoint:
                     if (Math.Abs(listToSearch[index - 1] - itemToFind) <=
                         Math.Abs(listToSearch[index] - itemToFind))
                     {
