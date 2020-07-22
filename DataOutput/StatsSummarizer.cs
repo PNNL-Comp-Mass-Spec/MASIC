@@ -966,6 +966,7 @@ namespace MASIC.DataOutput
                 var midPoint = ((float)histogram[i].LowerBound + (float)histogram[i].UpperBound) / 2;
 
                 var binCountInteger = (int)binCount;
+
                 if (binCountInteger == 0 && lastNonZeroCount > 0)
                 {
                     // This bucket has a count of zero but the previous bucket has a non-zero count
@@ -992,6 +993,9 @@ namespace MASIC.DataOutput
                 }
 
                 interpolatedHistogram.Add(midPoint, binCountInteger);
+
+                if (binCountInteger <= 0)
+                    continue;
 
                 lastNonZeroBin = midPoint;
                 lastNonZeroCount = binCountInteger;
