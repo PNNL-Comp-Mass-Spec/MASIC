@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace MASIC.DataOutput
     {
 
         #region "Constants and Enums"
+
+        private const string UNDEFINED_UNITS = "Undefined Units";
 
         private enum ReporterIonsColumns
         {
@@ -117,7 +120,7 @@ namespace MASIC.DataOutput
         /// Reporter ion column names
         /// </summary>
         /// <remarks>Keys are column index, values are reporter ion info</remarks>
-        private Dictionary<int, string> ReporterIonNames { get; }
+        public Dictionary<int, string> ReporterIonNames { get; }
 
         /// <summary>
         /// Reporter ion observation rate, by channel
@@ -165,7 +168,7 @@ namespace MASIC.DataOutput
             PeakAreaHistogram = new Dictionary<float, int>();
 
             PeakWidthHistogram = new Dictionary<float, int>();
-            PeakWidthHistogramUnits = "Undefined Units";
+            PeakWidthHistogramUnits = UNDEFINED_UNITS;
 
             ReporterIonNames = new Dictionary<int, string>();
 
@@ -191,7 +194,7 @@ namespace MASIC.DataOutput
             PeakAreaHistogram.Clear();
 
             PeakWidthHistogram.Clear();
-            PeakWidthHistogramUnits = "Undefined Units";
+            PeakWidthHistogramUnits = UNDEFINED_UNITS;
 
             ReporterIonNames.Clear();
 
@@ -423,6 +426,8 @@ namespace MASIC.DataOutput
 
                 var peakWidths = new List<double>();
 
+                var timeBasedPeakWidths = false;
+
                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                 foreach (var parentIon in mParentIons)
                 {
@@ -468,59 +473,29 @@ namespace MASIC.DataOutput
 
                         var peakWidth = (int)Math.Floor(mScanList[endScan].ScanTime * 60.0 - mScanList[startScan].ScanTime * 60.0);
                         peakWidths.Add(peakWidth);
+                        timeBasedPeakWidths = true;
                         continue;
                     }
 
                     // Track peak width in scans
                     peakWidths.Add(fwhmWidthScans);
-
                 }
 
+                PeakWidthHistogramUnits = timeBasedPeakWidths ? "seconds" : "scans";
+
+                // Make an initial histogram
                 var numberOfBins = Options.PlotOptions.PeakWidthHistogramBinCount <= 0 ?
                                        40 :
                                        Options.PlotOptions.PeakWidthHistogramBinCount;
 
                 var histogram = new MathNet.Numerics.Statistics.Histogram(peakWidths, numberOfBins);
 
-                var binCountSum = 0;
-                var maxPeakWidthToUse = -1;
+                const double filterPercentile = 98;
+                var filteredHistogramValues = GetFilteredHistogram(peakWidths, histogram, numberOfBins, filterPercentile);
 
-                for (var i = 0; i < histogram.BucketCount; i++)
+                foreach (var dataPoint in (from item in filteredHistogramValues orderby item.Key select item))
                 {
-                    var binCount = histogram[i].Count;
-
-                    if (double.IsNaN(binCount))
-                        continue;
-
-                    binCountSum += (int)binCount;
-
-                    if (binCountSum / (double)peakWidths.Count > 0.98)
-                    {
-                        var binStart = (int)Math.Round(histogram[i].UpperBound);
-                        maxPeakWidthToUse = binStart;
-                        break;
-                    }
-                }
-
-                var filteredPeakWidths = new List<double>();
-                foreach (var peakWidth in peakWidths)
-                {
-                    if (maxPeakWidthToUse < 0 || peakWidth <= maxPeakWidthToUse)
-                        filteredPeakWidths.Add(peakWidth);
-                }
-
-                var filteredHistogram = new MathNet.Numerics.Statistics.Histogram(filteredPeakWidths, numberOfBins);
-
-                for (var i = 0; i < filteredHistogram.BucketCount; i++)
-                {
-                    var binCount = filteredHistogram[i].Count;
-
-                    if (double.IsNaN(binCount))
-                        continue;
-
-                    var midPoint = ((float)histogram[i].LowerBound + (float)histogram[i].UpperBound) / 2;
-
-                    PeakWidthHistogram.Add(midPoint, (int)binCount);
+                    PeakWidthHistogram.Add(dataPoint.Key, dataPoint.Value);
                 }
 
                 return true;
@@ -530,6 +505,54 @@ namespace MASIC.DataOutput
                 OnErrorEvent("Exception in GeneratePeakWidthHistogram", ex);
                 return false;
             }
+        }
+
+        private Dictionary<float, int> GetFilteredHistogram(
+            IReadOnlyCollection<double> peakWidths,
+            MathNet.Numerics.Statistics.Histogram histogram,
+            int numberOfBins,
+            double percentile)
+        {
+
+            // Find the bin at which 98% of the peaks have been included in the histogram
+            var binCountSum = 0;
+            var maxPeakWidthToUse = -1;
+
+            var threshold = percentile / 100.0;
+
+            for (var i = 0; i < histogram.BucketCount; i++)
+            {
+                var binCount = histogram[i].Count;
+
+                if (double.IsNaN(binCount))
+                    continue;
+
+                binCountSum += (int)binCount;
+
+                if (binCountSum / (double)peakWidths.Count > threshold)
+                {
+                    var binStart = (int)Math.Round(histogram[i].UpperBound);
+                    maxPeakWidthToUse = binStart;
+                    break;
+                }
+            }
+
+            // Populate a new list using the peak widths that are less than the 98th percentile
+            var filteredPeakWidths = new List<double>();
+
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var peakWidth in peakWidths)
+            {
+                if (maxPeakWidthToUse < 0 || peakWidth <= maxPeakWidthToUse)
+                    filteredPeakWidths.Add(peakWidth);
+            }
+
+            // Make a new histogram using the filtered list
+            var filteredHistogram = new MathNet.Numerics.Statistics.Histogram(filteredPeakWidths, numberOfBins);
+
+            var interpolatedHistogram = ReplaceZeroesInHistogram(filteredHistogram);
+
+            return interpolatedHistogram;
         }
 
         private bool LoadReporterIons(string reporterIonsFilePath)
@@ -922,6 +945,59 @@ namespace MASIC.DataOutput
                 OnErrorEvent("Exception in LoadSICStats", ex);
                 return false;
             }
+        }
+
+        private Dictionary<float, int> ReplaceZeroesInHistogram(MathNet.Numerics.Statistics.Histogram histogram)
+        {
+            var interpolatedHistogram = new Dictionary<float, int>();
+
+            var lastNonZeroBin = 0.0;
+            var lastNonZeroCount = 0;
+
+            var binsToAdd = new Queue<float>();
+
+            for (var i = 0; i < histogram.BucketCount; i++)
+            {
+                var binCount = histogram[i].Count;
+
+                if (double.IsNaN(binCount))
+                    continue;
+
+                var midPoint = ((float)histogram[i].LowerBound + (float)histogram[i].UpperBound) / 2;
+
+                var binCountInteger = (int)binCount;
+                if (binCountInteger == 0 && lastNonZeroCount > 0)
+                {
+                    // This bucket has a count of zero but the previous bucket has a non-zero count
+                    // Store this bucket's x value in a queue that we will use later to interpolate this bucket's count
+                    binsToAdd.Enqueue(midPoint);
+                    continue;
+                }
+
+                if (binsToAdd.Count > 0)
+                {
+                    // Interpolate counts for buckets in binsToAdd
+
+                    var points = new List<double> { lastNonZeroBin, midPoint };
+                    var values = new List<double> { lastNonZeroCount, binCountInteger };
+                    var interpolationTool = MathNet.Numerics.Interpolate.Linear(points, values);
+
+                    while (binsToAdd.Count > 0)
+                    {
+                        var binToAdd = binsToAdd.Dequeue();
+                        var interpolatedBinCount = (int)Math.Round(interpolationTool.Interpolate(binToAdd), 0);
+
+                        interpolatedHistogram.Add(binToAdd, interpolatedBinCount);
+                    }
+                }
+
+                interpolatedHistogram.Add(midPoint, binCountInteger);
+
+                lastNonZeroBin = midPoint;
+                lastNonZeroCount = binCountInteger;
+            }
+
+            return interpolatedHistogram;
         }
 
         public bool SummarizeSICStats(string sicStatsFilePath)
