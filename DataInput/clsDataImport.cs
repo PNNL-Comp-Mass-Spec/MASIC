@@ -289,7 +289,7 @@ namespace MASIC.DataInput
                     if (writeDebugData)
                     {
                         writer = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_BeforeFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read));
-                        writer.WriteLine("m/z" + "\t" + "Intensity");
+                        writer.WriteLine("{0}\t{1}", "m/z", "Intensity");
                     }
 
                     // Store the intensity values in filterDataArray
@@ -350,7 +350,7 @@ namespace MASIC.DataInput
                 {
                     using (var postFilterWriter = new StreamWriter(new FileStream(Path.Combine(mOptions.OutputDirectoryPath, "DataDump_" + msSpectrum.ScanNumber.ToString() + "_PostFilter.txt"), FileMode.Create, FileAccess.Write, FileShare.Read)))
                     {
-                        postFilterWriter.WriteLine("m/z" + "\t" + "Intensity");
+                        postFilterWriter.WriteLine("{0}\t{1}", "m/z", "Intensity");
 
                         // Store the intensity values in filterDataArray
                         for (var ionIndex = 0; ionIndex < msSpectrum.IonCount; ionIndex++)

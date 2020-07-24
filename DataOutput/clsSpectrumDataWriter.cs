@@ -245,7 +245,8 @@ namespace MASIC.DataOutput
 
             spectrumExportCount += 1;
 
-            writer.WriteLine("Time domain signal level:" + "\t" + currentScan.BasePeakIonIntensity.ToString("0.000"));          // Store the base peak ion intensity as the time domain signal level value
+            // Store the base peak ion intensity as the time domain signal level value
+            writer.WriteLine("{0}\t{1:0.000}", "Time domain signal level:", currentScan.BasePeakIonIntensity);
 
             writer.WriteLine("MASIC " + mOptions.MASICVersion);                     // Software version
             var pekFileInfoLine = "MS/MS-based PEK file";
@@ -329,23 +330,22 @@ namespace MASIC.DataOutput
                 exportCount = 0;
                 for (var ionIndex = 0; ionIndex < spectrum.IonCount; ionIndex++)
                 {
-                    if (spectrum.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
-                    {
-                        var dataLine =
-                            "1" + "\t" +
-                            "1" + "\t" +
-                            spectrum.IonsIntensity[ionIndex] + "\t" +
-                            spectrum.IonsMZ[ionIndex] + "\t" +
-                            "0";
+                    if (spectrum.IonsIntensity[ionIndex] < minimumIntensityCurrentScan)
+                        continue;
 
-                        writer.WriteLine(dataLine);
-                        exportCount += 1;
-                    }
+                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
+                        "1",
+                        "1",
+                        spectrum.IonsIntensity[ionIndex],
+                        spectrum.IonsMZ[ionIndex],
+                        "0");
+
+                    exportCount += 1;
                 }
             }
 
-            writer.WriteLine("Number of peaks in spectrum = " + spectrum.IonCount.ToString());
-            writer.WriteLine("Number of isotopic distributions detected = " + exportCount.ToString());
+            writer.WriteLine("Number of peaks in spectrum = " + spectrum.IonCount);
+            writer.WriteLine("Number of isotopic distributions detected = " + exportCount);
             writer.WriteLine();
         }
 

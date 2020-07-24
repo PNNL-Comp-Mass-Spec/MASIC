@@ -788,15 +788,19 @@ namespace MASIC.DataOutput
 
                 OutputFileHandles.SICDataFile = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
+                var headerNames = new List<string>
+                {
+                    "Dataset",
+                    "ParentIonIndex",
+                    "FragScanIndex",
+                    "ParentIonMZ",
+                    "Scan",
+                    "MZ",
+                    "Intensity"
+                };
+
                 // Write the header line
-                OutputFileHandles.SICDataFile.WriteLine(
-                    "Dataset" + "\t" +
-                    "ParentIonIndex" + "\t" +
-                    "FragScanIndex" + "\t" +
-                    "ParentIonMZ" + "\t" +
-                    "Scan" + "\t" +
-                    "MZ" + "\t" +
-                    "Intensity");
+                OutputFileHandles.SICDataFile.WriteLine(string.Join("\t", headerNames));
             }
             catch (Exception ex)
             {
@@ -882,24 +886,26 @@ namespace MASIC.DataOutput
                 for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {
                     // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
-                    var prefix = sicOptions.DatasetID + "\t" +
-                                 parentIonIndex + "\t" +
-                                 fragScanIndex + "\t" +
-                                 StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4) + "\t";
+                    var prefix = string.Format("{0}\t{1}\t{2}\t{3}", 
+                        sicOptions.DatasetID,
+                        parentIonIndex,
+                        fragScanIndex,
+                        StringUtilities.DblToString(scanList.ParentIons[parentIonIndex].MZ, 4));
 
                     if (sicDetails.SICDataCount == 0)
                     {
                         // Nothing to write
-                        OutputFileHandles.SICDataFile.WriteLine(prefix + "0" + "\t" + "0" + "\t" + "0");
+                        OutputFileHandles.SICDataFile.WriteLine("{0}\t{1}\t{2}\t{3}", prefix, "0", "0", "0");
                     }
                     else
                     {
                         foreach (var dataPoint in sicDetails.SICData)
                         {
                             OutputFileHandles.SICDataFile.WriteLine(
-                                prefix +
-                                dataPoint.ScanNumber + "\t" +
-                                dataPoint.Mass + "\t" +
+                                "{0}\t{1}\t{2}\t{3}",
+                                prefix,
+                                dataPoint.ScanNumber,
+                                dataPoint.Mass,
                                 dataPoint.Intensity);
                         }
                     }
