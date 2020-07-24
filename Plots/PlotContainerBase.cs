@@ -8,7 +8,15 @@ namespace MASIC.Plots
 {
     internal abstract class PlotContainerBase : EventNotifier
     {
+        public enum PlotTypes
+        {
+            XY = 0,
+            BarChart = 1
+        }
+
         protected StreamWriter mLogWriter;
+
+        #region "Properties"
 
         public string AnnotationBottomLeft { get; set; }
 
@@ -16,9 +24,11 @@ namespace MASIC.Plots
 
         public string PlotTitle { get; set; }
 
-        public bool PlottingDeisotopedData { get; set; }
+        public PlotTypes PlotType { get; protected set; }
 
         public abstract int SeriesCount { get; }
+
+        #endregion
 
         /// <summary>
         /// Constructor
@@ -30,8 +40,7 @@ namespace MASIC.Plots
             AnnotationBottomLeft = string.Empty;
             AnnotationBottomRight = string.Empty;
             PlotTitle = "Undefined Plot Title";
-
-            PlottingDeisotopedData = false;
+            PlotType = PlotTypes.XY;
 
             if (writeDebug)
             {
@@ -51,9 +60,11 @@ namespace MASIC.Plots
         protected string GetPlotOptions()
         {
             var plotOptions = new List<string> {
+                "PlotType=" + PlotType,
                 "Title=" + PlotTitle,
                 "BottomLeft=" + AnnotationBottomLeft,
-                "BottomRight=" + AnnotationBottomRight};
+                "BottomRight=" + AnnotationBottomRight
+            };
 
             return string.Join(";", plotOptions);
         }

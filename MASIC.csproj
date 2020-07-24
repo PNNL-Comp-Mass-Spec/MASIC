@@ -164,6 +164,9 @@
     <Compile Include="Plots\PlotContainer.cs" />
     <Compile Include="Plots\PlotContainerBase.cs" />
     <Compile Include="Plots\PlotUtilities.cs" />
+    <Compile Include="Plots\PythonPlotContainer.cs" />
+    <Compile Include="Plots\PythonPlotContainerXY.cs" />
+    <Compile Include="Plots\PythonPlotContainerBarChart.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -213,6 +216,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)Lib\netcdf.dll" "$(TargetDir)" /D /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)Lib\netcdf.dll" "$(TargetDir)" /D /Y
+xcopy "$(ProjectDir)Python\MASIC_Plotter.py"  "$(TargetDir)" /D /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

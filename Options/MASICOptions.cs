@@ -267,6 +267,7 @@ namespace MASIC.Options
                 {
                     // No parameter file specified; nothing to load
                     ReportMessage("Parameter file not specified -- will use default settings");
+                    Console.WriteLine();
                     return true;
                 }
 
@@ -657,6 +658,15 @@ namespace MASIC.Options
                 PlotOptions.CreatePlots = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
 
+                PlotOptions.PlotWithPython = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "PlotWithPython", PlotOptions.PlotWithPython);
+
+                PlotOptions.SaveHistogramData = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "SaveHistogramData", PlotOptions.SaveHistogramData);
+
+                PlotOptions.SaveReporterIonObservationRateData = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "SaveReporterIonObservationRateData", PlotOptions.SaveReporterIonObservationRateData);
+
                 PlotOptions.PeakAreaHistogramBinCount = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "PeakAreaHistogramBinCount", PlotOptions.PeakAreaHistogramBinCount);
 
@@ -913,6 +923,9 @@ namespace MASIC.Options
 
                 // Plot options
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PlotWithPython", PlotOptions.PlotWithPython);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "SaveHistogramData", PlotOptions.SaveHistogramData);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "SaveReporterIonObservationRateData", PlotOptions.SaveReporterIonObservationRateData);
 
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PeakAreaHistogramBinCount", PlotOptions.PeakAreaHistogramBinCount);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PeakWidthHistogramBinCount", PlotOptions.PeakWidthHistogramBinCount);

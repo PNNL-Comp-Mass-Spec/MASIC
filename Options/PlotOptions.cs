@@ -13,6 +13,11 @@ namespace MASIC.Options
         public bool CreatePlots { get; set; } = true;
 
         /// <summary>
+        /// When true, delete temp files created while creating plots with Python
+        /// </summary>
+        public bool DeleteTempFiles { get; set; } = true;
+
+        /// <summary>
         /// Number of bins (buckets) to use for the histogram of log-10 transformed peak areas
         /// </summary>
         public int PeakAreaHistogramBinCount { get; set; } = 40;
@@ -21,6 +26,20 @@ namespace MASIC.Options
         /// Number of bins (buckets) to use for the histogram of peak widths
         /// </summary>
         public int PeakWidthHistogramBinCount { get; set; } = 40;
+
+        /// <summary>
+        /// When true, create plots using Python instead of OxyPlot
+        /// </summary>
+        /// <remarks>
+        /// Looks for `python.exe` in directories that start with "Python3" or "Python 3" on Windows, searching below:
+        /// - C:\Program Files
+        /// - C:\Program Files(x86)
+        /// - C:\Users\Username\AppData\Local\Programs
+        /// - C:\ProgramData\Anaconda3
+        /// - C:\
+        /// Assumes Python is at `/usr/bin/python3` on Linux
+        /// </remarks>
+        public bool PlotWithPython { get; set; } = false;
 
         /// <summary>
         /// When compiling reporter ion observation rates, only look at data

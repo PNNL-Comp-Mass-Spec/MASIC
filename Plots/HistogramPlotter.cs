@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Options;
 using OxyPlot;
 using OxyPlot.Series;
 using PRISM;
@@ -21,6 +22,9 @@ namespace MASIC.Plots
 
         #region "Properties"
 
+        /// <summary>
+        /// When true, autoscale the Y axis
+        /// </summary>
         public bool AutoMinMaxY { get; set; }
 
         /// <summary>
@@ -28,12 +32,29 @@ namespace MASIC.Plots
         /// </summary>
         public string PlotAbbrev { get; set; } = "Histogram";
 
+        /// <summary>
+        /// Plot options
+        /// </summary>
+        public PlotOptions Options { get; }
+
+        /// <summary>
+        /// Plot title
+        /// </summary>
         public string PlotTitle { get; set; }
 
+        /// <summary>
+        /// X-axis label
+        /// </summary>
         public string XAxisLabel { get; set; } = "Bin";
 
+        /// <summary>
+        /// y-axis label
+        /// </summary>
         public string YAxisLabel { get; set; } = "Bin Count";
 
+        /// <summary>
+        /// When true, remove zeroes from the start and end of the data
+        /// </summary>
         public bool RemoveZeroesFromEnds { get; set; }
 
         #endregion
@@ -41,10 +62,12 @@ namespace MASIC.Plots
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="options"></param>
         /// <param name="plotTitle"></param>
         /// <param name="writeDebug"></param>
-        public HistogramPlotter(string plotTitle, bool writeDebug = false)
+        public HistogramPlotter(PlotOptions options, string plotTitle, bool writeDebug = false)
         {
+            Options = options;
             PlotTitle = plotTitle;
             mHistogram = new HistogramInfo();
             mWriteDebug = writeDebug;
@@ -135,6 +158,10 @@ namespace MASIC.Plots
             string xAxisLabel,
             AxisInfo yAxisInfo)
         {
+            if (Options.PlotWithPython)
+            {
+                return InitializePythonPlot(histogramInfo, plotTitle, xAxisLabel, yAxisInfo);
+            }
 
             return InitializeOxyPlot(histogramInfo, plotTitle, xAxisLabel, yAxisInfo);
         }
@@ -159,7 +186,7 @@ namespace MASIC.Plots
             if (points.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PlotContainer(new PlotModel(), mWriteDebug);
+                var emptyContainer = new PlotContainer(PlotContainerBase.PlotTypes.XY, new PlotModel(), mWriteDebug);
                 emptyContainer.WriteDebugLog("points.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
                 return emptyContainer;
             }
@@ -176,7 +203,7 @@ namespace MASIC.Plots
             var yVals = (from item in points select item.Y).ToList();
             OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[1], yVals, false);
 
-            var plotContainer = new PlotContainer(myPlot, mWriteDebug)
+            var plotContainer = new PlotContainer(PlotContainerBase.PlotTypes.XY, myPlot, mWriteDebug)
             {
                 FontSizeBase = PlotContainer.DEFAULT_BASE_FONT_SIZE
             };
@@ -206,19 +233,64 @@ namespace MASIC.Plots
             // Assure that we don't see ticks between scan numbers
             OxyPlotUtilities.ValidateMajorStep(myPlot.Axes[0]);
 
-            // Override the auto-computed Y axis range
             if (yAxisInfo.AutoScale)
             {
                 // Auto scale
             }
             else
             {
+                // Override the auto-computed Y axis range
                 myPlot.Axes[1].Minimum = 0;
                 myPlot.Axes[1].Maximum = maxIntensity;
             }
 
             // Hide the legend
             myPlot.IsLegendVisible = false;
+
+            return plotContainer;
+        }
+
+        /// <summary>
+        /// Initialize a Python plot container for a histogram
+        /// </summary>
+        /// <param name="histogramInfo">Data to display</param>
+        /// <param name="plotTitle">Title of the plot</param>
+        /// <param name="xAxisLabel"></param>
+        /// <param name="yAxisInfo"></param>
+        /// <returns>OxyPlot PlotContainer</returns>
+        private PythonPlotContainer InitializePythonPlot(
+            HistogramInfo histogramInfo,
+            string plotTitle,
+            string xAxisLabel,
+            AxisInfo yAxisInfo)
+        {
+
+            var points = GetDataToPlot(histogramInfo, out var minBin, out var maxBin, out var maxIntensity);
+
+            if (points.Count == 0)
+            {
+                // Nothing to plot
+                var emptyContainer = new PythonPlotContainerXY();
+                emptyContainer.WriteDebugLog("points.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
+                return emptyContainer;
+            }
+
+            var plotContainer = new PythonPlotContainerXY(plotTitle, xAxisLabel, yAxisInfo.Title)
+            {
+                DeleteTempFiles = Options.DeleteTempFiles
+            };
+
+            plotContainer.SetData(points);
+
+            if (yAxisInfo.AutoScale)
+            {
+                // Auto scale
+            }
+            else
+            {
+                // Override the auto-computed Y axis range
+                plotContainer.XAxisInfo.SetRange(0, maxIntensity);
+            }
 
             return plotContainer;
         }

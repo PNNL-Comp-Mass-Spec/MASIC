@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Wpf;
+using PRISM;
 using LinearColorAxis = OxyPlot.Axes.LinearColorAxis;
 
 // ReSharper disable RedundantNameQualifier
@@ -55,15 +56,18 @@ namespace MASIC.Plots
         /// Constructor
         /// </summary>
         /// <param name="thePlot">The plot (type OxyPlot.PlotModel)</param>
+        /// <param name="plotType">Plot type</param>
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
         /// <remarks></remarks>
         public PlotContainer(
+            PlotTypes plotType,
             PlotModel thePlot,
             bool writeDebug = false,
             string dataSource = "") : base(writeDebug, dataSource)
         {
             Plot = thePlot;
+            PlotType = plotType;
             FontSizeBase = DEFAULT_BASE_FONT_SIZE;
         }
 
@@ -181,7 +185,7 @@ namespace MASIC.Plots
             if (imageFile == null)
                 throw new ArgumentNullException(nameof(imageFile), "Image file instance cannot be blank");
 
-            Console.WriteLine("Saving " + Path.GetFileName(imageFile.FullName));
+            OnDebugEvent("Saving " + PathUtils.CompactPathString(imageFile.FullName, 120));
 
             // Note that this operation can be slow if there are over 100,000 data points
             var plotBitmap = ExportToBitMap(Plot, width, height, OxyColors.White, resolution);
@@ -246,6 +250,7 @@ namespace MASIC.Plots
             return true;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void AddGradient(string gradientName, OxyPalette colorGradient)
         {
             var colorGradients = new Dictionary<string, OxyPalette> {

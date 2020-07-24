@@ -39,7 +39,7 @@ namespace MASIC.DataOutput
         {
             try
             {
-                var histogramPlotter = new HistogramPlotter(plotTitle)
+                var histogramPlotter = new HistogramPlotter(Options.PlotOptions, plotTitle)
                 {
                     PlotAbbrev = plotAbbreviation,
                     XAxisLabel = xAxisLabel,
@@ -103,11 +103,12 @@ namespace MASIC.DataOutput
             string outputDirectory,
             string plotTitle,
             string plotAbbreviation,
-            string yAxisLabel)
+            string yAxisLabel,
+            int yAxisMinimum = 0)
         {
             try
             {
-                var barChartPlotter = new BarChartPlotter(plotTitle) {
+                var barChartPlotter = new BarChartPlotter(Options.PlotOptions, plotTitle) {
                     PlotAbbrev = plotAbbreviation,
                     YAxisLabel = yAxisLabel};
 
@@ -119,7 +120,7 @@ namespace MASIC.DataOutput
                     barChartPlotter.AddData(label, dataPoint.Value);
                 }
 
-                var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory);
+                var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory, yAxisMinimum);
 
                 return success;
             }
@@ -135,9 +136,9 @@ namespace MASIC.DataOutput
             try
             {
                 var highAbundanceTitle = string.Format("Reporter Ion Observation Rate (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
-                var reporterIonObservationRatePlotter = new BarChartPlotter(highAbundanceTitle);
+                var reporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, highAbundanceTitle);
 
-                var highAbundanceReporterIonObservationRatePlotter = new BarChartPlotter("Reporter Ion Observation Rate");
+                var highAbundanceReporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, "Reporter Ion Observation Rate");
 
                 RegisterEvents(reporterIonObservationRatePlotter);
                 RegisterEvents(highAbundanceReporterIonObservationRatePlotter);
@@ -149,7 +150,8 @@ namespace MASIC.DataOutput
                     outputDirectory,
                     highAbundanceTitle,
                     "RepIonObsRateHighAbundance",
-                    "Observation Rate (%)");
+                    "Observation Rate (%)",
+                    Options.PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum);
 
                 var success2 = CreateBarChart(
                     mStatsSummarizer.ReporterIonNames,

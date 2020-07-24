@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MASIC.Options;
 using OxyPlot;
 using OxyPlot.Series;
 using PRISM;
@@ -22,6 +23,9 @@ namespace MASIC.Plots
 
         #region "Properties"
 
+        /// <summary>
+        /// When true, autoscale the Y axis
+        /// </summary>
         public bool AutoMinMaxY { get; set; }
 
         /// <summary>
@@ -29,8 +33,19 @@ namespace MASIC.Plots
         /// </summary>
         public string PlotAbbrev { get; set; } = "BarChart";
 
+        /// <summary>
+        /// Plot options
+        /// </summary>
+        public PlotOptions Options { get; }
+
+        /// <summary>
+        /// Plot title
+        /// </summary>
         public string PlotTitle { get; set; }
 
+        /// <summary>
+        /// Y-axis label
+        /// </summary>
         public string YAxisLabel { get; set; } = "Intensity";
 
         #endregion
@@ -38,10 +53,12 @@ namespace MASIC.Plots
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="options"></param>
         /// <param name="plotTitle"></param>
         /// <param name="writeDebug"></param>
-        public BarChartPlotter(string plotTitle, bool writeDebug = false)
+        public BarChartPlotter(PlotOptions options, string plotTitle, bool writeDebug = false)
         {
+            Options = options;
             PlotTitle = plotTitle;
             mBarChart = new BarChartInfo();
             mWriteDebug = writeDebug;
@@ -140,6 +157,10 @@ namespace MASIC.Plots
 
         private PlotContainerBase InitializePlot(BarChartInfo barChartInfo, string plotTitle, AxisInfo yAxisInfo)
         {
+            if (Options.PlotWithPython)
+            {
+                return InitializePythonPlot(barChartInfo, plotTitle, yAxisInfo);
+            }
 
             return InitializeOxyPlot(barChartInfo, plotTitle, yAxisInfo);
         }
@@ -181,26 +202,77 @@ namespace MASIC.Plots
             var yVals = (from item in points select item.Value).ToList();
             OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[1], yVals, false);
 
-            var plotContainer = new PlotContainer(myPlot, mWriteDebug)
+            var plotContainer = new PlotContainer(PlotContainerBase.PlotTypes.BarChart, myPlot, mWriteDebug)
             {
-                FontSizeBase = PlotContainer.DEFAULT_BASE_FONT_SIZE
+                FontSizeBase = PlotContainer.DEFAULT_BASE_FONT_SIZE,
             };
 
             plotContainer.WriteDebugLog(string.Format("Instantiated plotContainer for plot {0}: {1} data points", plotTitle, points.Count));
 
-            // Override the auto-computed Y axis range
             if (yAxisInfo.AutoScale)
             {
                 // Auto scale
             }
             else
             {
+                // Override the auto-computed Y axis range
                 myPlot.Axes[1].Minimum = yAxisMinimum;
                 myPlot.Axes[1].Maximum = yAxisMaximum;
             }
 
             // Hide the legend
             myPlot.IsLegendVisible = false;
+
+            return plotContainer;
+        }
+
+        /// <summary>
+        /// Initialize a Python plot container for a bar chart
+        /// </summary>
+        /// <param name="barChartInfo">Data to display</param>
+        /// <param name="plotTitle">Title of the plot</param>
+        /// <param name="yAxisInfo"></param>
+        /// <returns>Python PlotContainer</returns>
+        private PythonPlotContainer InitializePythonPlot(BarChartInfo barChartInfo, string plotTitle, AxisInfo yAxisInfo)
+        {
+
+            var xAxisLabels = GetDataToPlot(barChartInfo, yAxisInfo, out var dataPoints, out var yAxisMinimum, out var yAxisMaximum);
+
+            if (dataPoints.Count == 0)
+            {
+                // Nothing to plot
+                var emptyContainer = new PythonPlotContainerBarChart();
+                emptyContainer.WriteDebugLog("points.Count == 0 in PythonPlotContainer for plot " + plotTitle);
+                return emptyContainer;
+            }
+
+            // Instantiate the list to track the data points
+            var points = new List<KeyValuePair<string, double>>();
+            var pointColors = new List<OxyColor>();
+
+            for (var i = 0; i < dataPoints.Count; i++)
+            {
+                var dataPoint = new KeyValuePair<string, double>(xAxisLabels[i], dataPoints[i].Key);
+                points.Add(dataPoint);
+                pointColors.Add(dataPoints[i].Value);
+            }
+
+            var plotContainer = new PythonPlotContainerBarChart(plotTitle, yAxisInfo.Title)
+            {
+                DeleteTempFiles = Options.DeleteTempFiles
+            };
+
+            plotContainer.SetData(points, pointColors);
+
+            if (yAxisInfo.AutoScale)
+            {
+                // Auto scale
+            }
+            else
+            {
+                // Override the auto-computed Y axis range
+                plotContainer.XAxisInfo.SetRange(yAxisMinimum, yAxisMaximum);
+            }
 
             return plotContainer;
         }
