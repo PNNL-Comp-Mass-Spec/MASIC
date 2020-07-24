@@ -55,6 +55,7 @@ namespace MASIC.Plots
 
         private void AddOxyPlotSeries(PlotModel myPlot, IReadOnlyCollection<ColumnItem> points)
         {
+            // A column series represents a bar chart with vertical bars
             var series = new ColumnSeries();
 
             if (points.Count <= 0)
@@ -71,26 +72,18 @@ namespace MASIC.Plots
             myPlot.Series.Add(series);
         }
 
-        private PlotContainer InitializePlot(BarChartInfo histogramInfo, string plotTitle, AxisInfo yAxisInfo)
+        private List<string> GetDataToPlot(
+            BarChartInfo barChartInfo,
+            AxisInfo yAxisInfo,
+            out List<KeyValuePair<double, OxyColor>> dataPoints,
+            out double yAxisMinimum,
+            out double yAxisMaximum)
         {
-            return InitializeOxyPlot(histogramInfo, plotTitle, yAxisInfo);
-        }
-
-        /// <summary>
-        /// Plots bar chart
-        /// </summary>
-        /// <param name="histogramInfo">Data to display</param>
-        /// <param name="plotTitle">Title of the plot</param>
-        /// <param name="yAxisInfo"></param>
-        /// <returns>OxyPlot PlotContainer</returns>
-        private PlotContainer InitializeOxyPlot(BarChartInfo histogramInfo, string plotTitle, AxisInfo yAxisInfo)
-        {
-
             double maxIntensity = 0;
 
             // Instantiate parallel lists to track the data points
             var xAxisLabels = new List<string>();
-            var points = new List<ColumnItem>();
+            dataPoints = new List<KeyValuePair<double, OxyColor>>();
 
             var colorMap = new Dictionary<int, OxyColor>();
 
@@ -102,7 +95,7 @@ namespace MASIC.Plots
                 }
             }
 
-            foreach (var dataPoint in histogramInfo.DataPoints)
+            foreach (var dataPoint in barChartInfo.DataPoints)
             {
                 if (dataPoint.Value > maxIntensity)
                 {
@@ -110,20 +103,19 @@ namespace MASIC.Plots
                 }
             }
 
-            var yAxisMinimum = PlotUtilities.GetNumberOrDefault(yAxisInfo.Minimum, 0);
-            var yAxisMaximum = PlotUtilities.GetNumberOrDefault(yAxisInfo.Maximum, maxIntensity);
+            yAxisMinimum = PlotUtilities.GetNumberOrDefault(yAxisInfo.Minimum, 0);
+            yAxisMaximum = PlotUtilities.GetNumberOrDefault(yAxisInfo.Maximum, maxIntensity);
 
             if (Math.Abs(yAxisMinimum) < float.Epsilon && Math.Abs(yAxisMaximum) < float.Epsilon && maxIntensity > 0)
             {
                 yAxisMaximum = maxIntensity;
             }
 
-            foreach (var dataPoint in histogramInfo.DataPoints)
+            foreach (var dataPoint in barChartInfo.DataPoints)
             {
                 xAxisLabels.Add(dataPoint.Label);
 
-                var columnItem = new ColumnItem(dataPoint.Value);
-
+                OxyColor colorToUse;
                 if (colorMap.Count > 0 && yAxisMaximum > 0)
                 {
                     var colorIndex = (int)Math.Round(dataPoint.Value * colorMap.Count / yAxisMaximum, 0) - 1;
@@ -132,23 +124,54 @@ namespace MASIC.Plots
                         colorIndex = 0;
                     }
 
-                    columnItem.Color = colorMap[colorIndex];
+                    colorToUse = colorMap[colorIndex];
                 }
-
-                points.Add(columnItem);
-
-                if (dataPoint.Value > maxIntensity)
+                else
                 {
-                    maxIntensity = dataPoint.Value;
+                    colorToUse = OxyColors.Black;
                 }
+
+                var pointWithColor = new KeyValuePair<double, OxyColor>(dataPoint.Value, colorToUse);
+                dataPoints.Add(pointWithColor);
             }
 
-            if (points.Count == 0)
+            return xAxisLabels;
+        }
+
+        private PlotContainerBase InitializePlot(BarChartInfo barChartInfo, string plotTitle, AxisInfo yAxisInfo)
+        {
+
+            return InitializeOxyPlot(barChartInfo, plotTitle, yAxisInfo);
+        }
+
+        /// <summary>
+        /// Initialize an OxyPlot plot container for a bar chart
+        /// </summary>
+        /// <param name="barChartInfo">Data to display</param>
+        /// <param name="plotTitle">Title of the plot</param>
+        /// <param name="yAxisInfo"></param>
+        /// <returns>OxyPlot PlotContainer</returns>
+        private PlotContainer InitializeOxyPlot(BarChartInfo barChartInfo, string plotTitle, AxisInfo yAxisInfo)
+        {
+            var xAxisLabels = GetDataToPlot(barChartInfo, yAxisInfo, out var dataPoints, out var yAxisMinimum, out var yAxisMaximum);
+
+            if (dataPoints.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PlotContainer(new PlotModel(), mWriteDebug);
+                var emptyContainer = new PlotContainer(PlotContainerBase.PlotTypes.BarChart, new PlotModel(), mWriteDebug);
                 emptyContainer.WriteDebugLog("points.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
                 return emptyContainer;
+            }
+
+            var points = new List<ColumnItem>();
+
+            foreach (var dataPoint in dataPoints)
+            {
+                var columnItem = new ColumnItem(dataPoint.Key) {
+                    Color = dataPoint.Value
+                };
+
+                points.Add(columnItem);
             }
 
             var myPlot = OxyPlotUtilities.GetBasicBarChartModel(plotTitle, xAxisLabels, yAxisInfo);

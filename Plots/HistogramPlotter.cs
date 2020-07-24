@@ -86,34 +86,15 @@ namespace MASIC.Plots
 
             myPlot.Series.Add(series);
         }
-
-        private PlotContainer InitializePlot(
+        private List<DataPoint> GetDataToPlot(
             HistogramInfo histogramInfo,
-            string plotTitle,
-            string xAxisLabel,
-            AxisInfo yAxisInfo)
+            out double minBin,
+            out double maxBin,
+            out double maxIntensity)
         {
-            return InitializeOxyPlot(histogramInfo, plotTitle, xAxisLabel, yAxisInfo);
-        }
-
-        /// <summary>
-        /// Plots a histogram
-        /// </summary>
-        /// <param name="histogramInfo">Data to display</param>
-        /// <param name="plotTitle">Title of the plot</param>
-        /// <param name="xAxisLabel"></param>
-        /// <param name="yAxisInfo"></param>
-        /// <returns>OxyPlot PlotContainer</returns>
-        private PlotContainer InitializeOxyPlot(
-            HistogramInfo histogramInfo,
-            string plotTitle,
-            string xAxisLabel,
-            AxisInfo yAxisInfo)
-        {
-
-            var minBin = double.MaxValue;
-            var maxBin = double.MinValue;
-            double maxIntensity = 0;
+            minBin = double.MaxValue;
+            maxBin = double.MinValue;
+            maxIntensity = 0;
 
             // Instantiate the list to track the data points
             var points = new List<DataPoint>();
@@ -139,6 +120,42 @@ namespace MASIC.Plots
                 }
             }
 
+            // Round maxBin down to the nearest multiple of 10
+            maxBin = (int)Math.Ceiling(maxBin / 10.0) * 10;
+
+            // Multiply maxIntensity by 2% and then round up to the nearest integer
+            maxIntensity = Math.Ceiling(maxIntensity * 1.02);
+
+            return points;
+        }
+
+        private PlotContainerBase InitializePlot(
+            HistogramInfo histogramInfo,
+            string plotTitle,
+            string xAxisLabel,
+            AxisInfo yAxisInfo)
+        {
+
+            return InitializeOxyPlot(histogramInfo, plotTitle, xAxisLabel, yAxisInfo);
+        }
+
+        /// <summary>
+        /// Initialize an OxyPlot plot container for a histogram
+        /// </summary>
+        /// <param name="histogramInfo">Data to display</param>
+        /// <param name="plotTitle">Title of the plot</param>
+        /// <param name="xAxisLabel"></param>
+        /// <param name="yAxisInfo"></param>
+        /// <returns>OxyPlot PlotContainer</returns>
+        private PlotContainer InitializeOxyPlot(
+            HistogramInfo histogramInfo,
+            string plotTitle,
+            string xAxisLabel,
+            AxisInfo yAxisInfo)
+        {
+
+            var points = GetDataToPlot(histogramInfo, out var minBin, out var maxBin, out var maxIntensity);
+
             if (points.Count == 0)
             {
                 // Nothing to plot
@@ -146,12 +163,6 @@ namespace MASIC.Plots
                 emptyContainer.WriteDebugLog("points.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
                 return emptyContainer;
             }
-
-            // Round maxBin down to the nearest multiple of 10
-            maxBin = (int)Math.Ceiling(maxBin / 10.0) * 10;
-
-            // Multiply maxIntensity by 2% and then round up to the nearest integer
-            maxIntensity = Math.Ceiling(maxIntensity * 1.02);
 
             var myPlot = OxyPlotUtilities.GetBasicPlotModel(
                 plotTitle, xAxisLabel, yAxisInfo);
