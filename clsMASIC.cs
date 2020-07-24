@@ -40,7 +40,7 @@ namespace MASIC
         /// </summary>
         public clsMASIC()
         {
-            mFileDate = "July 21, 2020";
+            mFileDate = "July 23, 2020";
 
             LocalErrorCode = eMasicErrorCodes.NoError;
             StatusMessage = string.Empty;
@@ -852,6 +852,35 @@ namespace MASIC
         {
             AbortProcessing = true;
             Options.AbortProcessing = true;
+        }
+
+        /// <summary>
+        /// Create an example parameter file
+        /// </summary>
+        /// <param name="paramFilePath">File name or path; if an empty string, will use MASIC_ExampleSettings.xml</param>
+        public void CreateExampleParameterFile(string paramFilePath)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(paramFilePath))
+                {
+                    paramFilePath = "MASIC_ExampleSettings.xml";
+                }
+
+                var outputFile = new FileInfo(paramFilePath);
+
+                var action = outputFile.Exists ? "Overwriting " : "Creating ";
+                Console.WriteLine(action + PathUtils.CompactPathString(outputFile.FullName, 100));
+
+                Options.SaveParameterFileSettings(outputFile.FullName);
+
+                Console.WriteLine("... done");
+            }
+            catch (Exception ex)
+            {
+                LogErrors("CreateExampleParameterFile", "Error creating an example parameter file", ex, eMasicErrorCodes.OutputFileWriteError);
+            }
+
         }
 
         private bool CreatePlots(string inputFilePath, string outputDirectoryPath)

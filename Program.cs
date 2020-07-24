@@ -32,7 +32,7 @@ namespace MASIC
 
     public static class Program
     {
-        public const string PROGRAM_DATE = "July 21, 2020";
+        public const string PROGRAM_DATE = "July 23, 2020";
 
         private static string mInputFilePath;
         private static string mOutputDirectoryPath;                         // Optional
@@ -51,6 +51,10 @@ namespace MASIC
         private static string mLogDirectoryPath = string.Empty;
 
         private static string mMASICStatusFilename = string.Empty;
+
+        private static bool mCreateParamFile;
+        private static string mExampleParamFilePath;
+
         private static bool mQuietMode;
 
         private static clsMASIC mMASIC;
@@ -103,7 +107,10 @@ namespace MASIC
                     return 0;
                 }
 
+                if (mCreateParamFile)
                 {
+                    CreateExampleParameterFile();
+                    return 0;
                 }
 
                 if (!proceed || commandLineParser.NeedToShowHelp || mInputFilePath.Length == 0)
@@ -137,6 +144,14 @@ namespace MASIC
                 }
             }
 #endif
+        }
+
+        private static void CreateExampleParameterFile()
+        {
+            var masicProcessor = new clsMASIC();
+            RegisterMasicEvents(masicProcessor);
+
+            masicProcessor.CreateExampleParameterFile(mExampleParamFilePath);
         }
 
         private static void DisplayProgressPercent(int percentComplete, bool addCarriageReturn)
@@ -245,7 +260,7 @@ namespace MASIC
         private static bool SetOptionsUsingCommandLineParameters(clsParseCommandLine commandLineParser)
         {
             var validParameters = new List<string> {
-                "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "Q"
+                "I", "O", "P", "D", "S", "A", "R", "L", "Log", "SF", "LogDir", "LogFolder", "CreateParamFile", "Q"
             };
 
             try
@@ -345,6 +360,15 @@ namespace MASIC
                     if (!string.IsNullOrEmpty(logFolderPath))
                     {
                         mLogDirectoryPath = logFolderPath;
+                    }
+                }
+
+                if (commandLineParser.RetrieveValueForParameter("CreateParamFile", out var exampleParamFilePath))
+                {
+                    mCreateParamFile = true;
+                    if (!string.IsNullOrEmpty(exampleParamFilePath))
+                    {
+                        mExampleParamFilePath = exampleParamFilePath;
                     }
                 }
 
