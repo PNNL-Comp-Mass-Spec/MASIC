@@ -212,11 +212,6 @@ namespace MASIC.Plots
                 {
                     AddText(AnnotationBottomRight, drawContext, width, height, HorizontalAlignment.Right, VerticalAlignment.Bottom, 5);
                 }
-
-                if (PlottingDeisotopedData)
-                {
-                    AddDeisotopedDataLegend(drawContext, width, height, 10, -30, 25);
-                }
             }
 
             const int DPI = 96;
@@ -262,49 +257,6 @@ namespace MASIC.Plots
         public void AddGradients(Dictionary<string, OxyPalette> colorGradients)
         {
             mColorGradients = colorGradients;
-        }
-
-        private void AddDeisotopedDataLegend(DrawingContext drawContext, int canvasWidth, int canvasHeight, int offsetLeft, int offsetTop, int spacing)
-        {
-            const int CHARGE_START = 1;
-            const int CHARGE_END = 6;
-
-            var usCulture = CultureInfo.GetCultureInfo("en-us");
-            // var fontTypeface = new Typeface(new FontFamily("Arial"), FontStyles.Normal, System.Windows.FontWeights.Normal, FontStretches.Normal);
-            var fontTypeface = new Typeface("Arial");
-
-            var fontSizeEm = FontSizeBase + 3;
-
-            // Write out the text 1+  2+  3+  4+  5+  6+
-
-            // Create a box for the legend
-            var rectPen = new Pen
-            {
-                Brush = new SolidColorBrush(Colors.Black),
-                Thickness = 1
-            };
-
-            for (var chargeState = CHARGE_START; chargeState <= CHARGE_END; chargeState++)
-            {
-                var newBrush = new SolidColorBrush(GetColorByCharge(chargeState));
-
-                var newText = new FormattedText(chargeState + "+", usCulture, FlowDirection.LeftToRight, fontTypeface, fontSizeEm, newBrush, null, PIXELS_PER_DIP);
-
-                var textRect = new Rect(0, 0, canvasWidth, canvasHeight);
-                var position = textRect.Location;
-
-                position.X = Plot.PlotArea.Left + offsetLeft + (chargeState - 1) * (newText.Width + spacing);
-                position.Y = Plot.PlotArea.Top + offsetTop;
-
-                if (chargeState == CHARGE_START)
-                {
-                    var legendBox = new Rect(position.X - 10, position.Y, CHARGE_END * (newText.Width + spacing) - spacing / 4.0, newText.Height);
-                    drawContext.DrawRectangle(null, rectPen, legendBox);
-                }
-
-                drawContext.DrawText(newText, position);
-            }
-
         }
 
         private void AddText(string textToAdd, DrawingContext drawContext, int canvasWidth, int canvasHeight, HorizontalAlignment hAlign, VerticalAlignment vAlign, int padding)
@@ -360,44 +312,6 @@ namespace MASIC.Plots
             };
 
             return exporter.ExportToBitmap(plot);
-        }
-
-        public static Color GetColorByCharge(int charge)
-        {
-            Color seriesColor;
-            switch (charge)
-            {
-                case 1:
-                    seriesColor = Colors.MediumBlue;
-                    break;
-                case 2:
-                    seriesColor = Colors.Red;
-                    break;
-                case 3:
-                    seriesColor = Colors.Green;
-                    break;
-                case 4:
-                    seriesColor = Colors.Magenta;
-                    break;
-                case 5:
-                    seriesColor = Colors.SaddleBrown;
-                    break;
-                case 6:
-                    seriesColor = Colors.Indigo;
-                    break;
-                case 7:
-                    seriesColor = Colors.LimeGreen;
-                    break;
-                case 8:
-                    seriesColor = Colors.CornflowerBlue;
-                    break;
-                default:
-                    seriesColor = Colors.Gray;
-                    break;
-            }
-
-            return seriesColor;
-
         }
 
         // ReSharper disable once UnusedMember.Local
