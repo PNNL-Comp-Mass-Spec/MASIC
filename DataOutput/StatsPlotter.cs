@@ -73,7 +73,7 @@ namespace MASIC.DataOutput
                     datasetName,
                     outputDirectory,
                     "Peak Area Histogram",
-                    "PeakAreaStats",
+                    "PeakAreaHistogram",
                     "Peak Area (Log 10)",
                     "Count");
 
@@ -83,7 +83,7 @@ namespace MASIC.DataOutput
                     datasetName,
                     outputDirectory,
                     "Peak Width Histogram",
-                    "PeakWidthStats",
+                    "PeakWidthHistogram",
                     string.Format("Peak Width ({0}), FWHM", mStatsSummarizer.PeakWidthHistogramUnits),
                     "Count");
 
