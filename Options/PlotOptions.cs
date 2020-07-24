@@ -31,7 +31,8 @@ namespace MASIC.Options
         /// <summary>
         /// Minimum Y-axis value for the Top N Pct based reporter ion observation rate plot
         /// </summary>
-        public int ReporterIonTopNPctObsRateYAxisMinimum { get; set; } = 80;
+        /// <remarks>Set this to a larger value to scale the y-axis to a range of this to 100</remarks>
+        public int ReporterIonTopNPctObsRateYAxisMinimum { get; set; } = 0;
 
         #endregion
 

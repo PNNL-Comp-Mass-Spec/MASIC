@@ -196,7 +196,7 @@ namespace MASIC.Plots
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
         /// <returns>True if success, false if an error</returns>
-        public bool SavePlotFile(string datasetName, string outputDirectory)
+        public bool SavePlotFile(string datasetName, string outputDirectory, int yAxisMinimum = 0)
         {
 
             try
@@ -223,7 +223,7 @@ namespace MASIC.Plots
                     {
                         Title = YAxisLabel,
                         AutoScale = AutoMinMaxY,
-                        Minimum = 0,
+                        Minimum = yAxisMinimum,
                         Maximum = 100,
                         AddColorAxis = true,
                         ColorPalette = colorGradient.Value,
