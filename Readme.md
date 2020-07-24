@@ -200,6 +200,31 @@ MSConvert supports creating files with centroided MS1 spectra and profile mode M
 msconvert.exe --32 --mzML --filter "peakPicking true 1" DatasetName.raw
 ```
 
+## Plots
+
+The `PlotOptions` section in the MASIC parameter file has options for instructing MASIC to create various plots.  When enabled, the following plots are created:
+
+| Plot Title                            | Filename                               | Description                                                                                                                                                                        |
+|---------------------------------------|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Peak area histogram                   | Dataset_PeakAreaHistogram.png          | Histogram of selected ion chromatogram (SIC) peak areas.  Areas are log-10 transformed.                                                                                            |
+| Peak width histogram                  | Dataset_PeakWidthHistogram.png         | Histogram of peak widths (FWHM) of selected ion chromatogram peaks (in seconds)                                                                                                    |
+| Reporter ion observation rate         | Dataset_RepIonObsRate.png              | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed, showing a separate bar for each channel.  Only created if reporter ions were searched for |
+| Reporter ion observation rate, top N% | Dataset_RepIonObsRateHighAbundance.png | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed.  Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable)      |
+
+Plots are created using OxyPlot, which only works on Windows
+* Set `PlotWithPython` to `True` to create plots with Python instead of OxyPlot
+* Looks for `python.exe` in directories that start with "Python3" or "Python 3" on Windows, searching below:
+  * C:\Program Files
+  * C:\Program Files (x86)
+  * C:\Users\Username\AppData\Local\Programs
+  * C:\ProgramData\Anaconda3
+  * C:\
+* Assumes Python is at `/usr/bin/python3` on Linux
+
+The plot data can optionally be saved as tab-delimited text files
+* Enable by setting `SaveHistogramData` and/or `SaveReporterIonObservationRateData` to True
+
+Plots can be created from existing MASIC results by providing the _SICStats.txt or _ScanStats.txt file name as the input file
 
 ## Command Line Interface
 
@@ -209,7 +234,8 @@ MASIC.exe
  /I:InputFilePath [/O:OutputDirectoryPath]
  [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath]
  [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]
- [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]
+ [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] 
+ [/CreateParamFile:FileName.xml] [/Q]
 ```
 
 The input file path can contain the wildcard character *
@@ -247,6 +273,9 @@ specify the name (or full path) for the log file.
 
 Use `/SF` to specify the name to use for the MASIC Status file (default is
 MasicStatus.xml).
+
+Use `/CreateParamFile` to create an example parameter file named MASIC_ExampleSettings.xml
+* Include a colon and a filename to customize the filename
 
 The optional `/Q` switch will prevent the progress window from being shown (only applicable to the GUI version, MASIC.exe)
 
