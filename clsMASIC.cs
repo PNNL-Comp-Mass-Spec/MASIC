@@ -888,18 +888,18 @@ namespace MASIC
             bool success;
             var inputFile = new FileInfo(inputFilePath);
 
-            if (inputFile.Name.EndsWith(clsDataOutput.SIC_STATS_FILE_SUFFIX))
+            if (inputFile.Name.EndsWith(clsDataOutput.SIC_STATS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
             {
                 success = CreatePlots(inputFile, outputDirectoryPath);
             }
-            else if (inputFilePath.EndsWith(clsDataOutput.SCAN_STATS_FILE_SUFFIX))
+            else if (inputFilePath.EndsWith(clsDataOutput.SCAN_STATS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
             {
                 // The user specified the Scan Stats file
                 // Auto-switch to the SIC stats file
                 var sicStatsFilePath = clsUtilities.ReplaceSuffix(inputFilePath, clsDataOutput.SCAN_STATS_FILE_SUFFIX, clsDataOutput.SIC_STATS_FILE_SUFFIX);
                 success = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
             }
-            else if (inputFilePath.EndsWith(clsDataOutput.REPORTER_IONS_FILE_SUFFIX))
+            else if (inputFilePath.EndsWith(clsDataOutput.REPORTER_IONS_FILE_SUFFIX, StringComparison.OrdinalIgnoreCase))
             {
                 // The user specified the Reporter Ion data file
                 // Auto-switch to the SIC stats file
