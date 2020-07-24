@@ -924,6 +924,11 @@ namespace MASIC
                 var statsPlotter = new StatsPlotter(Options);
 
                 var success = statsPlotter.ProcessFile(sicStatsFile.FullName, outputDirectoryPath);
+                if (!success)
+                {
+                    SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                }
+
                 return success;
             }
             catch (Exception ex)
