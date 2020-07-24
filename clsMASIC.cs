@@ -1676,6 +1676,12 @@ namespace MASIC
                 return false;
             }
 
+            if (!Options.PlotOptions.PlotWithPython && SystemInfo.IsLinux)
+            {
+                OnWarningEvent("Plotting with OxyPlot is not supported on Linux; " +
+                               "you should set PlotWithPython=True in the parameter file");
+            }
+
             var dataOutputHandler = new clsDataOutput(Options);
             var existingResultsFound = false;
 
