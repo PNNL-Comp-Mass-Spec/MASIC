@@ -34,6 +34,16 @@ namespace MASIC.Options
         /// <remarks>Set this to a larger value to scale the y-axis to a range of this to 100</remarks>
         public int ReporterIonTopNPctObsRateYAxisMinimum { get; set; } = 0;
 
+        /// <summary>
+        /// When true, create text files of the peak area and peak width histograms
+        /// </summary>
+        public bool SaveHistogramData { get; set; } = false;
+
+        /// <summary>
+        /// When true, create text files of reporter ion observation rate stats
+        /// </summary>
+        public bool SaveReporterIonObservationRateData { get; set; } = true;
+
         #endregion
 
     }

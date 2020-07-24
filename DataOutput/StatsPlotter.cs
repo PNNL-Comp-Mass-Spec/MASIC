@@ -194,11 +194,140 @@ namespace MASIC.DataOutput
 
                 var plotsGenerated = CreatePlots(datasetName, outputDirectory);
 
-                return plotsGenerated;
+                var plotDataSaved = SavePlotData(datasetName, outputDirectory);
+
+                return plotsGenerated && plotDataSaved;
             }
             catch (Exception ex)
             {
                 OnErrorEvent("Exception in StatsPlotter.ProcessFile", ex);
+                return false;
+            }
+        }
+
+        private bool SaveHistogramData(string datasetName, string outputDirectory)
+        {
+
+            var peakAreaSuccess = WriteHistogramData(
+                mStatsSummarizer.PeakAreaHistogram,
+                datasetName,
+                outputDirectory,
+                "PeakAreaHistogram",
+                "PeakArea_Log10");
+
+            var peakWidthSuccess = WriteHistogramData(
+                mStatsSummarizer.PeakWidthHistogram,
+                datasetName,
+                outputDirectory,
+                "PeakWidthHistogram",
+                string.Format("PeakWidth_{0}", mStatsSummarizer.PeakWidthHistogramUnits));
+
+            return peakAreaSuccess && peakWidthSuccess;
+        }
+
+        private bool SavePlotData(string datasetName, string outputDirectory)
+        {
+            bool histogramSuccess;
+            bool obsRateSuccess;
+
+            if (Options.PlotOptions.SaveHistogramData)
+            {
+                histogramSuccess = SaveHistogramData(datasetName, outputDirectory);
+            }
+            else
+            {
+                histogramSuccess = true;
+            }
+
+            if (Options.PlotOptions.SaveReporterIonObservationRateData)
+            {
+                obsRateSuccess = SaveReporterIonObservationRateData(datasetName, outputDirectory);
+            }
+            else
+            {
+                obsRateSuccess = true;
+            }
+
+            return histogramSuccess && obsRateSuccess;
+        }
+
+        private bool SaveReporterIonObservationRateData(string datasetName, string outputDirectory)
+        {
+            var success1 = WriteReporterIonObservationRateData(
+                mStatsSummarizer.ReporterIonNames,
+                mStatsSummarizer.ReporterIonObservationRateHighAbundance,
+                datasetName,
+                outputDirectory,
+                "RepIonObsRateHighAbundance");
+
+            var success2 = WriteReporterIonObservationRateData(
+                mStatsSummarizer.ReporterIonNames,
+                mStatsSummarizer.ReporterIonObservationRate,
+                datasetName,
+                outputDirectory,
+                "RepIonObsRate");
+
+            return success1 && success2;
+        }
+
+        private bool WriteHistogramData(
+            IReadOnlyDictionary<float, int> histogramData,
+            string datasetName,
+            string outputDirectory,
+            string fileSuffix,
+            string dataColumnHeader)
+        {
+            try
+            {
+                var outputFilePath = Path.Combine(outputDirectory, string.Format("{0}_{1}.txt", datasetName, fileSuffix));
+                OnDebugEvent("Saving " + PathUtils.CompactPathString(outputFilePath, 120));
+
+                using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                {
+                    writer.WriteLine("{0}\t{1}", dataColumnHeader, "Count");
+                    foreach (var dataPoint in histogramData)
+                    {
+                        writer.WriteLine("{0:0.0#}\t{1}", dataPoint.Key, dataPoint.Value);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in WriteHistogramData", ex);
+                return false;
+            }
+        }
+
+        private bool WriteReporterIonObservationRateData(
+            IReadOnlyDictionary<int, string> reporterIonNames,
+            IReadOnlyDictionary<int, float> reporterIonObservationRateData,
+            string datasetName,
+            string outputDirectory,
+            string fileSuffix)
+        {
+            try
+            {
+                var outputFilePath = Path.Combine(outputDirectory, string.Format("{0}_{1}.txt", datasetName, fileSuffix));
+                OnDebugEvent("Saving " + PathUtils.CompactPathString(outputFilePath, 120));
+
+                using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                {
+                    writer.WriteLine("{0}\t{1}", "Reporter_Ion", "Observation_Rate");
+                    foreach (var reporterIonIndex in reporterIonNames.Keys)
+                    {
+                        writer.WriteLine("{0}\t{1:0.0##}",
+                            reporterIonNames[reporterIonIndex],
+                            reporterIonObservationRateData[reporterIonIndex]);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in WriteReporterIonObservationRateData", ex);
                 return false;
             }
         }
