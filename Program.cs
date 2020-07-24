@@ -103,70 +103,16 @@ namespace MASIC
                     return 0;
                 }
 
+                {
+                }
+
                 if (!proceed || commandLineParser.NeedToShowHelp || mInputFilePath.Length == 0)
                 {
                     ShowProgramHelp();
                     return -1;
                 }
 
-                mMASIC = new clsMASIC();
-                RegisterMasicEvents(mMASIC);
-
-                mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath;
-                mMASIC.Options.SICOptions.DatasetID = mDatasetID;
-
-                if (!string.IsNullOrEmpty(mMASICStatusFilename))
-                {
-                    mMASIC.Options.MASICStatusFilename = mMASICStatusFilename;
-                }
-
-                mMASIC.LogMessagesToFile = mLogMessagesToFile;
-                mMASIC.LogFilePath = mLogFilePath;
-                mMASIC.LogDirectoryPath = mLogDirectoryPath;
-
-                if (!mQuietMode)
-                {
-#if GUI
-                    mProgressForm = new frmProgress();
-
-                    mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
-                    mProgressForm.InitializeSubtask(string.Empty, 0, 100, false);
-                    mProgressForm.ResetKeyPressAbortProcess();
-                    mProgressForm.Show();
-                    Application.DoEvents();
-#else
-                    Console.WriteLine("Parsing " + Path.GetFileName(mInputFilePath));
-#endif
-                }
-
-                int returnCode;
-
-                if (mRecurseDirectories)
-                {
-                    // This call will lead to calls to method ProcessFile in clsMASIC
-                    if (mMASIC.ProcessFilesAndRecurseDirectories(mInputFilePath, mOutputDirectoryPath,
-                                                                 mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath,
-                                                                 mParameterFilePath, mMaxLevelsToRecurse))
-                    {
-                        returnCode = 0;
-                    }
-                    else
-                    {
-                        returnCode = (int)mMASIC.ErrorCode;
-                    }
-                }
-                else if (mMASIC.ProcessFilesWildcard(mInputFilePath, mOutputDirectoryPath, mParameterFilePath))
-                {
-                    returnCode = 0;
-                }
-                else
-                {
-                    returnCode = (int)mMASIC.ErrorCode;
-                    if (returnCode != 0)
-                    {
-                        Console.WriteLine("Error while processing: " + mMASIC.GetErrorMessage());
-                    }
-                }
+                var returnCode = ProcessFiles();
 
                 if (returnCode != 0)
                 {
@@ -213,6 +159,65 @@ namespace MASIC
         private static string GetAppVersion()
         {
             return ProcessFilesOrDirectoriesBase.GetAppVersion(PROGRAM_DATE);
+        }
+
+        private static int ProcessFiles()
+        {
+            mMASIC = new clsMASIC();
+            RegisterMasicEvents(mMASIC);
+
+            mMASIC.Options.DatasetLookupFilePath = mDatasetLookupFilePath;
+            mMASIC.Options.SICOptions.DatasetID = mDatasetID;
+
+            if (!string.IsNullOrEmpty(mMASICStatusFilename))
+            {
+                mMASIC.Options.MASICStatusFilename = mMASICStatusFilename;
+            }
+
+            mMASIC.LogMessagesToFile = mLogMessagesToFile;
+            mMASIC.LogFilePath = mLogFilePath;
+            mMASIC.LogDirectoryPath = mLogDirectoryPath;
+
+            if (!mQuietMode)
+            {
+#if GUI
+                    mProgressForm = new frmProgress();
+
+                    mProgressForm.InitializeProgressForm("Parsing " + Path.GetFileName(mInputFilePath), 0, 100, false, true);
+                    mProgressForm.InitializeSubtask(string.Empty, 0, 100, false);
+                    mProgressForm.ResetKeyPressAbortProcess();
+                    mProgressForm.Show();
+                    Application.DoEvents();
+#else
+                Console.WriteLine("Parsing " + Path.GetFileName(mInputFilePath));
+#endif
+            }
+
+            if (mRecurseDirectories)
+            {
+                // This call will lead to calls to method ProcessFile in clsMASIC
+                if (mMASIC.ProcessFilesAndRecurseDirectories(mInputFilePath, mOutputDirectoryPath,
+                                                             mOutputDirectoryAlternatePath, mRecreateDirectoryHierarchyInAlternatePath,
+                                                             mParameterFilePath, mMaxLevelsToRecurse))
+                {
+                    return 0;
+                }
+
+                return (int)mMASIC.ErrorCode;
+            }
+
+            if (mMASIC.ProcessFilesWildcard(mInputFilePath, mOutputDirectoryPath, mParameterFilePath))
+            {
+                return 0;
+            }
+
+            var returnCode = (int)mMASIC.ErrorCode;
+            if (returnCode != 0)
+            {
+                Console.WriteLine("Error while processing: " + mMASIC.GetErrorMessage());
+            }
+
+            return returnCode;
         }
 
         private static void RegisterEvents(IEventNotifier sourceClass)
