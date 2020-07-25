@@ -608,33 +608,42 @@ namespace MASIC.DataInput
                         }
 
                         // Fix duplicate scans (values) in elutionTimeToScanMap, if possible
-                        // For Each elutionTime In (From item In elutionTimeToScanMap.Keys Order By item Select item)
+
+                        // elutionTimeToScanMap is a SortedDictionary where keys are elution times and values are the pseudo scan number mapped to each time (initially 0)
+                        // Cache the keys in elutionTimeToScanMap in a list that we can iterate over them
+                        var elutionTimes = (from item in elutionTimeToScanMap.Keys orderby item select item).ToList();
 
                         for (var i = 1; i < elutionTimeToScanMap.Count; i++)
                         {
-                            var previousScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i - 1);
-                            var currentScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i);
-                            if (currentScan == previousScan)
+                            var previousElutionTime = elutionTimes[i - 1];
+                            var currentElutionTime = elutionTimes[i];
+
+                            var previousScan = elutionTimeToScanMap[previousElutionTime];
+                            var currentScan = elutionTimeToScanMap[currentElutionTime];
+
+                            if (currentScan != previousScan)
+                                continue;
+
+                            // Adjacent time points have an identical scan number
+                            if (i == elutionTimeToScanMap.Count - 1)
                             {
-                                // Adjacent time points have an identical scan number
-                                if (i == elutionTimeToScanMap.Count - 1)
-                                {
-                                    elutionTimeToScanMap[elutionTimeToScanMap.Keys.ElementAtOrDefault(i)] = currentScan + 1;
-                                }
-                                else
-                                {
-                                    var nextScan = elutionTimeToScanMap.Values.ElementAtOrDefault(i + 1);
-                                    if (nextScan - currentScan > 1)
-                                    {
-                                        // The next scan is more than 1 scan away from this one; it is safe to increment currentScan
-                                        elutionTimeToScanMap[elutionTimeToScanMap.Keys.ElementAtOrDefault(i)] = currentScan + 1;
-                                    }
-                                }
+                                // We're at the final scan
+                                elutionTimeToScanMap[currentElutionTime] = currentScan + 1;
+                                continue;
+                            }
+
+                            // We're somewhere in the middle; increment the scan only if it's not a collision
+                            var nextElutionTime = elutionTimes[i + 1];
+                            var nextScan = elutionTimeToScanMap[nextElutionTime];
+
+                            if (nextScan - currentScan > 1)
+                            {
+                                // The next scan is more than 1 scan away from this one; it is safe to use currentScan + 1 for the current elution time
+                                elutionTimeToScanMap[currentElutionTime] = currentScan + 1;
                             }
                         }
 
                         // Populate the master dictionary mapping elution time to scan number
-
                         foreach (var item in elutionTimeToScanMap)
                         {
                             if (elutionTimeToScanMapMaster.TryGetValue(item.Key, out var existingScan))

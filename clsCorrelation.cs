@@ -375,8 +375,8 @@ namespace MASIC
         /// <returns>Correlation value (0 to 1), or -1 if an error</returns>
         /// <remarks>If necessary, use the BinData function before calling this function to bin the data</remarks>
         public float Correlate(
-            IReadOnlyCollection<float> dataList1,
-            IReadOnlyCollection<float> dataList2,
+            IReadOnlyList<float> dataList1,
+            IReadOnlyList<float> dataList2,
             cmCorrelationMethodConstants eCorrelationMethod)
         {
             // ReSharper disable once NotAccessedVariable
@@ -393,11 +393,14 @@ namespace MASIC
                     return -1;
                 }
 
+                if (dataCount == 0)
+                    return 0;
+
                 // Determine the number of non-zero data points in the two spectra
                 var nonZeroDataCount = 0;
                 for (var index = 0; index < dataCount; index++)
                 {
-                    if (dataList1.ElementAtOrDefault(index) > 0)
+                    if (dataList1[index] > 0)
                         nonZeroDataCount += 1;
                 }
 
@@ -407,7 +410,7 @@ namespace MASIC
                 nonZeroDataCount = 0;
                 for (var index = 0; index < dataCount; index++)
                 {
-                    if (dataList2.ElementAtOrDefault(index) > 0)
+                    if (dataList2[index] > 0)
                         nonZeroDataCount += 1;
                 }
 
@@ -451,9 +454,10 @@ namespace MASIC
         /// <param name="probabilityOfSignificance"></param>
         /// <param name="FishersZ"></param>
         private void CorrelatePearson(
-            IReadOnlyCollection<float> dataList1, IReadOnlyCollection<float> dataList2,
             out float RValue,
             out float probabilityOfSignificance, out float FishersZ)
+            IReadOnlyList<float> dataList1, 
+            IReadOnlyList<float> dataList2,
         {
             // TINY is used to "regularize" the unusual case of complete correlation
             var TINY = 1.0E-20;
@@ -485,8 +489,8 @@ namespace MASIC
             // Find the means
             for (var j = 0; j < n; j++)
             {
-                ax += dataList1.ElementAtOrDefault(j);
-                ay += dataList2.ElementAtOrDefault(j);
+                ax += dataList1[j];
+                ay += dataList2[j];
             }
 
             ax /= n;
@@ -495,8 +499,8 @@ namespace MASIC
             // Compute the correlation coefficient
             for (var j = 0; j < n; j++)
             {
-                var xt = dataList1.ElementAtOrDefault(j) - ax;
-                var yt = dataList2.ElementAtOrDefault(j) - ay;
+                var xt = dataList1[j] - ax;
+                var yt = dataList2[j] - ay;
                 sxx += xt * xt;
                 syy += yt * yt;
                 sxy += xt * yt;
@@ -525,8 +529,8 @@ namespace MASIC
         /// <param name="Z"></param>
         /// <param name="probabilityOfSignificance"></param>
         private void CorrelateKendall(
-            IReadOnlyCollection<float> dataList1,
-            IReadOnlyCollection<float> dataList2,
+            IReadOnlyList<float> dataList1,
+            IReadOnlyList<float> dataList2,
             // ReSharper disable once IdentifierTypo
             out float kendallsTau,
             out float Z,
@@ -559,8 +563,8 @@ namespace MASIC
             {
                 for (var k = j + 1; k < n; k++)
                 {
-                    double a1 = dataList1.ElementAtOrDefault(j) - dataList1.ElementAtOrDefault(k);
-                    double a2 = dataList2.ElementAtOrDefault(j) - dataList2.ElementAtOrDefault(k);
+                    double a1 = dataList1[j] - dataList1[k];
+                    double a2 = dataList2[j] - dataList2[k];
                     var aa = a1 * a2;
                     if (Math.Abs(aa) > double.Epsilon)
                     {
