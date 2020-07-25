@@ -923,6 +923,7 @@ namespace MASIC
             try
             {
                 var statsPlotter = new StatsPlotter(Options);
+                RegisterEvents(statsPlotter);
 
                 var success = statsPlotter.ProcessFile(sicStatsFile.FullName, outputDirectoryPath);
                 if (!success)
@@ -1119,7 +1120,7 @@ namespace MASIC
                     xmlResultsWriter.XmlOutputFileUpdateEntries(scanList, inputFileName, outputDirectoryPath);
                 }
 
-                if (string.IsNullOrEmpty(sicStatsFilePath) || !Options.PlotOptions.CreatePlots)
+                if (string.IsNullOrEmpty(sicStatsFilePath) || !Options.PlotOptions.CreatePlots || scanList.ParentIons.Count == 0)
                 {
                     return true;
                 }
@@ -1866,6 +1867,7 @@ namespace MASIC
                     ShowErrorMessage(StatusMessage);
                 }
 
+                Console.WriteLine();
                 LogMessage(string.Format("ProcessingStats: Memory Usage At Start (MB) = {0:F2}", mProcessingStats.MemoryUsageMBAtStart));
                 LogMessage(string.Format("ProcessingStats: Peak memory usage (MB) = {0:F2}", mProcessingStats.PeakMemoryUsageMB));
 
