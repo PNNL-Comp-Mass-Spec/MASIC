@@ -849,10 +849,10 @@ namespace MASIC.DataInput
                 return false;
             }
 
-            if (DateTime.UtcNow.Subtract(mLastLogTime).TotalSeconds >= 10 || scansRead % 500 == 0)
+            if (DateTime.UtcNow.Subtract(mLastLogTime).TotalSeconds >= 10 ||
+                scansRead % 1000 == 0 && DateTime.UtcNow.Subtract(mLastLogTime).TotalSeconds >= 1)
             {
-                ReportMessage("Reading scan: " + scansRead.ToString());
-                Console.Write(".");
+                ReportMessage("Reading scan: " + scansRead);
                 mLastLogTime = DateTime.UtcNow;
             }
 
