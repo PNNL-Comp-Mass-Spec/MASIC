@@ -1593,11 +1593,7 @@ namespace MASIC
             Options.StatusMessage = message;
 
             var messageWithoutCRLF = Options.StatusMessage.Replace(Environment.NewLine, "; ");
-            if (ex == null)
-            {
-                ex = new Exception("Error");
-            }
-            else if (!string.IsNullOrEmpty(ex.Message) && !message.Contains(ex.Message))
+            if (ex != null && !string.IsNullOrEmpty(ex.Message) && !message.Contains(ex.Message))
             {
                 messageWithoutCRLF += "; " + ex.Message;
             }
@@ -1612,7 +1608,10 @@ namespace MASIC
                 ShowErrorMessage(source + ": " + messageWithoutCRLF);
             }
 
-            Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
+            if (ex != null)
+            {
+                Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
+            }
 
             if (newErrorCode != eMasicErrorCodes.NoError)
             {
