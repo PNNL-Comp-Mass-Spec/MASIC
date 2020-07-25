@@ -108,8 +108,9 @@ namespace MASIC.Options
         public bool WriteMRMIntensityCrosstab { get; set; }
 
         /// <summary>
-        /// If this is true, then an error will not be raised if the input file contains no parent ions or no survey scans
+        /// If this is true, an error will not be raised if the input file contains no parent ions or no survey scans
         /// </summary>
+        /// <remarks>It is useful to set this to true when processing a file that only has MRM data</remarks>
         public bool SuppressNoParentIonsError { get; set; }
 
         public RawDataExportOptions RawDataExportOptions { get; }
