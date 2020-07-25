@@ -852,6 +852,8 @@ namespace MASIC.DataOutput
                     SICStatsColumns.PeakArea
                 };
 
+                var duplicateParentIonIndices = new SortedSet<int>();
+
                 using (var reader = new StreamReader(new FileStream(sicStatsFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
                 {
                     var linesRead = 0;
@@ -911,31 +913,34 @@ namespace MASIC.DataOutput
                         parentIon.SICStats.Peak.FWHMScanWidth = fwhmInScans;
                         parentIon.SICStats.Peak.Area = peakArea;
 
-                        if (mParentIons.ContainsKey(parentIonIndex))
-                        {
-                            if (parentIonIndex > 0)
-                            {
-                                OnWarningEvent(string.Format(
-                                    "Ignoring duplicate parent ion index {0} found in {1}", parentIonIndex, sicStatsFile.Name));
-                                continue;
-                            }
-
-                            var alternateIndex = -linesRead;
-
-                            if (mParentIons.ContainsKey(alternateIndex))
-                            {
-                                OnWarningEvent(string.Format(
-                                    "Ignoring conflicting parent ion index {0} for parent ion {1} found in {2}",
-                                    alternateIndex, parentIonIndex, sicStatsFile.Name));
-                                continue;
-                            }
-
-                            mParentIons.Add(alternateIndex, parentIon);
-                        }
-                        else
+                        if (!mParentIons.ContainsKey(parentIonIndex))
                         {
                             mParentIons.Add(parentIonIndex, parentIon);
+                            continue;
                         }
+
+                        // Duplicate parent ion index
+                        // This is not typically seen, but it is possible if the same parent ion is fragmented using multiple fragmentation modes
+                        // For example, see Angiotensin_AllScans.raw at https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Lumos_Example
+
+                        if (duplicateParentIonIndices.Contains(parentIonIndex))
+                            continue;
+
+                        duplicateParentIonIndices.Add(parentIonIndex);
+                        if (duplicateParentIonIndices.Count > 5)
+                            continue;
+
+                        OnWarningEvent(string.Format(
+                            "Ignoring duplicate parent ion index {0} found in {1}", parentIonIndex, sicStatsFile.Name));
+                    }
+
+                    if (duplicateParentIonIndices.Count > 5)
+                    {
+                        OnWarningEvent(string.Format(
+                            // ReSharper disable once StringLiteralTypo
+                            "Ignored {0} lines in the _SICstats.txt file due to a duplicate parent ion index\n" +
+                            "This typically indicates that the same parent ion was fragmented " +
+                            "using multiple fragmentation modes, and is thus not an error", duplicateParentIonIndices.Count));
                     }
                 }
 
