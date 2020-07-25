@@ -80,6 +80,7 @@ namespace MASIC
             SaveSICStatsFlatFile = 6,
             CloseOpenFileHandles = 7,
             UpdateXMLFileWithNewOptimalPeakApexValues = 8,
+            CreatePlots = 9,
             Cancelled = 99,
             Complete = 100
         }
@@ -1122,6 +1123,10 @@ namespace MASIC
                 {
                     return true;
                 }
+
+                UpdateProcessingStep(eProcessingStepConstants.CreatePlots);
+                SetSubtaskProcessingStepPct(0);
+                UpdateOverallProgress("Creating plots in " + outputDirectoryPath);
 
                 var plotsCreated = CreatePlots(new FileInfo(sicStatsFilePath), outputDirectoryPath);
                 return plotsCreated;
@@ -2193,6 +2198,7 @@ namespace MASIC
             // SaveSICStatsFlatFile = 6
             // CloseOpenFileHandles = 7
             // UpdateXMLFileWithNewOptimalPeakApexValues = 8
+            // CreatePlots = 9
             // Cancelled = 99
             // Complete = 100
 
@@ -2200,13 +2206,13 @@ namespace MASIC
 
             if (Options.SkipMSMSProcessing)
             {
-                // Step                    0  1      2       3  4  5       6       7       8
-                weightingFactors = new[] { 0, 0.97F, 0.002F, 0, 0, 0.001F, 0.025F, 0.001F, 0.001F };            // The sum of these factors should be 1.00
+                // Step                    0  1      2       3  4  5       6       7       8       9
+                weightingFactors = new[] { 0, 0.96F, 0.002F, 0, 0, 0.001F, 0.025F, 0.001F, 0.001F, 0.01F };           // The sum of these factors should be 1.00
             }
             else
             {
-                // Step                    0  1       2       3      4      5       6       7       8
-                weightingFactors = new[] { 0, 0.194F, 0.003F, 0.65F, 0.09F, 0.001F, 0.006F, 0.001F, 0.055F };   // The sum of these factors should be 1.00
+                // Step                    0  1       2       3      4      5       6       7       8       9
+                weightingFactors = new[] { 0, 0.194F, 0.003F, 0.64F, 0.09F, 0.001F, 0.006F, 0.001F, 0.055F, 0.01F };   // The sum of these factors should be 1.00
             }
 
             try
