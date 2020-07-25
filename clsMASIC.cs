@@ -1223,7 +1223,7 @@ namespace MASIC
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
 
-                LogMessage("FindSicsWork: Call CreateParentIonSICs", MessageTypeConstants.Debug);
+                LogMessage("FindSICsWork: Call CreateParentIonSICs", MessageTypeConstants.Debug);
                 var sicProcessor = new clsSICProcessing(mMASICPeakFinder, mrmProcessor);
                 RegisterEvents(sicProcessor);
 

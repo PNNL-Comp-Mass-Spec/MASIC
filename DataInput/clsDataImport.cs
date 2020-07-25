@@ -378,7 +378,7 @@ namespace MASIC.DataInput
                 }
                 else
                 {
-                    ReportError("No scans found in the input file: " + dataFile.FullName);
+                    ReportError("No scans found in the input file: " + dataFile.FullName, clsMASIC.eMasicErrorCodes.InputFileAccessError);
                     SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
                 }
 

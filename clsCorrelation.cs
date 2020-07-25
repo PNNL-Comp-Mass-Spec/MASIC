@@ -420,16 +420,16 @@ namespace MASIC
                 switch (eCorrelationMethod)
                 {
                     case cmCorrelationMethodConstants.Pearson:
-                        CorrelatePearson(dataList1, dataList2, out var RValue, out probabilityOfSignificance, out var fishersZ);
-                        return RValue;
+                        CorrelatePearson(dataList1, dataList2, out var rValue, out probabilityOfSignificance, out _);
+                        return rValue;
 
                     case cmCorrelationMethodConstants.Spearman:
-                        CorrelateSpearman(dataList1, dataList2, out var diffInRanks, out var ZD, out probabilityOfSignificance, out var RS, out var ProbRS);
+                        CorrelateSpearman(dataList1, dataList2, out var diffInRanks, out _, out probabilityOfSignificance, out var RS, out _);
                         return RS;
 
                     case cmCorrelationMethodConstants.Kendall:
                         // ReSharper disable once IdentifierTypo
-                        CorrelateKendall(dataList1, dataList2, out var kendallsTau, out var Z, out probabilityOfSignificance);
+                        CorrelateKendall(dataList1, dataList2, out var kendallsTau, out _, out probabilityOfSignificance);
                         return kendallsTau;
 
                     default:
@@ -450,17 +450,17 @@ namespace MASIC
         /// </summary>
         /// <param name="dataList1"></param>
         /// <param name="dataList2"></param>
-        /// <param name="RValue"></param>
+        /// <param name="rValue"></param>
         /// <param name="probabilityOfSignificance"></param>
-        /// <param name="FishersZ"></param>
+        /// <param name="fishersZ"></param>
         private void CorrelatePearson(
-            out float RValue,
-            out float probabilityOfSignificance, out float FishersZ)
             IReadOnlyList<float> dataList1, 
             IReadOnlyList<float> dataList2,
+            out float rValue,
+            out float probabilityOfSignificance, out float fishersZ)
         {
             // TINY is used to "regularize" the unusual case of complete correlation
-            var TINY = 1.0E-20;
+            const double TINY = 1.0E-20;
 
             // Given two arrays x[1..n] and y[1..n], this routine computes their correlation coefficient
             // r (returned as r), the significance level at which the null hypothesis of zero correlation is
@@ -473,9 +473,9 @@ namespace MASIC
             var ay = 0.0;
             var ax = 0.0;
 
-            RValue = 0;
+            rValue = 0;
             probabilityOfSignificance = 0;
-            FishersZ = 0;
+            fishersZ = 0;
 
             var n = dataList1.Count;
             if (n != dataList2.Count)
@@ -506,13 +506,13 @@ namespace MASIC
                 sxy += xt * yt;
             }
 
-            RValue = (float)(sxy / (Math.Sqrt(sxx * syy) + TINY));
+            rValue = (float)(sxy / (Math.Sqrt(sxx * syy) + TINY));
 
             // Fisher's z transformation
-            FishersZ = (float)(0.5 * Math.Log((1.0 + RValue + TINY) / (1.0 - RValue + TINY)));
+            fishersZ = (float)(0.5 * Math.Log((1.0 + rValue + TINY) / (1.0 - rValue + TINY)));
             double df = n - 2;
 
-            var t = RValue * Math.Sqrt(df / ((1.0 - RValue + TINY) * (1.0 + RValue + TINY)));
+            var t = rValue * Math.Sqrt(df / ((1.0 - rValue + TINY) * (1.0 + rValue + TINY)));
 
             // Student's t probability
             probabilityOfSignificance = (float)(BetaI(0.5 * df, 0.5, df / (df + t * t)));
@@ -526,14 +526,14 @@ namespace MASIC
         /// <param name="dataList1"></param>
         /// <param name="dataList2"></param>
         /// <param name="kendallsTau"></param>
-        /// <param name="Z"></param>
+        /// <param name="z"></param>
         /// <param name="probabilityOfSignificance"></param>
         private void CorrelateKendall(
             IReadOnlyList<float> dataList1,
             IReadOnlyList<float> dataList2,
             // ReSharper disable once IdentifierTypo
             out float kendallsTau,
-            out float Z,
+            out float z,
             out float probabilityOfSignificance)
         {
 
@@ -547,7 +547,7 @@ namespace MASIC
             var intIS = 0;
 
             kendallsTau = 0;
-            Z = 0;
+            z = 0;
             probabilityOfSignificance = 0;
 
             var n = dataList1.Count;
@@ -594,9 +594,9 @@ namespace MASIC
             // ReSharper disable once IdentifierTypo
             var svar = (4.0 * n + 10.0) / (9.0 * n * (n - 1.0));
 
-            Z = (float)(kendallsTau / Math.Sqrt(svar));
+            z = (float)(kendallsTau / Math.Sqrt(svar));
 
-            probabilityOfSignificance = (float)(ErfCC(Math.Abs(Z) / 1.4142136));
+            probabilityOfSignificance = (float)(ErfCC(Math.Abs(z) / 1.4142136));
         }
 
         /// <summary>

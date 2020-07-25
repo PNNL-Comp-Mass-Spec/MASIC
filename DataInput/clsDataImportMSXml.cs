@@ -590,7 +590,7 @@ namespace MASIC.DataInput
                     // Keys in this dictionary are scan times, values are the pseudo scan number mapped to each time
                     var elutionTimeToScanMapMaster = new Dictionary<double, int>();
 
-                    // Define the mapped scan number fo each elution time in elutionTimeToScanMapByChromatogram
+                    // Define the mapped scan number of each elution time in elutionTimeToScanMapByChromatogram
                     foreach (var chromatogramTimeEntry in elutionTimeToScanMapByChromatogram)
                     {
                         if (DateTime.UtcNow.Subtract(lastProgress).TotalSeconds >= 2.5)
@@ -650,7 +650,7 @@ namespace MASIC.DataInput
                             {
                                 if (existingScan != item.Value)
                                 {
-                                    Console.WriteLine("Elution times resulted in different pseudo scans; this is unexpected");
+                                    ConsoleMsgUtils.ShowWarning("Elution times resulted in different pseudo scans in ExtractScanInfoFromMzMLDataFile; this is unexpected");
                                 }
                             }
                             else

@@ -565,7 +565,8 @@ namespace MASIC.DataOutput
                 var reporterIonsFile = new FileInfo(reporterIonsFilePath);
                 if (!reporterIonsFile.Exists)
                 {
-                    OnWarningEvent("ReporterIons file not found, cannot convert FWHM in scans to minutes; file path:" + reporterIonsFile.FullName);
+                    // ReporterIons file not found
+                    // Cannot create any reporter-ion based plots; this is not an error
                     return false;
                 }
 
