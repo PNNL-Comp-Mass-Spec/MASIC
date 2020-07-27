@@ -521,6 +521,18 @@ namespace MASIC.DataInput
                 }
                 else if (xmlReader.NumSpectra == 0 && xmlReader.NumChromatograms > 0)
                 {
+                    // ReSharper disable CommentTypo
+
+                    // m/z and intensity data in the .mzML file are stored as chromatograms, instead of as spectra
+                    // An example is TSQ dataset QC18PepsR1_4Apr18_legolas1, converted from .raw to .mzML using:
+                    // msconvert.exe --32 --mzML QC18PepsR1_4Apr18_legolas1.raw
+                    //
+                    // The .mzML file for this dataset has 69 chromatograms
+                    // The first has CV Param MS_total_ion_current_chromatogram and is thus TIC vs. time
+                    // The remaining ones have CV Param MS_selected_reaction_monitoring_chromatogram, and that is the data we need to load
+
+                    // ReSharper restore CommentTypo
+
                     // Construct a list of the difference in time (in minutes) between adjacent data points in each chromatogram
                     var scanTimeDiffMedians = new List<double>(200);
 
@@ -541,6 +553,8 @@ namespace MASIC.DataInput
                             continue;
 
                         chromatogramNumber += 1;
+
+                        // Keys in this dictionary are elution time, values are the pseudo scan number (assigned later in this method)
                         var elutionTimeToScanMap = new SortedDictionary<double, int>();
                         elutionTimeToScanMapByChromatogram.Add(chromatogramNumber, elutionTimeToScanMap);
 
@@ -566,16 +580,17 @@ namespace MASIC.DataInput
                             }
                         }
 
-                        // First, compute the median time diff in scanTimeDiffs
+                        // Compute the median time diff in scanTimeDiffs
                         var medianScanTimeDiffThisChromatogram = clsUtilities.ComputeMedian(scanTimeDiffs);
 
+                        // Store in scanTimeDiffMedians, which tracks the median scan time difference for each chromatogram
                         scanTimeDiffMedians.Add(medianScanTimeDiffThisChromatogram);
                     }
 
                     // Construct a mapping between elution time and scan number
                     // This is a bit of a challenge since chromatogram data only tracks elution time, and not scan number
 
-                    // First, compute the overall median time diff
+                    // First, compute the overall median time diff, e.g. 0.0216
                     var medianScanTimeDiff = clsUtilities.ComputeMedian(scanTimeDiffMedians);
                     if (Math.Abs(medianScanTimeDiff) < 0.000001)
                     {
@@ -600,6 +615,10 @@ namespace MASIC.DataInput
                             Console.Write("{0:N0}% ", percentComplete);
                         }
 
+                        // Assign the pseudo scan number for each time in the chromatogram
+                        // For example, if elutionTime is 0.00461 and medianScanTimeDiff is 0.0216 minutes,
+                        // nearestPseudoScan will be 0.00461 / 0.0216 * 100 + 1 = 22
+
                         var elutionTimeToScanMap = chromatogramTimeEntry.Value;
                         foreach (var elutionTime in elutionTimeToScanMap.Keys.ToList())
                         {
@@ -608,9 +627,9 @@ namespace MASIC.DataInput
                         }
 
                         // Fix duplicate scans (values) in elutionTimeToScanMap, if possible
+                        // (elutionTimeToScanMap is a SortedDictionary where keys are elution times and values are the pseudo scan number mapped to each time)
 
-                        // elutionTimeToScanMap is a SortedDictionary where keys are elution times and values are the pseudo scan number mapped to each time (initially 0)
-                        // Cache the keys in elutionTimeToScanMap in a list that we can iterate over them
+                        // Cache the keys in elutionTimeToScanMap in a list that we can iterate over
                         var elutionTimes = (from item in elutionTimeToScanMap.Keys orderby item select item).ToList();
 
                         for (var i = 1; i < elutionTimeToScanMap.Count; i++)
@@ -643,7 +662,10 @@ namespace MASIC.DataInput
                             }
                         }
 
-                        // Populate the master dictionary mapping elution time to scan number
+                        // Populate the master dictionary mapping elution time to scan number (using chromatogram 1)
+                        // On subsequent chromatograms, add new elution times,
+                        // or validate that existing elution times have the same computed pseudo scan number (which should always be true)
+
                         foreach (var item in elutionTimeToScanMap)
                         {
                             if (elutionTimeToScanMapMaster.TryGetValue(item.Key, out var existingScan))
@@ -672,6 +694,7 @@ namespace MASIC.DataInput
                     // Values are the elution time for the scan
                     var simulatedSpectraTimes = new Dictionary<int, double>();
 
+                    // Open the file with a new reader
                     var xmlReader2 = new SimpleMzMLReader(mzMLFile.FullName, false);
 
                     var scanTimeLookupErrors = 0;
