@@ -1456,22 +1456,24 @@ namespace MASIC.DataInput
             return false;
         }
 
-        private bool IsSrmChromatogram(SimpleMzMLReader.ParamData chromatogramItem)
+        private static bool IsSrmChromatogram(SimpleMzMLReader.ParamData chromatogramItem)
         {
-            if (chromatogramItem.CVParams.Count > 0)
+            if (chromatogramItem.CVParams.Count <= 0)
+                return false;
+
+            foreach (var item in chromatogramItem.CVParams)
             {
-                foreach (var item in chromatogramItem.CVParams)
+                // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+                switch (item.TermInfo.Cvid)
                 {
-                    switch (item.TermInfo.Cvid)
-                    {
-                        case CV.CVID.MS_total_ion_current_chromatogram:
-                            // Skip this chromatogram
-                            return false;
-                        case CV.CVID.MS_selected_ion_current_chromatogram:
-                        case CV.CVID.MS_selected_ion_monitoring_chromatogram:
-                        case CV.CVID.MS_selected_reaction_monitoring_chromatogram:
-                            return true;
-                    }
+                    case CV.CVID.MS_total_ion_current_chromatogram:
+                        // Skip this chromatogram
+                        return false;
+
+                    case CV.CVID.MS_selected_ion_current_chromatogram:
+                    case CV.CVID.MS_selected_ion_monitoring_chromatogram:
+                    case CV.CVID.MS_selected_reaction_monitoring_chromatogram:
+                        return true;
                 }
             }
 
