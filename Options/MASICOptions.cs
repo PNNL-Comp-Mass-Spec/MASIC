@@ -665,6 +665,9 @@ namespace MASIC.Options
                 PlotOptions.SaveHistogramData = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "SaveHistogramData", PlotOptions.SaveHistogramData);
 
+                PlotOptions.SaveHtmlFile = reader.GetParam(
+                    XML_SECTION_PLOT_OPTIONS, "SaveHtmlFile", PlotOptions.SaveHtmlFile);
+
                 PlotOptions.SaveReporterIonObservationRateData = reader.GetParam(
                     XML_SECTION_PLOT_OPTIONS, "SaveReporterIonObservationRateData", PlotOptions.SaveReporterIonObservationRateData);
 
@@ -926,6 +929,7 @@ namespace MASIC.Options
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "CreatePlots", PlotOptions.CreatePlots);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PlotWithPython", PlotOptions.PlotWithPython);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "SaveHistogramData", PlotOptions.SaveHistogramData);
+                writer.SetParam(XML_SECTION_PLOT_OPTIONS, "SaveHtmlFile", PlotOptions.SaveHtmlFile);
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "SaveReporterIonObservationRateData", PlotOptions.SaveReporterIonObservationRateData);
 
                 writer.SetParam(XML_SECTION_PLOT_OPTIONS, "PeakAreaHistogramBinCount", PlotOptions.PeakAreaHistogramBinCount);

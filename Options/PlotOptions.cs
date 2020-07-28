@@ -59,6 +59,11 @@ namespace MASIC.Options
         public bool SaveHistogramData { get; set; } = false;
 
         /// <summary>
+        /// When true, create a index.html file that shows the plots and includes a link to DMS
+        /// </summary>
+        public bool SaveHtmlFile { get; set; } = true;
+
+        /// <summary>
         /// When true, create text files of reporter ion observation rate stats
         /// </summary>
         public bool SaveReporterIonObservationRateData { get; set; } = true;

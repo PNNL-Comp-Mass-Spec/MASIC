@@ -247,13 +247,27 @@ namespace MASIC.DataOutput
 
                 var plotDataSaved = SavePlotData(datasetName, outputDirectory);
 
-                return plotsGenerated && plotDataSaved;
+                var htmlCreated = SaveIndexHTML(datasetName, outputDirectory, plotFiles);
+
+                return plotsGenerated && plotDataSaved && htmlCreated;
             }
             catch (Exception ex)
             {
                 OnErrorEvent("Exception in StatsPlotter.ProcessFile", ex);
                 return false;
             }
+        }
+
+        private bool SaveIndexHTML(string datasetName, string outputDirectory, List<PlotFileInfo> plotFiles)
+        {
+            if (!Options.PlotOptions.SaveHtmlFile)
+                return true;
+
+            var htmlCreator = new HTMLFileCreator(datasetName, Options.PlotOptions, plotFiles);
+            RegisterEvents(htmlCreator);
+
+            var success = htmlCreator.CreateHTMLFile(outputDirectory);
+            return success;
         }
 
         private bool SaveHistogramData(string datasetName, string outputDirectory)
