@@ -263,7 +263,8 @@ namespace MASIC.DataOutput
                 var scansToUseForHighAbundanceHistogram = peakAreaByScan.Count * highAbundanceThreshold / 100.0;
 
                 // Assure that peakAreaByScan has an entry for each reporter ion
-                // This shouldn't be required, but we'll check anyway
+                // This shouldn't typically be required, but it can happen if the first scan (or scans) of the instrument data file are MS2 scans instead of MS1 scans
+                // In this case, these MS2 scans will have reporter ions, but there won't be any parent ions for them
                 foreach (var reporterIon in mReporterIonAbundances)
                 {
                     foreach (var scanNumber in reporterIon.Value.Keys.Where(scanNumber => !peakAreaByScan.ContainsKey(scanNumber)))
