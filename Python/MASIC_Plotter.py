@@ -123,9 +123,9 @@ def set_title_and_labels(ax, baseFontSize, title, xDataMin, xDataMax, xAxisLabel
         ymin = 0
         ymax += ymax * 0.05
     else:
-        # Bar Plot; always scale the y axis from 0 to 100
+        # Bar Plot; always scale the y axis from 0 to 102 (to give a little whitespace above bars that are at 100%)
         ymin = 0
-        ymax = 100
+        ymax = 102
 
     plt.ylim(ymin=ymin, ymax=ymax)
 
@@ -206,7 +206,8 @@ def generate_bar_chart(columnNames, xLabels, barHeights, title, r_label, l_label
     # dataMin = np.min(barHeights)
     # dataMax = np.max(barHeights)
 
-    # Fix min/max at 100
+    # Define the range of values that we could see
+    # This is used when normalizing the bar heights to determine the bar color
     dataMin = 0
     dataMax = 100
 

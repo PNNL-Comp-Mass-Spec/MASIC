@@ -271,7 +271,7 @@ namespace MASIC.Plots
             else
             {
                 // Override the auto-computed Y axis range
-                plotContainer.XAxisInfo.SetRange(yAxisMinimum, yAxisMaximum);
+                plotContainer.YAxisInfo.SetRange(yAxisMinimum, yAxisMaximum);
             }
 
             return plotContainer;
@@ -319,7 +319,7 @@ namespace MASIC.Plots
                         Title = YAxisLabel,
                         AutoScale = AutoMinMaxY,
                         Minimum = yAxisMinimum,
-                        Maximum = 100,
+                        Maximum = 102,
                         AddColorAxis = true,
                         ColorPalette = colorGradient.Value,
                         TickLabelsArePercents = true
