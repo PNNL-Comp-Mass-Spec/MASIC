@@ -11,6 +11,8 @@ namespace MASIC.DataOutput
     {
         private readonly StatsSummarizer mStatsSummarizer;
 
+        public const string REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX = "RepIonObsRate.txt";
+
         /// <summary>
         /// MASIC Options
         /// </summary>
@@ -255,21 +257,18 @@ namespace MASIC.DataOutput
 
         private bool SaveReporterIonObservationRateData(string datasetName, string outputDirectory)
         {
-            var success1 = WriteReporterIonObservationRateData(
+            if (mStatsSummarizer.ReporterIonNames.Keys.Count == 0)
+                return true;
+
+            var success = WriteReporterIonObservationRateData(
                 mStatsSummarizer.ReporterIonNames,
+                mStatsSummarizer.ReporterIonObservationRate,
                 mStatsSummarizer.ReporterIonObservationRateHighAbundance,
                 datasetName,
                 outputDirectory,
-                "RepIonObsRateHighAbundance");
+                REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX);
 
-            var success2 = WriteReporterIonObservationRateData(
-                mStatsSummarizer.ReporterIonNames,
-                mStatsSummarizer.ReporterIonObservationRate,
-                datasetName,
-                outputDirectory,
-                "RepIonObsRate");
-
-            return success1 && success2;
+            return success;
         }
 
         private bool WriteHistogramData(
@@ -305,23 +304,27 @@ namespace MASIC.DataOutput
         private bool WriteReporterIonObservationRateData(
             IReadOnlyDictionary<int, string> reporterIonNames,
             IReadOnlyDictionary<int, float> reporterIonObservationRateData,
+            IReadOnlyDictionary<int, float> reporterIonObservationRateHighAbundanceData,
             string datasetName,
             string outputDirectory,
             string fileSuffix)
         {
             try
             {
-                var outputFilePath = Path.Combine(outputDirectory, string.Format("{0}_{1}.txt", datasetName, fileSuffix));
+                var outputFilePath = Path.Combine(outputDirectory, string.Format("{0}_{1}", datasetName, fileSuffix));
                 OnDebugEvent("Saving " + PathUtils.CompactPathString(outputFilePath, 120));
 
                 using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
                 {
-                    writer.WriteLine("{0}\t{1}", "Reporter_Ion", "Observation_Rate");
+                    var observationRateHighAbundance = string.Format("Observation_Rate_Top{0}Pct", Options.PlotOptions.ReporterIonObservationRateTopNPct);
+
+                    writer.WriteLine("{0}\t{1}\t{2}", "Reporter_Ion", "Observation_Rate", observationRateHighAbundance);
                     foreach (var reporterIonIndex in reporterIonNames.Keys)
                     {
-                        writer.WriteLine("{0}\t{1:0.0##}",
+                        writer.WriteLine("{0,-12}\t{1,-16:0.0##}\t{2:0.0##}",
                             reporterIonNames[reporterIonIndex],
-                            reporterIonObservationRateData[reporterIonIndex]);
+                            reporterIonObservationRateData[reporterIonIndex],
+                            reporterIonObservationRateHighAbundanceData[reporterIonIndex]);
                     }
                 }
 
