@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using OxyPlot;
 
 namespace MASIC.Plots
 {
@@ -9,8 +8,6 @@ namespace MASIC.Plots
     {
 
         public List<KeyValuePair<string, double>> Data { get; private set; }
-
-        public List<OxyColor> DataPointColors { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -27,7 +24,6 @@ namespace MASIC.Plots
             string dataSource = "") : base(PlotTypes.BarChart, plotTitle, "Label", yAxisTitle, writeDebug, dataSource)
         {
             Data = new List<KeyValuePair<string, double>>();
-            DataPointColors = new List<OxyColor>();
             ClearData();
         }
 
@@ -66,11 +62,8 @@ namespace MASIC.Plots
                     writer.WriteLine("{0}\t{1}", XAxisInfo.Title, YAxisInfo.Title);
 
                     // Data
-                    for (var i = 0; i < Data.Count; i++)
+                    foreach (var dataPoint in Data)
                     {
-                        var dataPoint = Data[i];
-                        var barColor = i < DataPointColors.Count ? DataPointColors[i].ToString() : string.Empty;
-
                         writer.WriteLine("{0}\t{1}", dataPoint.Key, dataPoint.Value);
                     }
                 }
@@ -110,11 +103,10 @@ namespace MASIC.Plots
         public void ClearData()
         {
             Data.Clear();
-            DataPointColors.Clear();
             mSeriesCount = 0;
         }
 
-        public void SetData(List<KeyValuePair<string, double>> points, List<OxyColor> pointColors)
+        public void SetData(List<KeyValuePair<string, double>> points)
         {
             if (points.Count == 0)
             {
@@ -123,7 +115,6 @@ namespace MASIC.Plots
             }
 
             Data = points;
-            DataPointColors = pointColors;
 
             mSeriesCount = 1;
         }

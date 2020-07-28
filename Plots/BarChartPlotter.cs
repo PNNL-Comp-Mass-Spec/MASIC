@@ -141,6 +141,7 @@ namespace MASIC.Plots
                         colorIndex = 0;
                     }
 
+                    // Note that this color is only used when creating plots with OxyPlot; when plotting with Python, MASIC_Plotter.py handles bar colors
                     colorToUse = colorMap[colorIndex];
                 }
                 else
@@ -248,13 +249,11 @@ namespace MASIC.Plots
 
             // Instantiate the list to track the data points
             var points = new List<KeyValuePair<string, double>>();
-            var pointColors = new List<OxyColor>();
 
             for (var i = 0; i < dataPoints.Count; i++)
             {
                 var dataPoint = new KeyValuePair<string, double>(xAxisLabels[i], dataPoints[i].Key);
                 points.Add(dataPoint);
-                pointColors.Add(dataPoints[i].Value);
             }
 
             var plotContainer = new PythonPlotContainerBarChart(plotTitle, yAxisInfo.Title)
@@ -262,7 +261,7 @@ namespace MASIC.Plots
                 DeleteTempFiles = Options.DeleteTempFiles
             };
 
-            plotContainer.SetData(points, pointColors);
+            plotContainer.SetData(points);
 
             if (yAxisInfo.AutoScale)
             {

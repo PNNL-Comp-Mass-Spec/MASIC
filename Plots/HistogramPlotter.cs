@@ -265,7 +265,7 @@ namespace MASIC.Plots
             AxisInfo yAxisInfo)
         {
 
-            var points = GetDataToPlot(histogramInfo, out var minBin, out var maxBin, out var maxIntensity);
+            var points = GetDataToPlot(histogramInfo, out _, out _, out var maxIntensity);
 
             if (points.Count == 0)
             {
