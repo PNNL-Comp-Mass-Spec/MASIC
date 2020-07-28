@@ -279,6 +279,7 @@ namespace MASIC.Plots
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };
+            RegisterEvents(plotContainer);
 
             plotContainer.SetData(points);
 
