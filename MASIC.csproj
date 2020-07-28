@@ -160,9 +160,11 @@
     <Compile Include="Plots\AxisInfo.cs" />
     <Compile Include="Plots\BarChartPlotter.cs" />
     <Compile Include="Plots\HistogramPlotter.cs" />
+    <Compile Include="Plots\HTMLFileCreator.cs" />
     <Compile Include="Plots\OxyPlotUtilities.cs" />
     <Compile Include="Plots\PlotContainer.cs" />
     <Compile Include="Plots\PlotContainerBase.cs" />
+    <Compile Include="Plots\PlotFileInfo.cs" />
     <Compile Include="Plots\PlotUtilities.cs" />
     <Compile Include="Plots\PythonPlotContainer.cs" />
     <Compile Include="Plots\PythonPlotContainerXY.cs" />
