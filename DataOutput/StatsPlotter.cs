@@ -30,11 +30,39 @@ namespace MASIC.DataOutput
             RegisterEvents(mStatsSummarizer);
         }
 
+        /// <summary>
+        /// Append a plot to the list of plot files saved to disk
+        /// </summary>
+        /// <param name="plotFiles"></param>
+        /// <param name="outputFilePath"></param>
+        /// <param name="plotType"></param>
+        /// <param name="plotDescription"></param>
+        private void AppendPlotFile(
+            ICollection<PlotFileInfo> plotFiles,
+            string outputFilePath,
+            PlotContainerBase.PlotTypes plotType,
+            string plotDescription)
+        {
+            if (string.IsNullOrWhiteSpace(outputFilePath))
+                return;
+
+            var outputFile = new FileInfo(outputFilePath);
+            var plotFile = new PlotFileInfo(outputFile)
+            {
+                PlotType = plotType,
+                FileDescription = plotDescription
+            };
+
+            plotFiles.Add(plotFile);
+        }
+
         private bool CreateHistogram(
             Dictionary<float, int> histogramData,
             string datasetName,
             string outputDirectory,
+            ICollection<PlotFileInfo> plotFiles,
             string plotTitle,
+            string plotDescription,
             string plotAbbreviation,
             string xAxisLabel,
             string yAxisLabel)
@@ -55,7 +83,9 @@ namespace MASIC.DataOutput
                     histogramPlotter.AddData(dataPoint.Key, dataPoint.Value);
                 }
 
-                var success = histogramPlotter.SavePlotFile(datasetName, outputDirectory);
+                var success = histogramPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath);
+
+                AppendPlotFile(plotFiles, outputFilePath, PlotContainerBase.PlotTypes.XY, plotDescription);
 
                 return success;
             }
@@ -66,7 +96,7 @@ namespace MASIC.DataOutput
             }
         }
 
-        private bool CreateHistograms(string datasetName, string outputDirectory)
+        private bool CreateHistograms(string datasetName, string outputDirectory, ICollection<PlotFileInfo> plotFiles)
         {
             try
             {
@@ -74,7 +104,9 @@ namespace MASIC.DataOutput
                     mStatsSummarizer.PeakAreaHistogram,
                     datasetName,
                     outputDirectory,
+                    plotFiles,
                     "Peak Area Histogram",
+                    "Peak Areas",
                     "PeakAreaHistogram",
                     "Peak Area (Log 10)",
                     "Count");
@@ -84,7 +116,9 @@ namespace MASIC.DataOutput
                     mStatsSummarizer.PeakWidthHistogram,
                     datasetName,
                     outputDirectory,
+                    plotFiles,
                     "Peak Width Histogram",
+                    "Peak Widths",
                     "PeakWidthHistogram",
                     string.Format("Peak Width ({0}), FWHM", mStatsSummarizer.PeakWidthHistogramUnits),
                     "Count");
@@ -103,16 +137,20 @@ namespace MASIC.DataOutput
             IReadOnlyDictionary<int, float> barChartDataByIndex,
             string datasetName,
             string outputDirectory,
+            ICollection<PlotFileInfo> plotFiles,
             string plotTitle,
+            string plotDescription,
             string plotAbbreviation,
             string yAxisLabel,
             int yAxisMinimum = 0)
         {
             try
             {
-                var barChartPlotter = new BarChartPlotter(Options.PlotOptions, plotTitle) {
+                var barChartPlotter = new BarChartPlotter(Options.PlotOptions, plotTitle)
+                {
                     PlotAbbrev = plotAbbreviation,
-                    YAxisLabel = yAxisLabel};
+                    YAxisLabel = yAxisLabel
+                };
 
                 RegisterEvents(barChartPlotter);
 
@@ -122,7 +160,9 @@ namespace MASIC.DataOutput
                     barChartPlotter.AddData(label, dataPoint.Value);
                 }
 
-                var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory, yAxisMinimum);
+                var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath, yAxisMinimum);
+
+                AppendPlotFile(plotFiles, outputFilePath, PlotContainerBase.PlotTypes.BarChart, plotDescription);
 
                 return success;
             }
@@ -133,11 +173,13 @@ namespace MASIC.DataOutput
             }
         }
 
-        private bool CreateBarCharts(string datasetName, string outputDirectory)
+        private bool CreateBarCharts(string datasetName, string outputDirectory, ICollection<PlotFileInfo> plotFiles)
         {
             try
             {
                 var highAbundanceTitle = string.Format("Reporter Ion Observation Rate (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
+                var allSpectraTitle = "Reporter Ion Observation Rate";
+
                 var reporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, highAbundanceTitle);
 
                 var highAbundanceReporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, "Reporter Ion Observation Rate");
@@ -150,7 +192,9 @@ namespace MASIC.DataOutput
                     mStatsSummarizer.ReporterIonObservationRateHighAbundance,
                     datasetName,
                     outputDirectory,
+                    plotFiles,
                     highAbundanceTitle,
+                    "Observation rate, excluding low abundance spectra",
                     "RepIonObsRateHighAbundance",
                     "Observation Rate (%)",
                     Options.PlotOptions.ReporterIonTopNPctObsRateYAxisMinimum);
@@ -160,8 +204,10 @@ namespace MASIC.DataOutput
                     mStatsSummarizer.ReporterIonObservationRate,
                     datasetName,
                     outputDirectory,
-                    "Reporter Ion Observation Rate",
-                    "RepIonObsRate",
+                    plotFiles,
+                    allSpectraTitle,
+                    "Observation rate, all spectra",
+                    Path.GetFileNameWithoutExtension(REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX),
                     "Observation Rate (%)");
 
                 return success1 && success2;
@@ -173,10 +219,11 @@ namespace MASIC.DataOutput
             }
         }
 
-        private bool CreatePlots(string datasetName, string outputDirectory)
+        private bool CreatePlots(string datasetName, string outputDirectory, out List<PlotFileInfo> plotFiles)
         {
-            var barChartSuccess = CreateBarCharts(datasetName, outputDirectory);
-            var histogramSuccess = CreateHistograms(datasetName, outputDirectory);
+            plotFiles = new List<PlotFileInfo>();
+            var barChartSuccess = CreateBarCharts(datasetName, outputDirectory, plotFiles);
+            var histogramSuccess = CreateHistograms(datasetName, outputDirectory, plotFiles);
 
             return barChartSuccess && histogramSuccess;
         }
@@ -196,7 +243,7 @@ namespace MASIC.DataOutput
 
                 var datasetName = clsUtilities.ReplaceSuffix(Path.GetFileName(sicStatsFilePath), clsDataOutput.SIC_STATS_FILE_SUFFIX, string.Empty);
 
-                var plotsGenerated = CreatePlots(datasetName, outputDirectory);
+                var plotsGenerated = CreatePlots(datasetName, outputDirectory, out var plotFiles);
 
                 var plotDataSaved = SavePlotData(datasetName, outputDirectory);
 

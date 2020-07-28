@@ -290,9 +290,13 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
-        /// <returns>True if success, false if an error</returns>
-        public bool SavePlotFile(string datasetName, string outputDirectory, int yAxisMinimum = 0)
+        /// <param name="outputFilePath"></param>
+        /// <param name="yAxisMinimum"></param>
+        /// <returns></returns>
+        public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath, int yAxisMinimum = 0)
         {
+
+            outputFilePath = string.Empty;
 
             try
             {
@@ -337,6 +341,11 @@ namespace MASIC.Plots
                     var colorLabel = colorGradients.Count > 1 ? "_Gradient_" + colorGradient.Key : string.Empty;
 
                     var pngFile = new FileInfo(Path.Combine(outputDirectory, datasetName + "_" + PlotAbbrev + colorLabel + ".png"));
+
+                    if (string.IsNullOrWhiteSpace(outputFilePath))
+                    {
+                        outputFilePath = pngFile.FullName;
+                    }
 
                     var success = barChart.SaveToPNG(pngFile, 1024, 600, 96);
                     if (success)
@@ -402,6 +411,8 @@ namespace MASIC.Plots
                 mLabels.Add(label);
             }
 
+            // ReSharper disable once UnusedMember.Global
+            // ReSharper disable once UnusedMember.Local
             public BarChartDataPoint GetDataPoint(int index)
             {
                 if (mDataPoints.Count == 0)
@@ -425,6 +436,7 @@ namespace MASIC.Plots
                 mLabels.Clear();
             }
 
+            // ReSharper disable once UnusedMember.Global
             // ReSharper disable once UnusedMember.Local
             public void RemoveAt(int index)
             {

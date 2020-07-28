@@ -366,9 +366,12 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
-        /// <returns>True if success, false if an error</returns>
-        public bool SavePlotFile(string datasetName, string outputDirectory)
+        /// <param name="outputFilePath"></param>
+        /// <returns></returns>
+        public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath)
         {
+
+            outputFilePath = string.Empty;
 
             try
             {
@@ -395,6 +398,8 @@ namespace MASIC.Plots
                 }
 
                 var pngFile = new FileInfo(Path.Combine(outputDirectory, datasetName + "_" + PlotAbbrev + ".png"));
+
+                outputFilePath = pngFile.FullName;
 
                 var success = histogramPlot.SaveToPNG(pngFile, 1024, 600, 96);
                 return success;
@@ -477,6 +482,7 @@ namespace MASIC.Plots
                 mData.Clear();
             }
 
+            // ReSharper disable once UnusedMember.Global
             // ReSharper disable once UnusedMember.Local
             public void RemoveAt(int index)
             {
