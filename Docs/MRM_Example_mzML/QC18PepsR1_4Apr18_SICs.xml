@@ -5,9 +5,9 @@
   <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\MRM_Example_mzML\QC18PepsR1_4Apr18.mzML</SourceFilePath>
   <SourceFileDateTime>4/26/2019 3:47 PM</SourceFileDateTime>
   <SourceFileSizeBytes>2832363</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-02-11 11:39:25 AM</MASICProcessingDate>
-  <MASICVersion>3.0.7346.20829</MASICVersion>
-  <MASICPeakFinderDllVersion>2.0.7346.20799</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-07-28 04:15:19 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7514.28956</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
   <ScanCountTotal>60896</ScanCountTotal>
   <SurveyScanCount>60896</SurveyScanCount>
   <FragScanCount>0</FragScanCount>
@@ -79,10 +79,11 @@
   <LimitSearchToCustomMZList>False</LimitSearchToCustomMZList>
  </CustomSICValues>
  <ProcessingStats>
-  <CacheEventCount>120792</CacheEventCount>
+  <CacheEventCount>60896</CacheEventCount>
   <UnCacheEventCount>60896</UnCacheEventCount>
-  <PeakMemoryUsageMB>160.27</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>17.89</TotalProcessingTimeSeconds>
+  <SpectraPoolHitEventCount>0</SpectraPoolHitEventCount>
+  <PeakMemoryUsageMB>112.0</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>3.9</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>
