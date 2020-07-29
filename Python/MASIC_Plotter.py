@@ -186,11 +186,7 @@ def plot_histogram(outputFilePath, columnNames, xValues, yValues, title, r_label
 
     ymin, ymax = plt.ylim()
 
-    if ymax < 1:
-        yAxisFormatString = '%0.2f'
-    if ymax < 10:
-        yAxisFormatString = '%0.1f'
-    elif ymax < 10000:
+    if ymax < 10000:
         yAxisFormatString = '%d'
     else:
         yAxisFormatString = '%.2e'
