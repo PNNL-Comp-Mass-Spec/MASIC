@@ -324,7 +324,7 @@ namespace MASIC.Plots
                         AutoScale = AutoMinMaxY,
                         Minimum = yAxisMinimum,
                         Maximum = 102,
-                        AddColorAxis = true,
+                        AddColorAxis = colorGradients.Count > 1,
                         ColorPalette = colorGradient.Value,
                         TickLabelsArePercents = true
                     };
