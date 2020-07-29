@@ -835,7 +835,6 @@ namespace MASIC
             }
         }
 
-        [Obsolete("Legacy parameter; no longer used")]
         public int CacheSpectraToRetainInMemory
         {
             get => Options.CacheOptions.SpectraToRetainInMemory;
