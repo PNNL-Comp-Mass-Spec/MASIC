@@ -32,7 +32,7 @@ namespace MASIC
 
     public static class Program
     {
-        public const string PROGRAM_DATE = "July 27, 2020";
+        public const string PROGRAM_DATE = "July 28, 2020";
 
         private static string mInputFilePath;
         private static string mOutputDirectoryPath;                         // Optional
@@ -426,7 +426,8 @@ namespace MASIC
                 Console.WriteLine(" /I:InputFilePath [/O:OutputDirectoryPath]");
                 Console.WriteLine(" [/P:ParamFilePath] [/D:DatasetID or DatasetLookupFilePath] ");
                 Console.WriteLine(" [/S:[MaxLevel]] [/A:AlternateOutputDirectoryPath] [/R]");
-                Console.WriteLine(" [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName] [/Q]");
+                Console.WriteLine(" [/L:[LogFilePath]] [/LogDir:LogDirPath] [/SF:StatusFileName]");
+                Console.WriteLine(" [/CreateParamFile:FileName.xml] [/Q]");
                 Console.WriteLine();
 
                 Console.WriteLine("The input file path can contain the wildcard character *");
@@ -477,6 +478,10 @@ namespace MASIC
 
                 Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
                     "Use /SF to specify the name to use for the Masic Status file (default is " + MASICOptions.DEFAULT_MASIC_STATUS_FILE_NAME + ")."));
+                Console.WriteLine();
+
+                Console.WriteLine("Use /CreateParamFile to create an example parameter file named MASIC_ExampleSettings.xml");
+                Console.WriteLine("Include a colon and a filename to customize the filename");
                 Console.WriteLine();
 
                 Console.WriteLine("The optional /Q switch will prevent the progress window from being shown");

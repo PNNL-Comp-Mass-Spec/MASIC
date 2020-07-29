@@ -186,7 +186,7 @@ namespace MASIC.Plots
         public static void UpdateAxisFormatCodeIfSmallValues(Axis currentAxis, List<double> dataPoints, bool integerData)
 #pragma warning restore CS3001
         {
-            if (!dataPoints.Any())
+            if (!dataPoints.Any() || double.IsNaN(currentAxis.MajorStep))
                 return;
 
             var axisInfo = new AxisInfo(currentAxis.MajorStep, currentAxis.MinorGridlineThickness, currentAxis.Title);

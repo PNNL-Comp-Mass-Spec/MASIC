@@ -387,6 +387,12 @@ namespace MASIC.DataOutput
                     peakAreaData.Add(logPeakArea);
                 }
 
+                if (peakAreaData.Count == 0)
+                {
+                    OnWarningEvent("None of the parent ions has a non-zero peak area; cannot create a histogram of peak areas");
+                    return true;
+                }
+
                 var numberOfBins = Options.PlotOptions.PeakAreaHistogramBinCount <= 0 ?
                                        40 :
                                        Options.PlotOptions.PeakAreaHistogramBinCount;
@@ -480,6 +486,12 @@ namespace MASIC.DataOutput
 
                     // Track peak width in scans
                     peakWidths.Add(fwhmWidthScans);
+                }
+
+                if (peakWidths.Count == 0)
+                {
+                    OnWarningEvent("None of the parent ions has a non-zero peak area; cannot create a histogram of peak width");
+                    return true;
                 }
 
                 PeakWidthHistogramUnits = timeBasedPeakWidths ? "seconds" : "scans";
