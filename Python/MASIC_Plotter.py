@@ -121,7 +121,7 @@ def set_title_and_labels(ax, baseFontSize, title, xDataMin, xDataMax, xAxisLabel
 
     if "Histogram" in title:
         ymin = 0
-        ymax += ymax * 0.05
+        ymax = ymax * 1.02
     else:
         # Bar Plot; always scale the y axis from 0 to 102 (to give a little whitespace above bars that are at 100%)
         ymin = 0
@@ -184,8 +184,19 @@ def plot_histogram(outputFilePath, columnNames, xValues, yValues, title, r_label
     # Y axis
     yAxisLabel = columnNames[1]
 
+    ymin, ymax = plt.ylim()
+
+    if ymax < 1:
+        yAxisFormatString = '%0.2f'
+    if ymax < 10:
+        yAxisFormatString = '%0.1f'
+    elif ymax < 10000:
+        yAxisFormatString = '%d'
+    else:
+        yAxisFormatString = '%.2e'
+        
     set_title_and_labels(ax, baseFontSize, title, np.min(xValues), np.max(xValues),
-                         xAxisLabel, yAxisLabel, '%.2e', r_label, '')
+                         xAxisLabel, yAxisLabel, yAxisFormatString, r_label, '')
 
     plt.tight_layout()
 
@@ -232,8 +243,10 @@ def generate_bar_chart(columnNames, xLabels, barHeights, title, r_label, l_label
     # Y axis is counts
     yAxisLabel = columnNames[1]
 
+    yAxisFormatString = '%d'
+        
     set_title_and_labels(ax, baseFontSize, title, 0, 0,
-                         xAxisLabel, yAxisLabel, '%.1d', r_label, l_label)
+                         xAxisLabel, yAxisLabel, yAxisFormatString, r_label, l_label)
 
     # Add bar labels (rotated)
     plt.xticks(xPos, xLabels)
