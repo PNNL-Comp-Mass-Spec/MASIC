@@ -2,12 +2,12 @@
 <SICData>
  <ProcessingSummary>
   <DatasetID>0</DatasetID>
-  <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\TMT_Example\TMT_QCPool_23Jun14.mzML</SourceFilePath>
+  <SourceFilePath>TMT_QCPool_23Jun14.mzML</SourceFilePath>
   <SourceFileDateTime>4/26/2019 6:49 PM</SourceFileDateTime>
   <SourceFileSizeBytes>6478568</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-02-11 11:53:30 AM</MASICProcessingDate>
-  <MASICVersion>3.0.7346.21329</MASICVersion>
-  <MASICPeakFinderDllVersion>2.0.7346.20799</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-07-28 05:22:38 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7514.31015</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
   <ScanCountTotal>501</ScanCountTotal>
   <SurveyScanCount>76</SurveyScanCount>
   <FragScanCount>425</FragScanCount>
@@ -15806,8 +15806,9 @@
  <ProcessingStats>
   <CacheEventCount>0</CacheEventCount>
   <UnCacheEventCount>0</UnCacheEventCount>
-  <PeakMemoryUsageMB>53.27</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>1.73</TotalProcessingTimeSeconds>
+  <SpectraPoolHitEventCount>1442</SpectraPoolHitEventCount>
+  <PeakMemoryUsageMB>56.7</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>2.0</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>

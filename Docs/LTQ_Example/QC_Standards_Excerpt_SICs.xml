@@ -2,12 +2,12 @@
 <SICData>
  <ProcessingSummary>
   <DatasetID>0</DatasetID>
-  <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML</SourceFilePath>
+  <SourceFilePath>QC_Standards_Excerpt.mzXML</SourceFilePath>
   <SourceFileDateTime>3/24/2006 11:42 AM</SourceFileDateTime>
   <SourceFileSizeBytes>940496</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-02-11 11:17:47 AM</MASICProcessingDate>
-  <MASICVersion>3.0.7235.27701</MASICVersion>
-  <MASICPeakFinderDllVersion>2.0.7235.23950</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-07-28 05:19:28 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7514.31015</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
   <ScanCountTotal>297</ScanCountTotal>
   <SurveyScanCount>27</SurveyScanCount>
   <FragScanCount>270</FragScanCount>
@@ -10071,8 +10071,9 @@
  <ProcessingStats>
   <CacheEventCount>0</CacheEventCount>
   <UnCacheEventCount>0</UnCacheEventCount>
-  <PeakMemoryUsageMB>39.88</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>0.36</TotalProcessingTimeSeconds>
+  <SpectraPoolHitEventCount>447</SpectraPoolHitEventCount>
+  <PeakMemoryUsageMB>40.7</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>0.4</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>

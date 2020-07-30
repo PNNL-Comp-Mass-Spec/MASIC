@@ -104,8 +104,17 @@
     <item key="DiskCachingAlwaysDisabled" value="False" />
     <item key="CacheFolderPath" value="" />
     <item key="CacheSpectraToRetainInMemory" value="5000" />
-    <item key="CacheMinimumFreeMemoryMB" value="250" />
-    <item key="CacheMaximumMemoryUsageMB" value="3000" />
+  </section>
+  <section name="PlotOptions">
+    <item key="CreatePlots" value="True" />
+    <item key="PlotWithPython" value="True" />
+    <item key="SaveHistogramData" value="False" />
+    <item key="SaveReporterIonObservationRateData" value="True" />
+    <item key="SaveHtmlFile" value="True" />
+    <item key="PeakAreaHistogramBinCount" value="40" />
+    <item key="PeakWidthHistogramBinCount" value="40" />
+    <item key="ReporterIonObservationRateTopNPct" value="80" />
+    <item key="ReporterIonTopNPctObsRateYAxisMinimum" value="0" />
   </section>
   <section name="CustomSICValues">
     <item key="MZList" value="" />

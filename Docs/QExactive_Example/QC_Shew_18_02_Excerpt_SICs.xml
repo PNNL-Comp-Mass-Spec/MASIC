@@ -2,12 +2,12 @@
 <SICData>
  <ProcessingSummary>
   <DatasetID>0</DatasetID>
-  <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\QExactive_Example\QC_Shew_18_02_Excerpt.mzXML</SourceFilePath>
+  <SourceFilePath>QC_Shew_18_02_Excerpt.mzXML</SourceFilePath>
   <SourceFileDateTime>3/5/2019 4:01 PM</SourceFileDateTime>
   <SourceFileSizeBytes>2320048</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-02-11 11:51:01 AM</MASICProcessingDate>
-  <MASICVersion>3.0.7346.21329</MASICVersion>
-  <MASICPeakFinderDllVersion>2.0.7346.20799</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-07-28 05:21:44 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7514.31015</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
   <ScanCountTotal>1001</ScanCountTotal>
   <SurveyScanCount>79</SurveyScanCount>
   <FragScanCount>922</FragScanCount>
@@ -34045,10 +34045,11 @@
   <MassDataList>,,,,,,,,,,,,,,,,,,,,,,,,,1556.33,1556.342,1556.336,1556.331,1556.334,1556.336,1556.337,1556.34,1556.335,1556.334,1556.336,1556.344,1556.352,1556.341,,,,,,,,,,,,,,1556.33,,,1556.33,,,1556.328,,,,,,,,</MassDataList>
  </ParentIon>
  <ProcessingStats>
-  <CacheEventCount>6</CacheEventCount>
-  <UnCacheEventCount>5</UnCacheEventCount>
-  <PeakMemoryUsageMB>42.51</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>0.92</TotalProcessingTimeSeconds>
+  <CacheEventCount>1</CacheEventCount>
+  <UnCacheEventCount>1</UnCacheEventCount>
+  <SpectraPoolHitEventCount>2821</SpectraPoolHitEventCount>
+  <PeakMemoryUsageMB>42.9</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>1.0</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>

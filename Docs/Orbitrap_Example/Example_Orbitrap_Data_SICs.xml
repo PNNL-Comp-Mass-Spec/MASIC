@@ -2,12 +2,12 @@
 <SICData>
  <ProcessingSummary>
   <DatasetID>0</DatasetID>
-  <SourceFilePath>F:\Documents\Projects\DataMining\MASIC\Docs\Orbitrap_Example\Example_Orbitrap_Data.mzXML</SourceFilePath>
+  <SourceFilePath>Example_Orbitrap_Data.mzXML</SourceFilePath>
   <SourceFileDateTime>4/1/2017 5:20 PM</SourceFileDateTime>
   <SourceFileSizeBytes>79522804</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-02-11 11:48:23 AM</MASICProcessingDate>
-  <MASICVersion>3.0.7346.20829</MASICVersion>
-  <MASICPeakFinderDllVersion>2.0.7346.20799</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-07-28 05:21:27 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7514.31015</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
   <ScanCountTotal>1001</ScanCountTotal>
   <SurveyScanCount>143</SurveyScanCount>
   <FragScanCount>858</FragScanCount>
@@ -31640,10 +31640,11 @@
   <MassDataList>,,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,1530.893,,,,,,,,,,,,,,,,,,,,,,,,</MassDataList>
  </ParentIon>
  <ProcessingStats>
-  <CacheEventCount>7</CacheEventCount>
-  <UnCacheEventCount>6</UnCacheEventCount>
-  <PeakMemoryUsageMB>137.3</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>3.17</TotalProcessingTimeSeconds>
+  <CacheEventCount>1</CacheEventCount>
+  <UnCacheEventCount>1</UnCacheEventCount>
+  <SpectraPoolHitEventCount>2499</SpectraPoolHitEventCount>
+  <PeakMemoryUsageMB>220.3</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>3.9</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>
