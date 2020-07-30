@@ -3,10 +3,10 @@
 Install Python 3.6.2 or newer from https://www.python.org/downloads/
 
 From an admin level command prompt:
-python-3.6.2.exe /passive InstallAllUsers=1 DefaultAllUsersTargetDir=C:\Python36 CompileAll=1
+python-3.8.5.exe /passive InstallAllUsers=1 DefaultAllUsersTargetDir=C:\Python38 CompileAll=1
 
-After that finishes:
-C:\Python36\Scripts\pip install numpy matplotlib pandas
+After that finishes, install these packages:
+C:\Python38\Scripts\pip install numpy matplotlib pandas
 
 
 == Linux (Ubuntu) ==

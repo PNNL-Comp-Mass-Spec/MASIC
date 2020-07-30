@@ -211,18 +211,30 @@ The `PlotOptions` section in the MASIC parameter file has options for instructin
 | Reporter ion observation rate         | Dataset_RepIonObsRate.png              | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed, showing a separate bar for each channel.  Only created if reporter ions were searched for |
 | Reporter ion observation rate, top N% | Dataset_RepIonObsRateHighAbundance.png | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed.  Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable)      |
 
-Plots are created using OxyPlot, which only works on Windows
-* Set `PlotWithPython` to `True` to create plots with Python instead of OxyPlot
-* Looks for `python.exe` in directories that start with "Python3" or "Python 3" on Windows, searching below:
-  * C:\Program Files
-  * C:\Program Files (x86)
-  * C:\Users\Username\AppData\Local\Programs
-  * C:\ProgramData\Anaconda3
-  * C:\
-* Assumes Python is at `/usr/bin/python3` on Linux
+By default, plots are created using OxyPlot, which only works on Windows
+
+To create plots with Python instead of OxyPlot, set `PlotWithPython` to `True` in the parameter file
+* For example, see https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/Parameter_Files/TMT11_LTQ-FT_10ppm_ReporterTol0.003Da_2017-03-17.xml
+
+On Windows, MASIC looks for `python.exe` in directories that start with "Python3" or "Python 3", searching below:
+* C:\Program Files
+* C:\Program Files (x86)
+* C:\Users\Username\AppData\Local\Programs
+* C:\ProgramData\Anaconda3
+* C:\
+
+On Linux, assumes Python is at `/usr/bin/python3`
+
+Python plotting requires that three libraries be installed
+* numpy
+* matplotlib
+* pandas
+
+For Python library installation options, see the `Python_Setup.txt` file on GitHub
+* https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Python/Python_Setup.txt
 
 The plot data can optionally be saved as tab-delimited text files
-* Enable by setting `SaveHistogramData` and/or `SaveReporterIonObservationRateData` to True
+* Enable by setting `SaveHistogramData` and/or `SaveReporterIonObservationRateData` to True in the parameter file
 
 Plots can be created from existing MASIC results by providing the _SICStats.txt or _ScanStats.txt file name as the input file
 
