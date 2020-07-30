@@ -118,3 +118,4 @@ Lib/MASIC.exe
 Lib/MASICPeakFinder.dll
 Lib/MatrixDecompositionUtility.dll
 **/.vs/
+Docs/*/Compare_OxyPlot
