@@ -77,6 +77,12 @@ cd TMT_Example
 call ProcessData.bat
 cd ..
 
+
+cd TMT_Example_Bad_Labeling
+call ProcessData.bat
+cd ..
+
+
 @echo off
 echo.
 echo.
