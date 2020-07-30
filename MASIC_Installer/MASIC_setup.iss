@@ -25,6 +25,8 @@ Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll          ; DestDir: {ap
 Source: ..\bin\Release\MSDataFileReader.dll                       ; DestDir: {app}
 Source: ..\bin\Release\NetCDFReader.dll                           ; DestDir: {app}
 Source: ..\bin\Release\Npgsql.dll                                 ; DestDir: {app}
+Source: ..\bin\Release\OxyPlot.dll                                ; DestDir: {app}
+Source: ..\bin\Release\OxyPlot.Wpf.dll                            ; DestDir: {app}
 Source: ..\bin\Release\PRISM.dll                                  ; DestDir: {app}
 Source: ..\bin\Release\PRISMDatabaseUtils.dll                     ; DestDir: {app}
 Source: ..\bin\Release\PRISMWin.dll                               ; DestDir: {app}
@@ -51,14 +53,17 @@ Source: ..\MASICBrowser\bin\Release\MASICBrowser.exe                        ; De
 Source: ..\MASICBrowser\bin\Release\C5.dll                                  ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\Fizzler.dll                             ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\OxyDataPlotter.dll                      ; DestDir: {app}
-Source: ..\MASICBrowser\bin\Release\OxyPlot.dll                             ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\OxyPlot.WindowsForms.dll                ; DestDir: {app}
 Source: ..\MASICBrowser\bin\Release\Svg.dll                                 ; DestDir: {app}
-                                                                    
+
 Source: ..\Readme.md                                                     ; DestDir: {app}
 Source: ..\RevisionHistory.txt                                           ; DestDir: {app}
+
+Source: ..\Python\MASIC_Plotter.py                                       ; DestDir: {app}
+Source: ..\Python\Python_Setup.txt                                       ; DestDir: {app}
+
 Source: Images\delete_16x.ico                                            ; DestDir: {app}
-                                                                         
+
 Source: ..\Docs\MASICParameters.xml                                      ; DestDir: {app}
 Source: ..\Docs\LTQ_Example\Default_2008-08-22.xml                       ; DestDir: {app}\LTQ_Example
 Source: ..\Docs\LTQ_Example\QC_Standards_Excerpt.mzXML                   ; DestDir: {app}\LTQ_Example
@@ -77,7 +82,7 @@ Source: ..\docs\Orbitrap_Example\Example_Orbitrap_Data_SICstats.txt      ; DestD
 
 Source: ..\Docs\CustomMZList_AcqTime.txt                                 ; DestDir: {app}
 Source: ..\Docs\CustomMZList.txt                                         ; DestDir: {app}
-                                                                         
+
 Source: ..\Lib\netcdf.dll                                                ; DestDir: {app}
 Source: ..\Lib\RawFileReaderLicense.doc                                  ; DestDir: {app}
 
