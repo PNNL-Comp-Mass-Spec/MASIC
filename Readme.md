@@ -211,6 +211,11 @@ The `PlotOptions` section in the MASIC parameter file has options for instructin
 | Reporter ion observation rate         | Dataset_RepIonObsRate.png              | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed, showing a separate bar for each channel.  Only created if reporter ions were searched for |
 | Reporter ion observation rate, top N% | Dataset_RepIonObsRateHighAbundance.png | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed.  Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable)      |
 
+Example plots are visible on GitHub
+* [TMT Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/TMT_Example/index.html)
+* [Incomplete TMT labeling example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/TMT_Example_Bad_Labeling/index.html)
+* [QExactive Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/QExactive_Example/index.html)
+
 By default, plots are created using OxyPlot, which only works on Windows
 
 To create plots with Python instead of OxyPlot, set `PlotWithPython` to `True` in the parameter file
