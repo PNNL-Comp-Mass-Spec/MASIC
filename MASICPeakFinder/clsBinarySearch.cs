@@ -9,7 +9,7 @@ namespace MASICPeakFinder
     /// If an exact match is not found, then the MissingDataMode defines which value will be returned (closest, always previous, or always next)
     /// </summary>
     /// <remarks>The search functions assume the input data is already sorted</remarks>
-    public class clsBinarySearch
+    public static class clsBinarySearch
     {
         public enum eMissingDataModeConstants
         {
