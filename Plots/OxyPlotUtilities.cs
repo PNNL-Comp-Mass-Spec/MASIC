@@ -1,32 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using OxyPlot;
 using OxyPlot.Axes;
 
 namespace MASIC.Plots
 {
-    public class OxyPlotUtilities
+    public static class OxyPlotUtilities
     {
-#pragma warning disable CS3002 // Return type is not CLS-compliant
-        public static PlotModel GetBasicBarChartModel(
-            string title,
-            IEnumerable<string> xAxisLabels,
-            AxisInfo yAxisInfo)
-#pragma warning restore CS3002 // Argument type is not CLS-compliant
+
+        private static string AddAxes(PlotModel myPlot, Axis xAxis, Axis yAxis, AxisInfo yAxisInfo)
         {
-            var myPlot = GetPlotModel(title);
-
-            var xAxis = MakeCategoryAxis(AxisPosition.Bottom, PlotContainer.DEFAULT_BASE_FONT_SIZE);
-
-            foreach (var label in xAxisLabels)
-            {
-                xAxis.Labels.Add(label);
-            }
-
             myPlot.Axes.Add(xAxis);
 
-            var yAxis = MakeLinearAxis(AxisPosition.Left, yAxisInfo.Title, PlotContainer.DEFAULT_BASE_FONT_SIZE);
             myPlot.Axes.Add(yAxis);
 
             string yAxisFormatString;
@@ -43,7 +28,7 @@ namespace MASIC.Plots
             }
             else
             {
-                yAxisFormatString = AxisInfo.DEFAULT_AXIS_LABEL_FORMAT;
+                yAxisFormatString = string.IsNullOrWhiteSpace(yAxisInfo.StringFormat) ? AxisInfo.DEFAULT_AXIS_LABEL_FORMAT : yAxisInfo.StringFormat;
             }
 
             myPlot.Axes[1].StringFormat = yAxisFormatString;
@@ -51,6 +36,30 @@ namespace MASIC.Plots
             // Adjust the font sizes
             myPlot.Axes[0].FontSize = PlotContainer.DEFAULT_BASE_FONT_SIZE;
             myPlot.Axes[1].FontSize = PlotContainer.DEFAULT_BASE_FONT_SIZE;
+
+            return yAxisFormatString;
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public static PlotModel GetBasicBarChartModel(
+            string title,
+            IEnumerable<string> xAxisLabels,
+            AxisInfo yAxisInfo)
+#pragma warning restore CS3002 // Argument type is not CLS-compliant
+        {
+            var myPlot = GetPlotModel(title);
+
+            var xAxisInfo = new AxisInfo(string.Empty);
+            var xAxis = MakeCategoryAxis(AxisPosition.Bottom, xAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
+
+            foreach (var label in xAxisLabels)
+            {
+                xAxis.Labels.Add(label);
+            }
+
+            var yAxis = MakeYAxis(yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
+
+            var yAxisFormatString = AddAxes(myPlot, xAxis, yAxis, yAxisInfo);
 
             if (!yAxisInfo.AddColorAxis)
                 return myPlot;
@@ -108,6 +117,23 @@ namespace MASIC.Plots
             myPlot.Axes[0].FontSize = PlotContainer.DEFAULT_BASE_FONT_SIZE;
             myPlot.Axes[1].FontSize = PlotContainer.DEFAULT_BASE_FONT_SIZE;
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public static PlotModel GetBasicPlotModel(
+            string title,
+            string xAxisLabel,
+            AxisInfo yAxisInfo)
+#pragma warning restore CS3002 // Argument type is not CLS-compliant
+        {
+            var myPlot = GetPlotModel(title);
+
+            var xAxisInfo = new AxisInfo(xAxisLabel);
+            var xAxis = MakeLinearAxis(AxisPosition.Bottom, xAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
+
+            var yAxis = MakeYAxis(yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
+
+            AddAxes(myPlot, xAxis, yAxis, yAxisInfo);
+            myPlot.Axes[0].Minimum = 0;
+
             return myPlot;
         }
 
@@ -129,49 +155,75 @@ namespace MASIC.Plots
             return myPlot;
         }
 
-        private static CategoryAxis MakeCategoryAxis(AxisPosition position, int baseFontSize)
+        private static void InitializeAxis(Axis axis, AxisPosition position, AxisInfo axisInfo, int baseFontSize, bool isCategoryAxis = false)
         {
-            var axis = new CategoryAxis
-            {
-                Position = position,
-                TitleFontSize = baseFontSize + 2,
-                TitleFontWeight = FontWeights.Normal,
-                TitleFont = "Arial",
-                AxisTitleDistance = 15,
-                TickStyle = TickStyle.Crossing,
-                AxislineColor = OxyColors.Black,
-                AxislineStyle = LineStyle.Solid,
-                MajorTickSize = 8,
-                MajorGridlineStyle = LineStyle.None,
-                MinorGridlineStyle = LineStyle.None,
-                Font = "Arial",
-                Angle = 30
-            };
+            axis.Position = position;
 
-            return axis;
+            if (!isCategoryAxis)
+            {
+                axis.Title = axisInfo.Title ?? string.Empty;
+            }
+
+            axis.TitleFontSize = baseFontSize + 2;
+            axis.TitleFontWeight = FontWeights.Normal;
+            axis.TitleFont = "Arial";
+            axis.AxisTitleDistance = 15;
+            axis.TickStyle = TickStyle.Crossing;
+            axis.AxislineColor = OxyColors.Black;
+            axis.AxislineStyle = LineStyle.Solid;
+            axis.MajorTickSize = 8;
+            axis.MajorGridlineStyle = LineStyle.None;
+            axis.MinorGridlineStyle = LineStyle.None;
+
+            if (!isCategoryAxis)
+            {
+                var stringFormat = string.IsNullOrWhiteSpace(axisInfo.StringFormat) ? AxisInfo.DEFAULT_AXIS_LABEL_FORMAT : axisInfo.StringFormat;
+
+                // Option 1:
+                // axis.LabelFormatter = delegate (double value) { return value.ToString(stringFormat); };
+
+                // Option 2: use a lambda expression
+                axis.LabelFormatter = value => value.ToString(stringFormat);
+            }
+
+            axis.Font = "Arial";
         }
 
-        private static LinearAxis MakeLinearAxis(AxisPosition position, string axisTitle, int baseFontSize)
+        private static CategoryAxis MakeCategoryAxis(AxisPosition position, AxisInfo axisInfo, int baseFontSize)
         {
-            var axis = new LinearAxis
+            var categoryAxis = new CategoryAxis()
             {
-                Position = position,
-                Title = axisTitle,
-                TitleFontSize = baseFontSize + 2,
-                TitleFontWeight = FontWeights.Normal,
-                TitleFont = "Arial",
-                AxisTitleDistance = 15,
-                TickStyle = TickStyle.Crossing,
-                AxislineColor = OxyColors.Black,
-                AxislineStyle = LineStyle.Solid,
-                MajorTickSize = 8,
-                MajorGridlineStyle = LineStyle.None,
-                MinorGridlineStyle = LineStyle.None,
-                StringFormat = AxisInfo.DEFAULT_AXIS_LABEL_FORMAT,
-                Font = "Arial"
+                Angle = 30
             };
+            InitializeAxis(categoryAxis, position, axisInfo, baseFontSize, true);
 
-            return axis;
+            return categoryAxis;
+        }
+
+        private static LinearAxis MakeLinearAxis(AxisPosition position, AxisInfo axisInfo, int baseFontSize)
+        {
+            var linearAxis = new LinearAxis();
+            InitializeAxis(linearAxis, position, axisInfo, baseFontSize);
+
+            return linearAxis;
+        }
+
+        private static LogarithmicAxis MakeLogarithmicAxis(AxisPosition position, AxisInfo axisInfo, int baseFontSize)
+        {
+            var logAxis = new LogarithmicAxis();
+            InitializeAxis(logAxis, position, axisInfo, baseFontSize);
+
+            return logAxis;
+        }
+
+        private static Axis MakeYAxis(AxisInfo yAxisInfo, int defaultBaseFontSize)
+        {
+            if (yAxisInfo.UseLogarithmicScale)
+            {
+                return MakeLogarithmicAxis(AxisPosition.Left, yAxisInfo, defaultBaseFontSize);
+            }
+
+            return MakeLinearAxis(AxisPosition.Left, yAxisInfo, defaultBaseFontSize);
         }
 
         /// <summary>
@@ -191,6 +243,19 @@ namespace MASIC.Plots
 
             var axisInfo = new AxisInfo(currentAxis.MajorStep, currentAxis.MinorGridlineThickness, currentAxis.Title);
             PlotUtilities.GetAxisFormatInfo(dataPoints, integerData, axisInfo);
+
+            currentAxis.StringFormat = axisInfo.StringFormat;
+            currentAxis.MajorStep = axisInfo.MajorStep;
+            currentAxis.MinorGridlineThickness = axisInfo.MinorGridLineThickness;
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static void UpdateAxisFormatCodeIfSmallValues(Axis currentAxis, double absoluteValueMin, double absoluteValueMax, bool integerData)
+#pragma warning restore CS3001
+        {
+            var axisInfo = new AxisInfo(currentAxis.MajorStep, currentAxis.MinorGridlineThickness, currentAxis.Title);
+
+            PlotUtilities.GetAxisFormatInfo(absoluteValueMin, absoluteValueMax, integerData, axisInfo);
 
             currentAxis.StringFormat = axisInfo.StringFormat;
             currentAxis.MajorStep = axisInfo.MajorStep;
