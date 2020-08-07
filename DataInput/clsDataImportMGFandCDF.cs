@@ -259,7 +259,7 @@ namespace MASIC.DataInput
                     if (!fragScanFound)
                         break;
 
-                    mDatasetFileInfo.ScanCount += 1;
+                    mDatasetFileInfo.ScanCount++;
 
                     while (spectrumInfo.ScanNumber < scanList.SurveyScans[lastSurveyScanIndex].ScanNumber)
                     {
@@ -267,7 +267,7 @@ namespace MASIC.DataInput
                         // This can happen, due to oddities with combining scans when creating the .MGF file
                         // Need to decrement lastSurveyScanIndex until we find the appropriate survey scan
 
-                        lastSurveyScanIndex -= 1;
+                        lastSurveyScanIndex--;
                         if (lastSurveyScanIndex == 0)
                             break;
                     }
@@ -339,7 +339,7 @@ namespace MASIC.DataInput
                     while (lastSurveyScanIndex < scanList.SurveyScans.Count - 1 &&
                            spectrumInfo.ScanNumber > scanList.SurveyScans[lastSurveyScanIndex + 1].ScanNumber)
                     {
-                        lastSurveyScanIndex += 1;
+                        lastSurveyScanIndex++;
 
                         // Add the given SurveyScan to .MasterScanOrder, though only if it hasn't yet been added
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
@@ -447,7 +447,7 @@ namespace MASIC.DataInput
                 // At the same time, populate .MasterScanOrder
                 while (lastSurveyScanIndex < scanList.SurveyScans.Count - 1)
                 {
-                    lastSurveyScanIndex += 1;
+                    lastSurveyScanIndex++;
 
                     // Note that scanTime is the scan time of the most recent survey scan processed in the above Do loop, so it's not accurate
                     if (mScanTracking.CheckScanInRange(scanList.SurveyScans[lastSurveyScanIndex].ScanNumber, scanTime, sicOptions))
@@ -574,12 +574,12 @@ namespace MASIC.DataInput
                 // Decrement lastSurveyScanIndex if the corresponding SurveyScan's scan number is larger than fragScanNumber
                 while (lastSurveyScanIndex > 0 && surveyScans[lastSurveyScanIndex].ScanNumber > fragScanNumber)
                     // This code will generally not be reached, provided the calling function passed the correct lastSurveyScanIndex value to this function
-                    lastSurveyScanIndex -= 1;
+                    lastSurveyScanIndex--;
 
                 // Increment lastSurveyScanIndex if the next SurveyScan's scan number is smaller than fragScanNumber
                 while (lastSurveyScanIndex < surveyScans.Count - 1 && surveyScans[lastSurveyScanIndex + 1].ScanNumber < fragScanNumber)
                     // This code will generally not be reached, provided the calling function passed the correct lastSurveyScanIndex value to this function
-                    lastSurveyScanIndex += 1;
+                    lastSurveyScanIndex++;
 
                 if (lastSurveyScanIndex >= surveyScans.Count - 1)
                 {

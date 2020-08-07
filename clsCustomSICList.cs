@@ -166,14 +166,14 @@ namespace MASIC
                             clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                         while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
-                            fragScanIndexMatch += 1;
+                            fragScanIndexMatch++;
 
                         if (fragScanIndexMatch == scanList.MasterScanOrderCount)
                         {
                             // Did not find the next frag scan; find the previous frag scan
-                            fragScanIndexMatch -= 1;
+                            fragScanIndexMatch--;
                             while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
-                                fragScanIndexMatch -= 1;
+                                fragScanIndexMatch--;
 
                             if (fragScanIndexMatch < 0)
                                 fragScanIndexMatch = 0;
@@ -216,7 +216,7 @@ namespace MASIC
                     else
                     {
                         scanOrAcqTimeSumForAveraging += currentParentIon.CustomSICPeakScanOrAcqTimeTolerance;
-                        scanOrAcqTimeSumCount += 1;
+                        scanOrAcqTimeSumCount++;
                     }
 
                     if (currentParentIon.SurveyScanIndex < scanList.SurveyScans.Count)
@@ -311,7 +311,7 @@ namespace MASIC
 
             ResetMzSearchValues();
 
-            if (mzValues.Count <= 0)
+            if (mzValues.Count == 0)
             {
                 // Nothing to parse; return true
                 return true;
@@ -568,11 +568,11 @@ namespace MASIC
             {
                 if (customMzValue.ScanOrAcqTimeCenter > 1)
                 {
-                    countOverOne += 1;
+                    countOverOne++;
                 }
                 else
                 {
-                    countBetweenZeroAndOne += 1;
+                    countBetweenZeroAndOne++;
                 }
             }
 

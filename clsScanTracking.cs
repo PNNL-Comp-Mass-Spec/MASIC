@@ -144,7 +144,7 @@ namespace MASIC
                     {
                         if (msSpectrum.IonsIntensity[comparisonIndex] < float.Epsilon)
                         {
-                            countCombined += 1;
+                            countCombined++;
                         }
                         else
                         {
@@ -159,7 +159,7 @@ namespace MASIC
                         msSpectrum.IonsMZ[targetIndex] = msSpectrum.IonsMZ[index];
                         msSpectrum.IonsIntensity[targetIndex] = msSpectrum.IonsIntensity[index];
 
-                        targetIndex += 1;
+                        targetIndex++;
                         msSpectrum.IonsMZ[targetIndex] = msSpectrum.IonsMZ[index + countCombined];
                         msSpectrum.IonsIntensity[targetIndex] = msSpectrum.IonsIntensity[index + countCombined];
 
@@ -181,8 +181,8 @@ namespace MASIC
                     msSpectrum.IonsIntensity[targetIndex] = msSpectrum.IonsIntensity[index];
                 }
 
-                index += 1;
-                targetIndex += 1;
+                index++;
+                targetIndex++;
             }
 
             // Update .IonCount with the new data count
@@ -223,7 +223,7 @@ namespace MASIC
                                     bestMz = msSpectrum.IonsMZ[comparisonIndex];
                                 }
 
-                                countCombined += 1;
+                                countCombined++;
                             }
                             else
                             {
@@ -243,8 +243,8 @@ namespace MASIC
                     index += countCombined;
                 }
 
-                index += 1;
-                targetIndex += 1;
+                index++;
+                targetIndex++;
             }
 
             // Update .IonCount with the new data count
@@ -329,7 +329,7 @@ namespace MASIC
                 {
                     // Do not keep more than 50,000 ions
                     lastKnownLocation = "Call DiscardDataToLimitIonCount";
-                    mSpectraFoundExceedingMaxIonCount += 1;
+                    mSpectraFoundExceedingMaxIonCount++;
 
                     // Display a message at the console the first 10 times we encounter spectra with over MAX_ALLOWABLE_ION_COUNT ions
                     // In addition, display a new message every time a new max value is encountered

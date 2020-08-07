@@ -1897,7 +1897,7 @@ namespace MASIC
 
             if (success)
             {
-                Options.SICOptions.DatasetID += 1;
+                Options.SICOptions.DatasetID++;
             }
 
             if (success)

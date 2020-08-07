@@ -103,7 +103,7 @@ namespace MASIC
                 foreach (var reporterIon in mOptions.ReporterIons.ReporterIonList)
                 {
                     reporterIons[index] = reporterIon;
-                    index += 1;
+                    index++;
                 }
 
                 Array.Sort(reporterIons, new clsReportIonInfoComparer());
@@ -449,7 +449,7 @@ namespace MASIC
                     {
                         if (reporterIntensitiesCorrected[reporterIonIndex] > 0)
                         {
-                            positiveCount += 1;
+                            positiveCount++;
                         }
                     }
 

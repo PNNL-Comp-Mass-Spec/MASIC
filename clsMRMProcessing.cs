@@ -126,7 +126,7 @@ namespace MASIC
                         }
                         else
                         {
-                            mrmInfoForHash.ScanCount += 1;
+                            mrmInfoForHash.ScanCount++;
                         }
                     }
                 }
@@ -489,7 +489,7 @@ namespace MASIC
                 if (crosstabColumnValue[index] > 0)
                 {
                     dataColumns.Add(crosstabColumnValue[index].ToString("0.000"));
-                    nonZeroCount += 1;
+                    nonZeroCount++;
                 }
                 else
                 {
@@ -682,7 +682,7 @@ namespace MASIC
                     xmlResultsWriter.SaveDataToXML(scanList, parentIonIndex, sicDetails, smoothedYDataSubset,
                                                    mDataOutputHandler);
 
-                    parentIonsProcessed += 1;
+                    parentIonsProcessed++;
 
                     // ---------------------------------------------------------
                     // Update progress

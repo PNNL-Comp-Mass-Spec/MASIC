@@ -363,12 +363,12 @@ namespace MASIC.DataInput
                         firstRead = false;
                     }
 
-                    mDatasetFileInfo.ScanCount += 1;
+                    mDatasetFileInfo.ScanCount++;
                     scanTimeMax = spectrumInfo.RetentionTimeMin;
 
                     if (spectrumInfo.ScanNumber > 0 && !mScanTracking.CheckScanInRange(spectrumInfo.ScanNumber, mOptions.SICOptions))
                     {
-                        mScansOutOfRange += 1;
+                        mScansOutOfRange++;
                         continue;
                     }
 
@@ -490,11 +490,11 @@ namespace MASIC.DataInput
                         if (mzMLSpectrum == null)
                             continue;
 
-                        mDatasetFileInfo.ScanCount += 1;
+                        mDatasetFileInfo.ScanCount++;
 
                         if (mzMLSpectrum.ScanNumber > 0 && !mScanTracking.CheckScanInRange(mzMLSpectrum.ScanNumber, mOptions.SICOptions))
                         {
-                            mScansOutOfRange += 1;
+                            mScansOutOfRange++;
                             continue;
                         }
 
@@ -552,7 +552,7 @@ namespace MASIC.DataInput
                         if (!isSRM)
                             continue;
 
-                        chromatogramNumber += 1;
+                        chromatogramNumber++;
 
                         // Keys in this dictionary are elution time, values are the pseudo scan number (assigned later in this method)
                         var elutionTimeToScanMap = new SortedDictionary<double, int>();
@@ -681,7 +681,7 @@ namespace MASIC.DataInput
                             }
                         }
 
-                        chromatogramsProcessed += 1;
+                        chromatogramsProcessed++;
                     }
 
                     Console.WriteLine();
@@ -740,7 +740,7 @@ namespace MASIC.DataInput
                             }
                             else
                             {
-                                scanTimeLookupErrors += 1;
+                                scanTimeLookupErrors++;
                                 if (scanTimeLookupErrors <= 5 || scanTimeLookupErrors >= nextWarningThreshold)
                                 {
                                     ConsoleMsgUtils.ShowWarning("The elutionTimeToScanMap dictionary did not have scan time {0:N1} for {1}; this is unexpected",
@@ -764,11 +764,11 @@ namespace MASIC.DataInput
                     {
                         var scanNumber = simulatedSpectrum.Key;
 
-                        mDatasetFileInfo.ScanCount += 1;
+                        mDatasetFileInfo.ScanCount++;
 
                         if (scanNumber > 0 && !mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
                         {
-                            mScansOutOfRange += 1;
+                            mScansOutOfRange++;
                             continue;
                         }
 
@@ -855,7 +855,7 @@ namespace MASIC.DataInput
             }
             else
             {
-                mScansOutOfRange += 1;
+                mScansOutOfRange++;
                 success = true;
             }
 
@@ -1154,7 +1154,7 @@ namespace MASIC.DataInput
                         // The data is likely MRM and not SRM
                         // We cannot currently handle data like this
                         // (would need to examine the mass values and find the clumps of data to infer the transitions present)
-                        mWarnCount += 1;
+                        mWarnCount++;
                         if (mWarnCount <= 5)
                         {
                             ReportError("Warning: m/z range for SRM scan " + spectrumInfo.ScanNumber + " is " +

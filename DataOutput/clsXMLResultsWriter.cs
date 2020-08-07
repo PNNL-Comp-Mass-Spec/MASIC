@@ -329,8 +329,8 @@ namespace MASIC.DataOutput
                                 // Trim the trailing comma
                                 if (sbIntensityDataList[sbIntensityDataList.Length - 1] == ',')
                                 {
-                                    sbIntensityDataList.Length -= 1;
-                                    sbMassDataList.Length -= 1;
+                                    sbIntensityDataList.Length--;
+                                    sbMassDataList.Length--;
                                 }
                             }
 
@@ -368,7 +368,7 @@ namespace MASIC.DataOutput
                                         sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString(CultureInfo.InvariantCulture) + ",");
 
                                     // Trim the trailing comma
-                                    sbPeakYDataSmoothed.Length -= 1;
+                                    sbPeakYDataSmoothed.Length--;
                                 }
 
                                 writer.WriteElementString("SmoothedYDataList", sbPeakYDataSmoothed.ToString());
@@ -732,7 +732,7 @@ namespace MASIC.DataOutput
                                     if (clsUtilities.IsNumber(work))
                                     {
                                         parentIonIndex = int.Parse(work);
-                                        parentIonsProcessed += 1;
+                                        parentIonsProcessed++;
 
                                         // Update progress
                                         if (scanList.ParentIons.Count > 1)

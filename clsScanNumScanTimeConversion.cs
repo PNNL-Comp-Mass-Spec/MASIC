@@ -76,7 +76,7 @@ namespace MASIC
                             if (Math.Abs(scanList.SurveyScans[index + 1].ScanNumber - scanNumberToFind) <
                                 Math.Abs(scanList.SurveyScans[index].ScanNumber - scanNumberToFind))
                             {
-                                surveyScanIndexMatch += 1;
+                                surveyScanIndexMatch++;
                             }
                         }
 

@@ -131,7 +131,7 @@ namespace MASIC.DataOutput
                 return;
             }
 
-            spectrumExportCount += 1;
+            spectrumExportCount++;
 
             // First, write an entry to the "_scans.csv" file
 
@@ -243,7 +243,7 @@ namespace MASIC.DataOutput
                 return;
             }
 
-            spectrumExportCount += 1;
+            spectrumExportCount++;
 
             // Store the base peak ion intensity as the time domain signal level value
             writer.WriteLine("{0}\t{1:0.000}", "Time domain signal level:", currentScan.BasePeakIonIntensity);
@@ -340,7 +340,7 @@ namespace MASIC.DataOutput
                         spectrum.IonsMZ[ionIndex],
                         "0");
 
-                    exportCount += 1;
+                    exportCount++;
                 }
             }
 

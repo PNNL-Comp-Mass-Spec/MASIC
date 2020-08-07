@@ -625,7 +625,7 @@ namespace MASIC.DataOutput
                         if (dataValues.Length <= 0)
                             continue;
 
-                        linesRead += 1;
+                        linesRead++;
 
                         if (linesRead == 1)
                         {
@@ -766,7 +766,7 @@ namespace MASIC.DataOutput
                         if (dataValues.Length <= 0)
                             continue;
 
-                        linesRead += 1;
+                        linesRead++;
 
                         if (linesRead == 1)
                         {
@@ -882,7 +882,7 @@ namespace MASIC.DataOutput
                         if (dataValues.Length <= 0)
                             continue;
 
-                        linesRead += 1;
+                        linesRead++;
 
                         if (linesRead == 1)
                         {

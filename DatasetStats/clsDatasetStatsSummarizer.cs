@@ -192,7 +192,7 @@ namespace MASIC.DatasetStats
                     var scanTypeKey = statEntry.ScanTypeName + SCAN_TYPE_STATS_SEP_CHAR + statEntry.ScanFilterText;
                     if (summaryStats.ScanTypeStats.ContainsKey(scanTypeKey))
                     {
-                        summaryStats.ScanTypeStats[scanTypeKey] += 1;
+                        summaryStats.ScanTypeStats[scanTypeKey]++;
                     }
                     else
                     {
@@ -253,7 +253,7 @@ namespace MASIC.DatasetStats
                 bpiList.Add(basePeakIntensity);
             }
 
-            summaryStatDetails.ScanCount += 1;
+            summaryStatDetails.ScanCount++;
         }
 
         // ReSharper disable once UnusedMember.Global

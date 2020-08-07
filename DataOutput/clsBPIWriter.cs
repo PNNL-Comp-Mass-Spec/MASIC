@@ -62,7 +62,7 @@ namespace MASIC.DataOutput
 
                 SaveDecon2LSChromatogram(scanList.SurveyScans, spectraCache, msScansFilePath);
 
-                stepsCompleted += 1;
+                stepsCompleted++;
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
@@ -112,7 +112,7 @@ namespace MASIC.DataOutput
                         }
                     }
 
-                    scansWritten += 1;
+                    scansWritten++;
                 }
             }
         }

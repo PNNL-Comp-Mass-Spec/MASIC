@@ -199,7 +199,7 @@ namespace MASIC.DataInput
                                 {
                                     msSpectrum.IonsMZ[ionCountNew] = msSpectrum.IonsMZ[ionIndex];
                                     msSpectrum.IonsIntensity[ionCountNew] = msSpectrum.IonsIntensity[ionIndex];
-                                    ionCountNew += 1;
+                                    ionCountNew++;
                                 }
                             }
                         }
@@ -234,7 +234,7 @@ namespace MASIC.DataInput
                                 {
                                     msSpectrum.IonsMZ[ionCountNew] = msSpectrum.IonsMZ[ionIndex];
                                     msSpectrum.IonsIntensity[ionCountNew] = msSpectrum.IonsIntensity[ionIndex];
-                                    ionCountNew += 1;
+                                    ionCountNew++;
                                 }
                             }
                         }
@@ -331,7 +331,7 @@ namespace MASIC.DataInput
                         {
                             msSpectrum.IonsMZ[ionCountNew] = msSpectrum.IonsMZ[ionIndex];
                             msSpectrum.IonsIntensity[ionCountNew] = msSpectrum.IonsIntensity[ionIndex];
-                            ionCountNew += 1;
+                            ionCountNew++;
                         }
                     }
                 }
@@ -565,7 +565,7 @@ namespace MASIC.DataInput
 
         protected void WarnIsolationWidthNotFound(int scanNumber, string warningMessage)
         {
-            mIsolationWidthNotFoundCount += 1;
+            mIsolationWidthNotFoundCount++;
 
             if (mIsolationWidthNotFoundCount <= ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW)
             {
@@ -582,7 +582,7 @@ namespace MASIC.DataInput
             if (message.StartsWith("Did not find the precursor for"))
             {
                 // The precursor ion was not found in the centroided MS1 spectrum; this happens sometimes
-                mPrecursorNotFoundCount += 1;
+                mPrecursorNotFoundCount++;
                 if (mPrecursorNotFoundCount <= PRECURSOR_NOT_FOUND_WARNINGS_TO_SHOW || mPrecursorNotFoundCount > mNextPrecursorNotFoundCountThreshold)
                 {
                     OnWarningEvent(message);

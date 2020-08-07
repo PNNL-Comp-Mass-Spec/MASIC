@@ -575,7 +575,7 @@ namespace MASIC
 
                         intensityPointerArray[findSimilarIonsDataCount] = index;
                         intensityList[findSimilarIonsDataCount] = scanList.ParentIons[index].SICStats.Peak.MaxIntensityValue;
-                        findSimilarIonsDataCount += 1;
+                        findSimilarIonsDataCount++;
                     }
                 }
 
@@ -645,7 +645,7 @@ namespace MASIC
                     if (similarParentIonsData.IonUsed[originalIndex])
                     {
                         // Parent ion was already used; move onto the next one
-                        parentIonIndex += 1;
+                        parentIonIndex++;
                     }
                     else
                     {
@@ -714,7 +714,7 @@ namespace MASIC
                         }
                         while (similarParentIonsData.IonInUseCount > ionInUseCountOriginal);
 
-                        parentIonIndex += 1;
+                        parentIonIndex++;
                     }
 
                     if (findSimilarIonsDataCount > 1)
@@ -765,7 +765,7 @@ namespace MASIC
                             continue;
                         }
 
-                        ionUpdateCount += 1;
+                        ionUpdateCount++;
                         scanList.ParentIons[parentIonMatchIndex].OptimalPeakApexScanNumber = uniqueMzListItem.ScanNumberMaxIntensity;
                         scanList.ParentIons[parentIonMatchIndex].PeakApexOverrideParentIonIndex = uniqueMzListItem.ParentIonIndexMaxIntensity;
                     }
@@ -852,7 +852,7 @@ namespace MASIC
                 AppendParentIonToUniqueMZEntry(scanList, matchOriginalIndex, uniqueMzListItem, searchMZOffset);
 
                 similarParentIonsData.IonUsed[matchOriginalIndex] = true;
-                similarParentIonsData.IonInUseCount += 1;
+                similarParentIonsData.IonInUseCount++;
             }
         }
 

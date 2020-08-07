@@ -136,7 +136,7 @@ namespace MASIC.DataInput
                         if (dataCols.Length <= 0)
                             continue;
 
-                        linesRead += 1;
+                        linesRead++;
 
                         if (linesRead == 1)
                         {

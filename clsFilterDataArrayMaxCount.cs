@@ -87,7 +87,7 @@ namespace MASIC
             mDataValues[DataCount] = abundance;
             mDataIndices[DataCount] = dataPointIndex;
 
-            DataCount += 1;
+            DataCount++;
         }
 
         /// <summary>
@@ -230,11 +230,11 @@ namespace MASIC
                     {
                         if (mDataValues[index] >= histogramBinStartIntensity[targetBin + 1])
                         {
-                            targetBin += 1;
+                            targetBin++;
                         }
                     }
 
-                    histogramBinCounts[targetBin] += 1;
+                    histogramBinCounts[targetBin]++;
 
                     if (mDataValues[index] < histogramBinStartIntensity[targetBin])
                     {
@@ -329,7 +329,7 @@ namespace MASIC
 
                                 binToSortAbundances[binToSortDataCount] = mDataValues[index];
                                 binToSortDataIndices[binToSortDataCount] = mDataIndices[index];
-                                binToSortDataCount += 1;
+                                binToSortDataCount++;
                             }
                             else
                             {
@@ -377,7 +377,7 @@ namespace MASIC
                         for (var index = 0; index < binToSortDataCount; index++)
                         {
                             while (binToSortDataIndices[index] > mDataIndices[originalDataArrayIndex])
-                                originalDataArrayIndex += 1;
+                                originalDataArrayIndex++;
 
                             if (Math.Abs(binToSortAbundances[index] - SkipDataPointFlag) < float.Epsilon)
                             {
@@ -391,7 +391,7 @@ namespace MASIC
                                 }
                             }
 
-                            originalDataArrayIndex += 1;
+                            originalDataArrayIndex++;
 
                             if (binToSortDataCount < 1000 || binToSortDataCount % 100 == 0)
                             {

@@ -401,7 +401,7 @@ namespace MASIC
                 for (var index = 0; index < dataCount; index++)
                 {
                     if (dataList1[index] > 0)
-                        nonZeroDataCount += 1;
+                        nonZeroDataCount++;
                 }
 
                 if (nonZeroDataCount < MIN_NON_ZERO_ION_COUNT)
@@ -411,7 +411,7 @@ namespace MASIC
                 for (var index = 0; index < dataCount; index++)
                 {
                     if (dataList2[index] > 0)
-                        nonZeroDataCount += 1;
+                        nonZeroDataCount++;
                 }
 
                 if (nonZeroDataCount < MIN_NON_ZERO_ION_COUNT)
@@ -568,23 +568,23 @@ namespace MASIC
                     var aa = a1 * a2;
                     if (Math.Abs(aa) > double.Epsilon)
                     {
-                        n1 += 1;
-                        n2 += 1;
+                        n1++;
+                        n2++;
                         if (aa > 0)
                         {
-                            intIS += 1;
+                            intIS++;
                         }
                         else
                         {
-                            intIS -= 1;
+                            intIS--;
                         }
                     }
                     else
                     {
                         if (Math.Abs(a1) > double.Epsilon)
-                            n1 += 1;
+                            n1++;
                         if (Math.Abs(a2) > double.Epsilon)
-                            n2 += 1;
+                            n2++;
                     }
                 }
             }
@@ -706,13 +706,13 @@ namespace MASIC
                 if (Math.Abs(w[j + 1] - w[j]) > float.Epsilon)
                 {
                     w[j] = j + 1;            // Rank = j + 1
-                    j += 1;
+                    j++;
                 }
                 else
                 {
                     var jt = j + 1;
                     while (jt < n && Math.Abs(w[jt] - w[j]) < float.Epsilon)
-                        jt += 1;
+                        jt++;
 
                     var rank = 0.5F * (j + jt - 1) + 1;
 
@@ -764,7 +764,7 @@ namespace MASIC
 
             for (var j = 0; j <= 5; j++)
             {
-                y += 1;
+                y++;
                 ser += mCoefficients[j] / y;
             }
 

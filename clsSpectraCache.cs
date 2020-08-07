@@ -175,7 +175,7 @@ namespace MASIC
                     // Store all of the spectra in one large file
                     CacheSpectrumWork(spectrum);
 
-                    CacheEventCount += 1;
+                    CacheEventCount++;
                     return true;
                 }
 
@@ -249,7 +249,7 @@ namespace MASIC
                 }
                 catch (Exception ex)
                 {
-                    retryCount -= 1;
+                    retryCount--;
                     var message = string.Format("Error caching scan {0}: {1}", scanNumber, ex.Message);
                     if (retryCount >= 0)
                     {
@@ -426,7 +426,7 @@ namespace MASIC
                     cacheItem.Scan.Clear(0);
                     cacheItem.CacheState = eCacheStateConstants.UnusedSlot;
 
-                    CacheEventCount += 1;
+                    CacheEventCount++;
                 }
             }
         }
@@ -568,7 +568,7 @@ namespace MASIC
                 //for (var index = 0; index < ionCount; index++)
                 //    msSpectrum.IonsIntensity.Add(mPageFileReader.ReadDouble());
 
-                UnCacheEventCount += 1;
+                UnCacheEventCount++;
                 success = true;
             }
 

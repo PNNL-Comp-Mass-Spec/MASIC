@@ -427,7 +427,7 @@ namespace MASIC
                                 }
                                 else
                                 {
-                                    scanIndexStart -= 1;
+                                    scanIndexStart--;
                                     if (fullSICIntensities[mzIndexWork, scanIndexStart] > maximumIntensity)
                                     {
                                         maximumIntensity = fullSICIntensities[mzIndexWork, scanIndexStart];
@@ -504,7 +504,7 @@ namespace MASIC
                                 }
                                 else
                                 {
-                                    scanIndexEnd += 1;
+                                    scanIndexEnd++;
                                     if (fullSICIntensities[mzIndexWork, scanIndexEnd] > maximumIntensity)
                                     {
                                         maximumIntensity = fullSICIntensities[mzIndexWork, scanIndexEnd];
@@ -676,7 +676,7 @@ namespace MASIC
                            Math.Abs(mzBinList[mzIndex + 1].MZTolerance - mzSearchChunk.MZTolerance) < double.Epsilon &&
                            mzBinList[mzIndex + 1].MZToleranceIsPPM == mzSearchChunk.MZToleranceIsPPM &&
                            mzBinList[mzIndex + 1].MZ - mzBinList[mzSearchChunk.MZIndexStart].MZ <= mzToleranceDa / 2)
-                        mzIndex += 1;
+                        mzIndex++;
 
                     mzSearchChunk.MZIndexEnd = mzIndex;
 
@@ -738,7 +738,7 @@ namespace MASIC
                         break;
                     }
 
-                    mzIndex += 1;
+                    mzIndex++;
                 }
 
                 return true;
@@ -868,7 +868,7 @@ namespace MASIC
                         current.ScanIndexMax = dataIndex;
                     }
 
-                    fullSICDataCount[mzIndexWork] += 1;
+                    fullSICDataCount[mzIndexWork]++;
                 }
 
                 if (surveyScanIndex % 100 == 0)
@@ -1052,7 +1052,7 @@ namespace MASIC
                                                    smoothedYDataSubsetInSearchChunk, dataOutputHandler);
 
                     parentIonUpdated[parentIonIndexPointer] = true;
-                    parentIonsProcessed += 1;
+                    parentIonsProcessed++;
                 }
 
                 // ---------------------------------------------------------
@@ -1164,7 +1164,7 @@ namespace MASIC
                                                smoothedYDataSubset, dataOutputHandler);
 
                 parentIonUpdated[parentIonIndexPointer] = true;
-                parentIonsProcessed += 1;
+                parentIonsProcessed++;
             }
         }
 

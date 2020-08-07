@@ -225,7 +225,7 @@ namespace MASIC.DataInput
                 {
                     if (!mScanTracking.CheckScanInRange(scanNumber, mOptions.SICOptions))
                     {
-                        mScansOutOfRange += 1;
+                        mScansOutOfRange++;
                         continue;
                     }
 
@@ -283,7 +283,7 @@ namespace MASIC.DataInput
             }
             else
             {
-                mScansOutOfRange += 1;
+                mScansOutOfRange++;
                 success = true;
             }
 
@@ -671,7 +671,7 @@ namespace MASIC.DataInput
 
                 if (Math.Abs(scanInfo.BasePeakIonMZ - basePeakMz) > 0.1)
                 {
-                    mBpiUpdateCount += 1;
+                    mBpiUpdateCount++;
 
                     if (mBpiUpdateCount < 10)
                     {
