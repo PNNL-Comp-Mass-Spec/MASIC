@@ -11,7 +11,8 @@ namespace MASIC.Plots
         public enum PlotTypes
         {
             XY = 0,
-            BarChart = 1
+            BarChart = 1,
+            BoxPlot = 2
         }
 
         protected StreamWriter mLogWriter;

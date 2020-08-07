@@ -38,6 +38,8 @@ namespace MASIC.Plots
 
         public string Title { get; set; }
 
+        public bool UseLogarithmicScale { get; set; }
+
         /// <summary>
         /// Constructor
         /// </summary>

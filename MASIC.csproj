@@ -127,6 +127,7 @@
     <Compile Include="DataInput\clsDataImportMGFandCDF.cs" />
     <Compile Include="DataInput\clsDataImportMSXml.cs" />
     <Compile Include="DataInput\clsDataImportThermoRaw.cs" />
+    <Compile Include="DataOutput\BoxPlotStats.cs" />
     <Compile Include="DataOutput\clsBPIWriter.cs" />
     <Compile Include="DataOutput\clsDataOutput.cs" />
     <Compile Include="DataOutput\clsExtendedStatsWriter.cs" />
@@ -162,6 +163,7 @@
     <Compile Include="Options\SpectrumCacheOptions.cs" />
     <Compile Include="Plots\AxisInfo.cs" />
     <Compile Include="Plots\BarChartPlotter.cs" />
+    <Compile Include="Plots\BoxPlotPlotter.cs" />
     <Compile Include="Plots\HistogramPlotter.cs" />
     <Compile Include="Plots\HTMLFileCreator.cs" />
     <Compile Include="Plots\OxyPlotUtilities.cs" />
@@ -170,6 +172,7 @@
     <Compile Include="Plots\PlotFileInfo.cs" />
     <Compile Include="Plots\PlotUtilities.cs" />
     <Compile Include="Plots\PythonPlotContainer.cs" />
+    <Compile Include="Plots\PythonPlotContainerBoxPlot.cs" />
     <Compile Include="Plots\PythonPlotContainerXY.cs" />
     <Compile Include="Plots\PythonPlotContainerBarChart.cs" />
     <Compile Include="Program.cs" />

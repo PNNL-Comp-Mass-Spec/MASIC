@@ -95,27 +95,27 @@ namespace MASIC.Plots
         }
 
 #pragma warning disable CS3002 // Return type is not CLS-compliant
-        public static PlotModel GetBasicPlotModel(
+        public static PlotModel GetBasicBoxPlotModel(
             string title,
-            string xAxisLabel,
+            IEnumerable<string> xAxisLabels,
             AxisInfo yAxisInfo)
 #pragma warning restore CS3002 // Argument type is not CLS-compliant
         {
             var myPlot = GetPlotModel(title);
 
-            myPlot.Axes.Add(MakeLinearAxis(AxisPosition.Bottom, xAxisLabel, PlotContainer.DEFAULT_BASE_FONT_SIZE));
-            myPlot.Axes[0].Minimum = 0;
+            var xAxis = MakeCategoryAxis(AxisPosition.Bottom, yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
 
-            myPlot.Axes.Add(MakeLinearAxis(AxisPosition.Left, yAxisInfo.Title, PlotContainer.DEFAULT_BASE_FONT_SIZE));
-
-            if (yAxisInfo.TickLabelsUseExponentialNotation)
+            foreach (var label in xAxisLabels)
             {
-                myPlot.Axes[1].StringFormat = AxisInfo.EXPONENTIAL_FORMAT;
+                xAxis.Labels.Add(label);
             }
 
-            // Adjust the font sizes
-            myPlot.Axes[0].FontSize = PlotContainer.DEFAULT_BASE_FONT_SIZE;
-            myPlot.Axes[1].FontSize = PlotContainer.DEFAULT_BASE_FONT_SIZE;
+            var yAxis = MakeYAxis(yAxisInfo, PlotContainer.DEFAULT_BASE_FONT_SIZE);
+
+            AddAxes(myPlot, xAxis, yAxis, yAxisInfo);
+
+            return myPlot;
+        }
 
 #pragma warning disable CS3002 // Return type is not CLS-compliant
         public static PlotModel GetBasicPlotModel(
