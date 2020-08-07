@@ -151,7 +151,7 @@ namespace MASIC
                                     }
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 // Ignore errors here
                             }

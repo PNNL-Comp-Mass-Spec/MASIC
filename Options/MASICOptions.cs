@@ -1034,7 +1034,7 @@ namespace MASIC.Options
                         StatusLogKeyNameFilterList.Add(item);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore errors here
             }
@@ -1064,7 +1064,7 @@ namespace MASIC.Options
                     SetStatusLogKeyNameFilterList(validatedItems);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Error parsing matchSpecList
                 // Ignore errors here

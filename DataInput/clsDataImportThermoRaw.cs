@@ -861,7 +861,7 @@ namespace MASIC.DataInput
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore any errors here
             }

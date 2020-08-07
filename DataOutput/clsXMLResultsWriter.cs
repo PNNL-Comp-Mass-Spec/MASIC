@@ -340,7 +340,7 @@ namespace MASIC.DataOutput
                             writer.WriteElementString("MassDataList", sbMassDataList.ToString());
                             massDataList = true;
                         }
-                        catch (OutOfMemoryException ex)
+                        catch (OutOfMemoryException)
                         {
                             // Ignore the exception if it is an Out of Memory exception
 
@@ -373,7 +373,7 @@ namespace MASIC.DataOutput
 
                                 writer.WriteElementString("SmoothedYDataList", sbPeakYDataSmoothed.ToString());
                             }
-                            catch (OutOfMemoryException ex)
+                            catch (OutOfMemoryException)
                             {
                                 // Ignore the exception if this is an Out of Memory exception
                                 writer.WriteElementString("SmoothedYDataList", string.Empty);

@@ -2304,7 +2304,7 @@ namespace MASIC
                     File.Copy(tempPath, statusFilePath, true);
                     File.Delete(tempPath);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Ignore any errors
                 }

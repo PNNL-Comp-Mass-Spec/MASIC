@@ -409,7 +409,7 @@ namespace MASIC.DataInput
                 {
                     xmlReader.CloseFile();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Ignore errors here
                 }

@@ -423,7 +423,7 @@ namespace MASICPeakFinder
                 while (noiseStatsSegments.Count > segmentCountLocal)
                     noiseStatsSegments.RemoveAt(noiseStatsSegments.Count - 1);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -1124,7 +1124,7 @@ namespace MASICPeakFinder
 
                 success = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore errors here
                 success = false;
@@ -1290,7 +1290,7 @@ namespace MASICPeakFinder
                         statMomentsData.CenterOfMassScan = sicData[sicPeak.IndexMax].ScanNumber;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Ignore errors here
                 }
@@ -3629,7 +3629,7 @@ namespace MASICPeakFinder
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore Errors
             }
