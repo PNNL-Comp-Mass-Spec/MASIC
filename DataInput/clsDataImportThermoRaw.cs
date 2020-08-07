@@ -834,7 +834,7 @@ namespace MASIC.DataInput
                         saveItem = false;
                         foreach (var item in keyNameFilterList)
                         {
-                            if (statusEntry.Key.ToLower().Contains(item.ToLower()))
+                            if (statusEntry.Key.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
                             {
                                 saveItem = true;
                                 break;

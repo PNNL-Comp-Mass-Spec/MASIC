@@ -64,7 +64,7 @@ namespace MASIC
 
                 var includeFtmsColumns = false;
 
-                if (inputFilePathFull.ToUpper().EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION.ToUpper()))
+                if (inputFilePathFull.EndsWith(DataInput.clsDataImport.THERMO_RAW_FILE_EXTENSION, StringComparison.OrdinalIgnoreCase))
                 {
                     // Processing a thermo .Raw file
                     // Check whether any of the frag scans has IsFTMS true
