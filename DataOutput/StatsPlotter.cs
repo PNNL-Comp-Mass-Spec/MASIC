@@ -182,7 +182,7 @@ namespace MASIC.DataOutput
 
                 var reporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, highAbundanceTitle);
 
-                var highAbundanceReporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, "Reporter Ion Observation Rate");
+                var highAbundanceReporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, allSpectraTitle);
 
                 RegisterEvents(reporterIonObservationRatePlotter);
                 RegisterEvents(highAbundanceReporterIonObservationRatePlotter);
