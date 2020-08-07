@@ -13,6 +13,8 @@ namespace MASIC.DataOutput
 
         public const string REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX = "RepIonObsRate.txt";
 
+        public const string REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX = "RepIonStats.txt";
+
         /// <summary>
         /// MASIC Options
         /// </summary>
@@ -54,6 +56,23 @@ namespace MASIC.DataOutput
             };
 
             plotFiles.Add(plotFile);
+        }
+
+        private void AppendReporterIonStats(
+            ICollection<string> dataLine,
+            IReadOnlyDictionary<int, BoxPlotStats> reporterIonStats,
+            int reporterIonIndex,
+            IReadOnlyDictionary<string, int> columnWidths,
+            string statNameSuffix)
+        {
+            var boxPlotStats = reporterIonStats.ContainsKey(reporterIonIndex) ? reporterIonStats[reporterIonIndex] : new BoxPlotStats();
+
+            dataLine.Add(string.Format("{0}", boxPlotStats.NonZeroCount).PadRight(columnWidths["NonZeroCount" + statNameSuffix]));
+            dataLine.Add(string.Format("{0}", boxPlotStats.Median).PadRight(columnWidths["Median" + statNameSuffix]));
+            dataLine.Add(string.Format("{0}", boxPlotStats.InterQuartileRange).PadRight(columnWidths["InterQuartileRange" + statNameSuffix]));
+            dataLine.Add(string.Format("{0}", boxPlotStats.LowerWhisker).PadRight(columnWidths["LowerWhisker" + statNameSuffix]));
+            dataLine.Add(string.Format("{0}", boxPlotStats.UpperWhisker).PadRight(columnWidths["UpperWhisker" + statNameSuffix]));
+            dataLine.Add(string.Format("{0}", boxPlotStats.NumberOfOutliers).PadRight(columnWidths["NumberOfOutliers" + statNameSuffix]));
         }
 
         private bool CreateHistogram(
@@ -219,20 +238,118 @@ namespace MASIC.DataOutput
             }
         }
 
+        private bool CreateBoxPlots(string datasetName, string outputDirectory, ICollection<PlotFileInfo> plotFiles)
+        {
+            try
+            {
+                var highAbundanceTitle = string.Format("Reporter Ion Intensities (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
+                var allSpectraTitle = "Reporter Ion Intensities";
+
+                var reporterIonIntensityPlotter = new BoxPlotPlotter(Options.PlotOptions, highAbundanceTitle);
+
+                var highAbundanceReporterIonIntensity = new BoxPlotPlotter(Options.PlotOptions, allSpectraTitle);
+
+                RegisterEvents(reporterIonIntensityPlotter);
+                RegisterEvents(highAbundanceReporterIonIntensity);
+
+                var success1 = CreateBoxPlot(
+                    mStatsSummarizer.ReporterIonNames,
+                    mStatsSummarizer.NonZeroReporterIons,
+                    mStatsSummarizer.ReporterIonIntensityStats,
+                    datasetName,
+                    outputDirectory,
+                    plotFiles,
+                    highAbundanceTitle,
+                    "Reporter ion intensities, excluding low abundance spectra",
+                    "RepIonStatsHighAbundance",
+                    "Intensity");
+
+                var success2 = CreateBoxPlot(
+                    mStatsSummarizer.ReporterIonNames,
+                    mStatsSummarizer.NonZeroReporterIonsHighAbundance,
+                    mStatsSummarizer.ReporterIonIntensityStatsHighAbundanceData,
+                    datasetName,
+                    outputDirectory,
+                    plotFiles,
+                    allSpectraTitle,
+                    "Reporter ion intensities, all spectra",
+                    Path.GetFileNameWithoutExtension(REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX),
+                    "Intensity");
+
+                return success1 && success2;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in StatsPlotter.CreateBoxPlots", ex);
+                return false;
+            }
+        }
+
+        private bool CreateBoxPlot(
+            IReadOnlyDictionary<int, string> boxPlotLabelsByIndex,
+            IReadOnlyDictionary<int, List<double>> boxPlotDataByIndex,
+            IDictionary<int, BoxPlotStats> boxPlotStats,
+            string datasetName,
+            string outputDirectory,
+            ICollection<PlotFileInfo> plotFiles,
+            string plotTitle,
+            string plotDescription,
+            string plotAbbreviation,
+            string yAxisLabel,
+            bool logarithmicYAxis = true,
+            int yAxisMinimum = 0)
+        {
+            boxPlotStats.Clear();
+
+            try
+            {
+                var boxPlotPlotter = new BoxPlotPlotter(Options.PlotOptions, plotTitle)
+                {
+                    PlotAbbrev = plotAbbreviation,
+                    YAxisLabel = yAxisLabel
+                };
+
+                RegisterEvents(boxPlotPlotter);
+
+                foreach (var item in boxPlotDataByIndex)
+                {
+                    var label = boxPlotLabelsByIndex[item.Key];
+                    boxPlotPlotter.AddData(item.Key, label, item.Value);
+                }
+
+                var success = boxPlotPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath, logarithmicYAxis, yAxisMinimum);
+
+                foreach (var item in boxPlotPlotter.BoxPlotStatistics)
+                {
+                    boxPlotStats.Add(item.Key, item.Value);
+                }
+
+                AppendPlotFile(plotFiles, outputFilePath, PlotContainerBase.PlotTypes.BoxPlot, plotDescription);
+
+                return success;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in StatsPlotter.CreateBoxPlot", ex);
+                return false;
+            }
+        }
+
         private bool CreatePlots(string datasetName, string outputDirectory, out List<PlotFileInfo> plotFiles)
         {
             plotFiles = new List<PlotFileInfo>();
             var barChartSuccess = CreateBarCharts(datasetName, outputDirectory, plotFiles);
+            var boxPlotSuccess = CreateBoxPlots(datasetName, outputDirectory, plotFiles);
             var histogramSuccess = CreateHistograms(datasetName, outputDirectory, plotFiles);
 
-            return barChartSuccess && histogramSuccess;
+            return barChartSuccess && boxPlotSuccess && histogramSuccess;
         }
 
         /// <summary>
         /// Read the SIC stats file (and optionally reporter ions file)
         /// Generate stats, then create plots
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if success, otherwise false</returns>
         public bool ProcessFile(string sicStatsFilePath, string outputDirectory)
         {
             try
@@ -293,6 +410,7 @@ namespace MASIC.DataOutput
         private bool SavePlotData(string datasetName, string outputDirectory)
         {
             bool histogramSuccess;
+            bool intensityStatsSuccess;
             bool obsRateSuccess;
 
             if (Options.PlotOptions.SaveHistogramData)
@@ -304,6 +422,15 @@ namespace MASIC.DataOutput
                 histogramSuccess = true;
             }
 
+            if (Options.PlotOptions.SaveReporterIonIntensityStatsData)
+            {
+                intensityStatsSuccess = SaveReporterIonIntensityStatsData(datasetName, outputDirectory);
+            }
+            else
+            {
+                intensityStatsSuccess = true;
+            }
+
             if (Options.PlotOptions.SaveReporterIonObservationRateData)
             {
                 obsRateSuccess = SaveReporterIonObservationRateData(datasetName, outputDirectory);
@@ -313,7 +440,23 @@ namespace MASIC.DataOutput
                 obsRateSuccess = true;
             }
 
-            return histogramSuccess && obsRateSuccess;
+            return histogramSuccess && intensityStatsSuccess && obsRateSuccess;
+        }
+
+        private bool SaveReporterIonIntensityStatsData(string datasetName, string outputDirectory)
+        {
+            if (mStatsSummarizer.ReporterIonNames.Keys.Count == 0)
+                return true;
+
+            var success = WriteReporterIonIntensityStatsData(
+                mStatsSummarizer.ReporterIonNames,
+                mStatsSummarizer.ReporterIonIntensityStats,
+                mStatsSummarizer.ReporterIonIntensityStatsHighAbundanceData,
+                datasetName,
+                outputDirectory,
+                REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX);
+
+            return success;
         }
 
         private bool SaveReporterIonObservationRateData(string datasetName, string outputDirectory)
@@ -358,6 +501,83 @@ namespace MASIC.DataOutput
             catch (Exception ex)
             {
                 OnErrorEvent("Exception in WriteHistogramData", ex);
+                return false;
+            }
+        }
+
+        private bool WriteReporterIonIntensityStatsData(
+            IReadOnlyDictionary<int, string> reporterIonNames,
+            IReadOnlyDictionary<int, BoxPlotStats> reporterIonIntensityStats,
+            IReadOnlyDictionary<int, BoxPlotStats> reporterIonIntensityStatsHighAbundance,
+            string datasetName,
+            string outputDirectory,
+            string fileSuffix)
+        {
+            try
+            {
+                var outputFilePath = Path.Combine(outputDirectory, string.Format("{0}_{1}", datasetName, fileSuffix));
+                OnDebugEvent("Saving " + PathUtils.CompactPathString(outputFilePath, 120));
+
+                var statNameSuffixTopNPct = string.Format("_Top{0}Pct", Options.PlotOptions.ReporterIonObservationRateTopNPct);
+
+                // Define the column names and widths
+                var statNames = new List<string>
+                {
+                    "NonZeroCount",
+                    "Median",
+                    "InterQuartileRange",
+                    "LowerWhisker",
+                    "UpperWhisker",
+                    "NumberOfOutliers"
+                };
+
+                var columnWidths = new Dictionary<string, int>();
+                foreach (var item in statNames)
+                {
+                    columnWidths.Add(item, Math.Max(10, item.Length));
+                    columnWidths.Add(item + statNameSuffixTopNPct, (item + statNameSuffixTopNPct).Length);
+                }
+
+                columnWidths.Add("Reporter_Ion", "Reporter_Ion".Length);
+
+                using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                {
+                   // Write the header line
+                    var dataLine = new List<string> {
+                        "Reporter_Ion"
+                    };
+
+                    for (var i = 0; i < 2; i++)
+                    {
+                        var statNameSuffix = i == 0 ? statNameSuffixTopNPct : string.Empty;
+
+                        foreach (var statName in statNames)
+                        {
+                            var columnName = string.Format("{0}{1}", statName, statNameSuffix);
+                            var totalWidth = columnWidths[columnName];
+                            dataLine.Add(columnName.PadRight(totalWidth));
+                        }
+                    }
+
+                    writer.WriteLine(string.Join("\t", dataLine));
+
+                    foreach (var reporterIonIndex in reporterIonNames.Keys)
+                    {
+                        dataLine.Clear();
+                        dataLine.Add(reporterIonNames[reporterIonIndex].PadRight("Reporter_Ion".Length));
+
+                        AppendReporterIonStats(dataLine, reporterIonIntensityStatsHighAbundance, reporterIonIndex, columnWidths, statNameSuffixTopNPct);
+                        AppendReporterIonStats(dataLine, reporterIonIntensityStats, reporterIonIndex, columnWidths, string.Empty);
+
+                        writer.WriteLine(string.Join("\t", dataLine));
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OnErrorEvent("Exception in WriteReporterIonObservationRateData", ex);
                 return false;
             }
         }

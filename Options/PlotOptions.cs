@@ -64,7 +64,12 @@ namespace MASIC.Options
         public bool SaveHtmlFile { get; set; } = true;
 
         /// <summary>
-        /// When true, create text files of reporter ion observation rate stats
+        /// When true, create a text file with reporter ion intensity statistics
+        /// </summary>
+        public bool SaveReporterIonIntensityStatsData { get; set; } = true;
+
+        /// <summary>
+        /// When true, create a text file with reporter ion observation rate stats
         /// </summary>
         public bool SaveReporterIonObservationRateData { get; set; } = true;
 

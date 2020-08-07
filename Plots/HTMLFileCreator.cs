@@ -79,6 +79,9 @@ namespace MASIC.Plots
                     // Add the bar charts (if defined)
                     AppendPlots(writer, PlotContainerBase.PlotTypes.BarChart);
 
+                    // Add the box plots (if defined)
+                    AppendPlots(writer, PlotContainerBase.PlotTypes.BoxPlot);
+
                     // Append dataset info
                     AppendDatasetInfo(writer, DatasetName, outputDirectoryPath);
 
