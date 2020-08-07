@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -117,6 +116,24 @@ namespace MASIC.DataOutput
         public string PeakWidthHistogramUnits { get; private set; }
 
         /// <summary>
+        /// Non-zero reporter ion values, by channel
+        /// </summary>
+        /// <remarks>
+        /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
+        /// Values are reporter ion intensities
+        /// </remarks>
+        public Dictionary<int, List<double>> NonZeroReporterIons { get; }
+
+        /// <summary>
+        /// Non-zero reporter ion values, by channel, using data from the top N percent of the data (sorted by descending peak area)
+        /// </summary>
+        /// <remarks>
+        /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
+        /// Values are reporter ion intensities
+        /// </remarks>
+        public Dictionary<int, List<double>> NonZeroReporterIonsHighAbundance { get; }
+
+        /// <summary>
         /// Reporter ion column names
         /// </summary>
         /// <remarks>Keys are column index, values are reporter ion info</remarks>
@@ -141,8 +158,18 @@ namespace MASIC.DataOutput
         public Dictionary<int, float> ReporterIonObservationRateHighAbundance { get; }
 
         /// <summary>
+        /// Box plot statistics for each reporter ion channel
         /// </summary>
         /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
+        /// Values are box plot stats, by channel
+        public Dictionary<int, BoxPlotStats> ReporterIonIntensityStats { get; set; }
+
+        /// <summary>
+        /// Box plot statistics for each reporter ion channel, using data from the top N percent of the data (sorted by descending peak area)
+        /// </summary>
+        /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
+        /// Values are box plot stats, by channel
+        public Dictionary<int, BoxPlotStats> ReporterIonIntensityStatsHighAbundanceData { get; set; }
 
         #endregion
 
@@ -167,9 +194,14 @@ namespace MASIC.DataOutput
 
             ReporterIonNames = new Dictionary<int, string>();
 
+            NonZeroReporterIons = new Dictionary<int, List<double>>();
+            NonZeroReporterIonsHighAbundance = new Dictionary<int, List<double>>();
+
             ReporterIonObservationRate = new Dictionary<int, float>();
             ReporterIonObservationRateHighAbundance = new Dictionary<int, float>();
 
+            ReporterIonIntensityStats = new Dictionary<int, BoxPlotStats>();
+            ReporterIonIntensityStatsHighAbundanceData = new Dictionary<int, BoxPlotStats>();
         }
 
         private void AddHeaderColumn<T>(Dictionary<T, SortedSet<string>> columnNamesByIdentifier, T columnId, string columnName)
@@ -195,12 +227,17 @@ namespace MASIC.DataOutput
             ReporterIonObservationRate.Clear();
             ReporterIonObservationRateHighAbundance.Clear();
 
+            ReporterIonIntensityStats.Clear();
+            ReporterIonIntensityStatsHighAbundanceData.Clear();
         }
 
         private bool ComputeReporterIonObservationRates()
         {
             try
             {
+                NonZeroReporterIons.Clear();
+                NonZeroReporterIonsHighAbundance.Clear();
+
                 ReporterIonObservationRate.Clear();
                 ReporterIonObservationRateHighAbundance.Clear();
 
@@ -266,17 +303,15 @@ namespace MASIC.DataOutput
                     }
                 }
 
-                // Create the dictionary that will track the count of non-zero values, by reporter ion
-                // Keys in this dictionary correspond to the keys in mReporterIonAbundances (which correspond to keys in mReporterIonInfo)
+                // Cache the non-zero reporter ion intensities in NonZeroReporterIons and NonZeroReporterIonsHighAbundance
+                // Keys in these dictionaries correspond to the keys in mReporterIonAbundances (which correspond to keys in mReporterIonInfo)
                 // Values are the count of scans with a non-zero reporter ion
-                var nonZeroReporterIonStats = new Dictionary<int, int>();
-                var nonZeroReporterIonStatsHighAbundance = new Dictionary<int, int>();
 
                 // Initialize the tracking dictionaries
                 foreach (var reporterIonIndex in mReporterIonAbundances.Keys)
                 {
-                    nonZeroReporterIonStats.Add(reporterIonIndex, 0);
-                    nonZeroReporterIonStatsHighAbundance.Add(reporterIonIndex, 0);
+                    NonZeroReporterIons.Add(reporterIonIndex, new List<double>());
+                    NonZeroReporterIonsHighAbundance.Add(reporterIonIndex, new List<double>());
                 }
 
                 var scansUsed = 0;
@@ -298,12 +333,12 @@ namespace MASIC.DataOutput
                         if (reporterIonAbundance <= 0)
                             continue;
 
-                        nonZeroReporterIonStats[reporterIonIndex]++;
+                        NonZeroReporterIons[reporterIonIndex].Add(reporterIonAbundance);
 
                         if (scansUsed > scansToUseForHighAbundanceHistogram)
                             continue;
 
-                        nonZeroReporterIonStatsHighAbundance[reporterIonIndex]++;
+                        NonZeroReporterIonsHighAbundance[reporterIonIndex].Add(reporterIonAbundance);
                     }
 
                     if (scansUsed > scansToUseForHighAbundanceHistogram)
@@ -321,10 +356,10 @@ namespace MASIC.DataOutput
                 // Compute observation rate
                 foreach (var reporterIonIndex in mReporterIonAbundances.Keys)
                 {
-                    var observationRate = nonZeroReporterIonStats[reporterIonIndex] / (float)scansUsed * 100;
+                    var observationRate = NonZeroReporterIons[reporterIonIndex].Count / (float)scansUsed * 100;
                     ReporterIonObservationRate.Add(reporterIonIndex, observationRate);
 
-                    var observationRateHighAbundance = nonZeroReporterIonStatsHighAbundance[reporterIonIndex] / (float)scansUsedHighAbundance * 100;
+                    var observationRateHighAbundance = NonZeroReporterIonsHighAbundance[reporterIonIndex].Count / (float)scansUsedHighAbundance * 100;
                     ReporterIonObservationRateHighAbundance.Add(reporterIonIndex, observationRateHighAbundance);
                 }
 
@@ -417,7 +452,10 @@ namespace MASIC.DataOutput
                     if (scanNumbers.Count > 0)
                     {
                         // Track peak width in seconds
-                        var scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanNumbers, parentIon.Value.OptimalPeakApexScanNumber, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                        var scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                            scanNumbers,
+                            parentIon.Value.OptimalPeakApexScanNumber,
+                            clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
                         var startScanIndex = (int)Math.Floor(scanIndexMatch - fwhmWidthScans / 2.0);
                         if (startScanIndex < 0)
