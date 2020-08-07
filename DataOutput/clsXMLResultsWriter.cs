@@ -633,7 +633,7 @@ namespace MASIC.DataOutput
         }
 
         /// <summary>
-        ///
+        /// Replace a value in the XML results file
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="lineIn"></param>

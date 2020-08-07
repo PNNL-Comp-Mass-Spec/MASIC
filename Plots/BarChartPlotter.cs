@@ -89,6 +89,15 @@ namespace MASIC.Plots
             myPlot.Series.Add(series);
         }
 
+        /// <summary>
+        /// Get data to plot
+        /// </summary>
+        /// <param name="barChartInfo"></param>
+        /// <param name="yAxisInfo"></param>
+        /// <param name="dataPoints">List of key value pairs, where the key is the bar height and the value is the bar color</param>
+        /// <param name="yAxisMinimum"></param>
+        /// <param name="yAxisMaximum"></param>
+        /// <returns>Labels for the bars</returns>
         private List<string> GetDataToPlot(
             BarChartInfo barChartInfo,
             AxisInfo yAxisInfo,

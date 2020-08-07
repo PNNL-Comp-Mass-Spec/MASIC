@@ -26,7 +26,10 @@ namespace MASIC
                 if (scanType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute || scanType == clsCustomSICList.eCustomSICScanTypeConstants.Relative)
                 {
                     var absoluteScanNumber = ScanOrAcqTimeToAbsolute(scanList, scanOrAcqTime, scanType, false);
-                    scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(scanList.MasterScanNumList, absoluteScanNumber, clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
+                    scanIndexMatch = clsBinarySearch.BinarySearchFindNearest(
+                        scanList.MasterScanNumList,
+                        absoluteScanNumber,
+                        clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
                 }
                 else
                 {
