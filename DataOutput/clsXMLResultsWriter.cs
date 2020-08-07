@@ -342,7 +342,7 @@ namespace MASIC.DataOutput
                         }
                         catch (OutOfMemoryException ex)
                         {
-                            // Ignore the exception if this is an Out of Memory exception
+                            // Ignore the exception if it is an Out of Memory exception
 
                             if (!intensityDataListWritten)
                             {

@@ -146,7 +146,7 @@ namespace MASIC.Plots
             // Round maxBin down to the nearest multiple of 10
             maxBin = (int)Math.Ceiling(maxBin / 10.0) * 10;
 
-            // Multiply maxIntensity by 2% and then round up to the nearest integer
+            // Multiply maxIntensity by 2% then round up to the nearest integer
             maxIntensity = Math.Ceiling(maxIntensity * 1.02);
 
             return points;
@@ -271,7 +271,7 @@ namespace MASIC.Plots
             {
                 // Nothing to plot
                 var emptyContainer = new PythonPlotContainerXY();
-                emptyContainer.WriteDebugLog("points.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
+                emptyContainer.WriteDebugLog("points.Count == 0 in InitializePythonPlot for plot " + plotTitle);
                 return emptyContainer;
             }
 
@@ -406,7 +406,7 @@ namespace MASIC.Plots
             }
             catch (Exception ex)
             {
-                OnErrorEvent("Error in SavePlotFile", ex);
+                OnErrorEvent("Error in HistogramPlotter.SavePlotFile", ex);
                 return false;
             }
 

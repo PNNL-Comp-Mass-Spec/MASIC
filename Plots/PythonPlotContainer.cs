@@ -217,7 +217,7 @@ namespace MASIC.Plots
             OnErrorEvent("Python ExitCode = " + programRunner.ExitCode);
             return false;
         }
-        
+
         protected void NotifyPythonNotFound(string currentTask)
         {
             OnErrorEvent(currentTask + "; Python not found");

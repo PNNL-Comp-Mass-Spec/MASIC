@@ -1649,7 +1649,7 @@ namespace MASIC
                         filterIndex = 1;
                         break;
 
-                    // ReSharper restore StringLiteralTypo
+                        // ReSharper restore StringLiteralTypo
                 }
 
                 fileSelector.FilterIndex = filterIndex;

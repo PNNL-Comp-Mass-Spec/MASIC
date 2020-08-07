@@ -929,7 +929,7 @@ namespace MASIC.DataInput
         }
 
         /// <summary>
-        ///
+        /// Read a MS1 spectrum
         /// </summary>
         /// <param name="scanList"></param>
         /// <param name="spectraCache"></param>

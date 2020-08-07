@@ -356,7 +356,7 @@ namespace MASIC.Plots
             }
             catch (Exception ex)
             {
-                OnErrorEvent("Error in SavePlotFile", ex);
+                OnErrorEvent("Error in BarChartPlotter.SavePlotFile", ex);
                 return false;
             }
 

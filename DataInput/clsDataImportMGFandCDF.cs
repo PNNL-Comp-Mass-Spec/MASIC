@@ -651,7 +651,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                // Ignore any errors that occur in this function
+                // Report this error, but otherwise ignore it
                 // ReSharper disable once StringLiteralTypo
                 ReportError("Error in InterpolateRTandFragScanNumber", ex);
             }

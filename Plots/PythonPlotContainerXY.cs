@@ -98,7 +98,7 @@ namespace MASIC.Plots
             }
             catch (Exception ex)
             {
-                OnErrorEvent("Error creating 2D plot with Python using " + exportFile.Name, ex);
+                OnErrorEvent("Error creating XY plot with Python using " + exportFile.Name, ex);
                 return false;
             }
 

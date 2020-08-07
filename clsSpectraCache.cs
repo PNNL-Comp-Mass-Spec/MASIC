@@ -353,7 +353,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                // Ignore errors here
+                // Report this error, but otherwise ignore it
                 ReportError("Error deleting cached spectrum files for this task", ex);
             }
 
