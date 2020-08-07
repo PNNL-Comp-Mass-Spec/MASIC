@@ -123,7 +123,7 @@ namespace MASIC.Plots
             // Instantiate the list to track the data points
             var points = new List<DataPoint>();
 
-            foreach (var dataPoint in histogramInfo.Data)
+            foreach (var dataPoint in histogramInfo.DataPoints)
             {
 
                 points.Add(new DataPoint(dataPoint.Bin, dataPoint.BinCount));
@@ -426,21 +426,18 @@ namespace MASIC.Plots
 
         private class HistogramInfo
         {
-
-            public int DataCount => mData.Count;
-
-            public IEnumerable<HistogramDataPoint> Data => mData;
-
-            private readonly List<HistogramDataPoint> mData;
-
             private readonly SortedSet<double> mBinValues;
+
+            public int DataCount => DataPoints.Count;
+
+            public List<HistogramDataPoint> DataPoints { get; }
 
             /// <summary>
             /// Constructor
             /// </summary>
             public HistogramInfo()
             {
-                mData = new List<HistogramDataPoint>();
+                DataPoints = new List<HistogramDataPoint>();
                 mBinValues = new SortedSet<double>();
             }
 
@@ -457,22 +454,22 @@ namespace MASIC.Plots
                     BinCount = binCount
                 };
 
-                mData.Add(dataPoint);
+                DataPoints.Add(dataPoint);
                 mBinValues.Add(bin);
             }
 
             public HistogramDataPoint GetDataPoint(int index)
             {
-                if (mData.Count == 0)
+                if (DataPoints.Count == 0)
                 {
                     throw new Exception("Histogram list is empty; cannot retrieve data point at index " + index);
                 }
-                if (index < 0 || index >= mData.Count)
+                if (index < 0 || index >= DataPoints.Count)
                 {
-                    throw new Exception("Histogram index out of range: " + index + "; should be between 0 and " + (mData.Count - 1));
+                    throw new Exception("Histogram index out of range: " + index + "; should be between 0 and " + (DataPoints.Count - 1));
                 }
 
-                return mData[index];
+                return DataPoints[index];
             }
 
             /// <summary>
@@ -480,7 +477,7 @@ namespace MASIC.Plots
             /// </summary>
             public void Initialize()
             {
-                mData.Clear();
+                DataPoints.Clear();
             }
 
             // ReSharper disable once UnusedMember.Global
@@ -496,14 +493,14 @@ namespace MASIC.Plots
                     return;
 
                 var binsToRemove = new List<double>();
-                var lastIndex = Math.Min(index + count, mData.Count) - 1;
+                var lastIndex = Math.Min(index + count, DataPoints.Count) - 1;
 
                 for (var i = index; i <= lastIndex; i++)
                 {
-                    binsToRemove.Add(mData[i].Bin);
+                    binsToRemove.Add(DataPoints[i].Bin);
                 }
 
-                mData.RemoveRange(index, count);
+                DataPoints.RemoveRange(index, count);
 
                 foreach (var scanNumber in binsToRemove)
                 {

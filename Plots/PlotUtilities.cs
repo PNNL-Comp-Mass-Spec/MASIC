@@ -13,26 +13,26 @@ namespace MASIC.Plots
             AxisInfo axisInfo)
         {
 
-            var absValueMin = dataPoints.Count == 0 ? 0 : Math.Abs(dataPoints[0]);
-            var absValueMax = absValueMin;
+            var absoluteValueMin = dataPoints.Count == 0 ? 0 : Math.Abs(dataPoints[0]);
+            var absoluteValueMax = absoluteValueMin;
 
             foreach (var currentValAbs in from value in dataPoints select Math.Abs(value))
             {
-                absValueMin = Math.Min(absValueMin, currentValAbs);
-                absValueMax = Math.Max(absValueMax, currentValAbs);
+                absoluteValueMin = Math.Min(absoluteValueMin, currentValAbs);
+                absoluteValueMax = Math.Max(absoluteValueMax, currentValAbs);
             }
 
-            GetAxisFormatInfo(absValueMin, absValueMax, integerData, axisInfo);
+            GetAxisFormatInfo(absoluteValueMin, absoluteValueMax, integerData, axisInfo);
         }
 
         public static void GetAxisFormatInfo(
-            double absValueMin,
-            double absValueMax,
+            double absoluteValueMin,
+            double absoluteValueMax,
             bool integerData,
             AxisInfo axisInfo)
         {
 
-            if (Math.Abs(absValueMin) < float.Epsilon && Math.Abs(absValueMax) < float.Epsilon)
+            if (Math.Abs(absoluteValueMin) < float.Epsilon && Math.Abs(absoluteValueMax) < float.Epsilon)
             {
                 axisInfo.StringFormat = "0";
                 axisInfo.MinorGridLineThickness = 0;
@@ -42,7 +42,7 @@ namespace MASIC.Plots
 
             if (integerData)
             {
-                if (absValueMax >= 1000000)
+                if (absoluteValueMax >= 1000000)
                 {
                     axisInfo.StringFormat = AxisInfo.EXPONENTIAL_FORMAT;
                 }
@@ -51,26 +51,26 @@ namespace MASIC.Plots
 
             var minDigitsPrecision = 0;
 
-            if (absValueMax < 0.02)
+            if (absoluteValueMax < 0.02)
             {
                 axisInfo.StringFormat = AxisInfo.EXPONENTIAL_FORMAT;
             }
-            else if (absValueMax < 0.2)
+            else if (absoluteValueMax < 0.2)
             {
                 minDigitsPrecision = 2;
                 axisInfo.StringFormat = "0.00";
             }
-            else if (absValueMax < 2)
+            else if (absoluteValueMax < 2)
             {
                 minDigitsPrecision = 1;
                 axisInfo.StringFormat = "0.0";
             }
-            else if (absValueMax >= 1000000)
+            else if (absoluteValueMax >= 1000000)
             {
                 axisInfo.StringFormat = AxisInfo.EXPONENTIAL_FORMAT;
             }
 
-            if (absValueMax - absValueMin < 1E-05)
+            if (absoluteValueMax - absoluteValueMin < 1E-05)
             {
                 if (!axisInfo.StringFormat.Contains("."))
                 {
@@ -82,7 +82,7 @@ namespace MASIC.Plots
                 // Examine the range of values between the minimum and the maximum
                 // If the range is small, e.g. between 3.95 and 3.98, then we need to guarantee that we have at least 2 digits of precision
                 // The following combination of Log10 and ceiling determines the minimum needed
-                var minDigitsRangeBased = (int)Math.Ceiling(-Math.Log10(absValueMax - absValueMin));
+                var minDigitsRangeBased = (int)Math.Ceiling(-Math.Log10(absoluteValueMax - absoluteValueMin));
 
                 if (minDigitsRangeBased > minDigitsPrecision)
                 {

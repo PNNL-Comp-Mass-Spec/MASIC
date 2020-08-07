@@ -375,22 +375,19 @@ namespace MASIC.Plots
 
         private class BarChartInfo
         {
+            private readonly SortedSet<string> mLabels;
 
             // ReSharper disable once MemberCanBePrivate.Local
-            public int DataCount => mDataPoints.Count;
+            private int DataCount => DataPoints.Count;
 
-            public IEnumerable<BarChartDataPoint> DataPoints => mDataPoints;
-
-            private readonly List<BarChartDataPoint> mDataPoints;
-
-            private readonly SortedSet<string> mLabels;
+            public List<BarChartDataPoint> DataPoints { get; }
 
             /// <summary>
             /// Constructor
             /// </summary>
             public BarChartInfo()
             {
-                mDataPoints = new List<BarChartDataPoint>();
+                DataPoints = new List<BarChartDataPoint>();
                 mLabels = new SortedSet<string>();
             }
 
@@ -407,7 +404,7 @@ namespace MASIC.Plots
                     Value = value
                 };
 
-                mDataPoints.Add(dataPoint);
+                DataPoints.Add(dataPoint);
                 mLabels.Add(label);
             }
 
@@ -415,16 +412,16 @@ namespace MASIC.Plots
             // ReSharper disable once UnusedMember.Local
             public BarChartDataPoint GetDataPoint(int index)
             {
-                if (mDataPoints.Count == 0)
+                if (DataPoints.Count == 0)
                 {
                     throw new Exception("Bar chart data list is empty; cannot retrieve data point at index " + index);
                 }
-                if (index < 0 || index >= mDataPoints.Count)
+                if (index < 0 || index >= DataPoints.Count)
                 {
-                    throw new Exception("Bar chart data index out of range: " + index + "; should be between 0 and " + (mDataPoints.Count - 1));
+                    throw new Exception("Bar chart data index out of range: " + index + "; should be between 0 and " + (DataPoints.Count - 1));
                 }
 
-                return mDataPoints[index];
+                return DataPoints[index];
             }
 
             /// <summary>
@@ -432,7 +429,7 @@ namespace MASIC.Plots
             /// </summary>
             public void Initialize()
             {
-                mDataPoints.Clear();
+                DataPoints.Clear();
                 mLabels.Clear();
             }
 
@@ -450,14 +447,14 @@ namespace MASIC.Plots
                     return;
 
                 var labelsToRemove = new List<string>();
-                var lastIndex = Math.Min(index + count, mDataPoints.Count) - 1;
+                var lastIndex = Math.Min(index + count, DataPoints.Count) - 1;
 
                 for (var i = index; i <= lastIndex; i++)
                 {
-                    labelsToRemove.Add(mDataPoints[i].Label);
+                    labelsToRemove.Add(DataPoints[i].Label);
                 }
 
-                mDataPoints.RemoveRange(index, count);
+                DataPoints.RemoveRange(index, count);
 
                 foreach (var label in labelsToRemove)
                 {
