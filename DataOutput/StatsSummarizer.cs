@@ -141,13 +141,8 @@ namespace MASIC.DataOutput
         public Dictionary<int, float> ReporterIonObservationRateHighAbundance { get; }
 
         /// <summary>
-        /// Total intensity for each reporter ion channel
         /// </summary>
-        /// <remarks>
         /// Keys are column index (corresponding to <see cref="ReporterIonNames"/> and <see cref="mReporterIonInfo"/>)
-        /// Values are total intensity
-        /// </remarks>
-        public Dictionary<int, double> ReporterIonTotalIntensityByChannel { get; }
 
         #endregion
 
@@ -175,7 +170,6 @@ namespace MASIC.DataOutput
             ReporterIonObservationRate = new Dictionary<int, float>();
             ReporterIonObservationRateHighAbundance = new Dictionary<int, float>();
 
-            ReporterIonTotalIntensityByChannel = new Dictionary<int, double>();
         }
 
         private void AddHeaderColumn<T>(Dictionary<T, SortedSet<string>> columnNamesByIdentifier, T columnId, string columnName)
@@ -201,7 +195,6 @@ namespace MASIC.DataOutput
             ReporterIonObservationRate.Clear();
             ReporterIonObservationRateHighAbundance.Clear();
 
-            ReporterIonTotalIntensityByChannel.Clear();
         }
 
         private bool ComputeReporterIonObservationRates()
@@ -340,29 +333,6 @@ namespace MASIC.DataOutput
             catch (Exception ex)
             {
                 OnErrorEvent("Exception in ComputeReporterIonObservationRates", ex);
-                return false;
-            }
-        }
-
-        private bool ComputeTotalIntensityByReporterIon()
-        {
-            try
-            {
-                ReporterIonTotalIntensityByChannel.Clear();
-
-                foreach (var reporterIon in mReporterIonAbundances)
-                {
-                    var reporterIonIndex = reporterIon.Key;
-                    var totalIntensity = reporterIon.Value.Values.Sum();
-
-                    ReporterIonTotalIntensityByChannel.Add(reporterIonIndex, totalIntensity);
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                OnErrorEvent("Exception in ComputeTotalIntensityByReporterIon", ex);
                 return false;
             }
         }
@@ -1030,7 +1000,6 @@ namespace MASIC.DataOutput
                 bool peakAreaHistogramCreated;
                 bool peakWidthHistogramCreated;
                 bool observationRatesDetermined;
-                bool totalIntensitiesComputed;
 
                 ClearResults();
 
@@ -1058,18 +1027,15 @@ namespace MASIC.DataOutput
                 if (reporterIonsLoaded)
                 {
                     observationRatesDetermined = ComputeReporterIonObservationRates();
-                    totalIntensitiesComputed = ComputeTotalIntensityByReporterIon();
                 }
                 else
                 {
                     observationRatesDetermined = false;
-                    totalIntensitiesComputed = false;
                 }
 
                 return peakAreaHistogramCreated ||
                        peakWidthHistogramCreated ||
-                       observationRatesDetermined ||
-                       totalIntensitiesComputed;
+                       observationRatesDetermined;
             }
             catch (Exception ex)
             {
