@@ -524,7 +524,7 @@ namespace MASIC
         /// </summary>
         public void UpdateMZIntensityFilterIgnoreRange()
         {
-            if (!ReporterIonStatsEnabled || ReporterIonList.Count <= 0)
+            if (!ReporterIonStatsEnabled || ReporterIonList.Count == 0)
             {
                 MZIntensityFilterIgnoreRangeStart = 0;
                 MZIntensityFilterIgnoreRangeEnd = 0;

@@ -136,7 +136,7 @@ namespace MASIC
         {
             var success = false;
 
-            if (scanList.ParentIons.Count <= 0)
+            if (scanList.ParentIons.Count == 0)
             {
                 // No parent ions
                 if (masicOptions.SuppressNoParentIonsError)
@@ -148,7 +148,7 @@ namespace MASIC
                 return false;
             }
 
-            if (scanList.SurveyScans.Count <= 0)
+            if (scanList.SurveyScans.Count == 0)
             {
                 // No survey scans
                 if (masicOptions.SuppressNoParentIonsError)

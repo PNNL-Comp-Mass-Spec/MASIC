@@ -75,7 +75,7 @@ namespace MASIC.Plots
             // A column series represents a bar chart with vertical bars
             var series = new ColumnSeries();
 
-            if (points.Count <= 0)
+            if (points.Count == 0)
             {
                 return;
             }

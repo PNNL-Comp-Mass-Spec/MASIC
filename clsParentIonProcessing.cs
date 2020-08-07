@@ -529,7 +529,7 @@ namespace MASIC
 
             try
             {
-                if (scanList.ParentIons.Count <= 0)
+                if (scanList.ParentIons.Count == 0)
                 {
                     return masicOptions.SuppressNoParentIonsError;
                 }

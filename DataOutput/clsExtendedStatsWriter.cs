@@ -110,7 +110,7 @@ namespace MASIC.DataOutput
 
             // Populate headerNames
 
-            if (mExtendedHeaderNameMap.Count <= 0)
+            if (mExtendedHeaderNameMap.Count == 0)
             {
                 return headerNames;
             }

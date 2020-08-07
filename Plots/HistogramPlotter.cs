@@ -84,7 +84,7 @@ namespace MASIC.Plots
             // Generate a black curve with no symbols
             var series = new LineSeries();
 
-            if (points.Count <= 0)
+            if (points.Count == 0)
             {
                 return;
             }
@@ -109,6 +109,7 @@ namespace MASIC.Plots
 
             myPlot.Series.Add(series);
         }
+
         private List<DataPoint> GetDataToPlot(
             HistogramInfo histogramInfo,
             out double minBin,
@@ -391,7 +392,7 @@ namespace MASIC.Plots
                 var histogramPlot = InitializePlot(mHistogram, PlotTitle, XAxisLabel, yAxisInfo);
                 RegisterEvents(histogramPlot);
 
-                if (histogramPlot.SeriesCount <= 0)
+                if (histogramPlot.SeriesCount == 0)
                 {
                     // We'll treat this as success
                     return true;

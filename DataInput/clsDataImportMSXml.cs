@@ -1251,7 +1251,7 @@ namespace MASIC.DataInput
 
             var filterStrings = (from item in mzMLSpectrum.CVParams where item.TermInfo.Cvid == CV.CVID.MS_filter_string select item).ToList();
 
-            if (filterStrings.Count <= 0)
+            if (filterStrings.Count == 0)
             {
                 return string.Empty;
             }
@@ -1458,7 +1458,7 @@ namespace MASIC.DataInput
 
         private static bool IsSrmChromatogram(SimpleMzMLReader.ParamData chromatogramItem)
         {
-            if (chromatogramItem.CVParams.Count <= 0)
+            if (chromatogramItem.CVParams.Count == 0)
                 return false;
 
             foreach (var item in chromatogramItem.CVParams)
