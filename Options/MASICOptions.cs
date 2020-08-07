@@ -452,6 +452,14 @@ namespace MASIC.Options
 
                     RawDataExportOptions.IntensityMinimum = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", RawDataExportOptions.IntensityMinimum);
+
+                    var masicStatusFilename = reader.GetParam(
+                        XML_SECTION_EXPORT_OPTIONS, "MASICStatusFilename", MASICStatusFilename);
+
+                    if (!string.IsNullOrWhiteSpace(masicStatusFilename))
+                    {
+                        MASICStatusFilename = masicStatusFilename;
+                    }
                 }
 
                 if (!reader.SectionPresent(XML_SECTION_SIC_OPTIONS))
@@ -829,6 +837,8 @@ namespace MASIC.Options
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMinimumSignalToNoiseRatio", RawDataExportOptions.MinimumSignalToNoiseRatio);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataMaxIonCountPerScan", RawDataExportOptions.MaxIonCountPerScan);
                 writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "ExportRawDataIntensityMinimum", RawDataExportOptions.IntensityMinimum);
+
+                writer.SetParam(XML_SECTION_EXPORT_OPTIONS, "MASICStatusFilename", MASICStatusFilename);
 
                 // SIC Options
                 // Note: Skipping .DatasetID since this must be provided at the command line or through the Property Function interface
