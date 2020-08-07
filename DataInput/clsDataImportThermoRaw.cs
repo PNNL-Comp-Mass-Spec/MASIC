@@ -142,9 +142,18 @@ namespace MASIC.DataInput
         {
             // Use XrawFileIO to read the .Raw files (it uses ThermoFisher.CommonCore)
 
+            var loadMSMethodInfo = mOptions.WriteMSMethodFile && !SystemInfo.IsLinux;
+
+            if (SystemInfo.IsLinux && mOptions.WriteMSMethodFile)
+            {
+                ReportWarning(
+                    "Ignoring WriteMSMethodFile=True in the parameter file since running on Linux; " +
+                    "set WriteMSMethodFile to false to suppress this warning");
+            }
+
             var readerOptions = new ThermoReaderOptions
             {
-                LoadMSMethodInfo = mOptions.WriteMSMethodFile,
+                LoadMSMethodInfo = loadMSMethodInfo,
                 LoadMSTuneInfo = mOptions.WriteMSTuneFile
             };
 
