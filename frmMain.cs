@@ -753,6 +753,19 @@ namespace MASIC
                     Width = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
                     Height = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
 
+                    // Uncomment to test DPI scaling
+                    //var graphics = this.CreateGraphics();
+                    //var dpiX = graphics.DpiX;
+                    //var dpiY = graphics.DpiY;
+
+                    //var savedWidth = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", 0);
+                    //var savedHeight = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", 0);
+                    //if (savedWidth > 0)
+                    //    Width = (int)Math.Floor(savedWidth * 96 / dpiX);
+
+                    //if (savedHeight > 0)
+                    //    Height = (int)Math.Floor(savedHeight * 96 / dpiY);
+
                     if (updateIOPaths)
                     {
                         txtOutputDirectoryPath.Text = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "LastDirectory", txtOutputDirectoryPath.Text);

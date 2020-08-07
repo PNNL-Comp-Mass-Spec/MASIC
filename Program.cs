@@ -60,6 +60,10 @@ namespace MASIC
         private static clsMASIC mMASIC;
 #if GUI
         private static frmProgress mProgressForm;
+
+        // Uncomment to test DPI scaling
+        //[System.Runtime.InteropServices.DllImport("user32.dll")]
+        //private static extern bool SetProcessDPIAware();
 #endif
 
         private static DateTime mLastSubtaskProgressTime;
@@ -73,6 +77,14 @@ namespace MASIC
         [STAThread]
         public static int Main()
         {
+#if GUI
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            // Uncomment to test DPI scaling
+            //if (Environment.OSVersion.Version.Major >= 6)
+            //    SetProcessDPIAware();
+#endif
             var commandLineParser = new clsParseCommandLine();
 
             mInputFilePath = string.Empty;
