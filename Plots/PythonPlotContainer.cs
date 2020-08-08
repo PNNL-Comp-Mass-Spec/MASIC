@@ -18,6 +18,10 @@ namespace MASIC.Plots
         /// <summary>
         /// When true, delete the temporary text files that contain data for Python to plot
         /// </summary>
+        /// <remarks>
+        /// The value for this property is controlled by the DeleteTempFiles property in the PlotOptions class
+        /// Search for "DeleteTempFiles { get; set; } ="
+        /// </remarks>
         public bool DeleteTempFiles { get; set; }
 
         /// <summary>
