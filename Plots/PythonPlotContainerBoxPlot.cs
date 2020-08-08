@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace MASIC.Plots
 {
@@ -61,21 +62,27 @@ namespace MASIC.Plots
                     writer.WriteLine("{0}\t{1}", XAxisInfo.GetOptions(), YAxisInfo.GetOptions());
 
                     // Column names
-                    writer.WriteLine("{0}\t{1}", XAxisInfo.Title, YAxisInfo.Title);
+                    var xAxisTitle = string.IsNullOrWhiteSpace(XAxisInfo.Title) ? "Label" : XAxisInfo.Title;
+                    writer.WriteLine("{0}\t{1}", xAxisTitle, YAxisInfo.Title);
+
+                    var intensityValues = new StringBuilder();
 
                     for (var i = 0; i < XAxisLabels.Count; i++)
                     {
-                        writer.WriteLine("{0}\t{1}", i, XAxisLabels[i]);
+                        intensityValues.Clear();
+
+                        // Data: the first column is the box label; the second column is a comma separated list of intensities for the box
+                        for (var j =0 ; j < Data[i].Count; j++)
+                        {
+                            if (j > 0)
+                                intensityValues.Append(",");
+
+                            intensityValues.Append(Data[i][j]);
+                        }
+
+                        writer.WriteLine("{0}\t{1}", XAxisLabels[i], intensityValues);
                     }
 
-                    // Data: the first column is the box index; the second column is a data point for that box
-                    for (var i = 0; i < Data.Count; i++)
-                    {
-                        foreach (var dataPoint in Data[i])
-                        {
-                            writer.WriteLine("{0}\t{1}", i, dataPoint);
-                        }
-                    }
                 }
 
             }

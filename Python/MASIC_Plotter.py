@@ -1,6 +1,7 @@
 import glob
 from pathlib import Path
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import numpy as np
@@ -61,6 +62,17 @@ def process_file(dataFilePath):
                        plotOptions['Title'], plotOptions['BottomRight'], plotOptions['BottomLeft'])
         return
 
+    if plotOptions['PlotType'] == 'BoxPlot':
+        # Box and whisker plot
+        print('Output:', outputFilePath)
+        print()
+        print('Plot "' + data.columns[0] + '" vs. "' + data.columns[1])
+        print("  {:,}".format(len(data.index)) + ' data points')
+        print()
+        plot_box_chart(outputFilePath, data.columns, data[data.columns[0]], data[data.columns[1]],
+                       plotOptions['Title'], plotOptions['BottomRight'], plotOptions['BottomLeft'])
+        return
+
     print('Unsupported plot type: ' + plotOptions['PlotType'])
     print(data.columns)
 
@@ -86,8 +98,11 @@ def read_file(fpath):
         return data, plotOptions, columnOptions
 
 
-def set_title_and_labels(ax, baseFontSize, title, xDataMin, xDataMax, xAxisLabel, yAxisLabel, yAxisFormatString,
+def set_title_and_labels(ax, baseFontSize, plotType, title,
+                         xDataMin, xDataMax, xAxisLabel,
+                         yAxisLabel, yAxisFormatString,
                          r_label, l_label):
+
     MAX_TITLE_LENGTH = 68
 
     if len(title) > MAX_TITLE_LENGTH:
@@ -112,24 +127,24 @@ def set_title_and_labels(ax, baseFontSize, title, xDataMin, xDataMax, xAxisLabel
     # Assure that the X axis minimum is not negative
     xmin, xmax = plt.xlim()
 
-    if "Histogram" in title and xmin < 0:
+    if plotType == "Histogram" and xmin < 0:
         plt.xlim(xmin=0)
 
     # When plotting a histogram, fix the Y axis minimum at 0 and add 5% padding above the Y axis maximum
     # Otherwise, assure that the Y range isn't too small
     ymin, ymax = plt.ylim()
 
-    if "Histogram" in title:
+    if plotType == "Histogram":
         ymin = 0
         ymax = ymax * 1.02
-    else:
-        # Bar Plot; always scale the y axis from 0 to 102 (to give a little whitespace above bars that are at 100%)
+    elif plotType == "BarChart":
+        # Bar Chart; always scale the y axis from 0 to 102 (to give a little whitespace above bars that are at 100%)
         ymin = 0
         ymax = 102
 
     plt.ylim(ymin=ymin, ymax=ymax)
 
-    if "Histogram" in title:
+    if plotType == "Histogram":
         # Set the X axis maximum to the max X value (in other words, we don't want any padding)
         # However, if there is only one X data point, do add some padding
         if xDataMin == xDataMax:
@@ -144,19 +159,22 @@ def set_title_and_labels(ax, baseFontSize, title, xDataMin, xDataMax, xAxisLabel
     if len(yAxisLabel) > 0:
         plt.ylabel(yAxisLabel, fontsize=baseFontSize)
 
-    if "Histogram" in title:
+    if plotType == "Histogram":
         plt.xticks(fontsize=baseFontSize - 2)
 
     plt.yticks(fontsize=baseFontSize - 2)
     ax.yaxis.set_major_formatter(mtick.FormatStrFormatter(yAxisFormatString))
-    ax.yaxis.set_minor_locator(mtick.AutoMinorLocator())
+
+    # Define the minor tick locator for the y axis, only if the y-axis is not log scaled
+    if type(ax.yaxis._scale) != mpl.scale.LogScale:
+        ax.yaxis.set_minor_locator(mtick.AutoMinorLocator())
 
     # If the x axis range is 5 or less, assure that the minimum distance between major tick marks is at least 1
     if not (xDataMin == 0 and xDataMax == 0):
         if xDataMax - xDataMin <= 5:
             ax.xaxis.set_major_locator(mtick.MultipleLocator(1))
 
-    if "Histogram" in title:
+    if plotType == "Histogram":
         ax.xaxis.set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
         ax.xaxis.set_minor_locator(mtick.AutoMinorLocator())
 
@@ -191,7 +209,7 @@ def plot_histogram(outputFilePath, columnNames, xValues, yValues, title, r_label
     else:
         yAxisFormatString = '%.2e'
         
-    set_title_and_labels(ax, baseFontSize, title, np.min(xValues), np.max(xValues),
+    set_title_and_labels(ax, baseFontSize, "Histogram", title, np.min(xValues), np.max(xValues),
                          xAxisLabel, yAxisLabel, yAxisFormatString, r_label, '')
 
     plt.tight_layout()
@@ -241,7 +259,71 @@ def generate_bar_chart(columnNames, xLabels, barHeights, title, r_label, l_label
 
     yAxisFormatString = '%d'
         
-    set_title_and_labels(ax, baseFontSize, title, 0, 0,
+    set_title_and_labels(ax, baseFontSize, "BarChart", title, 0, 0,
+                         xAxisLabel, yAxisLabel, yAxisFormatString, r_label, l_label)
+
+    # Add bar labels (rotated)
+    plt.xticks(xPos, xLabels)
+    plt.setp(plt.gca().get_xticklabels(), rotation=-30, horizontalalignment='left')
+
+    plt.tight_layout()
+
+    return plt
+
+
+def generate_box_plot(columnNames, xLabels, xData, title, r_label, l_label):
+    """
+    Generate a box and whiskers plot
+    :param columnNames: Column names, tracking the X and Y axis titles
+    :param xLabels: X axis labels
+    :param xData: Y axis data, with the same number of rows as xLabels; each row is a comma-separated list of values
+    :param title: Plot title
+    :param r_label: Optional text for the bottom right of the plot
+    :param l_label: Optional text for the bottom left of the plot
+    :return:
+    """
+
+    fig = plt.figure(figsize=(8.5333, 5.8333), dpi=120)
+    ax = fig.add_subplot(111, facecolor='whitesmoke')
+
+    baseFontSize = 12
+
+    # Construct a list of bar positions
+    xPos = [i+1 for i, _ in enumerate(xLabels)]
+
+    # Transform xData into a sequence of vectors
+    boxData = []
+
+    for intensityList in xData:
+        intensities = [float(i) for i in intensityList.split(',')]
+        boxData.append(intensities)
+
+    boxprops = dict(linestyle='-', linewidth=1.5, color='black')
+    flierprops = dict(marker='o', markersize=3,
+                      linestyle='none')
+    medianprops = dict(linestyle='-', linewidth=2, color='black')
+
+    bp = ax.boxplot(boxData, boxprops=boxprops, flierprops=flierprops, medianprops=medianprops, patch_artist=True)
+
+    #for element in ['boxes', 'whiskers', 'fliers', 'means', 'medians', 'caps']:
+    #    plt.setp(bp[element], color='black')
+
+    # This could be used to give each box a different color
+    for patch in bp['boxes']:
+        patch.set(facecolor='lightskyblue')
+
+    # Leave the x axis label blank, since this is a bar chart
+    xAxisLabel = ""
+
+    # Y axis is counts
+    yAxisLabel = columnNames[1]
+
+    yAxisFormatString = '%.0e'
+
+    # Use logarithmic scaling for the y-axis
+    ax.set_yscale('log')
+
+    set_title_and_labels(ax, baseFontSize, "BoxPlot", title, 0, 0,
                          xAxisLabel, yAxisLabel, yAxisFormatString, r_label, l_label)
 
     # Add bar labels (rotated)
@@ -257,6 +339,12 @@ def plot_bar_chart(outputFilePath, columnNames, xLabels, barHeights, title, r_la
     barChart = generate_bar_chart(columnNames, xLabels, barHeights, title, r_label, l_label)
     barChart.savefig(outputFilePath)
     print('Bar chart created')
+
+
+def plot_box_chart(outputFilePath, columnNames, xLabels, xData, title, r_label, l_label):
+    boxPlot = generate_box_plot(columnNames, xLabels, xData, title, r_label, l_label)
+    boxPlot.savefig(outputFilePath)
+    print('Box plot created')
 
 
 if __name__ == '__main__':
