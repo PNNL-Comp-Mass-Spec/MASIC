@@ -74,7 +74,6 @@ namespace MASIC.Plots
 
         private void AddOxyPlotSeries(PlotModel myPlot, IEnumerable<double> points, out BoxPlotStats boxPlotStats)
         {
-            boxPlotStats = new BoxPlotStats();
 
             var series = new BoxPlotSeries
             {
@@ -82,6 +81,31 @@ namespace MASIC.Plots
                 StrokeThickness = 1.1,
                 WhiskerWidth = 1
             };
+
+            boxPlotStats = ComputeBoxStats(points);
+
+            var xValue = myPlot.Series.Count;
+
+            var boxPlotItem = new BoxPlotItem(
+                xValue,
+                boxPlotStats.LowerWhisker,
+                boxPlotStats.FirstQuartile,
+                boxPlotStats.Median,
+                boxPlotStats.ThirdQuartile,
+                boxPlotStats.UpperWhisker)
+            {
+                Outliers = boxPlotStats.Outliers
+            };
+
+            series.Items.Add(boxPlotItem);
+
+            myPlot.Series.Add(series);
+        }
+
+        private BoxPlotStats ComputeBoxStats(IEnumerable<double> points)
+        {
+
+            var boxPlotStats = new BoxPlotStats();
 
             // Assure that the data is sorted
             var values = (from item in points orderby item select item).ToList();
@@ -126,28 +150,15 @@ namespace MASIC.Plots
             var lowerValues = values.Where(item => item >= lowerWhiskerThreshold).ToList();
             var lowerWhisker = lowerValues.Count == 0 ? 0 : lowerValues.Min();
 
-            var xValue = myPlot.Series.Count;
-
-            var boxPlotItem = new BoxPlotItem(
-                xValue,
-                lowerWhisker,
-                boxPlotStats.FirstQuartile,
-                boxPlotStats.Median,
-                boxPlotStats.ThirdQuartile,
-                upperWhisker)
-            {
-                Outliers = values.Where(item => item > upperWhisker || item < lowerWhisker).ToList()
-            };
+            var outliers = values.Where(item => item > upperWhisker || item < lowerWhisker);
+            boxPlotStats.StoreOutliers(outliers);
 
             boxPlotStats.UpperWhisker = upperWhisker;
             boxPlotStats.LowerWhisker = lowerWhisker;
 
             boxPlotStats.NonZeroCount = values.Count(item => item > 0);
-            boxPlotStats.NumberOfOutliers = boxPlotItem.Outliers.Count;
 
-            series.Items.Add(boxPlotItem);
-
-            myPlot.Series.Add(series);
+            return boxPlotStats;
         }
 
         /// <summary>
@@ -193,17 +204,21 @@ namespace MASIC.Plots
             return MathNet.Numerics.Statistics.Statistics.Median(values);
         }
 
-        private PlotContainerBase InitializePlot(
-            BoxPlotInfo boxPlotInfo,
-            string plotTitle,
-            AxisInfo yAxisInfo)
+        private List<int> GetXAxisLabelIndices(Dictionary<int, string> xAxisLabels)
         {
+            return (from item in xAxisLabels.Keys orderby item select item).ToList();
+        }
+
+        private PlotContainerBase InitializePlot(BoxPlotInfo boxPlotInfo)
+        {
+            var xAxisLabels = GetDataToPlot(boxPlotInfo, out var pointsByBox);
+
             if (Options.PlotWithPython)
             {
-                return InitializePythonPlot(boxPlotInfo, plotTitle, yAxisInfo);
+                return InitializePythonPlot(boxPlotInfo, xAxisLabels, pointsByBox);
             }
 
-            return InitializeOxyPlot(boxPlotInfo, plotTitle, yAxisInfo);
+            return InitializeOxyPlot(boxPlotInfo, xAxisLabels, pointsByBox);
         }
 
         /// <summary>
@@ -220,8 +235,6 @@ namespace MASIC.Plots
             IReadOnlyList<List<double>> pointsByBox)
         {
 
-            var xAxisLabels = GetDataToPlot(boxPlotInfo, out var pointsByBox, out var maxIntensity);
-
             if (pointsByBox.Count == 0)
             {
                 // Nothing to plot
@@ -235,25 +248,20 @@ namespace MASIC.Plots
             var absoluteValueMin = double.MaxValue;
             var absoluteValueMax = double.MinValue;
 
-            var xAxisLabelIndices = new List<int>();
-
-            foreach (var labelIndex in (from item in xAxisLabels.Keys orderby item select item))
-            {
-                xAxisLabelIndices.Add(labelIndex);
-            }
+            var xAxisLabelIndices = GetXAxisLabelIndices(xAxisLabels);
 
             for (var i = 0; i < pointsByBox.Count; i++)
             {
                 var labelIndex = xAxisLabelIndices[i];
-                var values = pointsByBox[i];
+                var points = pointsByBox[i];
 
-                foreach (var currentValAbs in from value in values select Math.Abs(value))
+                foreach (var currentValAbs in from value in points select Math.Abs(value))
                 {
                     absoluteValueMin = Math.Min(absoluteValueMin, currentValAbs);
                     absoluteValueMax = Math.Max(absoluteValueMax, currentValAbs);
                 }
 
-                AddOxyPlotSeries(myPlot, values, out var boxPlotStats);
+                AddOxyPlotSeries(myPlot, points, out var boxPlotStats);
 
                 mBoxPlot.BoxPlotStatistics.Add(labelIndex, boxPlotStats);
             }
@@ -303,8 +311,6 @@ namespace MASIC.Plots
             List<List<double>> pointsByBox)
         {
 
-            var xAxisLabels = GetDataToPlot(boxPlotInfo, out var pointsByBox, out var maxIntensity);
-
             if (pointsByBox.Count == 0)
             {
                 // Nothing to plot
@@ -323,7 +329,18 @@ namespace MASIC.Plots
 
             plotContainer.SetData(labelNames, pointsByBox);
 
-            if (yAxisInfo.AutoScale)
+            var xAxisLabelIndices = GetXAxisLabelIndices(xAxisLabels);
+
+            for (var i = 0; i < pointsByBox.Count; i++)
+            {
+                var labelIndex = xAxisLabelIndices[i];
+
+                var boxPlotStats = ComputeBoxStats(pointsByBox[i]);
+
+                mBoxPlot.BoxPlotStatistics.Add(labelIndex, boxPlotStats);
+            }
+
+            if (boxPlotInfo.YAxisInfo.AutoScale)
             {
                 // Auto scale
             }
