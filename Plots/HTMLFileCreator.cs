@@ -168,11 +168,26 @@ namespace MASIC.Plots
             writer.WriteLine("    <tr>");
             writer.WriteLine("      <td align=\"center\">DMS <a href=\"http://dms2.pnl.gov/dataset/show/" + datasetName + "\">Dataset Detail Report</a></td>");
 
-            // Link to the _RepIonObsRate.txt file
-            var reporterIonObsRateDataFile = datasetName + "_" + StatsPlotter.REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX;
-            if (File.Exists(Path.Combine(outputDirectoryPath, reporterIonObsRateDataFile)))
+            // Link to the tab-delimited text files
+            var obsRateURL = GetFileUrlIfExists(
+                outputDirectoryPath,
+                datasetName + "_" + StatsPlotter.REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX,
+                "Reporter Ion Observation Rate data file");
+
+            var intensityStatsURL = GetFileUrlIfExists(
+                outputDirectoryPath,
+                datasetName + "_" + StatsPlotter.REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX,
+                "Reporter Ion Intensity Stats data file");
+
+            if (obsRateURL.Length > 0 || intensityStatsURL.Length > 0)
             {
-                writer.WriteLine("      <td align=\"center\"><a href=\"" + reporterIonObsRateDataFile + "\">Reporter Ion Observation Rate data file</a></td>");
+                string breakTag;
+                if (obsRateURL.Length > 0 && intensityStatsURL.Length > 0)
+                    breakTag = "<br>";
+                else
+                    breakTag = string.Empty;
+
+                writer.WriteLine("      <td align=\"center\">{0}{1}{2}</td>", obsRateURL, breakTag, intensityStatsURL);
             }
             else
             {
@@ -208,5 +223,14 @@ namespace MASIC.Plots
             return hyperlink;
         }
 
+
+        private string GetFileUrlIfExists(string outputDirectoryPath, string fileName, string fileDescription)
+        {
+            var dataFile = new FileInfo(Path.Combine(outputDirectoryPath, fileName));
+
+            return dataFile.Exists ?
+                       string.Format("<a href=\"{0}\">{1}</a>", dataFile.Name, fileDescription) :
+                       string.Empty;
+        }
     }
 }
