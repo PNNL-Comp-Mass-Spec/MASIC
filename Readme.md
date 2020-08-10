@@ -1,7 +1,7 @@
 # MASIC (MS/MS Automated Selected Ion Chromatogram Generator)
 
 MASIC generates selected ion chromatograms (SICs) for all of the parent ions 
-chosen for fragmentation in an LC-MS/MS analysis.  The SICs are generated 
+chosen for fragmentation in an LC-MS/MS analysis. The SICs are generated 
 using the LC-MS data, then each SIC is processed using a peak finding 
 algorithm to characterize the chromatographic peaks, providing peak statistics 
 including elution time of the peak apex, peak area, and peak signal/noise.
@@ -13,12 +13,12 @@ The program can read instrument data in the following formats:
 * .cdf/.mgf combo files
 
 Results are saved both as flat files (.txt) and in an XML file that can be read 
-using the accompanying graphical results browser, MASIC Browser.  The browser 
+using the accompanying graphical results browser, MASIC Browser. The browser 
 provides a fast, graphical method for browsing the SICs identified by MASIC, 
 allowing the user to sort and filter the SIC list as desired.
 
 The application note describing MASIC is:
-Monroe ME et. al., Comput Biol Chem. 2008 Jun;32(3):215-217.  More info is on 
+Monroe ME et. al., Comput Biol Chem. 2008 Jun;32(3):215-217. More info is on 
 [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/18440872)
 
 ## Downloads
@@ -59,9 +59,9 @@ For all three methods, you can define three types of time modes:
 * AcquisitionTime: scan acquisition time, aka elution time (in minutes)
 
 When defining custom SIC values, you must provide, at a minimum, the m/z value
-to search for.  If no other values are provided, the default m/z search
+to search for. If no other values are provided, the default m/z search
 tolerance will be used (defined on the SIC Options tab in the GUI), and the 
-entire dataset will be searched for the m/z value.  You can optionally also define:
+entire dataset will be searched for the m/z value. You can optionally also define:
 1. A custom m/z tolerance to use for each m/z
   * If 0, the default SIC tolerance will be used
 2. The central scan number or scan acquisition time you want the search to be centered around
@@ -75,25 +75,25 @@ Custom SIC Values table will change based on the Tolerance Type defined.
 
 If you define a tab-delimited text file from which to read the Custom SIC 
 search details, the column headers present in the text file define the 
-search tolerances to use.  Files CustomMZList.txt and CustomMZList_AcqTime.txt,
+search tolerances to use. Files CustomMZList.txt and CustomMZList_AcqTime.txt,
 which are installed with MASIC, show the proper format for a Custom SIC Values
-file.  At a minimum, the file must have a column titled "MZ" which specifies
-the custom m/z values to search for.  If no other columns are present,
+file. At a minimum, the file must have a column titled "MZ" which specifies
+the custom m/z values to search for. If no other columns are present,
 a default tolerance is used for the m/z tolerance and the entire file will be
-searched for each custom m/z file.  If you add other columns of data to the
-file, additional tolerances can be defined.  Allowable column names are:
+searched for each custom m/z file. If you add other columns of data to the
+file, additional tolerances can be defined. Allowable column names are:
 MZToleranceDa, ScanCenter, ScanTolerance, and Comment
 
 The data in columns ScanCenter and ScanTolerance can be absolute scan numbers, 
-relative scan numbers, or acquisition time values.  The mode to use can be
+relative scan numbers, or acquisition time values. The mode to use can be
 defined in the GUI using the "Tolerance Type" option on the Custom SIC Options
-tab.  Alternatively, if running MASIC from the Command Line, the mode to
+tab. Alternatively, if running MASIC from the Command Line, the mode to
 use must be defined using the "ScanType" setting in section "CustomSICValues"
 of an XML parameter file ("ScanType" can be "Absolute", "Relative", or 
 "AcquisitionTime").
 
 Instead of using column names ScanCenter and ScanTolerance you can alternatively
-use the column names ScanTime and TimeTolerance.  When these columns are present,
+use the column names ScanTime and TimeTolerance. When these columns are present,
 then the values in those columns will be treated as AcquisitionTime values,
 regardless of the global custom SIC Tolerance Type setting defined in the GUI
 or in the XML parameter file.
@@ -102,7 +102,7 @@ or in the XML parameter file.
 
 Enable the "Generate Reporter Ion Stats" option to instruct MASIC to look 
 for standard reporter ion masses and to save their observed intensities in
-file _ReporterIons.txt.  Supported reporter ion modes are shown in the following table
+file _ReporterIons.txt. Supported reporter ion modes are shown in the following table
 The integer value corresponds to the number that appears in the MASIC settings file, e.g.
 `<item key="ReporterIonMassMode" value="16" />` for TMT 11
 
@@ -132,19 +132,19 @@ The integer value corresponds to the number that appears in the MASIC settings f
 
 When processing Thermo-Finnigan MRM data files, a file named _MRMSettings.txt 
 will be created listing the parent and daughter m/z values monitored via 
-selected reaction monitoring.  You can optionally export detailed MRM 
+selected reaction monitoring. You can optionally export detailed MRM 
 intensity data using the "MRM Data List" and/or "MRM Intensity Crosstab" 
-options.  The MRM Data List file is a long, narrow file with only a few
+options. The MRM Data List file is a long, narrow file with only a few
 columns: Scan, MRM_Parent_MZ, MRM_Daughter_MZ, and MRM_Daughter_Intensity.
 In contrast, the MRM Intensity Crosstab file is a wide, rectangular file
-that presents the data in a crosstab format (aka PivotTable).  Here, each
+that presents the data in a crosstab format (aka PivotTable). Here, each
 column in the crosstab corresponds to the intensity values over time for a 
 given parent m/z to daughter m/z transition being monitored.
 
 If you convert a MRM file to the .mzML format using the MSConvert utility in ProteoWizard, 
 you need to use command line switches `--srmAsSpectra` and `--simAsSpectra`.
 Otherwise, the PSI_Interface utility which we use to read .mzML files cannot 
-load the mass spectra data.  Example command line:
+load the mass spectra data. Example command line:
 ```
 msconvert.exe --32 --mzML --srmAsSpectra --simAsSpectra DatasetName.raw
 ```
@@ -152,12 +152,12 @@ msconvert.exe --32 --mzML --srmAsSpectra --simAsSpectra DatasetName.raw
 ## IonCountRaw vs. IonCount
 
 In the ScanStats file, IonCountRaw is the number MASIC m/z values present in 
-each spectrum.  IonCount is the number of points that MASIC keeps in memory and 
-examines when creating SICs.  For LTQ-FT data with scans containing lots of high 
+each spectrum. IonCount is the number of points that MASIC keeps in memory and 
+examines when creating SICs. For LTQ-FT data with scans containing lots of high 
 resolution data, MASIC compresses the data a bit to combine m/z values that are 
 within ~0.05 m/z (thus, combine 1000.05 and 1000.052 as simply 1000.051).
 Additionally, for scans with a lot of low quality, low intensity data, MASIC 
-discards the low intensity data.  The IonCount value would let you see which 
+discards the low intensity data. The IonCount value would let you see which 
 scans MASIC is discarding some data, for whatever reason.
 
 ## .mzML Support
@@ -192,7 +192,7 @@ Precursor Ion Interference Scores
 * .mzML centroid mode data has identical interference scores as Thermo .raw files
 
 Based on the above observations, when reading .mzML files, centroided MS1 spectra work better for
-interference score calculations, but intensities are 2.5 fold smaller.  In contrast,
+interference score calculations, but intensities are 2.5 fold smaller. In contrast,
 profile mode MS2 spectra more accurately represent reporter ion intensities.
 
 MSConvert supports creating files with centroided MS1 spectra and profile mode MS2 spectra:
@@ -202,14 +202,18 @@ msconvert.exe --32 --mzML --filter "peakPicking true 1" DatasetName.raw
 
 ## Plots
 
-The `PlotOptions` section in the MASIC parameter file has options for instructing MASIC to create various plots.  When enabled, the following plots are created:
+The `PlotOptions` section in the MASIC parameter file has options for instructing MASIC to create various plots. When enabled, the following plots are created:
 
-| Plot Title                            | Filename                               | Description                                                                                                                                                                        |
-|---------------------------------------|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Peak area histogram                   | Dataset_PeakAreaHistogram.png          | Histogram of selected ion chromatogram (SIC) peak areas.  Areas are log-10 transformed.                                                                                            |
-| Peak width histogram                  | Dataset_PeakWidthHistogram.png         | Histogram of peak widths (FWHM) of selected ion chromatogram peaks (in seconds)                                                                                                    |
-| Reporter ion observation rate         | Dataset_RepIonObsRate.png              | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed, showing a separate bar for each channel.  Only created if reporter ions were searched for |
-| Reporter ion observation rate, top N% | Dataset_RepIonObsRateHighAbundance.png | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed.  Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable)      |
+| Plot Title                            | Filename                               | Description                                                                                                                                                                    |
+|---------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Peak area histogram                   | Dataset_PeakAreaHistogram.png          | Histogram of selected ion chromatogram (SIC) peak areas. Areas are log-10 transformed.                                                                                         |
+| Peak width histogram                  | Dataset_PeakWidthHistogram.png         | Histogram of peak widths (FWHM) of selected ion chromatogram peaks (in seconds)                                                                                                |
+| Reporter ion observation rate, top N% | Dataset_RepIonObsRateHighAbundance.png | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed. Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable)   |
+| Reporter ion observation rate         | Dataset_RepIonObsRate.png              | Bar chart showing the percentage of MS/MS spectra for which a reporter ion was observed, showing a separate bar for each channel.                                              |
+| Reporter ion intensity stats, top N%  | Dataset_RepIonStatsHighAbundance.png   | Box and whiskers plot showing the distribution of reporter ion intensities, by channel. Uses data from the top 80% of spectra, as sorted by SIC peak area (% is adjustable).   |
+| Reporter ion intensity stats          | Dataset_RepIonStats.png                | Box and whiskers plot showing the distribution of reporter ion intensities, by channel. Only created if reporter ions were searched for                                        |
+
+The reporter ion based plots are only created if reporter ions were searched for.
 
 Example plots are visible on GitHub
 * [TMT Example](https://htmlpreview.github.io/?https://github.com/PNNL-Comp-Mass-Spec/MASIC/blob/master/Docs/TMT_Example/index.html)
@@ -261,12 +265,12 @@ The input file path can contain the wildcard character *
 If the input file name ends with _SICstats.txt, MASIC will create plots using existing results
 * If a _ReporterIons.txt file is also present, the Reporter Ion Observation Rate plots will also be made
 
-The output directory name is optional.  If omitted, the output files will be
+The output directory name is optional. If omitted, the output files will be
 created in the same directory as the input file. If included, a subdirectory
 will be created with the name OutputDirectoryName.
 
 The parameter file switch `/P` is optional. If supplied, it should point to a valid 
-MASIC XML parameter file.  If omitted, defaults are used.
+MASIC XML parameter file. If omitted, defaults are used.
 * Create a parameter file for MASIC using the MASIC GUI
 * Alternatively, download a file from [GitHub](https://github.com/PNNL-Comp-Mass-Spec/MASIC/tree/master/Docs/Parameter_Files)
 
@@ -285,7 +289,7 @@ examine.
 * When using `/S`, you can use `/R` to re-create the input directory hierarchy in the
 alternate output directory (if defined).
 
-Use `/L` to specify that a log file should be created.  Use `/L:LogFilePath` to
+Use `/L` to specify that a log file should be created. Use `/L:LogFilePath` to
 specify the name (or full path) for the log file.
 
 Use `/SF` to specify the name to use for the MASIC Status file (default is
@@ -299,7 +303,7 @@ The optional `/Q` switch will prevent the progress window from being shown (only
 ## Contacts
 
 Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)\
-Copyright 2019, Battelle Memorial Institute.  All Rights Reserved.\
+Copyright 2019, Battelle Memorial Institute. All Rights Reserved.\
 E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov\
 Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/\
 
