@@ -68,11 +68,11 @@ namespace MASIC.DataOutput
             var boxPlotStats = reporterIonStats.ContainsKey(reporterIonIndex) ? reporterIonStats[reporterIonIndex] : new BoxPlotStats();
 
             dataLine.Add(string.Format("{0}", boxPlotStats.NonZeroCount).PadRight(columnWidths["NonZeroCount" + statNameSuffix]));
-            dataLine.Add(string.Format("{0}", boxPlotStats.Median).PadRight(columnWidths["Median" + statNameSuffix]));
-            dataLine.Add(string.Format("{0}", boxPlotStats.InterQuartileRange).PadRight(columnWidths["InterQuartileRange" + statNameSuffix]));
-            dataLine.Add(string.Format("{0}", boxPlotStats.LowerWhisker).PadRight(columnWidths["LowerWhisker" + statNameSuffix]));
-            dataLine.Add(string.Format("{0}", boxPlotStats.UpperWhisker).PadRight(columnWidths["UpperWhisker" + statNameSuffix]));
-            dataLine.Add(string.Format("{0}", boxPlotStats.NumberOfOutliers).PadRight(columnWidths["NumberOfOutliers" + statNameSuffix]));
+            dataLine.Add(string.Format("{0:0}", boxPlotStats.Median).PadRight(columnWidths["Median" + statNameSuffix]));
+            dataLine.Add(string.Format("{0:0}", boxPlotStats.InterQuartileRange).PadRight(columnWidths["InterQuartileRange" + statNameSuffix]));
+            dataLine.Add(string.Format("{0:0}", boxPlotStats.LowerWhisker).PadRight(columnWidths["LowerWhisker" + statNameSuffix]));
+            dataLine.Add(string.Format("{0:0}", boxPlotStats.UpperWhisker).PadRight(columnWidths["UpperWhisker" + statNameSuffix]));
+            dataLine.Add(string.Format("{0:0}", boxPlotStats.Outliers.Count).PadRight(columnWidths["NumberOfOutliers" + statNameSuffix]));
         }
 
         private bool CreateHistogram(
@@ -534,21 +534,25 @@ namespace MASIC.DataOutput
                 var columnWidths = new Dictionary<string, int>();
                 foreach (var item in statNames)
                 {
-                    columnWidths.Add(item, Math.Max(10, item.Length));
-                    columnWidths.Add(item + statNameSuffixTopNPct, (item + statNameSuffixTopNPct).Length);
+                    var columnWidth = Math.Max(10, (item + statNameSuffixTopNPct).Length);
+                    columnWidths.Add(item, columnWidth);
+                    columnWidths.Add(item + statNameSuffixTopNPct, columnWidth);
                 }
 
                 columnWidths.Add("Reporter_Ion", "Reporter_Ion".Length);
 
                 using (var writer = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
                 {
-                   // Write the header line
-                    var dataLine = new List<string> {
-                        "Reporter_Ion"
-                    };
-
                     for (var i = 0; i < 2; i++)
                     {
+                        if (i > 0)
+                            writer.WriteLine();
+
+                        // Write the header line
+                        var dataLine = new List<string> {
+                            "Reporter_Ion"
+                        };
+
                         var statNameSuffix = i == 0 ? statNameSuffixTopNPct : string.Empty;
 
                         foreach (var statName in statNames)
@@ -557,19 +561,23 @@ namespace MASIC.DataOutput
                             var totalWidth = columnWidths[columnName];
                             dataLine.Add(columnName.PadRight(totalWidth));
                         }
-                    }
-
-                    writer.WriteLine(string.Join("\t", dataLine));
-
-                    foreach (var reporterIonIndex in reporterIonNames.Keys)
-                    {
-                        dataLine.Clear();
-                        dataLine.Add(reporterIonNames[reporterIonIndex].PadRight("Reporter_Ion".Length));
-
-                        AppendReporterIonStats(dataLine, reporterIonIntensityStatsHighAbundance, reporterIonIndex, columnWidths, statNameSuffixTopNPct);
-                        AppendReporterIonStats(dataLine, reporterIonIntensityStats, reporterIonIndex, columnWidths, string.Empty);
-
                         writer.WriteLine(string.Join("\t", dataLine));
+
+                        foreach (var reporterIonIndex in reporterIonNames.Keys)
+                        {
+                            dataLine.Clear();
+                            dataLine.Add(reporterIonNames[reporterIonIndex].PadRight("Reporter_Ion".Length));
+
+                            AppendReporterIonStats(
+                                dataLine,
+                                i == 0 ? reporterIonIntensityStatsHighAbundance : reporterIonIntensityStats,
+                                reporterIonIndex,
+                                columnWidths,
+                                statNameSuffixTopNPct);
+
+                            writer.WriteLine(string.Join("\t", dataLine));
+                        }
+
                     }
                 }
 
