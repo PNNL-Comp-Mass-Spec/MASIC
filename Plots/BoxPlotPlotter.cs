@@ -47,11 +47,6 @@ namespace MASIC.Plots
         public PlotOptions Options { get; }
 
         /// <summary>
-        /// Plot title
-        /// </summary>
-        public string PlotTitle { get; set; }
-
-        /// <summary>
         /// Y-axis label
         /// </summary>
         public string YAxisLabel { get; set; } = "Intensity";
@@ -67,8 +62,7 @@ namespace MASIC.Plots
         public BoxPlotPlotter(PlotOptions options, string plotTitle, bool writeDebug = false)
         {
             Options = options;
-            PlotTitle = plotTitle;
-            mBoxPlot = new BoxPlotInfo();
+            mBoxPlot = new BoxPlotInfo(plotTitle);
             mWriteDebug = writeDebug;
             Reset();
         }
@@ -165,15 +159,15 @@ namespace MASIC.Plots
         /// <returns>Labels for the bars</returns>
         private Dictionary<int, string> GetDataToPlot(
             BoxPlotInfo boxPlotInfo,
-            out List<List<double>> pointsByBox,
-            out double maxIntensity)
+            out List<List<double>> pointsByBox)
         {
 
             // Instantiate the list to track the data points
             pointsByBox = new List<List<double>>();
             var xAxisLabels = new Dictionary<int, string>();
 
-            maxIntensity = 0;
+            var maxIntensity = 0.0;
+
             foreach (var item in boxPlotInfo.DataPoints)
             {
                 xAxisLabels.Add(item.Key, boxPlotInfo.ReporterIonNames[item.Key]);
@@ -186,7 +180,7 @@ namespace MASIC.Plots
             }
 
             // Multiply maxIntensity by 2% then round up to the nearest integer
-            maxIntensity = Math.Max(1, Math.Ceiling(maxIntensity * 1.02));
+            boxPlotInfo.MaxIntensity = Math.Max(1, Math.Ceiling(maxIntensity * 1.02));
 
             return xAxisLabels;
         }
@@ -222,8 +216,8 @@ namespace MASIC.Plots
         /// <returns>OxyPlot PlotContainer</returns>
         private PlotContainer InitializeOxyPlot(
             BoxPlotInfo boxPlotInfo,
-            string plotTitle,
-            AxisInfo yAxisInfo)
+            Dictionary<int, string> xAxisLabels,
+            IReadOnlyList<List<double>> pointsByBox)
         {
 
             var xAxisLabels = GetDataToPlot(boxPlotInfo, out var pointsByBox, out var maxIntensity);
@@ -232,11 +226,11 @@ namespace MASIC.Plots
             {
                 // Nothing to plot
                 var emptyContainer = new PlotContainer(PlotContainerBase.PlotTypes.BoxPlot, new PlotModel(), mWriteDebug);
-                emptyContainer.WriteDebugLog("pointsByBox.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
+                emptyContainer.WriteDebugLog("pointsByBox.Count == 0 in InitializeOxyPlot for plot " + boxPlotInfo.PlotTitle);
                 return emptyContainer;
             }
 
-            var myPlot = OxyPlotUtilities.GetBasicBoxPlotModel(plotTitle, xAxisLabels.Values, yAxisInfo);
+            var myPlot = OxyPlotUtilities.GetBasicBoxPlotModel(boxPlotInfo.PlotTitle, xAxisLabels.Values, boxPlotInfo.YAxisInfo);
 
             var absoluteValueMin = double.MaxValue;
             var absoluteValueMax = double.MinValue;
@@ -277,9 +271,9 @@ namespace MASIC.Plots
                 FontSizeBase = PlotContainer.DEFAULT_BASE_FONT_SIZE
             };
 
-            plotContainer.WriteDebugLog(string.Format("Instantiated plotContainer for plot {0}: {1} boxes", plotTitle, pointsByBox.Count));
+            plotContainer.WriteDebugLog(string.Format("Instantiated plotContainer for plot {0}: {1} boxes", boxPlotInfo.PlotTitle, pointsByBox.Count));
 
-            if (yAxisInfo.AutoScale)
+            if (boxPlotInfo.YAxisInfo.AutoScale)
             {
                 // Auto scale
             }
@@ -287,7 +281,7 @@ namespace MASIC.Plots
             {
                 // Override the auto-computed Y axis range
                 myPlot.Axes[1].Minimum = 0;
-                myPlot.Axes[1].Maximum = maxIntensity;
+                myPlot.Axes[1].Maximum = boxPlotInfo.MaxIntensity;
             }
 
             // Hide the legend
@@ -305,8 +299,8 @@ namespace MASIC.Plots
         /// <returns>OxyPlot PlotContainer</returns>
         private PythonPlotContainer InitializePythonPlot(
             BoxPlotInfo boxPlotInfo,
-            string plotTitle,
-            AxisInfo yAxisInfo)
+            Dictionary<int, string> xAxisLabels,
+            List<List<double>> pointsByBox)
         {
 
             var xAxisLabels = GetDataToPlot(boxPlotInfo, out var pointsByBox, out var maxIntensity);
@@ -315,11 +309,11 @@ namespace MASIC.Plots
             {
                 // Nothing to plot
                 var emptyContainer = new PythonPlotContainerBoxPlot();
-                emptyContainer.WriteDebugLog("points.Count == 0 in InitializePythonPlot for plot " + plotTitle);
+                emptyContainer.WriteDebugLog("points.Count == 0 in InitializePythonPlot for plot " + boxPlotInfo.PlotTitle);
                 return emptyContainer;
             }
 
-            var plotContainer = new PythonPlotContainerBoxPlot(plotTitle, string.Empty, yAxisInfo.Title)
+            var plotContainer = new PythonPlotContainerBoxPlot(boxPlotInfo.PlotTitle, string.Empty, boxPlotInfo.YAxisInfo.Title)
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };
@@ -336,7 +330,7 @@ namespace MASIC.Plots
             else
             {
                 // Override the auto-computed Y axis range
-                plotContainer.YAxisInfo.SetRange(0, maxIntensity);
+                plotContainer.YAxisInfo.SetRange(0, boxPlotInfo.MaxIntensity);
             }
 
             return plotContainer;
@@ -365,21 +359,17 @@ namespace MASIC.Plots
             bool logarithmicYAxis,
             int yAxisMinimum = 0)
         {
-
             outputFilePath = string.Empty;
 
             try
             {
-                var yAxisInfo = new AxisInfo(YAxisLabel)
-                {
-                    Title = YAxisLabel,
-                    Minimum = yAxisMinimum,
-                    TickLabelsArePercents = false,
-                    UseLogarithmicScale = logarithmicYAxis,
-                    StringFormat = "0E0"
-                };
+                mBoxPlot.YAxisInfo.Title = YAxisLabel;
+                mBoxPlot.YAxisInfo.Minimum = yAxisMinimum;
+                mBoxPlot.YAxisInfo.TickLabelsArePercents = false;
+                mBoxPlot.YAxisInfo.UseLogarithmicScale = logarithmicYAxis;
+                mBoxPlot.YAxisInfo.StringFormat = "0E0";
 
-                var boxPlot = InitializePlot(mBoxPlot, PlotTitle, yAxisInfo);
+                var boxPlot = InitializePlot(mBoxPlot);
                 RegisterEvents(boxPlot);
 
                 if (boxPlot.SeriesCount == 0)
@@ -422,8 +412,12 @@ namespace MASIC.Plots
             /// Reporter ion intensities, by channel
             /// </summary>
             /// Keys are column index (corresponding to <see cref="ReporterIonNames"/>)
-            /// Values the list of non-zero reporter ion intensities for the given reporter ion
+            /// Values are the list of non-zero reporter ion intensities for the given reporter ion
             public Dictionary<int, List<double>> DataPoints { get; }
+
+            public double MaxIntensity { get; set; }
+
+            public string PlotTitle { get; }
 
             /// <summary>
             /// Reporter ion column names
@@ -431,14 +425,20 @@ namespace MASIC.Plots
             /// <remarks>Keys are column index, values are reporter ion info</remarks>
             public Dictionary<int, string> ReporterIonNames { get; }
 
+            public AxisInfo YAxisInfo { get; }
+
             /// <summary>
             /// Constructor
             /// </summary>
-            public BoxPlotInfo()
+            /// <param name="plotTitle"></param>
+            public BoxPlotInfo(string plotTitle)
             {
                 BoxPlotStatistics = new Dictionary<int, BoxPlotStats>();
                 DataPoints = new Dictionary<int, List<double>>();
+                MaxIntensity = 0;
+                PlotTitle = plotTitle;
                 ReporterIonNames = new Dictionary<int, string>();
+                YAxisInfo = new AxisInfo();
             }
 
             public void AddPoints(int labelIndex, string label, List<double> values)
