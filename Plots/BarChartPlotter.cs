@@ -153,9 +153,9 @@ namespace MASIC.Plots
                 xAxisLabels.Add(dataPoint.Label);
 
                 OxyColor colorToUse;
-                if (colorMap.Count > 0 && yAxisMaximum > 0)
+                if (colorMap.Count > 0 && maxIntensity > 0)
                 {
-                    var colorIndex = (int)Math.Round(dataPoint.Value * colorMap.Count / yAxisMaximum, 0) - 1;
+                    var colorIndex = (int)Math.Round(dataPoint.Value * colorMap.Count / maxIntensity, 0) - 1;
                     if (colorIndex < 0)
                     {
                         colorIndex = 0;
@@ -238,7 +238,13 @@ namespace MASIC.Plots
             {
                 // Override the auto-computed Y axis range
                 myPlot.Axes[1].Minimum = yAxisMinimum;
-                myPlot.Axes[1].Maximum = yAxisMaximum;
+
+                // If the yAxisMaximum is 102, assume this is a bar chart of percentage values between 0 and 100
+                // Otherwise, add 2% padding
+                if (Math.Abs(yAxisMaximum - 102) < 0.1)
+                    myPlot.Axes[1].Maximum = yAxisMaximum;
+                else
+                    myPlot.Axes[1].Maximum = yAxisMaximum * 1.02;
             }
 
             // Hide the legend
@@ -309,10 +315,10 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
-        /// <param name="outputFilePath"></param>
+        /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
         /// <param name="yAxisMinimum"></param>
         /// <returns></returns>
-        public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath, int yAxisMinimum = 0)
+        public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath, int yAxisMinimum, int yAxisMaximum)
         {
 
             outputFilePath = string.Empty;
@@ -342,7 +348,7 @@ namespace MASIC.Plots
                         Title = YAxisLabel,
                         AutoScale = AutoMinMaxY,
                         Minimum = yAxisMinimum,
-                        Maximum = 102,
+                        Maximum = yAxisMaximum,
                         AddColorAxis = colorGradients.Count > 1,
                         ColorPalette = colorGradient.Value,
                         TickLabelsArePercents = true

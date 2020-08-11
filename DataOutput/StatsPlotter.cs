@@ -165,7 +165,8 @@ namespace MASIC.DataOutput
             string plotDescription,
             string plotAbbreviation,
             string yAxisLabel,
-            int yAxisMinimum = 0)
+            int yAxisMinimum = 0,
+            int yAxisMaximum = 102)
         {
             try
             {
@@ -183,7 +184,7 @@ namespace MASIC.DataOutput
                     barChartPlotter.AddData(label, dataPoint.Value);
                 }
 
-                var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath, yAxisMinimum);
+                var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath, yAxisMinimum, yAxisMaximum);
 
                 AppendPlotFile(plotFiles, outputFilePath, plotCategory, plotDescription);
 
