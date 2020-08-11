@@ -204,13 +204,6 @@ namespace MASIC.DataOutput
                 var highAbundanceTitle = string.Format("Reporter Ion Observation Rate (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
                 var allSpectraTitle = "Reporter Ion Observation Rate";
 
-                var reporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, highAbundanceTitle);
-
-                var highAbundanceReporterIonObservationRatePlotter = new BarChartPlotter(Options.PlotOptions, allSpectraTitle);
-
-                RegisterEvents(reporterIonObservationRatePlotter);
-                RegisterEvents(highAbundanceReporterIonObservationRatePlotter);
-
                 var success1 = CreateBarChart(
                     mStatsSummarizer.ReporterIonNames,
                     mStatsSummarizer.ReporterIonObservationRateHighAbundance,
@@ -251,13 +244,6 @@ namespace MASIC.DataOutput
             {
                 var highAbundanceTitle = string.Format("Reporter Ion Intensities (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
                 var allSpectraTitle = "Reporter Ion Intensities";
-
-                var reporterIonIntensityPlotter = new BoxPlotPlotter(Options.PlotOptions, highAbundanceTitle);
-
-                var highAbundanceReporterIonIntensity = new BoxPlotPlotter(Options.PlotOptions, allSpectraTitle);
-
-                RegisterEvents(reporterIonIntensityPlotter);
-                RegisterEvents(highAbundanceReporterIonIntensity);
 
                 var success1 = CreateBoxPlot(
                     mStatsSummarizer.ReporterIonNames,
