@@ -203,6 +203,7 @@ namespace MASIC.DataOutput
             {
                 var highAbundanceTitle = string.Format("Reporter Ion Observation Rate (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
                 var allSpectraTitle = "Reporter Ion Observation Rate";
+                var observationCountsTitle = string.Format("Reporter Ion Observation Counts (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
 
                 var success1 = CreateBarChart(
                     mStatsSummarizer.ReporterIonNames,
@@ -229,7 +230,38 @@ namespace MASIC.DataOutput
                     Path.GetFileNameWithoutExtension(REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX),
                     "Observation Rate (%)");
 
-                return success1 && success2;
+                var reporterIonObservationCounts = new Dictionary<int, float>();
+                foreach (var item in mStatsSummarizer.ReporterIonIntensityStatsHighAbundanceData)
+                {
+                    reporterIonObservationCounts.Add(item.Key, item.Value.NonZeroCount);
+                }
+
+                var obsCountMaximum = 1;
+                foreach (var item in reporterIonObservationCounts.Values)
+                {
+                    var observationCount = (int)Math.Round(item);
+                    if (observationCount > obsCountMaximum)
+                    {
+                        obsCountMaximum = observationCount;
+                    }
+                }
+
+                obsCountMaximum = (int)Math.Round(obsCountMaximum * 1.02);
+
+                var success3 = CreateBarChart(
+                     mStatsSummarizer.ReporterIonNames,
+                     reporterIonObservationCounts,
+                     datasetName,
+                     outputDirectory,
+                     plotFiles,
+                     observationCountsTitle,
+                     PlotContainerBase.PlotCategories.ReporterIonObservationCount,
+                     "Observation counts, excluding low abundance spectra",
+                     "RepIonObsCounts",
+                     "Number of Spectra",
+                     yAxisMaximum: obsCountMaximum);
+
+                return success1 && success2 && success3;
             }
             catch (Exception ex)
             {
@@ -341,9 +373,13 @@ namespace MASIC.DataOutput
         private bool CreatePlots(string datasetName, string outputDirectory, out List<PlotFileInfo> plotFiles)
         {
             plotFiles = new List<PlotFileInfo>();
-            var barChartSuccess = CreateBarCharts(datasetName, outputDirectory, plotFiles);
-            var boxPlotSuccess = CreateBoxPlots(datasetName, outputDirectory, plotFiles);
             var histogramSuccess = CreateHistograms(datasetName, outputDirectory, plotFiles);
+
+            // Note that CreateBoxPlots needs to be called before calling CreateBarCharts
+            // This is required to populate mStatsSummarizer.ReporterIonIntensityStatsHighAbundanceData
+            var boxPlotSuccess = CreateBoxPlots(datasetName, outputDirectory, plotFiles);
+
+            var barChartSuccess = CreateBarCharts(datasetName, outputDirectory, plotFiles);
 
             return barChartSuccess && boxPlotSuccess && histogramSuccess;
         }
