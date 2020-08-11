@@ -40,7 +40,7 @@ namespace MASIC.Plots
         /// <summary>
         /// Plot title
         /// </summary>
-        public string PlotTitle { get; set; }
+        public string PlotTitle { get; }
 
         /// <summary>
         /// Plot category
