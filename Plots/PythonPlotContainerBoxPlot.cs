@@ -20,11 +20,12 @@ namespace MASIC.Plots
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
         public PythonPlotContainerBoxPlot(
+            PlotCategories plotCategory,
             string plotTitle = "Undefined",
             string xAxisTitle = "X",
             string yAxisTitle = "Y",
             bool writeDebug = false,
-            string dataSource = "") : base(PlotTypes.BoxPlot, plotTitle, xAxisTitle, yAxisTitle, writeDebug, dataSource)
+            string dataSource = "") : base(plotCategory, plotTitle, xAxisTitle, yAxisTitle, writeDebug, dataSource)
         {
             XAxisLabels = new List<string>();
             Data = new List<List<double>>();

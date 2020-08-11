@@ -73,14 +73,14 @@ namespace MASIC.Plots
                     // Add HTML headers and <table>
                     AppendHTMLHeader(writer, DatasetName);
 
-                    // Add the histograms (X vs. Y plots)
-                    AppendPlots(writer, PlotContainerBase.PlotTypes.XY);
+                    // Add the SIC peak stats histograms (X vs. Y plots)
+                    AppendPlots(writer, PlotContainerBase.PlotCategories.SelectedIonChromatogramPeakStats);
 
                     // Add the bar charts (if defined)
-                    AppendPlots(writer, PlotContainerBase.PlotTypes.BarChart);
+                    AppendPlots(writer, PlotContainerBase.PlotCategories.ReporterIonObservationRate);
 
-                    // Add the box plots (if defined)
-                    AppendPlots(writer, PlotContainerBase.PlotTypes.BoxPlot);
+                    // Add the reporter ion intensity stats box plot and histogram of observation count by channel (if defined)
+                    AppendPlots(writer, PlotContainerBase.PlotCategories.ReporterIonIntensityStats, PlotContainerBase.PlotCategories.ReporterIonObservationCount);
 
                     // Append dataset info
                     AppendDatasetInfo(writer, DatasetName, outputDirectoryPath);
@@ -99,14 +99,15 @@ namespace MASIC.Plots
 
         }
 
-        private void AppendPlots(TextWriter writer, PlotContainerBase.PlotTypes plotType)
+        private void AppendPlots(TextWriter writer, params PlotContainerBase.PlotCategories[] plotCategories)
         {
             var matchingPlotFiles = new List<PlotFileInfo>();
 
             foreach (var plotFile in PlotFiles)
             {
-                if (plotFile.PlotType != plotType)
+                if (!plotCategories.Contains(plotFile.PlotCategory))
                     continue;
+
                 matchingPlotFiles.Add(plotFile);
             }
 

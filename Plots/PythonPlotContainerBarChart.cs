@@ -18,10 +18,11 @@ namespace MASIC.Plots
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
         public PythonPlotContainerBarChart(
+            PlotCategories plotCategory,
             string plotTitle = "Undefined",
             string yAxisTitle = "Y",
             bool writeDebug = false,
-            string dataSource = "") : base(PlotTypes.BarChart, plotTitle, "Label", yAxisTitle, writeDebug, dataSource)
+            string dataSource = "") : base(plotCategory, plotTitle, "Label", yAxisTitle, writeDebug, dataSource)
         {
             Data = new List<KeyValuePair<string, double>>();
             ClearData();

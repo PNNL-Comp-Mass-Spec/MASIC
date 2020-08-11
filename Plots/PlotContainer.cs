@@ -55,19 +55,19 @@ namespace MASIC.Plots
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="plotCategory">Plot category</param>
         /// <param name="thePlot">The plot (type OxyPlot.PlotModel)</param>
-        /// <param name="plotType">Plot type</param>
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
         /// <remarks></remarks>
         public PlotContainer(
-            PlotTypes plotType,
+            PlotCategories plotCategory,
             PlotModel thePlot,
             bool writeDebug = false,
             string dataSource = "") : base(writeDebug, dataSource)
         {
             Plot = thePlot;
-            PlotType = plotType;
+            PlotCategory = plotCategory;
             FontSizeBase = DEFAULT_BASE_FONT_SIZE;
         }
 

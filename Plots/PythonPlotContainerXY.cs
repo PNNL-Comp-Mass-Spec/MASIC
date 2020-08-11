@@ -22,11 +22,12 @@ namespace MASIC.Plots
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
         public PythonPlotContainerXY(
+            PlotCategories plotCategory,
             string plotTitle = "Undefined",
             string xAxisTitle = "X",
             string yAxisTitle = "Y",
             bool writeDebug = false,
-            string dataSource = "") : base(PlotTypes.XY, plotTitle, xAxisTitle, yAxisTitle, writeDebug, dataSource)
+            string dataSource = "") : base(plotCategory, plotTitle, xAxisTitle, yAxisTitle, writeDebug, dataSource)
         {
             Data = new List<DataPoint>();
             ClearData();

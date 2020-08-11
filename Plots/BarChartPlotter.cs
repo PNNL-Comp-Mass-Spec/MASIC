@@ -41,7 +41,12 @@ namespace MASIC.Plots
         /// <summary>
         /// Plot title
         /// </summary>
-        public string PlotTitle { get; set; }
+        public string PlotTitle { get; }
+
+        /// <summary>
+        /// Plot Category
+        /// </summary>
+        public PlotContainerBase.PlotCategories PlotCategory { get; }
 
         /// <summary>
         /// Y-axis label
@@ -55,11 +60,17 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="options"></param>
         /// <param name="plotTitle"></param>
+        /// <param name="plotCategory"></param>
         /// <param name="writeDebug"></param>
-        public BarChartPlotter(PlotOptions options, string plotTitle, bool writeDebug = false)
+        public BarChartPlotter(
+            PlotOptions options,
+            string plotTitle,
+            PlotContainerBase.PlotCategories plotCategory,
+            bool writeDebug = false)
         {
             Options = options;
             PlotTitle = plotTitle;
+            PlotCategory = plotCategory;
             mBarChart = new BarChartInfo();
             mWriteDebug = writeDebug;
             Reset();
@@ -189,7 +200,7 @@ namespace MASIC.Plots
             if (dataPoints.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PlotContainer(PlotContainerBase.PlotTypes.BarChart, new PlotModel(), mWriteDebug);
+                var emptyContainer = new PlotContainer(PlotCategory, new PlotModel(), mWriteDebug);
                 emptyContainer.WriteDebugLog("points.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
                 return emptyContainer;
             }
@@ -212,7 +223,7 @@ namespace MASIC.Plots
             var yVals = (from item in points select item.Value).ToList();
             OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[1], yVals, false);
 
-            var plotContainer = new PlotContainer(PlotContainerBase.PlotTypes.BarChart, myPlot, mWriteDebug)
+            var plotContainer = new PlotContainer(PlotCategory, myPlot, mWriteDebug)
             {
                 FontSizeBase = PlotContainer.DEFAULT_BASE_FONT_SIZE,
             };
@@ -245,13 +256,12 @@ namespace MASIC.Plots
         /// <returns>Python PlotContainer</returns>
         private PythonPlotContainer InitializePythonPlot(BarChartInfo barChartInfo, string plotTitle, AxisInfo yAxisInfo)
         {
-
             var xAxisLabels = GetDataToPlot(barChartInfo, yAxisInfo, out var dataPoints, out var yAxisMinimum, out var yAxisMaximum);
 
             if (dataPoints.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PythonPlotContainerBarChart();
+                var emptyContainer = new PythonPlotContainerBarChart(PlotCategory);
                 emptyContainer.WriteDebugLog("points.Count == 0 in PythonPlotContainer for plot " + plotTitle);
                 return emptyContainer;
             }
@@ -265,7 +275,7 @@ namespace MASIC.Plots
                 points.Add(dataPoint);
             }
 
-            var plotContainer = new PythonPlotContainerBarChart(plotTitle, yAxisInfo.Title)
+            var plotContainer = new PythonPlotContainerBarChart(PlotCategory, plotTitle, yAxisInfo.Title)
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };

@@ -43,14 +43,14 @@ namespace MASIC.Plots
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="plotType"></param>
+        /// <param name="plotCategory"></param>
         /// <param name="plotTitle"></param>
         /// <param name="xAxisTitle"></param>
         /// <param name="yAxisTitle"></param>
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
         protected PythonPlotContainer(
-            PlotTypes plotType,
+            PlotCategories plotCategory,
             string plotTitle = "Undefined",
             string xAxisTitle = "X",
             string yAxisTitle = "Y",
@@ -59,7 +59,7 @@ namespace MASIC.Plots
         {
             mSeriesCount = 0;
 
-            PlotType = plotType;
+            PlotCategory = plotCategory;
             PlotTitle = plotTitle;
             if (PythonPath == null)
                 PythonPath = string.Empty;

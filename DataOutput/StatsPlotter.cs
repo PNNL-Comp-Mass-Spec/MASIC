@@ -37,12 +37,12 @@ namespace MASIC.DataOutput
         /// </summary>
         /// <param name="plotFiles"></param>
         /// <param name="outputFilePath"></param>
-        /// <param name="plotType"></param>
+        /// <param name="plotCategory"></param>
         /// <param name="plotDescription"></param>
         private void AppendPlotFile(
             ICollection<PlotFileInfo> plotFiles,
             string outputFilePath,
-            PlotContainerBase.PlotTypes plotType,
+            PlotContainerBase.PlotCategories plotCategory,
             string plotDescription)
         {
             if (string.IsNullOrWhiteSpace(outputFilePath))
@@ -51,7 +51,7 @@ namespace MASIC.DataOutput
             var outputFile = new FileInfo(outputFilePath);
             var plotFile = new PlotFileInfo(outputFile)
             {
-                PlotType = plotType,
+                PlotCategory = plotCategory,
                 FileDescription = plotDescription
             };
 
@@ -81,6 +81,7 @@ namespace MASIC.DataOutput
             string outputDirectory,
             ICollection<PlotFileInfo> plotFiles,
             string plotTitle,
+            PlotContainerBase.PlotCategories plotCategory,
             string plotDescription,
             string plotAbbreviation,
             string xAxisLabel,
@@ -88,7 +89,7 @@ namespace MASIC.DataOutput
         {
             try
             {
-                var histogramPlotter = new HistogramPlotter(Options.PlotOptions, plotTitle)
+                var histogramPlotter = new HistogramPlotter(Options.PlotOptions, plotTitle, plotCategory)
                 {
                     PlotAbbrev = plotAbbreviation,
                     XAxisLabel = xAxisLabel,
@@ -104,7 +105,7 @@ namespace MASIC.DataOutput
 
                 var success = histogramPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath);
 
-                AppendPlotFile(plotFiles, outputFilePath, PlotContainerBase.PlotTypes.XY, plotDescription);
+                AppendPlotFile(plotFiles, outputFilePath, plotCategory, plotDescription);
 
                 return success;
             }
@@ -125,6 +126,7 @@ namespace MASIC.DataOutput
                     outputDirectory,
                     plotFiles,
                     "Peak Area Histogram",
+                    PlotContainerBase.PlotCategories.SelectedIonChromatogramPeakStats,
                     "Peak Areas",
                     "PeakAreaHistogram",
                     "Peak Area (Log 10)",
@@ -137,6 +139,7 @@ namespace MASIC.DataOutput
                     outputDirectory,
                     plotFiles,
                     "Peak Width Histogram",
+                    PlotContainerBase.PlotCategories.SelectedIonChromatogramPeakStats,
                     "Peak Widths",
                     "PeakWidthHistogram",
                     string.Format("Peak Width ({0}), FWHM", mStatsSummarizer.PeakWidthHistogramUnits),
@@ -158,6 +161,7 @@ namespace MASIC.DataOutput
             string outputDirectory,
             ICollection<PlotFileInfo> plotFiles,
             string plotTitle,
+            PlotContainerBase.PlotCategories plotCategory,
             string plotDescription,
             string plotAbbreviation,
             string yAxisLabel,
@@ -165,7 +169,7 @@ namespace MASIC.DataOutput
         {
             try
             {
-                var barChartPlotter = new BarChartPlotter(Options.PlotOptions, plotTitle)
+                var barChartPlotter = new BarChartPlotter(Options.PlotOptions, plotTitle, plotCategory)
                 {
                     PlotAbbrev = plotAbbreviation,
                     YAxisLabel = yAxisLabel
@@ -181,7 +185,7 @@ namespace MASIC.DataOutput
 
                 var success = barChartPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath, yAxisMinimum);
 
-                AppendPlotFile(plotFiles, outputFilePath, PlotContainerBase.PlotTypes.BarChart, plotDescription);
+                AppendPlotFile(plotFiles, outputFilePath, plotCategory, plotDescription);
 
                 return success;
             }
@@ -213,6 +217,7 @@ namespace MASIC.DataOutput
                     outputDirectory,
                     plotFiles,
                     highAbundanceTitle,
+                    PlotContainerBase.PlotCategories.ReporterIonObservationRate,
                     "Observation rate, excluding low abundance spectra",
                     "RepIonObsRateHighAbundance",
                     "Observation Rate (%)",
@@ -225,6 +230,7 @@ namespace MASIC.DataOutput
                     outputDirectory,
                     plotFiles,
                     allSpectraTitle,
+                    PlotContainerBase.PlotCategories.ReporterIonObservationRate,
                     "Observation rate, all spectra",
                     Path.GetFileNameWithoutExtension(REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX),
                     "Observation Rate (%)");
@@ -260,6 +266,7 @@ namespace MASIC.DataOutput
                     outputDirectory,
                     plotFiles,
                     highAbundanceTitle,
+                    PlotContainerBase.PlotCategories.ReporterIonIntensityStats,
                     "Reporter ion intensities, excluding low abundance spectra",
                     "RepIonStatsHighAbundance",
                     "Intensity");
@@ -272,6 +279,7 @@ namespace MASIC.DataOutput
                     outputDirectory,
                     plotFiles,
                     allSpectraTitle,
+                    PlotContainerBase.PlotCategories.ReporterIonIntensityStats,
                     "Reporter ion intensities, all spectra",
                     Path.GetFileNameWithoutExtension(REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX),
                     "Intensity");
@@ -293,6 +301,7 @@ namespace MASIC.DataOutput
             string outputDirectory,
             ICollection<PlotFileInfo> plotFiles,
             string plotTitle,
+            PlotContainerBase.PlotCategories plotCategory,
             string plotDescription,
             string plotAbbreviation,
             string yAxisLabel,
@@ -303,7 +312,7 @@ namespace MASIC.DataOutput
 
             try
             {
-                var boxPlotPlotter = new BoxPlotPlotter(Options.PlotOptions, plotTitle)
+                var boxPlotPlotter = new BoxPlotPlotter(Options.PlotOptions, plotTitle, plotCategory)
                 {
                     PlotAbbrev = plotAbbreviation,
                     YAxisLabel = yAxisLabel
@@ -324,7 +333,7 @@ namespace MASIC.DataOutput
                     boxPlotStats.Add(item.Key, item.Value);
                 }
 
-                AppendPlotFile(plotFiles, outputFilePath, PlotContainerBase.PlotTypes.BoxPlot, plotDescription);
+                    AppendPlotFile(plotFiles, outputFilePath, plotCategory, plotDescription);
 
                 return success;
             }

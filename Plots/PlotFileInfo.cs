@@ -4,11 +4,20 @@ namespace MASIC.Plots
 {
     internal class PlotFileInfo
     {
+        /// <summary>
+        /// File description
+        /// </summary>
         public string FileDescription { get; set;  }
 
+        /// <summary>
+        /// File info
+        /// </summary>
         public FileInfo PlotFile { get; }
 
-        public PlotContainerBase.PlotTypes PlotType { get; set; }
+        /// <summary>
+        /// Plot category
+        /// </summary>
+        public PlotContainerBase.PlotCategories PlotCategory { get; set; }
 
         /// <summary>
         /// Constructor

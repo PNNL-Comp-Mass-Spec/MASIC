@@ -6,13 +6,59 @@ using PRISM.FileProcessor;
 
 namespace MASIC.Plots
 {
-    internal abstract class PlotContainerBase : EventNotifier
+    public abstract class PlotContainerBase : EventNotifier
     {
+        /// <summary>
+        /// Plot types
+        /// </summary>
         public enum PlotTypes
         {
+            /// <summary>
+            /// X vs. Y plots (aka histograms)
+            /// </summary>
             XY = 0,
+
+            /// <summary>
+            /// Bar chart of reporter ion observation rates
+            /// </summary>
             BarChart = 1,
+
+            /// <summary>
+            /// Box and whiskers plot of reporter ion intensities
+            /// </summary>
             BoxPlot = 2
+        }
+
+        /// <summary>
+        /// Plot categories
+        /// </summary>
+        public enum PlotCategories
+        {
+            Undefined = 0,
+
+            /// <summary>
+            /// X vs. Y plots (aka histograms)
+            /// </summary>
+            /// <remarks>Type PlotTypes.XY</remarks>
+            SelectedIonChromatogramPeakStats = 1,
+
+            /// <summary>
+            /// Bar chart of reporter ion observation rates
+            /// </summary>
+            /// <remarks>Type PlotTypes.BarChart</remarks>
+            ReporterIonObservationRate = 2,
+
+            /// <summary>
+            /// Box and whiskers plot of reporter ion intensities
+            /// </summary>
+            /// /// <remarks>Type PlotTypes.BoxPlot</remarks>
+            ReporterIonIntensityStats = 3,
+
+            /// <summary>
+            /// Bar chart of reporter ion observation counts
+            /// </summary>
+            /// <remarks>Type PlotTypes.BarChart</remarks>
+            ReporterIonObservationCount = 4
         }
 
         protected StreamWriter mLogWriter;
@@ -25,7 +71,7 @@ namespace MASIC.Plots
 
         public string PlotTitle { get; set; }
 
-        public PlotTypes PlotType { get; protected set; }
+        public PlotCategories PlotCategory { get; protected set; }
 
         public abstract int SeriesCount { get; }
 
@@ -41,7 +87,7 @@ namespace MASIC.Plots
             AnnotationBottomLeft = string.Empty;
             AnnotationBottomRight = string.Empty;
             PlotTitle = "Undefined Plot Title";
-            PlotType = PlotTypes.XY;
+            PlotCategory = PlotCategories.Undefined;
 
             if (writeDebug)
             {
@@ -68,6 +114,26 @@ namespace MASIC.Plots
             };
 
             return string.Join(";", plotOptions);
+        }
+
+        protected PlotTypes GetPlotTypeForCategory(PlotCategories plotCategory)
+        {
+            switch (plotCategory)
+            {
+                case PlotCategories.Undefined:
+                case PlotCategories.SelectedIonChromatogramPeakStats:
+                    return PlotTypes.XY;
+
+                case PlotCategories.ReporterIonObservationRate:
+                case PlotCategories.ReporterIonObservationCount:
+                    return PlotTypes.BarChart;
+
+                case PlotCategories.ReporterIonIntensityStats:
+                    return PlotTypes.BoxPlot;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(plotCategory), plotCategory, null);
+            }
         }
 
         protected void OpenDebugFile(string dataSource)

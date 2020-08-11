@@ -58,11 +58,16 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="options"></param>
         /// <param name="plotTitle"></param>
+        /// <param name="plotCategory"></param>
         /// <param name="writeDebug"></param>
-        public BoxPlotPlotter(PlotOptions options, string plotTitle, bool writeDebug = false)
+        public BoxPlotPlotter(
+            PlotOptions options,
+            string plotTitle,
+            PlotContainerBase.PlotCategories plotCategory,
+            bool writeDebug = false)
         {
             Options = options;
-            mBoxPlot = new BoxPlotInfo(plotTitle);
+            mBoxPlot = new BoxPlotInfo(plotTitle, plotCategory);
             mWriteDebug = writeDebug;
             Reset();
         }
@@ -238,7 +243,7 @@ namespace MASIC.Plots
             if (pointsByBox.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PlotContainer(PlotContainerBase.PlotTypes.BoxPlot, new PlotModel(), mWriteDebug);
+                var emptyContainer = new PlotContainer(boxPlotInfo.PlotCategory, new PlotModel(), mWriteDebug);
                 emptyContainer.WriteDebugLog("pointsByBox.Count == 0 in InitializeOxyPlot for plot " + boxPlotInfo.PlotTitle);
                 return emptyContainer;
             }
@@ -274,7 +279,7 @@ namespace MASIC.Plots
 
             OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[1], absoluteValueMin, absoluteValueMax, false);
 
-            var plotContainer = new PlotContainer(PlotContainerBase.PlotTypes.XY, myPlot, mWriteDebug)
+            var plotContainer = new PlotContainer(boxPlotInfo.PlotCategory, myPlot, mWriteDebug)
             {
                 FontSizeBase = PlotContainer.DEFAULT_BASE_FONT_SIZE
             };
@@ -314,12 +319,12 @@ namespace MASIC.Plots
             if (pointsByBox.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PythonPlotContainerBoxPlot();
+                var emptyContainer = new PythonPlotContainerBoxPlot(boxPlotInfo.PlotCategory);
                 emptyContainer.WriteDebugLog("points.Count == 0 in InitializePythonPlot for plot " + boxPlotInfo.PlotTitle);
                 return emptyContainer;
             }
 
-            var plotContainer = new PythonPlotContainerBoxPlot(boxPlotInfo.PlotTitle, string.Empty, boxPlotInfo.YAxisInfo.Title)
+            var plotContainer = new PythonPlotContainerBoxPlot(boxPlotInfo.PlotCategory, boxPlotInfo.PlotTitle, string.Empty, boxPlotInfo.YAxisInfo.Title)
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };
@@ -432,9 +437,20 @@ namespace MASIC.Plots
             /// Values are the list of non-zero reporter ion intensities for the given reporter ion
             public Dictionary<int, List<double>> DataPoints { get; }
 
+            /// <summary>
+            /// Maximum intensity
+            /// </summary>
             public double MaxIntensity { get; set; }
 
+            /// <summary>
+            /// Plot title
+            /// </summary>
             public string PlotTitle { get; }
+
+            /// <summary>
+            /// Plot category
+            /// </summary>
+            public PlotContainerBase.PlotCategories PlotCategory { get; }
 
             /// <summary>
             /// Reporter ion column names
@@ -442,18 +458,23 @@ namespace MASIC.Plots
             /// <remarks>Keys are column index, values are reporter ion info</remarks>
             public Dictionary<int, string> ReporterIonNames { get; }
 
+            /// <summary>
+            /// Y axis info
+            /// </summary>
             public AxisInfo YAxisInfo { get; }
 
             /// <summary>
             /// Constructor
             /// </summary>
             /// <param name="plotTitle"></param>
-            public BoxPlotInfo(string plotTitle)
+            /// <param name="plotCategory"></param>
+            public BoxPlotInfo(string plotTitle, PlotContainerBase.PlotCategories plotCategory)
             {
                 BoxPlotStatistics = new Dictionary<int, BoxPlotStats>();
                 DataPoints = new Dictionary<int, List<double>>();
                 MaxIntensity = 0;
                 PlotTitle = plotTitle;
+                PlotCategory = plotCategory;
                 ReporterIonNames = new Dictionary<int, string>();
                 YAxisInfo = new AxisInfo();
             }

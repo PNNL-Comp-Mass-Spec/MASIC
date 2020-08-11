@@ -43,6 +43,11 @@ namespace MASIC.Plots
         public string PlotTitle { get; set; }
 
         /// <summary>
+        /// Plot category
+        /// </summary>
+        public PlotContainerBase.PlotCategories PlotCategory { get; }
+
+        /// <summary>
         /// X-axis label
         /// </summary>
         public string XAxisLabel { get; set; } = "Bin";
@@ -64,11 +69,17 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="options"></param>
         /// <param name="plotTitle"></param>
+        /// <param name="plotCategory"></param>
         /// <param name="writeDebug"></param>
-        public HistogramPlotter(PlotOptions options, string plotTitle, bool writeDebug = false)
+        public HistogramPlotter(
+            PlotOptions options,
+            string plotTitle,
+            PlotContainerBase.PlotCategories plotCategory,
+            bool writeDebug = false)
         {
             Options = options;
             PlotTitle = plotTitle;
+            PlotCategory = plotCategory;
             mHistogram = new HistogramInfo();
             mWriteDebug = writeDebug;
             Reset();
@@ -187,7 +198,7 @@ namespace MASIC.Plots
             if (points.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PlotContainer(PlotContainerBase.PlotTypes.XY, new PlotModel(), mWriteDebug);
+                var emptyContainer = new PlotContainer(PlotCategory, new PlotModel(), mWriteDebug);
                 emptyContainer.WriteDebugLog("points.Count == 0 in InitializeOxyPlot for plot " + plotTitle);
                 return emptyContainer;
             }
@@ -204,7 +215,7 @@ namespace MASIC.Plots
             var yVals = (from item in points select item.Y).ToList();
             OxyPlotUtilities.UpdateAxisFormatCodeIfSmallValues(myPlot.Axes[1], yVals, false);
 
-            var plotContainer = new PlotContainer(PlotContainerBase.PlotTypes.XY, myPlot, mWriteDebug)
+            var plotContainer = new PlotContainer(PlotCategory, myPlot, mWriteDebug)
             {
                 FontSizeBase = PlotContainer.DEFAULT_BASE_FONT_SIZE
             };
@@ -271,12 +282,12 @@ namespace MASIC.Plots
             if (points.Count == 0)
             {
                 // Nothing to plot
-                var emptyContainer = new PythonPlotContainerXY();
+                var emptyContainer = new PythonPlotContainerXY(PlotCategory);
                 emptyContainer.WriteDebugLog("points.Count == 0 in InitializePythonPlot for plot " + plotTitle);
                 return emptyContainer;
             }
 
-            var plotContainer = new PythonPlotContainerXY(plotTitle, xAxisLabel, yAxisInfo.Title)
+            var plotContainer = new PythonPlotContainerXY(PlotCategory, plotTitle, xAxisLabel, yAxisInfo.Title)
             {
                 DeleteTempFiles = Options.DeleteTempFiles
             };
@@ -367,7 +378,7 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
-        /// <param name="outputFilePath"></param>
+        /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
         /// <returns></returns>
         public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath)
         {
