@@ -371,7 +371,8 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
-        /// <param name="outputFilePath"></param>
+        /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
+        /// <param name="skipCreatingPngFile">When true, generate the plot in memory but do not actually save to disk</param>
         /// <param name="yAxisMinimum"></param>
         /// <returns>True if success, otherwise false</returns>
         public bool SavePlotFile(
@@ -379,6 +380,7 @@ namespace MASIC.Plots
             string outputDirectory,
             out string outputFilePath,
             bool logarithmicYAxis,
+            bool skipCreatingPngFile = false,
             int yAxisMinimum = 0)
         {
             outputFilePath = string.Empty;
@@ -391,10 +393,11 @@ namespace MASIC.Plots
                 mBoxPlot.YAxisInfo.UseLogarithmicScale = logarithmicYAxis;
                 mBoxPlot.YAxisInfo.StringFormat = "0E0";
 
+                // This call will lead to a call to ComputeBoxStats
                 var boxPlot = InitializePlot(mBoxPlot);
                 RegisterEvents(boxPlot);
 
-                if (boxPlot.SeriesCount == 0)
+                if (boxPlot.SeriesCount == 0 || skipCreatingPngFile)
                 {
                     // We'll treat this as success
                     return true;
@@ -402,10 +405,7 @@ namespace MASIC.Plots
 
                 var pngFile = new FileInfo(Path.Combine(outputDirectory, datasetName + "_" + PlotAbbrev + ".png"));
 
-                if (string.IsNullOrWhiteSpace(outputFilePath))
-                {
-                    outputFilePath = pngFile.FullName;
-                }
+                outputFilePath = pngFile.FullName;
 
                 var success = boxPlot.SaveToPNG(pngFile, 1024, 600, 96);
 

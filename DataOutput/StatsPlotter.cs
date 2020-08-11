@@ -269,7 +269,8 @@ namespace MASIC.DataOutput
                     PlotContainerBase.PlotCategories.ReporterIonIntensityStats,
                     "Reporter ion intensities, all spectra",
                     Path.GetFileNameWithoutExtension(REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX),
-                    "Intensity");
+                    "Intensity",
+                    skipCreatingPngFile: true);
 
                 return success1 && success2;
             }
@@ -293,6 +294,7 @@ namespace MASIC.DataOutput
             string plotAbbreviation,
             string yAxisLabel,
             bool logarithmicYAxis = true,
+            bool skipCreatingPngFile = false,
             int yAxisMinimum = 0)
         {
             boxPlotStats.Clear();
@@ -313,14 +315,19 @@ namespace MASIC.DataOutput
                     boxPlotPlotter.AddData(item.Key, label, item.Value);
                 }
 
-                var success = boxPlotPlotter.SavePlotFile(datasetName, outputDirectory, out var outputFilePath, logarithmicYAxis, yAxisMinimum);
+                var success = boxPlotPlotter.SavePlotFile(
+                    datasetName, outputDirectory, out var outputFilePath,
+                    logarithmicYAxis, skipCreatingPngFile, yAxisMinimum);
 
                 foreach (var item in boxPlotPlotter.BoxPlotStatistics)
                 {
                     boxPlotStats.Add(item.Key, item.Value);
                 }
 
+                if (!skipCreatingPngFile)
+                {
                     AppendPlotFile(plotFiles, outputFilePath, plotCategory, plotDescription);
+                }
 
                 return success;
             }
