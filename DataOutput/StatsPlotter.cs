@@ -247,8 +247,8 @@ namespace MASIC.DataOutput
 
                 var success1 = CreateBoxPlot(
                     mStatsSummarizer.ReporterIonNames,
-                    mStatsSummarizer.NonZeroReporterIons,
-                    mStatsSummarizer.ReporterIonIntensityStats,
+                    mStatsSummarizer.NonZeroReporterIonsHighAbundance,
+                    mStatsSummarizer.ReporterIonIntensityStatsHighAbundanceData,
                     datasetName,
                     outputDirectory,
                     plotFiles,
@@ -260,8 +260,8 @@ namespace MASIC.DataOutput
 
                 var success2 = CreateBoxPlot(
                     mStatsSummarizer.ReporterIonNames,
-                    mStatsSummarizer.NonZeroReporterIonsHighAbundance,
-                    mStatsSummarizer.ReporterIonIntensityStatsHighAbundanceData,
+                    mStatsSummarizer.NonZeroReporterIons,
+                    mStatsSummarizer.ReporterIonIntensityStats,
                     datasetName,
                     outputDirectory,
                     plotFiles,
