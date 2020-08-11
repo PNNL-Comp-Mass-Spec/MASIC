@@ -27,5 +27,10 @@ namespace MASIC.Plots
         {
             PlotFile = plotFile;
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0}: {1}", PlotCategory, PlotFile.Name);
+        }
     }
 }

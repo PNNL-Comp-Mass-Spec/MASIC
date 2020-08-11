@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MASIC.Plots
 {
-    internal class PlotUtilities
+    internal static class PlotUtilities
     {
 
         public static void GetAxisFormatInfo(
