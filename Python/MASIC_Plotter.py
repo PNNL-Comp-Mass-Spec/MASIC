@@ -53,13 +53,15 @@ def process_file(dataFilePath):
 
     if plotOptions['PlotType'] == 'BarChart':
         # Bar chart
+        isPercentages = string_to_bool(plotOptions['Percentages'])
+        
         print('Output:', outputFilePath)
         print()
         print('Plot "' + data.columns[0] + '" vs. "' + data.columns[1])
         print("  {:,}".format(len(data.index)) + ' data points')
         print()
         plot_bar_chart(outputFilePath, data.columns, data[data.columns[0]], data[data.columns[1]],
-                       plotOptions['Title'], plotOptions['BottomRight'], plotOptions['BottomLeft'])
+                       plotOptions['Title'], isPercentages, plotOptions['BottomRight'], plotOptions['BottomLeft'])
         return
 
     if plotOptions['PlotType'] == 'BoxPlot':
@@ -77,6 +79,15 @@ def process_file(dataFilePath):
     print(data.columns)
 
 
+def string_to_bool(value):
+    if value.lower() == 'true':
+         return True
+    elif value.lower() == 'false':
+         return False
+    else:
+         raise ValueError("Cannot convert {} to a bool".format(value))
+
+
 def parse_metadata(plotOption):
     return {m.split('=')[0]: m.split('=')[1] for m in plotOption.split(';')}
 
@@ -84,8 +95,8 @@ def parse_metadata(plotOption):
 def read_file(fpath):
     data = pd.read_csv(fpath, sep='\t', skiprows=2, header=0)
     with open(fpath, 'r') as f:
-        # The first line has the plot title and axis labels, formatted as:
-        # [PlotType=XY;Title=PlotTitle;BottomLeft=Annotation1;BottomRight=Annotation2;]
+        # The first line has the plot type, plot title, etc., formatted as:
+        # [PlotType=XY;Title=PlotTitle;Percentages=True;BottomLeft=Annotation1;BottomRight=Annotation2;]
         plotOptionData = f.readline().split('[')[1].split(']')[0]
         plotOptions = parse_metadata(plotOptionData)
 
@@ -98,9 +109,9 @@ def read_file(fpath):
         return data, plotOptions, columnOptions
 
 
-def set_title_and_labels(ax, baseFontSize, plotType, title,
-                         xDataMin, xDataMax, xAxisLabel,
-                         yAxisLabel, yAxisFormatString,
+def set_title_and_labels(ax, baseFontSize, plotType, title, isPercentages,
+                         xDataMin, xDataMax, 
+                         xAxisLabel, yAxisLabel, yAxisFormatString,
                          r_label, l_label):
 
     MAX_TITLE_LENGTH = 68
@@ -130,7 +141,7 @@ def set_title_and_labels(ax, baseFontSize, plotType, title,
     if plotType == "Histogram" and xmin < 0:
         plt.xlim(xmin=0)
 
-    # When plotting a histogram, fix the Y axis minimum at 0 and add 5% padding above the Y axis maximum
+    # When plotting a histogram or a bar chart of percentages, fix the Y axis minimum at 0 and add 2% padding above the Y axis maximum
     # Otherwise, assure that the Y range isn't too small
     ymin, ymax = plt.ylim()
 
@@ -138,9 +149,14 @@ def set_title_and_labels(ax, baseFontSize, plotType, title,
         ymin = 0
         ymax = ymax * 1.02
     elif plotType == "BarChart":
-        # Bar Chart; always scale the y axis from 0 to 102 (to give a little whitespace above bars that are at 100%)
-        ymin = 0
-        ymax = 102
+        if isPercentages:
+            # Bar Chart of values between 0 and 100
+            # Scale the y axis from 0 to 102 (to give a little whitespace above bars that are at 100%)
+            ymin = 0
+            ymax = 102
+        else:
+            ymin = 0
+            ymax = ymax
 
     plt.ylim(ymin=ymin, ymax=ymax)
 
@@ -209,8 +225,10 @@ def plot_histogram(outputFilePath, columnNames, xValues, yValues, title, r_label
     else:
         yAxisFormatString = '%.2e'
         
-    set_title_and_labels(ax, baseFontSize, "Histogram", title, np.min(xValues), np.max(xValues),
-                         xAxisLabel, yAxisLabel, yAxisFormatString, r_label, '')
+    set_title_and_labels(ax, baseFontSize, "Histogram", title, False,
+                         np.min(xValues), np.max(xValues),
+                         xAxisLabel, yAxisLabel, yAxisFormatString, 
+                         r_label, '')
 
     plt.tight_layout()
 
@@ -222,7 +240,7 @@ def plot_histogram(outputFilePath, columnNames, xValues, yValues, title, r_label
     # plt.show()
 
 
-def generate_bar_chart(columnNames, xLabels, barHeights, title, r_label, l_label):
+def generate_bar_chart(columnNames, xLabels, barHeights, title, isPercentages, r_label, l_label):
     fig = plt.figure(figsize=(8.5333, 5.8333), dpi=120)
     ax = fig.add_subplot(111, facecolor='whitesmoke')
 
@@ -259,8 +277,10 @@ def generate_bar_chart(columnNames, xLabels, barHeights, title, r_label, l_label
 
     yAxisFormatString = '%d'
         
-    set_title_and_labels(ax, baseFontSize, "BarChart", title, 0, 0,
-                         xAxisLabel, yAxisLabel, yAxisFormatString, r_label, l_label)
+    set_title_and_labels(ax, baseFontSize, "BarChart", title, isPercentages,
+                         0, 0,
+                         xAxisLabel, yAxisLabel, yAxisFormatString, 
+                         r_label, l_label)
 
     # Add bar labels (rotated)
     plt.xticks(xPos, xLabels)
@@ -323,8 +343,10 @@ def generate_box_plot(columnNames, xLabels, xData, title, r_label, l_label):
     # Use logarithmic scaling for the y-axis
     ax.set_yscale('log')
 
-    set_title_and_labels(ax, baseFontSize, "BoxPlot", title, 0, 0,
-                         xAxisLabel, yAxisLabel, yAxisFormatString, r_label, l_label)
+    set_title_and_labels(ax, baseFontSize, "BoxPlot", title, False,
+                         0, 0,
+                         xAxisLabel, yAxisLabel, yAxisFormatString, 
+                         r_label, l_label)
 
     # Add bar labels (rotated)
     plt.xticks(xPos, xLabels)
@@ -335,8 +357,8 @@ def generate_box_plot(columnNames, xLabels, xData, title, r_label, l_label):
     return plt
 
 
-def plot_bar_chart(outputFilePath, columnNames, xLabels, barHeights, title, r_label, l_label):
-    barChart = generate_bar_chart(columnNames, xLabels, barHeights, title, r_label, l_label)
+def plot_bar_chart(outputFilePath, columnNames, xLabels, barHeights, title, isPercentages, r_label, l_label):
+    barChart = generate_bar_chart(columnNames, xLabels, barHeights, title, isPercentages, r_label, l_label)
     barChart.savefig(outputFilePath)
     print('Bar chart created')
 

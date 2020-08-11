@@ -103,12 +103,18 @@ namespace MASIC.Plots
         /// <summary>
         /// Get semicolon separated list of plot options
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// Example options:
+        /// PlotType=XY;Title=PlotTitle;Percentages=False;BottomLeft=Annotation1;BottomRight=Annotation2;
+        /// </remarks>
         protected string GetPlotOptions()
         {
+            var percentagesFlag = PlotCategory == PlotCategories.ReporterIonObservationRate ? "True" : "False";
+
             var plotOptions = new List<string> {
-                "PlotType=" + PlotType,
+                "PlotType=" + GetPlotTypeForCategory(PlotCategory),
                 "Title=" + PlotTitle,
+                "Percentages=" + percentagesFlag,
                 "BottomLeft=" + AnnotationBottomLeft,
                 "BottomRight=" + AnnotationBottomRight
             };
