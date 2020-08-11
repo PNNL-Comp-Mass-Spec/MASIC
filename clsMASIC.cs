@@ -984,7 +984,7 @@ namespace MASIC
 
                     dataOutputHandler.OutputFileHandles.CloseScanStats();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Ignore errors here
                 }
@@ -2304,7 +2304,9 @@ namespace MASIC
                     File.Copy(tempPath, statusFilePath, true);
                     File.Delete(tempPath);
                 }
+#pragma warning disable RCS1075
                 catch (Exception)
+#pragma warning restore RCS1075
                 {
                     // Ignore any errors
                 }

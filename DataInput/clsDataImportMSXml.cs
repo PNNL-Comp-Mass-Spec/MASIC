@@ -409,7 +409,9 @@ namespace MASIC.DataInput
                 {
                     xmlReader.CloseFile();
                 }
+#pragma warning disable RCS1075
                 catch (Exception)
+#pragma warning restore RCS1075
                 {
                     // Ignore errors here
                 }
@@ -1692,6 +1694,7 @@ namespace MASIC.DataInput
                     scanInfo.ScanTypeName = "CID-SRM";
                     scanInfo.MRMScanType = MRMScanTypeConstants.SRM;
                 }
+                // ReSharper disable once RedundantIfElseBlock
                 else
                 {
                     // Leave .ScanTypeName unchanged
