@@ -128,7 +128,7 @@ namespace MASIC
                     var targetIndex = GetReporterIonIndexFromMode(value);
                     cboReporterIonMassMode.SelectedIndex = targetIndex;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Ignore errors here
                 }
@@ -150,7 +150,8 @@ namespace MASIC
             existingRowFound = false;
             foreach (DataRow myDataRow in mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows)
             {
-                if (Math.Abs(double.Parse(myDataRow[0].ToString()) - mz) < float.Epsilon & Math.Abs(float.Parse(myDataRow[1].ToString()) - scanOrAcqTimeCenter) < float.Epsilon)
+                if (Math.Abs(double.Parse(myDataRow[0].ToString()) - mz) < float.Epsilon &&
+                    Math.Abs(float.Parse(myDataRow[1].ToString()) - scanOrAcqTimeCenter) < float.Epsilon)
                 {
                     existingRowFound = true;
                     break;
@@ -187,14 +188,9 @@ namespace MASIC
         {
             cboReporterIonMassMode.Items.Add(description);
             var currentIndex = cboReporterIonMassMode.Items.Count - 1;
-            if (mReporterIonIndexToModeMap.ContainsKey(currentIndex))
-            {
-                mReporterIonIndexToModeMap[currentIndex] = reporterIonMassMode;
-            }
-            else
-            {
-                mReporterIonIndexToModeMap.Add(currentIndex, reporterIonMassMode);
-            }
+
+            // Add or update the value for key currentIndex
+            mReporterIonIndexToModeMap[currentIndex] = reporterIonMassMode;
         }
 
         private void AppendToLog(EventLogEntryType messageType, string message)
@@ -270,7 +266,7 @@ namespace MASIC
                 mHeightAdjustForce = 0;
                 mHeightAdjustTime = DateTime.Parse("1900-01-01");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore errors here
             }
@@ -386,7 +382,7 @@ namespace MASIC
 
                 return Convert.ToString(item);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return string.Empty;
             }
@@ -435,7 +431,7 @@ namespace MASIC
             msg.Clear();
             msg.Append("Select a comma or tab delimited file to read custom SIC search values from, ");
             msg.Append("or define them in the Custom SIC Values table below.  If using the file, ");
-            msg.Append("allowed column names are: " + clsCustomSICListReader.GetCustomMZFileColumnHeaders() + ".  ");
+            msg.Append("allowed column names are: ").Append(clsCustomSICListReader.GetCustomMZFileColumnHeaders()).Append(".  ");
             msg.Append("Note: use " +
                 clsCustomSICListReader.CUSTOM_SIC_COLUMN_SCAN_TIME + " and " +
                 clsCustomSICListReader.CUSTOM_SIC_COLUMN_TIME_TOLERANCE + " only when specifying ");
@@ -580,7 +576,7 @@ namespace MASIC
                     defaultMZTolerance = clsUtilities.PPMToMass(defaultMZTolerance, 1000);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 defaultMZTolerance = 0.6;
             }
@@ -589,7 +585,7 @@ namespace MASIC
             {
                 defaultScanOrAcqTimeTolerance = float.Parse(txtCustomSICScanOrAcqTimeTolerance.Text);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 defaultScanOrAcqTimeTolerance = 0;
             }
@@ -1020,7 +1016,7 @@ namespace MASIC
                 var columns = dataLine.Split(columnDelimiters, 5);
                 if (columns.Length < 2)
                 {
-                    rowsSkipped += 1;
+                    rowsSkipped++;
                     continue;
                 }
 
@@ -1084,14 +1080,14 @@ namespace MASIC
 
                         if (existingRowFound)
                         {
-                            rowsAlreadyPresent += 1;
+                            rowsAlreadyPresent++;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     // Skip this row
-                    rowsSkipped += 1;
+                    rowsSkipped++;
                 }
             }
 
@@ -1909,7 +1905,7 @@ namespace MASIC
                 if (parseError)
                     return false;
 
-                if (txtDatabaseConnectionString.TextLength > 0 & txtDatasetInfoQuerySQL.TextLength > 0)
+                if (txtDatabaseConnectionString.TextLength > 0 && txtDatasetInfoQuerySQL.TextLength > 0)
                 {
                     masicOptions.DatabaseConnectionString = txtDatabaseConnectionString.Text;
                     masicOptions.DatasetInfoQuerySql = txtDatasetInfoQuerySQL.Text;
