@@ -5,23 +5,17 @@
   <style>
     table.DataTable {
       margin: 10px 5px 5px 5px;
-      border: 1px solid black;
-      border-collapse: collapse;
+      border: none;
+      border-collapse: separate;
     }
     
-    th.DataHead {
-      border: 1px solid black;
-      padding: 2px 4px 2px 2px; 
-      text-align: left;
-    }
-    
-    td.DataCell {
-      border: 1px solid black;
-      padding: 2px 4px 2px 4px;
+    td.Links {
+      border: none;
+      padding: 2px 4px 2px 20px;
     }
         
-    td.DataCentered {
-      border: 1px solid black;
+    td.LinksCentered {
+      border: none;
       padding: 2px 4px 2px 4px;
       text-align: center;
     }
@@ -31,26 +25,22 @@
 <body>
   <h2>TMT_QCPool_23Jun14</h2>
 
-  <table>
+  <table class="DataTable">
     <tr>
-      <td><a href="TMT_QCPool_23Jun14_PeakAreaHistogram.png"><img src="TMT_QCPool_23Jun14_PeakAreaHistogram.png" width="425" border="0" alt=Peak Areas></a></td>
-      <td><a href="TMT_QCPool_23Jun14_PeakWidthHistogram.png"><img src="TMT_QCPool_23Jun14_PeakWidthHistogram.png" width="425" border="0" alt=Peak Widths></a></td>
+      <td><a href="TMT_QCPool_23Jun14_PeakAreaHistogram.png"><img src="TMT_QCPool_23Jun14_PeakAreaHistogram.png" width="425" border="0" alt="Peak Areas"></a></td>
+      <td><a href="TMT_QCPool_23Jun14_PeakWidthHistogram.png"><img src="TMT_QCPool_23Jun14_PeakWidthHistogram.png" width="425" border="0" alt="Peak Widths"></a></td>
     </tr>
 
     <tr>
-      <td><a href="TMT_QCPool_23Jun14_RepIonObsRateHighAbundance.png"><img src="TMT_QCPool_23Jun14_RepIonObsRateHighAbundance.png" width="425" border="0" alt=Observation rate, excluding low abundance spectra></a></td>
-      <td><a href="TMT_QCPool_23Jun14_RepIonObsRate.png"><img src="TMT_QCPool_23Jun14_RepIonObsRate.png" width="425" border="0" alt=Observation rate, all spectra></a></td>
+      <td><a href="TMT_QCPool_23Jun14_RepIonObsRateHighAbundance.png"><img src="TMT_QCPool_23Jun14_RepIonObsRateHighAbundance.png" width="425" border="0" alt="Observation rate, excluding low abundance spectra"></a></td>
+      <td><a href="TMT_QCPool_23Jun14_RepIonObsRate.png"><img src="TMT_QCPool_23Jun14_RepIonObsRate.png" width="425" border="0" alt="Observation rate, all spectra"></a></td>
     </tr>
 
     <tr>
-      <td><a href="TMT_QCPool_23Jun14_RepIonStatsHighAbundance.png"><img src="TMT_QCPool_23Jun14_RepIonStatsHighAbundance.png" width="425" border="0" alt=Reporter ion intensities, excluding low abundance spectra></a></td>
-      <td><a href="TMT_QCPool_23Jun14_RepIonStats.png"><img src="TMT_QCPool_23Jun14_RepIonStats.png" width="425" border="0" alt=Reporter ion intensities, all spectra></a></td>
+      <td><a href="TMT_QCPool_23Jun14_RepIonStatsHighAbundance.png"><img src="TMT_QCPool_23Jun14_RepIonStatsHighAbundance.png" width="425" border="0" alt="Reporter ion intensities, excluding low abundance spectra"></a></td>
+      <td class="Links">DMS <a href="http://dms2.pnl.gov/dataset/show/TMT_QCPool_23Jun14">Dataset Detail Report</a><br><br><a href="TMT_QCPool_23Jun14_RepIonObsRate.txt">Reporter Ion Observation Rate data file</a><br><a href="TMT_QCPool_23Jun14_RepIonStats.txt">Reporter Ion Intensity Stats data file</a>
     </tr>
 
-    <tr>
-      <td align="center">DMS <a href="http://dms2.pnl.gov/dataset/show/TMT_QCPool_23Jun14">Dataset Detail Report</a></td>
-      <td align="center"><a href="TMT_QCPool_23Jun14_RepIonObsRate.txt">Reporter Ion Observation Rate data file</a><br><a href="TMT_QCPool_23Jun14_RepIonStats.txt">Reporter Ion Intensity Stats data file</a></td>
-    </tr>
 
   </table>
 

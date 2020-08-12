@@ -5,9 +5,9 @@
   <SourceFilePath>QC_Standards_Excerpt.mzXML</SourceFilePath>
   <SourceFileDateTime>3/24/2006 11:42 AM</SourceFileDateTime>
   <SourceFileSizeBytes>940496</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-07-28 05:19:28 PM</MASICProcessingDate>
-  <MASICVersion>3.2.7514.31015</MASICVersion>
-  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-08-11 04:12:42 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7528.29165</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7528.29165</MASICPeakFinderDllVersion>
   <ScanCountTotal>297</ScanCountTotal>
   <SurveyScanCount>27</SurveyScanCount>
   <FragScanCount>270</FragScanCount>
@@ -10072,7 +10072,7 @@
   <CacheEventCount>0</CacheEventCount>
   <UnCacheEventCount>0</UnCacheEventCount>
   <SpectraPoolHitEventCount>447</SpectraPoolHitEventCount>
-  <PeakMemoryUsageMB>40.7</PeakMemoryUsageMB>
+  <PeakMemoryUsageMB>40.6</PeakMemoryUsageMB>
   <TotalProcessingTimeSeconds>0.4</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>

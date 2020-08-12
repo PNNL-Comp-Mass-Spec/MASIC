@@ -5,9 +5,9 @@
   <SourceFilePath>Example_Orbitrap_Data.mzXML</SourceFilePath>
   <SourceFileDateTime>4/1/2017 5:20 PM</SourceFileDateTime>
   <SourceFileSizeBytes>79522804</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-07-28 05:21:27 PM</MASICProcessingDate>
-  <MASICVersion>3.2.7514.31015</MASICVersion>
-  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-08-11 04:15:08 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7528.29165</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7528.29165</MASICPeakFinderDllVersion>
   <ScanCountTotal>1001</ScanCountTotal>
   <SurveyScanCount>143</SurveyScanCount>
   <FragScanCount>858</FragScanCount>
@@ -31643,8 +31643,8 @@
   <CacheEventCount>1</CacheEventCount>
   <UnCacheEventCount>1</UnCacheEventCount>
   <SpectraPoolHitEventCount>2499</SpectraPoolHitEventCount>
-  <PeakMemoryUsageMB>220.3</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>3.9</TotalProcessingTimeSeconds>
+  <PeakMemoryUsageMB>199.1</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>3.5</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>

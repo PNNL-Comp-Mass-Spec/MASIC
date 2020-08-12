@@ -5,23 +5,17 @@
   <style>
     table.DataTable {
       margin: 10px 5px 5px 5px;
-      border: 1px solid black;
-      border-collapse: collapse;
+      border: none;
+      border-collapse: separate;
     }
     
-    th.DataHead {
-      border: 1px solid black;
-      padding: 2px 4px 2px 2px; 
-      text-align: left;
-    }
-    
-    td.DataCell {
-      border: 1px solid black;
-      padding: 2px 4px 2px 4px;
+    td.Links {
+      border: none;
+      padding: 2px 4px 2px 20px;
     }
         
-    td.DataCentered {
-      border: 1px solid black;
+    td.LinksCentered {
+      border: none;
       padding: 2px 4px 2px 4px;
       text-align: center;
     }
@@ -31,15 +25,15 @@
 <body>
   <h2>QC_Standards_Excerpt</h2>
 
-  <table>
+  <table class="DataTable">
     <tr>
-      <td><a href="QC_Standards_Excerpt_PeakAreaHistogram.png"><img src="QC_Standards_Excerpt_PeakAreaHistogram.png" width="425" border="0" alt=Peak Areas></a></td>
-      <td><a href="QC_Standards_Excerpt_PeakWidthHistogram.png"><img src="QC_Standards_Excerpt_PeakWidthHistogram.png" width="425" border="0" alt=Peak Widths></a></td>
+      <td><a href="QC_Standards_Excerpt_PeakAreaHistogram.png"><img src="QC_Standards_Excerpt_PeakAreaHistogram.png" width="425" border="0" alt="Peak Areas"></a></td>
+      <td><a href="QC_Standards_Excerpt_PeakWidthHistogram.png"><img src="QC_Standards_Excerpt_PeakWidthHistogram.png" width="425" border="0" alt="Peak Widths"></a></td>
     </tr>
 
     <tr>
-      <td align="center">DMS <a href="http://dms2.pnl.gov/dataset/show/QC_Standards_Excerpt">Dataset Detail Report</a></td>
-      <td>&nbsp;</td>
+      <td class="LinksCentered">DMS <a href="http://dms2.pnl.gov/dataset/show/QC_Standards_Excerpt">Dataset Detail Report</a></td>
+      <td class="Links"></td>
     </tr>
 
   </table>

@@ -5,9 +5,9 @@
   <SourceFilePath>QC18PepsR1_4Apr18.raw</SourceFilePath>
   <SourceFileDateTime>4/26/2019 6:30 PM</SourceFileDateTime>
   <SourceFileSizeBytes>14944896</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-07-28 05:20:41 PM</MASICProcessingDate>
-  <MASICVersion>3.2.7514.31015</MASICVersion>
-  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-08-11 04:13:46 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7528.29165</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7528.29165</MASICPeakFinderDllVersion>
   <ScanCountTotal>60897</ScanCountTotal>
   <SurveyScanCount>1</SurveyScanCount>
   <FragScanCount>60896</FragScanCount>
@@ -2598,8 +2598,8 @@
   <CacheEventCount>60896</CacheEventCount>
   <UnCacheEventCount>437344</UnCacheEventCount>
   <SpectraPoolHitEventCount>0</SpectraPoolHitEventCount>
-  <PeakMemoryUsageMB>165.4</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>31.9</TotalProcessingTimeSeconds>
+  <PeakMemoryUsageMB>165.6</PeakMemoryUsageMB>
+  <TotalProcessingTimeSeconds>25.9</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>

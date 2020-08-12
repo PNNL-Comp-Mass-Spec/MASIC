@@ -5,9 +5,9 @@
   <SourceFilePath>QC_Shew_18_02_Excerpt.mzML</SourceFilePath>
   <SourceFileDateTime>5/1/2019 7:24 PM</SourceFileDateTime>
   <SourceFileSizeBytes>7345105</SourceFileSizeBytes>
-  <MASICProcessingDate>2020-07-28 05:22:01 PM</MASICProcessingDate>
-  <MASICVersion>3.2.7514.31015</MASICVersion>
-  <MASICPeakFinderDllVersion>2.2.7509.31353</MASICPeakFinderDllVersion>
+  <MASICProcessingDate>2020-08-11 04:15:38 PM</MASICProcessingDate>
+  <MASICVersion>3.2.7528.29165</MASICVersion>
+  <MASICPeakFinderDllVersion>2.2.7528.29165</MASICPeakFinderDllVersion>
   <ScanCountTotal>997</ScanCountTotal>
   <SurveyScanCount>79</SurveyScanCount>
   <FragScanCount>918</FragScanCount>
@@ -34049,7 +34049,7 @@
   <UnCacheEventCount>0</UnCacheEventCount>
   <SpectraPoolHitEventCount>2742</SpectraPoolHitEventCount>
   <PeakMemoryUsageMB>55.4</PeakMemoryUsageMB>
-  <TotalProcessingTimeSeconds>2.3</TotalProcessingTimeSeconds>
+  <TotalProcessingTimeSeconds>2.0</TotalProcessingTimeSeconds>
  </ProcessingStats>
  <ProcessingComplete>True</ProcessingComplete>
 </SICData>
