@@ -83,9 +83,7 @@ namespace MASIC.Plots
 
                         writer.WriteLine("{0}\t{1}", XAxisLabels[i], intensityValues);
                     }
-
                 }
-
             }
             catch (Exception ex)
             {
@@ -115,7 +113,6 @@ namespace MASIC.Plots
                 OnErrorEvent("Error creating box plot with Python using " + exportFile.Name, ex);
                 return false;
             }
-
         }
 
         public void ClearData()

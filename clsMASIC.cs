@@ -880,7 +880,6 @@ namespace MASIC
             {
                 LogErrors("CreateExampleParameterFile", "Error creating an example parameter file", ex, eMasicErrorCodes.OutputFileWriteError);
             }
-
         }
 
         private bool CreatePlots(string inputFilePath, string outputDirectoryPath)
@@ -1136,7 +1135,6 @@ namespace MASIC
                 LogErrors("FindSICsAndWriteOutput", "Error saving results to: " + outputDirectoryPath, ex, eMasicErrorCodes.OutputFileWriteError);
                 return false;
             }
-
         }
 
         private bool FindSICsWork(
@@ -1151,7 +1149,6 @@ namespace MASIC
             clsXMLResultsWriter xmlResultsWriter,
             out int similarParentIonUpdateCount)
         {
-
             var inputFileName = Path.GetFileName(inputFilePathFull);
             similarParentIonUpdateCount = 0;
 
@@ -1814,7 +1811,6 @@ namespace MASIC
                         {
                             success = ProcessInstrumentDataFile(inputFilePath, outputDirectoryPath, dataOutputHandler, out existingResultsFound);
                         }
-
                     }
                 }
             }
@@ -1973,7 +1969,6 @@ namespace MASIC
                     var scanTracking = new clsScanTracking(Options.ReporterIons, mMASICPeakFinder);
                     RegisterEvents(scanTracking);
 
-
                     // ---------------------------------------------------------
                     // Load the mass spectral data
                     // ---------------------------------------------------------
@@ -2015,7 +2010,6 @@ namespace MASIC
                         datasetFileInfo, parentIonProcessor, dataImporterBase);
 
                     return success;
-
                 }
             }
             catch (Exception ex)
@@ -2023,7 +2017,6 @@ namespace MASIC
                 LogErrors("ProcessInstrumentDataFile", "Error processing", ex, eMasicErrorCodes.InputFileDataReadError);
                 return false;
             }
-
         }
 
         private void RegisterDataImportEvents(clsDataImport dataImporter)
