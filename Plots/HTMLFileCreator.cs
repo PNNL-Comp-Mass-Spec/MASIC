@@ -133,23 +133,24 @@ namespace MASIC.Plots
             writer.WriteLine("  <style>");
             writer.WriteLine("    table.DataTable {");
             writer.WriteLine("      margin: 10px 5px 5px 5px;");
-            writer.WriteLine("      border: 1px solid black;");
-            writer.WriteLine("      border-collapse: collapse;");
+
+            // Option 1: tight, with a border
+            // writer.WriteLine("      border: 1px solid black;");
+            // writer.WriteLine("      border-collapse: collapse;");
+
+            // Option 2: no border, normal spacing
+            writer.WriteLine("      border: none;");
+            writer.WriteLine("      border-collapse: separate;");
+
             writer.WriteLine("    }");
             writer.WriteLine("    ");
-            writer.WriteLine("    th.DataHead {");
-            writer.WriteLine("      border: 1px solid black;");
-            writer.WriteLine("      padding: 2px 4px 2px 2px; ");
-            writer.WriteLine("      text-align: left;");
-            writer.WriteLine("    }");
-            writer.WriteLine("    ");
-            writer.WriteLine("    td.DataCell {");
-            writer.WriteLine("      border: 1px solid black;");
-            writer.WriteLine("      padding: 2px 4px 2px 4px;");
+            writer.WriteLine("    td.Links {");
+            writer.WriteLine("      border: none;");
+            writer.WriteLine("      padding: 2px 4px 2px 20px;");
             writer.WriteLine("    }");
             writer.WriteLine("        ");
-            writer.WriteLine("    td.DataCentered {");
-            writer.WriteLine("      border: 1px solid black;");
+            writer.WriteLine("    td.LinksCentered {");
+            writer.WriteLine("      border: none;");
             writer.WriteLine("      padding: 2px 4px 2px 4px;");
             writer.WriteLine("      text-align: center;");
             writer.WriteLine("    }");
@@ -159,7 +160,7 @@ namespace MASIC.Plots
             writer.WriteLine("<body>");
             writer.WriteLine("  <h2>" + datasetName + "</h2>");
             writer.WriteLine();
-            writer.WriteLine("  <table>");
+            writer.WriteLine("  <table class=\"DataTable\">");
         }
 
         private void AppendDatasetInfo(TextWriter writer, string datasetName, string outputDirectoryPath)
