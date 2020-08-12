@@ -80,8 +80,18 @@ namespace MASIC.Plots
                     AppendPlots(writer, PlotContainerBase.PlotCategories.ReporterIonObservationRate);
 
                     // Add the reporter ion intensity stats box plot and histogram of observation count by channel (if defined)
-                    // Append dataset info
-                    AppendDatasetInfo(writer, DatasetName, outputDirectoryPath);
+                    var intensityStatPlotCount = AppendPlots(
+                        writer,
+                        PlotContainerBase.PlotCategories.ReporterIonIntensityStats,
+                        DatasetName,
+                        outputDirectoryPath);
+
+                    // If this dataset has reporter ions, the ReporterIonIntensityStats row will include a plot on the left and a link to the dataset on the right
+                    // Otherwise, if there are no reporter ions, we need to append another row with a link to DMS
+                    if (intensityStatPlotCount == 0)
+                    {
+                        AppendDatasetInfo(writer, DatasetName, outputDirectoryPath);
+                    }
 
                     // Add </table> and HTML footers
                     AppendHTMLFooter(writer);
@@ -97,20 +107,32 @@ namespace MASIC.Plots
 
         }
 
-        private void AppendPlots(TextWriter writer, params PlotContainerBase.PlotCategories[] plotCategories)
+        /// <summary>
+        /// Append plots of the given type
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="plotCategory"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="datasetName"></param>
+        /// <returns>Number of plots appended</returns>
+        private int AppendPlots(
+            TextWriter writer,
+            PlotContainerBase.PlotCategories plotCategory,
+            string datasetName = "",
+            string outputDirectoryPath = "")
         {
             var matchingPlotFiles = new List<PlotFileInfo>();
 
             foreach (var plotFile in PlotFiles)
             {
-                if (!plotCategories.Contains(plotFile.PlotCategory))
+                if (plotFile.PlotCategory != plotCategory)
                     continue;
 
                 matchingPlotFiles.Add(plotFile);
             }
 
             if (matchingPlotFiles.Count == 0)
-                return;
+                return 0;
 
             writer.WriteLine("    <tr>");
 
@@ -119,8 +141,26 @@ namespace MASIC.Plots
                 writer.WriteLine("      <td>" + GeneratePlotHTML(plotFile, 425) + "</td>");
             }
 
+            if (plotCategory == PlotContainerBase.PlotCategories.ReporterIonIntensityStats)
+            {
+                var datasetDetailReportLink = GetDatasetDetailReportLink(datasetName);
+                var reporterIonDataFileLinks = GetReporterIonDataFileLinks(datasetName, outputDirectoryPath);
+
+                writer.Write("      <td class=\"Links\">" + datasetDetailReportLink);
+                if (reporterIonDataFileLinks.Length > 0)
+                {
+                    writer.WriteLine("<br><br>" + reporterIonDataFileLinks);
+                }
+                else
+                {
+                    writer.WriteLine();
+                }
+            }
+
             writer.WriteLine("    </tr>");
             writer.WriteLine();
+
+            return matchingPlotFiles.Count;
         }
 
         private void AppendHTMLHeader(TextWriter writer, string datasetName)
@@ -165,35 +205,12 @@ namespace MASIC.Plots
 
         private void AppendDatasetInfo(TextWriter writer, string datasetName, string outputDirectoryPath)
         {
+            var datasetDetailReportLink = GetDatasetDetailReportLink(datasetName);
+            var reporterIonDataFileLinks = GetReporterIonDataFileLinks(datasetName, outputDirectoryPath);
+
             writer.WriteLine("    <tr>");
-            writer.WriteLine("      <td align=\"center\">DMS <a href=\"http://dms2.pnl.gov/dataset/show/" + datasetName + "\">Dataset Detail Report</a></td>");
-
-            // Link to the tab-delimited text files
-            var obsRateURL = GetFileUrlIfExists(
-                outputDirectoryPath,
-                datasetName + "_" + StatsPlotter.REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX,
-                "Reporter Ion Observation Rate data file");
-
-            var intensityStatsURL = GetFileUrlIfExists(
-                outputDirectoryPath,
-                datasetName + "_" + StatsPlotter.REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX,
-                "Reporter Ion Intensity Stats data file");
-
-            if (obsRateURL.Length > 0 || intensityStatsURL.Length > 0)
-            {
-                string breakTag;
-                if (obsRateURL.Length > 0 && intensityStatsURL.Length > 0)
-                    breakTag = "<br>";
-                else
-                    breakTag = string.Empty;
-
-                writer.WriteLine("      <td align=\"center\">{0}{1}{2}</td>", obsRateURL, breakTag, intensityStatsURL);
-            }
-            else
-            {
-                writer.WriteLine("      <td>&nbsp;</td>");
-            }
-
+            writer.WriteLine("      <td class=\"LinksCentered\">{0}</td>", datasetDetailReportLink);
+            writer.WriteLine("      <td class=\"Links\">{0}</td>", reporterIonDataFileLinks);
             writer.WriteLine("    </tr>");
         }
 
@@ -211,11 +228,11 @@ namespace MASIC.Plots
         {
             if (plotFile.PlotFile == null)
             {
-                return "&nbsp;";
+                return string.Empty;
             }
 
             var hyperlink = string.Format(
-                "<a href=\"{0}\"><img src=\"{0}\" width=\"{1}\" border=\"0\" alt={2}></a>",
+                "<a href=\"{0}\"><img src=\"{0}\" width=\"{1}\" border=\"0\" alt=\"{2}\"></a>",
                 plotFile.PlotFile.Name,
                 widthPixels,
                 plotFile.FileDescription);
@@ -223,6 +240,10 @@ namespace MASIC.Plots
             return hyperlink;
         }
 
+        private string GetDatasetDetailReportLink(string datasetName)
+        {
+            return string.Format("DMS <a href=\"http://dms2.pnl.gov/dataset/show/{0}\">Dataset Detail Report</a>", datasetName);
+        }
 
         private string GetFileUrlIfExists(string outputDirectoryPath, string fileName, string fileDescription)
         {
@@ -231,6 +252,32 @@ namespace MASIC.Plots
             return dataFile.Exists ?
                        string.Format("<a href=\"{0}\">{1}</a>", dataFile.Name, fileDescription) :
                        string.Empty;
+        }
+
+        private string GetReporterIonDataFileLinks(string datasetName, string outputDirectoryPath)
+        {
+            // Link to the tab-delimited text files
+            var obsRateURL = GetFileUrlIfExists(
+                outputDirectoryPath,
+                datasetName + "_" + StatsPlotter.REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX,
+                "Reporter Ion Observation Rate data file");
+
+            var intensityStatsURL = GetFileUrlIfExists(
+                outputDirectoryPath,
+                datasetName + "_" + StatsPlotter.REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX,
+                "Reporter Ion Intensity Stats data file");
+
+
+            if (obsRateURL.Length == 0 && intensityStatsURL.Length == 0)
+                return string.Empty;
+
+            string breakTag;
+            if (obsRateURL.Length > 0 && intensityStatsURL.Length > 0)
+                breakTag = "<br>";
+            else
+                breakTag = string.Empty;
+
+            return obsRateURL + breakTag + intensityStatsURL;
         }
     }
 }
