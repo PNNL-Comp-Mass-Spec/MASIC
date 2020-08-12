@@ -3379,7 +3379,7 @@ namespace MASICPeakFinder
                 ButterworthSamplingFrequency = 0.25,
                 ButterworthSamplingFrequencyDoubledForSIMData = true,
 
-                UseSavitzkyGolaySmooth = true,
+                UseSavitzkyGolaySmooth = false,
                 SavitzkyGolayFilterOrder = 0,                               // Moving average filter if 0, Savitzky Golay filter if 2, 4, 6, etc.
 
                 // Set the default Mass Spectra noise threshold options
