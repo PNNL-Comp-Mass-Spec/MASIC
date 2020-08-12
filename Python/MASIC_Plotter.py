@@ -315,7 +315,14 @@ def generate_box_plot(columnNames, xLabels, xData, title, r_label, l_label):
     boxData = []
 
     for intensityList in xData:
-        intensities = [float(i) for i in intensityList.split(',')]
+        if isinstance(intensityList, str):
+            # List of floats; split on commas
+            # This also works if the column has a single float or single integer
+            intensities = [float(i) for i in intensityList.split(',')]
+        else:
+            # This line had an empty second column in the input ifle
+            intensities = []
+
         boxData.append(intensities)
 
     boxprops = dict(linestyle='-', linewidth=1.5, color='black')
