@@ -409,9 +409,7 @@ namespace MASIC.DataInput
                 {
                     xmlReader.CloseFile();
                 }
-#pragma warning disable RCS1075
                 catch (Exception)
-#pragma warning restore RCS1075
                 {
                     // Ignore errors here
                 }

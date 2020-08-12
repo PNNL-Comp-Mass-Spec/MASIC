@@ -140,6 +140,7 @@
     <Compile Include="DatasetStats\DatasetSummaryStats.cs" />
     <Compile Include="DatasetStats\ScanStatsEntry.cs" />
     <Compile Include="DatasetStats\SummaryStatDetails.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Options\BinningOptions.cs" />
     <Compile Include="Options\MASICOptions.cs" />
     <Compile Include="Options\PlotOptions.cs" />

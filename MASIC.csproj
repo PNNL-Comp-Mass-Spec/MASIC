@@ -155,6 +155,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="GlobalSuppressionsGUI.cs" />
     <Compile Include="Options\BinningOptions.cs" />
     <Compile Include="Options\MASICOptions.cs" />
     <Compile Include="Options\PlotOptions.cs" />
