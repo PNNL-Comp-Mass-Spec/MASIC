@@ -52,6 +52,13 @@ cd MRM_Example_mzML_ChromAsSpectra
 call ProcessData.bat
 cd ..
 
+cd QEHFX01_PreMix_QC
+call ProcessData.bat
+cd ..
+
+cd QExactHF03_PreMix_QC
+call ProcessData.bat
+cd ..
 
 cd Orbitrap_Example
 call ProcessData.bat
