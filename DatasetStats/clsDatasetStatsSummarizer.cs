@@ -98,7 +98,7 @@ namespace MASIC.DatasetStats
         /// </summary>
         public clsDatasetStatsSummarizer()
         {
-            FileDate = "May 15, 2020";
+            FileDate = "August 7, 2020";
 
             ErrorMessage = string.Empty;
 
@@ -575,7 +575,7 @@ namespace MASIC.DatasetStats
             string scanStatsFilePath,
             List<ScanStatsEntry> scanStats)
         {
-            var datasetID = 0;
+            const int DATASET_ID = 0;
 
             try
             {
@@ -614,7 +614,7 @@ namespace MASIC.DatasetStats
                         dataValues.Clear();
 
                         // Dataset ID
-                        dataValues.Add(datasetID.ToString());
+                        dataValues.Add(DATASET_ID.ToString());
 
                         // Scan number
                         dataValues.Add(scanStatsEntry.ScanNumber.ToString());
