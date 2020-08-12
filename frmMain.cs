@@ -908,6 +908,9 @@ namespace MASIC
             }
             catch (Exception ex)
             {
+                ConsoleMsgUtils.ShowWarning("Error saving settings to file: " + filePath);
+                ConsoleMsgUtils.ShowWarning(ex.Message);
+
                 MessageBox.Show("Error saving settings to file: " + filePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
