@@ -52,13 +52,7 @@ namespace MASIC.Plots
             /// Box and whiskers plot of reporter ion intensities
             /// </summary>
             /// /// <remarks>Type PlotTypes.BoxPlot</remarks>
-            ReporterIonIntensityStats = 3,
-
-            /// <summary>
-            /// Bar chart of reporter ion observation counts
-            /// </summary>
-            /// <remarks>Type PlotTypes.BarChart</remarks>
-            ReporterIonObservationCount = 4
+            ReporterIonIntensityStats = 3
         }
 
         protected StreamWriter mLogWriter;
@@ -131,7 +125,6 @@ namespace MASIC.Plots
                     return PlotTypes.XY;
 
                 case PlotCategories.ReporterIonObservationRate:
-                case PlotCategories.ReporterIonObservationCount:
                     return PlotTypes.BarChart;
 
                 case PlotCategories.ReporterIonIntensityStats:

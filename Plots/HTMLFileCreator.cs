@@ -80,8 +80,6 @@ namespace MASIC.Plots
                     AppendPlots(writer, PlotContainerBase.PlotCategories.ReporterIonObservationRate);
 
                     // Add the reporter ion intensity stats box plot and histogram of observation count by channel (if defined)
-                    AppendPlots(writer, PlotContainerBase.PlotCategories.ReporterIonIntensityStats, PlotContainerBase.PlotCategories.ReporterIonObservationCount);
-
                     // Append dataset info
                     AppendDatasetInfo(writer, DatasetName, outputDirectoryPath);
 
