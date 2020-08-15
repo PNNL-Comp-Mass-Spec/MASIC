@@ -121,7 +121,7 @@ namespace MASIC.DataOutput
                     {
                         xmlDoc.Load(filePathToCheck);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         // Invalid XML file; do not continue
                         return false;
@@ -129,7 +129,7 @@ namespace MASIC.DataOutput
 
                     // If we get here, the file opened successfully
                     var rootElement = xmlDoc.DocumentElement;
-                    if (rootElement != null && rootElement.Name == "SICData")
+                    if (rootElement?.Name == "SICData")
                     {
                         // See if the ProcessingComplete node has a value of True
                         var matchingNodeList = rootElement.GetElementsByTagName("ProcessingComplete");
@@ -416,7 +416,7 @@ namespace MASIC.DataOutput
                         var sicOptions = masicOptions.SICOptions;
 
                         // Check if the processing options match
-                        if (clsUtilities.ValuesMatch(sicOptionsCompare.SICTolerance, sicOptions.SICTolerance, 3) &&
+                        validExistingResultsFound = clsUtilities.ValuesMatch(sicOptionsCompare.SICTolerance, sicOptions.SICTolerance, 3) &&
                             sicOptionsCompare.SICToleranceIsPPM == sicOptions.SICToleranceIsPPM &&
                             sicOptionsCompare.RefineReportedParentIonMZ == sicOptions.RefineReportedParentIonMZ &&
                             sicOptionsCompare.ScanRangeStart == sicOptions.ScanRangeStart &&
@@ -454,52 +454,32 @@ namespace MASIC.DataOutput
                             clsUtilities.ValuesMatch(sicOptionsCompare.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio, sicOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio) &&
                             clsUtilities.ValuesMatch(sicOptionsCompare.SimilarIonMZToleranceHalfWidth, sicOptions.SimilarIonMZToleranceHalfWidth) &&
                             clsUtilities.ValuesMatch(sicOptionsCompare.SimilarIonToleranceHalfWidthMinutes, sicOptions.SimilarIonToleranceHalfWidthMinutes) &&
-                            clsUtilities.ValuesMatch(sicOptionsCompare.SpectrumSimilarityMinimum, sicOptions.SpectrumSimilarityMinimum))
-                        {
-                            validExistingResultsFound = true;
-                        }
-                        else
-                        {
-                            validExistingResultsFound = false;
-                        }
+                            clsUtilities.ValuesMatch(sicOptionsCompare.SpectrumSimilarityMinimum, sicOptions.SpectrumSimilarityMinimum);
 
                         if (validExistingResultsFound)
                         {
                             // Check if the binning options match
                             var binningOptions = masicOptions.BinningOptions;
 
-                            if (clsUtilities.ValuesMatch(binningOptionsCompare.StartX, binningOptions.StartX) &&
+                            validExistingResultsFound = clsUtilities.ValuesMatch(binningOptionsCompare.StartX, binningOptions.StartX) &&
                                 clsUtilities.ValuesMatch(binningOptionsCompare.EndX, binningOptions.EndX) &&
                                 clsUtilities.ValuesMatch(binningOptionsCompare.BinSize, binningOptions.BinSize) &&
                                 binningOptionsCompare.MaximumBinCount == binningOptions.MaximumBinCount &&
                                 clsUtilities.ValuesMatch(binningOptionsCompare.IntensityPrecisionPercent, binningOptions.IntensityPrecisionPercent) &&
                                 binningOptionsCompare.Normalize == binningOptions.Normalize &&
-                                binningOptionsCompare.SumAllIntensitiesForBin == binningOptions.SumAllIntensitiesForBin)
-                            {
-                                validExistingResultsFound = true;
-                            }
-                            else
-                            {
-                                validExistingResultsFound = false;
-                            }
+                                binningOptionsCompare.SumAllIntensitiesForBin == binningOptions.SumAllIntensitiesForBin;
                         }
 
                         if (validExistingResultsFound)
                         {
                             // Check if the Custom MZ options match
-                            if ((customSICListCompare.RawTextMZList ?? "") == (masicOptions.CustomSICList.RawTextMZList ?? "") &&
+                            validExistingResultsFound =
+                                (customSICListCompare.RawTextMZList ?? "") == (masicOptions.CustomSICList.RawTextMZList ?? "") &&
                                 (customSICListCompare.RawTextMZToleranceDaList ?? "") == (masicOptions.CustomSICList.RawTextMZToleranceDaList ?? "") &&
                                 (customSICListCompare.RawTextScanOrAcqTimeCenterList ?? "") == (masicOptions.CustomSICList.RawTextScanOrAcqTimeCenterList ?? "") &&
                                 (customSICListCompare.RawTextScanOrAcqTimeToleranceList ?? "") == (masicOptions.CustomSICList.RawTextScanOrAcqTimeToleranceList ?? "") &&
                                 clsUtilities.ValuesMatch(customSICListCompare.ScanOrAcqTimeTolerance, masicOptions.CustomSICList.ScanOrAcqTimeTolerance) &&
-                                customSICListCompare.ScanToleranceType == masicOptions.CustomSICList.ScanToleranceType)
-                            {
-                                validExistingResultsFound = true;
-                            }
-                            else
-                            {
-                                validExistingResultsFound = false;
-                            }
+                                customSICListCompare.ScanToleranceType == masicOptions.CustomSICList.ScanToleranceType;
                         }
 
                         if (validExistingResultsFound)
@@ -690,7 +670,7 @@ namespace MASIC.DataOutput
                     };
                     break;
                 case eOutputFileTypeConstants.ScanStatsExtendedFlatFile:
-                    if (!(ExtendedStatsWriter.ExtendedHeaderNameCount > 0))
+                    if (ExtendedStatsWriter.ExtendedHeaderNameCount <= 0)
                     {
                         // Lookup extended stats values that are constants for all scans
                         // The following will also remove the constant header values from htExtendedHeaderInfo
@@ -886,7 +866,7 @@ namespace MASIC.DataOutput
                 for (var fragScanIndex = 0; fragScanIndex < scanList.ParentIons[parentIonIndex].FragScanIndices.Count; fragScanIndex++)
                 {
                     // "Dataset  ParentIonIndex  FragScanIndex  ParentIonMZ
-                    var prefix = string.Format("{0}\t{1}\t{2}\t{3}", 
+                    var prefix = string.Format("{0}\t{1}\t{2}\t{3}",
                         sicOptions.DatasetID,
                         parentIonIndex,
                         fragScanIndex,

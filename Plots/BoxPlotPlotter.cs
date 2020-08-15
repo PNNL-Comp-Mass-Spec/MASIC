@@ -10,9 +10,8 @@ using PRISM;
 
 namespace MASIC.Plots
 {
-    class BoxPlotPlotter : EventNotifier
+    internal class BoxPlotPlotter : EventNotifier
     {
-
         #region "Member variables"
 
         private readonly BoxPlotInfo mBoxPlot;
@@ -79,7 +78,6 @@ namespace MASIC.Plots
 
         private void AddOxyPlotSeries(PlotModel myPlot, IEnumerable<double> points, out BoxPlotStats boxPlotStats)
         {
-
             var series = new BoxPlotSeries
             {
                 Fill = OxyColor.FromRgb(0x1e, 0xb4, 0xda),
@@ -109,7 +107,6 @@ namespace MASIC.Plots
 
         private BoxPlotStats ComputeBoxStats(IEnumerable<double> points)
         {
-
             var boxPlotStats = new BoxPlotStats();
 
             // Assure that the data is sorted
@@ -171,13 +168,11 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="boxPlotInfo"></param>
         /// <param name="pointsByBox">List of lists; each item is the list of values for the given box</param>
-        /// <param name="maxIntensity"></param>
         /// <returns>Labels for the bars</returns>
         private Dictionary<int, string> GetDataToPlot(
             BoxPlotInfo boxPlotInfo,
             out List<List<double>> pointsByBox)
         {
-
             // Instantiate the list to track the data points
             pointsByBox = new List<List<double>>();
             var xAxisLabels = new Dictionary<int, string>();
@@ -230,16 +225,14 @@ namespace MASIC.Plots
         /// Initialize an OxyPlot plot container for a histogram
         /// </summary>
         /// <param name="boxPlotInfo">Data to display</param>
-        /// <param name="plotTitle">Title of the plot</param>
-        /// <param name="xAxisLabel"></param>
-        /// <param name="yAxisInfo"></param>
+        /// <param name="xAxisLabels"></param>
+        /// <param name="pointsByBox"></param>
         /// <returns>OxyPlot PlotContainer</returns>
         private PlotContainer InitializeOxyPlot(
             BoxPlotInfo boxPlotInfo,
             Dictionary<int, string> xAxisLabels,
             IReadOnlyList<List<double>> pointsByBox)
         {
-
             if (pointsByBox.Count == 0)
             {
                 // Nothing to plot
@@ -307,15 +300,14 @@ namespace MASIC.Plots
         /// Initialize a Python plot container for a histogram
         /// </summary>
         /// <param name="boxPlotInfo">Data to display</param>
-        /// <param name="plotTitle">Title of the plot</param>
-        /// <param name="yAxisInfo"></param>
+        /// <param name="xAxisLabels">Title of the plot</param>
+        /// <param name="pointsByBox"></param>
         /// <returns>OxyPlot PlotContainer</returns>
         private PythonPlotContainer InitializePythonPlot(
             BoxPlotInfo boxPlotInfo,
             Dictionary<int, string> xAxisLabels,
             List<List<double>> pointsByBox)
         {
-
             if (pointsByBox.Count == 0)
             {
                 // Nothing to plot
@@ -372,6 +364,7 @@ namespace MASIC.Plots
         /// <param name="datasetName"></param>
         /// <param name="outputDirectory"></param>
         /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
+        /// <param name="logarithmicYAxis">When true, use logarithmic scaling for the y axis</param>
         /// <param name="skipCreatingPngFile">When true, generate the plot in memory but do not actually save to disk</param>
         /// <param name="yAxisMinimum"></param>
         /// <returns>True if success, otherwise false</returns>
@@ -416,7 +409,6 @@ namespace MASIC.Plots
                 OnErrorEvent("Error in BoxPlotPlotter.SavePlotFile", ex);
                 return false;
             }
-
         }
 
         private class BoxPlotInfo

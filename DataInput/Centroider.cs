@@ -31,6 +31,7 @@ namespace MASIC
         /// <param name="scanInfo"></param>
         /// <param name="masses"></param>
         /// <param name="intensities"></param>
+        /// <param name="massResolution"></param>
         /// <param name="centroidedPrecursorIonsMz"></param>
         /// <param name="centroidedPrecursorIonsIntensity"></param>
         /// <returns></returns>
@@ -74,7 +75,7 @@ namespace MASIC
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 centroidedPrecursorIonsMz = new double[1];
                 centroidedPrecursorIonsIntensity = new double[1];

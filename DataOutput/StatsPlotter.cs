@@ -132,7 +132,6 @@ namespace MASIC.DataOutput
                     "Peak Area (Log 10)",
                     "Count");
 
-
                 var peakWidthSuccess = CreateHistogram(
                     mStatsSummarizer.PeakWidthHistogram,
                     datasetName,
@@ -202,7 +201,6 @@ namespace MASIC.DataOutput
             try
             {
                 var highAbundanceTitle = string.Format("Reporter Ion Observation Rate (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
-                var allSpectraTitle = "Reporter Ion Observation Rate";
 
                 var success1 = CreateBarChart(
                     mStatsSummarizer.ReporterIonNames,
@@ -223,7 +221,7 @@ namespace MASIC.DataOutput
                     datasetName,
                     outputDirectory,
                     plotFiles,
-                    allSpectraTitle,
+                    "Reporter Ion Observation Rate",
                     PlotContainerBase.PlotCategories.ReporterIonObservationRate,
                     "Observation rate, all spectra",
                     Path.GetFileNameWithoutExtension(REPORTER_ION_OBSERVATION_RATE_DATA_FILE_SUFFIX),
@@ -243,7 +241,6 @@ namespace MASIC.DataOutput
             try
             {
                 var highAbundanceTitle = string.Format("Reporter Ion Intensities (top {0}%)", Options.PlotOptions.ReporterIonObservationRateTopNPct);
-                var allSpectraTitle = "Reporter Ion Intensities";
 
                 var success1 = CreateBoxPlot(
                     mStatsSummarizer.ReporterIonNames,
@@ -265,7 +262,7 @@ namespace MASIC.DataOutput
                     datasetName,
                     outputDirectory,
                     plotFiles,
-                    allSpectraTitle,
+                    "Reporter Ion Intensities",
                     PlotContainerBase.PlotCategories.ReporterIonIntensityStats,
                     "Reporter ion intensities, all spectra",
                     Path.GetFileNameWithoutExtension(REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX),
@@ -396,7 +393,6 @@ namespace MASIC.DataOutput
 
         private bool SaveHistogramData(string datasetName, string outputDirectory)
         {
-
             var peakAreaSuccess = WriteHistogramData(
                 mStatsSummarizer.PeakAreaHistogram,
                 datasetName,
@@ -584,7 +580,6 @@ namespace MASIC.DataOutput
 
                             writer.WriteLine(string.Join("\t", dataLine));
                         }
-
                     }
                 }
 

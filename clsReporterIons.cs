@@ -488,7 +488,6 @@ namespace MASIC
             double mzToleranceDa,
             bool customReporterIons)
         {
-
             if (mzToleranceDa < REPORTER_ION_TOLERANCE_DA_MINIMUM)
             {
                 mzToleranceDa = REPORTER_ION_TOLERANCE_DA_MINIMUM;

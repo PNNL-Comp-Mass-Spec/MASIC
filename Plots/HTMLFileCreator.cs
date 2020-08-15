@@ -48,7 +48,6 @@ namespace MASIC.Plots
         {
             try
             {
-
                 if (PlotFiles.Count == 0)
                 {
                     OnWarningEvent("No plot files defined; cannot create the index.html file");
@@ -104,7 +103,6 @@ namespace MASIC.Plots
                 OnErrorEvent("Error in Plots.HTMLFileCreator.CreateHTMLFile", ex);
                 return false;
             }
-
         }
 
         /// <summary>
@@ -112,8 +110,8 @@ namespace MASIC.Plots
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="plotCategory"></param>
-        /// <param name="outputDirectoryPath"></param>
         /// <param name="datasetName"></param>
+        /// <param name="outputDirectoryPath"></param>
         /// <returns>Number of plots appended</returns>
         private int AppendPlots(
             TextWriter writer,
@@ -266,7 +264,6 @@ namespace MASIC.Plots
                 outputDirectoryPath,
                 datasetName + "_" + StatsPlotter.REPORTER_ION_INTENSITY_STATS_FILE_SUFFIX,
                 "Reporter Ion Intensity Stats data file");
-
 
             if (obsRateURL.Length == 0 && intensityStatsURL.Length == 0)
                 return string.Empty;

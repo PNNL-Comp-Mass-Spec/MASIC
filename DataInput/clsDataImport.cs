@@ -97,6 +97,7 @@ namespace MASIC.DataInput
         /// <param name="masicOptions"></param>
         /// <param name="peakFinder"></param>
         /// <param name="parentIonProcessor"></param>
+        /// <param name="scanTracking"></param>
         protected clsDataImport(
             MASICOptions masicOptions,
             MASICPeakFinder.clsMASICPeakFinder peakFinder,
@@ -569,7 +570,7 @@ namespace MASIC.DataInput
 
             if (mIsolationWidthNotFoundCount <= ISOLATION_WIDTH_NOT_FOUND_WARNINGS_TO_SHOW)
             {
-                ReportWarning(warningMessage + "; " + "cannot compute interference for scan " + scanNumber);
+                ReportWarning(warningMessage + "; cannot compute interference for scan " + scanNumber);
             }
             else if (mIsolationWidthNotFoundCount % 5000 == 0)
             {

@@ -307,15 +307,14 @@ namespace MASIC.DataInput
             }
 
             if (DateTime.UtcNow.Subtract(mLastLogTime).TotalSeconds >= 10 ||
-                thermoScanInfo.ScanNumber % 500 == 0 && (
-                    thermoScanInfo.ScanNumber >= mOptions.SICOptions.ScanRangeStart &&
-                    thermoScanInfo.ScanNumber <= mOptions.SICOptions.ScanRangeEnd))
+                thermoScanInfo.ScanNumber % 500 == 0 &&
+                thermoScanInfo.ScanNumber >= mOptions.SICOptions.ScanRangeStart &&
+                thermoScanInfo.ScanNumber <= mOptions.SICOptions.ScanRangeEnd)
             {
                 ReportMessage("Reading scan: " + thermoScanInfo.ScanNumber.ToString());
                 Console.Write(".");
                 mLastLogTime = DateTime.UtcNow;
             }
-
 
             return success;
         }
@@ -333,24 +332,18 @@ namespace MASIC.DataInput
                 thermoScanInfo.ParentIonMZ += mOptions.ParentIonDecoyMassDa;
             }
 
-            bool success;
-
             // Determine if this was an MS/MS scan
             // If yes, determine the scan number of the survey scan
             if (thermoScanInfo.MSLevel <= 1)
             {
                 // Survey Scan
-                success = ExtractXcaliburSurveyScan(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
+                return ExtractXcaliburSurveyScan(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
                                                     sicOptions, thermoScanInfo);
             }
-            else
-            {
-                // Fragmentation Scan
-                success = ExtractXcaliburFragmentationScan(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
-                                                           sicOptions, mOptions.BinningOptions, thermoScanInfo);
-            }
 
-            return success;
+            // Fragmentation Scan
+            return ExtractXcaliburFragmentationScan(xcaliburAccessor, scanList, spectraCache, dataOutputHandler,
+                sicOptions, mOptions.BinningOptions, thermoScanInfo);
         }
 
         private bool ExtractXcaliburSurveyScan(
@@ -757,7 +750,7 @@ namespace MASIC.DataInput
             {
                 mDatasetFileInfo.AcqTimeStart = xcaliburAccessor.FileInfo.CreationDate;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Read error
                 return false;
@@ -772,7 +765,7 @@ namespace MASIC.DataInput
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart.AddMinutes(scanInfo.RetentionTime);
                 mDatasetFileInfo.ScanCount = xcaliburAccessor.GetNumScans();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Error; use default values
                 mDatasetFileInfo.AcqTimeEnd = mDatasetFileInfo.AcqTimeStart;
@@ -821,12 +814,10 @@ namespace MASIC.DataInput
             {
                 if (statusEntries == null)
                     return;
-                if (keyNameFilterList != null && keyNameFilterList.Count > 0)
+
+                if (keyNameFilterList?.Count > 0 && keyNameFilterList.Any(item => item.Length > 0))
                 {
-                    if (keyNameFilterList.Any(item => item.Length > 0))
-                    {
-                        filterItems = true;
-                    }
+                    filterItems = true;
                 }
 
                 foreach (var statusEntry in statusEntries)

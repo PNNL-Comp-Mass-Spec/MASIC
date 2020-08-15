@@ -72,7 +72,6 @@ namespace MASIC.DataOutput
             MASICPeakFinder.clsSmoothedYDataSubset smoothedYDataSubset,
             clsDataOutput dataOutputHandler)
         {
-
             var lastGoodLoc = "Start";
 
             try
@@ -504,7 +503,7 @@ namespace MASIC.DataOutput
                     lastModTimeText = lastModTime.ToShortDateString() + " " + lastModTime.ToShortTimeString();
                     fileSizeBytes = inputFileInfo.Length.ToString();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     lastModTimeText = string.Empty;
                     fileSizeBytes = "0";

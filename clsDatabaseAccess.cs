@@ -80,13 +80,15 @@ namespace MASIC
         /// </summary>
         /// <param name="masicOptions"></param>
         /// <param name="datasetName"></param>
+        /// <param name="newDatasetID"></param>
         /// <returns></returns>
         private bool GetDatasetIDFromDatabase(MASICOptions masicOptions, string datasetName, out int newDatasetID)
         {
-            var avoidErrorMessage = "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " +
-                                    "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " +
-                                    "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " +
-                                    "for parameters ConnectionString and DatasetInfoQuerySql.";
+            const string avoidErrorMessage =
+                "To avoid seeing this message in the future, clear the 'SQL Server Connection String' and " +
+                "'Dataset Info Query SQL' entries on the Advanced tab and save a new settings file. " +
+                "Alternatively, edit a MASIC parameter file to remove the text after the equals sign " +
+                "for parameters ConnectionString and DatasetInfoQuerySql.";
 
             newDatasetID = 0;
 
@@ -161,7 +163,7 @@ namespace MASIC
 
                 return false;
             }
-            catch (NullReferenceException ex2)
+            catch (NullReferenceException)
             {
                 ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + Environment.NewLine + avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
                 return false;

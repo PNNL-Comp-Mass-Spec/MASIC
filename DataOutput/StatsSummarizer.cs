@@ -424,6 +424,7 @@ namespace MASIC.DataOutput
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Readability", "RCS1123:Add parentheses when necessary.", Justification = "Parentheses not needed")]
         private bool GeneratePeakWidthHistogram()
         {
             try
@@ -534,7 +535,6 @@ namespace MASIC.DataOutput
             int numberOfBins,
             double percentile)
         {
-
             // Find the bin at which 98% of the peaks have been included in the histogram
             var binCountSum = 0;
             var maxPeakWidthToUse = -1;
@@ -630,7 +630,7 @@ namespace MASIC.DataOutput
 
                         var dataValues = dataLine.Split('\t');
 
-                        if (dataValues.Length <= 0)
+                        if (dataValues.Length == 0)
                             continue;
 
                         linesRead++;
@@ -771,7 +771,7 @@ namespace MASIC.DataOutput
 
                         var dataValues = dataLine.Split('\t');
 
-                        if (dataValues.Length <= 0)
+                        if (dataValues.Length == 0)
                             continue;
 
                         linesRead++;
@@ -887,7 +887,7 @@ namespace MASIC.DataOutput
 
                         var dataValues = dataLine.Split('\t');
 
-                        if (dataValues.Length <= 0)
+                        if (dataValues.Length == 0)
                             continue;
 
                         linesRead++;

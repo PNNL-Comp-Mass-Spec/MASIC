@@ -14,6 +14,7 @@ namespace MASIC.Plots
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="plotCategory"></param>
         /// <param name="plotTitle"></param>
         /// <param name="xAxisTitle"></param>
         /// <param name="yAxisTitle"></param>

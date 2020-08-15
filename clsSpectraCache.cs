@@ -165,7 +165,6 @@ namespace MASIC
             clsMSSpectrum spectrum,
             int scanNumber)
         {
-
             try
             {
                 if (SpectrumCount > CacheSpectraToRetainInMemory + 5 &&
@@ -360,7 +359,7 @@ namespace MASIC
             // Now look for old spectrum cache files
             try
             {
-                var filePathMatch = SPECTRUM_CACHE_FILE_PREFIX + "*" + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + "*";
+                const string filePathMatch = SPECTRUM_CACHE_FILE_PREFIX + "*" + SPECTRUM_CACHE_FILE_BASENAME_TERMINATOR + "*";
 
                 var spectrumFile = new FileInfo(Path.GetFullPath(ConstructCachedSpectrumPath()));
                 if (spectrumFile.Directory == null)
@@ -610,7 +609,7 @@ namespace MASIC
                 catch (Exception ex)
                 {
                     // Error defining .DirectoryPath
-                    ReportError("Error creating spectrum cache directory");
+                    ReportError("Error creating spectrum cache directory: " + ex.Message);
                     return false;
                 }
             }

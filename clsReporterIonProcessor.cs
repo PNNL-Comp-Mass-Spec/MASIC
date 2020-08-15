@@ -172,7 +172,7 @@ namespace MASIC
                         {
                             reporterIonMZsUnique.Add(mzValue);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             // Error updating the SortedSet;
                             // this shouldn't happen based on the .ContainsKey test above

@@ -3,11 +3,14 @@
 namespace MASIC
 {
     /// <summary>
+    /// <para>
     /// This class can be used to search a list of values for a given value, plus or minus a given tolerance
     /// The input list need not be sorted, since mPointerIndices() will be populated when the data is loaded,
     /// after which the data array will be sorted
-    ///
+    /// </para>
+    /// <para>
     /// To prevent this behavior, and save memory by not populating mPointerIndices, set UsePointerIndexArray = False
+    /// </para>
     /// </summary>
     public class clsSearchRange
     {
@@ -27,7 +30,6 @@ namespace MASIC
         }
 
         #endregion
-
 
         #region "Classwide Variables"
 
@@ -96,7 +98,6 @@ namespace MASIC
             {
                 return -1;
             }
-
         }
 
         /// <summary>
@@ -150,25 +151,30 @@ namespace MASIC
                 var leftIndex = indexMidpoint;
                 do
                 {
-                    leftIndex = leftIndex - 1;
+                    leftIndex--;
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
                     }
                     else if (Math.Abs(searchValue - mDataInt[leftIndex]) > toleranceHalfWidth)
+                    {
                         leftDone = true;
+                    }
                 }
                 while (!leftDone);
+
                 var rightIndex = indexMidpoint;
                 do
                 {
-                    rightIndex = rightIndex + 1;
+                    rightIndex++;
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;
                     }
                     else if (Math.Abs(searchValue - mDataInt[rightIndex]) > toleranceHalfWidth)
+                    {
                         rightDone = true;
+                    }
                 }
                 while (!rightDone);
 
@@ -218,27 +224,33 @@ namespace MASIC
                 var leftIndex = indexMidpoint;
                 do
                 {
-                    leftIndex = leftIndex - 1;
+                    leftIndex--;
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
                     }
                     else if (Math.Abs(searchValue - mDataSingle[leftIndex]) > toleranceHalfWidth)
+                    {
                         leftDone = true;
+                    }
                 }
                 while (!leftDone);
+
                 var rightIndex = indexMidpoint;
                 do
                 {
-                    rightIndex = rightIndex + 1;
+                    rightIndex++;
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;
                     }
                     else if (Math.Abs(searchValue - mDataSingle[rightIndex]) > toleranceHalfWidth)
+                    {
                         rightDone = true;
+                    }
                 }
                 while (!rightDone);
+
                 matchIndexStart = leftIndex + 1;
                 matchIndexEnd = rightIndex - 1;
             }
@@ -285,27 +297,33 @@ namespace MASIC
                 var leftIndex = indexMidpoint;
                 do
                 {
-                    leftIndex = leftIndex - 1;
+                    leftIndex--;
                     if (leftIndex < matchIndexStart)
                     {
                         leftDone = true;
                     }
                     else if (Math.Abs(searchValue - mDataDouble[leftIndex]) > toleranceHalfWidth)
+                    {
                         leftDone = true;
+                    }
                 }
                 while (!leftDone);
+
                 var rightIndex = indexMidpoint;
                 do
                 {
-                    rightIndex = rightIndex + 1;
+                    rightIndex++;
                     if (rightIndex > matchIndexEnd)
                     {
                         rightDone = true;
                     }
                     else if (Math.Abs(searchValue - mDataDouble[rightIndex]) > toleranceHalfWidth)
+                    {
                         rightDone = true;
+                    }
                 }
                 while (!rightDone);
+
                 matchIndexStart = leftIndex + 1;
                 matchIndexEnd = rightIndex - 1;
             }
@@ -379,7 +397,7 @@ namespace MASIC
                     success = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 success = false;
             }
@@ -426,7 +444,7 @@ namespace MASIC
                     success = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 success = false;
             }
@@ -785,7 +803,7 @@ namespace MASIC
         /// <summary>
         /// Get the value stored at the given original index
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="indexOriginal"></param>
         /// <returns>The value, or 0 if no data, an invalid index, or an error</returns>
         public double GetValueByOriginalIndex(int indexOriginal)
         {
@@ -859,14 +877,7 @@ namespace MASIC
             for (var index = 0; index < arrayLength; index++)
                 mPointerIndices[index] = index;
 
-            if (arrayLength > 0)
-            {
-                mPointerArrayIsValid = true;
-            }
-            else
-            {
-                mPointerArrayIsValid = false;
-            }
+            mPointerArrayIsValid = arrayLength > 0;
         }
     }
 }

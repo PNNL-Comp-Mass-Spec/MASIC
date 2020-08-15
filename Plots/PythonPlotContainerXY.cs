@@ -10,12 +10,12 @@ namespace MASIC.Plots
     /// </summary>
     internal class PythonPlotContainerXY : PythonPlotContainer
     {
-
         public List<DataPoint> Data { get; private set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="plotCategory"></param>
         /// <param name="plotTitle"></param>
         /// <param name="xAxisTitle"></param>
         /// <param name="yAxisTitle"></param>
@@ -72,7 +72,6 @@ namespace MASIC.Plots
                         writer.WriteLine("{0}\t{1}", dataPoint.X, dataPoint.Y);
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -102,7 +101,6 @@ namespace MASIC.Plots
                 OnErrorEvent("Error creating XY plot with Python using " + exportFile.Name, ex);
                 return false;
             }
-
         }
 
         public void ClearData()

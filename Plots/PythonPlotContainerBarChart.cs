@@ -6,14 +6,13 @@ namespace MASIC.Plots
 {
     internal class PythonPlotContainerBarChart : PythonPlotContainer
     {
-
         public List<KeyValuePair<string, double>> Data { get; private set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="plotCategory"></param>
         /// <param name="plotTitle"></param>
-        /// <param name="xAxisTitle"></param>
         /// <param name="yAxisTitle"></param>
         /// <param name="writeDebug"></param>
         /// <param name="dataSource"></param>
@@ -45,7 +44,6 @@ namespace MASIC.Plots
 
             try
             {
-
                 using (var writer = new StreamWriter(new FileStream(exportFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
                 {
                     // Plot options: set of square brackets with semicolon separated key/value pairs
@@ -68,7 +66,6 @@ namespace MASIC.Plots
                         writer.WriteLine("{0}\t{1}", dataPoint.Key, dataPoint.Value);
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -98,7 +95,6 @@ namespace MASIC.Plots
                 OnErrorEvent("Error creating bar chart with Python using " + exportFile.Name, ex);
                 return false;
             }
-
         }
 
         public void ClearData()

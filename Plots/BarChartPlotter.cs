@@ -12,7 +12,6 @@ namespace MASIC.Plots
 {
     public class BarChartPlotter : EventNotifier
     {
-
         #region "Member variables"
 
         private readonly BarChartInfo mBarChart;
@@ -317,10 +316,10 @@ namespace MASIC.Plots
         /// <param name="outputDirectory"></param>
         /// <param name="outputFilePath">Output: the full path to the .png file created by this method</param>
         /// <param name="yAxisMinimum"></param>
+        /// <param name="yAxisMaximum"></param>
         /// <returns></returns>
         public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath, int yAxisMinimum, int yAxisMaximum)
         {
-
             outputFilePath = string.Empty;
 
             try
@@ -384,7 +383,6 @@ namespace MASIC.Plots
                 OnErrorEvent("Error in BarChartPlotter.SavePlotFile", ex);
                 return false;
             }
-
         }
 
         private class BarChartDataPoint
@@ -492,7 +490,6 @@ namespace MASIC.Plots
                 return string.Format("BarChartInfo: {0} values", DataCount);
             }
         }
-
     }
 }
 

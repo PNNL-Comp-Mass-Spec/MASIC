@@ -133,7 +133,7 @@ namespace MASIC.DataInput
 
                         var dataCols = dataLine.Split(delimiterList);
 
-                        if (dataCols.Length <= 0)
+                        if (dataCols.Length == 0)
                             continue;
 
                         linesRead++;
@@ -180,7 +180,6 @@ namespace MASIC.DataInput
                             ScanOrAcqTimeCenter = 0,
                             ScanOrAcqTimeTolerance = 0
                         };
-
 
                         var mzTarget = DataTableUtils.GetColumnValue(dataCols, columnMap, CustomSICFileColumns.MZ, string.Empty, out var mzValuePresent);
                         if (mzValuePresent)

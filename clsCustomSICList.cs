@@ -44,13 +44,7 @@ namespace MASIC
 
         public string CustomSICListFileName
         {
-            get
-            {
-                if (mCustomSICListFileName == null)
-                    return string.Empty;
-
-                return mCustomSICListFileName;
-            }
+            get => mCustomSICListFileName ?? string.Empty;
             set
             {
                 if (value == null)
@@ -433,7 +427,6 @@ namespace MASIC
             float[] scanOrAcqTimeToleranceList,
             string[] scanComments)
         {
-
             if (mzToleranceList.Length > 0 && mzToleranceList.Length != mzList.Length)
             {
                 // Invalid Custom SIC comment list; number of entries doesn't match
@@ -529,7 +522,6 @@ namespace MASIC
             float scanOrAcqTimeToleranceValue,
             List<clsCustomMZSearchSpec> mzSearchSpecs)
         {
-
             ResetMzSearchValues();
 
             ScanToleranceType = eScanType;

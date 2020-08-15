@@ -12,9 +12,6 @@ namespace MASIC
         /// <summary>
         /// Provides information on the number of cache and uncache events in spectraCache
         /// </summary>
-        /// <param name="cacheEventCount"></param>
-        /// <param name="unCacheEventCount"></param>
-        /// <param name="spectraPoolHitEventCount"></param>
         public event UpdateCacheStatsEventEventHandler UpdateCacheStatsEvent;
 
         public delegate void UpdateCacheStatsEventEventHandler(int cacheEventCount, int unCacheEventCount, int spectraPoolHitEventCount);
@@ -22,7 +19,6 @@ namespace MASIC
         /// <summary>
         /// Update the code associated with an error
         /// </summary>
-        /// <param name="eNewErrorCode"></param>
         public event UpdateBaseClassErrorCodeEventEventHandler UpdateBaseClassErrorCodeEvent;
 
         public delegate void UpdateBaseClassErrorCodeEventEventHandler(PRISM.FileProcessor.ProcessFilesBase.ProcessFilesErrorCodes eNewErrorCode);
@@ -30,8 +26,6 @@ namespace MASIC
         /// <summary>
         /// Update the code associated with an error
         /// </summary>
-        /// <param name="eNewErrorCode"></param>
-        /// <param name="leaveExistingErrorCodeUnchanged"></param>
         public event UpdateErrorCodeEventEventHandler UpdateErrorCodeEvent;
 
         public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
