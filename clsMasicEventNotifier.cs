@@ -84,18 +84,6 @@ namespace MASIC
             OnErrorEvent(message, ex);
         }
 
-        [Obsolete("Source, allowInformUser, and allowThrowException are no longer supported")]
-        protected void ReportError(
-            string source,
-            string message,
-            Exception ex,
-            bool allowInformUser,
-            bool allowThrowException = true,
-            clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
-        {
-            ReportError(message, ex, eNewErrorCode);
-        }
-
         protected void ReportWarning(string message)
         {
             OnWarningEvent(message);
