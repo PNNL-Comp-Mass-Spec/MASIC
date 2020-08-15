@@ -12,7 +12,6 @@ namespace MASIC.DataOutput
 {
     public class StatsSummarizer : EventNotifier
     {
-
         #region "Constants and Enums"
 
         private const string UNDEFINED_UNITS = "Undefined Units";
@@ -349,7 +348,16 @@ namespace MASIC.DataOutput
 
                 if (scansUsed == 0)
                 {
-                    // reporterIonScans was empty; this is unexpected
+                    // SortedSet reporterIonScans is likely empty
+                    // This will be true if mReporterIonAbundances has reporter ion keys defined,
+                    // but none of the keys has any values, which will be true if _ReporterIons.txt has a header row but no data rows
+
+                    foreach (var reporterIonIndex in mReporterIonAbundances.Keys)
+                    {
+                        ReporterIonObservationRate.Add(reporterIonIndex, 0);
+                        ReporterIonObservationRateHighAbundance.Add(reporterIonIndex, 0);
+                    }
+
                     return true;
                 }
 
@@ -358,6 +366,11 @@ namespace MASIC.DataOutput
                 {
                     var observationRate = NonZeroReporterIons[reporterIonIndex].Count / (float)scansUsed * 100;
                     ReporterIonObservationRate.Add(reporterIonIndex, observationRate);
+
+                    if (scansUsedHighAbundance == 0) {
+                        ReporterIonObservationRateHighAbundance.Add(reporterIonIndex, 0);
+                        continue;
+                    }
 
                     var observationRateHighAbundance = NonZeroReporterIonsHighAbundance[reporterIonIndex].Count / (float)scansUsedHighAbundance * 100;
                     ReporterIonObservationRateHighAbundance.Add(reporterIonIndex, observationRateHighAbundance);
@@ -411,8 +424,21 @@ namespace MASIC.DataOutput
                     if (double.IsNaN(binCount))
                         continue;
 
+                    var binCountInt = (int)binCount;
+
                     var midPoint = ((float)histogram[i].LowerBound + (float)histogram[i].UpperBound) / 2;
-                    PeakAreaHistogram.Add(midPoint, (int)binCount);
+
+                    if (PeakAreaHistogram.ContainsKey(midPoint))
+                    {
+                        if (binCountInt > 0)
+                        {
+                            PeakAreaHistogram[midPoint] += binCountInt;
+                        }
+
+                        continue;
+                    }
+
+                    PeakAreaHistogram.Add(midPoint, binCountInt);
                 }
 
                 return true;

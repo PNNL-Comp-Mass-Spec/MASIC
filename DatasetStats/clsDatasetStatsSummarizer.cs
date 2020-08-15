@@ -98,7 +98,7 @@ namespace MASIC.DatasetStats
         /// </summary>
         public clsDatasetStatsSummarizer()
         {
-            FileDate = "August 7, 2020";
+            FileDate = "August 14, 2020";
 
             ErrorMessage = string.Empty;
 
