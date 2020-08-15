@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <NoWarn>CS1591,CS1572,CS0168</NoWarn>
+    <NoWarn>CS1591</NoWarn>
     <DocumentationFile>bin\Debug\MASICPeakFinder.xml</DocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
@@ -33,7 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\MASICPeakFinder.xml</DocumentationFile>
-    <NoWarn>CS1591,CS1572,CS0168</NoWarn>
+    <NoWarn>CS1591</NoWarn>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>

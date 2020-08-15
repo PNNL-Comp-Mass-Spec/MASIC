@@ -21,7 +21,7 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
     <DocumentationFile>bin\MASIC.xml</DocumentationFile>
-    <NoWarn>CS1591,CS1572,CS1573,CS0168</NoWarn>
+    <NoWarn>CS1591</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>TRACE;DEBUG;GUI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -33,7 +33,7 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>bin\Release\MASIC.xml</DocumentationFile>
-    <NoWarn>CS1591,CS1572,CS1573,CS0168</NoWarn>
+    <NoWarn>CS1591</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>TRACE;GUI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
