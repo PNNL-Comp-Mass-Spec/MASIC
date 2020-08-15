@@ -390,13 +390,14 @@ namespace MASIC.DatasetStats
         /// <param name="datasetName">Dataset Name</param>
         /// <param name="scanStats">Scan stats to parse</param>
         /// <param name="datasetInfo">Dataset Info</param>
+        /// <param name="sampleInfo">Sample Info</param>
         /// <returns>XML (as string)</returns>
         /// <remarks></remarks>
         public string CreateDatasetInfoXML(
             string datasetName,
             List<ScanStatsEntry> scanStats,
             DatasetFileInfo datasetInfo,
-            SampleInfo oSampleInfo)
+            SampleInfo sampleInfo)
         {
             try
             {
@@ -522,12 +523,12 @@ namespace MASIC.DatasetStats
                 writer.WriteEndElement();       // TICInfo
 
                 // Only write the oSampleInfo block if oSampleInfo contains entries
-                if (oSampleInfo.HasData())
+                if (sampleInfo.HasData())
                 {
                     writer.WriteStartElement("SampleInfo");
-                    writer.WriteElementString("SampleName", FixNull(oSampleInfo.SampleName));
-                    writer.WriteElementString("Comment1", FixNull(oSampleInfo.Comment1));
-                    writer.WriteElementString("Comment2", FixNull(oSampleInfo.Comment2));
+                    writer.WriteElementString("SampleName", FixNull(sampleInfo.SampleName));
+                    writer.WriteElementString("Comment1", FixNull(sampleInfo.Comment1));
+                    writer.WriteElementString("Comment2", FixNull(sampleInfo.Comment2));
                     writer.WriteEndElement();       // SampleInfo
                 }
 
