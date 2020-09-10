@@ -59,6 +59,7 @@
     <Compile Include="clsSICStatsPeak.cs" />
     <Compile Include="clsSmoothedYDataSubset.cs" />
     <Compile Include="clsStatisticalMoments.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
