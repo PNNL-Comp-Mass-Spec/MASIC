@@ -1247,7 +1247,7 @@ namespace MASICPeakFinder
                     scansPerPoint = 1;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 scansPerPoint = 1;
             }
@@ -1977,7 +1977,7 @@ namespace MASICPeakFinder
                 var peakWidthFullScans = sicData[sicPeak.IndexBaseRight].ScanNumber - sicData[sicPeak.IndexBaseLeft].ScanNumber + 1;
                 return ComputeWidthAtBaseUsingFWHM(sicPeak.FWHMScanWidth, peakWidthFullScans, sigmaValueForBase);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return 0;
             }

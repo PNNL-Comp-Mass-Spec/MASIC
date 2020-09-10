@@ -274,7 +274,7 @@ namespace MASICPeakFinder
                                     // If secondDerivative(index)) is tiny, the following division will fail
                                     sigma = Math.Sqrt(Math.Abs(-yValues[index] / secondDerivative[index]));
                                 }
-                                catch (Exception ex)
+                                catch (Exception)
                                 {
                                     sigma = 0;
                                 }
@@ -739,7 +739,7 @@ namespace MASICPeakFinder
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

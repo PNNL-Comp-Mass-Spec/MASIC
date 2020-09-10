@@ -736,7 +736,7 @@ namespace MASIC
                             txtDatasetLookupFilePath.Text = string.Empty;
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         // Ignore any errors here
                     }
@@ -774,7 +774,7 @@ namespace MASIC
 
                     mPreferredInputFileExtension = xmlFileReader.GetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "PreferredInputFileExtension", mPreferredInputFileExtension);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     MessageBox.Show("Invalid parameter in settings file: " + Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -881,7 +881,7 @@ namespace MASIC
                                 xmlFileReader.SetParam(MASICOptions.XML_SECTION_DATABASE_SETTINGS, "DatasetLookupFilePath", txtDatasetLookupFilePath.Text);
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             // Ignore any errors here
                         }
@@ -895,7 +895,7 @@ namespace MASIC
                     xmlFileReader.SetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowWidth", Width);
                     xmlFileReader.SetParam(MASICOptions.XML_SECTION_IMPORT_OPTIONS, "WindowHeight", Height);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     MessageBox.Show("Error storing parameter in settings file: " + Path.GetFileName(filePath), "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -1084,7 +1084,7 @@ namespace MASIC
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Skip this row
                     rowsSkipped++;
@@ -1339,7 +1339,7 @@ namespace MASIC
                         txtDatasetLookupFilePath.Text = string.Empty;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     txtDatasetLookupFilePath.Text = string.Empty;
                 }
@@ -1927,7 +1927,7 @@ namespace MASIC
                         masicOptions.DatasetLookupFilePath = string.Empty;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     masicOptions.DatasetLookupFilePath = string.Empty;
                 }

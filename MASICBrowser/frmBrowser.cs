@@ -262,7 +262,7 @@ namespace MASICBrowser
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore any errors
             }
@@ -535,7 +535,7 @@ namespace MASICBrowser
 
                     sicStats.ScanNumberMaxIntensity = mParentIonStats[parentIonIndex].SICData[sicStats.Peak.IndexMax].ScanNumber;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Index out of range; ignore the error
                 }
@@ -2045,7 +2045,7 @@ namespace MASICBrowser
                                                 break;
                                         }
                                     }
-                                    catch (Exception ex)
+                                    catch (Exception)
                                     {
                                         // Ignore any errors looking up smoothing options
                                     }
@@ -2213,7 +2213,7 @@ namespace MASICBrowser
                                                     break;
                                             }
                                         }
-                                        catch (Exception ex)
+                                        catch (Exception)
                                         {
                                             // Error parsing value from the ParentIon data
                                             errorMessages.Add("Error parsing value for parent ion '" + indexInXMLFile + "'");
