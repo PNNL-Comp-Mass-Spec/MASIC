@@ -154,7 +154,7 @@ namespace MASIC.DataOutput
                 msLevel = 1;
             }
 
-            var numIsotopicSignatures = 0;
+            const int numIsotopicSignatures = 0;
             var numPeaks = spectrum.IonCount;
 
             var baselineNoiseLevel = currentScan.BaselineNoiseStats.NoiseLevel;
@@ -209,13 +209,13 @@ namespace MASIC.DataOutput
                 {
                     if (spectrum.IonsIntensity[ionIndex] >= minimumIntensityCurrentScan)
                     {
-                        var charge = 1;
-                        var isoFit = 0;
+                        const int charge = 1;
+                        const int isoFit = 0;
                         var mass = clsUtilities.ConvoluteMass(spectrum.IonsMZ[ionIndex], 1, 0);
-                        var peakFWHM = 0;
+                        const int peakFWHM = 0;
                         var signalToNoise = spectrum.IonsIntensity[ionIndex] / baselineNoiseLevel;
-                        var monoisotopicAbu = -10;
-                        var monoPlus2Abu = -10;
+                        const int monoisotopicAbu = -10;
+                        const int monoPlus2Abu = -10;
 
                         mBPIWriter.WriteDecon2LSIsosFileEntry(
                             dataWriter, scanNumber, charge,

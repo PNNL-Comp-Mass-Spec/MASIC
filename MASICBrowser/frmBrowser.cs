@@ -1398,7 +1398,7 @@ namespace MASICBrowser
 
                 mSpectrum.SetDataXvsY(2, xDataSeries2, yDataSeries2, dataCountSeries2, ctlOxyPlotControl.SeriesPlotMode.PointsAndLines, peakCaption);
 
-                var fragScansCaption = "Similar Frag scans";
+                const string fragScansCaption = "Similar Frag scans";
                 mSpectrum.SetDataXvsY(3, xDataSeries3, yDataSeries3, dataCountSeries3, ctlOxyPlotControl.SeriesPlotMode.Points, fragScansCaption);
 
                 if (chkShowSmoothedData.Checked && xDataSeries4.Length > 0)
@@ -1437,7 +1437,7 @@ namespace MASICBrowser
                     mSpectrum.SetSeriesLineWidth(4, 2);
                 }
 
-                var arrowLengthPixels = 15;
+                const int arrowLengthPixels = 15;
                 ctlOxyPlotControl.CaptionOffsetDirection captionOffsetDirection;
 
                 if (currentParentIon.FragScanObserved <= currentParentIon.OptimalPeakApexScanNumber)
@@ -1668,7 +1668,7 @@ namespace MASICBrowser
             var intensityDataList = string.Empty;
             var massDataList = string.Empty;
             var smoothedYDataList = string.Empty;
-            var delimiters = " ,;\t";
+            const string delimiters = " ,;\t";
 
             var delimiterList = delimiters.ToCharArray();
 

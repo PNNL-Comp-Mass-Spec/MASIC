@@ -130,7 +130,7 @@ namespace MASIC
         private double BetaCF(double a, double b, double x)
         {
             const int MAX_ITERATIONS = 100;
-            var EPS = 0.0000003;
+            const double EPS = 0.0000003;
             const double FP_MIN = 1.0E-30;
 
             int m;

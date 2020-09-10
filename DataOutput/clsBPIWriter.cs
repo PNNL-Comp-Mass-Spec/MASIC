@@ -38,7 +38,7 @@ namespace MASIC.DataOutput
 
             try
             {
-                var bpiStepCount = 3;
+                const int bpiStepCount = 3;
 
                 UpdateProgress(0, "Saving chromatograms to disk");
 
@@ -344,7 +344,7 @@ namespace MASIC.DataOutput
             if (msLevel < 1)
                 msLevel = 1;
 
-            var numIsotopicSignatures = 0;
+            const int numIsotopicSignatures = 0;
 
             WriteDecon2LSScanFileEntry(writer, currentScan, scanNumber, msLevel, numPeaks, numIsotopicSignatures);
         }

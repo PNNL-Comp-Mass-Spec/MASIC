@@ -53,7 +53,7 @@ namespace MASICTest
                     // Write the headers
                     srOutFile.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
 
-                    var searchValueStart = -10;
+                    const int searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 10;
 
                     // Initialize searchResults
@@ -154,7 +154,7 @@ namespace MASICTest
                     // Write the headers
                     srOutFile.WriteLine("Search Value" + "\t" + "Match Value" + "\t" + "Match Index");
 
-                    var searchValueStart = -10;
+                    const int searchValueStart = -10;
                     var searchValueEnd = maxDataValue + 11;
 
                     // Initialize searchResults

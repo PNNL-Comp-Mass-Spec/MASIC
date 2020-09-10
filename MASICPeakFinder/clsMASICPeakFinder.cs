@@ -378,7 +378,7 @@ namespace MASICPeakFinder
                 }
 
                 // Compare adjacent segments using a T-Test, starting with the final segment and working backward
-                var confidenceLevel = eTTestConfidenceLevelConstants.Conf90Pct;
+                const eTTestConfidenceLevelConstants confidenceLevel = eTTestConfidenceLevelConstants.Conf90Pct;
                 var segmentIndex = segmentCountLocal - 1;
 
                 while (segmentIndex > 0)
@@ -764,13 +764,13 @@ namespace MASICPeakFinder
             var scanNumbers = new[] { 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40 };
             var intensities = new double[] { 2, 5, 7, 10, 11, 18, 19, 15, 8, 4, 1 };
 
-            var scanAtApex = 20;
-            double fwhm = 25;
+            const int scanAtApex = 20;
+            const double fwhm = 25;
 
-            double peakMean = scanAtApex;
+            const double peakMean = scanAtApex;
             // fwhm / 2.35482 = fwhm / (2 * Sqrt(2 * Ln(2)))
 
-            var peakStDev = fwhm / 2.35482;
+            const double peakStDev = fwhm / 2.35482;
             // peakStDev = 28.8312
 
             ComputeKSStatistic(scanNumbers.Length, scanNumbers, intensities, peakMean, peakStDev);

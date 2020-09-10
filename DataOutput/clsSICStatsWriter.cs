@@ -142,10 +142,10 @@ namespace MASIC.DataOutput
                         for (var fragScanIndex = 0; fragScanIndex < scanList.FragScans.Count; fragScanIndex++)
                         {
                             var fakeParentIon = GetFakeParentIonForFragScan(scanList, fragScanIndex);
-                            var parentIonIndex = 0;
+                            const int parentIonIndex = 0;
 
-                            var surveyScanNumber = 0;
-                            float surveyScanTime = 0;
+                            const int surveyScanNumber = 0;
+                            const float surveyScanTime = 0;
 
                             WriteSICStatsFlatFileEntry(writer, TAB_DELIMITER, masicOptions.SICOptions, scanList,
                                                        fakeParentIon, parentIonIndex, surveyScanNumber, surveyScanTime,
