@@ -195,7 +195,7 @@ namespace MASICBrowser
             var dataDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(masicFilePath));
 
             var fileNameBase = Path.GetFileNameWithoutExtension(masicFilePath);
-            if (fileNameBase.ToLower().EndsWith("_sics"))
+            if (fileNameBase.EndsWith("_sics", StringComparison.OrdinalIgnoreCase))
             {
                 fileNameBase = fileNameBase.Substring(0, fileNameBase.Length - 5);
             }
