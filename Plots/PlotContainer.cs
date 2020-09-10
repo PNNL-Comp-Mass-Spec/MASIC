@@ -95,7 +95,6 @@ namespace MASIC.Plots
             }
 
             return success;
-
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -193,7 +192,6 @@ namespace MASIC.Plots
             var drawVisual = new DrawingVisual();
             using (var drawContext = drawVisual.RenderOpen())
             {
-
                 var myCanvas = new Rect(0, 0, width, height);
 
                 drawContext.DrawImage(plotBitmap, myCanvas);
@@ -332,7 +330,6 @@ namespace MASIC.Plots
             var fontSizePixels = fontSizePoints * 1.33;
             return (int)Math.Round(fontSizePixels, 0);
         }
-
     }
 }
 

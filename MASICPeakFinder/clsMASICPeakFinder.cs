@@ -191,7 +191,6 @@ namespace MASICPeakFinder
             }
 
             return true;
-
         }
 
         private bool ComputeAverageNoiseLevelExcludingRegion(
@@ -829,9 +828,10 @@ namespace MASICPeakFinder
             // Compute the Vector of Normal PDF values evaluated at the X values in the peak window
             var xDataPDF = new double[xData.Length];
             for (var i = 0; i < xData.Length; i++)
-                xDataPDF[i] = 1 / (Math.Sqrt(2 * Math.PI) * peakStDev) * Math.Exp(-1 / 2.0 *
-                                      Math.Pow((xData[i] - (peakMean - scanOffset)) / peakStDev, 2));
-
+            {
+                xDataPDF[i] = 1 / (Math.Sqrt(2 * Math.PI) * peakStDev) *
+                    Math.Exp(-1 / 2.0 * Math.Pow((xData[i] - (peakMean - scanOffset)) / peakStDev, 2));
+            }
             var xDataPDFSum = xDataPDF.Sum();
 
             // Estimate the theoretical CDF using an accumulating sum
@@ -1705,7 +1705,6 @@ namespace MASICPeakFinder
 
                 statMomentsData.KSStat = ComputeKSStatistic(dataCount, scanNumbers, intensities, peakMean, peakStDev);
             }
-
             catch (Exception ex)
             {
                 LogErrors("clsMASICPeakFinder->ComputeStatisticalMomentsStats", "Error computing statistical moments", ex, false);

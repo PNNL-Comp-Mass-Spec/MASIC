@@ -137,7 +137,6 @@ namespace MASICTest
                 Assert.AreEqual(item.Value.Key, msSpectrum.IonsMZ[index], 0.00001);
                 Assert.AreEqual(item.Value.Value, msSpectrum.IonsIntensity[index], 0.00001);
             }
-
         }
 
         [Test]
@@ -309,7 +308,6 @@ namespace MASICTest
         /// <param name="scanNumber">Absolute scan number</param>
         /// <param name="relativeTime">Relative scan (value between 0 and 1)</param>
         /// <param name="scanTime">Scan time</param>
-
         public void TestScanConversionToTime(clsScanList scanList, clsScanNumScanTimeConversion scanNumScanConverter, KeyValuePair<int, int> scanNumber, KeyValuePair<float, float> relativeTime, KeyValuePair<float, float> scanTime)
         {
             try

@@ -299,7 +299,6 @@ namespace MASIC.DataInput
             bool keepRawSpectra,
             bool keepMSMSSpectra)
         {
-
             bool success;
 
             try

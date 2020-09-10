@@ -7,7 +7,6 @@ namespace MASIC.Plots
 {
     public static class OxyPlotUtilities
     {
-
         private static string AddAxes(PlotModel myPlot, Axis xAxis, Axis yAxis, AxisInfo yAxisInfo)
         {
             myPlot.Axes.Add(xAxis);
@@ -272,6 +271,5 @@ namespace MASIC.Plots
                 currentAxis.MinorGridlineThickness = 0;
             }
         }
-
     }
 }

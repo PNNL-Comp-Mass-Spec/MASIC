@@ -11,7 +11,6 @@ namespace MASIC.Plots
 {
     public class HistogramPlotter : EventNotifier
     {
-
         #region "Member variables"
 
         private readonly HistogramInfo mHistogram;
@@ -136,7 +135,6 @@ namespace MASIC.Plots
 
             foreach (var dataPoint in histogramInfo.DataPoints)
             {
-
                 points.Add(new DataPoint(dataPoint.Bin, dataPoint.BinCount));
 
                 if (dataPoint.Bin < minBin)
@@ -192,7 +190,6 @@ namespace MASIC.Plots
             string xAxisLabel,
             AxisInfo yAxisInfo)
         {
-
             var points = GetDataToPlot(histogramInfo, out var minBin, out var maxBin, out var maxIntensity);
 
             if (points.Count == 0)
@@ -276,7 +273,6 @@ namespace MASIC.Plots
             string xAxisLabel,
             AxisInfo yAxisInfo)
         {
-
             var points = GetDataToPlot(histogramInfo, out _, out _, out var maxIntensity);
 
             if (points.Count == 0)
@@ -362,7 +358,6 @@ namespace MASIC.Plots
             {
                 histogramInfo.RemoveRange(0, indexNonZeroValue);
             }
-
         }
 
         /// <summary>
@@ -382,12 +377,10 @@ namespace MASIC.Plots
         /// <returns></returns>
         public bool SavePlotFile(string datasetName, string outputDirectory, out string outputFilePath)
         {
-
             outputFilePath = string.Empty;
 
             try
             {
-
                 if (RemoveZeroesFromEnds)
                 {
                     // Check whether the last few scans have values if 0; if they do, remove them
@@ -421,7 +414,6 @@ namespace MASIC.Plots
                 OnErrorEvent("Error in HistogramPlotter.SavePlotFile", ex);
                 return false;
             }
-
         }
 
         private class HistogramDataPoint
@@ -524,7 +516,6 @@ namespace MASIC.Plots
                 return string.Format("HistogramInfo: {0} points", DataCount);
             }
         }
-
     }
 }
 

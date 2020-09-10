@@ -166,6 +166,5 @@ namespace MASIC.Plots
         {
             mLogWriter?.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + ": " + message);
         }
-
     }
 }

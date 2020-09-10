@@ -1555,10 +1555,13 @@ namespace MASICBrowser
         }
 
         /// <summary>
+        /// <para>
         /// For each row in mMsMsResults.Tables(TABLE_NAME_MSMS_RESULTS), find the corresponding row in mParentIonStats
-        ///
+        /// </para>
+        /// <para>
         /// Construct a mapping between .FragScanObserved and Index in mParentIonStats
         /// If multiple parent ions have the same value for .FragScanObserved, then the we will only track the mapping to the first one
+        /// </para>
         /// </summary>
         private void PopulateParentIonIndexColumnInMsMsResultsTable()
         {
@@ -2678,12 +2681,6 @@ namespace MASICBrowser
                 "this computer software."
             };
 
-
-
-
-
-
-
             MessageBox.Show(string.Join(Environment.NewLine, message), "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -3708,6 +3705,5 @@ namespace MASICBrowser
                 MessageBox.Show("MASICPeakFinder error: " + message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-
     }
 }

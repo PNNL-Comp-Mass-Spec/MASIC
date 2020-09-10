@@ -199,7 +199,6 @@ namespace MASIC.Plots
                     break;
                 }
 
-
             }
             catch (Exception ex)
             {
@@ -249,7 +248,6 @@ namespace MASIC.Plots
 
         private bool RenameTempPngFile(FileSystemInfo exportFile, FileSystemInfo workDir)
         {
-
             string newFileName = null;
 
             try
@@ -286,7 +284,6 @@ namespace MASIC.Plots
 
                 return false;
             }
-
         }
     }
 }

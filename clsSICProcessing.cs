@@ -404,7 +404,6 @@ namespace MASIC
                                 if (scanIndexObservedInFullSIC - scanIndexStart < sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
                                     leftDone = false;
 
-
                                 if (scanIndexMax - scanIndexStart < sicOptions.SICPeakFinderOptions.InitialPeakWidthScansMaximum)
                                     leftDone = false;
 

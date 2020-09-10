@@ -3,7 +3,6 @@ namespace MASIC.Options
 {
     public class PlotOptions
     {
-
         #region "Properties"
 
         /// <summary>
@@ -76,5 +75,4 @@ namespace MASIC.Options
         #endregion
 
     }
-
 }

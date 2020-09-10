@@ -62,7 +62,6 @@ namespace MASIC
             float scanOrAcqTime,
             clsCustomSICList.eCustomSICScanTypeConstants scanType)
         {
-
             try
             {
                 var surveyScanIndexMatch = -1;

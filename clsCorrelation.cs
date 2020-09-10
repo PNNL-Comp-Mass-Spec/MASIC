@@ -349,7 +349,6 @@ namespace MASIC
                 if (!binningOptions.Normalize || maximumIntensity <= 0)
                     return;
 
-
                 for (var index = 0; index < binCount; index++)
                 {
                     if (Math.Abs(binnedYData[index]) > float.Epsilon)
@@ -536,7 +535,6 @@ namespace MASIC
             out float z,
             out float probabilityOfSignificance)
         {
-
             // Given data arrays data1[1..n] and data2[1..n], this program returns Kendall's tau as tau,
             // its number of standard deviations from zero as z, and its two-sided significance level as prob.
             // Small values of prob indicate a significant correlation (tau positive) or anti correlation (tau

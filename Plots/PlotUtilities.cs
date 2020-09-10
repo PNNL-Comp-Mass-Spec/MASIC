@@ -6,13 +6,11 @@ namespace MASIC.Plots
 {
     internal static class PlotUtilities
     {
-
         public static void GetAxisFormatInfo(
             IList<double> dataPoints,
             bool integerData,
             AxisInfo axisInfo)
         {
-
             var absoluteValueMin = dataPoints.Count == 0 ? 0 : Math.Abs(dataPoints[0]);
             var absoluteValueMax = absoluteValueMin;
 
@@ -31,7 +29,6 @@ namespace MASIC.Plots
             bool integerData,
             AxisInfo axisInfo)
         {
-
             if (Math.Abs(absoluteValueMin) < float.Epsilon && Math.Abs(absoluteValueMax) < float.Epsilon)
             {
                 axisInfo.StringFormat = "0";

@@ -130,6 +130,5 @@ namespace MASIC.Plots
             Minimum = min;
             Maximum = max;
         }
-
     }
 }

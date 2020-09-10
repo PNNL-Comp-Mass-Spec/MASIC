@@ -84,7 +84,7 @@ namespace MASICPeakFinder
         /// <returns>
         /// List of detected peaks (list of clsPeakInfo)
         /// .PeakLocation is the location of the peak (index of the peak apex in the source arrays)
-        /// .LeftEdge is the the left edge of the peak (in points, not actual units); this value could be negative if useValleysForPeakWidth = False
+        /// .LeftEdge is the left edge of the peak (in points, not actual units); this value could be negative if useValleysForPeakWidth = False
         /// .RightEdge is the right edge of the peak (in points); this value could be larger than sourceDataCount-1 if useValleysForPeakWidth = False
         /// .PeakArea is the peak area
         /// Compute peak width using: peakWidthPoints = newPeak.RightEdge - newPeak.LeftEdge + 1
@@ -470,7 +470,6 @@ namespace MASICPeakFinder
         /// </remarks>
         private bool LeastSquaresFit(IList<double> xValues, IList<double> yValues, out double[] coefficients, int polynomialOrder)
         {
-
             var equationTerms = new udtLeastSquaresFitEquationTermType[polynomialOrder + 1];
             coefficients = new double[polynomialOrder + 1];
 

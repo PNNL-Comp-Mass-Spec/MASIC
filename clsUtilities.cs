@@ -63,7 +63,6 @@ namespace MASIC
             short desiredCharge = 1,
             double chargeCarrierMass = 0)
         {
-
             if (Math.Abs(chargeCarrierMass) < double.Epsilon)
                 chargeCarrierMass = CHARGE_CARRIER_MASS_MONOISOTOPIC;
 

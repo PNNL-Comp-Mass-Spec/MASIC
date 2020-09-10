@@ -137,7 +137,6 @@ namespace MASICBrowser
             this.Name = "InputBox";
             this.Text = "Title";
             this.ResumeLayout(false);
-
         }
         #endregion
 
