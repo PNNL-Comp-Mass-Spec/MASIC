@@ -129,7 +129,8 @@
 
                 // Polynomial order should be even
                 if (value % 2 != 0)
-                    value -= 1;
+                    value--;
+
                 if (value < 0)
                     value = 0;
 

@@ -237,7 +237,7 @@ namespace MASICPeakFinder
                 for (var i = indexStart; i <= exclusionIndexStart; i++)
                 {
                     sumA += Math.Max(minimumPositiveValue, sicData[i].Intensity);
-                    validDataCountA += 1;
+                    validDataCountA++;
                 }
 
                 var validDataCountB = 0;
@@ -245,7 +245,7 @@ namespace MASICPeakFinder
                 for (var i = exclusionIndexEnd; i <= indexEnd; i++)
                 {
                     sumB += Math.Max(minimumPositiveValue, sicData[i].Intensity);
-                    validDataCountB += 1;
+                    validDataCountB++;
                 }
 
                 success = ComputeAverageNoiseLevelCheckCounts(
@@ -269,13 +269,13 @@ namespace MASICPeakFinder
                     for (var i = indexStart; i <= exclusionIndexStart; i++)
                     {
                         sumA += Math.Pow(Math.Max(minimumPositiveValue, sicData[i].Intensity) - baselineNoiseStats.NoiseLevel, 2);
-                        validDataCountA += 1;
+                        validDataCountA++;
                     }
 
                     for (var i = exclusionIndexEnd; i <= indexEnd; i++)
                     {
                         sumB += Math.Pow(Math.Max(minimumPositiveValue, sicData[i].Intensity) - baselineNoiseStats.NoiseLevel, 2);
-                        validDataCountB += 1;
+                        validDataCountB++;
                     }
                 }
 
@@ -413,10 +413,10 @@ namespace MASICPeakFinder
 
                         for (var segmentIndexCopy = segmentIndex; segmentIndexCopy < segmentCountLocal - 1; segmentIndexCopy++)
                             noiseStatsSegments[segmentIndexCopy] = noiseStatsSegments[segmentIndexCopy + 1];
-                        segmentCountLocal -= 1;
+                        segmentCountLocal--;
                     }
 
-                    segmentIndex -= 1;
+                    segmentIndex--;
                 }
 
                 while (noiseStatsSegments.Count > segmentCountLocal)
@@ -529,11 +529,11 @@ namespace MASICPeakFinder
                             break;
                         }
 
-                        sortedIndex += 1;
+                        sortedIndex++;
                     }
                 }
 
-                sortedIndex += 1;
+                sortedIndex++;
             }
 
             dataUsedCount = dataSortedIndexEnd - dataSortedIndexStart + 1;
@@ -969,10 +969,10 @@ namespace MASICPeakFinder
                     if (shiftLeft)
                     {
                         if (indexStart > 0)
-                            indexStart -= 1;
+                            indexStart--;
                     }
                     else if (indexBaseLeft < sicPeak.IndexMax)
-                        indexBaseLeft += 1;
+                        indexBaseLeft++;
                     if (indexStart <= 0 && indexBaseLeft >= sicPeak.IndexMax)
                     {
                         break;
@@ -1000,10 +1000,10 @@ namespace MASICPeakFinder
                     if (shiftLeft)
                     {
                         if (indexBaseRight > sicPeak.IndexMax)
-                            indexBaseRight -= 1;
+                            indexBaseRight--;
                     }
                     else if (indexEnd < sicData.Count - 1)
-                        indexEnd += 1;
+                        indexEnd++;
                     if (indexBaseRight <= sicPeak.IndexMax && indexEnd >= sicData.Count - 1)
                     {
                         break;
@@ -1196,7 +1196,7 @@ namespace MASICPeakFinder
                     scanNumbers[dataIndex] = sicData[sicPeak.IndexBaseRight].ScanNumber + avgScanInterval;
 
                     intensities[dataIndex] = intensityThreshold;
-                    areaDataCount += 1;
+                    areaDataCount++;
                     // intensitiesSmoothed(dataIndex) = intensityThreshold
                 }
 
@@ -1343,7 +1343,7 @@ namespace MASICPeakFinder
                                 indexMaximumIntensity = dataCount;
                             }
 
-                            dataCount += 1;
+                            dataCount++;
                         }
                     }
                 }
@@ -1366,7 +1366,7 @@ namespace MASICPeakFinder
                             indexMaximumIntensity = dataCount;
                         }
 
-                        dataCount += 1;
+                        dataCount++;
                     }
                 }
 #pragma warning restore 162
@@ -1381,12 +1381,12 @@ namespace MASICPeakFinder
                 // Note that the final data will include one data point less than intensityThreshold at the beginning and end of the data
                 var validDataIndexLeft = indexMaximumIntensity;
                 while (validDataIndexLeft > 0 && intensities[validDataIndexLeft] >= intensityThreshold)
-                    validDataIndexLeft -= 1;
+                    validDataIndexLeft--;
 
                 // Step right from indexMaximumIntensity to find the first data point < intensityThreshold
                 var validDataIndexRight = indexMaximumIntensity;
                 while (validDataIndexRight < dataCount - 1 && intensities[validDataIndexRight] >= intensityThreshold)
-                    validDataIndexRight += 1;
+                    validDataIndexRight++;
 
                 if (validDataIndexLeft > 0 || validDataIndexRight < dataCount - 1)
                 {
@@ -1412,7 +1412,7 @@ namespace MASICPeakFinder
                     // Due to the algorithm used to find the contiguous data centered around the peak maximum, this will typically have no effect
                     validDataIndexLeft = 0;
                     while (validDataIndexLeft < dataCount - 1 && intensities[validDataIndexLeft + 1] < intensityThreshold)
-                        validDataIndexLeft += 1;
+                        validDataIndexLeft++;
 
                     if (validDataIndexLeft >= dataCount - 1)
                     {
@@ -1439,7 +1439,7 @@ namespace MASICPeakFinder
                         // Due to the algorithm used to find the contiguous data centered around the peak maximum, this will typically have no effect
                         validDataIndexRight = dataCount - 1;
                         while (validDataIndexRight > 0 && intensities[validDataIndexRight - 1] < intensityThreshold)
-                            validDataIndexRight -= 1;
+                            validDataIndexRight--;
 
                         if (validDataIndexRight < dataCount - 1)
                         {
@@ -1463,7 +1463,7 @@ namespace MASICPeakFinder
 
                             scanNumbers[0] = scanNumbers[1] - avgScanInterval;
                             intensities[0] = intensityThreshold;
-                            dataCount += 1;
+                            dataCount++;
                         }
 
                         // Make sure that intensities(dataCount-1) is <= intensityThreshold
@@ -1473,7 +1473,7 @@ namespace MASICPeakFinder
 
                             scanNumbers[dataCount] = scanNumbers[dataCount - 1] + avgScanInterval;
                             intensities[dataCount] = intensityThreshold;
-                            dataCount += 1;
+                            dataCount++;
                         }
                     }
                 }
@@ -1496,7 +1496,7 @@ namespace MASICPeakFinder
                                 {
                                     scanNumbers[dataCount] = sicData[dataIndex].ScanNumber;
                                     intensities[dataCount] = smoothedYDataSubset.Data[smoothedDataPointer];
-                                    dataCount += 1;
+                                    dataCount++;
                                 }
                             }
                         }
@@ -1515,7 +1515,7 @@ namespace MASICPeakFinder
                             {
                                 scanNumbers[dataCount] = sicData[dataIndex].ScanNumber;
                                 intensities[dataCount] = sicData[dataIndex].Intensity;
-                                dataCount += 1;
+                                dataCount++;
                             }
                         }
                     }
@@ -1540,7 +1540,7 @@ namespace MASICPeakFinder
                         // Find the next positive point
                         validDataIndexLeft = pointIndex + 1;
                         while (validDataIndexLeft < dataCount && intensities[validDataIndexLeft] <= 0)
-                            validDataIndexLeft += 1;
+                            validDataIndexLeft++;
 
                         // Interpolate between pointIndex-1 and validDataIndexLeft
                         for (var indexPointer = pointIndex; indexPointer < validDataIndexLeft; indexPointer++)
@@ -1559,7 +1559,7 @@ namespace MASICPeakFinder
                     }
                     else
                     {
-                        pointIndex += 1;
+                        pointIndex++;
                     }
                 }
 
@@ -1777,7 +1777,7 @@ namespace MASICPeakFinder
                         if (dataListSorted[i] > 0)
                         {
                             dataListSorted[validDataCount] = dataListSorted[i];
-                            validDataCount += 1;
+                            validDataCount++;
                         }
                     }
 
@@ -1914,7 +1914,7 @@ namespace MASICPeakFinder
                             i = 0;
                         var sum2 = dataListSorted[i];
 
-                        i += 1;
+                        i++;
                         if (i == dataSortedCount)
                             i = dataSortedCount - 1;
                         sum2 += dataListSorted[i];
@@ -2214,7 +2214,7 @@ namespace MASICPeakFinder
                             maximumPotentialPeakArea = potentialPeakArea;
                         }
 
-                        dataPointCountAboveThreshold += 1;
+                        dataPointCountAboveThreshold++;
                     }
                 }
 
@@ -2294,7 +2294,7 @@ namespace MASICPeakFinder
                                 if (Math.Abs(sicData[currentPeak.LeftEdge].Intensity) < double.Epsilon &&
                                     Math.Abs(sicData[currentPeak.LeftEdge + 1].Intensity) < double.Epsilon)
                                 {
-                                    currentPeak.LeftEdge += 1;
+                                    currentPeak.LeftEdge++;
                                 }
                                 else
                                 {
@@ -2308,7 +2308,7 @@ namespace MASICPeakFinder
                                 if (Math.Abs(sicData[currentPeak.RightEdge].Intensity) < double.Epsilon &&
                                     Math.Abs(sicData[currentPeak.RightEdge - 1].Intensity) < double.Epsilon)
                                 {
-                                    currentPeak.RightEdge -= 1;
+                                    currentPeak.RightEdge--;
                                 }
                                 else
                                 {
@@ -2389,7 +2389,7 @@ namespace MASICPeakFinder
                                             if (sicData[peakItem.PeakLocation].Intensity >= sicPeakFinderOptions.IntensityThresholdFractionMax * sicData[peakLocationIndex].Intensity)
                                             {
                                                 // Yes, this is a shoulder peak
-                                                shoulderCount += 1;
+                                                shoulderCount++;
                                             }
                                         }
                                     }
@@ -2611,7 +2611,7 @@ namespace MASICPeakFinder
 
             if (testingMinimumPeakWidth)
             {
-                if (peaksContainer.Peaks.Count <= 0)
+                if (peaksContainer.Peaks.Count == 0)
                 {
                     // No peaks were found; create a new peak list using the original peak location index as the peak center
                     var newPeak = new clsPeakInfo(peaksContainer.OriginalPeakLocationIndex)
@@ -2643,7 +2643,7 @@ namespace MASICPeakFinder
                 }
             }
 
-            if (peaksContainer.Peaks.Count <= 0)
+            if (peaksContainer.Peaks.Count == 0)
             {
                 // No peaks were found
                 return false;
@@ -2703,7 +2703,7 @@ namespace MASICPeakFinder
                     if (peaksContainer.YData[peakIndexStart] > peaksContainer.YData[peakIndexStart + 1])
                         // || (usedSmoothedDataForPeakDetection && peaksContainer.SmoothedYData[peakIndexStart] < 0))
                     {
-                        peakIndexStart += 1;
+                        peakIndexStart++;
                     }
                     else
                     {
@@ -2716,7 +2716,7 @@ namespace MASICPeakFinder
                     if (peaksContainer.YData[peakIndexEnd - 1] < peaksContainer.YData[peakIndexEnd])
                         // || (usedSmoothedDataForPeakDetection && peaksContainer.SmoothedYData[peakIndexEnd] < 0))
                     {
-                        peakIndexEnd -= 1;
+                        peakIndexEnd--;
                     }
                     else
                     {
@@ -2739,20 +2739,20 @@ namespace MASICPeakFinder
                     //{
                     //    // We reached a low intensity data point and we're going downhill (i.e. the slope from this point to peakLocationIndex is positive)
                     //    // Step once more and stop
-                    //    peakIndexStart -= 1;
+                    //    peakIndexStart--;
                     //    break;
                     //}
 
                     if (peaksContainer.SmoothedYData[peakIndexStart - 1] < peaksContainer.SmoothedYData[peakIndexStart])
                     {
                         // The adjacent point is lower than the current point
-                        peakIndexStart -= 1;
+                        peakIndexStart--;
                     }
                     else if (Math.Abs(peaksContainer.SmoothedYData[peakIndexStart - 1] -
                                       peaksContainer.SmoothedYData[peakIndexStart]) < double.Epsilon)
                     {
                         // The adjacent point is equal to the current point
-                        peakIndexStart -= 1;
+                        peakIndexStart--;
                     }
                     // The next point to the left is not lower; what about the point after it?
                     else if (peakIndexStart > 1)
@@ -2773,9 +2773,9 @@ namespace MASICPeakFinder
                                     break;
                             }
 
-                            peakIndexStart -= 1;
+                            peakIndexStart--;
 
-                            stepOverIncreaseCount += 1;
+                            stepOverIncreaseCount++;
                         }
                         else
                         {
@@ -2798,20 +2798,20 @@ namespace MASICPeakFinder
                     //    peaksContainer.SmoothedYData(peakIndexEnd + 1) < Math.Max(sicPeakFinderOptions.IntensityThresholdFractionMax * peakMaximum, sicPeakFinderOptions.IntensityThresholdAbsoluteMinimum))
                     //{
                     //    // We reached a low intensity data point and we're going downhill (i.e. the slope from peakLocationIndex to this point is negative)
-                    //    peakIndexEnd += 1;
+                    //    peakIndexEnd++;
                     //    break;
                     //}
 
                     if (peaksContainer.SmoothedYData[peakIndexEnd + 1] < peaksContainer.SmoothedYData[peakIndexEnd])
                     {
                         // The adjacent point is lower than the current point
-                        peakIndexEnd += 1;
+                        peakIndexEnd++;
                     }
                     else if (Math.Abs(peaksContainer.SmoothedYData[peakIndexEnd + 1] -
                         peaksContainer.SmoothedYData[peakIndexEnd]) < double.Epsilon)
                     {
                         // The adjacent point is equal to the current point
-                        peakIndexEnd += 1;
+                        peakIndexEnd++;
                     }
                     // The next point to the right is not lower; what about the point after it?
                     else if (peakIndexEnd < peaksContainer.SourceDataCount - 2)
@@ -2832,9 +2832,9 @@ namespace MASICPeakFinder
                                     break;
                             }
 
-                            peakIndexEnd += 1;
+                            peakIndexEnd++;
 
-                            stepOverIncreaseCount += 1;
+                            stepOverIncreaseCount++;
                         }
                         else
                         {
@@ -2962,7 +2962,7 @@ namespace MASICPeakFinder
                 // Make sure filterThirdWidth is Odd
                 if (filterThirdWidth % 2 == 0)
                 {
-                    filterThirdWidth -= 1;
+                    filterThirdWidth--;
                 }
 
                 // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
@@ -3042,7 +3042,7 @@ namespace MASICPeakFinder
                     if (intensityToUse >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel)
                     {
                         potentialPeakArea += intensityToUse;
-                        validPeakCount += 1;
+                        validPeakCount++;
                     }
 
                     if (intensityQueue.Count >= sicPeakFinderOptions.InitialPeakWidthScansMaximum)
@@ -3054,7 +3054,7 @@ namespace MASICPeakFinder
                         if (oldestIntensity >= sicPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel && oldestIntensity > 0)
                         {
                             potentialPeakArea -= oldestIntensity;
-                            validPeakCount -= 1;
+                            validPeakCount--;
                         }
                     }
                     // Add this intensity to the queue

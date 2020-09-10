@@ -267,7 +267,7 @@ namespace MagnitudeConcavityPeakFinder
                     maximumPotentialPeakArea = potentialPeakArea;
                 }
 
-                dataPointCountAboveThreshold += 1;
+                dataPointCountAboveThreshold++;
             }
 
             return maximumPotentialPeakArea;
@@ -333,7 +333,7 @@ namespace MagnitudeConcavityPeakFinder
                 if (intensityToUse >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel)
                 {
                     potentialPeakArea += intensityToUse;
-                    validPeakCount += 1;
+                    validPeakCount++;
                 }
 
                 if (queIntensityList.Count >= udtSICPeakFinderOptions.InitialPeakWidthScansMaximum)
@@ -345,7 +345,7 @@ namespace MagnitudeConcavityPeakFinder
                     if (dblOldestIntensity >= udtSICPeakFinderOptions.SICBaselineNoiseOptions.MinimumBaselineNoiseLevel && dblOldestIntensity > 0)
                     {
                         potentialPeakArea -= dblOldestIntensity;
-                        validPeakCount -= 1;
+                        validPeakCount--;
                     }
                 }
 
@@ -571,7 +571,7 @@ namespace MagnitudeConcavityPeakFinder
 
         private void ExamineNarrowPeaks(PeakDataContainer peakData, udtSICPeakFinderOptionsType peakFinderOptions)
         {
-            if (peakData.Peaks.Count <= 0)
+            if (peakData.Peaks.Count == 0)
             {
                 // No peaks were found; create a new peak list using the original peak location index as the peak center
                 peakData.Peaks = new List<clsPeak>
@@ -627,13 +627,13 @@ namespace MagnitudeConcavityPeakFinder
                     peakData.SmoothedYData[peak.LeftEdge])
                 {
                     // The adjacent point is lower than the current point
-                    peak.LeftEdge -= 1;
+                    peak.LeftEdge--;
                 }
                 else if (Math.Abs(peakData.SmoothedYData[peak.LeftEdge - 1] -
                                   peakData.SmoothedYData[peak.LeftEdge]) < double.Epsilon)
                 {
                     // The adjacent point is equal to the current point
-                    peak.LeftEdge -= 1;
+                    peak.LeftEdge--;
                 }
                 else
                 {
@@ -659,9 +659,9 @@ namespace MagnitudeConcavityPeakFinder
                                 }
                             }
 
-                            peak.LeftEdge -= 1;
+                            peak.LeftEdge--;
 
-                            intStepOverIncreaseCount += 1;
+                            intStepOverIncreaseCount++;
                         }
                         else
                         {
@@ -689,13 +689,13 @@ namespace MagnitudeConcavityPeakFinder
                 if (peakData.SmoothedYData[peak.RightEdge + 1] < peakData.SmoothedYData[peak.RightEdge])
                 {
                     // The adjacent point is lower than the current point
-                    peak.RightEdge += 1;
+                    peak.RightEdge++;
                 }
                 else if (Math.Abs(peakData.SmoothedYData[peak.RightEdge + 1] -
                                   peakData.SmoothedYData[peak.RightEdge]) < double.Epsilon)
                 {
                     // The adjacent point is equal to the current point
-                    peak.RightEdge += 1;
+                    peak.RightEdge++;
                 }
                 else
                 {
@@ -722,9 +722,9 @@ namespace MagnitudeConcavityPeakFinder
                                 }
                             }
 
-                            peak.RightEdge += 1;
+                            peak.RightEdge++;
 
-                            intStepOverIncreaseCount += 1;
+                            intStepOverIncreaseCount++;
                         }
                         else
                         {
@@ -810,7 +810,7 @@ namespace MagnitudeConcavityPeakFinder
                 ExamineNarrowPeaks(peakData, peakFinderOptions);
             }
 
-            if (peakData.Peaks.Count <= 0)
+            if (peakData.Peaks.Count == 0)
             {
                 // No peaks were found
                 return false;
@@ -873,7 +873,7 @@ namespace MagnitudeConcavityPeakFinder
                     if (peakData.YData[peak.LeftEdge] > peakData.YData[peak.LeftEdge + 1])
                     {
                         // OrElse (usedSmoothedDataForPeakDetection AndAlso peakData.SmoothedYData[peak.LeftEdge) < 0) Then
-                        peak.LeftEdge += 1;
+                        peak.LeftEdge++;
                     }
                     else
                     {
@@ -886,7 +886,7 @@ namespace MagnitudeConcavityPeakFinder
                     if (peakData.YData[peak.RightEdge - 1] < peakData.YData[peak.RightEdge])
                     {
                         // OrElse (usedSmoothedDataForPeakDetection AndAlso peakData.SmoothedYData[peak.RightEdge) < 0) Then
-                        peak.RightEdge -= 1;
+                        peak.RightEdge--;
                     }
                     else
                     {
@@ -1068,7 +1068,7 @@ namespace MagnitudeConcavityPeakFinder
             // Make sure filterThirdWidth is Odd
             if (filterThirdWidth % 2 == 0)
             {
-                filterThirdWidth -= 1;
+                filterThirdWidth--;
             }
 
             const int startIndex = 0;

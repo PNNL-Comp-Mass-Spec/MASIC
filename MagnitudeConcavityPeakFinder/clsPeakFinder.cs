@@ -287,7 +287,7 @@ namespace MagnitudeConcavityPeakFinder
 
                     if (yValuesZeroBased[compareIndex] < intensityThreshold)
                     {
-                        lowIntensityPointCount += 1;
+                        lowIntensityPointCount++;
                         if (lowIntensityPointCount > peakHalfWidth)
                         {
                             newPeak.LeftEdge = compareIndex +
@@ -324,7 +324,7 @@ namespace MagnitudeConcavityPeakFinder
 
                     if (yValuesZeroBased[compareIndex] < intensityThreshold)
                     {
-                        lowIntensityPointCount += 1;
+                        lowIntensityPointCount++;
                         if (lowIntensityPointCount > peakHalfWidth)
                         {
                             newPeak.RightEdge = compareIndex - (peakHalfWidth - 1);
@@ -701,7 +701,6 @@ namespace MagnitudeConcavityPeakFinder
             int termCount,
             ref double[] b)
         {
-
             var indexC = new int[termCount];
             var indexR = new int[termCount];
 
@@ -735,7 +734,7 @@ namespace MagnitudeConcavityPeakFinder
                         }
                     }
 
-                    ipiv[columnIndex] += 1;
+                    ipiv[columnIndex]++;
                     if (rowIndex != columnIndex)
                     {
                         double swapValue;

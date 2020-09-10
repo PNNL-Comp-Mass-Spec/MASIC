@@ -126,7 +126,7 @@ namespace MagnitudeConcavityPeakFinder
                     {
                         // Copy in place
                         sortedData[validDataCount] = sortedData[intIndex];
-                        validDataCount += 1;
+                        validDataCount++;
                     }
                 }
 
@@ -237,7 +237,7 @@ namespace MagnitudeConcavityPeakFinder
                             intIndex = 0;
                         summedIntensity = sortedData[intIndex];
 
-                        intIndex += 1;
+                        intIndex++;
                         if (intIndex == dataSortedCount)
                             intIndex = dataSortedCount - 1;
                         summedIntensity += sortedData[intIndex];

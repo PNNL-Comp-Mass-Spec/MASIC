@@ -121,7 +121,7 @@ namespace MASICPeakFinder
             try
             {
                 var sourceDataCount = xValues.Length;
-                if (sourceDataCount <= 0)
+                if (sourceDataCount == 0)
                     return detectedPeaks;
 
                 // Reserve space for the first and second derivatives
@@ -200,7 +200,7 @@ namespace MASICPeakFinder
 
                                         if (yValues[compareIndex] < intensityThreshold)
                                         {
-                                            lowIntensityPointCount += 1;
+                                            lowIntensityPointCount++;
                                             if (lowIntensityPointCount > peakHalfWidth)
                                             {
                                                 newPeak.LeftEdge = compareIndex + (peakHalfWidth - 1);
@@ -233,7 +233,7 @@ namespace MASICPeakFinder
 
                                         if (yValues[compareIndex] < intensityThreshold)
                                         {
-                                            lowIntensityPointCount += 1;
+                                            lowIntensityPointCount++;
                                             if (lowIntensityPointCount > peakHalfWidth)
                                             {
                                                 newPeak.RightEdge = compareIndex - (peakHalfWidth - 1);
@@ -678,7 +678,7 @@ namespace MASICPeakFinder
                         }
                     }
 
-                    ipiv[columnIndex] += 1;
+                    ipiv[columnIndex]++;
                     if (rowIndex != columnIndex)
                     {
                         double swapValue;

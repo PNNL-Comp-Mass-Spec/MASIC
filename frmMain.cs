@@ -324,7 +324,7 @@ namespace MASIC
         /// </returns>
         private bool ClearCustomSICList(bool confirmReplaceExistingResults)
         {
-            if (mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows.Count <= 0)
+            if (mCustomSICValuesDataset.Tables[CUSTOM_SIC_VALUES_DATA_TABLE].Rows.Count == 0)
                 return true;
 
             DialogResult result;

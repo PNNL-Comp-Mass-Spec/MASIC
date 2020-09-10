@@ -1065,7 +1065,7 @@ namespace MASICBrowser
                             }
 
                             sequences += sequenceRows[0][COL_NAME_SEQUENCE].ToString();
-                            sequenceCount += 1;
+                            sequenceCount++;
                         }
                     }
                     catch (Exception)
@@ -1162,14 +1162,16 @@ namespace MASICBrowser
             {
                 if (lstParentIonData.SelectedIndex < lstParentIonData.Items.Count - 1)
                 {
-                    lstParentIonData.SelectedIndex += 1;
+                    lstParentIonData.SelectedIndex++;
                 }
                 else if (mAutoStepEnabled)
+                {
                     ToggleAutoStep(true);
+                }
             }
             else if (lstParentIonData.SelectedIndex > 0)
             {
-                lstParentIonData.SelectedIndex -= 1;
+                lstParentIonData.SelectedIndex--;
             }
             else if (mAutoStepEnabled)
                 ToggleAutoStep(true);
@@ -1229,12 +1231,12 @@ namespace MASICBrowser
                     // Zero pad Series 1
                     xDataSeries1[0] = currentParentIon.SICData[0].ScanNumber;
                     yDataSeries1[0] = 0;
-                    dataCountSeries1 += 1;
+                    dataCountSeries1++;
 
                     // Zero pad Series 2
                     xDataSeries2[0] = currentParentIon.SICData[0].ScanNumber;
                     yDataSeries2[0] = 0;
-                    dataCountSeries2 += 1;
+                    dataCountSeries2++;
 
                     zeroEdgeSeries1 = true;
                 }
@@ -1301,22 +1303,22 @@ namespace MASICBrowser
                             // Zero pad Series 1
                             xDataSeries1[dataCountSeries1] = currentParentIon.SICData[index].ScanNumber;
                             yDataSeries1[dataCountSeries1] = currentParentIon.SICData[index].Intensity;
-                            dataCountSeries1 += 1;
+                            dataCountSeries1++;
                             xDataSeries1[dataCountSeries1] = currentParentIon.SICData[index].ScanNumber;
                             yDataSeries1[dataCountSeries1] = 0;
-                            dataCountSeries1 += 1;
+                            dataCountSeries1++;
 
                             // Zero pad Series 2
                             xDataSeries2[dataCountSeries2] = currentParentIon.SICData[index].ScanNumber;
                             yDataSeries2[dataCountSeries2] = 0;
-                            dataCountSeries2 += 1;
+                            dataCountSeries2++;
 
                             zeroEdgeSeries1 = true;
                         }
 
                         xDataSeries2[dataCountSeries2] = currentParentIon.SICData[index].ScanNumber;
                         yDataSeries2[dataCountSeries2] = currentParentIon.SICData[index].Intensity;
-                        dataCountSeries2 += 1;
+                        dataCountSeries2++;
                     }
                     else
                     {
@@ -1325,22 +1327,22 @@ namespace MASICBrowser
                             // Zero pad Series 2
                             xDataSeries2[dataCountSeries2] = currentParentIon.SICData[index - 1].ScanNumber;
                             yDataSeries2[dataCountSeries2] = 0;
-                            dataCountSeries2 += 1;
+                            dataCountSeries2++;
 
                             // Zero pad Series 1
                             xDataSeries1[dataCountSeries1] = currentParentIon.SICData[index - 1].ScanNumber;
                             yDataSeries1[dataCountSeries1] = 0;
-                            dataCountSeries1 += 1;
+                            dataCountSeries1++;
 
                             xDataSeries1[dataCountSeries1] = currentParentIon.SICData[index - 1].ScanNumber;
                             yDataSeries1[dataCountSeries1] = currentParentIon.SICData[index - 1].Intensity;
-                            dataCountSeries1 += 1;
+                            dataCountSeries1++;
                             zeroEdgeSeries1 = false;
                         }
 
                         xDataSeries1[dataCountSeries1] = currentParentIon.SICData[index].ScanNumber;
                         yDataSeries1[dataCountSeries1] = currentParentIon.SICData[index].Intensity;
-                        dataCountSeries1 += 1;
+                        dataCountSeries1++;
                     }
 
                     if (index >= smoothedYDataIndexStart &&
@@ -1348,7 +1350,7 @@ namespace MASICBrowser
                     {
                         xDataSeries4[dataCountSeries4] = currentParentIon.SICData[index].ScanNumber;
                         yDataSeries4[dataCountSeries4] = smoothedYData[index - smoothedYDataIndexStart];
-                        dataCountSeries4 += 1;
+                        dataCountSeries4++;
                     }
                 }
 
@@ -2338,7 +2340,7 @@ namespace MASICBrowser
                     while (!reader.EndOfStream)
                     {
                         var dataLine = reader.ReadLine();
-                        linesRead += 1;
+                        linesRead++;
 
                         if (dataLine != null)
                         {
@@ -2508,7 +2510,7 @@ namespace MASICBrowser
         {
             try
             {
-                if (txtDataFilePath.Text.Length <= 0)
+                if (txtDataFilePath.Text.Length == 0)
                     return;
 
                 var regKey = Registry.CurrentUser.CreateSubKey($"SOFTWARE\\PNNL PAST Toolkit\\{REG_APP_NAME}\\{REG_SECTION_NAME}");
@@ -2697,7 +2699,7 @@ namespace MASICBrowser
             double mzFilter, mzFilterTol;
             double minimumSN;
 
-            if (mParentIonStats.Count <= 0)
+            if (mParentIonStats.Count == 0)
             {
                 mParentIonPointerArray = new int[0];
                 return;
@@ -2769,7 +2771,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].Index;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2783,7 +2785,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.ScanNumberMaxIntensity;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2797,7 +2799,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = double.Parse(mParentIonStats[index].OptimalPeakApexScanNumber + "." + Math.Round(mParentIonStats[index].MZ, 0).ToString("0000") + mParentIonStats[index].Index.ToString("00000"));
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2811,7 +2813,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = double.Parse(Math.Round(mParentIonStats[index].MZ, 2) + mParentIonStats[index].SICStats.ScanNumberMaxIntensity.ToString("000000"));
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2825,7 +2827,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.SignalToNoiseRatio;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2840,7 +2842,7 @@ namespace MASICBrowser
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = clsMASICPeakFinder.BaselineAdjustIntensity(mParentIonStats[index].SICStats.Peak, true);
 
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2858,7 +2860,7 @@ namespace MASICBrowser
                                 sortKeys[mParentIonPointerArrayCount] = clsMASICPeakFinder.BaselineAdjustArea(sicStats.Peak, sicStats.SICPeakWidthFullScans, true);
                             }
 
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2874,7 +2876,7 @@ namespace MASICBrowser
                             // Create a sort key that is based on both PeakFWHMScans and ScanNumberMaxIntensity by separating the two integers with a "."
                             sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].SICStats.Peak.FWHMScanWidth,
                                                                                mParentIonStats[index].SICStats.ScanNumberMaxIntensity);
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2898,7 +2900,7 @@ namespace MASICBrowser
                                 sortKeys[mParentIonPointerArrayCount] += mParentIonStats[index].FragScanObserved / 1000000.0;
                             }
 
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2912,7 +2914,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.MaxIntensityValue;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2926,7 +2928,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.Area;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2942,7 +2944,7 @@ namespace MASICBrowser
                             // Create a sort key that is based on both FragScan-OptimalPeakApexScanNumber and OptimalPeakApexScanNumber by separating the two integers with a "."
                             sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].FragScanObserved - mParentIonStats[index].OptimalPeakApexScanNumber,
                                                                                mParentIonStats[index].OptimalPeakApexScanNumber);
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2958,7 +2960,7 @@ namespace MASICBrowser
                             // Create a sort key that is based on both ScanNumberMaxIntensity-OptimalPeakApexScanNumber and OptimalPeakApexScanNumber by separating the two integers with a "."
                             sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].SICStats.ScanNumberMaxIntensity - mParentIonStats[index].OptimalPeakApexScanNumber,
                                                                                mParentIonStats[index].OptimalPeakApexScanNumber);
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2974,7 +2976,7 @@ namespace MASICBrowser
                             // Create a sort key that is based on both ShoulderCount and OptimalPeakApexScanNumber by separating the two integers with a "."
                             sortKeys[mParentIonPointerArrayCount] = GetSortKey(mParentIonStats[index].SICStats.Peak.ShoulderCount,
                                                                                mParentIonStats[index].OptimalPeakApexScanNumber);
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -2988,7 +2990,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.ParentIonIntensity;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -3002,7 +3004,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.StatisticalMoments.Skew;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -3016,7 +3018,7 @@ namespace MASICBrowser
                         {
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = mParentIonStats[index].SICStats.Peak.StatisticalMoments.KSStat;
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -3031,7 +3033,7 @@ namespace MASICBrowser
                             mParentIonPointerArray[mParentIonPointerArrayCount] = index;
                             sortKeys[mParentIonPointerArrayCount] = GetSortKey((int)Math.Round(mParentIonStats[index].SICStats.Peak.BaselineNoiseStats.NoiseLevel, 0),
                                                                                mParentIonStats[index].SICStats.Peak.SignalToNoiseRatio);
-                            mParentIonPointerArrayCount += 1;
+                            mParentIonPointerArrayCount++;
                         }
                     }
 
@@ -3243,7 +3245,7 @@ namespace MASICBrowser
                     // Make sure filterThirdWidth is Odd
                     if (filterThirdWidth % 2 == 0)
                     {
-                        filterThirdWidth -= 1;
+                        filterThirdWidth--;
                     }
 
                     // Note that the SavitzkyGolayFilter doesn't work right for PolynomialDegree values greater than 0
