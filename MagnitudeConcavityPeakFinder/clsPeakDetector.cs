@@ -246,20 +246,20 @@ namespace MagnitudeConcavityPeakFinder
             double potentialPeakArea = 0;
             dataPointCountAboveThreshold = 0;
 
-            for (var index = 0; index < intensityData.Count; index++)
+            foreach (var value in intensityData)
             {
-                if (intensityData[index] > maximumIntensity)
+                if (value > maximumIntensity)
                 {
-                    maximumIntensity = intensityData[index];
+                    maximumIntensity = value;
                 }
 
-                if (intensityData[index] < udtBaselineNoiseStats.NoiseLevel)
+                if (value < udtBaselineNoiseStats.NoiseLevel)
                 {
                     continue;
                 }
 
                 // Add this intensity to potentialPeakArea
-                potentialPeakArea += intensityData[index];
+                potentialPeakArea += value;
                 if (queIntensityList.Count >= peakFinderOptions.InitialPeakWidthScansMaximum)
                 {
                     // Decrement potentialPeakArea by the oldest item in the queue
@@ -267,7 +267,7 @@ namespace MagnitudeConcavityPeakFinder
                 }
 
                 // Add this intensity to the queue
-                queIntensityList.Enqueue(intensityData[index]);
+                queIntensityList.Enqueue(value);
 
                 if (potentialPeakArea > maximumPotentialPeakArea)
                 {
