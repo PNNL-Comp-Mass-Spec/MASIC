@@ -49,7 +49,7 @@ namespace MASIC
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         /// <summary>
         /// Matrix of coefficients, derived from the isotope contribution table

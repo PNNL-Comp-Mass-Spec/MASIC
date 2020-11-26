@@ -13,6 +13,8 @@ namespace MASIC.Options
     /// <remarks>Set options through the Property Functions or by passing parameterFilePath to ProcessFile()</remarks>
     public class MASICOptions : clsMasicEventNotifier
     {
+        // Ignore Spelling: Sql, Da, plex, Butterworth, SavitzkyGolay, Zeroes, html
+
         #region "Constants and Enums"
 
         public const string XML_SECTION_DATABASE_SETTINGS = "MasicDatabaseSettings";
@@ -28,7 +30,7 @@ namespace MASIC.Options
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         /// <summary>
         /// SIC processing options
@@ -310,7 +312,7 @@ namespace MASIC.Options
 
                 if (!reader.SectionPresent(XML_SECTION_DATABASE_SETTINGS))
                 {
-                    // Database settings section not found; that's ok
+                    // Database settings section not found; that's OK
                 }
                 else
                 {
@@ -323,7 +325,7 @@ namespace MASIC.Options
 
                 if (!reader.SectionPresent(XML_SECTION_IMPORT_OPTIONS))
                 {
-                    // Import options section not found; that's ok
+                    // Import options section not found; that's OK
                 }
                 else
                 {
@@ -337,7 +339,7 @@ namespace MASIC.Options
                 // MASIC Export Options
                 if (!reader.SectionPresent(XML_SECTION_EXPORT_OPTIONS))
                 {
-                    // Export options section not found; that's ok
+                    // Export options section not found; that's OK
                 }
                 else
                 {
@@ -694,7 +696,7 @@ namespace MASIC.Options
                 // Custom SIC options
                 if (!reader.SectionPresent(XML_SECTION_CUSTOM_SIC_VALUES))
                 {
-                    // Custom SIC values section not found; that's ok
+                    // Custom SIC values section not found; that's OK
                     // No more settings to load so return true
                     return true;
                 }

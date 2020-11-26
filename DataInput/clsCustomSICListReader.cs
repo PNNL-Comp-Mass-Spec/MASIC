@@ -30,7 +30,7 @@ namespace MASIC.DataInput
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         private readonly clsCustomSICList mCustomSICList;
 

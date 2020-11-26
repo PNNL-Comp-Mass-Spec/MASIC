@@ -184,7 +184,7 @@
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         private float mMaxSICPeakWidthMinutesBackward;
         private float mMaxSICPeakWidthMinutesForward;
@@ -275,7 +275,7 @@
             return string.Format("SIC Tolerance: {0:F2} {1}", SICTolerance, toleranceUnits);
         }
 
-        #region "Classwide variables"
+        #region "Class wide variables"
         private float mSimilarIonMZToleranceHalfWidth = 0.1F;
         private float mSimilarIonToleranceHalfWidthMinutes = 5;
         private float mSpectrumSimilarityMinimum = 0.8F;

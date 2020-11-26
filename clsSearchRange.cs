@@ -31,7 +31,7 @@ namespace MASIC
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         private eDataTypeToUse mDataType;
 

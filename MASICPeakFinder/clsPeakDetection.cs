@@ -3,17 +3,25 @@ using System.Collections.Generic;
 
 namespace MASICPeakFinder
 {
+    /// <summary>
+    /// <para>
+    /// Peak detection routines
+    /// Written by Matthew Monroe in roughly 2001 at UNC (Chapel Hill, NC)
+    /// Kevin Lan provided the concept of Magnitude Concavity fitting
+    /// Ported from LabView code to VB 6 in June 2003 at PNNL (Richland, WA)
+    /// Ported from VB 6 to VB.NET in October 2003
+    /// Switched from using the eols.dll least squares fitting routine to using a local function
+    /// Ported to C# in February 2015
+    /// </para>
+    /// <para>
+    /// Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in November 2004
+    /// Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
+    /// </para>
+    /// </summary>
     internal class clsPeakDetection
     {
-        // Peak detection routines
-        // Written by Matthew Monroe in roughly 2001 at UNC (Chapel Hill, NC)
-        // Kevin Lan provided the concept of Magnitude Concavity fitting
-        // Ported from LabView code to VB 6 in June 2003 at PNNL (Richland, WA)
-        // Ported from VB 6 to VB.NET in October 2003
-        // Switched from using the eols.dll least squares fitting routine to using a local function
-
-        // Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in November 2004
-        // Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: cx, struct, lan, pFunc, const, Eols, EoLeast, fn, coef
 
         private enum eTermFunctionConstants
         {
@@ -35,7 +43,10 @@ namespace MASICPeakFinder
             public double Coefficient;
             public bool Inverse;
 
-            public double ParamResult;        // Stores the coefficient determined for the fit
+            /// <summary>
+            /// Stores the coefficient determined for the fit
+            /// </summary>
+            public double ParamResult;
         }
 
         /// <summary>
@@ -110,7 +121,7 @@ namespace MASICPeakFinder
             // Given this, a_1 is the first derivative and a_2 is the second derivative
             // From this, the first derivative gives the index of the peak apex
             // The standard deviation (s) can be found using:
-            // s = sqrt(-h(t_r) / h''(t_r))
+            //   s = sqrt(-h(t_r) / h''(t_r))
             // where h(t_r) is the height of the peak at the peak center
             // and h''(t_r) is the height of the second derivative of the peak
             // In chromatography, the baseline peak widthInPoints = 4*sigma

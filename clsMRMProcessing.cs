@@ -9,6 +9,9 @@ using ThermoRawFileReader;
 
 namespace MASIC
 {
+    /// <summary>
+    /// MRM processing class
+    /// </summary>
     public class clsMRMProcessing : clsMasicEventNotifier
     {
         #region "Structures"
@@ -547,6 +550,16 @@ namespace MASIC
             return false;
         }
 
+        /// <summary>
+        /// Process MRM data
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="sicProcessor"></param>
+        /// <param name="xmlResultsWriter"></param>
+        /// <param name="peakFinder"></param>
+        /// <param name="parentIonsProcessed"></param>
+        /// <returns></returns>
         public bool ProcessMRMList(
             clsScanList scanList,
             clsSpectraCache spectraCache,

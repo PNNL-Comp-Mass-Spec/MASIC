@@ -16,7 +16,7 @@ namespace MASIC
     /// </summary>
     public class clsCorrelation : EventNotifier
     {
-        #region "Classwide variables"
+        #region "Class wide variables"
 
         /// <summary>
         /// Coefficients used by GammaLn

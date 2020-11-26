@@ -19,11 +19,14 @@ namespace MASIC
 
         #region "Properties"
 
+        /// <summary>
+        /// Scan Stats list
+        /// </summary>
         public List<ScanStatsEntry> ScanStats { get; }
 
         #endregion
 
-        #region "Classwide variables"
+        #region "Class wide variables"
 
         private readonly clsReporterIons mReporterIons;
 

@@ -7,15 +7,34 @@ using PRISM;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Custom SIC list container
+    /// </summary>
     public class clsCustomSICList : EventNotifier
     {
+        // Ignore Spelling: frag, acq, Da
+
         #region "Constants and Enums"
 
+        /// <summary>
+        /// Keyword corresponding to CustomSICScanTypeConstants.Absolute
+        /// </summary>
         public const string CUSTOM_SIC_TYPE_ABSOLUTE = "Absolute";
+
+        /// <summary>
+        /// Keyword corresponding to CustomSICScanTypeConstants.Relative
+        /// </summary>
         public const string CUSTOM_SIC_TYPE_RELATIVE = "Relative";
+
+        /// <summary>
+        /// Keyword corresponding to CustomSICScanTypeConstants.AcquisitionTime
+        /// </summary>
         public const string CUSTOM_SIC_TYPE_ACQUISITION_TIME = "AcquisitionTime";
 
         public enum eCustomSICScanTypeConstants
+        /// <summary>
+        /// Custom SIC scan types
+        /// </summary>
         {
             /// <summary>
             /// Absolute scan number
@@ -42,6 +61,9 @@ namespace MASIC
 
         #region "Properties"
 
+        /// <summary>
+        /// Custom SIC list filename
+        /// </summary>
         public string CustomSICListFileName
         {
             get => mCustomSICListFileName ?? string.Empty;
@@ -59,6 +81,9 @@ namespace MASIC
         }
 
         public eCustomSICScanTypeConstants ScanToleranceType { get; set; }
+        /// <summary>
+        /// Scan tolerance type
+        /// </summary>
 
         /// <summary>
         /// This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute
@@ -77,14 +102,29 @@ namespace MASIC
         /// </summary>
         public bool LimitSearchToCustomMZList { get; set; }
 
+        /// <summary>
+        /// Comma separated list of m/z values
+        /// </summary>
         public string RawTextMZList { get; set; }
+
+        /// <summary>
+        /// Comma separate list of tolerances
+        /// </summary>
         public string RawTextMZToleranceDaList { get; set; }
+
+        /// <summary>
+        /// Comma separated list of scan times
+        /// </summary>
         public string RawTextScanOrAcqTimeCenterList { get; set; }
+
+        /// <summary>
+        /// Comma separated list of scan time tolerances
+        /// </summary>
         public string RawTextScanOrAcqTimeToleranceList { get; set; }
 
         #endregion
 
-        #region "Classwide variables"
+        #region "Class wide variables"
 
         private string mCustomSICListFileName;
 
@@ -542,6 +582,9 @@ namespace MASIC
             return true;
         }
 
+        /// <summary>
+        /// Validate data in CustomMZSearchValues
+        /// </summary>
         public void ValidateCustomSICList()
         {
             if (CustomMZSearchValues == null ||
@@ -589,6 +632,10 @@ namespace MASIC
             }
         }
 
+        /// <summary>
+        /// Show a count of the number of custom m/z values to find
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             if (CustomMZSearchValues == null || CustomMZSearchValues.Count == 0)

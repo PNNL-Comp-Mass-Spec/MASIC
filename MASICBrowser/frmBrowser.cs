@@ -36,10 +36,18 @@ using ProgressFormNET;
 
 namespace MASICBrowser
 {
+    /// <summary>
+    /// MASIC Browser
+    /// </summary>
     public partial class frmBrowser : Form
     {
+        // Ignore Spelling: similarFragScan, Const
+
         private const string PROGRAM_DATE = "June 9, 2020";
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public frmBrowser()
         {
             Application.EnableVisualStyles();

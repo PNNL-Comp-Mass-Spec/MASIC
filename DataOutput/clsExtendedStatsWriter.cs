@@ -18,7 +18,7 @@ namespace MASIC.DataOutput
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         /// <summary>
         /// Keys are strings of extended info names

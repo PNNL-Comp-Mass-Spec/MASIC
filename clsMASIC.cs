@@ -35,12 +35,14 @@ namespace MASIC
 {
     public class clsMASIC : PRISM.FileProcessor.ProcessFilesBase
     {
+        // Ignore Spelling: Da, uncaching, OxyPlot, UnCache
+
         /// <summary>
         /// Constructor
         /// </summary>
         public clsMASIC()
         {
-            mFileDate = "August 14, 2020";
+            mFileDate = "November 25, 2020";
 
             LocalErrorCode = eMasicErrorCodes.NoError;
             StatusMessage = string.Empty;
@@ -113,7 +115,7 @@ namespace MASIC
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         private bool mLoggedMASICVersion;
 
@@ -1578,7 +1580,7 @@ namespace MASIC
         /// Load settings from a parameter file
         /// </summary>
         /// <param name="parameterFilePath"></param>
-        /// <returns></returns>
+        /// <returns>True if success, false if an error</returns>
         // ReSharper disable once UnusedMember.Global
         public bool LoadParameterFileSettings(string parameterFilePath)
         {

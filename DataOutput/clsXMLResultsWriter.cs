@@ -8,11 +8,15 @@ using PRISM;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// XML results file writer
+    /// </summary>
     public class clsXMLResultsWriter : clsMasicEventNotifier
     {
-        #region "Classwide variables"
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: frag, Da, UnCache, Butterworth, SavitzkyGolay, Zeroes, parention
+
         private readonly MASICOptions mOptions;
-        #endregion
 
         /// <summary>
         /// Constructor
@@ -65,6 +69,15 @@ namespace MASIC.DataOutput
             return string.Empty;
         }
 
+        /// <summary>
+        /// Save data to an XML file
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="parentIonIndex"></param>
+        /// <param name="sicDetails"></param>
+        /// <param name="smoothedYDataSubset"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <returns></returns>
         public bool SaveDataToXML(
             clsScanList scanList,
             int parentIonIndex,
@@ -420,6 +433,15 @@ namespace MASIC.DataOutput
             writer.WriteEndElement();
         }
 
+        /// <summary>
+        /// Finalize the output file
+        /// </summary>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="processingStats"></param>
+        /// <param name="processingTimeSec"></param>
+        /// <returns></returns>
         public bool XMLOutputFileFinalize(
             clsDataOutput dataOutputHandler,
             clsScanList scanList,
@@ -466,6 +488,17 @@ namespace MASIC.DataOutput
             return true;
         }
 
+        /// <summary>
+        /// Initialize the output file
+        /// </summary>
+        /// <param name="inputFilePathFull"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <param name="dataOutputHandler"></param>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="sicOptions"></param>
+        /// <param name="binningOptions"></param>
+        /// <returns></returns>
         public bool XMLOutputFileInitialize(
             string inputFilePathFull,
             string outputDirectoryPath,

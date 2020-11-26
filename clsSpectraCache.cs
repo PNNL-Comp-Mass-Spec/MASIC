@@ -52,7 +52,7 @@ namespace MASIC
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         /// <summary>
         /// Pool (collection) of currently loaded spectra

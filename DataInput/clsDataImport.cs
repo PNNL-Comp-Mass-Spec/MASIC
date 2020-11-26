@@ -37,7 +37,7 @@ namespace MASIC.DataInput
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         protected readonly MASICOptions mOptions;
 

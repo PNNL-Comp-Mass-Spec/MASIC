@@ -41,7 +41,7 @@ namespace MASIC.DatasetStats
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         private string mDatasetStatsSummaryFileName;
 

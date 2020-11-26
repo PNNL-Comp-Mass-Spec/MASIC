@@ -1,5 +1,8 @@
 ﻿namespace MASICPeakFinder
 {
+    /// <summary>
+    /// Class for tracking baseline noise stats
+    /// </summary>
     public class clsBaselineNoiseStats
     {
         /// <summary>
@@ -12,15 +15,28 @@
         /// </summary>
         public double NoiseStDev { get; set; }
 
+        /// <summary>
+        /// Number of points used
+        /// </summary>
         public int PointsUsed { get; set; }
 
         public clsMASICPeakFinder.eNoiseThresholdModes NoiseThresholdModeUsed { get; set; }
+        /// <summary>
+        /// Noise threshold mode used
+        /// </summary>
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public clsBaselineNoiseStats()
         {
             NoiseThresholdModeUsed = clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold;
         }
 
+        /// <summary>
+        /// Clone an instance of this class
+        /// </summary>
+        /// <returns></returns>
         public clsBaselineNoiseStats Clone()
         {
             var clonedStats = new clsBaselineNoiseStats()

@@ -2,6 +2,8 @@
 {
     public class clsSICPeakFinderOptions
     {
+        // Ignore Spelling: Butterworth, Savitzky, Golay
+
         #region "Properties"
 
         /// <summary>
@@ -142,13 +144,15 @@
 
         #endregion
 
-        #region "Classwide variables"
+        #region "Class wide variables"
+
         private int mInitialPeakWidthScansMaximum = 30;
         private double mInitialPeakWidthScansScaler = 0.5;
         private double mIntensityThresholdFractionMax = 0.01;
         private double mMaxAllowedUpwardSpikeFractionMax = 0.2;
         private int mMaxDistanceScansNoOverlap;
         private short mSavitzkyGolayFilterOrder;
+
         #endregion
     }
 }

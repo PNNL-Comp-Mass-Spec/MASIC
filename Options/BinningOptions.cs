@@ -53,7 +53,7 @@
 
         #endregion
 
-        #region "Classwide variables"
+        #region "Class wide variables"
 
         private float mBinSize = 1;
         private float mIntensityPrecisionPercent = 1;

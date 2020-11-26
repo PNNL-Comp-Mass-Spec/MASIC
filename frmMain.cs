@@ -33,8 +33,17 @@ using ShFolderBrowser.FolderBrowser;
 
 namespace MASIC
 {
+    /// <summary>
+    /// Main GUI window
+    /// </summary>
     public partial class frmMain : Form
     {
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: dpi, Da, CrLf, iTraq, frmMain, csv, Savitzky, Golay, Xcalibur, Acq, Checkbox, Combobox, Textbox
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public frmMain() : base()
         {
             // This call is required by the Windows Form Designer.

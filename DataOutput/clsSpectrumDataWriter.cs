@@ -4,9 +4,12 @@ using MASIC.Options;
 
 namespace MASIC.DataOutput
 {
+    /// <summary>
+    /// Spectrum data writer
+    /// </summary>
     public class clsSpectrumDataWriter : clsMasicEventNotifier
     {
-        #region "Classwide variables"
+        #region "Class wide variables"
         private readonly clsBPIWriter mBPIWriter;
         private readonly MASICOptions mOptions;
         #endregion
@@ -20,6 +23,14 @@ namespace MASIC.DataOutput
             mOptions = masicOptions;
         }
 
+        /// <summary>
+        /// Export raw data to a .pek file or .csv file
+        /// </summary>
+        /// <param name="scanList"></param>
+        /// <param name="spectraCache"></param>
+        /// <param name="inputFileName"></param>
+        /// <param name="outputDirectoryPath"></param>
+        /// <returns></returns>
         public bool ExportRawDataToDisk(
             clsScanList scanList,
             clsSpectraCache spectraCache,

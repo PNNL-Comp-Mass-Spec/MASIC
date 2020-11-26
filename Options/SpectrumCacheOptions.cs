@@ -38,7 +38,7 @@ namespace MASIC.Options
 
         #endregion
 
-        #region "Classwide variables"
+        #region "Class wide variables"
 
         private int mSpectraToRetainInMemory = 1000;
 

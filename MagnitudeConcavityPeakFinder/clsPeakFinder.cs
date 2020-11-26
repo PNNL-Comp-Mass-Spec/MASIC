@@ -3,20 +3,26 @@ using System.Collections.Generic;
 
 namespace MagnitudeConcavityPeakFinder
 {
+    /// <summary>
+    /// <para>
+    /// Peak detection routines
+    /// Written by Matthew Monroe in roughly 2001 at UNC (Chapel Hill, NC)
+    /// Kevin Lan provided the concept of Magnitude Concavity fitting
+    /// Ported from LabView code to VB 6 in June 2003 at PNNL (Richland, WA)
+    /// Ported from VB 6 to VB.NET in October 2003
+    /// Switched from using the eols.dll least squares fitting routine to using a local function
+    /// Ported to C# in February 2015
+    /// </para>
+    /// <para>
+    /// Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in November 2004
+    /// Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
+    /// </para>
+    /// </summary>
     internal class PeakFinder
     {
-        // Peak detection routines
-        // Written by Matthew Monroe in roughly 2001 at UNC (Chapel Hill, NC)
-        // Kevin Lan provided the concept of Magnitude Concavity fitting
-        // Ported from LabView code to VB 6 in June 2003 at PNNL (Richland, WA)
-        // Ported from VB 6 to VB.NET in October 2003
-        // Switched from using the eols.dll least squares fitting routine to using a local function
-        // Ported to C# in February 2015
-
-        // Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA) in November 2004
-        // Copyright 2005, Battelle Memorial Institute.  All Rights Reserved.
-
         private enum eTermFunctionConstants
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: cx, struct, lan, pFunc, const, Eols, EoLeast, fn, coef
         {
             One = 0,
             X = 1,
@@ -73,6 +79,31 @@ namespace MagnitudeConcavityPeakFinder
         public List<clsPeak> DetectPeaks(
             double[] xValuesZeroBased,
             double[] yValuesZeroBased,
+        /// <summary>
+        /// Finds peaks in the parallel arrays xValues() and yValues()
+        /// </summary>
+        /// <param name="xValues"></param>
+        /// <param name="yValues"></param>
+        /// <param name="intensityThresholdAbsoluteMinimum">Minimum absolute intensity allowable for a peak</param>
+        /// <param name="peakWidthPointsMinimum"></param>
+        /// <param name="peakDetectIntensityThresholdPercentageOfMaximum">Use this to specify a minimum intensity as a percentage of the maximum peak intensity</param>
+        /// <param name="peakWidthInSigma"></param>
+        /// <param name="useValleysForPeakWidth"></param>
+        /// <param name="movePeakLocationToMaxIntensity"></param>
+        /// <returns>
+        /// List of detected peaks (list of clsPeakInfo)
+        /// .PeakLocation is the location of the peak (index of the peak apex in the source arrays)
+        /// .LeftEdge is the left edge of the peak (in points, not actual units); this value could be negative if useValleysForPeakWidth = False
+        /// .RightEdge is the right edge of the peak (in points); this value could be larger than sourceDataCount-1 if useValleysForPeakWidth = False
+        /// .PeakArea is the peak area
+        /// Compute peak width using: peakWidthPoints = newPeak.RightEdge - newPeak.LeftEdge + 1
+        /// </returns>
+        /// <remarks>
+        /// Note that the maximum value of intensityThreshold vs. MaxValue*peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
+        /// For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
+        /// then if the maximum of yValues() is 50, then the minimum intensity of identified peaks is 10, and not 2.5
+        /// However, if the maximum of yValues() is 500, then the minimum intensity of identified peaks is 50, and not 10
+        /// </remarks>
             double intensityThresholdAbsoluteMinimum,
             int peakWidthPointsMinimum,
             int peakDetectIntensityThresholdPercentageOfMaximum = 0,
@@ -80,33 +111,15 @@ namespace MagnitudeConcavityPeakFinder
             bool useValleysForPeakWidth = true,
             bool movePeakLocationToMaxIntensity = true)
         {
-            // Finds peaks in the parallel arrays xValuesZeroBased[] and yValuesZeroBased[]
-            // intensityThreshold is the minimum absolute intensity allowable for a peak
-            // peakDetectIntensityThresholdPercentageOfMaximum allows one to specify a minimum intensity as a percentage of the maximum peak intensity
-            // Note that the maximum value of intensityThreshold vs. MaxValue * peakDetectIntensityThresholdPercentageOfMaximum is used as the minimum
-            // For example, if intensityThreshold = 10 and peakDetectIntensityThresholdPercentageOfMaximum =  5 (indicating 5%),
-            //   then if the maximum of yValuesZeroBased[] is 50, then the minimum intensity of identified peaks is 10, and not 2.5
-            //   However, if the maximum of yValuesZeroBased[] is 500, then the minimum intensity of identified peaks is 50, and not 10
-
-            // Returns the peaks in List<clsPeak>
-            // Each peak has these values:
-            //   LocationIndex  is the index of the peak apex in the source arrays
-            //   LeftEdge       is the left edge of the peak (in points, not actual units); this value could be negative if blnUseValleysForPeakWidth = False
-            //   RightEdge      is the right edge of the peak (in points, not actual units); this value could be larger than sourceDataCount-1 if blnUseValleysForPeakWidth = False
-            //   Area
-            //   IsValid
-
-            // Note: Compute peak width using: peakWidthPoints = peakEdgesRight[intPeakLocationsCount] - peakEdgesLeft[intPeakLocationsCount] + 1
-
-            // Uses the Magnitude-Concavity method, wherein a second order
-            //   polynomial is fit to the points within the window, giving a_2*x^2 + a_1*x + a_0
-            //   Given this, a_1 is the first derivative and a_2 is the second derivative
+            // This method uses the Magnitude-Concavity method, wherein a second order
+            // polynomial is fit to the points within the window, giving a_2*x^2 + a_1*x + a_0
+            // Given this, a_1 is the first derivative and a_2 is the second derivative
             // From this, the first derivative gives the index of the peak apex
             // The standard deviation (s) can be found using:
             //   s = sqrt(-h(t_r) / h''(t_r))
-            //  where h(t_r) is the height of the peak at the peak center
-            //  and h''(t_r) is the height of the second derivative of the peak
-            // In chromatography, the baseline peak widthInPoints = 4*dblSigma
+            // where h(t_r) is the height of the peak at the peak center
+            // and h''(t_r) is the height of the second derivative of the peak
+            // In chromatography, the baseline peak widthInPoints = 4*sigma
 
             var detectedPeaks = new List<clsPeak>(30);
 
@@ -405,6 +418,13 @@ namespace MagnitudeConcavityPeakFinder
             }
         }
 
+        /// <summary>
+        /// Finds the area under the curve, using trapezoidal integration
+        /// </summary>
+        /// <param name="xValues">X values</param>
+        /// <param name="yValues">Y values (intensities)</param>
+        /// <param name="dataPointCount"></param>
+        /// <returns></returns>
         private double FindArea(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, int dataPointCount)
         {
             // yValues() should be 0-based
@@ -510,6 +530,20 @@ namespace MagnitudeConcavityPeakFinder
 
         #region "LinearLeastSquaresFitting"
 
+        /// <summary>
+        /// Least squares fit
+        /// </summary>
+        /// <param name="xValues"></param>
+        /// <param name="yValues"></param>
+        /// <param name="coefficients"></param>
+        /// <param name="polynomialOrder"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Code from article "Fit for Purpose" written by Steven Abbot
+        /// and published in the February 2003 issue of Hardcore Visual Basic.
+        /// Code excerpted from the VB6 program FitIt
+        /// URL: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnhcvb03/html/hcvb03b1.asp
+        /// </remarks>
         private void LeastSquaresFit(IReadOnlyList<double> xValues, IReadOnlyList<double> yValues, out double[] coefficients, int polynomialOrder)
         {
             // Code from article "Fit for Purpose" written by Steven Abbot

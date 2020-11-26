@@ -16,7 +16,7 @@ namespace MASIC
 
         #endregion
 
-        #region "Classwide variables"
+        #region "Class wide variables"
 
         private readonly MASICOptions mOptions;
 
