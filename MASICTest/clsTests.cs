@@ -189,7 +189,7 @@ namespace MASICTest
 
                     var intLastSurveyScanIndex = scanList.SurveyScans.Count - 1;
 
-                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, intLastSurveyScanIndex);
+                    scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, intLastSurveyScanIndex);
                     intLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1;
                 }
                 else
@@ -226,7 +226,7 @@ namespace MASICTest
                     newFragScan.IsFTMS = false;
 
                     scanList.FragScans.Add(newFragScan);
-                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count - 1);
+                    scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.FragScan, scanList.FragScans.Count - 1);
                 }
             }
 
@@ -280,15 +280,15 @@ namespace MASICTest
             try
             {
                 // Find the scan number corresponding to each of these values
-                float result1 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanNumber.Key, clsCustomSICList.eCustomSICScanTypeConstants.Absolute, false);
+                float result1 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanNumber.Key, clsCustomSICList.CustomSICScanTypeConstants.Absolute, false);
                 Console.WriteLine(scanNumber.Key + " -> " + result1);
                 Assert.AreEqual(scanNumber.Value, result1, 1E-05);
 
-                float result2 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, relativeTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.Relative, false);
+                float result2 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, relativeTime.Key, clsCustomSICList.CustomSICScanTypeConstants.Relative, false);
                 Console.WriteLine(relativeTime.Key + " -> " + result2);
                 Assert.AreEqual(relativeTime.Value, result2, 1E-05);
 
-                float result3 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime, false);
+                float result3 = scanNumScanConverter.ScanOrAcqTimeToAbsolute(scanList, scanTime.Key, clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime, false);
                 Console.WriteLine(scanTime.Key + " -> " + result3);
                 Assert.AreEqual(scanTime.Value, result3, 1E-05);
 
@@ -313,15 +313,15 @@ namespace MASICTest
             try
             {
                 // Find the scan time corresponding to each of these values
-                var result1 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanNumber.Key, clsCustomSICList.eCustomSICScanTypeConstants.Absolute, false);
+                var result1 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanNumber.Key, clsCustomSICList.CustomSICScanTypeConstants.Absolute, false);
                 Console.WriteLine(scanNumber.Key + " -> " + result1 + " minutes");
                 Assert.AreEqual(scanNumber.Value, result1, 1E-05);
 
-                var result2 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, relativeTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.Relative, false);
+                var result2 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, relativeTime.Key, clsCustomSICList.CustomSICScanTypeConstants.Relative, false);
                 Console.WriteLine(relativeTime.Key + " -> " + result2 + " minutes");
                 Assert.AreEqual(relativeTime.Value, result2, 1E-05);
 
-                var result3 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanTime.Key, clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime, false);
+                var result3 = scanNumScanConverter.ScanOrAcqTimeToScanTime(scanList, scanTime.Key, clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime, false);
                 Console.WriteLine(scanTime.Key + " -> " + result3 + " minutes");
                 Assert.AreEqual(scanTime.Value, result3, 1E-05);
 

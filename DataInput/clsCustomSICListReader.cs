@@ -158,7 +158,7 @@ namespace MASIC.DataInput
                                 DataTableUtils.GetColumnIndex(columnMap, CustomSICFileColumns.TimeTolerance) >= 0)
                             {
                                 forceAcquisitionTimeMode = true;
-                                mCustomSICList.ScanToleranceType = clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime;
+                                mCustomSICList.ScanToleranceType = clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
                             }
                             else
                             {
@@ -209,7 +209,7 @@ namespace MASIC.DataInput
                             // Do not use this value if both the ScanTime and the TimeTolerance columns were present
                             if (!forceAcquisitionTimeMode)
                             {
-                                if (mCustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
+                                if (mCustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Absolute)
                                 {
                                     mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(scanTolerance);
                                 }
@@ -249,7 +249,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error in LoadCustomSICListFromFile", ex, clsMASIC.eMasicErrorCodes.InvalidCustomSICValues);
+                ReportError("Error in LoadCustomSICListFromFile", ex, clsMASIC.MasicErrorCodes.InvalidCustomSICValues);
                 mCustomSICList.CustomMZSearchValues.Clear();
                 return false;
             }

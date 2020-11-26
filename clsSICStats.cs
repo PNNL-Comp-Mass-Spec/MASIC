@@ -4,7 +4,7 @@
     {
         public MASICPeakFinder.clsSICStatsPeak Peak { get; set; }
 
-        public clsScanList.eScanTypeConstants ScanTypeForPeakIndices { get; set; }
+        public clsScanList.ScanTypeConstants ScanTypeForPeakIndices { get; set; }
 
         /// <summary>
         /// Pointer to entry in .SurveyScans() or .FragScans() indicating the survey scan that contains the peak maximum

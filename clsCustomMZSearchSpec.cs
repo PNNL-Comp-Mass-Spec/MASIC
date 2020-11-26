@@ -11,13 +11,13 @@
         public double MZToleranceDa { get; set; }
 
         /// <summary>
-        /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
+        /// This is an Integer if ScanType = CustomSICScanTypeConstants.Absolute
         /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
         /// </summary>
         public float ScanOrAcqTimeCenter { get; set; }
 
         /// <summary>
-        /// This is an Integer if ScanType = eCustomSICScanTypeConstants.Absolute
+        /// This is an Integer if ScanType = CustomSICScanTypeConstants.Absolute
         /// It is a Single if ScanType = .Relative or ScanType = .AcquisitionTime
         /// </summary>
         /// <remarks>Set to 0 to search the entire file for the given mass</remarks>

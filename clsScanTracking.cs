@@ -263,7 +263,7 @@ namespace MASIC
 
             scanInfo.BaselineNoiseStats = clsMASICPeakFinder.InitializeBaselineNoiseStats(0, noiseThresholdOptions.BaselineNoiseMode);
 
-            if (noiseThresholdOptions.BaselineNoiseMode == clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold)
+            if (noiseThresholdOptions.BaselineNoiseMode == clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold)
             {
                 scanInfo.BaselineNoiseStats.NoiseLevel = noiseThresholdOptions.BaselineNoiseLevelAbsolute;
                 scanInfo.BaselineNoiseStats.PointsUsed = 1;
@@ -362,7 +362,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error in ProcessAndStoreSpectrum (LastKnownLocation: " + lastKnownLocation + ")", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ProcessAndStoreSpectrum (LastKnownLocation: " + lastKnownLocation + ")", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }

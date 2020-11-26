@@ -135,7 +135,7 @@ namespace MASIC
                                     return true;
                                 }
 
-                                ReportError("Error converting Dataset ID '" + datasetItem[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                                ReportError("Error converting Dataset ID '" + datasetItem[1] + "' to an integer", clsMASIC.MasicErrorCodes.InvalidDatasetID);
 
                                 break;
                             }
@@ -165,12 +165,12 @@ namespace MASIC
             }
             catch (NullReferenceException)
             {
-                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + Environment.NewLine + avoidErrorMessage, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + Environment.NewLine + avoidErrorMessage, clsMASIC.MasicErrorCodes.InvalidDatasetID);
                 return false;
             }
             catch (Exception ex)
             {
-                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + Environment.NewLine + avoidErrorMessage, ex, clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                ReportError("Error connecting to database: " + masicOptions.DatabaseConnectionString + Environment.NewLine + avoidErrorMessage, ex, clsMASIC.MasicErrorCodes.InvalidDatasetID);
                 return false;
             }
         }
@@ -222,7 +222,7 @@ namespace MASIC
                             return true;
                         }
 
-                        ReportError("Error converting Dataset ID '" + dataValues[1] + "' to an integer", clsMASIC.eMasicErrorCodes.InvalidDatasetID);
+                        ReportError("Error converting Dataset ID '" + dataValues[1] + "' to an integer", clsMASIC.MasicErrorCodes.InvalidDatasetID);
                     }
                 }
 
@@ -230,7 +230,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error reading the dataset lookup file", ex, clsMASIC.eMasicErrorCodes.InvalidDatasetLookupFilePath);
+                ReportError("Error reading the dataset lookup file", ex, clsMASIC.MasicErrorCodes.InvalidDatasetLookupFilePath);
                 return false;
             }
         }

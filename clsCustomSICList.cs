@@ -31,10 +31,10 @@ namespace MASIC
         /// </summary>
         public const string CUSTOM_SIC_TYPE_ACQUISITION_TIME = "AcquisitionTime";
 
-        public enum eCustomSICScanTypeConstants
         /// <summary>
         /// Custom SIC scan types
         /// </summary>
+        public enum CustomSICScanTypeConstants
         {
             /// <summary>
             /// Absolute scan number
@@ -80,13 +80,13 @@ namespace MASIC
             }
         }
 
-        public eCustomSICScanTypeConstants ScanToleranceType { get; set; }
         /// <summary>
         /// Scan tolerance type
         /// </summary>
+        public CustomSICScanTypeConstants ScanToleranceType { get; set; }
 
         /// <summary>
-        /// This is an Integer if ScanToleranceType = eCustomSICScanTypeConstants.Absolute
+        /// This is an Integer if ScanToleranceType = CustomSICScanTypeConstants.Absolute
         /// It is a Single if ScanToleranceType = .Relative or ScanToleranceType = .AcquisitionTime
         /// Set to 0 to search the entire file for the given mass
         /// </summary>
@@ -173,7 +173,7 @@ namespace MASIC
                     {
                         // Set the SurveyScanIndex to the center of the analysis
                         currentParentIon.SurveyScanIndex = scanNumScanConverter.FindNearestSurveyScanIndex(
-                            scanList, 0.5F, eCustomSICScanTypeConstants.Relative);
+                            scanList, 0.5F, CustomSICScanTypeConstants.Relative);
                     }
                     else
                     {
@@ -199,14 +199,14 @@ namespace MASIC
                             surveyScanNumberAbsolute,
                             clsBinarySearch.eMissingDataModeConstants.ReturnClosestPoint);
 
-                        while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
+                        while (fragScanIndexMatch < scanList.MasterScanOrderCount && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
                             fragScanIndexMatch++;
 
                         if (fragScanIndexMatch == scanList.MasterScanOrderCount)
                         {
                             // Did not find the next frag scan; find the previous frag scan
                             fragScanIndexMatch--;
-                            while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
+                            while (fragScanIndexMatch > 0 && scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
                                 fragScanIndexMatch--;
 
                             if (fragScanIndexMatch < 0)
@@ -216,7 +216,7 @@ namespace MASIC
                         // This is a custom SIC-based parent ion
                         // Prior to August 2014, we set .FragScanIndices(0) = 0, which made it appear that the fragmentation scan was the first MS2 spectrum in the dataset for all custom SICs
                         // This caused undesirable display results in MASIC browser, so we now set it to the next MS2 scan that occurs after the survey scan (parent scan)
-                        if (scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.eScanTypeConstants.FragScan)
+                        if (scanList.MasterScanOrder[fragScanIndexMatch].ScanType == clsScanList.ScanTypeConstants.FragScan)
                         {
                             currentParentIon.FragScanIndices.Add(scanList.MasterScanOrder[fragScanIndexMatch].ScanIndexPointer);
                         }
@@ -369,7 +369,7 @@ namespace MASIC
                 {
                     if (clsUtilities.IsNumber(scanCenters[index]))
                     {
-                        if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
+                        if (ScanToleranceType == CustomSICScanTypeConstants.Absolute)
                         {
                             mzSearchSpec.ScanOrAcqTimeCenter = int.Parse(scanCenters[index]);
                         }
@@ -385,7 +385,7 @@ namespace MASIC
                 {
                     if (clsUtilities.IsNumber(scanTolerances[index]))
                     {
-                        if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
+                        if (ScanToleranceType == CustomSICScanTypeConstants.Absolute)
                         {
                             mzSearchSpec.ScanOrAcqTimeTolerance = int.Parse(scanTolerances[index]);
                         }
@@ -425,7 +425,7 @@ namespace MASIC
         /// </summary>
         public void Reset()
         {
-            ScanToleranceType = eCustomSICScanTypeConstants.Absolute;
+            ScanToleranceType = CustomSICScanTypeConstants.Absolute;
             ScanOrAcqTimeTolerance = 1000;
 
             ResetMzSearchValues();
@@ -457,8 +457,9 @@ namespace MASIC
         /// <param name="scanComments"></param>
         /// <returns>True if success, otherwise false</returns>
         [Obsolete("Use SetCustomSICListValues that takes List(Of clsCustomMZSearchSpec)")]
+        // ReSharper disable once UnusedMember.Global
         public bool SetCustomSICListValues(
-            eCustomSICScanTypeConstants eScanType,
+            CustomSICScanTypeConstants eScanType,
             double mzToleranceDa,
             float scanOrAcqTimeToleranceValue,
             double[] mzList,
@@ -558,7 +559,7 @@ namespace MASIC
         /// <param name="mzSearchSpecs"></param>
         /// <returns>True if success, false if error</returns>
         public bool SetCustomSICListValues(
-            eCustomSICScanTypeConstants eScanType,
+            CustomSICScanTypeConstants eScanType,
             float scanOrAcqTimeToleranceValue,
             List<clsCustomMZSearchSpec> mzSearchSpecs)
         {
@@ -613,21 +614,21 @@ namespace MASIC
 
             if (countOverOne == 0 && countBetweenZeroAndOne > 0)
             {
-                if (ScanToleranceType == eCustomSICScanTypeConstants.Absolute)
+                if (ScanToleranceType == CustomSICScanTypeConstants.Absolute)
                 {
                     // No values were greater than 1 but at least one value is between 0 and 1
                     // Change the ScanToleranceType mode from Absolute to Relative
-                    ScanToleranceType = eCustomSICScanTypeConstants.Relative;
+                    ScanToleranceType = CustomSICScanTypeConstants.Relative;
                 }
             }
 
             if (countOverOne > 0 && countBetweenZeroAndOne == 0)
             {
-                if (ScanToleranceType == eCustomSICScanTypeConstants.Relative)
+                if (ScanToleranceType == CustomSICScanTypeConstants.Relative)
                 {
                     // The ScanOrAcqTimeCenter values cannot be relative
                     // Change the ScanToleranceType mode from Relative to Absolute
-                    ScanToleranceType = eCustomSICScanTypeConstants.Absolute;
+                    ScanToleranceType = CustomSICScanTypeConstants.Absolute;
                 }
             }
         }

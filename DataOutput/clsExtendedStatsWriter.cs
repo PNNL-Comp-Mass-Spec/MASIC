@@ -334,12 +334,12 @@ namespace MASIC.DataOutput
 
                 switch (scanList.MasterScanOrder[masterScanIndex].ScanType)
                 {
-                    case clsScanList.eScanTypeConstants.SurveyScan:
+                    case clsScanList.ScanTypeConstants.SurveyScan:
                         // Survey scan
                         currentScan = scanList.SurveyScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
                         break;
 
-                    case clsScanList.eScanTypeConstants.FragScan:
+                    case clsScanList.ScanTypeConstants.FragScan:
                         // Frag Scan
                         currentScan = scanList.FragScans[scanList.MasterScanOrder[masterScanIndex].ScanIndexPointer];
                         break;
@@ -369,8 +369,8 @@ namespace MASIC.DataOutput
             {
                 UpdateProgress(0, "Saving extended scan stats to flat file");
 
-                var extendedConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile);
-                extendedNonConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.ScanStatsExtendedFlatFile);
+                var extendedConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.ScanStatsExtendedConstantFlatFile);
+                extendedNonConstantHeaderOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.ScanStatsExtendedFlatFile);
 
                 ReportMessage("Saving extended scan stats flat file to disk: " + Path.GetFileName(extendedNonConstantHeaderOutputFilePath));
 
@@ -418,7 +418,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the Extended Scan Stats to: " + extendedNonConstantHeaderOutputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the Extended Scan Stats to: " + extendedNonConstantHeaderOutputFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 

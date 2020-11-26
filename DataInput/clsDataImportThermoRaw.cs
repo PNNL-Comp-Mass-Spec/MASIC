@@ -182,7 +182,7 @@ namespace MASIC.DataInput
                 if (!xcaliburAccessor.OpenRawFile(inputFileFullPath))
                 {
                     ReportError("Error opening input data file: " + inputFileFullPath + " (xcaliburAccessor.OpenRawFile returned False)");
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
@@ -209,7 +209,7 @@ namespace MASIC.DataInput
                 {
                     // No scans found
                     ReportError("No scans found in the input file: " + filePath);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
@@ -266,7 +266,7 @@ namespace MASIC.DataInput
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                ReportError("Error in ExtractScanInfoFromXcaliburDataFile", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromXcaliburDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
             }
 
             // Close the handle to the data file
@@ -421,7 +421,7 @@ namespace MASIC.DataInput
                 mLastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1;
             }
 
-            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1);
+            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1);
 
             double msDataResolution;
 
@@ -459,7 +459,7 @@ namespace MASIC.DataInput
             if (!success)
                 return false;
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID);
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.ScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID);
 
             return true;
         }
@@ -552,7 +552,7 @@ namespace MASIC.DataInput
             scanList.FragScans.Add(scanInfo);
             var fragScanIndex = scanList.FragScans.Count - 1;
 
-            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, fragScanIndex);
+            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.FragScan, fragScanIndex);
 
             // Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             var msDataResolution = binningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
@@ -570,7 +570,7 @@ namespace MASIC.DataInput
             if (!success)
                 return false;
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID);
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.ScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID);
 
             if (thermoScanInfo.MRMScanType == MRMScanTypeConstants.NotMRM)
             {
@@ -727,7 +727,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error in LoadSpectraForThermoRawFile (LastKnownLocation: " + lastKnownLocation + ")", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in LoadSpectraForThermoRawFile (LastKnownLocation: " + lastKnownLocation + ")", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
 

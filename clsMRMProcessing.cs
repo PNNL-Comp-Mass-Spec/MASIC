@@ -16,7 +16,7 @@ namespace MASIC
     {
         #region "Structures"
 
-        public struct udtSRMListType
+        private struct SRMListType
         {
             public double ParentIonMZ;
             public double CentralMass;
@@ -29,7 +29,7 @@ namespace MASIC
 
         #endregion
 
-        #region "Classwide variables"
+        #region "Class wide variables"
 
         private readonly MASICOptions mOptions;
         private readonly clsDataAggregation mDataAggregation;
@@ -49,7 +49,7 @@ namespace MASIC
             mDataOutputHandler = dataOutputHandler;
         }
 
-        private string ConstructSRMMapKey(udtSRMListType srmEntry)
+        private string ConstructSRMMapKey(SRMListType srmEntry)
         {
             return ConstructSRMMapKey(srmEntry.ParentIonMZ, srmEntry.CentralMass);
         }
@@ -62,13 +62,13 @@ namespace MASIC
         private bool DetermineMRMSettings(
             clsScanList scanList,
             out List<clsMRMScanInfo> mrmSettings,
-            out List<udtSRMListType> srmList)
+            out List<SRMListType> srmList)
         {
             // Returns true if this dataset has MRM data and if it is parsed successfully
             // Returns false if the dataset does not have MRM data, or if an error occurs
 
             mrmSettings = new List<clsMRMScanInfo>(200);
-            srmList = new List<udtSRMListType>(600); // Assume there are 3 frag masses for each parent mass
+            srmList = new List<SRMListType>(600); // Assume there are 3 frag masses for each parent mass
 
             try
             {
@@ -117,7 +117,7 @@ namespace MASIC
                                 {
                                     // Entry is not yet present; add it
 
-                                    var newSRMItem = new udtSRMListType()
+                                    var newSRMItem = new SRMListType()
                                     {
                                         ParentIonMZ = mrmInfoForHash.ParentIonMZ,
                                         CentralMass = mrmInfoForHash.MRMMassList[mrmMassIndex].CentralMass
@@ -142,7 +142,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error determining the MRM settings", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error determining the MRM settings", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
         }
@@ -167,11 +167,11 @@ namespace MASIC
 
             if (sourceInfo.MRMMassList == null)
             {
-                targetInfo.MRMMassList = new List<udtMRMMassRangeType>();
+                targetInfo.MRMMassList = new List<MRMMassRangeType>();
             }
             else
             {
-                targetInfo.MRMMassList = new List<udtMRMMassRangeType>(sourceInfo.MRMMassList.Count);
+                targetInfo.MRMMassList = new List<MRMMassRangeType>(sourceInfo.MRMMassList.Count);
                 targetInfo.MRMMassList.AddRange(sourceInfo.MRMMassList);
             }
 
@@ -195,11 +195,11 @@ namespace MASIC
 
             if (sourceInfo.MRMMassList == null)
             {
-                targetInfo.MRMMassList = new List<udtMRMMassRangeType>();
+                targetInfo.MRMMassList = new List<MRMMassRangeType>();
             }
             else
             {
-                targetInfo.MRMMassList = new List<udtMRMMassRangeType>(sourceInfo.MRMMassList.Count);
+                targetInfo.MRMMassList = new List<MRMMassRangeType>(sourceInfo.MRMMassList.Count);
                 targetInfo.MRMMassList.AddRange(sourceInfo.MRMMassList);
             }
 
@@ -244,7 +244,7 @@ namespace MASIC
             clsScanList scanList,
             clsSpectraCache spectraCache,
             IReadOnlyList<clsMRMScanInfo> mrmSettings,
-            IReadOnlyList<udtSRMListType> srmList,
+            IReadOnlyList<SRMListType> srmList,
             string inputFileName,
             string outputDirectoryPath)
         {
@@ -267,10 +267,10 @@ namespace MASIC
 
                 // Write out the MRM Settings
                 var mrmSettingsFilePath = clsDataOutput.ConstructOutputFilePath(
-                    inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile);
+                    inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMSettingsFile);
                 using (var settingsWriter = new StreamWriter(mrmSettingsFilePath))
                 {
-                    settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMSettingsFile));
+                    settingsWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMSettingsFile));
 
                     var dataColumns = new List<string>(7);
 
@@ -302,17 +302,17 @@ namespace MASIC
                         if (mOptions.WriteMRMDataList)
                         {
                             // Write out the raw MRM Data
-                            var dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMDatafile);
+                            var dataFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMDatafile);
                             dataWriter = new StreamWriter(dataFilePath);
 
                             // Write the file headers
-                            dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.eOutputFileTypeConstants.MRMDatafile));
+                            dataWriter.WriteLine(mDataOutputHandler.GetHeadersForOutputFile(scanList, clsDataOutput.OutputFileTypeConstants.MRMDatafile));
                         }
 
                         if (mOptions.WriteMRMIntensityCrosstab)
                         {
                             // Write out the raw MRM Data
-                            var crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.MRMCrosstabFile);
+                            var crosstabFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.MRMCrosstabFile);
                             crosstabWriter = new StreamWriter(crosstabFilePath);
 
                             // Initialize the crosstab header variable using the data in udtSRMList()
@@ -446,7 +446,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the SRM data to disk", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the SRM data to disk", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 success = false;
             }
             finally
@@ -522,7 +522,7 @@ namespace MASIC
         }
 
         private bool MRMParentDaughterMatch(
-            udtSRMListType udtSRMListEntry,
+            SRMListType udtSRMListEntry,
             clsMRMScanInfo mrmSettingsEntry,
             int mrmMassIndex)
         {
@@ -573,7 +573,7 @@ namespace MASIC
                 // Initialize sicDetails
                 var sicDetails = new clsSICDetails();
                 sicDetails.Reset();
-                sicDetails.SICScanType = clsScanList.eScanTypeConstants.FragScan;
+                sicDetails.SICScanType = clsScanList.ScanTypeConstants.FragScan;
 
                 for (var parentIonIndex = 0; parentIonIndex < scanList.ParentIons.Count; parentIonIndex++)
                 {
@@ -638,7 +638,7 @@ namespace MASIC
 
                     if (!success)
                     {
-                        SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, true);
+                        SetLocalErrorCode(clsMASIC.MasicErrorCodes.FindSICPeaksError, true);
                         return false;
                     }
 
@@ -730,7 +730,7 @@ namespace MASIC
                     }
                     catch (Exception ex)
                     {
-                        ReportError("Error updating progress", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                        ReportError("Error updating progress", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                     }
                 }
 
@@ -738,7 +738,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error creating SICs for MRM spectra", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                ReportError("Error creating SICs for MRM spectra", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                 return false;
             }
         }

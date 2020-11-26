@@ -11,7 +11,7 @@ namespace MASIC
     {
         #region "Constants and Enums"
 
-        public enum eScanTypeConstants
+        public enum ScanTypeConstants
         {
             SurveyScan = 0,
             FragScan = 1
@@ -21,9 +21,9 @@ namespace MASIC
 
         #region "Structures"
 
-        public struct udtScanOrderPointerType
+        public struct ScanOrderPointerType
         {
-            public eScanTypeConstants ScanType;
+            public ScanTypeConstants ScanType;
             public int ScanIndexPointer;                  // Pointer to entry into list clsScanList.SurveyScans or clsScanList.FragScans
 
             public override string ToString()
@@ -51,7 +51,7 @@ namespace MASIC
         /// <summary>
         /// List holding pointers to either the SurveyScans or FragScans lists, in order of scan number
         /// </summary>
-        public readonly List<udtScanOrderPointerType> MasterScanOrder;
+        public readonly List<ScanOrderPointerType> MasterScanOrder;
 
         /// <summary>
         /// List of scan numbers, parallel to MasterScanOrder
@@ -99,7 +99,7 @@ namespace MASIC
             SurveyScans = new List<clsScanInfo>(8);
             FragScans = new List<clsScanInfo>(8);
 
-            MasterScanOrder = new List<udtScanOrderPointerType>(8);
+            MasterScanOrder = new List<ScanOrderPointerType>(8);
             MasterScanNumList = new List<int>(8);
             MasterScanTimeList = new List<float>(8);
 
@@ -130,16 +130,16 @@ namespace MASIC
 
             SurveyScans.Add(surveyScan);
 
-            AddMasterScanEntry(eScanTypeConstants.SurveyScan, surveyScanIndex);
+            AddMasterScanEntry(ScanTypeConstants.SurveyScan, surveyScanIndex);
 
             return surveyScanIndex;
         }
 
-        public void AddMasterScanEntry(eScanTypeConstants eScanType, int scanIndex)
+        public void AddMasterScanEntry(ScanTypeConstants eScanType, int scanIndex)
         {
             // Adds a new entry to .MasterScanOrder using an existing entry in SurveyScans() or FragScans()
 
-            if (eScanType == eScanTypeConstants.SurveyScan)
+            if (eScanType == ScanTypeConstants.SurveyScan)
             {
                 if (SurveyScans.Count > 0 && scanIndex < SurveyScans.Count)
                 {
@@ -152,7 +152,7 @@ namespace MASIC
                     AddMasterScanEntry(eScanType, scanIndex, 0, 0);
                 }
             }
-            else if (eScanType == eScanTypeConstants.FragScan)
+            else if (eScanType == ScanTypeConstants.FragScan)
             {
                 if (FragScans.Count > 0 && scanIndex < FragScans.Count)
                 {
@@ -173,12 +173,12 @@ namespace MASIC
         }
 
         public void AddMasterScanEntry(
-            eScanTypeConstants eScanType,
+            ScanTypeConstants eScanType,
             int scanIndex,
             int scanNumber,
             float scanTime)
         {
-            var newScanEntry = new udtScanOrderPointerType()
+            var newScanEntry = new ScanOrderPointerType()
             {
                 ScanType = eScanType,
                 ScanIndexPointer = scanIndex

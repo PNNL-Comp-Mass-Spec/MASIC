@@ -9,8 +9,8 @@ namespace MASIC
     // The isotopic distribution weights are provided by the iTraq or TMT manufacturer
     //
     // There are two options for the iTRAQ 4-plex weights:
-    // eCorrectionFactorsiTRAQ4Plex.ABSciex
-    // eCorrectionFactorsiTRAQ4Plex.BroadInstitute
+    // CorrectionFactorsiTRAQ4Plex.ABSciex
+    // CorrectionFactorsiTRAQ4Plex.BroadInstitute
 
     public class clsITraqIntensityCorrection
     {
@@ -23,7 +23,7 @@ namespace MASIC
         private const int ELEVEN_PLEX_TMT_MATRIX_LENGTH = 11;
         private const int SIXTEEN_PLEX_TMT_MATRIX_LENGTH = 16;
 
-        public enum eCorrectionFactorsiTRAQ4Plex
+        public enum CorrectionFactorsiTRAQ4Plex
         {
             ABSciex = 0,
             BroadInstitute = 1          // Provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
@@ -33,7 +33,7 @@ namespace MASIC
 
         #region "Structures"
 
-        private struct udtIsotopeContributionType
+        private struct IsotopeContributionType
         {
             public float Minus2;
             public float Minus1;
@@ -63,19 +63,19 @@ namespace MASIC
 
         #region "Properties"
 
-        public clsReporterIons.eReporterIonMassModeConstants ReporterIonMode { get; private set; }
+        public clsReporterIons.ReporterIonMassModeConstants ReporterIonMode { get; private set; }
 
-        public eCorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType { get; private set; }
+        public CorrectionFactorsiTRAQ4Plex ITraq4PlexCorrectionFactorType { get; private set; }
 
         #endregion
 
         /// <summary>
-        /// Constructor; assumes iTraqCorrectionFactorType = eCorrectionFactorsiTRAQ4Plex.ABSciex
+        /// Constructor; assumes iTraqCorrectionFactorType = CorrectionFactorsiTRAQ4Plex.ABSciex
         /// </summary>
         /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
         /// <remarks></remarks>
-        public clsITraqIntensityCorrection(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode)
-            : this(eReporterIonMode, eCorrectionFactorsiTRAQ4Plex.ABSciex)
+        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode)
+            : this(eReporterIonMode, CorrectionFactorsiTRAQ4Plex.ABSciex)
         {
         }
 
@@ -85,14 +85,14 @@ namespace MASIC
         /// <param name="eReporterIonMode">iTRAQ or TMT mode</param>
         /// <param name="iTraqCorrectionFactorType">Correction factor type for 4-plex iTRAQ</param>
         /// <remarks>The iTraqCorrectionFactorType parameter is only used if eReporterIonMode is ITraqFourMZ</remarks>
-        public clsITraqIntensityCorrection(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode, eCorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        public clsITraqIntensityCorrection(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
             ReporterIonMode = eReporterIonMode;
             ITraq4PlexCorrectionFactorType = iTraqCorrectionFactorType;
 
             mMatrixUtility = new MatrixDecompositionUtility.LUDecomposition();
 
-            if (ReporterIonMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
+            if (ReporterIonMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
             {
                 return;
             }
@@ -104,7 +104,7 @@ namespace MASIC
         /// Change the reporter ion mode
         /// </summary>
         /// <param name="eReporterIonMode"></param>
-        public void UpdateReporterIonMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode)
+        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode)
         {
             UpdateReporterIonMode(eReporterIonMode, ITraq4PlexCorrectionFactorType);
         }
@@ -114,7 +114,7 @@ namespace MASIC
         /// </summary>
         /// <param name="eReporterIonMode"></param>
         /// <param name="iTraqCorrectionFactorType"></param>
-        public void UpdateReporterIonMode(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode, eCorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
+        public void UpdateReporterIonMode(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode, CorrectionFactorsiTRAQ4Plex iTraqCorrectionFactorType)
         {
             if (ReporterIonMode != eReporterIonMode || ITraq4PlexCorrectionFactorType != iTraqCorrectionFactorType)
             {
@@ -227,21 +227,21 @@ namespace MASIC
             return true;
         }
 
-        private int GetMatrixLength(clsReporterIons.eReporterIonMassModeConstants eReporterIonMode)
+        private int GetMatrixLength(clsReporterIons.ReporterIonMassModeConstants eReporterIonMode)
         {
             switch (eReporterIonMode)
             {
-                case clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ:
+                case clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ:
                     return FOUR_PLEX_MATRIX_LENGTH;
-                case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes:
+                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes:
                     return EIGHT_PLEX_HIGH_RES_MATRIX_LENGTH;
-                case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes:
+                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes:
                     return EIGHT_PLEX_LOW_RES_MATRIX_LENGTH;
-                case clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ:
+                case clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ:
                     return TEN_PLEX_TMT_MATRIX_LENGTH;
-                case clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ:
+                case clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ:
                     return ELEVEN_PLEX_TMT_MATRIX_LENGTH;
-                case clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ:
+                case clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ:
                     return SIXTEEN_PLEX_TMT_MATRIX_LENGTH;
                 default:
                     throw new ArgumentOutOfRangeException("Invalid value for eReporterIonMode in GetMatrixLength: " + eReporterIonMode.ToString());
@@ -255,42 +255,42 @@ namespace MASIC
         private void InitializeCoefficients(bool debugShowMatrixTable)
         {
             // iTraq reporter ions
-            udtIsotopeContributionType udtIsoPct113;
-            udtIsotopeContributionType udtIsoPct114;
-            udtIsotopeContributionType udtIsoPct115;
-            udtIsotopeContributionType udtIsoPct116;
-            udtIsotopeContributionType udtIsoPct117;
-            udtIsotopeContributionType udtIsoPct118;
-            udtIsotopeContributionType udtIsoPct119;
-            udtIsotopeContributionType udtIsoPct120;
-            udtIsotopeContributionType udtIsoPct121;
+            IsotopeContributionType udtIsoPct113;
+            IsotopeContributionType udtIsoPct114;
+            IsotopeContributionType udtIsoPct115;
+            IsotopeContributionType udtIsoPct116;
+            IsotopeContributionType udtIsoPct117;
+            IsotopeContributionType udtIsoPct118;
+            IsotopeContributionType udtIsoPct119;
+            IsotopeContributionType udtIsoPct120;
+            IsotopeContributionType udtIsoPct121;
 
             // TMT reporter ions
-            udtIsotopeContributionType udtIsoPct126;
-            udtIsotopeContributionType udtIsoPct127N;
-            udtIsotopeContributionType udtIsoPct127C;
-            udtIsotopeContributionType udtIsoPct128N;
-            udtIsotopeContributionType udtIsoPct128C;
-            udtIsotopeContributionType udtIsoPct129N;
-            udtIsotopeContributionType udtIsoPct129C;
-            udtIsotopeContributionType udtIsoPct130N;
-            udtIsotopeContributionType udtIsoPct130C;
-            udtIsotopeContributionType udtIsoPct131N;
-            udtIsotopeContributionType udtIsoPct131C;
+            IsotopeContributionType udtIsoPct126;
+            IsotopeContributionType udtIsoPct127N;
+            IsotopeContributionType udtIsoPct127C;
+            IsotopeContributionType udtIsoPct128N;
+            IsotopeContributionType udtIsoPct128C;
+            IsotopeContributionType udtIsoPct129N;
+            IsotopeContributionType udtIsoPct129C;
+            IsotopeContributionType udtIsoPct130N;
+            IsotopeContributionType udtIsoPct130C;
+            IsotopeContributionType udtIsoPct131N;
+            IsotopeContributionType udtIsoPct131C;
 
-            udtIsotopeContributionType udtIsoPct132N;
-            udtIsotopeContributionType udtIsoPct132C;
-            udtIsotopeContributionType udtIsoPct133N;
-            udtIsotopeContributionType udtIsoPct133C;
-            udtIsotopeContributionType udtIsoPct134N;
+            IsotopeContributionType udtIsoPct132N;
+            IsotopeContributionType udtIsoPct132C;
+            IsotopeContributionType udtIsoPct133N;
+            IsotopeContributionType udtIsoPct133C;
+            IsotopeContributionType udtIsoPct134N;
 
             var matrixSize = GetMatrixLength(ReporterIonMode);
             var maxIndex = matrixSize - 1;
 
             switch (ReporterIonMode)
             {
-                case clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ:
-                    if (ITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.ABSciex)
+                case clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ:
+                    if (ITraq4PlexCorrectionFactorType == CorrectionFactorsiTRAQ4Plex.ABSciex)
                     {
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Applied Biosystems
@@ -300,7 +300,7 @@ namespace MASIC
                         udtIsoPct116 = this.DefineIsotopeContribution(0, 3, 92.4F, 4.5F, 0.1F);
                         udtIsoPct117 = this.DefineIsotopeContribution(0.1F, 4, 92.3F, 3.5F, 0.1F);
                     }
-                    else if (ITraq4PlexCorrectionFactorType == eCorrectionFactorsiTRAQ4Plex.BroadInstitute)
+                    else if (ITraq4PlexCorrectionFactorType == CorrectionFactorsiTRAQ4Plex.BroadInstitute)
                     {
                         // 4-plex ITraq, isotope contribution table
                         // Source percentages provided by Philipp Mertins at the Broad Institute (pmertins@broadinstitute.org)
@@ -351,7 +351,7 @@ namespace MASIC
                     mCoeffs[3, 3] = udtIsoPct117.Zero;
                     break;
 
-                case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes:
+                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes:
                     // 8-plex ITraq, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Applied Biosystems
                     // Note there is a 2 Da jump between 119 and 121, which is why 7.44 and 0.87 are not included in mCoeffs()
@@ -421,7 +421,7 @@ namespace MASIC
                     mCoeffs[7, 7] = udtIsoPct121.Zero;
                     break;
 
-                case clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes:
+                case clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes:
                     // 8-plex ITraq, isotope contribution table for Low Res MS/MS
 
                     // ReSharper disable CommentTypo
@@ -506,8 +506,8 @@ namespace MASIC
                     mCoeffs[8, 8] = udtIsoPct121.Zero;
                     break;
 
-                case clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ:
-                case clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ:
+                case clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ:
+                case clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ:
                     // 10-plex TMT and 11-plex TMT, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Thermo
 
@@ -665,7 +665,7 @@ namespace MASIC
 
                     break;
 
-                case clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ:
+                case clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ:
                     // 16-plex TMT, isotope contribution table for High Res MS/MS
                     // Source percentages provided by Thermo
 
@@ -927,14 +927,14 @@ namespace MASIC
         /// <param name="plus2">Value between 0 and 100, but typically close to 0</param>
         /// <returns></returns>
         /// <remarks>The values should sum to 100; however, if zero (aka the Monoisotopic Peak) is 0, its value will be auto-computed</remarks>
-        private udtIsotopeContributionType DefineIsotopeContribution(
+        private IsotopeContributionType DefineIsotopeContribution(
             float minus2,
             float minus1,
             float zero,
             float plus1,
             float plus2)
         {
-            udtIsotopeContributionType udtIsotopePct;
+            IsotopeContributionType udtIsotopePct;
 
             if (Math.Abs(zero) < float.Epsilon ||
                 zero < 0 ||

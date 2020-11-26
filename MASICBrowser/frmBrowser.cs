@@ -85,7 +85,7 @@ namespace MASICBrowser
 
         private const int SORT_ORDER_MODE_COUNT = 18;
 
-        private enum eSortOrderConstants
+        private enum SortOrderConstants
         {
             SortByPeakIndex = 0,
             SortByScanPeakCenter = 1,
@@ -107,21 +107,21 @@ namespace MASICBrowser
             SortByBaselineNoiseLevel = 17
         }
 
-        private enum eSICTypeFilterConstants
+        private enum SICTypeFilterConstants
         {
             AllSICs = 0,
             NoCustomSICs = 1,
             CustomSICsOnly = 2
         }
 
-        private enum eSmoothModeConstants
+        private enum SmoothModeConstants
         {
             DoNotReSmooth = 0,
             Butterworth = 1,
             SavitzkyGolay = 2
         }
 
-        private enum eMsMsSearchEngineResultColumns
+        private enum MsMsSearchEngineResultColumns
         {
             RowIndex = 0,
             Scan,
@@ -144,7 +144,7 @@ namespace MASICBrowser
             NTT
         }
 
-        private enum eCurrentXMLDataFileSectionConstants
+        private enum CurrentXMLDataFileSectionConstants
         {
             UnknownFile = 0,
             Start = 1,
@@ -160,7 +160,7 @@ namespace MASICBrowser
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         private Spectrum mSpectrum;
 
@@ -252,16 +252,16 @@ namespace MASICBrowser
         {
             try
             {
-                var eSortOrder = (eSortOrderConstants)cboSortOrder.SelectedIndex;
+                var eSortOrder = (SortOrderConstants)cboSortOrder.SelectedIndex;
 
                 switch (eSortOrder)
                 {
-                    case eSortOrderConstants.SortByMz:
-                    case eSortOrderConstants.SortByPeakIndex:
-                    case eSortOrderConstants.SortByScanOptimalPeakCenter:
-                    case eSortOrderConstants.SortByScanPeakCenter:
-                    case eSortOrderConstants.SortByPeakSkew:
-                    case eSortOrderConstants.SortByKSStat:
+                    case SortOrderConstants.SortByMz:
+                    case SortOrderConstants.SortByPeakIndex:
+                    case SortOrderConstants.SortByScanOptimalPeakCenter:
+                    case SortOrderConstants.SortByScanPeakCenter:
+                    case SortOrderConstants.SortByPeakSkew:
+                    case SortOrderConstants.SortByKSStat:
                         chkSortDescending.Checked = false;
                         break;
                     default:
@@ -291,18 +291,18 @@ namespace MASICBrowser
 
             if (parentIonIndex >= 0 && parentIonIndex < mParentIonStats.Count)
             {
-                eSmoothModeConstants smoothMode;
+                SmoothModeConstants smoothMode;
                 if (optUseButterworthSmooth.Checked)
                 {
-                    smoothMode = eSmoothModeConstants.Butterworth;
+                    smoothMode = SmoothModeConstants.Butterworth;
                 }
                 else if (optUseSavitzkyGolaySmooth.Checked)
                 {
-                    smoothMode = eSmoothModeConstants.SavitzkyGolay;
+                    smoothMode = SmoothModeConstants.SavitzkyGolay;
                 }
                 else
                 {
-                    smoothMode = eSmoothModeConstants.DoNotReSmooth;
+                    smoothMode = SmoothModeConstants.DoNotReSmooth;
                 }
 
                 var validPeakFound = UpdateSICStats(parentIonIndex, chkUsePeakFinder.Checked, smoothMode, out sicStats);
@@ -507,7 +507,7 @@ namespace MASICBrowser
                 mMASICPeakFinder.ComputeParentIonIntensity(parentIon.SICData, sicStats.Peak, parentIon.FragScanObserved);
 
                 bool recomputeNoiseLevel;
-                if (parentIon.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed == clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+                if (parentIon.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed == clsMASICPeakFinder.NoiseThresholdModes.DualTrimmedMeanByAbundance)
                 {
                     recomputeNoiseLevel = false;
                 }
@@ -515,9 +515,9 @@ namespace MASICBrowser
                 {
                     recomputeNoiseLevel = true;
                     // Note: We cannot use DualTrimmedMeanByAbundance since we don't have access to the full-length SICs
-                    if (mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode == clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+                    if (mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode == clsMASICPeakFinder.NoiseThresholdModes.DualTrimmedMeanByAbundance)
                     {
-                        mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance;
+                        mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance;
                     }
                 }
 
@@ -1536,32 +1536,32 @@ namespace MASICBrowser
         private void PopulateComboBoxes()
         {
             cboSortOrder.Items.Clear();
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByPeakIndex, "Sort by Scan of Peak Index");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByScanPeakCenter, "Sort by Scan of Peak Center");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByScanOptimalPeakCenter, "Sort by Scan of Optimal Peak Apex");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByMz, "Sort by m/z");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByPeakSignalToNoise, "Sort by Peak Signal/Noise");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByBaselineCorrectedPeakIntensity, "Sort by Baseline-corrected Intensity");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByBaselineCorrectedPeakArea, "Sort by Baseline-corrected Area");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByPeakWidth, "Sort by Peak FWHM (Width)");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortBySICIntensityMax, "Sort by SIC Max Intensity");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByPeakIntensity, "Sort by Peak Intensity (uncorrected for noise)");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByPeakArea, "Sort by Peak Area (uncorrected for noise)");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByFragScanToOptimalLocDistance, "Sort by Frag Scan to Optimal Loc Distance");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByPeakCenterToOptimalLocDistance, "Sort by Peak Center to Optimal Loc Distance");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByShoulderCount, "Sort by Shoulder Peak Count");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByParentIonIntensity, "Sort by Parent Ion Intensity");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByPeakSkew, "Sort by Peak Skew");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByKSStat, "Sort by Peak KS Stat");
-            cboSortOrder.Items.Insert((int)eSortOrderConstants.SortByBaselineNoiseLevel, "Sort by Baseline Noise level");
-            cboSortOrder.SelectedIndex = (int)eSortOrderConstants.SortByPeakSignalToNoise;
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByPeakIndex, "Sort by Scan of Peak Index");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByScanPeakCenter, "Sort by Scan of Peak Center");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByScanOptimalPeakCenter, "Sort by Scan of Optimal Peak Apex");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByMz, "Sort by m/z");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByPeakSignalToNoise, "Sort by Peak Signal/Noise");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByBaselineCorrectedPeakIntensity, "Sort by Baseline-corrected Intensity");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByBaselineCorrectedPeakArea, "Sort by Baseline-corrected Area");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByPeakWidth, "Sort by Peak FWHM (Width)");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortBySICIntensityMax, "Sort by SIC Max Intensity");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByPeakIntensity, "Sort by Peak Intensity (uncorrected for noise)");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByPeakArea, "Sort by Peak Area (uncorrected for noise)");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByFragScanToOptimalLocDistance, "Sort by Frag Scan to Optimal Loc Distance");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByPeakCenterToOptimalLocDistance, "Sort by Peak Center to Optimal Loc Distance");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByShoulderCount, "Sort by Shoulder Peak Count");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByParentIonIntensity, "Sort by Parent Ion Intensity");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByPeakSkew, "Sort by Peak Skew");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByKSStat, "Sort by Peak KS Stat");
+            cboSortOrder.Items.Insert((int)SortOrderConstants.SortByBaselineNoiseLevel, "Sort by Baseline Noise level");
+            cboSortOrder.SelectedIndex = (int)SortOrderConstants.SortByPeakSignalToNoise;
 
             cboSICsTypeFilter.Items.Clear();
-            cboSICsTypeFilter.Items.Insert((int)eSICTypeFilterConstants.AllSICs, "All SIC's");
-            cboSICsTypeFilter.Items.Insert((int)eSICTypeFilterConstants.NoCustomSICs, "No custom SIC's");
-            cboSICsTypeFilter.Items.Insert((int)eSICTypeFilterConstants.CustomSICsOnly, "Custom SIC's only");
+            cboSICsTypeFilter.Items.Insert((int)SICTypeFilterConstants.AllSICs, "All SIC's");
+            cboSICsTypeFilter.Items.Insert((int)SICTypeFilterConstants.NoCustomSICs, "No custom SIC's");
+            cboSICsTypeFilter.Items.Insert((int)SICTypeFilterConstants.CustomSICsOnly, "Custom SIC's only");
 
-            cboSICsTypeFilter.SelectedIndex = (int)eSICTypeFilterConstants.AllSICs;
+            cboSICsTypeFilter.SelectedIndex = (int)SICTypeFilterConstants.AllSICs;
         }
 
         /// <summary>
@@ -1694,7 +1694,7 @@ namespace MASICBrowser
             try
             {
                 // Initialize the stream reader and the XML Text Reader
-                eCurrentXMLDataFileSectionConstants eCurrentXMLDataFileSection;
+                CurrentXMLDataFileSectionConstants eCurrentXMLDataFileSection;
                 using (var reader = new StreamReader(filePath))
                 using (var xmlReader = new XmlTextReader(reader))
                 {
@@ -1705,7 +1705,7 @@ namespace MASICBrowser
                     // Initialize mParentIonStats
                     mParentIonStats.Clear();
 
-                    eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.UnknownFile;
+                    eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.UnknownFile;
                     var validParentIon = false;
 
                     while (xmlReader.Read())
@@ -1720,7 +1720,7 @@ namespace MASICBrowser
                                 switch (xmlReader.Name)
                                 {
                                     case "ParentIon":
-                                        eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.ParentIons;
+                                        eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.ParentIons;
                                         validParentIon = false;
 
                                         if (xmlReader.HasAttributes)
@@ -1781,7 +1781,7 @@ namespace MASICBrowser
                                         break;
 
                                     case "SICData":
-                                        eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.Start;
+                                        eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Start;
                                         break;
                                     case "ProcessingSummary":
                                         xmlReader.Skip();
@@ -1790,7 +1790,7 @@ namespace MASICBrowser
                                         xmlReader.Skip();
                                         break;
                                     case "SICOptions":
-                                        eCurrentXMLDataFileSection = eCurrentXMLDataFileSectionConstants.Options;
+                                        eCurrentXMLDataFileSection = CurrentXMLDataFileSectionConstants.Options;
                                         break;
                                     case "ProcessingStats":
                                         xmlReader.Skip();
@@ -2001,9 +2001,9 @@ namespace MASICBrowser
                                         {
                                             // Compute the Noise Threshold for this SIC
                                             // Note: We cannot use DualTrimmedMeanByAbundance since we don't have access to the full-length SICs
-                                            if (mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode == clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+                                            if (mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode == clsMASICPeakFinder.NoiseThresholdModes.DualTrimmedMeanByAbundance)
                                             {
-                                                mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance;
+                                                mSICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance;
                                             }
 
                                             mMASICPeakFinder.ComputeNoiseLevelInPeakVicinity(sicData, currentParentIon.SICStats.Peak, mSICPeakFinderOptions.SICBaselineNoiseOptions);
@@ -2015,11 +2015,11 @@ namespace MASICBrowser
                             }
                         }
 
-                        if (eCurrentXMLDataFileSection != eCurrentXMLDataFileSectionConstants.UnknownFile && xmlReader.NodeType == XmlNodeType.Element)
+                        if (eCurrentXMLDataFileSection != CurrentXMLDataFileSectionConstants.UnknownFile && xmlReader.NodeType == XmlNodeType.Element)
                         {
                             switch (eCurrentXMLDataFileSection)
                             {
-                                case eCurrentXMLDataFileSectionConstants.Options:
+                                case CurrentXMLDataFileSectionConstants.Options:
                                     try
                                     {
                                         switch (xmlReader.Name)
@@ -2060,7 +2060,7 @@ namespace MASICBrowser
 
                                     break;
 
-                                case eCurrentXMLDataFileSectionConstants.ParentIons:
+                                case CurrentXMLDataFileSectionConstants.ParentIons:
                                     if (validParentIon)
                                     {
                                         try
@@ -2147,7 +2147,7 @@ namespace MASICBrowser
                                                     ionStats.SICStats.Peak.BaselineNoiseStats.PointsUsed = int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
                                                 case "NoiseThresholdModeUsed":
-                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = (clsMASICPeakFinder.eNoiseThresholdModes)int.Parse(XMLTextReaderGetInnerText(xmlReader));
+                                                    ionStats.SICStats.Peak.BaselineNoiseStats.NoiseThresholdModeUsed = (clsMASICPeakFinder.NoiseThresholdModes)int.Parse(XMLTextReaderGetInnerText(xmlReader));
                                                     break;
 
                                                 case "StatMomentsArea":
@@ -2244,7 +2244,7 @@ namespace MASICBrowser
 
                 FindSimilarParentIon(similarIonMZToleranceHalfWidth * 2, progressForm);
 
-                if (eCurrentXMLDataFileSection == eCurrentXMLDataFileSectionConstants.UnknownFile)
+                if (eCurrentXMLDataFileSection == CurrentXMLDataFileSectionConstants.UnknownFile)
                 {
                     MessageBox.Show("Root element 'SICData' not found in the input file: " + Environment.NewLine + filePath, "Invalid File Format", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -2366,14 +2366,14 @@ namespace MASICBrowser
 
                             if (dataCols.Length >= 13)
                             {
-                                var sequenceID = LookupSequenceID(dataCols[(int)eMsMsSearchEngineResultColumns.Sequence], dataCols[(int)eMsMsSearchEngineResultColumns.Protein]);
+                                var sequenceID = LookupSequenceID(dataCols[(int)MsMsSearchEngineResultColumns.Sequence], dataCols[(int)MsMsSearchEngineResultColumns.Protein]);
 
                                 if (sequenceID >= 0)
                                 {
                                     try
                                     {
-                                        var scanNumber = int.Parse(dataCols[(int)eMsMsSearchEngineResultColumns.Scan]);
-                                        var charge = int.Parse(dataCols[(int)eMsMsSearchEngineResultColumns.Charge]);
+                                        var scanNumber = int.Parse(dataCols[(int)MsMsSearchEngineResultColumns.Scan]);
+                                        var charge = int.Parse(dataCols[(int)MsMsSearchEngineResultColumns.Charge]);
 
                                         var msMsResultsTable = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS];
                                         if (!msMsResultsTable.Rows.Contains(new object[] { scanNumber, charge, sequenceID }))
@@ -2381,12 +2381,12 @@ namespace MASICBrowser
                                             var newRow = mMsMsResults.Tables[TABLE_NAME_MSMS_RESULTS].NewRow();
                                             newRow[COL_NAME_SCAN] = scanNumber;
                                             newRow[COL_NAME_CHARGE] = charge;
-                                            newRow[COL_NAME_MH] = dataCols[(int)eMsMsSearchEngineResultColumns.MH];
-                                            newRow[COL_NAME_XCORR] = dataCols[(int)eMsMsSearchEngineResultColumns.XCorr];
-                                            newRow[COL_NAME_DELTACN] = dataCols[(int)eMsMsSearchEngineResultColumns.DeltaCN];
-                                            newRow[COL_NAME_DELTACN2] = dataCols[(int)eMsMsSearchEngineResultColumns.DeltaCn2];
-                                            newRow[COL_NAME_RANK_SP] = dataCols[(int)eMsMsSearchEngineResultColumns.RankSp];
-                                            newRow[COL_NAME_RANK_XC] = dataCols[(int)eMsMsSearchEngineResultColumns.RankXc];
+                                            newRow[COL_NAME_MH] = dataCols[(int)MsMsSearchEngineResultColumns.MH];
+                                            newRow[COL_NAME_XCORR] = dataCols[(int)MsMsSearchEngineResultColumns.XCorr];
+                                            newRow[COL_NAME_DELTACN] = dataCols[(int)MsMsSearchEngineResultColumns.DeltaCN];
+                                            newRow[COL_NAME_DELTACN2] = dataCols[(int)MsMsSearchEngineResultColumns.DeltaCn2];
+                                            newRow[COL_NAME_RANK_SP] = dataCols[(int)MsMsSearchEngineResultColumns.RankSp];
+                                            newRow[COL_NAME_RANK_XC] = dataCols[(int)MsMsSearchEngineResultColumns.RankXc];
                                             newRow[COL_NAME_SEQUENCE_ID] = sequenceID;
                                             newRow[COL_NAME_PARENT_ION_INDEX] = -1;
 
@@ -2425,7 +2425,7 @@ namespace MASICBrowser
 
         private void RedoSICPeakFindingAllData()
         {
-            const eSmoothModeConstants SMOOTH_MODE = eSmoothModeConstants.Butterworth;
+            const SmoothModeConstants SMOOTH_MODE = SmoothModeConstants.Butterworth;
 
             var progressForm = new frmProgress();
 
@@ -2699,7 +2699,7 @@ namespace MASICBrowser
         /// </summary>
         private void SortData()
         {
-            eSortOrderConstants eSortMode;
+            SortOrderConstants eSortMode;
 
             var scanNumberSaved = 0;
 
@@ -2731,11 +2731,11 @@ namespace MASICBrowser
 
             if (cboSortOrder.SelectedIndex >= 0 && cboSortOrder.SelectedIndex < SORT_ORDER_MODE_COUNT)
             {
-                eSortMode = (eSortOrderConstants)cboSortOrder.SelectedIndex;
+                eSortMode = (SortOrderConstants)cboSortOrder.SelectedIndex;
             }
             else
             {
-                eSortMode = eSortOrderConstants.SortByScanPeakCenter;
+                eSortMode = SortOrderConstants.SortByScanPeakCenter;
             }
 
             if (chkFilterByIntensity.Checked && PRISM.DataUtils.StringToValueUtils.IsNumber(txtMinimumIntensity.Text))
@@ -2770,7 +2770,7 @@ namespace MASICBrowser
 
             switch (eSortMode)
             {
-                case eSortOrderConstants.SortByPeakIndex:
+                case SortOrderConstants.SortByPeakIndex:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2784,7 +2784,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByScanPeakCenter:
+                case SortOrderConstants.SortByScanPeakCenter:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2798,7 +2798,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByScanOptimalPeakCenter:
+                case SortOrderConstants.SortByScanOptimalPeakCenter:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2812,7 +2812,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByMz:
+                case SortOrderConstants.SortByMz:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2826,7 +2826,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByPeakSignalToNoise:
+                case SortOrderConstants.SortByPeakSignalToNoise:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2840,7 +2840,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByBaselineCorrectedPeakIntensity:
+                case SortOrderConstants.SortByBaselineCorrectedPeakIntensity:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2855,7 +2855,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByBaselineCorrectedPeakArea:
+                case SortOrderConstants.SortByBaselineCorrectedPeakArea:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2873,7 +2873,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByPeakWidth:
+                case SortOrderConstants.SortByPeakWidth:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2889,7 +2889,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortBySICIntensityMax:
+                case SortOrderConstants.SortBySICIntensityMax:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2913,7 +2913,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByPeakIntensity:
+                case SortOrderConstants.SortByPeakIntensity:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2927,7 +2927,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByPeakArea:
+                case SortOrderConstants.SortByPeakArea:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2941,7 +2941,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByFragScanToOptimalLocDistance:
+                case SortOrderConstants.SortByFragScanToOptimalLocDistance:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2957,7 +2957,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByPeakCenterToOptimalLocDistance:
+                case SortOrderConstants.SortByPeakCenterToOptimalLocDistance:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2973,7 +2973,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByShoulderCount:
+                case SortOrderConstants.SortByShoulderCount:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -2989,7 +2989,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByParentIonIntensity:
+                case SortOrderConstants.SortByParentIonIntensity:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -3003,7 +3003,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByPeakSkew:
+                case SortOrderConstants.SortByPeakSkew:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -3017,7 +3017,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByKSStat:
+                case SortOrderConstants.SortByKSStat:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -3031,7 +3031,7 @@ namespace MASICBrowser
                     }
 
                     break;
-                case eSortOrderConstants.SortByBaselineNoiseLevel:
+                case SortOrderConstants.SortByBaselineNoiseLevel:
                     for (var index = 0; index < mParentIonStats.Count; index++)
                     {
                         var ionStats = mParentIonStats[index];
@@ -3081,11 +3081,11 @@ namespace MASICBrowser
         {
             bool useData;
 
-            if (cboSICsTypeFilter.SelectedIndex == (int)eSICTypeFilterConstants.CustomSICsOnly)
+            if (cboSICsTypeFilter.SelectedIndex == (int)SICTypeFilterConstants.CustomSICsOnly)
             {
                 useData = isCustomSIC;
             }
-            else if (cboSICsTypeFilter.SelectedIndex == (int)eSICTypeFilterConstants.NoCustomSICs)
+            else if (cboSICsTypeFilter.SelectedIndex == (int)SICTypeFilterConstants.NoCustomSICs)
             {
                 useData = !isCustomSIC;
             }
@@ -3218,7 +3218,7 @@ namespace MASICBrowser
             //msNoiseThresholdOpts.MinimumNoiseThresholdLevel =
         }
 
-        private bool UpdateSICStats(int parentIonIndex, bool repeatPeakFinding, eSmoothModeConstants smoothMode, out clsSICStats sicStats)
+        private bool UpdateSICStats(int parentIonIndex, bool repeatPeakFinding, SmoothModeConstants smoothMode, out clsSICStats sicStats)
         {
             // Copy the original SIC stats found by MASIC into udtSICStats
             // This also includes the original smoothed data
@@ -3228,7 +3228,7 @@ namespace MASICBrowser
             // the array linked in both mParentIonStats().SICStats and udtSICStats
             sicStats = mParentIonStats[parentIonIndex].SICStats.Clone();
 
-            if (smoothMode != eSmoothModeConstants.DoNotReSmooth)
+            if (smoothMode != SmoothModeConstants.DoNotReSmooth)
             {
                 // Re-smooth the data
                 var dataFilter = new DataFilter.DataFilter();
@@ -3239,7 +3239,7 @@ namespace MASICBrowser
 
                 var intensities = (from item in currentParentIon.SICData select item.Intensity).ToArray();
 
-                if (smoothMode == eSmoothModeConstants.SavitzkyGolay)
+                if (smoothMode == SmoothModeConstants.SavitzkyGolay)
                 {
                     // Resmooth using a Savitzky Golay filter
 
@@ -3265,7 +3265,7 @@ namespace MASICBrowser
                 }
                 else
                 {
-                    // Assume smoothMode = eSmoothModeConstants.Butterworth
+                    // Assume smoothMode = SmoothModeConstants.Butterworth
                     var samplingFrequency = PRISMWin.TextBoxUtils.ParseTextBoxValueFloat(txtButterworthSamplingFrequency, lblButterworthSamplingFrequency.Text + " should be a number between 0.01 and 0.99; assuming 0.2", out _, 0.2F);
                     dataFilter.ButterworthFilter(intensities, 0, currentParentIon.SICData.Count - 1, samplingFrequency);
                 }

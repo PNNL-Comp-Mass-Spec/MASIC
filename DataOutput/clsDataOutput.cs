@@ -17,7 +17,7 @@ namespace MASIC.DataOutput
 
         public const string REPORTER_IONS_FILE_SUFFIX = "_ReporterIons.txt";
 
-        public enum eOutputFileTypeConstants
+        public enum OutputFileTypeConstants
         {
             XMLFile = 0,
             ScanStatsFlatFile = 1,
@@ -104,7 +104,7 @@ namespace MASIC.DataOutput
                 }
 
                 // Obtain the output XML filename
-                var filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.XMLFile);
+                var filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.XMLFile);
 
                 // See if the file exists
                 if (File.Exists(filePathToCheck))
@@ -281,7 +281,7 @@ namespace MASIC.DataOutput
                                             peakFinderOptions.IntensityThresholdAbsoluteMinimum = float.Parse(valueNode.InnerText);
                                             break;
                                         case "SICNoiseThresholdMode":
-                                            peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)int.Parse(valueNode.InnerText);
+                                            peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes)int.Parse(valueNode.InnerText);
                                             break;
                                         case "SICNoiseThresholdIntensity":
                                             peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = float.Parse(valueNode.InnerText);
@@ -326,7 +326,7 @@ namespace MASIC.DataOutput
                                             peakFinderOptions.SavitzkyGolayFilterOrder = short.Parse(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseThresholdMode":
-                                            peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)int.Parse(valueNode.InnerText);
+                                            peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes)int.Parse(valueNode.InnerText);
                                             break;
                                         case "MassSpectraNoiseThresholdIntensity":
                                             peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = float.Parse(valueNode.InnerText);
@@ -486,15 +486,15 @@ namespace MASIC.DataOutput
                         {
                             // All of the options match, make sure the other output files exist
 
-                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
+                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.ScanStatsFlatFile);
                             if (!File.Exists(filePathToCheck))
                                 return false;
 
-                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.SICStatsFlatFile);
+                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.SICStatsFlatFile);
                             if (!File.Exists(filePathToCheck))
                                 return false;
 
-                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.BPIFile);
+                            filePathToCheck = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.BPIFile);
                             if (!File.Exists(filePathToCheck))
                                 return false;
 
@@ -515,88 +515,88 @@ namespace MASIC.DataOutput
         public static string ConstructOutputFilePath(
             string inputFileName,
             string outputDirectoryPath,
-            eOutputFileTypeConstants eFileType,
+            OutputFileTypeConstants eFileType,
             int fragTypeNumber = 1)
         {
             var outputFilePath = Path.Combine(outputDirectoryPath, Path.GetFileNameWithoutExtension(inputFileName));
             switch (eFileType)
             {
-                case eOutputFileTypeConstants.XMLFile:
+                case OutputFileTypeConstants.XMLFile:
                     outputFilePath += "_SICs.xml";
                     break;
-                case eOutputFileTypeConstants.ScanStatsFlatFile:
+                case OutputFileTypeConstants.ScanStatsFlatFile:
                     outputFilePath += SCAN_STATS_FILE_SUFFIX;
                     break;
-                case eOutputFileTypeConstants.ScanStatsExtendedFlatFile:
+                case OutputFileTypeConstants.ScanStatsExtendedFlatFile:
                     outputFilePath += "_ScanStatsEx.txt";
                     break;
-                case eOutputFileTypeConstants.ScanStatsExtendedConstantFlatFile:
+                case OutputFileTypeConstants.ScanStatsExtendedConstantFlatFile:
                     outputFilePath += "_ScanStatsConstant.txt";
                     break;
-                case eOutputFileTypeConstants.SICStatsFlatFile:
+                case OutputFileTypeConstants.SICStatsFlatFile:
                     outputFilePath += SIC_STATS_FILE_SUFFIX;
                     break;
-                case eOutputFileTypeConstants.BPIFile:
+                case OutputFileTypeConstants.BPIFile:
                     outputFilePath += "_BPI.txt";
                     break;
-                case eOutputFileTypeConstants.FragBPIFile:
+                case OutputFileTypeConstants.FragBPIFile:
                     outputFilePath += "_Frag" + fragTypeNumber.ToString() + "_BPI.txt";
                     break;
-                case eOutputFileTypeConstants.TICFile:
+                case OutputFileTypeConstants.TICFile:
                     outputFilePath += "_TIC.txt";
                     break;
-                case eOutputFileTypeConstants.ICRToolsBPIChromatogramByScan:
+                case OutputFileTypeConstants.ICRToolsBPIChromatogramByScan:
                     outputFilePath += "_BPI_Scan.tic";
                     break;
-                case eOutputFileTypeConstants.ICRToolsBPIChromatogramByTime:
+                case OutputFileTypeConstants.ICRToolsBPIChromatogramByTime:
                     outputFilePath += "_BPI_Time.tic";
                     break;
-                case eOutputFileTypeConstants.ICRToolsTICChromatogramByScan:
+                case OutputFileTypeConstants.ICRToolsTICChromatogramByScan:
                     outputFilePath += "_TIC_Scan.tic";
                     break;
-                case eOutputFileTypeConstants.ICRToolsFragTICChromatogramByScan:
+                case OutputFileTypeConstants.ICRToolsFragTICChromatogramByScan:
                     outputFilePath += "_TIC_MSMS_Scan.tic";
                     break;
-                case eOutputFileTypeConstants.DeconToolsMSChromatogramFile:
+                case OutputFileTypeConstants.DeconToolsMSChromatogramFile:
                     outputFilePath += "_MS_scans.csv";
                     break;
-                case eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile:
+                case OutputFileTypeConstants.DeconToolsMSMSChromatogramFile:
                     outputFilePath += "_MSMS_scans.csv";
                     break;
-                case eOutputFileTypeConstants.PEKFile:
+                case OutputFileTypeConstants.PEKFile:
                     outputFilePath += ".pek";
                     break;
-                case eOutputFileTypeConstants.HeaderGlossary:
+                case OutputFileTypeConstants.HeaderGlossary:
                     outputFilePath = Path.Combine(outputDirectoryPath, "Header_Glossary_Readme.txt");
                     break;
-                case eOutputFileTypeConstants.DeconToolsIsosFile:
+                case OutputFileTypeConstants.DeconToolsIsosFile:
                     outputFilePath += "_isos.csv";
                     break;
-                case eOutputFileTypeConstants.DeconToolsScansFile:
+                case OutputFileTypeConstants.DeconToolsScansFile:
                     outputFilePath += "_scans.csv";
                     break;
-                case eOutputFileTypeConstants.MSMethodFile:
+                case OutputFileTypeConstants.MSMethodFile:
                     outputFilePath += "_MSMethod";
                     break;
-                case eOutputFileTypeConstants.MSTuneFile:
+                case OutputFileTypeConstants.MSTuneFile:
                     outputFilePath += "_MSTuneSettings";
                     break;
-                case eOutputFileTypeConstants.ReporterIonsFile:
+                case OutputFileTypeConstants.ReporterIonsFile:
                     outputFilePath += REPORTER_IONS_FILE_SUFFIX;
                     break;
-                case eOutputFileTypeConstants.MRMSettingsFile:
+                case OutputFileTypeConstants.MRMSettingsFile:
                     outputFilePath += "_MRMSettings.txt";
                     break;
-                case eOutputFileTypeConstants.MRMDatafile:
+                case OutputFileTypeConstants.MRMDatafile:
                     outputFilePath += "_MRMData.txt";
                     break;
-                case eOutputFileTypeConstants.MRMCrosstabFile:
+                case OutputFileTypeConstants.MRMCrosstabFile:
                     outputFilePath += "_MRMCrosstab.txt";
                     break;
-                case eOutputFileTypeConstants.DatasetInfoFile:
+                case OutputFileTypeConstants.DatasetInfoFile:
                     outputFilePath += "_DatasetInfo.xml";
                     break;
-                case eOutputFileTypeConstants.SICDataFile:
+                case OutputFileTypeConstants.SICDataFile:
                     outputFilePath += "_SICdata.txt";
                     break;
                 default:
@@ -616,7 +616,7 @@ namespace MASIC.DataOutput
             try
             {
                 var datasetName = Path.GetFileNameWithoutExtension(inputFileName);
-                var datasetInfoFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.DatasetInfoFile);
+                var datasetInfoFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.DatasetInfoFile);
 
                 var datasetStatsSummarizer = new clsDatasetStatsSummarizer();
 
@@ -636,24 +636,24 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error creating dataset info file", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error creating dataset info file", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
         }
 
-        public string GetHeadersForOutputFile(clsScanList scanList, eOutputFileTypeConstants eOutputFileType)
+        public string GetHeadersForOutputFile(clsScanList scanList, OutputFileTypeConstants eOutputFileType)
         {
             return GetHeadersForOutputFile(scanList, eOutputFileType, '\t');
         }
 
         public string GetHeadersForOutputFile(
-            clsScanList scanList, eOutputFileTypeConstants eOutputFileType, char delimiter)
+            clsScanList scanList, OutputFileTypeConstants eOutputFileType, char delimiter)
         {
             List<string> headerNames;
 
             switch (eOutputFileType)
             {
-                case eOutputFileTypeConstants.ScanStatsFlatFile:
+                case OutputFileTypeConstants.ScanStatsFlatFile:
                     headerNames = new List<string>()
                     {
                         "Dataset",
@@ -669,7 +669,7 @@ namespace MASIC.DataOutput
                         "ScanTypeName"
                     };
                     break;
-                case eOutputFileTypeConstants.ScanStatsExtendedFlatFile:
+                case OutputFileTypeConstants.ScanStatsExtendedFlatFile:
                     if (ExtendedStatsWriter.ExtendedHeaderNameCount <= 0)
                     {
                         // Lookup extended stats values that are constants for all scans
@@ -685,7 +685,7 @@ namespace MASIC.DataOutput
 
                     break;
 
-                case eOutputFileTypeConstants.SICStatsFlatFile:
+                case OutputFileTypeConstants.SICStatsFlatFile:
                     headerNames = new List<string>(31)
                     {
                         "Dataset",
@@ -725,7 +725,7 @@ namespace MASIC.DataOutput
 
                     break;
 
-                case eOutputFileTypeConstants.MRMSettingsFile:
+                case OutputFileTypeConstants.MRMSettingsFile:
                     headerNames = new List<string>()
                     {
                         "Parent_Index",
@@ -736,7 +736,7 @@ namespace MASIC.DataOutput
                         "Scan_Count"
                     };
                     break;
-                case eOutputFileTypeConstants.MRMDatafile:
+                case OutputFileTypeConstants.MRMDatafile:
                     headerNames = new List<string>()
                     {
                         "Scan",
@@ -764,7 +764,7 @@ namespace MASIC.DataOutput
 
             try
             {
-                outputFilePath = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, eOutputFileTypeConstants.SICDataFile);
+                outputFilePath = ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, OutputFileTypeConstants.SICDataFile);
 
                 OutputFileHandles.SICDataFile = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read));
 
@@ -784,7 +784,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error initializing the XML output file: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error initializing the XML output file: " + outputFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -797,13 +797,13 @@ namespace MASIC.DataOutput
             bool writeHeaders)
         {
             // Scan Stats file
-            var outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ScanStatsFlatFile);
+            var outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.ScanStatsFlatFile);
             OutputFileHandles.ScanStats = new StreamWriter(outputFilePath, false);
             if (writeHeaders)
-                OutputFileHandles.ScanStats.WriteLine(GetHeadersForOutputFile(null, eOutputFileTypeConstants.ScanStatsFlatFile));
+                OutputFileHandles.ScanStats.WriteLine(GetHeadersForOutputFile(null, OutputFileTypeConstants.ScanStatsFlatFile));
 
-            OutputFileHandles.MSMethodFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSMethodFile);
-            OutputFileHandles.MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.MSTuneFile);
+            OutputFileHandles.MSMethodFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.MSMethodFile);
+            OutputFileHandles.MSTuneFilePathBase = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.MSTuneFile);
         }
 
         public bool SaveHeaderGlossary(
@@ -815,33 +815,33 @@ namespace MASIC.DataOutput
 
             try
             {
-                outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.HeaderGlossary);
+                outputFilePath = ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.HeaderGlossary);
                 ReportMessage("Saving Header Glossary to " + Path.GetFileName(outputFilePath));
 
                 using (var writer = new StreamWriter(outputFilePath, false))
                 {
                     // ScanStats
-                    writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, eOutputFileTypeConstants.ScanStatsFlatFile) + ":");
-                    writer.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsFlatFile));
+                    writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.ScanStatsFlatFile) + ":");
+                    writer.WriteLine(GetHeadersForOutputFile(scanList, OutputFileTypeConstants.ScanStatsFlatFile));
                     writer.WriteLine();
 
                     // SICStats
-                    writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, eOutputFileTypeConstants.SICStatsFlatFile) + ":");
-                    writer.WriteLine(GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.SICStatsFlatFile));
+                    writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.SICStatsFlatFile) + ":");
+                    writer.WriteLine(GetHeadersForOutputFile(scanList, OutputFileTypeConstants.SICStatsFlatFile));
                     writer.WriteLine();
 
                     // ScanStatsExtended
-                    var headers = GetHeadersForOutputFile(scanList, eOutputFileTypeConstants.ScanStatsExtendedFlatFile);
+                    var headers = GetHeadersForOutputFile(scanList, OutputFileTypeConstants.ScanStatsExtendedFlatFile);
                     if (!string.IsNullOrWhiteSpace(headers))
                     {
-                        writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, eOutputFileTypeConstants.ScanStatsExtendedFlatFile) + ":");
+                        writer.WriteLine(ConstructOutputFilePath(string.Empty, string.Empty, OutputFileTypeConstants.ScanStatsExtendedFlatFile) + ":");
                         writer.WriteLine(headers);
                     }
                 }
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the Header Glossary to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the Header Glossary to: " + outputFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -893,7 +893,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error writing to detailed SIC data text file", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing to detailed SIC data text file", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 

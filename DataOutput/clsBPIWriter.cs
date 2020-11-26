@@ -46,7 +46,7 @@ namespace MASIC.DataOutput
 
                 // Disabled in April 2015 since not used
                 // ' First, write a true TIC file (in ICR-2LS format)
-                // outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, eOutputFileTypeConstants.ICRToolsTICChromatogramByScan)
+                // outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, OutputFileTypeConstants.ICRToolsTICChromatogramByScan)
                 // LogMessage("Saving ICR Tools TIC to " + Path.GetFileName(outputFilePath))
 
                 // SaveICRToolsChromatogramByScan(scanList.SurveyScans, scanList.SurveyScans.Count, outputFilePath, False, True, inputFilePathFull)
@@ -55,7 +55,7 @@ namespace MASIC.DataOutput
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Second, write an MS-based _scans.csv file (readable with Decon2LS)
-                var msScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSChromatogramFile);
+                var msScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsMSChromatogramFile);
                 currentFilePath = string.Copy(msScansFilePath);
 
                 ReportMessage("Saving Decon2LS MS Chromatogram File to " + Path.GetFileName(msScansFilePath));
@@ -66,7 +66,7 @@ namespace MASIC.DataOutput
                 UpdateProgress((short)(stepsCompleted / (double)bpiStepCount * 100));
 
                 // Third, write an MSMS-based _scans.csv file (readable with Decon2LS)
-                var msmsScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
+                var msmsScansFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsMSMSChromatogramFile);
                 currentFilePath = string.Copy(msmsScansFilePath);
 
                 ReportMessage("Saving Decon2LS MSMS Chromatogram File to " + Path.GetFileName(msmsScansFilePath));
@@ -78,7 +78,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the BPI to: " + currentFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the BPI to: " + currentFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
         }
@@ -331,7 +331,7 @@ namespace MASIC.DataOutput
             {
                 if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
                 {
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
                     return;
                 }
 

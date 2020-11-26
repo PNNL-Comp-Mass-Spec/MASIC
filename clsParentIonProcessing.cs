@@ -236,7 +236,7 @@ namespace MASIC
             if (sicStats.Peak.MaxIntensityValue > mzListEntry.MaxIntensity || mzListEntry.MatchCount == 1)
             {
                 mzListEntry.MaxIntensity = sicStats.Peak.MaxIntensityValue;
-                if (sicStats.ScanTypeForPeakIndices == clsScanList.eScanTypeConstants.FragScan)
+                if (sicStats.ScanTypeForPeakIndices == clsScanList.ScanTypeConstants.FragScan)
                 {
                     mzListEntry.ScanNumberMaxIntensity = scanList.FragScans[sicStats.PeakScanIndexMax].ScanNumber;
                     mzListEntry.ScanTimeMaxIntensity = scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime;
@@ -292,7 +292,7 @@ namespace MASIC
                     {
                         if (!spectraCache.GetSpectrum(scanList.FragScans[fragSpectrumIndex1].ScanNumber, out var spectrum1, false))
                         {
-                            SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
+                            SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
                             return -1;
                         }
 
@@ -310,7 +310,7 @@ namespace MASIC
                         {
                             if (!spectraCache.GetSpectrum(scanList.FragScans[fragSpectrumIndex2].ScanNumber, out var spectrum2, false))
                             {
-                                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
+                                SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
                                 return -1;
                             }
 
@@ -446,7 +446,7 @@ namespace MASIC
                 }
                 else if (!spectraCache.GetSpectrum(scanList[spectrumIndex].ScanNumber, out var spectrum, canSkipPool: true))
                 {
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
                     success = false;
                 }
                 else
@@ -775,7 +775,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error in FindSimilarParentIons", ex, clsMASIC.eMasicErrorCodes.FindSimilarParentIonsError);
+                ReportError("Error in FindSimilarParentIons", ex, clsMASIC.MasicErrorCodes.FindSimilarParentIonsError);
                 return false;
             }
         }
@@ -814,7 +814,7 @@ namespace MASIC
                 var uniqueMzListItem = similarParentIonsData.UniqueMZList.Last();
                 var sicStats = scanList.ParentIons[matchOriginalIndex].SICStats;
 
-                if (sicStats.ScanTypeForPeakIndices == clsScanList.eScanTypeConstants.FragScan)
+                if (sicStats.ScanTypeForPeakIndices == clsScanList.ScanTypeConstants.FragScan)
                 {
                     if (scanList.FragScans[sicStats.PeakScanIndexMax].ScanTime < float.Epsilon &&
                         uniqueMzListItem.ScanTimeMaxIntensity < float.Epsilon)

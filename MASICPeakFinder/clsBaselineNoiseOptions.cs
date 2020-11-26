@@ -5,12 +5,12 @@
         /// <summary>
         /// Method to use to determine the baseline noise level
         /// </summary>
-        public clsMASICPeakFinder.eNoiseThresholdModes BaselineNoiseMode;
+        public clsMASICPeakFinder.NoiseThresholdModes BaselineNoiseMode;
 
         /// <summary>
         /// Explicitly defined noise intensity
         /// </summary>
-        /// <remarks>Only used if .BaselineNoiseMode = eNoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra</remarks>
+        /// <remarks>Only used if .BaselineNoiseMode = NoiseThresholdModes.AbsoluteThreshold; 50000 for SIC, 0 for MS/MS spectra</remarks>
         public double BaselineNoiseLevelAbsolute;
 
         /// <summary>
@@ -27,12 +27,12 @@
 
         /// <summary>
         /// Typically 0.75 for SICs, 0.5 for MS/MS spectra
-        /// Only used for eNoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
+        /// Only used for NoiseThresholdModes.TrimmedMeanByAbundance, .TrimmedMeanByCount, .TrimmedMedianByAbundance
         /// </summary>
         public double TrimmedMeanFractionLowIntensityDataToAverage;
 
         /// <summary>
-        /// Typically 5; distance from the mean in standard deviation units (SqrRt(Variance)) to discard data for computing the trimmed mean
+        /// Typically 5; distance from the mean in standard deviation units (SquareRoot(Variance)) to discard data for computing the trimmed mean
         /// </summary>
         public short DualTrimmedMeanStdDevLimits;
 

@@ -24,7 +24,7 @@ namespace MASICPeakFinder
 
         public const int MINIMUM_PEAK_WIDTH = 3;                         // Width in points
 
-        public enum eNoiseThresholdModes
+        public enum NoiseThresholdModes
         {
             AbsoluteThreshold = 0,
             TrimmedMeanByAbundance = 1,
@@ -34,7 +34,7 @@ namespace MASICPeakFinder
             MeanOfDataInPeakVicinity = 5
         }
 
-        public enum eTTestConfidenceLevelConstants
+        public enum TTestConfidenceLevelConstants
         {
             // ReSharper disable UnusedMember.Global
             Conf80Pct = 0,
@@ -293,7 +293,7 @@ namespace MASICPeakFinder
             {
                 var baselineNoiseOptionsOverride = baselineNoiseOptions.Clone();
 
-                baselineNoiseOptionsOverride.BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance;
+                baselineNoiseOptionsOverride.BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance;
                 baselineNoiseOptionsOverride.TrimmedMeanFractionLowIntensityDataToAverage = 0.33;
 
                 var intensities = (from item in sicData select item.Intensity).ToArray();
@@ -335,7 +335,7 @@ namespace MASICPeakFinder
                 {
                     var baselineNoiseStats = InitializeBaselineNoiseStats(
                         baselineNoiseOptions.MinimumBaselineNoiseLevel,
-                        eNoiseThresholdModes.DualTrimmedMeanByAbundance);
+                        NoiseThresholdModes.DualTrimmedMeanByAbundance);
                     noiseStatsSegments.Add(new clsBaselineNoiseStatsSegment(baselineNoiseStats));
                 }
 
@@ -378,7 +378,7 @@ namespace MASICPeakFinder
                 }
 
                 // Compare adjacent segments using a T-Test, starting with the final segment and working backward
-                const eTTestConfidenceLevelConstants confidenceLevel = eTTestConfidenceLevelConstants.Conf90Pct;
+                const TTestConfidenceLevelConstants confidenceLevel = TTestConfidenceLevelConstants.Conf90Pct;
                 var segmentIndex = segmentCountLocal - 1;
 
                 while (segmentIndex > 0)
@@ -452,7 +452,7 @@ namespace MASICPeakFinder
             // Initialize baselineNoiseStats
             baselineNoiseStats = InitializeBaselineNoiseStats(
                 baselineNoiseOptions.MinimumBaselineNoiseLevel,
-                eNoiseThresholdModes.DualTrimmedMeanByAbundance);
+                NoiseThresholdModes.DualTrimmedMeanByAbundance);
 
             if (dataList == null || indexEnd - indexStart < 0)
             {
@@ -872,7 +872,7 @@ namespace MASICPeakFinder
         {
             const bool IGNORE_NON_POSITIVE_DATA = false;
 
-            if (baselineNoiseOptions.BaselineNoiseMode == eNoiseThresholdModes.AbsoluteThreshold)
+            if (baselineNoiseOptions.BaselineNoiseMode == NoiseThresholdModes.AbsoluteThreshold)
             {
                 baselineNoiseStats = InitializeBaselineNoiseStats(
                     baselineNoiseOptions.BaselineNoiseLevelAbsolute,
@@ -881,7 +881,7 @@ namespace MASICPeakFinder
                 return true;
             }
 
-            if (baselineNoiseOptions.BaselineNoiseMode == eNoiseThresholdModes.DualTrimmedMeanByAbundance)
+            if (baselineNoiseOptions.BaselineNoiseMode == NoiseThresholdModes.DualTrimmedMeanByAbundance)
             {
                 return ComputeDualTrimmedNoiseLevel(dataList, 0, dataCount - 1, baselineNoiseOptions, out baselineNoiseStats);
             }
@@ -914,7 +914,7 @@ namespace MASICPeakFinder
             // Initialize baselineNoiseStats
             sicPeak.BaselineNoiseStats = InitializeBaselineNoiseStats(
                 baselineNoiseOptions.MinimumBaselineNoiseLevel,
-                eNoiseThresholdModes.MeanOfDataInPeakVicinity);
+                NoiseThresholdModes.MeanOfDataInPeakVicinity);
 
             // Only use a portion of the data to compute the noise level
             // The number of points to extend from the left and right is based on the width at 4 sigma; useful for tailing peaks
@@ -1801,12 +1801,12 @@ namespace MASICPeakFinder
 
             switch (baselineNoiseOptions.BaselineNoiseMode)
             {
-                case eNoiseThresholdModes.TrimmedMeanByAbundance:
-                case eNoiseThresholdModes.TrimmedMeanByCount:
+                case NoiseThresholdModes.TrimmedMeanByAbundance:
+                case NoiseThresholdModes.TrimmedMeanByCount:
                     int countSummed;
                     double sum;
 
-                    if (baselineNoiseOptions.BaselineNoiseMode == eNoiseThresholdModes.TrimmedMeanByAbundance)
+                    if (baselineNoiseOptions.BaselineNoiseMode == NoiseThresholdModes.TrimmedMeanByAbundance)
                     {
                         // Average the data that has intensity values less than
                         // Minimum + baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage * (Maximum - Minimum)
@@ -1834,7 +1834,7 @@ namespace MASICPeakFinder
                     }
                     else
                     {
-                        // eNoiseThresholdModes.TrimmedMeanByCount
+                        // NoiseThresholdModes.TrimmedMeanByCount
                         // Find the index of the data point at dataSortedCount * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage and
                         // average the data from the start to that index
                         indexEnd = (int)Math.Round((dataSortedCount - 1) * baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage, 0);
@@ -1876,7 +1876,7 @@ namespace MASICPeakFinder
 
                     break;
 
-                case eNoiseThresholdModes.TrimmedMedianByAbundance:
+                case NoiseThresholdModes.TrimmedMedianByAbundance:
                     if (baselineNoiseOptions.TrimmedMeanFractionLowIntensityDataToAverage >= 1)
                     {
                         indexEnd = dataSortedCount - 1;
@@ -3268,7 +3268,7 @@ namespace MASICPeakFinder
 
                         //// Compute the trimmed median of the data in SICData (replacing non positive values with the minimum)
                         //// If the median is less than sicPeak.BaselineNoiseStats.NoiseLevel then update sicPeak.BaselineNoiseStats.NoiseLevel
-                        //noiseOptionsOverride.BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance;
+                        //noiseOptionsOverride.BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance;
                         //noiseOptionsOverride.TrimmedMeanFractionLowIntensityDataToAverage = 0.75;
                         //
                         //success = ComputeNoiseLevelForSICData[sicData, noiseOptionsOverride, noiseStatsCompare];
@@ -3279,7 +3279,7 @@ namespace MASICPeakFinder
                         //    {
                         //        // Yes, the comparison noise level is lower
                         //        // Use a T-Test to see if the comparison noise level is significantly different than the primary noise level
-                        //        if (TestSignificanceUsingTTest[noiseStatsCompare.NoiseLevel, sicPeak.BaselineNoiseStats.NoiseLevel, noiseStatsCompare.NoiseStDev, sicPeak.BaselineNoiseStats.NoiseStDev, noiseStatsCompare.PointsUsed, sicPeak.BaselineNoiseStats.PointsUsed, eTTestConfidenceLevelConstants.Conf95Pct, tCalculated])
+                        //        if (TestSignificanceUsingTTest[noiseStatsCompare.NoiseLevel, sicPeak.BaselineNoiseStats.NoiseLevel, noiseStatsCompare.NoiseStDev, sicPeak.BaselineNoiseStats.NoiseStDev, noiseStatsCompare.PointsUsed, sicPeak.BaselineNoiseStats.PointsUsed, TTestConfidenceLevelConstants.Conf95Pct, tCalculated])
                         //        {
                         //            sicPeak.BaselineNoiseStats = noiseStatsCompare;
                         //        }
@@ -3344,7 +3344,7 @@ namespace MASICPeakFinder
         {
             var baselineNoiseOptions = new clsBaselineNoiseOptions
             {
-                BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance,
+                BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance,
                 BaselineNoiseLevelAbsolute = 0,
                 MinimumSignalToNoiseRatio = 0,                      // ToDo: Figure out how best to use this when > 0; for now, the SICNoiseMinimumSignalToNoiseRatio property ignores any attempts to set this value
                 MinimumBaselineNoiseLevel = 1,
@@ -3386,9 +3386,9 @@ namespace MASICPeakFinder
             };
 
             // Customize a few values
-            sicPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance;
+            sicPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance;
 
-            sicPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = eNoiseThresholdModes.TrimmedMedianByAbundance;
+            sicPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = NoiseThresholdModes.TrimmedMedianByAbundance;
             sicPeakFinderOptions.MassSpectraNoiseThresholdOptions.TrimmedMeanFractionLowIntensityDataToAverage = 0.5;
             sicPeakFinderOptions.MassSpectraNoiseThresholdOptions.MinimumSignalToNoiseRatio = 2;
 
@@ -3410,7 +3410,7 @@ namespace MASICPeakFinder
 
         public static clsBaselineNoiseStats InitializeBaselineNoiseStats(
             double minimumBaselineNoiseLevel,
-            eNoiseThresholdModes noiseThresholdMode)
+            NoiseThresholdModes noiseThresholdMode)
         {
             var baselineNoiseStats = new clsBaselineNoiseStats()
             {
@@ -3427,7 +3427,7 @@ namespace MASICPeakFinder
         public static void InitializeBaselineNoiseStats(
             out clsBaselineNoiseStats baselineNoiseStats,
             double minimumBaselineNoiseLevel,
-            eNoiseThresholdModes noiseThresholdMode)
+            NoiseThresholdModes noiseThresholdMode)
         {
             baselineNoiseStats = InitializeBaselineNoiseStats(minimumBaselineNoiseLevel, noiseThresholdMode);
         }
@@ -3525,7 +3525,7 @@ namespace MASICPeakFinder
                 {
                     baselineNoiseStats = InitializeBaselineNoiseStats(
                         GetDefaultNoiseThresholdOptions().MinimumBaselineNoiseLevel,
-                        eNoiseThresholdModes.DualTrimmedMeanByAbundance);
+                        NoiseThresholdModes.DualTrimmedMeanByAbundance);
 
                     return baselineNoiseStats;
                 }
@@ -3685,7 +3685,7 @@ namespace MASICPeakFinder
             double mean1, double mean2,
             double stDev1, double stDev2,
             int dataCount1, int dataCount2,
-            eTTestConfidenceLevelConstants confidenceLevel,
+            TTestConfidenceLevelConstants confidenceLevel,
             out double tCalculated)
         {
             // To use the t-test you must use sample variance values, not population variance values

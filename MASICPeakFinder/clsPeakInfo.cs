@@ -33,10 +33,10 @@
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="intPeakLocation">Index of this peak in the data arrays</param>
-        public clsPeakInfo(int intPeakLocation)
+        /// <param name="locationIndex">Index of this peak in the data arrays</param>
+        public clsPeakInfo(int locationIndex)
         {
-            PeakLocation = intPeakLocation;
+            PeakLocation = locationIndex;
         }
 
         /// <summary>

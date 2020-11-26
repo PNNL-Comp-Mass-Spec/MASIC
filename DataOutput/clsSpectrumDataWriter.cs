@@ -47,14 +47,14 @@ namespace MASIC.DataOutput
                 switch (mOptions.RawDataExportOptions.FileFormat)
                 {
                     case RawDataExportOptions.eExportRawDataFileFormatConstants.PEKFile:
-                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.PEKFile);
+                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.PEKFile);
                         dataWriter = new StreamWriter(outputFilePath);
                         scanInfoWriter = null;
                         break;
                     case RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile:
-                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsIsosFile);
+                        outputFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsIsosFile);
 
-                        var outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.DeconToolsScansFile);
+                        var outputFilePath2 = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.DeconToolsScansFile);
 
                         dataWriter = new StreamWriter(outputFilePath);
                         scanInfoWriter = new StreamWriter(outputFilePath2);
@@ -86,7 +86,7 @@ namespace MASIC.DataOutput
                 for (var masterOrderIndex = 0; masterOrderIndex < scanList.MasterScanOrderCount; masterOrderIndex++)
                 {
                     var scanPointer = scanList.MasterScanOrder[masterOrderIndex].ScanIndexPointer;
-                    if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.eScanTypeConstants.SurveyScan)
+                    if (scanList.MasterScanOrder[masterOrderIndex].ScanType == clsScanList.ScanTypeConstants.SurveyScan)
                     {
                         SaveRawDataToDiskWork(dataWriter, scanInfoWriter, scanList.SurveyScans[scanPointer], spectraCache, inputFileName, false, ref spectrumExportCount);
                     }
@@ -121,7 +121,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the raw spectra data to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the raw spectra data to: " + outputFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
         }
@@ -138,7 +138,7 @@ namespace MASIC.DataOutput
 
             if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
             {
-                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
+                SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
                 return;
             }
 
@@ -250,7 +250,7 @@ namespace MASIC.DataOutput
 
             if (!spectraCache.GetSpectrum(currentScan.ScanNumber, out var spectrum, true))
             {
-                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
+                SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
                 return;
             }
 

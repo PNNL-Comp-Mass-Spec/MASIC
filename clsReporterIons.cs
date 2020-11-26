@@ -12,7 +12,7 @@ namespace MASIC
 
         public const double REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES = 0.015;
 
-        public enum eReporterIonMassModeConstants
+        public enum ReporterIonMassModeConstants
         {
             CustomOrNone = 0,
             ITraqFourMZ = 1,
@@ -42,7 +42,7 @@ namespace MASIC
 
         private double mReporterIonToleranceDaDefault;
 
-        private eReporterIonMassModeConstants mReporterIonMassMode;
+        private ReporterIonMassModeConstants mReporterIonMassMode;
 
         #endregion
 
@@ -66,14 +66,14 @@ namespace MASIC
 
         public bool ReporterIonApplyAbundanceCorrection { get; set; }
 
-        public clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex ReporterIonITraq4PlexCorrectionFactorType { get; set; }
+        public clsITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex ReporterIonITraq4PlexCorrectionFactorType { get; set; }
 
         /// <summary>
         /// This is ignored if mReporterIonApplyAbundanceCorrection is False
         /// </summary>
         public bool ReporterIonSaveUncorrectedIntensities { get; set; }
 
-        public eReporterIonMassModeConstants ReporterIonMassMode
+        public ReporterIonMassModeConstants ReporterIonMassMode
         {
             get => mReporterIonMassMode;
             set => SetReporterIonMassMode(value);
@@ -111,9 +111,9 @@ namespace MASIC
             InitializeReporterIonInfo();
         }
 
-        public static List<clsReporterIonInfo> GetDefaultReporterIons(eReporterIonMassModeConstants eReporterIonMassMode)
+        public static List<clsReporterIonInfo> GetDefaultReporterIons(ReporterIonMassModeConstants eReporterIonMassMode)
         {
-            if (eReporterIonMassMode == eReporterIonMassModeConstants.ITraqEightMZHighRes)
+            if (eReporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
             {
                 return GetDefaultReporterIons(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
             }
@@ -124,14 +124,14 @@ namespace MASIC
         }
 
         public static List<clsReporterIonInfo> GetDefaultReporterIons(
-            eReporterIonMassModeConstants eReporterIonMassMode,
+            ReporterIonMassModeConstants eReporterIonMassMode,
             double mzToleranceDa)
         {
             var reporterIons = new List<clsReporterIonInfo>(16); // largest count is 16
 
             switch (eReporterIonMassMode)
             {
-                case eReporterIonMassModeConstants.ITraqFourMZ:
+                case ReporterIonMassModeConstants.ITraqFourMZ:
                     // ITRAQ, aka iTRAQ4
                     reporterIons.Add(new clsReporterIonInfo(114.1112));
                     reporterIons.Add(new clsReporterIonInfo(115.1083));
@@ -139,20 +139,20 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(117.115));
                     break;
 
-                case eReporterIonMassModeConstants.ITraqETDThreeMZ:
+                case ReporterIonMassModeConstants.ITraqETDThreeMZ:
                     // ITRAQ ETD tags
                     reporterIons.Add(new clsReporterIonInfo(101.107));
                     reporterIons.Add(new clsReporterIonInfo(102.104));
                     reporterIons.Add(new clsReporterIonInfo(104.1107));
                     break;
 
-                case eReporterIonMassModeConstants.TMTTwoMZ:
+                case ReporterIonMassModeConstants.TMTTwoMZ:
                     // TMT duplex Isobaric tags (from Thermo)
                     reporterIons.Add(new clsReporterIonInfo(126.1283));
                     reporterIons.Add(new clsReporterIonInfo(127.1316));
                     break;
 
-                case eReporterIonMassModeConstants.TMTSixMZ:
+                case ReporterIonMassModeConstants.TMTSixMZ:
                     // TMT 6-plex Isobaric tags (from Thermo), aka TMT6
                     // These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                     // ' Old values:
@@ -164,7 +164,7 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(131.138176));        // 131.1387
                     break;
 
-                case eReporterIonMassModeConstants.TMTTenMZ:
+                case ReporterIonMassModeConstants.TMTTenMZ:
                     // TMT 10-plex Isobaric tags (from Thermo), aka TMT10
                     // These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                     // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
@@ -180,7 +180,7 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(131.138180));        // 131N
                     break;
 
-                case eReporterIonMassModeConstants.TMTElevenMZ:
+                case ReporterIonMassModeConstants.TMTElevenMZ:
                     // TMT 11-plex Isobaric tags (from Thermo), aka TMT11
                     // These mass values are for HCD spectra; ETD spectra are exactly 12 Da lighter
                     // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
@@ -197,7 +197,7 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(131.144499));        // 131C
                     break;
 
-                case eReporterIonMassModeConstants.TMTSixteenMZ:
+                case ReporterIonMassModeConstants.TMTSixteenMZ:
                     // ReSharper disable once CommentTypo
                     // TMT 16-plex Isobaric tags (from Thermo), aka TMT16 or TMTpro
                     // Several of the reporter ion masses are just 49 ppm apart, thus you must use a very tight tolerance of +/-0.003 Da (which is +/-23 ppm)
@@ -219,7 +219,7 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(134.148245));        // 134N
                     break;
 
-                case eReporterIonMassModeConstants.ITraqEightMZHighRes:
+                case ReporterIonMassModeConstants.ITraqEightMZHighRes:
                     // ITRAQ eight-plex Isobaric tags (iTRAQ8), High-Res MS/MS
                     reporterIons.Add(new clsReporterIonInfo(113.107873));
                     reporterIons.Add(new clsReporterIonInfo(114.111228));
@@ -231,7 +231,7 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(121.122072));
                     break;
 
-                case eReporterIonMassModeConstants.ITraqEightMZLowRes:
+                case ReporterIonMassModeConstants.ITraqEightMZLowRes:
                     // ITRAQ eight-plex Isobaric tags (iTRAQ8), Low-Res MS/MS
                     reporterIons.Add(new clsReporterIonInfo(113.107873));
                     reporterIons.Add(new clsReporterIonInfo(114.111228));
@@ -247,7 +247,7 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(121.122072));
                     break;
 
-                case eReporterIonMassModeConstants.PCGalnaz:
+                case ReporterIonMassModeConstants.PCGalnaz:
                     // ReSharper disable CommentTypo
 
                     // Custom reporter ions for Josh Alfaro
@@ -256,47 +256,47 @@ namespace MASIC
                     reporterIons.Add(new clsReporterIonInfo(503.2101566));     // C19H31N6O10
                     break;
 
-                case eReporterIonMassModeConstants.HemeCFragment:
+                case ReporterIonMassModeConstants.HemeCFragment:
                     // Custom reporter ions for Eric Merkley
                     reporterIons.Add(new clsReporterIonInfo(616.1767));
                     reporterIons.Add(new clsReporterIonInfo(617.1845));
                     break;
 
-                case eReporterIonMassModeConstants.LycAcetFragment:
+                case ReporterIonMassModeConstants.LycAcetFragment:
                     // Custom reporter ions for Ernesto Nakayasu
                     reporterIons.Add(new clsReporterIonInfo(126.09134));
                     reporterIons.Add(new clsReporterIonInfo(127.094695));
                     break;
 
-                case eReporterIonMassModeConstants.OGlcNAc:
+                case ReporterIonMassModeConstants.OGlcNAc:
                     // O-GlcNAc
                     reporterIons.Add(new clsReporterIonInfo(204.0872));
                     reporterIons.Add(new clsReporterIonInfo(300.13079));
                     reporterIons.Add(new clsReporterIonInfo(503.21017));
                     break;
 
-                case eReporterIonMassModeConstants.FrackingAmine20160217:
+                case ReporterIonMassModeConstants.FrackingAmine20160217:
                     // Product ions associated with FrackingFluid_amine_1_02172016
                     reporterIons.Add(new clsReporterIonInfo(157.089));
                     reporterIons.Add(new clsReporterIonInfo(170.097));
                     reporterIons.Add(new clsReporterIonInfo(234.059));
                     break;
 
-                case eReporterIonMassModeConstants.FSFACustomCarbonyl:
+                case ReporterIonMassModeConstants.FSFACustomCarbonyl:
                     // Custom product ions from Chengdong Xu
                     reporterIons.Add(new clsReporterIonInfo(171.104));
                     reporterIons.Add(new clsReporterIonInfo(236.074));
                     reporterIons.Add(new clsReporterIonInfo(257.088));
                     break;
 
-                case eReporterIonMassModeConstants.FSFACustomCarboxylic:
+                case ReporterIonMassModeConstants.FSFACustomCarboxylic:
                     // Custom product ions from Chengdong Xu
                     reporterIons.Add(new clsReporterIonInfo(171.104));
                     reporterIons.Add(new clsReporterIonInfo(234.058));
                     reporterIons.Add(new clsReporterIonInfo(336.174));
                     break;
 
-                case eReporterIonMassModeConstants.FSFACustomHydroxyl:
+                case ReporterIonMassModeConstants.FSFACustomHydroxyl:
                     // Custom product ions from Chengdong Xu
                     reporterIons.Add(new clsReporterIonInfo(151.063));
                     reporterIons.Add(new clsReporterIonInfo(166.087));
@@ -304,13 +304,13 @@ namespace MASIC
 
                 // ReSharper restore CommentTypo
 
-                case eReporterIonMassModeConstants.Acetylation:
+                case ReporterIonMassModeConstants.Acetylation:
                     // Reporter ions for peptides with acetylated lysine residues
                     reporterIons.Add(new clsReporterIonInfo(126.09134));
                     reporterIons.Add(new clsReporterIonInfo(143.11789));
                     break;
 
-                case eReporterIonMassModeConstants.NativeOGlcNAc:
+                case ReporterIonMassModeConstants.NativeOGlcNAc:
                     // Native O-GlcNAc
                     reporterIons.Add(new clsReporterIonInfo(126.055));
                     reporterIons.Add(new clsReporterIonInfo(138.055));
@@ -322,7 +322,7 @@ namespace MASIC
                     break;
 
                 default:
-                    // Includes eReporterIonMassModeConstants.CustomOrNone
+                    // Includes ReporterIonMassModeConstants.CustomOrNone
                     reporterIons.Clear();
                     break;
             }
@@ -333,50 +333,50 @@ namespace MASIC
             return reporterIons;
         }
 
-        public static string GetReporterIonModeDescription(eReporterIonMassModeConstants eReporterIonMode)
+        public static string GetReporterIonModeDescription(ReporterIonMassModeConstants eReporterIonMode)
         {
             switch (eReporterIonMode)
             {
-                case eReporterIonMassModeConstants.CustomOrNone:
+                case ReporterIonMassModeConstants.CustomOrNone:
                     return "Custom/None";
-                case eReporterIonMassModeConstants.ITraqFourMZ:
+                case ReporterIonMassModeConstants.ITraqFourMZ:
                     return "4-plex iTraq";
-                case eReporterIonMassModeConstants.ITraqETDThreeMZ:
+                case ReporterIonMassModeConstants.ITraqETDThreeMZ:
                     return "3-plex ETD iTraq";
-                case eReporterIonMassModeConstants.TMTTwoMZ:
+                case ReporterIonMassModeConstants.TMTTwoMZ:
                     return "2-plex TMT";
-                case eReporterIonMassModeConstants.TMTSixMZ:
+                case ReporterIonMassModeConstants.TMTSixMZ:
                     return "6-plex TMT";
-                case eReporterIonMassModeConstants.TMTTenMZ:
+                case ReporterIonMassModeConstants.TMTTenMZ:
                     return "10-plex TMT";
-                case eReporterIonMassModeConstants.TMTElevenMZ:
+                case ReporterIonMassModeConstants.TMTElevenMZ:
                     return "11-plex TMT";
-                case eReporterIonMassModeConstants.TMTSixteenMZ:
+                case ReporterIonMassModeConstants.TMTSixteenMZ:
                     // ReSharper disable once StringLiteralTypo
                     return "16-plex TMT (aka TMTpro)";
-                case eReporterIonMassModeConstants.ITraqEightMZHighRes:
+                case ReporterIonMassModeConstants.ITraqEightMZHighRes:
                     return "8-plex iTraq (High Res MS/MS)";
-                case eReporterIonMassModeConstants.ITraqEightMZLowRes:
+                case ReporterIonMassModeConstants.ITraqEightMZLowRes:
                     return "8-plex iTraq (Low Res MS/MS)";
-                case eReporterIonMassModeConstants.PCGalnaz:
+                case ReporterIonMassModeConstants.PCGalnaz:
                     return "PCGalnaz (300.13 m/z and 503.21 m/z)";
-                case eReporterIonMassModeConstants.HemeCFragment:
+                case ReporterIonMassModeConstants.HemeCFragment:
                     return "Heme C (616.18 m/z and 616.19 m/z)";
-                case eReporterIonMassModeConstants.LycAcetFragment:
+                case ReporterIonMassModeConstants.LycAcetFragment:
                     return "Lys Acet (126.091 m/z and 127.095 m/z)";
-                case eReporterIonMassModeConstants.OGlcNAc:
+                case ReporterIonMassModeConstants.OGlcNAc:
                     return "O-GlcNAc (204.087, 300.13, and 503.21 m/z)";
-                case eReporterIonMassModeConstants.NativeOGlcNAc:
+                case ReporterIonMassModeConstants.NativeOGlcNAc:
                     return "Native O-GlcNAc (126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14 m/z)";
-                case eReporterIonMassModeConstants.FrackingAmine20160217:
+                case ReporterIonMassModeConstants.FrackingAmine20160217:
                     return "Fracking Amine 20160217 (157.089, 170.097, and 234.059 m/z)";
-                case eReporterIonMassModeConstants.FSFACustomCarbonyl:
+                case ReporterIonMassModeConstants.FSFACustomCarbonyl:
                     return "FSFA Custom Carbonyl (171.104, 236.074, 157.088 m/z)";
-                case eReporterIonMassModeConstants.FSFACustomCarboxylic:
+                case ReporterIonMassModeConstants.FSFACustomCarboxylic:
                     return "FSFA Custom Carboxylic (171.104, 234.058, 336.174 m/z)";
-                case eReporterIonMassModeConstants.FSFACustomHydroxyl:
+                case ReporterIonMassModeConstants.FSFACustomHydroxyl:
                     return "FSFA Custom Hydroxyl (151.063 and 166.087 m/z)";
-                case eReporterIonMassModeConstants.Acetylation:
+                case ReporterIonMassModeConstants.Acetylation:
                     return "Acetylated K (126.091 and 143.118 m/z)";
                 default:
                     return "Unknown mode";
@@ -387,19 +387,19 @@ namespace MASIC
         {
             ReporterIonList.Clear();
 
-            SetReporterIonMassMode(eReporterIonMassModeConstants.CustomOrNone);
+            SetReporterIonMassMode(ReporterIonMassModeConstants.CustomOrNone);
 
             ReporterIonToleranceDaDefault = REPORTER_ION_TOLERANCE_DA_DEFAULT;
             ReporterIonApplyAbundanceCorrection = true;
-            ReporterIonITraq4PlexCorrectionFactorType = clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex.ABSciex;
+            ReporterIonITraq4PlexCorrectionFactorType = clsITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex.ABSciex;
 
             ReporterIonSaveObservedMasses = false;
             ReporterIonSaveUncorrectedIntensities = false;
         }
 
-        public void SetReporterIonMassMode(eReporterIonMassModeConstants eReporterIonMassMode)
+        public void SetReporterIonMassMode(ReporterIonMassModeConstants eReporterIonMassMode)
         {
-            if (eReporterIonMassMode == eReporterIonMassModeConstants.ITraqEightMZHighRes)
+            if (eReporterIonMassMode == ReporterIonMassModeConstants.ITraqEightMZHighRes)
             {
                 SetReporterIonMassMode(eReporterIonMassMode, REPORTER_ION_TOLERANCE_DA_DEFAULT_ITRAQ8_HIGH_RES);
             }
@@ -410,12 +410,12 @@ namespace MASIC
         }
 
         public void SetReporterIonMassMode(
-            eReporterIonMassModeConstants eReporterIonMassMode,
+            ReporterIonMassModeConstants eReporterIonMassMode,
             double mzToleranceDa)
         {
-            // Note: If eReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone then nothing is changed
+            // Note: If eReporterIonMassMode = ReporterIonMassModeConstants.CustomOrNone then nothing is changed
 
-            if (eReporterIonMassMode != eReporterIonMassModeConstants.CustomOrNone)
+            if (eReporterIonMassMode != ReporterIonMassModeConstants.CustomOrNone)
             {
                 ReporterIonToleranceDaDefault = mzToleranceDa;
 
@@ -449,7 +449,7 @@ namespace MASIC
 
             if (customReporterIons)
             {
-                mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone;
+                mReporterIonMassMode = ReporterIonMassModeConstants.CustomOrNone;
             }
         }
 
@@ -482,7 +482,7 @@ namespace MASIC
         /// <param name="reporterIonMZList"></param>
         /// <param name="mzToleranceDa">Search tolerance (half width); must be 0.001 or larger</param>
         /// <param name="customReporterIons">True if these are custom reporter ions</param>
-        /// <remarks>When customReportIons is true, sets mReporterIonMassMode to eReporterIonMassModeConstants.CustomOrNone</remarks>
+        /// <remarks>When customReportIons is true, sets mReporterIonMassMode to ReporterIonMassModeConstants.CustomOrNone</remarks>
         public void SetReporterIons(
             double[] reporterIonMZList,
             double mzToleranceDa,
@@ -496,7 +496,7 @@ namespace MASIC
             ReporterIonList.Clear();
             if (reporterIonMZList == null || reporterIonMZList.Length == 0)
             {
-                mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone;
+                mReporterIonMassMode = ReporterIonMassModeConstants.CustomOrNone;
                 return;
             }
 
@@ -512,7 +512,7 @@ namespace MASIC
 
             if (customReporterIons)
             {
-                mReporterIonMassMode = eReporterIonMassModeConstants.CustomOrNone;
+                mReporterIonMassMode = ReporterIonMassModeConstants.CustomOrNone;
             }
         }
 

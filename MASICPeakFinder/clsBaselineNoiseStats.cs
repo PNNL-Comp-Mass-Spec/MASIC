@@ -20,17 +20,17 @@
         /// </summary>
         public int PointsUsed { get; set; }
 
-        public clsMASICPeakFinder.eNoiseThresholdModes NoiseThresholdModeUsed { get; set; }
         /// <summary>
         /// Noise threshold mode used
         /// </summary>
+        public clsMASICPeakFinder.NoiseThresholdModes NoiseThresholdModeUsed { get; set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public clsBaselineNoiseStats()
         {
-            NoiseThresholdModeUsed = clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold;
+            NoiseThresholdModeUsed = clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold;
         }
 
         /// <summary>

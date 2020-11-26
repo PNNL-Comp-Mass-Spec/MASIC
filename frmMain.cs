@@ -52,9 +52,9 @@ namespace MASIC
             // Add any initialization after the InitializeComponent() call
 
             mCacheOptions = new SpectrumCacheOptions();
-            mDefaultCustomSICList = new List<udtCustomSICEntryType>();
+            mDefaultCustomSICList = new List<CustomSICEntryType>();
             mLogMessages = new List<string>();
-            mReporterIonIndexToModeMap = new Dictionary<int, clsReporterIons.eReporterIonMassModeConstants>();
+            mReporterIonIndexToModeMap = new Dictionary<int, clsReporterIons.ReporterIonMassModeConstants>();
             InitializeControls();
             mMasic = new clsMASIC();
             RegisterEvents(mMasic);
@@ -77,7 +77,7 @@ namespace MASIC
 
         #region "Structures"
 
-        private struct udtCustomSICEntryType
+        private struct CustomSICEntryType
         {
             public double MZ;
             public float ScanCenter;
@@ -86,11 +86,11 @@ namespace MASIC
 
         #endregion
 
-        #region "Classwide Variables"
+        #region "Class wide Variables"
 
         private DataSet mCustomSICValuesDataset;
 
-        private readonly List<udtCustomSICEntryType> mDefaultCustomSICList;
+        private readonly List<CustomSICEntryType> mDefaultCustomSICList;
         private bool mWorking;
 
         private string mXmlSettingsFilePath;
@@ -117,13 +117,13 @@ namespace MASIC
         // ReSharper disable once CollectionNeverQueried.Local
         private readonly List<string> mLogMessages;
 
-        private readonly Dictionary<int, clsReporterIons.eReporterIonMassModeConstants> mReporterIonIndexToModeMap;
+        private readonly Dictionary<int, clsReporterIons.ReporterIonMassModeConstants> mReporterIonIndexToModeMap;
 
         #endregion
 
         #region "Properties"
 
-        private clsReporterIons.eReporterIonMassModeConstants SelectedReporterIonMode
+        private clsReporterIons.ReporterIonMassModeConstants SelectedReporterIonMode
         {
             get
             {
@@ -184,7 +184,7 @@ namespace MASIC
 
         private void AppendCustomSICListItem(double mz, float scanCenter, string comment)
         {
-            var customSicEntryItem = new udtCustomSICEntryType()
+            var customSicEntryItem = new CustomSICEntryType
             {
                 MZ = mz,
                 ScanCenter = scanCenter,
@@ -193,7 +193,7 @@ namespace MASIC
             mDefaultCustomSICList.Add(customSicEntryItem);
         }
 
-        private void AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants reporterIonMassMode, string description)
+        private void AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMassMode, string description)
         {
             cboReporterIonMassMode.Items.Add(description);
             var currentIndex = cboReporterIonMassMode.Items.Count - 1;
@@ -249,7 +249,7 @@ namespace MASIC
             if (ClearCustomSICList(confirmReplaceExistingResults))
             {
                 // The default values use relative times, so make sure that mode is enabled
-                SetCustomSICToleranceType(clsCustomSICList.eCustomSICScanTypeConstants.Relative);
+                SetCustomSICToleranceType(clsCustomSICList.CustomSICScanTypeConstants.Relative);
                 txtCustomSICScanOrAcqTimeTolerance.Text = defaultScanOrAcqTimeTolerance.ToString(CultureInfo.InvariantCulture);
                 foreach (var item in mDefaultCustomSICList)
                 {
@@ -287,7 +287,7 @@ namespace MASIC
 
         private void AutoToggleReporterIonStatsEnabled()
         {
-            if (SelectedReporterIonMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
+            if (SelectedReporterIonMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
             {
                 if (chkReporterIonStatsEnabled.Checked)
                 {
@@ -304,14 +304,14 @@ namespace MASIC
         {
             if (chkReporterIonStatsEnabled.Checked)
             {
-                if (SelectedReporterIonMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
+                if (SelectedReporterIonMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
                 {
-                    SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ;
+                    SelectedReporterIonMode = clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ;
                 }
             }
-            else if (SelectedReporterIonMode != clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
+            else if (SelectedReporterIonMode != clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
             {
-                SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone;
+                SelectedReporterIonMode = clsReporterIons.ReporterIonMassModeConstants.CustomOrNone;
             }
         }
 
@@ -495,14 +495,14 @@ namespace MASIC
             txtExportRawDataMaxIonCountPerScan.Enabled = rawExportEnabled;
             txtExportRawDataIntensityMinimum.Enabled = rawExportEnabled;
 
-            if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold)
+            if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold)
             {
                 txtSICNoiseThresholdIntensity.Enabled = true;
                 txtSICNoiseFractionLowIntensityDataToAverage.Enabled = false;
             }
-            else if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance ||
-                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount ||
-                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance)
+            else if (cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance ||
+                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount ||
+                cboSICNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance)
             {
                 txtSICNoiseThresholdIntensity.Enabled = false;
                 txtSICNoiseFractionLowIntensityDataToAverage.Enabled = true;
@@ -517,15 +517,15 @@ namespace MASIC
             txtButterworthSamplingFrequency.Enabled = optUseButterworthSmooth.Checked;
             txtSavitzkyGolayFilterOrder.Enabled = optUseSavitzkyGolaySmooth.Checked;
 
-            if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold)
+            if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold)
             {
                 txtMassSpectraNoiseThresholdIntensity.Enabled = true;
                 txtMassSpectraNoiseFractionLowIntensityDataToAverage.Enabled = false;
                 txtMassSpectraNoiseMinimumSignalToNoiseRatio.Enabled = false;
             }
-            else if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance ||
-                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount ||
-                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance)
+            else if (cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance ||
+                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount ||
+                cboMassSpectraNoiseThresholdMode.SelectedIndex == (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance)
             {
                 txtMassSpectraNoiseThresholdIntensity.Enabled = false;
                 txtMassSpectraNoiseFractionLowIntensityDataToAverage.Enabled = true;
@@ -600,28 +600,28 @@ namespace MASIC
             }
         }
 
-        private clsCustomSICList.eCustomSICScanTypeConstants GetCustomSICScanToleranceType()
+        private clsCustomSICList.CustomSICScanTypeConstants GetCustomSICScanToleranceType()
         {
             if (optCustomSICScanToleranceAbsolute.Checked)
             {
-                return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
+                return clsCustomSICList.CustomSICScanTypeConstants.Absolute;
             }
 
             if (optCustomSICScanToleranceRelative.Checked)
             {
-                return clsCustomSICList.eCustomSICScanTypeConstants.Relative;
+                return clsCustomSICList.CustomSICScanTypeConstants.Relative;
             }
 
             if (optCustomSICScanToleranceAcqTime.Checked)
             {
-                return clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime;
+                return clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
             }
 
             // Assume absolute
-            return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
+            return clsCustomSICList.CustomSICScanTypeConstants.Absolute;
         }
 
-        private int GetReporterIonIndexFromMode(clsReporterIons.eReporterIonMassModeConstants reporterIonMassMode)
+        private int GetReporterIonIndexFromMode(clsReporterIons.ReporterIonMassModeConstants reporterIonMassMode)
         {
             foreach (var item in mReporterIonIndexToModeMap)
             {
@@ -634,7 +634,7 @@ namespace MASIC
             throw new InvalidEnumArgumentException("Dictionary mReporterIonIndexToModeMap is missing enum " + reporterIonMassMode);
         }
 
-        private clsReporterIons.eReporterIonMassModeConstants GetReporterIonModeFromIndex(int comboboxIndex)
+        private clsReporterIons.ReporterIonMassModeConstants GetReporterIonModeFromIndex(int comboboxIndex)
         {
             if (mReporterIonIndexToModeMap.TryGetValue(comboboxIndex, out var reporterIonMassMode))
             {
@@ -644,7 +644,7 @@ namespace MASIC
             throw new Exception("Dictionary mReporterIonIndexToModeMap is missing index " + comboboxIndex);
         }
 
-        private clsReporterIons.eReporterIonMassModeConstants GetSelectedReporterIonMode()
+        private clsReporterIons.ReporterIonMassModeConstants GetSelectedReporterIonMode()
         {
             return GetReporterIonModeFromIndex(cboReporterIonMassMode.SelectedIndex);
         }
@@ -1139,46 +1139,46 @@ namespace MASIC
             cboExportRawDataFileFormat.SelectedIndex = (int)RawDataExportOptions.eExportRawDataFileFormatConstants.CSVFile;
 
             cboSICNoiseThresholdMode.Items.Clear();
-            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
-            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance");
-            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count");
-            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance");
-            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance, "Dual Trimmed Mean By Abundance");
-            cboSICNoiseThresholdMode.SelectedIndex = (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.DualTrimmedMeanByAbundance;
+            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
+            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance");
+            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count");
+            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance");
+            cboSICNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.DualTrimmedMeanByAbundance, "Dual Trimmed Mean By Abundance");
+            cboSICNoiseThresholdMode.SelectedIndex = (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.DualTrimmedMeanByAbundance;
 
             cboMassSpectraNoiseThresholdMode.Items.Clear();
-            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
-            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance");
-            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count");
-            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance");
-            cboMassSpectraNoiseThresholdMode.SelectedIndex = (int)MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance;
+            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold, "Absolute Threshold");
+            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance, "Trimmed Mean By Abundance");
+            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount, "Trimmed Mean By Data Count");
+            cboMassSpectraNoiseThresholdMode.Items.Insert((int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance, "Trimmed Median By Abundance");
+            cboMassSpectraNoiseThresholdMode.SelectedIndex = (int)MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance;
 
             cboReporterIonMassMode.Items.Clear();
             mReporterIonIndexToModeMap.Clear();
 
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.CustomOrNone, "None");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.CustomOrNone, "None");
 
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.Acetylation, "Acetylated K");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqETDThreeMZ, "iTraq ETD: 101, 102, and 104");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqFourMZ, "iTraq: 114, 115, 116, and 117");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes, "iTraq 8 for High Res MS/MS: 113, 114, ... 121");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes, "iTraq 8 for Low Res MS/MS (Considers 120 m/z for immonium loss from phenylalanine)");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.NativeOGlcNAc, "Native OGlcNAc: 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C");
-            AppendReporterIonMassMode(clsReporterIons.eReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.Acetylation, "Acetylated K");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FrackingAmine20160217, "Fracking Amine 20160217: 157.089, 170.097, and 234.059");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FSFACustomCarbonyl, "FSFACustomCarbonyl");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FSFACustomCarboxylic, "FSFACustomCarboxylic");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.FSFACustomHydroxyl, "FSFACustomHydroxyl");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.HemeCFragment, "Heme C: 616.18 and 617.19");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqETDThreeMZ, "iTraq ETD: 101, 102, and 104");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqFourMZ, "iTraq: 114, 115, 116, and 117");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes, "iTraq 8 for High Res MS/MS: 113, 114, ... 121");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes, "iTraq 8 for Low Res MS/MS (Considers 120 m/z for immonium loss from phenylalanine)");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.LycAcetFragment, "Lys Acet: 126.091 and 127.095");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.NativeOGlcNAc, "Native OGlcNAc: 126.055, 138.055, 144.065, 168.066, 186.076, 204.087, and 366.14");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.OGlcNAc, "OGlcNAc: 204.087, 300.13, and 503.21");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.PCGalnaz, "PCGalnaz: 300.13 and 503.21");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTTwoMZ, "TMT 2: 126, 127");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTSixMZ, "TMT 6: 126, 127, 128, 129, 130, 131");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTTenMZ, "TMT 10: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTElevenMZ, "TMT 11: 126, 127N, 127C, 128N, 128C, 129N, 129C, 130N, 130C, 131N, 131C");
+            AppendReporterIonMassMode(clsReporterIons.ReporterIonMassModeConstants.TMTSixteenMZ, "TMT 16: 126, 127N, 127C, ... 132N, 132C, 133N, 133C, 134N");
 
-            SelectedReporterIonMode = clsReporterIons.eReporterIonMassModeConstants.CustomOrNone;
+            SelectedReporterIonMode = clsReporterIons.ReporterIonMassModeConstants.CustomOrNone;
         }
 
         private void ProcessFileUsingMASIC()
@@ -1219,7 +1219,7 @@ namespace MASIC
                     Cursor.Current = Cursors.Default;
                     if (mMasic.Options.AbortProcessing)
                     {
-                        MessageBox.Show("Cancelled processing", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Canceled processing", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                     if (success)
@@ -1715,17 +1715,17 @@ namespace MASIC
             txtDatasetInfoQuerySQL.Text = clsDatabaseAccess.DATABASE_DATASET_INFO_QUERY_DEFAULT;
         }
 
-        private void SetCustomSICToleranceType(clsCustomSICList.eCustomSICScanTypeConstants eCustomSICScanToleranceType)
+        private void SetCustomSICToleranceType(clsCustomSICList.CustomSICScanTypeConstants eCustomSICScanToleranceType)
         {
             switch (eCustomSICScanToleranceType)
             {
-                case clsCustomSICList.eCustomSICScanTypeConstants.Absolute:
+                case clsCustomSICList.CustomSICScanTypeConstants.Absolute:
                     optCustomSICScanToleranceAbsolute.Checked = true;
                     break;
-                case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
+                case clsCustomSICList.CustomSICScanTypeConstants.Relative:
                     optCustomSICScanToleranceRelative.Checked = true;
                     break;
-                case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
+                case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                     optCustomSICScanToleranceAcqTime.Checked = true;
                     break;
                 default:
@@ -1810,19 +1810,19 @@ namespace MASIC
             var timeTolerance = false;
             switch (GetCustomSICScanToleranceType())
             {
-                case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
+                case clsCustomSICList.CustomSICScanTypeConstants.Relative:
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Relative Scan Number (0 to 1)", 170);
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
                     break;
 
-                case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
+                case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Acq time (minutes)", 110);
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Time Tolerance", 90);
                     timeTolerance = true;
                     break;
 
                 default:
-                    // Includes eCustomSICScanTypeConstants.Absolute
+                    // Includes CustomSICScanTypeConstants.Absolute
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_CENTER, "Scan Number", 90);
                     DataGridUtils.AppendColumnToTableStyle(tsCustomSICValues, COL_NAME_SCAN_TOLERANCE, "Scan Tolerance", 90);
                     break;
@@ -1991,7 +1991,7 @@ namespace MASIC
                 // ' sicOptions.UseSICStatsFromLargestPeak = chkUseSICStatsFromLargestPeak.Checked
 
                 // Peak Finding Options
-                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)cboSICNoiseThresholdMode.SelectedIndex;
+                peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes)cboSICNoiseThresholdMode.SelectedIndex;
                 peakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtSICNoiseThresholdIntensity, lblSICNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
                     return false;
@@ -2030,7 +2030,7 @@ namespace MASIC
                 peakFinderOptions.SmoothDataRegardlessOfMinimumPeakWidth = chkSmoothDataRegardlessOfMinimumPeakWidth.Checked;
 
                 // Mass Spectra Noise Threshold Options
-                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)cboMassSpectraNoiseThresholdMode.SelectedIndex;
+                peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode = (MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes)cboMassSpectraNoiseThresholdMode.SelectedIndex;
                 peakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = TextBoxUtils.ParseTextBoxValueFloat(txtMassSpectraNoiseThresholdIntensity, lblMassSpectraNoiseThresholdIntensity.Text + " must be a value", out parseError);
                 if (parseError)
                     return false;
@@ -2136,23 +2136,23 @@ namespace MASIC
                     }
                 }
 
-                clsCustomSICList.eCustomSICScanTypeConstants scanType;
+                clsCustomSICList.CustomSICScanTypeConstants scanType;
                 if (optCustomSICScanToleranceAbsolute.Checked)
                 {
-                    scanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
+                    scanType = clsCustomSICList.CustomSICScanTypeConstants.Absolute;
                 }
                 else if (optCustomSICScanToleranceRelative.Checked)
                 {
-                    scanType = clsCustomSICList.eCustomSICScanTypeConstants.Relative;
+                    scanType = clsCustomSICList.CustomSICScanTypeConstants.Relative;
                 }
                 else if (optCustomSICScanToleranceAcqTime.Checked)
                 {
-                    scanType = clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime;
+                    scanType = clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
                 }
                 else
                 {
                     // Assume absolute
-                    scanType = clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
+                    scanType = clsCustomSICList.CustomSICScanTypeConstants.Absolute;
                 }
 
                 var scanOrAcqTimeTolerance = TextBoxUtils.ParseTextBoxValueFloat(txtCustomSICScanOrAcqTimeTolerance, lblCustomSICScanTolerance.Text + " must be a value", out parseError);
@@ -2171,10 +2171,10 @@ namespace MASIC
 
         private bool ValidateSettings(clsMASIC masicInstance)
         {
-            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.CustomOrNone)
+            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.CustomOrNone)
                 return true;
 
-            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZHighRes)
+            if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZHighRes)
             {
                 // Make sure the tolerance is less than 0.03 Da; if not, warn the user
                 if (masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault > 0.03)
@@ -2194,7 +2194,7 @@ namespace MASIC
                     }
                 }
             }
-            else if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.eReporterIonMassModeConstants.ITraqEightMZLowRes)
+            else if (masicInstance.Options.ReporterIons.ReporterIonMassMode == clsReporterIons.ReporterIonMassModeConstants.ITraqEightMZLowRes)
             {
                 // Make sure the tolerance is at least 0.1 Da; if not, warn the user
                 if (masicInstance.Options.ReporterIons.ReporterIonToleranceDaDefault < 0.1)

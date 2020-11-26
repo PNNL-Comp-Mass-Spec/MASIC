@@ -28,7 +28,7 @@ namespace MASIC
         /// </summary>
         public event UpdateErrorCodeEventEventHandler UpdateErrorCodeEvent;
 
-        public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
+        public delegate void UpdateErrorCodeEventEventHandler(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged);
 
         #endregion
 
@@ -42,7 +42,7 @@ namespace MASIC
             UpdateBaseClassErrorCodeEvent?.Invoke(eNewErrorCode);
         }
 
-        private void OnUpdateErrorCode(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged)
+        private void OnUpdateErrorCode(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged)
         {
             UpdateErrorCodeEvent?.Invoke(eNewErrorCode, leaveExistingErrorCodeUnchanged);
         }
@@ -62,9 +62,9 @@ namespace MASIC
         }
 
         protected void ReportError(string message,
-                                   clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+                                   clsMASIC.MasicErrorCodes eNewErrorCode = clsMASIC.MasicErrorCodes.NoError)
         {
-            if (eNewErrorCode != clsMASIC.eMasicErrorCodes.NoError)
+            if (eNewErrorCode != clsMASIC.MasicErrorCodes.NoError)
             {
                 OnUpdateErrorCode(eNewErrorCode, false);
             }
@@ -74,9 +74,9 @@ namespace MASIC
 
         protected void ReportError(string message,
                                    Exception ex,
-                                   clsMASIC.eMasicErrorCodes eNewErrorCode = clsMASIC.eMasicErrorCodes.NoError)
+                                   clsMASIC.MasicErrorCodes eNewErrorCode = clsMASIC.MasicErrorCodes.NoError)
         {
-            if (eNewErrorCode != clsMASIC.eMasicErrorCodes.NoError)
+            if (eNewErrorCode != clsMASIC.MasicErrorCodes.NoError)
             {
                 OnUpdateErrorCode(eNewErrorCode, false);
             }
@@ -94,7 +94,7 @@ namespace MASIC
             OnUpdateBaseClassErrorCode(eNewErrorCode);
         }
 
-        protected void SetLocalErrorCode(clsMASIC.eMasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged = false)
+        protected void SetLocalErrorCode(clsMASIC.MasicErrorCodes eNewErrorCode, bool leaveExistingErrorCodeUnchanged = false)
         {
             OnUpdateErrorCode(eNewErrorCode, leaveExistingErrorCodeUnchanged);
         }
@@ -136,7 +136,7 @@ namespace MASIC
             SetBaseClassErrorCode(eErrorCode);
         }
 
-        private void UpdateErrorCodeEventHandler(clsMASIC.eMasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
+        private void UpdateErrorCodeEventHandler(clsMASIC.MasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
         {
             SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
         }

@@ -44,7 +44,7 @@ namespace MASIC
         {
             mFileDate = "November 25, 2020";
 
-            LocalErrorCode = eMasicErrorCodes.NoError;
+            LocalErrorCode = MasicErrorCodes.NoError;
             StatusMessage = string.Empty;
 
             mProcessingStats = new clsProcessingStats();
@@ -60,10 +60,14 @@ namespace MASIC
 
         #region "Constants and Enums"
 
-        // Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
+        /// <summary>
+        /// Enabling this will result in SICs with less noise, which will hurt noise determination after finding the SICs
+        /// </summary>
         public const bool DISCARD_LOW_INTENSITY_MS_DATA_ON_LOAD = false;
 
-        // Disabling this will slow down the correlation process (slightly)
+        /// <summary>
+        /// Disabling this will slow down the correlation process (slightly)
+        /// </summary>
         public const bool DISCARD_LOW_INTENSITY_MSMS_DATA_ON_LOAD = true;
 
         private const int MINIMUM_STATUS_FILE_UPDATE_INTERVAL_SECONDS = 3;
@@ -71,7 +75,7 @@ namespace MASIC
         /// <summary>
         /// Processing steps
         /// </summary>
-        public enum eProcessingStepConstants
+        public enum ProcessingStepConstants
         {
             NewTask = 0,
             ReadDataFile = 1,
@@ -90,7 +94,7 @@ namespace MASIC
         /// <summary>
         /// MASIC Error Codes
         /// </summary>
-        public enum eMasicErrorCodes
+        public enum MasicErrorCodes
         {
             NoError = 0,
             InvalidDatasetLookupFilePath = 1,
@@ -179,7 +183,7 @@ namespace MASIC
         /// <summary>
         /// Local error code
         /// </summary>
-        public eMasicErrorCodes LocalErrorCode { get; private set; }
+        public MasicErrorCodes LocalErrorCode { get; private set; }
 
         public string MASICPeakFinderDllVersion
         {
@@ -219,7 +223,7 @@ namespace MASIC
         /// <summary>
         /// Current processing step
         /// </summary>
-        public eProcessingStepConstants ProcessStep { get; private set; }
+        public ProcessingStepConstants ProcessStep { get; private set; }
 
         /// <summary>
         /// Status message
@@ -880,7 +884,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                LogErrors("CreateExampleParameterFile", "Error creating an example parameter file", ex, eMasicErrorCodes.OutputFileWriteError);
+                LogErrors("CreateExampleParameterFile", "Error creating an example parameter file", ex, MasicErrorCodes.OutputFileWriteError);
             }
         }
 
@@ -928,14 +932,14 @@ namespace MASIC
                 var success = statsPlotter.ProcessFile(sicStatsFile.FullName, outputDirectoryPath);
                 if (!success)
                 {
-                    SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                    SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
                 }
 
                 return success;
             }
             catch (Exception ex)
             {
-                LogErrors("CreatePlots", "Error summarizing stats and creating plots", ex, eMasicErrorCodes.OutputFileWriteError);
+                LogErrors("CreatePlots", "Error summarizing stats and creating plots", ex, MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
         }
@@ -965,7 +969,7 @@ namespace MASIC
                 // Save the BPIs and TICs
                 // ---------------------------------------------------------
 
-                UpdateProcessingStep(eProcessingStepConstants.SaveBPI);
+                UpdateProcessingStep(ProcessingStepConstants.SaveBPI);
                 UpdateOverallProgress("Processing Data for " + inputFileName);
                 SetSubtaskProcessingStepPct(0, "Saving chromatograms to disk");
                 UpdatePeakMemoryUsage();
@@ -1029,7 +1033,7 @@ namespace MASIC
                     // Save Extended Scan Stats Files
                     // ---------------------------------------------------------
 
-                    UpdateProcessingStep(eProcessingStepConstants.SaveExtendedScanStatsFiles);
+                    UpdateProcessingStep(ProcessingStepConstants.SaveExtendedScanStatsFiles);
                     SetSubtaskProcessingStepPct(0);
                     UpdatePeakMemoryUsage();
 
@@ -1039,7 +1043,7 @@ namespace MASIC
 
                     if (!extendedStatsWritten)
                     {
-                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
+                        SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError, true);
                         return false;
                     }
                 }
@@ -1048,7 +1052,7 @@ namespace MASIC
                 // Save SIC Stats Flat File
                 // ---------------------------------------------------------
 
-                UpdateProcessingStep(eProcessingStepConstants.SaveSICStatsFlatFile);
+                UpdateProcessingStep(ProcessingStepConstants.SaveSICStatsFlatFile);
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
 
@@ -1063,7 +1067,7 @@ namespace MASIC
 
                     if (!sicStatsWritten)
                     {
-                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError, true);
+                        SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError, true);
                         return false;
                     }
 
@@ -1074,7 +1078,7 @@ namespace MASIC
                     sicStatsFilePath = string.Empty;
                 }
 
-                UpdateProcessingStep(eProcessingStepConstants.CloseOpenFileHandles);
+                UpdateProcessingStep(ProcessingStepConstants.CloseOpenFileHandles);
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
 
@@ -1112,7 +1116,7 @@ namespace MASIC
                     // Optimal peak apex scan numbers updated
                     // ---------------------------------------------------------
 
-                    UpdateProcessingStep(eProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues);
+                    UpdateProcessingStep(ProcessingStepConstants.UpdateXMLFileWithNewOptimalPeakApexValues);
                     SetSubtaskProcessingStepPct(0);
                     UpdatePeakMemoryUsage();
 
@@ -1125,7 +1129,7 @@ namespace MASIC
                     return true;
                 }
 
-                UpdateProcessingStep(eProcessingStepConstants.CreatePlots);
+                UpdateProcessingStep(ProcessingStepConstants.CreatePlots);
                 SetSubtaskProcessingStepPct(0);
                 UpdateOverallProgress("Creating plots in " + outputDirectoryPath);
 
@@ -1134,7 +1138,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                LogErrors("FindSICsAndWriteOutput", "Error saving results to: " + outputDirectoryPath, ex, eMasicErrorCodes.OutputFileWriteError);
+                LogErrors("FindSICsAndWriteOutput", "Error saving results to: " + outputDirectoryPath, ex, MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
         }
@@ -1202,7 +1206,7 @@ namespace MASIC
                     var sicDetailsFileCreated = dataOutputHandler.InitializeSICDetailsTextFile(inputFilePathFull, outputDirectoryPath);
                     if (!sicDetailsFileCreated)
                     {
-                        SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                        SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
                         return false;
                     }
                 }
@@ -1214,7 +1218,7 @@ namespace MASIC
                     spectraCache, Options.SICOptions, Options.BinningOptions);
                 if (!xmlWriterInitialized)
                 {
-                    SetLocalErrorCode(eMasicErrorCodes.OutputFileWriteError);
+                    SetLocalErrorCode(MasicErrorCodes.OutputFileWriteError);
                     return false;
                 }
 
@@ -1223,7 +1227,7 @@ namespace MASIC
                 // For each one, find the peaks and make an entry to the XML output file
                 // ---------------------------------------------------------
 
-                UpdateProcessingStep(eProcessingStepConstants.CreateSICsAndFindPeaks);
+                UpdateProcessingStep(ProcessingStepConstants.CreateSICsAndFindPeaks);
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
 
@@ -1236,7 +1240,7 @@ namespace MASIC
 
                 if (!parentIonSICsCreated)
                 {
-                    SetLocalErrorCode(eMasicErrorCodes.CreateSICsError, true);
+                    SetLocalErrorCode(MasicErrorCodes.CreateSICsError, true);
                     return false;
                 }
             }
@@ -1247,7 +1251,7 @@ namespace MASIC
                 // Find Similar Parent Ions
                 // ---------------------------------------------------------
 
-                UpdateProcessingStep(eProcessingStepConstants.FindSimilarParentIons);
+                UpdateProcessingStep(ProcessingStepConstants.FindSimilarParentIons);
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
 
@@ -1257,7 +1261,7 @@ namespace MASIC
 
                 if (!foundSimilarParentIons)
                 {
-                    SetLocalErrorCode(eMasicErrorCodes.FindSimilarParentIonsError, true);
+                    SetLocalErrorCode(MasicErrorCodes.FindSimilarParentIonsError, true);
                     return false;
                 }
             }
@@ -1287,62 +1291,62 @@ namespace MASIC
             {
                 switch (LocalErrorCode)
                 {
-                    case eMasicErrorCodes.NoError:
+                    case MasicErrorCodes.NoError:
                         errorMessage = string.Empty;
                         break;
-                    case eMasicErrorCodes.InvalidDatasetLookupFilePath:
+                    case MasicErrorCodes.InvalidDatasetLookupFilePath:
                         errorMessage = "Invalid dataset lookup file path";
                         break;
-                    case eMasicErrorCodes.UnknownFileExtension:
+                    case MasicErrorCodes.UnknownFileExtension:
                         errorMessage = "Unknown file extension";
                         break;
-                    case eMasicErrorCodes.InputFileAccessError:
+                    case MasicErrorCodes.InputFileAccessError:
                         errorMessage = "Input file access error";
                         break;
-                    case eMasicErrorCodes.InvalidDatasetID:
+                    case MasicErrorCodes.InvalidDatasetID:
                         errorMessage = "Invalid dataset number";
                         break;
-                    case eMasicErrorCodes.CreateSICsError:
+                    case MasicErrorCodes.CreateSICsError:
                         // ReSharper disable once StringLiteralTypo
                         errorMessage = "Create SIC's error";
                         break;
-                    case eMasicErrorCodes.FindSICPeaksError:
+                    case MasicErrorCodes.FindSICPeaksError:
                         errorMessage = "Error finding SIC peaks";
                         break;
-                    case eMasicErrorCodes.InvalidCustomSICValues:
+                    case MasicErrorCodes.InvalidCustomSICValues:
                         errorMessage = "Invalid custom SIC values";
                         break;
-                    case eMasicErrorCodes.NoParentIonsFoundInInputFile:
+                    case MasicErrorCodes.NoParentIonsFoundInInputFile:
                         errorMessage = "No parent ions were found in the input file (additionally, no custom SIC values were defined)";
                         break;
-                    case eMasicErrorCodes.NoSurveyScansFoundInInputFile:
+                    case MasicErrorCodes.NoSurveyScansFoundInInputFile:
                         errorMessage = "No survey scans were found in the input file (do you have a Scan Range filter defined?)";
                         break;
-                    case eMasicErrorCodes.FindSimilarParentIonsError:
+                    case MasicErrorCodes.FindSimilarParentIonsError:
                         errorMessage = "Find similar parent ions error";
                         break;
-                    case eMasicErrorCodes.InputFileDataReadError:
+                    case MasicErrorCodes.InputFileDataReadError:
                         errorMessage = "Error reading data from input file";
                         break;
-                    case eMasicErrorCodes.OutputFileWriteError:
+                    case MasicErrorCodes.OutputFileWriteError:
                         errorMessage = "Error writing data to output file";
                         break;
-                    case eMasicErrorCodes.FileIOPermissionsError:
+                    case MasicErrorCodes.FileIOPermissionsError:
                         errorMessage = "File IO Permissions Error";
                         break;
-                    case eMasicErrorCodes.ErrorCreatingSpectrumCacheDirectory:
+                    case MasicErrorCodes.ErrorCreatingSpectrumCacheDirectory:
                         errorMessage = "Error creating spectrum cache directory";
                         break;
-                    case eMasicErrorCodes.ErrorCachingSpectrum:
+                    case MasicErrorCodes.ErrorCachingSpectrum:
                         errorMessage = "Error caching spectrum";
                         break;
-                    case eMasicErrorCodes.ErrorUncachingSpectrum:
+                    case MasicErrorCodes.ErrorUncachingSpectrum:
                         errorMessage = "Error uncaching spectrum";
                         break;
-                    case eMasicErrorCodes.ErrorDeletingCachedSpectrumFiles:
+                    case MasicErrorCodes.ErrorDeletingCachedSpectrumFiles:
                         errorMessage = "Error deleting cached spectrum files";
                         break;
-                    case eMasicErrorCodes.UnspecifiedError:
+                    case MasicErrorCodes.UnspecifiedError:
                         errorMessage = "Unspecified localized error";
                         break;
                     default:
@@ -1442,7 +1446,7 @@ namespace MASIC
                 // Read the mass spectra from the input data file
                 // ---------------------------------------------------------
 
-                UpdateProcessingStep(eProcessingStepConstants.ReadDataFile);
+                UpdateProcessingStep(ProcessingStepConstants.ReadDataFile);
                 SetSubtaskProcessingStepPct(0);
                 UpdatePeakMemoryUsage();
                 StatusMessage = string.Empty;
@@ -1541,7 +1545,7 @@ namespace MASIC
 
                     default:
                         StatusMessage = "Unknown file extension: " + Path.GetExtension(inputFilePath);
-                        SetLocalErrorCode(eMasicErrorCodes.UnknownFileExtension);
+                        SetLocalErrorCode(MasicErrorCodes.UnknownFileExtension);
                         success = false;
 
                         // Instantiate this object to avoid a warning below about the object potentially not being initialized
@@ -1553,18 +1557,18 @@ namespace MASIC
 
                 if (!success)
                 {
-                    if (LocalErrorCode == eMasicErrorCodes.NoParentIonsFoundInInputFile && string.IsNullOrWhiteSpace(StatusMessage))
+                    if (LocalErrorCode == MasicErrorCodes.NoParentIonsFoundInInputFile && string.IsNullOrWhiteSpace(StatusMessage))
                     {
                         StatusMessage = "None of the spectra in the input file was within the specified scan number and/or scan time range";
                     }
 
-                    SetLocalErrorCode(eMasicErrorCodes.InputFileAccessError, true);
+                    SetLocalErrorCode(MasicErrorCodes.InputFileAccessError, true);
                 }
             }
             catch (Exception ex)
             {
                 success = false;
-                LogErrors("LoadData", "Error accessing input data file: " + inputFilePath, ex, eMasicErrorCodes.InputFileDataReadError);
+                LogErrors("LoadData", "Error accessing input data file: " + inputFilePath, ex, MasicErrorCodes.InputFileDataReadError);
                 dataImporterBase = null;
             }
 
@@ -1592,7 +1596,7 @@ namespace MASIC
             string source,
             string message,
             Exception ex,
-            eMasicErrorCodes newErrorCode = eMasicErrorCodes.NoError)
+            MasicErrorCodes newErrorCode = MasicErrorCodes.NoError)
         {
             Options.StatusMessage = message;
 
@@ -1617,7 +1621,7 @@ namespace MASIC
                 Console.WriteLine(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
             }
 
-            if (newErrorCode != eMasicErrorCodes.NoError)
+            if (newErrorCode != MasicErrorCodes.NoError)
             {
                 SetLocalErrorCode(newErrorCode, true);
             }
@@ -1648,13 +1652,13 @@ namespace MASIC
 
             if (resetErrorCode)
             {
-                SetLocalErrorCode(eMasicErrorCodes.NoError);
+                SetLocalErrorCode(MasicErrorCodes.NoError);
             }
 
             Options.OutputDirectoryPath = outputDirectoryPath;
 
             SubtaskProgressPercentComplete = 0;
-            UpdateProcessingStep(eProcessingStepConstants.NewTask, true);
+            UpdateProcessingStep(ProcessingStepConstants.NewTask, true);
             ResetProgress("Starting calculations");
 
             StatusMessage = string.Empty;
@@ -1673,7 +1677,7 @@ namespace MASIC
                     SetBaseClassErrorCode(ProcessFilesErrorCodes.InvalidParameterFile);
                 }
 
-                UpdateProcessingStep(eProcessingStepConstants.Cancelled, true);
+                UpdateProcessingStep(ProcessingStepConstants.Cancelled, true);
 
                 LogMessage("Processing ended in error");
                 return false;
@@ -1702,7 +1706,7 @@ namespace MASIC
                     success = sicListReader.LoadCustomSICListFromFile(Options.CustomSICList.CustomSICListFileName);
                     if (!success)
                     {
-                        SetLocalErrorCode(eMasicErrorCodes.InvalidCustomSICValues);
+                        SetLocalErrorCode(MasicErrorCodes.InvalidCustomSICValues);
                         keepProcessing = false;
                     }
                 }
@@ -1735,12 +1739,12 @@ namespace MASIC
 
                         Options.SICOptions.DatasetID = dbAccessor.LookupDatasetID(inputFilePath, Options.DatasetLookupFilePath, Options.SICOptions.DatasetID);
 
-                        if (LocalErrorCode != eMasicErrorCodes.NoError)
+                        if (LocalErrorCode != MasicErrorCodes.NoError)
                         {
-                            if (LocalErrorCode == eMasicErrorCodes.InvalidDatasetID || LocalErrorCode == eMasicErrorCodes.InvalidDatasetLookupFilePath)
+                            if (LocalErrorCode == MasicErrorCodes.InvalidDatasetID || LocalErrorCode == MasicErrorCodes.InvalidDatasetLookupFilePath)
                             {
                                 // Ignore this error
-                                SetLocalErrorCode(eMasicErrorCodes.NoError);
+                                SetLocalErrorCode(MasicErrorCodes.NoError);
                             }
                             else
                             {
@@ -1751,7 +1755,7 @@ namespace MASIC
 
                     if (!success)
                     {
-                        if (LocalErrorCode == eMasicErrorCodes.NoError)
+                        if (LocalErrorCode == MasicErrorCodes.NoError)
                             SetBaseClassErrorCode(ProcessFilesErrorCodes.FilePathError);
                         keepProcessing = false;
                     }
@@ -1790,12 +1794,12 @@ namespace MASIC
                     catch (Exception ex)
                     {
                         success = false;
-                        LogErrors("ProcessFile", "The current user does not have write permission for the output directory: " + outputDirectoryPath, ex, eMasicErrorCodes.FileIOPermissionsError);
+                        LogErrors("ProcessFile", "The current user does not have write permission for the output directory: " + outputDirectoryPath, ex, MasicErrorCodes.FileIOPermissionsError);
                     }
 
                     if (!success)
                     {
-                        SetLocalErrorCode(eMasicErrorCodes.FileIOPermissionsError);
+                        SetLocalErrorCode(MasicErrorCodes.FileIOPermissionsError);
                     }
                     else
                     {
@@ -1819,7 +1823,7 @@ namespace MASIC
             catch (Exception ex)
             {
                 success = false;
-                LogErrors("ProcessFile", "Error in ProcessFile", ex, eMasicErrorCodes.UnspecifiedError);
+                LogErrors("ProcessFile", "Error in ProcessFile", ex, MasicErrorCodes.UnspecifiedError);
             }
             finally
             {
@@ -1853,7 +1857,7 @@ namespace MASIC
                     StatusMessage = "Processing complete.  Results can be found in directory: " + outputDirectoryPath;
                     ShowMessage(StatusMessage);
                 }
-                else if (LocalErrorCode == eMasicErrorCodes.NoError)
+                else if (LocalErrorCode == MasicErrorCodes.NoError)
                 {
                     StatusMessage = "Error Code " + ErrorCode + ": " + GetErrorMessage();
                     ShowErrorMessage(StatusMessage);
@@ -1890,7 +1894,7 @@ namespace MASIC
             catch (Exception ex)
             {
                 success = false;
-                LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, eMasicErrorCodes.UnspecifiedError);
+                LogErrors("ProcessFile", "Error in ProcessFile (Cleanup)", ex, MasicErrorCodes.UnspecifiedError);
             }
 
             if (success)
@@ -1900,11 +1904,11 @@ namespace MASIC
 
             if (success)
             {
-                UpdateProcessingStep(eProcessingStepConstants.Complete, true);
+                UpdateProcessingStep(ProcessingStepConstants.Complete, true);
             }
             else
             {
-                UpdateProcessingStep(eProcessingStepConstants.Cancelled, true);
+                UpdateProcessingStep(ProcessingStepConstants.Cancelled, true);
             }
 
             return success;
@@ -1940,7 +1944,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                LogErrors("ProcessInstrumentDataFile", "Error checking for existing results file", ex, eMasicErrorCodes.InputFileDataReadError);
+                LogErrors("ProcessInstrumentDataFile", "Error checking for existing results file", ex, MasicErrorCodes.InputFileDataReadError);
                 existingResultsFound = false;
                 return false;
             }
@@ -2016,7 +2020,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                LogErrors("ProcessInstrumentDataFile", "Error processing", ex, eMasicErrorCodes.InputFileDataReadError);
+                LogErrors("ProcessInstrumentDataFile", "Error processing", ex, MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }
@@ -2092,7 +2096,7 @@ namespace MASIC
                     var scanIndexObserved = parentIon.SurveyScanIndex;
 
                     var sicStats = parentIon.SICStats;
-                    sicStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.SurveyScan;
+                    sicStats.ScanTypeForPeakIndices = clsScanList.ScanTypeConstants.SurveyScan;
                     sicStats.PeakScanIndexStart = scanIndexObserved;
                     sicStats.PeakScanIndexEnd = scanIndexObserved;
                     sicStats.PeakScanIndexMax = scanIndexObserved;
@@ -2104,9 +2108,9 @@ namespace MASIC
             }
         }
 
-        private void SetLocalErrorCode(eMasicErrorCodes newErrorCode, bool leaveExistingErrorCodeUnchanged = false)
+        private void SetLocalErrorCode(MasicErrorCodes newErrorCode, bool leaveExistingErrorCodeUnchanged = false)
         {
-            if (leaveExistingErrorCodeUnchanged && LocalErrorCode != eMasicErrorCodes.NoError)
+            if (leaveExistingErrorCodeUnchanged && LocalErrorCode != MasicErrorCodes.NoError)
             {
                 // An error code is already defined; do not change it
             }
@@ -2114,7 +2118,7 @@ namespace MASIC
             {
                 LocalErrorCode = newErrorCode;
 
-                if (newErrorCode == eMasicErrorCodes.NoError)
+                if (newErrorCode == MasicErrorCodes.NoError)
                 {
                     if (ErrorCode == ProcessFilesErrorCodes.LocalizedError)
                     {
@@ -2195,7 +2199,7 @@ namespace MASIC
             // CloseOpenFileHandles = 7
             // UpdateXMLFileWithNewOptimalPeakApexValues = 8
             // CreatePlots = 9
-            // Cancelled = 99
+            // Canceled = 99
             // Complete = 100
 
             float[] weightingFactors;
@@ -2242,7 +2246,7 @@ namespace MASIC
             }
         }
 
-        private void UpdateProcessingStep(eProcessingStepConstants eNewProcessingStep, bool forceStatusFileUpdate = false)
+        private void UpdateProcessingStep(ProcessingStepConstants eNewProcessingStep, bool forceStatusFileUpdate = false)
         {
             ProcessStep = eNewProcessingStep;
             UpdateStatusFile(forceStatusFileUpdate);
@@ -2352,7 +2356,7 @@ namespace MASIC
             SetBaseClassErrorCode(eErrorCode);
         }
 
-        private void UpdateErrorCodeEventHandler(eMasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
+        private void UpdateErrorCodeEventHandler(MasicErrorCodes eErrorCode, bool leaveExistingErrorCodeUnchanged)
         {
             SetLocalErrorCode(eErrorCode, leaveExistingErrorCodeUnchanged);
         }

@@ -9,7 +9,7 @@ namespace MASIC
         /// <summary>
         /// Indicates the type of scans that the SICScanIndices() array points to. Will normally be "SurveyScan", but for MRM data will be "FragScan"
         /// </summary>
-        public clsScanList.eScanTypeConstants SICScanType;
+        public clsScanList.ScanTypeConstants SICScanType;
 
         public readonly List<clsSICDataPoint> SICData;
 
@@ -45,7 +45,7 @@ namespace MASIC
         public void Reset()
         {
             SICData.Clear();
-            SICScanType = clsScanList.eScanTypeConstants.SurveyScan;
+            SICScanType = clsScanList.ScanTypeConstants.SurveyScan;
         }
 
         public override string ToString()

@@ -230,7 +230,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error in ExtractScanInfoFromMzMLDataFile", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromMzMLDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }
@@ -251,7 +251,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error in ExtractScanInfoFromMzXMLDataFile", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromMzXMLDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }
@@ -273,7 +273,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error in ExtractScanInfoFromMzDataFile", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromMzDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }
@@ -326,7 +326,7 @@ namespace MASIC.DataInput
                 if (!xmlReader.OpenFile(inputFileFullPath))
                 {
                     ReportError("Error opening input data file: " + inputFileFullPath);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
@@ -397,7 +397,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error in ExtractScanInfoFromMSXMLDataFile", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromMSXMLDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 success = false;
             }
 
@@ -826,11 +826,11 @@ namespace MASIC.DataInput
                 if (!fileOpened)
                 {
                     ReportError("Error opening input data file: " + mzMLFile.FullName);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
-                ReportError("Error in ExtractScanInfoFromMzMLDataFile", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromMzMLDataFile", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }
@@ -986,7 +986,7 @@ namespace MASIC.DataInput
                 mLastNonZoomSurveyScanIndex = scanList.SurveyScans.Count - 1;
             }
 
-            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1);
+            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, scanList.SurveyScans.Count - 1);
             mLastSurveyScanIndexInMasterSeqOrder = scanList.MasterScanOrderCount - 1;
 
             double msDataResolution;
@@ -1062,7 +1062,7 @@ namespace MASIC.DataInput
                 }
             }
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID);
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.ScanTypeConstants.SurveyScan, scanInfo, sicOptions.DatasetID);
 
             return true;
         }
@@ -1167,7 +1167,7 @@ namespace MASIC.DataInput
                         }
                     }
 
-                    var mrmMassRange = new udtMRMMassRangeType()
+                    var mrmMassRange = new MRMMassRangeType()
                     {
                         StartMass = spectrumInfo.mzRangeStart,
                         EndMass = spectrumInfo.mzRangeEnd
@@ -1197,7 +1197,7 @@ namespace MASIC.DataInput
             scanList.FragScans.Add(scanInfo);
             var fragScanIndex = scanList.FragScans.Count - 1;
 
-            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, fragScanIndex);
+            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.FragScan, fragScanIndex);
 
             // Note: Even if keepRawSpectra = False, we still need to load the raw data so that we can compute the noise level for the spectrum
             var msDataResolution = mOptions.BinningOptions.BinSize / sicOptions.CompressToleranceDivisorForDa;
@@ -1212,7 +1212,7 @@ namespace MASIC.DataInput
                 msDataResolution,
                 mKeepRawSpectra && mKeepMSMSSpectra);
 
-            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.eScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID);
+            SaveScanStatEntry(dataOutputHandler.OutputFileHandles.ScanStats, clsScanList.ScanTypeConstants.FragScan, scanInfo, sicOptions.DatasetID);
 
             if (eMRMScanType == MRMScanTypeConstants.NotMRM)
             {

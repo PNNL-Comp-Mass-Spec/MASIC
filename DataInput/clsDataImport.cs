@@ -177,7 +177,7 @@ namespace MASIC.DataInput
             {
                 switch (noiseThresholdOptions.BaselineNoiseMode)
                 {
-                    case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.AbsoluteThreshold:
+                    case MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.AbsoluteThreshold:
                         if (noiseThresholdOptions.BaselineNoiseLevelAbsolute > 0)
                         {
                             ionCountNew = 0;
@@ -210,9 +210,9 @@ namespace MASIC.DataInput
                         }
 
                         break;
-                    case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByAbundance:
-                    case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMeanByCount:
-                    case MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes.TrimmedMedianByAbundance:
+                    case MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByAbundance:
+                    case MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMeanByCount:
+                    case MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes.TrimmedMedianByAbundance:
                         if (noiseThresholdOptions.MinimumSignalToNoiseRatio > 0)
                         {
                             ionCountNew = 0;
@@ -258,7 +258,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error discarding data below the noise threshold", ex, clsMASIC.eMasicErrorCodes.UnspecifiedError);
+                ReportError("Error discarding data below the noise threshold", ex, clsMASIC.MasicErrorCodes.UnspecifiedError);
             }
         }
 
@@ -363,7 +363,7 @@ namespace MASIC.DataInput
             }
             catch (Exception ex)
             {
-                ReportError("Error limiting the number of data points to " + maxIonCountToRetain, ex, clsMASIC.eMasicErrorCodes.UnspecifiedError);
+                ReportError("Error limiting the number of data points to " + maxIonCountToRetain, ex, clsMASIC.MasicErrorCodes.UnspecifiedError);
             }
         }
 
@@ -375,12 +375,12 @@ namespace MASIC.DataInput
                 if (mScansOutOfRange > 0)
                 {
                     ReportWarning("None of the spectra in the input file was within the specified scan number and/or scan time range: " + dataFile.FullName);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.NoParentIonsFoundInInputFile);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.NoParentIonsFoundInInputFile);
                 }
                 else
                 {
-                    ReportError("No scans found in the input file: " + dataFile.FullName, clsMASIC.eMasicErrorCodes.InputFileAccessError);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    ReportError("No scans found in the input file: " + dataFile.FullName, clsMASIC.MasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                 }
 
                 return false;
@@ -437,7 +437,7 @@ namespace MASIC.DataInput
 
         protected void SaveScanStatEntry(
             StreamWriter writer,
-            clsScanList.eScanTypeConstants eScanType,
+            clsScanList.ScanTypeConstants eScanType,
             clsScanInfo currentScan,
             int datasetID)
         {
@@ -448,7 +448,7 @@ namespace MASIC.DataInput
                 ScanNumber = currentScan.ScanNumber
             };
 
-            if (eScanType == clsScanList.eScanTypeConstants.SurveyScan)
+            if (eScanType == clsScanList.ScanTypeConstants.SurveyScan)
             {
                 scanStatsEntry.ScanType = 1;
                 scanStatsEntry.ScanTypeName = string.Copy(currentScan.ScanTypeName);

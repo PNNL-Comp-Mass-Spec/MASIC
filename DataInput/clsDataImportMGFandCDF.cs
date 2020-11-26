@@ -65,14 +65,14 @@ namespace MASIC.DataInput
                 if (!cdfReader.OpenMSCdfFile(cdfInputFilePathFull))
                 {
                     ReportError("Error opening input data file: " + cdfInputFilePathFull);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
                 if (!mgfReader.OpenFile(mgfInputFilePathFull))
                 {
                     ReportError("Error opening input data file: " + mgfInputFilePathFull);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
@@ -83,7 +83,7 @@ namespace MASIC.DataInput
                 {
                     // No scans found
                     ReportError("No scans found in the input file: " + cdfInputFilePathFull);
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileAccessError);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileAccessError);
                     return false;
                 }
 
@@ -117,7 +117,7 @@ namespace MASIC.DataInput
                     {
                         // Error reading CDF file
                         ReportError("Error obtaining data from CDF file: " + cdfInputFilePathFull);
-                        SetLocalErrorCode(clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                        SetLocalErrorCode(clsMASIC.MasicErrorCodes.InputFileDataReadError);
                         return false;
                     }
 
@@ -242,7 +242,7 @@ namespace MASIC.DataInput
                 // We can now initialize .MasterScanOrder()
                 var lastSurveyScanIndex = 0;
 
-                scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex);
+                scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, lastSurveyScanIndex);
 
                 var surveyScansRecorded = new SortedSet<int>()
                 {
@@ -345,12 +345,12 @@ namespace MASIC.DataInput
                         if (!surveyScansRecorded.Contains(lastSurveyScanIndex))
                         {
                             surveyScansRecorded.Add(lastSurveyScanIndex);
-                            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan,
+                            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan,
                                 lastSurveyScanIndex);
                         }
                     }
 
-                    scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.FragScan, scanList.FragScans.Count,
+                    scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.FragScan, scanList.FragScans.Count,
                         spectrumInfo.ScanNumber, (float)scanTime);
 
                     var newFragScan = new clsScanInfo
@@ -457,7 +457,7 @@ namespace MASIC.DataInput
                         {
                             surveyScansRecorded.Add(lastSurveyScanIndex);
 
-                            scanList.AddMasterScanEntry(clsScanList.eScanTypeConstants.SurveyScan, lastSurveyScanIndex);
+                            scanList.AddMasterScanEntry(clsScanList.ScanTypeConstants.SurveyScan, lastSurveyScanIndex);
                         }
                     }
                 }
@@ -471,7 +471,7 @@ namespace MASIC.DataInput
                     var eScanType = scanList.MasterScanOrder[scanIndex].ScanType;
                     clsScanInfo currentScan;
 
-                    if (eScanType == clsScanList.eScanTypeConstants.SurveyScan)
+                    if (eScanType == clsScanList.ScanTypeConstants.SurveyScan)
                     {
                         // Survey scan
                         currentScan = scanList.SurveyScans[scanList.MasterScanOrder[scanIndex].ScanIndexPointer];
@@ -495,7 +495,7 @@ namespace MASIC.DataInput
             catch (Exception ex)
             {
                 // ReSharper disable once StringLiteralTypo
-                ReportError("Error in ExtractScanInfoFromMGFandCDF", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in ExtractScanInfoFromMGFandCDF", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }
@@ -694,7 +694,7 @@ namespace MASIC.DataInput
             {
                 // Reorder .MasterScanOrder, .MasterScanNumList, and .MasterScanTimeList
 
-                var udtMasterScanOrderListCopy = new clsScanList.udtScanOrderPointerType[scanList.MasterScanOrder.Count];
+                var udtMasterScanOrderListCopy = new clsScanList.ScanOrderPointerType[scanList.MasterScanOrder.Count];
                 var masterScanTimeListCopy = new float[scanList.MasterScanOrder.Count];
 
                 Array.Copy(scanList.MasterScanOrder.ToArray(), udtMasterScanOrderListCopy, scanList.MasterScanOrderCount);

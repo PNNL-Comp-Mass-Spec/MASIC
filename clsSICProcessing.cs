@@ -144,7 +144,7 @@ namespace MASIC
                     return true;
                 }
 
-                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.NoParentIonsFoundInInputFile);
+                SetLocalErrorCode(clsMASIC.MasicErrorCodes.NoParentIonsFoundInInputFile);
                 return false;
             }
 
@@ -156,7 +156,7 @@ namespace MASIC
                     return true;
                 }
 
-                SetLocalErrorCode(clsMASIC.eMasicErrorCodes.NoSurveyScansFoundInInputFile);
+                SetLocalErrorCode(clsMASIC.MasicErrorCodes.NoSurveyScansFoundInInputFile);
                 return false;
             }
 
@@ -223,7 +223,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error creating Parent Ion SICs", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                ReportError("Error creating Parent Ion SICs", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                 return false;
             }
         }
@@ -291,7 +291,7 @@ namespace MASIC
                 }
                 else
                 {
-                    if (masicOptions.CustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Relative && customSICPeakScanOrAcqTimeTolerance > 10)
+                    if (masicOptions.CustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Relative && customSICPeakScanOrAcqTimeTolerance > 10)
                     {
                         // Relative scan time should only range from 0 to 1; we'll allow values up to 10
                         customSICPeakScanOrAcqTimeTolerance = 10;
@@ -332,7 +332,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error initializing SIC start/end indices", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                ReportError("Error initializing SIC start/end indices", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
             }
 
             if (scanIndexEnd >= scanIndexStart)
@@ -355,7 +355,7 @@ namespace MASIC
                 }
                 catch (Exception ex)
                 {
-                    ReportError("Error while creating initial SIC", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                    ReportError("Error while creating initial SIC", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                 }
 
                 // Now extend the SIC, stepping left and right until a threshold is reached
@@ -446,7 +446,7 @@ namespace MASIC
                     }
                     catch (Exception ex)
                     {
-                        ReportError("Error extending SIC to the left", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                        ReportError("Error extending SIC to the left", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                     }
 
                     try
@@ -523,7 +523,7 @@ namespace MASIC
                     }
                     catch (Exception ex)
                     {
-                        ReportError("Error extending SIC to the right", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                        ReportError("Error extending SIC to the right", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                     }
                 }    // While Not LeftDone and Not RightDone
             }
@@ -536,7 +536,7 @@ namespace MASIC
 
             if (scanIndexEnd < scanIndexStart)
             {
-                ReportError("Programming error: scanIndexEnd < scanIndexStart", clsMASIC.eMasicErrorCodes.FindSICPeaksError);
+                ReportError("Programming error: scanIndexEnd < scanIndexStart", clsMASIC.MasicErrorCodes.FindSICPeaksError);
                 scanIndexEnd = scanIndexStart;
             }
 
@@ -546,7 +546,7 @@ namespace MASIC
                 // Copy the intensity values from fullSICIntensities() to .SICData()
                 // Copy the mz values from fullSICMasses() to .SICMasses()
 
-                sicDetails.SICScanType = clsScanList.eScanTypeConstants.SurveyScan;
+                sicDetails.SICScanType = clsScanList.ScanTypeConstants.SurveyScan;
                 sicDetails.SICData.Clear();
 
                 sicPeak.IndexObserved = 0;
@@ -572,7 +572,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error populating .SICScanIndices, .SICData, and .SICMasses", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                ReportError("Error populating .SICScanIndices, .SICData, and .SICMasses", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
             }
 
             return sicPeak;
@@ -627,7 +627,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error reserving memory for the m/z chunks", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                ReportError("Error reserving memory for the m/z chunks", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                 return false;
             }
 
@@ -744,7 +744,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error processing the m/z chunks to create the SIC data", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                ReportError("Error processing the m/z chunks to create the SIC data", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                 return false;
             }
         }
@@ -828,7 +828,7 @@ namespace MASIC
 
                 if (!spectraCache.GetSpectrum(scanList.SurveyScans[surveyScanIndex].ScanNumber, out var spectrum, true))
                 {
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.ErrorUncachingSpectrum);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.ErrorUncachingSpectrum);
                     return false;
                 }
 
@@ -924,7 +924,7 @@ namespace MASIC
 
                 if (!success)
                 {
-                    SetLocalErrorCode(clsMASIC.eMasicErrorCodes.FindSICPeaksError, true);
+                    SetLocalErrorCode(clsMASIC.MasicErrorCodes.FindSICPeaksError, true);
                     return false;
                 }
 
@@ -942,7 +942,7 @@ namespace MASIC
                 // Initialize sicDetails
                 var sicDetails = new clsSICDetails()
                 {
-                    SICScanType = clsScanList.eScanTypeConstants.SurveyScan
+                    SICScanType = clsScanList.ScanTypeConstants.SurveyScan
                 };
 
                 // Populate sicDetails using the data centered around the highest intensity in fullSICIntensities
@@ -1004,7 +1004,7 @@ namespace MASIC
                     if (scanIndexObservedInFullSIC == -1)
                     {
                         // Match wasn't found; this is unexpected
-                        ReportError("Programming error: survey scan index not found in fullSICScanIndices()", clsMASIC.eMasicErrorCodes.FindSICPeaksError);
+                        ReportError("Programming error: survey scan index not found in fullSICScanIndices()", clsMASIC.MasicErrorCodes.FindSICPeaksError);
                         scanIndexObservedInFullSIC = 0;
                     }
 
@@ -1084,7 +1084,7 @@ namespace MASIC
                 }
                 catch (Exception ex)
                 {
-                    ReportError("Error updating progress", ex, clsMASIC.eMasicErrorCodes.CreateSICsError);
+                    ReportError("Error updating progress", ex, clsMASIC.MasicErrorCodes.CreateSICsError);
                 }
             }
 
@@ -1229,11 +1229,11 @@ namespace MASIC
                 sicStats.ScanTypeForPeakIndices = sicDetails.SICScanType;
                 if (processingMRMPeak)
                 {
-                    if (sicStats.ScanTypeForPeakIndices != clsScanList.eScanTypeConstants.FragScan)
+                    if (sicStats.ScanTypeForPeakIndices != clsScanList.ScanTypeConstants.FragScan)
                     {
                         // ScanType is not FragScan; this is unexpected
-                        ReportError("Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", clsMASIC.eMasicErrorCodes.FindSICPeaksError);
-                        sicStats.ScanTypeForPeakIndices = clsScanList.eScanTypeConstants.FragScan;
+                        ReportError("Programming error: udtSICDetails.SICScanType is not FragScan even though we're processing an MRM peak", clsMASIC.MasicErrorCodes.FindSICPeaksError);
+                        sicStats.ScanTypeForPeakIndices = clsScanList.ScanTypeConstants.FragScan;
                     }
                 }
 
@@ -1260,7 +1260,7 @@ namespace MASIC
                     if (sicStats.Peak.IndexObserved == -1)
                     {
                         // Match wasn't found; this is unexpected
-                        ReportError("Programming error: survey scan index not found in sicScanIndices", clsMASIC.eMasicErrorCodes.FindSICPeaksError);
+                        ReportError("Programming error: survey scan index not found in sicScanIndices", clsMASIC.MasicErrorCodes.FindSICPeaksError);
                         sicStats.Peak.IndexObserved = 0;
                     }
                 }
@@ -1337,7 +1337,7 @@ namespace MASIC
             }
             catch (Exception ex)
             {
-                ReportError("Error finding SIC peaks and their areas", ex, clsMASIC.eMasicErrorCodes.FindSICPeaksError);
+                ReportError("Error finding SIC peaks and their areas", ex, clsMASIC.MasicErrorCodes.FindSICPeaksError);
                 return false;
             }
         }

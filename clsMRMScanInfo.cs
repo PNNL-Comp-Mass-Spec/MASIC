@@ -14,7 +14,7 @@ namespace MASIC
         /// <summary>
         /// Daughter m/z values monitored for this parent m/z
         /// </summary>
-        public List<udtMRMMassRangeType> MRMMassList { get; set; }
+        public List<MRMMassRangeType> MRMMassList { get; set; }
 
         /// <summary>
         /// Number of spectra that used these MRM search values
@@ -28,7 +28,7 @@ namespace MASIC
         /// </summary>
         public clsMRMScanInfo()
         {
-            MRMMassList = new List<udtMRMMassRangeType>();
+            MRMMassList = new List<MRMMassRangeType>();
             ScanCount = 0;
         }
     }

@@ -117,9 +117,9 @@ namespace MASIC.DataOutput
                     return false;
 
                 // Initialize the StringBuilder objects
-                var sbIntensityDataList = new System.Text.StringBuilder();
-                var sbMassDataList = new System.Text.StringBuilder();
-                var sbPeakYDataSmoothed = new System.Text.StringBuilder();
+                var intensityDataList = new System.Text.StringBuilder();
+                var massDataList = new System.Text.StringBuilder();
+                var peakYDataSmoothed = new System.Text.StringBuilder();
 
                 var sicScanIndices = sicDetails.SICScanIndices;
 
@@ -180,7 +180,7 @@ namespace MASIC.DataOutput
                     lastGoodLoc = "sicStatsPeak = currentParentIon.SICStats.Peak";
                     var sicStatsPeak = currentParentIon.SICStats.Peak;
 
-                    if (sicDetails.SICScanType == clsScanList.eScanTypeConstants.FragScan)
+                    if (sicDetails.SICScanType == clsScanList.ScanTypeConstants.FragScan)
                     {
                         writer.WriteElementString("SICScanType", "FragScan");
                         writer.WriteElementString("PeakScanStart", scanList.FragScans[sicScanIndices[sicStatsPeak.IndexBaseLeft]].ScanNumber.ToString());
@@ -220,7 +220,7 @@ namespace MASIC.DataOutput
 
                     writer.WriteElementString("InterferenceScore", StringUtilities.ValueToString(interferenceScore, 4));
 
-                    if (sicDetails.SICScanType == clsScanList.eScanTypeConstants.FragScan)
+                    if (sicDetails.SICScanType == clsScanList.ScanTypeConstants.FragScan)
                     {
                         writer.WriteElementString("SICScanStart", scanList.FragScans[sicScanIndices[0]].ScanNumber.ToString());
                     }
@@ -306,12 +306,12 @@ namespace MASIC.DataOutput
                         // Save intensity and mass data lists as tab-delimited text list
 
                         var intensityDataListWritten = false;
-                        var massDataList = false;
+                        var massDataListWritten = false;
                         try
                         {
-                            lastGoodLoc = "Populate sbIntensityDataList";
-                            sbIntensityDataList.Length = 0;
-                            sbMassDataList.Length = 0;
+                            lastGoodLoc = "Populate intensityDataList";
+                            intensityDataList.Length = 0;
+                            massDataList.Length = 0;
 
                             if (sicDetails.SICDataCount > 0)
                             {
@@ -319,38 +319,38 @@ namespace MASIC.DataOutput
                                 {
                                     if (dataPoint.Intensity > 0)
                                     {
-                                        sbIntensityDataList.Append(StringUtilities.DblToString(dataPoint.Intensity, 1) + ",");
+                                        intensityDataList.Append(StringUtilities.DblToString(dataPoint.Intensity, 1) + ",");
                                     }
                                     else
                                     {
                                         // Do not output any number if the intensity is 0
-                                        sbIntensityDataList.Append(',');
+                                        intensityDataList.Append(',');
                                     }
 
                                     if (dataPoint.Mass > 0)
                                     {
-                                        sbMassDataList.Append(StringUtilities.DblToString(dataPoint.Mass, 3) + ",");
+                                        massDataList.Append(StringUtilities.DblToString(dataPoint.Mass, 3) + ",");
                                     }
                                     else
                                     {
                                         // Do not output any number if the mass is 0
-                                        sbMassDataList.Append(',');
+                                        massDataList.Append(',');
                                     }
                                 }
 
                                 // Trim the trailing comma
-                                if (sbIntensityDataList[sbIntensityDataList.Length - 1] == ',')
+                                if (intensityDataList[intensityDataList.Length - 1] == ',')
                                 {
-                                    sbIntensityDataList.Length--;
-                                    sbMassDataList.Length--;
+                                    intensityDataList.Length--;
+                                    massDataList.Length--;
                                 }
                             }
 
-                            writer.WriteElementString("IntensityDataList", sbIntensityDataList.ToString());
+                            writer.WriteElementString("IntensityDataList", intensityDataList.ToString());
                             intensityDataListWritten = true;
 
-                            writer.WriteElementString("MassDataList", sbMassDataList.ToString());
-                            massDataList = true;
+                            writer.WriteElementString("MassDataList", massDataList.ToString());
+                            massDataListWritten = true;
                         }
                         catch (OutOfMemoryException)
                         {
@@ -361,7 +361,7 @@ namespace MASIC.DataOutput
                                 writer.WriteElementString("IntensityDataList", string.Empty);
                             }
 
-                            if (!massDataList)
+                            if (!massDataListWritten)
                             {
                                 writer.WriteElementString("MassDataList", string.Empty);
                             }
@@ -371,19 +371,19 @@ namespace MASIC.DataOutput
                         {
                             try
                             {
-                                lastGoodLoc = "Populate sbPeakYDataSmoothed";
-                                sbPeakYDataSmoothed.Length = 0;
+                                lastGoodLoc = "Populate peakYDataSmoothed";
+                                peakYDataSmoothed.Length = 0;
 
                                 if (smoothedYDataSubset.Data != null && smoothedYDataSubset.DataCount > 0)
                                 {
                                     for (var index = 0; index < smoothedYDataSubset.DataCount; index++)
-                                        sbPeakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString(CultureInfo.InvariantCulture) + ",");
+                                        peakYDataSmoothed.Append(Math.Round(smoothedYDataSubset.Data[index]).ToString(CultureInfo.InvariantCulture) + ",");
 
                                     // Trim the trailing comma
-                                    sbPeakYDataSmoothed.Length--;
+                                    peakYDataSmoothed.Length--;
                                 }
 
-                                writer.WriteElementString("SmoothedYDataList", sbPeakYDataSmoothed.ToString());
+                                writer.WriteElementString("SmoothedYDataList", peakYDataSmoothed.ToString());
                             }
                             catch (OutOfMemoryException)
                             {
@@ -398,7 +398,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the XML data to the output file; Last good location: " + lastGoodLoc, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the XML data to the output file; Last good location: " + lastGoodLoc, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -481,7 +481,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error finalizing the XML output file", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error finalizing the XML output file", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -512,7 +512,7 @@ namespace MASIC.DataOutput
 
             try
             {
-                xmlOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.XMLFile);
+                xmlOutputFilePath = clsDataOutput.ConstructOutputFilePath(inputFilePathFull, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.XMLFile);
 
                 dataOutputHandler.OutputFileHandles.XMLFileForSICs = new XmlTextWriter(xmlOutputFilePath, System.Text.Encoding.UTF8);
                 var writer = dataOutputHandler.OutputFileHandles.XMLFileForSICs;
@@ -657,7 +657,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error initializing the XML output file: " + xmlOutputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error initializing the XML output file: " + xmlOutputFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -721,7 +721,7 @@ namespace MASIC.DataOutput
             const string OPTIMAL_PEAK_APEX_TAG_NAME = "OptimalPeakApexScanNumber";
             const string PEAK_APEX_OVERRIDE_PARENT_ION_TAG_NAME = "PeakApexOverrideParentIonIndex";
 
-            var xmlReadFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.eOutputFileTypeConstants.XMLFile);
+            var xmlReadFilePath = clsDataOutput.ConstructOutputFilePath(inputFileName, outputDirectoryPath, clsDataOutput.OutputFileTypeConstants.XMLFile);
 
             var xmlOutputFilePath = Path.Combine(outputDirectoryPath, "__temp__MASICOutputFile.xml");
 
@@ -829,7 +829,7 @@ namespace MASIC.DataOutput
                 }
                 catch (Exception ex)
                 {
-                    ReportError("Error renaming XML output file from temp name to: " + xmlReadFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                    ReportError("Error renaming XML output file from temp name to: " + xmlReadFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                     return false;
                 }
 
@@ -841,7 +841,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error updating the XML output file: " + xmlReadFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error updating the XML output file: " + xmlReadFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 

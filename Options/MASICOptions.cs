@@ -166,7 +166,7 @@ namespace MASIC.Options
             StatusLogKeyNameFilterList = new SortedSet<string>();
         }
 
-        public clsCustomSICList.eCustomSICScanTypeConstants GetScanToleranceTypeFromText(string scanType)
+        public clsCustomSICList.CustomSICScanTypeConstants GetScanToleranceTypeFromText(string scanType)
         {
             if (scanType == null)
                 scanType = string.Empty;
@@ -175,16 +175,16 @@ namespace MASIC.Options
 
             if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE, StringComparison.InvariantCultureIgnoreCase))
             {
-                return clsCustomSICList.eCustomSICScanTypeConstants.Relative;
+                return clsCustomSICList.CustomSICScanTypeConstants.Relative;
             }
 
             if (string.Equals(scanTypeTrimmed, clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME, StringComparison.InvariantCultureIgnoreCase))
             {
-                return clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime;
+                return clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime;
             }
 
             // Assume absolute
-            return clsCustomSICList.eCustomSICScanTypeConstants.Absolute;
+            return clsCustomSICList.CustomSICScanTypeConstants.Absolute;
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace MASIC.Options
                 // Pass False to .LoadSettings() here to turn off case sensitive matching
                 if (!reader.LoadSettings(parameterFilePath, false))
                 {
-                    ReportError("Error calling XmlSettingsFileAccessor.LoadSettings for " + parameterFilePath, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                    ReportError("Error calling XmlSettingsFileAccessor.LoadSettings for " + parameterFilePath, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                     return false;
                 }
 
@@ -406,7 +406,7 @@ namespace MASIC.Options
                     ReporterIons.ReporterIonStatsEnabled = reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonStatsEnabled", ReporterIons.ReporterIonStatsEnabled);
 
-                    var eReporterIonMassMode = (clsReporterIons.eReporterIonMassModeConstants)reader.GetParam(
+                    var eReporterIonMassMode = (clsReporterIons.ReporterIonMassModeConstants)reader.GetParam(
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonMassMode", (int)ReporterIons.ReporterIonMassMode);
 
                     ReporterIons.ReporterIonToleranceDaDefault = reader.GetParam(
@@ -416,7 +416,7 @@ namespace MASIC.Options
                         XML_SECTION_EXPORT_OPTIONS, "ReporterIonApplyAbundanceCorrection", ReporterIons.ReporterIonApplyAbundanceCorrection);
 
                     ReporterIons.ReporterIonITraq4PlexCorrectionFactorType =
-                        (clsITraqIntensityCorrection.eCorrectionFactorsiTRAQ4Plex)reader.GetParam(
+                        (clsITraqIntensityCorrection.CorrectionFactorsiTRAQ4Plex)reader.GetParam(
                             XML_SECTION_EXPORT_OPTIONS,
                             "ReporterIonITraq4PlexCorrectionFactorType",
                             (int)ReporterIons.ReporterIonITraq4PlexCorrectionFactorType);
@@ -542,7 +542,7 @@ namespace MASIC.Options
                     XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdMode", (int)SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode);
 
                 SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseMode =
-                    (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)sicNoiseThresholdMode;
+                    (MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes)sicNoiseThresholdMode;
 
                 SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute = reader.GetParam(
                     XML_SECTION_SIC_OPTIONS, "SICNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.SICBaselineNoiseOptions.BaselineNoiseLevelAbsolute);
@@ -595,7 +595,7 @@ namespace MASIC.Options
                     (int)SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode);
 
                 SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseMode =
-                    (MASICPeakFinder.clsMASICPeakFinder.eNoiseThresholdModes)massSpectraNoiseThresholdMode;
+                    (MASICPeakFinder.clsMASICPeakFinder.NoiseThresholdModes)massSpectraNoiseThresholdMode;
 
                 SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute = reader.GetParam(
                     XML_SECTION_SIC_OPTIONS, "MassSpectraNoiseThresholdIntensity", SICOptions.SICPeakFinderOptions.MassSpectraNoiseThresholdOptions.BaselineNoiseLevelAbsolute);
@@ -714,7 +714,7 @@ namespace MASIC.Options
 
                 if (scanTolerance.Length > 0 && clsUtilities.IsNumber(scanTolerance))
                 {
-                    if (CustomSICList.ScanToleranceType == clsCustomSICList.eCustomSICScanTypeConstants.Absolute)
+                    if (CustomSICList.ScanToleranceType == clsCustomSICList.CustomSICScanTypeConstants.Absolute)
                     {
                         CustomSICList.ScanOrAcqTimeTolerance = int.Parse(scanTolerance);
                     }
@@ -764,7 +764,7 @@ namespace MASIC.Options
             }
             catch (Exception ex)
             {
-                ReportError("Error in LoadParameterFileSettings", ex, clsMASIC.eMasicErrorCodes.InputFileDataReadError);
+                ReportError("Error in LoadParameterFileSettings", ex, clsMASIC.MasicErrorCodes.InputFileDataReadError);
                 return false;
             }
         }
@@ -1001,10 +1001,10 @@ namespace MASIC.Options
 
                 switch (CustomSICList.ScanToleranceType)
                 {
-                    case clsCustomSICList.eCustomSICScanTypeConstants.Relative:
+                    case clsCustomSICList.CustomSICScanTypeConstants.Relative:
                         writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_RELATIVE);
                         break;
-                    case clsCustomSICList.eCustomSICScanTypeConstants.AcquisitionTime:
+                    case clsCustomSICList.CustomSICScanTypeConstants.AcquisitionTime:
                         writer.SetParam(XML_SECTION_CUSTOM_SIC_VALUES, "ScanType", clsCustomSICList.CUSTOM_SIC_TYPE_ACQUISITION_TIME);
                         break;
                     default:
@@ -1021,7 +1021,7 @@ namespace MASIC.Options
             }
             catch (Exception ex)
             {
-                ReportError("Error in SaveParameterFileSettings", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error in SaveParameterFileSettings", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 

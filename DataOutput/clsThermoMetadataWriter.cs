@@ -25,7 +25,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error looking up InstMethod length in rawFileReader.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error looking up InstMethod length in rawFileReader.FileInfo", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -60,7 +60,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the MS Method to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the MS Method to: " + outputFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -87,7 +87,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error looking up TuneMethods length in rawFileReader.FileInfo", ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error looking up TuneMethods length in rawFileReader.FileInfo", ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
@@ -119,7 +119,7 @@ namespace MASIC.DataOutput
             }
             catch (Exception ex)
             {
-                ReportError("Error writing the MS Tune Settings to: " + outputFilePath, ex, clsMASIC.eMasicErrorCodes.OutputFileWriteError);
+                ReportError("Error writing the MS Tune Settings to: " + outputFilePath, ex, clsMASIC.MasicErrorCodes.OutputFileWriteError);
                 return false;
             }
 
