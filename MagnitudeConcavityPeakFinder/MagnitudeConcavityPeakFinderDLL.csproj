@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsNoiseLevelAnalyzer.cs" />
-    <Compile Include="clsPeak.cs" />
+    <Compile Include="clsPeakInfo.cs" />
     <Compile Include="clsPeakDataContainer.cs" />
     <Compile Include="clsPeakFinder.cs" />
     <Compile Include="clsPeakDetector.cs" />
